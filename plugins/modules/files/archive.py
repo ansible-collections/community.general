@@ -308,7 +308,7 @@ def main():
     changed = False
     state = 'absent'
 
-    exclusion_patterns = params['exclusion_patterns'] if params['exclusion_patterns'] is not None else []
+    exclusion_patterns = params['exclusion_patterns'] or []
 
     # Simple or archive file compression (inapplicable with 'zip' since it's always an archive)
     b_successes = []
