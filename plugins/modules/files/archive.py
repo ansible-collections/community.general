@@ -41,6 +41,7 @@ options:
   exclude_path:
     description:
       - Remote absolute path, glob, or list of paths or globs for the file or files to exclude from I(path) list and glob expansion.
+      - Use I(exclusion_patterns) to instead exclude files or subdirectories below any of the paths from the I(path) list.
     type: list
     elements: path
   exclusion_patterns:
@@ -226,7 +227,7 @@ def expand_paths(paths):
 
 
 def matches_exclusion_patterns(path, exclusion_patterns):
-    return any(map(lambda p: fnmatch(path, p), exclusion_patterns))
+    return any(fnmatch(path, p) for p in exclusion_patterns)
 
 
 def get_filter(exclusion_patterns, format):
@@ -262,7 +263,7 @@ def get_add_to_archive(format, filter):
         except Exception as e:
             return e
 
-        return ""
+        return None
 
     def add_to_tar_archive(archive_file, path, archive_name):
         try:
@@ -273,7 +274,7 @@ def get_add_to_archive(format, filter):
         except Exception as e:
             return e
 
-        return ""
+        return None
 
     return add_to_zip_archive if format == 'zip' else add_to_tar_archive
 
