@@ -10,36 +10,41 @@ __metaclass__ = type
 import re
 
 from ansible import context
-from ansible.playbook.play_context import PlayContext
-from ansible.plugins.loader import become_loader
+
+from .helper import call_become_plugin
 
 
 def test_sudosu(mocker, parser, reset_cli_args):
     options = parser.parse_args([])
     context._init_global_context(options)
-    play_context = PlayContext()
 
     default_cmd = "/bin/foo"
     default_exe = "/bin/bash"
     sudo_exe = 'sudo'
     sudo_flags = '-H -s -n'
 
-    cmd = play_context.make_become_cmd(cmd=default_cmd, executable=default_exe)
-    assert cmd == default_cmd
-
     success = 'BECOME-SUCCESS-.+?'
 
-    play_context.become = True
-    play_context.become_user = 'foo'
-    play_context.set_become_plugin(become_loader.get('community.general.sudosu'))
-    play_context.become_flags = sudo_flags
-    cmd = play_context.make_become_cmd(cmd=default_cmd, executable=default_exe)
-
-    assert (re.match("""%s %s  su -l %s %s -c 'echo %s; %s'""" % (sudo_exe, sudo_flags, play_context.become_user,
+    task = {
+        'become_user': 'foo',
+        'become_method': 'community.general.sudosu',
+        'become_flags': sudo_flags,
+    }
+    var_options = {}
+    cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
+    print(cmd)
+    assert (re.match("""%s %s  su -l %s %s -c 'echo %s; %s'""" % (sudo_exe, sudo_flags, task['become_user'],
                                                                   default_exe, success, default_cmd), cmd) is not None)
 
-    play_context.become_pass = 'testpass'
-    cmd = play_context.make_become_cmd(cmd=default_cmd, executable=default_exe)
+    task = {
+        'become_user': 'foo',
+        'become_method': 'community.general.sudosu',
+        'become_flags': sudo_flags,
+        'become_pass': 'testpass',
+    }
+    var_options = {}
+    cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
+    print(cmd)
     assert (re.match("""%s %s -p "%s" su -l %s %s -c 'echo %s; %s'""" % (sudo_exe, sudo_flags.replace('-n', ''),
-                                                                         r"\[sudo via ansible, key=.+?\] password:", play_context.become_user,
+                                                                         r"\[sudo via ansible, key=.+?\] password:", task['become_user'],
                                                                          default_exe, success, default_cmd), cmd) is not None)
