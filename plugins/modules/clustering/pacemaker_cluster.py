@@ -20,7 +20,7 @@ options:
     state:
       description:
         - Indicate desired state of the cluster
-      choices: [ cleanup, offline, online, restart ]
+      choices: [ cleanup, offline, online, restart, status ]
       required: yes
     node:
       description:
@@ -155,7 +155,7 @@ def set_node(module, state, timeout, force, node='all'):
 
 def main():
     argument_spec = dict(
-        state=dict(type='str', choices=['online', 'offline', 'restart', 'cleanup']),
+        state=dict(type='str', choices=['online', 'offline', 'restart', 'cleanup', 'status']),
         node=dict(type='str'),
         timeout=dict(type='int', default=300),
         force=dict(type='bool', default=True),
@@ -214,6 +214,10 @@ def main():
         cluster_state = get_cluster_status(module)
         module.exit_json(changed=True,
                          out=cluster_state)
+    
+    if state in ['status']:
+        cluster_state = get_cluster_status(module)
+        module.exit_json(changed=False, out=cluster_state)
 
 
 if __name__ == '__main__':
