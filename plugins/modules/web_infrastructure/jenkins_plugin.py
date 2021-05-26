@@ -696,7 +696,8 @@ class JenkinsPlugin(object):
         self._get_url_data(
             url,
             msg_status="Plugin not found. %s" % url,
-            msg_exception="%s has failed." % msg)
+            msg_exception="%s has failed." % msg,
+            method="POST")
 
 
 def main():
