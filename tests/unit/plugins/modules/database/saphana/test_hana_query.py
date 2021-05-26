@@ -23,6 +23,10 @@ def get_bin_path(*args, **kwargs):
     """Function to return path of hdbsql"""
     return "/usr/sap/HDB/HDB01/exe/hdbsql"
 
+def out(*args, **kwargs):
+    """Function to return path of hdbsql"""
+    return [[{"username": "testuser" }]]
+
 
 class Testhana_query(ModuleTestCase):
     """Main class for testing hana_query module."""
@@ -32,8 +36,10 @@ class Testhana_query(ModuleTestCase):
         super(Testhana_query, self).setUp()
         self.module = hana_query
         self.mock_get_bin_path = patch.object(basic.AnsibleModule, 'get_bin_path', get_bin_path)
+        self.mock_out = patch.object(basic.AnsibleModule, 'out', out)
         self.mock_get_bin_path.start()
-        self.addCleanup(self.mock_get_bin_path.stop)  # ensure that the patching is 'undone'
+        self.mock_out.start()
+        self.addCleanup(self.mock_get_bin_path.stop, self.mock_out.stop)  # ensure that the patching is 'undone'
 
     def tearDown(self):
         """Teardown."""
@@ -166,7 +172,7 @@ class Testhana_query(ModuleTestCase):
 >>>>>>> c004c054... extent test
         })
         with patch.object(basic.AnsibleModule, 'run_command') as run_command:
-            run_command.return_value = 0, '', ''  # successful execution, no output
+            run_command.return_value = 0, [[{"username": "testuser" }]], ''  # successful execution, no output
             with self.assertRaises(AnsibleExitJson) as result:
                 hana_query.main()
                 self.assertTrue(result.exception.args[0]['changed'])
