@@ -13,7 +13,7 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
     ModuleTestCase,
     set_module_args,
 )
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock
 from ansible.module_utils import basic
 
 
@@ -37,6 +37,9 @@ class Testhana_query(ModuleTestCase):
         """Teardown."""
         super(Testhana_query, self).tearDown()
 
+    def patch_hana_query(self, **kwds):
+        return patch('ansible_collections.community.general.plugins.modules.hana_query', autospec=True, **kwds)
+
     def test_without_required_parameters(self):
         """Failure must occurs when all parameters are missing."""
         with self.assertRaises(AnsibleFailJson):
@@ -44,7 +47,7 @@ class Testhana_query(ModuleTestCase):
             self.module.main()
 
     def test_hana_query(self):
-        """Check that result is changed."""
+        """Check that result is processed."""
         set_module_args({
             'sid': "HDB",
             'instance': "01",
@@ -56,8 +59,8 @@ class Testhana_query(ModuleTestCase):
             'query': "SELECT * FROM users;"
         })
         with patch.object(basic.AnsibleModule, 'run_command') as run_command:
-            run_command.return_value = 0, '', ''  # successful execution, no output
+            run_command.return_value = 0, 'username\ntestuser\n', ''
             with self.assertRaises(AnsibleExitJson) as result:
                 hana_query.main()
-                self.assertTrue(result.exception.args[0]['changed'])
+            self.assertEqual(result.exception.args[0]['query_result'], [[{'username':'testuser'}]])
         self.assertEqual(run_command.call_count, 1)
