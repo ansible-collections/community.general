@@ -257,9 +257,8 @@ def get_archive_contains(format):
 def get_add_to_archive(format, filter):
     def add_to_zip_archive(archive_file, path, archive_name):
         try:
-            if format == 'zip':
-                if not filter(path):
-                    archive_file.write(path, archive_name)
+            if not filter(path):
+                archive_file.write(path, archive_name)
         except Exception as e:
             return e
 
