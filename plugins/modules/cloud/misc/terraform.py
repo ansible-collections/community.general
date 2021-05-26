@@ -442,10 +442,10 @@ def main():
         if rc != 0:
             if workspace_ctx["current"] != workspace:
                 select_workspace(command[0], project_path, workspace_ctx["current"])
-            module.fail_json(
-                msg=err.rstrip(),
-                rc=rc, stdout=out, stdout_lines=out.splitlines(), stderr=err, stderr_lines=err.splitlines(),
-                cmd=' '.join(command))
+            module.fail_json(msg=err.rstrip(), rc=rc, stdout=out,
+                             stdout_lines=out.splitlines(), stderr=err,
+                             stderr_lines=err.splitlines(),
+                             cmd=' '.join(command))
         # checks out to decide if changes were made during execution
         if ' 0 added, 0 changed' not in out and not state == "absent" or ' 0 destroyed' not in out:
             changed = True
