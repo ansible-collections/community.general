@@ -304,7 +304,7 @@ def write_state(b_path, lines, changed):
     return changed
 
 
-def initialize_from_null_state(initializer, initcommand, table):
+def initialize_from_null_state(initializer, initcommand, fallbackcmd, table):
     '''
     This ensures iptables-state output is suitable for iptables-restore to roll
     back to it, i.e. iptables-save output is not empty. This also works for the
@@ -315,8 +315,14 @@ def initialize_from_null_state(initializer, initcommand, table):
 
     commandline = list(initializer)
     commandline += ['-t', table]
-    (rc, out, err) = module.run_command(commandline, check_rc=True)
+    dummy = module.run_command(commandline, check_rc=True)
     (rc, out, err) = module.run_command(initcommand, check_rc=True)
+    if '*%s' % table not in out.splitlines():
+        # The last resort.
+        iptables_input = '*%s\n:OUTPUT ACCEPT\nCOMMIT\n' % table
+        dummy = module.run_command(fallbackcmd, data=iptables_input, check_rc=True)
+        (rc, out, err) = module.run_command(initcommand, check_rc=True)
+
     return rc, out, err
 
 
@@ -401,6 +407,7 @@ def main():
     INITCOMMAND = [bin_iptables_save]
     INITIALIZER = [bin_iptables, '-L', '-n']
     TESTCOMMAND = [bin_iptables_restore, '--test']
+    FALLBACKCMD = [bin_iptables_restore]
 
     if counters:
         COMMANDARGS.append('--counters')
@@ -425,6 +432,7 @@ def main():
         INITIALIZER.extend(['--modprobe', modprobe])
         INITCOMMAND.extend(['--modprobe', modprobe])
         TESTCOMMAND.extend(['--modprobe', modprobe])
+        FALLBACKCMD.extend(['--modprobe', modprobe])
 
     SAVECOMMAND = list(COMMANDARGS)
     SAVECOMMAND.insert(0, bin_iptables_save)
@@ -458,15 +466,15 @@ def main():
             for t in TABLES:
                 if '*%s' % t in state_to_restore:
                     if len(stdout) == 0 or '*%s' % t not in stdout.splitlines():
-                        (rc, stdout, stderr) = initialize_from_null_state(INITIALIZER, INITCOMMAND, t)
+                        (rc, stdout, stderr) = initialize_from_null_state(INITIALIZER, INITCOMMAND, FALLBACKCMD, t)
         elif len(stdout) == 0:
-            (rc, stdout, stderr) = initialize_from_null_state(INITIALIZER, INITCOMMAND, 'filter')
+            (rc, stdout, stderr) = initialize_from_null_state(INITIALIZER, INITCOMMAND, FALLBACKCMD, 'filter')
 
     elif state == 'restored' and '*%s' % table not in state_to_restore:
         module.fail_json(msg="Table %s to restore not defined in %s" % (table, path))
 
     elif len(stdout) == 0 or '*%s' % table not in stdout.splitlines():
-        (rc, stdout, stderr) = initialize_from_null_state(INITIALIZER, INITCOMMAND, table)
+        (rc, stdout, stderr) = initialize_from_null_state(INITIALIZER, INITCOMMAND, FALLBACKCMD, table)
 
     initial_state = filter_and_format_state(stdout)
     if initial_state is None:
