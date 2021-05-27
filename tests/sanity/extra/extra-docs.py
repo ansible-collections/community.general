@@ -14,7 +14,9 @@ def main():
     """Main entry point."""
     if not os.path.isdir(os.path.join('docs', 'docsite')):
         return
-    subprocess.run(['antsibull-lint', 'collection-docs', '.'])
+    p = subprocess.run(['antsibull-lint', 'collection-docs', '.'], check=False)
+    if p.check_call not in (0, 3):
+        print('{0}:0:0: unexpected return code {1}'.format(sys.argv[0], p.check_call))
 
 
 if __name__ == '__main__':
