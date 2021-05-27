@@ -1,0 +1,2 @@
+minor_changes:
+- "Remove unnecessary ``__init__.py`` files from ``plugins/`` (https://github.com/ansible-collections/community.general/pull/2632)."
