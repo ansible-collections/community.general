@@ -233,7 +233,7 @@ def get_version(bin_path):
 
 
 def preflight_validation(bin_path, project_path, version, variables_args=None, plan_file=None):
-    if project_path in [None, ''] or '/' not in project_path:
+    if project_path is None or '/' not in project_path:
         module.fail_json(msg="Path for Terraform project can not be None or ''.")
     if not os.path.exists(bin_path):
         module.fail_json(msg="Path for Terraform binary '{0}' doesn't exist on this host - check the path and try again please.".format(bin_path))
