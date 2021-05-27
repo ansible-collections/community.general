@@ -95,7 +95,7 @@ class ProxmoxGroup:
         self.group = dict()
         # Data representation is not the same depending on API calls
         for k, v in group.items():
-            if k == 'users' and type(v) == str:
+            if k == 'users' and isinstance(v, str):
                 self.group['users'] = v.split(',')
             elif k == 'members':
                 self.group['users'] = group['members']

@@ -808,23 +808,23 @@ def get_vminfo(module, proxmox, node, vmid, **kwargs):
     # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
     kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
 
-    # Convert all dict in kwargs to elements. For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n]
+    # Convert all dict in kwargs to elements.
+    # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n]
     for k in list(kwargs.keys()):
         if isinstance(kwargs[k], dict):
             kwargs.update(kwargs[k])
             del kwargs[k]
 
     # Split information by type
+    re_net = re.compile(r'net[0-9]')
+    re_dev = re.compile(r'(virtio|ide|scsi|sata)[0-9]')
     for k, v in kwargs.items():
-        if re.match(r'net[0-9]', k) is not None:
+        if re_net.match(k):
             interface = k
             k = vm[k]
             k = re.search('=(.*?),', k).group(1)
             mac[interface] = k
-        if (re.match(r'virtio[0-9]', k) is not None or
-                re.match(r'ide[0-9]', k) is not None or
-                re.match(r'scsi[0-9]', k) is not None or
-                re.match(r'sata[0-9]', k) is not None):
+        elif re_dev.match(k):
             device = k
             k = vm[k]
             k = re.search('(.*?),', k).group(1)
@@ -835,16 +835,13 @@ def get_vminfo(module, proxmox, node, vmid, **kwargs):
     results['vmid'] = int(vmid)
 
 
-def settings(module, proxmox, vmid, node, name, **kwargs):
+def settings(proxmox, vmid, node, **kwargs):
     proxmox_node = proxmox.nodes(node)
 
     # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
     kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
 
-    if proxmox_node.qemu(vmid).config.set(**kwargs) is None:
-        return True
-    else:
-        return False
+    return proxmox_node.qemu(vmid).config.set(**kwargs) is None
 
 
 def wait_for_task(module, proxmox, node, taskid):
@@ -915,7 +912,8 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
         if 'pool' in kwargs:
             del kwargs['pool']
 
-    # Convert all dict in kwargs to elements. For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
+    # Convert all dict in kwargs to elements.
+    # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
     for k in list(kwargs.keys()):
         if isinstance(kwargs[k], dict):
             kwargs.update(kwargs[k])
@@ -938,8 +936,9 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
 
     # VM tags are expected to be valid and presented as a comma/semi-colon delimited string
     if 'tags' in kwargs:
+        re_tag = re.compile(r'^[a-z0-9_][a-z0-9_\-\+\.]*$')
         for tag in kwargs['tags']:
-            if not re.match(r'^[a-z0-9_][a-z0-9_\-\+\.]*$', tag):
+            if not re_tag.match(tag):
                 module.fail_json(msg='%s is not a valid tag' % tag)
         kwargs['tags'] = ",".join(kwargs['tags'])
 
@@ -971,7 +970,7 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
 
     if not wait_for_task(module, proxmox, node, taskid):
         module.fail_json(msg='Reached timeout while waiting for creating VM. Last line in task before timeout: %s' %
-                         proxmox_node.tasks(taskid).log.get()[:1])
+                             proxmox_node.tasks(taskid).log.get()[:1])
         return False
     return True
 
@@ -1209,14 +1208,14 @@ def main():
 
     if delete is not None:
         try:
-            settings(module, proxmox, vmid, node, name, delete=delete)
+            settings(proxmox, vmid, node, delete=delete)
             module.exit_json(changed=True, vmid=vmid, msg="Settings has deleted on VM {0} with vmid {1}".format(name, vmid))
         except Exception as e:
             module.fail_json(vmid=vmid, msg='Unable to delete settings on VM {0} with vmid {1}: '.format(name, vmid) + str(e))
 
     if revert is not None:
         try:
-            settings(module, proxmox, vmid, node, name, revert=revert)
+            settings(proxmox, vmid, node, revert=revert)
             module.exit_json(changed=True, vmid=vmid, msg="Settings has reverted on VM {0} with vmid {1}".format(name, vmid))
         except Exception as e:
             module.fail_json(vmid=vmid, msg='Unable to revert settings on VM {0} with vmid {1}: Maybe is not a pending task...   '.format(name, vmid) + str(e))
