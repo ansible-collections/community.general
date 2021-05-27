@@ -1,0 +1,2 @@
+minor_changes:
+  - terraform - add option ``overwrite_init`` to skip init if exists (https://github.com/ansible-collections/community.general/pull/2573).
