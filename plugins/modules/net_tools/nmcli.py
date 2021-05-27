@@ -81,7 +81,7 @@ options:
         description:
             - Ignore automatically configured IPv4 routes.
         type: bool
-        default: no
+        default: false
         version_added: 3.2.0
     routes4:
         description:
@@ -117,7 +117,7 @@ options:
         description:
             - Ignore automatically configured IPv4 name servers.
         type: bool
-        default: no
+        default: false
         version_added: 3.2.0
     method4:
         description:
@@ -141,7 +141,7 @@ options:
         description:
             - Ignore automatically configured IPv6 routes.
         type: bool
-        default: no
+        default: false
         version_added: 3.2.0
     dns6:
         description:
@@ -158,7 +158,7 @@ options:
         description:
             - Ignore automatically configured IPv6 name servers.
         type: bool
-        default: no
+        default: false
         version_added: 3.2.0
     method6:
         description:
