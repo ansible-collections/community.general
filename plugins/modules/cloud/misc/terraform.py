@@ -107,6 +107,12 @@ options:
         you intend to provision an entirely new Terraform deployment.
     default: false
     type: bool
+  overwrite_init:
+    description:
+      - Run init even if C(.terraform/terraform.tfstate) already exists in I(project_path).
+    default: true
+    type: bool
+    version_added: '3.2.0'
   backend_config:
     description:
       - A group of key-values to provide at init stage to the -backend-config parameter.
@@ -348,6 +354,7 @@ def main():
             backend_config=dict(type='dict', default=None),
             backend_config_files=dict(type='list', elements='path', default=None),
             init_reconfigure=dict(required=False, type='bool', default=False),
+            overwrite_init=dict(type='bool', default=True),
         ),
         required_if=[('state', 'planned', ['plan_file'])],
         supports_check_mode=True,
@@ -367,6 +374,7 @@ def main():
     backend_config = module.params.get('backend_config')
     backend_config_files = module.params.get('backend_config_files')
     init_reconfigure = module.params.get('init_reconfigure')
+    overwrite_init = module.params.get('overwrite_init')
 
     if bin_path is not None:
         command = [bin_path]
@@ -383,7 +391,8 @@ def main():
         APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve')
 
     if force_init:
-        init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure, plugin_paths)
+        if overwrite_init or not os.path.isfile(os.path.join(project_path, ".terraform", "terraform.tfstate")):
+            init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure, plugin_paths)
 
     workspace_ctx = get_workspace_context(command[0], project_path)
     if workspace_ctx["current"] != workspace:
