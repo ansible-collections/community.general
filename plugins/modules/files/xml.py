@@ -301,6 +301,23 @@ EXAMPLES = r'''
             - floor: Grog storage
             - construction_date: "1990"  # Only strings are valid
       - building: Grog factory
+
+# Consider this XML for following example -
+#
+# <config>
+#   <element name="test1">
+#     <text>part to remove</text>
+#   </element>
+#   <element name="test2">
+#     <text>part to keep</text>
+#   </element>
+# </config>
+
+- name: Delete element node based upon attribute
+  community.general.xml:
+    path: bar.xml
+    xpath: /config/element[@name='test1']
+    state: absent
 '''
 
 RETURN = r'''
