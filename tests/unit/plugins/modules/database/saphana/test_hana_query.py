@@ -59,5 +59,8 @@ class Testhana_query(ModuleTestCase):
             run_command.return_value = 0, 'username,name\n  testuser,test user  \n myuser, my user   \n', ''
             with self.assertRaises(AnsibleExitJson) as result:
                 hana_query.main()
-            self.assertEqual(result.exception.args[0]['query_result'], [[{'username': 'testuser', 'name': 'test user'},{'username': 'myuser', 'name': 'my user',}]])
+            self.assertEqual(result.exception.args[0]['query_result'], [[
+                {'username': 'testuser', 'name': 'test user'},
+                {'username': 'myuser', 'name': 'my user'},
+            ]])
         self.assertEqual(run_command.call_count, 1)
