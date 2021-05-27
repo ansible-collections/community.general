@@ -1,0 +1,7 @@
+minor_changes:
+  - cloud_init_data_facts - minor refactor (https://github.com/ansible-collections/community.general/pull/2557).
+  - proxmox_group_info - minor refactor (https://github.com/ansible-collections/community.general/pull/2557).
+  - proxmox_kvm - minor refactor (https://github.com/ansible-collections/community.general/pull/2557).
+  - rhevm - minor refactor (https://github.com/ansible-collections/community.general/pull/2557).
+  - serverless - minor refactor (https://github.com/ansible-collections/community.general/pull/2557).
+  - terraform - minor refactor (https://github.com/ansible-collections/community.general/pull/2557).
