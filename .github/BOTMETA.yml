@@ -347,6 +347,8 @@ files:
   $modules/database/mssql/mssql_db.py:
     maintainers: vedit Jmainguy kenichi-ogawa-1988
     labels: mssql_db
+  $modules/database/saphana/hana_query.py:
+    maintainers: rainerleber
   $modules/database/vertica/:
     maintainers: dareko
   $modules/files/archive.py:
