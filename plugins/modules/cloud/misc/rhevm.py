@@ -547,7 +547,7 @@ class RHEVConn(object):
 
     def set_Memory_Policy(self, name, memory_policy):
         VM = self.get_VM(name)
-        VM.memory_policy.guaranteed = int(int(memory_policy) * 1024 * 1024 * 1024)
+        VM.memory_policy.guaranteed = int(memory_policy) * 1024 * 1024 * 1024
         try:
             VM.update()
             setMsg("The memory policy has been updated.")
@@ -1260,7 +1260,7 @@ def core(module):
 
     r = RHEV(module)
 
-    state = module.params.get('state', 'present')
+    state = module.params.get('state')
 
     if state == 'ping':
         r.test()
