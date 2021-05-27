@@ -88,7 +88,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_text
 
 
-CLOUD_INIT_PATH = "/var/lib/cloud/data/"
+CLOUD_INIT_PATH = "/var/lib/cloud/data"
 
 
 def gather_cloud_init_data_facts(module):
@@ -100,7 +100,7 @@ def gather_cloud_init_data_facts(module):
         filter = module.params.get('filter')
         if filter is None or filter == i:
             res['cloud_init_data_facts'][i] = dict()
-            json_file = CLOUD_INIT_PATH + i + '.json'
+            json_file = os.path.join(CLOUD_INIT_PATH, i + '.json')
 
             if os.path.exists(json_file):
                 f = open(json_file, 'rb')
