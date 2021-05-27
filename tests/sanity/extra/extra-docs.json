@@ -1,0 +1,10 @@
+{
+    "include_symlinks": false,
+    "prefixes": [
+        "docs/docsite/"
+    ],
+    "output": "path-line-column-message",
+    "requirements": [
+        "antsibull"
+    ]
+}
