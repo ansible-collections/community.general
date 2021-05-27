@@ -107,8 +107,7 @@ from ansible.module_utils._text import to_native
 
 
 def csv_to_list(rawcsv):
-    lines = rawcsv[:rawcsv.rfind('\n')]
-    reader_raw = csv.DictReader(StringIO(lines))
+    reader_raw = csv.DictReader(StringIO(rawcsv))
     reader = [dict((k, v.strip()) for k, v in row.items()) for row in reader_raw]
     return list(reader)
 
