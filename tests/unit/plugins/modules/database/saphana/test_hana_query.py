@@ -56,8 +56,8 @@ class Testhana_query(ModuleTestCase):
             'query': "SELECT * FROM users;"
         })
         with patch.object(basic.AnsibleModule, 'run_command') as run_command:
-            run_command.return_value = 0, 'username\ntestuser\n', ''
+            run_command.return_value = 0, 'username,name\n  testuser,test user  \n myuser, my user   \n', ''
             with self.assertRaises(AnsibleExitJson) as result:
                 hana_query.main()
-            self.assertEqual(result.exception.args[0]['query_result'], [[{'username': 'testuser'}]])
+            self.assertEqual(result.exception.args[0]['query_result'], [[{'username': 'testuser', 'name': 'test user'},{'username': 'myuser', 'name': 'my user',}]])
         self.assertEqual(run_command.call_count, 1)
