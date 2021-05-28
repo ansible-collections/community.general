@@ -590,20 +590,6 @@ class MavenDownloader:
                 hash.update(chunk)
         return hash.hexdigest()
 
-    def _local_md5(self, file):
-        md5 = hashlib.md5()
-        with io.open(file, 'rb') as f:
-            for chunk in iter(lambda: f.read(8192), b''):
-                md5.update(chunk)
-        return md5.hexdigest()
-
-    def _local_sha1(self, file):
-        sha1 = hashlib.sha1()
-        with io.open(file, 'rb') as f:
-            for chunk in iter(lambda: f.read(8192), b''):
-                sha1.update(chunk)
-        return sha1.hexdigest()
-
 
 def main():
     module = AnsibleModule(
