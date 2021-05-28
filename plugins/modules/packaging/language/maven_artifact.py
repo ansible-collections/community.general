@@ -129,9 +129,9 @@ options:
     verify_checksum:
         type: str
         description:
-            - If C(never), the md5/sha1 checksum will never be downloaded and verified.
-            - If C(download), the md5/sha1 checksum will be downloaded and verified only after artifact download. This is the default.
-            - If C(change), the md5/sha1 checksum will be downloaded and verified if the destination already exist,
+            - If C(never), the MD5/SHA1 checksum will never be downloaded and verified.
+            - If C(download), the MD5/SHA1 checksum will be downloaded and verified only after artifact download. This is the default.
+            - If C(change), the MD5/SHA1 checksum will be downloaded and verified if the destination already exist,
               to verify if they are identical. This was the behaviour before 2.6. Since it downloads the checksum before (maybe)
               downloading the artifact, and since some repository software, when acting as a proxy/cache, return a 404 error
               if the artifact has not been cached yet, it may fail unexpectedly.
