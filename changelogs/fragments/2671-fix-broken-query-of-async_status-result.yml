@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - "iptables_state - fix a broken query of ``async_status`` result
+    (https://github.com/ansible-collections/community.general/issues/2627,
+    https://github.com/ansible-collections/community.general/pull/2671)."
