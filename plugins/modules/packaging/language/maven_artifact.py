@@ -147,7 +147,6 @@ options:
             - If C(md5), checksums will use the MD5 algorithm. This is the default.
             - If C(sha1), checksums will use the SHA1 algorithm. This can be used on systems configured to use
               FIPS-compliant algorithms, since MD5 will be blocked on such systems.
-        required: false
         default: 'md5'
         choices: ['md5', 'sha1']
         version_added: 3.2.0
