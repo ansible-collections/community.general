@@ -117,9 +117,14 @@ options:
         default: false
         type: bool
         aliases: [ ignore-platform-reqs ]
+    composer_executable:
+        type: path
+        description:
+            - Path to composer executable on the remote host, if composer is not in C(PATH) or a custom composer is needed.
+        version_added: 3.2.0
 requirements:
     - php
-    - composer installed in bin path (recommended /usr/local/bin)
+    - composer installed in bin path (recommended /usr/local/bin) or specified in I(composer_executable)
 notes:
     - Default options that are always appended in each execution are --no-ansi, --no-interaction and --no-progress if available.
     - We received reports about issues on macOS if composer was installed by Homebrew. Please use the official install method to avoid issues.
@@ -187,7 +192,11 @@ def composer_command(module, command, arguments="", options=None, global_command
     else:
         php_path = module.params['executable']
 
-    composer_path = module.get_bin_path("composer", True, ["/usr/local/bin"])
+    if module.params['composer_executable'] is None:
+        composer_path = module.get_bin_path("composer", True, ["/usr/local/bin"])
+    else:
+        composer_path = module.params['composer_executable']
+
     cmd = "%s %s %s %s %s %s" % (php_path, composer_path, "global" if global_command else "", command, " ".join(options), arguments)
     return module.run_command(cmd)
 
@@ -231,6 +240,7 @@ def main():
             ignore_platform_reqs=dict(
                 default=False, type="bool", aliases=["ignore-platform-reqs"],
                 deprecated_aliases=[dict(name='ignore-platform-reqs', version='5.0.0', collection_name='community.general')]),
+            composer_executable=dict(type="path"),
         ),
         required_if=[('global_command', False, ['working_dir'])],
         supports_check_mode=True
