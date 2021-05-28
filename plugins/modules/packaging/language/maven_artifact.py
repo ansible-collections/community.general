@@ -580,11 +580,15 @@ class MavenDownloader:
 
     def _local_checksum(self, checksum_alg, file):
         if checksum_alg.lower() == 'md5':
-            return self._local_md5(file)
+            hash = hashlib.md5()
         elif checksum_alg.lower() == 'sha1':
-            return self._local_sha1(file)
+            hash = hashlib.sha1()
         else:
             raise ValueError("Unknown checksum_alg %s" % checksum_alg)
+        with io.open(file, 'rb') as f:
+            for chunk in iter(lambda: f.read(8192), b''):
+                hash.update(chunk)
+        return hash.hexdigest()
 
     def _local_md5(self, file):
         md5 = hashlib.md5()
