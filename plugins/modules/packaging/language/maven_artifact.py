@@ -150,6 +150,7 @@ options:
         required: false
         default: 'md5'
         choices: ['md5', 'sha1']
+        version_added: 3.2.0
     directory_mode:
         type: str
         description:
