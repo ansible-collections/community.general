@@ -120,11 +120,11 @@ options:
     composer_executable:
         type: path
         description:
-            - Path to composer Executable on the remote host, if composer is not in PATH or a custom composer is needed.
+            - Path to composer executable on the remote host, if composer is not in C(PATH) or a custom composer is needed.
         version_added: 3.2.0
 requirements:
     - php
-    - composer installed in bin path (recommended /usr/local/bin) or fill composer_executable
+    - composer installed in bin path (recommended /usr/local/bin) or specified in I(composer_executable)
 notes:
     - Default options that are always appended in each execution are --no-ansi, --no-interaction and --no-progress if available.
     - We received reports about issues on macOS if composer was installed by Homebrew. Please use the official install method to avoid issues.
