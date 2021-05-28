@@ -561,7 +561,7 @@ class MavenDownloader:
                     remote_checksum = to_text(self._getContent(remote_url + '.' + checksum_alg, "Failed to retrieve checksum", False), errors='strict')
                 except UnicodeError as e:
                     return "Cannot retrieve a valid %s checksum from %s: %s" % (checksum_alg, remote_url, to_native(e))
-                if(not remote_checksum):
+                if not remote_checksum:
                     return "Cannot find %s checksum from %s" % (checksum_alg, remote_url)
             try:
                 # Check if remote checksum only contains md5/sha1 or md5/sha1 + filename
