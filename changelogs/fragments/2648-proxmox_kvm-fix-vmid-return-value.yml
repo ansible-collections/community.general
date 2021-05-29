@@ -1,0 +1,2 @@
+bugfixes:
+  - proxmox_kvm - fixed ``vmid`` return value when VM with ``name`` already exists (https://github.com/ansible-collections/community.general/issues/2648).
