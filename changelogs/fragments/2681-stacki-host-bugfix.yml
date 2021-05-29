@@ -1,0 +1,4 @@
+bugfixes:
+  - stacki_host - when adding a new server, ``rack`` and ``rank`` must be passed, and network parameters are optional (https://github.com/ansible-collections/community.general/pull/2681).
+minor_changes:
+  - stacki_host - minor refactoring (https://github.com/ansible-collections/community.general/pull/2681).
