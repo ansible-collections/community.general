@@ -52,7 +52,7 @@ class ActionModule(ActionBase):
                 module_args=module_args,
                 task_vars=task_vars,
                 wrap_async=False)
-            if async_result['finished'] == 1:
+            if async_result.get('finished', 0) == 1:
                 break
             time.sleep(min(1, timeout))
 
