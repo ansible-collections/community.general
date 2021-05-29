@@ -4,8 +4,6 @@ plugins/module_utils/_mount.py metaclass-boilerplate
 plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
 plugins/modules/cloud/lxc/lxc_container.py validate-modules:use-run-command-not-popen
 plugins/modules/cloud/misc/rhevm.py validate-modules:parameter-state-invalid-choice
-plugins/modules/cloud/online/online_server_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/online/online_user_info.py validate-modules:return-syntax-error
 plugins/modules/cloud/rackspace/rax.py use-argspec-type-path # fix needed
 plugins/modules/cloud/rackspace/rax_files.py validate-modules:parameter-state-invalid-choice
 plugins/modules/cloud/rackspace/rax_files_objects.py use-argspec-type-path
