@@ -65,16 +65,19 @@ options:
   appliance:
     description:
       - Applicance to be used in host creation.
+      - Required if I(state) is C(present) and host does not yet exist.
     type: str
     default: backend
   rack:
     description:
       - Rack to be used in host creation.
+      - Required if I(state) is C(present) and host does not yet exist.
     type: int
   rank:
     description:
       - Rank to be used in host creation.
       - In Stacki terminology, the rank is the position of the machine in a rack.
+      - Required if I(state) is C(present) and host does not yet exist.
     type: int
   network:
     description:
