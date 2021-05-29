@@ -1225,7 +1225,7 @@ def main():
             if get_vm(proxmox, vmid) and not (update or clone):
                 module.exit_json(changed=False, vmid=vmid, msg="VM with vmid <%s> already exists" % vmid)
             elif get_vmid(proxmox, name) and not (update or clone):
-                module.exit_json(changed=False, vmid=vmid, msg="VM with name <%s> already exists" % name)
+                module.exit_json(changed=False, vmid=get_vmid(proxmox, name)[0], msg="VM with name <%s> already exists" % name)
             elif not (node, name):
                 module.fail_json(msg='node, name is mandatory for creating/updating vm')
             elif not node_check(proxmox, node):
