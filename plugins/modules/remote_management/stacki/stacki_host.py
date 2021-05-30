@@ -53,7 +53,7 @@ options:
     type: str
   force_install:
     description:
-      - Set value to True to force node into install state if it already exists in stacki.
+      - Set value to C(true) to force node into install state if it already exists in stacki.
     type: bool
     default: no
   state:
