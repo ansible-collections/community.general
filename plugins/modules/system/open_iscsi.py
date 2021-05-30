@@ -404,17 +404,17 @@ def main():
         isauto = target_isauto(module, target, portal, port)
         if (automatic_portal and isauto) or (not automatic_portal and not isauto):
             result['changed'] |= False
-            result['automatic_changed'] = False
+            result['automatic_portal_changed'] = False
         elif not check:
             if automatic_portal:
                 target_setauto(module, target, portal, port)
             else:
                 target_setmanual(module, target, portal, port)
             result['changed'] |= True
-            result['automatic_changed'] = True
+            result['automatic_portal_changed'] = True
         else:
             result['changed'] |= True
-            result['automatic_changed'] = True
+            result['automatic_portal_changed'] = True
 
     module.exit_json(**result)
 
