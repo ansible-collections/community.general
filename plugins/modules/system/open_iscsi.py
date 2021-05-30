@@ -57,6 +57,11 @@ options:
         - Whether the target node should be automatically connected at startup.
         type: bool
         aliases: [ automatic ]
+    auto_portal_startup:
+        description:
+        - Whether the target node portal should be automatically connected at startup.
+        type: bool
+        aliases: [ automatic_portal ]
     discover:
         description:
         - Whether the list of target nodes on the portal should be
@@ -226,8 +231,14 @@ def target_device_node(module, target):
     return devdisks
 
 
-def target_isauto(module, target):
+def target_isauto(module, target, portal=None, port=None):
     cmd = '%s --mode node --targetname %s' % (iscsiadm_cmd, target)
+
+    if portal is not None:
+        if port is not None:
+            portal = '%s:%s' % (portal, port)
+        cmd = '%s --portal %s' % (cmd, portal)
+
     (rc, out, err) = module.run_command(cmd)
 
     if rc == 0:
@@ -240,16 +251,28 @@ def target_isauto(module, target):
         module.fail_json(cmd=cmd, rc=rc, msg=err)
 
 
-def target_setauto(module, target):
+def target_setauto(module, target, portal=None, port=None):
     cmd = '%s --mode node --targetname %s --op=update --name node.startup --value automatic' % (iscsiadm_cmd, target)
+
+    if portal is not None:
+        if port is not None:
+            portal = '%s:%s' % (portal, port)
+        cmd = '%s --portal %s' % (cmd, portal)
+
     (rc, out, err) = module.run_command(cmd)
 
     if rc > 0:
         module.fail_json(cmd=cmd, rc=rc, msg=err)
 
 
-def target_setmanual(module, target):
+def target_setmanual(module, target, portal=None, port=None):
     cmd = '%s --mode node --targetname %s --op=update --name node.startup --value manual' % (iscsiadm_cmd, target)
+
+    if portal is not None:
+        if port is not None:
+            portal = '%s:%s' % (portal, port)
+        cmd = '%s --portal %s' % (cmd, portal)
+
     (rc, out, err) = module.run_command(cmd)
 
     if rc > 0:
@@ -272,6 +295,7 @@ def main():
             # actions
             login=dict(type='bool', aliases=['state']),
             auto_node_startup=dict(type='bool', aliases=['automatic']),
+            auto_portal_startup=dict(type='bool', aliases=['automatic_portal']),
             discover=dict(type='bool', default=False),
             show_nodes=dict(type='bool', default=False),
         ),
@@ -295,6 +319,7 @@ def main():
     port = module.params['port']
     login = module.params['login']
     automatic = module.params['auto_node_startup']
+    automatic_portal = module.params['auto_portal_startup']
     discover = module.params['discover']
     show_nodes = module.params['show_nodes']
 
@@ -369,6 +394,22 @@ def main():
                 target_setauto(module, target)
             else:
                 target_setmanual(module, target)
+            result['changed'] |= True
+            result['automatic_changed'] = True
+        else:
+            result['changed'] |= True
+            result['automatic_changed'] = True
+
+    if automatic_portal is not None:
+        isauto = target_isauto(module, target, portal, port)
+        if (automatic_portal and isauto) or (not automatic_portal and not isauto):
+            result['changed'] |= False
+            result['automatic_changed'] = False
+        elif not check:
+            if automatic_portal:
+                target_setauto(module, target, portal, port)
+            else:
+                target_setmanual(module, target, portal, port)
             result['changed'] |= True
             result['automatic_changed'] = True
         else:
