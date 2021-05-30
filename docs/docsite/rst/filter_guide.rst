@@ -1,6 +1,6 @@
 .. _ansible_collections.community.general.docsite.filter_guide:
 
-Community.General Filter Guide
+community.general Filter Guide
 ==============================
 
 The :ref:`community.general collection <plugins_in_community.general>` offers several useful filter plugins.
