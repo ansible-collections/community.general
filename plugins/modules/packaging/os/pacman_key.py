@@ -17,7 +17,7 @@ short_description: Manage pacman's list of trusted keys
 description:
 - Add or remove gpg keys from the pacman keyring.
 notes:
-- Use full key ID (16 characters) and fingerprint (40 characters) to avoid key collisions.
+- Use full-length identifier (40 characters) for key ID and fingerprint to avoid key collisions.
 - If you specify both the key id and the URL with C(state=present), the task can verify or add the key as needed.
 - By default, keys will be locally signed after being imported into the keyring.
 - If the specified key id exists in the keyring, the key will not be added.
@@ -29,7 +29,7 @@ requirements:
 options:
     id:
         description:
-            - The 16 character identifier of the key.
+            - The 40 character identifier of the key.
             - Including this allows check mode to correctly report the changed state.
             - Do not specify a subkey id, instead specify the master key id.
         required: yes
@@ -134,10 +134,11 @@ class PacmanKey(object):
         force_update = module.params['force_update']
         keyring = module.params['keyring']
         state = module.params['state']
+        self.keylength = 40
 
-        keyid = self.sanitise_keyid(keyid)
+        keyid = self.sanitise_identifier(keyid)
         if fingerprint:
-            fingerprint = self.sanitise_fingerprint(fingerprint)
+            fingerprint = self.sanitise_identifier(fingerprint)
         key_present = self.key_in_keyring(keyid, keyring)
 
         if (
@@ -165,22 +166,22 @@ class PacmanKey(object):
 
             if data:
                 file = self.save_key(data)
-                self.add_key(file, keyid, fingerprint, keyring)
+                self.add_key(keyring, file, keyid, fingerprint)
                 module.exit_json(changed=True)
             elif file:
-                self.add_key(file, keyid, fingerprint, keyring)
+                self.add_key(keyring, file, keyid, fingerprint)
                 module.exit_json(changed=True)
             elif url:
                 data = self.fetch_key(url)
                 file = self.save_key(data)
-                self.add_key(file, keyid, fingerprint, keyring)
+                self.add_key(keyring, file, keyid, fingerprint)
                 module.exit_json(changed=True)
             elif keyserver:
-                self.recv_key(keyid, keyserver, keyring)
+                self.recv_key(keyring, keyid, keyserver)
                 module.exit_json(changed=True)
         elif state == "absent":
             if key_present:
-                self.remove_key(keyid)
+                self.remove_key(keyring, keyid)
                 module.exit_json(changed=True)
             module.exit_json(changed=False)
 
@@ -192,23 +193,17 @@ class PacmanKey(object):
             return False
         return True
 
-    def sanitise_keyid(self, keyid):
-        """Sanitise given keyid"""
-        keyid = keyid.strip().upper().replace('0X', '')
-        if len(keyid) != 16:
-            self.module.fail_json(msg="keyid is not 16 characters: %s" % keyid)
-        if not self.is_hexadecimal(keyid):
-            self.module.fail_json(msg="keyid is not hexadecimal: %s" % keyid)
-        return keyid
+    def sanitise_identifier(self, identifier):
+        """Sanitise given key id or fingerprint.
 
-    def sanitise_fingerprint(self, fingerprint):
-        """Sanitise given fingerprint"""
-        fingerprint = fingerprint.strip().upper().replace(' ', '').replace('0X', '')
-        if len(fingerprint) != 40:
-            self.module.fail_json(msg="fingerprint is not 40 characters: %s" % fingerprint)
-        if not self.is_hexadecimal(fingerprint):
-            self.module.fail_json(msg="fingerprint is not hexadecimal: %s" % fingerprint)
-        return fingerprint
+        Strips whitespace, uppercases all characters, and strips leading `0X`.
+        """
+        identifier = identifier.strip().upper().replace(' ', '').replace('0X', '')
+        if len(identifier) != self.keylength:
+            self.module.fail_json(msg="identifier is not full-length: %s" % identifier)
+        if not self.is_hexadecimal(identifier):
+            self.module.fail_json(msg="identifier is not hexadecimal: %s" % identifier)
+        return identifier
 
     def fetch_key(self, url):
         """Downloads a key from url"""
@@ -217,28 +212,18 @@ class PacmanKey(object):
             self.module.fail_json(msg="failed to fetch key at %s, error was %s" % (url, info['msg']))
         return to_native(response.read())
 
-    def recv_key(self, keyid, keyserver=None, keyring=None):
+    def recv_key(self, keyring, keyid, keyserver=None):
         """Receives key via keyserver"""
-        cmd = [self.pacman_key]
-        if keyring is not None:
-            cmd.extend(['--gpgdir', keyring])
+        cmd = [self.pacman_key, '--gpgdir', keyring]
         if keyserver is not None:
             cmd.extend(['--keyserver', keyserver])
-
-        rc, stdout, stderr = self.module.run_command(cmd + ['--recv-keys', keyid])
-        if rc != 0:
-            self.module.fail_json(msg="failed to receive key %s from %s, error: %s" % (keyid, keyserver, stderr))
+        self.module.run_command(cmd + ['--recv-keys', keyid], check_rc=True)
         self.lsign_key(keyid, keyring)
 
-    def lsign_key(self, keyid, keyring=None):
+    def lsign_key(self, keyring, keyid):
         """Locally sign key"""
-        cmd = [self.pacman_key]
-        if keyring is not None:
-            cmd.extend(['--gpgdir', keyring])
-
-        rc, stdout, stderr = self.module.run_command(cmd + ['--lsign-key', keyid])
-        if rc != 0:
-            self.module.fail_json(msg="error locally signing key: %s" % stderr)
+        cmd = [self.pacman_key, '--gpgdir', keyring]
+        self.module.run_command(cmd + ['--lsign-key', keyid], check_rc=True)
 
     def save_key(self, data):
         "Saves key data to a temporary file"
@@ -249,29 +234,18 @@ class PacmanKey(object):
         tmpfile.close()
         return tmpname
 
-    def add_key(self, keyfile, keyid, fingerprint=None, keyring=None):
+    def add_key(self, keyring, keyfile, keyid, fingerprint=None):
         """Add key to pacman's keyring"""
-        cmd = [self.pacman_key]
-        if keyring is not None:
-            cmd.extend(['--gpgdir', keyring])
-
+        cmd = [self.pacman_key, '--gpgdir', keyring]
         if fingerprint is not None:
             self.verify_keyfile(keyfile, keyid, fingerprint)
-
-        rc, stdout, stderr = self.module.run_command(cmd + ['--add', keyfile])
-        if rc != 0:
-            self.module.fail_json(msg="error adding key to keyring: %s" % stderr)
+        self.module.run_command(cmd + ['--add', keyfile], check_rc=True)
         self.lsign_key(keyid, keyring)
 
-    def remove_key(self, keyid, keyring=None):
+    def remove_key(self, keyring, keyid):
         """Remove key from pacman's keyring"""
-        cmd = [self.pacman_key]
-        if keyring is not None:
-            cmd.extend(['--gpgdir', keyring])
-
-        rc, stdout, stderr = self.module.run_command(cmd + ['--delete', keyid])
-        if rc != 0:
-            self.module.fail_json(msg="error removing key from keyring: %s" % stderr)
+        cmd = [self.pacman_key, '--gpgdir', keyring]
+        self.module.run_command(cmd + ['--delete', keyid], check_rc=True)
 
     def verify_keyfile(self, keyfile, keyid, fingerprint):
         """Verify that keyfile matches the specified keyid & fingerprint"""
@@ -282,9 +256,7 @@ class PacmanKey(object):
         elif fingerprint is None:
             self.module.fail_json(msg="expected a fingerprint, got none")
 
-        rc, stdout, stderr = self.module.run_command([self.gpg, '--with-colons', '--with-fingerprint', '--batch', '--no-tty', '--show-keys', keyfile])
-        if rc != 0:
-            self.module.fail_json(msg="gpg returned an error: %s" % stderr)
+        _, stdout, _ = self.module.run_command([self.gpg, '--with-colons', '--with-fingerprint', '--batch', '--no-tty', '--show-keys', keyfile], check_rc=True)
 
         extracted_keyid = extracted_fingerprint = None
         for line in stdout.splitlines():
@@ -299,12 +271,9 @@ class PacmanKey(object):
         elif extracted_fingerprint != fingerprint:
             self.module.fail_json(msg="fingerprint does not match. expected %s, got %s" % (fingerprint, extracted_fingerprint))
 
-    def key_in_keyring(self, keyid, keyring=None):
+    def key_in_keyring(self, keyring, keyid):
         "Check if the keyid is in pacman's keyring"
-        if keyring is None:
-            keyring = '/etc/pacman.d/gnupg'
-
-        rc, stdout, stderr = self.module.run_command(
+        rc, _, stderr = self.module.run_command(
             [self.gpg, '--with-colons', '--batch', '--no-tty',
                 '--no-default-keyring', '--keyring=' + keyring + '/pubring.gpg',
                 '--list-keys', keyid])
@@ -326,7 +295,7 @@ def main():
             keyserver=dict(type='str'),
             fingerprint=dict(type='str'),
             force_update=dict(type='bool', default=False),
-            keyring=dict(type='path'),
+            keyring=dict(type='path', default='/etc/pacman.d/gnupg'),
             state=dict(type='str', default='present', choices=['absent', 'present']),
         ),
         supports_check_mode=True,
