@@ -159,12 +159,17 @@ def iscsi_discover(module, portal, port):
         module.fail_json(cmd=cmd, rc=rc, msg=err)
 
 
-def target_loggedon(module, target, portal, port):
+def target_loggedon(module, target, portal=None, port=None):
     cmd = '%s --mode session' % iscsiadm_cmd
     (rc, out, err) = module.run_command(cmd)
 
+    if portal is None:
+        portal = ""
+    if port is None:
+        port = ""
+
     if rc == 0:
-        search_re = "%s:%s.*%s" % (portal.replace(".", "\\."), port, target)
+        search_re = "%s:%s.*%s" % (re.escape(portal), port, re.escape(target))
         return re.search(search_re, out) is not None
     elif rc == 21:
         return False
