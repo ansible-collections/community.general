@@ -275,7 +275,7 @@ def main():
             .format(module.params['name'])
     # Otherwise, state is present, but host doesn't exists, require more params to add host
     elif module.params['state'] == 'present' and not host_exists:
-        for param in ['appliance', 'rack', 'rank']:
+        for param in ['appliance', 'rack', 'rank', 'prim_intf', 'prim_intf_ip', 'network', 'prim_intf_mac']:
             if not module.params[param]:
                 missing_params.append(param)
         if len(missing_params) > 0:   # @FIXME replace with required_if
