@@ -106,6 +106,7 @@ EXAMPLES = r'''
 
 import glob
 import os
+import re
 import socket
 import time
 
@@ -158,12 +159,13 @@ def iscsi_discover(module, portal, port):
         module.fail_json(cmd=cmd, rc=rc, msg=err)
 
 
-def target_loggedon(module, target):
+def target_loggedon(module, target, portal, port):
     cmd = '%s --mode session' % iscsiadm_cmd
     (rc, out, err) = module.run_command(cmd)
 
     if rc == 0:
-        return target in out
+        search_re =  "%s:%s.*%s" % (portal.replace(".", "\\."), port, target)
+        return re.search(search_re, out) is not None
     elif rc == 21:
         return False
     else:
@@ -333,7 +335,7 @@ def main():
         result['nodes'] = nodes
 
     if login is not None:
-        loggedon = target_loggedon(module, target)
+        loggedon = target_loggedon(module, target, portal, port)
         if (login and loggedon) or (not login and not loggedon):
             result['changed'] |= False
             if login:
