@@ -164,7 +164,7 @@ def target_loggedon(module, target, portal, port):
     (rc, out, err) = module.run_command(cmd)
 
     if rc == 0:
-        search_re =  "%s:%s.*%s" % (portal.replace(".", "\\."), port, target)
+        search_re = "%s:%s.*%s" % (portal.replace(".", "\\."), port, target)
         return re.search(search_re, out) is not None
     elif rc == 21:
         return False
