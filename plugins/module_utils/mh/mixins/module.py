@@ -72,7 +72,7 @@ class ModuleMixin(object):
             self.module = module
 
         if not isinstance(self.module, AnsibleModule):
-            if self.auto_args_spec or self.auto_args_spec_extends:
+            if self.auto_args_spec:
                 try:
                     options = self.auto_args()
                     self.module['argument_spec'] = options
