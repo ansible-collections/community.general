@@ -150,21 +150,10 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 
 class CPANMinus(CmdMixin, ModuleHelper):
     output_params = ['name', 'version']
+    auto_args_spec = DOCUMENTATION
     module = dict(
         argument_spec=dict(
-            name=dict(type='str', aliases=['pkg']),
-            version=dict(type='str'),
-            from_path=dict(type='path'),
-            notest=dict(type='bool', default=False),
-            locallib=dict(type='path'),
-            mirror=dict(type='str'),
-            mirror_only=dict(type='bool', default=False),
-            installdeps=dict(type='bool', default=False),
-            system_lib=dict(type='bool', default=False, aliases=['use_sudo'],
-                            removed_in_version="4.0.0", removed_from_collection="community.general"),
-            executable=dict(type='path'),
-            mode=dict(type='str', choices=['compatibility', 'new'], default='compatibility'),
-            name_check=dict(type='str')
+            system_lib=dict(removed_in_version="4.0.0", removed_from_collection="community.general"),
         ),
         required_one_of=[('name', 'from_path')],
 

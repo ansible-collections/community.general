@@ -156,19 +156,9 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
     diff_params = 'value',
     output_params = ('property', 'channel', 'value')
     facts_params = ('property', 'channel', 'value')
+    auto_args_spec = DOCUMENTATION
     module = dict(
-        argument_spec=dict(
-            state=dict(default="present",
-                       choices=("present", "get", "absent"),
-                       type='str'),
-            channel=dict(required=True, type='str'),
-            property=dict(required=True, type='str'),
-            value_type=dict(required=False, type='list',
-                            elements='str', choices=('int', 'uint', 'bool', 'float', 'double', 'string')),
-            value=dict(required=False, type='list', elements='raw'),
-            force_array=dict(default=False, type='bool', aliases=['array']),
-            disable_facts=dict(type='bool', default=False),
-        ),
+        argument_spec={},
         required_if=[('state', 'present', ['value', 'value_type'])],
         required_together=[('value', 'value_type')],
         supports_check_mode=True,
@@ -184,9 +174,6 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
         create=dict(fmt="--create", style=ArgFormat.BOOLEAN),
         values_and_types=dict(fmt=values_fmt)
     )
-
-    def update_xfconf_output(self, **kwargs):
-        self.update_vars(meta={"output": True, "fact": True}, **kwargs)
 
     def __init_module__(self):
         self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.module.params['property'],

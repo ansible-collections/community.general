@@ -122,8 +122,8 @@ class VarDict(object):
 class VarsMixin(object):
 
     def __init__(self, module=None):
-        self.vars = VarDict()
         super(VarsMixin, self).__init__(module)
+        self.vars = VarDict()
 
     def update_vars(self, meta=None, **kwargs):
         if meta is None:

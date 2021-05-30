@@ -395,42 +395,10 @@ from ansible.module_utils.urls import fetch_url
 
 
 class JIRA(StateModuleHelper):
+    auto_args_spec = DOCUMENTATION
     module = dict(
         argument_spec=dict(
-            attachment=dict(type='dict', options=dict(
-                content=dict(type='str'),
-                filename=dict(type='path', required=True),
-                mimetype=dict(type='str')
-            )),
-            uri=dict(type='str', required=True),
-            operation=dict(
-                type='str',
-                choices=['attach', 'create', 'comment', 'edit', 'update', 'fetch', 'transition', 'link', 'search'],
-                aliases=['command'], required=True
-            ),
-            username=dict(type='str', required=True),
-            password=dict(type='str', required=True, no_log=True),
-            project=dict(type='str', ),
-            summary=dict(type='str', ),
-            description=dict(type='str', ),
-            issuetype=dict(type='str', ),
-            issue=dict(type='str', aliases=['ticket']),
-            comment=dict(type='str', ),
-            comment_visibility=dict(type='dict', options=dict(
-                type=dict(type='str', choices=['group', 'role'], required=True),
-                value=dict(type='str', required=True)
-            )),
-            status=dict(type='str', ),
-            assignee=dict(type='str', ),
-            fields=dict(default={}, type='dict'),
-            linktype=dict(type='str', ),
-            inwardissue=dict(type='str', ),
-            outwardissue=dict(type='str', ),
-            jql=dict(type='str', ),
-            maxresults=dict(type='int'),
-            timeout=dict(type='float', default=10),
-            validate_certs=dict(default=True, type='bool'),
-            account_id=dict(type='str'),
+            password=dict(no_log=True),
         ),
         required_if=(
             ('operation', 'attach', ['issue', 'attachment']),
