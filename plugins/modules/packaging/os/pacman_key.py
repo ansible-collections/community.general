@@ -139,7 +139,7 @@ class PacmanKey(object):
         keyid = self.sanitise_identifier(keyid)
         if fingerprint:
             fingerprint = self.sanitise_identifier(fingerprint)
-        key_present = self.key_in_keyring(keyid, keyring)
+        key_present = self.key_in_keyring(keyring, keyid)
 
         if (
             state == "present"
@@ -218,7 +218,7 @@ class PacmanKey(object):
         if keyserver is not None:
             cmd.extend(['--keyserver', keyserver])
         self.module.run_command(cmd + ['--recv-keys', keyid], check_rc=True)
-        self.lsign_key(keyid, keyring)
+        self.lsign_key(keyring, keyid)
 
     def lsign_key(self, keyring, keyid):
         """Locally sign key"""
@@ -240,7 +240,7 @@ class PacmanKey(object):
         if fingerprint is not None:
             self.verify_keyfile(keyfile, keyid, fingerprint)
         self.module.run_command(cmd + ['--add', keyfile], check_rc=True)
-        self.lsign_key(keyid, keyring)
+        self.lsign_key(keyring, keyid)
 
     def remove_key(self, keyring, keyid):
         """Remove key from pacman's keyring"""
