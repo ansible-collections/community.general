@@ -1,0 +1,2 @@
+minor_changes:
+  - archive - added ``exclusion_patterns`` option to exclude files or subdirectories from archives (https://github.com/ansible-collections/community.general/pull/2616).

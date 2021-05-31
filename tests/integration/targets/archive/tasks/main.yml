@@ -363,6 +363,19 @@
 - name: remove nonascii test
   file: path="{{ output_dir }}/test-archive-nonascii-くらとみ.zip" state=absent
 
+- name: Test exclusion_patterns option
+  archive:
+    path: "{{ output_dir }}/*.txt"
+    dest: "{{ output_dir }}/test-archive-exclustion-patterns.tgz"
+    exclusion_patterns: b?r.*
+  register: exclusion_patterns_result
+
+- name: Assert that exclusion_patterns only archives included files
+  assert:
+    that:
+      - exclusion_patterns_result is changed
+      - "'bar.txt' not in exclusion_patterns_result.archived"
+
 - name: Remove backports.lzma if previously installed (pip)
   pip: name=backports.lzma state=absent
   when: backports_lzma_pip is changed
