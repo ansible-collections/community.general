@@ -302,7 +302,7 @@ def main():
             # actions
             login=dict(type='bool', aliases=['state']),
             auto_node_startup=dict(type='bool', aliases=['automatic']),
-            auto_portal_startup=dict(type='bool', aliases=['automatic_portal']),
+            auto_portal_startup=dict(type='bool'),
             discover=dict(type='bool', default=False),
             show_nodes=dict(type='bool', default=False),
         ),
