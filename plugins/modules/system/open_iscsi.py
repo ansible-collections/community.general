@@ -61,7 +61,7 @@ options:
         description:
         - Whether the target node portal should be automatically connected at startup.
         type: bool
-        aliases: [ automatic_portal ]
+        version_added: 3.2.0
     discover:
         description:
         - Whether the list of target nodes on the portal should be
