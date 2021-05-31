@@ -248,7 +248,10 @@ class PacmanKey(object):
         elif fingerprint is None:
             self.module.fail_json(msg="expected a fingerprint, got none")
 
-        _, stdout, _ = self.module.run_command([self.gpg, '--with-colons', '--with-fingerprint', '--batch', '--no-tty', '--show-keys', keyfile], check_rc=True)
+        rc, stdout, stderr = self.module.run_command(
+            [self.gpg, '--with-colons', '--with-fingerprint', '--batch', '--no-tty', '--show-keys', keyfile],
+            check_rc=True
+        )
 
         extracted_keyid = extracted_fingerprint = None
         for line in stdout.splitlines():
@@ -265,7 +268,7 @@ class PacmanKey(object):
 
     def key_in_keyring(self, keyring, keyid):
         "Check if the keyid is in pacman's keyring"
-        rc, _, stderr = self.module.run_command(
+        rc, stdout, stderr = self.module.run_command(
             [self.gpg, '--with-colons', '--batch', '--no-tty',
                 '--no-default-keyring', '--keyring=' + keyring + '/pubring.gpg',
                 '--list-keys', keyid])
