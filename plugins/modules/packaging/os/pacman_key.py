@@ -69,6 +69,7 @@ options:
             - If not specified, module will use pacman's default (/etc/pacman.d/gnupg).
             - Useful if the remote system requires an alternative gnupg directory.
         type: path
+        default: /etc/pacman.d/gnupg
     state:
         description:
             - Ensures that the key is present (added) or absent (revoked).
