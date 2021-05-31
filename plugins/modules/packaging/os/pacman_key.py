@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 module: pacman_key
 author:
 - George Rawlinson (@grawlinson)
-version_added: "1.3.0"
+version_added: "3.2.0"
 short_description: Manage pacman's list of trusted keys
 description:
 - Add or remove gpg keys from the pacman keyring.
@@ -21,7 +21,7 @@ notes:
 - If you specify both the key id and the URL with C(state=present), the task can verify or add the key as needed.
 - By default, keys will be locally signed after being imported into the keyring.
 - If the specified key id exists in the keyring, the key will not be added.
-- I(data), I(file), and I(url) are mutually exclusive.
+- I(data), I(file), I(url), and I(keyserver) are mutually exclusive.
 - Supports C(check_mode).
 requirements:
 - gpg
