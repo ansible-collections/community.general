@@ -5,12 +5,14 @@ from ansible_collections.community.general.plugins.modules.packaging.os import p
 import pytest
 import json
 
+
 @pytest.fixture
 def patch_pacman_key_calls(mocker):
     get_bin_path = mocker.patch(
         'ansible.module_utils.basic.AnsibleModule.get_bin_path',
         return_value="/mocked/path",
     )
+
 
 TEST_FAILING_PARAMS = [
     # state: present, id: absent
@@ -71,6 +73,7 @@ TEST_FAILING_PARAMS = [
     ],
 ]
 
+
 @pytest.mark.parametrize(
     'patch_ansible_module, expected',
     TEST_FAILING_PARAMS,
@@ -92,4 +95,3 @@ def test_failing_params(mocker, capfd, patch_pacman_key_calls, expected):
     assert 'failed' in results
     if 'msg' in results:
         assert results['msg'] == expected['msg']
-
