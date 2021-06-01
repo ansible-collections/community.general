@@ -25,12 +25,12 @@ options:
     type: path
   binary_path:
     description:
-      - The path to the SAPCAR binary e.g. /home/dummy/sapcar or https://myserver/SAPCAR.
+      - The path to the SAPCAR binary, for example, C(/home/dummy/sapcar) or C(https://myserver/SAPCAR).
         If this parameter is not provided the module will look in C(PATH).
     type: path
   signature:
     description:
-      - If C(true) the signature will be extracted
+      - If C(true) the signature will be extracted.
     default: false
     type: bool
   manifest:
@@ -45,52 +45,41 @@ options:
     type: bool
 author:
     - Rainer Leber (@RainerLeber)
+notes:
+    - Always returns B(changed True) in C(check_mode).
 '''
 
 EXAMPLES = """
-# Extract SAR file - simple
-  - name: Run sapcar extract
-    community.general.sapcar_extract:
-      path: "~/source/hana.sar"
-    register: sapcar
+- name: Extract SAR file
+  community.general.sapcar_extract:
+    path: "~/source/hana.sar"
 
-# Extract SAR file with destination
-  - name: Run sapcar extract
-    community.general.sapcar_extract:
-      path: "~/source/hana.sar"
-      dest: "~/test/"
-    register: sapcar
+- name: Extract SAR file with destination
+  community.general.sapcar_extract:
+    path: "~/source/hana.sar"
+    dest: "~/test/"
 
-# Extract SAR file with destination and download from webserver can be a fileshare as well
-  - name: Run sapcar extract
-    community.general.sapcar_extract:
-      path: "~/source/hana.sar"
-      dest: "~/dest/"
-      binary_path: "https://myserver/SAPCAR"
-    register: sapcar
+- name: Extract SAR file with destination and download from webserver can be a fileshare as well
+  community.general.sapcar_extract:
+    path: "~/source/hana.sar"
+    dest: "~/dest/"
+    binary_path: "https://myserver/SAPCAR"
 
-# Extract SAR file and delete SAR after extract
-  - name: Run sapcar extract
-    community.general.sapcar_extract:
-      path: "~/source/hana.sar"
-      remove: true
-    register: sapcar
+- name: Extract SAR file and delete SAR after extract
+  community.general.sapcar_extract:
+    path: "~/source/hana.sar"
+    remove: true
 
-# Extract SAR file with manifest
-  - name: Run sapcar extract
-    community.general.sapcar_extract:
-      path: "~/source/hana.sar"
-      signature: true
-    register: sapcar
+- name: Extract SAR file with manifest
+  community.general.sapcar_extract:
+    path: "~/source/hana.sar"
+    signature: true
 
-# Extract SAR file with manifest and rename it
-  - name: Run sapcar extract
-    community.general.sapcar_extract:
-      path: "~/source/hana.sar"
-      manifest: "MyNewSignature.SMF"
-      signature: true
-    register: sapcar
-
+- name: Extract SAR file with manifest and rename it
+  community.general.sapcar_extract:
+    path: "~/source/hana.sar"
+    manifest: "MyNewSignature.SMF"
+    signature: true
 """
 
 import os
