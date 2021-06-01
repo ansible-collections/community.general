@@ -95,8 +95,12 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 """
 
 TESTCASE_GENERIC_DNS4_SEARCH = [
@@ -120,10 +124,14 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
 ipv4.dns-search:                        search.redhat.com
 ipv6.dns-search:                        search6.redhat.com
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 """
 
 TESTCASE_GENERIC_ZONE = [
@@ -147,8 +155,12 @@ connection.zone:                        external
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 """
 
 TESTCASE_BOND = [
@@ -172,8 +184,12 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 bond.options:                           mode=active-backup,primary=non_existent_primary
 """
 
@@ -199,8 +215,12 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 bridge.mac-address:                     52:54:00:AB:CD:EF
 bridge.stp:                             yes
 bridge.max-age:                         100
@@ -252,8 +272,12 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 vlan.id:                                10
 """
 
@@ -343,8 +367,12 @@ connection.autoconnect:                 yes
 802-3-ethernet.mtu:                     auto
 ipv4.method:                            auto
 ipv4.dhcp-client-id:                    00:11:22:AA:BB:CC:DD
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 """
 
 TESTCASE_ETHERNET_STATIC = [
@@ -368,9 +396,13 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
 ipv4.dns:                               1.1.1.1,8.8.8.8
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 """
 
 
