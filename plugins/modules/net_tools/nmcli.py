@@ -77,6 +77,12 @@ options:
             - Use the format C(192.0.2.1).
             - This parameter is mutually_exclusive with never_default4 parameter.
         type: str
+    gw4_ignore_auto:
+        description:
+            - Ignore automatically configured IPv4 routes.
+        type: bool
+        default: false
+        version_added: 3.2.0
     routes4:
         description:
             - The list of ipv4 routes.
@@ -107,6 +113,12 @@ options:
             - A list of DNS search domains.
         elements: str
         type: list
+    dns4_ignore_auto:
+        description:
+            - Ignore automatically configured IPv4 name servers.
+        type: bool
+        default: false
+        version_added: 3.2.0
     method4:
         description:
             - Configuration method to be used for IPv4.
@@ -125,6 +137,12 @@ options:
             - The IPv6 gateway for this interface.
             - Use the format C(2001:db8::1).
         type: str
+    gw6_ignore_auto:
+        description:
+            - Ignore automatically configured IPv6 routes.
+        type: bool
+        default: false
+        version_added: 3.2.0
     dns6:
         description:
             - A list of up to 3 dns servers.
@@ -136,6 +154,12 @@ options:
             - A list of DNS search domains.
         elements: str
         type: list
+    dns6_ignore_auto:
+        description:
+            - Ignore automatically configured IPv6 name servers.
+        type: bool
+        default: false
+        version_added: 3.2.0
     method6:
         description:
             - Configuration method to be used for IPv6
@@ -648,16 +672,20 @@ class Nmcli(object):
         self.type = module.params['type']
         self.ip4 = module.params['ip4']
         self.gw4 = module.params['gw4']
+        self.gw4_ignore_auto = module.params['gw4_ignore_auto']
         self.routes4 = module.params['routes4']
         self.route_metric4 = module.params['route_metric4']
         self.never_default4 = module.params['never_default4']
         self.dns4 = module.params['dns4']
         self.dns4_search = module.params['dns4_search']
+        self.dns4_ignore_auto = module.params['dns4_ignore_auto']
         self.method4 = module.params['method4']
         self.ip6 = module.params['ip6']
         self.gw6 = module.params['gw6']
+        self.gw6_ignore_auto = module.params['gw6_ignore_auto']
         self.dns6 = module.params['dns6']
         self.dns6_search = module.params['dns6_search']
+        self.dns6_ignore_auto = module.params['dns6_ignore_auto']
         self.method6 = module.params['method6']
         self.mtu = module.params['mtu']
         self.stp = module.params['stp']
@@ -729,7 +757,9 @@ class Nmcli(object):
                 'ipv4.dhcp-client-id': self.dhcp_client_id,
                 'ipv4.dns': self.dns4,
                 'ipv4.dns-search': self.dns4_search,
+                'ipv4.ignore-auto-dns': self.dns4_ignore_auto,
                 'ipv4.gateway': self.gw4,
+                'ipv4.ignore-auto-routes': self.gw4_ignore_auto,
                 'ipv4.routes': self.routes4,
                 'ipv4.route-metric': self.route_metric4,
                 'ipv4.never-default': self.never_default4,
@@ -737,7 +767,9 @@ class Nmcli(object):
                 'ipv6.addresses': self.ip6,
                 'ipv6.dns': self.dns6,
                 'ipv6.dns-search': self.dns6_search,
+                'ipv6.ignore-auto-dns': self.dns6_ignore_auto,
                 'ipv6.gateway': self.gw6,
+                'ipv6.ignore-auto-routes': self.gw6_ignore_auto,
                 'ipv6.method': self.ipv6_method,
             })
 
@@ -900,7 +932,11 @@ class Nmcli(object):
         if setting in ('bridge.stp',
                        'bridge-port.hairpin-mode',
                        'connection.autoconnect',
-                       'ipv4.never-default'):
+                       'ipv4.never-default',
+                       'ipv4.ignore-auto-dns',
+                       'ipv4.ignore-auto-routes',
+                       'ipv6.ignore-auto-dns',
+                       'ipv6.ignore-auto-routes'):
             return bool
         elif setting in ('ipv4.dns',
                          'ipv4.dns-search',
@@ -1116,17 +1152,21 @@ def main():
                       ]),
             ip4=dict(type='str'),
             gw4=dict(type='str'),
+            gw4_ignore_auto=dict(type='bool', default=False),
             routes4=dict(type='list', elements='str'),
             route_metric4=dict(type='int'),
             never_default4=dict(type='bool', default=False),
             dns4=dict(type='list', elements='str'),
             dns4_search=dict(type='list', elements='str'),
+            dns4_ignore_auto=dict(type='bool', default=False),
             method4=dict(type='str', choices=['auto', 'link-local', 'manual', 'shared', 'disabled']),
             dhcp_client_id=dict(type='str'),
             ip6=dict(type='str'),
             gw6=dict(type='str'),
+            gw6_ignore_auto=dict(type='bool', default=False),
             dns6=dict(type='list', elements='str'),
             dns6_search=dict(type='list', elements='str'),
+            dns6_ignore_auto=dict(type='bool', default=False),
             method6=dict(type='str', choices=['ignore', 'auto', 'dhcp', 'link-local', 'manual', 'shared']),
             # Bond Specific vars
             mode=dict(type='str', default='balance-rr',
