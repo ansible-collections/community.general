@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli - add new options to ignore automatic DNS servers and gateways (https://github.com/ansible-collections/community.general/issues/1087).
