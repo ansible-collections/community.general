@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Copyright: (c) 2021, Lennert Mertens (lennert@nubera.be)
 # Copyright: (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
 # Copyright: (c) 2015, Werner Dijkerman (ikben@werner-dijkerman.nl)
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -22,6 +23,8 @@ notes:
 author:
   - Werner Dijkerman (@dj-wasabi)
   - Guillaume Martinez (@Lunik)
+  - Lennert Mertens (@LennertMertens)
+  - Stef Graces (@stgrace)
 requirements:
   - python >= 2.7
   - python-gitlab python module
@@ -107,6 +110,14 @@ options:
       - Define external parameter for this user.
     type: bool
     default: no
+  provider:
+    description:
+      - External provider for this user.
+    type: str
+  extern_uid:
+    description:
+      - External UID for this user.
+    type: str
 '''
 
 EXAMPLES = '''
@@ -130,6 +141,22 @@ EXAMPLES = '''
     email: me@example.com
     sshkey_name: MySSH
     sshkey_file: ssh-rsa AAAAB3NzaC1yc...
+    state: present
+    group: super_group/mon_group
+    access_level: owner
+
+- name: "Create GitLab User using external identity provider"
+  community.general.gitlab_user:
+    api_url: https://gitlab.example.com/
+    validate_certs: True
+    api_username: dj-wasabi
+    api_password: "MySecretPassword"
+    name: My Name
+    username: myusername
+    password: mysecretpassword
+    email: me@example.com
+    provider: Keycloak
+    extern_uid: f278f95c-12c7-4d51-996f-758cc2eb11bc
     state: present
     group: super_group/mon_group
     access_level: owner
@@ -219,10 +246,13 @@ class GitLabUser(object):
                 'name': options['name'],
                 'username': username,
                 'password': options['password'],
+                'reset_password': options['reset_password'],
                 'email': options['email'],
                 'skip_confirmation': not options['confirm'],
                 'admin': options['isadmin'],
-                'external': options['external']})
+                'external': options['external'],
+                'provider': options['provider'],
+                'extern_uid': options['extern_uid']})
             changed = True
         else:
             changed, user = self.updateUser(
@@ -231,6 +261,8 @@ class GitLabUser(object):
                     # params in the dict below
                     'name': {'value': options['name']},
                     'email': {'value': options['email']},
+                    'provider': {'value': options['provider']},
+                    'extern_uid': {'value': options['extern_uid']},
 
                     # note: for some attributes like this one the key
                     #   from reading back from server is unfortunately
@@ -247,6 +279,7 @@ class GitLabUser(object):
                     # not return any information about it
                     'skip_reconfirmation': {'value': not options['confirm']},
                     'password': {'value': options['password']},
+                    'reset_password': {'value': options['reset_password']},
                 }
             )
 
@@ -393,7 +426,13 @@ class GitLabUser(object):
             av = arg_value['value']
 
             if av is not None:
-                if getattr(user, arg_key) != av:
+                if arg_key == "provider" or arg_key == "extern_uid":
+                    for identity in user.identities:
+                        if identity['provider'] == arguments['provider']['value'] and identity['extern_uid'] != arguments['extern_uid']['value']:
+                            setattr(user, 'provider', arguments['provider']['value'])
+                            setattr(user, 'extern_uid', arguments['extern_uid']['value'])
+                            changed = True
+                elif getattr(user, arg_key) != av:
                     setattr(user, arg_value.get('setter', arg_key), av)
                     changed = True
 
@@ -479,6 +518,7 @@ def main():
         state=dict(type='str', default="present", choices=["absent", "present", "blocked", "unblocked"]),
         username=dict(type='str', required=True),
         password=dict(type='str', no_log=True),
+        reset_password=dict(type='str', default=False,  no_log=True),
         email=dict(type='str'),
         sshkey_name=dict(type='str'),
         sshkey_file=dict(type='str', no_log=False),
@@ -488,6 +528,8 @@ def main():
         confirm=dict(type='bool', default=True),
         isadmin=dict(type='bool', default=False),
         external=dict(type='bool', default=False),
+        provider=dict(type='str'),
+        extern_uid=dict(type='str'),
     ))
 
     module = AnsibleModule(
@@ -504,7 +546,7 @@ def main():
         ],
         supports_check_mode=True,
         required_if=(
-            ('state', 'present', ['name', 'email', 'password']),
+            ('state', 'present', ['name', 'email']),
         )
     )
 
@@ -512,6 +554,7 @@ def main():
     state = module.params['state']
     user_username = module.params['username'].lower()
     user_password = module.params['password']
+    user_reset_password = module.params['reset_password']
     user_email = module.params['email']
     user_sshkey_name = module.params['sshkey_name']
     user_sshkey_file = module.params['sshkey_file']
@@ -521,6 +564,8 @@ def main():
     confirm = module.params['confirm']
     user_isadmin = module.params['isadmin']
     user_external = module.params['external']
+    user_provider = module.params['provider']
+    user_extern_uid = module.params['extern_uid']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -559,6 +604,7 @@ def main():
         if gitlab_user.createOrUpdateUser(user_username, {
                                           "name": user_name,
                                           "password": user_password,
+                                          "reset_password": user_reset_password,
                                           "email": user_email,
                                           "sshkey_name": user_sshkey_name,
                                           "sshkey_file": user_sshkey_file,
@@ -567,7 +613,9 @@ def main():
                                           "access_level": access_level,
                                           "confirm": confirm,
                                           "isadmin": user_isadmin,
-                                          "external": user_external}):
+                                          "external": user_external,
+                                          "provider": user_provider,
+                                          "extern_uid": user_extern_uid}):
             module.exit_json(changed=True, msg="Successfully created or updated the user %s" % user_username, user=gitlab_user.userObject._attrs)
         else:
             module.exit_json(changed=False, msg="No need to update the user %s" % user_username, user=gitlab_user.userObject._attrs)
