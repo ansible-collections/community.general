@@ -8,10 +8,10 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: sapcar_extract
-short_description: Manages SAPCAR from SAP
+short_description: Manages SAP SAPCAR archives
 version_added: "3.2.0"
 description:
-    - Provides support for unpacking sar/car files with the SAPCAR binary from SAP and pulling
+    - Provides support for unpacking C(sar)/C(car) files with the SAPCAR binary from SAP and pulling
       information back into Ansible.
 options:
   path:
@@ -26,21 +26,21 @@ options:
   binary_path:
     description:
       - The path to the SAPCAR binary e.g. /home/dummy/sapcar or https://myserver/SAPCAR.
-        If this parameter is not provided the module will try excute from application binary e.g /usr/local/bin.
+        If this parameter is not provided the module will look in C(PATH).
     type: path
   signature:
     description:
-      - If true the Signature will be extracted
+      - If C(true) the signature will be extracted
     default: false
     type: bool
   manifest:
     description:
-      - The Name of the manifest defaults to SIGNATURE.SMF.
+      - The name of the manifest.
     default: "SIGNATURE.SMF"
     type: str
   remove:
     description:
-      - If true the SAR/CAR file will be removed - !!!This should be used with caution!!!.
+      - If C(true) the SAR/CAR file will be removed. B(This should be used with caution!)
     default: false
     type: bool
 author:
@@ -98,7 +98,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url
 
 
-def getListOfFiles(dirName):
+def get_list_of_files(dir_name):
     # create a list of file and directories
     # names in the given directory
     listOfFile = os.listdir(dirName)
@@ -125,7 +125,7 @@ def downloadSAPCAR(binary_path):
                 with open("/tmp/sapcar", 'wb') as out_file:
                     data = response.read()
                     out_file.write(data)
-            os.chmod("/tmp/sapcar", 0o755)
+            os.chmod("/tmp/sapcar", 0o700)
             bin_path = "/tmp/sapcar"
         except Exception:
             bin_path = binary_path
