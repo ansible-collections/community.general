@@ -1,0 +1,2 @@
+minor_changes:
+  - maven_artifact - added ``checksum_alg`` option to support SHA1 checksums in order to support FIPS systems (https://github.com/ansible-collections/community.general/pull/2662).
