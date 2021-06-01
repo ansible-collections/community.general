@@ -219,10 +219,9 @@ def main():
     if remove:
         os.remove(path)
 
-    #if bin path is random generated it will be removed.
+    # if bin path is random generated it will be removed.
     if bin_path_raw[1]:
-        os.unlink(bin_path)
-        assert not os.path.exists(bin_path)
+        os.remove(bin_path)
 
     module.exit_json(changed=changed, message=rc, stdout=out,
                      stderr=err, command=' '.join(command))
