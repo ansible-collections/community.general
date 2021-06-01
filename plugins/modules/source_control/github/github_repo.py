@@ -10,30 +10,18 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: github_repo
+
 short_description: Manage your repositories on Github
+
 version_added: 2.2.0
+
 description:
-- Manages Github repositories using PyGithub library.
-- Authentication can be done with I(access_token) or with I(username) and I(password).
+- Manages Github repositories using the PyGithub library.
+
+extends_documentation_fragment:
+- community.general.github
+
 options:
-  username:
-    description:
-    - Username used for authentication.
-    - This is only needed when not using I(access_token).
-    type: str
-    required: false
-  password:
-    description:
-    - Password used for authentication.
-    - This is only needed when not using I(access_token).
-    type: str
-    required: false
-  access_token:
-    description:
-    - Token parameter for authentication.
-    - This is only needed when not using I(username) and I(password).
-    type: str
-    required: false
   name:
     description:
     - Repository name.
@@ -66,13 +54,19 @@ options:
     - When I(state) is C(present), the repository will be created in the current user profile.
     type: str
     required: false
+  token:
+    aliases:
+    - access_token
+
 requirements:
 - PyGithub>=1.54
+
 notes:
 - For Python 3, PyGithub>=1.54 should be used.
 - "For Python 3.5, PyGithub==1.54 should be used. More information: U(https://pygithub.readthedocs.io/en/latest/changes.html#version-1-54-november-30-2020)."
 - "For Python 2.7, PyGithub==1.45 should be used. More information: U(https://pygithub.readthedocs.io/en/latest/changes.html#version-1-45-december-29-2019)."
 - Supports C(check_mode).
+
 author:
 - Álvaro Torres Cogollo (@atorrescogollo)
 '''
@@ -80,7 +74,7 @@ author:
 EXAMPLES = '''
 - name: Create a Github repository
   community.general.github_repo:
-    access_token: mytoken
+    token: mytoken
     organization: MyOrganization
     name: myrepo
     description: "Just for fun"
@@ -90,8 +84,7 @@ EXAMPLES = '''
 
 - name: Delete the repository
   community.general.github_repo:
-    username: octocat
-    password: password
+    token: mytoken
     organization: MyOrganization
     name: myrepo
     state: absent
@@ -119,11 +112,8 @@ except Exception:
     HAS_GITHUB_PACKAGE = False
 
 
-def authenticate(username=None, password=None, access_token=None):
-    if access_token:
-        return Github(base_url="https://api.github.com", login_or_token=access_token)
-    else:
-        return Github(base_url="https://api.github.com", login_or_token=username, password=password)
+def authenticate(access_token=None, base_url="https://api.github.com"):
+    return Github(base_url=base_url, login_or_token=access_token)
 
 
 def create_repo(gh, name, organization=None, private=False, description='', check_mode=False):
@@ -184,8 +174,7 @@ def delete_repo(gh, name, organization=None, check_mode=False):
 
 
 def run_module(params, check_mode=False):
-    gh = authenticate(
-        username=params['username'], password=params['password'], access_token=params['access_token'])
+    gh = authenticate(access_token=params['access_token'])
     if params['state'] == "absent":
         return delete_repo(
             gh=gh,
@@ -206,10 +195,8 @@ def run_module(params, check_mode=False):
 
 def main():
     module_args = dict(
-        username=dict(type='str', required=False, default=None),
-        password=dict(type='str', required=False, default=None, no_log=True),
-        access_token=dict(type='str', required=False,
-                          default=None, no_log=True),
+        token=dict(type='str', required=True,
+                   no_log=True, aliases=['access_token']),
         name=dict(type='str', required=True),
         state=dict(type='str', required=False, default="present",
                    choices=["present", "absent"]),
@@ -220,9 +207,6 @@ def main():
     module = AnsibleModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        required_together=[('username', 'password')],
-        required_one_of=[('username', 'access_token')],
-        mutually_exclusive=[('username', 'access_token')]
     )
 
     if not HAS_GITHUB_PACKAGE:

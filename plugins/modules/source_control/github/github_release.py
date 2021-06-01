@@ -11,23 +11,16 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: github_release
+
 short_description: Interact with GitHub Releases
+
 description:
     - Fetch metadata about GitHub Releases
+
+extends_documentation_fragment:
+- community.general.github
+
 options:
-    token:
-        description:
-            - GitHub Personal Access Token for authenticating. Mutually exclusive with C(password).
-        type: str
-    user:
-        description:
-            - The GitHub account that owns the repository
-        type: str
-        required: true
-    password:
-        description:
-            - The GitHub account password for the user. Mutually exclusive with C(token).
-        type: str
     repo:
         description:
             - Repository name
@@ -75,28 +68,25 @@ requirements:
 EXAMPLES = '''
 - name: Get latest release of a public repository
   community.general.github_release:
-    user: ansible
+    token: tokenabc1234567890
     repo: ansible
     action: latest_release
 
 - name: Get latest release of testuseer/testrepo
   community.general.github_release:
     token: tokenabc1234567890
-    user: testuser
     repo: testrepo
     action: latest_release
 
-- name: Get latest release of test repo using username and password. Ansible 2.4.
+- name: Get latest release of test repo.
   community.general.github_release:
-    user: testuser
-    password: secret123
+    token: tokenabc1234567890
     repo: testrepo
     action: latest_release
 
 - name: Create a new release
   community.general.github_release:
     token: tokenabc1234567890
-    user: testuser
     repo: testrepo
     action: create_release
     tag: test
@@ -142,9 +132,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             repo=dict(required=True),
-            user=dict(required=True),
-            password=dict(no_log=True),
-            token=dict(no_log=True),
+            token=dict(no_log=True, required=True),
             action=dict(
                 required=True, choices=['latest_release', 'create_release']),
             tag=dict(type='str'),
@@ -155,9 +143,8 @@ def main():
             prerelease=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
-        mutually_exclusive=(('password', 'token'),),
         required_if=[('action', 'create_release', ['tag']),
-                     ('action', 'create_release', ['password', 'token'], True)],
+                     ('action', 'create_release', ['token'], True)],
     )
 
     if not HAS_GITHUB_API:
@@ -165,8 +152,6 @@ def main():
                          exception=GITHUB_IMP_ERR)
 
     repo = module.params['repo']
-    user = module.params['user']
-    password = module.params['password']
     login_token = module.params['token']
     action = module.params['action']
     tag = module.params.get('tag')
@@ -178,15 +163,13 @@ def main():
 
     # login to github
     try:
-        if password:
-            gh_obj = github3.login(user, password=password)
-        elif login_token:
+        if login_token:
             gh_obj = github3.login(token=login_token)
         else:
             gh_obj = github3.GitHub()
 
         # test if we're actually logged in
-        if password or login_token:
+        if login_token:
             gh_obj.me()
     except github3.exceptions.AuthenticationFailed as e:
         module.fail_json(msg='Failed to connect to GitHub: %s' % to_native(e),

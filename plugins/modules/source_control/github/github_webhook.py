@@ -9,11 +9,18 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: github_webhook
+
 short_description: Manage GitHub webhooks
+
 description:
   - "Create and delete GitHub webhooks"
+
 requirements:
   - "PyGithub >= 1.3.5"
+
+extends_documentation_fragment:
+- community.general.github
+
 options:
   repository:
     description:
@@ -69,21 +76,6 @@ options:
     required: false
     choices: [ absent, present ]
     default: present
-  user:
-    description:
-      - User to authenticate to GitHub as
-    type: str
-    required: true
-  password:
-    description:
-      - Password to authenticate to GitHub with
-    type: str
-    required: false
-  token:
-    description:
-      - Token to authenticate to GitHub with
-    type: str
-    required: false
   github_url:
     description:
       - Base URL of the GitHub API
@@ -102,8 +94,7 @@ EXAMPLES = '''
     url: https://www.example.com/hooks/
     events:
       - push
-    user: "{{ github_user }}"
-    password: "{{ github_password }}"
+    token: "{{ github_user_api_token }}"
 
 - name: Create a new webhook in a github enterprise installation with multiple event triggers (token auth)
   community.general.github_webhook:
@@ -115,7 +106,6 @@ EXAMPLES = '''
     events:
       - issue_comment
       - pull_request
-    user: "{{ github_user }}"
     token: "{{ github_user_api_token }}"
     github_url: https://github.example.com
 
@@ -124,8 +114,7 @@ EXAMPLES = '''
     repository: ansible/ansible
     url: https://www.example.com/hooks/
     state: absent
-    user: "{{ github_user }}"
-    password: "{{ github_password }}"
+    token: "{{ github_user_api_token }}"
 '''
 
 RETURN = '''
@@ -197,31 +186,27 @@ def update_hook(repo, hook, module):
 
 def main():
     module = AnsibleModule(
-        argument_spec=dict(
-            repository=dict(type='str', required=True, aliases=['repo']),
-            url=dict(type='str', required=True),
-            content_type=dict(
-                type='str',
-                choices=('json', 'form'),
-                required=False,
-                default='form'),
-            secret=dict(type='str', required=False, no_log=True),
-            insecure_ssl=dict(type='bool', required=False, default=False),
-            events=dict(type='list', elements='str', required=False),
-            active=dict(type='bool', required=False, default=True),
-            state=dict(
-                type='str',
-                required=False,
-                choices=('absent', 'present'),
-                default='present'),
-            user=dict(type='str', required=True),
-            password=dict(type='str', required=False, no_log=True),
-            token=dict(type='str', required=False, no_log=True),
-            github_url=dict(
-                type='str', required=False, default="https://api.github.com")),
-        mutually_exclusive=(('password', 'token'),),
-        required_one_of=(("password", "token"),),
-        required_if=(("state", "present", ("events",)),),
+      argument_spec=dict(
+          repository=dict(type='str', required=True, aliases=['repo']),
+          url=dict(type='str', required=True),
+          content_type=dict(
+              type='str',
+              choices=('json', 'form'),
+              required=False,
+              default='form'),
+          secret=dict(type='str', required=False, no_log=True),
+          insecure_ssl=dict(type='bool', required=False, default=False),
+          events=dict(type='list', elements='str', required=False),
+          active=dict(type='bool', required=False, default=True),
+          state=dict(
+              type='str',
+              required=False,
+              choices=('absent', 'present'),
+              default='present'),
+          token=dict(type='str', required=True, no_log=True),
+          github_url=dict(type='str', required=False, default="https://api.github.com"),
+      ),
+      required_if=[("state", "present", ["events"])]
     )
 
     if not HAS_GITHUB:
@@ -230,8 +215,7 @@ def main():
 
     try:
         github_conn = github.Github(
-            module.params["user"],
-            module.params.get("password") or module.params.get("token"),
+            module.params.get("token"),
             base_url=module.params["github_url"])
     except github.GithubException as err:
         module.fail_json(msg="Could not connect to GitHub at %s: %s" % (

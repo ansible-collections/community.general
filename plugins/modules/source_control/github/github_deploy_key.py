@@ -10,12 +10,18 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: github_deploy_key
+
 author: "Ali (@bincyber)"
+
 short_description: Manages deploy keys for GitHub repositories.
+
 description:
-  - "Adds or removes deploy keys for GitHub repositories. Supports authentication using username and password,
-  username and password and 2-factor authentication code (OTP), OAuth2 token, or personal access token. Admin
+  - "Adds or removes deploy keys for GitHub repositories. Supports authentication using OAuth2 token, or personal access token. Admin
   rights on the repository are required."
+
+extends_documentation_fragment:
+- community.general.github
+
 options:
   github_url:
     description:
@@ -63,24 +69,6 @@ options:
       - If C(true), forcefully adds the deploy key by deleting any existing deploy key with the same public key or title.
     type: bool
     default: 'no'
-  username:
-    description:
-      - The username to authenticate with. Should not be set when using personal access token
-    type: str
-  password:
-    description:
-      - The password to authenticate with. Alternatively, a personal access token can be used instead of I(username) and I(password) combination.
-    type: str
-  token:
-    description:
-      - The OAuth2 token or personal access token to authenticate with. Mutually exclusive with I(password).
-    type: str
-  otp:
-    description:
-      - The 6 digit One Time Password for 2-Factor Authentication. Required together with I(username) and I(password).
-      - Alias C(2fa_token) has been deprecated and will be removed in community.general 5.0.0.
-    aliases: ['2fa_token']
-    type: int
 notes:
    - "Refer to GitHub's API documentation here: https://developer.github.com/v3/repos/keys/."
 '''
@@ -93,8 +81,7 @@ EXAMPLES = '''
     name: "new-deploy-key"
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAwXxn7kIMNWzcDfou..."
     read_only: yes
-    username: "johndoe"
-    password: "supersecretpassword"
+    token: "ABAQDAwXxn7kIMNWzcDfo..."
 
 - name: Remove an existing deploy key from a GitHub repository
   community.general.github_deploy_key:
@@ -103,8 +90,7 @@ EXAMPLES = '''
     name: "new-deploy-key"
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAwXxn7kIMNWzcDfou..."
     force: yes
-    username: "johndoe"
-    password: "supersecretpassword"
+    token: "ABAQDAwXxn7kIMNWzcDfo..."
     state: absent
 
 - name: Add a new deploy key to a GitHub repository, replace an existing key, use an OAuth2 token to authenticate
@@ -122,8 +108,7 @@ EXAMPLES = '''
     repository: "example"
     name: "replace-deploy-key"
     key: "{{ lookup('file', '~/.ssh/github.pub') }}"
-    username: "johndoe"
-    password: "supersecretpassword"
+    token: "ABAQDAwXxn7kIMNWzcDfo..."
 
 - name: Add a new deploy key to a GitHub repository using 2FA
   community.general.github_deploy_key:
@@ -131,8 +116,7 @@ EXAMPLES = '''
     repo: "example"
     name: "new-deploy-key-2"
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAwXxn7kIMNWzcDfou..."
-    username: "johndoe"
-    password: "supersecretpassword"
+    token: "ABAQDAwXxn7kIMNWzcDfo..."
     otp: 123456
 
 - name: Add a read-only deploy key to a repository hosted on GitHub Enterprise
@@ -143,8 +127,7 @@ EXAMPLES = '''
     name: "new-deploy-key"
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAwXxn7kIMNWzcDfou..."
     read_only: yes
-    username: "janedoe"
-    password: "supersecretpassword"
+    token: "ABAQDAwXxn7kIMNWzcDfo..."
 '''
 
 RETURN = '''
@@ -188,8 +171,6 @@ class GithubDeployKey(object):
         self.state = module.params['state']
         self.read_only = module.params.get('read_only', True)
         self.force = module.params.get('force', False)
-        self.username = module.params.get('username', None)
-        self.password = module.params.get('password', None)
         self.token = module.params.get('token', None)
         self.otp = module.params.get('otp', None)
 
@@ -201,13 +182,7 @@ class GithubDeployKey(object):
 
     @property
     def headers(self):
-        if self.username is not None and self.password is not None:
-            self.module.params['url_username'] = self.username
-            self.module.params['url_password'] = self.password
-            self.module.params['force_basic_auth'] = True
-            if self.otp is not None:
-                return {"X-GitHub-OTP": self.otp}
-        elif self.token is not None:
+        if self.token is not None:
             return {"Authorization": "token {0}".format(self.token)}
         else:
             return None
@@ -296,23 +271,8 @@ def main():
             read_only=dict(required=False, type='bool', default=True),
             state=dict(default='present', choices=['present', 'absent']),
             force=dict(required=False, type='bool', default=False),
-            username=dict(required=False, type='str'),
-            password=dict(required=False, type='str', no_log=True),
-            otp=dict(
-                required=False, type='int', aliases=['2fa_token'], no_log=True,
-                deprecated_aliases=[dict(name='2fa_token', version='5.0.0', collection_name='community.general')]),
-            token=dict(required=False, type='str', no_log=True)
+            token=dict(required=True, type='str', no_log=True)
         ),
-        mutually_exclusive=[
-            ['password', 'token']
-        ],
-        required_together=[
-            ['username', 'password'],
-            ['otp', 'username', 'password']
-        ],
-        required_one_of=[
-            ['username', 'token']
-        ],
         supports_check_mode=True,
     )
 

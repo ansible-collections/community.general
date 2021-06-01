@@ -9,12 +9,19 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: github_webhook_info
+
 short_description: Query information about GitHub webhooks
+
 description:
   - "Query information about GitHub webhooks"
   - This module was called C(github_webhook_facts) before Ansible 2.9. The usage did not change.
+
+extends_documentation_fragment:
+- community.general.github
+
 requirements:
   - "PyGithub >= 1.3.5"
+
 options:
   repository:
     description:
@@ -23,21 +30,6 @@ options:
     required: true
     aliases:
       - repo
-  user:
-    description:
-      - User to authenticate to GitHub as
-    type: str
-    required: true
-  password:
-    description:
-      - Password to authenticate to GitHub with
-    type: str
-    required: false
-  token:
-    description:
-      - Token to authenticate to GitHub with
-    type: str
-    required: false
   github_url:
     description:
       - Base URL of the github api
@@ -117,13 +109,9 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             repository=dict(type='str', required=True, aliases=["repo"]),
-            user=dict(type='str', required=True),
-            password=dict(type='str', required=False, no_log=True),
-            token=dict(type='str', required=False, no_log=True),
+            token=dict(type='str', required=True, no_log=True),
             github_url=dict(
                 type='str', required=False, default="https://api.github.com")),
-        mutually_exclusive=(('password', 'token'), ),
-        required_one_of=(("password", "token"), ),
         supports_check_mode=True)
 
     if not HAS_GITHUB:
@@ -131,9 +119,7 @@ def main():
                          exception=GITHUB_IMP_ERR)
 
     try:
-        github_conn = github.Github(
-            module.params["user"],
-            module.params.get("password") or module.params.get("token"),
+        github_conn = github.Github(module.params.get("token"),
             base_url=module.params["github_url"])
     except github.GithubException as err:
         module.fail_json(msg="Could not connect to GitHub at %s: %s" % (
