@@ -94,45 +94,50 @@ EXAMPLES = """
 """
 
 import os
+from tempfile import NamedTemporaryFile
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url
+from ansible.module_utils._text import to_native
 
 
 def get_list_of_files(dir_name):
     # create a list of file and directories
     # names in the given directory
-    listOfFile = os.listdir(dirName)
+    listOfFile = os.listdir(dir_name)
     allFiles = list()
     # Iterate over all the entries
     for entry in listOfFile:
         # Create full path
-        fullPath = os.path.join(dirName, entry)
+        fullPath = os.path.join(dir_name, entry)
         # If entry is a directory then get the list of files in this directory
         if os.path.isdir(fullPath):
             allFiles = allFiles + [fullPath]
-            allFiles = allFiles + getListOfFiles(fullPath)
+            allFiles = allFiles + get_list_of_files(fullPath)
         else:
             allFiles.append(fullPath)
     return allFiles
 
 
-def downloadSAPCAR(binary_path):
+def download_SAPCAR(binary_path):
     bin_path = None
+    is_random = False
+    random_file = NamedTemporaryFile(delete=False)
     # download sapcar binary if url is provided otherwise path is returned
     if binary_path is not None:
-        try:
+        if binary_path.startswith('http://' or 'https://'):
             with open_url(binary_path) as response:
-                with open("/tmp/sapcar", 'wb') as out_file:
+                with open(random_file, 'wb') as out_file:
                     data = response.read()
                     out_file.write(data)
-            os.chmod("/tmp/sapcar", 0o700)
-            bin_path = "/tmp/sapcar"
-        except Exception:
+            os.chmod(random_file, 0o700)
+            bin_path = random_file
+            is_random = True
+        else:
             bin_path = binary_path
-    return bin_path
+    return [bin_path, is_random]
 
 
-def checkifPresent(command, path, dest, signature, manifest):
+def check_if_Present(command, path, dest, signature, manifest):
     # manipuliating output from SAR file for compare with already extracted files
     iter_command = [command, '-tvf', path]
     sar_out = module.run_command(iter_command)[1]
@@ -148,7 +153,7 @@ def checkifPresent(command, path, dest, signature, manifest):
         sar_files = [item for item in sar_files if '.SMF' not in item]
         sar_files = sar_files + [manifest]
     # get extracted files if present
-    files_extracted = getListOfFiles(dest)
+    files_extracted = get_list_of_files(dest)
     # compare extracted files with files in sar file
     present = all(elem in files_extracted for elem in sar_files)
     return present
@@ -178,7 +183,8 @@ def main():
     manifest = params['manifest']
     remove = params['remove']
 
-    bin_path = downloadSAPCAR(params['binary_path'])
+    bin_path_raw = download_SAPCAR(params['binary_path'])
+    bin_path = bin_path_raw[0]
 
     if dest is None:
         dest_head_tail = os.path.split(path)
@@ -191,11 +197,12 @@ def main():
         command = [module.get_bin_path(bin_path, required=True)]
     else:
         try:
-            command = [module.get_bin_path('/tmp/sapcar' or '/tmp/SAPCAR', required=True)]
-        except Exception:
             command = [module.get_bin_path('sapcar', required=True)]
+        except Exception as e:
+            module.fail_json(msg='Failed to find SAPCAR at the expected path or URL "{0}".Please check if it is available: "{1}"'
+                             .format(bin_path, to_native(e)))
 
-    present = checkifPresent(command[0], path, dest, signature, manifest)
+    present = check_if_Present(command[0], path, dest, signature, manifest)
 
     if not present:
         if not signature:
@@ -211,6 +218,11 @@ def main():
 
     if remove:
         os.remove(path)
+
+    #if bin path is random generated it will be removed.
+    if bin_path_raw[1]:
+        os.unlink(bin_path)
+        assert not os.path.exists(bin_path)
 
     module.exit_json(changed=changed, message=rc, stdout=out,
                      stderr=err, command=' '.join(command))
