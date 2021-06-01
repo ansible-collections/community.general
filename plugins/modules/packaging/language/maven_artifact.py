@@ -129,10 +129,10 @@ options:
     verify_checksum:
         type: str
         description:
-            - If C(never), the md5 checksum will never be downloaded and verified.
-            - If C(download), the md5 checksum will be downloaded and verified only after artifact download. This is the default.
-            - If C(change), the md5 checksum will be downloaded and verified if the destination already exist,
-              to verify if they are identical. This was the behaviour before 2.6. Since it downloads the md5 before (maybe)
+            - If C(never), the MD5/SHA1 checksum will never be downloaded and verified.
+            - If C(download), the MD5/SHA1 checksum will be downloaded and verified only after artifact download. This is the default.
+            - If C(change), the MD5/SHA1 checksum will be downloaded and verified if the destination already exist,
+              to verify if they are identical. This was the behaviour before 2.6. Since it downloads the checksum before (maybe)
               downloading the artifact, and since some repository software, when acting as a proxy/cache, return a 404 error
               if the artifact has not been cached yet, it may fail unexpectedly.
               If you still need it, you should consider using C(always) instead - if you deal with a checksum, it is better to
@@ -141,6 +141,15 @@ options:
         required: false
         default: 'download'
         choices: ['never', 'download', 'change', 'always']
+    checksum_alg:
+        type: str
+        description:
+            - If C(md5), checksums will use the MD5 algorithm. This is the default.
+            - If C(sha1), checksums will use the SHA1 algorithm. This can be used on systems configured to use
+              FIPS-compliant algorithms, since MD5 will be blocked on such systems.
+        default: 'md5'
+        choices: ['md5', 'sha1']
+        version_added: 3.2.0
     directory_mode:
         type: str
         description:
@@ -507,7 +516,7 @@ class MavenDownloader:
             raise ValueError(failmsg + " because of " + info['msg'] + "for URL " + url_to_use)
         return None
 
-    def download(self, tmpdir, artifact, verify_download, filename=None):
+    def download(self, tmpdir, artifact, verify_download, filename=None, checksum_alg='md5'):
         if (not artifact.version and not artifact.version_by_spec) or artifact.version == "latest":
             artifact = Artifact(artifact.group_id, artifact.artifact_id, self.find_latest_version_available(artifact), None,
                                 artifact.classifier, artifact.extension)
@@ -528,11 +537,11 @@ class MavenDownloader:
                     shutil.copyfileobj(response, f)
 
             if verify_download:
-                invalid_md5 = self.is_invalid_md5(tempname, url)
-                if invalid_md5:
+                invalid_checksum = self.is_invalid_checksum(tempname, url, checksum_alg)
+                if invalid_checksum:
                     # if verify_change was set, the previous file would be deleted
                     os.remove(tempname)
-                    return invalid_md5
+                    return invalid_checksum
         except Exception as e:
             os.remove(tempname)
             raise e
@@ -541,40 +550,45 @@ class MavenDownloader:
         shutil.move(tempname, artifact.get_filename(filename))
         return None
 
-    def is_invalid_md5(self, file, remote_url):
+    def is_invalid_checksum(self, file, remote_url, checksum_alg='md5'):
         if os.path.exists(file):
-            local_md5 = self._local_md5(file)
+            local_checksum = self._local_checksum(checksum_alg, file)
             if self.local:
                 parsed_url = urlparse(remote_url)
-                remote_md5 = self._local_md5(parsed_url.path)
+                remote_checksum = self._local_checksum(checksum_alg, parsed_url.path)
             else:
                 try:
-                    remote_md5 = to_text(self._getContent(remote_url + '.md5', "Failed to retrieve MD5", False), errors='strict')
+                    remote_checksum = to_text(self._getContent(remote_url + '.' + checksum_alg, "Failed to retrieve checksum", False), errors='strict')
                 except UnicodeError as e:
-                    return "Cannot retrieve a valid md5 from %s: %s" % (remote_url, to_native(e))
-                if(not remote_md5):
-                    return "Cannot find md5 from " + remote_url
+                    return "Cannot retrieve a valid %s checksum from %s: %s" % (checksum_alg, remote_url, to_native(e))
+                if not remote_checksum:
+                    return "Cannot find %s checksum from %s" % (checksum_alg, remote_url)
             try:
-                # Check if remote md5 only contains md5 or md5 + filename
-                _remote_md5 = remote_md5.split(None)[0]
-                remote_md5 = _remote_md5
-                # remote_md5 is empty so we continue and keep original md5 string
-                # This should not happen since we check for remote_md5 before
+                # Check if remote checksum only contains md5/sha1 or md5/sha1 + filename
+                _remote_checksum = remote_checksum.split(None)[0]
+                remote_checksum = _remote_checksum
+                # remote_checksum is empty so we continue and keep original checksum string
+                # This should not happen since we check for remote_checksum before
             except IndexError:
                 pass
-            if local_md5.lower() == remote_md5.lower():
+            if local_checksum.lower() == remote_checksum.lower():
                 return None
             else:
-                return "Checksum does not match: we computed " + local_md5 + " but the repository states " + remote_md5
+                return "Checksum does not match: we computed " + local_checksum + " but the repository states " + remote_checksum
 
         return "Path does not exist: " + file
 
-    def _local_md5(self, file):
-        md5 = hashlib.md5()
+    def _local_checksum(self, checksum_alg, file):
+        if checksum_alg.lower() == 'md5':
+            hash = hashlib.md5()
+        elif checksum_alg.lower() == 'sha1':
+            hash = hashlib.sha1()
+        else:
+            raise ValueError("Unknown checksum_alg %s" % checksum_alg)
         with io.open(file, 'rb') as f:
             for chunk in iter(lambda: f.read(8192), b''):
-                md5.update(chunk)
-        return md5.hexdigest()
+                hash.update(chunk)
+        return hash.hexdigest()
 
 
 def main():
@@ -599,6 +613,7 @@ def main():
             client_key=dict(type="path", required=False),
             keep_name=dict(required=False, default=False, type='bool'),
             verify_checksum=dict(required=False, default='download', choices=['never', 'download', 'change', 'always']),
+            checksum_alg=dict(required=False, default='md5', choices=['md5', 'sha1']),
             directory_mode=dict(type='str'),
         ),
         add_file_common_args=True,
@@ -639,6 +654,7 @@ def main():
     verify_checksum = module.params["verify_checksum"]
     verify_download = verify_checksum in ['download', 'always']
     verify_change = verify_checksum in ['change', 'always']
+    checksum_alg = module.params["checksum_alg"]
 
     downloader = MavenDownloader(module, repository_url, local, headers)
 
@@ -683,12 +699,12 @@ def main():
 
         b_dest = to_bytes(dest, errors='surrogate_or_strict')
 
-    if os.path.lexists(b_dest) and ((not verify_change) or not downloader.is_invalid_md5(dest, downloader.find_uri_for_artifact(artifact))):
+    if os.path.lexists(b_dest) and ((not verify_change) or not downloader.is_invalid_checksum(dest, downloader.find_uri_for_artifact(artifact), checksum_alg)):
         prev_state = "present"
 
     if prev_state == "absent":
         try:
-            download_error = downloader.download(module.tmpdir, artifact, verify_download, b_dest)
+            download_error = downloader.download(module.tmpdir, artifact, verify_download, b_dest, checksum_alg)
             if download_error is None:
                 changed = True
             else:
