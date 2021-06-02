@@ -154,6 +154,7 @@ def main():
             dest=dict(type='path'),
             binary_path=dict(type='path'),
             signature=dict(type='bool', default=False),
+            security_library=dict(type='path'),
             manifest=dict(type='str', default="SIGNATURE.SMF"),
             remove=dict(type='bool', default=False),
         ),
@@ -166,6 +167,7 @@ def main():
     path = params['path']
     dest = params['dest']
     signature = params['signature']
+    security_library =  params['security_library']   
     manifest = params['manifest']
     remove = params['remove']
 
@@ -191,6 +193,8 @@ def main():
 
     if not present:
         command.extend(['-xvf', path, '-R', dest])
+        if security_library:
+            command.extend(['-L', security_library])
         if signature:
             command.extend(['-manifest', manifest])
         if not check_mode:
