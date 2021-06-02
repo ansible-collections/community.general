@@ -95,7 +95,7 @@ def get_list_of_files(dir_name):
     list_of_file = os.listdir(dir_name)
     allFiles = list()
     # Iterate over all the entries
-    for entry in listOfFile:
+    for entry in list_of_file:
         # Create full path
         fullPath = os.path.join(dir_name, entry)
         # If entry is a directory then get the list of files in this directory
@@ -107,26 +107,25 @@ def get_list_of_files(dir_name):
     return allFiles
 
 
-def download_SAPCAR(binary_path):
+def download_SAPCAR(binary_path, module):
     bin_path = None
-    is_random = False
-    random_file = NamedTemporaryFile(delete=False)
     # download sapcar binary if url is provided otherwise path is returned
     if binary_path is not None:
-        if binary_path.startswith('http://' or 'https://'):
+        if binary_path.startswith('https://') or binary_path.startswith('http://'):
+            random_file = NamedTemporaryFile(delete=False)
             with open_url(binary_path) as response:
-                with open(random_file, 'wb') as out_file:
+                with random_file as out_file:
                     data = response.read()
                     out_file.write(data)
-            os.chmod(random_file, 0o700)
-            bin_path = random_file
+            os.chmod(out_file.name, 0o700)
+            bin_path = out_file.name
             module.add_cleanup_file(bin_path)
         else:
             bin_path = binary_path
-    return [bin_path, is_random]
+    return bin_path
 
 
-def check_if_present(command, path, dest, signature, manifest):
+def check_if_Present(command, path, dest, signature, manifest, module):
     # manipuliating output from SAR file for compare with already extracted files
     iter_command = [command, '-tvf', path]
     sar_out = module.run_command(iter_command)[1]
@@ -149,8 +148,6 @@ def check_if_present(command, path, dest, signature, manifest):
 
 
 def main():
-    global module
-
     module = AnsibleModule(
         argument_spec=dict(
             path=dict(type='path', required=True),
@@ -172,7 +169,7 @@ def main():
     manifest = params['manifest']
     remove = params['remove']
 
-    bin_path, bin_path_cleanup = download_SAPCAR(params['binary_path'])
+    bin_path = download_SAPCAR(params['binary_path'], module)
 
     if dest is None:
         dest_head_tail = os.path.split(path)
@@ -190,7 +187,7 @@ def main():
             module.fail_json(msg='Failed to find SAPCAR at the expected path or URL "{0}". Please check whether it is available: {1}'
                              .format(bin_path, to_native(e)))
 
-    present = check_if_Present(command[0], path, dest, signature, manifest)
+    present = check_if_Present(command[0], path, dest, signature, manifest, module)
 
     if not present:
         command.extend(['-xvf', path, '-R', dest])
@@ -206,9 +203,6 @@ def main():
     if remove:
         os.remove(path)
 
-    # if bin path is random generated it will be removed.
-    if bin_path_cleanup:
-        os.remove(bin_path)
 
     module.exit_json(changed=changed, message=rc, stdout=out,
                      stderr=err, command=' '.join(command))
