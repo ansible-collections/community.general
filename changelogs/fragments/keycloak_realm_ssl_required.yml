@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - keycloak_realm module plugin - 'ssl_required' changed from a bool type to accept 'none', 'external' or 'all' (https://github.com/ansible-collections/community.general/pull/2693).
