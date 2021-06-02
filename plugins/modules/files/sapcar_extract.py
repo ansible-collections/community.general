@@ -35,7 +35,7 @@ options:
     type: bool
   security_library:
     description:
-      - The path to the security library, for example, C(/usr/sap/hostctrl/exe/libsapcrytp.so), for signature operations. 
+      - The path to the security library, for example, C(/usr/sap/hostctrl/exe/libsapcrytp.so), for signature operations.
     type: path
   manifest:
     description:
@@ -171,7 +171,7 @@ def main():
     path = params['path']
     dest = params['dest']
     signature = params['signature']
-    security_library =  params['security_library']   
+    security_library =  params['security_library']
     manifest = params['manifest']
     remove = params['remove']
 
