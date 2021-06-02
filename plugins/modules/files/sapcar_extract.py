@@ -203,7 +203,6 @@ def main():
     if remove:
         os.remove(path)
 
-
     module.exit_json(changed=changed, message=rc, stdout=out,
                      stderr=err, command=' '.join(command))
 
