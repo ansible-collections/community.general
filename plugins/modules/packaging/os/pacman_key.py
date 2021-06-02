@@ -18,9 +18,9 @@ description:
 - Add or remove gpg keys from the pacman keyring.
 notes:
 - Use full-length identifier (40 characters) for key ID and fingerprint to avoid key collisions.
-- If you specify both the key id and the URL with C(state=present), the task can verify or add the key as needed.
+- If you specify both the key ID and the URL with I(state=present), the task can verify or add the key as needed.
 - By default, keys will be locally signed after being imported into the keyring.
-- If the specified key id exists in the keyring, the key will not be added.
+- If the specified key ID exists in the keyring, the key will not be added.
 - I(data), I(file), I(url), and I(keyserver) are mutually exclusive.
 - Supports C(check_mode).
 requirements:
@@ -31,23 +31,23 @@ options:
         description:
             - The 40 character identifier of the key.
             - Including this allows check mode to correctly report the changed state.
-            - Do not specify a subkey id, instead specify the master key id.
+            - Do not specify a subkey ID, instead specify the master key ID.
         required: yes
         type: str
     data:
         description:
             - The keyfile contents to add to the keyring.
-            - Must be of "PGP PUBLIC KEY BLOCK" type.
+            - Must be of C(PGP PUBLIC KEY BLOCK) type.
         type: str
     file:
         description:
             - The path to a keyfile on the remote server to add to the keyring.
-            - Remote file should be of "PGP PUBLIC KEY BLOCK" type.
+            - Remote file must be of C(PGP PUBLIC KEY BLOCK) type.
         type: path
     url:
         description:
             - The URL to retrieve keyfile from.
-            - Remote file should be of "PGP PUBLIC KEY BLOCK" type.
+            - Remote file must be of C(PGP PUBLIC KEY BLOCK) type.
         type: str
     keyserver:
         description:
@@ -66,7 +66,7 @@ options:
     keyring:
         description:
             - The full path to the keyring folder on the remote server.
-            - If not specified, module will use pacman's default (/etc/pacman.d/gnupg).
+            - If not specified, module will use pacman's default (C(/etc/pacman.d/gnupg)).
             - Useful if the remote system requires an alternative gnupg directory.
         type: path
         default: /etc/pacman.d/gnupg
@@ -186,7 +186,7 @@ class PacmanKey(object):
         return True
 
     def sanitise_identifier(self, identifier):
-        """Sanitise given key id or fingerprint.
+        """Sanitise given key ID or fingerprint.
 
         Strips whitespace, uppercases all characters, and strips leading `0X`.
         """
@@ -240,11 +240,11 @@ class PacmanKey(object):
         self.module.run_command(cmd + ['--delete', keyid], check_rc=True)
 
     def verify_keyfile(self, keyfile, keyid, fingerprint):
-        """Verify that keyfile matches the specified keyid & fingerprint"""
+        """Verify that keyfile matches the specified key ID & fingerprint"""
         if keyfile is None:
             self.module.fail_json(msg="expected a key, got none")
         elif keyid is None:
-            self.module.fail_json(msg="expected a keyid, got none")
+            self.module.fail_json(msg="expected a key ID, got none")
         elif fingerprint is None:
             self.module.fail_json(msg="expected a fingerprint, got none")
 
@@ -270,12 +270,12 @@ class PacmanKey(object):
                 break
 
         if extracted_keyid != keyid:
-            self.module.fail_json(msg="keyid does not match. expected %s, got %s" % (keyid, extracted_keyid))
+            self.module.fail_json(msg="key ID does not match. expected %s, got %s" % (keyid, extracted_keyid))
         elif extracted_fingerprint != fingerprint:
             self.module.fail_json(msg="fingerprint does not match. expected %s, got %s" % (fingerprint, extracted_fingerprint))
 
     def key_in_keyring(self, keyring, keyid):
-        "Check if the keyid is in pacman's keyring"
+        "Check if the key ID is in pacman's keyring"
         rc, stdout, stderr = self.module.run_command(
             [
                 self.gpg,
@@ -283,7 +283,7 @@ class PacmanKey(object):
                 '--batch',
                 '--no-tty',
                 '--no-default-keyring',
-                '--keyring=' + keyring + '/pubring.gpg',
+                '--keyring=%s/pubring.gpg' % keyring,
                 '--list-keys', keyid
             ],
             check_rc=False,

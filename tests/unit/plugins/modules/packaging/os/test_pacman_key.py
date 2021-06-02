@@ -100,8 +100,8 @@ def test_failing_params(mocker, capfd, patch_pacman_key_calls, expected):
     print(results)
 
     # assertion time!
-    assert 'failed' in results
-    if 'msg' in results:
+    assert results['failed']
+    if 'msg' in expected:
         assert results['msg'] == expected['msg']
 
 
@@ -408,15 +408,15 @@ fpr:::::::::097B313077AE62A02F84DA4DF1A6668FBB7D572E:
 
 
 @pytest.mark.parametrize(
-    'patch_ansible_module, testcase',
+    'patch_ansible_module, expected',
     TEST_CASES,
     ids=[item[1]['id'] for item in TEST_CASES],
     indirect=['patch_ansible_module']
 )
 @pytest.mark.usefixtures('patch_ansible_module')
-def test_normal_operation(mocker, capfd, patch_pacman_key_calls, testcase):
+def test_normal_operation(mocker, capfd, patch_pacman_key_calls, expected):
     # patch run_command invocations with mock data
-    call_results = [item[2] for item in testcase['run_command.calls']]
+    call_results = [item[2] for item in expected['run_command.calls']]
     mock_run_command = mocker.patch.object(
         AnsibleModule,
         'run_command',
@@ -433,12 +433,12 @@ def test_normal_operation(mocker, capfd, patch_pacman_key_calls, testcase):
 
     # assertion time!
     assert 'changed' in results
-    assert results['changed'] == testcase['changed']
-    if 'msg' in results:
-        assert results['msg'] == testcase['msg']
+    assert results['changed'] == expected['changed']
+    if 'msg' in expected:
+        assert results['msg'] == expected['msg']
 
-    assert AnsibleModule.run_command.call_count == len(testcase['run_command.calls'])
+    assert AnsibleModule.run_command.call_count == len(expected['run_command.calls'])
     if AnsibleModule.run_command.call_count:
         call_args_list = [(item[0][0], item[1]) for item in AnsibleModule.run_command.call_args_list]
-        expected_call_args_list = [(item[0], item[1]) for item in testcase['run_command.calls']]
+        expected_call_args_list = [(item[0], item[1]) for item in expected['run_command.calls']]
         assert call_args_list == expected_call_args_list
