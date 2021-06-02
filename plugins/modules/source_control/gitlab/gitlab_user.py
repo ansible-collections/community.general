@@ -422,16 +422,23 @@ class GitLabUser(object):
     def updateUser(self, user, arguments, uncheckable_args):
         changed = False
 
+        arguments = sanitize_arguments(arguments)
+
+        new_identity = {
+                "provider": arguments['provider']['value'],
+                "extern_uid": arguments['extern_uid']['value']
+        }
+
         for arg_key, arg_value in arguments.items():
             av = arg_value['value']
 
             if av is not None:
                 if arg_key == "provider" or arg_key == "extern_uid":
-                    for identity in user.identities:
-                        if identity['provider'] == arguments['provider']['value'] and identity['extern_uid'] != arguments['extern_uid']['value']:
-                            setattr(user, 'provider', arguments['provider']['value'])
-                            setattr(user, 'extern_uid', arguments['extern_uid']['value'])
-                            changed = True
+                    if not new_identity in user.identities:
+                        setattr(user, 'provider', arguments['provider']['value'])
+                        setattr(user, 'extern_uid', arguments['extern_uid']['value'])
+                        changed = True
+
                 elif getattr(user, arg_key) != av:
                     setattr(user, arg_value.get('setter', arg_key), av)
                     changed = True
@@ -450,6 +457,8 @@ class GitLabUser(object):
     def createUser(self, arguments):
         if self._module.check_mode:
             return True
+
+        arguments = sanitize_arguments(arguments)
 
         try:
             user = self._gitlab.users.create(arguments)
@@ -508,6 +517,13 @@ class GitLabUser(object):
         user = self.userObject
 
         return user.unblock()
+
+
+def sanitize_arguments(arguments):
+    for key, value in dict(arguments).items():
+        if value is None:
+            del arguments[key]
+    return arguments
 
 
 def main():
