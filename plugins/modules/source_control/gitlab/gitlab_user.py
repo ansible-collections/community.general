@@ -56,6 +56,7 @@ options:
   reset_password:
     description:
       - Wether the user can change its password or not.
+    default: False
     type: bool
   email:
     description:
@@ -439,7 +440,7 @@ class GitLabUser(object):
                         "extern_uid": arguments['extern_uid']['value']
                     }
 
-                    if not new_identity in user.identities:
+                    if new_identity not in user.identities:
                         setattr(user, 'provider', arguments['provider']['value'])
                         setattr(user, 'extern_uid', arguments['extern_uid']['value'])
                         changed = True
