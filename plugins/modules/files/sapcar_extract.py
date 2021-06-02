@@ -33,6 +33,10 @@ options:
       - If C(true) the signature will be extracted.
     default: false
     type: bool
+  security_library:
+    description:
+      - The path to the security library, for example, C(/usr/sap/hostctrl/exe/libsapcrytp.so), for signature operations. 
+    type: path
   manifest:
     description:
       - The name of the manifest.
