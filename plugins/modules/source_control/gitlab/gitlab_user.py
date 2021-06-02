@@ -53,6 +53,10 @@ options:
       - GitLab server enforces minimum password length to 8, set this value with 8 or more characters.
       - Required only if C(state) is set to C(present).
     type: str
+  reset_password:
+    description:
+      - Wether the user can change its password or not.
+    type: bool
   email:
     description:
       - The email that belongs to the user.
@@ -424,16 +428,17 @@ class GitLabUser(object):
 
         arguments = sanitize_arguments(arguments)
 
-        new_identity = {
-                "provider": arguments['provider']['value'],
-                "extern_uid": arguments['extern_uid']['value']
-        }
-
         for arg_key, arg_value in arguments.items():
             av = arg_value['value']
 
             if av is not None:
                 if arg_key == "provider" or arg_key == "extern_uid":
+
+                    new_identity = {
+                        "provider": arguments['provider']['value'],
+                        "extern_uid": arguments['extern_uid']['value']
+                    }
+
                     if not new_identity in user.identities:
                         setattr(user, 'provider', arguments['provider']['value'])
                         setattr(user, 'extern_uid', arguments['extern_uid']['value'])
@@ -534,7 +539,7 @@ def main():
         state=dict(type='str', default="present", choices=["absent", "present", "blocked", "unblocked"]),
         username=dict(type='str', required=True),
         password=dict(type='str', no_log=True),
-        reset_password=dict(type='str', default=False,  no_log=True),
+        reset_password=dict(type='bool', default=False, no_log=True),
         email=dict(type='str'),
         sshkey_name=dict(type='str'),
         sshkey_file=dict(type='str', no_log=False),
