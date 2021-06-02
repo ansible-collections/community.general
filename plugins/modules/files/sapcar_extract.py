@@ -46,7 +46,7 @@ options:
 author:
     - Rainer Leber (@RainerLeber)
 notes:
-    - Always returns B(changed True) in C(check_mode).
+    - Always returns C(changed=true) in C(check_mode).
 '''
 
 EXAMPLES = """
@@ -92,7 +92,7 @@ from ansible.module_utils._text import to_native
 def get_list_of_files(dir_name):
     # create a list of file and directories
     # names in the given directory
-    listOfFile = os.listdir(dir_name)
+    list_of_file = os.listdir(dir_name)
     allFiles = list()
     # Iterate over all the entries
     for entry in listOfFile:
@@ -120,13 +120,13 @@ def download_SAPCAR(binary_path):
                     out_file.write(data)
             os.chmod(random_file, 0o700)
             bin_path = random_file
-            is_random = True
+            module.add_cleanup_file(bin_path)
         else:
             bin_path = binary_path
     return [bin_path, is_random]
 
 
-def check_if_Present(command, path, dest, signature, manifest):
+def check_if_present(command, path, dest, signature, manifest):
     # manipuliating output from SAR file for compare with already extracted files
     iter_command = [command, '-tvf', path]
     sar_out = module.run_command(iter_command)[1]
@@ -172,8 +172,7 @@ def main():
     manifest = params['manifest']
     remove = params['remove']
 
-    bin_path_raw = download_SAPCAR(params['binary_path'])
-    bin_path = bin_path_raw[0]
+    bin_path, bin_path_cleanup = download_SAPCAR(params['binary_path'])
 
     if dest is None:
         dest_head_tail = os.path.split(path)
@@ -188,16 +187,15 @@ def main():
         try:
             command = [module.get_bin_path('sapcar', required=True)]
         except Exception as e:
-            module.fail_json(msg='Failed to find SAPCAR at the expected path or URL "{0}".Please check if it is available: "{1}"'
+            module.fail_json(msg='Failed to find SAPCAR at the expected path or URL "{0}". Please check whether it is available: {1}'
                              .format(bin_path, to_native(e)))
 
     present = check_if_Present(command[0], path, dest, signature, manifest)
 
     if not present:
-        if not signature:
-            command.extend(['-xvf', path, '-R', dest])
-        else:
-            command.extend(['-xvf', path, '-R', dest, '-manifest', manifest])
+        command.extend(['-xvf', path, '-R', dest])
+        if signature:
+            command.extend(['-manifest', manifest])
         if not check_mode:
             (rc, out, err) = module.run_command(command, check_rc=True)
         changed = True
@@ -209,7 +207,7 @@ def main():
         os.remove(path)
 
     # if bin path is random generated it will be removed.
-    if bin_path_raw[1]:
+    if bin_path_cleanup:
         os.remove(bin_path)
 
     module.exit_json(changed=changed, message=rc, stdout=out,
