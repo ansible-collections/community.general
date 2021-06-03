@@ -717,8 +717,9 @@ files:
     labels: zypper
     ignore: dirtyharrycallahan robinro
   $modules/packaging/os/zypper_repository.py:
-    maintainers: $team_suse matze
+    maintainers: $team_suse
     labels: zypper
+    ignore: matze
   $modules/remote_management/cobbler/:
     maintainers: dagwieers
   $modules/remote_management/hpilo/:
