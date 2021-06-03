@@ -654,7 +654,7 @@ def main():
         registration_flow=dict(type='str', aliases=['registrationFlow']),
         remember_me=dict(type='bool', aliases=['rememberMe']),
         reset_credentials_flow=dict(type='str', aliases=['resetCredentialsFlow']),
-        reset_password_allowed=dict(type='bool', aliases=['resetPasswordAllowed']),
+        reset_password_allowed=dict(type='bool', aliases=['resetPasswordAllowed'], no_log=False),
         revoke_refresh_token=dict(type='bool', aliases=['revokeRefreshToken']),
         smtp_server=dict(type='dict', aliases=['smtpServer']),
         ssl_required=dict(type='bool', aliases=['sslRequired']),
