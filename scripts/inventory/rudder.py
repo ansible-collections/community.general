@@ -146,6 +146,18 @@ class RudderInventory(object):
         cache.write(json_data)
         cache.close()
 
+    def get_inherited_properties(self, node_id):
+        ''' Gets the node properties and inherited properties from Rudder api'''
+
+        path = '/nodes/' + node_id + '/inheritedProperties'
+        result = self.api_call(path)
+        properties = []
+        if 'properties' in result['data'][0]:
+            # only keep the keys and values
+            for prop in result['data'][0]['properties']:
+                properties.append({'name': prop['name'], 'value': prop['value']})
+        return properties
+
     def get_nodes(self):
         ''' Gets the nodes list from Rudder '''
 
@@ -157,10 +169,7 @@ class RudderInventory(object):
         for node in result['data']['nodes']:
             nodes[node['id']] = {}
             nodes[node['id']]['hostname'] = node['hostname']
-            if 'properties' in node:
-                nodes[node['id']]['properties'] = node['properties']
-            else:
-                nodes[node['id']]['properties'] = []
+            nodes[node['id']]['properties'] = self.get_inherited_properties(node['id'])
 
         return nodes
 
