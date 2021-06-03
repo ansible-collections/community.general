@@ -119,11 +119,13 @@ options:
   provider:
     description:
       - External provider for this user.
+    version_added: 3.2.0
     type: str
   extern_uid:
     description:
       - External UID for this user.
     type: str
+    version_added: 3.2.0
 '''
 
 EXAMPLES = '''
