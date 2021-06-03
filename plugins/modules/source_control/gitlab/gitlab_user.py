@@ -56,7 +56,7 @@ options:
   reset_password:
     description:
       - Wether the user can change its password or not.
-    default: False
+    default: false
     type: bool
     version_added: 3.2.0
   email:
