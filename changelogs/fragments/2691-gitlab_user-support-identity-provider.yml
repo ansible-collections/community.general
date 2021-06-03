@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - "gitlab_user - Add functionality for adding an external identity provider to a GitLab user (https://github.com/ansible-collections/community.general/pull/2691)"
