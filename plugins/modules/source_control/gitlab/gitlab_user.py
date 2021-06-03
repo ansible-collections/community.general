@@ -541,7 +541,7 @@ def main():
         state=dict(type='str', default="present", choices=["absent", "present", "blocked", "unblocked"]),
         username=dict(type='str', required=True),
         password=dict(type='str', no_log=True),
-        reset_password=dict(type='bool', default=False, no_log=True),
+        reset_password=dict(type='bool', default=False, no_log=False),
         email=dict(type='str'),
         sshkey_name=dict(type='str'),
         sshkey_file=dict(type='str', no_log=False),
