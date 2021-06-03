@@ -154,8 +154,7 @@ EXAMPLES = '''
   community.general.gitlab_user:
     api_url: https://gitlab.example.com/
     validate_certs: True
-    api_username: dj-wasabi
-    api_password: "MySecretPassword"
+    api_token: "{{ access_token }}"
     name: My Name
     username: myusername
     password: mysecretpassword
