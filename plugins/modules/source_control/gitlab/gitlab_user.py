@@ -58,6 +58,7 @@ options:
       - Wether the user can change its password or not.
     default: False
     type: bool
+    version_added: 3.2.0
   email:
     description:
       - The email that belongs to the user.
