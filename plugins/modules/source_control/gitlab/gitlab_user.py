@@ -527,7 +527,7 @@ class GitLabUser(object):
 
 
 def sanitize_arguments(arguments):
-    for key, value in dict(arguments).items():
+    for key, value in list(arguments.items()):
         if value is None:
             del arguments[key]
     return arguments
