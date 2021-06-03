@@ -257,7 +257,8 @@ class GitLabUser(object):
                 'admin': options['isadmin'],
                 'external': options['external'],
                 'provider': options['provider'],
-                'extern_uid': options['extern_uid']})
+                'extern_uid': options['extern_uid'],
+            })
             changed = True
         else:
             changed, user = self.updateUser(
