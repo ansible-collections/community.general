@@ -47,10 +47,10 @@ class ActionModule(ActionBase):
         '''
         async_status = self._task.copy()
         async_status.args = module_args
-        async_status.action = 'async_status'
+        async_status.action = 'ansible.builtin.async_status'
         async_status.async_val = 0
         async_action = self._shared_loader_obj.action_loader.get(
-            'ansible.legacy.async_status', task=async_status, connection=self._connection,
+            'ansible.builtin.async_status', task=async_status, connection=self._connection,
             play_context=self._play_context, loader=self._loader, templar=self._templar,
             shared_loader_obj=self._shared_loader_obj)
 
