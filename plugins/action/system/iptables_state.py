@@ -113,7 +113,7 @@ class ActionModule(ActionBase):
                     module_args['_back'] = '%s/iptables.state' % async_dir
 
                     async_status_task = self._task.copy()
-                    async_status_task._task.async_val = 0
+                    async_status_task.async_val = 0
                     async_status_task.args.clear()
 
                     confirm_cmd = 'rm -f %s' % module_args['_back']
