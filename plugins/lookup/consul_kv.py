@@ -2,11 +2,6 @@
 # (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import (absolute_import, division, print_function)
-from ansible.module_utils._text import to_text
-from ansible.plugins.lookup import LookupBase
-from ansible.errors import AnsibleError, AnsibleAssertionError
-from ansible.module_utils.six.moves.urllib.parse import urlparse
-import os
 
 __metaclass__ = type
 
@@ -107,6 +102,11 @@ RETURN = """
     type: dict
 """
 
+import os
+from ansible.module_utils.six.moves.urllib.parse import urlparse
+from ansible.errors import AnsibleError, AnsibleAssertionError
+from ansible.plugins.lookup import LookupBase
+from ansible.module_utils._text import to_text
 
 try:
     import consul
@@ -126,7 +126,6 @@ class LookupModule(LookupBase):
 
         # get options
         self.set_options(direct=kwargs)
-
         scheme = self.get_option('scheme')
         host = self.get_option('host')
         port = self.get_option('port')
@@ -138,6 +137,10 @@ class LookupModule(LookupBase):
             host = u.hostname
             if u.port is not None:
                 port = u.port
+        token = self.get_option('token')
+        datacenter = self.get_option('datacenter')
+        recurse = self.get_option('recurse')
+        index = self.get_option('index')
 
         validate_certs = self.get_option('validate_certs')
         client_cert = self.get_option('client_cert')
@@ -145,15 +148,14 @@ class LookupModule(LookupBase):
         values = []
         try:
             for term in terms:
-                params = self.parse_params(term)
-                consul_api = consul.Consul(
-                    host=host, port=port, scheme=scheme, verify=validate_certs, cert=client_cert)
+                key = term.split(' ')[0]
+                consul_api = consul.Consul(host=host, port=port, scheme=scheme, token=token,
+                                           dc=datacenter, verify=validate_certs, cert=client_cert)
 
-                results = consul_api.kv.get(params['key'],
-                                            token=params['token'],
-                                            index=params['index'],
-                                            recurse=params['recurse'],
-                                            dc=params['datacenter'])
+                results = consul_api.kv.get(key,
+                                            index=index,
+                                            recurse=recurse,
+                                            )
                 if results[1]:
                     # responds with a single or list of result maps
                     if isinstance(results[1], list):
@@ -163,31 +165,6 @@ class LookupModule(LookupBase):
                         values.append(to_text(results[1]['Value']))
         except Exception as e:
             raise AnsibleError(
-                "Error locating '%s' in kv store. Error was %s" % (term, e))
+                "Error locating '%s' in kv store. Error was %s" % (key, e))
 
         return values
-
-    def parse_params(self, term):
-        params = term.split(' ')
-
-        paramvals = {
-            'key': params[0],
-            'token': self.get_option('token'),
-            'recurse': self.get_option('recurse'),
-            'index': self.get_option('index'),
-            'datacenter': self.get_option('datacenter')
-        }
-
-        # parameters specified?
-        try:
-            for param in params[1:]:
-                if param and len(param) > 0:
-                    name, value = param.split('=')
-                    if name not in paramvals:
-                        raise AnsibleAssertionError(
-                            "%s not a valid consul lookup parameter" % name)
-                    paramvals[name] = value
-        except (ValueError, AssertionError) as e:
-            raise AnsibleError(e)
-
-        return paramvals
