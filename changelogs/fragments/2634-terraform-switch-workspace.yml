@@ -1,0 +1,2 @@
+bugfixes:
+  - terraform - ensure the workspace is set back to its previous value when the apply fails (https://github.com/ansible-collections/community.general/pull/2634).
