@@ -447,7 +447,14 @@ def main():
         command.append(plan_file)
 
     if needs_application and not module.check_mode and not state == 'planned':
-        rc, out, err = module.run_command(command, check_rc=True, cwd=project_path)
+        rc, out, err = module.run_command(command, check_rc=False, cwd=project_path)
+        if rc != 0:
+            if workspace_ctx["current"] != workspace:
+                select_workspace(command[0], project_path, workspace_ctx["current"])
+            module.fail_json(msg=err.rstrip(), rc=rc, stdout=out,
+                             stdout_lines=out.splitlines(), stderr=err,
+                             stderr_lines=err.splitlines(),
+                             cmd=' '.join(command))
         # checks out to decide if changes were made during execution
         if ' 0 added, 0 changed' not in out and not state == "absent" or ' 0 destroyed' not in out:
             changed = True
