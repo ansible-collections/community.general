@@ -314,8 +314,7 @@ TESTCASES = [
             'changed': False,
         },
     ],
-    # TODO
-    # state: present, key: absent
+    # state: present, key: absent, method: file
     [
         {
             'state': 'present',
@@ -371,7 +370,8 @@ TESTCASES = [
             'changed': True,
         },
     ],
-    # state: present, key: absent, keyid & keyfile don't match
+    # state: present, key: absent, method: file
+    # failure: keyid & keyfile don't match
     [
         {
             'state': 'present',
@@ -460,6 +460,63 @@ gpg:               imported: 1
             'changed': True,
         },
     ],
+    # state: present, key: absent, method: data
+    [
+        {
+            'state': 'present',
+            'id': TESTING_KEYID,
+            'data': 'PGP_DATA',
+        },
+        {
+            'id': 'state_present_key_absent_method_data',
+            'run_command.calls': [
+                (
+                    RUN_CMD_LISTKEYS,
+                    {'check_rc': False},
+                    (
+                        2,
+                        '',
+                        GPG_NOKEY_OUTPUT,
+                    ),
+                ),
+                (
+                    RUN_CMD_SHOW_KEYFILE,
+                    {'check_rc': True},
+                    (
+                        0,
+                        GPG_SHOWKEY_OUTPUT,
+                        '',
+                    ),
+                ),
+                (
+                    [
+                        MOCK_BIN_PATH,
+                        '--gpgdir',
+                        '/etc/pacman.d/gnupg',
+                        '--add',
+                        '/tmp/pubkey.asc',
+                    ],
+                    {'check_rc': True},
+                    (
+                        0,
+                        PACMAN_KEY_SUCCESS,
+                        '',
+                    ),
+                ),
+                (
+                    RUN_CMD_LSIGN_KEY,
+                    {'check_rc': True},
+                    (
+                        0,
+                        PACMAN_KEY_SUCCESS,
+                        '',
+                    ),
+                ),
+            ],
+            'save_key_output': TESTING_KEYFILE_PATH,
+            'changed': True,
+        },
+    ],
 ]
 
 
@@ -486,6 +543,14 @@ def test_operation(mocker, capfd, patch_get_bin_path, expected):
             AnsibleModule,
             'run_command',
             side_effect=[item[2] for item in expected['run_command.calls']],
+        )
+
+    # patch save_key invocations with mock data
+    if 'save_key_output' in expected:
+        mock_save_key = mocker.patch.object(
+            pacman_key.PacmanKey,
+            'save_key',
+            return_value=expected['save_key_output'],
         )
 
     # invoke module
