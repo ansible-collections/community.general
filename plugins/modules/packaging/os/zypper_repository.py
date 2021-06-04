@@ -124,6 +124,7 @@ EXAMPLES = '''
 '''
 
 import traceback
+import re
 
 XML_IMP_ERR = None
 try:
@@ -175,7 +176,7 @@ def _parse_repos(module):
         module.fail_json(msg='Failed to execute "%s"' % " ".join(cmd), rc=rc, stdout=stdout, stderr=stderr)
 
 
-def _repo_changes(realrepo, repocmp):
+def _repo_changes(module, realrepo, repocmp):
     "Check whether the 2 given repos have different settings."
     for k in repocmp:
         if repocmp[k] and k not in realrepo:
@@ -186,6 +187,9 @@ def _repo_changes(realrepo, repocmp):
             valold = str(repocmp[k] or "")
             valnew = v or ""
             if k == "url":
+                cmd = ('rpm -q --qf "%{version}" -f /etc/os-release')
+                rc, stdout, stderr = module.run_command(cmd, check_rc=True)
+                valnew = re.sub('$releasever', stdout, valold)
                 valold, valnew = valold.rstrip("/"), valnew.rstrip("/")
             if valold != valnew:
                 return True
@@ -215,7 +219,7 @@ def repo_exists(module, repodata, overwrite_multiple):
         return (False, False, None)
     elif len(repos) == 1:
         # Found an existing repo, look for changes
-        has_changes = _repo_changes(repos[0], repodata)
+        has_changes = _repo_changes(module, repos[0], repodata)
         return (True, has_changes, repos)
     elif len(repos) >= 2:
         if overwrite_multiple:
