@@ -1,0 +1,2 @@
+deprecated_features:
+- "All inventory and vault scripts will be removed from community.general. If you are referencing them, please update your references to the new `contrib-scripts GitHub repository <https://github.com/ansible-community/contrib-scripts>`_ so your workflow will not break once community.general 4.0.0 is released (https://github.com/ansible-collections/community.general/pull/2697)."
