@@ -1,4 +1,4 @@
 ---
 bugfixes:
-  - zypper_repository - fix idempotency on adding repo with releasever
+  - zypper_repository - fix idempotency on adding repository with ``$releasever``
     (https://github.com/ansible-collections/community.general/issues/1985).
