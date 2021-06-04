@@ -142,8 +142,8 @@
 
 - assert:
     that:
-      - "add_repo.changed"
-      - "not add_repo_again.changed"
+      - add_repo is changed
+      - add_repo_again is not changed
 
 - name: remove added repo
   community.general.zypper_repository:
@@ -153,4 +153,4 @@
 
 - assert:
     that:
-      - "remove_repo.changed"
+      - remove_repo is changed
