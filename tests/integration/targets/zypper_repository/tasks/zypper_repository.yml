@@ -128,12 +128,14 @@
 
 - name: add a repo by releasever
   community.general.zypper_repository:
+    name: testrepo
     repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_$releasever/
     state: present
   register: add_repo
 
 - name: add a repo by releasever again
   community.general.zypper_repository:
+    name: testrepo
     repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_$releasever/
     state: present
   register: add_repo_again
