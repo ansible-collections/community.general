@@ -147,9 +147,8 @@ class PacmanKey(object):
         # check mode
         if module.check_mode:
             if state == "present":
-                if (key_present and force_update) or not key_present:
-                    module.exit_json(changed=True)
-                module.exit_json(changed=False)
+                changed = (key_present and force_update) or not key_present
+                module.exit_json(changed=changed)
             elif state == "absent":
                 if key_present:
                     module.exit_json(changed=True)
