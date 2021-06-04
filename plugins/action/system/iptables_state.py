@@ -115,6 +115,9 @@ class ActionModule(ActionBase):
                     async_status_task = self._task.copy()
                     async_status_task.async_val = 0
                     async_status_task.args.clear()
+                    # For following is needed for Ansible 2.9, since its async_status action plugin
+                    # does not provide the module name when calling self._execute_module().
+                    async_status_task.action = 'ansible.builtin.async_status'
 
                     confirm_cmd = 'rm -f %s' % module_args['_back']
                     starter_cmd = 'touch %s.starter' % module_args['_back']
