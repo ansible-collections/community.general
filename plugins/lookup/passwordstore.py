@@ -138,6 +138,7 @@ import os
 import subprocess
 import time
 import yaml
+import gpg
 
 
 from distutils import util
@@ -188,7 +189,53 @@ def check_output2(*popenargs, **kwargs):
     return b_out
 
 
+class DecryptException(Exception):
+    pass
+
+class FileNotFoundException(Exception):
+    pass
+
+
+def decrypt_gpg_file(file):
+    ctx = gpg.Context()
+    try:
+        with open(file, "rb") as cfile:
+            return ctx.decrypt(cfile)
+    except (gpg.errors.GPGMEError, OSError) as ex:
+        text = "Failed to decrypt file: %s - %s"
+        text.format(file, repr(ex))
+        if isinstance(ex, OSError):
+            raise FileNotFoundException(text) from ex
+        else:
+            raise DecryptException(text) from ex
+
 class LookupModule(LookupBase):
+
+    def __init__(self, loader=None, templar=None, **kwargs):
+        super().__init__(loader, templar, **kwargs)
+        self.paramvals = {
+            'subkey': 'password',
+            'create': False,
+            'returnall': False,
+            'overwrite': False,
+            'nosymbols': False,
+            'userpass': '',
+            'length': 16,
+            'backup': False,
+        }
+        self.cache_dict = {}
+        self.passname = None
+        self.password = None
+        self.passdict = {}
+        self.passoutput = None
+
+    def pass_to_path(self, file):
+        _, ext = os.path.splitext(file)
+        if not ext or ext != ".gpg":
+            file += ".gpg"
+        result = os.path.join(self.env["PASSWORD_STORE_DIR"], file)
+        return result
+
     def parse_params(self, term):
         # I went with the "traditional" param followed with space separated KV pairs.
         # Waiting for final implementation of lookup parameter parsing.
@@ -242,9 +289,14 @@ class LookupModule(LookupBase):
                     raise AnsibleError('Passwordstore umask not allowed (password not user readable).')
                 else:
                     self.env['PASSWORD_STORE_UMASK'] = self.paramvals['umask']
+            return self.passname
 
     def check_pass(self):
         try:
+
+            fullpath = self.pass_to_path(self.passname)
+            plaintext, _, _ = decrypt_gpg_file(fullpath)
+
             self.passoutput = to_text(
                 check_output2(["pass", "show", self.passname], env=self.env),
                 errors='surrogate_or_strict'
@@ -260,6 +312,9 @@ class LookupModule(LookupBase):
                     if ':' in line:
                         name, value = line.split(':', 1)
                         self.passdict[name.strip()] = value.strip()
+        except (FileNotFoundException) as e:
+            if not self.paramvals['create']:
+                raise AnsibleError('passname: {0} not found, use create=True'.format(fullpath))
         except (subprocess.CalledProcessError) as e:
             if e.returncode != 0 and 'not in the password store' in e.output:
                 # if pass returns 1 and return string contains 'is not in the password store.'
@@ -271,10 +326,13 @@ class LookupModule(LookupBase):
                         display.warning('passwordstore: passname {0} not found'.format(self.passname))
                     return False
             else:
-                raise AnsibleError(e)
+                return False
+        except (DecryptException) as e:
+            raise AnsibleError(e)
         return True
 
     def get_newpass(self):
+        self.paramvals['directory'] = variables.get('passwordstore')
         if self.paramvals['nosymbols']:
             chars = C.DEFAULT_PASSWORD_CHARS[:62]
         else:
@@ -340,7 +398,36 @@ class LookupModule(LookupBase):
         }
 
         for term in terms:
-            self.parse_params(term)   # parse the input into paramvals
+            file = self.parse_params(term)   # parse the input into paramvals
+            check = False
+            if file in self.cache_dict:
+                cache = self.cache_dict[file]
+                if 'check' in cache:
+                    check = cache['check']
+                    data = cache['data']
+                    self.password = data['password']
+                    self.passdict = data['passdict']
+                    self.passoutput = data['passoutput']
+                else:
+                    check = self.check_pass()
+                    self.cache_dict[file] = {
+                        'check': check,
+                        'data': {
+                            'password': self.password,
+                            'passdict': self.passdict,
+                            'passoutput': self.passoutput
+                        }
+                    }
+            else:
+                check = self.check_pass()
+                self.cache_dict[file] = {
+                    'check': check,
+                    'data': {
+                        'password': self.password,
+                        'passdict': self.passdict,
+                        'passoutput': self.passoutput
+                    }
+                }
             if self.check_pass():     # password exists
                 if self.paramvals['overwrite'] and self.paramvals['subkey'] == 'password':
                     result.append(self.update_password())
@@ -351,5 +438,5 @@ class LookupModule(LookupBase):
                     result.append(self.generate_password())
                 else:
                     result.append(None)
-
+                    del self.cache_dict[file]
         return result
