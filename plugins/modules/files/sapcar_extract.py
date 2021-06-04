@@ -129,7 +129,7 @@ def download_SAPCAR(binary_path, module):
     return bin_path
 
 
-def check_if_Present(command, path, dest, signature, manifest, module):
+def check_if_present(command, path, dest, signature, manifest, module):
     # manipuliating output from SAR file for compare with already extracted files
     iter_command = [command, '-tvf', path]
     sar_out = module.run_command(iter_command)[1]
@@ -193,7 +193,7 @@ def main():
             module.fail_json(msg='Failed to find SAPCAR at the expected path or URL "{0}". Please check whether it is available: {1}'
                              .format(bin_path, to_native(e)))
 
-    present = check_if_Present(command[0], path, dest, signature, manifest, module)
+    present = check_if_present(command[0], path, dest, signature, manifest, module)
 
     if not present:
         command.extend(['-xvf', path, '-R', dest])
