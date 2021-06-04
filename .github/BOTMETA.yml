@@ -6,12 +6,9 @@ files:
     support: community
   $actions:
     labels: action
-  $actions/aireos.py:
-    labels: aireos cisco networking
-  $actions/ironware.py:
-    maintainers: paulquack
-    labels: ironware networking
-  $actions/shutdown.py:
+  $actions/system/iptables_state.py:
+    maintainers: quidame
+  $actions/system/shutdown.py:
     maintainers: nitzmahone samdoran aminvakil
   $becomes/:
     labels: become
@@ -853,6 +850,8 @@ files:
     labels: interfaces_file
   $modules/system/iptables_state.py:
     maintainers: quidame
+  $modules/system/shutdown.py:
+    maintainers: nitzmahone samdoran aminvakil
   $modules/system/java_cert.py:
     maintainers: haad absynth76
   $modules/system/java_keystore.py:
