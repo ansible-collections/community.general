@@ -1,0 +1,2 @@
+bugfixes:
+- "iptables_state - use ``async_status`` action plugin instead of module internally to check status (https://github.com/ansible-collections/community.general/pull/2706)."
