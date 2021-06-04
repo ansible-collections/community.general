@@ -100,7 +100,7 @@ options:
   fs_type:
     description:
      - If specified and the partition does not exist, will set filesystem type to given partition.
-     - Parameter optional, but see notes below about negative negative C(part_start) values.
+     - Parameter optional, but see notes below about negative C(part_start) values.
     type: str
     version_added: '0.2.0'
   resize:
