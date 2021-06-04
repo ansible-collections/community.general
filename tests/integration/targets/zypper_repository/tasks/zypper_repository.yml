@@ -125,3 +125,30 @@
     priority: 100
     auto_import_keys: true
     state: "present"
+
+- name: add a repo by releasever
+  community.general.zypper_repository:
+    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_$releasever/
+    state: present
+  register: add_repo
+
+- name: add a repo by releasever again
+  community.general.zypper_repository:
+    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_$releasever/
+    state: present
+  register: add_repo_again
+
+- assert:
+    that:
+      - "add_repo.changed"
+      - "not add_repo_again.changed"
+
+- name: remove added repo
+  community.general.zypper_repository:
+    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_$releasever/
+    state: absent
+  register: remove_repo
+
+- assert:
+    that:
+      - "remove_repo.changed"
