@@ -124,7 +124,6 @@ EXAMPLES = '''
 '''
 
 import traceback
-import re
 
 XML_IMP_ERR = None
 try:
@@ -189,7 +188,8 @@ def _repo_changes(module, realrepo, repocmp):
             if k == "url":
                 cmd = ('rpm -q --qf "%{version}" -f /etc/os-release')
                 rc, stdout, stderr = module.run_command(cmd, check_rc=True)
-                valnew = re.sub('$releasever', stdout, valold)
+                valnew = valnew.replace('$releasever', stdout)
+                valold = valold.replace('$releasever', stdout)
                 valold, valnew = valold.rstrip("/"), valnew.rstrip("/")
             if valold != valnew:
                 return True
