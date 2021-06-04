@@ -9,7 +9,7 @@
       result4: "{{ query('community.general.random_string', length=-1) }}"
       result5: "{{ query('community.general.random_string', override_special='_', min_special=1) }}"
       result6: "{{ query('community.general.random_string', upper=false, special=false) }}" # lower case only
-      result7: "{{ query('community.general.random_string', lower=false) }}" # upper case only
+      result7: "{{ query('community.general.random_string', lower=false, special=false) }}" # upper case only
       result8: "{{ query('community.general.random_string', lower=false, upper=false, special=false) }}" # number only
       result9: "{{ query('community.general.random_string', lower=false, upper=false, special=false, min_numeric=1, length=1) }}" # single digit only
       result10: "{{ query('community.general.random_string', numbers=false, upper=false, special=false, min_lower=1, length=1) }}" # single lowercase character only
