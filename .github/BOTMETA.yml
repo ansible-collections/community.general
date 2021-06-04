@@ -120,6 +120,8 @@ files:
   $lookups/nios:
     maintainers: $team_networking sganesh-infoblox
     labels: infoblox networking
+  $lookups/random_string.py:
+    maintainers: Akasurde
   $module_utils/:
     labels: module_utils
   $module_utils/gitlab.py:
@@ -652,6 +654,9 @@ files:
     maintainers: elasticdog indrajitr tchernomax
     labels: pacman
     ignore: elasticdog
+  $modules/packaging/os/pacman_key.py:
+    maintainers: grawlinson
+    labels: pacman
   $modules/packaging/os/pkgin.py:
     maintainers: $team_solaris L2G jasperla szinck martinm82
     labels: pkgin solaris
