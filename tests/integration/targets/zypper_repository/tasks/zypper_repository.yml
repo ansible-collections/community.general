@@ -147,7 +147,7 @@
 
 - name: remove added repo
   community.general.zypper_repository:
-    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_$releasever/
+    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_{{ ansible_distribution_version }}/
     state: absent
   register: remove_repo
 
