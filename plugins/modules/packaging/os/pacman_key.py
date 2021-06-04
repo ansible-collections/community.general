@@ -32,7 +32,7 @@ options:
             - The 40 character identifier of the key.
             - Including this allows check mode to correctly report the changed state.
             - Do not specify a subkey ID, instead specify the primary key ID.
-        required: yes
+        required: true
         type: str
     data:
         description:
@@ -57,12 +57,12 @@ options:
         description:
             - Whether or not to verify the keyfile's key ID against specified key ID.
         type: bool
-        default: yes
+        default: true
     force_update:
         description:
             - This forces the key to be updated if it already exists in the keyring.
         type: bool
-        default: no
+        default: false
     keyring:
         description:
             - The full path to the keyring folder on the remote server.
