@@ -110,9 +110,9 @@ EXAMPLES = r'''
 
 - name: Override and disable automatic portal login on specific portal
   community.general.open_iscsi:
-    login: no
+    login: false
     portal: 10.1.1.250
-    auto_portal_startup: no
+    auto_portal_startup: false
     target: iqn.1986-03.com.sun:02:f8c1f9e0-c3ec-ec84-c9c9-8bfb0cd5de3d
 '''
 
