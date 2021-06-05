@@ -186,7 +186,7 @@ def _repo_changes(module, realrepo, repocmp):
             valold = str(repocmp[k] or "")
             valnew = v or ""
             if k == "url":
-                cmd = ('rpm -q --qf "%{version}" -f /etc/os-release')
+                cmd = ['rpm', '-q', '--qf', '%{version}', '-f', '/etc/os-release']
                 rc, stdout, stderr = module.run_command(cmd, check_rc=True)
                 valnew = valnew.replace('$releasever', stdout)
                 valold = valold.replace('$releasever', stdout)
