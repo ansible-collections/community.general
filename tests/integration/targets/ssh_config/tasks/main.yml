@@ -183,3 +183,39 @@
     that:
       - not mut_ex.changed
       - "'parameters are mutually exclusive' in mut_ex.msg"
+
+- name: Add a full name host
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "full_name"
+    hostname: full_name.com
+    identity_file: '{{ ssh_private_key }}'
+    port: '2223'
+    state: present
+  register: full_name
+
+- name: Check if changes are made
+  assert:
+    that:
+      - full_name is changed
+      - full_name.hosts_added == ["full_name"]
+      - full_name.hosts_changed == []
+      - full_name.hosts_removed == []
+
+- name: Add a host with name which is contained in full name host
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "full"
+    hostname: full.com
+    identity_file: '{{ ssh_private_key }}'
+    port: '2223'
+    state: present
+  register: short_name
+
+- name: Check that short name host is added and full name host is not updated
+  assert:
+    that:
+      - short_name is changed
+      - short_name.hosts_added == ["full"]
+      - short_name.hosts_changed == []
+      - short_name.hosts_removed == []
