@@ -190,6 +190,10 @@ def _repo_changes(module, realrepo, repocmp):
                 rc, stdout, stderr = module.run_command(cmd, check_rc=True)
                 valnew = valnew.replace('$releasever', stdout)
                 valold = valold.replace('$releasever', stdout)
+                cmd = ['rpm', '-q', '--qf', '%{arch}', '-f', '/etc/os-release']
+                rc, stdout, stderr = module.run_command(cmd, check_rc=True)
+                valnew = valnew.replace('$basearch', stdout)
+                valold = valold.replace('$basearch', stdout)
                 valold, valnew = valold.rstrip("/"), valnew.rstrip("/")
             if valold != valnew:
                 return True
