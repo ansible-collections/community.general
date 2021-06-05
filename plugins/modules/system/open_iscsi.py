@@ -57,6 +57,11 @@ options:
         - Whether the target node should be automatically connected at startup.
         type: bool
         aliases: [ automatic ]
+    auto_portal_startup:
+        description:
+        - Whether the target node portal should be automatically connected at startup.
+        type: bool
+        version_added: 3.2.0
     discover:
         description:
         - Whether the list of target nodes on the portal should be
@@ -102,10 +107,18 @@ EXAMPLES = r'''
   community.general.open_iscsi:
     login: no
     target: iqn.1986-03.com.sun:02:f8c1f9e0-c3ec-ec84-c9c9-8bfb0cd5de3d
+
+- name: Override and disable automatic portal login on specific portal
+  community.general.open_iscsi:
+    login: false
+    portal: 10.1.1.250
+    auto_portal_startup: false
+    target: iqn.1986-03.com.sun:02:f8c1f9e0-c3ec-ec84-c9c9-8bfb0cd5de3d
 '''
 
 import glob
 import os
+import re
 import socket
 import time
 
@@ -158,12 +171,18 @@ def iscsi_discover(module, portal, port):
         module.fail_json(cmd=cmd, rc=rc, msg=err)
 
 
-def target_loggedon(module, target):
+def target_loggedon(module, target, portal=None, port=None):
     cmd = '%s --mode session' % iscsiadm_cmd
     (rc, out, err) = module.run_command(cmd)
 
+    if portal is None:
+        portal = ""
+    if port is None:
+        port = ""
+
     if rc == 0:
-        return target in out
+        search_re = "%s:%s.*%s" % (re.escape(portal), port, re.escape(target))
+        return re.search(search_re, out) is not None
     elif rc == 21:
         return False
     else:
@@ -219,8 +238,14 @@ def target_device_node(module, target):
     return devdisks
 
 
-def target_isauto(module, target):
+def target_isauto(module, target, portal=None, port=None):
     cmd = '%s --mode node --targetname %s' % (iscsiadm_cmd, target)
+
+    if portal is not None:
+        if port is not None:
+            portal = '%s:%s' % (portal, port)
+        cmd = '%s --portal %s' % (cmd, portal)
+
     (rc, out, err) = module.run_command(cmd)
 
     if rc == 0:
@@ -233,16 +258,28 @@ def target_isauto(module, target):
         module.fail_json(cmd=cmd, rc=rc, msg=err)
 
 
-def target_setauto(module, target):
+def target_setauto(module, target, portal=None, port=None):
     cmd = '%s --mode node --targetname %s --op=update --name node.startup --value automatic' % (iscsiadm_cmd, target)
+
+    if portal is not None:
+        if port is not None:
+            portal = '%s:%s' % (portal, port)
+        cmd = '%s --portal %s' % (cmd, portal)
+
     (rc, out, err) = module.run_command(cmd)
 
     if rc > 0:
         module.fail_json(cmd=cmd, rc=rc, msg=err)
 
 
-def target_setmanual(module, target):
+def target_setmanual(module, target, portal=None, port=None):
     cmd = '%s --mode node --targetname %s --op=update --name node.startup --value manual' % (iscsiadm_cmd, target)
+
+    if portal is not None:
+        if port is not None:
+            portal = '%s:%s' % (portal, port)
+        cmd = '%s --portal %s' % (cmd, portal)
+
     (rc, out, err) = module.run_command(cmd)
 
     if rc > 0:
@@ -265,6 +302,7 @@ def main():
             # actions
             login=dict(type='bool', aliases=['state']),
             auto_node_startup=dict(type='bool', aliases=['automatic']),
+            auto_portal_startup=dict(type='bool'),
             discover=dict(type='bool', default=False),
             show_nodes=dict(type='bool', default=False),
         ),
@@ -288,6 +326,7 @@ def main():
     port = module.params['port']
     login = module.params['login']
     automatic = module.params['auto_node_startup']
+    automatic_portal = module.params['auto_portal_startup']
     discover = module.params['discover']
     show_nodes = module.params['show_nodes']
 
@@ -333,7 +372,7 @@ def main():
         result['nodes'] = nodes
 
     if login is not None:
-        loggedon = target_loggedon(module, target)
+        loggedon = target_loggedon(module, target, portal, port)
         if (login and loggedon) or (not login and not loggedon):
             result['changed'] |= False
             if login:
@@ -367,6 +406,22 @@ def main():
         else:
             result['changed'] |= True
             result['automatic_changed'] = True
+
+    if automatic_portal is not None:
+        isauto = target_isauto(module, target, portal, port)
+        if (automatic_portal and isauto) or (not automatic_portal and not isauto):
+            result['changed'] |= False
+            result['automatic_portal_changed'] = False
+        elif not check:
+            if automatic_portal:
+                target_setauto(module, target, portal, port)
+            else:
+                target_setmanual(module, target, portal, port)
+            result['changed'] |= True
+            result['automatic_portal_changed'] = True
+        else:
+            result['changed'] |= True
+            result['automatic_portal_changed'] = True
 
     module.exit_json(**result)
 
