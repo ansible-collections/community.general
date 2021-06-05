@@ -209,6 +209,8 @@ class SSHConfig():
         hosts_removed = []
         hosts_added = []
 
+        hosts_result = [host for host in hosts_result if host['host'] == self.host]
+
         if hosts_result:
             for host in hosts_result:
                 if state == 'absent':
