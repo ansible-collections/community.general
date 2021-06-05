@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - consul_kv lookup plugin - allow to set ``recurse``, ``index``, ``datacenter`` and ``token`` as keyword arguments
+    (https://github.com/ansible-collections/community.general/issues/2124).
