@@ -40,21 +40,21 @@ class ActionModule(ActionBase):
         "(=%s) to 0, and 'async' (=%s) to a value >2 and not greater than "
         "'ansible_timeout' (=%s) (recommended).")
 
-    def _async_result(self, module_args, task_vars, timeout):
+    def _async_result(self, async_status_args, task_vars, timeout):
         '''
         Retrieve results of the asynchonous task, and display them in place of
         the async wrapper results (those with the ansible_job_id key).
         '''
         async_status = self._task.copy()
-        async_status.args = module_args
+        async_status.args = async_status_args
         async_status.action = 'ansible.builtin.async_status'
         async_status.async_val = 0
         async_action = self._shared_loader_obj.action_loader.get(
-            'ansible.builtin.async_status', task=async_status, connection=self._connection,
+            async_status.action, task=async_status, connection=self._connection,
             play_context=self._play_context, loader=self._loader, templar=self._templar,
             shared_loader_obj=self._shared_loader_obj)
 
-        if module_args['mode'] == 'cleanup':
+        if async_status.args['mode'] == 'cleanup':
             return async_action.run(task_vars=task_vars)
 
         # At least one iteration is required, even if timeout is 0.
