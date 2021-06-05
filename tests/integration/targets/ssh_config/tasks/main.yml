@@ -197,10 +197,10 @@
 - name: Check if changes are made
   assert:
     that:
-      - full_name.changed
-      - "'full_name' in full_name.hosts_added"
-      - full_name.hosts_changed is defined
-      - full_name.hosts_removed is defined
+      - full_name is changed
+      - full_name.hosts_added == ["full_name"]
+      - full_name.hosts_changed == []
+      - full_name.hosts_removed == []
 
 - name: Add a host with name which is contained in full name host
   community.general.ssh_config:
@@ -212,11 +212,10 @@
     state: present
   register: short_name
 
-- name: Check that shot name host is added and full name host is not updated
+- name: Check that short name host is added and full name host is not updated
   assert:
     that:
-      - short_name.changed
-      - not short_name.hosts_changed
-      - "'full' in short_name.hosts_added"
-      - short_name.hosts_changed is defined
-      - short_name.hosts_removed is defined
+      - short_name is changed
+      - short_name.hosts_added == ["full"]
+      - short_name.hosts_changed == []
+      - short_name.hosts_removed == []
