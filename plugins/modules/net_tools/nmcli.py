@@ -95,6 +95,10 @@ options:
             - Set metric level of ipv4 routes configured on interface.
         type: int
         version_added: 2.0.0
+    routing_rules4:
+        description:
+            - Is the same as in an 'ip route add' command, except always requires specifying a priority.
+        type: str
     never_default4:
         description:
             - Set as default route.
@@ -128,7 +132,9 @@ options:
         version_added: 2.2.0
     may_fail4:
         description:
-            - If I(ip6) 
+            - If you need I(ip4) configured before network-online.target is reached, set the the property to no.
+        type: bool
+        default: yes
     ip6:
         description:
             - The IPv6 address to this interface.
@@ -168,7 +174,7 @@ options:
             - Configuration method to be used for IPv6
             - If I(ip6) is set, C(ipv6.method) is automatically set to C(manual) and this parameter is not needed.
         type: str
-        choices: [ignore, auto, dhcp, link-local, manual, shared]
+        choices: [ignore, auto, dhcp, link-local, manual, shared, disabled]
         version_added: 2.2.0
     mtu:
         description:
@@ -1176,8 +1182,7 @@ def main():
             dns6=dict(type='list', elements='str'),
             dns6_search=dict(type='list', elements='str'),
             dns6_ignore_auto=dict(type='bool', default=False),
-            method6=dict(type='str', choices=['ignore', 'auto', 'dhcp', 'link-local', 'manual', 'shared']),
-            may_fail6=dict(type='bool', default=True),
+            method6=dict(type='str', choices=['ignore', 'auto', 'dhcp', 'link-local', 'manual', 'shared', 'disabled']),
             # Bond Specific vars
             mode=dict(type='str', default='balance-rr',
                       choices=['802.3ad', 'active-backup', 'balance-alb', 'balance-rr', 'balance-tlb', 'balance-xor', 'broadcast']),
