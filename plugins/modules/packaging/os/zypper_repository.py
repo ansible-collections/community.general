@@ -138,7 +138,7 @@ from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
-REPO_OPTS = ['alias', 'name', 'priority', 'enabled', 'autorefresh', 'gpgcheck']
+REPO_OPTS = ['alias', 'name', 'priority', 'enabled', 'autorefresh', 'gpgcheck', 'repo_gpgcheck', 'pkg_gpgcheck']
 
 
 def _get_cmd(module, *args):
@@ -249,10 +249,15 @@ def addmodify_repo(module, repodata, old_repos, zypper_version, warnings):
     # https://github.com/openSUSE/zypper/blob/b9b3cb6db76c47dc4c47e26f6a4d2d4a0d12b06d/package/zypper.changes#L2446-L2449
     # the default changed in the past, so don't assume a default here and show warning for old zypper versions
     if zypper_version >= LooseVersion('1.6.2'):
-        if repodata['gpgcheck'] == '1':
-            cmd.append('--gpgcheck')
-        else:
-            cmd.append('--no-gpgcheck')
+        gpg_dict = {
+            "default": "--default-gpgcheck",
+            "enable": "--gpgcheck",
+            "disable": "--no-gpgcheck",
+            "allow_unsigned": "--gpgcheck-allow-unsigned",
+            "allow_unsigned_repo": "--gpgcheck-allow-unsigned-repo",
+            "allow_unsigned_package": "--gpgcheck-allow-unsigned-package",
+        }
+        cmd.append(gpg_dict[module.params['gpg_signature_check']])
     else:
         warnings.append("Enabling/disabling gpgcheck only available for zypper >= 1.6.2. Using zypper default value.")
 
@@ -308,7 +313,14 @@ def main():
             state=dict(choices=['present', 'absent'], default='present'),
             runrefresh=dict(required=False, default=False, type='bool'),
             description=dict(required=False),
-            disable_gpg_check=dict(required=False, default=False, type='bool'),
+            gpg_signature_check=dict(required=False, choices=[
+                    "default",
+                    "enable",
+                    "disable",
+                    "allow_unsigned",
+                    "allow_unsigned_repo",
+                    "allow_unsigned_package",
+            ], default="default", aliases=["gpgcheck"]),
             autorefresh=dict(required=False, default=True, type='bool', aliases=['refresh']),
             priority=dict(required=False, type='int'),
             enabled=dict(required=False, default=True, type='bool'),
@@ -340,10 +352,25 @@ def main():
         repodata['enabled'] = '1'
     else:
         repodata['enabled'] = '0'
-    if module.params['disable_gpg_check']:
-        repodata['gpgcheck'] = '0'
+
+    if module.params['gpg_signature_check'] == 'enable':
+        gpgopts = ['1', '1', '1']
+    elif module.params['gpg_signature_check'] == 'disable':
+        gpgopts = ['0', '0', '0']
+    elif module.params['gpg_signature_check'] == 'allow_unsigned':
+        gpgopts = ['1', '0', '0']
+    elif module.params['gpg_signature_check'] == 'allow_unsigned_repo':
+        gpgopts = ['1', '0', '1']
+    elif module.params['gpg_signature_check'] == 'allow_unsigned_package':
+        gpgopts = ['1', '1', '0']
     else:
-        repodata['gpgcheck'] = '1'
+        # TODO: default variable parsing
+        gpgopts = ['1', '1', '1']
+
+    repodata['gpgcheck'] = gpgopts[0]
+    repodata['repo_gpgcheck'] = gpgopts[1]
+    repodata['pkg_gpgcheck'] = gpgopts[2]
+
     if module.params['autorefresh']:
         repodata['autorefresh'] = '1'
     else:
