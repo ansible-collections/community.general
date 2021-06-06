@@ -40,18 +40,26 @@ class ActionModule(ActionBase):
         "(=%s) to 0, and 'async' (=%s) to a value >2 and not greater than "
         "'ansible_timeout' (=%s) (recommended).")
 
-    def _async_result(self, module_args, task_vars, timeout):
+    def _async_result(self, async_status_args, task_vars, timeout):
         '''
         Retrieve results of the asynchonous task, and display them in place of
         the async wrapper results (those with the ansible_job_id key).
         '''
+        async_status = self._task.copy()
+        async_status.args = async_status_args
+        async_status.action = 'ansible.builtin.async_status'
+        async_status.async_val = 0
+        async_action = self._shared_loader_obj.action_loader.get(
+            async_status.action, task=async_status, connection=self._connection,
+            play_context=self._play_context, loader=self._loader, templar=self._templar,
+            shared_loader_obj=self._shared_loader_obj)
+
+        if async_status.args['mode'] == 'cleanup':
+            return async_action.run(task_vars=task_vars)
+
         # At least one iteration is required, even if timeout is 0.
         for dummy in range(max(1, timeout)):
-            async_result = self._execute_module(
-                module_name='ansible.builtin.async_status',
-                module_args=module_args,
-                task_vars=task_vars,
-                wrap_async=False)
+            async_result = async_action.run(task_vars=task_vars)
             if async_result.get('finished', 0) == 1:
                 break
             time.sleep(min(1, timeout))
@@ -106,7 +114,7 @@ class ActionModule(ActionBase):
                     # longer on the controller); and set a backup file path.
                     module_args['_timeout'] = task_async
                     module_args['_back'] = '%s/iptables.state' % async_dir
-                    async_status_args = dict(_async_dir=async_dir)
+                    async_status_args = dict(mode='status')
                     confirm_cmd = 'rm -f %s' % module_args['_back']
                     starter_cmd = 'touch %s.starter' % module_args['_back']
                     remaining_time = max(task_async, max_timeout)
@@ -168,11 +176,7 @@ class ActionModule(ActionBase):
                             del result['invocation']['module_args'][key]
 
                 async_status_args['mode'] = 'cleanup'
-                dummy = self._execute_module(
-                    module_name='ansible.builtin.async_status',
-                    module_args=async_status_args,
-                    task_vars=task_vars,
-                    wrap_async=False)
+                dummy = self._async_result(async_status_args, task_vars, 0)
 
         if not wrap_async:
             # remove a temporary path we created
