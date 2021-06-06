@@ -186,14 +186,16 @@ def _repo_changes(module, realrepo, repocmp):
             valold = str(repocmp[k] or "")
             valnew = v or ""
             if k == "url":
-                cmd = ['rpm', '-q', '--qf', '%{version}', '-f', '/etc/os-release']
-                rc, stdout, stderr = module.run_command(cmd, check_rc=True)
-                valnew = valnew.replace('$releasever', stdout)
-                valold = valold.replace('$releasever', stdout)
-                cmd = ['rpm', '-q', '--qf', '%{arch}', '-f', '/etc/os-release']
-                rc, stdout, stderr = module.run_command(cmd, check_rc=True)
-                valnew = valnew.replace('$basearch', stdout)
-                valold = valold.replace('$basearch', stdout)
+                if '$releasever' in valold or '$releasever' in valnew:
+                    cmd = ['rpm', '-q', '--qf', '%{version}', '-f', '/etc/os-release']
+                    rc, stdout, stderr = module.run_command(cmd, check_rc=True)
+                    valnew = valnew.replace('$releasever', stdout)
+                    valold = valold.replace('$releasever', stdout)
+                if '$basearch' in valold or '$basearch' in valnew:
+                    cmd = ['rpm', '-q', '--qf', '%{arch}', '-f', '/etc/os-release']
+                    rc, stdout, stderr = module.run_command(cmd, check_rc=True)
+                    valnew = valnew.replace('$basearch', stdout)
+                    valold = valold.replace('$basearch', stdout)
                 valold, valnew = valold.rstrip("/"), valnew.rstrip("/")
             if valold != valnew:
                 return True
