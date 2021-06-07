@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -eux
 
 flatpak install -y --system flathub org.freedesktop.Platform//1.6 org.freedesktop.Sdk//1.6
@@ -19,7 +19,7 @@ gpg --homedir gpg --batch --passphrase '' --quick-gen-key test@dummy.com future-
 
 KEY_ID=$(gpg --homedir=gpg --list-keys --with-colons test@dummy.com | grep fpr: | head -1 | cut -d ':' -f 10)
 
-gpg --homedir=gpg --export ${KEY_ID} > dummy-repo.gpg
+gpg --homedir=gpg --export "${KEY_ID}" > dummy-repo.gpg
 
 BASE64_PUBLIC_KEY=$(base64 dummy-repo.gpg | tr -d '\n')
 
@@ -43,8 +43,8 @@ Description=Dummy repo for ansible module integration testing
 GPGKey=${BASE64_PUBLIC_KEY}
 EOF
 
-flatpak build-sign repo --gpg-sign=${KEY_ID} --gpg-homedir=gpg
-flatpak build-update-repo repo --gpg-sign=${KEY_ID} --gpg-homedir=gpg
+flatpak build-sign repo --gpg-sign="${KEY_ID}" --gpg-homedir=gpg
+flatpak build-update-repo repo --gpg-sign="${KEY_ID}" --gpg-homedir=gpg
 tar cvfJ repo.tar.xz repo/
 mv repo.tar.xz files/
 
