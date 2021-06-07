@@ -155,13 +155,16 @@ class CmdMixin(object):
     def run_command(self, extra_params=None, params=None, process_output=None, *args, **kwargs):
         self.vars.cmd_args = self._calculate_args(extra_params, params)
         options = dict(self.run_command_fixed_options)
-        env_update = dict(options.get('environ_update', {}))
         options['check_rc'] = options.get('check_rc', self.check_rc)
+        options.update(kwargs)
+        env_update = dict(options.get('environ_update', {}))
         if self.force_lang:
-            env_update.update({'LANGUAGE': self.force_lang})
+            env_update.update({
+                'LANGUAGE': self.force_lang,
+                'LC_ALL': self.force_lang,
+            })
             self.update_output(force_lang=self.force_lang)
             options['environ_update'] = env_update
-        options.update(kwargs)
         rc, out, err = self.module.run_command(self.vars.cmd_args, *args, **options)
         self.update_output(rc=rc, stdout=out, stderr=err)
         if process_output is None:

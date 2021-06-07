@@ -38,7 +38,7 @@ TEST_CASES = [
                 ),
                 (
                     ['/testbin/cpanm', 'Dancer'],
-                    {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                     (0, '', '',),  # output rc, out, err
                 ),
             ],
@@ -65,7 +65,7 @@ TEST_CASES = [
             'id': 'install_dancer',
             'run_command.calls': [(
                 ['/testbin/cpanm', 'Dancer'],
-                {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
+                {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                 (0, '', '',),  # output rc, out, err
             )],
             'changed': True,
@@ -77,7 +77,7 @@ TEST_CASES = [
             'id': 'install_distribution_file_compatibility',
             'run_command.calls': [(
                 ['/testbin/cpanm', 'MIYAGAWA/Plack-0.99_05.tar.gz'],
-                {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
+                {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                 (0, '', '',),  # output rc, out, err
             )],
             'changed': True,
@@ -89,7 +89,7 @@ TEST_CASES = [
             'id': 'install_distribution_file',
             'run_command.calls': [(
                 ['/testbin/cpanm', 'MIYAGAWA/Plack-0.99_05.tar.gz'],
-                {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
+                {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                 (0, '', '',),  # output rc, out, err
             )],
             'changed': True,
@@ -101,7 +101,7 @@ TEST_CASES = [
             'id': 'install_into_locallib',
             'run_command.calls': [(
                 ['/testbin/cpanm', '--local-lib', '/srv/webapps/my_app/extlib', 'Dancer'],
-                {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
+                {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                 (0, '', '',),  # output rc, out, err
             )],
             'changed': True,
@@ -113,7 +113,7 @@ TEST_CASES = [
             'id': 'install_from_local_directory',
             'run_command.calls': [(
                 ['/testbin/cpanm', '/srv/webapps/my_app/src/'],
-                {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
+                {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                 (0, '', '',),  # output rc, out, err
             )],
             'changed': True,
@@ -125,7 +125,7 @@ TEST_CASES = [
             'id': 'install_into_locallib_no_unit_testing',
             'run_command.calls': [(
                 ['/testbin/cpanm', '--notest', '--local-lib', '/srv/webapps/my_app/extlib', 'Dancer'],
-                {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
+                {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                 (0, '', '',),  # output rc, out, err
             )],
             'changed': True,
@@ -137,7 +137,7 @@ TEST_CASES = [
             'id': 'install_from_mirror',
             'run_command.calls': [(
                 ['/testbin/cpanm', '--mirror', 'http://cpan.cpantesters.org/', 'Dancer'],
-                {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
+                {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                 (0, '', '',),  # output rc, out, err
             )],
             'changed': True,
@@ -158,7 +158,7 @@ TEST_CASES = [
             'id': 'install_minversion_implicit',
             'run_command.calls': [(
                 ['/testbin/cpanm', 'Dancer~1.0'],
-                {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
+                {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                 (0, '', '',),  # output rc, out, err
             )],
             'changed': True,
@@ -170,7 +170,7 @@ TEST_CASES = [
             'id': 'install_minversion_explicit',
             'run_command.calls': [(
                 ['/testbin/cpanm', 'Dancer~1.5'],
-                {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
+                {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                 (0, '', '',),  # output rc, out, err
             )],
             'changed': True,
@@ -182,7 +182,7 @@ TEST_CASES = [
             'id': 'install_specific_version',
             'run_command.calls': [(
                 ['/testbin/cpanm', 'Dancer@1.7'],
-                {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
+                {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                 (0, '', '',),  # output rc, out, err
             )],
             'changed': True,
@@ -215,7 +215,7 @@ TEST_CASES = [
             'id': 'install_specific_version_from_git_url_explicit',
             'run_command.calls': [(
                 ['/testbin/cpanm', 'git://github.com/plack/Plack.git@1.7'],
-                {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
+                {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                 (0, '', '',),  # output rc, out, err
             )],
             'changed': True,
@@ -228,7 +228,7 @@ TEST_CASES = [
             'id': 'install_specific_version_from_git_url_implicit',
             'run_command.calls': [(
                 ['/testbin/cpanm', 'git://github.com/plack/Plack.git@2.5'],
-                {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
+                {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': True},
                 (0, '', '',),  # output rc, out, err
             )],
             'changed': True,
