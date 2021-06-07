@@ -172,7 +172,7 @@ class OnePass(object):
 
         args = [
             'signin',
-            '{0}.{1}'.format(self.subdomain,self.domain),
+            '{0}.{1}'.format(self.subdomain, self.domain),
             to_bytes(self.username),
             to_bytes(self.secret_key),
             '--output=raw',
