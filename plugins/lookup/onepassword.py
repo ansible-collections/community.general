@@ -33,6 +33,7 @@ DOCUMENTATION = '''
       domain:
         description: Domain of 1Password. Default is U(1password.com).
         version_added: 3.2.0
+        default: '1password.com'
       subdomain:
         description: The 1Password subdomain to authenticate against.
       username:
