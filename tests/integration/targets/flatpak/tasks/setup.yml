@@ -38,5 +38,4 @@
   flatpak:
     name: com.dummy.App8
     remote: dummy-remote
-    no_dependencies: true
     state: present
