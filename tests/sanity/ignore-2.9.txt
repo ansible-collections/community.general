@@ -36,9 +36,6 @@ plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-missing-type                # missing docs on suboptions
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:parameter-type-not-in-doc       # missing docs on suboptions
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:undocumented-parameter          # missing docs on suboptions
-plugins/modules/remote_management/stacki/stacki_host.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/remote_management/stacki/stacki_host.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/stacki/stacki_host.py validate-modules:undocumented-parameter
 plugins/modules/net_tools/nios/nios_a_record.py validate-modules:deprecation-mismatch
 plugins/modules/net_tools/nios/nios_a_record.py validate-modules:invalid-documentation
 plugins/modules/net_tools/nios/nios_aaaa_record.py validate-modules:deprecation-mismatch

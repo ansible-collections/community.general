@@ -45,9 +45,6 @@ plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:parameter-type-not-in-doc       # missing docs on suboptions
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:undocumented-parameter          # missing docs on suboptions
 plugins/modules/remote_management/manageiq/manageiq_tags.py validate-modules:parameter-state-invalid-choice
-plugins/modules/remote_management/stacki/stacki_host.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/remote_management/stacki/stacki_host.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/stacki/stacki_host.py validate-modules:undocumented-parameter
 plugins/modules/source_control/github/github_deploy_key.py validate-modules:parameter-invalid
 plugins/modules/system/gconftool2.py validate-modules:parameter-state-invalid-choice
 plugins/modules/system/iptables_state.py validate-modules:undocumented-parameter
