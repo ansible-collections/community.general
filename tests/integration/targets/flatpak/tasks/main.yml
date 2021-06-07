@@ -44,6 +44,12 @@
         - executable_override_result is not changed
       msg: "Specifying non-existing executable shall fail module execution"
 
+  # TODO: remove once no_dependencies parameter from https://github.com/ansible/ansible/pull/55452 is added
+  #       and used in the tests!
+  - name: Install requirement for tests
+    command: flatpak install -y --system flathub org.freedesktop.Platform//1.6 org.freedesktop.Sdk//1.6
+    become: true
+
   - import_tasks: check_mode.yml
     become: false
 
