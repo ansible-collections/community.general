@@ -2,8 +2,8 @@
 
 - name: Test addition - {{ method }}
   flatpak:
-    name: org.gnome.Characters
-    remote: flathub
+    name: com.dummy.App1
+    remote: dummy-remote
     state: present
     method: "{{ method }}"
   register: addition_result
@@ -16,8 +16,8 @@
 
 - name: Test idempotency of addition - {{ method }}
   flatpak:
-    name: org.gnome.Characters
-    remote: flathub
+    name: com.dummy.App1
+    remote: dummy-remote
     state: present
     method: "{{ method }}"
   register: double_addition_result
@@ -32,7 +32,7 @@
 
 - name: Test removal - {{ method }}
   flatpak:
-    name: org.gnome.Characters
+    name: com.dummy.App1
     state: absent
     method: "{{ method }}"
   register: removal_result
@@ -45,7 +45,7 @@
 
 - name: Test idempotency of removal - {{ method }}
   flatpak:
-    name: org.gnome.Characters
+    name: com.dummy.App1
     state: absent
     method: "{{ method }}"
   register: double_removal_result
@@ -60,8 +60,8 @@
 
 - name: Test addition with url - {{ method }}
   flatpak:
-    name: https://flathub.org/repo/appstream/org.gnome.Characters.flatpakref
-    remote: flathub
+    name: file:///tmp/flatpak/repo/com.dummy.App1.flatpakref
+    remote: dummy-remote
     state: present
     method: "{{ method }}"
   register: url_addition_result
@@ -74,8 +74,8 @@
 
 - name: Test idempotency of addition with url - {{ method }}
   flatpak:
-    name: https://flathub.org/repo/appstream/org.gnome.Characters.flatpakref
-    remote: flathub
+    name: file:///tmp/flatpak/repo/com.dummy.App1.flatpakref
+    remote: dummy-remote
     state: present
     method: "{{ method }}"
   register: double_url_addition_result
@@ -90,7 +90,7 @@
 
 - name: Test removal with url - {{ method }}
   flatpak:
-    name: https://flathub.org/repo/appstream/org.gnome.Characters.flatpakref
+    name: file:///tmp/flatpak/repo/com.dummy.App1.flatpakref
     state: absent
     method: "{{ method }}"
   register: url_removal_result
@@ -103,7 +103,7 @@
 
 - name: Test idempotency of removal with url - {{ method }}
   flatpak:
-    name: https://flathub.org/repo/appstream/org.gnome.Characters.flatpakref
+    name: file:///tmp/flatpak/repo/com.dummy.App1.flatpakref
     state: absent
     method: "{{ method }}"
   register: double_url_removal_result
