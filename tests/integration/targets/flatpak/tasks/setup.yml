@@ -39,3 +39,4 @@
     name: com.dummy.App8
     remote: dummy-remote
     state: present
+    no_dependencies: true

@@ -6,6 +6,7 @@
     remote: dummy-remote
     state: present
     method: "{{ method }}"
+    no_dependencies: true
   register: addition_result
 
 - name: Verify addition test result - {{ method }}
@@ -20,6 +21,7 @@
     remote: dummy-remote
     state: present
     method: "{{ method }}"
+    no_dependencies: true
   register: double_addition_result
 
 - name: Verify idempotency of addition test result - {{ method }}
@@ -35,6 +37,7 @@
     name: com.dummy.App1
     state: absent
     method: "{{ method }}"
+    no_dependencies: true
   register: removal_result
 
 - name: Verify removal test result - {{ method }}
@@ -48,6 +51,7 @@
     name: com.dummy.App1
     state: absent
     method: "{{ method }}"
+    no_dependencies: true
   register: double_removal_result
 
 - name: Verify idempotency of removal test result - {{ method }}
@@ -64,6 +68,7 @@
     remote: dummy-remote
     state: present
     method: "{{ method }}"
+    no_dependencies: true
   register: url_addition_result
 
 - name: Verify addition test result - {{ method }}
@@ -78,6 +83,7 @@
     remote: dummy-remote
     state: present
     method: "{{ method }}"
+    no_dependencies: true
   register: double_url_addition_result
 
 - name: Verify idempotency of addition with url test result - {{ method }}
@@ -93,6 +99,7 @@
     name: file:///tmp/flatpak/repo/com.dummy.App1.flatpakref
     state: absent
     method: "{{ method }}"
+    no_dependencies: true
   register: url_removal_result
 
 - name: Verify removal test result - {{ method }}
@@ -106,6 +113,7 @@
     name: file:///tmp/flatpak/repo/com.dummy.App1.flatpakref
     state: absent
     method: "{{ method }}"
+    no_dependencies: true
   register: double_url_removal_result
 
 - name: Verify idempotency of removal with url test result - {{ method }}
