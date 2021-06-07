@@ -34,7 +34,7 @@ IsRuntime=false
 RuntimeRepo=https://flathub.org/repo/flathub.flatpakrepo
 EOF
 
-cat > repo/.flatpakrepo <<EOF
+cat > repo/dummy-repo.flatpakrepo <<EOF
 [Flatpak Repo]
 Title=Dummy Repo
 Url=file:///tmp/flatpak/repo
