@@ -29,4 +29,8 @@ Also, consider taking up a valuable, reviewed, but abandoned pull request which 
 
 You can also read [our Quick-start development guide](https://github.com/ansible/community-docs/blob/main/create_pr_quick_start_guide.rst).
 
+## Test pull requests
+
+If you wanted to checkout a PR branch and test the changes locally, use [this document](https://docs.ansible.com/ansible/latest/dev_guide/developing_collections_contributing.html), but instead of ansible-collections/community.general use pr_author/community.general and checkout the PR branch.
+
 If you find any inconsistencies or places in this document which can be improved, feel free to raise an issue or pull request to fix it.
