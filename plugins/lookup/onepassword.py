@@ -114,6 +114,7 @@ class OnePass(object):
         self.logged_in = False
         self.token = None
         self.subdomain = None
+        self.domain = None
         self.username = None
         self.secret_key = None
         self.master_password = None
