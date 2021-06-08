@@ -108,7 +108,8 @@
   # the following message, which we check for. If another error happens, we fail.
   assert:
     that:
-      - 'url_removal_result.msg == "error: Invalid branch 127.0.0.1:8000: Branch can't contain :"'
+      - >-
+        url_removal_result.msg == "error: Invalid branch 127.0.0.1:8000: Branch can't contain :"
   when: url_removal_result is failed
 
 - when: url_removal_result is not failed
