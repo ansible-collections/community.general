@@ -145,11 +145,12 @@
 - name: Test addition with list - {{ method }}
   flatpak:
     name:
-      - org.gnome.Characters
-      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
     remote: flathub
     state: present
     method: "{{ method }}"
+    no_dependencies: true
   register: addition_result
 
 - name: Verify addition with list test result - {{ method }}
@@ -161,11 +162,12 @@
 - name: Test idempotency of addition with list - {{ method }}
   flatpak:
     name:
-      - org.gnome.Characters
-      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
     remote: flathub
     state: present
     method: "{{ method }}"
+    no_dependencies: true
   register: double_addition_result
 
 - name: Verify idempotency of addition with list test result - {{ method }}
@@ -177,12 +179,13 @@
 - name: Test addition with list partially installed - {{ method }}
   flatpak:
     name:
-      - org.gnome.Characters
-      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
-      - org.inkscape.Inkscape
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App3
     remote: flathub
     state: present
     method: "{{ method }}"
+    no_dependencies: true
   register: addition_result
 
 - name: Verify addition with list partially installed test result - {{ method }}
@@ -194,12 +197,13 @@
 - name: Test idempotency of addition with list partially installed - {{ method }}
   flatpak:
     name:
-      - org.gnome.Characters
-      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
-      - org.inkscape.Inkscape
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App3
     remote: flathub
     state: present
     method: "{{ method }}"
+    no_dependencies: true
   register: double_addition_result
 
 - name: Verify idempotency of addition with list partially installed test result - {{ method }}
@@ -213,8 +217,8 @@
 - name: Test removal with list - {{ method }}
   flatpak:
     name:
-      - org.gnome.Characters
-      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
     state: absent
     method: "{{ method }}"
   register: removal_result
@@ -228,8 +232,8 @@
 - name: Test idempotency of removal with list - {{ method }}
   flatpak:
     name:
-      - org.gnome.Characters
-      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
     state: absent
     method: "{{ method }}"
   register: double_removal_result
@@ -243,9 +247,9 @@
 - name: Test removal with list partially removed - {{ method }}
   flatpak:
     name:
-      - org.gnome.Characters
-      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
-      - org.inkscape.Inkscape
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App3
     state: absent
     method: "{{ method }}"
   register: removal_result
@@ -259,9 +263,9 @@
 - name: Test idempotency of removal with list partially removed - {{ method }}
   flatpak:
     name:
-      - org.gnome.Characters
-      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
-      - org.inkscape.Inkscape
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App3
     state: absent
     method: "{{ method }}"
   register: double_removal_result

@@ -18,7 +18,7 @@ flatpak install -y --system flathub org.freedesktop.Platform//1.6 org.freedeskto
 # Add individual flatpaks
 echo $'#!/bin/sh\necho hello world' > hello.sh
 
-for NUM in 1 2; do
+for NUM in 1 2 3; do
     flatpak build-init appdir${NUM} com.dummy.App${NUM} org.freedesktop.Sdk org.freedesktop.Platform 1.6;
     flatpak build appdir${NUM} mkdir /app/bin;
     flatpak build appdir${NUM} install --mode=750 hello.sh /app/bin;
