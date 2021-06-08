@@ -175,6 +175,7 @@ options:
         description:
             - Configuration method to be used for IPv6
             - If I(ip6) is set, C(ipv6.method) is automatically set to C(manual) and this parameter is not needed.
+            - C(disabled) was added in community.general 3.2.0.
         type: str
         choices: [ignore, auto, dhcp, link-local, manual, shared, disabled]
         version_added: 2.2.0
