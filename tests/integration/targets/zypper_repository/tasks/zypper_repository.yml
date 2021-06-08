@@ -125,3 +125,61 @@
     priority: 100
     auto_import_keys: true
     state: "present"
+
+- name: add a repo by releasever
+  community.general.zypper_repository:
+    name: releaseverrepo
+    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_$releasever/
+    state: present
+  register: add_repo
+
+- name: add a repo by releasever again
+  community.general.zypper_repository:
+    name: releaseverrepo
+    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_$releasever/
+    state: present
+  register: add_repo_again
+
+- assert:
+    that:
+      - add_repo is changed
+      - add_repo_again is not changed
+
+- name: remove added repo
+  community.general.zypper_repository:
+    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_{{ ansible_distribution_version }}/
+    state: absent
+  register: remove_repo
+
+- assert:
+    that:
+      - remove_repo is changed
+
+- name: add a repo by basearch
+  community.general.zypper_repository:
+    name: basearchrepo
+    repo: https://packagecloud.io/netdata/netdata/opensuse/13.2/$basearch
+    state: present
+  register: add_repo
+
+- name: add a repo by basearch again
+  community.general.zypper_repository:
+    name: basearchrepo
+    repo: https://packagecloud.io/netdata/netdata/opensuse/13.2/$basearch
+    state: present
+  register: add_repo_again
+
+- assert:
+    that:
+      - add_repo is changed
+      - add_repo_again is not changed
+
+- name: remove added repo
+  community.general.zypper_repository:
+    repo: https://packagecloud.io/netdata/netdata/opensuse/13.2/x86_64
+    state: absent
+  register: remove_repo
+
+- assert:
+    that:
+      - remove_repo is changed
