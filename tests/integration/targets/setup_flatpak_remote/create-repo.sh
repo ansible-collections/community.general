@@ -26,7 +26,7 @@ for NUM in 1 2; do
 
     flatpak build-export repo appdir${NUM} stable
 
-    cat > repo/com.dummy.App1.flatpakref <<EOF
+    cat > repo/com.dummy.App${NUM}.flatpakref <<EOF
         [Flatpak Ref]
         Title=Dummy App${NUM}
         Name=com.dummy.App${NUM}
