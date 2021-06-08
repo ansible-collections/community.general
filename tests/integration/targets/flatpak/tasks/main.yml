@@ -69,7 +69,7 @@
 
   - name: Stop HTTP server
     command: >-
-      pkill -- '{{ remote_tmp_dir }}/serve.py'
+      pkill -f -- '{{ remote_tmp_dir }}/serve.py'
 
   when: |
       ansible_distribution == 'Fedora' or
