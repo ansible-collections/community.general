@@ -30,6 +30,11 @@ DOCUMENTATION = '''
         aliases: ['vault_password']
       section:
         description: Item section containing the field to retrieve (case-insensitive). If absent will return first match from any section.
+      domain:
+        description: Domain of 1Password. Default is U(1password.com).
+        version_added: 3.2.0
+        default: '1password.com'
+        type: str
       subdomain:
         description: The 1Password subdomain to authenticate against.
       username:
@@ -109,6 +114,7 @@ class OnePass(object):
         self.logged_in = False
         self.token = None
         self.subdomain = None
+        self.domain = None
         self.username = None
         self.secret_key = None
         self.master_password = None
@@ -168,7 +174,7 @@ class OnePass(object):
 
         args = [
             'signin',
-            '{0}.1password.com'.format(self.subdomain),
+            '{0}.{1}'.format(self.subdomain, self.domain),
             to_bytes(self.username),
             to_bytes(self.secret_key),
             '--output=raw',
@@ -265,6 +271,7 @@ class LookupModule(LookupBase):
         section = kwargs.get('section')
         vault = kwargs.get('vault')
         op.subdomain = kwargs.get('subdomain')
+        op.domain = kwargs.get('domain', '1password.com')
         op.username = kwargs.get('username')
         op.secret_key = kwargs.get('secret_key')
         op.master_password = kwargs.get('master_password', kwargs.get('vault_password'))
