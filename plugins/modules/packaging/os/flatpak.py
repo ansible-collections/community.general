@@ -208,8 +208,8 @@ def flatpak_exists(module, binary, names, method):
     installed = []
     not_installed = []
     for name in names:
-        name = _parse_flatpak_name(name).lower()
-        if name in output.lower():
+        parsed_name = _parse_flatpak_name(name).lower()
+        if parsed_name in output.lower():
             installed.append(name)
         else:
             not_installed.append(name)
