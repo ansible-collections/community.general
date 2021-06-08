@@ -99,6 +99,7 @@ options:
         description:
             - Is the same as in an 'ip route add' command, except always requires specifying a priority.
         type: str
+        version_added: 3.2.0
     never_default4:
         description:
             - Set as default route.
@@ -134,7 +135,8 @@ options:
         description:
             - If you need I(ip4) configured before network-online.target is reached, set the the property to no.
         type: bool
-        default: yes
+        default: true
+        version_added: 3.2.0
     ip6:
         description:
             - The IPv6 address to this interface.
