@@ -140,6 +140,13 @@
         - double_url_removal_result is not changed
       msg: "state=absent with url as name shall not do anything when flatpak is not present"
 
+- name: Make sure flatpak is really gone - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+
 # state=present with list of packages
 
 - name: Test addition with list - {{ method }}
@@ -218,7 +225,7 @@
   flatpak:
     name:
       - com.dummy.App1
-      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App2
     state: absent
     method: "{{ method }}"
   register: removal_result
@@ -233,7 +240,7 @@
   flatpak:
     name:
       - com.dummy.App1
-      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App2
     state: absent
     method: "{{ method }}"
   register: double_removal_result
@@ -248,7 +255,7 @@
   flatpak:
     name:
       - com.dummy.App1
-      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App2
       - com.dummy.App3
     state: absent
     method: "{{ method }}"
@@ -264,7 +271,7 @@
   flatpak:
     name:
       - com.dummy.App1
-      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App2
       - com.dummy.App3
     state: absent
     method: "{{ method }}"
