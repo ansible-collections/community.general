@@ -60,69 +60,64 @@
       - double_removal_result is not changed
     msg: "state=absent shall not do anything when flatpak is not present"
 
-- when: false
-  # file:// URLs are no longer supported by flatpak, see
-  # https://github.com/flatpak/flatpak/pull/2740#issuecomment-470117029
-  block:
+# state=present with url as name
 
-  # state=present with url as name
+- name: Test addition with url - {{ method }}
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: url_addition_result
 
-  - name: Test addition with url - {{ method }}
-    flatpak:
-      name: file:///tmp/flatpak/repo/com.dummy.App1.flatpakref
-      remote: dummy-remote
-      state: present
-      method: "{{ method }}"
-      no_dependencies: true
-    register: url_addition_result
+- name: Verify addition test result - {{ method }}
+  assert:
+    that:
+      - url_addition_result is changed
+    msg: "state=present with url as name shall add flatpak when absent"
 
-  - name: Verify addition test result - {{ method }}
-    assert:
-      that:
-        - url_addition_result is changed
-      msg: "state=present with url as name shall add flatpak when absent"
+- name: Test idempotency of addition with url - {{ method }}
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_url_addition_result
 
-  - name: Test idempotency of addition with url - {{ method }}
-    flatpak:
-      name: file:///tmp/flatpak/repo/com.dummy.App1.flatpakref
-      remote: dummy-remote
-      state: present
-      method: "{{ method }}"
-      no_dependencies: true
-    register: double_url_addition_result
+- name: Verify idempotency of addition with url test result - {{ method }}
+  assert:
+    that:
+      - double_url_addition_result is not changed
+    msg: "state=present with url as name shall not do anything when flatpak is already present"
 
-  - name: Verify idempotency of addition with url test result - {{ method }}
-    assert:
-      that:
-        - double_url_addition_result is not changed
-      msg: "state=present with url as name shall not do anything when flatpak is already present"
+# state=absent with url as name
 
-  # state=absent with url as name
+- name: Test removal with url - {{ method }}
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+  register: url_removal_result
 
-  - name: Test removal with url - {{ method }}
-    flatpak:
-      name: file:///tmp/flatpak/repo/com.dummy.App1.flatpakref
-      state: absent
-      method: "{{ method }}"
-      no_dependencies: true
-    register: url_removal_result
+- name: Verify removal test result - {{ method }}
+  assert:
+    that:
+      - url_removal_result is changed
+    msg: "state=absent with url as name shall remove flatpak when present"
 
-  - name: Verify removal test result - {{ method }}
-    assert:
-      that:
-        - url_removal_result is changed
-      msg: "state=absent with url as name shall remove flatpak when present"
+- name: Test idempotency of removal with url - {{ method }}
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_url_removal_result
 
-  - name: Test idempotency of removal with url - {{ method }}
-    flatpak:
-      name: file:///tmp/flatpak/repo/com.dummy.App1.flatpakref
-      state: absent
-      method: "{{ method }}"
-      no_dependencies: true
-    register: double_url_removal_result
-
-  - name: Verify idempotency of removal with url test result - {{ method }}
-    assert:
-      that:
-        - double_url_removal_result is not changed
-      msg: "state=absent with url as name shall not do anything when flatpak is not present"
+- name: Verify idempotency of removal with url test result - {{ method }}
+  assert:
+    that:
+      - double_url_removal_result is not changed
+    msg: "state=absent with url as name shall not do anything when flatpak is not present"

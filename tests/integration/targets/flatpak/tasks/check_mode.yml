@@ -47,60 +47,54 @@
       - removal_result is not changed
     msg: "Removing an absent flatpak shall mark module execution as not changed"
 
-- when: false
-  # file:// URLs are no longer supported by flatpak, see
-  # https://github.com/flatpak/flatpak/pull/2740#issuecomment-470117029
-  block:
+# state=present with url on absent flatpak
 
-  # state=present with url on absent flatpak
+- name: Test addition of absent flatpak with url (check mode)
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    remote: dummy-remote
+    state: present
+  register: url_addition_result
+  check_mode: true
 
-  - name: Test addition of absent flatpak with url (check mode)
-    flatpak:
-      name: file:///tmp/flatpak/repo/com.dummy.App1.flatpakref
-      remote: dummy-remote
-      state: present
-    register: url_addition_result
-    check_mode: true
+- name: Verify addition of absent flatpak with url test result (check mode)
+  assert:
+    that:
+      - url_addition_result is changed
+    msg: "Adding an absent flatpak from URL shall mark module execution as changed"
 
-  - name: Verify addition of absent flatpak with url test result (check mode)
-    assert:
-      that:
-        - url_addition_result is changed
-      msg: "Adding an absent flatpak from URL shall mark module execution as changed"
+- name: Test non-existent idempotency of addition of absent flatpak with url (check mode)
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    remote: dummy-remote
+    state: present
+  register: double_url_addition_result
+  check_mode: true
 
-  - name: Test non-existent idempotency of addition of absent flatpak with url (check mode)
-    flatpak:
-      name: file:///tmp/flatpak/repo/com.dummy.App1.flatpakref
-      remote: dummy-remote
-      state: present
-    register: double_url_addition_result
-    check_mode: true
+- name: >
+      Verify non-existent idempotency of additionof absent flatpak with url test
+      result (check mode)
+  assert:
+    that:
+      - double_url_addition_result is changed
+    msg: |
+        Adding an absent flatpak from URL a second time shall still mark module execution
+        as changed in check mode
 
-  - name: >
-        Verify non-existent idempotency of additionof absent flatpak with url test
-        result (check mode)
-    assert:
-      that:
-        - double_url_addition_result is changed
-      msg: |
-          Adding an absent flatpak from URL a second time shall still mark module execution
-          as changed in check mode
+# state=absent with url on absent flatpak
 
-  # state=absent with url on absent flatpak
+- name: Test removal of absent flatpak with url not doing anything (check mode)
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    state: absent
+  register: url_removal_result
+  check_mode: true
 
-  - name: Test removal of absent flatpak with url not doing anything (check mode)
-    flatpak:
-      name: file:///tmp/flatpak/repo/com.dummy.App1.flatpakref
-      state: absent
-    register: url_removal_result
-    check_mode: true
-
-  - name: Verify removal of absent flatpak with url test result (check mode)
-    assert:
-      that:
-        - url_removal_result is not changed
-      msg: "Removing an absent flatpak shall mark module execution as not changed"
-
+- name: Verify removal of absent flatpak with url test result (check mode)
+  assert:
+    that:
+      - url_removal_result is not changed
+    msg: "Removing an absent flatpak shall mark module execution as not changed"
 
 # - Tests with present flatpak -------------------------------------------------
 
@@ -150,54 +144,49 @@
         Removing a present flatpak a second time shall still mark module execution
         as changed in check mode
 
-- when: false
-  # file:// URLs are no longer supported by flatpak, see
-  # https://github.com/flatpak/flatpak/pull/2740#issuecomment-470117029
-  block:
+# state=present with url on present flatpak
 
-  # state=present with url on present flatpak
+- name: Test addition with url of present flatpak (check mode)
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+    remote: dummy-remote
+    state: present
+  register: url_addition_present_result
+  check_mode: true
 
-  - name: Test addition with url of present flatpak (check mode)
-    flatpak:
-      name: file:///tmp/flatpak/repo/com.dummy.App2.flatpakref
-      remote: dummy-remote
-      state: present
-    register: url_addition_present_result
-    check_mode: true
+- name: Verify addition with url of present flatpak test result (check mode)
+  assert:
+    that:
+      - url_addition_present_result is not changed
+    msg: "Adding a present flatpak from URL shall mark module execution as not changed"
 
-  - name: Verify addition with url of present flatpak test result (check mode)
-    assert:
-      that:
-        - url_addition_present_result is not changed
-      msg: "Adding a present flatpak from URL shall mark module execution as not changed"
+# state=absent with url on present flatpak
 
-  # state=absent with url on present flatpak
+- name: Test removal with url of present flatpak (check mode)
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+    state: absent
+  register: url_removal_present_result
+  check_mode: true
 
-  - name: Test removal with url of present flatpak (check mode)
-    flatpak:
-      name: file:///tmp/flatpak/repo/com.dummy.App2.flatpakref
-      state: absent
-    register: url_removal_present_result
-    check_mode: true
+- name: Verify removal with url of present flatpak test result (check mode)
+  assert:
+    that:
+      - url_removal_present_result is changed
+    msg: "Removing an absent flatpak shall mark module execution as not changed"
 
-  - name: Verify removal with url of present flatpak test result (check mode)
-    assert:
-      that:
-        - url_removal_present_result is changed
-      msg: "Removing an absent flatpak shall mark module execution as not changed"
+- name: Test non-existent idempotency of removal with url of present flatpak (check mode)
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+    remote: dummy-remote
+    state: absent
+  register: double_url_removal_present_result
+  check_mode: true
 
-  - name: Test non-existent idempotency of removal with url of present flatpak (check mode)
-    flatpak:
-      name: file:///tmp/flatpak/repo/com.dummy.App2.flatpakref
-      remote: dummy-remote
-      state: absent
-    register: double_url_removal_present_result
-    check_mode: true
-
-  - name: >
-        Verify non-existent idempotency of installation with url of present
-        flatpak test result (check mode)
-    assert:
-      that:
-        - double_url_removal_present_result is changed
-      msg: Removing an absent flatpak a second time shall still mark module execution as changed
+- name: >
+      Verify non-existent idempotency of installation with url of present
+      flatpak test result (check mode)
+  assert:
+    that:
+      - double_url_removal_present_result is changed
+    msg: Removing an absent flatpak a second time shall still mark module execution as changed
