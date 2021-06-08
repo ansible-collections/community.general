@@ -67,6 +67,7 @@ Individuals who have been asked to become a part of this group have generally be
 
 | Name                | GitHub ID            | IRC Nick           | Other                |
 | ------------------- | -------------------- | ------------------ | -------------------- |
+| Alexei Znamensky    | russoz               | russoz             |                      |
 | Amin Vakil          | aminvakil            | aminvakil          |                      |
 | Andrew Klychkov     | andersson007         | andersson007_      |                      |
 | Felix Fontein       | felixfontein         | felixfontein       |                      |
