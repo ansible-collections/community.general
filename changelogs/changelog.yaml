@@ -1156,3 +1156,133 @@ releases:
         name: random_pet
         namespace: null
     release_date: '2021-05-18'
+  3.2.0:
+    changes:
+      bugfixes:
+      - consul_kv lookup plugin - allow to set ``recurse``, ``index``, ``datacenter``
+        and ``token`` as keyword arguments (https://github.com/ansible-collections/community.general/issues/2124).
+      - cpanm - also use ``LC_ALL`` to enforce locale choice (https://github.com/ansible-collections/community.general/pull/2731).
+      - influxdb_user - fix bug which removed current privileges instead of appending
+        them to existing ones (https://github.com/ansible-collections/community.general/issues/2609,
+        https://github.com/ansible-collections/community.general/pull/2614).
+      - iptables_state - call ``async_status`` action plugin rather than its module
+        (https://github.com/ansible-collections/community.general/issues/2700).
+      - iptables_state - fix a broken query of ``async_status`` result with current
+        ansible-core development version (https://github.com/ansible-collections/community.general/issues/2627,
+        https://github.com/ansible-collections/community.general/pull/2671).
+      - java_cert - fix issue with incorrect alias used on PKCS#12 certificate import
+        (https://github.com/ansible-collections/community.general/pull/2560).
+      - jenkins_plugin - use POST method for sending request to jenkins API when ``state``
+        option is one of ``enabled``, ``disabled``, ``pinned``, ``unpinned``, or ``absent``
+        (https://github.com/ansible-collections/community.general/issues/2510).
+      - json_query filter plugin - avoid 'unknown type' errors for more Ansible internal
+        types (https://github.com/ansible-collections/community.general/pull/2607).
+      - keycloak_realm - ``ssl_required`` changed from a boolean type to accept the
+        strings ``none``, ``external`` or ``all``. This is not a breaking change since
+        the module always failed when a boolean was supplied (https://github.com/ansible-collections/community.general/pull/2693).
+      - keycloak_realm - remove warning that ``reset_password_allowed`` needs to be
+        marked as ``no_log`` (https://github.com/ansible-collections/community.general/pull/2694).
+      - module_helper module utils - ``CmdMixin`` must also use ``LC_ALL`` to enforce
+        locale choice (https://github.com/ansible-collections/community.general/pull/2731).
+      - netcup_dns - use ``str(ex)`` instead of unreliable ``ex.message`` in exception
+        handling to fix ``AttributeError`` in error cases (https://github.com/ansible-collections/community.general/pull/2590).
+      - ovir4 inventory script - improve configparser creation to avoid crashes for
+        options without values (https://github.com/ansible-collections/community.general/issues/674).
+      - proxmox_kvm - fixed ``vmid`` return value when VM with ``name`` already exists
+        (https://github.com/ansible-collections/community.general/issues/2648).
+      - redis cache - improved connection string parsing (https://github.com/ansible-collections/community.general/issues/497).
+      - rhsm_release - fix the issue that module considers 8, 7Client and 7Workstation
+        as invalid releases (https://github.com/ansible-collections/community.general/pull/2571).
+      - ssh_config - reduce stormssh searches based on host (https://github.com/ansible-collections/community.general/pull/2568/).
+      - stacki_host - when adding a new server, ``rack`` and ``rank`` must be passed,
+        and network parameters are optional (https://github.com/ansible-collections/community.general/pull/2681).
+      - terraform - ensure the workspace is set back to its previous value when the
+        apply fails (https://github.com/ansible-collections/community.general/pull/2634).
+      - xfconf - also use ``LC_ALL`` to enforce locale choice (https://github.com/ansible-collections/community.general/issues/2715).
+      - zypper_repository - fix idempotency on adding repository with ``$releasever``
+        and ``$basearch`` variables (https://github.com/ansible-collections/community.general/issues/1985).
+      deprecated_features:
+      - All inventory and vault scripts will be removed from community.general in
+        version 4.0.0. If you are referencing them, please update your references
+        to the new `contrib-scripts GitHub repository <https://github.com/ansible-community/contrib-scripts>`_
+        so your workflow will not break once community.general 4.0.0 is released (https://github.com/ansible-collections/community.general/pull/2697).
+      minor_changes:
+      - Remove unnecessary ``__init__.py`` files from ``plugins/`` (https://github.com/ansible-collections/community.general/pull/2632).
+      - archive - added ``exclusion_patterns`` option to exclude files or subdirectories
+        from archives (https://github.com/ansible-collections/community.general/pull/2616).
+      - cloud_init_data_facts - minor refactor (https://github.com/ansible-collections/community.general/pull/2557).
+      - composer - add ``composer_executable`` option (https://github.com/ansible-collections/community.general/issues/2649).
+      - flatpak - add ``no_dependencies`` parameter (https://github.com/ansible/ansible/pull/55452,
+        https://github.com/ansible-collections/community.general/pull/2751).
+      - ini_file - opening file with encoding ``utf-8-sig`` (https://github.com/ansible-collections/community.general/issues/2189).
+      - jira - add comment visibility parameter for comment operation (https://github.com/ansible-collections/community.general/pull/2556).
+      - maven_artifact - added ``checksum_alg`` option to support SHA1 checksums in
+        order to support FIPS systems (https://github.com/ansible-collections/community.general/pull/2662).
+      - module_helper module utils - method ``CmdMixin.run_command()`` now accepts
+        ``process_output`` specifying a function to process the outcome of the underlying
+        ``module.run_command()`` (https://github.com/ansible-collections/community.general/pull/2564).
+      - nmcli - add new options to ignore automatic DNS servers and gateways (https://github.com/ansible-collections/community.general/issues/1087).
+      - onepassword lookup plugin - add ``domain`` option (https://github.com/ansible-collections/community.general/issues/2734).
+      - open_iscsi - add ``auto_portal_startup`` parameter to allow ``node.startup``
+        setting per portal (https://github.com/ansible-collections/community.general/issues/2685).
+      - open_iscsi - also consider ``portal`` and ``port`` to check if already logged
+        in or not (https://github.com/ansible-collections/community.general/issues/2683).
+      - proxmox_group_info - minor refactor (https://github.com/ansible-collections/community.general/pull/2557).
+      - proxmox_kvm - minor refactor (https://github.com/ansible-collections/community.general/pull/2557).
+      - rhevm - minor refactor (https://github.com/ansible-collections/community.general/pull/2557).
+      - serverless - minor refactor (https://github.com/ansible-collections/community.general/pull/2557).
+      - stacki_host - minor refactoring (https://github.com/ansible-collections/community.general/pull/2681).
+      - terraform - add option ``overwrite_init`` to skip init if exists (https://github.com/ansible-collections/community.general/pull/2573).
+      - terraform - minor refactor (https://github.com/ansible-collections/community.general/pull/2557).
+      release_summary: Regular bugfix and feature release.
+    fragments:
+    - 2126-consul_kv-pass-token.yml
+    - 2461-ovirt4-fix-configparser.yml
+    - 2510-jenkins_plugin_use_post_method.yml
+    - 2556-add-comment_visibility-parameter-for-comment-operation-of-jira-module.yml
+    - 2557-cloud-misc-refactor.yml
+    - 2560-java_cert-pkcs12-alias-bugfix.yml
+    - 2564-mh-cmd-process-output.yml
+    - 2568-ssh_config-reduce-stormssh-searches-based-on-host.yml
+    - 2571-rhsm_release-fix-release_matcher.yaml
+    - 2573-terraform-overwrite-init.yml
+    - 2578-ini-file-utf8-bom.yml
+    - 2579-redis-cache-ipv6.yml
+    - 2590-netcup_dns-exception-no-message-attr.yml
+    - 2614-influxdb_user-fix-issue-introduced-in-PR#2499.yml
+    - 2616-archive-exclusion_patterns-option.yml
+    - 2632-cleanup.yml
+    - 2634-terraform-switch-workspace.yml
+    - 2635-nmcli-add-ignore-auto-arguments.yml
+    - 2648-proxmox_kvm-fix-vmid-return-value.yml
+    - 2650-composer-add_composer_executable.yml
+    - 2661-maven_artifact-add-sha1-option.yml
+    - 2671-fix-broken-query-of-async_status-result.yml
+    - 2681-stacki-host-bugfix.yml
+    - 2684-open_iscsi-single-target-multiple-portal-overrides.yml
+    - 2711-fix-iptables_state-2700-async_status-call.yml
+    - 2722-zypper_repository-fix_idempotency_on_adding_repo_with_releasever.yml
+    - 2731-mh-cmd-locale.yml
+    - 2735-onepassword-add_domain_option.yml
+    - 2751-flatpak-no_dependencies.yml
+    - 3.2.0.yml
+    - json_query_more_types.yml
+    - keycloak-realm-no-log-password-reset.yml
+    - keycloak_realm_ssl_required.yml
+    - script-removal.yml
+    modules:
+    - description: Execute SQL on HANA
+      name: hana_query
+      namespace: database.saphana
+    - description: Manage pacman's list of trusted keys
+      name: pacman_key
+      namespace: packaging.os
+    - description: Manages SAP SAPCAR archives
+      name: sapcar_extract
+      namespace: files
+    plugins:
+      lookup:
+      - description: Generates random string
+        name: random_string
+        namespace: null
+    release_date: '2021-06-08'

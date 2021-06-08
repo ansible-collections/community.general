@@ -1,2 +1,0 @@
-bugfixes:
-  - redis cache - improved connection string parsing (https://github.com/ansible-collections/community.general/issues/497).
