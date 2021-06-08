@@ -147,7 +147,7 @@
     name:
       - com.dummy.App1
       - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
-    remote: flathub
+    remote: dummy-remote
     state: present
     method: "{{ method }}"
     no_dependencies: true
@@ -164,7 +164,7 @@
     name:
       - com.dummy.App1
       - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
-    remote: flathub
+    remote: dummy-remote
     state: present
     method: "{{ method }}"
     no_dependencies: true
@@ -182,7 +182,7 @@
       - com.dummy.App1
       - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
       - com.dummy.App3
-    remote: flathub
+    remote: dummy-remote
     state: present
     method: "{{ method }}"
     no_dependencies: true
@@ -200,7 +200,7 @@
       - com.dummy.App1
       - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
       - com.dummy.App3
-    remote: flathub
+    remote: dummy-remote
     state: present
     method: "{{ method }}"
     no_dependencies: true
