@@ -51,3 +51,4 @@
   command: '{{ remote_tmp_dir }}/serve.py 127.0.0.1 8000 /tmp/flatpak/'
   async: 120
   poll: 0
+  register: webserver_status

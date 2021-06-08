@@ -59,6 +59,11 @@
 
   always:
 
+  - name: Check HTTP server status
+    async_status:
+      jid: "{{ webserver_status.ansible_job_id }}"
+    ignore_errors: true
+
   - name: Stop HTTP server
     command: >-
       pkill -- '{{ remote_tmp_dir }}/serve.py'
