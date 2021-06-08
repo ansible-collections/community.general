@@ -57,7 +57,7 @@
     vars:
       method: system
 
-  finally:
+  always:
 
   - name: Stop HTTP server
     command: >-
