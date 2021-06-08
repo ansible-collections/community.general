@@ -64,6 +64,9 @@
       jid: "{{ webserver_status.ansible_job_id }}"
     ignore_errors: true
 
+  - name: List processes
+    command: ps aux
+
   - name: Stop HTTP server
     command: >-
       pkill -- '{{ remote_tmp_dir }}/serve.py'
