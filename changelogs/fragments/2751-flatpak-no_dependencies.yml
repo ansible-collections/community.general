@@ -1,0 +1,2 @@
+minor_changes:
+- "flatpak - add ``no_dependencies`` parameter (https://github.com/ansible/ansible/pull/55452, https://github.com/ansible-collections/community.general/pull/2751)."
