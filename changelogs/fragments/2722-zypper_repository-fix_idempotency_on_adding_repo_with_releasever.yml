@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - zypper_repository - fix idempotency on adding repository with
+    ``$releasever`` and ``$basearch`` variables
+    (https://github.com/ansible-collections/community.general/issues/1985).
