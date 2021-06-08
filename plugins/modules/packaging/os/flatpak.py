@@ -152,6 +152,8 @@ stdout:
   sample: "org.gnome.Calendar/x86_64/stable\tcurrent\norg.gnome.gitg/x86_64/stable\tcurrent\n"
 '''
 
+from distutils.version import StrictVersion
+
 from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.module_utils.basic import AnsibleModule
 
