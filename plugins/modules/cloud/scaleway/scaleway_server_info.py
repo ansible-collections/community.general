@@ -49,9 +49,12 @@ EXAMPLES = r'''
 RETURN = r'''
 ---
 scaleway_server_info:
-  description: Response from Scaleway API
+  description:
+    - Response from Scaleway API.
+    - "For more details please refer to: U(https://developers.scaleway.com/en/products/instance/api/)."
   returned: success
-  type: complex
+  type: list
+  elements: dict
   sample:
     "scaleway_server_info": [
         {
