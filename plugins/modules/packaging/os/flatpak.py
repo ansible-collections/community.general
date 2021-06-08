@@ -196,7 +196,7 @@ def uninstall_flat(module, binary, names, method):
         command += ["-y"]
     else:
         command += ["--noninteractive"]
-    command += ["--{0}".format(method)] + installed_flat_names
+    command += ["--{0}".format(method)] + names
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
