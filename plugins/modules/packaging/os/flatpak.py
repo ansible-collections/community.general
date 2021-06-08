@@ -190,10 +190,6 @@ def install_flat(module, binary, remote, names, method, no_dependencies):
 def uninstall_flat(module, binary, names, method):
     """Remove existing flatpaks."""
     global result
-    installed_flat_names = [
-        _match_installed_flat_name(module, binary, name, method)
-        for name in names
-    ]
     command = [binary, "uninstall"]
     flatpak_version = _flatpak_version(module, binary)
     if StrictVersion(flatpak_version) < StrictVersion('1.1.3'):
@@ -329,10 +325,11 @@ def main():
     if not binary:
         module.fail_json(msg="Executable '%s' was not found on the system." % executable, **result)
 
-    if state == 'present' and not flatpak_exists(module, binary, name, method):
-        install_flat(module, binary, remote, name, method, no_dependencies)
-    elif state == 'absent' and flatpak_exists(module, binary, name, method):
-        uninstall_flat(module, binary, name, method)
+    installed, not_installed = flatpak_exists(module, binary, name, method)
+    if state == 'present' and not_installed:
+        install_flat(module, binary, remote, not_installed, method, no_dependencies)
+    elif state == 'absent' and installed:
+        uninstall_flat(module, binary, installed, method)
 
     module.exit_json(**result)
 
