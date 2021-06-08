@@ -34,6 +34,13 @@
     flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
     method: system
 
+- name: Remove (if necessary) flatpak for testing check mode on absent flatpak
+  flatpak:
+    name: com.dummy.App1
+    remote: dummy-remote
+    state: absent
+    no_dependencies: true
+
 - name: Add flatpak for testing check mode on present flatpak
   flatpak:
     name: com.dummy.App2
