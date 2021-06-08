@@ -6,13 +6,7 @@ plugins/modules/cloud/lxc/lxc_container.py validate-modules:use-run-command-not-
 plugins/modules/cloud/rackspace/rax.py use-argspec-type-path
 plugins/modules/cloud/rackspace/rax_files_objects.py use-argspec-type-path
 plugins/modules/cloud/rackspace/rax_scaling_group.py use-argspec-type-path  # fix needed, expanduser() applied to dict values
-plugins/modules/cloud/scaleway/scaleway_image_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/scaleway/scaleway_ip_info.py validate-modules:return-syntax-error
 plugins/modules/cloud/scaleway/scaleway_organization_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/scaleway/scaleway_security_group_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/scaleway/scaleway_server_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/scaleway/scaleway_snapshot_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/scaleway/scaleway_volume_info.py validate-modules:return-syntax-error
 plugins/modules/cloud/smartos/vmadm.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/smartos/vmadm.py validate-modules:undocumented-parameter
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-type-not-in-doc
