@@ -36,7 +36,7 @@
 
 - name: Add flatpak for testing check mode on present flatpak
   flatpak:
-    name: com.dummy.App8
+    name: com.dummy.App2
     remote: dummy-remote
     state: present
     no_dependencies: true

@@ -103,7 +103,7 @@
 
 - name: Test addition of present flatpak (check mode)
   flatpak:
-    name: com.dummy.App8
+    name: com.dummy.App2
     remote: dummy-remote
     state: present
   register: addition_present_result
@@ -119,7 +119,7 @@
 
 - name: Test removal of present flatpak (check mode)
   flatpak:
-    name: com.dummy.App8
+    name: com.dummy.App2
     state: absent
   register: removal_present_result
   check_mode: true
@@ -132,7 +132,7 @@
 
 - name: Test non-existent idempotency of removal (check mode)
   flatpak:
-    name: com.dummy.App8
+    name: com.dummy.App2
     state: absent
   register: double_removal_present_result
   check_mode: true
@@ -149,7 +149,7 @@
 
 - name: Test addition with url of present flatpak (check mode)
   flatpak:
-    name: file:///tmp/flatpak/repo/com.dummy.App8.flatpakref
+    name: file:///tmp/flatpak/repo/com.dummy.App2.flatpakref
     remote: dummy-remote
     state: present
   register: url_addition_present_result
@@ -165,7 +165,7 @@
 
 - name: Test removal with url of present flatpak (check mode)
   flatpak:
-    name: file:///tmp/flatpak/repo/com.dummy.App8.flatpakref
+    name: file:///tmp/flatpak/repo/com.dummy.App2.flatpakref
     state: absent
   register: url_removal_present_result
   check_mode: true
@@ -178,7 +178,7 @@
 
 - name: Test non-existent idempotency of removal with url of present flatpak (check mode)
   flatpak:
-    name: file:///tmp/flatpak/repo/com.dummy.App8.flatpakref
+    name: file:///tmp/flatpak/repo/com.dummy.App2.flatpakref
     remote: dummy-remote
     state: absent
   register: double_url_removal_present_result
