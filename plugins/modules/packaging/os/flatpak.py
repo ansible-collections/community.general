@@ -41,7 +41,7 @@ options:
     - The name of the flatpak to manage.
     - When used with I(state=present), I(name) can be specified as a URL to a
       C(flatpakref) file or the unique reverse DNS name that identifies a flatpak.
-    - C(https://), C(http://) and local C(file://) URLs are supported.
+    - Both C(https://) and C(http://) URLs are supported.
     - When supplying a reverse DNS name, you can use the I(remote) option to specify on what remote
       to look for the flatpak. An example for a reverse DNS name is C(org.gnome.gedit).
     - When used with I(state=absent), it is recommended to specify the name in the reverse DNS
@@ -232,7 +232,7 @@ def _match_flat_using_flatpak_column_feature(module, binary, parsed_name, method
 
 
 def _parse_flatpak_name(name):
-    if name.startswith('http://') or name.startswith('https://') or name.startswith('file://'):
+    if name.startswith('http://') or name.startswith('https://'):
         file_name = urlparse(name).path.split('/')[-1]
         file_name_without_extension = file_name.split('.')[0:-1]
         common_name = ".".join(file_name_without_extension)
