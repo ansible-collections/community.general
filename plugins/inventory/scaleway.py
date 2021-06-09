@@ -105,7 +105,7 @@ def _fetch_information(token, url):
         except Exception as e:
             raise AnsibleError("Error while fetching %s: %s" % (url, to_native(e)))
         try:
-            raw_json = json.loads(response.read())
+            raw_json = json.loads(response.read().decode('UTF-8'))
         except ValueError:
             raise AnsibleError("Incorrect JSON payload")
 
