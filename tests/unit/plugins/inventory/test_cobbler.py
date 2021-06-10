@@ -37,5 +37,11 @@ def test_init_cache(inventory):
     assert inventory._cache[inventory.cache_key] == {}
 
 
+def test_verify_file(tmp_path, inventory):
+    file = tmp_path / "foobar.cobbler.yml"
+    file.touch()
+    assert inventory.verify_file(str(file)) is True
+
+
 def test_verify_file_bad_config(inventory):
-    assert inventory.verify_file('foobar.cobber.yml') is False
+    assert inventory.verify_file('foobar.cobbler.yml') is False

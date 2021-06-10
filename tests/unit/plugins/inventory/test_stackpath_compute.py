@@ -66,6 +66,12 @@ def test_get_stack_slugs(inventory):
     ]
 
 
+def test_verify_file(tmp_path, inventory):
+    file = tmp_path / "foobar.stackpath_compute.yml"
+    file.touch()
+    assert inventory.verify_file(str(file)) is True
+
+
 def test_verify_file_bad_config(inventory):
     assert inventory.verify_file('foobar.stackpath_compute.yml') is False
 
