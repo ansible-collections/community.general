@@ -143,13 +143,13 @@ def main():
     # Prepare Datadog
     if not HAS_DATADOG:
         module.fail_json(msg=missing_required_lib('datadogpy'), exception=DATADOG_IMP_ERR)
-        
+
     options = {
         'api_key': module.params['api_key'],
         'app_key': module.params['app_key'],
     }
     if module.params['api_key'] is not None:
-        options['api_host'] = module.params['api_host'] 
+		options['api_host'] = module.params['api_host'] 
 
     initialize(**options)
 
