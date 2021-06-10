@@ -133,7 +133,7 @@ def main():
     options = {
         'api_key': module.params['api_key'],
         'app_key': module.params['app_key'],
-        'api_host': module.params['api_host']
+        'api_host': module.params['api_host'],
     }
 
     initialize(**options)
