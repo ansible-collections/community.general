@@ -113,6 +113,7 @@ def main():
         argument_spec=dict(
             api_key=dict(required=True, no_log=True),
             app_key=dict(required=True, no_log=True),
+            api_host=dict(required=False, default='https://api.datadoghq.com'),
             title=dict(required=True),
             text=dict(required=True),
             date_happened=dict(type='int'),
@@ -131,7 +132,8 @@ def main():
 
     options = {
         'api_key': module.params['api_key'],
-        'app_key': module.params['app_key']
+        'app_key': module.params['app_key'],
+        'api_host': module.params['api_host']
     }
 
     initialize(**options)
