@@ -81,4 +81,4 @@ def test_verify_file(tmp_path, inventory):
 
 
 def test_verify_file_bad_config(inventory):
-    assert inventory.verify_file('foobar.linde.yml') is False
+    assert inventory.verify_file('foobar.linode.yml') is False
