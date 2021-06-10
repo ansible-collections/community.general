@@ -1,2 +1,2 @@
 minor_changes:
-- "Adding ``api_host`` as an optional parameter to ``datadog_event.py`` to allow users who use ``datadog_event`` Ansible module to define a datadog API endpoint instead of using the default one considering not all datadog deployme$
+- "datadog_event - adding parameter ``api_host`` to allow selecting a datadog API endpoint instead of using the default one (https://github.com/ansible-collections/community.general/issues/2774, https://github.com/ansible-collections/community.general/pull/2775)."
