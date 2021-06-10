@@ -74,5 +74,11 @@ def test_conig_query_options(inventory):
     assert tags == ['web-server']
 
 
+def test_verify_file(tmp_path, inventory):
+    file = tmp_path / "foobar.linode.yml"
+    file.touch()
+    assert inventory.verify_file(str(file)) is True
+
+
 def test_verify_file_bad_config(inventory):
-    assert inventory.verify_file('foobar.linde.yml') is False
+    assert inventory.verify_file('foobar.linode.yml') is False
