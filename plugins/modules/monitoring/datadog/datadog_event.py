@@ -56,7 +56,8 @@ options:
         - If not specified, it defaults to the remote system's hostname.
     api_host:
         type: str
-        description: ["DataDog API endpoint URL."]
+        description:
+        - DataDog API endpoint URL.
         version_added: '3.3.0'
     tags:
         type: list
