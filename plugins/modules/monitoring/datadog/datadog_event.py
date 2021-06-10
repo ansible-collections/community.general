@@ -94,7 +94,7 @@ EXAMPLES = '''
     api_key: 9775a026f1ca7d1c6c5af9d94d9595a4
     app_key: j4JyCYfefWHhgFgiZUqRm63AXHNZQyPGBfJtAzmN
     tags: 'aa,bb,#host:{{ inventory_hostname }}'
-    
+
 - name: Post an event with several tags
   community.general.datadog_event:
     title: Testing from ansible
@@ -103,7 +103,7 @@ EXAMPLES = '''
     app_key: j4JyCYfefWHhgFgiZUqRm63AXHNZQyPGBfJtAzmN
     api_host: 'https://example.datadoghq.eu'
     tags: 'aa,bb,#host:{{ inventory_hostname }}'
-    
+
 '''
 
 import platform
@@ -143,7 +143,7 @@ def main():
     # Prepare Datadog
     if not HAS_DATADOG:
         module.fail_json(msg=missing_required_lib('datadogpy'), exception=DATADOG_IMP_ERR)
-        
+
     options = {
         'api_key': module.params['api_key'],
         'app_key': module.params['app_key'],
