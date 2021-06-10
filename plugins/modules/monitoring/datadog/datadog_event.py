@@ -96,7 +96,7 @@ EXAMPLES = '''
     app_key: j4JyCYfefWHhgFgiZUqRm63AXHNZQyPGBfJtAzmN
     tags: 'aa,bb,#host:{{ inventory_hostname }}'
 
-- name: Post an event with several tags
+- name: Post an event with several tags to another endpoint
   community.general.datadog_event:
     title: Testing from ansible
     text: Test
