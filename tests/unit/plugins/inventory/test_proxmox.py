@@ -21,6 +21,12 @@ def inventory():
     return r
 
 
+def test_verify_file(tmp_path, inventory):
+    file = tmp_path / "foobar.proxmox.yml"
+    file.touch()
+    assert inventory.verify_file(str(file)) is True
+
+
 def test_verify_file_bad_config(inventory):
     assert inventory.verify_file('foobar.proxmox.yml') is False
 

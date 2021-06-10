@@ -51,6 +51,12 @@ def inventory():
     return inv
 
 
+def test_verify_file(tmp_path, inventory):
+    file = tmp_path / "foobar.lxd.yml"
+    file.touch()
+    assert inventory.verify_file(str(file)) is True
+
+
 def test_verify_file_bad_config(inventory):
     assert inventory.verify_file('foobar.lxd.yml') is False
 
