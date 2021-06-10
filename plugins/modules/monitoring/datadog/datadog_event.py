@@ -54,6 +54,9 @@ options:
         description:
         - Host name to associate with the event.
         - If not specified, it defaults to the remote system's hostname.
+    api_host:
+        type: str
+        description: ["DataDog API endpoint URL."]
     tags:
         type: list
         elements: str
@@ -90,6 +93,16 @@ EXAMPLES = '''
     api_key: 9775a026f1ca7d1c6c5af9d94d9595a4
     app_key: j4JyCYfefWHhgFgiZUqRm63AXHNZQyPGBfJtAzmN
     tags: 'aa,bb,#host:{{ inventory_hostname }}'
+    
+- name: Post an event with several tags
+  community.general.datadog_event:
+    title: Testing from ansible
+    text: Test
+    api_key: 9775a026f1ca7d1c6c5af9d94d9595a4
+    app_key: j4JyCYfefWHhgFgiZUqRm63AXHNZQyPGBfJtAzmN
+    api_host: 'https://example.datadoghq.eu'
+    tags: 'aa,bb,#host:{{ inventory_hostname }}'
+    
 '''
 
 import platform
@@ -113,7 +126,7 @@ def main():
         argument_spec=dict(
             api_key=dict(required=True, no_log=True),
             app_key=dict(required=True, no_log=True),
-            api_host=dict(required=False, default='https://api.datadoghq.com'),
+            api_host=dict(required=False),
             title=dict(required=True),
             text=dict(required=True),
             date_happened=dict(type='int'),
@@ -129,12 +142,13 @@ def main():
     # Prepare Datadog
     if not HAS_DATADOG:
         module.fail_json(msg=missing_required_lib('datadogpy'), exception=DATADOG_IMP_ERR)
-
+        
     options = {
         'api_key': module.params['api_key'],
         'app_key': module.params['app_key'],
-        'api_host': module.params['api_host'],
     }
+    if module.params['api_key'] is not None:
+        options['api_host'] = module.params['api_host'] 
 
     initialize(**options)
 
