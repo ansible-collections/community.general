@@ -89,7 +89,7 @@ from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, parse_pagination_link
 from ansible.module_utils.urls import open_url
-from ansible.module_utils._text import to_native
+from ansible.module_utils._text import to_native, to_text
 
 import ansible.module_utils.six.moves.urllib.parse as urllib_parse
 
@@ -105,7 +105,7 @@ def _fetch_information(token, url):
         except Exception as e:
             raise AnsibleError("Error while fetching %s: %s" % (url, to_native(e)))
         try:
-            raw_json = json.loads(response.read())
+            raw_json = json.loads(to_text(response.read()))
         except ValueError:
             raise AnsibleError("Incorrect JSON payload")
 
