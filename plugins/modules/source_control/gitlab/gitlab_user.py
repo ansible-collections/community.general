@@ -116,16 +116,17 @@ options:
       - Define external parameter for this user.
     type: bool
     default: no
-  provider:
+  identities:
     description:
-      - External provider for this user.
-    version_added: 3.2.0
-    type: str
-  extern_uid:
+      - List of identities to be added/updated for this user.
+    type: list
+    version_added: 3.3.0
+  overwrite_identities:
     description:
-      - External UID for this user.
-    type: str
-    version_added: 3.2.0
+      - Overwrite identities with identities added in this module
+    type: bool
+    default: no
+    version_added: 3.3.0
 '''
 
 EXAMPLES = '''
@@ -258,8 +259,7 @@ class GitLabUser(object):
                 'skip_confirmation': not options['confirm'],
                 'admin': options['isadmin'],
                 'external': options['external'],
-                'provider': options['provider'],
-                'extern_uid': options['extern_uid'],
+                'identities': options['identities'],
             })
             changed = True
         else:
@@ -269,8 +269,6 @@ class GitLabUser(object):
                     # params in the dict below
                     'name': {'value': options['name']},
                     'email': {'value': options['email']},
-                    'provider': {'value': options['provider']},
-                    'extern_uid': {'value': options['extern_uid']},
 
                     # note: for some attributes like this one the key
                     #   from reading back from server is unfortunately
@@ -280,6 +278,7 @@ class GitLabUser(object):
                         'value': options['isadmin'], 'setter': 'admin'
                     },
                     'external': {'value': options['external']},
+                    'identities': {'value': options['identities']}
                 },
                 {
                     # put "uncheckable" params here, this means params
@@ -288,6 +287,7 @@ class GitLabUser(object):
                     'skip_reconfirmation': {'value': not options['confirm']},
                     'password': {'value': options['password']},
                     'reset_password': {'value': options['reset_password']},
+                    'overwrite_identities': {'value': options['overwrite_identities']}
                 }
             )
 
@@ -430,23 +430,12 @@ class GitLabUser(object):
     def updateUser(self, user, arguments, uncheckable_args):
         changed = False
 
-        arguments = sanitize_arguments(arguments)
-
         for arg_key, arg_value in arguments.items():
             av = arg_value['value']
 
             if av is not None:
-                if arg_key == "provider" or arg_key == "extern_uid":
-
-                    new_identity = {
-                        "provider": arguments['provider']['value'],
-                        "extern_uid": arguments['extern_uid']['value']
-                    }
-
-                    if new_identity not in user.identities:
-                        setattr(user, 'provider', arguments['provider']['value'])
-                        setattr(user, 'extern_uid', arguments['extern_uid']['value'])
-                        changed = True
+                if arg_key == "identities":
+                    changed = self.addIdentities(user, av, uncheckable_args['overwrite_identities']['value'])
 
                 elif getattr(user, arg_key) != av:
                     setattr(user, arg_value.get('setter', arg_key), av)
@@ -467,14 +456,49 @@ class GitLabUser(object):
         if self._module.check_mode:
             return True
 
-        arguments = sanitize_arguments(arguments)
+        if 'identities' in arguments:
+            identities = arguments['identities']
+            del arguments['identities']
 
         try:
             user = self._gitlab.users.create(arguments)
+            if identities:
+                self.addIdentities(user, identities)
+
         except (gitlab.exceptions.GitlabCreateError) as e:
             self._module.fail_json(msg="Failed to create user: %s " % to_native(e))
 
         return user
+
+    '''
+    @param user User object
+    @param identites List of identities to be added/updated
+    @param overwrite_identities Overwrite user identities with identities passed to this module
+    '''
+    def addIdentities(self, user, identities, overwrite_identities=False):
+        changed = False
+        if overwrite_identities:
+            changed = self.deleteIdentities(user, identities)
+
+        for identity in identities:
+            if identity not in user.identities:
+                setattr(user, 'provider', identity['provider'])
+                setattr(user, 'extern_uid', identity['extern_uid'])
+                user.save()
+                changed = True
+        return changed
+
+    '''
+    @param user User object
+    @param identites List of identities to be added/updated
+    '''
+    def deleteIdentities(self, user, identities):
+        changed = False
+        for identity in user.identities:
+                if identity not in identities:
+                    user.identityproviders.delete(identity['provider'])
+                    changed = True
+        return changed
 
     '''
     @param username Username of the user
@@ -553,8 +577,8 @@ def main():
         confirm=dict(type='bool', default=True),
         isadmin=dict(type='bool', default=False),
         external=dict(type='bool', default=False),
-        provider=dict(type='str'),
-        extern_uid=dict(type='str'),
+        identities=dict(type='list'),
+        overwrite_identities=dict(type='bool', default=False)
     ))
 
     module = AnsibleModule(
@@ -589,8 +613,8 @@ def main():
     confirm = module.params['confirm']
     user_isadmin = module.params['isadmin']
     user_external = module.params['external']
-    user_provider = module.params['provider']
-    user_extern_uid = module.params['extern_uid']
+    user_identities = module.params['identities']
+    overwrite_identities = module.params['overwrite_identities']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -639,8 +663,8 @@ def main():
                                           "confirm": confirm,
                                           "isadmin": user_isadmin,
                                           "external": user_external,
-                                          "provider": user_provider,
-                                          "extern_uid": user_extern_uid}):
+                                          "identities": user_identities,
+                                          "overwrite_identities": overwrite_identities}):
             module.exit_json(changed=True, msg="Successfully created or updated the user %s" % user_username, user=gitlab_user.userObject._attrs)
         else:
             module.exit_json(changed=False, msg="No need to update the user %s" % user_username, user=gitlab_user.userObject._attrs)
