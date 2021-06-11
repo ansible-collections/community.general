@@ -1,0 +1,3 @@
+bugfixes:
+  - scaleway plugin inventory - fix ``JSON object must be str, not 'bytes'`` with Python 3.5
+    (https://github.com/ansible-collections/community.general/issues/2769).
