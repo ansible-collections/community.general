@@ -588,7 +588,7 @@ def main():
         confirm=dict(type='bool', default=True),
         isadmin=dict(type='bool', default=False),
         external=dict(type='bool', default=False),
-        identities=dict(type='list'),
+        identities=dict(type='list', elements='dict'),
         overwrite_identities=dict(type='bool', default=False)
     ))
 
