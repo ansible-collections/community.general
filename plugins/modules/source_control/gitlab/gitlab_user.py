@@ -119,8 +119,17 @@ options:
   identities:
     description:
       - List of identities to be added/updated for this user.
-    elements: dict
     type: list
+    elements: dict
+    suboptions:
+      provider:
+        description:
+          - The name of the external identity provider
+        type: str
+      extern_uid:
+        description:
+          - UID for external identity
+        type: str
     version_added: 3.3.0
   overwrite_identities:
     description:
