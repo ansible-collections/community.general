@@ -8,6 +8,7 @@
   yum:
     name: procps-ng
     state: latest
+  when: ansible_distribution == 'Fedora' and ansible_distribution_major_version == '34'
 
 - block:
     - name: Install necessary packages to test yum_versionlock
