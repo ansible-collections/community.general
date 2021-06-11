@@ -29,6 +29,12 @@
             state: present
           register: lock_all_packages
 
+        - name: Lock all packages again
+          community.general.yum_versionlock:
+            name: "{{ yum_updates.results | map(attribute='name') | list }}"
+            state: present
+          register: lock_all_packages_again
+
           # This should fail when it needs user interaction and missing -y is on purpose.
         - name: Update all packages (not really)
           command: yum update --setopt=obsoletes=0
@@ -55,6 +61,7 @@
           assert:
             that:
               - "{{ lock_all_packages.changed }}"
+              - "{{ not lock_all_packages_again.changed }}"
               - "{{ not update_all_locked_packages.changed }}"
               - "{{ unlock_all_packages.changed }}"
               - "{{ update_all_packages.changed }}"
