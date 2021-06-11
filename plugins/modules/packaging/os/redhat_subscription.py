@@ -48,12 +48,12 @@ options:
         type: str
     server_prefix:
         description:
-            - Specify the prefix when registering to the Red Hat Subscription Management or Sat6 server
+            - Specify the prefix when registering to the Red Hat Subscription Management or Sat6 server.
         type: str
         version_added: 3.3.0
     server_port:
         description:
-            - Specify the port when registering to the Red Hat Subscription Management or Sat6 server
+            - Specify the port when registering to the Red Hat Subscription Management or Sat6 server.
         type: str
         version_added: 3.3.0
     rhsm_baseurl:
@@ -66,11 +66,11 @@ options:
         type: str
     server_proxy_hostname:
         description:
-            - Specify a HTTP proxy hostname
+            - Specify an HTTP proxy hostname.
         type: str
     server_proxy_port:
         description:
-            - Specify a HTTP proxy port
+            - Specify an HTTP proxy port.
         type: str
     server_proxy_user:
         description:
