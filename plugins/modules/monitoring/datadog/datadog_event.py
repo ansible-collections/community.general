@@ -103,7 +103,10 @@ EXAMPLES = '''
     api_key: 9775a026f1ca7d1c6c5af9d94d9595a4
     app_key: j4JyCYfefWHhgFgiZUqRm63AXHNZQyPGBfJtAzmN
     api_host: 'https://example.datadoghq.eu'
-    tags: 'aa,bb,#host:{{ inventory_hostname }}'
+    tags:
+      - aa
+      - b
+      - '#host:{{ inventory_hostname }}'
 
 '''
 
