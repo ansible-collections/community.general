@@ -119,11 +119,12 @@ options:
   identities:
     description:
       - List of identities to be added/updated for this user.
+    elements: dict
     type: list
     version_added: 3.3.0
   overwrite_identities:
     description:
-      - Overwrite identities with identities added in this module
+      - Overwrite identities with identities added in this module.
     type: bool
     default: no
     version_added: 3.3.0
@@ -163,8 +164,9 @@ EXAMPLES = '''
     username: myusername
     password: mysecretpassword
     email: me@example.com
-    provider: Keycloak
-    extern_uid: f278f95c-12c7-4d51-996f-758cc2eb11bc
+    identities:
+    - provider: Keycloak
+      extern_uid: f278f95c-12c7-4d51-996f-758cc2eb11bc
     state: present
     group: super_group/mon_group
     access_level: owner
@@ -495,9 +497,9 @@ class GitLabUser(object):
     def deleteIdentities(self, user, identities):
         changed = False
         for identity in user.identities:
-                if identity not in identities:
-                    user.identityproviders.delete(identity['provider'])
-                    changed = True
+            if identity not in identities:
+                user.identityproviders.delete(identity['provider'])
+                changed = True
         return changed
 
     '''
