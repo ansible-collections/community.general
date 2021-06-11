@@ -4,6 +4,12 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+- name: Update procps-ng temporary until issue (#2539) is fixed
+  yum:
+    name: procps-ng
+    state: latest
+  when: ansible_distribution == 'Fedora' and ansible_distribution_major_version == '34'
+
 - block:
     - name: Install necessary packages to test yum_versionlock
       yum:
@@ -60,4 +66,4 @@
         state: absent
       when: yum_versionlock_install is changed
   when: (ansible_distribution in ['CentOS', 'RedHat'] and ansible_distribution_major_version is version('7', '>=')) or
-        (ansible_distribution == 'Fedora' and ansible_distribution_major_version is version('33', '<='))
+        (ansible_distribution == 'Fedora')
