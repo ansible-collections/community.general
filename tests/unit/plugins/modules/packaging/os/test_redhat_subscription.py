@@ -278,10 +278,10 @@ TEST_CASES = [
                     (0, 'This system already registered.', '')
                 ),
                 (
-                    ['/testbin/subscription-manager',
-                     'config',
-                     '--server.prefix=/rhsm',
-                     '--server.port=443'],
+                    ['/testbin/subscription-manager', 'config',
+                        '--server.port=443',
+                        '--server.prefix=/rhsm'
+                     ],
                     {'check_rc': True},
                     (0, '', '')
                 ),
