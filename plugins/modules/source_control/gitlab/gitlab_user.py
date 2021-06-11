@@ -467,6 +467,7 @@ class GitLabUser(object):
         if self._module.check_mode:
             return True
 
+        identities = None
         if 'identities' in arguments:
             identities = arguments['identities']
             del arguments['identities']
