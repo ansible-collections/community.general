@@ -66,12 +66,12 @@
         - name: Assert everything is fine
           assert:
             that:
-              - "{{ lock_all_packages.changed }}"
+              - lock_all_packages is changed
               - lock_all_packages_again is not changed
-              - "{{ not lock_nss_wildcard.changed }}"
-              - "{{ not update_all_locked_packages.changed }}"
-              - "{{ unlock_all_packages.changed }}"
-              - "{{ update_all_packages.changed }}"
+              - lock_nss_wildcard is not changed
+              - update_all_locked_packages is not changed
+              - unlock_all_packages is changed
+              - update_all_packages is changed
       when: yum_updates.results | length != 0
 
     - name: Remove installed packages in case it was not installed
