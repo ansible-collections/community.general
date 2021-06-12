@@ -125,7 +125,7 @@ def main():
     if state in ('present'):
         command = 'add'
         for single_pkg in packages:
-            if single_pkg not in versionlock_packages:
+            if not any(fnmatch(pkg.split(":", 1)[-1], single_pkg) for pkg in versionlock_packages.split()):
                 if module.check_mode:
                     changed = True
                     continue
@@ -135,7 +135,7 @@ def main():
     elif state in ('absent'):
         command = 'delete'
         for single_pkg in packages:
-            if single_pkg in versionlock_packages:
+            if any(fnmatch(pkg, single_pkg) for pkg in versionlock_packages.split()):
                 if module.check_mode:
                     changed = True
                     continue
