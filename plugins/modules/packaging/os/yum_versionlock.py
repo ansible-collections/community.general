@@ -127,9 +127,6 @@ def main():
         command = 'add'
         for single_pkg in packages:
             if not any(fnmatch(pkg.split(":", 1)[-1], single_pkg) for pkg in versionlock_packages.split()):
-                if module.check_mode:
-                    changed = True
-                    continue
                 packages_list.append(single_pkg)
         if packages_list:
             changed = yum_v.ensure_state(packages_list, command)
@@ -137,12 +134,12 @@ def main():
         command = 'delete'
         for single_pkg in packages:
             if any(fnmatch(pkg, single_pkg) for pkg in versionlock_packages.split()):
-                if module.check_mode:
-                    changed = True
-                    continue
                 packages_list.append(single_pkg)
         if packages_list:
-            changed = yum_v.ensure_state(packages_list, command)
+            if module.check_mode:
+                changed = True
+            else:
+                changed = yum_v.ensure_state(packages_list, command)
 
     module.exit_json(
         changed=changed,
