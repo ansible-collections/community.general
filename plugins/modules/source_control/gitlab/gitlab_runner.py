@@ -77,7 +77,9 @@ options:
     type: bool
   access_level:
     description:
-      - Determines if a runner can pick up jobs from protected branches.
+      - Determines if a runner can pick up jobs only from protected branches.
+      - If set to C(ref_protected), runner can pick up jobs only from protected branches.
+      - If set to C(not_protected), runner can pick up jobs from both protected and unprotected branches.
     required: False
     default: ref_protected
     choices: ["ref_protected", "not_protected"]
