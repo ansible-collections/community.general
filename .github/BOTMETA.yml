@@ -1,5 +1,7 @@
 automerge: true
 files:
+  plugins/:
+    supershipit: quidame
   changelogs/fragments/:
     support: community
   $actions:
