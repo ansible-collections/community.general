@@ -69,7 +69,8 @@ DOCUMENTATION = '''
         default: false
         version_added: 2.0.0
       batch:
-        description: Correlation ID which can be set across multiple playbook executions
+        description:
+          - Correlation ID which can be set across multiple playbook executions
         env:
           - name: SPLUNK_BATCH
         ini:
