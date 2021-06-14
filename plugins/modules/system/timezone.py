@@ -107,7 +107,7 @@ class Timezone(object):
                 if rc == 0:
                     return super(Timezone, SystemdTimezone).__new__(SystemdTimezone)
                 else:
-                    module.warn('timedatectl command was found but not usable: %s. using other method.' % stderr)
+                    module.debug('timedatectl command was found but not usable: %s. using other method.' % stderr)
                     return super(Timezone, NosystemdTimezone).__new__(NosystemdTimezone)
             else:
                 return super(Timezone, NosystemdTimezone).__new__(NosystemdTimezone)
