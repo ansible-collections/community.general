@@ -156,6 +156,8 @@ macros:
 automerge: true
 >>>>>>> afcf87d21f (Enable bot automerge)
 files:
+  plugins/:
+    supershipit: quidame
   changelogs/fragments/:
     support: community
   $actions:
