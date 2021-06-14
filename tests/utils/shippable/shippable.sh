@@ -73,6 +73,10 @@ else
     export ANSIBLE_COLLECTIONS_PATHS="${PWD}/../../../"
 fi
 
+if [ "${test}" == "sanity/extra" ]; then
+    retry pip install junit-xml --disable-pip-version-check
+fi
+
 # START: HACK install dependencies
 retry git clone --depth=1 --single-branch https://github.com/ansible-collections/ansible.netcommon.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/ansible/netcommon"
 retry git clone --depth=1 --single-branch https://github.com/ansible-collections/community.kubernetes.git --branch 1.2.0 "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/kubernetes"
