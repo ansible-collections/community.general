@@ -73,6 +73,10 @@ else
     export ANSIBLE_COLLECTIONS_PATHS="${PWD}/../../../"
 fi
 
+if [ "${test}" == "sanity/extra" ]; then
+    retry pip install junit-xml --disable-pip-version-check
+fi
+
 # START: HACK install dependencies
 if [ "${script}" != "sanity" ] || [ "${test}" == "sanity/extra" ]; then
     # Nothing further should be added to this list.
