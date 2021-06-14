@@ -14,7 +14,7 @@ else
 fi
 
 if [ "${group}" == "extra" ]; then
-    ../internal_test_tools/tools/run.py --color
+    ../internal_test_tools/tools/run.py --color --bot --junit
     exit
 fi
 
