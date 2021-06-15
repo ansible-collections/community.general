@@ -488,6 +488,9 @@ class GitLabUser(object):
     @param overwrite_identities Overwrite user identities with identities passed to this module
     '''
     def addIdentities(self, user, identities, overwrite_identities=False):
+        if self._module.check_mode:
+            return True
+
         changed = False
         if overwrite_identities:
             changed = self.deleteIdentities(user, identities)
@@ -505,6 +508,9 @@ class GitLabUser(object):
     @param identites List of identities to be added/updated
     '''
     def deleteIdentities(self, user, identities):
+        if self._module.check_mode:
+            return True
+
         changed = False
         for identity in user.identities:
             if identity not in identities:
