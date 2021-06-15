@@ -29,7 +29,7 @@ Please check the included content on the [Ansible Galaxy page for this collectio
 
 ## Using this collection
 
-This collection is shipped with Ansible package. So if you have it installed, no more action is required.
+This collection is shipped with the Ansible package. So if you have it installed, no more action is required.
 
 If you have a minimal installation (only Ansible Core installed) or you want to use the latest version of the collection along with the whole Ansible package, you need to install the collection from [Ansible Galaxy](https://galaxy.ansible.com/community/general) manually with the `ansible-galaxy` command-line tool:
 
