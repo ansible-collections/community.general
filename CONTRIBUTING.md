@@ -31,6 +31,6 @@ You can also read [our Quick-start development guide](https://github.com/ansible
 
 ## Test pull requests
 
-If you wanted to checkout a PR branch and test the changes locally, use [this document](https://docs.ansible.com/ansible/latest/dev_guide/developing_collections_contributing.html), but instead of ``ansible-collections/community.general`` use ``pr_author/community.general`` and checkout the PR's branch.
+You can take a look at [our test a PR locally guide](https://github.com/ansible/community-docs/blob/main/test_pr_quick_start_guide.rst) for instructions on how to test pull requests.
 
 If you find any inconsistencies or places in this document which can be improved, feel free to raise an issue or pull request to fix it.
