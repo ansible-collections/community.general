@@ -64,7 +64,7 @@ All types of contributions are very welcome.
 
 You don't know how to start? Refer to our [contribution guide](https://github.com/ansible-collections/community.general/blob/main/CONTRIBUTING.md)!
 
-The current maintainers are listed in the [commit-rights.md](https://github.com/ansible-collections/community.general/blob/main/commit-rights.md#people) file. Don't hesitate to reach them out mentioning in the proposals.
+The current maintainers are listed in the [commit-rights.md](https://github.com/ansible-collections/community.general/blob/main/commit-rights.md#people) file. If you have questions or need help, feel free to mention them in the proposals.
 
 You can find more information in the [developer guide for collections](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#contributing-to-collections), and in the [Ansible Community Guide](https://docs.ansible.com/ansible/latest/community/index.html).
 
@@ -78,7 +78,7 @@ See [here](https://docs.ansible.com/ansible/devel/dev_guide/developing_collectio
 
 We announce important development changes and releases through the [Ansible Bullhorn newsletter](http://eepurl.com/gZmiEP). If you are a collection developer, be sure you are subscribed.
 
-Join us in the ``#ansible-community``and other [IRC channels](https://docs.ansible.com/ansible/devel/community/communication.html#irc-channels).
+Join us in the ``ansible`` (general use questions and support), ``#ansible-community`` (community and collection development questions), and other [IRC channels](https://docs.ansible.com/ansible/devel/community/communication.html#irc-channels).
 
 We take part in the global quarterly [Ansible Contributor Summit](https://github.com/ansible/community/wiki/Contributor-Summit) virtually or in-person. Track the [Bullhorn newsletter](https://github.com/ansible/community/issues/546) and join us.
 
