@@ -86,11 +86,9 @@ def get_pid(name):
     except TypeError:  # EL6, EL7: process_iter() takes no arguments (1 given)                        |
         for proc in psutil.process_iter():
             try:  # EL7
-                proc_name = proc.name()
-                proc_cmdline = proc.cmdline()
+                proc_name, proc_cmdline = proc.name(), proc.cmdline()
             except TypeError:  # EL6: 'str' object is not callable
-                proc_name = proc.name
-                proc_cmdline = proc.cmdline
+                proc_name, proc_cmdline = proc.name, proc.cmdline
             
             if compare_lower(proc_name, name) or \
                     proc_cmdline and compare_lower(proc_cmdline[0], name):
