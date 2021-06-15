@@ -62,7 +62,7 @@ The content of this collection is made by good people like you, a community of i
 
 All types of contributions are very welcome.
 
-You don't know how to start? Refer to our [contribution guide](CONTRIBUTING.md)!
+You don't know how to start? Refer to our [contribution guide](https://github.com/ansible-collections/community.general/blob/main/CONTRIBUTING.md)!
 
 The current maintainers are listed in the [commit-rights.md](https://github.com/ansible-collections/community.general/blob/main/commit-rights.md#people) file. Don't hesitate to reach them out mentioning in the proposals.
 
