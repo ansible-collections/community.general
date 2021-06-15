@@ -29,4 +29,8 @@ Also, consider taking up a valuable, reviewed, but abandoned pull request which 
 
 You can also read [our Quick-start development guide](https://github.com/ansible/community-docs/blob/main/create_pr_quick_start_guide.rst).
 
+## Test pull requests
+
+If you want to test a PR locally, refer to [our testing guide](https://github.com/ansible/community-docs/blob/main/test_pr_quick_start_guide.rst) for instructions on how do it quickly.
+
 If you find any inconsistencies or places in this document which can be improved, feel free to raise an issue or pull request to fix it.
