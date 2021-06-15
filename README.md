@@ -42,7 +42,7 @@ collections:
 - name: community.general
 ```
 
-Note that if you install the collection manually, it will not be upgraded automatically with upgrade of the Ansible package. To upgrade the collection to the latest available version, run the following command:
+Note that if you install the collection manually, it will not be upgraded automatically when you upgrade the Ansible package. To upgrade the collection to the latest available version, run the following command:
 
 ```bash
 ansible-galaxy collection install community.general --upgrade
