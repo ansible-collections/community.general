@@ -58,7 +58,7 @@ options:
       - Wether the user can change its password or not.
     default: false
     type: bool
-    version_added: 3.2.0
+    version_added: 3.3.0
   email:
     description:
       - The email that belongs to the user.
@@ -128,14 +128,14 @@ options:
         type: str
       extern_uid:
         description:
-          - UID for external identity
+          - User ID for external identity.
         type: str
     version_added: 3.3.0
   overwrite_identities:
     description:
       - Overwrite identities with identities added in this module.
     type: bool
-    default: no
+    default: false
     version_added: 3.3.0
 '''
 
@@ -289,7 +289,7 @@ class GitLabUser(object):
                         'value': options['isadmin'], 'setter': 'admin'
                     },
                     'external': {'value': options['external']},
-                    'identities': {'value': options['identities']}
+                    'identities': {'value': options['identities']},
                 },
                 {
                     # put "uncheckable" params here, this means params
@@ -298,7 +298,7 @@ class GitLabUser(object):
                     'skip_reconfirmation': {'value': not options['confirm']},
                     'password': {'value': options['password']},
                     'reset_password': {'value': options['reset_password']},
-                    'overwrite_identities': {'value': options['overwrite_identities']}
+                    'overwrite_identities': {'value': options['overwrite_identities']},
                 }
             )
 
@@ -590,7 +590,7 @@ def main():
         isadmin=dict(type='bool', default=False),
         external=dict(type='bool', default=False),
         identities=dict(type='list', elements='dict'),
-        overwrite_identities=dict(type='bool', default=False)
+        overwrite_identities=dict(type='bool', default=False),
     ))
 
     module = AnsibleModule(
