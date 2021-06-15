@@ -78,7 +78,7 @@ See [here](https://docs.ansible.com/ansible/devel/dev_guide/developing_collectio
 
 We announce important development changes and releases through the [Ansible Bullhorn newsletter](http://eepurl.com/gZmiEP). If you are a collection developer, be sure you are subscribed.
 
-Join us in the ``ansible`` (general use questions and support), ``#ansible-community`` (community and collection development questions), and other [IRC channels](https://docs.ansible.com/ansible/devel/community/communication.html#irc-channels).
+Join us in the `ansible` (general use questions and support), `#ansible-community` (community and collection development questions), and other [IRC channels](https://docs.ansible.com/ansible/devel/community/communication.html#irc-channels).
 
 We take part in the global quarterly [Ansible Contributor Summit](https://github.com/ansible/community/wiki/Contributor-Summit) virtually or in-person. Track the [Bullhorn newsletter](https://github.com/ansible/community/issues/546) and join us.
 
