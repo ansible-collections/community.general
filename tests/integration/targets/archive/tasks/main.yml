@@ -79,6 +79,8 @@
     - foo.txt
     - bar.txt
     - empty.txt
+    - sub
+    - sub/subfile.txt
 
 - name: archive using gz
   archive:
@@ -366,7 +368,7 @@
 - name: Test exclusion_patterns option
   archive:
     path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/test-archive-exclustion-patterns.tgz"
+    dest: "{{ output_dir }}/test-archive-exclusion-patterns.tgz"
     exclusion_patterns: b?r.*
   register: exclusion_patterns_result
 
@@ -375,6 +377,80 @@
     that:
       - exclusion_patterns_result is changed
       - "'bar.txt' not in exclusion_patterns_result.archived"
+
+- name: Test that excluded paths do not influence archive root
+  archive:
+    path:
+      - "{{ output_dir }}/sub/subfile.txt"
+      - "{{ output_dir }}"
+    exclude_path:
+      - "{{ output_dir }}"
+    dest: "{{ output_dir }}/test-archive-root.tgz"
+  register: archive_root_result
+
+- name: Assert that excluded paths do not influence archive root
+  assert:
+    that:
+      - archive_root_result.arcroot != output_dir
+
+- name: Remove archive root test
+  file:
+    path: "{{ output_dir }}/test-archive-root.tgz"
+    state: absent
+
+- name: Test Single Target with format={{ item }}
+  archive:
+    path: "{{ output_dir }}/foo.txt"
+    dest: "{{ output_dir }}/test-single-gzip.{{ item }}"
+    format: "{{ item }}"
+  register: "single_target_test"
+  loop:
+    - zip
+    - tar
+    - gz
+    - bz2
+    - xz
+
+- name: Remove single target test with format={{ item }}
+  file:
+    path: "{{ output_dir }}/test-single-gzip.{{ item }}"
+    state: absent
+  loop:
+    - zip
+    - tar
+    - gz
+    - bz2
+    - xz
+
+- name: Assert state is correct after single target test
+  assert:
+    that:
+      - single_target_test.results[0].dest_state == 'archive'
+      - single_target_test.results[1].dest_state == 'archive'
+      - single_target_test.results[2].dest_state == 'compress'
+      - single_target_test.results[3].dest_state == 'compress'
+      - single_target_test.results[4].dest_state == 'compress'
+
+- name: Test that missing files result in incomplete state
+  archive:
+    path:
+      - "{{ output_dir }}/*.txt"
+      - "{{ output_dir }}/dne.txt"
+    exclude_path: "{{ output_dir }}/foo.txt"
+    dest: "{{ output_dir }}/test-incomplete-archive.tgz"
+  register: incomplete_archive_result
+
+- name: Assert that incomplete archive has incomplete state
+  assert:
+    that:
+      - incomplete_archive_result.dest_state == 'incomplete'
+      - "'{{ output_dir }}/dne.txt' in incomplete_archive_result.missing"
+      - "'{{ output_dir }}/foo.txt' not in incomplete_archive_result.missing"
+
+- name: Remove incomplete archive
+  file:
+    path: "{{ output_dir }}/test-incomplete-archive.tgz"
+    state: absent
 
 - name: Remove backports.lzma if previously installed (pip)
   pip: name=backports.lzma state=absent
