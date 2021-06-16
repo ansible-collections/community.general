@@ -951,6 +951,7 @@ class Nmcli(object):
                        'ipv4.never-default',
                        'ipv4.ignore-auto-dns',
                        'ipv4.ignore-auto-routes',
+                       'ipv4.may-fail',
                        'ipv6.ignore-auto-dns',
                        'ipv6.ignore-auto-routes'):
             return bool
