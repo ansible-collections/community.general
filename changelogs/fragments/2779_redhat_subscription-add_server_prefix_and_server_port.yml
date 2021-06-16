@@ -1,0 +1,2 @@
+minor_changes:
+  - redhat_subscription - add ``server_prefix`` and ``server_port`` parameters (https://github.com/ansible-collections/community.general/pull/2779).
