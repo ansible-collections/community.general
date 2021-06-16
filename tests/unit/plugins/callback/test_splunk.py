@@ -43,7 +43,10 @@ class TestSplunkClient(unittest.TestCase):
         mock_datetime.utcnow.return_value = datetime(2020, 12, 1)
         result = TaskResult(host=self.mock_host, task=self.mock_task, return_data={}, task_fields=self.task_fields)
 
-        self.splunk.send_event(url='endpoint', authtoken='token', validate_certs=False, include_milliseconds=True, state='OK', result=result, runtime=100)
+        self.splunk.send_event(
+            url='endpoint', authtoken='token', validate_certs=False, include_milliseconds=True,
+            batch="abcefghi-1234-5678-9012-abcdefghijkl", state='OK', result=result, runtime=100
+        )
 
         args, kwargs = open_url_mock.call_args
         sent_data = json.loads(args[1])
@@ -58,7 +61,10 @@ class TestSplunkClient(unittest.TestCase):
         mock_datetime.utcnow.return_value = datetime(2020, 12, 1)
         result = TaskResult(host=self.mock_host, task=self.mock_task, return_data={}, task_fields=self.task_fields)
 
-        self.splunk.send_event(url='endpoint', authtoken='token', validate_certs=False, include_milliseconds=False, state='OK', result=result, runtime=100)
+        self.splunk.send_event(
+            url='endpoint', authtoken='token', validate_certs=False, include_milliseconds=False,
+            batch="abcefghi-1234-5678-9012-abcdefghijkl", state='OK', result=result, runtime=100
+        )
 
         args, kwargs = open_url_mock.call_args
         sent_data = json.loads(args[1])

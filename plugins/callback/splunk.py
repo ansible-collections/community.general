@@ -68,6 +68,16 @@ DOCUMENTATION = '''
         type: bool
         default: false
         version_added: 2.0.0
+      batch:
+        description:
+          - Correlation ID which can be set across multiple playbook executions.
+        env:
+          - name: SPLUNK_BATCH
+        ini:
+          - section: callback_splunk
+            key: batch
+        type: str
+        version_added: 3.3.0
 '''
 
 EXAMPLES = '''
@@ -107,7 +117,7 @@ class SplunkHTTPCollectorSource(object):
         self.ip_address = socket.gethostbyname(socket.gethostname())
         self.user = getpass.getuser()
 
-    def send_event(self, url, authtoken, validate_certs, include_milliseconds, state, result, runtime):
+    def send_event(self, url, authtoken, validate_certs, include_milliseconds, batch, state, result, runtime):
         if result._task_fields['args'].get('_ansible_check_mode') is True:
             self.ansible_check_mode = True
 
@@ -126,6 +136,8 @@ class SplunkHTTPCollectorSource(object):
         data = {}
         data['uuid'] = result._task._uuid
         data['session'] = self.session
+        if batch is not None:
+            data['batch'] = batch
         data['status'] = state
 
         if include_milliseconds:
@@ -175,6 +187,7 @@ class CallbackModule(CallbackBase):
         self.authtoken = None
         self.validate_certs = None
         self.include_milliseconds = None
+        self.batch = None
         self.splunk = SplunkHTTPCollectorSource()
 
     def _runtime(self, result):
@@ -212,6 +225,8 @@ class CallbackModule(CallbackBase):
 
         self.include_milliseconds = self.get_option('include_milliseconds')
 
+        self.batch = self.get_option('batch')
+
     def v2_playbook_on_start(self, playbook):
         self.splunk.ansible_playbook = basename(playbook._file_name)
 
@@ -227,6 +242,7 @@ class CallbackModule(CallbackBase):
             self.authtoken,
             self.validate_certs,
             self.include_milliseconds,
+            self.batch,
             'OK',
             result,
             self._runtime(result)
@@ -238,6 +254,7 @@ class CallbackModule(CallbackBase):
             self.authtoken,
             self.validate_certs,
             self.include_milliseconds,
+            self.batch,
             'SKIPPED',
             result,
             self._runtime(result)
@@ -249,6 +266,7 @@ class CallbackModule(CallbackBase):
             self.authtoken,
             self.validate_certs,
             self.include_milliseconds,
+            self.batch,
             'FAILED',
             result,
             self._runtime(result)
@@ -260,6 +278,7 @@ class CallbackModule(CallbackBase):
             self.authtoken,
             self.validate_certs,
             self.include_milliseconds,
+            self.batch,
             'FAILED',
             result,
             self._runtime(result)
@@ -271,6 +290,7 @@ class CallbackModule(CallbackBase):
             self.authtoken,
             self.validate_certs,
             self.include_milliseconds,
+            self.batch,
             'UNREACHABLE',
             result,
             self._runtime(result)
