@@ -32,7 +32,7 @@ options:
         type: str
     username:
         description:
-            - access.redhat.com or Sat6  username
+            - access.redhat.com or Sat6 username
         type: str
     password:
         description:
@@ -46,6 +46,16 @@ options:
         description:
             - Enable or disable https server certificate verification when connecting to C(server_hostname)
         type: str
+    server_prefix:
+        description:
+            - Specify the prefix when registering to the Red Hat Subscription Management or Sat6 server.
+        type: str
+        version_added: 3.3.0
+    server_port:
+        description:
+            - Specify the port when registering to the Red Hat Subscription Management or Sat6 server.
+        type: str
+        version_added: 3.3.0
     rhsm_baseurl:
         description:
             - Specify CDN baseurl
@@ -56,11 +66,11 @@ options:
         type: str
     server_proxy_hostname:
         description:
-            - Specify a HTTP proxy hostname
+            - Specify an HTTP proxy hostname.
         type: str
     server_proxy_port:
         description:
-            - Specify a HTTP proxy port
+            - Specify an HTTP proxy port.
         type: str
     server_proxy_user:
         description:
@@ -782,6 +792,8 @@ def main():
             'password': {'no_log': True},
             'server_hostname': {},
             'server_insecure': {},
+            'server_prefix': {},
+            'server_port': {},
             'rhsm_baseurl': {},
             'rhsm_repo_ca_cert': {},
             'auto_attach': {'aliases': ['autosubscribe'], 'type': 'bool'},
@@ -827,6 +839,8 @@ def main():
     password = module.params['password']
     server_hostname = module.params['server_hostname']
     server_insecure = module.params['server_insecure']
+    server_prefix = module.params['server_prefix']
+    server_port = module.params['server_port']
     rhsm_baseurl = module.params['rhsm_baseurl']
     rhsm_repo_ca_cert = module.params['rhsm_repo_ca_cert']
     auto_attach = module.params['auto_attach']
