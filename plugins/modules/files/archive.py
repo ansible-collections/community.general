@@ -305,8 +305,9 @@ class Archive(object):
 
     def add_single_target(self, path):
         if self.format in ('zip', 'tar'):
+            archive_name = re.sub(br'^%s' % re.escape(self.root), b'', path)
             self.open()
-            self.add(path, path[len(self.root):])
+            self.add(path, archive_name)
             self.close()
             self.destination_state = STATE_ARCHIVED
         else:
