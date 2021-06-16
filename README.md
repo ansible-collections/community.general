@@ -76,7 +76,7 @@ See [here](https://docs.ansible.com/ansible/devel/dev_guide/developing_collectio
 
 ### Communication
 
-We announce important development changes and releases through the [Ansible Bullhorn newsletter](http://eepurl.com/gZmiEP). If you are a collection developer, be sure you are subscribed.
+We announce important development changes and releases through Ansible's the [Bullhorn newsletter](http://eepurl.com/gZmiEP). If you are a collection developer, be sure you are subscribed.
 
 Join us in the `#ansible` (general use questions and support), `#ansible-community` (community and collection development questions), and other [IRC channels](https://docs.ansible.com/ansible/devel/community/communication.html#irc-channels).
 
