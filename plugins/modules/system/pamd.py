@@ -16,7 +16,9 @@ short_description: Manage PAM Modules
 description:
   - Edit PAM service's type, control, module path and module arguments.
   - In order for a PAM rule to be modified, the type, control and
-    module_path must match an existing rule.  See man(5) pam.d for details.
+    module_path must match an existing rule. See man(5) pam.d for details.
+notes:
+  - This module does not handle authselect profiles.
 options:
   name:
     description:
