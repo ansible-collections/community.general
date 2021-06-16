@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - splunk callback plugin - add ``batch`` option for user-configurable correlation ID's (https://github.com/ansible-collections/community.general/issues/2790).
