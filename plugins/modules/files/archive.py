@@ -44,6 +44,7 @@ options:
       - Use I(exclusion_patterns) to instead exclude files or subdirectories below any of the paths from the I(path) list.
     type: list
     elements: path
+    default: []
   exclusion_patterns:
     description:
       - Glob style patterns to exclude files or directories from the resulting archive.
@@ -131,13 +132,9 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-dest_state:
+state:
     description:
-        The current state of the archived file.
-        If 'absent', then no source files were found and the archive does not exist.
-        If 'compress', then the file source file is in the compressed state.
-        If 'archive', then the source file or paths are currently archived.
-        If 'incomplete', then an archive was created, but not all source paths were found.
+        The state of the input C(path).
     type: str
     returned: always
 missing:
@@ -266,11 +263,7 @@ class Archive(object):
 
         paths = module.params['path']
         self.expanded_paths, has_globs = expand_paths(paths)
-
-        if module.params['exclude_path']:
-            self.expanded_exclude_paths = expand_paths(module.params['exclude_path'])[0]
-        else:
-            self.expanded_exclude_paths = []
+        self.expanded_exclude_paths = expand_paths(module.params['exclude_path'])[0]
 
         self.paths = list(set(self.expanded_paths) - set(self.expanded_exclude_paths))
 
@@ -442,7 +435,6 @@ class Archive(object):
             'archived': [_to_native(p) for p in self.successes],
             'dest': _to_native(self.destination),
             'changed': self.changed,
-            'dest_state': self.destination_state,
             'arcroot': _to_native(self.root),
             'missing': [_to_native(p) for p in self.not_found],
             'expanded_paths': [_to_native(p) for p in self.expanded_paths],
@@ -559,7 +551,7 @@ def main():
             path=dict(type='list', elements='path', required=True),
             format=dict(type='str', default='gz', choices=['bz2', 'gz', 'tar', 'xz', 'zip']),
             dest=dict(type='path'),
-            exclude_path=dict(type='list', elements='path'),
+            exclude_path=dict(type='list', elements='path', default=[]),
             exclusion_patterns=dict(type='list', elements='path'),
             force_archive=dict(type='bool', default=False),
             remove=dict(type='bool', default=False),

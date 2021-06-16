@@ -411,6 +411,16 @@
     - bz2
     - xz
 
+# Dummy tests until ``dest_state`` result value can be implemented
+- name: Assert that single target tests are effective
+  assert:
+    that:
+      - single_target_test.results[0] is changed
+      - single_target_test.results[1] is changed
+      - single_target_test.results[2] is changed
+      - single_target_test.results[3] is changed
+      - single_target_test.results[4] is changed
+
 - name: Remove single target test with format={{ item }}
   file:
     path: "{{ output_dir }}/test-single-gzip.{{ item }}"
@@ -421,15 +431,6 @@
     - gz
     - bz2
     - xz
-
-- name: Assert state is correct after single target test
-  assert:
-    that:
-      - single_target_test.results[0].dest_state == 'archive'
-      - single_target_test.results[1].dest_state == 'archive'
-      - single_target_test.results[2].dest_state == 'compress'
-      - single_target_test.results[3].dest_state == 'compress'
-      - single_target_test.results[4].dest_state == 'compress'
 
 - name: Test that missing files result in incomplete state
   archive:
@@ -443,7 +444,7 @@
 - name: Assert that incomplete archive has incomplete state
   assert:
     that:
-      - incomplete_archive_result.dest_state == 'incomplete'
+      - incomplete_archive_result is changed
       - "'{{ output_dir }}/dne.txt' in incomplete_archive_result.missing"
       - "'{{ output_dir }}/foo.txt' not in incomplete_archive_result.missing"
 
