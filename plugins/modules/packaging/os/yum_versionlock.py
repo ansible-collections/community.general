@@ -129,7 +129,10 @@ def main():
             if not any(fnmatch(pkg.split(":", 1)[-1], single_pkg) for pkg in versionlock_packages.split()):
                 packages_list.append(single_pkg)
         if packages_list:
-            changed = yum_v.ensure_state(packages_list, command)
+            if module.check_mode:
+                changed = True
+            else:
+                changed = yum_v.ensure_state(packages_list, command)
     elif state in ('absent'):
         command = 'delete'
         for single_pkg in packages:
