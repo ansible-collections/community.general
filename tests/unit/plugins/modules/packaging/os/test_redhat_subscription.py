@@ -258,6 +258,47 @@ TEST_CASES = [
             'msg': "System successfully registered to 'None'."
         }
     ],
+    # Test of registration with arguments that are not part of register options but needs to be configured
+    [
+        {
+            'state': 'present',
+            'username': 'admin',
+            'password': 'admin',
+            'org_id': 'admin',
+            'force_register': 'true',
+            'server_prefix': '/rhsm',
+            'server_port': '443'
+        },
+        {
+            'id': 'test_arguments_not_in_register_options',
+            'run_command.calls': [
+                (
+                    ['/testbin/subscription-manager', 'identity'],
+                    {'check_rc': False},
+                    (0, 'This system already registered.', '')
+                ),
+                (
+                    ['/testbin/subscription-manager', 'config',
+                        '--server.port=443',
+                        '--server.prefix=/rhsm'
+                     ],
+                    {'check_rc': True},
+                    (0, '', '')
+                ),
+                (
+                    ['/testbin/subscription-manager', 'register',
+                        '--force',
+                        '--org', 'admin',
+                        '--username', 'admin',
+                        '--password', 'admin'],
+                    {'check_rc': True, 'expand_user_and_vars': False},
+                    (0, '', '')
+                )
+            ],
+            'changed': True,
+            'msg': "System successfully registered to 'None'."
+        }
+    ],
     # Test of registration using username, password and proxy options
     [
         {
