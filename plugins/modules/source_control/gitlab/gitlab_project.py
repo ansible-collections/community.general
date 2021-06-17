@@ -109,6 +109,12 @@ options:
     required: false
     default: false
     version_added: "2.0.0"
+  username:
+    description:
+      - Used to create a personal project under a user's name.
+    type: str
+    required: false
+    version_added: "3.3.0"
 '''
 
 EXAMPLES = r'''
@@ -302,6 +308,7 @@ def main():
         import_url=dict(type='str'),
         state=dict(type='str', default="present", choices=["absent", "present"]),
         lfs_enabled=dict(default=False, type='bool'),
+        username=dict(type='str'),
     ))
 
     module = AnsibleModule(
@@ -332,6 +339,7 @@ def main():
     import_url = module.params['import_url']
     state = module.params['state']
     lfs_enabled = module.params['lfs_enabled']
+    username = module.params['username']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -353,8 +361,11 @@ def main():
 
         user_group_id = group.id
     else:
-        user = gitlab_instance.users.list(username=gitlab_instance.user.username)[0]
-        user_group_id = user.id
+        if username:
+            namespace = gitlab_instance.namespaces.list(search=username)[0]
+        else:
+            namespace = gitlab_instance.namespaces.list(search=gitlab_instance.user.username)[0]
+        user_group_id = namespace.id
 
     if not user_group_id:
         module.fail_json(msg="Failed to find the user/group id which required to find namespace")
