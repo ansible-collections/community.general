@@ -3,11 +3,17 @@
 [![Build Status](https://dev.azure.com/ansible/community.general/_apis/build/status/CI?branchName=main)](https://dev.azure.com/ansible/community.general/_build?definitionId=31)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
 
-This repo contains the `community.general` Ansible Collection. The collection includes many modules and plugins supported by Ansible community which are not part of more specialized community collections.
+This repository contains the `community.general` Ansible Collection. The collection is a part of the Ansible package and includes many modules and plugins supported by Ansible community which are not part of more specialized community collections.
 
 You can find [documentation for this collection on the Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/general/).
 
 Please note that this collection does **not** support Windows targets. Only connection plugins included in this collection might support Windows targets, and will explicitly mention that in their documentation if they do so.
+
+## Code of Conduct
+
+We follow [Ansible Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html) in all our interactions within this project.
+
+If you encounter abusive behavior violating the [Ansible Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html), please refer to the [policy violations](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html#policy-violations) section of the Code of Conduct for information on how to raise a complaint.
 
 ## Tested with Ansible
 
@@ -23,7 +29,9 @@ Please check the included content on the [Ansible Galaxy page for this collectio
 
 ## Using this collection
 
-Before using the General community collection, you need to install the collection with the `ansible-galaxy` CLI:
+This collection is shipped with the Ansible package. So if you have it installed, no more action is required.
+
+If you have a minimal installation (only Ansible Core installed) or you want to use the latest version of the collection along with the whole Ansible package, you need to install the collection from [Ansible Galaxy](https://galaxy.ansible.com/community/general) manually with the `ansible-galaxy` command-line tool:
 
     ansible-galaxy collection install community.general
 
@@ -34,19 +42,29 @@ collections:
 - name: community.general
 ```
 
+Note that if you install the collection manually, it will not be upgraded automatically when you upgrade the Ansible package. To upgrade the collection to the latest available version, run the following command:
+
+```bash
+ansible-galaxy collection install community.general --upgrade
+```
+
+You can also install a specific version of the collection, for example, if you need to downgrade when something is broken in the latest version (please report an issue in this repository). Use the following syntax where `X.Y.Z` can be any [available version](https://galaxy.ansible.com/community/general):
+
+```bash
+ansible-galaxy collection install community.general:==X.Y.Z
+```
+
 See [Ansible Using collections](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html) for more details.
 
 ## Contributing to this collection
 
-If you want to develop new content for this collection or improve what is already here, the easiest way to work on the collection is to clone it into one of the configured [`COLLECTIONS_PATH`](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths), and work on it there.
+The content of this collection is made by good people like you, a community of individuals collaborating on making the world better through developing automation software.
 
-For example, if you are working in the `~/dev` directory:
+All types of contributions are very welcome.
 
-```
-cd ~/dev
-git clone git@github.com:ansible-collections/community.general.git collections/ansible_collections/community/general
-export COLLECTIONS_PATH=$(pwd)/collections:$COLLECTIONS_PATH
-```
+You don't know how to start? Refer to our [contribution guide](https://github.com/ansible-collections/community.general/blob/main/CONTRIBUTING.md)!
+
+The current maintainers are listed in the [commit-rights.md](https://github.com/ansible-collections/community.general/blob/main/commit-rights.md#people) file. If you have questions or need help, feel free to mention them in the proposals.
 
 You can find more information in the [developer guide for collections](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#contributing-to-collections), and in the [Ansible Community Guide](https://docs.ansible.com/ansible/latest/community/index.html).
 
@@ -58,16 +76,15 @@ See [here](https://docs.ansible.com/ansible/devel/dev_guide/developing_collectio
 
 ### Communication
 
-We have a dedicated Working Group for Ansible development.
+We announce important development changes and releases through Ansible's [The Bullhorn newsletter](https://eepurl.com/gZmiEP). If you are a collection developer, be sure you are subscribed.
 
-You can find other people interested on the following [Libera.chat](https://libera.chat/) IRC channels -
-- `#ansible` - For general use questions and support.
-- `#ansible-devel` - For discussions on developer topics and code related to features or bugs in ansible-core.
-- `#ansible-community` - For discussions on community topics and community meetings, and for general development questions for community collections.
+Join us in the `#ansible` (general use questions and support), `#ansible-community` (community and collection development questions), and other [IRC channels](https://docs.ansible.com/ansible/devel/community/communication.html#irc-channels) on [Libera.chat](https://libera.chat).
+
+We take part in the global quarterly [Ansible Contributor Summit](https://github.com/ansible/community/wiki/Contributor-Summit) virtually or in-person. Track [The Bullhorn newsletter](https://eepurl.com/gZmiEP) and join us.
 
 For more information about communities, meetings and agendas see [Community Wiki](https://github.com/ansible/community/wiki/Community).
 
-For more information about [communication](https://docs.ansible.com/ansible/latest/community/communication.html)
+For more information about communication, refer to the [Ansible communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
 
 ### Publishing New Version
 
