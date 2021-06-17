@@ -436,7 +436,7 @@
       - "'oo.txt' not in single_target_test_contents.files"
       - "'foo.txt' in single_target_test_contents.files"
   # ``unarchive`` fails for RHEL and FreeBSD on ansible 2.x
-  when: single_target_test_contents is success
+  when: single_target_test_contents is success and single_target_test_contents is not skipped
 
 - name: Remove single target test with format={{ item }}
   file:
