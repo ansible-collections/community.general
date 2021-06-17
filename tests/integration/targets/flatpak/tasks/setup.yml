@@ -36,7 +36,9 @@
 
 - name: Remove (if necessary) flatpak for testing check mode on absent flatpak
   flatpak:
-    name: com.dummy.App1
+    name:
+      - com.dummy.App1
+      - com.dummy.App3
     remote: dummy-remote
     state: absent
     no_dependencies: true

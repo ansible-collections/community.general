@@ -139,3 +139,146 @@
       that:
         - double_url_removal_result is not changed
       msg: "state=absent with url as name shall not do anything when flatpak is not present"
+
+- name: Make sure flatpak is really gone - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+
+# state=present with list of packages
+
+- name: Test addition with list - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: addition_result
+
+- name: Verify addition with list test result - {{ method }}
+  assert:
+    that:
+      - addition_result is changed
+    msg: "state=present shall add flatpak when absent"
+
+- name: Test idempotency of addition with list - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_addition_result
+
+- name: Verify idempotency of addition with list test result - {{ method }}
+  assert:
+    that:
+      - double_addition_result is not changed
+    msg: "state=present shall not do anything when flatpak is already present"
+
+- name: Test addition with list partially installed - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App3
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: addition_result
+
+- name: Verify addition with list partially installed test result - {{ method }}
+  assert:
+    that:
+      - addition_result is changed
+    msg: "state=present shall add flatpak when absent"
+
+- name: Test idempotency of addition with list partially installed - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App3
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_addition_result
+
+- name: Verify idempotency of addition with list partially installed test result - {{ method }}
+  assert:
+    that:
+      - double_addition_result is not changed
+    msg: "state=present shall not do anything when flatpak is already present"
+
+# state=absent with list of packages
+
+- name: Test removal with list - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - com.dummy.App2
+    state: absent
+    method: "{{ method }}"
+  register: removal_result
+
+- name: Verify removal with list test result - {{ method }}
+  assert:
+    that:
+      - removal_result is changed
+    msg: "state=absent shall remove flatpak when present"
+
+- name: Test idempotency of removal with list - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - com.dummy.App2
+    state: absent
+    method: "{{ method }}"
+  register: double_removal_result
+
+- name: Verify idempotency of removal with list test result - {{ method }}
+  assert:
+    that:
+      - double_removal_result is not changed
+    msg: "state=absent shall not do anything when flatpak is not present"
+
+- name: Test removal with list partially removed - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - com.dummy.App2
+      - com.dummy.App3
+    state: absent
+    method: "{{ method }}"
+  register: removal_result
+
+- name: Verify removal with list partially removed test result - {{ method }}
+  assert:
+    that:
+      - removal_result is changed
+    msg: "state=absent shall remove flatpak when present"
+
+- name: Test idempotency of removal with list partially removed - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - com.dummy.App2
+      - com.dummy.App3
+    state: absent
+    method: "{{ method }}"
+  register: double_removal_result
+
+- name: Verify idempotency of removal with list partially removed test result - {{ method }}
+  assert:
+    that:
+      - double_removal_result is not changed
+    msg: "state=absent shall not do anything when flatpak is not present"
