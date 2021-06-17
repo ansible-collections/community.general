@@ -351,15 +351,10 @@ class JavaKeystore:
         return stored_certificate_match.group(1)
 
     def is_jks_or_pkcs12(self):
+        magic_bytes = b'\xfe\xed\xfe\xed'
         with open(self.keystore_path, 'rb') as fd:
-            content = fd.read()
-        try:
-            magic_bytes = bytes('\xfe\xed\xfe\xed')
-            is_jks = content.startswith(magic_bytes)
-        except TypeError:
-            magic_bytes = bytes([0xFE, 0xED, 0xFE, 0xED])
-            is_jks = content.startswith(magic_bytes)
-        if is_jks:
+            header = fd.read(4)
+        if header == magic_bytes:
             return 'jks'
         return 'pkcs12'
 
