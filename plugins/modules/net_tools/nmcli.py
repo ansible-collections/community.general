@@ -833,6 +833,10 @@ class Nmcli(object):
                 'bridge-port.hairpin-mode': self.hairpin,
                 'bridge-port.priority': self.slavepriority,
             })
+        elif self.type == 'team-slave':
+            options.update({
+                'connection.slave-type': 'team',
+            })
         elif self.tunnel_conn_type:
             options.update({
                 'ip-tunnel.local': self.ip_tunnel_local,
