@@ -119,6 +119,7 @@ options:
   identities:
     description:
       - List of identities to be added/updated for this user.
+      - To remove all other identities from this user, set I(overwrite_identities=true).
     type: list
     elements: dict
     suboptions:
@@ -134,6 +135,8 @@ options:
   overwrite_identities:
     description:
       - Overwrite identities with identities added in this module.
+      - This means that all identities that the user has and that are not listed in I(identities) are removed from the user.
+      - This is only done if a list is provided for I(identities). To remove all identities, provide an empty list.
     type: bool
     default: false
     version_added: 3.3.0
