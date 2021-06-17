@@ -589,7 +589,7 @@ def main():
             if not archive.destination_exists():
                 archive.changed = True
         else:
-            path = archive.expanded_paths[0]
+            path = archive.paths[0]
             archive.add_single_target(path)
             if archive.destination_size() != size:
                 archive.changed = True
