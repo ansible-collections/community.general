@@ -110,7 +110,6 @@
     password: hunter2
     keystore_type: jks
   loop: "{{ java_keystore_new_certs }}"
-  check_mode: yes
   register: result_type_jks
 
 
@@ -149,7 +148,6 @@
     name: foobar
     password: hunter2
   loop: "{{ java_keystore_new_certs }}"
-  check_mode: yes
   register: result_type_omit
 
 
