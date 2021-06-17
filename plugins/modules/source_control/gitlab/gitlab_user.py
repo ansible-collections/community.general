@@ -55,7 +55,7 @@ options:
     type: str
   reset_password:
     description:
-      - Wether the user can change its password or not.
+      - Whether the user can change its password or not.
     default: false
     type: bool
     version_added: 3.3.0
