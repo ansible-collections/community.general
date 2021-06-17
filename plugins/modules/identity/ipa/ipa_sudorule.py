@@ -237,7 +237,7 @@ class SudoRuleIPAClient(IPAClient):
         return self._post_json(method='sudorule_add_allow_command', name=name, item={'sudocmd': item})
 
     def sudorule_add_allow_command_group(self, name, item):
-        return self._post_json(method='sudorule_add_allow_command_group', name=name, item={'sudocmdgroup': item})
+        return self._post_json(method='sudorule_add_allow_command', name=name, item={'sudocmdgroup': item})
 
     def sudorule_remove_allow_command(self, name, item):
         return self._post_json(method='sudorule_remove_allow_command', name=name, item=item)

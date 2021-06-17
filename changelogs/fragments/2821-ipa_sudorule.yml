@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - "ipa_sudorule - call ``sudorule_add_allow_command`` method instead of  ``sudorule_add_allow_command_group``
+    (https://github.com/ansible-collections/community.general/issues/2442)."
