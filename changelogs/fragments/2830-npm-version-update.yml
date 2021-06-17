@@ -1,0 +1,5 @@
+bugfixes:
+  - "npm - When the version property is used in the npm plugin,
+    the comparison of installed vs missing will be used as name@version instead of just name,
+    allowing for version specific updates.
+    (https://github.com/ansible-collections/community.general/issues/2021)."
