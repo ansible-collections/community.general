@@ -133,7 +133,7 @@ options:
         version_added: 2.2.0
     may_fail4:
         description:
-            - If you need I(ip4) configured before network-online.target is reached, set the the property to no.
+            - If you need I(ip4) configured before C(network-online.target) is reached, set this option to C(false).
         type: bool
         default: true
         version_added: 3.2.0
