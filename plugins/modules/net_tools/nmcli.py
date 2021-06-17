@@ -97,7 +97,7 @@ options:
         version_added: 2.0.0
     routing_rules4:
         description:
-            - Is the same as in an 'ip route add' command, except always requires specifying a priority.
+            - Is the same as in an C(ip route add) command, except always requires specifying a priority.
         type: str
         version_added: 3.2.0
     never_default4:
