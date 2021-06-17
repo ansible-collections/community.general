@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016, Guillaume Grossetie <ggrossetie@yuzutech.fr>
 # Copyright: (c) 2021, quidame <quidame@poivron.org>
+# Copyright: (c) 2016, Guillaume Grossetie <ggrossetie@yuzutech.fr>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
@@ -108,12 +108,13 @@ options:
         type is left untouched, unless another option leads to overwrite the
         keystore (in that case, this option behaves like for keystore creation).
       - When I(keystore_type) is set, the keystore is created with this type if
-        it doesn't exist, or is converted to the given type in case of mismatch.
+        it doesn't already exist, or is overwritten to match the given type in
+        case of mismatch.
     type: str
     choices:
       - jks
       - pkcs12
-    version_added: 3.2.0
+    version_added: 3.3.0
 requirements:
   - openssl in PATH (when I(ssl_backend=openssl))
   - keytool in PATH
@@ -131,6 +132,9 @@ notes:
     on the controller (either inline in a playbook, or with the C(file) lookup),
     while I(certificate_path) and I(private_key_path) require that the files are
     available on the target host.
+  - By design, any change of a value of options I(keystore_type), I(name) or
+    I(password), as well as changes of key or certificate materials lead to the
+    overwriting of the existing I(dest).
 '''
 
 EXAMPLES = '''
@@ -194,7 +198,7 @@ import tempfile
 
 from ansible.module_utils.six import PY2
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 try:
     from cryptography.hazmat.primitives.serialization.pkcs12 import serialize_key_and_certificates
@@ -229,6 +233,7 @@ class JavaKeystore:
         self.password = module.params['password']
         self.private_key = module.params['private_key']
         self.ssl_backend = module.params['ssl_backend']
+        self.keystore_type = module.params['keystore_type']
 
         if self.ssl_backend == 'openssl':
             self.openssl_bin = module.get_bin_path('openssl', True)
@@ -330,6 +335,11 @@ class JavaKeystore:
                 rc=rc
             )
 
+        if self.keystore_type is not None:
+            keystore_type = self.is_jks_or_pkcs12()
+            if keystore_type != self.keystore_type:
+                return "keystore type mismatch"
+
         stored_certificate_match = re.search(r"SHA256: ([\w:]+)", stored_certificate_fingerprint_out)
         if not stored_certificate_match:
             return self.module.fail_json(
@@ -339,6 +349,19 @@ class JavaKeystore:
             )
 
         return stored_certificate_match.group(1)
+
+    def is_jks_or_pkcs12(self):
+        with open(self.keystore_path, 'rb') as fd:
+            content = fd.read()
+        try:
+            magic_bytes = bytes('\xfe\xed\xfe\xed')
+            is_jks = content.startswith(magic_bytes)
+        except TypeError:
+            magic_bytes = bytes([0xFE, 0xED, 0xFE, 0xED])
+            is_jks = content.startswith(magic_bytes)
+        if is_jks:
+            return 'jks'
+        return 'pkcs12'
 
     def cert_changed(self):
         current_certificate_fingerprint = self.read_certificate_fingerprint()
@@ -406,6 +429,7 @@ class JavaKeystore:
 
         with open(keystore_p12_path, 'wb') as p12_file:
             p12_file.write(pkcs12_bundle)
+        return dict(msg='', cmd='python cryptography serialize_key_and_certificates()', rc=0)
 
     def openssl_create_pkcs12_bundle(self, keystore_p12_path):
         export_p12_cmd = [self.openssl_bin, "pkcs12", "-export", "-name", self.name, "-in", self.certificate_path,
@@ -423,45 +447,57 @@ class JavaKeystore:
             export_p12_cmd, data=cmd_stdin, environ_update=None, check_rc=False
         )
 
+        result = dict(msg=export_p12_out, cmd=export_p12_cmd, rc=rc)
         if rc != 0:
-            self.module.fail_json(msg=export_p12_out, cmd=export_p12_cmd, rc=rc)
+            self.module.fail_json(**result)
+        return result
 
     def create(self):
         if self.module.check_mode:
             return {'changed': True}
 
-        if os.path.exists(self.keystore_path):
-            os.remove(self.keystore_path)
-
         keystore_p12_path = create_path()
         self.module.add_cleanup_file(keystore_p12_path)
 
         if self.ssl_backend == 'cryptography':
-            self.cryptography_create_pkcs12_bundle(keystore_p12_path)
+            result = self.cryptography_create_pkcs12_bundle(keystore_p12_path)
         else:
-            self.openssl_create_pkcs12_bundle(keystore_p12_path)
+            result = self.openssl_create_pkcs12_bundle(keystore_p12_path)
+
+        if os.path.exists(self.keystore_path):
+            os.remove(self.keystore_path)
+            result['changed'] = True
+
+        if self.keystore_type == 'pkcs12':
+            self.module.preserved_copy(keystore_p12_path, self.keystore_path)
+            self.update_permissions()
+            result['changed'] = True
+            return result
 
         import_keystore_cmd = [self.keytool_bin, "-importkeystore",
                                "-destkeystore", self.keystore_path,
-                               "-deststoretype", "jks",
                                "-srckeystore", keystore_p12_path,
                                "-srcstoretype", "pkcs12",
                                "-alias", self.name,
                                "-noprompt"]
 
+        if self.keystore_type == 'jks':
+            keytool_help = self.module.run_command([self.keytool_bin, '-importkeystore', '-help'])
+            if '-deststoretype' in keytool_help[1] + keytool_help[2]:
+                import_keystore_cmd.insert(4, "-deststoretype")
+                import_keystore_cmd.insert(5, self.keystore_type)
+
         (rc, import_keystore_out, dummy) = self.module.run_command(
             import_keystore_cmd, data='%s\n%s\n%s' % (self.password, self.password, self.password), check_rc=False
         )
+
+        result.update(msg=import_keystore_out, cmd=import_keystore_cmd, rc=rc)
         if rc != 0:
-            return self.module.fail_json(msg=import_keystore_out, cmd=import_keystore_cmd, rc=rc)
+            return self.module.fail_json(**result)
 
         self.update_permissions()
-        return {
-            'changed': True,
-            'msg': import_keystore_out,
-            'cmd': import_keystore_cmd,
-            'rc': rc
-        }
+        result['changed'] = True
+        return result
 
     def exists(self):
         return os.path.exists(self.keystore_path)
@@ -484,11 +520,10 @@ def create_file(content):
 def hex_decode(s):
     if PY2:
         return s.decode('hex')
-    else:
-        return s.hex()
+    return s.hex()
 
 
-class ArgumentSpec(object):
+class ArgumentSpec:
     def __init__(self):
         self.supports_check_mode = True
         self.add_file_common_args = True
@@ -502,6 +537,7 @@ class ArgumentSpec(object):
             private_key_passphrase=dict(type='str', no_log=True),
             password=dict(type='str', required=True, no_log=True),
             ssl_backend=dict(type='str', default='openssl', choices=['openssl', 'cryptography']),
+            keystore_type=dict(type='str', choices=['jks', 'pkcs12']),
             force=dict(type='bool', default=False),
         )
         choose_between = (

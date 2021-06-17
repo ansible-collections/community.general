@@ -78,7 +78,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
             assert jks.create() == {
                 'changed': True,
                 'cmd': ["keytool", "-importkeystore",
-                        "-destkeystore", "/path/to/keystore.jks", "-deststoretype", "jks",
+                        "-destkeystore", "/path/to/keystore.jks",
                         "-srckeystore", "/tmp/tmpgrzm2ah7", "-srcstoretype", "pkcs12", "-alias", "test",
                         "-noprompt"],
                 'msg': '',
@@ -181,7 +181,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
             jks.create()
             module.fail_json.assert_called_once_with(
                 cmd=["keytool", "-importkeystore",
-                     "-destkeystore", "/path/to/keystore.jks", "-deststoretype", "jks",
+                     "-destkeystore", "/path/to/keystore.jks",
                      "-srckeystore", "/tmp/tmpgrzm2ah7", "-srcstoretype", "pkcs12", "-alias", "test",
                      "-noprompt"],
                 msg='',
