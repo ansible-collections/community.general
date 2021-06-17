@@ -99,7 +99,7 @@ options:
         description:
             - Is the same as in an C(ip route add) command, except always requires specifying a priority.
         type: str
-        version_added: 3.2.0
+        version_added: 3.3.0
     never_default4:
         description:
             - Set as default route.
