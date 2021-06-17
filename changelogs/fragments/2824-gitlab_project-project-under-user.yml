@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - User projects are created using namespace ID, instead of user ID.
+  - Projects can be created under other user's namespaces.
