@@ -215,12 +215,12 @@ class Npm(object):
         except (getattr(json, 'JSONDecodeError', ValueError)) as e:
             self.module.fail_json(msg="Failed to parse NPM output with error %s" % to_native(e))
         if 'dependencies' in data:
-            for dep in data['dependencies']:
-                dep_version = dep + '@' + str(data['dependencies'][dep]['version'])
+            for dep, props in data['dependencies'].items():
+                dep_version = dep + '@' + str(props['version'])
 
-                if 'missing' in data['dependencies'][dep] and data['dependencies'][dep]['missing']:
+                if 'missing' in props and props['missing']:
                     missing.append(dep)
-                elif 'invalid' in data['dependencies'][dep] and data['dependencies'][dep]['invalid']:
+                elif 'invalid' in props and props['invalid']:
                     missing.append(dep)
                 else:
                     installed.append(dep)
