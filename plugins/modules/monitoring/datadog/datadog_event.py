@@ -152,7 +152,7 @@ def main():
         'api_key': module.params['api_key'],
         'app_key': module.params['app_key'],
     }
-    if module.params['api_key'] is not None:
+    if module.params['api_host'] is not None:
         options['api_host'] = module.params['api_host']
 
     initialize(**options)
