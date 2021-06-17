@@ -131,7 +131,7 @@ def main():
         argument_spec=dict(
             api_key=dict(required=True, no_log=True),
             app_key=dict(required=True, no_log=True),
-            api_host=dict(type='str', required=False),
+            api_host=dict(type='str'),
             title=dict(required=True),
             text=dict(required=True),
             date_happened=dict(type='int'),
