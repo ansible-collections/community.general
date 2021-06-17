@@ -401,7 +401,7 @@
 - name: Test Single Target with format={{ item }}
   archive:
     path: "{{ output_dir }}/foo.txt"
-    dest: "{{ output_dir }}/test-single-gzip.{{ item }}"
+    dest: "{{ output_dir }}/test-single-target.{{ item }}"
     format: "{{ item }}"
   register: "single_target_test"
   loop:
@@ -421,9 +421,23 @@
       - single_target_test.results[3] is changed
       - single_target_test.results[4] is changed
 
+- name: Retrieve contents of single target archives
+  ansible.builtin.unarchive:
+    src: "{{ output_dir }}/test-single-target.zip"
+    dest: .
+    list_files: true
+  check_mode: true
+  register: single_target_test_contents
+
+- name: Assert that file names in single-file zip archives are preserved
+  assert:
+    that:
+      - "'oo.txt' not in single_target_test_contents.files"
+      - "'foo.txt' in single_target_test_contents.files"
+
 - name: Remove single target test with format={{ item }}
   file:
-    path: "{{ output_dir }}/test-single-gzip.{{ item }}"
+    path: "{{ output_dir }}/test-single-target.{{ item }}"
     state: absent
   loop:
     - zip
