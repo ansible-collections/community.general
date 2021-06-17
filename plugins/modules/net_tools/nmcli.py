@@ -136,7 +136,7 @@ options:
             - If you need I(ip4) configured before C(network-online.target) is reached, set this option to C(false).
         type: bool
         default: true
-        version_added: 3.2.0
+        version_added: 3.3.0
     ip6:
         description:
             - The IPv6 address to this interface.
