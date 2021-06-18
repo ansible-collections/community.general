@@ -180,7 +180,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
             jks = JavaKeystore(module)
             jks.create()
             module.fail_json.assert_called_once_with(
-                changed=true,
+                changed=True,
                 cmd=["keytool", "-importkeystore",
                      "-destkeystore", "/path/to/keystore.jks",
                      "-srckeystore", "/tmp/tmpgrzm2ah7", "-srcstoretype", "pkcs12", "-alias", "test",
