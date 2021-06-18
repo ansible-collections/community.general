@@ -49,6 +49,66 @@ class NPMModuleTestCase(ModuleTestCase):
         self.assertTrue(result['changed'])
         self.module_main_command.assert_has_calls([
             call(['/testbin/npm', 'list', '--json', '--long', '--global'], check_rc=False, cwd=None),
+            call(['/testbin/npm', 'install', '--global', 'coffee-script'], check_rc=True, cwd=None),
+        ])
+
+    def test_present_version(self):
+        set_module_args({
+            'name': 'coffee-script',
+            'global': 'true',
+            'state': 'present',
+            'version': '2.5.1'
+        })
+        self.module_main_command.side_effect = [
+            (0, '{}', ''),
+            (0, '{}', ''),
+        ]
+
+        result = self.module_main(AnsibleExitJson)
+
+        self.assertTrue(result['changed'])
+        self.module_main_command.assert_has_calls([
+            call(['/testbin/npm', 'list', '--json', '--long', '--global'], check_rc=False, cwd=None),
+            call(['/testbin/npm', 'install', '--global', 'coffee-script@2.5.1'], check_rc=True, cwd=None),
+        ])
+
+    def test_present_version_update(self):
+        set_module_args({
+            'name': 'coffee-script',
+            'global': 'true',
+            'state': 'present',
+            'version': '2.5.1'
+        })
+        self.module_main_command.side_effect = [
+            (0, '{"dependencies": {"coffee-script": {"version" : "2.5.0"}}}', ''),
+            (0, '{}', ''),
+        ]
+
+        result = self.module_main(AnsibleExitJson)
+
+        self.assertTrue(result['changed'])
+        self.module_main_command.assert_has_calls([
+            call(['/testbin/npm', 'list', '--json', '--long', '--global'], check_rc=False, cwd=None),
+            call(['/testbin/npm', 'install', '--global', 'coffee-script@2.5.1'], check_rc=True, cwd=None),
+        ])
+
+    def test_present_version_exists(self):
+        set_module_args({
+            'name': 'coffee-script',
+            'global': 'true',
+            'state': 'present',
+            'version': '2.5.1'
+        })
+        self.module_main_command.side_effect = [
+            (0, '{"dependencies": {"coffee-script": {"version" : "2.5.1"}}}', ''),
+            (0, '{}', ''),
+        ]
+
+        result = self.module_main(AnsibleExitJson)
+
+        self.assertFalse(result['changed'])
+        self.module_main_command.assert_has_calls([
+            call(['/testbin/npm', 'list', '--json', '--long', '--global'], check_rc=False, cwd=None),
         ])
 
     def test_absent(self):
@@ -58,7 +118,7 @@ class NPMModuleTestCase(ModuleTestCase):
             'state': 'absent'
         })
         self.module_main_command.side_effect = [
-            (0, '{"dependencies": {"coffee-script": {}}}', ''),
+            (0, '{"dependencies": {"coffee-script": {"version" : "2.5.1"}}}', ''),
             (0, '{}', ''),
         ]
 
@@ -66,5 +126,46 @@ class NPMModuleTestCase(ModuleTestCase):
 
         self.assertTrue(result['changed'])
         self.module_main_command.assert_has_calls([
+            call(['/testbin/npm', 'list', '--json', '--long', '--global'], check_rc=False, cwd=None),
+            call(['/testbin/npm', 'uninstall', '--global', 'coffee-script'], check_rc=True, cwd=None),
+        ])
+
+    def test_absent_version(self):
+        set_module_args({
+            'name': 'coffee-script',
+            'global': 'true',
+            'state': 'absent',
+            'version': '2.5.1'
+        })
+        self.module_main_command.side_effect = [
+            (0, '{"dependencies": {"coffee-script": {"version" : "2.5.1"}}}', ''),
+            (0, '{}', ''),
+        ]
+
+        result = self.module_main(AnsibleExitJson)
+
+        self.assertTrue(result['changed'])
+        self.module_main_command.assert_has_calls([
+            call(['/testbin/npm', 'list', '--json', '--long', '--global'], check_rc=False, cwd=None),
+            call(['/testbin/npm', 'uninstall', '--global', 'coffee-script'], check_rc=True, cwd=None),
+        ])
+
+    def test_absent_version_different(self):
+        set_module_args({
+            'name': 'coffee-script',
+            'global': 'true',
+            'state': 'absent',
+            'version': '2.5.1'
+        })
+        self.module_main_command.side_effect = [
+            (0, '{"dependencies": {"coffee-script": {"version" : "2.5.0"}}}', ''),
+            (0, '{}', ''),
+        ]
+
+        result = self.module_main(AnsibleExitJson)
+
+        self.assertTrue(result['changed'])
+        self.module_main_command.assert_has_calls([
+            call(['/testbin/npm', 'list', '--json', '--long', '--global'], check_rc=False, cwd=None),
             call(['/testbin/npm', 'uninstall', '--global', 'coffee-script'], check_rc=True, cwd=None),
         ])
