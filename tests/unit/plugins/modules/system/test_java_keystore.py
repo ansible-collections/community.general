@@ -28,6 +28,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
         self.spec = ArgumentSpec()
         self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file')
         self.mock_create_path = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_path')
+        self.mock_is_jks_or_pkcs12 = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.is_jks_or_pkcs12')
         self.mock_run_command = patch('ansible.module_utils.basic.AnsibleModule.run_command')
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
         self.mock_os_path_exists = patch('os.path.exists',
@@ -40,6 +41,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
         self.get_bin_path = self.mock_get_bin_path.start()
         self.create_file = self.mock_create_file.start()
         self.create_path = self.mock_create_path.start()
+        self.is_jks_or_pkcs12 = self.mock_is_jks_or_pkcs12.start()
         self.selinux_context = self.mock_selinux_context.start()
         self.is_special_selinux_path = self.mock_is_special_selinux_path.start()
         self.os_path_exists = self.mock_os_path_exists.start()
@@ -49,6 +51,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
         super(TestCreateJavaKeystore, self).tearDown()
         self.mock_create_file.stop()
         self.mock_create_path.stop()
+        self.mock_is_jks_or_pkcs12.stop()
         self.mock_run_command.stop()
         self.mock_get_bin_path.stop()
         self.mock_selinux_context.stop()
@@ -198,8 +201,10 @@ class TestCertChanged(ModuleTestCase):
         super(TestCertChanged, self).setUp()
         self.spec = ArgumentSpec()
         self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file')
+        self.mock_is_jks_or_pkcs12 = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.is_jks_or_pkcs12')
         self.mock_run_command = patch('ansible.module_utils.basic.AnsibleModule.run_command')
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
+        self.is_jks_or_pkcs12 = self.mock_is_jks_or_pkcs12.start()
         self.run_command = self.mock_run_command.start()
         self.create_file = self.mock_create_file.start()
         self.get_bin_path = self.mock_get_bin_path.start()
@@ -208,6 +213,7 @@ class TestCertChanged(ModuleTestCase):
         """Teardown."""
         super(TestCertChanged, self).tearDown()
         self.mock_create_file.stop()
+        self.mock_is_jks_or_pkcs12.stop()
         self.mock_run_command.stop()
         self.mock_get_bin_path.stop()
 
@@ -229,6 +235,7 @@ class TestCertChanged(ModuleTestCase):
             self.create_file.side_effect = ['/tmp/placeholder', '']
             self.run_command.side_effect = [(0, 'foo=abcd:1234:efgh', ''), (0, 'SHA256: abcd:1234:efgh', '')]
             self.get_bin_path.side_effect = ['keytool', 'openssl', '']
+            self.is_jks_or_pkcs12.side_effect = ['jks']
             jks = JavaKeystore(module)
             result = jks.cert_changed()
             self.assertFalse(result, 'Fingerprint is identical')
@@ -251,6 +258,7 @@ class TestCertChanged(ModuleTestCase):
             self.create_file.side_effect = ['/tmp/placeholder', '']
             self.run_command.side_effect = [(0, 'foo=abcd:1234:efgh', ''), (0, 'SHA256: wxyz:9876:stuv', '')]
             self.get_bin_path.side_effect = ['keytool', 'openssl', '']
+            self.is_jks_or_pkcs12.side_effect = ['jks']
             jks = JavaKeystore(module)
             result = jks.cert_changed()
             self.assertTrue(result, 'Fingerprint mismatch')
@@ -322,6 +330,7 @@ class TestCertChanged(ModuleTestCase):
             self.create_file.side_effect = ['/tmp/tmpdj6bvvme', '']
             self.run_command.side_effect = [(1, '', 'Oops'), (0, 'SHA256: wxyz:9876:stuv', '')]
             self.get_bin_path.side_effect = ['keytool', 'openssl', '']
+            self.is_jks_or_pkcs12.side_effect = ['jks']
             jks = JavaKeystore(module)
             jks.cert_changed()
             module.fail_json.assert_called_once_with(
