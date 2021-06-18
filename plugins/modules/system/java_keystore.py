@@ -101,8 +101,8 @@ options:
     description:
       - Type of the Java keystore.
       - When this option is omitted and the keystore doesn't already exist, the
-        behavior is to follow C(keytool) default store type, that depends on
-        Java version, and is C(pkcs12) since Java 9, and C(jks) before (may also
+        behavior follows C(keytool)'s default store type which depends on
+        Java version; C(pkcs12) since Java 9 and C(jks) prior (may also
         be C(pkcs12) if new default has been backported to this version).
       - When this option is omitted and the keystore already exists, the current
         type is left untouched, unless another option leads to overwrite the
@@ -133,8 +133,8 @@ notes:
     while I(certificate_path) and I(private_key_path) require that the files are
     available on the target host.
   - By design, any change of a value of options I(keystore_type), I(name) or
-    I(password), as well as changes of key or certificate materials lead to the
-    overwriting of the existing I(dest).
+    I(password), as well as changes of key or certificate materials will cause
+    the existing I(dest) to be overwritten.
 '''
 
 EXAMPLES = '''
