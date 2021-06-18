@@ -1,0 +1,4 @@
+bugfixes:
+  - "npm - when the ``version`` option is used the comparison of installed vs missing will
+    use name@version instead of just name, allowing version specific updates
+    (https://github.com/ansible-collections/community.general/issues/2021)."
