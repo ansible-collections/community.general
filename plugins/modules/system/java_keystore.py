@@ -335,10 +335,8 @@ class JavaKeystore:
                 rc=rc
             )
 
-        if self.keystore_type is not None:
-            keystore_type = self.is_jks_or_pkcs12()
-            if keystore_type != self.keystore_type:
-                return "keystore type mismatch"
+        if self.keystore_type not in (None, self.is_jks_or_pkcs12()):
+            return "keystore type mismatch"
 
         stored_certificate_match = re.search(r"SHA256: ([\w:]+)", stored_certificate_fingerprint_out)
         if not stored_certificate_match:
