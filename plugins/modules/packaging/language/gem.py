@@ -62,6 +62,11 @@ options:
       These gems will be independent from the global installed ones.
       Specifying this requires user_install to be false.
     required: false
+  bindir:
+    type: path
+    description:
+    - Install executables into a specific directory.
+    required: false
   env_shebang:
     description:
       - Rewrite the shebang line on installed scripts to use /usr/bin/env.
@@ -198,6 +203,9 @@ def uninstall(module):
     if module.params['install_dir']:
         cmd.extend(['--install-dir', module.params['install_dir']])
 
+    if module.params['bindir']:
+        cmd.extend(['--bindir', module.params['bindir']])
+
     if module.params['version']:
         cmd.extend(['--version', module.params['version']])
     else:
@@ -235,6 +243,8 @@ def install(module):
         cmd.append('--no-user-install')
     if module.params['install_dir']:
         cmd.extend(['--install-dir', module.params['install_dir']])
+    if module.params['bindir']:
+        cmd.extend(['--bindir', module.params['bindir']])
     if module.params['pre_release']:
         cmd.append('--pre')
     if not module.params['include_doc']:
@@ -265,6 +275,7 @@ def main():
             state=dict(required=False, default='present', choices=['present', 'absent', 'latest'], type='str'),
             user_install=dict(required=False, default=True, type='bool'),
             install_dir=dict(required=False, type='path'),
+            bindir=dict(required=False, type='path'),
             pre_release=dict(required=False, default=False, type='bool'),
             include_doc=dict(required=False, default=False, type='bool'),
             env_shebang=dict(required=False, default=False, type='bool'),
