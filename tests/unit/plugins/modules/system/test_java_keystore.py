@@ -28,7 +28,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
         self.spec = ArgumentSpec()
         self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file')
         self.mock_create_path = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_path')
-        self.mock_is_jks_or_pkcs12 = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.is_jks_or_pkcs12')
+        self.mock_is_jks_or_pkcs12 = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.JavaKeystore.is_jks_or_pkcs12')
         self.mock_run_command = patch('ansible.module_utils.basic.AnsibleModule.run_command')
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
         self.mock_os_path_exists = patch('os.path.exists',
@@ -201,13 +201,13 @@ class TestCertChanged(ModuleTestCase):
         super(TestCertChanged, self).setUp()
         self.spec = ArgumentSpec()
         self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file')
-        self.mock_is_jks_or_pkcs12 = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.is_jks_or_pkcs12')
+        self.mock_is_jks_or_pkcs12 = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.JavaKeystore.is_jks_or_pkcs12')
         self.mock_run_command = patch('ansible.module_utils.basic.AnsibleModule.run_command')
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
-        self.is_jks_or_pkcs12 = self.mock_is_jks_or_pkcs12.start()
         self.run_command = self.mock_run_command.start()
         self.create_file = self.mock_create_file.start()
         self.get_bin_path = self.mock_get_bin_path.start()
+        self.is_jks_or_pkcs12 = self.mock_is_jks_or_pkcs12.start()
 
     def tearDown(self):
         """Teardown."""
