@@ -335,7 +335,7 @@ class JavaKeystore:
                 rc=rc
             )
 
-        if self.keystore_type not in (None, self.is_jks_or_pkcs12()):
+        if self.keystore_type not in (None, self.current_type()):
             return "keystore type mismatch"
 
         stored_certificate_match = re.search(r"SHA256: ([\w:]+)", stored_certificate_fingerprint_out)
@@ -348,7 +348,7 @@ class JavaKeystore:
 
         return stored_certificate_match.group(1)
 
-    def is_jks_or_pkcs12(self):
+    def current_type(self):
         magic_bytes = b'\xfe\xed\xfe\xed'
         with open(self.keystore_path, 'rb') as fd:
             header = fd.read(4)
