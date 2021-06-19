@@ -95,6 +95,11 @@ options:
             - Set metric level of ipv4 routes configured on interface.
         type: int
         version_added: 2.0.0
+    routing_rules4:
+        description:
+            - Is the same as in an C(ip route add) command, except always requires specifying a priority.
+        type: str
+        version_added: 3.3.0
     never_default4:
         description:
             - Set as default route.
@@ -126,6 +131,12 @@ options:
         type: str
         choices: [auto, link-local, manual, shared, disabled]
         version_added: 2.2.0
+    may_fail4:
+        description:
+            - If you need I(ip4) configured before C(network-online.target) is reached, set this option to C(false).
+        type: bool
+        default: true
+        version_added: 3.3.0
     ip6:
         description:
             - The IPv6 address to this interface.
@@ -164,8 +175,9 @@ options:
         description:
             - Configuration method to be used for IPv6
             - If I(ip6) is set, C(ipv6.method) is automatically set to C(manual) and this parameter is not needed.
+            - C(disabled) was added in community.general 3.3.0.
         type: str
-        choices: [ignore, auto, dhcp, link-local, manual, shared]
+        choices: [ignore, auto, dhcp, link-local, manual, shared, disabled]
         version_added: 2.2.0
     mtu:
         description:
@@ -675,11 +687,13 @@ class Nmcli(object):
         self.gw4_ignore_auto = module.params['gw4_ignore_auto']
         self.routes4 = module.params['routes4']
         self.route_metric4 = module.params['route_metric4']
+        self.routing_rules4 = module.params['routing_rules4']
         self.never_default4 = module.params['never_default4']
         self.dns4 = module.params['dns4']
         self.dns4_search = module.params['dns4_search']
         self.dns4_ignore_auto = module.params['dns4_ignore_auto']
         self.method4 = module.params['method4']
+        self.may_fail4 = module.params['may_fail4']
         self.ip6 = module.params['ip6']
         self.gw6 = module.params['gw6']
         self.gw6_ignore_auto = module.params['gw6_ignore_auto']
@@ -762,8 +776,10 @@ class Nmcli(object):
                 'ipv4.ignore-auto-routes': self.gw4_ignore_auto,
                 'ipv4.routes': self.routes4,
                 'ipv4.route-metric': self.route_metric4,
+                'ipv4.routing-rules': self.routing_rules4,
                 'ipv4.never-default': self.never_default4,
                 'ipv4.method': self.ipv4_method,
+                'ipv4.may-fail': self.may_fail4,
                 'ipv6.addresses': self.ip6,
                 'ipv6.dns': self.dns6,
                 'ipv6.dns-search': self.dns6_search,
@@ -935,6 +951,7 @@ class Nmcli(object):
                        'ipv4.never-default',
                        'ipv4.ignore-auto-dns',
                        'ipv4.ignore-auto-routes',
+                       'ipv4.may-fail',
                        'ipv6.ignore-auto-dns',
                        'ipv6.ignore-auto-routes'):
             return bool
@@ -1155,11 +1172,13 @@ def main():
             gw4_ignore_auto=dict(type='bool', default=False),
             routes4=dict(type='list', elements='str'),
             route_metric4=dict(type='int'),
+            routing_rules4=dict(type='str'),
             never_default4=dict(type='bool', default=False),
             dns4=dict(type='list', elements='str'),
             dns4_search=dict(type='list', elements='str'),
             dns4_ignore_auto=dict(type='bool', default=False),
             method4=dict(type='str', choices=['auto', 'link-local', 'manual', 'shared', 'disabled']),
+            may_fail4=dict(type='bool', default=True),
             dhcp_client_id=dict(type='str'),
             ip6=dict(type='str'),
             gw6=dict(type='str'),
@@ -1167,7 +1186,7 @@ def main():
             dns6=dict(type='list', elements='str'),
             dns6_search=dict(type='list', elements='str'),
             dns6_ignore_auto=dict(type='bool', default=False),
-            method6=dict(type='str', choices=['ignore', 'auto', 'dhcp', 'link-local', 'manual', 'shared']),
+            method6=dict(type='str', choices=['ignore', 'auto', 'dhcp', 'link-local', 'manual', 'shared', 'disabled']),
             # Bond Specific vars
             mode=dict(type='str', default='balance-rr',
                       choices=['802.3ad', 'active-backup', 'balance-alb', 'balance-rr', 'balance-tlb', 'balance-xor', 'broadcast']),
