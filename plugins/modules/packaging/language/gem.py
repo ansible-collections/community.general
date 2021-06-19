@@ -66,7 +66,7 @@ options:
     type: path
     description:
     - Install executables into a specific directory.
-    required: false
+    version_added: 3.3.0
   env_shebang:
     description:
       - Rewrite the shebang line on installed scripts to use /usr/bin/env.
