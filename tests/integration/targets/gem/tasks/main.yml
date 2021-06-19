@@ -185,35 +185,35 @@
     name: gist
     state: present
     bindir: "{{ output_dir }}/custom_bindir"
-    user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
   register: install_gem_result
 
-- name: Get stats of gem executable
-  stat:
-    path: "{{ output_dir }}/custom_bindir/gist"
-  register: gem_bindir_stat
+- name: Find gem executable
+  find:
+    paths: "{{ output_dir }}/custom_bindir"
+    patterns: "gist*"
+  register: gem_bindir_search
 
 - name: Ensure gem executable was installed in custom directory
   assert:
     that:
       - install_gem_result is changed
-      - gem_bindir_stat.stat.exists and gem_bindir_stat.stat.isreg
+      - gem_bindir_search.files | length == 1
 
 - name: Remove gem with custom bindir
   gem:
     name: gist
     state: absent
     bindir: "{{ output_dir }}/custom_bindir"
-    user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
   register: install_gem_result
 
-- name: Get stats of gem executable
-  stat:
-    path: "{{ output_dir }}/custom_bindir/gist"
-  register: gem_bindir_stat
+- name: Find gem executable
+  find:
+    paths: "{{ output_dir }}/custom_bindir"
+    patterns: "gist*"
+  register: gem_bindir_search
 
 - name: Ensure gem executable was removed from custom directory
   assert:
     that:
       - install_gem_result is changed
-      - not gem_bindir_stat.stat.exists
+      - gem_bindir_search.files | length == 0
