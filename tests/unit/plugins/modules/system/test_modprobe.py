@@ -61,7 +61,7 @@ class TestLoadModule(ModuleTestCase):
             'state': 'present',
         }
 
-    def test_load_module_failure(self):
+    def test_load_module_unchanged(self):
         set_module_args(dict(
             name='test',
             state='present',
@@ -76,29 +76,16 @@ class TestLoadModule(ModuleTestCase):
             supports_check_mode=True,
         )
 
-        module.fail_json = Mock()
+        module.warn = Mock()
 
         self.get_bin_path.side_effect = ['modprobe']
         self.module_loaded.side_effect = [False]
-        self.run_command.side_effect = [(0, '', ''), (0, '', '')]
+        self.run_command.side_effect = [(0, '', ''), (1, '', '')]
 
         modprobe = Modprobe(module)
         modprobe.load_module()
 
-        dummy_result = {
-            'changed': False,
-            'name': 'test',
-            'state': 'present',
-            'params': '',
-        }
-
-        module.fail_json.assert_called_once_with(
-            msg="Module %s is not present after load attempt." % 'test',
-            rc=0,
-            stdout='',
-            stderr='',
-            **dummy_result
-        )
+        module.warn.assert_called_once_with('')
 
 
 class TestUnloadModule(ModuleTestCase):
@@ -170,7 +157,7 @@ class TestUnloadModule(ModuleTestCase):
 
         self.get_bin_path.side_effect = ['modprobe']
         self.module_loaded.side_effect = [True]
-        self.run_command.side_effect = [(0, '', '')]
+        self.run_command.side_effect = [(1, '', '')]
 
         modprobe = Modprobe(module)
         modprobe.unload_module()
@@ -183,5 +170,5 @@ class TestUnloadModule(ModuleTestCase):
         }
 
         module.fail_json.assert_called_once_with(
-            msg="Module %s is still present after unload attempt." % 'test', **dummy_result
+            msg='', rc=1, stdout='', stderr='', **dummy_result
         )

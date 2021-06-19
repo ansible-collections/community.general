@@ -70,26 +70,24 @@ class Modprobe(object):
         self.changed = False
 
     def load_module(self):
-        command = [self.modprobe_bin, '-vvv', self.name]
-        command.extend(shlex.split(self.params))
+        command = [self.modprobe_bin]
         if self.check_mode:
             command.append('-n')
+        command.extend([self.name] + shlex.split(self.params))
 
         rc, out, err = self.module.run_command(command)
 
         if rc != 0:
             return self.module.fail_json(msg=err, rc=rc, stdout=out, stderr=err, **self.result)
 
-        if not self.check_mode and not self.module_loaded():
-            return self.module.fail_json(
-                msg="Module %s is not present after load attempt." % self.name,
-                rc=rc,
-                stdout=out,
-                stderr=err,
-                **self.result
+        if self.check_mode or self.module_loaded():
+            self.changed = True
+        else:
+            rc, stdout, stderr = self.module.run_command(
+                [self.modprobe_bin, '-n', '--first-time', self.name] + shlex.split(self.params)
             )
-
-        self.changed = True
+            if rc != 0:
+                self.module.warn(stderr)
 
     def module_loaded(self):
         is_loaded = False
@@ -123,11 +121,6 @@ class Modprobe(object):
         rc, out, err = self.module.run_command(command)
         if rc != 0:
             return self.module.fail_json(msg=err, rc=rc, stdout=out, stderr=err, **self.result)
-
-        if not self.check_mode and self.module_loaded():
-            return self.module.fail_json(
-                msg="Module %s is still present after unload attempt." % self.name, **self.result
-            )
 
         self.changed = True
 
