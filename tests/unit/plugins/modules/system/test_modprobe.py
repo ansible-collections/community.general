@@ -93,7 +93,11 @@ class TestLoadModule(ModuleTestCase):
         }
 
         module.fail_json.assert_called_once_with(
-            msg="Module %s is not present after load attempt." % 'test', **dummy_result
+            msg="Module %s is not present after load attempt." % 'test',
+            rc=0,
+            stdout='',
+            stderr='',
+            **dummy_result
         )
 
 

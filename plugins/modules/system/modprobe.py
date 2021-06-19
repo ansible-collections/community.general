@@ -70,19 +70,24 @@ class Modprobe(object):
         self.changed = False
 
     def load_module(self):
-        if not self.check_mode:
-            command = [self.modprobe_bin, self.name]
-            command.extend(shlex.split(self.params))
-            rc, out, err = self.module.run_command(command)
-            if rc != 0:
-                self.module.fail_json(msg=err, rc=rc, stdout=out, stderr=err, **self.result)
+        command = [self.modprobe_bin, '-vvv', self.name]
+        command.extend(shlex.split(self.params))
+        if self.check_mode:
+            command.append('-n')
 
-            if not self.module_loaded():
-                rc, stdout, stderr = self.module.run_command([self.modprobe_bin, self.name, '-vvv'])
-                self.module.warn(stdout + stderr)
-                return self.module.fail_json(
-                    msg="Module %s is not present after load attempt." % self.name, **self.result
-                )
+        rc, out, err = self.module.run_command(command)
+
+        if rc != 0:
+            return self.module.fail_json(msg=err, rc=rc, stdout=out, stderr=err, **self.result)
+
+        if not self.check_mode and not self.module_loaded():
+            return self.module.fail_json(
+                msg="Module %s is not present after load attempt." % self.name,
+                rc=rc,
+                stdout=out,
+                stderr=err,
+                **self.result
+            )
 
         self.changed = True
 
@@ -111,15 +116,18 @@ class Modprobe(object):
         return is_loaded
 
     def unload_module(self):
-        if not self.check_mode:
-            rc, out, err = self.module.run_command([self.modprobe_bin, '-r', self.name])
-            if rc != 0:
-                self.module.fail_json(msg=err, rc=rc, stdout=out, stderr=err, **self.result)
+        command = [self.modprobe_bin, '-r', self.name]
+        if self.check_mode:
+            command.append('-n')
 
-            if self.module_loaded():
-                return self.module.fail_json(
-                    msg="Module %s is still present after unload attempt." % self.name, **self.result
-                )
+        rc, out, err = self.module.run_command(command)
+        if rc != 0:
+            return self.module.fail_json(msg=err, rc=rc, stdout=out, stderr=err, **self.result)
+
+        if not self.check_mode and self.module_loaded():
+            return self.module.fail_json(
+                msg="Module %s is still present after unload attempt." % self.name, **self.result
+            )
 
         self.changed = True
 
