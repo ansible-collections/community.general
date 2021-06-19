@@ -180,12 +180,6 @@
       - gem_search.files | length == 0
 
 # Custom directory for executables (--bindir)
-- name: Ensure gem is not installed
-  gem:
-    name: gist
-    state: absent
-    user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
-
 - name: Install gem with custom bindir
   gem:
     name: gist
