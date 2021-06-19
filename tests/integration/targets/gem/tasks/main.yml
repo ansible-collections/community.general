@@ -185,6 +185,7 @@
     name: gist
     state: present
     bindir: "{{ output_dir }}/custom_bindir"
+    user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
   register: install_gem_result
 
 - name: Get stats of gem executable
@@ -203,6 +204,7 @@
     name: gist
     state: absent
     bindir: "{{ output_dir }}/custom_bindir"
+    user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
   register: install_gem_result
 
 - name: Get stats of gem executable
