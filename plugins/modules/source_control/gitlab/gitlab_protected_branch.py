@@ -9,6 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: gitlab_protected_branch
 short_description: Creates/deletes proteched branches in Gitlab for an project.
+version_added: 3.3.0
 description:
   - Create/Delete a protected branch in an project.
 author:
@@ -23,7 +24,6 @@ options:
   state:
     description:
       - Create or delete proteced branch.
-      - Possible values are present and absent.
     default: present
     type: str
     choices: ["present", "absent"]
@@ -40,20 +40,18 @@ options:
   name:
     description:
       - The name of the branch that needs to be protected.
-      - Can make use a wildcard charachter for like 'production/*' or just have 'main' or 'develop' as value.
+      - Can make use a wildcard charachter for like C(production/*) or just have C(main) or C(develop) as value.
     required: true
     type: str
   merge_access_levels:
     description:
       - Access levels allowed to merge.
-      - Possible values are "maintainer", "developer" or "no_access".
     default: maintainer
     type: str
     choices: ["maintainer", "developer", "no_access"]
   push_access_level:
     description:
       - Access levels allowed to push.
-      - Possible values are "maintainer", "developer" or "no_access".
     default: maintainer
     type: str
     choices: ["maintainer", "developer", "no_access"]
@@ -97,10 +95,10 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import gi
 
 class GitlabProtectedBranch(object):
 
-    def __init__(self, module, gitlab_instance):
+    def __init__(self, module, project, gitlab_instance):
         self.repo = gitlab_instance
         self._module = module
-        self.project = self.get_project(self._module.params['project'])
+        self.project = self.get_project(project)
         self.ACCESS_LEVEL = {
             'no_access': gitlab.NO_ACCESS,
             'developer': gitlab.DEVELOPER_ACCESS,
@@ -110,9 +108,9 @@ class GitlabProtectedBranch(object):
     def get_project(self, project_name):
         return self.repo.projects.get(project_name)
 
-    def protected_branch_exist(self):
+    def protected_branch_exist(self, name):
         try:
-            return self.project.protectedbranches.get(self._module.params['name'])
+            return self.project.protectedbranches.get(name)
         except Exception as e:
             return False
 
@@ -130,7 +128,7 @@ class GitlabProtectedBranch(object):
     def compare_protected_branch(self, name, merge_access_levels, push_access_level):
         configured_merge = self.ACCESS_LEVEL[merge_access_levels]
         configured_push = self.ACCESS_LEVEL[push_access_level]
-        current = self.protected_branch_exist()
+        current = self.protected_branch_exist(name=name)
         current_merge = current.merge_access_levels[0]['access_level']
         current_push = current.push_access_levels[0]['access_level']
         if current:
@@ -170,6 +168,7 @@ def main():
         supports_check_mode=True
     )
 
+    project = module.params['project']
     name = module.params['name']
     merge_access_levels = module.params['merge_access_levels']
     push_access_level = module.params['push_access_level']
@@ -179,9 +178,9 @@ def main():
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
     gitlab_instance = gitlabAuthentication(module)
-    this_gitlab = GitlabProtectedBranch(module=module, gitlab_instance=gitlab_instance)
+    this_gitlab = GitlabProtectedBranch(module=module, project=project, gitlab_instance=gitlab_instance)
 
-    p_branch = this_gitlab.protected_branch_exist()
+    p_branch = this_gitlab.protected_branch_exist(name=name)
     if not p_branch and state == "present":
         this_gitlab.create_protected_branch(name=name, merge_access_levels=merge_access_levels, push_access_level=push_access_level)
         module.exit_json(changed=True, msg="Created the proteched branch.")
