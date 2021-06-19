@@ -197,7 +197,9 @@
   assert:
     that:
       - install_gem_result is changed
-      - gem_bindir_stat.stat.exists and gem_bindir_stat.stat.isreg
+        # openSUSE Leap adds `--format-executable` by default which makes bindir unusable
+        # so we ignore it
+      - gem_bindir_stat.stat.exists and gem_bindir_stat.stat.isreg or ansible_distribution == 'openSUSE Leap'
 
 - name: Remove gem with custom bindir
   gem:
