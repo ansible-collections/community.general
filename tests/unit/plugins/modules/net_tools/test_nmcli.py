@@ -98,6 +98,7 @@ ipv4.gateway:                           10.10.10.1
 ipv4.ignore-auto-dns:                   no
 ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
@@ -128,6 +129,7 @@ ipv4.ignore-auto-dns:                   no
 ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
 ipv4.dns-search:                        search.redhat.com
+ipv4.may-fail:                          yes
 ipv6.dns-search:                        search6.redhat.com
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
@@ -158,6 +160,7 @@ ipv4.gateway:                           10.10.10.1
 ipv4.ignore-auto-dns:                   no
 ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
@@ -187,6 +190,7 @@ ipv4.gateway:                           10.10.10.1
 ipv4.ignore-auto-dns:                   no
 ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
@@ -218,6 +222,7 @@ ipv4.gateway:                           10.10.10.1
 ipv4.ignore-auto-dns:                   no
 ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
@@ -275,6 +280,7 @@ ipv4.gateway:                           10.10.10.1
 ipv4.ignore-auto-dns:                   no
 ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
@@ -370,6 +376,7 @@ ipv4.dhcp-client-id:                    00:11:22:AA:BB:CC:DD
 ipv4.ignore-auto-dns:                   no
 ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
@@ -399,6 +406,7 @@ ipv4.gateway:                           10.10.10.1
 ipv4.ignore-auto-dns:                   no
 ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 ipv4.dns:                               1.1.1.1,8.8.8.8
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
