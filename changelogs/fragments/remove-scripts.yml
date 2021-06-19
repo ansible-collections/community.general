@@ -1,0 +1,2 @@
+removed_features:
+- "All inventory and vault scripts contained in community.general were moved to the `contrib-scripts GitHub repository <https://github.com/ansible-community/contrib-scripts>`_ (https://github.com/ansible-collections/community.general/pull/2696)."
