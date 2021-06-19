@@ -1,2 +1,2 @@
 minor_changes:
-  - gem module - add ``bindir`` option. This option allows to specify directory to install executables, e.g. ``/home/user/bin`` or ``/home/user/.local/bin``.
+  - gem module - add ``bindir`` option to specify an installation path for executables such as ``/home/user/bin`` or ``/home/user/.local/bin`` (https://github.com/ansible-collections/community.general/pull/2837).
