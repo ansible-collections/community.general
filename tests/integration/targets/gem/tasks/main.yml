@@ -196,7 +196,7 @@
 - name: Ensure gem executable was installed in custom directory
   assert:
     that:
-      - install_gem_result is changed or (ansible_version == 'develop' and ansible_distribution == 'openSUSE Leap')
+      - install_gem_result is changed
       - gem_bindir_stat.stat.exists and gem_bindir_stat.stat.isreg
 
 - name: Remove gem with custom bindir
@@ -215,5 +215,5 @@
 - name: Ensure gem executable was removed from custom directory
   assert:
     that:
-      - install_gem_result is changed or (ansible_version == 'develop' and ansible_distribution == 'openSUSE Leap')
+      - install_gem_result is changed
       - not gem_bindir_stat.stat.exists
