@@ -167,7 +167,7 @@ def get_installed_versions(module, remote=False):
 
     cmd = get_rubygems_path(module)
     cmd.append('query')
-    cmd = add_common_opts(module, cmd)
+    cmd.append(common_opts(module))
     if remote:
         cmd.append('--remote')
         if module.params['repository']:
@@ -202,11 +202,12 @@ def exists(module):
     return False
 
 
-def add_common_opts(module, cmd):
+def common_opts(module):
+    opts = []
     ver = get_rubygems_version(module)
     if module.params['norc'] and ver and ver >= (2, 5, 2):
-        cmd.append('--norc')
-    return cmd
+        opts.append('--norc')
+    return opts
 
 
 def uninstall(module):
@@ -216,7 +217,7 @@ def uninstall(module):
     cmd = get_rubygems_path(module)
     environ = get_rubygems_environ(module)
     cmd.append('uninstall')
-    cmd = add_common_opts(module, cmd)
+    cmd.append(common_opts(module))
     if module.params['install_dir']:
         cmd.extend(['--install-dir', module.params['install_dir']])
 
@@ -241,7 +242,7 @@ def install(module):
 
     cmd = get_rubygems_path(module)
     cmd.append('install')
-    cmd = add_common_opts(module, cmd)
+    cmd.append(common_opts(module))
     if module.params['version']:
         cmd.extend(['--version', module.params['version']])
     if module.params['repository']:
