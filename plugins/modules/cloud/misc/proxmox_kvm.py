@@ -828,9 +828,6 @@ def get_vminfo(module, proxmox, node, vmid, **kwargs):
     results['vmid'] = int(vmid)
 
 
-<<<<<<< HEAD
-def settings(module, proxmox, vmid, node, name, **kwargs):
-=======
 def parse_mac(netstr):
     return re.search('=(.*?),', netstr).group(1)
 
@@ -840,7 +837,6 @@ def parse_dev(devstr):
 
 
 def settings(proxmox, vmid, node, **kwargs):
->>>>>>> db713bd0 (proxmox_kvm: Fix ZFS device string parsing (#2841))
     proxmox_node = proxmox.nodes(node)
 
     # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
