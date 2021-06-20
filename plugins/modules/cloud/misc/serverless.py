@@ -159,7 +159,8 @@ def main():
         argument_spec=dict(
             service_path=dict(type='path', required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
-            functions=dict(type='list', elements='str'),
+            functions=dict(type='list', elements='str',
+                           removed_in_version="5.0.0", removed_from_collection="community.general"),
             region=dict(type='str', default=''),
             stage=dict(type='str', default=''),
             deploy=dict(type='bool', default=True),
