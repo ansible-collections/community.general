@@ -67,6 +67,12 @@ options:
     description:
     - Install executables into a specific directory.
     version_added: 3.3.0
+  norc:
+    type: bool
+    default: "no"
+    description:
+    - Avoid loading any .gemrc file. Ignored for rubygems prior to 2.5.2.
+    version_added: 3.3.0
   env_shebang:
     description:
       - Rewrite the shebang line on installed scripts to use /usr/bin/env.
@@ -202,7 +208,9 @@ def uninstall(module):
     environ = get_rubygems_environ(module)
     ver = get_rubygems_version(module)
     cmd.append('uninstall')
-    if ver and LooseVersion('.'.join(map(str, ver))) >= LooseVersion('2.5.2'):
+    if (module.params['norc']
+            and ver
+            and LooseVersion('.'.join(map(str, ver))) >= LooseVersion('2.5.2')):
         cmd.append('--norc')
     if module.params['install_dir']:
         cmd.extend(['--install-dir', module.params['install_dir']])
@@ -232,7 +240,9 @@ def install(module):
 
     cmd = get_rubygems_path(module)
     cmd.append('install')
-    if ver and LooseVersion('.'.join(map(str, ver))) >= LooseVersion('2.5.2'):
+    if (module.params['norc']
+            and ver
+            and LooseVersion('.'.join(map(str, ver))) >= LooseVersion('2.5.2')):
         cmd.append('--norc')
     if module.params['version']:
         cmd.extend(['--version', module.params['version']])
@@ -282,6 +292,7 @@ def main():
             user_install=dict(required=False, default=True, type='bool'),
             install_dir=dict(required=False, type='path'),
             bindir=dict(required=False, type='path'),
+            norc=dict(required=False, default=False, type='bool'),
             pre_release=dict(required=False, default=False, type='bool'),
             include_doc=dict(required=False, default=False, type='bool'),
             env_shebang=dict(required=False, default=False, type='bool'),
