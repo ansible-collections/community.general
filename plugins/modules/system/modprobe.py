@@ -50,11 +50,14 @@ EXAMPLES = '''
 '''
 
 import os.path
+import platform
 import shlex
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
+
+RELEASE_VER = platform.release()
 
 
 class Modprobe(object):
@@ -100,9 +103,8 @@ class Modprobe(object):
                         break
 
             if not is_loaded:
-                rc, uname_kernel_release, err = self.module.run_command([self.module.get_bin_path('uname', True), '-r'])
                 module_file = '/' + self.name + '.ko'
-                builtin_path = os.path.join('/lib/modules/', uname_kernel_release.strip(), 'modules.builtin')
+                builtin_path = os.path.join('/lib/modules/', RELEASE_VER, 'modules.builtin')
                 with open(builtin_path) as builtins:
                     for line in builtins:
                         if line.endswith(module_file):
