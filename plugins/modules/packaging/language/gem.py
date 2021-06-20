@@ -134,7 +134,6 @@ EXAMPLES = '''
 import re
 
 from ansible.module_utils.basic import AnsibleModule
-from distutils.version import LooseVersion
 
 
 def get_rubygems_path(module):
@@ -208,9 +207,7 @@ def uninstall(module):
     environ = get_rubygems_environ(module)
     ver = get_rubygems_version(module)
     cmd.append('uninstall')
-    if (module.params['norc']
-            and ver
-            and LooseVersion('.'.join(map(str, ver))) >= LooseVersion('2.5.2')):
+    if ver and ver >= (2, 5, 2):
         cmd.append('--norc')
     if module.params['install_dir']:
         cmd.extend(['--install-dir', module.params['install_dir']])
@@ -233,16 +230,10 @@ def install(module):
         return
 
     ver = get_rubygems_version(module)
-    if ver:
-        major = ver[0]
-    else:
-        major = None
 
     cmd = get_rubygems_path(module)
     cmd.append('install')
-    if (module.params['norc']
-            and ver
-            and LooseVersion('.'.join(map(str, ver))) >= LooseVersion('2.5.2')):
+    if ver and ver >= (2, 5, 2):
         cmd.append('--norc')
     if module.params['version']:
         cmd.extend(['--version', module.params['version']])
@@ -251,7 +242,7 @@ def install(module):
     if not module.params['include_dependencies']:
         cmd.append('--ignore-dependencies')
     else:
-        if major and major < 2:
+        if ver and ver < (2, 0, 0):
             cmd.append('--include-dependencies')
     if module.params['user_install']:
         cmd.append('--user-install')
@@ -264,7 +255,7 @@ def install(module):
     if module.params['pre_release']:
         cmd.append('--pre')
     if not module.params['include_doc']:
-        if major and major < 2:
+        if ver and ver < (2, 0, 0):
             cmd.append('--no-rdoc')
             cmd.append('--no-ri')
         else:
