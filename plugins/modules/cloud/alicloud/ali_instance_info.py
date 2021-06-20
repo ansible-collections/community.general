@@ -376,8 +376,10 @@ except ImportError:
 def main():
     argument_spec = ecs_argument_spec()
     argument_spec.update(dict(
-        availability_zone=dict(aliases=['alicloud_zone']),
-        instance_ids=dict(type='list', elements='str', aliases=['ids']),
+        availability_zone=dict(aliases=['alicloud_zone'],
+                               removed_in_version="5.0.0", removed_from_collection="community.general"),
+        instance_ids=dict(type='list', elements='str', aliases=['ids'],
+                          removed_in_version="5.0.0", removed_from_collection="community.general"),
         instance_names=dict(type='list', elements='str', aliases=['names']),
         name_prefix=dict(type='str'),
         tags=dict(type='dict', aliases=['instance_tags']),
