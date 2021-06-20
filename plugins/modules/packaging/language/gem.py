@@ -128,6 +128,7 @@ EXAMPLES = '''
 import re
 
 from ansible.module_utils.basic import AnsibleModule
+from packaging import version
 
 
 def get_rubygems_path(module):
@@ -199,7 +200,10 @@ def uninstall(module):
         return
     cmd = get_rubygems_path(module)
     environ = get_rubygems_environ(module)
+    ver = get_rubygems_version(module)
     cmd.append('uninstall')
+    if version.parse(ver) >= version.parse('2.5.2'):
+        cmd.append('--norc')
     if module.params['install_dir']:
         cmd.extend(['--install-dir', module.params['install_dir']])
 
@@ -228,6 +232,8 @@ def install(module):
 
     cmd = get_rubygems_path(module)
     cmd.append('install')
+    if version.parse(ver) >= version.parse('2.5.2'):
+        cmd.append('--norc')
     if module.params['version']:
         cmd.extend(['--version', module.params['version']])
     if module.params['repository']:
