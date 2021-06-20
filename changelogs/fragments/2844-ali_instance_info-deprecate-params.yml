@@ -1,0 +1,2 @@
+deprecated_features:
+  - ali_instance_info - marked removal version of deprecated parameters ``availability_zone`` and ``instance_names`` (https://github.com/ansible-collections/community.general/issues/2429).
