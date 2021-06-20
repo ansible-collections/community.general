@@ -35,12 +35,14 @@ description:
 options:
     availability_zone:
       description:
-        - (Deprecated) Aliyun availability zone ID in which to launch the instance. Please use filter item 'zone_id' instead.
+        - Aliyun availability zone ID in which to launch the instance.
+        - Deprecated parameter, it will be removed in community.general 5.0.0. Please use filter item I(zone_id) instead.
       aliases: ['alicloud_zone']
       type: str
     instance_names:
       description:
-        - (Deprecated) A list of ECS instance names. Please use filter item 'instance_name' instead.
+        - A list of ECS instance names.
+        - Deprecated parameter, it will be removed in community.general 5.0.0. Please use filter item I(instance_name) instead.
       aliases: ["names"]
       type: list
       elements: str
@@ -374,8 +376,10 @@ except ImportError:
 def main():
     argument_spec = ecs_argument_spec()
     argument_spec.update(dict(
-        availability_zone=dict(aliases=['alicloud_zone']),
-        instance_ids=dict(type='list', elements='str', aliases=['ids']),
+        availability_zone=dict(aliases=['alicloud_zone'],
+                               removed_in_version="5.0.0", removed_from_collection="community.general"),
+        instance_ids=dict(type='list', elements='str', aliases=['ids'],
+                          removed_in_version="5.0.0", removed_from_collection="community.general"),
         instance_names=dict(type='list', elements='str', aliases=['names']),
         name_prefix=dict(type='str'),
         tags=dict(type='dict', aliases=['instance_tags']),
