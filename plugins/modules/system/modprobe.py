@@ -107,7 +107,7 @@ class Modprobe(object):
                 builtin_path = os.path.join('/lib/modules/', RELEASE_VER, 'modules.builtin')
                 with open(builtin_path) as builtins:
                     for line in builtins:
-                        if line.endswith(module_file):
+                        if line.rstrip().endswith(module_file):
                             is_loaded = True
                             break
         except (IOError, OSError) as e:
