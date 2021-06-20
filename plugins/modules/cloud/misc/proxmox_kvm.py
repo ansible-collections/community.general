@@ -836,7 +836,7 @@ def parse_dev(devstr):
     return re.search('(.*?)(,|$)', devstr).group(1)
 
 
-def settings(proxmox, vmid, node, **kwargs):
+def settings(module, proxmox, vmid, node, **kwargs):
     proxmox_node = proxmox.nodes(node)
 
     # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
