@@ -36,13 +36,13 @@ options:
     availability_zone:
       description:
         - Aliyun availability zone ID in which to launch the instance.
-        - Deprecated parameter, it will be removed in community.general C(5.0.0). Please use filter item I(zone_id) instead.
+        - Deprecated parameter, it will be removed in community.general 5.0.0. Please use filter item I(zone_id) instead.
       aliases: ['alicloud_zone']
       type: str
     instance_names:
       description:
         - A list of ECS instance names.
-        - Deprecated parameter, it will be removed in community.general C(5.0.0). Please use filter item I(instance_name) instead.
+        - Deprecated parameter, it will be removed in community.general 5.0.0. Please use filter item I(instance_name) instead.
       aliases: ["names"]
       type: list
       elements: str
