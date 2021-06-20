@@ -48,13 +48,13 @@ options:
       - Access levels allowed to merge.
     default: maintainer
     type: str
-    choices: ["maintainer", "developer", "no_access"]
+    choices: ["maintainer", "developer", "nobody"]
   push_access_level:
     description:
       - Access levels allowed to push.
     default: maintainer
     type: str
-    choices: ["maintainer", "developer", "no_access"]
+    choices: ["maintainer", "developer", "nobody"]
 '''
 
 
@@ -66,7 +66,7 @@ EXAMPLES = '''
     project: "dj-wasabi/collection.general"
     name: main
     merge_access_levels: maintainer
-    push_access_level: no_access
+    push_access_level: nobody
 
 '''
 
@@ -100,7 +100,7 @@ class GitlabProtectedBranch(object):
         self._module = module
         self.project = self.get_project(project)
         self.ACCESS_LEVEL = {
-            'no_access': gitlab.NO_ACCESS,
+            'nobody': gitlab.nobody,
             'developer': gitlab.DEVELOPER_ACCESS,
             'maintainer': gitlab.MAINTAINER_ACCESS
         }
@@ -148,8 +148,8 @@ def main():
         api_token=dict(type='str', required=True, no_log=True),
         project=dict(type='str', required=True),
         name=dict(type='str', required=True),
-        merge_access_levels=dict(type='str', default="maintainer", choices=["maintainer", "developer", "no_access"]),
-        push_access_level=dict(type='str', default="maintainer", choices=["maintainer", "developer", "no_access"]),
+        merge_access_levels=dict(type='str', default="maintainer", choices=["maintainer", "developer", "nobody"]),
+        push_access_level=dict(type='str', default="maintainer", choices=["maintainer", "developer", "nobody"]),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )
 
