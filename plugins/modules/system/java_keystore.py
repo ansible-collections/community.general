@@ -516,11 +516,12 @@ def hex_decode(s):
     return s.hex()
 
 
-class ArgumentSpec:
-    def __init__(self):
-        self.supports_check_mode = True
-        self.add_file_common_args = True
-        argument_spec = dict(
+def main():
+    choose_between = (['certificate', 'certificate_path'],
+                      ['private_key', 'private_key_path'])
+
+    module = AnsibleModule(
+        argument_spec=dict(
             name=dict(type='str', required=True),
             dest=dict(type='path', required=True),
             certificate=dict(type='str', no_log=True),
@@ -532,24 +533,11 @@ class ArgumentSpec:
             ssl_backend=dict(type='str', default='openssl', choices=['openssl', 'cryptography']),
             keystore_type=dict(type='str', choices=['jks', 'pkcs12']),
             force=dict(type='bool', default=False),
-        )
-        choose_between = (
-            ['certificate', 'certificate_path'],
-            ['private_key', 'private_key_path'],
-        )
-        self.argument_spec = argument_spec
-        self.required_one_of = choose_between
-        self.mutually_exclusive = choose_between
-
-
-def main():
-    spec = ArgumentSpec()
-    module = AnsibleModule(
-        argument_spec=spec.argument_spec,
-        required_one_of=spec.required_one_of,
-        mutually_exclusive=spec.mutually_exclusive,
-        supports_check_mode=spec.supports_check_mode,
-        add_file_common_args=spec.add_file_common_args,
+        ),
+        required_one_of=choose_between,
+        mutually_exclusive=choose_between,
+        supports_check_mode=True,
+        add_file_common_args=True,
     )
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C')
 
