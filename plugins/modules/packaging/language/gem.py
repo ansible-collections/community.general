@@ -167,7 +167,7 @@ def get_installed_versions(module, remote=False):
 
     cmd = get_rubygems_path(module)
     cmd.append('query')
-    cmd.append(common_opts(module))
+    cmd.extend(common_opts(module))
     if remote:
         cmd.append('--remote')
         if module.params['repository']:
@@ -217,7 +217,7 @@ def uninstall(module):
     cmd = get_rubygems_path(module)
     environ = get_rubygems_environ(module)
     cmd.append('uninstall')
-    cmd.append(common_opts(module))
+    cmd.extend(common_opts(module))
     if module.params['install_dir']:
         cmd.extend(['--install-dir', module.params['install_dir']])
 
@@ -242,7 +242,7 @@ def install(module):
 
     cmd = get_rubygems_path(module)
     cmd.append('install')
-    cmd.append(common_opts(module))
+    cmd.extend(common_opts(module))
     if module.params['version']:
         cmd.extend(['--version', module.params['version']])
     if module.params['repository']:
