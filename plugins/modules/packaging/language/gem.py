@@ -72,6 +72,8 @@ options:
     default: false
     description:
     - Avoid loading any C(.gemrc) file. Ignored for RubyGems prior to 2.5.2.
+    - From community.general 4.0.0 on, there will be no default value for this option.
+    - From community.general 5.0.0 on, default will be changed to `true`.
     version_added: 3.3.0
   env_shebang:
     description:
