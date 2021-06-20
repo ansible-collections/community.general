@@ -8,10 +8,10 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: gitlab_protected_branch
-short_description: Creates/deletes proteched branches in Gitlab for an project.
+short_description: (un)Marking existing branches for protection in Gitlab for an project.
 version_added: 3.3.0
 description:
-  - Create/Delete a protected branch in an project.
+  - (un)Marking existing branches for protection.
 author:
   - "Werner Dijkerman (@dj-wasabi)"
 requirements:
