@@ -71,7 +71,7 @@ options:
     type: bool
     default: false
     description:
-    - Avoid loading any C(.gemrc) file. Ignored for rubygems prior to 2.5.2.
+    - Avoid loading any C(.gemrc) file. Ignored for RubyGems prior to 2.5.2.
     version_added: 3.3.0
   env_shebang:
     description:
