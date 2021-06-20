@@ -69,9 +69,9 @@ options:
     version_added: 3.3.0
   norc:
     type: bool
-    default: "no"
+    default: false
     description:
-    - Avoid loading any .gemrc file. Ignored for rubygems prior to 2.5.2.
+    - Avoid loading any C(.gemrc) file. Ignored for rubygems prior to 2.5.2.
     version_added: 3.3.0
   env_shebang:
     description:
