@@ -815,27 +815,32 @@ def get_vminfo(module, proxmox, node, vmid, **kwargs):
             del kwargs[k]
 
     # Split information by type
-    for k, v in kwargs.items():
-        if re.match(r'net[0-9]', k) is not None:
-            interface = k
-            k = vm[k]
-            k = re.search('=(.*?),', k).group(1)
-            mac[interface] = k
-        if (re.match(r'virtio[0-9]', k) is not None or
-                re.match(r'ide[0-9]', k) is not None or
-                re.match(r'scsi[0-9]', k) is not None or
-                re.match(r'sata[0-9]', k) is not None):
-            device = k
-            k = vm[k]
-            k = re.search('(.*?),', k).group(1)
-            devices[device] = k
+    re_net = re.compile(r'net[0-9]')
+    re_dev = re.compile(r'(virtio|ide|scsi|sata)[0-9]')
+    for k in kwargs.keys():
+        if re_net.match(k):
+            mac[k] = parse_mac(vm[k])
+        elif re_dev.match(k):
+            devices[k] = parse_dev(vm[k])
 
     results['mac'] = mac
     results['devices'] = devices
     results['vmid'] = int(vmid)
 
 
+<<<<<<< HEAD
 def settings(module, proxmox, vmid, node, name, **kwargs):
+=======
+def parse_mac(netstr):
+    return re.search('=(.*?),', netstr).group(1)
+
+
+def parse_dev(devstr):
+    return re.search('(.*?)(,|$)', devstr).group(1)
+
+
+def settings(proxmox, vmid, node, **kwargs):
+>>>>>>> db713bd0 (proxmox_kvm: Fix ZFS device string parsing (#2841))
     proxmox_node = proxmox.nodes(node)
 
     # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
