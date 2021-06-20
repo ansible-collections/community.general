@@ -38,7 +38,7 @@ options:
     description:
       - A list of specific functions to deploy.
       - If this is not provided, all functions in the service will be deployed.
-      - Deprecated parameter, it will be removed in community.general C(5.0.0).
+      - Deprecated parameter, it will be removed in community.general 5.0.0.
     type: list
     elements: str
     default: []
