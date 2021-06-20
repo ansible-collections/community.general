@@ -38,6 +38,7 @@ options:
     description:
       - A list of specific functions to deploy.
       - If this is not provided, all functions in the service will be deployed.
+      - Deprecated parameter, it will be removed in community.general C(5.0.0).
     type: list
     elements: str
     default: []
@@ -78,13 +79,6 @@ EXAMPLES = r'''
   community.general.serverless:
     service_path: '{{ project_dir }}'
     state: present
-
-- name: Deploy specific functions
-  community.general.serverless:
-    service_path: '{{ project_dir }}'
-    functions:
-      - my_func_one
-      - my_func_two
 
 - name: Deploy a project, then pull its resource list back into Ansible
   community.general.serverless:
