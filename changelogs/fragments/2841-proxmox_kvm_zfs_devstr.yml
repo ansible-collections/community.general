@@ -1,0 +1,4 @@
+bugfixes:
+  - "proxmox_kvm - fix parsing of Proxmox VM information with device info not containing
+    a comma, like disks backed by ZFS zvols
+    (https://github.com/ansible-collections/community.general/issues/2840)."
