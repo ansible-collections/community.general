@@ -275,6 +275,7 @@ connection.type:                        team
 ipv4.ignore-auto-dns:                   no
 ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
