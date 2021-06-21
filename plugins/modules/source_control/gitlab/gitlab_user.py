@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Copyright: (c) 2021, Lennert Mertens (lennert@nubera.be)
 # Copyright: (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
 # Copyright: (c) 2015, Werner Dijkerman (ikben@werner-dijkerman.nl)
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -22,6 +23,8 @@ notes:
 author:
   - Werner Dijkerman (@dj-wasabi)
   - Guillaume Martinez (@Lunik)
+  - Lennert Mertens (@LennertMertens)
+  - Stef Graces (@stgrace)
 requirements:
   - python >= 2.7
   - python-gitlab python module
@@ -50,6 +53,12 @@ options:
       - GitLab server enforces minimum password length to 8, set this value with 8 or more characters.
       - Required only if C(state) is set to C(present).
     type: str
+  reset_password:
+    description:
+      - Whether the user can change its password or not.
+    default: false
+    type: bool
+    version_added: 3.3.0
   email:
     description:
       - The email that belongs to the user.
@@ -107,6 +116,30 @@ options:
       - Define external parameter for this user.
     type: bool
     default: no
+  identities:
+    description:
+      - List of identities to be added/updated for this user.
+      - To remove all other identities from this user, set I(overwrite_identities=true).
+    type: list
+    elements: dict
+    suboptions:
+      provider:
+        description:
+          - The name of the external identity provider
+        type: str
+      extern_uid:
+        description:
+          - User ID for external identity.
+        type: str
+    version_added: 3.3.0
+  overwrite_identities:
+    description:
+      - Overwrite identities with identities added in this module.
+      - This means that all identities that the user has and that are not listed in I(identities) are removed from the user.
+      - This is only done if a list is provided for I(identities). To remove all identities, provide an empty list.
+    type: bool
+    default: false
+    version_added: 3.3.0
 '''
 
 EXAMPLES = '''
@@ -130,6 +163,22 @@ EXAMPLES = '''
     email: me@example.com
     sshkey_name: MySSH
     sshkey_file: ssh-rsa AAAAB3NzaC1yc...
+    state: present
+    group: super_group/mon_group
+    access_level: owner
+
+- name: "Create GitLab User using external identity provider"
+  community.general.gitlab_user:
+    api_url: https://gitlab.example.com/
+    validate_certs: True
+    api_token: "{{ access_token }}"
+    name: My Name
+    username: myusername
+    password: mysecretpassword
+    email: me@example.com
+    identities:
+    - provider: Keycloak
+      extern_uid: f278f95c-12c7-4d51-996f-758cc2eb11bc
     state: present
     group: super_group/mon_group
     access_level: owner
@@ -219,10 +268,13 @@ class GitLabUser(object):
                 'name': options['name'],
                 'username': username,
                 'password': options['password'],
+                'reset_password': options['reset_password'],
                 'email': options['email'],
                 'skip_confirmation': not options['confirm'],
                 'admin': options['isadmin'],
-                'external': options['external']})
+                'external': options['external'],
+                'identities': options['identities'],
+            })
             changed = True
         else:
             changed, user = self.updateUser(
@@ -240,6 +292,7 @@ class GitLabUser(object):
                         'value': options['isadmin'], 'setter': 'admin'
                     },
                     'external': {'value': options['external']},
+                    'identities': {'value': options['identities']},
                 },
                 {
                     # put "uncheckable" params here, this means params
@@ -247,6 +300,8 @@ class GitLabUser(object):
                     # not return any information about it
                     'skip_reconfirmation': {'value': not options['confirm']},
                     'password': {'value': options['password']},
+                    'reset_password': {'value': options['reset_password']},
+                    'overwrite_identities': {'value': options['overwrite_identities']},
                 }
             )
 
@@ -393,7 +448,10 @@ class GitLabUser(object):
             av = arg_value['value']
 
             if av is not None:
-                if getattr(user, arg_key) != av:
+                if arg_key == "identities":
+                    changed = self.addIdentities(user, av, uncheckable_args['overwrite_identities']['value'])
+
+                elif getattr(user, arg_key) != av:
                     setattr(user, arg_value.get('setter', arg_key), av)
                     changed = True
 
@@ -412,12 +470,52 @@ class GitLabUser(object):
         if self._module.check_mode:
             return True
 
+        identities = None
+        if 'identities' in arguments:
+            identities = arguments['identities']
+            del arguments['identities']
+
         try:
             user = self._gitlab.users.create(arguments)
+            if identities:
+                self.addIdentities(user, identities)
+
         except (gitlab.exceptions.GitlabCreateError) as e:
             self._module.fail_json(msg="Failed to create user: %s " % to_native(e))
 
         return user
+
+    '''
+    @param user User object
+    @param identites List of identities to be added/updated
+    @param overwrite_identities Overwrite user identities with identities passed to this module
+    '''
+    def addIdentities(self, user, identities, overwrite_identities=False):
+        changed = False
+        if overwrite_identities:
+            changed = self.deleteIdentities(user, identities)
+
+        for identity in identities:
+            if identity not in user.identities:
+                setattr(user, 'provider', identity['provider'])
+                setattr(user, 'extern_uid', identity['extern_uid'])
+                if not self._module.check_mode:
+                    user.save()
+                changed = True
+        return changed
+
+    '''
+    @param user User object
+    @param identites List of identities to be added/updated
+    '''
+    def deleteIdentities(self, user, identities):
+        changed = False
+        for identity in user.identities:
+            if identity not in identities:
+                if not self._module.check_mode:
+                    user.identityproviders.delete(identity['provider'])
+                changed = True
+        return changed
 
     '''
     @param username Username of the user
@@ -471,6 +569,13 @@ class GitLabUser(object):
         return user.unblock()
 
 
+def sanitize_arguments(arguments):
+    for key, value in list(arguments.items()):
+        if value is None:
+            del arguments[key]
+    return arguments
+
+
 def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(dict(
@@ -479,6 +584,7 @@ def main():
         state=dict(type='str', default="present", choices=["absent", "present", "blocked", "unblocked"]),
         username=dict(type='str', required=True),
         password=dict(type='str', no_log=True),
+        reset_password=dict(type='bool', default=False, no_log=False),
         email=dict(type='str'),
         sshkey_name=dict(type='str'),
         sshkey_file=dict(type='str', no_log=False),
@@ -488,6 +594,8 @@ def main():
         confirm=dict(type='bool', default=True),
         isadmin=dict(type='bool', default=False),
         external=dict(type='bool', default=False),
+        identities=dict(type='list', elements='dict'),
+        overwrite_identities=dict(type='bool', default=False),
     ))
 
     module = AnsibleModule(
@@ -504,7 +612,7 @@ def main():
         ],
         supports_check_mode=True,
         required_if=(
-            ('state', 'present', ['name', 'email', 'password']),
+            ('state', 'present', ['name', 'email']),
         )
     )
 
@@ -512,6 +620,7 @@ def main():
     state = module.params['state']
     user_username = module.params['username'].lower()
     user_password = module.params['password']
+    user_reset_password = module.params['reset_password']
     user_email = module.params['email']
     user_sshkey_name = module.params['sshkey_name']
     user_sshkey_file = module.params['sshkey_file']
@@ -521,6 +630,8 @@ def main():
     confirm = module.params['confirm']
     user_isadmin = module.params['isadmin']
     user_external = module.params['external']
+    user_identities = module.params['identities']
+    overwrite_identities = module.params['overwrite_identities']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -559,6 +670,7 @@ def main():
         if gitlab_user.createOrUpdateUser(user_username, {
                                           "name": user_name,
                                           "password": user_password,
+                                          "reset_password": user_reset_password,
                                           "email": user_email,
                                           "sshkey_name": user_sshkey_name,
                                           "sshkey_file": user_sshkey_file,
@@ -567,7 +679,9 @@ def main():
                                           "access_level": access_level,
                                           "confirm": confirm,
                                           "isadmin": user_isadmin,
-                                          "external": user_external}):
+                                          "external": user_external,
+                                          "identities": user_identities,
+                                          "overwrite_identities": overwrite_identities}):
             module.exit_json(changed=True, msg="Successfully created or updated the user %s" % user_username, user=gitlab_user.userObject._attrs)
         else:
             module.exit_json(changed=False, msg="No need to update the user %s" % user_username, user=gitlab_user.userObject._attrs)
