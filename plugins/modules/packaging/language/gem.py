@@ -147,6 +147,9 @@ def get_rubygems_path(module):
 
 
 def get_rubygems_version(module):
+    if hasattr(get_rubygems_version, "ver"):
+        return get_rubygems_version.ver
+
     cmd = get_rubygems_path(module) + ['--version']
     (rc, out, err) = module.run_command(cmd, check_rc=True)
 
@@ -154,7 +157,10 @@ def get_rubygems_version(module):
     if not match:
         return None
 
-    return tuple(int(x) for x in match.groups())
+    ver = tuple(int(x) for x in match.groups())
+    get_rubygems_version.ver = ver
+
+    return ver
 
 
 def get_rubygems_environ(module):
