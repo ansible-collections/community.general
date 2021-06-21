@@ -257,7 +257,7 @@ def main():
     if module.params.get('state') == "present":
         jenkins_build.present_build()
     elif module.params.get('state') == "stopped":
-        jenkins_build.stop_build()
+        jenkins_build.stopped_build()
     else:
         jenkins_build.absent_build()
 

@@ -108,7 +108,7 @@ class TestJenkinsBuild(unittest.TestCase):
 
     @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
     @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.JenkinsBuild.get_jenkins_connection')
-    def test_module_stop_build(self, jenkins_connection, test_deps):
+    def test_module_stopped_build(self, jenkins_connection, test_deps):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()
 
