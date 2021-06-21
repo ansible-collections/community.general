@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - "gitlab_user - specifying a password is no longer necessary (https://github.com/ansible-collections/community.general/pull/2691)."
+  - "gitlab_user - allow to reset an existing password with the new ``reset_password`` option (https://github.com/ansible-collections/community.general/pull/2691)."
+  - "gitlab_user - add functionality for adding external identity providers to a GitLab user (https://github.com/ansible-collections/community.general/pull/2691)."
