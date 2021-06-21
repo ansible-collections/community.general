@@ -62,6 +62,9 @@ class JenkinsMock():
     def delete_build(self, name, build_number):
         return None
 
+    def stop_build(self, name, build_number):
+        return None
+
 
 class TestJenkinsBuild(unittest.TestCase):
 
@@ -80,6 +83,16 @@ class TestJenkinsBuild(unittest.TestCase):
             jenkins_build.main()
 
     @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
+    def test_module_fail_when_missing_build_number(self, test_deps):
+        test_deps.return_value = None
+        with self.assertRaises(AnsibleFailJson):
+            set_module_args({
+                "name": "required-if",
+                "state": "stopped"
+            })
+            jenkins_build.main()
+
+    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
     @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.JenkinsBuild.get_jenkins_connection')
     def test_module_create_build(self, jenkins_connection, test_deps):
         test_deps.return_value = None
@@ -88,6 +101,22 @@ class TestJenkinsBuild(unittest.TestCase):
         with self.assertRaises(AnsibleExitJson):
             set_module_args({
                 "name": "host-check",
+                "user": "abc",
+                "token": "xyz"
+            })
+            jenkins_build.main()
+
+    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
+    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.JenkinsBuild.get_jenkins_connection')
+    def test_module_stop_build(self, jenkins_connection, test_deps):
+        test_deps.return_value = None
+        jenkins_connection.return_value = JenkinsMock()
+
+        with self.assertRaises(AnsibleExitJson):
+            set_module_args({
+                "name": "host-check",
+                "build_number": "1234",
+                "state": "stopped",
                 "user": "abc",
                 "token": "xyz"
             })

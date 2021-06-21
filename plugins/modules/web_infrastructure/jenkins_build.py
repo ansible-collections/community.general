@@ -15,7 +15,9 @@ description:
     - Manage Jenkins builds with Jenkins REST API.
 requirements:
   - "python-jenkins >= 0.4.12"
-author: Brett Milford (@brettmilford)
+author: 
+  - Brett Milford (@brettmilford)
+  - Tong He (@unnecessary-username)
 options:
   args:
     description:
@@ -36,9 +38,9 @@ options:
     type: str
   state:
     description:
-      - Attribute that specifies if the build is to be created or deleted.
+      - Attribute that specifies if the build is to be created, deleted or stopped.
     default: present
-    choices: ['present', 'absent']
+    choices: ['present', 'absent', 'stopped']
     type: str
   token:
     description:
@@ -62,8 +64,25 @@ EXAMPLES = '''
     args:
       cloud: "test"
       availability_zone: "test_az"
+    state: present
     user: admin
     password: asdfg
+    url: http://localhost:8080
+    
+- name: Stop a running jenkins build anonymously
+  community.general.jenkins_build:
+    name: "stop-check"
+    build_number: 3
+    state: stopped
+    url: http://localhost:8080
+    
+- name: Delete a jenkins build using token authentication
+  community.general.jenkins_build:
+    name: "delete-experiment"
+    build_number: 30
+    state: absent
+    user: Jenkins
+    token: abcdefghijklmnopqrstuvwxyz123456
     url: http://localhost:8080
 '''
 
@@ -176,6 +195,13 @@ class JenkinsBuild:
             self.module.fail_json(msg='Unable to create build for %s: %s' % (self.jenkins_url, to_native(e)),
                                   exception=traceback.format_exc())
 
+    def stopped_build(self):
+        try:
+            self.server.stop_build(self.name, self.build_number)
+        except Exception as e:
+            self.module.fail_json(msg='Unable to stop build for %s: %s' % (self.jenkins_url, to_native(e)),
+                                  exception=traceback.format_exc())
+
     def absent_build(self):
         try:
             self.server.delete_build(self.name, self.build_number)
@@ -216,14 +242,13 @@ def main():
             build_number=dict(type='int'),
             name=dict(required=True),
             password=dict(no_log=True),
-            state=dict(choices=['present', 'absent'], default="present"),
+            state=dict(choices=['present', 'absent', 'stopped'], default="present"),
             token=dict(no_log=True),
             url=dict(default="http://localhost:8080"),
             user=dict(),
         ),
-        mutually_exclusive=[
-            ['password', 'token'],
-        ],
+        mutually_exclusive=[['password', 'token'],],
+        required_if=[['state', 'absent', ['build_number'], True], ['state', 'stopped', ['build_number'], True]],
     )
 
     test_dependencies(module)
@@ -231,6 +256,8 @@ def main():
 
     if module.params.get('state') == "present":
         jenkins_build.present_build()
+    elif module.params.get('state') == "stopped":
+        jenkins_build.stop_build()
     else:
         jenkins_build.absent_build()
 
