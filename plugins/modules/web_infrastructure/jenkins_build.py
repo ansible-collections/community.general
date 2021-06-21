@@ -16,7 +16,7 @@ description:
     - Manage Jenkins builds with Jenkins REST API.
 requirements:
   - "python-jenkins >= 0.4.12"
-author: 
+author:
   - Brett Milford (@brettmilford)
   - Tong He (@unnecessary-username)
 options:
@@ -69,14 +69,14 @@ EXAMPLES = '''
     user: admin
     password: asdfg
     url: http://localhost:8080
-    
+
 - name: Stop a running jenkins build anonymously
   community.general.jenkins_build:
     name: "stop-check"
     build_number: 3
     state: stopped
     url: http://localhost:8080
-    
+
 - name: Delete a jenkins build using token authentication
   community.general.jenkins_build:
     name: "delete-experiment"
