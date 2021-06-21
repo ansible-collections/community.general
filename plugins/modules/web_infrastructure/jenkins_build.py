@@ -4,6 +4,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -120,6 +121,7 @@ from time import sleep
 JENKINS_IMP_ERR = None
 try:
     import jenkins
+
     python_jenkins_installed = True
 except ImportError:
     JENKINS_IMP_ERR = traceback.format_exc()
@@ -171,7 +173,8 @@ class JenkinsBuild:
         try:
             build_number = self.server.get_job_info(self.name)['nextBuildNumber']
         except Exception as e:
-            self.module.fail_json(msg='Unable to get job info from Jenkins server, %s' % to_native(e), exception=traceback.format_exc())
+            self.module.fail_json(msg='Unable to get job info from Jenkins server, %s' % to_native(e),
+                                  exception=traceback.format_exc())
 
         return build_number
 
@@ -181,7 +184,8 @@ class JenkinsBuild:
             return response
 
         except Exception as e:
-            self.module.fail_json(msg='Unable to fetch build information, %s' % to_native(e), exception=traceback.format_exc())
+            self.module.fail_json(msg='Unable to fetch build information, %s' % to_native(e),
+                                  exception=traceback.format_exc())
 
     def present_build(self):
         self.build_number = self.get_next_build()
@@ -247,7 +251,7 @@ def main():
             url=dict(default="http://localhost:8080"),
             user=dict(),
         ),
-        mutually_exclusive=[['password', 'token'],],
+        mutually_exclusive=[['password', 'token']],
         required_if=[['state', 'absent', ['build_number'], True], ['state', 'stopped', ['build_number'], True]],
     )
 

@@ -1,0 +1,2 @@
+minor_changes:
+  - jenkins_build - support stop a running jenkins build (https://github.com/ansible-collections/community.general/pull/2850).
