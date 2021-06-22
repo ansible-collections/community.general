@@ -4,7 +4,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -121,7 +120,6 @@ from time import sleep
 JENKINS_IMP_ERR = None
 try:
     import jenkins
-
     python_jenkins_installed = True
 except ImportError:
     JENKINS_IMP_ERR = traceback.format_exc()
