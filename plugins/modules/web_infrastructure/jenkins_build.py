@@ -199,7 +199,11 @@ class JenkinsBuild:
 
     def stopped_build(self):
         try:
-            self.server.stop_build(self.name, self.build_number)
+            build_info = self.server.get_build_info(self.name, self.build_number)
+            if build_info['building'] == True:
+                self.server.stop_build(self.name, self.build_number)
+            else:
+                self.module.exit_json(**self.result)
         except Exception as e:
             self.module.fail_json(msg='Unable to stop build for %s: %s' % (self.jenkins_url, to_native(e)),
                                   exception=traceback.format_exc())
@@ -219,7 +223,10 @@ class JenkinsBuild:
             sleep(10)
             self.get_result()
         else:
-            if build_status['result'] == "SUCCESS":
+            if self.state == "stopped" and build_status['result'] == "ABORTED":
+                result['changed'] = True
+                result['build_info'] = build_status
+            elif build_status['result'] == "SUCCESS":
                 result['changed'] = True
                 result['build_info'] = build_status
             else:

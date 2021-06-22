@@ -42,6 +42,7 @@ def fail_json(*args, **kwargs):
 
 
 class JenkinsMock():
+    idempotent = False
 
     def get_job_info(self, name):
         return {
@@ -49,9 +50,16 @@ class JenkinsMock():
         }
 
     def get_build_info(self, name, build_number):
-        return {
-            "result": "SUCCESS"
-        }
+        if self.idempotent == False:
+            return {
+                "building": True,
+                "result": "SUCCESS"
+            }
+        else:
+            return {
+                "building": False,
+                "result": "ABORTED"
+            }
 
     def get_build_status(self):
         pass
@@ -63,7 +71,11 @@ class JenkinsMock():
         return None
 
     def stop_build(self, name, build_number):
-        return None
+        if self.idempotent == False:
+            self.idempotent == True
+            return None
+        else:
+            exit_json(changed=False)
 
 
 class TestJenkinsBuild(unittest.TestCase):
@@ -129,7 +141,7 @@ class TestJenkinsBuild(unittest.TestCase):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()
 
-        with self.assertRaises(AnsibleExitJson):
+        with self.assertRaises(AnsibleExitJson) as return_json:
             set_module_args({
                 "name": "host-check",
                 "build_number": "1234",
@@ -138,6 +150,9 @@ class TestJenkinsBuild(unittest.TestCase):
                 "token": "xyz"
             })
             jenkins_build.main()
+
+        result = json.load(return_json)
+        self.assertFalse(result['changed'])
 
     @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
     @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.JenkinsBuild.get_jenkins_connection')
