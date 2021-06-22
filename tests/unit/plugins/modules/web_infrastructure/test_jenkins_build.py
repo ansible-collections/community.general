@@ -49,16 +49,9 @@ class JenkinsMock():
         }
 
     def get_build_info(self, name, build_number):
-        if self.token:
-            return {
-                "building": True,
-                "result": "SUCCESS"
-            }
-        else:
-            return {
-                "building": False,
-                "result": "ABORTED"
-            }
+        return {
+            "result": "SUCCESS"
+        }
 
     def get_build_status(self):
         pass
@@ -72,6 +65,30 @@ class JenkinsMock():
     def stop_build(self, name, build_number):
         return None
 
+class JenkinsMockIdempotent():
+
+    def get_job_info(self, name):
+        return {
+            "nextBuildNumber": 1235
+        }
+
+    def get_build_info(self, name, build_number):
+        return {
+            "building": False,
+            "result": "ABORTED"
+        }
+
+    def get_build_status(self):
+        pass
+
+    def build_job(self, *args):
+        return None
+
+    def delete_build(self, name, build_number):
+        return None
+
+    def stop_build(self, name, build_number):
+        return None
 
 class TestJenkinsBuild(unittest.TestCase):
 
@@ -134,7 +151,7 @@ class TestJenkinsBuild(unittest.TestCase):
     def test_module_stop_build_again(self, jenkins_connection, test_deps):
         # The stopped_build function is idempotent.
         test_deps.return_value = None
-        jenkins_connection.return_value = JenkinsMock()
+        jenkins_connection.return_value = JenkinsMockIdempotent()
 
         with self.assertRaises(AnsibleExitJson) as return_json:
             set_module_args({
