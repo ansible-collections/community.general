@@ -14,7 +14,25 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.compat.mock import Mock
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.modules.system.java_keystore import JavaKeystore, ArgumentSpec
+from ansible_collections.community.general.plugins.modules.system.java_keystore import JavaKeystore
+
+
+module_argument_spec = dict(
+    name=dict(type='str', required=True),
+    dest=dict(type='path', required=True),
+    certificate=dict(type='str', no_log=True),
+    certificate_path=dict(type='path'),
+    private_key=dict(type='str', no_log=True),
+    private_key_path=dict(type='path', no_log=False),
+    private_key_passphrase=dict(type='str', no_log=True),
+    password=dict(type='str', required=True, no_log=True),
+    ssl_backend=dict(type='str', default='openssl', choices=['openssl', 'cryptography']),
+    keystore_type=dict(type='str', choices=['jks', 'pkcs12']),
+    force=dict(type='bool', default=False),
+)
+module_supports_check_mode = True
+module_choose_between = (['certificate', 'certificate_path'],
+                         ['private_key', 'private_key_path'])
 
 
 class TestCreateJavaKeystore(ModuleTestCase):
@@ -25,12 +43,13 @@ class TestCreateJavaKeystore(ModuleTestCase):
         super(TestCreateJavaKeystore, self).setUp()
 
         orig_exists = os.path.exists
-        self.spec = ArgumentSpec()
         self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file')
         self.mock_create_path = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_path')
         self.mock_current_type = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.JavaKeystore.current_type')
         self.mock_run_command = patch('ansible.module_utils.basic.AnsibleModule.run_command')
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
+        self.mock_preserved_copy = patch('ansible.module_utils.basic.AnsibleModule.preserved_copy')
+        self.mock_atomic_move = patch('ansible.module_utils.basic.AnsibleModule.atomic_move')
         self.mock_os_path_exists = patch('os.path.exists',
                                          side_effect=lambda path: True if path == '/path/to/keystore.jks' else orig_exists(path))
         self.mock_selinux_context = patch('ansible.module_utils.basic.AnsibleModule.selinux_context',
@@ -39,6 +58,8 @@ class TestCreateJavaKeystore(ModuleTestCase):
                                                   side_effect=lambda path: (False, None))
         self.run_command = self.mock_run_command.start()
         self.get_bin_path = self.mock_get_bin_path.start()
+        self.preserved_copy = self.mock_preserved_copy.start()
+        self.atomic_move = self.mock_atomic_move.start()
         self.create_file = self.mock_create_file.start()
         self.create_path = self.mock_create_path.start()
         self.current_type = self.mock_current_type.start()
@@ -54,6 +75,8 @@ class TestCreateJavaKeystore(ModuleTestCase):
         self.mock_current_type.stop()
         self.mock_run_command.stop()
         self.mock_get_bin_path.stop()
+        self.mock_preserved_copy.stop()
+        self.mock_atomic_move.stop()
         self.mock_selinux_context.stop()
         self.mock_is_special_selinux_path.stop()
         self.mock_os_path_exists.stop()
@@ -68,8 +91,10 @@ class TestCreateJavaKeystore(ModuleTestCase):
         ))
 
         module = AnsibleModule(
-            argument_spec=self.spec.argument_spec,
-            supports_check_mode=self.spec.supports_check_mode
+            argument_spec=module_argument_spec,
+            supports_check_mode=module_supports_check_mode,
+            mutually_exclusive=module_choose_between,
+            required_one_of=module_choose_between
         )
 
         with patch('os.remove', return_value=True):
@@ -99,8 +124,10 @@ class TestCreateJavaKeystore(ModuleTestCase):
         ))
 
         module = AnsibleModule(
-            argument_spec=self.spec.argument_spec,
-            supports_check_mode=self.spec.supports_check_mode
+            argument_spec=module_argument_spec,
+            supports_check_mode=module_supports_check_mode,
+            mutually_exclusive=module_choose_between,
+            required_one_of=module_choose_between
         )
 
         module.exit_json = Mock()
@@ -109,7 +136,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
         with patch('os.remove', return_value=True):
             self.create_path.side_effect = ['/tmp/tmp1cyp12xa']
             self.create_file.side_effect = ['/tmp/tmpvalcrt32', '/tmp/tmpwh4key0c', '']
-            self.run_command.side_effect = [(1, '', ''), (0, '', '')]
+            self.run_command.side_effect = [(1, '', 'Oops'), (0, '', '')]
             self.get_bin_path.side_effect = ['keytool', 'openssl', '']
             jks = JavaKeystore(module)
             jks.create()
@@ -121,6 +148,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
                      "-passout", "stdin",
                      "-passin", "stdin"],
                 msg='',
+                err='Oops',
                 rc=1
             )
 
@@ -134,8 +162,10 @@ class TestCreateJavaKeystore(ModuleTestCase):
         ))
 
         module = AnsibleModule(
-            argument_spec=self.spec.argument_spec,
-            supports_check_mode=self.spec.supports_check_mode
+            argument_spec=module_argument_spec,
+            supports_check_mode=module_supports_check_mode,
+            mutually_exclusive=module_choose_between,
+            required_one_of=module_choose_between
         )
 
         module.exit_json = Mock()
@@ -144,7 +174,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
         with patch('os.remove', return_value=True):
             self.create_path.side_effect = ['/tmp/tmp1cyp12xa']
             self.create_file.side_effect = ['/tmp/tmpvalcrt32', '/tmp/tmpwh4key0c', '']
-            self.run_command.side_effect = [(1, '', ''), (0, '', '')]
+            self.run_command.side_effect = [(1, '', 'Oops'), (0, '', '')]
             self.get_bin_path.side_effect = ['keytool', 'openssl', '']
             jks = JavaKeystore(module)
             jks.create()
@@ -155,6 +185,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
                      "-out", "/tmp/tmp1cyp12xa",
                      "-passout", "stdin"],
                 msg='',
+                err='Oops',
                 rc=1
             )
 
@@ -168,8 +199,10 @@ class TestCreateJavaKeystore(ModuleTestCase):
         ))
 
         module = AnsibleModule(
-            argument_spec=self.spec.argument_spec,
-            supports_check_mode=self.spec.supports_check_mode
+            argument_spec=module_argument_spec,
+            supports_check_mode=module_supports_check_mode,
+            mutually_exclusive=module_choose_between,
+            required_one_of=module_choose_between
         )
 
         module.exit_json = Mock()
@@ -178,7 +211,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
         with patch('os.remove', return_value=True):
             self.create_path.side_effect = ['/tmp/tmpgrzm2ah7']
             self.create_file.side_effect = ['/tmp/etacifitrec', '/tmp/yek_etavirp', '']
-            self.run_command.side_effect = [(0, '', ''), (1, '', '')]
+            self.run_command.side_effect = [(0, '', ''), (1, '', 'Oops')]
             self.get_bin_path.side_effect = ['keytool', 'openssl', '']
             jks = JavaKeystore(module)
             jks.create()
@@ -188,6 +221,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
                      "-srckeystore", "/tmp/tmpgrzm2ah7", "-srcstoretype", "pkcs12", "-alias", "test",
                      "-noprompt"],
                 msg='',
+                err='Oops',
                 rc=1
             )
 
@@ -198,15 +232,18 @@ class TestCertChanged(ModuleTestCase):
     def setUp(self):
         """Setup."""
         super(TestCertChanged, self).setUp()
-        self.spec = ArgumentSpec()
         self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file')
         self.mock_current_type = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.JavaKeystore.current_type')
         self.mock_run_command = patch('ansible.module_utils.basic.AnsibleModule.run_command')
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
+        self.mock_preserved_copy = patch('ansible.module_utils.basic.AnsibleModule.preserved_copy')
+        self.mock_atomic_move = patch('ansible.module_utils.basic.AnsibleModule.atomic_move')
         self.run_command = self.mock_run_command.start()
         self.create_file = self.mock_create_file.start()
         self.get_bin_path = self.mock_get_bin_path.start()
         self.current_type = self.mock_current_type.start()
+        self.preserved_copy = self.mock_preserved_copy.start()
+        self.atomic_move = self.mock_atomic_move.start()
 
     def tearDown(self):
         """Teardown."""
@@ -215,6 +252,8 @@ class TestCertChanged(ModuleTestCase):
         self.mock_current_type.stop()
         self.mock_run_command.stop()
         self.mock_get_bin_path.stop()
+        self.mock_preserved_copy.stop()
+        self.mock_atomic_move.stop()
 
     def test_cert_unchanged_same_fingerprint(self):
         set_module_args(dict(
@@ -226,8 +265,10 @@ class TestCertChanged(ModuleTestCase):
         ))
 
         module = AnsibleModule(
-            argument_spec=self.spec.argument_spec,
-            supports_check_mode=self.spec.supports_check_mode
+            argument_spec=module_argument_spec,
+            supports_check_mode=module_supports_check_mode,
+            mutually_exclusive=module_choose_between,
+            required_one_of=module_choose_between
         )
 
         with patch('os.remove', return_value=True):
@@ -249,8 +290,10 @@ class TestCertChanged(ModuleTestCase):
         ))
 
         module = AnsibleModule(
-            argument_spec=self.spec.argument_spec,
-            supports_check_mode=self.spec.supports_check_mode
+            argument_spec=module_argument_spec,
+            supports_check_mode=module_supports_check_mode,
+            mutually_exclusive=module_choose_between,
+            required_one_of=module_choose_between
         )
 
         with patch('os.remove', return_value=True):
@@ -272,8 +315,10 @@ class TestCertChanged(ModuleTestCase):
         ))
 
         module = AnsibleModule(
-            argument_spec=self.spec.argument_spec,
-            supports_check_mode=self.spec.supports_check_mode
+            argument_spec=module_argument_spec,
+            supports_check_mode=module_supports_check_mode,
+            mutually_exclusive=module_choose_between,
+            required_one_of=module_choose_between
         )
 
         with patch('os.remove', return_value=True):
@@ -295,8 +340,10 @@ class TestCertChanged(ModuleTestCase):
         ))
 
         module = AnsibleModule(
-            argument_spec=self.spec.argument_spec,
-            supports_check_mode=self.spec.supports_check_mode
+            argument_spec=module_argument_spec,
+            supports_check_mode=module_supports_check_mode,
+            mutually_exclusive=module_choose_between,
+            required_one_of=module_choose_between
         )
 
         with patch('os.remove', return_value=True):
@@ -318,8 +365,10 @@ class TestCertChanged(ModuleTestCase):
         ))
 
         module = AnsibleModule(
-            argument_spec=self.spec.argument_spec,
-            supports_check_mode=self.spec.supports_check_mode
+            argument_spec=module_argument_spec,
+            supports_check_mode=module_supports_check_mode,
+            mutually_exclusive=module_choose_between,
+            required_one_of=module_choose_between
         )
 
         module.exit_json = Mock()
@@ -349,8 +398,10 @@ class TestCertChanged(ModuleTestCase):
         ))
 
         module = AnsibleModule(
-            argument_spec=self.spec.argument_spec,
-            supports_check_mode=self.spec.supports_check_mode
+            argument_spec=module_argument_spec,
+            supports_check_mode=module_supports_check_mode,
+            mutually_exclusive=module_choose_between,
+            required_one_of=module_choose_between
         )
 
         module.exit_json = Mock()

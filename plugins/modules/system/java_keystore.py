@@ -179,7 +179,7 @@ msg:
   sample: "Unable to find the current certificate fingerprint in ..."
 
 err:
-  description: Output from stderr of keytool/openssl command after execution of given command or an error.
+  description: Output from stderr of keytool/openssl command after error of given command.
   returned: failure
   type: str
   sample: "Keystore password is too short - must be at least 6 characters\n"
@@ -513,7 +513,6 @@ class JavaKeystore:
         self.update_permissions()
         self.result['changed'] = True
         return self.result
-
 
     def exists(self):
         return os.path.exists(self.keystore_path)
