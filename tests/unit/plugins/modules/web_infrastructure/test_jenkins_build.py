@@ -50,6 +50,7 @@ class JenkinsMock():
 
     def get_build_info(self, name, build_number):
         return {
+            "building": True,
             "result": "SUCCESS"
         }
 
@@ -64,6 +65,7 @@ class JenkinsMock():
 
     def stop_build(self, name, build_number):
         return None
+
 
 class JenkinsMockIdempotent():
 
@@ -89,6 +91,7 @@ class JenkinsMockIdempotent():
 
     def stop_build(self, name, build_number):
         return None
+
 
 class TestJenkinsBuild(unittest.TestCase):
 
