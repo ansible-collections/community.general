@@ -178,6 +178,12 @@ msg:
   type: str
   sample: "Unable to find the current certificate fingerprint in ..."
 
+err:
+  description: Output from stderr of keytool/openssl command after execution of given command or an error.
+  returned: failure
+  type: str
+  sample: "Keystore password is too short - must be at least 6 characters\n"
+
 rc:
   description: keytool/openssl command execution return value
   returned: changed and failure
@@ -223,6 +229,7 @@ except ImportError:
 class JavaKeystore:
     def __init__(self, module):
         self.module = module
+        self.result = dict()
 
         self.keytool_bin = module.get_bin_path('keytool', True)
 
@@ -422,7 +429,8 @@ class JavaKeystore:
 
         with open(keystore_p12_path, 'wb') as p12_file:
             p12_file.write(pkcs12_bundle)
-        return dict(msg='', cmd='python cryptography serialize_key_and_certificates()', rc=0)
+
+        self.result.update(msg="PKCS#12 bundle created by cryptography backend")
 
     def openssl_create_pkcs12_bundle(self, keystore_p12_path):
         export_p12_cmd = [self.openssl_bin, "pkcs12", "-export", "-name", self.name, "-in", self.certificate_path,
@@ -436,36 +444,37 @@ class JavaKeystore:
             cmd_stdin = "%s\n" % self.keypass
         cmd_stdin += "%s\n%s" % (self.password, self.password)
 
-        (rc, export_p12_out, dummy) = self.module.run_command(
+        (rc, export_p12_out, export_p12_err) = self.module.run_command(
             export_p12_cmd, data=cmd_stdin, environ_update=None, check_rc=False
         )
 
-        result = dict(msg=export_p12_out, cmd=export_p12_cmd, rc=rc)
+        self.result = dict(msg=export_p12_out, cmd=export_p12_cmd, rc=rc)
         if rc != 0:
-            self.module.fail_json(**result)
-        return result
+            self.result['err'] = export_p12_err
+            self.module.fail_json(**self.result)
 
     def create(self):
+        """Create the keystore, or replace it with a rollback in case of
+           keytool failure.
+        """
         if self.module.check_mode:
-            return {'changed': True}
+            self.result['changed'] = True
+            return self.result
 
         keystore_p12_path = create_path()
         self.module.add_cleanup_file(keystore_p12_path)
 
         if self.ssl_backend == 'cryptography':
-            result = self.cryptography_create_pkcs12_bundle(keystore_p12_path)
+            self.cryptography_create_pkcs12_bundle(keystore_p12_path)
         else:
-            result = self.openssl_create_pkcs12_bundle(keystore_p12_path)
-
-        if os.path.exists(self.keystore_path):
-            os.remove(self.keystore_path)
-            result['changed'] = True
+            self.openssl_create_pkcs12_bundle(keystore_p12_path)
 
         if self.keystore_type == 'pkcs12':
-            self.module.preserved_copy(keystore_p12_path, self.keystore_path)
+            # Preserve properties of the destination file, if any.
+            self.module.atomic_move(keystore_p12_path, self.keystore_path)
             self.update_permissions()
-            result['changed'] = True
-            return result
+            self.result['changed'] = True
+            return self.result
 
         import_keystore_cmd = [self.keytool_bin, "-importkeystore",
                                "-destkeystore", self.keystore_path,
@@ -480,17 +489,31 @@ class JavaKeystore:
                 import_keystore_cmd.insert(4, "-deststoretype")
                 import_keystore_cmd.insert(5, self.keystore_type)
 
-        (rc, import_keystore_out, dummy) = self.module.run_command(
+        keystore_backup = None
+        if self.exists():
+            keystore_backup = self.keystore_path + '.tmpbak'
+            self.module.add_cleanup_file(keystore_backup)
+            # Preserve properties of the source file
+            self.module.preserved_copy(self.keystore_path, keystore_backup)
+            os.remove(self.keystore_path)
+
+        (rc, import_keystore_out, import_keystore_err) = self.module.run_command(
             import_keystore_cmd, data='%s\n%s\n%s' % (self.password, self.password, self.password), check_rc=False
         )
 
-        result.update(msg=import_keystore_out, cmd=import_keystore_cmd, rc=rc)
-        if rc != 0:
-            return self.module.fail_json(**result)
+        self.result = dict(msg=import_keystore_out, cmd=import_keystore_cmd, rc=rc)
+
+        # keytool may return 0 whereas the keystore has not been created.
+        if rc != 0 or not self.exists():
+            if keystore_backup is not None:
+                self.module.preserved_copy(keystore_backup, self.keystore_path)
+            self.result['err'] = import_keystore_err
+            return self.module.fail_json(**self.result)
 
         self.update_permissions()
-        result['changed'] = True
-        return result
+        self.result['changed'] = True
+        return self.result
+
 
     def exists(self):
         return os.path.exists(self.keystore_path)

@@ -93,6 +93,16 @@
   register: result_pw_change
 
 
+- name: Create a Java keystore for the given certificates (force keystore type pkcs12, check mode)
+  community.general.java_keystore:
+    <<: *java_keystore_params
+    name: foobar
+    password: hunter2
+    keystore_type: pkcs12
+  loop: "{{ java_keystore_new_certs }}"
+  check_mode: yes
+  register: result_type_pkcs12_check
+
 - name: Create a Java keystore for the given certificates (force keystore type jks, check mode)
   community.general.java_keystore:
     <<: *java_keystore_params
@@ -179,8 +189,10 @@
       - result_pw_change is changed
       - result_pw_change_check is changed
       # We don't know if we start from jks or pkcs12 format, anyway check mode
-      # and actual mode must return the same 'changed' state
-      - result_type_jks.changed == result_type_jks_check.changed
+      # and actual mode must return the same 'changed' state, and 'jks' and
+      # 'pkcs12' must give opposite results on a same host.
+      - result_type_jks_check.changed != result_type_pkcs12_check.changed
+      - result_type_jks_check.changed == result_type_jks.changed
       - result_type_change is changed
       - result_type_change_check is changed
       - result_type_omit is not changed
