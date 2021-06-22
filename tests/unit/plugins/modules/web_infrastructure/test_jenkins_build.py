@@ -42,7 +42,6 @@ def fail_json(*args, **kwargs):
 
 
 class JenkinsMock():
-    idempotent = False
 
     def get_job_info(self, name):
         return {
@@ -50,7 +49,7 @@ class JenkinsMock():
         }
 
     def get_build_info(self, name, build_number):
-        if self.idempotent is False:
+        if self.token:
             return {
                 "building": True,
                 "result": "SUCCESS"
@@ -71,11 +70,7 @@ class JenkinsMock():
         return None
 
     def stop_build(self, name, build_number):
-        if self.idempotent is False:
-            self.idempotent = True
-            return None
-        else:
-            exit_json(changed=False)
+        return None
 
 
 class TestJenkinsBuild(unittest.TestCase):
@@ -136,7 +131,7 @@ class TestJenkinsBuild(unittest.TestCase):
 
     @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
     @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.JenkinsBuild.get_jenkins_connection')
-    def test_module_stop_build_idempotent(self, jenkins_connection, test_deps):
+    def test_module_stop_build_again(self, jenkins_connection, test_deps):
         # The stopped_build function is idempotent.
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()
@@ -147,7 +142,7 @@ class TestJenkinsBuild(unittest.TestCase):
                 "build_number": "1234",
                 "state": "stopped",
                 "user": "abc",
-                "token": "xyz"
+                "password": "xyz"
             })
             jenkins_build.main()
 
