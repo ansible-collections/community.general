@@ -50,7 +50,7 @@ class JenkinsMock():
         }
 
     def get_build_info(self, name, build_number):
-        if self.idempotent == False:
+        if self.idempotent is False:
             return {
                 "building": True,
                 "result": "SUCCESS"
@@ -71,8 +71,8 @@ class JenkinsMock():
         return None
 
     def stop_build(self, name, build_number):
-        if self.idempotent == False:
-            self.idempotent == True
+        if self.idempotent is False:
+            self.idempotent = True
             return None
         else:
             exit_json(changed=False)
@@ -151,8 +151,7 @@ class TestJenkinsBuild(unittest.TestCase):
             })
             jenkins_build.main()
 
-        result = json.load(return_json)
-        self.assertFalse(result['changed'])
+        self.assertFalse(return_json.exception.args[0]['changed'])
 
     @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
     @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.JenkinsBuild.get_jenkins_connection')

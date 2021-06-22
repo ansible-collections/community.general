@@ -200,7 +200,7 @@ class JenkinsBuild:
     def stopped_build(self):
         try:
             build_info = self.server.get_build_info(self.name, self.build_number)
-            if build_info['building'] == True:
+            if build_info['building'] is True:
                 self.server.stop_build(self.name, self.build_number)
             else:
                 self.module.exit_json(**self.result)
