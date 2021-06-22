@@ -123,6 +123,29 @@
   register: result_type_jks
 
 
+- name: Stat keystore (before failure)
+  ansible.builtin.stat:
+    path: "{{ output_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.jks' }}"
+  loop: "{{ java_keystore_new_certs }}"
+  register: result_stat_before
+
+- name: Fail to create a Java keystore for the given certificates (password too short)
+  community.general.java_keystore:
+    <<: *java_keystore_params
+    name: foobar
+    password: short
+    keystore_type: jks
+  loop: "{{ java_keystore_new_certs }}"
+  register: result_fail_jks
+  ignore_errors: true
+
+- name: Stat keystore (after failure)
+  ansible.builtin.stat:
+    path: "{{ output_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.jks' }}"
+  loop: "{{ java_keystore_new_certs }}"
+  register: result_stat_after
+
+
 - name: Create a Java keystore for the given certificates (keystore type changed, check mode)
   community.general.java_keystore:
     <<: *java_keystore_params
@@ -188,12 +211,25 @@
       - result_alias_change_check is changed
       - result_pw_change is changed
       - result_pw_change_check is changed
+
       # We don't know if we start from jks or pkcs12 format, anyway check mode
       # and actual mode must return the same 'changed' state, and 'jks' and
       # 'pkcs12' must give opposite results on a same host.
       - result_type_jks_check.changed != result_type_pkcs12_check.changed
       - result_type_jks_check.changed == result_type_jks.changed
+
       - result_type_change is changed
       - result_type_change_check is changed
       - result_type_omit is not changed
       - result_type_omit_check is not changed
+
+      # keystore properties must remain the same after failure
+      - result_fail_jks is failed
+      - result_stat_before.results[0].stat.uid == result_stat_after.results[0].stat.uid
+      - result_stat_before.results[1].stat.uid == result_stat_after.results[1].stat.uid
+      - result_stat_before.results[0].stat.gid == result_stat_after.results[0].stat.gid
+      - result_stat_before.results[1].stat.gid == result_stat_after.results[1].stat.gid
+      - result_stat_before.results[0].stat.mode == result_stat_after.results[0].stat.mode
+      - result_stat_before.results[1].stat.mode == result_stat_after.results[1].stat.mode
+      - result_stat_before.results[0].stat.checksum == result_stat_after.results[0].stat.checksum
+      - result_stat_before.results[1].stat.checksum == result_stat_after.results[1].stat.checksum
