@@ -54,9 +54,6 @@ class JenkinsMock():
             "result": "SUCCESS"
         }
 
-    def get_build_status(self):
-        pass
-
     def build_job(self, *args):
         return None
 
@@ -79,9 +76,6 @@ class JenkinsMockIdempotent():
             "building": False,
             "result": "ABORTED"
         }
-
-    def get_build_status(self):
-        pass
 
     def build_job(self, *args):
         return None
@@ -139,7 +133,7 @@ class TestJenkinsBuild(unittest.TestCase):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()
 
-        with self.assertRaises(AnsibleExitJson):
+        with self.assertRaises(AnsibleExitJson) as return_json:
             set_module_args({
                 "name": "host-check",
                 "build_number": "1234",
@@ -149,10 +143,11 @@ class TestJenkinsBuild(unittest.TestCase):
             })
             jenkins_build.main()
 
+        self.assertTrue(return_json.exception.args[0]['changed'])
+
     @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
     @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.JenkinsBuild.get_jenkins_connection')
     def test_module_stop_build_again(self, jenkins_connection, test_deps):
-        # The stopped_build function is idempotent.
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMockIdempotent()
 
