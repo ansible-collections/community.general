@@ -1,0 +1,4 @@
+minor_changes:
+  - jenkins_build - support stopping a running jenkins build (https://github.com/ansible-collections/community.general/pull/2850).
+bugfixes:
+  - jenkins_build - examine presence of ``build_number`` before deleting a jenkins build (https://github.com/ansible-collections/community.general/pull/2850).
