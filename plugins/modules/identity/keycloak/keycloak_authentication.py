@@ -63,7 +63,7 @@ options:
             authenticationConfig:
                 description:
                     - Describe the config of the authentication.
-                type: str
+                type: dict
             index:
                 description:
                     - Priority order of the execution.
@@ -272,7 +272,7 @@ def main():
                                           displayName=dict(type='str'),
                                           requirement=dict(choices=["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"], type='str'),
                                           flowAlias=dict(type='str'),
-                                          authenticationConfig=dict(type='str'),
+                                          authenticationConfig=dict(type='dict'),
                                           index=dict(type='int'),
                                       )),
         state=dict(choices=["absent", "present"], default='present'),
