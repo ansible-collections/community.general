@@ -64,6 +64,10 @@ options:
                 description:
                     - Describe the config of the authentication.
                 type: str
+            index:
+                description:
+                    - Priority order of the execution.
+                type: int
     state:
         description:
             - Control if the authentication flow must exists or not.
@@ -197,6 +201,8 @@ def create_or_update_executions(kc, config, realm='master'):
         changed = False
         if "authenticationExecutions" in config:
             for new_exec_index, new_exec in enumerate(config["authenticationExecutions"], start=0):
+                if new_exec["index"] is not None:
+                    new_exec_index = new_exec["index"]
                 # Get existing executions on the Keycloak server for this alias
                 existing_executions = kc.get_executions_representation(config, realm=realm)
                 exec_found = False
@@ -267,6 +273,7 @@ def main():
                                           requirement=dict(choices=["REQUIRED", "ALTERNATIVE", "DISABLED", "CONDITIONAL"], type='str'),
                                           flowAlias=dict(type='str'),
                                           authenticationConfig=dict(type='str'),
+                                          index=dict(type='int'),
                                       )),
         state=dict(choices=["absent", "present"], default='present'),
         force=dict(type='bool', default=False),
