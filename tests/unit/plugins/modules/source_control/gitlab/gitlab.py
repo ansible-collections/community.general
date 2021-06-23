@@ -475,6 +475,21 @@ def resp_get_protected_branch(url, request):
     return response(200, content, headers, None, 5, request)
 
 
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1/protected_branches/master", method="get")
+def resp_get_protected_branch_not_exist(url, request):
+    headers = {'content-type': 'application/json'}
+    content = ('')
+    content = content.encode("utf-8")
+    return response(404, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1/protected_branches/master", method="delete")
+def resp_delete_protected_branch(url, request):
+    headers = {'content-type': 'application/json'}
+    content = ('')
+    content = content.encode("utf-8")
+    return response(204, content, headers, None, 5, request)
+
 '''
 HOOK API
 '''

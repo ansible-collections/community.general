@@ -21,8 +21,8 @@ pytestmark = []
 try:
     from .gitlab import (GitlabModuleTestCase,
                          python_version_match_requirement,
-                         resp_get_protected_branch, resp_get_project_by_name, resp_create_project,
-                         resp_get_project, resp_delete_project, resp_get_user)
+                         resp_get_protected_branch, resp_get_project_by_name, resp_get_protected_branch_not_exist,
+                         resp_get_project, resp_delete_protected_branch, resp_get_user)
 
     # GitLab module requirements
     if python_version_match_requirement():
@@ -33,9 +33,9 @@ except ImportError:
     GitlabModuleTestCase = object
     resp_get_protected_branch = _dummy
     resp_get_project_by_name = _dummy
-    resp_create_project = _dummy
+    resp_get_protected_branch_not_exist = _dummy
     resp_get_project = _dummy
-    resp_delete_project = _dummy
+    resp_delete_protected_branch = _dummy
     resp_get_user = _dummy
 
 # Unit tests requirements
@@ -47,6 +47,7 @@ except ImportError:
 
 
 class TestGitlabProtectedBranch(GitlabModuleTestCase):
+    @with_httmock(resp_get_project_by_name)
     @with_httmock(resp_get_user)
     def setUp(self):
         super(TestGitlabProtectedBranch, self).setUp()
@@ -54,64 +55,28 @@ class TestGitlabProtectedBranch(GitlabModuleTestCase):
         self.gitlab_instance.user = self.gitlab_instance.users.get(1)
         self.moduleUtil = GitlabProtectedBranch(module=self.mock_module, project="foo-bar/diaspora-client", gitlab_instance=self.gitlab_instance)
 
-    @with_httmock(resp_get_project_by_name)
     @with_httmock(resp_get_protected_branch)
     def test_protected_branch_exist(self):
         rvalue = self.moduleUtil.protected_branch_exist(name="master")
+        self.assertEqual(rvalue.name, "master")
+
+    @with_httmock(resp_get_protected_branch_not_exist)
+    def test_protected_branch_exist_not_exist(self):
+        rvalue = self.moduleUtil.protected_branch_exist(name="master")
         self.assertEqual(rvalue, False)
 
-    # @with_httmock(resp_get_group)
-    # @with_httmock(resp_create_project)
-    # def test_create_project(self):
-    #     group = self.gitlab_instance.groups.get(1)
-    #     project = self.moduleUtil.createProject(group, {"name": "Diaspora Client", "path": "diaspora-client", "namespace_id": group.id})
+    @with_httmock(resp_get_protected_branch)
+    def test_compare_protected_branch(self):
+        rvalue = self.moduleUtil.compare_protected_branch(name="master", merge_access_levels="maintainer", push_access_level="maintainer")
+        self.assertEqual(rvalue, True)
 
-    #     self.assertEqual(type(project), Project)
-    #     self.assertEqual(project.name, "Diaspora Client")
+    @with_httmock(resp_get_protected_branch)
+    def test_compare_protected_branch_different_settings(self):
+        rvalue = self.moduleUtil.compare_protected_branch(name="master", merge_access_levels="developer", push_access_level="maintainer")
+        self.assertEqual(rvalue, False)
 
-    # @with_httmock(resp_get_project)
-    # def test_update_project(self):
-    #     project = self.gitlab_instance.projects.get(1)
-
-    #     changed, newProject = self.moduleUtil.updateProject(project, {"name": "New Name"})
-
-    #     self.assertEqual(changed, True)
-    #     self.assertEqual(type(newProject), Project)
-    #     self.assertEqual(newProject.name, "New Name")
-
-    #     changed, newProject = self.moduleUtil.updateProject(project, {"name": "New Name"})
-
-    #     self.assertEqual(changed, False)
-    #     self.assertEqual(newProject.name, "New Name")
-
-    # @with_httmock(resp_get_project)
-    # def test_update_project_merge_method(self):
-    #     project = self.gitlab_instance.projects.get(1)
-
-    #     # merge_method should be 'merge' by default
-    #     self.assertEqual(project.merge_method, "merge")
-
-    #     changed, newProject = self.moduleUtil.updateProject(project, {"name": "New Name", "merge_method": "rebase_merge"})
-
-    #     self.assertEqual(changed, True)
-    #     self.assertEqual(type(newProject), Project)
-    #     self.assertEqual(newProject.name, "New Name")
-    #     self.assertEqual(newProject.merge_method, "rebase_merge")
-
-    #     changed, newProject = self.moduleUtil.updateProject(project, {"name": "New Name", "merge_method": "rebase_merge"})
-
-    #     self.assertEqual(changed, False)
-    #     self.assertEqual(newProject.name, "New Name")
-    #     self.assertEqual(newProject.merge_method, "rebase_merge")
-
-    # @with_httmock(resp_get_group)
-    # @with_httmock(resp_get_project_by_name)
-    # @with_httmock(resp_delete_project)
-    # def test_delete_project(self):
-    #     group = self.gitlab_instance.groups.get(1)
-
-    #     self.moduleUtil.existsProject(group, "diaspora-client")
-
-    #     rvalue = self.moduleUtil.deleteProject()
-
-    #     self.assertEqual(rvalue, None)
+    @with_httmock(resp_get_protected_branch)
+    @with_httmock(resp_delete_protected_branch)
+    def test_delete_protected_branch(self):
+        rvalue = self.moduleUtil.delete_protected_branch(name="master")
+        self.assertEqual(rvalue, None)
