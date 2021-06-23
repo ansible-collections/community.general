@@ -470,7 +470,9 @@ def resp_delete_project(url, request):
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1/protected_branches/master", method="get")
 def resp_get_protected_branch(url, request):
     headers = {'content-type': 'application/json'}
-    content = ('{"id": 1, "name": "master", "push_access_levels": [{"access_level": 40, "access_level_description": "Maintainers"}], "merge_access_levels": [{"access_level": 40, "access_level_description": "Maintainers"}], "allow_force_push":false, "code_owner_approval_required": false}')
+    content = ('{"id": 1, "name": "master", "push_access_levels": [{"access_level": 40, "access_level_description": "Maintainers"}],'
+               '"merge_access_levels": [{"access_level": 40, "access_level_description": "Maintainers"}],'
+               '"allow_force_push":false, "code_owner_approval_required": false}')
     content = content.encode("utf-8")
     return response(200, content, headers, None, 5, request)
 
@@ -489,6 +491,7 @@ def resp_delete_protected_branch(url, request):
     content = ('')
     content = content.encode("utf-8")
     return response(204, content, headers, None, 5, request)
+
 
 '''
 HOOK API
