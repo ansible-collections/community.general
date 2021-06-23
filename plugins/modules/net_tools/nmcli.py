@@ -1826,7 +1826,8 @@ def main():
             gsm=dict(type='dict'),
         ),
         mutually_exclusive=[['never_default4', 'gw4']],
-        required_if=[("type", "wifi", [("ssid")])],
+        required_if=[("type", "wifi", [("ssid")]),
+                     ("state", "present", [("type")])],
         supports_check_mode=True,
     )
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
