@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - "nmcli - modify existing connections without type parameter"
