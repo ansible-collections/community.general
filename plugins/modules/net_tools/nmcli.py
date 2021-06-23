@@ -1720,6 +1720,15 @@ class Nmcli(object):
         options = {
             'connection.interface-name': self.ifname,
         }
+        # get the connection type of the already present connection when not given as param
+        if self.type is None:
+            type = self.show_connection().get('connection.type', None)
+            type_mapping = {
+                '802-3-ethernet': 'ethernet',
+            }
+            if type is not None:
+                self.type = type_mapping.get(type, type)
+
         options.update(self.connection_options(detect_change=True))
         return self._compare_conn_params(self.show_connection(), options)
 
@@ -1826,8 +1835,7 @@ def main():
             gsm=dict(type='dict'),
         ),
         mutually_exclusive=[['never_default4', 'gw4']],
-        required_if=[("type", "wifi", [("ssid")]),
-                     ("state", "present", [("type")])],
+        required_if=[("type", "wifi", [("ssid")])],
         supports_check_mode=True,
     )
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
