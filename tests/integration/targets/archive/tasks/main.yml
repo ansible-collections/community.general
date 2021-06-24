@@ -79,6 +79,8 @@
     - foo.txt
     - bar.txt
     - empty.txt
+    - sub
+    - sub/subfile.txt
 
 - name: archive using gz
   archive:
@@ -366,7 +368,7 @@
 - name: Test exclusion_patterns option
   archive:
     path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/test-archive-exclustion-patterns.tgz"
+    dest: "{{ output_dir }}/test-archive-exclusion-patterns.tgz"
     exclusion_patterns: b?r.*
   register: exclusion_patterns_result
 
@@ -375,6 +377,98 @@
     that:
       - exclusion_patterns_result is changed
       - "'bar.txt' not in exclusion_patterns_result.archived"
+
+- name: Test that excluded paths do not influence archive root
+  archive:
+    path:
+      - "{{ output_dir }}/sub/subfile.txt"
+      - "{{ output_dir }}"
+    exclude_path:
+      - "{{ output_dir }}"
+    dest: "{{ output_dir }}/test-archive-root.tgz"
+  register: archive_root_result
+
+- name: Assert that excluded paths do not influence archive root
+  assert:
+    that:
+      - archive_root_result.arcroot != output_dir
+
+- name: Remove archive root test
+  file:
+    path: "{{ output_dir }}/test-archive-root.tgz"
+    state: absent
+
+- name: Test Single Target with format={{ item }}
+  archive:
+    path: "{{ output_dir }}/foo.txt"
+    dest: "{{ output_dir }}/test-single-target.{{ item }}"
+    format: "{{ item }}"
+  register: "single_target_test"
+  loop:
+    - zip
+    - tar
+    - gz
+    - bz2
+    - xz
+
+# Dummy tests until ``dest_state`` result value can be implemented
+- name: Assert that single target tests are effective
+  assert:
+    that:
+      - single_target_test.results[0] is changed
+      - single_target_test.results[1] is changed
+      - single_target_test.results[2] is changed
+      - single_target_test.results[3] is changed
+      - single_target_test.results[4] is changed
+
+- name: Retrieve contents of single target archives
+  ansible.builtin.unarchive:
+    src: "{{ output_dir }}/test-single-target.zip"
+    dest: .
+    list_files: true
+  check_mode: true
+  ignore_errors: true
+  register: single_target_test_contents
+
+- name: Assert that file names in single-file zip archives are preserved
+  assert:
+    that:
+      - "'oo.txt' not in single_target_test_contents.files"
+      - "'foo.txt' in single_target_test_contents.files"
+  # ``unarchive`` fails for RHEL and FreeBSD on ansible 2.x
+  when: single_target_test_contents is success and single_target_test_contents is not skipped
+
+- name: Remove single target test with format={{ item }}
+  file:
+    path: "{{ output_dir }}/test-single-target.{{ item }}"
+    state: absent
+  loop:
+    - zip
+    - tar
+    - gz
+    - bz2
+    - xz
+
+- name: Test that missing files result in incomplete state
+  archive:
+    path:
+      - "{{ output_dir }}/*.txt"
+      - "{{ output_dir }}/dne.txt"
+    exclude_path: "{{ output_dir }}/foo.txt"
+    dest: "{{ output_dir }}/test-incomplete-archive.tgz"
+  register: incomplete_archive_result
+
+- name: Assert that incomplete archive has incomplete state
+  assert:
+    that:
+      - incomplete_archive_result is changed
+      - "'{{ output_dir }}/dne.txt' in incomplete_archive_result.missing"
+      - "'{{ output_dir }}/foo.txt' not in incomplete_archive_result.missing"
+
+- name: Remove incomplete archive
+  file:
+    path: "{{ output_dir }}/test-incomplete-archive.tgz"
+    state: absent
 
 - name: Remove backports.lzma if previously installed (pip)
   pip: name=backports.lzma state=absent
