@@ -492,7 +492,6 @@ class JavaKeystore:
         keystore_backup = None
         if self.exists():
             keystore_backup = self.keystore_path + '.tmpbak'
-            self.module.add_cleanup_file(keystore_backup)
             # Preserve properties of the source file
             self.module.preserved_copy(self.keystore_path, keystore_backup)
             os.remove(self.keystore_path)
@@ -507,10 +506,13 @@ class JavaKeystore:
         if rc != 0 or not self.exists():
             if keystore_backup is not None:
                 self.module.preserved_copy(keystore_backup, self.keystore_path)
+                os.remove(keystore_backup)
             self.result['err'] = import_keystore_err
             return self.module.fail_json(**self.result)
 
         self.update_permissions()
+        if keystore_backup is not None:
+            os.remove(keystore_backup)
         self.result['changed'] = True
         return self.result
 
