@@ -33,9 +33,9 @@
     - result.info.tcp_port == master_port
     - result.info.role == 'master'
 
-- name: redis_info - connect to slave
+- name: redis_info - connect to replica
   community.general.redis_info:
-    login_port: "{{ slave_port }}"
+    login_port: "{{ replica_port }}"
     login_password: "{{ redis_password }}"
   register: result
 
@@ -43,5 +43,5 @@
     that:
     - result is not changed
     - result.info is defined
-    - result.info.tcp_port == slave_port
+    - result.info.tcp_port == replica_port
     - result.info.role == 'slave'
