@@ -10,17 +10,17 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: redis
-short_description: Various redis commands, slave and flush
+short_description: Various redis commands, replica and flush
 description:
    - Unified utility to interact with redis instances.
 options:
     command:
         description:
             - The selected redis command
-            - C(config) (new in 1.6), ensures a configuration setting on an instance.
+            - C(config) ensures a configuration setting on an instance.
             - C(flush) flushes all the instance or a specified db.
-            - C(slave) sets a redis instance in slave or master mode.
-        choices: [ config, flush, slave ]
+            - C(replica) sets a redis instance in replica or master mode. (C(slave) is an alias for C(replica).)
+        choices: [ config, flush, replica, slave ]
         type: str
     login_password:
         description:
@@ -38,18 +38,21 @@ options:
         type: int
     master_host:
         description:
-            - The host of the master instance [slave command]
+            - The host of the master instance [replica command]
         type: str
     master_port:
         description:
-            - The port of the master instance [slave command]
+            - The port of the master instance [replica command]
         type: int
-    slave_mode:
+    replica_mode:
         description:
-            - the mode of the redis instance [slave command]
-        default: slave
-        choices: [ master, slave ]
+            - The mode of the redis instance [replica command]
+            - C(slave) is an alias for C(replica).
+        default: replica
+        choices: [ master, replica, slave ]
         type: str
+        aliases:
+            - slave_mode
     db:
         description:
             - The database to flush (used in db mode) [flush command]
@@ -76,7 +79,7 @@ notes:
    - Requires the redis-py Python package on the remote host. You can
      install it with pip (pip install redis) or with a package manager.
      https://github.com/andymccurdy/redis-py
-   - If the redis master instance we are making slave of is password protected
+   - If the redis master instance we are making replica of is password protected
      this needs to be in the redis.conf in the masterauth variable
 
 seealso:
@@ -86,16 +89,16 @@ author: "Xabier Larrakoetxea (@slok)"
 '''
 
 EXAMPLES = '''
-- name: Set local redis instance to be slave of melee.island on port 6377
+- name: Set local redis instance to be a replica of melee.island on port 6377
   community.general.redis:
-    command: slave
+    command: replica
     master_host: melee.island
     master_port: 6377
 
-- name: Deactivate slave mode
+- name: Deactivate replica mode
   community.general.redis:
-    command: slave
-    slave_mode: master
+    command: replica
+    replica_mode: master
 
 - name: Flush all the redis db
   community.general.redis:
@@ -145,7 +148,7 @@ import re
 
 
 # Redis module specific support methods.
-def set_slave_mode(client, master_host, master_port):
+def set_replica_mode(client, master_host, master_port):
     try:
         return client.slaveof(master_host, master_port)
     except Exception:
@@ -174,13 +177,13 @@ def flush(client, db=None):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            command=dict(type='str', choices=['config', 'flush', 'slave']),
+            command=dict(type='str', choices=['config', 'flush', 'replica', 'slave']),
             login_password=dict(type='str', no_log=True),
             login_host=dict(type='str', default='localhost'),
             login_port=dict(type='int', default=6379),
             master_host=dict(type='str'),
             master_port=dict(type='int'),
-            slave_mode=dict(type='str', default='slave', choices=['master', 'slave']),
+            replica_mode=dict(type='str', default='replica', choices=['master', 'replica', 'slave'], aliases=["slave_mode"]),
             db=dict(type='int'),
             flush_mode=dict(type='str', default='all', choices=['all', 'db']),
             name=dict(type='str'),
@@ -196,20 +199,24 @@ def main():
     login_host = module.params['login_host']
     login_port = module.params['login_port']
     command = module.params['command']
-
-    # Slave Command section -----------
     if command == "slave":
+        command = "replica"
+
+    # Replica Command section -----------
+    if command == "replica":
         master_host = module.params['master_host']
         master_port = module.params['master_port']
-        mode = module.params['slave_mode']
+        mode = module.params['replica_mode']
+        if mode == "slave":
+            mode = "replica"
 
         # Check if we have all the data
-        if mode == "slave":  # Only need data if we want to be slave
+        if mode == "replica":  # Only need data if we want to be replica
             if not master_host:
-                module.fail_json(msg='In slave mode master host must be provided')
+                module.fail_json(msg='In replica mode master host must be provided')
 
             if not master_port:
-                module.fail_json(msg='In slave mode master port must be provided')
+                module.fail_json(msg='In replica mode master port must be provided')
 
         # Connect and check
         r = redis.StrictRedis(host=login_host, port=login_port, password=login_password)
@@ -223,7 +230,7 @@ def main():
         if mode == "master" and info["role"] == "master":
             module.exit_json(changed=False, mode=mode)
 
-        elif mode == "slave" and info["role"] == "slave" and info["master_host"] == master_host and info["master_port"] == master_port:
+        elif mode == "replica" and info["role"] == "slave" and info["master_host"] == master_host and info["master_port"] == master_port:
             status = dict(
                 status=mode,
                 master_host=master_host,
@@ -234,9 +241,8 @@ def main():
             # Do the stuff
             # (Check Check_mode before commands so the commands aren't evaluated
             # if not necessary)
-            if mode == "slave":
-                if module.check_mode or\
-                   set_slave_mode(r, master_host, master_port):
+            if mode == "replica":
+                if module.check_mode or set_replica_mode(r, master_host, master_port):
                     info = r.info()
                     status = {
                         'status': mode,
@@ -245,7 +251,7 @@ def main():
                     }
                     module.exit_json(changed=True, mode=status)
                 else:
-                    module.fail_json(msg='Unable to set slave mode')
+                    module.fail_json(msg='Unable to set replica mode')
 
             else:
                 if module.check_mode or set_master_mode(r):

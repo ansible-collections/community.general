@@ -1,7 +1,7 @@
 - name: stop redis services
   shell: |
     kill -TERM $(cat /var/run/redis_{{ master_port }}.pid)
-    kill -TERM $(cat /var/run/redis_{{ slave_port }}.pid)
+    kill -TERM $(cat /var/run/redis_{{ replica_port }}.pid)
   listen: cleanup redis
 
 - name: remove redis packages
@@ -27,8 +27,8 @@
   - "{{ master_datadir }}"
   - "{{ master_logdir }}"
   - /var/run/redis_{{ master_port }}.pid
-  - "{{ slave_conf }}"
-  - "{{ slave_datadir }}"
-  - "{{ slave_logdir }}"
-  - /var/run/redis_{{ slave_port }}.pid
+  - "{{ replica_conf }}"
+  - "{{ replica_datadir }}"
+  - "{{ replica_logdir }}"
+  - /var/run/redis_{{ replica_port }}.pid
   listen: cleanup redis
