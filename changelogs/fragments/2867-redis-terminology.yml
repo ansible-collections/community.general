@@ -1,0 +1,2 @@
+minor_changes:
+- "redis - allow to use the term ``replica`` instead of ``slave``, which has been the official Redis terminology since 2018 (https://github.com/ansible-collections/community.general/pull/2867)."
