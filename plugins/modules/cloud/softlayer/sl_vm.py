@@ -217,7 +217,7 @@ EXAMPLES = '''
         datacenter: dal09
         tags:
           - ansible-module-test
-          - ansible-module-test-slaves
+          - ansible-module-test-replicas
         hourly: yes
         private: no
         dedicated: no
@@ -235,7 +235,7 @@ EXAMPLES = '''
         datacenter: dal09
         tags:
           - ansible-module-test
-          - ansible-module-test-slaves
+          - ansible-module-test-replicas
         hourly: yes
         private: no
         dedicated: no
