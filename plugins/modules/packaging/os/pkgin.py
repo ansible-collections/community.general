@@ -156,8 +156,15 @@ def query_package(module, name):
         # Search results may contain more than one line (e.g., 'emacs'), so iterate
         # through each line to see if we have a match.
         packages = out.split('\n')
-
         for package in packages:
+            # ignore the bottom menu
+            # =: package is installed and up-to-date
+            # <: package is installed but newer version is available
+            # >: installed package has a greater version than available package
+            if not package:
+                continue
+            elif len(package) > 10 and package[0:3] in ["=: ", "<: ", ">: "]:
+                continue
 
             # Break up line at spaces.  The first part will be the package with its
             # version (e.g. 'gcc47-libs-4.7.2nb4'), and the second will be the state
@@ -167,19 +174,13 @@ def query_package(module, name):
             #     '=' - installed and up to date
             #     '>' - installed but newer than the repository version
             pkgname_with_version, raw_state = package.split(splitchar)[0:2]
-
             # Search for package, stripping version
-            # (results in sth like 'gcc47-libs' or 'emacs24-nox11')
-            pkg_search_obj = re.search(r'^(.*?)\-[0-9][0-9.]*(nb[0-9]+)*', pkgname_with_version, re.M)
-
-            # Do not proceed unless we have a match
-            if not pkg_search_obj:
-                continue
-
-            # Grab matched string
-            pkgname_without_version = pkg_search_obj.group(1)
-
-            if name not in (pkgname_with_version, pkgname_without_version):
+            # (results in sth like 'gcc47-libs' or 'emacs24-nox11', 'iperf3')
+            if not (
+                    pkgname_with_version == name
+                    or
+                    pkgname_with_version.startswith("%s-" % name)
+                    ):
                 continue
 
             # The package was found; now return its state
