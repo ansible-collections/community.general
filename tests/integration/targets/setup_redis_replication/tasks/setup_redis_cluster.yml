@@ -84,7 +84,7 @@
   shell: "{{ redis_bin[ansible_distribution] }} {{ master_conf }}"
 
 - name: Start redis replica
-  shell: "{{ redis_bin[ansible_distribution] }} {{ replica_conf }} --replicaof 127.0.0.1 {{ master_port }}"
+  shell: "{{ redis_bin[ansible_distribution] }} {{ replica_conf }} --{% if old_redis %}slaveof{% else %}replicaof{% endif %} 127.0.0.1 {{ master_port }}"
 
 - name: Wait for redis master to be started
   ansible.builtin.wait_for:
