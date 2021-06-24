@@ -1,5 +1,5 @@
 # We run two servers listening different ports
-# to be able to check replication (one server for master, another for slave).
+# to be able to check replication (one server for master, another for replica).
 
 - name: Install redis server apt dependencies
   apt:
@@ -56,8 +56,8 @@
   loop:
   - "{{ master_datadir }}"
   - "{{ master_logdir }}"
-  - "{{ slave_datadir }}"
-  - "{{ slave_logdir }}"
+  - "{{ replica_datadir }}"
+  - "{{ replica_logdir }}"
 
 - name: Create redis configs
   copy:
@@ -75,16 +75,16 @@
     port: "{{ master_port }}"
     logdir: "{{ master_logdir }}"
     datadir: "{{ master_datadir }}"
-  - file: "{{ slave_conf }}"
-    port: "{{ slave_port }}"
-    logdir: "{{ slave_logdir }}"
-    datadir: "{{ slave_datadir }}"
+  - file: "{{ replica_conf }}"
+    port: "{{ replica_port }}"
+    logdir: "{{ replica_logdir }}"
+    datadir: "{{ replica_datadir }}"
 
 - name: Start redis master
   shell: "{{ redis_bin[ansible_distribution] }} {{ master_conf }}"
 
-- name: Start redis slave
-  shell: "{{ redis_bin[ansible_distribution] }} {{ slave_conf }} --slaveof 127.0.0.1 {{ master_port }}"
+- name: Start redis replica
+  shell: "{{ redis_bin[ansible_distribution] }} {{ replica_conf }} --{% if old_redis %}slaveof{% else %}replicaof{% endif %} 127.0.0.1 {{ master_port }}"
 
 - name: Wait for redis master to be started
   ansible.builtin.wait_for:
@@ -95,10 +95,10 @@
     connect_timeout: 5
     timeout: 30
 
-- name: Wait for redis slave to be started
+- name: Wait for redis replica to be started
   ansible.builtin.wait_for:
     host: 127.0.0.1
-    port: "{{ slave_port }}"
+    port: "{{ replica_port }}"
     state: started
     delay: 1
     connect_timeout: 5
