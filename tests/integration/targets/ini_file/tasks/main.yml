@@ -548,6 +548,9 @@
     - section: handler_exc_handler
       option: args
       value: (sys.stderr,)
-    - section: handler_exc_handler
-      option: class
-      value: StreamHandler
+    - section: båz
+      option: ﬀöø
+      value: ḃâŗ
+    - section: båz
+      option: ﬀöø
+      value: bar
