@@ -112,6 +112,7 @@ import tempfile
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils._text import to_native
 
 
 def match_opt(option, line):
@@ -267,10 +268,11 @@ def do_ini(module, filename, section=None, option=None, value=None,
         if backup:
             backup_file = module.backup_local(filename)
 
+        encoded_ini_lines = [to_native(line) for line in ini_lines]
         try:
             tmpfd, tmpfile = tempfile.mkstemp(dir=module.tmpdir)
             f = os.fdopen(tmpfd, 'w')
-            f.writelines(ini_lines)
+            f.writelines(encoded_ini_lines)
             f.close()
         except IOError:
             module.fail_json(msg="Unable to create temporary file %s", traceback=traceback.format_exc())
