@@ -43,7 +43,11 @@ URL_REALM = "{url}/admin/realms/{realm}"
 URL_TOKEN = "{url}/realms/{realm}/protocol/openid-connect/token"
 URL_CLIENT = "{url}/admin/realms/{realm}/clients/{id}"
 URL_CLIENTS = "{url}/admin/realms/{realm}/clients"
+
+URL_CLIENT_ROLE = "{url}/admin/realms/{realm}/clients/{id}/roles/{name}"
 URL_CLIENT_ROLES = "{url}/admin/realms/{realm}/clients/{id}/roles"
+
+URL_REALM_ROLE = "{url}/admin/realms/{realm}/roles/{name}"
 URL_REALM_ROLES = "{url}/admin/realms/{realm}/roles"
 
 URL_CLIENTTEMPLATE = "{url}/admin/realms/{realm}/client-templates/{id}"
@@ -886,3 +890,126 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Could not get executions for authentication flow %s in realm %s: %s'
                                   % (config["alias"], realm, str(e)))
+
+    def get_roles(self, clientid=None, realm='master'):
+        """ Obtains role representations for roles in a realm
+
+        :param realm: realm to be queried
+        :param client: if defined, return client roles for this client
+        :return: list of dicts of role representations
+        """
+        if clientid is not None:
+            cid = self.get_client_id(clientid, realm=realm)
+            if cid is None:
+                self.module.fail_json(msg="Could not find client %s in realm %s"
+                                          % (clientid, realm))
+            rolelist_url = URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid)
+        else:
+            rolelist_url = URL_REALM_ROLES.format(url=self.baseurl, realm=realm)
+
+        try:
+            return json.loads(to_native(open_url(rolelist_url, method='GET', headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+        except ValueError as e:
+            self.module.fail_json(msg='API returned incorrect JSON when trying to obtain list of roles for realm %s: %s'
+                                      % (realm, str(e)))
+        except Exception as e:
+            self.module.fail_json(msg='Could not obtain list of roles for realm %s: %s'
+                                      % (realm, str(e)))
+
+    def get_role_by_name(self, name, clientid=None, realm="master"):
+        """ Fetch a keycloak role from the provided realm using the role's name.
+
+        If the role does not exist, None is returned.
+        :param name: Name of the role to fetch.
+        :param client: id (not clientId) of client.
+        :param realm: Realm in which the role resides; default 'master'.
+        """
+        if clientid is not None:
+            cid = self.get_client_id(clientid, realm=realm)
+            if cid is None:
+                self.module.fail_json(msg="Could not find client %s in realm %s"
+                                          % (clientid, realm))
+            role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=name)
+        else:
+            role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=name)
+
+        try:
+            return json.loads(to_native(open_url(role_url, method="GET", headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+
+        except HTTPError as e:
+            if e.code == 404:
+                return None
+            else:
+                self.module.fail_json(msg="Could not fetch role %s in realm %s: %s"
+                                          % (name, realm, str(e)))
+        except Exception as e:
+            self.module.fail_json(msg="Could not fetch role %s in realm %s: %s"
+                                      % (name, realm, str(e)))
+
+    def create_role(self, rolerep, clientid=None, realm="master"):
+        """ Create a Keycloak role.
+
+        :param rolerep: a RoleRepresentation of the role to be created. Must contain at minimum the field name.
+        :return: HTTPResponse object on success
+        """
+        if clientid is not None:
+            cid = self.get_client_id(clientid, realm=realm)
+            if cid is None:
+                self.module.fail_json(msg="Could not find client %s in realm %s"
+                                          % (clientid, realm))
+            roles_url = URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid)
+        else:
+            roles_url = URL_REALM_ROLES.format(url=self.baseurl, realm=realm)
+
+        try:
+            return open_url(roles_url, method='POST', headers=self.restheaders,
+                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg="Could not create role %s in realm %s: %s"
+                                      % (rolerep['name'], realm, str(e)))
+
+    def update_role(self, rolerep, clientid=None, realm="master"):
+        """ Update an existing role.
+
+        :param rolerep: A RoleRepresentation of the updated role.
+        :return HTTPResponse object on success
+        """
+        if clientid is not None:
+            cid = self.get_client_id(clientid, realm=realm)
+            if cid is None:
+                self.module.fail_json(msg="Could not find client %s in realm %s"
+                                          % (clientid, realm))
+            role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=rolerep['name'])
+        else:
+            role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=rolerep['name'])
+
+        try:
+            return open_url(role_url, method='PUT', headers=self.restheaders,
+                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not update role %s in realm %s: %s'
+                                      % (rolerep['name'], realm, str(e)))
+
+    def delete_role(self, name, clientid=None, realm="master"):
+        """ Delete a role. One of name or roleid must be provided.
+
+        :param name: The name of the role.
+        :param realm: The realm in which this role resides, default "master".
+        """
+        if clientid is not None:
+            cid = self.get_client_id(clientid, realm=realm)
+            if cid is None:
+                self.module.fail_json(msg="Could not find client %s in realm %s"
+                                          % (clientid, realm))
+            role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=name)
+        else:
+            role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=name)
+
+        try:
+            return open_url(role_url, method='DELETE', headers=self.restheaders,
+                            validate_certs=self.validate_certs)
+
+        except Exception as e:
+            self.module.fail_json(msg="Unable to delete role %s: %s" % (roleid, str(e)))
