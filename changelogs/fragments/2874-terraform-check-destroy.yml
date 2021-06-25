@@ -1,0 +1,2 @@
+minor_changes:
+  - terraform - an optional parameter is added to check for deletion of resources before it is applied (https://github.com/ansible-collections/community.general/pull/2874).
