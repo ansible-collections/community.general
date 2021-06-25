@@ -27,9 +27,6 @@ description:
       be returned that way by this module. You may pass single values for attributes when calling the module,
       and this will be translated into a list suitable for the API.
 
-    - When updating a role, where possible provide the role ID to the module. This removes a lookup
-      to the API to translate the name into the role ID.
-
 
 options:
     state:
@@ -47,20 +44,19 @@ options:
         type: str
         description:
             - Name of the role.
-            - This parameter is required only when creating or updating the role.
+            - This parameter is required.
 
     realm:
         type: str
         description:
-            - They Keycloak realm under which this role resides.
+            - The Keycloak realm under which this role resides.
         default: 'master'
 
-    id:
+    client_id:
         type: str
         description:
-            - The unique identifier for this role.
-            - This parameter is not required for updating or deleting a role but
-              providing it will reduce the number of API calls required.
+            - If the role is a client role, the client id under which it resides.
+            - If this parameter is absent, the role is considered a realm role.
 
     attributes:
         type: dict
@@ -73,11 +69,11 @@ extends_documentation_fragment:
 
 
 author:
-    - Adam Goossens (@adamgoossens)
+    - Laurent Paumier (@laurpaum)
 '''
 
 EXAMPLES = '''
-- name: Create a Keycloak role, authentication with credentials
+- name: Create a Keycloak realm role, authentication with credentials
   community.general.keycloak_role:
     name: my-new-kc-role
     realm: MyCustomRealm
@@ -89,7 +85,7 @@ EXAMPLES = '''
     auth_password: PASSWORD
   delegate_to: localhost
 
-- name: Create a Keycloak role, authentication with token
+- name: Create a Keycloak realm role, authentication with token
   community.general.keycloak_role:
     name: my-new-kc-role
     realm: MyCustomRealm
@@ -99,11 +95,12 @@ EXAMPLES = '''
     token: TOKEN
   delegate_to: localhost
 
-- name: Delete a keycloak role
+- name: Create a Keycloak client role
   community.general.keycloak_role:
-    id: '9d59aa76-2755-48c6-b1af-beb70a82c3cd'
-    state: absent
+    name: my-new-kc-role
     realm: MyCustomRealm
+    client_id: MyClient
+    state: present
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -111,22 +108,10 @@ EXAMPLES = '''
     auth_password: PASSWORD
   delegate_to: localhost
 
-- name: Delete a Keycloak role based on name
+- name: Delete a Keycloak role
   community.general.keycloak_role:
     name: my-role-for-deletion
     state: absent
-    auth_client_id: admin-cli
-    auth_keycloak_url: https://auth.example.com/auth
-    auth_realm: master
-    auth_username: USERNAME
-    auth_password: PASSWORD
-  delegate_to: localhost
-
-- name: Update the name of a Keycloak role
-  community.general.keycloak_role:
-    id: '9d59aa76-2755-48c6-b1af-beb70a82c3cd'
-    name: an-updated-kc-role-name
-    state: present
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -141,7 +126,7 @@ EXAMPLES = '''
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
-    name: my-new_role
+    name: my-new-role
     attributes:
         attrib1: value1
         attrib2: value2
@@ -164,7 +149,7 @@ role:
       description: GUID that identifies the role
       type: str
       returned: always
-      sample: 23f38145-3195-462c-97e7-97041ccea73e
+      sample: aa3cb8d4-833c-41d7-a668-08fbfe317b5d
     name:
       description: Name of the role
       type: str
@@ -175,6 +160,21 @@ role:
       type: str
       returned: always
       sample: test role 123
+    clientRole:
+      description: Role is a client role
+      type: boolean
+      returned: always
+      sample: true
+    composite:
+      description: Role is composite
+      type: boolean
+      returned: always
+      sample: false
+    containerId:
+      description: Realm name or client UUID
+      type: str
+      returned: always
+      sample: b90ba0f6-e64d-4340-848d-b53ae0a47f2b
     attributes:
       description: Attributes applied to this group
       type: dict
