@@ -22,7 +22,7 @@ DOCUMENTATION = '''
 from os.path import basename
 from ansible import constants as C
 from ansible import context
-from ansible.module_utils._text import to_text
+from ansible.module_utils.common.text.converters import to_text
 from ansible.utils.color import colorize, hostcolor
 from ansible.plugins.callback.default import CallbackModule as CallbackModule_default
 

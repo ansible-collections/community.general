@@ -119,7 +119,7 @@ stdout:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 
 def add_remote(module, binary, name, flatpakrepo_url, method):
