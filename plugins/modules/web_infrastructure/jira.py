@@ -390,7 +390,7 @@ import traceback
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper, cause_changes
 from ansible.module_utils.six.moves.urllib.request import pathname2url
-from ansible.module_utils._text import to_text, to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_text, to_bytes, to_native
 from ansible.module_utils.urls import fetch_url
 
 

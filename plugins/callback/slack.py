@@ -58,7 +58,7 @@ import os
 import uuid
 
 from ansible import context
-from ansible.module_utils._text import to_text
+from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 
