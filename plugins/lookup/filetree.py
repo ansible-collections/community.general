@@ -124,7 +124,7 @@ except ImportError:
     pass
 
 from ansible.plugins.lookup import LookupBase
-from ansible.module_utils._text import to_native, to_text
+from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.utils.display import Display
 
 display = Display()

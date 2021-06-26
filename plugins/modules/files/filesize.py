@@ -224,7 +224,7 @@ import os
 import math
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_native
+from ansible.module_utils.common.text.converters import to_native
 
 
 # These are the multiplicative suffixes understood (or returned) by dd and

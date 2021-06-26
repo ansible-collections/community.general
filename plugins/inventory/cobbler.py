@@ -72,7 +72,7 @@ from distutils.version import LooseVersion
 import socket
 
 from ansible.errors import AnsibleError
-from ansible.module_utils._text import to_bytes, to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible.module_utils.common._collections_compat import MutableMapping
 from ansible.module_utils.six import iteritems
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, to_safe_group_name

@@ -56,7 +56,7 @@ from subprocess import Popen, PIPE
 
 from ansible import constants as C
 from ansible.errors import AnsibleParserError
-from ansible.module_utils._text import to_native, to_text
+from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.module_utils.common.process import get_bin_path
 

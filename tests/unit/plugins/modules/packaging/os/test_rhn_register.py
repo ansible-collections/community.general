@@ -8,7 +8,7 @@ import os
 
 from ansible_collections.community.general.tests.unit.compat.mock import mock_open
 from ansible.module_utils import basic
-from ansible.module_utils._text import to_native
+from ansible.module_utils.common.text.converters import to_native
 import ansible.module_utils.six
 from ansible.module_utils.six.moves import xmlrpc_client
 from ansible_collections.community.general.plugins.modules.packaging.os import rhn_register

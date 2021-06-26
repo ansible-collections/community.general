@@ -38,7 +38,7 @@ import traceback
 
 from ansible.errors import AnsibleError
 from ansible.module_utils.six.moves import shlex_quote
-from ansible.module_utils._text import to_bytes, to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible.plugins.connection import ConnectionBase, BUFSIZE
 from ansible.utils.display import Display
 

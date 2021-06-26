@@ -166,7 +166,7 @@ modlist:
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_native, to_bytes
+from ansible.module_utils.common.text.converters import to_native, to_bytes
 from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs
 import re
 
