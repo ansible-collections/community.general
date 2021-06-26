@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - modprobe - added additional checks to ensure module load/unload is effective (https://github.com/ansible-collections/community.general/issues/1608).
