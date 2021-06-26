@@ -62,7 +62,7 @@ import re
 import smtplib
 
 from ansible.module_utils.six import string_types
-from ansible.module_utils._text import to_bytes
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
 

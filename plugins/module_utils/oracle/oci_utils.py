@@ -38,7 +38,7 @@ except ImportError:
     HAS_OCI_PY_SDK = False
 
 
-from ansible.module_utils._text import to_bytes
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.six import iteritems
 
 __version__ = "1.6.0-dev"

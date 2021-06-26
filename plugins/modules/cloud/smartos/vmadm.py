@@ -404,7 +404,7 @@ import traceback
 
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_native
+from ansible.module_utils.common.text.converters import to_native
 
 # While vmadm(1M) supports a -E option to return any errors in JSON, the
 # generated JSON does not play well with the JSON parsers of Python.

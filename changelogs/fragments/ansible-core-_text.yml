@@ -1,0 +1,2 @@
+minor_changes:
+- "Avoid internal ansible-core module_utils in favor of equivalent public API available since at least Ansible 2.9 (https://github.com/ansible-collections/community.general/pull/2877)."

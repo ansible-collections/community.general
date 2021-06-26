@@ -39,7 +39,7 @@ RETURN = """
 from subprocess import Popen, PIPE
 
 from ansible.errors import AnsibleError
-from ansible.module_utils._text import to_bytes, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.plugins.lookup import LookupBase
 
 

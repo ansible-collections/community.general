@@ -152,7 +152,7 @@ RETURN = """
 
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
-from ansible.module_utils._text import to_native
+from ansible.module_utils.common.text.converters import to_native
 import socket
 
 try:

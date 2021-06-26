@@ -79,7 +79,7 @@ hluid:
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_native
+from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.storage.emc.emc_vnx import emc_vnx_argument_spec
 
 LIB_IMP_ERR = None

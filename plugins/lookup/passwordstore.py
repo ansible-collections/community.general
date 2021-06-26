@@ -142,7 +142,7 @@ import yaml
 
 from distutils import util
 from ansible.errors import AnsibleError, AnsibleAssertionError
-from ansible.module_utils._text import to_bytes, to_native, to_text
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible.utils.display import Display
 from ansible.utils.encrypt import random_password
 from ansible.plugins.lookup import LookupBase
