@@ -1,0 +1,337 @@
+---
+- name: Test on FreeBSD VMs
+  when:
+    - ansible_facts.virtualization_type != 'docker'
+    - ansible_facts.distribution == 'FreeBSD'
+  block:
+    - name: Cache original contents of /etc/rc.conf
+      shell: "cat /etc/rc.conf"
+      register: cached_etc_rcconf_content
+
+    - name: Cache original contents of /boot/loader.conf
+      shell: "cat /boot/loader.conf"
+      register: cached_boot_loaderconf_content
+
+    ##
+    ## sysrc - example - set mysqlpidfile
+    ##
+    - name: Configure mysql pid file
+      sysrc:
+        name: mysql_pidfile
+        value: /tmp/mysql.pid
+      register: sysrc_example1
+
+    - name: Configure mysql pid file (checkmode)
+      sysrc:
+        name: mysql_pidfile
+        value: checkmode
+      check_mode: yes
+      register: sysrc_example1_checkmode
+
+    - name: Configure mysql pid file (idempotent)
+      sysrc:
+        name: mysql_pidfile
+        value: /tmp/mysql.pid
+      register: sysrc_example1_idempotent
+
+    - name: Get file content
+      shell: "cat /etc/rc.conf | egrep -v ^\\#"
+      register: sysrc_example1_content
+
+    - name: Ensure sysrc updates rc.conf properly
+      assert:
+        that:
+          - sysrc_example1.changed
+          - sysrc_example1_checkmode.changed
+          - not sysrc_example1_idempotent.changed
+          - "'mysql_pidfile=\"/tmp/mysql.pid\"' in sysrc_example1_content.stdout_lines"
+          - "'mysql_pidfile=\"checkmode\"' not in sysrc_example1_content.stdout_lines"
+
+    ##
+    ## sysrc - example - Enable accf_http kld in /boot/loader.conf
+    ##
+    - name: Enable accf_http kld in /boot/loader.conf
+      sysrc:
+        name: accf_http_load
+        state: present
+        value: "YES"
+        path: /boot/loader.conf
+      register: sysrc_example2
+
+    - name: Enable accf_http kld in /boot/loader.conf (checkmode)
+      sysrc:
+        name: accf_http_load
+        state: present
+        value: "NO"
+        path: /boot/loader.conf
+      check_mode: yes
+      register: sysrc_example2_checkmode
+
+    - name: Enable accf_http kld in /boot/loader.conf (idempotent)
+      sysrc:
+        name: accf_http_load
+        state: present
+        value: "YES"
+        path: /boot/loader.conf
+      register: sysrc_example2_idempotent
+
+    - name: Get file content
+      shell: "cat /boot/loader.conf | egrep -v ^\\#"
+      register: sysrc_example2_content
+
+    - name: Ensure sysrc did not change the file, but marked as changed
+      assert:
+        that:
+          - sysrc_example2.changed
+          - sysrc_example2_checkmode.changed
+          - not sysrc_example2_idempotent.changed
+          - "'accf_http_load=\"YES\"' in sysrc_example2_content.stdout_lines"
+          - "'accf_http_load=\"NO\"' not in sysrc_example2_content.stdout_lines"
+
+    ##
+    ## sysrc - example - Add gif0 interface
+    ##
+    - name: Set cloned_interfaces
+      sysrc:
+        name: cloned_interfaces
+        value: "lo0"
+
+    - name: Add gif0 interface
+      sysrc:
+        name: cloned_interfaces
+        state: value_present
+        value: "gif0"
+      register: sysrc_example3
+
+    - name: Add gif1 interface (checkmode)
+      sysrc:
+        name: cloned_interfaces
+        state: value_present
+        value: "gif1"
+      check_mode: yes
+      register: sysrc_example3_checkmode
+
+    - name: Add gif0 interface (idempotent)
+      sysrc:
+        name: cloned_interfaces
+        state: value_present
+        value: "gif0"
+      register: sysrc_example3_idempotent
+
+    - name: Get file content
+      shell: "cat /etc/rc.conf | egrep -v ^\\#"
+      register: sysrc_example3_content
+
+    - name: Ensure sysrc did not change the file, but marked as changed
+      assert:
+        that:
+          - sysrc_example3.changed
+          - sysrc_example3_checkmode.changed
+          - not sysrc_example3_idempotent.changed
+          - "'cloned_interfaces=\"lo0 gif0\"' in sysrc_example3_content.stdout_lines"
+
+    ##
+    ## sysrc - example - Enable nginx in testjail
+    ##
+    - name: Test within jail
+      #
+      # NOTE: FreeBSD 12.0 test runner receives a "connection reset by peer" after ~20% downloaded so we are
+      #       only running this on 12.1 or higher
+      #
+      when: ansible_distribution_version is version('12.01', '>=')
+      block:
+        - name: Setup testjail
+          include: setup-testjail.yml
+
+        - name: Enable nginx in test jail
+          sysrc:
+            name: nginx_enable
+            value: "YES"
+            jail: testjail
+          register: sysrc_example4
+
+        - name: Enable nginx in test jail (checkmode)
+          sysrc:
+            name: nginx_enable
+            value: "NO"
+            jail: testjail
+          check_mode: yes
+          register: sysrc_example4_checkmode
+
+        - name: Enable nginx in test jail (idempotent)
+          sysrc:
+            name: nginx_enable
+            value: "YES"
+            jail: testjail
+          register: sysrc_example4_idempotent
+
+        - name: Get file content
+          shell: "cat /usr/jails/testjail/etc/rc.conf | grep nginx_enable"
+          register: sysrc_example4_content
+
+        - name: Ensure sysrc worked in testjail
+          assert:
+            that:
+              - sysrc_example4.changed
+              - sysrc_example4_checkmode.changed
+              - not sysrc_example4_idempotent.changed
+              - "'nginx_enable=\"YES\"' in sysrc_example4_content.stdout_lines"
+      always:
+        - name: Stop and remove testjail
+          failed_when: false
+          changed_when: false
+          command: "ezjail-admin delete -wf testjail"
+
+    ##
+    ## sysrc - Test Absent
+    ##
+    - name: Set sysrc_absent to test removal
+      sysrc:
+        name: sysrc_absent
+        value: test
+
+    - name: Remove sysrc_absent (checkmode)
+      sysrc:
+        name: sysrc_absent
+        state: absent
+      check_mode: yes
+      register: sysrc_absent_checkmode
+
+    - name: Remove sysrc_absent
+      sysrc:
+        name: sysrc_absent
+        state: absent
+      register: sysrc_absent
+
+    - name: Remove sysrc_absent (idempotent)
+      sysrc:
+        name: sysrc_absent
+        state: absent
+      register: sysrc_absent_idempotent
+
+    - name: Get file content
+      shell: "cat /etc/rc.conf | egrep -v ^\\#"
+      register: sysrc_absent_content
+
+    - name: Ensure sysrc did as intended
+      assert:
+        that:
+          - sysrc_absent_checkmode.changed
+          - sysrc_absent.changed
+          - not sysrc_absent_idempotent.changed
+          - "'sysrc_absent=\"test\"' not in sysrc_absent_content.stdout_lines"
+
+    ##
+    ## sysrc - Test alternate delimiter
+    ##
+    - name: Set sysrc_delim to known value
+      sysrc:
+        name: sysrc_delim
+        value: "t1,t2"
+
+    - name: Add to value with delimiter (not-exists)
+      sysrc:
+        name: sysrc_delim_create
+        state: value_present
+        delim: ","
+        value: t3
+      register: sysrc_delim_create
+
+    - name: Add to value with delimiter
+      sysrc:
+        name: sysrc_delim
+        state: value_present
+        delim: ","
+        value: t3
+      register: sysrc_delim
+
+    - name: Add to value with delimiter (checkmode)
+      sysrc:
+        name: sysrc_delim
+        state: value_present
+        delim: ","
+        value: t4
+      check_mode: yes
+      register: sysrc_delim_checkmode
+
+    - name: Add to value with delimiter (idempotent)
+      sysrc:
+        name: sysrc_delim
+        state: value_present
+        delim: ","
+        value: t3
+      register: sysrc_delim_idempotent
+
+    - name: Get file content
+      shell: "cat /etc/rc.conf | egrep -v ^\\#"
+      register: sysrc_delim_content
+
+    - name: Ensure sysrc did as intended
+      assert:
+        that:
+          - sysrc_delim_create.changed
+          - sysrc_delim.changed
+          - sysrc_delim_checkmode.changed
+          - not sysrc_delim_idempotent.changed
+          - "'sysrc_delim=\"t1,t2,t3\"' in sysrc_delim_content.stdout_lines"
+          - "'sysrc_delim_create=\"t3\"' in sysrc_delim_content.stdout_lines"
+
+    ##
+    ## sysrc - value_absent
+    ##
+    - name: Remove value (when not exists)
+      sysrc:
+        name: sysrc_value_absent_delete
+        state: value_absent
+        delim: ","
+        value: t3
+      register: sysrc_value_absent_ignored
+
+    - name: Remove value from sysrc_delim
+      sysrc:
+        name: sysrc_delim
+        state: value_absent
+        value: t3
+        delim: ","
+      register: sysrc_value_absent
+
+    - name: Remove value from sysrc_delim (checkmode)
+      sysrc:
+        name: sysrc_delim
+        state: value_absent
+        value: t2
+        delim: ","
+      check_mode: yes
+      register: sysrc_value_absent_checkmode
+
+    - name: Remove value from sysrc_delim (idempotent
+      sysrc:
+        name: sysrc_delim
+        state: value_absent
+        value: t3
+        delim: ","
+      register: sysrc_value_absent_idempotent
+
+    - name: Get file content
+      shell: "cat /etc/rc.conf | egrep -v ^\\#"
+      register: sysrc_delim_content
+
+    - name: Ensure sysrc did as intended with value_absent
+      assert:
+        that:
+          - not sysrc_value_absent_ignored.changed
+          - sysrc_value_absent.changed
+          - sysrc_value_absent_checkmode.changed
+          - not sysrc_value_absent_idempotent.changed
+          - "'sysrc_delim=\"t1,t2\"' in sysrc_delim_content.stdout_lines"
+          - "'sysrc_delim_delete' not in sysrc_delim_content.stdout_lines"
+  always:
+    - name: Restore /etc/rc.conf
+      copy:
+        content: "{{ cached_etc_rcconf_content }}"
+        dest: /etc/rc.conf
+
+    - name: Restore /boot/loader.conf
+      copy:
+        content: "{{ cached_boot_loaderconf_content }}"
+        dest: /boot/loader.conf

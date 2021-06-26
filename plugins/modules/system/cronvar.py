@@ -228,7 +228,7 @@ class CronVar(object):
         var_names = []
         for l in self.lines:
             try:
-                (var_name, _) = self.parse_for_var(l)
+                var_name, dummy = self.parse_for_var(l)
                 var_names.append(var_name)
             except CronVarError:
                 pass
@@ -242,7 +242,7 @@ class CronVar(object):
             newlines = []
             for l in self.lines:
                 try:
-                    (varname, _) = self.parse_for_var(l)  # Throws if not a var line
+                    varname, dummy = self.parse_for_var(l)  # Throws if not a var line
                     if varname == insertbefore:
                         newlines.append("%s=%s" % (name, value))
                         newlines.append(l)
@@ -263,7 +263,7 @@ class CronVar(object):
         newlines = []
         for l in self.lines:
             try:
-                (varname, _) = self.parse_for_var(l)  # Throws if not a var line
+                varname, dummy = self.parse_for_var(l)  # Throws if not a var line
                 if varname != name:
                     raise CronVarError  # Append.
                 if not remove:
@@ -377,7 +377,7 @@ def main():
 
     # if requested make a backup before making a change
     if backup:
-        (_, backup_file) = tempfile.mkstemp(prefix='cronvar')
+        dummy, backup_file = tempfile.mkstemp(prefix='cronvar')
         cronvar.write(backup_file)
 
     if cronvar.cron_file and not name and not ensure_present:

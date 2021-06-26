@@ -1,2 +1,0 @@
-minor_changes:
-  - splunk callback - new parameter ``include_milliseconds`` to add milliseconds to existing timestamp field (https://github.com/ansible-collections/community.general/pull/1462).

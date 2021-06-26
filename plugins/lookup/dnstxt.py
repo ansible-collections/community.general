@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: dnstxt
+    name: dnstxt
     author: Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
     short_description: query a domain(s)'s DNS txt fields
     requirements:

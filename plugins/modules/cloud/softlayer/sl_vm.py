@@ -115,6 +115,7 @@ options:
       - List of disk sizes to be assigned to new virtual instance.
     default: [ 25 ]
     type: list
+    elements: int
   os_code:
     description:
       - OS Code to be used for new virtual instance.
@@ -140,6 +141,7 @@ options:
     description:
       - List of ssh keys by their Id to be assigned to a virtual instance.
     type: list
+    elements: str
   post_uri:
     description:
       - URL of a post provisioning script to be loaded and executed on virtual instance.
@@ -215,7 +217,7 @@ EXAMPLES = '''
         datacenter: dal09
         tags:
           - ansible-module-test
-          - ansible-module-test-slaves
+          - ansible-module-test-replicas
         hourly: yes
         private: no
         dedicated: no
@@ -233,7 +235,7 @@ EXAMPLES = '''
         datacenter: dal09
         tags:
           - ansible-module-test
-          - ansible-module-test-slaves
+          - ansible-module-test-replicas
         hourly: yes
         private: no
         dedicated: no
@@ -396,13 +398,13 @@ def main():
             cpus=dict(type='int', choices=CPU_SIZES),
             memory=dict(type='int', choices=MEMORY_SIZES),
             flavor=dict(type='str'),
-            disks=dict(type='list', default=[25]),
+            disks=dict(type='list', elements='int', default=[25]),
             os_code=dict(type='str'),
             image_id=dict(type='str'),
             nic_speed=dict(type='int', choices=NIC_SPEEDS),
             public_vlan=dict(type='str'),
             private_vlan=dict(type='str'),
-            ssh_keys=dict(type='list', default=[]),
+            ssh_keys=dict(type='list', elements='str', default=[], no_log=False),
             post_uri=dict(type='str'),
             state=dict(type='str', default='present', choices=STATES),
             wait=dict(type='bool', default=True),

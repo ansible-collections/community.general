@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    lookup: consul_kv
+    name: consul_kv
     short_description: Fetch metadata from a Consul key value store.
     description:
       - Lookup metadata for a playbook from the key value store in a Consul cluster.
@@ -171,10 +171,10 @@ class LookupModule(LookupBase):
 
         paramvals = {
             'key': params[0],
-            'token': None,
-            'recurse': False,
-            'index': None,
-            'datacenter': None
+            'token': self.get_option('token'),
+            'recurse': self.get_option('recurse'),
+            'index': self.get_option('index'),
+            'datacenter': self.get_option('datacenter')
         }
 
         # parameters specified?

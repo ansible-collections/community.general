@@ -22,14 +22,21 @@ redis_module: "{{ (ansible_python_version is version('2.7', '>=')) | ternary('re
 
 redis_password: PASS
 
+old_redis: >-
+  {{
+    (ansible_distribution == 'CentOS' and ansible_distribution_major_version|int <= 7) or
+    (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int <= 18) or
+    (ansible_os_family == 'FreeBSD' and ansible_distribution_major_version|int <= 12)
+  }}
+
 # Master
 master_port: 6379
 master_conf: /etc/redis-master.conf
 master_datadir: /var/lib/redis-master
 master_logdir: /var/log/redis-master
 
-# Slave
-slave_port: 6380
-slave_conf: /etc/redis-slave.conf
-slave_datadir: /var/lib/redis-slave
-slave_logdir: /var/log/redis-slave
+# Replica
+replica_port: 6380
+replica_conf: /etc/redis-replica.conf
+replica_datadir: /var/lib/redis-replica
+replica_logdir: /var/log/redis-replica

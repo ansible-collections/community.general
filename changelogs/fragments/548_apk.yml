@@ -1,2 +1,0 @@
-minor_changes:
-- apk - added ``no_cache`` option (https://github.com/ansible-collections/community.general/pull/548).

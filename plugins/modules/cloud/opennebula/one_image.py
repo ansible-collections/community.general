@@ -31,7 +31,7 @@ short_description: Manages OpenNebula images
 description:
   - Manages OpenNebula images
 requirements:
-  - python-oca
+  - pyone
 options:
   api_url:
     description:
@@ -88,7 +88,7 @@ EXAMPLES = '''
 
 - name: Print the IMAGE properties
   ansible.builtin.debug:
-    msg: result
+    var: result
 
 - name: Rename existing IMAGE
   community.general.one_image:
@@ -168,21 +168,20 @@ running_vms:
 '''
 
 try:
-    import oca
-    HAS_OCA = True
+    import pyone
+    HAS_PYONE = True
 except ImportError:
-    HAS_OCA = False
+    HAS_PYONE = False
 
 from ansible.module_utils.basic import AnsibleModule
 import os
 
 
 def get_image(module, client, predicate):
-    pool = oca.ImagePool(client)
     # Filter -2 means fetch all images user can Use
-    pool.info(filter=-2)
+    pool = client.imagepool.info(-2, -1, -1, -1)
 
-    for image in pool:
+    for image in pool.IMAGE:
         if predicate(image):
             return image
 
@@ -190,11 +189,11 @@ def get_image(module, client, predicate):
 
 
 def get_image_by_name(module, client, image_name):
-    return get_image(module, client, lambda image: (image.name == image_name))
+    return get_image(module, client, lambda image: (image.NAME == image_name))
 
 
 def get_image_by_id(module, client, image_id):
-    return get_image(module, client, lambda image: (image.id == image_id))
+    return get_image(module, client, lambda image: (image.ID == image_id))
 
 
 def get_image_instance(module, client, requested_id, requested_name):
@@ -208,30 +207,28 @@ IMAGE_STATES = ['INIT', 'READY', 'USED', 'DISABLED', 'LOCKED', 'ERROR', 'CLONE',
 
 
 def get_image_info(image):
-    image.info()
-
     info = {
-        'id': image.id,
-        'name': image.name,
-        'state': IMAGE_STATES[image.state],
-        'running_vms': image.running_vms,
-        'used': bool(image.running_vms),
-        'user_name': image.uname,
-        'user_id': image.uid,
-        'group_name': image.gname,
-        'group_id': image.gid,
+        'id': image.ID,
+        'name': image.NAME,
+        'state': IMAGE_STATES[image.STATE],
+        'running_vms': image.RUNNING_VMS,
+        'used': bool(image.RUNNING_VMS),
+        'user_name': image.UNAME,
+        'user_id': image.UID,
+        'group_name': image.GNAME,
+        'group_id': image.GID,
     }
 
     return info
 
 
-def wait_for_state(module, image, wait_timeout, state_predicate):
+def wait_for_state(module, client, image_id, wait_timeout, state_predicate):
     import time
     start_time = time.time()
 
     while (time.time() - start_time) < wait_timeout:
-        image.info()
-        state = image.state
+        image = client.image.info(image_id)
+        state = image.STATE
 
         if state_predicate(state):
             return image
@@ -241,19 +238,19 @@ def wait_for_state(module, image, wait_timeout, state_predicate):
     module.fail_json(msg="Wait timeout has expired!")
 
 
-def wait_for_ready(module, image, wait_timeout=60):
-    return wait_for_state(module, image, wait_timeout, lambda state: (state in [IMAGE_STATES.index('READY')]))
+def wait_for_ready(module, client, image_id, wait_timeout=60):
+    return wait_for_state(module, client, image_id, wait_timeout, lambda state: (state in [IMAGE_STATES.index('READY')]))
 
 
-def wait_for_delete(module, image, wait_timeout=60):
-    return wait_for_state(module, image, wait_timeout, lambda state: (state in [IMAGE_STATES.index('DELETE')]))
+def wait_for_delete(module, client, image_id, wait_timeout=60):
+    return wait_for_state(module, client, image_id, wait_timeout, lambda state: (state in [IMAGE_STATES.index('DELETE')]))
 
 
 def enable_image(module, client, image, enable):
-    image.info()
+    image = client.image.info(image.ID)
     changed = False
 
-    state = image.state
+    state = image.STATE
 
     if state not in [IMAGE_STATES.index('READY'), IMAGE_STATES.index('DISABLED'), IMAGE_STATES.index('ERROR')]:
         if enable:
@@ -266,7 +263,7 @@ def enable_image(module, client, image, enable):
         changed = True
 
     if changed and not module.check_mode:
-        client.call('image.enable', image.id, enable)
+        client.image.enable(image.ID, enable)
 
     result = get_image_info(image)
     result['changed'] = changed
@@ -276,7 +273,7 @@ def enable_image(module, client, image, enable):
 
 def clone_image(module, client, image, new_name):
     if new_name is None:
-        new_name = "Copy of " + image.name
+        new_name = "Copy of " + image.NAME
 
     tmp_image = get_image_by_name(module, client, new_name)
     if tmp_image:
@@ -284,13 +281,13 @@ def clone_image(module, client, image, new_name):
         result['changed'] = False
         return result
 
-    if image.state == IMAGE_STATES.index('DISABLED'):
+    if image.STATE == IMAGE_STATES.index('DISABLED'):
         module.fail_json(msg="Cannot clone DISABLED image")
 
     if not module.check_mode:
-        new_id = client.call('image.clone', image.id, new_name)
-        image = get_image_by_id(module, client, new_id)
-        wait_for_ready(module, image)
+        new_id = client.image.clone(image.ID, new_name)
+        wait_for_ready(module, client, new_id)
+        image = client.image.info(new_id)
 
     result = get_image_info(image)
     result['changed'] = True
@@ -302,7 +299,7 @@ def rename_image(module, client, image, new_name):
     if new_name is None:
         module.fail_json(msg="'new_name' option has to be specified when the state is 'renamed'")
 
-    if new_name == image.name:
+    if new_name == image.NAME:
         result = get_image_info(image)
         result['changed'] = False
         return result
@@ -312,7 +309,7 @@ def rename_image(module, client, image, new_name):
         module.fail_json(msg="Name '" + new_name + "' is already taken by IMAGE with id=" + str(tmp_image.id))
 
     if not module.check_mode:
-        client.call('image.rename', image.id, new_name)
+        client.image.rename(image.ID, new_name)
 
     result = get_image_info(image)
     result['changed'] = True
@@ -324,12 +321,12 @@ def delete_image(module, client, image):
     if not image:
         return {'changed': False}
 
-    if image.running_vms > 0:
-        module.fail_json(msg="Cannot delete image. There are " + str(image.running_vms) + " VMs using it.")
+    if image.RUNNING_VMS > 0:
+        module.fail_json(msg="Cannot delete image. There are " + str(image.RUNNING_VMS) + " VMs using it.")
 
     if not module.check_mode:
-        client.call('image.delete', image.id)
-        wait_for_delete(module, image)
+        client.image.delete(image.ID)
+        wait_for_delete(module, client, image.ID)
 
     return {'changed': True}
 
@@ -378,8 +375,8 @@ def main():
                            mutually_exclusive=[['id', 'name']],
                            supports_check_mode=True)
 
-    if not HAS_OCA:
-        module.fail_json(msg='This module requires python-oca to work!')
+    if not HAS_PYONE:
+        module.fail_json(msg='This module requires pyone to work!')
 
     auth = get_connection_info(module)
     params = module.params
@@ -388,7 +385,7 @@ def main():
     state = params.get('state')
     enabled = params.get('enabled')
     new_name = params.get('new_name')
-    client = oca.Client(auth.username + ':' + auth.password, auth.url)
+    client = pyone.OneServer(auth.url, session=auth.username + ':' + auth.password)
 
     result = {}
 

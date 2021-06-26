@@ -38,7 +38,7 @@ options:
             - "A ':' separated list of paths to search for 'brew' executable.
               Since a package (I(formula) in homebrew parlance) location is prefixed relative to the actual path of I(brew) command,
               providing an alternative I(brew) path enables managing different set of packages in an alternative location in the system."
-        default: '/usr/local/bin'
+        default: '/usr/local/bin:/opt/homebrew/bin'
         type: path
     state:
         description:
@@ -49,6 +49,7 @@ options:
     update_homebrew:
         description:
             - update homebrew itself first.
+            - Alias C(update-brew) has been deprecated and will be removed in community.general 5.0.0.
         type: bool
         default: no
         aliases: ['update-brew']
@@ -76,7 +77,7 @@ notes:
 '''
 
 EXAMPLES = '''
-# Install formula foo with 'brew' in default path (C(/usr/local/bin))
+# Install formula foo with 'brew' in default path
 - community.general.homebrew:
     name: foo
     state: present
@@ -125,6 +126,11 @@ EXAMPLES = '''
     name: foo
     state: present
     install_options: with-baz,enable-debug
+
+- name: Install formula foo with 'brew' from cask
+  community.general.homebrew:
+    name: homebrew/cask/foo
+    state: present
 
 - name: Use ignored-pinned option while upgrading all
   community.general.homebrew:
@@ -871,7 +877,7 @@ def main():
                 elements='str',
             ),
             path=dict(
-                default="/usr/local/bin",
+                default="/usr/local/bin:/opt/homebrew/bin",
                 required=False,
                 type='path',
             ),
@@ -888,6 +894,7 @@ def main():
                 default=False,
                 aliases=["update-brew"],
                 type='bool',
+                deprecated_aliases=[dict(name='update-brew', version='5.0.0', collection_name='community.general')],
             ),
             upgrade_all=dict(
                 default=False,

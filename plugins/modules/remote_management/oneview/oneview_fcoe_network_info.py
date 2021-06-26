@@ -23,6 +23,7 @@ options:
     name:
       description:
         - FCoE Network name.
+      type: str
 extends_documentation_fragment:
 - community.general.oneview
 - community.general.oneview.factsparams
@@ -82,11 +83,6 @@ class FcoeNetworkInfoModule(OneViewModuleBase):
         )
 
         super(FcoeNetworkInfoModule, self).__init__(additional_arg_spec=argument_spec)
-        self.is_old_facts = self.module._name in ('oneview_fcoe_network_facts', 'community.general.oneview_fcoe_network_facts')
-        if self.is_old_facts:
-            self.module.deprecate("The 'oneview_fcoe_network_facts' module has been renamed to 'oneview_fcoe_network_info', "
-                                  "and the renamed one no longer returns ansible_facts",
-                                  version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     def execute_module(self):
 
@@ -95,11 +91,7 @@ class FcoeNetworkInfoModule(OneViewModuleBase):
         else:
             fcoe_networks = self.oneview_client.fcoe_networks.get_all(**self.facts_params)
 
-        if self.is_old_facts:
-            return dict(changed=False,
-                        ansible_facts=dict(fcoe_networks=fcoe_networks))
-        else:
-            return dict(changed=False, fcoe_networks=fcoe_networks)
+        return dict(changed=False, fcoe_networks=fcoe_networks)
 
 
 def main():

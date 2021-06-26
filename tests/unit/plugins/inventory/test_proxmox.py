@@ -21,6 +21,12 @@ def inventory():
     return r
 
 
+def test_verify_file(tmp_path, inventory):
+    file = tmp_path / "foobar.proxmox.yml"
+    file.touch()
+    assert inventory.verify_file(str(file)) is True
+
+
 def test_verify_file_bad_config(inventory):
     assert inventory.verify_file('foobar.proxmox.yml') is False
 
@@ -87,6 +93,38 @@ def get_json(url):
                  "netin": 1000,
                  "maxdisk": 1000,
                  "vmid": "101",
+                 "uptime": 1000,
+                 "disk": 0,
+                 "status": "running"},
+                {"name": "test-qemu-windows",
+                 "cpus": 1,
+                 "mem": 1000,
+                 "template": "",
+                 "diskread": 0,
+                 "cpu": 0.01,
+                 "maxmem": 1000,
+                 "diskwrite": 0,
+                 "netout": 1000,
+                 "pid": "1001",
+                 "netin": 1000,
+                 "maxdisk": 1000,
+                 "vmid": "102",
+                 "uptime": 1000,
+                 "disk": 0,
+                 "status": "running"},
+                {"name": "test-qemu-multi-nic",
+                 "cpus": 1,
+                 "mem": 1000,
+                 "template": "",
+                 "diskread": 0,
+                 "cpu": 0.01,
+                 "maxmem": 1000,
+                 "diskwrite": 0,
+                 "netout": 1000,
+                 "pid": "1001",
+                 "netin": 1000,
+                 "maxdisk": 1000,
+                 "vmid": "103",
                  "uptime": 1000,
                  "disk": 0,
                  "status": "running"},
@@ -162,6 +200,322 @@ def get_json(url):
                  "method6": "manual",
                  "autostart": 1,
                  "active": 1}]
+    elif url == "https://localhost:8006/api2/json/nodes/testnode/lxc/100/config":
+        # _get_vm_config (lxc)
+        return {
+            "console": 1,
+            "rootfs": "local-lvm:vm-100-disk-0,size=4G",
+            "cmode": "tty",
+            "description": "A testnode",
+            "cores": 1,
+            "hostname": "test-lxc",
+            "arch": "amd64",
+            "tty": 2,
+            "swap": 0,
+            "cpulimit": "0",
+            "net0": "name=eth0,bridge=vmbr0,gw=10.1.1.1,hwaddr=FF:FF:FF:FF:FF:FF,ip=10.1.1.3/24,type=veth",
+            "ostype": "ubuntu",
+            "digest": "123456789abcdef0123456789abcdef01234567890",
+            "protection": 0,
+            "memory": 1000,
+            "onboot": 0,
+            "cpuunits": 1024,
+            "tags": "one, two, three",
+        }
+    elif url == "https://localhost:8006/api2/json/nodes/testnode/qemu/101/config":
+        # _get_vm_config (qemu)
+        return {
+            "tags": "one, two, three",
+            "cores": 1,
+            "ide2": "none,media=cdrom",
+            "memory": 1000,
+            "kvm": 1,
+            "digest": "0123456789abcdef0123456789abcdef0123456789",
+            "description": "A test qemu",
+            "sockets": 1,
+            "onboot": 1,
+            "vmgenid": "ffffffff-ffff-ffff-ffff-ffffffffffff",
+            "numa": 0,
+            "bootdisk": "scsi0",
+            "cpu": "host",
+            "name": "test-qemu",
+            "ostype": "l26",
+            "hotplug": "network,disk,usb",
+            "scsi0": "local-lvm:vm-101-disk-0,size=8G",
+            "net0": "virtio=ff:ff:ff:ff:ff:ff,bridge=vmbr0,firewall=1",
+            "agent": "1,fstrim_cloned_disks=1",
+            "bios": "seabios",
+            "ide0": "local-lvm:vm-101-cloudinit,media=cdrom,size=4M",
+            "boot": "cdn",
+            "scsihw": "virtio-scsi-pci",
+            "smbios1": "uuid=ffffffff-ffff-ffff-ffff-ffffffffffff"
+        }
+    elif url == "https://localhost:8006/api2/json/nodes/testnode/qemu/102/config":
+        # _get_vm_config (qemu)
+        return {
+            "numa": 0,
+            "digest": "460add1531a7068d2ae62d54f67e8fb9493dece9",
+            "ide2": "none,media=cdrom",
+            "bootdisk": "sata0",
+            "name": "test-qemu-windows",
+            "balloon": 0,
+            "cpulimit": "4",
+            "agent": "1",
+            "cores": 6,
+            "sata0": "storage:vm-102-disk-0,size=100G",
+            "memory": 10240,
+            "smbios1": "uuid=127301fc-0122-48d5-8fc5-c04fa78d8146",
+            "scsihw": "virtio-scsi-pci",
+            "sockets": 1,
+            "ostype": "win8",
+            "net0": "virtio=ff:ff:ff:ff:ff:ff,bridge=vmbr0",
+            "onboot": 1
+        }
+    elif url == "https://localhost:8006/api2/json/nodes/testnode/qemu/103/config":
+        # _get_vm_config (qemu)
+        return {
+            'scsi1': 'storage:vm-103-disk-3,size=30G',
+            'sockets': 1,
+            'memory': 8192,
+            'ostype': 'l26',
+            'scsihw': 'virtio-scsi-pci',
+            "net0": "virtio=ff:ff:ff:ff:ff:ff,bridge=vmbr0",
+            "net1": "virtio=ff:ff:ff:ff:ff:ff,bridge=vmbr1",
+            'bootdisk': 'scsi0',
+            'scsi0': 'storage:vm-103-disk-0,size=10G',
+            'name': 'test-qemu-multi-nic',
+            'cores': 4,
+            'digest': '51b7599f869b9a3f564804a0aed290f3de803292',
+            'smbios1': 'uuid=863b31c3-42ca-4a92-aed7-4111f342f70a',
+            'agent': '1,type=virtio',
+            'ide2': 'none,media=cdrom',
+            'balloon': 0,
+            'numa': 0,
+            'scsi2': 'storage:vm-103-disk-2,size=10G',
+            'serial0': 'socket',
+            'vmgenid': 'ddfb79b2-b484-4d66-88e7-6e76f2d1be77',
+            'onboot': 1,
+            'tablet': 0
+        }
+
+    elif url == "https://localhost:8006/api2/json/nodes/testnode/qemu/101/agent/network-get-interfaces":
+        # _get_agent_network_interfaces
+        return {"result": [
+            {
+                "hardware-address": "00:00:00:00:00:00",
+                "ip-addresses": [
+                    {
+                        "prefix": 8,
+                        "ip-address-type": "ipv4",
+                        "ip-address": "127.0.0.1"
+                    },
+                    {
+                        "ip-address-type": "ipv6",
+                        "ip-address": "::1",
+                        "prefix": 128
+                    }],
+                "statistics": {
+                    "rx-errs": 0,
+                    "rx-bytes": 163244,
+                    "rx-packets": 1623,
+                    "rx-dropped": 0,
+                    "tx-dropped": 0,
+                    "tx-packets": 1623,
+                    "tx-bytes": 163244,
+                    "tx-errs": 0},
+                "name": "lo"},
+            {
+                "statistics": {
+                    "rx-packets": 4025,
+                    "rx-dropped": 12,
+                    "rx-bytes": 324105,
+                    "rx-errs": 0,
+                    "tx-errs": 0,
+                    "tx-bytes": 368860,
+                    "tx-packets": 3479,
+                    "tx-dropped": 0},
+                "name": "eth0",
+                "ip-addresses": [
+                    {
+                        "prefix": 24,
+                        "ip-address-type": "ipv4",
+                        "ip-address": "10.1.2.3"
+                    },
+                    {
+                        "prefix": 64,
+                        "ip-address": "fd8c:4687:e88d:1be3:5b70:7b88:c79c:293",
+                        "ip-address-type": "ipv6"
+                    }],
+                "hardware-address": "ff:ff:ff:ff:ff:ff"
+            },
+            {
+                "hardware-address": "ff:ff:ff:ff:ff:ff",
+                "ip-addresses": [
+                    {
+                        "prefix": 16,
+                        "ip-address": "10.10.2.3",
+                        "ip-address-type": "ipv4"
+                    }],
+                "name": "docker0",
+                "statistics": {
+                    "rx-bytes": 0,
+                    "rx-errs": 0,
+                    "rx-dropped": 0,
+                    "rx-packets": 0,
+                    "tx-packets": 0,
+                    "tx-dropped": 0,
+                    "tx-errs": 0,
+                    "tx-bytes": 0
+                }}]}
+    elif url == "https://localhost:8006/api2/json/nodes/testnode/qemu/102/agent/network-get-interfaces":
+        # _get_agent_network_interfaces
+        return {"result": {'error': {'desc': 'this feature or command is not currently supported', 'class': 'Unsupported'}}}
+    elif url == "https://localhost:8006/api2/json/nodes/testnode/qemu/103/agent/network-get-interfaces":
+        # _get_agent_network_interfaces
+        return {
+            "result": [
+                {
+                    "statistics": {
+                        "tx-errs": 0,
+                        "rx-errs": 0,
+                        "rx-dropped": 0,
+                        "tx-bytes": 48132932372,
+                        "tx-dropped": 0,
+                        "rx-bytes": 48132932372,
+                        "tx-packets": 178578980,
+                        "rx-packets": 178578980
+                    },
+                    "hardware-address": "ff:ff:ff:ff:ff:ff",
+                    "ip-addresses": [
+                        {
+                            "ip-address-type": "ipv4",
+                            "prefix": 8,
+                            "ip-address": "127.0.0.1"
+                        }
+                    ],
+                    "name": "lo"
+                },
+                {
+                    "name": "eth0",
+                    "ip-addresses": [
+                        {
+                            "ip-address-type": "ipv4",
+                            "prefix": 24,
+                            "ip-address": "172.16.0.143"
+                        }
+                    ],
+                    "statistics": {
+                        "rx-errs": 0,
+                        "tx-errs": 0,
+                        "rx-packets": 660028,
+                        "tx-packets": 304599,
+                        "tx-dropped": 0,
+                        "rx-bytes": 1846743499,
+                        "tx-bytes": 1287844926,
+                        "rx-dropped": 0
+                    },
+                    "hardware-address": "ff:ff:ff:ff:ff:ff"
+                },
+                {
+                    "name": "eth1",
+                    "hardware-address": "ff:ff:ff:ff:ff:ff",
+                    "statistics": {
+                        "rx-bytes": 235717091946,
+                        "tx-dropped": 0,
+                        "rx-dropped": 0,
+                        "tx-bytes": 123411636251,
+                        "rx-packets": 540431277,
+                        "tx-packets": 468411864,
+                        "rx-errs": 0,
+                        "tx-errs": 0
+                    },
+                    "ip-addresses": [
+                        {
+                            "ip-address": "10.0.0.133",
+                            "prefix": 24,
+                            "ip-address-type": "ipv4"
+                        }
+                    ]
+                },
+                {
+                    "name": "docker0",
+                    "ip-addresses": [
+                        {
+                            "ip-address": "172.17.0.1",
+                            "prefix": 16,
+                            "ip-address-type": "ipv4"
+                        }
+                    ],
+                    "hardware-address": "ff:ff:ff:ff:ff:ff",
+                    "statistics": {
+                        "rx-errs": 0,
+                        "tx-errs": 0,
+                        "rx-packets": 0,
+                        "tx-packets": 0,
+                        "tx-dropped": 0,
+                        "rx-bytes": 0,
+                        "rx-dropped": 0,
+                        "tx-bytes": 0
+                    }
+                },
+                {
+                    "hardware-address": "ff:ff:ff:ff:ff:ff",
+                    "name": "datapath"
+                },
+                {
+                    "name": "weave",
+                    "ip-addresses": [
+                        {
+                            "ip-address": "10.42.0.1",
+                            "ip-address-type": "ipv4",
+                            "prefix": 16
+                        }
+                    ],
+                    "hardware-address": "ff:ff:ff:ff:ff:ff",
+                    "statistics": {
+                        "rx-bytes": 127289123306,
+                        "tx-dropped": 0,
+                        "rx-dropped": 0,
+                        "tx-bytes": 43827573343,
+                        "rx-packets": 132750542,
+                        "tx-packets": 74218762,
+                        "rx-errs": 0,
+                        "tx-errs": 0
+                    }
+                },
+                {
+                    "name": "vethwe-datapath",
+                    "hardware-address": "ff:ff:ff:ff:ff:ff"
+                },
+                {
+                    "name": "vethwe-bridge",
+                    "hardware-address": "ff:ff:ff:ff:ff:ff"
+                },
+                {
+                    "hardware-address": "ff:ff:ff:ff:ff:ff",
+                    "name": "vxlan-6784"
+                },
+                {
+                    "name": "vethwepl0dfe1fe",
+                    "hardware-address": "ff:ff:ff:ff:ff:ff"
+                },
+                {
+                    "name": "vethweplf1e7715",
+                    "hardware-address": "ff:ff:ff:ff:ff:ff"
+                },
+                {
+                    "hardware-address": "ff:ff:ff:ff:ff:ff",
+                    "name": "vethwepl9d244a1"
+                },
+                {
+                    "hardware-address": "ff:ff:ff:ff:ff:ff",
+                    "name": "vethwepl2ca477b"
+                },
+                {
+                    "name": "nomacorip",
+                }
+            ]
+        }
 
 
 def get_vm_status(node, vmtype, vmid, name):
@@ -171,6 +525,12 @@ def get_vm_status(node, vmtype, vmid, name):
 def get_option(option):
     if option == 'group_prefix':
         return 'proxmox_'
+    if option == 'facts_prefix':
+        return 'proxmox_'
+    elif option == 'want_facts':
+        return True
+    elif option == 'want_proxmox_nodes_ansible_host':
+        return True
     else:
         return False
 
@@ -190,6 +550,8 @@ def test_populate(inventory, mocker):
 
     # get different hosts
     host_qemu = inventory.inventory.get_host('test-qemu')
+    host_qemu_windows = inventory.inventory.get_host('test-qemu-windows')
+    host_qemu_multi_nic = inventory.inventory.get_host('test-qemu-multi-nic')
     host_qemu_template = inventory.inventory.get_host('test-qemu-template')
     host_lxc = inventory.inventory.get_host('test-lxc')
     host_node = inventory.inventory.get_host('testnode')
@@ -198,6 +560,23 @@ def test_populate(inventory, mocker):
     assert 'proxmox_pool_test' in inventory.inventory.groups
     group_qemu = inventory.inventory.groups['proxmox_pool_test']
     assert group_qemu.hosts == [host_qemu]
+
+    # check if qemu-test has eth0 interface in agent_interfaces fact
+    assert 'eth0' in [d['name'] for d in host_qemu.get_vars()['proxmox_agent_interfaces']]
+
+    # check if qemu-multi-nic has multiple network interfaces
+    for iface_name in ['eth0', 'eth1', 'weave']:
+        assert iface_name in [d['name'] for d in host_qemu_multi_nic.get_vars()['proxmox_agent_interfaces']]
+
+    # check if interface with no mac-address or ip-address defaults correctly
+    assert [iface for iface in host_qemu_multi_nic.get_vars()['proxmox_agent_interfaces']
+            if iface['name'] == 'nomacorip'
+            and iface['mac-address'] == ''
+            and iface['ip-addresses'] == []
+            ]
+
+    # check to make sure qemu-windows doesn't have proxmox_agent_interfaces
+    assert "proxmox_agent_interfaces" not in host_qemu_windows.get_vars()
 
     # check if lxc-test has been discovered correctly
     group_lxc = inventory.inventory.groups['proxmox_all_lxc']

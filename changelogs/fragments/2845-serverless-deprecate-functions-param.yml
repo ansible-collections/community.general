@@ -1,0 +1,2 @@
+deprecated_features:
+  - serverless - deprecating parameter ``functions`` because it was not used in the code (https://github.com/ansible-collections/community.general/pull/2845).

@@ -4,6 +4,12 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+- name: Update procps-ng temporary until issue (#2539) is fixed
+  yum:
+    name: procps-ng
+    state: latest
+  when: ansible_distribution == 'Fedora' and ansible_distribution_major_version == '34'
+
 - block:
     - name: Install necessary packages to test yum_versionlock
       yum:
@@ -23,7 +29,8 @@
             state: present
           register: lock_all_packages
 
-        - name: Update all packages
+          # This should fail when it needs user interaction and missing -y is on purpose.
+        - name: Update all packages (not really)
           command: yum update --setopt=obsoletes=0
           register: update_all_locked_packages
           changed_when:

@@ -49,6 +49,7 @@ options:
     update_cache:
         description:
             - update the package db first
+            - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
         aliases: ['update-cache']
         default: "no"
         type: bool
@@ -173,7 +174,9 @@ def main():
             state=dict(default="present", choices=["present", "installed", "absent", "removed"]),
             force=dict(default="", choices=["", "depends", "maintainer", "reinstall", "overwrite", "downgrade", "space", "postinstall", "remove",
                                             "checksum", "removal-of-dependent-packages"]),
-            update_cache=dict(default="no", aliases=["update-cache"], type='bool')
+            update_cache=dict(
+                default="no", aliases=["update-cache"], type='bool',
+                deprecated_aliases=[dict(name='update-cache', version='5.0.0', collection_name='community.general')]),
         )
     )
 

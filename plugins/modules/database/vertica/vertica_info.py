@@ -21,25 +21,30 @@ options:
     description:
       - Name of the cluster running the schema.
     default: localhost
+    type: str
   port:
     description:
       Database port to connect to.
     default: 5433
+    type: str
   db:
     description:
       - Name of the database running the schema.
+    type: str
   login_user:
     description:
       - The username used to authenticate with.
     default: dbadmin
+    type: str
   login_password:
     description:
       - The password used to authenticate with.
+    type: str
 notes:
   - The default authentication assumes that you are either logging in as or sudo'ing
     to the C(dbadmin) account on the host.
   - This module uses C(pyodbc), a Python ODBC database adapter. You must ensure
-    that C(unixODBC) and C(pyodbc) is installed on the host and properly configured.
+    that C(unixODBC) and C(pyodbc) are installed on the host and properly configured.
   - Configuring C(unixODBC) for Vertica requires C(Driver = /opt/vertica/lib64/libverticaodbc.so)
     to be added to the C(Vertica) section of either C(/etc/odbcinst.ini) or C($HOME/.odbcinst.ini)
     and both C(ErrorMessagesPath = /opt/vertica/lib64) and C(DriverManagerEncoding = UTF-16)
@@ -228,11 +233,6 @@ def main():
             login_user=dict(default='dbadmin'),
             login_password=dict(default=None, no_log=True),
         ), supports_check_mode=True)
-    is_old_facts = module._name in ('vertica_facts', 'community.general.vertica_facts')
-    if is_old_facts:
-        module.deprecate("The 'vertica_facts' module has been renamed to 'vertica_info', "
-                         "and the renamed one no longer returns ansible_facts",
-                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     if not pyodbc_found:
         module.fail_json(msg=missing_required_lib('pyodbc'), exception=PYODBC_IMP_ERR)
@@ -264,20 +264,12 @@ def main():
         configuration_facts = get_configuration_facts(cursor)
         node_facts = get_node_facts(cursor)
 
-        if is_old_facts:
-            module.exit_json(changed=False,
-                             ansible_facts={'vertica_schemas': schema_facts,
-                                            'vertica_users': user_facts,
-                                            'vertica_roles': role_facts,
-                                            'vertica_configuration': configuration_facts,
-                                            'vertica_nodes': node_facts})
-        else:
-            module.exit_json(changed=False,
-                             vertica_schemas=schema_facts,
-                             vertica_users=user_facts,
-                             vertica_roles=role_facts,
-                             vertica_configuration=configuration_facts,
-                             vertica_nodes=node_facts)
+        module.exit_json(changed=False,
+                         vertica_schemas=schema_facts,
+                         vertica_users=user_facts,
+                         vertica_roles=role_facts,
+                         vertica_configuration=configuration_facts,
+                         vertica_nodes=node_facts)
     except NotSupportedError as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
     except SystemExit:

@@ -145,6 +145,13 @@ class GitLabDeployKey(object):
     def createOrUpdateDeployKey(self, project, key_title, key_key, options):
         changed = False
 
+        # note: unfortunately public key cannot be updated directly by
+        #   GitLab REST API, so for that case we need to delete and
+        #   than recreate the key
+        if self.deployKeyObject and self.deployKeyObject.key != key_key:
+            self.deployKeyObject.delete()
+            self.deployKeyObject = None
+
         # Because we have already call existsDeployKey in main()
         if self.deployKeyObject is None:
             deployKey = self.createDeployKey(project, {
@@ -234,7 +241,7 @@ def main():
         api_token=dict(type='str', no_log=True),
         state=dict(type='str', default="present", choices=["absent", "present"]),
         project=dict(type='str', required=True),
-        key=dict(type='str', required=True),
+        key=dict(type='str', required=True, no_log=False),
         can_push=dict(type='bool', default=False),
         title=dict(type='str', required=True)
     ))

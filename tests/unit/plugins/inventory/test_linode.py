@@ -58,19 +58,27 @@ def test_validation_option_bad_option(inventory):
 
 
 def test_empty_config_query_options(inventory):
-    regions, types = inventory._get_query_options({})
-    assert regions == types == []
+    regions, types, tags = inventory._get_query_options({})
+    assert regions == types == tags == []
 
 
 def test_conig_query_options(inventory):
-    regions, types = inventory._get_query_options({
+    regions, types, tags = inventory._get_query_options({
         'regions': ['eu-west', 'us-east'],
         'types': ['g5-standard-2', 'g6-standard-2'],
+        'tags': ['web-server'],
     })
 
     assert regions == ['eu-west', 'us-east']
     assert types == ['g5-standard-2', 'g6-standard-2']
+    assert tags == ['web-server']
+
+
+def test_verify_file(tmp_path, inventory):
+    file = tmp_path / "foobar.linode.yml"
+    file.touch()
+    assert inventory.verify_file(str(file)) is True
 
 
 def test_verify_file_bad_config(inventory):
-    assert inventory.verify_file('foobar.linde.yml') is False
+    assert inventory.verify_file('foobar.linode.yml') is False

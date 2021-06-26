@@ -1,0 +1,48 @@
+- hosts: localhost
+  gather_facts: no
+  tasks:
+  - name: Call plugin
+    set_fact:
+      result1: "{{ query('community.general.random_string') }}"
+      result2: "{{ query('community.general.random_string', length=0) }}"
+      result3: "{{ query('community.general.random_string', length=10) }}"
+      result4: "{{ query('community.general.random_string', length=-1) }}"
+      result5: "{{ query('community.general.random_string', override_special='_', min_special=1) }}"
+      result6: "{{ query('community.general.random_string', upper=false, special=false) }}" # lower case only
+      result7: "{{ query('community.general.random_string', lower=false, special=false) }}" # upper case only
+      result8: "{{ query('community.general.random_string', lower=false, upper=false, special=false) }}" # number only
+      result9: "{{ query('community.general.random_string', lower=false, upper=false, special=false, min_numeric=1, length=1) }}" # single digit only
+      result10: "{{ query('community.general.random_string', numbers=false, upper=false, special=false, min_lower=1, length=1) }}" # single lowercase character only
+      result11: "{{ query('community.general.random_string', base64=true, length=8) }}"
+      result12: "{{ query('community.general.random_string', upper=false, numbers=false, special=false) }}" # all lower case
+      result13: "{{ query('community.general.random_string', override_all='0', length=2) }}"
+
+  - name: Raise error when impossible constraints are provided
+    set_fact:
+      impossible: "{{ query('community.general.random_string', upper=false, lower=false, special=false, numbers=false) }}"
+    ignore_errors: yes
+    register: impossible_result
+
+  - name: Check results
+    assert:
+      that:
+        - result1[0] | length == 8
+        - result2[0] | length == 0
+        - result3[0] | length == 10
+        - result4[0] | length == 0
+        - result5[0] | length == 8
+        - "'_' in result5[0]"
+        - result6[0] is lower
+        - result7[0] is upper
+        - result8[0] | regex_replace('^(\d+)$', '') == ''
+        - result9[0] | regex_replace('^(\d+)$', '') == ''
+        - result9[0] | length == 1
+        - result10[0] | length == 1
+        - result10[0] is lower
+        # if input string is not multiple of 3, base64 encoded string will be padded with =
+        - result11[0].endswith('=')
+        - result12[0] is lower
+        - result13[0] | length == 2
+        - result13[0] == '00'
+        - impossible_result is failed
+        - "'Available characters cannot' in impossible_result.msg"

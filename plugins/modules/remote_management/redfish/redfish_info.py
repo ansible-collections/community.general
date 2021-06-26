@@ -24,26 +24,31 @@ options:
       - List of categories to execute on OOB controller
     default: ['Systems']
     type: list
+    elements: str
   command:
     required: false
     description:
       - List of commands to execute on OOB controller
     type: list
+    elements: str
   baseuri:
     required: true
     description:
       - Base URI of OOB controller
     type: str
   username:
-    required: true
     description:
       - User for authentication with OOB controller
     type: str
   password:
-    required: true
     description:
       - Password for authentication with OOB controller
     type: str
+  auth_token:
+    description:
+      - Security token for authentication with OOB controller
+    type: str
+    version_added: 2.3.0
   timeout:
     description:
       - Timeout in seconds for URL requests to OOB controller
@@ -296,24 +301,30 @@ def main():
     category_list = []
     module = AnsibleModule(
         argument_spec=dict(
-            category=dict(type='list', default=['Systems']),
-            command=dict(type='list'),
+            category=dict(type='list', elements='str', default=['Systems']),
+            command=dict(type='list', elements='str'),
             baseuri=dict(required=True),
-            username=dict(required=True),
-            password=dict(required=True, no_log=True),
+            username=dict(),
+            password=dict(no_log=True),
+            auth_token=dict(no_log=True),
             timeout=dict(type='int', default=10)
         ),
+        required_together=[
+            ('username', 'password'),
+        ],
+        required_one_of=[
+            ('username', 'auth_token'),
+        ],
+        mutually_exclusive=[
+            ('username', 'auth_token'),
+        ],
         supports_check_mode=False
     )
-    is_old_facts = module._name in ('redfish_facts', 'community.general.redfish_facts')
-    if is_old_facts:
-        module.deprecate("The 'redfish_facts' module has been renamed to 'redfish_info', "
-                         "and the renamed one no longer returns ansible_facts",
-                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     # admin credentials used for authentication
     creds = {'user': module.params['username'],
-             'pswd': module.params['password']}
+             'pswd': module.params['password'],
+             'token': module.params['auth_token']}
 
     # timeout
     timeout = module.params['timeout']
@@ -456,10 +467,7 @@ def main():
                     result["health_report"] = rf_utils.get_multi_manager_health_report()
 
     # Return data back
-    if is_old_facts:
-        module.exit_json(ansible_facts=dict(redfish_facts=result))
-    else:
-        module.exit_json(redfish_facts=result)
+    module.exit_json(redfish_facts=result)
 
 
 if __name__ == '__main__':

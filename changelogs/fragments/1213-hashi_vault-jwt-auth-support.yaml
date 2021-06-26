@@ -1,2 +1,0 @@
-minor_changes:
-  - hashi_vault lookup plugin - add support for JWT authentication (https://github.com/ansible-collections/community.general/pull/1213).

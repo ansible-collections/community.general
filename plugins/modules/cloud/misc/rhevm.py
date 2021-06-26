@@ -547,7 +547,7 @@ class RHEVConn(object):
 
     def set_Memory_Policy(self, name, memory_policy):
         VM = self.get_VM(name)
-        VM.memory_policy.guaranteed = int(int(memory_policy) * 1024 * 1024 * 1024)
+        VM.memory_policy.guaranteed = int(memory_policy) * 1024 * 1024 * 1024
         try:
             VM.update()
             setMsg("The memory policy has been updated.")
@@ -1229,24 +1229,6 @@ class RHEV(object):
         self.__get_conn()
         return self.conn.set_VM_Host(vmname, vmhost)
 
-        # pylint: disable=unreachable
-        VM = self.conn.get_VM(vmname)
-        HOST = self.conn.get_Host(vmhost)
-
-        if VM.placement_policy.host is None:
-            self.conn.set_VM_Host(vmname, vmhost)
-        elif str(VM.placement_policy.host.id) != str(HOST.id):
-            self.conn.set_VM_Host(vmname, vmhost)
-        else:
-            setMsg("VM's startup host was already set to " + vmhost)
-        checkFail()
-
-        if str(VM.status.state) == "up":
-            self.conn.migrate_VM(vmname, vmhost)
-        checkFail()
-
-        return True
-
     def setHost(self, hostname, cluster, ifaces):
         self.__get_conn()
         return self.conn.set_Host(hostname, cluster, ifaces)
@@ -1278,7 +1260,7 @@ def core(module):
 
     r = RHEV(module)
 
-    state = module.params.get('state', 'present')
+    state = module.params.get('state')
 
     if state == 'ping':
         r.test()

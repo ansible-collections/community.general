@@ -4,32 +4,60 @@
     state: present
   become: true
   when: ansible_distribution == 'Fedora'
+
 - block:
   - name: Activate flatpak ppa on Ubuntu
     apt_repository:
       repo: ppa:alexlarsson/flatpak
       state: present
       mode: '0644'
+    when: ansible_lsb.major_release | int < 18
+
   - name: Install flatpak package on Ubuntu
     apt:
       name: flatpak
       state: present
-  become: true
+
   when: ansible_distribution == 'Ubuntu'
-- name: Enable flathub for user
+
+- name: Install dummy remote for user
   flatpak_remote:
-    name: flathub
+    name: dummy-remote
     state: present
-    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+    flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
     method: user
-- name: Enable flathub for system
+
+- name: Install dummy remote for system
   flatpak_remote:
-    name: flathub
+    name: dummy-remote
     state: present
-    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+    flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
     method: system
+
+- name: Remove (if necessary) flatpak for testing check mode on absent flatpak
+  flatpak:
+    name:
+      - com.dummy.App1
+      - com.dummy.App3
+    remote: dummy-remote
+    state: absent
+    no_dependencies: true
+
 - name: Add flatpak for testing check mode on present flatpak
   flatpak:
-    name: org.gnome.Calculator
-    remote: flathub
+    name: com.dummy.App2
+    remote: dummy-remote
     state: present
+    no_dependencies: true
+
+- name: Copy HTTP server
+  copy:
+    src: serve.py
+    dest: '{{ remote_tmp_dir }}/serve.py'
+    mode: '0755'
+
+- name: Start HTTP server
+  command: '{{ remote_tmp_dir }}/serve.py 127.0.0.1 8000 /tmp/flatpak/'
+  async: 120
+  poll: 0
+  register: webserver_status

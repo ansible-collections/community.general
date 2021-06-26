@@ -97,6 +97,7 @@ RETURN = '''
 
 import json
 
+from ansible.module_utils._text import to_native
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
@@ -129,7 +130,7 @@ def query(module, url, check, subscription):
         )
 
     try:
-        json_out = json.loads(response.read())
+        json_out = json.loads(to_native(response.read()))
     except Exception:
         json_out = ""
 
@@ -181,7 +182,7 @@ def clear(module, url, check, subscription):
             )
 
         try:
-            json_out = json.loads(response.read())
+            json_out = json.loads(to_native(response.read()))
         except Exception:
             json_out = ""
 
@@ -246,7 +247,7 @@ def create(
             )
 
         try:
-            json_out = json.loads(response.read())
+            json_out = json.loads(to_native(response.read()))
         except Exception:
             json_out = ""
 

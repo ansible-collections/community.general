@@ -122,7 +122,7 @@ try:
 except ImportError:
     HAS_PROXMOXER = False
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 
 
 def get_template(proxmox, node, storage, content_type, template):
@@ -175,7 +175,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             api_host=dict(required=True),
-            api_password=dict(no_log=True),
+            api_password=dict(no_log=True, fallback=(env_fallback, ['PROXMOX_PASSWORD'])),
             api_token_id=dict(no_log=True),
             api_token_secret=dict(no_log=True),
             api_user=dict(required=True),
@@ -188,7 +188,10 @@ def main():
             timeout=dict(type='int', default=30),
             force=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent']),
-        )
+        ),
+        required_together=[('api_token_id', 'api_token_secret')],
+        required_one_of=[('api_password', 'api_token_id')],
+        required_if=[('state', 'absent', ['template'])]
     )
 
     if not HAS_PROXMOXER:
@@ -207,12 +210,6 @@ def main():
 
     auth_args = {'user': api_user}
     if not (api_token_id and api_token_secret):
-        # If password not set get it from PROXMOX_PASSWORD env
-        if not api_password:
-            try:
-                api_password = os.environ['PROXMOX_PASSWORD']
-            except KeyError as e:
-                module.fail_json(msg='You should set api_password param or use PROXMOX_PASSWORD environment variable')
         auth_args['password'] = api_password
     else:
         auth_args['token_name'] = api_token_id
@@ -261,9 +258,7 @@ def main():
             content_type = module.params['content_type']
             template = module.params['template']
 
-            if not template:
-                module.fail_json(msg='template param is mandatory')
-            elif not get_template(proxmox, node, storage, content_type, template):
+            if not get_template(proxmox, node, storage, content_type, template):
                 module.exit_json(changed=False, msg='template with volid=%s:%s/%s is already deleted' % (storage, content_type, template))
 
             if delete_template(module, proxmox, node, storage, content_type, template, timeout):

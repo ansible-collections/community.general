@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
-# (c) 2016, Indrajit Raychaudhuri <irc+code@indrajit.com>
+# Copyright: (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
+# Copyright: (c) 2016, Indrajit Raychaudhuri <irc+code@indrajit.com>
 #
 # Based on homebrew (Andrew Dunham <andrew@du.nham.ca>)
 #
@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: homebrew_tap
 author:
@@ -45,10 +45,16 @@ options:
         required: false
         default: 'present'
         type: str
+    path:
+        description:
+            - "A ':' separated list of paths to search for C(brew) executable."
+        default: '/usr/local/bin:/opt/homebrew/bin'
+        type: path
+        version_added: '2.1.0'
 requirements: [ homebrew ]
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Tap a Homebrew repository, state present
   community.general.homebrew_tap:
     name: homebrew/dupes
@@ -117,7 +123,7 @@ def add_tap(module, brew_path, tap, url=None):
             msg = 'successfully tapped: %s' % tap
         else:
             failed = True
-            msg = 'failed to tap: %s' % tap
+            msg = 'failed to tap: %s due to %s' % (tap, err)
 
     else:
         msg = 'already tapped: %s' % tap
@@ -127,7 +133,7 @@ def add_tap(module, brew_path, tap, url=None):
 
 def add_taps(module, brew_path, taps):
     '''Adds one or more taps.'''
-    failed, unchanged, added, msg = False, 0, 0, ''
+    failed, changed, unchanged, added, msg = False, False, 0, 0, ''
 
     for tap in taps:
         (failed, changed, msg) = add_tap(module, brew_path, tap)
@@ -172,7 +178,7 @@ def remove_tap(module, brew_path, tap):
             msg = 'successfully untapped: %s' % tap
         else:
             failed = True
-            msg = 'failed to untap: %s' % tap
+            msg = 'failed to untap: %s due to %s' % (tap, err)
 
     else:
         msg = 'already untapped: %s' % tap
@@ -182,7 +188,7 @@ def remove_tap(module, brew_path, tap):
 
 def remove_taps(module, brew_path, taps):
     '''Removes one or more taps.'''
-    failed, unchanged, removed, msg = False, 0, 0, ''
+    failed, changed, unchanged, removed, msg = False, False, 0, 0, ''
 
     for tap in taps:
         (failed, changed, msg) = remove_tap(module, brew_path, tap)
@@ -211,14 +217,23 @@ def main():
             name=dict(aliases=['tap'], type='list', required=True, elements='str'),
             url=dict(default=None, required=False),
             state=dict(default='present', choices=['present', 'absent']),
+            path=dict(
+                default="/usr/local/bin:/opt/homebrew/bin",
+                required=False,
+                type='path',
+            ),
         ),
         supports_check_mode=True,
     )
 
+    path = module.params['path']
+    if path:
+        path = path.split(':')
+
     brew_path = module.get_bin_path(
         'brew',
         required=True,
-        opt_dirs=['/usr/local/bin']
+        opt_dirs=path,
     )
 
     taps = module.params['name']

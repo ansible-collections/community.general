@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    callback: jabber
+    name: jabber
     type: notification
     short_description: post task events to a jabber server
     description:

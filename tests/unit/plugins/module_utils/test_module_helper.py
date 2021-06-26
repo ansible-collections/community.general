@@ -9,7 +9,7 @@ __metaclass__ = type
 import pytest
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    ArgFormat, DependencyCtxMgr, ModuleHelper
+    ArgFormat, DependencyCtxMgr, VarMeta, VarDict, cause_changes
 )
 
 
@@ -18,19 +18,42 @@ def single_lambda_2star(x, y, z):
 
 
 ARG_FORMATS = dict(
-    simple_boolean_true=("--superflag", ArgFormat.BOOLEAN, 0, True, ["--superflag"]),
-    simple_boolean_false=("--superflag", ArgFormat.BOOLEAN, 0, False, []),
-    single_printf=("--param=%s", ArgFormat.PRINTF, 0, "potatoes", ["--param=potatoes"]),
-    single_printf_no_substitution=("--param", ArgFormat.PRINTF, 0, "potatoes", ["--param"]),
-    multiple_printf=(["--param", "free-%s"], ArgFormat.PRINTF, 0, "potatoes", ["--param", "free-potatoes"]),
-    single_format=("--param={0}", ArgFormat.FORMAT, 0, "potatoes", ["--param=potatoes"]),
-    single_format_no_substitution=("--param", ArgFormat.FORMAT, 0, "potatoes", ["--param"]),
-    multiple_format=(["--param", "free-{0}"], ArgFormat.FORMAT, 0, "potatoes", ["--param", "free-potatoes"]),
-    single_lambda_0star=((lambda v: ["piggies=[{0},{1},{2}]".format(v[0], v[1], v[2])]),
-                         None, 0, ['a', 'b', 'c'], ["piggies=[a,b,c]"]),
-    single_lambda_1star=((lambda a, b, c: ["piggies=[{0},{1},{2}]".format(a, b, c)]),
-                         None, 1, ['a', 'b', 'c'], ["piggies=[a,b,c]"]),
-    single_lambda_2star=(single_lambda_2star, None, 2, dict(z='c', x='a', y='b'), ["piggies=[a,b,c]"])
+    simple_boolean_true=("--superflag", ArgFormat.BOOLEAN, 0,
+                         True, ["--superflag"]),
+    simple_boolean_false=("--superflag", ArgFormat.BOOLEAN, 0,
+                          False, []),
+    simple_boolean_none=("--superflag", ArgFormat.BOOLEAN, 0,
+                         None, []),
+    single_printf=("--param=%s", ArgFormat.PRINTF, 0,
+                   "potatoes", ["--param=potatoes"]),
+    single_printf_no_substitution=("--param", ArgFormat.PRINTF, 0,
+                                   "potatoes", ["--param"]),
+    single_printf_none=("--param=%s", ArgFormat.PRINTF, 0,
+                        None, []),
+    multiple_printf=(["--param", "free-%s"], ArgFormat.PRINTF, 0,
+                     "potatoes", ["--param", "free-potatoes"]),
+    single_format=("--param={0}", ArgFormat.FORMAT, 0,
+                   "potatoes", ["--param=potatoes"]),
+    single_format_none=("--param={0}", ArgFormat.FORMAT, 0,
+                        None, []),
+    single_format_no_substitution=("--param", ArgFormat.FORMAT, 0,
+                                   "potatoes", ["--param"]),
+    multiple_format=(["--param", "free-{0}"], ArgFormat.FORMAT, 0,
+                     "potatoes", ["--param", "free-potatoes"]),
+    multiple_format_none=(["--param", "free-{0}"], ArgFormat.FORMAT, 0,
+                          None, []),
+    single_lambda_0star=((lambda v: ["piggies=[{0},{1},{2}]".format(v[0], v[1], v[2])]), None, 0,
+                         ['a', 'b', 'c'], ["piggies=[a,b,c]"]),
+    single_lambda_0star_none=((lambda v: ["piggies=[{0},{1},{2}]".format(v[0], v[1], v[2])]), None, 0,
+                              None, []),
+    single_lambda_1star=((lambda a, b, c: ["piggies=[{0},{1},{2}]".format(a, b, c)]), None, 1,
+                         ['a', 'b', 'c'], ["piggies=[a,b,c]"]),
+    single_lambda_1star_none=((lambda a, b, c: ["piggies=[{0},{1},{2}]".format(a, b, c)]), None, 1,
+                              None, []),
+    single_lambda_2star=(single_lambda_2star, None, 2,
+                         dict(z='c', x='a', y='b'), ["piggies=[a,b,c]"]),
+    single_lambda_2star_none=(single_lambda_2star, None, 2,
+                              None, []),
 )
 ARG_FORMATS_IDS = sorted(ARG_FORMATS.keys())
 
@@ -82,3 +105,100 @@ def test_dependency_ctxmgr():
     with ctx:
         import sys
     assert ctx.has_it
+
+
+def test_variable_meta():
+    meta = VarMeta()
+    assert meta.output is True
+    assert meta.diff is False
+    assert meta.value is None
+    meta.set_value("abc")
+    assert meta.initial_value == "abc"
+    assert meta.value == "abc"
+    assert meta.diff_result is None
+    meta.set_value("def")
+    assert meta.initial_value == "abc"
+    assert meta.value == "def"
+    assert meta.diff_result is None
+
+
+def test_variable_meta_diff():
+    meta = VarMeta(diff=True)
+    assert meta.output is True
+    assert meta.diff is True
+    assert meta.value is None
+    meta.set_value("abc")
+    assert meta.initial_value == "abc"
+    assert meta.value == "abc"
+    assert meta.diff_result is None
+    meta.set_value("def")
+    assert meta.initial_value == "abc"
+    assert meta.value == "def"
+    assert meta.diff_result == {"before": "abc", "after": "def"}
+    meta.set_value("ghi")
+    assert meta.initial_value == "abc"
+    assert meta.value == "ghi"
+    assert meta.diff_result == {"before": "abc", "after": "ghi"}
+
+
+def test_vardict():
+    vd = VarDict()
+    vd.set('a', 123)
+    assert vd['a'] == 123
+    assert vd.a == 123
+    assert 'a' in vd._meta
+    assert vd.meta('a').output is True
+    assert vd.meta('a').diff is False
+    assert vd.meta('a').change is False
+    vd['b'] = 456
+    vd.set_meta('a', diff=True, change=True)
+    vd.set_meta('b', diff=True, output=False)
+    vd['c'] = 789
+    vd['a'] = 'new_a'
+    vd['c'] = 'new_c'
+    assert vd.a == 'new_a'
+    assert vd.c == 'new_c'
+    assert vd.output() == {'a': 'new_a', 'c': 'new_c'}
+    assert vd.diff() == {'before': {'a': 123}, 'after': {'a': 'new_a'}}, "diff={0}".format(vd.diff())
+
+
+class MockMH(object):
+    changed = None
+
+    def _div(self, x, y):
+        return x / y
+
+    func_none = cause_changes()(_div)
+    func_onsucc = cause_changes(on_success=True)(_div)
+    func_onfail = cause_changes(on_failure=True)(_div)
+    func_onboth = cause_changes(on_success=True, on_failure=True)(_div)
+
+
+CAUSE_CHG_DECO_PARAMS = ['method', 'expect_exception', 'expect_changed']
+CAUSE_CHG_DECO = dict(
+    none_succ=dict(method='func_none', expect_exception=False, expect_changed=None),
+    none_fail=dict(method='func_none', expect_exception=True, expect_changed=None),
+    onsucc_succ=dict(method='func_onsucc', expect_exception=False, expect_changed=True),
+    onsucc_fail=dict(method='func_onsucc', expect_exception=True, expect_changed=None),
+    onfail_succ=dict(method='func_onfail', expect_exception=False, expect_changed=None),
+    onfail_fail=dict(method='func_onfail', expect_exception=True, expect_changed=True),
+    onboth_succ=dict(method='func_onboth', expect_exception=False, expect_changed=True),
+    onboth_fail=dict(method='func_onboth', expect_exception=True, expect_changed=True),
+)
+CAUSE_CHG_DECO_IDS = sorted(CAUSE_CHG_DECO.keys())
+
+
+@pytest.mark.parametrize(CAUSE_CHG_DECO_PARAMS,
+                         [[CAUSE_CHG_DECO[tc][param]
+                           for param in CAUSE_CHG_DECO_PARAMS]
+                          for tc in CAUSE_CHG_DECO_IDS],
+                         ids=CAUSE_CHG_DECO_IDS)
+def test_cause_changes_deco(method, expect_exception, expect_changed):
+    mh = MockMH()
+    if expect_exception:
+        with pytest.raises(Exception):
+            getattr(mh, method)(1, 0)
+    else:
+        getattr(mh, method)(9, 3)
+
+    assert mh.changed == expect_changed

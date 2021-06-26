@@ -31,13 +31,14 @@ options:
     default: 'present'
   tags:
     type: list
+    elements: dict
     description:
       - tags - list of dictionaries, each includes 'name' and 'category' keys.
       - required if state is present or absent.
   resource_type:
     type: str
     description:
-      - the relevant resource type in manageiq
+      - The relevant resource type in manageiq.
     required: true
     choices: ['provider', 'host', 'vm', 'blueprint', 'category', 'cluster',
         'data store', 'group', 'resource pool', 'service', 'service template',
@@ -45,14 +46,35 @@ options:
   resource_name:
     type: str
     description:
-      - the relevant resource name in manageiq
-    required: true
+      - The name of the resource at which tags will be controlled.
+      - Must be specified if I(resource_id) is not set. Both options are mutually exclusive.
+  resource_id:
+    description:
+      - The ID of the resource at which tags will be controlled.
+      - Must be specified if I(resource_name) is not set. Both options are mutually exclusive.
+    type: int
+    version_added: 2.2.0
 '''
 
 EXAMPLES = '''
 - name: Create new tags for a provider in ManageIQ
   community.general.manageiq_tags:
     resource_name: 'EngLab'
+    resource_type: 'provider'
+    tags:
+    - category: environment
+      name: prod
+    - category: owner
+      name: prod_ops
+    manageiq_connection:
+      url: 'http://127.0.0.1:3000'
+      username: 'admin'
+      password: 'smartvm'
+      validate_certs: False
+
+- name: Create new tags for a provider in ManageIQ
+  community.general.manageiq_tags:
+    resource_id: 23000000790497
     resource_type: 'provider'
     tags:
     - category: environment
@@ -240,8 +262,9 @@ class ManageIQTags(object):
 def main():
     actions = {'present': 'assign', 'absent': 'unassign', 'list': 'list'}
     argument_spec = dict(
-        tags=dict(type='list'),
-        resource_name=dict(required=True, type='str'),
+        tags=dict(type='list', elements='dict'),
+        resource_id=dict(required=False, type='int'),
+        resource_name=dict(required=False, type='str'),
         resource_type=dict(required=True, type='str',
                            choices=list(manageiq_entities().keys())),
         state=dict(required=False, type='str',
@@ -252,6 +275,8 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
+        mutually_exclusive=[["resource_id", "resource_name"]],
+        required_one_of=[["resource_id", "resource_name"]],
         required_if=[
             ('state', 'present', ['tags']),
             ('state', 'absent', ['tags'])
@@ -259,6 +284,7 @@ def main():
     )
 
     tags = module.params['tags']
+    resource_id = module.params['resource_id']
     resource_type_key = module.params['resource_type']
     resource_name = module.params['resource_name']
     state = module.params['state']
@@ -270,7 +296,8 @@ def main():
     manageiq = ManageIQ(module)
 
     # query resource id, fail if resource does not exist
-    resource_id = query_resource_id(manageiq, resource_type, resource_name)
+    if resource_id is None:
+        resource_id = query_resource_id(manageiq, resource_type, resource_name)
 
     manageiq_tags = ManageIQTags(manageiq, resource_type, resource_id)
 

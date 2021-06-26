@@ -24,6 +24,7 @@ options:
     name:
       description:
         - Logical Interconnect Group name.
+      type: str
 extends_documentation_fragment:
 - community.general.oneview
 - community.general.oneview.factsparams
@@ -96,11 +97,6 @@ class LogicalInterconnectGroupInfoModule(OneViewModuleBase):
         )
 
         super(LogicalInterconnectGroupInfoModule, self).__init__(additional_arg_spec=argument_spec)
-        self.is_old_facts = self.module._name in ('oneview_logical_interconnect_group_facts', 'community.general.oneview_logical_interconnect_group_facts')
-        if self.is_old_facts:
-            self.module.deprecate("The 'oneview_logical_interconnect_group_facts' module has been renamed to 'oneview_logical_interconnect_group_info', "
-                                  "and the renamed one no longer returns ansible_facts",
-                                  version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     def execute_module(self):
         if self.module.params.get('name'):
@@ -108,10 +104,7 @@ class LogicalInterconnectGroupInfoModule(OneViewModuleBase):
         else:
             ligs = self.oneview_client.logical_interconnect_groups.get_all(**self.facts_params)
 
-        if self.is_old_facts:
-            return dict(changed=False, ansible_facts=dict(logical_interconnect_groups=ligs))
-        else:
-            return dict(changed=False, logical_interconnect_groups=ligs)
+        return dict(changed=False, logical_interconnect_groups=ligs)
 
 
 def main():

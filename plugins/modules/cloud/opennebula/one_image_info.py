@@ -56,6 +56,7 @@ options:
       - A list of images ids whose facts you want to gather.
     aliases: ['id']
     type: list
+    elements: str
   name:
     description:
       - A C(name) of the image whose facts will be gathered.
@@ -253,16 +254,13 @@ def main():
         "api_url": {"required": False, "type": "str"},
         "api_username": {"required": False, "type": "str"},
         "api_password": {"required": False, "type": "str", "no_log": True},
-        "ids": {"required": False, "aliases": ['id'], "type": "list"},
+        "ids": {"required": False, "aliases": ['id'], "type": "list", "elements": "str"},
         "name": {"required": False, "type": "str"},
     }
 
     module = AnsibleModule(argument_spec=fields,
                            mutually_exclusive=[['ids', 'name']],
                            supports_check_mode=True)
-    if module._name in ('one_image_facts', 'community.general.one_image_facts'):
-        module.deprecate("The 'one_image_facts' module has been renamed to 'one_image_info'",
-                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     if not HAS_PYONE:
         module.fail_json(msg='This module requires pyone to work!')
@@ -273,9 +271,6 @@ def main():
     name = params.get('name')
     client = pyone.OneServer(auth.url, session=auth.username + ':' + auth.password)
 
-    result = {'images': []}
-    images = []
-
     if ids:
         images = get_images_by_ids(module, client, ids)
     elif name:
@@ -283,8 +278,9 @@ def main():
     else:
         images = get_all_images(client).IMAGE
 
-    for image in images:
-        result['images'].append(get_image_info(image))
+    result = {
+        'images': [get_image_info(image) for image in images],
+    }
 
     module.exit_json(**result)
 

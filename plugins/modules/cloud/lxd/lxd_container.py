@@ -45,6 +45,7 @@ options:
         description:
           - Profile to be used by the container
         type: list
+        elements: str
     devices:
         description:
           - 'The devices for the container
@@ -132,14 +133,14 @@ options:
           - If not specified, it defaults to C(${HOME}/.config/lxc/client.key).
         required: false
         aliases: [ key_file ]
-        type: str
+        type: path
     client_cert:
         description:
           - The client certificate file path.
           - If not specified, it defaults to C(${HOME}/.config/lxc/client.crt).
         required: false
         aliases: [ cert_file ]
-        type: str
+        type: path
     trust_password:
         description:
           - The client trusted password.
@@ -658,12 +659,13 @@ def main():
             ),
             profiles=dict(
                 type='list',
+                elements='str',
             ),
             source=dict(
                 type='dict',
             ),
             state=dict(
-                choices=LXD_ANSIBLE_STATES.keys(),
+                choices=list(LXD_ANSIBLE_STATES.keys()),
                 default='started'
             ),
             target=dict(
@@ -690,11 +692,11 @@ def main():
                 default='unix:/var/snap/lxd/common/lxd/unix.socket'
             ),
             client_key=dict(
-                type='str',
+                type='path',
                 aliases=['key_file']
             ),
             client_cert=dict(
-                type='str',
+                type='path',
                 aliases=['cert_file']
             ),
             trust_password=dict(type='str', no_log=True)

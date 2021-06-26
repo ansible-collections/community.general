@@ -38,6 +38,7 @@ options:
     description:
       - A list of specific functions to deploy.
       - If this is not provided, all functions in the service will be deployed.
+      - Deprecated parameter, it will be removed in community.general 5.0.0.
     type: list
     elements: str
     default: []
@@ -78,13 +79,6 @@ EXAMPLES = r'''
   community.general.serverless:
     service_path: '{{ project_dir }}'
     state: present
-
-- name: Deploy specific functions
-  community.general.serverless:
-    service_path: '{{ project_dir }}'
-    functions:
-      - my_func_one
-      - my_func_two
 
 - name: Deploy a project, then pull its resource list back into Ansible
   community.general.serverless:
@@ -139,16 +133,14 @@ from ansible.module_utils.basic import AnsibleModule
 
 def read_serverless_config(module):
     path = module.params.get('service_path')
+    full_path = os.path.join(path, 'serverless.yml')
 
     try:
-        with open(os.path.join(path, 'serverless.yml')) as sls_config:
+        with open(full_path) as sls_config:
             config = yaml.safe_load(sls_config.read())
             return config
     except IOError as e:
-        module.fail_json(msg="Could not open serverless.yml in {0}. err: {1}".format(path, str(e)))
-
-    module.fail_json(msg="Failed to open serverless config at {0}".format(
-        os.path.join(path, 'serverless.yml')))
+        module.fail_json(msg="Could not open serverless.yml in {0}. err: {1}".format(full_path, str(e)))
 
 
 def get_service_name(module, stage):
@@ -167,7 +159,8 @@ def main():
         argument_spec=dict(
             service_path=dict(type='path', required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
-            functions=dict(type='list', elements='str'),
+            functions=dict(type='list', elements='str',
+                           removed_in_version="5.0.0", removed_from_collection="community.general"),
             region=dict(type='str', default=''),
             stage=dict(type='str', default=''),
             deploy=dict(type='bool', default=True),
@@ -182,7 +175,6 @@ def main():
 
     service_path = module.params.get('service_path')
     state = module.params.get('state')
-    functions = module.params.get('functions')
     region = module.params.get('region')
     stage = module.params.get('stage')
     deploy = module.params.get('deploy', True)
@@ -193,7 +185,7 @@ def main():
     if serverless_bin_path is not None:
         command = serverless_bin_path + " "
     else:
-        command = "serverless "
+        command = module.get_bin_path("serverless") + " "
 
     if state == 'present':
         command += 'deploy '

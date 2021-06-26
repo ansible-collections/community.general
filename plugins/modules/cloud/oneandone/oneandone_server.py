@@ -87,6 +87,7 @@ options:
       - A list of hard disks with nested "size" and "is_main" properties.
         It must be provided with vcore, cores_per_processor, and ram parameters.
     type: list
+    elements: dict
   private_network:
     description:
       - The private network name or ID.
@@ -627,9 +628,9 @@ def main():
             vcore=dict(type='int'),
             cores_per_processor=dict(type='int'),
             ram=dict(type='float'),
-            hdds=dict(type='list'),
+            hdds=dict(type='list', elements='dict'),
             count=dict(type='int', default=1),
-            ssh_key=dict(type='raw'),
+            ssh_key=dict(type='raw', no_log=False),
             auto_increment=dict(type='bool', default=True),
             server=dict(type='str'),
             datacenter=dict(

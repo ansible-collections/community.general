@@ -100,7 +100,7 @@ options:
   fs_type:
     description:
      - If specified and the partition does not exist, will set filesystem type to given partition.
-     - Parameter optional, but see notes below about negative negative C(part_start) values.
+     - Parameter optional, but see notes below about negative C(part_start) values.
     type: str
     version_added: '0.2.0'
   resize:
@@ -217,10 +217,11 @@ EXAMPLES = r'''
 
 - name: Extend an existing partition to fill all available space
   community.general.parted:
-    decice: /dev/sdb
+    device: /dev/sdb
     number: "{{ sdb_info.partitions | length }}"
     part_end: "100%"
     resize: true
+    state: present
 '''
 
 
@@ -240,7 +241,7 @@ def parse_unit(size_str, unit=''):
     """
     Parses a string containing a size or boundary information
     """
-    matches = re.search(r'^(-?[\d.]+)([\w%]+)?$', size_str)
+    matches = re.search(r'^(-?[\d.]+) *([\w%]+)?$', size_str)
     if matches is None:
         # "<cylinder>,<head>,<sector>" format
         matches = re.search(r'^(\d+),(\d+),(\d+)$', size_str)
@@ -487,7 +488,7 @@ def check_parted_label(device):
     global parted_exec
 
     # Check the version
-    parted_major, parted_minor, _ = parted_version()
+    parted_major, parted_minor, dummy = parted_version()
     if (parted_major == 3 and parted_minor >= 1) or parted_major > 3:
         return False
 
@@ -497,6 +498,33 @@ def check_parted_label(device):
         return True
 
     return False
+
+
+def parse_parted_version(out):
+    """
+    Returns version tuple from the output of "parted --version" command
+    """
+    lines = [x for x in out.split('\n') if x.strip() != '']
+    if len(lines) == 0:
+        return None, None, None
+
+    # Sample parted versions (see as well test unit):
+    # parted (GNU parted) 3.3
+    # parted (GNU parted) 3.4.5
+    # parted (GNU parted) 3.3.14-dfc61
+    matches = re.search(r'^parted.+\s(\d+)\.(\d+)(?:\.(\d+))?', lines[0].strip())
+
+    if matches is None:
+        return None, None, None
+
+    # Convert version to numbers
+    major = int(matches.group(1))
+    minor = int(matches.group(2))
+    rev = 0
+    if matches.group(3) is not None:
+        rev = int(matches.group(3))
+
+    return major, minor, rev
 
 
 def parted_version():
@@ -511,20 +539,9 @@ def parted_version():
             msg="Failed to get parted version.", rc=rc, out=out, err=err
         )
 
-    lines = [x for x in out.split('\n') if x.strip() != '']
-    if len(lines) == 0:
+    (major, minor, rev) = parse_parted_version(out)
+    if major is None:
         module.fail_json(msg="Failed to get parted version.", rc=0, out=out)
-
-    matches = re.search(r'^parted.+(\d+)\.(\d+)(?:\.(\d+))?$', lines[0])
-    if matches is None:
-        module.fail_json(msg="Failed to get parted version.", rc=0, out=out)
-
-    # Convert version to numbers
-    major = int(matches.group(1))
-    minor = int(matches.group(2))
-    rev = 0
-    if matches.group(3) is not None:
-        rev = int(matches.group(3))
 
     return major, minor, rev
 

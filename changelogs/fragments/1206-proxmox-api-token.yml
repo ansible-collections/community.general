@@ -1,5 +1,0 @@
----
-minor_changes:
-  - proxmox - add support for API tokens (https://github.com/ansible-collections/community.general/pull/1206).
-  - proxmox_kvm - add support for API tokens (https://github.com/ansible-collections/community.general/pull/1206).
-  - proxmox_template - add support for API tokens (https://github.com/ansible-collections/community.general/pull/1206).

@@ -6,7 +6,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-
 DOCUMENTATION = '''
 ---
 module: jenkins_job
@@ -65,6 +64,15 @@ options:
     description:
        - User to authenticate with the Jenkins server.
     required: false
+  validate_certs:
+    type: bool
+    default: yes
+    description:
+      - If set to C(no), the SSL certificates will not be validated.
+        This should only set to C(no) used on personally controlled sites
+        using self-signed certificates as it avoids verifying the source site.
+      - The C(python-jenkins) library only handles this by using the environment variable C(PYTHONHTTPSVERIFY).
+    version_added: 2.3.0
 '''
 
 EXAMPLES = '''
@@ -146,6 +154,7 @@ url:
   sample: https://jenkins.mydomain.com
 '''
 
+import os
 import traceback
 import xml.etree.ElementTree as ET
 
@@ -161,7 +170,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
 
 
-class JenkinsJob:
+class JenkinsJob(object):
 
     def __init__(self, module):
         self.module = module
@@ -189,14 +198,16 @@ class JenkinsJob:
         }
 
         self.EXCL_STATE = "excluded state"
+        if not module.params['validate_certs']:
+            os.environ['PYTHONHTTPSVERIFY'] = '0'
 
     def get_jenkins_connection(self):
         try:
-            if (self.user and self.password):
+            if self.user and self.password:
                 return jenkins.Jenkins(self.jenkins_url, self.user, self.password)
-            elif (self.user and self.token):
+            elif self.user and self.token:
                 return jenkins.Jenkins(self.jenkins_url, self.user, self.token)
-            elif (self.user and not (self.password or self.token)):
+            elif self.user and not (self.password or self.token):
                 return jenkins.Jenkins(self.jenkins_url, self.user)
             else:
                 return jenkins.Jenkins(self.jenkins_url)
@@ -256,9 +267,7 @@ class JenkinsJob:
         if self.enabled is None:
             return False
 
-        if ((self.enabled is False and status != "disabled") or (self.enabled is True and status == "disabled")):
-            return True
-        return False
+        return (self.enabled is False and status != "disabled") or (self.enabled is True and status == "disabled")
 
     def switch_state(self):
         if self.enabled is False:
@@ -277,7 +286,7 @@ class JenkinsJob:
                     self.server.reconfig_job(self.name, self.get_config())
 
             # Handle job disable/enable
-            elif (status != self.EXCL_STATE and self.has_state_changed(status)):
+            elif status != self.EXCL_STATE and self.has_state_changed(status):
                 self.result['changed'] = True
                 if not self.module.check_mode:
                     self.switch_state()
@@ -342,7 +351,8 @@ def main():
             enabled=dict(required=False, type='bool'),
             token=dict(type='str', required=False, no_log=True),
             url=dict(type='str', required=False, default="http://localhost:8080"),
-            user=dict(type='str', required=False)
+            user=dict(type='str', required=False),
+            validate_certs=dict(type='bool', default=True),
         ),
         mutually_exclusive=[
             ['password', 'token'],

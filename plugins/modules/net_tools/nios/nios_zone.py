@@ -10,6 +10,10 @@ DOCUMENTATION = '''
 module: nios_zone
 author: "Peter Sprygada (@privateip)"
 short_description: Configure Infoblox NIOS DNS zones
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding module from it.
+    alternative: infoblox.nios_modules.nios_zone
+    removed_in: 5.0.0
 description:
   - Adds and/or removes instances of DNS zone objects from
     Infoblox NIOS servers.  This module manages NIOS C(zone_auth) objects
@@ -27,6 +31,7 @@ options:
     required: true
     aliases:
       - name
+    type: str
   view:
     description:
       - Configures the DNS view name for the configured resource.  The
@@ -35,6 +40,7 @@ options:
     default: default
     aliases:
       - dns_view
+    type: str
   grid_primary:
     description:
       - Configures the grid primary servers for this zone.
@@ -45,6 +51,7 @@ options:
         description:
           - The name of the grid primary server
         required: true
+        type: str
   grid_secondaries:
     description:
       - Configures the grid secondary servers for this zone.
@@ -55,10 +62,12 @@ options:
         description:
           - The name of the grid secondary server
         required: true
+        type: str
   ns_group:
     description:
       - Configures the name server group for this zone. Name server group is
         mutually exclusive with grid primary and grid secondaries.
+    type: str
   restart_if_needed:
     description:
       - If set to true, causes the NIOS DNS service to restart and load the
@@ -71,16 +80,19 @@ options:
         responsibility to respond to address-to-name queries. It supports
         reverse-mapping zones for both IPv4 and IPv6 addresses.
     default: FORWARD
+    type: str
   extattrs:
     description:
       - Allows for the configuration of Extensible Attributes on the
         instance of the object.  This argument accepts a set of key / value
         pairs for configuration.
+    type: dict
   comment:
     description:
       - Configures a text string comment to be associated with the instance
         of this object.  The provided text string will be configured on the
         object instance.
+    type: str
   state:
     description:
       - Configures the intended state of the instance of the object on
@@ -91,6 +103,7 @@ options:
     choices:
       - present
       - absent
+    type: str
 '''
 
 EXAMPLES = '''
@@ -178,6 +191,7 @@ RETURN = ''' # '''
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiModule
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import NIOS_ZONE
+from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_ib_spec
 
 
 def main():
@@ -206,7 +220,7 @@ def main():
         state=dict(default='present', choices=['present', 'absent'])
     )
 
-    argument_spec.update(ib_spec)
+    argument_spec.update(normalize_ib_spec(ib_spec))
     argument_spec.update(WapiModule.provider_spec)
 
     module = AnsibleModule(argument_spec=argument_spec,

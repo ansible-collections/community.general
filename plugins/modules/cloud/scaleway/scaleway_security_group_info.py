@@ -27,6 +27,10 @@ options:
       - EMEA-NL-EVS
       - par1
       - EMEA-FR-PAR1
+      - par2
+      - EMEA-FR-PAR2
+      - waw1
+      - EMEA-PL-WAW1
 extends_documentation_fragment:
 - community.general.scaleway
 
@@ -45,9 +49,12 @@ EXAMPLES = r'''
 RETURN = r'''
 ---
 scaleway_security_group_info:
-  description: Response from Scaleway API
+  description:
+    - Response from Scaleway API.
+    - "For more details please refer to: U(https://developers.scaleway.com/en/products/instance/api/)."
   returned: success
-  type: complex
+  type: list
+  elements: dict
   sample:
     "scaleway_security_group_info": [
         {

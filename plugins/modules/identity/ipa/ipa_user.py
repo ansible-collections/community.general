@@ -94,7 +94,8 @@ options:
     description:
     - The authentication type to use for the user.
     choices: ["password", "radius", "otp", "pkinit", "hardened"]
-    type: str
+    type: list
+    elements: str
     version_added: '1.2.0'
 extends_documentation_fragment:
 - community.general.ipa.documentation
@@ -146,11 +147,13 @@ EXAMPLES = r'''
     ipa_pass: topsecret
     update_password: on_create
 
-- name: Ensure pinky is present and using one time password authentication
+- name: Ensure pinky is present and using one time password and RADIUS authentication
   community.general.ipa_user:
     name: pinky
     state: present
-    userauthtype: otp
+    userauthtype:
+      - otp
+      - radius
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
@@ -269,16 +272,18 @@ def get_user_diff(client, ipa_user, module_user):
 def get_ssh_key_fingerprint(ssh_key, hash_algo='sha256'):
     """
     Return the public key fingerprint of a given public SSH key
-    in format "[fp] [user@host] (ssh-rsa)" where fp is of the format:
+    in format "[fp] [comment] (ssh-rsa)" where fp is of the format:
     FB:0C:AC:0A:07:94:5B:CE:75:6E:63:32:13:AD:AD:D7
     for md5 or
     SHA256:[base64]
     for sha256
+    Comments are assumed to be all characters past the second
+    whitespace character in the sshpubkey string.
     :param ssh_key:
     :param hash_algo:
     :return:
     """
-    parts = ssh_key.strip().split()
+    parts = ssh_key.strip().split(None, 2)
     if len(parts) == 0:
         return None
     key_type = parts[0]
@@ -293,8 +298,8 @@ def get_ssh_key_fingerprint(ssh_key, hash_algo='sha256'):
     if len(parts) < 3:
         return "%s (%s)" % (key_fp, key_type)
     else:
-        user_host = parts[2]
-        return "%s %s (%s)" % (key_fp, user_host, key_type)
+        comment = parts[2]
+        return "%s %s (%s)" % (key_fp, comment, key_type)
 
 
 def ensure(module, client):
@@ -361,7 +366,7 @@ def main():
                          telephonenumber=dict(type='list', elements='str'),
                          title=dict(type='str'),
                          homedirectory=dict(type='str'),
-                         userauthtype=dict(type='str',
+                         userauthtype=dict(type='list', elements='str',
                                            choices=['password', 'radius', 'otp', 'pkinit', 'hardened']))
 
     module = AnsibleModule(argument_spec=argument_spec,

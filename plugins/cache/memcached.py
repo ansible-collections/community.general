@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    cache: memcached
+    name: memcached
     short_description: Use memcached DB for cache
     description:
         - This cache uses JSON formatted, per host records saved in memcached.
@@ -162,7 +162,7 @@ class CacheModuleKeys(MutableSet):
         self._cache.set(self.PREFIX, self._keyset)
 
     def remove_by_timerange(self, s_min, s_max):
-        for k in self._keyset.keys():
+        for k in list(self._keyset.keys()):
             t = self._keyset[k]
             if s_min < t < s_max:
                 del self._keyset[k]

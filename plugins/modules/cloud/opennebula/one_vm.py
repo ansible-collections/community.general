@@ -72,6 +72,7 @@ options:
       - A list of instance ids used for states':' C(absent), C(running), C(rebooted), C(poweredoff)
     aliases: ['ids']
     type: list
+    elements: int
   state:
     description:
       - C(present) - create instances from a template specified with C(template_id)/C(template_name).
@@ -120,6 +121,7 @@ options:
       - C(state) of instances with these labels.
     default: []
     type: list
+    elements: str
   count_attributes:
     description:
       - A dictionary of key/value attributes that can only be used with
@@ -134,6 +136,7 @@ options:
       - This can be expressed in multiple ways and is shown in the EXAMPLES
       - section.
     type: list
+    elements: str
   count:
     description:
       - Number of instances to launch
@@ -168,6 +171,7 @@ options:
       - NOTE':' If The Template hats Multiple Disks the Order of the Sizes is
       - matched against the order specified in C(template_id)/C(template_name).
     type: list
+    elements: str
   cpu:
     description:
       - Percentage of CPU divided by 100 required for the new instance. Half a
@@ -182,6 +186,7 @@ options:
       - A list of dictionaries with network parameters. See examples for more details.
     default: []
     type: list
+    elements: dict
   disk_saveas:
     description:
       - Creates an image from a VM disk.
@@ -747,11 +752,20 @@ def get_vm_info(client, vm):
     if 'NIC' in vm.TEMPLATE:
         if isinstance(vm.TEMPLATE['NIC'], list):
             for nic in vm.TEMPLATE['NIC']:
-                networks_info.append({'ip': nic['IP'], 'mac': nic['MAC'], 'name': nic['NETWORK'], 'security_groups': nic['SECURITY_GROUPS']})
+                networks_info.append({
+                    'ip': nic.get('IP', ''),
+                    'mac': nic.get('MAC', ''),
+                    'name': nic.get('NETWORK', ''),
+                    'security_groups': nic.get('SECURITY_GROUPS', '')
+                })
         else:
-            networks_info.append(
-                {'ip': vm.TEMPLATE['NIC']['IP'], 'mac': vm.TEMPLATE['NIC']['MAC'],
-                    'name': vm.TEMPLATE['NIC']['NETWORK'], 'security_groups': vm.TEMPLATE['NIC']['SECURITY_GROUPS']})
+            networks_info.append({
+                'ip': vm.TEMPLATE['NIC'].get('IP', ''),
+                'mac': vm.TEMPLATE['NIC'].get('MAC', ''),
+                'name': vm.TEMPLATE['NIC'].get('NETWORK', ''),
+                'security_groups':
+                    vm.TEMPLATE['NIC'].get('SECURITY_GROUPS', '')
+            })
     import time
 
     current_time = time.localtime()
@@ -1349,7 +1363,7 @@ def main():
         "api_url": {"required": False, "type": "str"},
         "api_username": {"required": False, "type": "str"},
         "api_password": {"required": False, "type": "str", "no_log": True},
-        "instance_ids": {"required": False, "aliases": ['ids'], "type": "list"},
+        "instance_ids": {"required": False, "aliases": ['ids'], "type": "list", "elements": "int"},
         "template_name": {"required": False, "type": "str"},
         "template_id": {"required": False, "type": "int"},
         "vm_start_on_hold": {"default": False, "type": "bool"},
@@ -1367,16 +1381,16 @@ def main():
         "memory": {"required": False, "type": "str"},
         "cpu": {"required": False, "type": "float"},
         "vcpu": {"required": False, "type": "int"},
-        "disk_size": {"required": False, "type": "list"},
+        "disk_size": {"required": False, "type": "list", "elements": "str"},
         "datastore_name": {"required": False, "type": "str"},
         "datastore_id": {"required": False, "type": "int"},
-        "networks": {"default": [], "type": "list"},
+        "networks": {"default": [], "type": "list", "elements": "dict"},
         "count": {"default": 1, "type": "int"},
         "exact_count": {"required": False, "type": "int"},
         "attributes": {"default": {}, "type": "dict"},
         "count_attributes": {"required": False, "type": "dict"},
-        "labels": {"default": [], "type": "list"},
-        "count_labels": {"required": False, "type": "list"},
+        "labels": {"default": [], "type": "list", "elements": "str"},
+        "count_labels": {"required": False, "type": "list", "elements": "str"},
         "disk_saveas": {"type": "dict"},
         "persistent": {"default": False, "type": "bool"}
     }

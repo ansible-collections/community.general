@@ -1,3 +1,0 @@
----
-minor_changes:
-  - proxmox_template - download proxmox applicance templates (pveam) (https://github.com/ansible-collections/community.general/pull/1046).

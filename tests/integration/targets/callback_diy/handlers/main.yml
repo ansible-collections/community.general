@@ -1,9 +1,0 @@
-  
-- name: Remove temporary playbooks
-  file:
-    path: "{{ temporary_file.path }}"
-    state: absent
-  loop: "{{ temporary_playbook_files.results }}"
-  loop_control:
-    loop_var: temporary_file
-    label: "{{ temporary_file.test.name }}: {{ temporary_file.path }}"

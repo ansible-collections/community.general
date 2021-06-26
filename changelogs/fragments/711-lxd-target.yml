@@ -1,2 +1,0 @@
-minor_changes:
-  - lxd_container - added support of ``--target`` flag for cluster deployments (https://github.com/ansible-collections/community.general/issues/637).

@@ -59,11 +59,13 @@ options:
         default: "https://api.status.io"
     components:
         type: list
+        elements: str
         description:
             - The given name of your component (server name)
         aliases: ['component']
     containers:
         type: list
+        elements: str
         description:
             - The given name of your container (data center)
         aliases: ['container']
@@ -339,9 +341,9 @@ def main():
             state=dict(required=False, default='present',
                        choices=['present', 'absent']),
             url=dict(default='https://api.status.io', required=False),
-            components=dict(type='list', required=False, default=None,
+            components=dict(type='list', elements='str', required=False, default=None,
                             aliases=['component']),
-            containers=dict(type='list', required=False, default=None,
+            containers=dict(type='list', elements='str', required=False, default=None,
                             aliases=['container']),
             all_infrastructure_affected=dict(type='bool', default=False,
                                              required=False),
@@ -423,7 +425,7 @@ def main():
         if module.check_mode:
             module.exit_json(changed=True)
         else:
-            (rc, _, error) = create_maintenance(
+            (rc, dummy, error) = create_maintenance(
                 auth_headers, url, statuspage, host_ids,
                 all_infrastructure_affected, automation,
                 title, desc, returned_date, maintenance_notify_now,
@@ -449,7 +451,7 @@ def main():
         if module.check_mode:
             module.exit_json(changed=True)
         else:
-            (rc, _, error) = delete_maintenance(
+            (rc, dummy, error) = delete_maintenance(
                 auth_headers, url, statuspage, maintenance_id)
             if rc == 0:
                 module.exit_json(

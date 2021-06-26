@@ -151,7 +151,7 @@ def main():
     # Setup the Ansible module
     module = AnsibleModule(
         argument_spec=dict(
-            key=dict(type='str', required=True),
+            key=dict(type='str', required=True, no_log=False),
             value_type=dict(type='str', choices=['bool', 'float', 'int', 'string']),
             value=dict(type='str'),
             state=dict(type='str', required=True, choices=['absent', 'get', 'present']),
@@ -200,7 +200,7 @@ def main():
     gconf_pref = GConf2Preference(module, key, value_type,
                                   value, direct, config_source)
     # Now we get the current value, if not found don't fail
-    _, current_value = gconf_pref.call("get", fail_onerr=False)
+    dummy, current_value = gconf_pref.call("get", fail_onerr=False)
 
     # Check if the current value equals the value we want to set.  If not, make
     # a change

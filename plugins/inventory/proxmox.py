@@ -7,7 +7,6 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     name: proxmox
-    plugin_type: inventory
     short_description: Proxmox inventory source
     version_added: "1.2.0"
     author:
@@ -20,6 +19,7 @@ DOCUMENTATION = '''
         - Will retrieve the first network interface with an IP for Proxmox nodes.
         - Can retrieve LXC/QEMU configuration as facts.
     extends_documentation_fragment:
+        - constructed
         - inventory_cache
     options:
       plugin:
@@ -28,17 +28,32 @@ DOCUMENTATION = '''
         choices: ['community.general.proxmox']
         type: str
       url:
-        description: URL to Proxmox cluster.
+        description:
+          - URL to Proxmox cluster.
+          - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_URL) will be used instead.
         default: 'http://localhost:8006'
         type: str
+        env:
+          - name: PROXMOX_URL
+            version_added: 2.0.0
       user:
-        description: Proxmox authentication user.
+        description:
+          - Proxmox authentication user.
+          - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_USER) will be used instead.
         required: yes
         type: str
+        env:
+          - name: PROXMOX_USER
+            version_added: 2.0.0
       password:
-        description: Proxmox authentication password.
+        description:
+          - Proxmox authentication password.
+          - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_PASSWORD) will be used instead.
         required: yes
         type: str
+        env:
+          - name: PROXMOX_PASSWORD
+            version_added: 2.0.0
       validate_certs:
         description: Verify SSL certificate if using HTTPS.
         type: boolean
@@ -55,6 +70,21 @@ DOCUMENTATION = '''
         description: Gather LXC/QEMU configuration facts.
         default: no
         type: bool
+      want_proxmox_nodes_ansible_host:
+        version_added: 3.0.0
+        description:
+          - Whether to set C(ansbile_host) for proxmox nodes.
+          - When set to C(true) (default), will use the first available interface. This can be different from what you expect.
+        default: true
+        type: bool
+      strict:
+        version_added: 2.5.0
+      compose:
+        version_added: 2.5.0
+      groups:
+        version_added: 2.5.0
+      keyed_groups:
+        version_added: 2.5.0
 '''
 
 EXAMPLES = '''
@@ -64,6 +94,15 @@ url: http://localhost:8006
 user: ansible@pve
 password: secure
 validate_certs: no
+keyed_groups:
+  - key: proxmox_tags_parsed
+    separator: ""
+    prefix: group
+groups:
+  webservers: "'web' in (proxmox_tags_parsed|list)"
+  mailservers: "'mail' in (proxmox_tags_parsed|list)"
+compose:
+  ansible_port: 2222
 '''
 
 import re
@@ -72,7 +111,7 @@ from ansible.module_utils.common._collections_compat import MutableMapping
 from distutils.version import LooseVersion
 
 from ansible.errors import AnsibleError
-from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable
+from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 
 # 3rd party imports
@@ -85,7 +124,7 @@ except ImportError:
     HAS_REQUESTS = False
 
 
-class InventoryModule(BaseInventoryPlugin, Cacheable):
+class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     ''' Host inventory parser for ansible using Proxmox as source. '''
 
     NAME = 'community.general.proxmox'
@@ -192,8 +231,44 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             except Exception:
                 return None
 
+    def _get_agent_network_interfaces(self, node, vmid, vmtype):
+        result = []
+
+        try:
+            ifaces = self._get_json(
+                "%s/api2/json/nodes/%s/%s/%s/agent/network-get-interfaces" % (
+                    self.proxmox_url, node, vmtype, vmid
+                )
+            )['result']
+
+            if "error" in ifaces:
+                if "class" in ifaces["error"]:
+                    # This happens on Windows, even though qemu agent is running, the IP address
+                    # cannot be fetched, as it's unsupported, also a command disabled can happen.
+                    errorClass = ifaces["error"]["class"]
+                    if errorClass in ["Unsupported"]:
+                        self.display.v("Retrieving network interfaces from guest agents on windows with older qemu-guest-agents is not supported")
+                    elif errorClass in ["CommandDisabled"]:
+                        self.display.v("Retrieving network interfaces from guest agents has been disabled")
+                return result
+
+            for iface in ifaces:
+                result.append({
+                    'name': iface['name'],
+                    'mac-address': iface['hardware-address'] if 'hardware-address' in iface else '',
+                    'ip-addresses': ["%s/%s" % (ip['ip-address'], ip['prefix']) for ip in iface['ip-addresses']] if 'ip-addresses' in iface else []
+                })
+        except requests.HTTPError:
+            pass
+
+        return result
+
     def _get_vm_config(self, node, vmid, vmtype, name):
         ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/config" % (self.proxmox_url, node, vmtype, vmid))
+
+        node_key = 'node'
+        node_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), node_key.lower()))
+        self.inventory.set_variable(name, node_key, node)
 
         vmid_key = 'vmid'
         vmid_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), vmid_key.lower()))
@@ -202,6 +277,10 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         vmtype_key = 'vmtype'
         vmtype_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), vmtype_key.lower()))
         self.inventory.set_variable(name, vmtype_key, vmtype)
+
+        plaintext_configs = [
+            'tags',
+        ]
 
         for config in ret:
             key = config
@@ -212,10 +291,22 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 if config == 'rootfs' or config.startswith(('virtio', 'sata', 'ide', 'scsi')):
                     value = ('disk_image=' + value)
 
-                if isinstance(value, int) or ',' not in value:
-                    value = value
-                # split off strings with commas to a dict
-                else:
+                # Additional field containing parsed tags as list
+                if config == 'tags':
+                    parsed_key = self.to_safe('%s%s' % (key, "_parsed"))
+                    parsed_value = [tag.strip() for tag in value.split(",")]
+                    self.inventory.set_variable(name, parsed_key, parsed_value)
+
+                # The first field in the agent string tells you whether the agent is enabled
+                # the rest of the comma separated string is extra config for the agent
+                if config == 'agent' and int(value.split(',')[0]):
+                    agent_iface_key = self.to_safe('%s%s' % (key, "_interfaces"))
+                    agent_iface_value = self._get_agent_network_interfaces(node, vmid, vmtype)
+                    if agent_iface_value:
+                        self.inventory.set_variable(name, agent_iface_key, agent_iface_value)
+
+                if not (isinstance(value, int) or ',' not in value):
+                    # split off strings with commas to a dict
                     # skip over any keys that cannot be processed
                     try:
                         value = dict(key.split("=") for key in value.split(","))
@@ -241,6 +332,12 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         '''
         regex = r"[^A-Za-z0-9\_]"
         return re.sub(regex, "_", word.replace(" ", ""))
+
+    def _apply_constructable(self, name, variables):
+        strict = self.get_option('strict')
+        self._add_host_to_composed_groups(self.get_option('groups'), variables, name, strict=strict)
+        self._add_host_to_keyed_groups(self.get_option('keyed_groups'), variables, name, strict=strict)
+        self._set_composite_vars(self.get_option('compose'), variables, name, strict=strict)
 
     def _populate(self):
 
@@ -273,8 +370,9 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     self.inventory.add_child(nodes_group, node['node'])
 
                 # get node IP address
-                ip = self._get_node_ip(node['node'])
-                self.inventory.set_variable(node['node'], 'ansible_host', ip)
+                if self.get_option("want_proxmox_nodes_ansible_host"):
+                    ip = self._get_node_ip(node['node'])
+                    self.inventory.set_variable(node['node'], 'ansible_host', ip)
 
                 # get LXC containers for this node
                 node_lxc_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), ('%s_lxc' % node['node']).lower()))
@@ -295,6 +393,8 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     # get LXC config for facts
                     if self.get_option('want_facts'):
                         self._get_vm_config(node['node'], lxc['vmid'], 'lxc', lxc['name'])
+
+                    self._apply_constructable(lxc["name"], self.inventory.get_host(lxc['name']).get_vars())
 
                 # get QEMU vm's for this node
                 node_qemu_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), ('%s_qemu' % node['node']).lower()))
@@ -318,6 +418,8 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     if self.get_option('want_facts'):
                         self._get_vm_config(node['node'], qemu['vmid'], 'qemu', qemu['name'])
 
+                    self._apply_constructable(qemu["name"], self.inventory.get_host(qemu['name']).get_vars())
+
         # gather vm's in pools
         for pool in self._get_pools():
             if pool.get('poolid'):
@@ -327,7 +429,8 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
                 for member in self._get_members_per_pool(pool['poolid']):
                     if member.get('name'):
-                        self.inventory.add_child(pool_group, member['name'])
+                        if not member.get('template'):
+                            self.inventory.add_child(pool_group, member['name'])
 
     def parse(self, inventory, loader, path, cache=True):
         if not HAS_REQUESTS:
@@ -340,7 +443,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         self._read_config_data(path)
 
         # get connection host
-        self.proxmox_url = self.get_option('url')
+        self.proxmox_url = self.get_option('url').rstrip('/')
         self.proxmox_user = self.get_option('user')
         self.proxmox_password = self.get_option('password')
         self.cache_key = self.get_cache_key(path)

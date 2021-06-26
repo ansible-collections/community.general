@@ -63,6 +63,7 @@ options:
         required: false
     links:
         type: list
+        elements: dict
         description:
             - See examples
 '''
@@ -148,14 +149,14 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             user=dict(required=True),
-            api_key=dict(required=True),
+            api_key=dict(required=True, no_log=True),
             name=dict(required=False),
             title=dict(required=True),
             source=dict(required=False),
             description=dict(required=False),
             start_time=dict(required=False, default=None, type='int'),
             end_time=dict(required=False, default=None, type='int'),
-            links=dict(type='list')
+            links=dict(type='list', elements='dict')
         )
     )
 

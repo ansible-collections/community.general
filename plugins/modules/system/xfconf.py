@@ -57,6 +57,14 @@ options:
     default: 'no'
     aliases: ['array']
     version_added: 1.0.0
+  disable_facts:
+    description:
+    - For backward compatibility, output results are also returned as C(ansible_facts), but this behaviour is deprecated
+      and will be removed in community.general 4.0.0.
+    - This flag disables the output as facts and also disables the deprecation warning.
+    type: bool
+    default: no
+    version_added: 2.1.0
 '''
 
 EXAMPLES = """
@@ -135,10 +143,7 @@ def values_fmt(values, value_types):
     for value, value_type in zip(values, value_types):
         if value_type == 'bool':
             value = fix_bool(value)
-        result.append('--type')
-        result.append('{0}'.format(value_type))
-        result.append('--set')
-        result.append('{0}'.format(value))
+        result.extend(['--type', '{0}'.format(value_type), '--set', '{0}'.format(value)])
     return result
 
 
@@ -147,6 +152,10 @@ class XFConfException(Exception):
 
 
 class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
+    change_params = 'value',
+    diff_params = 'value',
+    output_params = ('property', 'channel', 'value')
+    facts_params = ('property', 'channel', 'value')
     module = dict(
         argument_spec=dict(
             state=dict(default="present",
@@ -158,13 +167,13 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
                             elements='str', choices=('int', 'uint', 'bool', 'float', 'double', 'string')),
             value=dict(required=False, type='list', elements='raw'),
             force_array=dict(default=False, type='bool', aliases=['array']),
+            disable_facts=dict(type='bool', default=False),
         ),
         required_if=[('state', 'present', ['value', 'value_type'])],
         required_together=[('value', 'value_type')],
         supports_check_mode=True,
     )
 
-    facts_name = "xfconf"
     default_state = 'present'
     command = 'xfconf-query'
     command_args_formats = dict(
@@ -177,16 +186,24 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
     )
 
     def update_xfconf_output(self, **kwargs):
-        self.update_output(**kwargs)
-        self.update_facts(**kwargs)
+        self.update_vars(meta={"output": True, "fact": True}, **kwargs)
 
     def __init_module__(self):
         self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.module.params['property'],
                                                                                  self.module.params['channel'])
-        self.vars.previous_value = self._get()
-        self.update_xfconf_output(property=self.module.params['property'],
-                                  channel=self.module.params['channel'],
-                                  previous_value=None)
+        self.vars.set('previous_value', self._get(), fact=True)
+        self.vars.set('type', self.vars.value_type, fact=True)
+        self.vars.meta('value').set(initial_value=self.vars.previous_value)
+
+        if not self.module.params['disable_facts']:
+            self.facts_name = "xfconf"
+            self.module.deprecate(
+                msg="Returning results as facts is deprecated. "
+                    "Please register the module output to a variable instead."
+                    " You can use the disable_facts option to switch to the "
+                    "new behavior already now and disable this warning",
+                version="4.0.0", collection_name="community.general"
+            )
 
     def process_command_output(self, rc, out, err):
         if err.rstrip() == self.does_not:
@@ -202,33 +219,23 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
 
         return result
 
-    @property
-    def changed(self):
-        if self.vars.previous_value is None:
-            return self.vars.value is not None
-        elif self.vars.value is None:
-            return self.vars.previous_value is not None
-        else:
-            return set(self.vars.previous_value) != set(self.vars.value)
-
     def _get(self):
         return self.run_command(params=('channel', 'property'))
 
     def state_get(self):
         self.vars.value = self.vars.previous_value
-        self.update_xfconf_output(value=self.vars.value)
+        self.vars.previous_value = None
 
     def state_absent(self):
+        if not self.module.check_mode:
+            self.run_command(params=('channel', 'property', {'reset': True}))
         self.vars.value = None
-        self.run_command(params=('channel', 'property', 'reset'), extra_params={"reset": True})
-        self.update_xfconf_output(previous_value=self.vars.previous_value,
-                                  value=None)
 
     def state_present(self):
         # stringify all values - in the CLI they will all be happy strings anyway
         # and by doing this here the rest of the code can be agnostic to it
-        self.vars.value = [str(v) for v in self.module.params['value']]
-        value_type = self.module.params['value_type']
+        self.vars.value = [str(v) for v in self.vars.value]
+        value_type = self.vars.value_type
 
         values_len = len(self.vars.value)
         types_len = len(value_type)
@@ -245,29 +252,23 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
 
         # calculates if it is an array
         self.vars.is_array = \
-            bool(self.module.params['force_array']) or \
+            bool(self.vars.force_array) or \
             isinstance(self.vars.previous_value, list) or \
             values_len > 1
 
-        params = ['channel', 'property', 'create']
+        params = ['channel', 'property', {'create': True}]
         if self.vars.is_array:
             params.append('is_array')
-        params.append('values_and_types')
-
-        extra_params = dict(values_and_types=(self.vars.value, value_type))
-        extra_params['create'] = True
-        extra_params['is_array'] = self.vars.is_array
+        params.append({'values_and_types': (self.vars.value, value_type)})
 
         if not self.module.check_mode:
-            self.run_command(params=params, extra_params=extra_params)
+            self.run_command(params=params)
 
         if not self.vars.is_array:
             self.vars.value = self.vars.value[0]
-            value_type = value_type[0]
-
-        self.update_xfconf_output(previous_value=self.vars.previous_value,
-                                  value=self.vars.value,
-                                  type=value_type)
+            self.vars.type = value_type[0]
+        else:
+            self.vars.type = value_type
 
 
 def main():

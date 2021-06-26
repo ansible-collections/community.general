@@ -90,7 +90,7 @@ def get_common_arg_spec(supports_create=False, supports_wait=False):
         config_profile_name=dict(type="str", default="DEFAULT"),
         api_user=dict(type="str"),
         api_user_fingerprint=dict(type="str", no_log=True),
-        api_user_key_file=dict(type="str"),
+        api_user_key_file=dict(type="path"),
         api_user_key_pass_phrase=dict(type="str", no_log=True),
         auth_type=dict(
             type="str",
@@ -104,7 +104,7 @@ def get_common_arg_spec(supports_create=False, supports_wait=False):
 
     if supports_create:
         common_args.update(
-            key_by=dict(type="list"),
+            key_by=dict(type="list", elements="str", no_log=False),
             force_create=dict(type="bool", default=False),
         )
 

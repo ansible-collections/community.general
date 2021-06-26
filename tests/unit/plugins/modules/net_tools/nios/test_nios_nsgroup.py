@@ -42,9 +42,13 @@ class TestNiosNSGroupModule(TestNiosModule):
 
         self.load_config = self.mock_wapi_run.start()
 
+        self.mock_check_type_dict = patch('ansible_collections.community.general.plugins.module_utils.net_tools.nios.api.check_type_dict')
+        self.mock_check_type_dict_obj = self.mock_check_type_dict.start()
+
     def tearDown(self):
         super(TestNiosNSGroupModule, self).tearDown()
         self.mock_wapi.stop()
+        self.mock_check_type_dict.stop()
 
     def _get_wapi(self, test_object):
         wapi = api.WapiModule(self.module)
@@ -73,7 +77,7 @@ class TestNiosNSGroupModule(TestNiosModule):
         res = wapi.run('testobject', test_spec)
 
         self.assertTrue(res['changed'])
-        wapi.create_object.assert_called_once_with('testobject', {'name': self.module._check_type_dict().__getitem__()})
+        wapi.create_object.assert_called_once_with('testobject', {'name': self.mock_check_type_dict_obj().__getitem__()})
 
     def test_nios_nsgroup_remove(self):
         self.module.params = {'provider': None, 'state': 'absent', 'name': 'my-simple-group',

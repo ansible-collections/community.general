@@ -224,7 +224,7 @@ def main():
     argument_spec.update(
         repository=dict(type='str', required=True),
         username=dict(type='str', required=True),
-        key=dict(type='str'),
+        key=dict(type='str', no_log=False),
         label=dict(type='str', required=True),
         state=dict(type='str', choices=['present', 'absent'], required=True),
     )

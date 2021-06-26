@@ -10,6 +10,10 @@ DOCUMENTATION = '''
 module: nios_naptr_record
 author: "Blair Rampling (@brampling)"
 short_description: Configure Infoblox NIOS NAPTR records
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding module from it.
+    alternative: infoblox.nios_modules.nios_naptr_record
+    removed_in: 5.0.0
 description:
   - Adds and/or removes instances of NAPTR record objects from
     Infoblox NIOS servers.  This module manages NIOS C(record:naptr) objects
@@ -25,6 +29,7 @@ options:
       - Specifies the fully qualified hostname to add or remove from
         the system
     required: true
+    type: str
   view:
     description:
       - Sets the DNS view to associate this a record with. The DNS
@@ -32,33 +37,39 @@ options:
     default: default
     aliases:
       - dns_view
+    type: str
   order:
     description:
       - Configures the order (0-65535) for this NAPTR record. This parameter
         specifies the order in which the NAPTR rules are applied when
         multiple rules are present.
+    type: int
   preference:
     description:
       - Configures the preference (0-65535) for this NAPTR record. The
         preference field determines the order NAPTR records are processed
         when multiple records with the same order parameter are present.
+    type: int
   replacement:
     description:
       - Configures the replacement field for this NAPTR record.
         For nonterminal NAPTR records, this field specifies the
         next domain name to look up.
+    type: str
   services:
     description:
       - Configures the services field (128 characters maximum) for this
         NAPTR record. The services field contains protocol and service
         identifiers, such as "http+E2U" or "SIPS+D2T".
     required: false
+    type: str
   flags:
     description:
       - Configures the flags field for this NAPTR record. These control the
         interpretation of the fields for an NAPTR record object. Supported
         values for the flags field are "U", "S", "P" and "A".
     required: false
+    type: str
   regexp:
     description:
       - Configures the regexp field for this NAPTR record. This is the
@@ -67,19 +78,23 @@ options:
         substitution rule and flags. Refer to RFC 2915 for the field syntax
         details.
     required: false
+    type: str
   ttl:
     description:
       - Configures the TTL to be associated with this NAPTR record
+    type: int
   extattrs:
     description:
       - Allows for the configuration of Extensible Attributes on the
         instance of the object.  This argument accepts a set of key / value
         pairs for configuration.
+    type: dict
   comment:
     description:
       - Configures a text string comment to be associated with the instance
         of this object.  The provided text string will be configured on the
         object instance.
+    type: str
   state:
     description:
       - Configures the intended state of the instance of the object on
@@ -90,6 +105,7 @@ options:
     choices:
       - present
       - absent
+    type: str
 '''
 
 EXAMPLES = '''
@@ -137,8 +153,8 @@ EXAMPLES = '''
 RETURN = ''' # '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiModule
+from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_ib_spec
 
 
 def main():
@@ -167,7 +183,7 @@ def main():
         state=dict(default='present', choices=['present', 'absent'])
     )
 
-    argument_spec.update(ib_spec)
+    argument_spec.update(normalize_ib_spec(ib_spec))
     argument_spec.update(WapiModule.provider_spec)
 
     module = AnsibleModule(argument_spec=argument_spec,

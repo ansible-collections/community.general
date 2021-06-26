@@ -18,8 +18,8 @@
 
 - assert:
     that:
-      - "{{ get_status_0002.changed == True }}"
-      - "{{ get_status_0002.issue_status == 'closed' }}"
+      - get_status_0002 is changed
+      - get_status_0002.issue_status == 'closed'
 
 - name: Check if GitHub issue is closed or not
   github_issue:
@@ -32,6 +32,6 @@
 
 - assert:
     that:
-      - "{{ get_status_0003.changed == False }}"
-      - "{{ get_status_0003.failed == True }}"
-      - "{{ 'Failed' in get_status_0003.msg }}"
+      - get_status_0003 is not changed
+      - get_status_0003 is failed
+      - "'Failed' in get_status_0003.msg"

@@ -12,52 +12,79 @@ DOCUMENTATION = '''
 module: stacki_host
 short_description: Add or remove host to stacki front-end
 description:
- - Use this module to add or remove hosts to a stacki front-end via API.
- - U(https://github.com/StackIQ/stacki)
+  - Use this module to add or remove hosts to a stacki front-end via API.
+  - Information on stacki can be found at U(https://github.com/StackIQ/stacki).
 options:
   name:
     description:
-     - Name of the host to be added to Stacki.
+      - Name of the host to be added to Stacki.
     required: True
     type: str
   stacki_user:
     description:
-     - Username for authenticating with Stacki API, but if not
-       specified, the environment variable C(stacki_user) is used instead.
+      - Username for authenticating with Stacki API, but if not specified, the environment variable C(stacki_user) is used instead.
     required: True
     type: str
   stacki_password:
     description:
-     - Password for authenticating with Stacki API, but if not
+      - Password for authenticating with Stacki API, but if not
        specified, the environment variable C(stacki_password) is used instead.
     required: True
     type: str
   stacki_endpoint:
     description:
-     - URL for the Stacki API Endpoint.
+      - URL for the Stacki API Endpoint.
     required: True
     type: str
   prim_intf_mac:
     description:
-     - MAC Address for the primary PXE boot network interface.
+      - MAC Address for the primary PXE boot network interface.
+      - Currently not used by the module.
     type: str
   prim_intf_ip:
     description:
-     - IP Address for the primary network interface.
+      - IP Address for the primary network interface.
+      - Currently not used by the module.
     type: str
   prim_intf:
     description:
-     - Name of the primary network interface.
+      - Name of the primary network interface.
+      - Currently not used by the module.
     type: str
   force_install:
     description:
-     - Set value to True to force node into install state if it already exists in stacki.
+      - Set value to C(true) to force node into install state if it already exists in stacki.
     type: bool
+    default: no
   state:
     description:
       - Set value to the desired state for the specified host.
     type: str
     choices: [ absent, present ]
+    default: present
+  appliance:
+    description:
+      - Applicance to be used in host creation.
+      - Required if I(state) is C(present) and host does not yet exist.
+    type: str
+    default: backend
+  rack:
+    description:
+      - Rack to be used in host creation.
+      - Required if I(state) is C(present) and host does not yet exist.
+    type: int
+  rank:
+    description:
+      - Rank to be used in host creation.
+      - In Stacki terminology, the rank is the position of the machine in a rack.
+      - Required if I(state) is C(present) and host does not yet exist.
+    type: int
+  network:
+    description:
+      - Network to be configured in the host.
+      - Currently not used by the module.
+    type: str
+    default: private
 author:
 - Hugh Ma (@bbyhuy) <Hugh.Ma@flextronics.com>
 '''
@@ -103,9 +130,8 @@ stdout_lines:
 '''
 
 import json
-import os
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url
 
@@ -128,7 +154,7 @@ class StackiHost(object):
                       'PASSWORD': module.params['stacki_password']}
 
         # Get Initial CSRF
-        cred_a = self.do_request(self.module, self.endpoint, method="GET")
+        cred_a = self.do_request(self.endpoint, method="GET")
         cookie_a = cred_a.headers.get('Set-Cookie').split(';')
         init_csrftoken = None
         for c in cookie_a:
@@ -145,8 +171,7 @@ class StackiHost(object):
         login_endpoint = self.endpoint + "/login"
 
         # Get Final CSRF and Session ID
-        login_req = self.do_request(self.module, login_endpoint, headers=header,
-                                    payload=urlencode(auth_creds), method='POST')
+        login_req = self.do_request(login_endpoint, headers=header, payload=urlencode(auth_creds), method='POST')
 
         cookie_f = login_req.headers.get('Set-Cookie').split(';')
         csrftoken = None
@@ -163,8 +188,8 @@ class StackiHost(object):
                        'Content-type': 'application/json',
                        'Cookie': login_req.headers.get('Set-Cookie')}
 
-    def do_request(self, module, url, payload=None, headers=None, method=None):
-        res, info = fetch_url(module, url, data=payload, headers=headers, method=method)
+    def do_request(self, url, payload=None, headers=None, method=None):
+        res, info = fetch_url(self.module, url, data=payload, headers=headers, method=method)
 
         if info['status'] != 200:
             self.module.fail_json(changed=False, msg=info['msg'])
@@ -172,24 +197,16 @@ class StackiHost(object):
         return res
 
     def stack_check_host(self):
-        res = self.do_request(self.module, self.endpoint, payload=json.dumps({"cmd": "list host"}), headers=self.header, method="POST")
-
-        if self.hostname in res.read():
-            return True
-        else:
-            return False
+        res = self.do_request(self.endpoint, payload=json.dumps({"cmd": "list host"}), headers=self.header, method="POST")
+        return self.hostname in res.read()
 
     def stack_sync(self):
-        self.do_request(self.module, self.endpoint, payload=json.dumps({"cmd": "sync config"}), headers=self.header, method="POST")
-        self.do_request(self.module, self.endpoint, payload=json.dumps({"cmd": "sync host config"}), headers=self.header, method="POST")
+        self.do_request(self.endpoint, payload=json.dumps({"cmd": "sync config"}), headers=self.header, method="POST")
+        self.do_request(self.endpoint, payload=json.dumps({"cmd": "sync host config"}), headers=self.header, method="POST")
 
     def stack_force_install(self, result):
-        data = dict()
-        changed = False
-
-        data['cmd'] = "set host boot {0} action=install" \
-            .format(self.hostname)
-        self.do_request(self.module, self.endpoint, payload=json.dumps(data), headers=self.header, method="POST")
+        data = {'cmd': "set host boot {0} action=install".format(self.hostname)}
+        self.do_request(self.endpoint, payload=json.dumps(data), headers=self.header, method="POST")
         changed = True
 
         self.stack_sync()
@@ -203,7 +220,7 @@ class StackiHost(object):
 
         data['cmd'] = "add host {0} rack={1} rank={2} appliance={3}"\
             .format(self.hostname, self.rack, self.rank, self.appliance)
-        self.do_request(self.module, self.endpoint, payload=json.dumps(data), headers=self.header, method="POST")
+        self.do_request(self.endpoint, payload=json.dumps(data), headers=self.header, method="POST")
 
         self.stack_sync()
 
@@ -215,7 +232,7 @@ class StackiHost(object):
 
         data['cmd'] = "remove host {0}"\
             .format(self.hostname)
-        self.do_request(self.module, self.endpoint, payload=json.dumps(data), headers=self.header, method="POST")
+        self.do_request(self.endpoint, payload=json.dumps(data), headers=self.header, method="POST")
 
         self.stack_sync()
 
@@ -235,9 +252,9 @@ def main():
             prim_intf_ip=dict(type='str'),
             network=dict(type='str', default='private'),
             prim_intf_mac=dict(type='str'),
-            stacki_user=dict(type='str', required=True, default=os.environ.get('stacki_user')),
-            stacki_password=dict(type='str', required=True, default=os.environ.get('stacki_password'), no_log=True),
-            stacki_endpoint=dict(type='str', required=True, default=os.environ.get('stacki_endpoint')),
+            stacki_user=dict(type='str', required=True, fallback=(env_fallback, ['stacki_user'])),
+            stacki_password=dict(type='str', required=True, fallback=(env_fallback, ['stacki_password']), no_log=True),
+            stacki_endpoint=dict(type='str', required=True, fallback=(env_fallback, ['stacki_endpoint'])),
             force_install=dict(type='bool', default=False),
         ),
         supports_check_mode=False,
@@ -258,8 +275,7 @@ def main():
             .format(module.params['name'])
     # Otherwise, state is present, but host doesn't exists, require more params to add host
     elif module.params['state'] == 'present' and not host_exists:
-        for param in ['appliance', 'prim_intf',
-                      'prim_intf_ip', 'network', 'prim_intf_mac']:
+        for param in ['appliance', 'rack', 'rank', 'prim_intf', 'prim_intf_ip', 'network', 'prim_intf_mac']:
             if not module.params[param]:
                 missing_params.append(param)
         if len(missing_params) > 0:   # @FIXME replace with required_if

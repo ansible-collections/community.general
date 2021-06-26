@@ -23,10 +23,13 @@ options:
     name:
       description:
         - Ethernet Network name.
+      type: str
     options:
       description:
         - "List with options to gather additional information about an Ethernet Network and related resources.
           Options allowed: C(associatedProfiles) and C(associatedUplinkGroups)."
+      type: list
+      elements: str
 extends_documentation_fragment:
 - community.general.oneview
 - community.general.oneview.factsparams
@@ -106,17 +109,12 @@ from ansible_collections.community.general.plugins.module_utils.oneview import O
 class EthernetNetworkInfoModule(OneViewModuleBase):
     argument_spec = dict(
         name=dict(type='str'),
-        options=dict(type='list'),
+        options=dict(type='list', elements='str'),
         params=dict(type='dict')
     )
 
     def __init__(self):
         super(EthernetNetworkInfoModule, self).__init__(additional_arg_spec=self.argument_spec)
-        self.is_old_facts = self.module._name in ('oneview_ethernet_network_facts', 'community.general.oneview_ethernet_network_facts')
-        if self.is_old_facts:
-            self.module.deprecate("The 'oneview_ethernet_network_facts' module has been renamed to 'oneview_ethernet_network_info', "
-                                  "and the renamed one no longer returns ansible_facts",
-                                  version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
         self.resource_client = self.oneview_client.ethernet_networks
 
@@ -132,10 +130,7 @@ class EthernetNetworkInfoModule(OneViewModuleBase):
 
         info['ethernet_networks'] = ethernet_networks
 
-        if self.is_old_facts:
-            return dict(changed=False, ansible_facts=info)
-        else:
-            return dict(changed=False, **info)
+        return dict(changed=False, **info)
 
     def __gather_optional_info(self, ethernet_network):
 

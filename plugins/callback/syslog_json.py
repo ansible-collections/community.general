@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    callback: syslog_json
+    name: syslog_json
     type: notification
     requirements:
       - whitelist in configuration

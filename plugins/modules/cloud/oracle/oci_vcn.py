@@ -128,7 +128,7 @@ def update_vcn(virtual_network_client, module):
         primitive_params_update=["vcn_id"],
         kwargs_non_primitive_update={UpdateVcnDetails: "update_vcn_details"},
         module=module,
-        update_attributes=UpdateVcnDetails().attribute_map.keys(),
+        update_attributes=list(UpdateVcnDetails().attribute_map.keys()),
     )
     return result
 

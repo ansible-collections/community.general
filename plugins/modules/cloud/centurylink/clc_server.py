@@ -17,6 +17,7 @@ options:
     description:
       - The list of additional disks for the server
     type: list
+    elements: dict
     default: []
   add_public_ip:
     description:
@@ -66,6 +67,7 @@ options:
       - The list of custom fields to set on the server.
     type: list
     default: []
+    elements: dict
   description:
     description:
       - The description to set for the server.
@@ -111,6 +113,7 @@ options:
     description:
       - The list of blue print packages to run on the server after its created.
     type: list
+    elements: dict
     default: []
   password:
     description:
@@ -130,6 +133,7 @@ options:
     description:
       - A list of ports to allow on the firewall to the servers public ip, if add_public_ip is set to True.
     type: list
+    elements: dict
     default: []
   secondary_dns:
     description:
@@ -141,6 +145,7 @@ options:
         A list of server Ids to insure are started, stopped, or absent.
     type: list
     default: []
+    elements: str
   source_server_password:
     description:
       - The password for the source server if a clone is specified.
@@ -575,8 +580,8 @@ class ClcServer:
             type=dict(default='standard', choices=['standard', 'hyperscale', 'bareMetal']),
             primary_dns=dict(default=None),
             secondary_dns=dict(default=None),
-            additional_disks=dict(type='list', default=[]),
-            custom_fields=dict(type='list', default=[]),
+            additional_disks=dict(type='list', default=[], elements='dict'),
+            custom_fields=dict(type='list', default=[], elements='dict'),
             ttl=dict(default=None),
             managed_os=dict(type='bool', default=False),
             description=dict(default=None),
@@ -586,7 +591,7 @@ class ClcServer:
             anti_affinity_policy_name=dict(default=None),
             alert_policy_id=dict(default=None),
             alert_policy_name=dict(default=None),
-            packages=dict(type='list', default=[]),
+            packages=dict(type='list', default=[], elements='dict'),
             state=dict(
                 default='present',
                 choices=[
@@ -597,7 +602,7 @@ class ClcServer:
             count=dict(type='int', default=1),
             exact_count=dict(type='int', default=None),
             count_group=dict(),
-            server_ids=dict(type='list', default=[]),
+            server_ids=dict(type='list', default=[], elements='str'),
             add_public_ip=dict(type='bool', default=False),
             public_ip_protocol=dict(
                 default='TCP',
@@ -605,7 +610,7 @@ class ClcServer:
                     'TCP',
                     'UDP',
                     'ICMP']),
-            public_ip_ports=dict(type='list', default=[]),
+            public_ip_ports=dict(type='list', default=[], elements='dict'),
             configuration_id=dict(default=None),
             os_type=dict(default=None,
                          choices=[

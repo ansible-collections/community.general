@@ -1,3 +1,0 @@
----
-minor_changes:
-  - consul - added support for tcp checks (https://github.com/ansible-collections/community.general/issues/1128).

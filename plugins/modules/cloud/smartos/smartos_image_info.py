@@ -24,6 +24,7 @@ options:
               manifest and 'published_date', 'published', 'source', 'clones',
               and 'size'. More information can be found at U(https://smartos.org/man/1m/imgadm)
               under 'imgadm list'.
+        type: str
 '''
 
 EXAMPLES = '''
@@ -46,9 +47,6 @@ EXAMPLES = '''
          has {{ result.smartos_images[item]['clones'] }} VM(s)"
   with_items: "{{ result.smartos_images.keys() | list }}"
 
-# When the module is called as smartos_image_facts, return values are published
-# in ansible_facts['smartos_images'] and can be used as follows.
-# Note that this is deprecated and will stop working in community.general 3.0.0.
 - name: Print information
   ansible.builtin.debug:
     msg: "{{ smartos_images[item]['name'] }}-{{ smartos_images[item]['version'] }}
@@ -71,10 +69,7 @@ class ImageFacts(object):
         self.filters = module.params['filters']
 
     def return_all_installed_images(self):
-        cmd = [self.module.get_bin_path('imgadm')]
-
-        cmd.append('list')
-        cmd.append('-j')
+        cmd = [self.module.get_bin_path('imgadm'), 'list', '-j']
 
         if self.filters:
             cmd.append(self.filters)
@@ -104,20 +99,12 @@ def main():
         ),
         supports_check_mode=False,
     )
-    is_old_facts = module._name in ('smartos_image_facts', 'community.general.smartos_image_facts')
-    if is_old_facts:
-        module.deprecate("The 'smartos_image_facts' module has been renamed to 'smartos_image_info', "
-                         "and the renamed one no longer returns ansible_facts",
-                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     image_facts = ImageFacts(module)
 
     data = dict(smartos_images=image_facts.return_all_installed_images())
 
-    if is_old_facts:
-        module.exit_json(ansible_facts=data)
-    else:
-        module.exit_json(**data)
+    module.exit_json(**data)
 
 
 if __name__ == '__main__':

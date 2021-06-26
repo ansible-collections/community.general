@@ -19,18 +19,22 @@ options:
     description:
       - Hostname or ip address of the BMC.
     required: true
+    type: str
   port:
     description:
       - Remote RMCP port.
     default: 623
+    type: int
   user:
     description:
       - Username to use to connect to the BMC.
     required: true
+    type: str
   password:
     description:
       - Password to connect to the BMC.
     required: true
+    type: str
   bootdev:
     description:
       - Set boot device to use on next reboot
@@ -51,6 +55,7 @@ options:
       - optical
       - setup
       - default
+    type: str
   state:
     description:
       - Whether to ensure that boot devices is desired.
@@ -59,6 +64,7 @@ options:
             - absent -- Request system turn on"
     default: present
     choices: [ present, absent ]
+    type: str
   persistent:
     description:
       - If set, ask that system firmware uses this device beyond next boot.

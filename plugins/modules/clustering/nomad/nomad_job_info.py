@@ -36,13 +36,13 @@ seealso:
 
 EXAMPLES = '''
 - name: Get info for job awx
-  community.general.nomad_job:
+  community.general.nomad_job_info:
     host: localhost
     name: awx
   register: result
 
 - name: List Nomad jobs
-  community.general.nomad_job:
+  community.general.nomad_job_info:
     host: localhost
   register: result
 
@@ -312,12 +312,11 @@ def run():
     )
 
     changed = False
-    nomad_jobs = list()
+    result = list()
     try:
         job_list = nomad_client.jobs.get_jobs()
         for job in job_list:
-            nomad_jobs.append(nomad_client.job.get_job(job.get('ID')))
-            result = nomad_jobs
+            result.append(nomad_client.job.get_job(job.get('ID')))
     except Exception as e:
         module.fail_json(msg=to_native(e))
 

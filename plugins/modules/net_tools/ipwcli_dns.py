@@ -205,9 +205,11 @@ class ResourceRecord(object):
     def list_record(self, record):
         # check if the record exists via list on ipwcli
         search = 'list %s' % (record.replace(';', '&&').replace('set', 'where'))
-        cmd = [self.module.get_bin_path('ipwcli', True)]
-        cmd.append('-user=%s' % (self.user))
-        cmd.append('-password=%s' % (self.password))
+        cmd = [
+            self.module.get_bin_path('ipwcli', True),
+            '-user=%s' % self.user,
+            '-password=%s' % self.password,
+        ]
         rc, out, err = self.module.run_command(cmd, data=search)
 
         if 'Invalid username or password' in out:
@@ -222,9 +224,11 @@ class ResourceRecord(object):
     def deploy_record(self, record):
         # check what happens if create fails on ipworks
         stdin = 'create %s' % (record)
-        cmd = [self.module.get_bin_path('ipwcli', True)]
-        cmd.append('-user=%s' % (self.user))
-        cmd.append('-password=%s' % (self.password))
+        cmd = [
+            self.module.get_bin_path('ipwcli', True),
+            '-user=%s' % self.user,
+            '-password=%s' % self.password,
+        ]
         rc, out, err = self.module.run_command(cmd, data=stdin)
 
         if 'Invalid username or password' in out:
@@ -238,9 +242,11 @@ class ResourceRecord(object):
     def delete_record(self, record):
         # check what happens if create fails on ipworks
         stdin = 'delete %s' % (record.replace(';', '&&').replace('set', 'where'))
-        cmd = [self.module.get_bin_path('ipwcli', True)]
-        cmd.append('-user=%s' % (self.user))
-        cmd.append('-password=%s' % (self.password))
+        cmd = [
+            self.module.get_bin_path('ipwcli', True),
+            '-user=%s' % self.user,
+            '-password=%s' % self.password,
+        ]
         rc, out, err = self.module.run_command(cmd, data=stdin)
 
         if 'Invalid username or password' in out:

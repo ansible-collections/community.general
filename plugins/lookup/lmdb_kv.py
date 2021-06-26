@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: lmdb_kv
+    name: lmdb_kv
     author:
       - Jan-Piet Mens (@jpmens)
     version_added: '0.2.0'

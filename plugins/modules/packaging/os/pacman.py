@@ -44,6 +44,14 @@ options:
         default: no
         type: bool
 
+    executable:
+        description:
+            - Name of binary to use. This can either be C(pacman) or a pacman compatible AUR helper.
+            - Beware that AUR helpers might behave unexpectedly and are therefore not recommended.
+        default: pacman
+        type: str
+        version_added: 3.1.0
+
     extra_args:
         description:
             - Additional option to pass to pacman when enforcing C(state).
@@ -54,6 +62,7 @@ options:
         description:
             - Whether or not to refresh the master package lists.
             - This can be run as part of a package installation or as a separate step.
+            - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
         default: no
         type: bool
         aliases: [ update-cache ]
@@ -78,8 +87,10 @@ options:
         type: str
 
 notes:
-  - When used with a `loop:` each package will be processed individually,
-    it is much more efficient to pass the list directly to the `name` option.
+  - When used with a C(loop:) each package will be processed individually,
+    it is much more efficient to pass the list directly to the I(name) option.
+  - To use an AUR helper (I(executable) option), a few extra setup steps might be required beforehand.
+    For example, a dedicated build user with permissions to install packages could be necessary.
 '''
 
 RETURN = '''
@@ -107,6 +118,13 @@ EXAMPLES = '''
       - foo
       - ~/bar-1.0-1-any.pkg.tar.xz
     state: present
+
+- name: Install package from AUR using a Pacman compatible AUR helper
+  community.general.pacman:
+    name: foo
+    state: present
+    executable: yay
+    extra_args: --builddir /var/cache/yay
 
 - name: Upgrade package foo
   community.general.pacman:
@@ -418,10 +436,13 @@ def main():
             name=dict(type='list', elements='str', aliases=['pkg', 'package']),
             state=dict(type='str', default='present', choices=['present', 'installed', 'latest', 'absent', 'removed']),
             force=dict(type='bool', default=False),
+            executable=dict(type='str', default='pacman'),
             extra_args=dict(type='str', default=''),
             upgrade=dict(type='bool', default=False),
             upgrade_extra_args=dict(type='str', default=''),
-            update_cache=dict(type='bool', default=False, aliases=['update-cache']),
+            update_cache=dict(
+                type='bool', default=False, aliases=['update-cache'],
+                deprecated_aliases=[dict(name='update-cache', version='5.0.0', collection_name='community.general')]),
             update_cache_extra_args=dict(type='str', default=''),
         ),
         required_one_of=[['name', 'update_cache', 'upgrade']],
@@ -429,10 +450,12 @@ def main():
         supports_check_mode=True,
     )
 
-    pacman_path = module.get_bin_path('pacman', True)
     module.run_command_environ_update = dict(LC_ALL='C')
 
     p = module.params
+
+    # find pacman binary
+    pacman_path = module.get_bin_path(p['executable'], True)
 
     # normalize the state parameter
     if p['state'] in ['present', 'installed']:

@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Stephan Lohse (!UNKNOWN) <dev-github@ploek.org>
-    connection: iocage
+    name: iocage
     short_description: Run tasks in iocage jails
     description:
         - Run commands or put/fetch files to an existing iocage jail
@@ -40,7 +40,7 @@ display = Display()
 
 
 class Connection(Jail):
-    ''' Local iocage based connections '''
+    """ Local iocage based connections """
 
     transport = 'community.general.iocage'
 

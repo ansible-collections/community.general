@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = r'''
-  callback: diy
+  name: diy
   type: stdout
   short_description: Customize the output
   version_added: 0.2.0
@@ -1013,7 +1013,7 @@ class CallbackModule(Default):
             for attr in _stats_attributes:
                 _ret[self.DIY_NS]['stats'].update({attr: _get_value(obj=stats, attr=attr)})
 
-        _ret[self.DIY_NS].update({'top_level_var_names': _ret.keys()})
+        _ret[self.DIY_NS].update({'top_level_var_names': list(_ret.keys())})
 
         return _ret
 

@@ -1,0 +1,5 @@
+removed_features:
+- "The vendored copy of ``ipaddress`` has been removed. Please use ``ipaddress`` from the Python 3 standard library, or `from pypi <https://pypi.org/project/ipaddress/>`_. (https://github.com/ansible-collections/community.general/pull/2441)."
+breaking_changes:
+- "scaleway_security_group_rule - when used with Python 2, the module now needs ``ipaddress`` installed `from pypi <https://pypi.org/project/ipaddress/>`_ (https://github.com/ansible-collections/community.general/pull/2441)."
+- "lxd inventory plugin - when used with Python 2, the plugin now needs ``ipaddress`` installed `from pypi <https://pypi.org/project/ipaddress/>`_ (https://github.com/ansible-collections/community.general/pull/2441)."

@@ -7,7 +7,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
     author:
       - Juan Manuel Parrilla (@jparrill)
-    lookup: hiera
+    name: hiera
     short_description: get info from hiera data
     requirements:
       - hiera (command line utility)
@@ -63,6 +63,7 @@ import os
 
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.cmd_functions import run_cmd
+from ansible.module_utils._text import to_text
 
 ANSIBLE_HIERA_CFG = os.getenv('ANSIBLE_HIERA_CFG', '/etc/hiera.yaml')
 ANSIBLE_HIERA_BIN = os.getenv('ANSIBLE_HIERA_BIN', '/usr/bin/hiera')
@@ -78,13 +79,11 @@ class Hiera(object):
         rc, output, err = run_cmd("{0} -c {1} {2}".format(
             ANSIBLE_HIERA_BIN, ANSIBLE_HIERA_CFG, hiera_key[0]))
 
-        return output.strip()
+        return to_text(output.strip())
 
 
 class LookupModule(LookupBase):
     def run(self, terms, variables=''):
         hiera = Hiera()
-        ret = []
-
-        ret.append(hiera.get(terms))
+        ret = [hiera.get(terms)]
         return ret

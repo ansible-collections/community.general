@@ -1,2 +1,0 @@
-bugfixes:
-  - capabilities - fix for a newer version of libcap release (https://github.com/ansible-collections/community.general/pull/1061).

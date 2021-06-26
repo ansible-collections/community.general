@@ -1,3 +1,0 @@
----
-minor_changes:
-  - proxmox - extract common code and documentation (https://github.com/ansible-collections/community.general/pull/1331).

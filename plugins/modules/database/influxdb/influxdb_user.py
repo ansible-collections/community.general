@@ -100,6 +100,8 @@ RETURN = r'''
 #only defaults
 '''
 
+import json
+
 from ansible.module_utils.urls import ConnectionError
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
@@ -115,7 +117,7 @@ def find_user(module, client, user_name):
             if user['user'] == user_name:
                 user_result = user
                 break
-    except (ConnectionError, influx.exceptions.InfluxDBClientError) as e:
+    except ConnectionError as e:
         module.fail_json(msg=to_native(e))
     return user_result
 
@@ -166,16 +168,16 @@ def set_user_grants(module, client, user_name, grants):
 
     try:
         current_grants = client.get_list_privileges(user_name)
+        parsed_grants = []
         # Fix privileges wording
         for i, v in enumerate(current_grants):
-            if v['privilege'] == 'ALL PRIVILEGES':
-                v['privilege'] = 'ALL'
-                current_grants[i] = v
-            elif v['privilege'] == 'NO PRIVILEGES':
-                del(current_grants[i])
+            if v['privilege'] != 'NO PRIVILEGES':
+                if v['privilege'] == 'ALL PRIVILEGES':
+                    v['privilege'] = 'ALL'
+                parsed_grants.append(v)
 
         # check if the current grants are included in the desired ones
-        for current_grant in current_grants:
+        for current_grant in parsed_grants:
             if current_grant not in grants:
                 if not module.check_mode:
                     client.revoke_privilege(current_grant['privilege'],
@@ -185,7 +187,7 @@ def set_user_grants(module, client, user_name, grants):
 
         # check if the desired grants are included in the current ones
         for grant in grants:
-            if grant not in current_grants:
+            if grant not in parsed_grants:
                 if not module.check_mode:
                     client.grant_privilege(grant['privilege'],
                                            grant['database'],
@@ -196,6 +198,9 @@ def set_user_grants(module, client, user_name, grants):
         module.fail_json(msg=e.content)
 
     return changed
+
+
+INFLUX_AUTH_FIRST_USER_REQUIRED = "error authorizing query: create admin user first or disable authentication"
 
 
 def main():
@@ -219,7 +224,23 @@ def main():
     grants = module.params['grants']
     influxdb = influx.InfluxDb(module)
     client = influxdb.connect_to_influxdb()
-    user = find_user(module, client, user_name)
+
+    user = None
+    try:
+        user = find_user(module, client, user_name)
+    except influx.exceptions.InfluxDBClientError as e:
+        if e.code == 403:
+            reason = None
+            try:
+                msg = json.loads(e.content)
+                reason = msg["error"]
+            except (KeyError, ValueError):
+                module.fail_json(msg=to_native(e))
+
+            if reason != INFLUX_AUTH_FIRST_USER_REQUIRED:
+                module.fail_json(msg=to_native(e))
+        else:
+            module.fail_json(msg=to_native(e))
 
     changed = False
 

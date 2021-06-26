@@ -137,6 +137,7 @@ options:
         aliases:
             - defaultRoles
         type: list
+        elements: str
 
     redirect_uris:
         description:
@@ -145,6 +146,7 @@ options:
         aliases:
             - redirectUris
         type: list
+        elements: str
 
     web_origins:
         description:
@@ -153,6 +155,7 @@ options:
         aliases:
             - webOrigins
         type: list
+        elements: str
 
     not_before:
         description:
@@ -508,20 +511,30 @@ author:
 '''
 
 EXAMPLES = '''
-- name: Create or update Keycloak client (minimal example)
-  local_action:
-    module: keycloak_client
-    auth_client_id: admin-cli
+- name: Create or update Keycloak client (minimal example), authentication with credentials
+  community.general.keycloak_client:
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
     client_id: test
     state: present
+  delegate_to: localhost
+
+
+- name: Create or update Keycloak client (minimal example), authentication with token
+  community.general.keycloak_client:
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    token: TOKEN
+    client_id: test
+    state: present
+  delegate_to: localhost
+
 
 - name: Delete a Keycloak client
-  local_action:
-    module: keycloak_client
+  community.general.keycloak_client:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -529,10 +542,11 @@ EXAMPLES = '''
     auth_password: PASSWORD
     client_id: test
     state: absent
+  delegate_to: localhost
+
 
 - name: Create or update a Keycloak client (with all the bells and whistles)
-  local_action:
-    module: keycloak_client
+  community.general.keycloak_client:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -616,6 +630,7 @@ EXAMPLES = '''
       use.jwks.url: true
       jwks.url: JWKS_URL_FOR_CLIENT_AUTH_JWT
       jwt.credential.certificate: JWT_CREDENTIAL_CERTIFICATE_FOR_CLIENT_AUTH
+  delegate_to: localhost
 '''
 
 RETURN = '''
@@ -707,10 +722,10 @@ def main():
         enabled=dict(type='bool'),
         client_authenticator_type=dict(type='str', choices=['client-secret', 'client-jwt'], aliases=['clientAuthenticatorType']),
         secret=dict(type='str', no_log=True),
-        registration_access_token=dict(type='str', aliases=['registrationAccessToken']),
-        default_roles=dict(type='list', aliases=['defaultRoles']),
-        redirect_uris=dict(type='list', aliases=['redirectUris']),
-        web_origins=dict(type='list', aliases=['webOrigins']),
+        registration_access_token=dict(type='str', aliases=['registrationAccessToken'], no_log=True),
+        default_roles=dict(type='list', elements='str', aliases=['defaultRoles']),
+        redirect_uris=dict(type='list', elements='str', aliases=['redirectUris']),
+        web_origins=dict(type='list', elements='str', aliases=['webOrigins']),
         not_before=dict(type='int', aliases=['notBefore']),
         bearer_only=dict(type='bool', aliases=['bearerOnly']),
         consent_required=dict(type='bool', aliases=['consentRequired']),
@@ -737,21 +752,15 @@ def main():
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
-                           required_one_of=([['client_id', 'id']]))
+                           required_one_of=([['client_id', 'id'],
+                                             ['token', 'auth_realm', 'auth_username', 'auth_password']]),
+                           required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
     result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
 
     # Obtain access token, initialize API
     try:
-        connection_header = get_token(
-            base_url=module.params.get('auth_keycloak_url'),
-            validate_certs=module.params.get('validate_certs'),
-            auth_realm=module.params.get('auth_realm'),
-            client_id=module.params.get('auth_client_id'),
-            auth_username=module.params.get('auth_username'),
-            auth_password=module.params.get('auth_password'),
-            client_secret=module.params.get('auth_client_secret'),
-        )
+        connection_header = get_token(module.params)
     except KeycloakError as e:
         module.fail_json(msg=str(e))
 

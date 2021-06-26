@@ -36,16 +36,27 @@ options:
     description:
       - The file name of the destination archive. The parent directory must exists on the remote host.
       - This is required when C(path) refers to multiple files by either specifying a glob, a directory or multiple paths in a list.
+      - If the destination archive already exists, it will be truncated and overwritten.
     type: path
   exclude_path:
     description:
       - Remote absolute path, glob, or list of paths or globs for the file or files to exclude from I(path) list and glob expansion.
+      - Use I(exclusion_patterns) to instead exclude files or subdirectories below any of the paths from the I(path) list.
     type: list
     elements: path
+    default: []
+  exclusion_patterns:
+    description:
+      - Glob style patterns to exclude files or directories from the resulting archive.
+      - This differs from I(exclude_path) which applies only to the source paths from I(path).
+    type: list
+    elements: path
+    version_added: 3.2.0
   force_archive:
     description:
-      - Allow you to force the module to treat this as an archive even if only a single file is specified.
-      - By default behaviour is maintained. i.e A when a single file is specified it is compressed only (not archived).
+      - Allows you to force the module to treat this as an archive even if only a single file is specified.
+      - By default when a single file is specified it is compressed only (not archived).
+      - Enable this if you want to use M(ansible.builtin.unarchive) on an archive of a single file created with this module.
     type: bool
     default: false
   remove:
@@ -123,11 +134,7 @@ EXAMPLES = r'''
 RETURN = r'''
 state:
     description:
-        The current state of the archived file.
-        If 'absent', then no source files were found and the archive does not exist.
-        If 'compress', then the file source file is in the compressed state.
-        If 'archive', then the source file or paths are currently archived.
-        If 'incomplete', then an archive was created, but not all source paths were found.
+        The state of the input C(path).
     type: str
     returned: always
 missing:
@@ -152,8 +159,8 @@ expanded_exclude_paths:
     returned: always
 '''
 
+import abc
 import bz2
-import filecmp
 import glob
 import gzip
 import io
@@ -162,15 +169,17 @@ import re
 import shutil
 import tarfile
 import zipfile
+from fnmatch import fnmatch
+from sys import version_info
 from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_bytes, to_native
-from ansible.module_utils.six import PY3
+from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils import six
 
 
 LZMA_IMP_ERR = None
-if PY3:
+if six.PY3:
     try:
         import lzma
         HAS_LZMA = True
@@ -185,6 +194,356 @@ else:
         LZMA_IMP_ERR = format_exc()
         HAS_LZMA = False
 
+PATH_SEP = to_bytes(os.sep)
+PY27 = version_info[0:2] >= (2, 7)
+
+STATE_ABSENT = 'absent'
+STATE_ARCHIVED = 'archive'
+STATE_COMPRESSED = 'compress'
+STATE_INCOMPLETE = 'incomplete'
+
+
+def _to_bytes(s):
+    return to_bytes(s, errors='surrogate_or_strict')
+
+
+def _to_native(s):
+    return to_native(s, errors='surrogate_or_strict')
+
+
+def _to_native_ascii(s):
+    return to_native(s, errors='surrogate_or_strict', encoding='ascii')
+
+
+def expand_paths(paths):
+    expanded_path = []
+    is_globby = False
+    for path in paths:
+        b_path = _to_bytes(path)
+        if b'*' in b_path or b'?' in b_path:
+            e_paths = glob.glob(b_path)
+            is_globby = True
+        else:
+            e_paths = [b_path]
+        expanded_path.extend(e_paths)
+    return expanded_path, is_globby
+
+
+def is_archive(path):
+    return re.search(br'\.(tar|tar\.(gz|bz2|xz)|tgz|tbz2|zip)$', os.path.basename(path), re.IGNORECASE)
+
+
+def legacy_filter(path, exclusion_patterns):
+    return matches_exclusion_patterns(path, exclusion_patterns)
+
+
+def matches_exclusion_patterns(path, exclusion_patterns):
+    return any(fnmatch(path, p) for p in exclusion_patterns)
+
+
+@six.add_metaclass(abc.ABCMeta)
+class Archive(object):
+    def __init__(self, module):
+        self.module = module
+
+        self.destination = _to_bytes(module.params['dest']) if module.params['dest'] else None
+        self.exclusion_patterns = module.params['exclusion_patterns'] or []
+        self.format = module.params['format']
+        self.must_archive = module.params['force_archive']
+        self.remove = module.params['remove']
+
+        self.changed = False
+        self.destination_state = STATE_ABSENT
+        self.errors = []
+        self.file = None
+        self.root = b''
+        self.successes = []
+        self.targets = []
+        self.not_found = []
+
+        paths = module.params['path']
+        self.expanded_paths, has_globs = expand_paths(paths)
+        self.expanded_exclude_paths = expand_paths(module.params['exclude_path'])[0]
+
+        self.paths = list(set(self.expanded_paths) - set(self.expanded_exclude_paths))
+
+        if not self.paths:
+            module.fail_json(
+                path=', '.join(paths),
+                expanded_paths=_to_native(b', '.join(self.expanded_paths)),
+                expanded_exclude_paths=_to_native(b', '.join(self.expanded_exclude_paths)),
+                msg='Error, no source paths were found'
+            )
+
+        if not self.must_archive:
+            self.must_archive = any([has_globs, os.path.isdir(self.paths[0]), len(self.paths) > 1])
+
+        if not self.destination and not self.must_archive:
+            self.destination = b'%s.%s' % (self.paths[0], _to_bytes(self.format))
+
+        if self.must_archive and not self.destination:
+            module.fail_json(
+                dest=_to_native(self.destination),
+                path=', '.join(paths),
+                msg='Error, must specify "dest" when archiving multiple files or trees'
+            )
+
+    def add(self, path, archive_name):
+        try:
+            self._add(_to_native_ascii(path), _to_native(archive_name))
+            if self.contains(_to_native(archive_name)):
+                self.successes.append(path)
+        except Exception as e:
+            self.errors.append('%s: %s' % (_to_native_ascii(path), _to_native(e)))
+
+    def add_single_target(self, path):
+        if self.format in ('zip', 'tar'):
+            archive_name = re.sub(br'^%s' % re.escape(self.root), b'', path)
+            self.open()
+            self.add(path, archive_name)
+            self.close()
+            self.destination_state = STATE_ARCHIVED
+        else:
+            try:
+                f_out = self._open_compressed_file(_to_native_ascii(self.destination))
+                with open(path, 'rb') as f_in:
+                    shutil.copyfileobj(f_in, f_out)
+                f_out.close()
+                self.successes.append(path)
+                self.destination_state = STATE_COMPRESSED
+            except (IOError, OSError) as e:
+                self.module.fail_json(
+                    path=_to_native(path),
+                    dest=_to_native(self.destination),
+                    msg='Unable to write to compressed file: %s' % _to_native(e), exception=format_exc()
+                )
+
+    def add_targets(self):
+        self.open()
+        try:
+            match_root = re.compile(br'^%s' % re.escape(self.root))
+            for target in self.targets:
+                if os.path.isdir(target):
+                    for directory_path, directory_names, file_names in os.walk(target, topdown=True):
+                        if not directory_path.endswith(PATH_SEP):
+                            directory_path += PATH_SEP
+
+                        for directory_name in directory_names:
+                            full_path = directory_path + directory_name
+                            archive_name = match_root.sub(b'', full_path)
+                            self.add(full_path, archive_name)
+
+                        for file_name in file_names:
+                            full_path = directory_path + file_name
+                            archive_name = match_root.sub(b'', full_path)
+                            self.add(full_path, archive_name)
+                else:
+                    archive_name = match_root.sub(b'', target)
+                    self.add(target, archive_name)
+        except Exception as e:
+            if self.format in ('zip', 'tar'):
+                archive_format = self.format
+            else:
+                archive_format = 'tar.' + self.format
+            self.module.fail_json(
+                msg='Error when writing %s archive at %s: %s' % (
+                    archive_format, _to_native(self.destination), _to_native(e)
+                ),
+                exception=format_exc()
+            )
+        self.close()
+
+        if self.errors:
+            self.module.fail_json(
+                msg='Errors when writing archive at %s: %s' % (_to_native(self.destination), '; '.join(self.errors))
+            )
+
+    def destination_exists(self):
+        return self.destination and os.path.exists(self.destination)
+
+    def destination_size(self):
+        return os.path.getsize(self.destination) if self.destination_exists() else 0
+
+    def find_targets(self):
+        for path in self.paths:
+            # Use the longest common directory name among all the files as the archive root path
+            if self.root == b'':
+                self.root = os.path.dirname(path) + PATH_SEP
+            else:
+                for i in range(len(self.root)):
+                    if path[i] != self.root[i]:
+                        break
+
+                if i < len(self.root):
+                    self.root = os.path.dirname(self.root[0:i + 1])
+
+                self.root += PATH_SEP
+            # Don't allow archives to be created anywhere within paths to be removed
+            if self.remove and os.path.isdir(path):
+                prefix = path if path.endswith(PATH_SEP) else path + PATH_SEP
+                if self.destination.startswith(prefix):
+                    self.module.fail_json(
+                        path=', '.join(self.paths),
+                        msg='Error, created archive can not be contained in source paths when remove=true'
+                    )
+            if not os.path.lexists(path):
+                self.not_found.append(path)
+            else:
+                self.targets.append(path)
+
+    def has_targets(self):
+        return bool(self.targets)
+
+    def has_unfound_targets(self):
+        return bool(self.not_found)
+
+    def remove_targets(self):
+        for path in self.successes:
+            try:
+                if os.path.isdir(path):
+                    shutil.rmtree(path)
+                else:
+                    os.remove(path)
+            except OSError:
+                self.errors.append(_to_native(path))
+        for path in self.paths:
+            try:
+                if os.path.isdir(path):
+                    shutil.rmtree(path)
+            except OSError:
+                self.errors.append(_to_native(path))
+
+        if self.errors:
+            self.module.fail_json(
+                dest=_to_native(self.destination), msg='Error deleting some source files: ', files=self.errors
+            )
+
+    def update_permissions(self):
+        try:
+            file_args = self.module.load_file_common_arguments(self.module.params, path=self.destination)
+        except TypeError:
+            # The path argument is only supported in Ansible-base 2.10+. Fall back to
+            # pre-2.10 behavior for older Ansible versions.
+            self.module.params['path'] = self.destination
+            file_args = self.module.load_file_common_arguments(self.module.params)
+
+        self.changed = self.module.set_fs_attributes_if_different(file_args, self.changed)
+
+    @property
+    def result(self):
+        return {
+            'archived': [_to_native(p) for p in self.successes],
+            'dest': _to_native(self.destination),
+            'changed': self.changed,
+            'arcroot': _to_native(self.root),
+            'missing': [_to_native(p) for p in self.not_found],
+            'expanded_paths': [_to_native(p) for p in self.expanded_paths],
+            'expanded_exclude_paths': [_to_native(p) for p in self.expanded_exclude_paths],
+        }
+
+    def _open_compressed_file(self, path):
+        f = None
+        if self.format == 'gz':
+            f = gzip.open(path, 'wb')
+        elif self.format == 'bz2':
+            f = bz2.BZ2File(path, 'wb')
+        elif self.format == 'xz':
+            f = lzma.LZMAFile(path, 'wb')
+        else:
+            self.module.fail_json(msg="%s is not a valid format" % self.format)
+
+        return f
+
+    @abc.abstractmethod
+    def close(self):
+        pass
+
+    @abc.abstractmethod
+    def contains(self, name):
+        pass
+
+    @abc.abstractmethod
+    def open(self):
+        pass
+
+    @abc.abstractmethod
+    def _add(self, path, archive_name):
+        pass
+
+
+class ZipArchive(Archive):
+    def __init__(self, module):
+        super(ZipArchive, self).__init__(module)
+
+    def close(self):
+        self.file.close()
+
+    def contains(self, name):
+        try:
+            self.file.getinfo(name)
+        except KeyError:
+            return False
+        return True
+
+    def open(self):
+        self.file = zipfile.ZipFile(_to_native_ascii(self.destination), 'w', zipfile.ZIP_DEFLATED, True)
+
+    def _add(self, path, archive_name):
+        if not legacy_filter(path, self.exclusion_patterns):
+            self.file.write(path, archive_name)
+
+
+class TarArchive(Archive):
+    def __init__(self, module):
+        super(TarArchive, self).__init__(module)
+        self.fileIO = None
+
+    def close(self):
+        self.file.close()
+        if self.format == 'xz':
+            with lzma.open(_to_native(self.destination), 'wb') as f:
+                f.write(self.fileIO.getvalue())
+            self.fileIO.close()
+
+    def contains(self, name):
+        try:
+            self.file.getmember(name)
+        except KeyError:
+            return False
+        return True
+
+    def open(self):
+        if self.format in ('gz', 'bz2'):
+            self.file = tarfile.open(_to_native_ascii(self.destination), 'w|' + self.format)
+        # python3 tarfile module allows xz format but for python2 we have to create the tarfile
+        # in memory and then compress it with lzma.
+        elif self.format == 'xz':
+            self.fileIO = io.BytesIO()
+            self.file = tarfile.open(fileobj=self.fileIO, mode='w')
+        elif self.format == 'tar':
+            self.file = tarfile.open(_to_native_ascii(self.destination), 'w')
+        else:
+            self.module.fail_json(msg="%s is not a valid archive format" % self.format)
+
+    def _add(self, path, archive_name):
+        def py27_filter(tarinfo):
+            return None if matches_exclusion_patterns(tarinfo.name, self.exclusion_patterns) else tarinfo
+
+        def py26_filter(path):
+            return matches_exclusion_patterns(path, self.exclusion_patterns)
+
+        if PY27:
+            self.file.add(path, archive_name, recursive=False, filter=py27_filter)
+        else:
+            self.file.add(path, archive_name, recursive=False, exclude=py26_filter)
+
+
+def get_archive(module):
+    if module.params['format'] == 'zip':
+        return ZipArchive(module)
+    else:
+        return TarArchive(module)
+
 
 def main():
     module = AnsibleModule(
@@ -192,7 +551,8 @@ def main():
             path=dict(type='list', elements='path', required=True),
             format=dict(type='str', default='gz', choices=['bz2', 'gz', 'tar', 'xz', 'zip']),
             dest=dict(type='path'),
-            exclude_path=dict(type='list', elements='path'),
+            exclude_path=dict(type='list', elements='path', default=[]),
+            exclusion_patterns=dict(type='list', elements='path'),
             force_archive=dict(type='bool', default=False),
             remove=dict(type='bool', default=False),
         ),
@@ -200,379 +560,52 @@ def main():
         supports_check_mode=True,
     )
 
-    params = module.params
-    check_mode = module.check_mode
-    paths = params['path']
-    dest = params['dest']
-    b_dest = None if not dest else to_bytes(dest, errors='surrogate_or_strict')
-    exclude_paths = params['exclude_path']
-    remove = params['remove']
-
-    b_expanded_paths = []
-    b_expanded_exclude_paths = []
-    fmt = params['format']
-    b_fmt = to_bytes(fmt, errors='surrogate_or_strict')
-    force_archive = params['force_archive']
-    globby = False
-    changed = False
-    state = 'absent'
-
-    # Simple or archive file compression (inapplicable with 'zip' since it's always an archive)
-    archive = False
-    b_successes = []
-
-    # Fail early
-    if not HAS_LZMA and fmt == 'xz':
-        module.fail_json(msg=missing_required_lib("lzma or backports.lzma", reason="when using xz format"),
-                         exception=LZMA_IMP_ERR)
-        module.fail_json(msg="lzma or backports.lzma is required when using xz format.")
-
-    for path in paths:
-        b_path = to_bytes(path, errors='surrogate_or_strict')
-
-        # Expand any glob characters. If found, add the expanded glob to the
-        # list of expanded_paths, which might be empty.
-        if (b'*' in b_path or b'?' in b_path):
-            b_expanded_paths.extend(glob.glob(b_path))
-            globby = True
-
-        # If there are no glob characters the path is added to the expanded paths
-        # whether the path exists or not
-        else:
-            b_expanded_paths.append(b_path)
-
-    # Only attempt to expand the exclude paths if it exists
-    if exclude_paths:
-        for exclude_path in exclude_paths:
-            b_exclude_path = to_bytes(exclude_path, errors='surrogate_or_strict')
-
-            # Expand any glob characters. If found, add the expanded glob to the
-            # list of expanded_paths, which might be empty.
-            if (b'*' in b_exclude_path or b'?' in b_exclude_path):
-                b_expanded_exclude_paths.extend(glob.glob(b_exclude_path))
-
-                # If there are no glob character the exclude path is added to the expanded
-                # exclude paths whether the path exists or not.
-            else:
-                b_expanded_exclude_paths.append(b_exclude_path)
-
-    if not b_expanded_paths:
-        return module.fail_json(
-            path=', '.join(paths),
-            expanded_paths=to_native(b', '.join(b_expanded_paths), errors='surrogate_or_strict'),
-            msg='Error, no source paths were found'
+    if not HAS_LZMA and module.params['format'] == 'xz':
+        module.fail_json(
+            msg=missing_required_lib("lzma or backports.lzma", reason="when using xz format"), exception=LZMA_IMP_ERR
         )
 
-    # Only try to determine if we are working with an archive or not if we haven't set archive to true
-    if not force_archive:
-        # If we actually matched multiple files or TRIED to, then
-        # treat this as a multi-file archive
-        archive = globby or os.path.isdir(b_expanded_paths[0]) or len(b_expanded_paths) > 1
+    check_mode = module.check_mode
+
+    archive = get_archive(module)
+    size = archive.destination_size()
+    archive.find_targets()
+
+    if not archive.has_targets():
+        if archive.destination_exists():
+            archive.destination_state = STATE_ARCHIVED if is_archive(archive.destination) else STATE_COMPRESSED
+    elif archive.has_targets() and archive.must_archive:
+        if check_mode:
+            archive.changed = True
+        else:
+            archive.add_targets()
+            archive.destination_state = STATE_INCOMPLETE if archive.has_unfound_targets() else STATE_ARCHIVED
+            if archive.remove:
+                archive.remove_targets()
+            if archive.destination_size() != size:
+                archive.changed = True
     else:
-        archive = True
-
-    # Default created file name (for single-file archives) to
-    # <file>.<format>
-    if not b_dest and not archive:
-        b_dest = b'%s.%s' % (b_expanded_paths[0], b_fmt)
-
-    # Force archives to specify 'dest'
-    if archive and not b_dest:
-        module.fail_json(dest=dest, path=', '.join(paths), msg='Error, must specify "dest" when archiving multiple files or trees')
-
-    b_sep = to_bytes(os.sep, errors='surrogate_or_strict')
-
-    b_archive_paths = []
-    b_missing = []
-    b_arcroot = b''
-
-    for b_path in b_expanded_paths:
-        # Use the longest common directory name among all the files
-        # as the archive root path
-        if b_arcroot == b'':
-            b_arcroot = os.path.dirname(b_path) + b_sep
+        if check_mode:
+            if not archive.destination_exists():
+                archive.changed = True
         else:
-            for i in range(len(b_arcroot)):
-                if b_path[i] != b_arcroot[i]:
-                    break
-
-            if i < len(b_arcroot):
-                b_arcroot = os.path.dirname(b_arcroot[0:i + 1])
-
-            b_arcroot += b_sep
-
-        # Don't allow archives to be created anywhere within paths to be removed
-        if remove and os.path.isdir(b_path):
-            b_path_dir = b_path
-            if not b_path.endswith(b'/'):
-                b_path_dir += b'/'
-
-            if b_dest.startswith(b_path_dir):
-                module.fail_json(
-                    path=', '.join(paths),
-                    msg='Error, created archive can not be contained in source paths when remove=True'
-                )
-
-        if os.path.lexists(b_path) and b_path not in b_expanded_exclude_paths:
-            b_archive_paths.append(b_path)
-        else:
-            b_missing.append(b_path)
-
-    # No source files were found but the named archive exists: are we 'compress' or 'archive' now?
-    if len(b_missing) == len(b_expanded_paths) and b_dest and os.path.exists(b_dest):
-        # Just check the filename to know if it's an archive or simple compressed file
-        if re.search(br'(\.tar|\.tar\.gz|\.tgz|\.tbz2|\.tar\.bz2|\.tar\.xz|\.zip)$', os.path.basename(b_dest), re.IGNORECASE):
-            state = 'archive'
-        else:
-            state = 'compress'
-
-    # Multiple files, or globbiness
-    elif archive:
-        if not b_archive_paths:
-            # No source files were found, but the archive is there.
-            if os.path.lexists(b_dest):
-                state = 'archive'
-        elif b_missing:
-            # SOME source files were found, but not all of them
-            state = 'incomplete'
-
-        archive = None
-        size = 0
-        errors = []
-
-        if os.path.lexists(b_dest):
-            size = os.path.getsize(b_dest)
-
-        if state != 'archive':
-            if check_mode:
-                changed = True
-
-            else:
+            path = archive.paths[0]
+            archive.add_single_target(path)
+            if archive.destination_size() != size:
+                archive.changed = True
+            if archive.remove:
                 try:
-                    # Slightly more difficult (and less efficient!) compression using zipfile module
-                    if fmt == 'zip':
-                        arcfile = zipfile.ZipFile(
-                            to_native(b_dest, errors='surrogate_or_strict', encoding='ascii'),
-                            'w',
-                            zipfile.ZIP_DEFLATED,
-                            True
-                        )
-
-                    # Easier compression using tarfile module
-                    elif fmt == 'gz' or fmt == 'bz2':
-                        arcfile = tarfile.open(to_native(b_dest, errors='surrogate_or_strict', encoding='ascii'), 'w|' + fmt)
-
-                    # python3 tarfile module allows xz format but for python2 we have to create the tarfile
-                    # in memory and then compress it with lzma.
-                    elif fmt == 'xz':
-                        arcfileIO = io.BytesIO()
-                        arcfile = tarfile.open(fileobj=arcfileIO, mode='w')
-
-                    # Or plain tar archiving
-                    elif fmt == 'tar':
-                        arcfile = tarfile.open(to_native(b_dest, errors='surrogate_or_strict', encoding='ascii'), 'w')
-
-                    b_match_root = re.compile(br'^%s' % re.escape(b_arcroot))
-                    for b_path in b_archive_paths:
-                        if os.path.isdir(b_path):
-                            # Recurse into directories
-                            for b_dirpath, b_dirnames, b_filenames in os.walk(b_path, topdown=True):
-                                if not b_dirpath.endswith(b_sep):
-                                    b_dirpath += b_sep
-
-                                for b_dirname in b_dirnames:
-                                    b_fullpath = b_dirpath + b_dirname
-                                    n_fullpath = to_native(b_fullpath, errors='surrogate_or_strict', encoding='ascii')
-                                    n_arcname = to_native(b_match_root.sub(b'', b_fullpath), errors='surrogate_or_strict')
-
-                                    try:
-                                        if fmt == 'zip':
-                                            arcfile.write(n_fullpath, n_arcname)
-                                        else:
-                                            arcfile.add(n_fullpath, n_arcname, recursive=False)
-
-                                    except Exception as e:
-                                        errors.append('%s: %s' % (n_fullpath, to_native(e)))
-
-                                for b_filename in b_filenames:
-                                    b_fullpath = b_dirpath + b_filename
-                                    n_fullpath = to_native(b_fullpath, errors='surrogate_or_strict', encoding='ascii')
-                                    n_arcname = to_native(b_match_root.sub(b'', b_fullpath), errors='surrogate_or_strict')
-
-                                    try:
-                                        if fmt == 'zip':
-                                            arcfile.write(n_fullpath, n_arcname)
-                                        else:
-                                            arcfile.add(n_fullpath, n_arcname, recursive=False)
-
-                                        b_successes.append(b_fullpath)
-                                    except Exception as e:
-                                        errors.append('Adding %s: %s' % (to_native(b_path), to_native(e)))
-                        else:
-                            path = to_native(b_path, errors='surrogate_or_strict', encoding='ascii')
-                            arcname = to_native(b_match_root.sub(b'', b_path), errors='surrogate_or_strict')
-                            if fmt == 'zip':
-                                arcfile.write(path, arcname)
-                            else:
-                                arcfile.add(path, arcname, recursive=False)
-
-                            b_successes.append(b_path)
-
-                except Exception as e:
-                    expanded_fmt = 'zip' if fmt == 'zip' else ('tar.' + fmt)
-                    module.fail_json(
-                        msg='Error when writing %s archive at %s: %s' % (expanded_fmt, dest, to_native(e)),
-                        exception=format_exc()
-                    )
-
-                if arcfile:
-                    arcfile.close()
-                    state = 'archive'
-
-                if fmt == 'xz':
-                    with lzma.open(b_dest, 'wb') as f:
-                        f.write(arcfileIO.getvalue())
-                    arcfileIO.close()
-
-                if errors:
-                    module.fail_json(msg='Errors when writing archive at %s: %s' % (dest, '; '.join(errors)))
-
-        if state in ['archive', 'incomplete'] and remove:
-            for b_path in b_successes:
-                try:
-                    if os.path.isdir(b_path):
-                        shutil.rmtree(b_path)
-                    elif not check_mode:
-                        os.remove(b_path)
-                except OSError as e:
-                    errors.append(to_native(b_path))
-
-            for b_path in b_expanded_paths:
-                try:
-                    if os.path.isdir(b_path):
-                        shutil.rmtree(b_path)
-                except OSError as e:
-                    errors.append(to_native(b_path))
-
-            if errors:
-                module.fail_json(dest=dest, msg='Error deleting some source files: ', files=errors)
-
-        # Rudimentary check: If size changed then file changed. Not perfect, but easy.
-        if not check_mode and os.path.getsize(b_dest) != size:
-            changed = True
-
-        if b_successes and state != 'incomplete':
-            state = 'archive'
-
-    # Simple, single-file compression
-    else:
-        b_path = b_expanded_paths[0]
-
-        # No source or compressed file
-        if not (os.path.exists(b_path) or os.path.lexists(b_dest)):
-            state = 'absent'
-
-        # if it already exists and the source file isn't there, consider this done
-        elif not os.path.lexists(b_path) and os.path.lexists(b_dest):
-            state = 'compress'
-
-        else:
-            if module.check_mode:
-                if not os.path.exists(b_dest):
-                    changed = True
-            else:
-                size = 0
-                f_in = f_out = arcfile = None
-
-                if os.path.lexists(b_dest):
-                    size = os.path.getsize(b_dest)
-
-                try:
-                    if fmt == 'zip':
-                        arcfile = zipfile.ZipFile(
-                            to_native(b_dest, errors='surrogate_or_strict', encoding='ascii'),
-                            'w',
-                            zipfile.ZIP_DEFLATED,
-                            True
-                        )
-                        arcfile.write(
-                            to_native(b_path, errors='surrogate_or_strict', encoding='ascii'),
-                            to_native(b_path[len(b_arcroot):], errors='surrogate_or_strict')
-                        )
-                        arcfile.close()
-                        state = 'archive'  # because all zip files are archives
-                    elif fmt == 'tar':
-                        arcfile = tarfile.open(to_native(b_dest, errors='surrogate_or_strict', encoding='ascii'), 'w')
-                        arcfile.add(to_native(b_path, errors='surrogate_or_strict', encoding='ascii'))
-                        arcfile.close()
-                    else:
-                        f_in = open(b_path, 'rb')
-
-                        n_dest = to_native(b_dest, errors='surrogate_or_strict', encoding='ascii')
-                        if fmt == 'gz':
-                            f_out = gzip.open(n_dest, 'wb')
-                        elif fmt == 'bz2':
-                            f_out = bz2.BZ2File(n_dest, 'wb')
-                        elif fmt == 'xz':
-                            f_out = lzma.LZMAFile(n_dest, 'wb')
-                        else:
-                            raise OSError("Invalid format")
-
-                        shutil.copyfileobj(f_in, f_out)
-
-                    b_successes.append(b_path)
-
+                    os.remove(path)
                 except OSError as e:
                     module.fail_json(
-                        path=to_native(b_path),
-                        dest=dest,
-                        msg='Unable to write to compressed file: %s' % to_native(e), exception=format_exc()
+                        path=_to_native(path),
+                        msg='Unable to remove source file: %s' % _to_native(e), exception=format_exc()
                     )
 
-                if arcfile:
-                    arcfile.close()
-                if f_in:
-                    f_in.close()
-                if f_out:
-                    f_out.close()
+    if archive.destination_exists():
+        archive.update_permissions()
 
-                # Rudimentary check: If size changed then file changed. Not perfect, but easy.
-                if os.path.getsize(b_dest) != size:
-                    changed = True
-
-            state = 'compress'
-
-        if remove and not check_mode:
-            try:
-                os.remove(b_path)
-
-            except OSError as e:
-                module.fail_json(
-                    path=to_native(b_path),
-                    msg='Unable to remove source file: %s' % to_native(e), exception=format_exc()
-                )
-
-    try:
-        file_args = module.load_file_common_arguments(params, path=b_dest)
-    except TypeError:
-        # The path argument is only supported in Ansible-base 2.10+. Fall back to
-        # pre-2.10 behavior for older Ansible versions.
-        params['path'] = b_dest
-        file_args = module.load_file_common_arguments(params)
-
-    if not check_mode:
-        changed = module.set_fs_attributes_if_different(file_args, changed)
-
-    module.exit_json(
-        archived=[to_native(p, errors='surrogate_or_strict') for p in b_successes],
-        dest=dest,
-        changed=changed,
-        state=state,
-        arcroot=to_native(b_arcroot, errors='surrogate_or_strict'),
-        missing=[to_native(p, errors='surrogate_or_strict') for p in b_missing],
-        expanded_paths=[to_native(p, errors='surrogate_or_strict') for p in b_expanded_paths],
-        expanded_exclude_paths=[to_native(p, errors='surrogate_or_strict') for p in b_expanded_exclude_paths],
-    )
+    module.exit_json(**archive.result)
 
 
 if __name__ == '__main__':

@@ -23,6 +23,7 @@ options:
     name:
       description:
         - Fibre Channel Network name.
+      type: str
 
 extends_documentation_fragment:
 - community.general.oneview
@@ -83,11 +84,6 @@ class FcNetworkInfoModule(OneViewModuleBase):
         )
 
         super(FcNetworkInfoModule, self).__init__(additional_arg_spec=argument_spec)
-        self.is_old_facts = self.module._name in ('oneview_fc_network_facts', 'community.general.oneview_fc_network_facts')
-        if self.is_old_facts:
-            self.module.deprecate("The 'oneview_fc_network_facts' module has been renamed to 'oneview_fc_network_info', "
-                                  "and the renamed one no longer returns ansible_facts",
-                                  version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     def execute_module(self):
 
@@ -96,10 +92,7 @@ class FcNetworkInfoModule(OneViewModuleBase):
         else:
             fc_networks = self.oneview_client.fc_networks.get_all(**self.facts_params)
 
-        if self.is_old_facts:
-            return dict(changed=False, ansible_facts=dict(fc_networks=fc_networks))
-        else:
-            return dict(changed=False, fc_networks=fc_networks)
+        return dict(changed=False, fc_networks=fc_networks)
 
 
 def main():

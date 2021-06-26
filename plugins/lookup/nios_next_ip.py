@@ -23,8 +23,12 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 author: Unknown (!UNKNOWN)
-lookup: nios_next_ip
+name: nios_next_ip
 short_description: Return the next available IP address for a network
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding lookup from it.
+    alternative: infoblox.nios_modules.nios_next_ip
+    removed_in: 5.0.0
 description:
   - Uses the Infoblox WAPI API to return the next available IP addresses
     for a given network CIDR

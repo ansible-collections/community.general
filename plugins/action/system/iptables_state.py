@@ -7,7 +7,7 @@ __metaclass__ = type
 import time
 
 from ansible.plugins.action import ActionBase
-from ansible.errors import AnsibleError, AnsibleActionFail, AnsibleConnectionFailure
+from ansible.errors import AnsibleActionFail, AnsibleConnectionFailure
 from ansible.utils.vars import merge_hash
 from ansible.utils.display import Display
 
@@ -40,19 +40,27 @@ class ActionModule(ActionBase):
         "(=%s) to 0, and 'async' (=%s) to a value >2 and not greater than "
         "'ansible_timeout' (=%s) (recommended).")
 
-    def _async_result(self, module_args, task_vars, timeout):
+    def _async_result(self, async_status_args, task_vars, timeout):
         '''
         Retrieve results of the asynchonous task, and display them in place of
         the async wrapper results (those with the ansible_job_id key).
         '''
+        async_status = self._task.copy()
+        async_status.args = async_status_args
+        async_status.action = 'ansible.builtin.async_status'
+        async_status.async_val = 0
+        async_action = self._shared_loader_obj.action_loader.get(
+            async_status.action, task=async_status, connection=self._connection,
+            play_context=self._play_context, loader=self._loader, templar=self._templar,
+            shared_loader_obj=self._shared_loader_obj)
+
+        if async_status.args['mode'] == 'cleanup':
+            return async_action.run(task_vars=task_vars)
+
         # At least one iteration is required, even if timeout is 0.
-        for i in range(max(1, timeout)):
-            async_result = self._execute_module(
-                module_name='ansible.builtin.async_status',
-                module_args=module_args,
-                task_vars=task_vars,
-                wrap_async=False)
-            if async_result['finished'] == 1:
+        for dummy in range(max(1, timeout)):
+            async_result = async_action.run(task_vars=task_vars)
+            if async_result.get('finished', 0) == 1:
                 break
             time.sleep(min(1, timeout))
 
@@ -76,7 +84,6 @@ class ActionModule(ActionBase):
             task_async = self._task.async_val
             check_mode = self._play_context.check_mode
             max_timeout = self._connection._play_context.timeout
-            module_name = self._task.action
             module_args = self._task.args
 
             if module_args.get('state', None) == 'restored':
@@ -107,7 +114,7 @@ class ActionModule(ActionBase):
                     # longer on the controller); and set a backup file path.
                     module_args['_timeout'] = task_async
                     module_args['_back'] = '%s/iptables.state' % async_dir
-                    async_status_args = dict(_async_dir=async_dir)
+                    async_status_args = dict(mode='status')
                     confirm_cmd = 'rm -f %s' % module_args['_back']
                     starter_cmd = 'touch %s.starter' % module_args['_back']
                     remaining_time = max(task_async, max_timeout)
@@ -133,7 +140,7 @@ class ActionModule(ActionBase):
                 # The module is aware to not process the main iptables-restore
                 # command before finding (and deleting) the 'starter' cookie on
                 # the host, so the previous query will not reach ssh timeout.
-                garbage = self._low_level_execute_command(starter_cmd, sudoable=self.DEFAULT_SUDOABLE)
+                dummy = self._low_level_execute_command(starter_cmd, sudoable=self.DEFAULT_SUDOABLE)
 
                 # As the main command is not yet executed on the target, here
                 # 'finished' means 'failed before main command be executed'.
@@ -143,7 +150,7 @@ class ActionModule(ActionBase):
                     except AttributeError:
                         pass
 
-                    for x in range(max_timeout):
+                    for dummy in range(max_timeout):
                         time.sleep(1)
                         remaining_time -= 1
                         # - AnsibleConnectionFailure covers rejected requests (i.e.
@@ -151,7 +158,7 @@ class ActionModule(ActionBase):
                         # - ansible_timeout is able to cover dropped requests (due
                         #   to a rule or policy DROP) if not lower than async_val.
                         try:
-                            garbage = self._low_level_execute_command(confirm_cmd, sudoable=self.DEFAULT_SUDOABLE)
+                            dummy = self._low_level_execute_command(confirm_cmd, sudoable=self.DEFAULT_SUDOABLE)
                             break
                         except AnsibleConnectionFailure:
                             continue
@@ -164,16 +171,12 @@ class ActionModule(ActionBase):
                         del result[key]
 
                 if result.get('invocation', {}).get('module_args'):
-                    if '_timeout' in result['invocation']['module_args']:
-                        del result['invocation']['module_args']['_back']
-                        del result['invocation']['module_args']['_timeout']
+                    for key in ('_back', '_timeout', '_async_dir', 'jid'):
+                        if result['invocation']['module_args'].get(key):
+                            del result['invocation']['module_args'][key]
 
                 async_status_args['mode'] = 'cleanup'
-                garbage = self._execute_module(
-                    module_name='ansible.builtin.async_status',
-                    module_args=async_status_args,
-                    task_vars=task_vars,
-                    wrap_async=False)
+                dummy = self._async_result(async_status_args, task_vars, 0)
 
         if not wrap_async:
             # remove a temporary path we created

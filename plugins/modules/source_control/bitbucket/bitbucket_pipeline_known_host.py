@@ -263,7 +263,7 @@ def main():
         repository=dict(type='str', required=True),
         username=dict(type='str', required=True),
         name=dict(type='str', required=True),
-        key=dict(type='str'),
+        key=dict(type='str', no_log=False),
         state=dict(type='str', choices=['present', 'absent'], required=True),
     )
     module = AnsibleModule(

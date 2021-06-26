@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Michael Scherer (@msherer) <misc@zarb.org>
-    connection: funcd
+    name: funcd
     short_description: Use funcd to connect to target
     description:
         - This transport permits you to use Ansible over Func.
@@ -37,13 +37,14 @@ import tempfile
 import shutil
 
 from ansible.errors import AnsibleError
+from ansible.plugins.connection import ConnectionBase
 from ansible.utils.display import Display
 
 display = Display()
 
 
-class Connection(object):
-    ''' Func-based connections '''
+class Connection(ConnectionBase):
+    """ Func-based connections """
 
     has_pipelining = False
 
@@ -52,6 +53,7 @@ class Connection(object):
         self.host = host
         # port is unused, this go on func
         self.port = port
+        self.client = None
 
     def connect(self, port=None):
         if not HAVE_FUNC:
@@ -61,31 +63,32 @@ class Connection(object):
         return self
 
     def exec_command(self, cmd, become_user=None, sudoable=False, executable='/bin/sh', in_data=None):
-        ''' run a command on the remote minion '''
+        """ run a command on the remote minion """
 
         if in_data:
             raise AnsibleError("Internal Error: this module does not support optimized module pipelining")
 
         # totally ignores privlege escalation
-        display.vvv("EXEC %s" % (cmd), host=self.host)
+        display.vvv("EXEC %s" % cmd, host=self.host)
         p = self.client.command.run(cmd)[self.host]
-        return (p[0], p[1], p[2])
+        return p[0], p[1], p[2]
 
-    def _normalize_path(self, path, prefix):
+    @staticmethod
+    def _normalize_path(path, prefix):
         if not path.startswith(os.path.sep):
             path = os.path.join(os.path.sep, path)
         normpath = os.path.normpath(path)
         return os.path.join(prefix, normpath[1:])
 
     def put_file(self, in_path, out_path):
-        ''' transfer a file from local to remote '''
+        """ transfer a file from local to remote """
 
         out_path = self._normalize_path(out_path, '/')
         display.vvv("PUT %s TO %s" % (in_path, out_path), host=self.host)
         self.client.local.copyfile.send(in_path, out_path)
 
     def fetch_file(self, in_path, out_path):
-        ''' fetch a file from remote to local '''
+        """ fetch a file from remote to local """
 
         in_path = self._normalize_path(in_path, '/')
         display.vvv("FETCH %s TO %s" % (in_path, out_path), host=self.host)
@@ -98,5 +101,5 @@ class Connection(object):
         shutil.rmtree(tmpdir)
 
     def close(self):
-        ''' terminate the connection; nothing to do here '''
+        """ terminate the connection; nothing to do here """
         pass

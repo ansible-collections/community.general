@@ -16,7 +16,9 @@ short_description: Manage PAM Modules
 description:
   - Edit PAM service's type, control, module path and module arguments.
   - In order for a PAM rule to be modified, the type, control and
-    module_path must match an existing rule.  See man(5) pam.d for details.
+    module_path must match an existing rule. See man(5) pam.d for details.
+notes:
+  - This module does not handle authselect profiles.
 options:
   name:
     description:
@@ -287,7 +289,7 @@ class PamdLine(object):
 
     @property
     def is_valid(self):
-        if self.line == '':
+        if self.line.strip() == '':
             return True
         return False
 
@@ -302,6 +304,10 @@ class PamdLine(object):
 
     def __str__(self):
         return str(self.line)
+
+
+class PamdEmptyLine(PamdLine):
+    pass
 
 
 class PamdComment(PamdLine):
@@ -445,8 +451,8 @@ class PamdService(object):
                 pamd_line = PamdComment(line)
             elif line.lstrip().startswith('@include'):
                 pamd_line = PamdInclude(line)
-            elif line == '':
-                pamd_line = PamdLine(line)
+            elif line.strip() == '':
+                pamd_line = PamdEmptyLine(line)
             else:
                 pamd_line = PamdRule.rule_from_string(line)
 
@@ -545,7 +551,7 @@ class PamdService(object):
 
             # Next we may have to loop backwards if the previous line is a comment.  If it
             # is, we'll get the previous "rule's" previous.
-            while previous_rule is not None and isinstance(previous_rule, PamdComment):
+            while previous_rule is not None and isinstance(previous_rule, (PamdComment, PamdEmptyLine)):
                 previous_rule = previous_rule.prev
             # Next we'll see if the previous rule matches what we are trying to insert.
             if previous_rule is not None and not previous_rule.matches(new_type, new_control, new_path):
@@ -589,7 +595,7 @@ class PamdService(object):
             next_rule = current_rule.next
             # Next we may have to loop forwards if the next line is a comment.  If it
             # is, we'll get the next "rule's" next.
-            while next_rule is not None and isinstance(next_rule, PamdComment):
+            while next_rule is not None and isinstance(next_rule, (PamdComment, PamdEmptyLine)):
                 next_rule = next_rule.next
 
             # First we create a new rule
@@ -780,13 +786,8 @@ def main():
         required_if=[
             ("state", "args_present", ["module_arguments"]),
             ("state", "args_absent", ["module_arguments"]),
-            ("state", "before", ["new_control"]),
-            ("state", "before", ["new_type"]),
-            ("state", "before", ["new_module_path"]),
-            ("state", "after", ["new_control"]),
-            ("state", "after", ["new_type"]),
-            ("state", "after", ["new_module_path"]),
-
+            ("state", "before", ["new_control", "new_type", "new_module_path"]),
+            ("state", "after", ["new_control", "new_type", "new_module_path"]),
         ],
     )
     content = str()
@@ -798,9 +799,7 @@ def main():
             content = service_file_obj.read()
     except IOError as e:
         # If unable to read the file, fail out
-        module.fail_json(msg='Unable to open/read PAM module \
-                            file %s with error %s.' %
-                         (fname, str(e)))
+        module.fail_json(msg='Unable to open/read PAM module file %s with error %s.' % (fname, str(e)))
 
     # Assuming we didn't fail, create the service
     service = PamdService(content)

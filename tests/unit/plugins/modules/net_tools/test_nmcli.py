@@ -95,8 +95,13 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 """
 
 TESTCASE_GENERIC_DNS4_SEARCH = [
@@ -120,10 +125,15 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
 ipv4.dns-search:                        search.redhat.com
+ipv4.may-fail:                          yes
 ipv6.dns-search:                        search6.redhat.com
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 """
 
 TESTCASE_GENERIC_ZONE = [
@@ -147,8 +157,13 @@ connection.zone:                        external
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 """
 
 TESTCASE_BOND = [
@@ -172,8 +187,13 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 bond.options:                           mode=active-backup,primary=non_existent_primary
 """
 
@@ -184,6 +204,7 @@ TESTCASE_BRIDGE = [
         'ifname': 'br0_non_existant',
         'ip4': '10.10.10.10/24',
         'gw4': '10.10.10.1',
+        'mac': '52:54:00:ab:cd:ef',
         'maxage': 100,
         'stp': True,
         'state': 'present',
@@ -198,8 +219,14 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+bridge.mac-address:                     52:54:00:AB:CD:EF
 bridge.stp:                             yes
 bridge.max-age:                         100
 bridge.ageing-time:                     300
@@ -223,6 +250,7 @@ TESTCASE_BRIDGE_SLAVE_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
 connection.interface-name:              br0_non_existant
 connection.autoconnect:                 yes
+connection.slave-type:                  bridge
 ipv4.never-default:                     no
 bridge-port.path-cost:                  100
 bridge-port.hairpin-mode:               yes
@@ -249,8 +277,13 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 vlan.id:                                10
 """
 
@@ -340,8 +373,13 @@ connection.autoconnect:                 yes
 802-3-ethernet.mtu:                     auto
 ipv4.method:                            auto
 ipv4.dhcp-client-id:                    00:11:22:AA:BB:CC:DD
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 """
 
 TESTCASE_ETHERNET_STATIC = [
@@ -365,9 +403,14 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 ipv4.dns:                               1.1.1.1,8.8.8.8
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 """
 
 

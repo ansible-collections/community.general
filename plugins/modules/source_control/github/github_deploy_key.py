@@ -29,20 +29,24 @@ options:
       - The name of the individual account or organization that owns the GitHub repository.
     required: true
     aliases: [ 'account', 'organization' ]
+    type: str
   repo:
     description:
       - The name of the GitHub repository.
     required: true
     aliases: [ 'repository' ]
+    type: str
   name:
     description:
       - The name for the deploy key.
     required: true
     aliases: [ 'title', 'label' ]
+    type: str
   key:
     description:
       - The SSH public key to add to the repository as a deploy key.
     required: true
+    type: str
   read_only:
     description:
       - If C(true), the deploy key will only be able to read repository contents. Otherwise, the deploy key will be able to read and write.
@@ -53,6 +57,7 @@ options:
       - The state of the deploy key.
     default: "present"
     choices: [ "present", "absent" ]
+    type: str
   force:
     description:
       - If C(true), forcefully adds the deploy key by deleting any existing deploy key with the same public key or title.
@@ -61,16 +66,21 @@ options:
   username:
     description:
       - The username to authenticate with. Should not be set when using personal access token
+    type: str
   password:
     description:
       - The password to authenticate with. Alternatively, a personal access token can be used instead of I(username) and I(password) combination.
+    type: str
   token:
     description:
       - The OAuth2 token or personal access token to authenticate with. Mutually exclusive with I(password).
+    type: str
   otp:
     description:
       - The 6 digit One Time Password for 2-Factor Authentication. Required together with I(username) and I(password).
+      - Alias C(2fa_token) has been deprecated and will be removed in community.general 5.0.0.
     aliases: ['2fa_token']
+    type: int
 notes:
    - "Refer to GitHub's API documentation here: https://developer.github.com/v3/repos/keys/."
 '''
@@ -282,13 +292,15 @@ def main():
             owner=dict(required=True, type='str', aliases=['account', 'organization']),
             repo=dict(required=True, type='str', aliases=['repository']),
             name=dict(required=True, type='str', aliases=['title', 'label']),
-            key=dict(required=True, type='str'),
+            key=dict(required=True, type='str', no_log=False),
             read_only=dict(required=False, type='bool', default=True),
             state=dict(default='present', choices=['present', 'absent']),
             force=dict(required=False, type='bool', default=False),
             username=dict(required=False, type='str'),
             password=dict(required=False, type='str', no_log=True),
-            otp=dict(required=False, type='int', aliases=['2fa_token'], no_log=True),
+            otp=dict(
+                required=False, type='int', aliases=['2fa_token'], no_log=True,
+                deprecated_aliases=[dict(name='2fa_token', version='5.0.0', collection_name='community.general')]),
             token=dict(required=False, type='str', no_log=True)
         ),
         mutually_exclusive=[

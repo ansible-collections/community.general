@@ -54,8 +54,14 @@ options:
         description:
         - Host name to associate with the event.
         - If not specified, it defaults to the remote system's hostname.
+    api_host:
+        type: str
+        description:
+        - DataDog API endpoint URL.
+        version_added: '3.3.0'
     tags:
         type: list
+        elements: str
         description: ["Comma separated list of tags to apply to the event."]
     alert_type:
         type: str
@@ -89,6 +95,19 @@ EXAMPLES = '''
     api_key: 9775a026f1ca7d1c6c5af9d94d9595a4
     app_key: j4JyCYfefWHhgFgiZUqRm63AXHNZQyPGBfJtAzmN
     tags: 'aa,bb,#host:{{ inventory_hostname }}'
+
+- name: Post an event with several tags to another endpoint
+  community.general.datadog_event:
+    title: Testing from ansible
+    text: Test
+    api_key: 9775a026f1ca7d1c6c5af9d94d9595a4
+    app_key: j4JyCYfefWHhgFgiZUqRm63AXHNZQyPGBfJtAzmN
+    api_host: 'https://example.datadoghq.eu'
+    tags:
+      - aa
+      - b
+      - '#host:{{ inventory_hostname }}'
+
 '''
 
 import platform
@@ -112,19 +131,15 @@ def main():
         argument_spec=dict(
             api_key=dict(required=True, no_log=True),
             app_key=dict(required=True, no_log=True),
+            api_host=dict(type='str'),
             title=dict(required=True),
             text=dict(required=True),
-            date_happened=dict(required=False, default=None, type='int'),
-            priority=dict(
-                required=False, default='normal', choices=['normal', 'low']
-            ),
-            host=dict(required=False, default=None),
-            tags=dict(required=False, default=None, type='list'),
-            alert_type=dict(
-                required=False, default='info',
-                choices=['error', 'warning', 'info', 'success']
-            ),
-            aggregation_key=dict(required=False, default=None),
+            date_happened=dict(type='int'),
+            priority=dict(default='normal', choices=['normal', 'low']),
+            host=dict(),
+            tags=dict(type='list', elements='str'),
+            alert_type=dict(default='info', choices=['error', 'warning', 'info', 'success']),
+            aggregation_key=dict(no_log=False),
             validate_certs=dict(default=True, type='bool'),
         )
     )
@@ -135,8 +150,10 @@ def main():
 
     options = {
         'api_key': module.params['api_key'],
-        'app_key': module.params['app_key']
+        'app_key': module.params['app_key'],
     }
+    if module.params['api_host'] is not None:
+        options['api_host'] = module.params['api_host']
 
     initialize(**options)
 

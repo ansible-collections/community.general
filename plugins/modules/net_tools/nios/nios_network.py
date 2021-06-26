@@ -10,6 +10,10 @@ DOCUMENTATION = '''
 module: nios_network
 author: "Peter Sprygada (@privateip)"
 short_description: Configure Infoblox NIOS network object
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding module from it.
+    alternative: infoblox.nios_modules.nios_network
+    removed_in: 5.0.0
 description:
   - Adds and/or removes instances of network objects from
     Infoblox NIOS servers.  This module manages NIOS C(network) objects
@@ -29,12 +33,13 @@ options:
     aliases:
       - name
       - cidr
+    type: str
   network_view:
     description:
       - Configures the name of the network view to associate with this
         configured instance.
-    required: true
     default: default
+    type: str
   options:
     description:
       - Configures the set of DHCP options to be included as part of
@@ -50,13 +55,16 @@ options:
             C(router), C(router-templates), C(domain-name-servers), C(domain-name),
             C(broadcast-address), C(broadcast-address-offset), C(dhcp-lease-time),
             and C(dhcp6.name-servers).
+        type: str
       num:
         description:
           - The number of the DHCP option to configure
+        type: int
       value:
         description:
           - The value of the DHCP option specified by C(name)
         required: true
+        type: str
       use_option:
         description:
           - Only applies to a subset of options (see NIOS API documentation)
@@ -66,16 +74,19 @@ options:
         description:
           - The name of the space this DHCP option is associated to
         default: DHCP
+        type: str
   extattrs:
     description:
       - Allows for the configuration of Extensible Attributes on the
         instance of the object.  This argument accepts a set of key / value
         pairs for configuration.
+    type: dict
   comment:
     description:
       - Configures a text string comment to be associated with the instance
         of this object.  The provided text string will be configured on the
         object instance.
+    type: str
   container:
     description:
       - If set to true it'll create the network container to be added or removed
@@ -91,6 +102,7 @@ options:
     choices:
       - present
       - absent
+    type: str
 '''
 
 EXAMPLES = '''
@@ -173,12 +185,38 @@ EXAMPLES = '''
 
 RETURN = ''' # '''
 
+import socket
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiModule
-from ansible_collections.ansible.netcommon.plugins.module_utils.network.common.utils import validate_ip_address, validate_ip_v6_address
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import NIOS_IPV4_NETWORK, NIOS_IPV6_NETWORK
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import NIOS_IPV4_NETWORK_CONTAINER, NIOS_IPV6_NETWORK_CONTAINER
+from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_ib_spec
+
+
+# The following function validate_ip_address has been taken from
+# https://github.com/ansible-collections/ansible.netcommon/blob/20124ecbb420daa0f5bb9cdaa865a952657aa0e7/plugins/module_utils/network/common/utils.py#L496
+# The code there is licensed under BSD 2-clause.
+# Copyright (c) 2016 Red Hat Inc.
+def validate_ip_address(address):
+    try:
+        socket.inet_aton(address)
+    except socket.error:
+        return False
+    return address.count(".") == 3
+
+
+# The following function validate_ip_v6_address has been taken from
+# https://github.com/ansible-collections/ansible.netcommon/blob/20124ecbb420daa0f5bb9cdaa865a952657aa0e7/plugins/module_utils/network/common/utils.py#L504
+# The code there is licensed under BSD 2-clause.
+# Copyright (c) 2016 Red Hat Inc.
+def validate_ip_v6_address(address):
+    try:
+        socket.inet_pton(socket.AF_INET6, address)
+    except socket.error:
+        return False
+    return True
 
 
 def options(module):
@@ -272,7 +310,7 @@ def main():
         state=dict(default='present', choices=['present', 'absent'])
     )
 
-    argument_spec.update(ib_spec)
+    argument_spec.update(normalize_ib_spec(ib_spec))
     argument_spec.update(WapiModule.provider_spec)
 
     module = AnsibleModule(argument_spec=argument_spec,

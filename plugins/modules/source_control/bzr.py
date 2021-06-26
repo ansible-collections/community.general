@@ -22,15 +22,18 @@ options:
             - SSH or HTTP protocol address of the parent branch.
         aliases: [ parent ]
         required: yes
+        type: str
     dest:
         description:
             - Absolute path of where the branch should be cloned to.
         required: yes
+        type: path
     version:
         description:
             - What version of the branch to clone.  This can be the
               bzr revno or revid.
         default: head
+        type: str
     force:
         description:
             - If C(yes), any modified files in the working
@@ -42,6 +45,7 @@ options:
         description:
             - Path to bzr executable to use. If not supplied,
               the normal mechanism for resolving binary paths will be used.
+        type: str
 '''
 
 EXAMPLES = '''

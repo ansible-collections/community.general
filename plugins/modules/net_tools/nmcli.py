@@ -54,7 +54,7 @@ options:
             - Type C(generic) is added in Ansible 2.5.
             - Type C(infiniband) is added in community.general 2.0.0.
         type: str
-        choices: [ bond, bond-slave, bridge, bridge-slave, ethernet, generic, infiniband, ipip, sit, team, team-slave, vlan, vxlan ]
+        choices: [ bond, bond-slave, bridge, bridge-slave, ethernet, generic, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi ]
     mode:
         description:
             - This is the type of device or network connection that you wish to create for a bond, team or bridge.
@@ -69,6 +69,7 @@ options:
         description:
             - The IPv4 address to this interface.
             - Use the format C(192.0.2.24/24).
+            - If defined and I(method4) is not specified, automatically set C(ipv4.method) to C(manual).
         type: str
     gw4:
         description:
@@ -76,6 +77,12 @@ options:
             - Use the format C(192.0.2.1).
             - This parameter is mutually_exclusive with never_default4 parameter.
         type: str
+    gw4_ignore_auto:
+        description:
+            - Ignore automatically configured IPv4 routes.
+        type: bool
+        default: false
+        version_added: 3.2.0
     routes4:
         description:
             - The list of ipv4 routes.
@@ -88,6 +95,11 @@ options:
             - Set metric level of ipv4 routes configured on interface.
         type: int
         version_added: 2.0.0
+    routing_rules4:
+        description:
+            - Is the same as in an C(ip route add) command, except always requires specifying a priority.
+        type: str
+        version_added: 3.3.0
     never_default4:
         description:
             - Set as default route.
@@ -106,16 +118,42 @@ options:
             - A list of DNS search domains.
         elements: str
         type: list
+    dns4_ignore_auto:
+        description:
+            - Ignore automatically configured IPv4 name servers.
+        type: bool
+        default: false
+        version_added: 3.2.0
+    method4:
+        description:
+            - Configuration method to be used for IPv4.
+            - If I(ip4) is set, C(ipv4.method) is automatically set to C(manual) and this parameter is not needed.
+        type: str
+        choices: [auto, link-local, manual, shared, disabled]
+        version_added: 2.2.0
+    may_fail4:
+        description:
+            - If you need I(ip4) configured before C(network-online.target) is reached, set this option to C(false).
+        type: bool
+        default: true
+        version_added: 3.3.0
     ip6:
         description:
             - The IPv6 address to this interface.
             - Use the format C(abbe::cafe).
+            - If defined and I(method6) is not specified, automatically set C(ipv6.method) to C(manual).
         type: str
     gw6:
         description:
             - The IPv6 gateway for this interface.
             - Use the format C(2001:db8::1).
         type: str
+    gw6_ignore_auto:
+        description:
+            - Ignore automatically configured IPv6 routes.
+        type: bool
+        default: false
+        version_added: 3.2.0
     dns6:
         description:
             - A list of up to 3 dns servers.
@@ -127,6 +165,20 @@ options:
             - A list of DNS search domains.
         elements: str
         type: list
+    dns6_ignore_auto:
+        description:
+            - Ignore automatically configured IPv6 name servers.
+        type: bool
+        default: false
+        version_added: 3.2.0
+    method6:
+        description:
+            - Configuration method to be used for IPv6
+            - If I(ip6) is set, C(ipv6.method) is automatically set to C(manual) and this parameter is not needed.
+            - C(disabled) was added in community.general 3.3.0.
+        type: str
+        choices: [ignore, auto, dhcp, link-local, manual, shared, disabled]
+        version_added: 2.2.0
     mtu:
         description:
             - The connection MTU, e.g. 9000. This can't be applied when creating the interface and is done once the interface has been created.
@@ -194,7 +246,7 @@ options:
         default: 300
     mac:
         description:
-            - This is only used with bridge - MAC address of the bridge.
+            - MAC address of the connection.
             - Note this requires a recent kernel feature, originally introduced in 3.15 upstream kernel.
         type: str
     slavepriority:
@@ -263,6 +315,19 @@ options:
             - When updating this property on a currently activated connection, the change takes effect immediately.
        type: str
        version_added: 2.0.0
+    wifi_sec:
+       description:
+            - 'The security configuration of the Wifi connection. The valid attributes are listed on:'
+            - 'U(https://developer.gnome.org/NetworkManager/stable/settings-802-11-wireless-security.html)'
+            - 'For instance to use common WPA-PSK auth with a password:'
+            - '- C({key-mgmt: wpa-psk, psk: my_password})'
+       type: dict
+       version_added: 3.0.0
+    ssid:
+       description:
+            - Name of the Wireless router or the access point.
+       type: str
+       version_added: 3.0.0
 '''
 
 EXAMPLES = r'''
@@ -566,6 +631,19 @@ EXAMPLES = r'''
 #     - 8 NetworkManager is not running
 #     - 9 nmcli and NetworkManager versions mismatch
 #     - 10 Connection, device, or access point does not exist.
+
+- name: Create the wifi connection
+  community.general.nmcli:
+    type: wifi
+    conn_name: Brittany
+    ifname: wlp4s0
+    ssid: Brittany
+    wifi_sec:
+      key-mgmt: wpa-psk
+      psk: my_password
+    autoconnect: true
+    state: present
+
 '''
 
 RETURN = r"""#
@@ -606,15 +684,23 @@ class Nmcli(object):
         self.type = module.params['type']
         self.ip4 = module.params['ip4']
         self.gw4 = module.params['gw4']
+        self.gw4_ignore_auto = module.params['gw4_ignore_auto']
         self.routes4 = module.params['routes4']
         self.route_metric4 = module.params['route_metric4']
+        self.routing_rules4 = module.params['routing_rules4']
         self.never_default4 = module.params['never_default4']
         self.dns4 = module.params['dns4']
         self.dns4_search = module.params['dns4_search']
+        self.dns4_ignore_auto = module.params['dns4_ignore_auto']
+        self.method4 = module.params['method4']
+        self.may_fail4 = module.params['may_fail4']
         self.ip6 = module.params['ip6']
         self.gw6 = module.params['gw6']
+        self.gw6_ignore_auto = module.params['gw6_ignore_auto']
         self.dns6 = module.params['dns6']
         self.dns6_search = module.params['dns6_search']
+        self.dns6_ignore_auto = module.params['dns6_ignore_auto']
+        self.method6 = module.params['method6']
         self.mtu = module.params['mtu']
         self.stp = module.params['stp']
         self.priority = module.params['priority']
@@ -647,19 +733,21 @@ class Nmcli(object):
         self.nmcli_bin = self.module.get_bin_path('nmcli', True)
         self.dhcp_client_id = module.params['dhcp_client_id']
         self.zone = module.params['zone']
+        self.ssid = module.params['ssid']
+        self.wifi_sec = module.params['wifi_sec']
 
-        if self.ip4:
+        if self.method4:
+            self.ipv4_method = self.method4
+        elif self.ip4:
             self.ipv4_method = 'manual'
         else:
-            # supported values for 'ipv4.method': [auto, link-local, manual, shared, disabled]
-            # TODO: add a new module parameter to specify a non 'manual' value
             self.ipv4_method = None
 
-        if self.ip6:
+        if self.method6:
+            self.ipv6_method = self.method6
+        elif self.ip6:
             self.ipv6_method = 'manual'
         else:
-            # supported values for 'ipv6.method': [ignore, auto, dhcp, link-local, manual, shared]
-            # TODO: add a new module parameter to specify a non 'manual' value
             self.ipv6_method = None
 
     def execute_command(self, cmd, use_unsafe_shell=False, data=None):
@@ -677,26 +765,32 @@ class Nmcli(object):
         }
 
         # IP address options.
-        if self.ip_conn_type:
+        if self.ip_conn_type and not self.master:
             options.update({
                 'ipv4.addresses': self.ip4,
                 'ipv4.dhcp-client-id': self.dhcp_client_id,
                 'ipv4.dns': self.dns4,
                 'ipv4.dns-search': self.dns4_search,
+                'ipv4.ignore-auto-dns': self.dns4_ignore_auto,
                 'ipv4.gateway': self.gw4,
+                'ipv4.ignore-auto-routes': self.gw4_ignore_auto,
                 'ipv4.routes': self.routes4,
                 'ipv4.route-metric': self.route_metric4,
+                'ipv4.routing-rules': self.routing_rules4,
                 'ipv4.never-default': self.never_default4,
                 'ipv4.method': self.ipv4_method,
+                'ipv4.may-fail': self.may_fail4,
                 'ipv6.addresses': self.ip6,
                 'ipv6.dns': self.dns6,
                 'ipv6.dns-search': self.dns6_search,
+                'ipv6.ignore-auto-dns': self.dns6_ignore_auto,
                 'ipv6.gateway': self.gw6,
+                'ipv6.ignore-auto-routes': self.gw6_ignore_auto,
                 'ipv6.method': self.ipv6_method,
             })
 
         # Layer 2 options.
-        if self.mac_conn_type:
+        if self.mac:
             options.update({self.mac_setting: self.mac})
 
         if self.mtu_conn_type:
@@ -719,6 +813,10 @@ class Nmcli(object):
                 'primary': self.primary,
                 'updelay': self.updelay,
             })
+        elif self.type == 'bond-slave':
+            options.update({
+                'connection.slave-type': 'bond',
+            })
         elif self.type == 'bridge':
             options.update({
                 'bridge.ageing-time': self.ageingtime,
@@ -730,6 +828,7 @@ class Nmcli(object):
             })
         elif self.type == 'bridge-slave':
             options.update({
+                'connection.slave-type': 'bridge',
                 'bridge-port.path-cost': self.path_cost,
                 'bridge-port.hairpin-mode': self.hairpin,
                 'bridge-port.priority': self.slavepriority,
@@ -752,7 +851,10 @@ class Nmcli(object):
                 'vxlan.local': self.vxlan_local,
                 'vxlan.remote': self.vxlan_remote,
             })
-
+        elif self.type == 'wifi':
+            options.update({
+                'connection.slave-type': 'bond' if self.master else None,
+            })
         # Convert settings values based on the situation.
         for setting, value in options.items():
             setting_type = self.settings_type(setting)
@@ -781,17 +883,13 @@ class Nmcli(object):
         return self.type in (
             'bond',
             'bridge',
-            'bridge-slave',
             'ethernet',
             'generic',
             'infiniband',
             'team',
             'vlan',
+            'wifi'
         )
-
-    @property
-    def mac_conn_type(self):
-        return self.type == 'bridge'
 
     @property
     def mac_setting(self):
@@ -824,6 +922,7 @@ class Nmcli(object):
             'bond-slave',
             'bridge-slave',
             'team-slave',
+            'wifi',
         )
 
     @property
@@ -849,7 +948,12 @@ class Nmcli(object):
         if setting in ('bridge.stp',
                        'bridge-port.hairpin-mode',
                        'connection.autoconnect',
-                       'ipv4.never-default'):
+                       'ipv4.never-default',
+                       'ipv4.ignore-auto-dns',
+                       'ipv4.ignore-auto-routes',
+                       'ipv4.may-fail',
+                       'ipv6.ignore-auto-dns',
+                       'ipv6.ignore-auto-routes'):
             return bool
         elif setting in ('ipv4.dns',
                          'ipv4.dns-search',
@@ -898,6 +1002,13 @@ class Nmcli(object):
         else:
             ifname = self.ifname
 
+        if self.type == "wifi":
+            cmd.append('ssid')
+            cmd.append(self.ssid)
+            if self.wifi_sec:
+                for name, value in self.wifi_sec.items():
+                    cmd += ['wifi-sec.%s' % name, value]
+
         options = {
             'connection.interface-name': ifname,
         }
@@ -919,7 +1030,7 @@ class Nmcli(object):
 
     @property
     def create_connection_up(self):
-        if self.type in ('bond', 'ethernet', 'infiniband'):
+        if self.type in ('bond', 'ethernet', 'infiniband', 'wifi'):
             if (self.mtu is not None) or (self.dns4 is not None) or (self.dns6 is not None):
                 return True
         elif self.type == 'team':
@@ -978,18 +1089,6 @@ class Nmcli(object):
         return conn_info
 
     def _compare_conn_params(self, conn_info, options):
-        # See nmcli(1) for details
-        param_alias = {
-            'type': 'connection.type',
-            'con-name': 'connection.id',
-            'autoconnect': 'connection.autoconnect',
-            'ifname': 'connection.interface-name',
-            'mac': self.mac_setting,
-            'master': 'connection.master',
-            'slave-type': 'connection.slave-type',
-            'zone': 'connection.zone',
-        }
-
         changed = False
         diff_before = dict()
         diff_after = dict()
@@ -1008,13 +1107,11 @@ class Nmcli(object):
                     current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+),\s*mt\s*=\s*([^} ]+)\s*}', r'\1 \2 \3',
                                      route) for route in current_value]
                     current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+)\s*}', r'\1 \2', route) for route in current_value]
-            elif key in param_alias:
-                real_key = param_alias[key]
-                if real_key in conn_info:
-                    current_value = conn_info[real_key]
-                else:
-                    # alias parameter does not exist
-                    current_value = None
+                if key == self.mac_setting:
+                    # MAC addresses are case insensitive, nmcli always reports them in uppercase
+                    value = value.upper()
+                    # ensure current_value is also converted to uppercase in case nmcli changes behaviour
+                    current_value = current_value.upper()
             else:
                 # parameter does not exist
                 current_value = None
@@ -1067,20 +1164,29 @@ def main():
                           'team',
                           'team-slave',
                           'vlan',
-                          'vxlan'
+                          'vxlan',
+                          'wifi',
                       ]),
             ip4=dict(type='str'),
             gw4=dict(type='str'),
+            gw4_ignore_auto=dict(type='bool', default=False),
             routes4=dict(type='list', elements='str'),
             route_metric4=dict(type='int'),
+            routing_rules4=dict(type='str'),
             never_default4=dict(type='bool', default=False),
             dns4=dict(type='list', elements='str'),
             dns4_search=dict(type='list', elements='str'),
+            dns4_ignore_auto=dict(type='bool', default=False),
+            method4=dict(type='str', choices=['auto', 'link-local', 'manual', 'shared', 'disabled']),
+            may_fail4=dict(type='bool', default=True),
             dhcp_client_id=dict(type='str'),
             ip6=dict(type='str'),
             gw6=dict(type='str'),
+            gw6_ignore_auto=dict(type='bool', default=False),
             dns6=dict(type='list', elements='str'),
             dns6_search=dict(type='list', elements='str'),
+            dns6_ignore_auto=dict(type='bool', default=False),
+            method6=dict(type='str', choices=['ignore', 'auto', 'dhcp', 'link-local', 'manual', 'shared', 'disabled']),
             # Bond Specific vars
             mode=dict(type='str', default='balance-rr',
                       choices=['802.3ad', 'active-backup', 'balance-alb', 'balance-rr', 'balance-tlb', 'balance-xor', 'broadcast']),
@@ -1118,8 +1224,11 @@ def main():
             ip_tunnel_dev=dict(type='str'),
             ip_tunnel_local=dict(type='str'),
             ip_tunnel_remote=dict(type='str'),
+            ssid=dict(type='str'),
+            wifi_sec=dict(type='dict', no_log=True),
         ),
         mutually_exclusive=[['never_default4', 'gw4']],
+        required_if=[("type", "wifi", [("ssid")])],
         supports_check_mode=True,
     )
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')

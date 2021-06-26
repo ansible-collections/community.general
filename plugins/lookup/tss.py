@@ -6,7 +6,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = r"""
-lookup: tss
+name: tss
 author: Adam Migus (@amigus) <adam@migus.org>
 short_description: Get secrets from Thycotic Secret Server
 version_added: 1.0.0
@@ -75,7 +75,42 @@ EXAMPLES = r"""
   vars:
       secret: "{{ lookup('community.general.tss', 1) }}"
   tasks:
-      - ansible.builtin.debug: msg="the password is {{ (secret['items'] | items2dict(key_name='slug', value_name='itemValue'))['password'] }}"
+      - ansible.builtin.debug:
+          msg: >
+            the password is {{
+              (secret['items']
+                | items2dict(key_name='slug',
+                             value_name='itemValue'))['password']
+            }}
+
+- hosts: localhost
+  vars:
+      secret: >-
+        {{
+            lookup(
+                'community.general.tss',
+                102,
+                base_url='https://secretserver.domain.com/SecretServer/',
+                username='user.name',
+                password='password'
+            )
+        }}
+  tasks:
+      - ansible.builtin.debug:
+          msg: >
+            the password is {{
+              (secret['items']
+                | items2dict(key_name='slug',
+                             value_name='itemValue'))['password']
+            }}
+
+- hosts: localhost
+  vars:
+      secret_password: >-
+        {{ ((lookup('community.general.tss', 1) | from_json).get('items') | items2dict(key_name='slug', value_name='itemValue'))['password'] }}"
+  tasks:
+      - ansible.builtin.debug:
+          msg: the password is {{ secret_password }}
 """
 
 from ansible.errors import AnsibleError, AnsibleOptionsError

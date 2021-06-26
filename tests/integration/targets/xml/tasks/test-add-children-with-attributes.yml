@@ -29,7 +29,7 @@
   - name: Test expected result
     assert:
       that:
-      - add_children_with_attributes.changed == true
-      - comparison.changed == false  # identical
+      - add_children_with_attributes is changed
+      - comparison is not changed  # identical
     when: lxml_predictable_attribute_order
     #command: diff -u {{ role_path }}/results/test-add-children-with-attributes.xml /tmp/ansible-xml-beers.xml

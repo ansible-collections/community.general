@@ -70,6 +70,7 @@ options:
 
   tags:
     type: list
+    elements: str
     description:
     - List of tags to apply to the instance (5 max)
     required: false
@@ -85,6 +86,10 @@ options:
       - EMEA-NL-EVS
       - par1
       - EMEA-FR-PAR1
+      - par2
+      - EMEA-FR-PAR2
+      - waw1
+      - EMEA-PL-WAW1
 
   commercial_type:
     type: str
@@ -648,7 +653,7 @@ def main():
         enable_ipv6=dict(default=False, type="bool"),
         public_ip=dict(default="absent"),
         state=dict(choices=list(state_strategy.keys()), default='present'),
-        tags=dict(type="list", default=[]),
+        tags=dict(type="list", elements="str", default=[]),
         organization=dict(required=True),
         wait=dict(type="bool", default=False),
         wait_timeout=dict(type="int", default=300),

@@ -30,8 +30,8 @@
 
   - name: Test executable override
     flatpak:
-      name: org.gnome.Characters
-      remote: flathub
+      name: com.dummy.App1
+      remote: dummy-remote
       state: present
       executable: nothing-that-exists
     ignore_errors: true
@@ -40,8 +40,8 @@
   - name: Verify executable override test result
     assert:
       that:
-        - "executable_override_result.failed == true"
-        - "executable_override_result.changed == false"
+        - executable_override_result is failed
+        - executable_override_result is not changed
       msg: "Specifying non-existing executable shall fail module execution"
 
   - import_tasks: check_mode.yml
@@ -57,5 +57,20 @@
     vars:
       method: system
 
+  always:
+
+  - name: Check HTTP server status
+    async_status:
+      jid: "{{ webserver_status.ansible_job_id }}"
+    ignore_errors: true
+
+  - name: List processes
+    command: ps aux
+
+  - name: Stop HTTP server
+    command: >-
+      pkill -f -- '{{ remote_tmp_dir }}/serve.py'
+
   when: |
-      ansible_distribution in ('Fedora', 'Ubuntu')
+      ansible_distribution == 'Fedora' or
+      ansible_distribution == 'Ubuntu' and not ansible_distribution_major_version | int < 16

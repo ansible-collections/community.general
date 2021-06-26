@@ -32,7 +32,7 @@ options:
         type: str
     username:
         description:
-            - access.redhat.com or Sat6  username
+            - access.redhat.com or Sat6 username
         type: str
     password:
         description:
@@ -46,6 +46,16 @@ options:
         description:
             - Enable or disable https server certificate verification when connecting to C(server_hostname)
         type: str
+    server_prefix:
+        description:
+            - Specify the prefix when registering to the Red Hat Subscription Management or Sat6 server.
+        type: str
+        version_added: 3.3.0
+    server_port:
+        description:
+            - Specify the port when registering to the Red Hat Subscription Management or Sat6 server.
+        type: str
+        version_added: 3.3.0
     rhsm_baseurl:
         description:
             - Specify CDN baseurl
@@ -56,11 +66,11 @@ options:
         type: str
     server_proxy_hostname:
         description:
-            - Specify a HTTP proxy hostname
+            - Specify an HTTP proxy hostname.
         type: str
     server_proxy_port:
         description:
-            - Specify a HTTP proxy port
+            - Specify an HTTP proxy port.
         type: str
     server_proxy_user:
         description:
@@ -105,6 +115,7 @@ options:
               entitlements from a pool (the pool must support this). Mutually exclusive with I(pool).
         default: []
         type: list
+        elements: raw
     consumer_type:
         description:
             - The type of unit to register, defaults to system
@@ -153,6 +164,7 @@ options:
             addons:
                 description: Syspurpose attribute addons
                 type: list
+                elements: str
             sync:
                 description:
                     - When this option is true, then syspurpose attributes are synchronized with
@@ -594,7 +606,7 @@ class Rhsm(RegistrationBase):
 
         if missing_pools or serials:
             changed = True
-        return {'changed': changed, 'subscribed_pool_ids': missing_pools.keys(),
+        return {'changed': changed, 'subscribed_pool_ids': list(missing_pools.keys()),
                 'unsubscribed_serials': serials}
 
     def sync_syspurpose(self):
@@ -780,6 +792,8 @@ def main():
             'password': {'no_log': True},
             'server_hostname': {},
             'server_insecure': {},
+            'server_prefix': {},
+            'server_port': {},
             'rhsm_baseurl': {},
             'rhsm_repo_ca_cert': {},
             'auto_attach': {'aliases': ['autosubscribe'], 'type': 'bool'},
@@ -787,7 +801,7 @@ def main():
             'org_id': {},
             'environment': {},
             'pool': {'default': '^$'},
-            'pool_ids': {'default': [], 'type': 'list'},
+            'pool_ids': {'default': [], 'type': 'list', 'elements': 'raw'},
             'consumer_type': {},
             'consumer_name': {},
             'consumer_id': {},
@@ -803,7 +817,7 @@ def main():
                     'role': {},
                     'usage': {},
                     'service_level_agreement': {},
-                    'addons': {'type': 'list'},
+                    'addons': {'type': 'list', 'elements': 'str'},
                     'sync': {'type': 'bool', 'default': False}
                 }
             }
@@ -814,7 +828,7 @@ def main():
         mutually_exclusive=[['activationkey', 'username'],
                             ['activationkey', 'consumer_id'],
                             ['activationkey', 'environment'],
-                            ['activationkey', 'autosubscribe'],
+                            ['activationkey', 'auto_attach'],
                             ['pool', 'pool_ids']],
         required_if=[['state', 'present', ['username', 'activationkey'], True]],
     )
@@ -825,6 +839,8 @@ def main():
     password = module.params['password']
     server_hostname = module.params['server_hostname']
     server_insecure = module.params['server_insecure']
+    server_prefix = module.params['server_prefix']
+    server_port = module.params['server_port']
     rhsm_baseurl = module.params['rhsm_baseurl']
     rhsm_repo_ca_cert = module.params['rhsm_repo_ca_cert']
     auto_attach = module.params['auto_attach']

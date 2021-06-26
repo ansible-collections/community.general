@@ -17,7 +17,6 @@ options:
   password:
     description:
       - the instance root password
-      - required only for C(state=present)
     type: str
   hostname:
     description:
@@ -69,6 +68,13 @@ options:
     description:
       - specifies network interfaces for the container. As a hash/dictionary defining interfaces.
     type: dict
+  features:
+    description:
+      - Specifies a list of features to be enabled. For valid options, see U(https://pve.proxmox.com/wiki/Linux_Container#pct_options).
+      - Some features require the use of a privileged container.
+    type: list
+    elements: str
+    version_added: 2.0.0
   mounts:
     description:
       - specifies additional mounts (separate disks) for the container. As a hash/dictionary defining mount points
@@ -117,6 +123,15 @@ options:
       - with states C(stopped) , C(restarted) allow to force stop instance
     type: bool
     default: 'no'
+  purge:
+    description:
+      - Remove container from all related configurations.
+      - For example backup jobs, replication jobs, or HA.
+      - Related ACLs and Firewall entries will always be removed.
+      - Used with state C(absent).
+    type: bool
+    default: false
+    version_added: 2.3.0
   state:
     description:
      - Indicate desired state of the instance
@@ -270,6 +285,21 @@ EXAMPLES = r'''
     ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     cores: 2
 
+- name: Create a new container with nesting enabled and allows the use of CIFS/NFS inside the container.
+  community.general.proxmox:
+    vmid: 100
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    password: 123456
+    hostname: example.org
+    ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
+    features:
+     - nesting=1
+     - mount=cifs,nfs
+
+
 - name: Start container
   community.general.proxmox:
     vmid: 100
@@ -323,7 +353,6 @@ EXAMPLES = r'''
     state: absent
 '''
 
-import os
 import time
 import traceback
 from distutils.version import LooseVersion
@@ -334,7 +363,7 @@ try:
 except ImportError:
     HAS_PROXMOXER = False
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible.module_utils._text import to_native
 
 
@@ -459,7 +488,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             api_host=dict(required=True),
-            api_password=dict(no_log=True),
+            api_password=dict(no_log=True, fallback=(env_fallback, ['PROXMOX_PASSWORD'])),
             api_token_id=dict(no_log=True),
             api_token_secret=dict(no_log=True),
             api_user=dict(required=True),
@@ -479,19 +508,24 @@ def main():
             mounts=dict(type='dict'),
             ip_address=dict(),
             onboot=dict(type='bool'),
+            features=dict(type='list', elements='str'),
             storage=dict(default='local'),
             cpuunits=dict(type='int'),
             nameserver=dict(),
             searchdomain=dict(),
             timeout=dict(type='int', default=30),
             force=dict(type='bool', default=False),
+            purge=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted']),
             pubkey=dict(type='str', default=None),
             unprivileged=dict(type='bool', default=False),
             description=dict(type='str'),
             hookscript=dict(type='str'),
             proxmox_default_behavior=dict(type='str', choices=['compatibility', 'no_defaults']),
-        )
+        ),
+        required_if=[('state', 'present', ['node', 'hostname', 'ostemplate'])],
+        required_together=[('api_token_id', 'api_token_secret')],
+        required_one_of=[('api_password', 'api_token_id')],
     )
 
     if not HAS_PROXMOXER:
@@ -538,13 +572,7 @@ def main():
                 module.params[param] = value
 
     auth_args = {'user': api_user}
-    if not (api_token_id and api_token_secret):
-        # If password not set get it from PROXMOX_PASSWORD env
-        if not api_password:
-            try:
-                api_password = os.environ['PROXMOX_PASSWORD']
-            except KeyError as e:
-                module.fail_json(msg='You should set api_password param or use PROXMOX_PASSWORD environment variable')
+    if not api_token_id:
         auth_args['password'] = api_password
     else:
         auth_args['token_name'] = api_token_id
@@ -576,8 +604,6 @@ def main():
             # If no vmid was passed, there cannot be another VM named 'hostname'
             if not module.params['vmid'] and get_vmid(proxmox, hostname) and not module.params['force']:
                 module.exit_json(changed=False, msg="VM with hostname %s already exists and has ID number %s" % (hostname, get_vmid(proxmox, hostname)[0]))
-            elif not (node, module.params['hostname'] and module.params['password'] and module.params['ostemplate']):
-                module.fail_json(msg='node, hostname, password and ostemplate are mandatory for creating vm')
             elif not node_check(proxmox, node):
                 module.fail_json(msg="node '%s' not exists in cluster" % node)
             elif not content_check(proxmox, node, module.params['ostemplate'], template_store):
@@ -599,6 +625,7 @@ def main():
                             searchdomain=module.params['searchdomain'],
                             force=int(module.params['force']),
                             pubkey=module.params['pubkey'],
+                            features=",".join(module.params['features']) if module.params['features'] is not None else None,
                             unprivileged=int(module.params['unprivileged']),
                             description=module.params['description'],
                             hookscript=module.params['hookscript'])
@@ -669,7 +696,13 @@ def main():
             if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'mounted':
                 module.exit_json(changed=False, msg="VM %s is mounted. Stop it with force option before deletion." % vmid)
 
-            taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE).delete(vmid)
+            delete_params = {}
+
+            if module.params['purge']:
+                delete_params['purge'] = 1
+
+            taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE).delete(vmid, **delete_params)
+
             while timeout:
                 if (proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['status'] == 'stopped' and
                         proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):

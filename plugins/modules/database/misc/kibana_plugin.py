@@ -22,36 +22,49 @@ options:
       description:
       - Name of the plugin to install.
       required: True
+      type: str
     state:
       description:
       - Desired state of a plugin.
       choices: ["present", "absent"]
       default: present
+      type: str
     url:
       description:
       - Set exact URL to download the plugin from.
       - For local file, prefix its absolute path with file://
+      type: str
     timeout:
       description:
       - "Timeout setting: 30s, 1m, 1h etc."
       default: 1m
+      type: str
     plugin_bin:
       description:
       - Location of the Kibana binary.
       default: /opt/kibana/bin/kibana
+      type: path
     plugin_dir:
       description:
       - Your configured plugin directory specified in Kibana.
       default: /opt/kibana/installedPlugins/
+      type: path
     version:
       description:
       - Version of the plugin to be installed.
       - If plugin exists with previous version, plugin will NOT be updated unless C(force) is set to yes.
+      type: str
     force:
       description:
       - Delete and re-install the plugin. Can be useful for plugins update.
       type: bool
-      default: 'no'
+      default: false
+    allow_root:
+      description:
+      - Whether to allow C(kibana) and C(kibana-plugin) to be run as root. Passes the C(--allow-root) flag to these commands.
+      type: bool
+      default: false
+      version_added: 2.3.0
 '''
 
 EXAMPLES = '''
@@ -145,7 +158,7 @@ def parse_error(string):
         return string
 
 
-def install_plugin(module, plugin_bin, plugin_name, url, timeout, kibana_version='4.6'):
+def install_plugin(module, plugin_bin, plugin_name, url, timeout, allow_root, kibana_version='4.6'):
     if LooseVersion(kibana_version) > LooseVersion('4.6'):
         kibana_plugin_bin = os.path.join(os.path.dirname(plugin_bin), 'kibana-plugin')
         cmd_args = [kibana_plugin_bin, "install"]
@@ -157,48 +170,53 @@ def install_plugin(module, plugin_bin, plugin_name, url, timeout, kibana_version
         cmd_args = [plugin_bin, "plugin", PACKAGE_STATE_MAP["present"], plugin_name]
 
         if url:
-            cmd_args.append("--url %s" % url)
+            cmd_args.extend(["--url", url])
 
     if timeout:
-        cmd_args.append("--timeout %s" % timeout)
+        cmd_args.extend(["--timeout", timeout])
 
-    cmd = " ".join(cmd_args)
+    if allow_root:
+        cmd_args.append('--allow-root')
 
     if module.check_mode:
-        return True, cmd, "check mode", ""
+        return True, " ".join(cmd_args), "check mode", ""
 
-    rc, out, err = module.run_command(cmd)
+    rc, out, err = module.run_command(cmd_args)
     if rc != 0:
         reason = parse_error(out)
         module.fail_json(msg=reason)
 
-    return True, cmd, out, err
+    return True, " ".join(cmd_args), out, err
 
 
-def remove_plugin(module, plugin_bin, plugin_name, kibana_version='4.6'):
+def remove_plugin(module, plugin_bin, plugin_name, allow_root, kibana_version='4.6'):
     if LooseVersion(kibana_version) > LooseVersion('4.6'):
         kibana_plugin_bin = os.path.join(os.path.dirname(plugin_bin), 'kibana-plugin')
         cmd_args = [kibana_plugin_bin, "remove", plugin_name]
     else:
         cmd_args = [plugin_bin, "plugin", PACKAGE_STATE_MAP["absent"], plugin_name]
 
-    cmd = " ".join(cmd_args)
+    if allow_root:
+        cmd_args.append('--allow-root')
 
     if module.check_mode:
-        return True, cmd, "check mode", ""
+        return True, " ".join(cmd_args), "check mode", ""
 
-    rc, out, err = module.run_command(cmd)
+    rc, out, err = module.run_command(cmd_args)
     if rc != 0:
         reason = parse_error(out)
         module.fail_json(msg=reason)
 
-    return True, cmd, out, err
+    return True, " ".join(cmd_args), out, err
 
 
-def get_kibana_version(module, plugin_bin):
+def get_kibana_version(module, plugin_bin, allow_root):
     cmd_args = [plugin_bin, '--version']
-    cmd = " ".join(cmd_args)
-    rc, out, err = module.run_command(cmd)
+
+    if allow_root:
+        cmd_args.append('--allow-root')
+
+    rc, out, err = module.run_command(cmd_args)
     if rc != 0:
         module.fail_json(msg="Failed to get Kibana version : %s" % err)
 
@@ -209,13 +227,14 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True),
-            state=dict(default="present", choices=PACKAGE_STATE_MAP.keys()),
+            state=dict(default="present", choices=list(PACKAGE_STATE_MAP.keys())),
             url=dict(default=None),
             timeout=dict(default="1m"),
             plugin_bin=dict(default="/opt/kibana/bin/kibana", type="path"),
             plugin_dir=dict(default="/opt/kibana/installedPlugins/", type="path"),
             version=dict(default=None),
-            force=dict(default="no", type="bool")
+            force=dict(default=False, type="bool"),
+            allow_root=dict(default=False, type="bool"),
         ),
         supports_check_mode=True,
     )
@@ -228,10 +247,11 @@ def main():
     plugin_dir = module.params["plugin_dir"]
     version = module.params["version"]
     force = module.params["force"]
+    allow_root = module.params["allow_root"]
 
     changed, cmd, out, err = False, '', '', ''
 
-    kibana_version = get_kibana_version(module, plugin_bin)
+    kibana_version = get_kibana_version(module, plugin_bin, allow_root)
 
     present = is_plugin_present(parse_plugin_repo(name), plugin_dir)
 
@@ -244,11 +264,11 @@ def main():
 
     if state == "present":
         if force:
-            remove_plugin(module, plugin_bin, name)
-        changed, cmd, out, err = install_plugin(module, plugin_bin, name, url, timeout, kibana_version)
+            remove_plugin(module, plugin_bin, name, allow_root, kibana_version)
+        changed, cmd, out, err = install_plugin(module, plugin_bin, name, url, timeout, allow_root, kibana_version)
 
     elif state == "absent":
-        changed, cmd, out, err = remove_plugin(module, plugin_bin, name, kibana_version)
+        changed, cmd, out, err = remove_plugin(module, plugin_bin, name, allow_root, kibana_version)
 
     module.exit_json(changed=changed, cmd=cmd, name=name, state=state, url=url, timeout=timeout, stdout=out, stderr=err)
 

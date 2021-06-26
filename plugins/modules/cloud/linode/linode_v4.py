@@ -28,7 +28,6 @@ options:
       - The region of the instance. This is a required parameter only when
         creating Linode instances. See
         U(https://www.linode.com/docs/api/regions/).
-    required: false
     type: str
   image:
     description:
@@ -36,14 +35,12 @@ options:
         creating Linode instances. See
         U(https://www.linode.com/docs/api/images/).
     type: str
-    required: false
   type:
     description:
       - The type of the instance. This is a required parameter only when
         creating Linode instances. See
         U(https://www.linode.com/docs/api/linode-types/).
     type: str
-    required: false
   label:
     description:
       - The instance label. This label is used as the main determiner for
@@ -56,25 +53,30 @@ options:
          group labelling is deprecated but still supported. The encouraged
          method for marking instances is to use tags.
     type: str
-    required: false
+  private_ip:
+    description:
+      - If C(true), the created Linode will have private networking enabled and
+        assigned a private IPv4 address.
+    type: bool
+    default: false
+    version_added: 3.0.0
   tags:
     description:
       - The tags that the instance should be marked under. See
         U(https://www.linode.com/docs/api/tags/).
-    required: false
     type: list
+    elements: str
   root_pass:
     description:
       - The password for the root user. If not specified, one will be
         generated. This generated password will be available in the task
         success JSON.
-    required: false
     type: str
   authorized_keys:
     description:
       - A list of SSH public key parts to deploy for the root user.
-    required: false
     type: list
+    elements: str
   state:
     description:
       - The desired instance state.
@@ -206,9 +208,8 @@ def create_linode(module, client, **kwargs):
         else:
             return response._raw_json
     except TypeError:
-        module.fail_json(msg='Unable to parse Linode instance creation'
-                             ' response. Please raise a bug against this'
-                             ' module on https://github.com/ansible/ansible/issues'
+        module.fail_json(msg='Unable to parse Linode instance creation response. Please raise a bug against this'
+                             ' module on https://github.com/ansible-collections/community.general/issues'
                          )
 
 
@@ -240,15 +241,16 @@ def initialise_module():
                 no_log=True,
                 fallback=(env_fallback, ['LINODE_ACCESS_TOKEN']),
             ),
-            authorized_keys=dict(type='list', required=False),
-            group=dict(type='str', required=False),
-            image=dict(type='str', required=False),
-            region=dict(type='str', required=False),
-            root_pass=dict(type='str', required=False, no_log=True),
-            tags=dict(type='list', required=False),
-            type=dict(type='str', required=False),
-            stackscript_id=dict(type='int', required=False),
-            stackscript_data=dict(type='dict', required=False),
+            authorized_keys=dict(type='list', elements='str', no_log=False),
+            group=dict(type='str'),
+            image=dict(type='str'),
+            private_ip=dict(type='bool', default=False),
+            region=dict(type='str'),
+            root_pass=dict(type='str', no_log=True),
+            tags=dict(type='list', elements='str'),
+            type=dict(type='str'),
+            stackscript_id=dict(type='int'),
+            stackscript_data=dict(type='dict'),
         ),
         supports_check_mode=False,
         required_one_of=(
@@ -288,6 +290,7 @@ def main():
             group=module.params['group'],
             image=module.params['image'],
             label=module.params['label'],
+            private_ip=module.params['private_ip'],
             region=module.params['region'],
             root_pass=module.params['root_pass'],
             tags=module.params['tags'],

@@ -108,8 +108,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def package_installed(module, name, category):
-    cmd = [module.get_bin_path('pkginfo', True)]
-    cmd.append('-q')
+    cmd = [module.get_bin_path('pkginfo', True), '-q']
     if category:
         cmd.append('-c')
     cmd.append(name)
@@ -122,7 +121,7 @@ def package_installed(module, name, category):
 
 def create_admin_file():
     (desc, filename) = tempfile.mkstemp(prefix='ansible_svr4pkg', text=True)
-    fullauto = '''
+    fullauto = b'''
 mail=
 instance=unique
 partial=nocheck

@@ -1,35 +1,38 @@
-# Copyright (c) 2017 Ansible Project
+# Copyright: (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
     name: scaleway
-    plugin_type: inventory
     author:
       - Remy Leone (@sieben)
     short_description: Scaleway inventory source
     description:
-        - Get inventory hosts from Scaleway
+        - Get inventory hosts from Scaleway.
     options:
         plugin:
-            description: token that ensures this is a source file for the 'scaleway' plugin.
+            description: Token that ensures this is a source file for the 'scaleway' plugin.
             required: True
             choices: ['scaleway', 'community.general.scaleway']
         regions:
-            description: Filter results on a specific Scaleway region
+            description: Filter results on a specific Scaleway region.
             type: list
             default:
                 - ams1
                 - par1
+                - par2
+                - waw1
         tags:
-            description: Filter results on a specific tag
+            description: Filter results on a specific tag.
             type: list
         oauth_token:
             required: True
-            description: Scaleway OAuth token.
+            description:
+            - Scaleway OAuth token.
+            - More details on L(how to generate token, https://www.scaleway.com/en/docs/generate-api-keys/).
             env:
                 # in order of precedence
                 - name: SCW_TOKEN
@@ -47,14 +50,14 @@ DOCUMENTATION = '''
                 - hostname
                 - id
         variables:
-            description: 'set individual variables: keys are variable names and
+            description: 'Set individual variables: keys are variable names and
                           values are templates. Any value returned by the
                           L(Scaleway API, https://developer.scaleway.com/#servers-server-get)
                           can be used.'
             type: dict
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 # scaleway_inventory.yml file in YAML format
 # Example command line: ansible-inventory --list -i scaleway_inventory.yml
 
@@ -80,6 +83,15 @@ regions:
   - par1
 variables:
   ansible_host: public_ip.address
+
+# Using static strings as variables
+plugin: community.general.scaleway
+hostnames:
+  - hostname
+variables:
+  ansible_host: public_ip.address
+  ansible_connection: "'ssh'"
+  ansible_user: "'admin'"
 '''
 
 import json
@@ -88,7 +100,7 @@ from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, parse_pagination_link
 from ansible.module_utils.urls import open_url
-from ansible.module_utils._text import to_native
+from ansible.module_utils._text import to_native, to_text
 
 import ansible.module_utils.six.moves.urllib.parse as urllib_parse
 
@@ -104,7 +116,7 @@ def _fetch_information(token, url):
         except Exception as e:
             raise AnsibleError("Error while fetching %s: %s" % (url, to_native(e)))
         try:
-            raw_json = json.loads(response.read())
+            raw_json = json.loads(to_text(response.read()))
         except ValueError:
             raise AnsibleError("Incorrect JSON payload")
 
@@ -229,8 +241,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
         if not matching_tags:
             return set()
-        else:
-            return matching_tags.union((server_zone,))
+        return matching_tags.union((server_zone,))
 
     def _filter_host(self, host_infos, hostname_preferences):
 

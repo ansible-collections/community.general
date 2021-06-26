@@ -15,7 +15,7 @@ class ModuleDocFragment(object):
 options:
   bind_dn:
     description:
-      - A DN to bind with. If this is omitted, we'll try a SASL bind with the EXTERNAL mechanism.
+      - A DN to bind with. If this is omitted, we'll try a SASL bind with the EXTERNAL mechanism as default.
       - If this is blank, we'll use an anonymous bind.
     type: str
   bind_pw:
@@ -27,6 +27,15 @@ options:
     description:
       - The DN of the entry to add or remove.
     type: str
+  referrals_chasing:
+    choices: [disabled, anonymous]
+    default: anonymous
+    type: str
+    description:
+      - Set the referrals chasing behavior.
+      - C(anonymous) follow referrals anonymously. This is the default behavior.
+      - C(disabled) disable referrals chasing. This sets C(OPT_REFERRALS) to off.
+    version_added: 2.0.0
   server_uri:
     description:
       - A URI to the LDAP server.
@@ -44,4 +53,12 @@ options:
       - This should only be used on sites using self-signed certificates.
     type: bool
     default: yes
+  sasl_class:
+    description:
+      - The class to use for SASL authentication.
+      - possible choices are C(external), C(gssapi).
+    type: str
+    choices: ['external', 'gssapi']
+    default: external
+    version_added: "2.0.0"
 '''
