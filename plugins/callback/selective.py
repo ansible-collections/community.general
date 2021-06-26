@@ -40,7 +40,7 @@ import difflib
 
 from ansible import constants as C
 from ansible.plugins.callback import CallbackBase
-from ansible.module_utils._text import to_text
+from ansible.module_utils.common.text.converters import to_text
 
 try:
     codeCodes = C.COLOR_CODES

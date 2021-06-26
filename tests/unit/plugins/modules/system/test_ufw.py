@@ -6,7 +6,7 @@ __metaclass__ = type
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible.module_utils import basic
-from ansible.module_utils._text import to_bytes
+from ansible.module_utils.common.text.converters import to_bytes
 import ansible_collections.community.general.plugins.modules.system.ufw as module
 
 import json
