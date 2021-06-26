@@ -66,7 +66,7 @@ options:
     required: false
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. The value is not used for the v2 API.
+      - If C(no), SSL certificates will not be validated.
       - This should only be used on personally controlled sites using self-signed certificates.
       - This option has been deprecated and will be removed in community.general 4.0.0.
     required: false
