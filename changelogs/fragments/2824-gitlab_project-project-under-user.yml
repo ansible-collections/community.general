@@ -1,4 +1,0 @@
----
-minor_changes:
-  - gitlab_project - user projects are created using namespace ID, instead of user ID (https://github.com/ansible-collections/community.general/pull/2824).
-  - gitlab_project - projects can be created under other user's namespaces (https://github.com/ansible-collections/community.general/pull/2824).
