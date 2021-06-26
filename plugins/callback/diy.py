@@ -792,7 +792,7 @@ from ansible.utils.color import colorize, hostcolor
 from ansible.template import Templar
 from ansible.vars.manager import VariableManager
 from ansible.plugins.callback.default import CallbackModule as Default
-from ansible.module_utils._text import to_text
+from ansible.module_utils.common.text.converters import to_text
 
 
 class DummyStdout(object):

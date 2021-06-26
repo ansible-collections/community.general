@@ -161,7 +161,7 @@ import os
 from distutils.version import LooseVersion
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 
 def diversion_state(module, command, path):

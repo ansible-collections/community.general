@@ -84,7 +84,7 @@ import os
 import re
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_native
+from ansible.module_utils.common.text.converters import to_native
 
 
 class Sv(object):

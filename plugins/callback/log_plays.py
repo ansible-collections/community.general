@@ -31,7 +31,7 @@ import time
 import json
 
 from ansible.utils.path import makedirs_safe
-from ansible.module_utils._text import to_bytes
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.common._collections_compat import MutableMapping
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase

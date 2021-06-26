@@ -13,7 +13,7 @@ try:
 except ImportError:
     HAS_VEXATAPI = False
 
-from ansible.module_utils._text import to_native
+from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.basic import env_fallback
 
 VXOS_VERSION = None

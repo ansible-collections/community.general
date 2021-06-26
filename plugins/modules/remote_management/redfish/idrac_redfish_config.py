@@ -150,7 +150,7 @@ from ansible.module_utils.common.validation import (
     check_required_arguments
 )
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
-from ansible.module_utils._text import to_native
+from ansible.module_utils.common.text.converters import to_native
 
 
 class IdracRedfishUtils(RedfishUtils):
