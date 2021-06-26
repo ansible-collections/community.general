@@ -132,8 +132,8 @@ options:
     version_added: '1.3.0'
   check_destroy:
     description:
-      - Check and apply only when there are no resource destruction. Note that it only prevents "destroy" actions,
-        but allows "destroy and then create replacement" actions. This option will be ignored if I(state=absent).
+      - Apply only when no resources are destroyed. Note that this only prevents "destroy" actions,
+        but not "destroy and re-create" actions. This option is ignored when I(state=absent).
     type: bool
     default: false
     version_added: '3.3.0'
