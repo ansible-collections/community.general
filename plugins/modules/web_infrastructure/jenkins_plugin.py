@@ -803,7 +803,7 @@ def main():
         timeout=dict(default=30, type="int"),
         updates_expiration=dict(default=86400, type="int"),
         updates_url=dict(type="list", elements="str", default=['https://updates.jenkins.io',
-                                                               'http://mirrors.jenkins.io/updates']),
+                                                               'http://mirrors.jenkins.io']),
         update_json_url_segment=dict(type="list", elements="str", default=['update-center.json',
                                                                            'updates/update-center.json']),
         latest_plugins_url_segments=dict(type="list", elements="str", default=['latest']),
