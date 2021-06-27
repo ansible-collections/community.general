@@ -109,6 +109,11 @@ options:
     required: false
     default: false
     version_added: "2.0.0"
+  username:
+    description:
+      - Used to create a personal project under a user's name.
+    type: str
+    version_added: "3.3.0"
 '''
 
 EXAMPLES = r'''
@@ -302,6 +307,7 @@ def main():
         import_url=dict(type='str'),
         state=dict(type='str', default="present", choices=["absent", "present"]),
         lfs_enabled=dict(default=False, type='bool'),
+        username=dict(type='str'),
     ))
 
     module = AnsibleModule(
@@ -309,6 +315,7 @@ def main():
         mutually_exclusive=[
             ['api_username', 'api_token'],
             ['api_password', 'api_token'],
+            ['group', 'username'],
         ],
         required_together=[
             ['api_username', 'api_password'],
@@ -332,6 +339,7 @@ def main():
     import_url = module.params['import_url']
     state = module.params['state']
     lfs_enabled = module.params['lfs_enabled']
+    username = module.params['username']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -353,7 +361,10 @@ def main():
 
         namespace_id = group.id
     else:
-        namespace = gitlab_instance.namespaces.list(search=gitlab_instance.user.username)[0]
+        if username:
+            namespace = gitlab_instance.namespaces.list(search=username)[0]
+        else:
+            namespace = gitlab_instance.namespaces.list(search=gitlab_instance.user.username)[0]
         namespace_id = namespace.id
 
     if not namespace_id:
