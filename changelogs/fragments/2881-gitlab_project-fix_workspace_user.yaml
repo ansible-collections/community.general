@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - gitlab_project - user projects are created using namespace ID now, instead of user ID (https://github.com/ansible-collections/community.general/pull/2881).
