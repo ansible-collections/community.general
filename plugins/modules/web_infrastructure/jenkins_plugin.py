@@ -69,29 +69,29 @@ options:
     type: list
     elements: str
     description:
-      - A list of base URLs to retrieve I(update-center.json), and direct plugin files
+      - A list of base URL(s) to retrieve I(update-center.json), and direct plugin files from.
     default: ['https://updates.jenkins.io', 'http://mirrors.jenkins.io']
   update_json_url_segment:
     type: list
     elements: str
     description:
-      - A list of URL segments to retrieve the update center json file from
+      - A list of URL segment(s) to retrieve the update center json file from.
     default: ['update-center.json', 'updates/update-center.json']
-    version_added: 1.3.0
+    version_added: 3.3.0
   latest_plugins_url_segments:
     type: list
     elements: str
     description:
-      - Path inside the updates_url to get latest plugins from
+      - Path inside the I(updates_url) to get latest plugins from.
     default: ['latest']
-    version_added: 1.3.0
+    version_added: 3.3.0
   versioned_plugins_url_segments:
     type: list
     elements: str
     description:
-      - Path inside the updates_url to get specific version of plugins from
+      - Path inside the I(updates_url) to get specific version of plugins from.
     default: ['download/plugins', 'plugins']
-    version_added: 1.3.0
+    version_added: 3.3.0
   url:
     type: str
     description:
