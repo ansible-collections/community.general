@@ -130,6 +130,13 @@ options:
     default: false
     type: bool
     version_added: '1.3.0'
+  check_destroy:
+    description:
+      - Apply only when no resources are destroyed. Note that this only prevents "destroy" actions,
+        but not "destroy and re-create" actions. This option is ignored when I(state=absent).
+    type: bool
+    default: false
+    version_added: '3.3.0'
 notes:
    - To just run a `terraform plan`, use check mode.
 requirements: [ "terraform" ]
@@ -313,7 +320,7 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
 
     plan_command = [command[0], 'plan', '-input=false', '-no-color', '-detailed-exitcode', '-out', plan_path]
 
-    for t in (module.params.get('targets') or []):
+    for t in targets:
         plan_command.extend(['-target', t])
 
     plan_command.extend(_state_args(state_file))
@@ -340,21 +347,22 @@ def main():
             project_path=dict(required=True, type='path'),
             binary_path=dict(type='path'),
             plugin_paths=dict(type='list', elements='path'),
-            workspace=dict(required=False, type='str', default='default'),
+            workspace=dict(type='str', default='default'),
             purge_workspace=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent', 'planned']),
             variables=dict(type='dict'),
-            variables_files=dict(aliases=['variables_file'], type='list', elements='path', default=None),
+            variables_files=dict(aliases=['variables_file'], type='list', elements='path'),
             plan_file=dict(type='path'),
             state_file=dict(type='path'),
             targets=dict(type='list', elements='str', default=[]),
             lock=dict(type='bool', default=True),
             lock_timeout=dict(type='int',),
             force_init=dict(type='bool', default=False),
-            backend_config=dict(type='dict', default=None),
-            backend_config_files=dict(type='list', elements='path', default=None),
-            init_reconfigure=dict(required=False, type='bool', default=False),
+            backend_config=dict(type='dict'),
+            backend_config_files=dict(type='list', elements='path'),
+            init_reconfigure=dict(type='bool', default=False),
             overwrite_init=dict(type='bool', default=True),
+            check_destroy=dict(type='bool', default=False),
         ),
         required_if=[('state', 'planned', ['plan_file'])],
         supports_check_mode=True,
@@ -375,6 +383,7 @@ def main():
     backend_config_files = module.params.get('backend_config_files')
     init_reconfigure = module.params.get('init_reconfigure')
     overwrite_init = module.params.get('overwrite_init')
+    check_destroy = module.params.get('check_destroy')
 
     if bin_path is not None:
         command = [bin_path]
@@ -444,9 +453,12 @@ def main():
     else:
         plan_file, needs_application, out, err, command = build_plan(command, project_path, variables_args, state_file,
                                                                      module.params.get('targets'), state, plan_file)
+        if state == 'present' and check_destroy and '- destroy' in out:
+            module.fail_json(msg="Aborting command because it would destroy some resources. "
+                                 "Consider switching the 'check_destroy' to false to suppress this error")
         command.append(plan_file)
 
-    if needs_application and not module.check_mode and not state == 'planned':
+    if needs_application and not module.check_mode and state != 'planned':
         rc, out, err = module.run_command(command, check_rc=False, cwd=project_path)
         if rc != 0:
             if workspace_ctx["current"] != workspace:
