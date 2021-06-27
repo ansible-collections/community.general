@@ -1,0 +1,2 @@
+bugfixes:
+- "ini_file - fix Unicode processing for Python 2 (https://github.com/ansible-collections/community.general/pull/2875)."
