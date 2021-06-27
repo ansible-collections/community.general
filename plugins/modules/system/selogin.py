@@ -113,7 +113,7 @@ except ImportError:
 
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_native
+from ansible.module_utils.common.text.converters import to_native
 
 
 def semanage_login_add(module, login, seuser, do_reload, serange='s0', sestore=''):
