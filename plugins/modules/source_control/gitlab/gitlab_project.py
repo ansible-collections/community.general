@@ -113,7 +113,6 @@ options:
     description:
       - Used to create a personal project under a user's name.
     type: str
-    required: false
     version_added: "3.3.0"
 '''
 
