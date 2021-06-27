@@ -345,22 +345,22 @@ def main():
     gitlab_project = GitLabProject(module, gitlab_instance)
 
     namespace = None
-    user_group_id = None
+    namespace_id = None
     if group_identifier:
         group = findGroup(gitlab_instance, group_identifier)
         if group is None:
             module.fail_json(msg="Failed to create project: group %s doesn't exists" % group_identifier)
 
-        user_group_id = group.id
+        namespace_id = group.id
     else:
-        user = gitlab_instance.users.list(username=gitlab_instance.user.username)[0]
-        user_group_id = user.id
+        namespace = gitlab_instance.namespaces.list(search=gitlab_instance.user.username)[0]
+        namespace_id = namespace.id
 
-    if not user_group_id:
-        module.fail_json(msg="Failed to find the user/group id which required to find namespace")
+    if not namespace_id:
+        module.fail_json(msg="Failed to find the namespace or group ID which is required to look up the namespace")
 
     try:
-        namespace = gitlab_instance.namespaces.get(user_group_id)
+        namespace = gitlab_instance.namespaces.get(namespace_id)
     except gitlab.exceptions.GitlabGetError as e:
         module.fail_json(msg="Failed to find the namespace for the given user: %s" % to_native(e))
 
