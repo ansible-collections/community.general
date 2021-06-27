@@ -583,29 +583,25 @@ class JenkinsPlugin(object):
         return changed
 
     def _get_latest_plugin_urls(self):
-      urls = []
-      for base_url in self.params['updates_url']:
-        for update_segment in self.params['latest_plugins_url_segments']:
-          urls.append("{0}/{1}/{2}.hpi".format(
-            base_url, update_segment, self.params['name']))
-      return urls
-    
-    def _get_versioned_plugin_urls(self):
-      urls = []
-      for base_url in self.params['updates_url']:
-        for versioned_segment in self.params['versioned_plugins_url_segments']:
-          urls.append("{0}/{1}/{2}/{3}/{2}.hpi".format(
-            base_url, versioned_segment, self.params['name'], self.params['version']))
-      return urls
-    
-    def _get_update_center_urls(self):
-      urls = []
-      for base_url in self.params['updates_url']:
-        for update_json in self.params['update_json_url_segment']:
-          urls.append("{0}/{1}".format(
-            base_url, update_json))
-      return urls
+        urls = []
+        for base_url in self.params['updates_url']:
+            for update_segment in self.params['latest_plugins_url_segments']:
+                urls.append("{0}/{1}/{2}.hpi".format(base_url, update_segment, self.params['name']))
+        return urls
 
+    def _get_versioned_plugin_urls(self):
+        urls = []
+        for base_url in self.params['updates_url']:
+            for versioned_segment in self.params['versioned_plugins_url_segments']:
+                urls.append("{0}/{1}/{2}/{3}/{2}.hpi".format(base_url, versioned_segment, self.params['name'], self.params['version']))
+        return urls
+
+    def _get_update_center_urls(self):
+        urls = []
+        for base_url in self.params['updates_url']:
+            for update_json in self.params['update_json_url_segment']:
+                urls.append("{0}/{1}".format(base_url, update_json))
+        return urls
 
     def _download_updates(self):
         updates_filename = 'jenkins-plugin-cache.json'
@@ -811,7 +807,7 @@ def main():
         update_json_url_segment=dict(type="list", elements="str", default=['update-center.json',
                                                                            'updates/update-center.json']),
         latest_plugins_url_segments=dict(type="list", elements="str", default=['latest']),
-        versioned_plugins_url_segments=dict(type="list", elements="str", default=['download/plugins','plugins']),
+        versioned_plugins_url_segments=dict(type="list", elements="str", default=['download/plugins', 'plugins']),
         url=dict(default='http://localhost:8080'),
         url_password=dict(no_log=True),
         version=dict(),
