@@ -112,6 +112,7 @@ import tempfile
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 
 
 def match_opt(option, line):
@@ -127,6 +128,13 @@ def match_active_opt(option, line):
 def do_ini(module, filename, section=None, option=None, value=None,
            state='present', backup=False, no_extra_spaces=False, create=True,
            allow_no_value=False):
+
+    if section is not None:
+        section = to_text(section)
+    if option is not None:
+        option = to_text(option)
+    if value is not None:
+        value = to_text(value)
 
     diff = dict(
         before='',
@@ -144,33 +152,33 @@ def do_ini(module, filename, section=None, option=None, value=None,
         ini_lines = []
     else:
         with io.open(filename, 'r', encoding="utf-8-sig") as ini_file:
-            ini_lines = ini_file.readlines()
+            ini_lines = [to_text(line) for line in ini_file.readlines()]
 
     if module._diff:
-        diff['before'] = ''.join(ini_lines)
+        diff['before'] = u''.join(ini_lines)
 
     changed = False
 
     # ini file could be empty
     if not ini_lines:
-        ini_lines.append('\n')
+        ini_lines.append(u'\n')
 
     # last line of file may not contain a trailing newline
-    if ini_lines[-1] == "" or ini_lines[-1][-1] != '\n':
-        ini_lines[-1] += '\n'
+    if ini_lines[-1] == u"" or ini_lines[-1][-1] != u'\n':
+        ini_lines[-1] += u'\n'
         changed = True
 
     # append fake section lines to simplify the logic
     # At top:
     # Fake random section to do not match any other in the file
     # Using commit hash as fake section name
-    fake_section_name = "ad01e11446efb704fcdbdb21f2c43757423d91c5"
+    fake_section_name = u"ad01e11446efb704fcdbdb21f2c43757423d91c5"
 
     # Insert it at the beginning
-    ini_lines.insert(0, '[%s]' % fake_section_name)
+    ini_lines.insert(0, u'[%s]' % fake_section_name)
 
     # At bottom:
-    ini_lines.append('[')
+    ini_lines.append(u'[')
 
     # If no section is defined, fake section is used
     if not section:
@@ -180,21 +188,23 @@ def do_ini(module, filename, section=None, option=None, value=None,
     section_start = 0
     msg = 'OK'
     if no_extra_spaces:
-        assignment_format = '%s=%s\n'
+        assignment_format = u'%s=%s\n'
     else:
-        assignment_format = '%s = %s\n'
+        assignment_format = u'%s = %s\n'
+
+    non_blank_non_comment_pattern = re.compile(to_text(r'^[ \t]*([#;].*)?$'))
 
     for index, line in enumerate(ini_lines):
-        if line.startswith('[%s]' % section):
+        if line.startswith(u'[%s]' % section):
             within_section = True
             section_start = index
-        elif line.startswith('['):
+        elif line.startswith(u'['):
             if within_section:
                 if state == 'present':
                     # insert missing option line at the end of the section
                     for i in range(index, 0, -1):
                         # search backwards for previous non-blank or non-comment line
-                        if not re.match(r'^[ \t]*([#;].*)?$', ini_lines[i - 1]):
+                        if not non_blank_non_comment_pattern.match(ini_lines[i - 1]):
                             if option and value:
                                 ini_lines.insert(i, assignment_format % (option, value))
                                 msg = 'option added'
@@ -216,7 +226,7 @@ def do_ini(module, filename, section=None, option=None, value=None,
                     # change the existing option line
                     if match_opt(option, line):
                         if not value and allow_no_value:
-                            newline = '%s\n' % option
+                            newline = u'%s\n' % option
                         else:
                             newline = assignment_format % (option, value)
                         option_changed = ini_lines[index] != newline
@@ -229,7 +239,7 @@ def do_ini(module, filename, section=None, option=None, value=None,
                             index = index + 1
                             while index < len(ini_lines):
                                 line = ini_lines[index]
-                                if line.startswith('['):
+                                if line.startswith(u'['):
                                     break
                                 if match_active_opt(option, line):
                                     del ini_lines[index]
@@ -249,28 +259,29 @@ def do_ini(module, filename, section=None, option=None, value=None,
     del ini_lines[-1:]
 
     if not within_section and state == 'present':
-        ini_lines.append('[%s]\n' % section)
+        ini_lines.append(u'[%s]\n' % section)
         msg = 'section and option added'
         if option and value is not None:
             ini_lines.append(assignment_format % (option, value))
         elif option and value is None and allow_no_value:
-            ini_lines.append('%s\n' % option)
+            ini_lines.append(u'%s\n' % option)
         else:
             msg = 'only section added'
         changed = True
 
     if module._diff:
-        diff['after'] = ''.join(ini_lines)
+        diff['after'] = u''.join(ini_lines)
 
     backup_file = None
     if changed and not module.check_mode:
         if backup:
             backup_file = module.backup_local(filename)
 
+        encoded_ini_lines = [to_bytes(line) for line in ini_lines]
         try:
             tmpfd, tmpfile = tempfile.mkstemp(dir=module.tmpdir)
-            f = os.fdopen(tmpfd, 'w')
-            f.writelines(ini_lines)
+            f = os.fdopen(tmpfd, 'wb')
+            f.writelines(encoded_ini_lines)
             f.close()
         except IOError:
             module.fail_json(msg="Unable to create temporary file %s", traceback=traceback.format_exc())
