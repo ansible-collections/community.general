@@ -1,5 +1,3 @@
-plugins/module_utils/_mount.py future-import-boilerplate
-plugins/module_utils/_mount.py metaclass-boilerplate
 plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
 plugins/modules/cloud/lxc/lxc_container.py validate-modules:use-run-command-not-popen
 plugins/modules/cloud/misc/rhevm.py validate-modules:parameter-state-invalid-choice
