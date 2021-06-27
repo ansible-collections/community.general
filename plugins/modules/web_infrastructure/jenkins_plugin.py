@@ -69,25 +69,28 @@ options:
     type: list
     elements: str
     description:
-      - URLs of the Update Centre.
-      - Used as the base URLs to download the I(update-center.json) JSON file.
-      - Tries all URLs on failure
-    default: ['https://updates.jenkins.io', 'http://mirrors.jenkins.io/updates']
-  latest_plugins_url:
+      - A list of base URLs to retrieve I(update-center.json), and direct plugin files
+    default: ['https://updates.jenkins.io', 'http://mirrors.jenkins.io']
+  update_json_url_segment:
     type: list
     elements: str
     description:
-      - URLs of the latest plugins center.
-      - Used as the base URL to download the latest plugins from.
-    default: ['https://updates.jenkins.io/latest']
+      - A list of URL segments to retrieve the update center json file from
+    default: ['update-center.json', 'updates/update-center.json']
     version_added: 1.3.0
-  versioned_plugins_url:
+  latest_plugins_url_segments:
     type: list
     elements: str
     description:
-      - URL of the versioned plugins center.
-      - Used as the base URL to download versioned(not latest) plugins from.
-    default: ['https://updates.jenkins.io/download/plugins', 'http://mirrors.jenkins.io/plugins']
+      - Path inside the updates_url to get latest plugins from
+    default: ['latest']
+    version_added: 1.3.0
+  versioned_plugins_url_segments:
+    type: list
+    elements: str
+    description:
+      - Path inside the updates_url to get specific version of plugins from
+    default: ['download/plugins', 'plugins']
     version_added: 1.3.0
   url:
     type: str
@@ -516,16 +519,10 @@ class JenkinsPlugin(object):
 
             if self.params['version'] in [None, 'latest']:
                 # Take latest version
-                plugin_urls = [("%s/%s.hpi" % (
-                    url,
-                    self.params['name'])) for url in self.params['latest_plugins_url']]
+                plugin_urls = self._get_latest_plugin_urls()
             else:
                 # Take specific version
-                plugin_urls = [(
-                    "{0}/{1}/{2}/{1}.hpi".format(
-                        url,
-                        self.params['name'],
-                        self.params['version'])) for url in self.params['versioned_plugins_url']]
+                plugin_urls = self._get_versioned_plugin_urls()
             if (
                     self.params['updates_expiration'] == 0 or
                     self.params['version'] not in [None, 'latest'] or
@@ -585,6 +582,31 @@ class JenkinsPlugin(object):
 
         return changed
 
+    def _get_latest_plugin_urls(self):
+      urls = []
+      for base_url in self.params['updates_url']:
+        for update_segment in self.params['latest_plugins_url_segments']:
+          urls.append("{0}/{1}/{2}.hpi".format(
+            base_url, update_segment, self.params['name']))
+      return urls
+    
+    def _get_versioned_plugin_urls(self):
+      urls = []
+      for base_url in self.params['updates_url']:
+        for versioned_segment in self.params['versioned_plugins_url_segments']:
+          urls.append("{0}/{1}/{2}/{3}/{2}.hpi".format(
+            base_url, versioned_segment, self.params['name'], self.params['version']))
+      return urls
+    
+    def _get_update_center_urls(self):
+      urls = []
+      for base_url in self.params['updates_url']:
+        for update_json in self.params['update_json_url_segment']:
+          urls.append("{0}/{1}".format(
+            base_url, update_json))
+      return urls
+
+
     def _download_updates(self):
         updates_filename = 'jenkins-plugin-cache.json'
         updates_dir = os.path.expanduser('~/.ansible/tmp')
@@ -604,7 +626,7 @@ class JenkinsPlugin(object):
 
         # Download the updates file if needed
         if download_updates:
-            urls = ["%s/update-center.json" % url for url in self.params['updates_url']]
+            urls = self._get_update_center_urls()
 
             # Get the data
             r = self._get_urls_data(
@@ -786,9 +808,10 @@ def main():
         updates_expiration=dict(default=86400, type="int"),
         updates_url=dict(type="list", elements="str", default=['https://updates.jenkins.io',
                                                                'http://mirrors.jenkins.io/updates']),
-        latest_plugins_url=dict(type="list", elements="str", default=['https://updates.jenkins.io/latest']),
-        versioned_plugins_url=dict(type="list", elements="str", default=['https://updates.jenkins.io/download/plugins',
-                                                                         'http://mirrors.jenkins.io/plugins']),
+        update_json_url_segment=dict(type="list", elements="str", default=['update-center.json',
+                                                                           'updates/update-center.json']),
+        latest_plugins_url_segments=dict(type="list", elements="str", default=['latest']),
+        versioned_plugins_url_segments=dict(type="list", elements="str", default=['download/plugins','plugins']),
         url=dict(default='http://localhost:8080'),
         url_password=dict(no_log=True),
         version=dict(),
