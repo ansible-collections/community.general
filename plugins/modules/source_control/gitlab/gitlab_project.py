@@ -315,6 +315,7 @@ def main():
         mutually_exclusive=[
             ['api_username', 'api_token'],
             ['api_password', 'api_token'],
+            ['group', 'username'],
         ],
         required_together=[
             ['api_username', 'api_password'],
