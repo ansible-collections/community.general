@@ -122,7 +122,7 @@ import time
 import os
 import socket
 from ansible.plugins.inventory import BaseInventoryPlugin
-from ansible.module_utils._text import to_native, to_text
+from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible_collections.community.general.plugins.module_utils.compat import ipaddress

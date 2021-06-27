@@ -151,7 +151,7 @@ import ssl
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six import iteritems
 from ansible.module_utils.six.moves import xmlrpc_client
-from ansible.module_utils._text import to_text
+from ansible.module_utils.common.text.converters import to_text
 
 IFPROPS_MAPPING = dict(
     bondingopts='bonding_opts',
