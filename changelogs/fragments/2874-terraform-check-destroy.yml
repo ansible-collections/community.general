@@ -1,0 +1,2 @@
+minor_changes:
+  - terraform - add ``check_destroy`` optional parameter to check for deletion of resources before it is applied (https://github.com/ansible-collections/community.general/pull/2874).
