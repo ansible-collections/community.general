@@ -32,7 +32,7 @@ options:
         description:
           - Whether to install (C(present) or C(installed), C(latest)), or remove (C(absent) or C(removed)) a package.
           - C(present) and C(installed) will simply ensure that a desired package is installed.
-          - C(latest) will update the specified package if it's not of the latest available version.
+          - C(latest) will update the specified package if it is not of the latest available version.
           - C(absent) and C(removed) will remove the specified package.
         default: present
         choices: [ absent, installed, latest, present, removed ]
