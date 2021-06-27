@@ -48,6 +48,10 @@
 # agrees to be bound by the terms and conditions of this License
 # Agreement.
 
+from __future__ import absolute_import, division, print_function
+
+__metaclass__ = type
+
 import os
 
 
