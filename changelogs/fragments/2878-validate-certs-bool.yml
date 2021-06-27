@@ -1,0 +1,2 @@
+minor_changes:
+- "nrdp callback plugin - parameters are now converted to strings, except ``validate_certs`` which is converted to boolean (https://github.com/ansible-collections/community.general/pull/2878)."
