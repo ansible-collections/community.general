@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - yum_versionlock - fix idempotency when using wildcard (asterisk) in ``name`` option (https://github.com/ansible-collections/community.general/issues/2761).
