@@ -354,10 +354,10 @@ def main():
         user_group_id = group.id
     else:
         namespace = gitlab_instance.namespaces.list(search=gitlab_instance.user.username)[0]
-        user_group_id = namespace.id
+        namespace_group_id = namespace.id
 
     if not user_group_id:
-        module.fail_json(msg="Failed to find the user/group id which required to find namespace")
+        module.fail_json(msg="Failed to find the namespace or group ID which is required to look up the namespace")
 
     try:
         namespace = gitlab_instance.namespaces.get(user_group_id)
