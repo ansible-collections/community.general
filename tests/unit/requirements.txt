@@ -17,6 +17,7 @@ httmock
 
 # requirement for kubevirt modules
 openshift ; python_version >= '2.7'
+ruamel.yaml.clib <= 0.2.2 ; python_version == '2.7' # 0.2.4 require python 3.5 or later, 0.2.3 is yanked
 
 # requirement for maven_artifact module
 lxml
