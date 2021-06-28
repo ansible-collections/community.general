@@ -70,6 +70,7 @@ options:
     elements: str
     description:
       - A list of base URL(s) to retrieve I(update-center.json), and direct plugin files from.
+      - This can be a list since community.general 3.3.0.
     default: ['https://updates.jenkins.io', 'http://mirrors.jenkins.io']
   update_json_url_segment:
     type: list
@@ -378,7 +379,7 @@ class JenkinsPlugin(object):
                     if info['status'] > 400:  # extend error message
                         err_msg = "%s. response body: %s" % (err_msg, info['body'])
             except Exception as e:
-                err_msg = "%s. fetching url %s failed. error msg: %s" % (msg_status, url, str(e))
+                err_msg = "%s. fetching url %s failed. error msg: %s" % (msg_status, url, to_native(e))
             finally:
                 if err_msg is not None:
                     self.module.debug(err_msg)
