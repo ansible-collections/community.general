@@ -5,6 +5,19 @@ Community General Release Notes
 .. contents:: Topics
 
 
+v1.3.11
+=======
+
+Release Summary
+---------------
+
+Maintenance release.
+
+Bugfixes
+--------
+
+- ovirt* modules - remove bad unnecessary import for current ansible-core development version (https://github.com/ansible-collections/community.general/pull/2381).
+
 v1.3.10
 =======
 

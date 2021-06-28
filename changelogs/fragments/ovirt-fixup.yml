@@ -1,2 +1,0 @@
-bugfixes:
-- "ovirt* modules - remove bad unnecessary import for current ansible-core development version (https://github.com/ansible-collections/community.general/pull/2381)."

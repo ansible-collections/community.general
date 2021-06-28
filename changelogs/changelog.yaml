@@ -1719,6 +1719,16 @@ releases:
     - 2340-jenkins_plugin-py2.yml
     - allow_funcd_to_load.yml
     release_date: '2021-04-26'
+  1.3.11:
+    changes:
+      bugfixes:
+      - ovirt* modules - remove bad unnecessary import for current ansible-core development
+        version (https://github.com/ansible-collections/community.general/pull/2381).
+      release_summary: Maintenance release.
+    fragments:
+    - 1.3.11.yml
+    - ovirt-fixup.yml
+    release_date: '2021-06-28'
   1.3.2:
     changes:
       bugfixes:
