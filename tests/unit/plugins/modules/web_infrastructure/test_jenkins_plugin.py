@@ -151,3 +151,40 @@ def test__get_json_data(mocker):
         'CSRF')
 
     assert isinstance(json_data, Mapping)
+
+
+def test__new_fallback_urls(mocker):
+    "test generation of new fallback URLs"
+
+    params = {
+        "url": "http://fake.jenkins.server",
+        "timeout": 30,
+        "name": "test-plugin",
+        "version": "1.2.3",
+        "updates_url": ["https://some.base.url"],
+        "latest_plugins_url_segments": ["test_latest"],
+        "versioned_plugins_url_segments": ["ansible", "versioned_plugins"],
+        "update_json_url_segment": ["unreachable", "updates/update-center.json"],
+    }
+    module = mocker.Mock()
+    module.params = params
+
+    JenkinsPlugin._csrf_enabled = pass_function
+    JenkinsPlugin._get_installed_plugins = pass_function
+
+    jenkins_plugin = JenkinsPlugin(module)
+
+    latest_urls = jenkins_plugin._get_latest_plugin_urls()
+    assert isInList(latest_urls, "https://some.base.url/test_latest/test-plugin.hpi")
+    versioned_urls = jenkins_plugin._get_versioned_plugin_urls()
+    assert isInList(versioned_urls, "https://some.base.url/versioned_plugins/test-plugin/1.2.3/test-plugin.hpi")
+    json_urls = jenkins_plugin._get_update_center_urls()
+    assert isInList(json_urls, "https://some.base.url/updates/update-center.json")
+
+
+def isInList(l, i):
+    print("checking if %s in %s" % (i, l))
+    for item in l:
+        if item == i:
+            return True
+    return False

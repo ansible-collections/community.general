@@ -66,12 +66,33 @@ options:
         C(latest) is specified.
     default: 86400
   updates_url:
-    type: str
+    type: list
+    elements: str
     description:
-      - URL of the Update Centre.
-      - Used as the base URL to download the plugins and the
-        I(update-center.json) JSON file.
-    default: https://updates.jenkins.io
+      - A list of base URL(s) to retrieve I(update-center.json), and direct plugin files from.
+      - This can be a list since community.general 3.3.0.
+    default: ['https://updates.jenkins.io', 'http://mirrors.jenkins.io']
+  update_json_url_segment:
+    type: list
+    elements: str
+    description:
+      - A list of URL segment(s) to retrieve the update center json file from.
+    default: ['update-center.json', 'updates/update-center.json']
+    version_added: 3.3.0
+  latest_plugins_url_segments:
+    type: list
+    elements: str
+    description:
+      - Path inside the I(updates_url) to get latest plugins from.
+    default: ['latest']
+    version_added: 3.3.0
+  versioned_plugins_url_segments:
+    type: list
+    elements: str
+    description:
+      - Path inside the I(updates_url) to get specific version of plugins from.
+    default: ['download/plugins', 'plugins']
+    version_added: 3.3.0
   url:
     type: str
     description:
@@ -283,6 +304,10 @@ import tempfile
 import time
 
 
+class FailedInstallingWithPluginManager(Exception):
+    pass
+
+
 class JenkinsPlugin(object):
     def __init__(self, module):
         # To be able to call fail_json
@@ -330,9 +355,42 @@ class JenkinsPlugin(object):
 
         return json_data
 
+    def _get_urls_data(self, urls, what=None, msg_status=None, msg_exception=None, **kwargs):
+        # Compose default messages
+        if msg_status is None:
+            msg_status = "Cannot get %s" % what
+
+        if msg_exception is None:
+            msg_exception = "Retrieval of %s failed." % what
+
+        errors = {}
+        for url in urls:
+            err_msg = None
+            try:
+                self.module.debug("fetching url: %s" % url)
+                response, info = fetch_url(
+                    self.module, url, timeout=self.timeout, cookies=self.cookies,
+                    headers=self.crumb, **kwargs)
+
+                if info['status'] == 200:
+                    return response
+                else:
+                    err_msg = ("%s. fetching url %s failed. response code: %s" % (msg_status, url, info['status']))
+                    if info['status'] > 400:  # extend error message
+                        err_msg = "%s. response body: %s" % (err_msg, info['body'])
+            except Exception as e:
+                err_msg = "%s. fetching url %s failed. error msg: %s" % (msg_status, url, to_native(e))
+            finally:
+                if err_msg is not None:
+                    self.module.debug(err_msg)
+                    errors[url] = err_msg
+
+        # failed on all urls
+        self.module.fail_json(msg=msg_exception, details=errors)
+
     def _get_url_data(
             self, url, what=None, msg_status=None, msg_exception=None,
-            **kwargs):
+            dont_fail=False, **kwargs):
         # Compose default messages
         if msg_status is None:
             msg_status = "Cannot get %s" % what
@@ -347,9 +405,15 @@ class JenkinsPlugin(object):
                 headers=self.crumb, **kwargs)
 
             if info['status'] != 200:
-                self.module.fail_json(msg=msg_status, details=info['msg'])
+                if dont_fail:
+                    raise FailedInstallingWithPluginManager(info['msg'])
+                else:
+                    self.module.fail_json(msg=msg_status, details=info['msg'])
         except Exception as e:
-            self.module.fail_json(msg=msg_exception, details=to_native(e))
+            if dont_fail:
+                raise FailedInstallingWithPluginManager(e)
+            else:
+                self.module.fail_json(msg=msg_exception, details=to_native(e))
 
         return response
 
@@ -394,6 +458,39 @@ class JenkinsPlugin(object):
 
                 break
 
+    def _install_with_plugin_manager(self):
+        if not self.module.check_mode:
+            # Install the plugin (with dependencies)
+            install_script = (
+                'd = Jenkins.instance.updateCenter.getPlugin("%s")'
+                '.deploy(); d.get();' % self.params['name'])
+
+            if self.params['with_dependencies']:
+                install_script = (
+                    'Jenkins.instance.updateCenter.getPlugin("%s")'
+                    '.getNeededDependencies().each{it.deploy()}; %s' % (
+                        self.params['name'], install_script))
+
+            script_data = {
+                'script': install_script
+            }
+            data = urlencode(script_data)
+
+            # Send the installation request
+            r = self._get_url_data(
+                "%s/scriptText" % self.url,
+                msg_status="Cannot install plugin.",
+                msg_exception="Plugin installation has failed.",
+                data=data,
+                dont_fail=True)
+
+            hpi_file = '%s/plugins/%s.hpi' % (
+                self.params['jenkins_home'],
+                self.params['name'])
+
+            if os.path.isfile(hpi_file):
+                os.remove(hpi_file)
+
     def install(self):
         changed = False
         plugin_file = (
@@ -402,39 +499,13 @@ class JenkinsPlugin(object):
                 self.params['name']))
 
         if not self.is_installed and self.params['version'] in [None, 'latest']:
-            if not self.module.check_mode:
-                # Install the plugin (with dependencies)
-                install_script = (
-                    'd = Jenkins.instance.updateCenter.getPlugin("%s")'
-                    '.deploy(); d.get();' % self.params['name'])
+            try:
+                self._install_with_plugin_manager()
+                changed = True
+            except FailedInstallingWithPluginManager:  # Fallback to manually downloading the plugin
+                pass
 
-                if self.params['with_dependencies']:
-                    install_script = (
-                        'Jenkins.instance.updateCenter.getPlugin("%s")'
-                        '.getNeededDependencies().each{it.deploy()}; %s' % (
-                            self.params['name'], install_script))
-
-                script_data = {
-                    'script': install_script
-                }
-                data = urlencode(script_data)
-
-                # Send the installation request
-                r = self._get_url_data(
-                    "%s/scriptText" % self.url,
-                    msg_status="Cannot install plugin.",
-                    msg_exception="Plugin installation has failed.",
-                    data=data)
-
-                hpi_file = '%s/plugins/%s.hpi' % (
-                    self.params['jenkins_home'],
-                    self.params['name'])
-
-                if os.path.isfile(hpi_file):
-                    os.remove(hpi_file)
-
-            changed = True
-        else:
+        if not changed:
             # Check if the plugin directory exists
             if not os.path.isdir(self.params['jenkins_home']):
                 self.module.fail_json(
@@ -449,26 +520,17 @@ class JenkinsPlugin(object):
 
             if self.params['version'] in [None, 'latest']:
                 # Take latest version
-                plugin_url = (
-                    "%s/latest/%s.hpi" % (
-                        self.params['updates_url'],
-                        self.params['name']))
+                plugin_urls = self._get_latest_plugin_urls()
             else:
                 # Take specific version
-                plugin_url = (
-                    "{0}/download/plugins/"
-                    "{1}/{2}/{1}.hpi".format(
-                        self.params['updates_url'],
-                        self.params['name'],
-                        self.params['version']))
-
+                plugin_urls = self._get_versioned_plugin_urls()
             if (
                     self.params['updates_expiration'] == 0 or
                     self.params['version'] not in [None, 'latest'] or
                     checksum_old is None):
 
                 # Download the plugin file directly
-                r = self._download_plugin(plugin_url)
+                r = self._download_plugin(plugin_urls)
 
                 # Write downloaded plugin into file if checksums don't match
                 if checksum_old is None:
@@ -498,7 +560,7 @@ class JenkinsPlugin(object):
                 # If the latest version changed, download it
                 if checksum_old != to_bytes(plugin_data['sha1']):
                     if not self.module.check_mode:
-                        r = self._download_plugin(plugin_url)
+                        r = self._download_plugin(plugin_urls)
                         self._write_file(plugin_file, r)
 
                     changed = True
@@ -521,6 +583,27 @@ class JenkinsPlugin(object):
 
         return changed
 
+    def _get_latest_plugin_urls(self):
+        urls = []
+        for base_url in self.params['updates_url']:
+            for update_segment in self.params['latest_plugins_url_segments']:
+                urls.append("{0}/{1}/{2}.hpi".format(base_url, update_segment, self.params['name']))
+        return urls
+
+    def _get_versioned_plugin_urls(self):
+        urls = []
+        for base_url in self.params['updates_url']:
+            for versioned_segment in self.params['versioned_plugins_url_segments']:
+                urls.append("{0}/{1}/{2}/{3}/{2}.hpi".format(base_url, versioned_segment, self.params['name'], self.params['version']))
+        return urls
+
+    def _get_update_center_urls(self):
+        urls = []
+        for base_url in self.params['updates_url']:
+            for update_json in self.params['update_json_url_segment']:
+                urls.append("{0}/{1}".format(base_url, update_json))
+        return urls
+
     def _download_updates(self):
         updates_filename = 'jenkins-plugin-cache.json'
         updates_dir = os.path.expanduser('~/.ansible/tmp')
@@ -540,11 +623,11 @@ class JenkinsPlugin(object):
 
         # Download the updates file if needed
         if download_updates:
-            url = "%s/update-center.json" % self.params['updates_url']
+            urls = self._get_update_center_urls()
 
             # Get the data
-            r = self._get_url_data(
-                url,
+            r = self._get_urls_data(
+                urls,
                 msg_status="Remote updates not found.",
                 msg_exception="Updates download failed.")
 
@@ -602,14 +685,13 @@ class JenkinsPlugin(object):
 
         return data['plugins'][self.params['name']]
 
-    def _download_plugin(self, plugin_url):
+    def _download_plugin(self, plugin_urls):
         # Download the plugin
-        r = self._get_url_data(
-            plugin_url,
+
+        return self._get_urls_data(
+            plugin_urls,
             msg_status="Plugin not found.",
             msg_exception="Plugin download failed.")
-
-        return r
 
     def _write_file(self, f, data):
         # Store the plugin into a temp file and then move it
@@ -721,7 +803,12 @@ def main():
             default='present'),
         timeout=dict(default=30, type="int"),
         updates_expiration=dict(default=86400, type="int"),
-        updates_url=dict(default='https://updates.jenkins.io'),
+        updates_url=dict(type="list", elements="str", default=['https://updates.jenkins.io',
+                                                               'http://mirrors.jenkins.io']),
+        update_json_url_segment=dict(type="list", elements="str", default=['update-center.json',
+                                                                           'updates/update-center.json']),
+        latest_plugins_url_segments=dict(type="list", elements="str", default=['latest']),
+        versioned_plugins_url_segments=dict(type="list", elements="str", default=['download/plugins', 'plugins']),
         url=dict(default='http://localhost:8080'),
         url_password=dict(no_log=True),
         version=dict(),
