@@ -30,7 +30,7 @@
           ansible.builtin.set_fact:
             dev: "/dev/{{ memory_disk_cmd.stdout }}"
 
-     - include_tasks: '{{ action }}.yml'
+    - include_tasks: '{{ action }}.yml'
 
   always:
     - name: 'Detach loop device used for LVM'
@@ -45,7 +45,7 @@
         removes: '{{ dev }}'
       when: fstype == 'ufs'
 
-     - name: 'Clean correct device for LVM and UFS'
+    - name: 'Clean correct device for LVM and UFS'
       ansible.builtin.set_fact:
         dev: '{{ image_file }}'
       when: fstype in ['lvm', 'ufs']
