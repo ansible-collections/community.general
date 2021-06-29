@@ -79,6 +79,6 @@
     grow: '{{ item.0.value.grow }}'
     action: '{{ item.1 }}'
   when:
-    - "ansible_system == 'FreeBSD'"
-    - 'item.0.key in ["xfs", "vfat", "ufs"])'
+    - 'ansible_system == "FreeBSD"'
+    - 'item.0.key in ["xfs", "vfat"]'
   loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'overwrite_another_fs', 'remove_fs'])|list }}"
