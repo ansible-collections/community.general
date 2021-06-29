@@ -461,7 +461,7 @@ class UFS(Filesystem):
         for line in out.splitlines():
             if line.startswith('fsize'):
                 fragmentsize = int(line.split()[1])
-            elif line.split()[-2] == 'providersize':
+            elif 'providersize' in line:
                 providersize = int(line.split()[-1])
             if None not in (fragmentsize, providersize):
                 break
