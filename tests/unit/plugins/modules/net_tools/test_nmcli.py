@@ -1076,7 +1076,7 @@ def test_team_connection_create_hwaddr_policy_fails(mocked_generic_connection_cr
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert results.get('failed')
-    assert results['msg']  == "Runner-hwaddr-policy is only allowed for runner activebackup"
+    assert results['msg'] == "Runner-hwaddr-policy is only allowed for runner activebackup"
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_TEAM_SLAVE, indirect=['patch_ansible_module'])
