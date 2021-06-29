@@ -451,6 +451,7 @@ class UFS(Filesystem):
     MKFS = 'newfs'
     INFO = 'dumpfs'
     GROW = 'growfs'
+    GROW_MAX_SPACE_FLAGS = ['-y']
 
     def get_fs_size(self, dev):
         """Get providersize and fragment size and return their product."""
