@@ -36,12 +36,6 @@ options:
     description:
       - Filesystem type to be created. This option is required with
         C(state=present) (or if I(state) is omitted).
-      - reiserfs support was added in 2.2.
-      - lvm support was added in 2.5.
-      - vfat support was added in 2.5.
-      - ocfs2 support was added in 2.6.
-      - f2fs support was added in 2.7.
-      - swap support was added in 2.8.
       - ufs support has been added in 3.3.0 of community.general.
     type: str
     aliases: [type]
@@ -53,7 +47,6 @@ options:
         only works when applying to regular files, aka disk images.
       - Currently C(lvm) (Linux-only) and C(ufs) (FreeBSD-only) don't support
         a regular file as their target I(dev).
-      - Support for image files was added in 2.5.
       - Support for character devices on FreeBSD has been added in 3.3.0 of
         comunity.general.
     type: path
