@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: keycloak_clientscopes
+module: keycloak_clientscope
 
 short_description: Allows administration of Keycloak client_scopes via Keycloak API
 
@@ -60,6 +60,19 @@ options:
             - The unique identifier for this client_scope.
             - This parameter is not required for updating or deleting a client_scope but
               providing it will reduce the number of API calls required.
+    
+    description:
+        type: str
+        description:
+            - Description for this client_scope.
+            - This parameter is not required for updating or deleting a client_scope.
+    
+    protocol:
+        type: str
+        description:
+            - Protocol for this client_scope.
+            - When you are creating the client scope, you must choose the Protocol.
+              Only the clients which use same protocol can then be linked with this client scope.
 
     attributes:
         type: dict
@@ -141,6 +154,8 @@ EXAMPLES = '''
     auth_username: USERNAME
     auth_password: PASSWORD
     name: my-new_clientscope
+    description: description-of-clientscope
+    protocol: openid-connect
     attributes:
         attrib1: value1
         attrib2: value2
@@ -206,6 +221,8 @@ def main():
         realm=dict(default='master'),
         id=dict(type='str'),
         name=dict(type='str'),
+        description=dict(type='str'),
+        protocol=dict(type='str'),
         attributes=dict(type='dict'),
     )
 
@@ -251,8 +268,8 @@ def main():
             module.params['attributes'][key] = [val] if not isinstance(val, list) else val
 
     clientscope_params = [x for x in module.params
-                    if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
-                    module.params.get(x) is not None]
+                          if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
+                          module.params.get(x) is not None]
 
     # build a changeset
     changeset = {}
@@ -293,7 +310,7 @@ def main():
 
         result['group'] = after_clientscope
         result['msg'] = 'Clientscope {name} has been created with ID {id}'.format(name=after_clientscope['name'],
-                                                                            id=after_clientscope['id'])
+                                                                                  id=after_clientscope['id'])
 
     else:
         if state == 'present':
