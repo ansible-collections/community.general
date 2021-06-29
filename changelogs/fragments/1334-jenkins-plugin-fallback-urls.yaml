@@ -1,0 +1,2 @@
+minor_changes:
+  - jenkins_plugin - add fallback url(s) for failure of plugin installation/download (https://github.com/ansible-collections/community.general/pull/1334).
