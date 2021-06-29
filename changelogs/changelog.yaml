@@ -1955,3 +1955,33 @@ releases:
     - 2731-mh-cmd-locale.yml
     - json_query_more_types.yml
     release_date: '2021-06-08'
+  2.5.4:
+    changes:
+      bugfixes:
+      - _mount module utils - fixed the sanity checks (https://github.com/ansible-collections/community.general/pull/2883).
+      - gitlab_project - user projects are created using namespace ID now, instead
+        of user ID (https://github.com/ansible-collections/community.general/pull/2881).
+      - ipa_sudorule - call ``sudorule_add_allow_command`` method instead of  ``sudorule_add_allow_command_group``
+        (https://github.com/ansible-collections/community.general/issues/2442).
+      - modprobe - added additional checks to ensure module load/unload is effective
+        (https://github.com/ansible-collections/community.general/issues/1608).
+      - nmcli - fixes team-slave configuration by adding connection.slave-type (https://github.com/ansible-collections/community.general/issues/766).
+      - npm - when the ``version`` option is used the comparison of installed vs missing
+        will use name@version instead of just name, allowing version specific updates
+        (https://github.com/ansible-collections/community.general/issues/2021).
+      - proxmox_kvm - fix parsing of Proxmox VM information with device info not containing
+        a comma, like disks backed by ZFS zvols (https://github.com/ansible-collections/community.general/issues/2840).
+      - scaleway plugin inventory - fix ``JSON object must be str, not 'bytes'`` with
+        Python 3.5 (https://github.com/ansible-collections/community.general/issues/2769).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 2.5.4.yml
+    - 2771-scaleway_inventory_json_accept_byte_array.yml
+    - 2821-ipa_sudorule.yml
+    - 2827-nmcli_fix_team_slave.yml
+    - 2830-npm-version-update.yml
+    - 2841-proxmox_kvm_zfs_devstr.yml
+    - 2843-modprobe-failure-conditions.yml
+    - 2881-gitlab_project-fix_workspace_user.yaml
+    - 2883-_mount-fixed-sanity-checks.yml
+    release_date: '2021-06-29'
