@@ -107,6 +107,8 @@ snaps_removed:
 
 import re
 
+from ansible.module_utils.common.text.converters import to_native
+
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
     CmdStateModuleHelper, ArgFormat, ModuleHelperException
 )
@@ -163,7 +165,7 @@ class Snap(CmdStateModuleHelper):
                 results[i].append(output[i])
 
         return [
-            '; '.join([str(x) for x in results[0]]),
+            '; '.join([to_native(x) for x in results[0]]),
             self._first_non_zero(results[1]),
             '\n'.join(results[2]),
             '\n'.join(results[3]),
