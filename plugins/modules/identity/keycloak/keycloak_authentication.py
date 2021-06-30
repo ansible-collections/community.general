@@ -200,11 +200,11 @@ def create_or_update_executions(kc, config, realm='master'):
     try:
         changed = False
         if "authenticationExecutions" in config:
+            # Get existing executions on the Keycloak server for this alias
+            existing_executions = kc.get_executions_representation(config, realm=realm)
             for new_exec_index, new_exec in enumerate(config["authenticationExecutions"], start=0):
                 if new_exec["index"] is not None:
                     new_exec_index = new_exec["index"]
-                # Get existing executions on the Keycloak server for this alias
-                existing_executions = kc.get_executions_representation(config, realm=realm)
                 exec_found = False
                 # Get flowalias parent if given
                 if new_exec["flowAlias"] is not None:
@@ -222,6 +222,9 @@ def create_or_update_executions(kc, config, realm='master'):
                     # Compare the executions to see if it need changes
                     if not is_struct_included(new_exec, existing_executions[exec_index], exclude_key) or exec_index != new_exec_index:
                         changed = True
+                    id_to_update = existing_executions[exec_index]["id"]
+                    # Remove exec from list in case 2 exec with same name
+                    existing_executions[exec_index].clear()
                 elif new_exec["providerId"] is not None:
                     kc.create_execution(new_exec, flowAlias=flow_alias_parent, realm=realm)
                     changed = True
@@ -229,13 +232,10 @@ def create_or_update_executions(kc, config, realm='master'):
                     kc.create_subflow(new_exec["displayName"], flow_alias_parent, realm=realm)
                     changed = True
                 if changed:
-                    # Get existing executions on the Keycloak server for this alias
-                    existing_executions = kc.get_executions_representation(config, realm=realm)
-                    exec_index = find_exec_in_executions(new_exec, existing_executions)
                     if exec_index != -1:
                         # Update the existing execution
                         updated_exec = {
-                            "id": existing_executions[exec_index]["id"]
+                            "id": id_to_update
                         }
                         # add the execution configuration
                         if new_exec["authenticationConfig"] is not None:
