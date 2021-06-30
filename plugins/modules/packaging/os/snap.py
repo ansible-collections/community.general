@@ -123,7 +123,7 @@ __state_map = dict(
 
 
 def _state_map(value):
-    return __state_map[value]
+    return [__state_map[value]]
 
 
 class Snap(CmdStateModuleHelper):
@@ -170,13 +170,13 @@ class Snap(CmdStateModuleHelper):
         ]
 
     def snap_exists(self, snap_name):
-        return 0 == self.run_command(params=[{'state': 'info'}, {'name': [snap_name]}])[0]
+        return 0 == self.run_command(params=[{'state': 'info'}, {'name': snap_name}])[0]
 
     def is_snap_installed(self, snap_name):
-        return 0 == self.run_command(params=[{'state': 'list'}, {'name': [snap_name]}])[0]
+        return 0 == self.run_command(params=[{'state': 'list'}, {'name': snap_name}])[0]
 
     def is_snap_enabled(self, snap_name):
-        rc, out, err = self.run_command(params=[{'state': 'list'}, {'name': [snap_name]}])
+        rc, out, err = self.run_command(params=[{'state': 'list'}, {'name': snap_name}])
         if rc != 0:
             return None
         result = out.splitlines()[1]
@@ -207,9 +207,9 @@ class Snap(CmdStateModuleHelper):
         has_one_pkg_params = bool(self.vars.classic) or self.vars.channel != 'stable'
         has_multiple_snaps = len(actionable_snaps) > 1
         if has_one_pkg_params and has_multiple_snaps:
-            commands = [params + [s] for s in actionable_snaps]
+            commands = [params + [{'actionable_snaps': [s]}] for s in actionable_snaps]
         else:
-            commands = [params + actionable_snaps]
+            commands = [params + [{'actionable_snaps': actionable_snaps}]]
         self.vars.cmd, rc, out, err = self._run_multiple_commands(commands)
         if rc == 0:
             return
@@ -235,7 +235,7 @@ class Snap(CmdStateModuleHelper):
         if self.module.check_mode:
             return
         params = ['classic', 'channel', 'state']  # get base cmd parts
-        commands = [params + actionable_snaps]
+        commands = [params + [{'actionable_snaps': actionable_snaps}]]
         self.vars.cmd, rc, out, err = self._run_multiple_commands(commands)
         if rc == 0:
             return
@@ -253,7 +253,7 @@ class Snap(CmdStateModuleHelper):
         if self.module.check_mode:
             return
         params = ['classic', 'channel', 'state']  # get base cmd parts
-        commands = [params + actionable_snaps]
+        commands = [params + [{'actionable_snaps': actionable_snaps}]]
         self.vars.cmd, rc, out, err = self._run_multiple_commands(commands)
         if rc == 0:
             return
@@ -271,7 +271,7 @@ class Snap(CmdStateModuleHelper):
         if self.module.check_mode:
             return
         params = ['classic', 'channel', 'state']  # get base cmd parts
-        commands = [params + actionable_snaps]
+        commands = [params + [{'actionable_snaps': actionable_snaps}]]
         self.vars.cmd, rc, out, err = self._run_multiple_commands(commands)
         if rc == 0:
             return
