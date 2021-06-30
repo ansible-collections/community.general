@@ -25,12 +25,12 @@
         repo: 'https://download.opensuse.org/repositories/system:/snappy/openSUSE_Leap_$releasever'
         state: present
         auto_import_keys: true
+      register: snapd_install_opensuse
 
     - name: install snapd on opensuse
       community.general.zypper:
         name: snapd
         state: present
-  register: snapd_install_opensuse
   when: ansible_distribution == 'openSUSE Leap'
 
 - block:
