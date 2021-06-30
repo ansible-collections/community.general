@@ -4,21 +4,25 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- name: install snapd
-  apt:
-    name: snapd
-    state: present
-  register: snapd_install_ubuntu
-  when: ansible_distribution == 'Ubuntu'
-
-- name: install snapd
-  dnf:
-    name: snapd
-    state: present
-  register: snapd_install_fedora
-  when: ansible_distribution == 'Fedora'
+- name: Include distribution specific tasks
+  include_tasks: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml"
+        - "{{ ansible_facts.os_family }}-{{ ansible_facts.distribution_major_version }}.yml"
+        - "{{ ansible_facts.distribution }}.yml"
+        - "{{ ansible_facts.os_family }}.yml"
+        - "nothing.yml"
+      paths:
+        - "{{ role_path }}/tasks"
 
 - block:
+    - name: make sure package is not installed
+      community.general.snap:
+        name: hello-world
+        state: absent
+
     - name: install package
       community.general.snap:
         name: hello-world
@@ -57,16 +61,4 @@
         that:
           - remove is changed
           - remove_again is not changed
-  when: ansible_distribution in ['Ubuntu','Fedora']
-
-- name: Remove snapd in case it was not installed
-  apt:
-    name: snapd
-    state: absent
-  when: snapd_install_ubuntu is changed and ansible_distribution == 'Ubuntu'
-
-- name: Remove snapd in case it was not installed
-  dnf:
-    name: snapd
-    state: absent
-  when: snapd_install_fedora is changed and ansible_distribution == 'Fedora'
+  when: has_snap

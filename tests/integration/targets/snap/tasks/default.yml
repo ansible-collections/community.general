@@ -1,0 +1,10 @@
+---
+- name: Install snapd
+  package:
+    name: "{{ snap_packages }}"
+    state: present
+  notify: Remove snapd
+
+- name: Inform that snap is installed
+  set_fact:
+    has_snap: true
