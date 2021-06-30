@@ -1,0 +1,52 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- block:
+    - name: install snapd
+      apt:
+        name: snapd
+        state: present
+
+    - name: install package
+      community.general.snap:
+        name: hello-world
+        state: present
+      register: install
+
+    - name: install package again
+      community.general.snap:
+        name: hello-world
+        state: present
+      register: install_again
+
+    - name: Assert package has been installed just once
+      assert:
+        that:
+          - install is changed
+          - install_again is not changed
+
+    - name: check package has been installed correctly
+      command: hello-world
+
+    - name: remove package
+      community.general.snap:
+        name: hello-world
+        state: absent
+      register: remove
+
+    - name: remove package again
+      community.general.snap:
+        name: hello-world
+        state: absent
+      register: remove_again
+
+    - name: Assert package has been installed just once
+      assert:
+        that:
+          - remove is changed
+          - remove_again is not changed
+
+  when: ansible_distribution == 'Ubuntu'
