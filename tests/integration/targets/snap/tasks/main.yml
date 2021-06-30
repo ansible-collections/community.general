@@ -4,7 +4,6 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-<<<<<<< HEAD
 - name: install snapd
   apt:
     name: snapd
@@ -20,14 +19,6 @@
   when: ansible_distribution == 'Fedora'
 
 - block:
-=======
-- block:
-    - name: install snapd
-      apt:
-        name: snapd
-        state: present
-
->>>>>>> b2e56c1d (Add integration tests for snap)
     - name: install package
       community.general.snap:
         name: hello-world
@@ -61,16 +52,11 @@
         state: absent
       register: remove_again
 
-<<<<<<< HEAD
     - name: Assert package has been removed just once
-=======
-    - name: Assert package has been installed just once
->>>>>>> b2e56c1d (Add integration tests for snap)
       assert:
         that:
           - remove is changed
           - remove_again is not changed
-<<<<<<< HEAD
   when: ansible_distribution in ['Ubuntu','Fedora']
 
 - name: Remove snapd in case it was not installed
@@ -84,7 +70,3 @@
     name: snapd
     state: absent
   when: snapd_install_fedora is changed and ansible_distribution == 'Fedora'
-=======
-
-  when: ansible_distribution == 'Ubuntu'
->>>>>>> b2e56c1d (Add integration tests for snap)

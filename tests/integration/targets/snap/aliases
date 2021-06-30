@@ -3,7 +3,4 @@ skip/aix
 skip/freebsd
 skip/osx
 skip/macos
-<<<<<<< HEAD
 disabled #FIXME 2609
-=======
->>>>>>> b2e56c1d (Add integration tests for snap)
