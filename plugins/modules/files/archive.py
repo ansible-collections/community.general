@@ -182,6 +182,7 @@ import zipfile
 from fnmatch import fnmatch
 from sys import version_info
 from traceback import format_exc
+from zlib import crc32
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_native
@@ -203,6 +204,8 @@ else:
     except ImportError:
         LZMA_IMP_ERR = format_exc()
         HAS_LZMA = False
+
+ENABLE_IDEMPOTENCY_FIX = False
 
 PATH_SEP = to_bytes(os.sep)
 PY27 = version_info[0:2] >= (2, 7)
@@ -298,6 +301,9 @@ class Archive(object):
                 msg='Error, must specify "dest" when archiving multiple files or trees'
             )
 
+        self.original_checksums = self.destination_checksums()
+        self.original_size = self.destination_size()
+
     def add(self, path, archive_name):
         try:
             self._add(_to_native_ascii(path), _to_native(archive_name))
@@ -315,7 +321,7 @@ class Archive(object):
             self.destination_state = STATE_ARCHIVED
         else:
             try:
-                f_out = self._open_compressed_file(_to_native_ascii(self.destination))
+                f_out = self._open_compressed_file(_to_native_ascii(self.destination), 'wb')
                 with open(path, 'rb') as f_in:
                     shutil.copyfileobj(f_in, f_out)
                 f_out.close()
@@ -368,8 +374,22 @@ class Archive(object):
                 msg='Errors when writing archive at %s: %s' % (_to_native(self.destination), '; '.join(self.errors))
             )
 
+    def compare_with_original(self):
+        if ENABLE_IDEMPOTENCY_FIX and self.original_checksums is not None:
+            self.changed |= self.original_checksums != self.destination_checksums()
+        else:
+            self.changed |= self.original_size != self.destination_size()
+
+    def destination_checksums(self):
+        if self.destination_exists() and self.destination_readable():
+            return self._get_checksums(self.destination)
+        return None
+
     def destination_exists(self):
         return self.destination and os.path.exists(self.destination)
+
+    def destination_readable(self):
+        return self.destination and os.access(self.destination, os.R_OK)
 
     def destination_size(self):
         return os.path.getsize(self.destination) if self.destination_exists() else 0
@@ -406,6 +426,15 @@ class Archive(object):
 
     def has_unfound_targets(self):
         return bool(self.not_found)
+
+    def remove_single_target(self, path):
+        try:
+            os.remove(path)
+        except OSError as e:
+            self.module.fail_json(
+                path=_to_native(path),
+                msg='Unable to remove source file: %s' % _to_native(e), exception=format_exc()
+            )
 
     def remove_targets(self):
         for path in self.successes:
@@ -453,14 +482,14 @@ class Archive(object):
             'expanded_exclude_paths': [_to_native(p) for p in self.expanded_exclude_paths],
         }
 
-    def _open_compressed_file(self, path):
+    def _open_compressed_file(self, path, mode):
         f = None
         if self.format == 'gz':
-            f = gzip.open(path, 'wb')
+            f = gzip.open(path, mode)
         elif self.format == 'bz2':
-            f = bz2.BZ2File(path, 'wb')
+            f = bz2.BZ2File(path, mode)
         elif self.format == 'xz':
-            f = lzma.LZMAFile(path, 'wb')
+            f = lzma.LZMAFile(path, mode)
         else:
             self.module.fail_json(msg="%s is not a valid format" % self.format)
 
@@ -480,6 +509,10 @@ class Archive(object):
 
     @abc.abstractmethod
     def _add(self, path, archive_name):
+        pass
+
+    @abc.abstractmethod
+    def _get_checksums(self, path):
         pass
 
 
@@ -503,6 +536,15 @@ class ZipArchive(Archive):
     def _add(self, path, archive_name):
         if not legacy_filter(path, self.exclusion_patterns):
             self.file.write(path, archive_name)
+
+    def _get_checksums(self, path):
+        try:
+            archive = zipfile.ZipFile(_to_native_ascii(path), 'r')
+            checksums = set((info.filename, info.CRC) for info in archive.infolist())
+            archive.close()
+        except zipfile.BadZipfile:
+            checksums = set()
+        return checksums
 
 
 class TarArchive(Archive):
@@ -541,13 +583,32 @@ class TarArchive(Archive):
         def py27_filter(tarinfo):
             return None if matches_exclusion_patterns(tarinfo.name, self.exclusion_patterns) else tarinfo
 
-        def py26_filter(path):
-            return matches_exclusion_patterns(path, self.exclusion_patterns)
-
         if PY27:
             self.file.add(path, archive_name, recursive=False, filter=py27_filter)
         else:
-            self.file.add(path, archive_name, recursive=False, exclude=py26_filter)
+            self.file.add(path, archive_name, recursive=False, exclude=legacy_filter)
+
+    def _get_checksums(self, path):
+        try:
+            if self.format == 'xz':
+                with lzma.open(_to_native_ascii(path), 'r') as f:
+                    archive = tarfile.open(fileobj=f)
+                    checksums = set((info.name, info.chksum) for info in archive.getmembers())
+                    archive.close()
+            else:
+                archive = tarfile.open(_to_native_ascii(path), 'r|' + self.format)
+                checksums = set((info.name, info.chksum) for info in archive.getmembers())
+                archive.close()
+        except (lzma.LZMAError, tarfile.ReadError, tarfile.CompressionError):
+            try:
+                # The python implementations of gzip, bz2, and lzma do not support restoring compressed files
+                # to their original names so only file checksum is returned
+                f = self._open_compressed_file(_to_native_ascii(path), 'r')
+                checksums = set([(b'', crc32(f.read()))])
+                f.close()
+            except Exception:
+                checksums = set()
+        return checksums
 
 
 def get_archive(module):
@@ -580,7 +641,6 @@ def main():
     check_mode = module.check_mode
 
     archive = get_archive(module)
-    size = archive.destination_size()
     archive.find_targets()
 
     if not archive.has_targets():
@@ -592,10 +652,9 @@ def main():
         else:
             archive.add_targets()
             archive.destination_state = STATE_INCOMPLETE if archive.has_unfound_targets() else STATE_ARCHIVED
+            archive.compare_with_original()
             if archive.remove:
                 archive.remove_targets()
-            if archive.destination_size() != size:
-                archive.changed = True
     else:
         if check_mode:
             if not archive.destination_exists():
@@ -603,16 +662,9 @@ def main():
         else:
             path = archive.paths[0]
             archive.add_single_target(path)
-            if archive.destination_size() != size:
-                archive.changed = True
+            archive.compare_with_original()
             if archive.remove:
-                try:
-                    os.remove(path)
-                except OSError as e:
-                    module.fail_json(
-                        path=_to_native(path),
-                        msg='Unable to remove source file: %s' % _to_native(e), exception=format_exc()
-                    )
+                archive.remove_single_target(path)
 
     if archive.destination_exists():
         archive.update_permissions()
