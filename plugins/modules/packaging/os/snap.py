@@ -196,7 +196,7 @@ class Snap(CmdStateModuleHelper):
         self.validate_input_snaps()  # if snap doesnt exist, it will explode when trying to install
         self.vars.meta('classic').set(output=True)
         self.vars.meta('channel').set(output=True)
-        actionable_snaps = [s for s in self.vars.name if self.is_snap_installed(s)]
+        actionable_snaps = [s for s in self.vars.name if not self.is_snap_installed(s)]
         if not actionable_snaps:
             return
         self.changed = True
@@ -227,7 +227,7 @@ class Snap(CmdStateModuleHelper):
 
     def state_absent(self):
         self.validate_input_snaps()  # if snap doesnt exist, it will be absent by definition
-        actionable_snaps = [s for s in self.vars.name if not self.is_snap_installed(s)]
+        actionable_snaps = [s for s in self.vars.name if self.is_snap_installed(s)]
         if not actionable_snaps:
             return
         self.changed = True
