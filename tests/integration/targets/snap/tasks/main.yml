@@ -1,0 +1,72 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: install snapd
+  apt:
+    name: snapd
+    state: present
+  register: snapd_install_ubuntu
+  when: ansible_distribution == 'Ubuntu'
+
+- name: install snapd
+  dnf:
+    name: snapd
+    state: present
+  register: snapd_install_fedora
+  when: ansible_distribution == 'Fedora'
+
+- block:
+    - name: install package
+      community.general.snap:
+        name: hello-world
+        state: present
+      register: install
+
+    - name: install package again
+      community.general.snap:
+        name: hello-world
+        state: present
+      register: install_again
+
+    - name: Assert package has been installed just once
+      assert:
+        that:
+          - install is changed
+          - install_again is not changed
+
+    - name: check package has been installed correctly
+      command: hello-world
+
+    - name: remove package
+      community.general.snap:
+        name: hello-world
+        state: absent
+      register: remove
+
+    - name: remove package again
+      community.general.snap:
+        name: hello-world
+        state: absent
+      register: remove_again
+
+    - name: Assert package has been removed just once
+      assert:
+        that:
+          - remove is changed
+          - remove_again is not changed
+  when: ansible_distribution in ['Ubuntu','Fedora']
+
+- name: Remove snapd in case it was not installed
+  apt:
+    name: snapd
+    state: absent
+  when: snapd_install_ubuntu is changed and ansible_distribution == 'Ubuntu'
+
+- name: Remove snapd in case it was not installed
+  dnf:
+    name: snapd
+    state: absent
+  when: snapd_install_fedora is changed and ansible_distribution == 'Fedora'
