@@ -139,13 +139,14 @@ state:
     returned: always
 dest_state:
     description:
-      - The state of the I(destination) file.
+      - The state of the I(dest) file.
       - C(absent) when the file does not exist.
       - C(archive) when the file is an archive.
       - C(compress) when the file is compressed, but not an archive.
       - C(incomplete) when the file is an archive, but some files under I(path) were not found.
     type: str
     returned: success
+    version_added: 3.4.0
 missing:
     description: Any files that were missing from the source.
     type: list
