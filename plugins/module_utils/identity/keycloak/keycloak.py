@@ -597,6 +597,7 @@ class KeycloakAPI(object):
         try:
             return open_url(clientscope_url, method='PUT', headers=self.restheaders,
                             data=json.dumps(clientscoperep), validate_certs=self.validate_certs)
+
         except Exception as e:
             self.module.fail_json(msg='Could not update clientscope %s in realm %s: %s'
                                       % (clientscoperep['name'], realm, str(e)))

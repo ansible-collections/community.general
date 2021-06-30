@@ -60,19 +60,49 @@ options:
             - The unique identifier for this client_scope.
             - This parameter is not required for updating or deleting a client_scope but
               providing it will reduce the number of API calls required.
-    
+
     description:
         type: str
         description:
             - Description for this client_scope.
             - This parameter is not required for updating or deleting a client_scope.
-    
+
     protocol:
         type: str
         description:
-            - Protocol for this client_scope.
-            - When you are creating the client scope, you must choose the Protocol.
-              Only the clients which use same protocol can then be linked with this client scope.
+            - Protocol for this client_scope ("saml" or "openid-connect").
+            - This parameter is not required for updating or deleting a client_scope.
+
+    protocolMappers:
+        type: list
+        description: 
+            - Allows for creating and managing protocol mappers for both types of clients 
+              (openid-connect and saml) within Keycloak.
+        elements: dict
+        suboptions:
+            config:
+                description: 
+                    - A map with key / value pairs for configuring the protocol mapper. 
+                    - The supported keys depends on the protocol mapper.
+                type: dict 
+            protocol:
+                description:
+                    - The type of client (either openid-connect or saml). 
+                    - The type must match the type of the client.
+                type: str
+            protocolMapper: 
+                description:
+                    - The name of the protocol mapper.
+                    - The protocol mapper must be compatible with the specified client.
+                type: str
+            name:
+                description:
+                    - The display name of this protocol mapper in the GUI.
+                type: str
+            id: 
+                description: 
+                    - Id of the protocol mapper.
+                type: str
 
     attributes:
         type: dict
@@ -156,6 +186,10 @@ EXAMPLES = '''
     name: my-new_clientscope
     description: description-of-clientscope
     protocol: openid-connect
+    protocolMappers:
+        - protocol: openid-connect
+          name: my-new_clientscope
+          protocolMapper: oidc-group-membership-mapper
     attributes:
         attrib1: value1
         attrib2: value2
@@ -224,6 +258,7 @@ def main():
         description=dict(type='str'),
         protocol=dict(type='str'),
         attributes=dict(type='dict'),
+        protocolMappers=dict(type='list'),
     )
 
     argument_spec.update(meta_args)
@@ -249,6 +284,7 @@ def main():
     gid = module.params.get('id')
     name = module.params.get('name')
     attributes = module.params.get('attributes')
+    protocol_mappers = module.params.get('protocolMappers')
 
     before_clientscope = None         # current state of the group, for merging.
 
@@ -259,13 +295,6 @@ def main():
         before_clientscope = kc.get_clientscope_by_clientscopeid(gid, realm=realm)
 
     before_clientscope = {} if before_clientscope is None else before_clientscope
-
-    # attributes in Keycloak have their values returned as lists
-    # via the API. attributes is a dict, so we'll transparently convert
-    # the values to lists.
-    if attributes is not None:
-        for key, val in module.params['attributes'].items():
-            module.params['attributes'][key] = [val] if not isinstance(val, list) else val
 
     clientscope_params = [x for x in module.params
                           if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
