@@ -163,7 +163,7 @@ class Snap(CmdStateModuleHelper):
                 results[i].append(output[i])
 
         return [
-            '; '.join(results[0]),
+            '; '.join([str(x) for x in results[0]]),
             self._first_non_zero(results[1]),
             '\n'.join(results[2]),
             '\n'.join(results[3]),
