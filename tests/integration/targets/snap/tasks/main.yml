@@ -8,14 +8,14 @@
   apt:
     name: snapd
     state: present
-  register: snapd_install_ubuntu
+  notify: remove snapd in ubuntu
   when: ansible_distribution == 'Ubuntu'
 
 - name: install snapd on fedora
   dnf:
     name: snapd
     state: present
-  register: snapd_install_fedora
+  notify: remove snapd in fedora
   when: ansible_distribution == 'Fedora'
 
 - block:
@@ -25,12 +25,13 @@
         repo: 'https://download.opensuse.org/repositories/system:/snappy/openSUSE_Leap_$releasever'
         state: present
         auto_import_keys: true
-      register: snapd_install_opensuse
+      notify: remove opensuse repository
 
     - name: install snapd on opensuse
       community.general.zypper:
         name: snapd
         state: present
+      notify: remove snapd in opensuse
   when: ansible_distribution == 'openSUSE Leap'
 
 - block:
@@ -74,26 +75,3 @@
           - remove_again is not changed
   when: ansible_distribution in ['Ubuntu','Fedora', 'openSUSE Leap']
 
-- name: Remove snapd in case it was not installed
-  apt:
-    name: snapd
-    state: absent
-  when: snapd_install_ubuntu is changed and ansible_distribution == 'Ubuntu'
-
-- name: Remove snapd in case it was not installed
-  dnf:
-    name: snapd
-    state: absent
-  when: snapd_install_fedora is changed and ansible_distribution == 'Fedora'
-
-- block:
-    - name: remove opensuse repository
-      community.general.zypper_repository:
-        name: snapd
-        state: absent
-
-    - name: remove snapd on opensuse
-      community.general.zypper:
-        name: snapd
-        state: present
-  when: snapd_install_opensue is changed and ansible_distribution == 'openSUSE Leap'

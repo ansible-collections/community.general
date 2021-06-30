@@ -1,0 +1,20 @@
+---
+- name: remove snapd in ubuntu
+  apt:
+    name: snapd
+    state: absent
+
+- name: remove snapd in fedora
+  dnf:
+    name: snapd
+    state: absent
+
+- name: remove snapd in opensuse
+  community.general.zypper:
+    name: snapd
+    state: present
+
+- name: remove opensuse repository
+  community.general.zypper_repository:
+    name: snapd
+    state: absent
