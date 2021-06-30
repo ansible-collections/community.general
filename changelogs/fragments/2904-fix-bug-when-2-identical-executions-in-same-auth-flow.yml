@@ -1,0 +1,3 @@
+bugfixes:
+  - keycloak_authentication - fix bug when two identical executions are in the same authentication flow
+    (https://github.com/ansible-collections/community.general/pull/2904).
