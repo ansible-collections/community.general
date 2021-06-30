@@ -43,6 +43,8 @@
 
     - name: check package has been installed correctly
       command: hello-world
+      environment:
+        PATH: /var/lib/snapd/snap/bin/
 
     - name: remove package
       community.general.snap:
