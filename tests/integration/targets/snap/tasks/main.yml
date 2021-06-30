@@ -4,19 +4,34 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- name: install snapd
+- name: install snapd on ubuntu
   apt:
     name: snapd
     state: present
   register: snapd_install_ubuntu
   when: ansible_distribution == 'Ubuntu'
 
-- name: install snapd
+- name: install snapd on fedora
   dnf:
     name: snapd
     state: present
   register: snapd_install_fedora
   when: ansible_distribution == 'Fedora'
+
+- block:
+    - name: add opensuse repository
+      community.general.zypper_repository:
+        name: snapd
+        repo: 'https://download.opensuse.org/repositories/system:/snappy/openSUSE_Leap_$releasever'
+        state: present
+        auto_import_keys: true
+
+    - name: install snapd on opensuse
+      community.general.zypper:
+        name: snapd
+        state: present
+  register: snapd_install_opensuse
+  when: ansible_distribution == 'openSUSE Leap'
 
 - block:
     - name: install package
@@ -57,7 +72,7 @@
         that:
           - remove is changed
           - remove_again is not changed
-  when: ansible_distribution in ['Ubuntu','Fedora']
+  when: ansible_distribution in ['Ubuntu','Fedora', 'openSUSE Leap']
 
 - name: Remove snapd in case it was not installed
   apt:
@@ -70,3 +85,15 @@
     name: snapd
     state: absent
   when: snapd_install_fedora is changed and ansible_distribution == 'Fedora'
+
+- block:
+    - name: remove opensuse repository
+      community.general.zypper_repository:
+        name: snapd
+        state: absent
+
+    - name: remove snapd on opensuse
+      community.general.zypper:
+        name: snapd
+        state: present
+  when: snapd_install_opensue is changed and ansible_distribution == 'openSUSE Leap'
