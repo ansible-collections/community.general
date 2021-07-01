@@ -4,28 +4,46 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- name: install snapd
-  apt:
-    name: snapd
-    state: present
-  register: snapd_install_ubuntu
-  when: ansible_distribution == 'Ubuntu'
-
-- name: install snapd
-  dnf:
-    name: snapd
-    state: present
-  register: snapd_install_fedora
-  when: ansible_distribution == 'Fedora'
+- name: Include distribution specific tasks
+  include_tasks: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml"
+        - "{{ ansible_facts.os_family }}-{{ ansible_facts.distribution_major_version }}.yml"
+        - "{{ ansible_facts.distribution }}.yml"
+        - "{{ ansible_facts.os_family }}.yml"
+        - "nothing.yml"
+      paths:
+        - "{{ role_path }}/tasks"
 
 - block:
-    - name: install package
+    - name: Make sure package is not installed
+      community.general.snap:
+        name: hello-world
+        state: absent
+
+    - name: Install package (check mode)
+      community.general.snap:
+        name: hello-world
+        state: present
+      register: install_check
+      check_mode: true
+
+    - name: Install package
       community.general.snap:
         name: hello-world
         state: present
       register: install
 
-    - name: install package again
+    - name: Install package again (check mode)
+      community.general.snap:
+        name: hello-world
+        state: present
+      register: install_again_check
+      check_mode: true
+
+    - name: Install package again
       community.general.snap:
         name: hello-world
         state: present
@@ -35,18 +53,36 @@
       assert:
         that:
           - install is changed
+          - install_check is changed
           - install_again is not changed
+          - install_again_check is not changed
 
-    - name: check package has been installed correctly
+    - name: Check package has been installed correctly
       command: hello-world
+      environment:
+        PATH: /var/lib/snapd/snap/bin/
 
-    - name: remove package
+    - name: Remove package (check mode)
+      community.general.snap:
+        name: hello-world
+        state: absent
+      register: remove_check
+      check_mode: true
+
+    - name: Remove package
       community.general.snap:
         name: hello-world
         state: absent
       register: remove
 
-    - name: remove package again
+    - name: Remove package again (check mode)
+      community.general.snap:
+        name: hello-world
+        state: absent
+      register: remove_again_check
+      check_mode: true
+
+    - name: Remove package again
       community.general.snap:
         name: hello-world
         state: absent
@@ -56,17 +92,7 @@
       assert:
         that:
           - remove is changed
+          - remove_check is changed
           - remove_again is not changed
-  when: ansible_distribution in ['Ubuntu','Fedora']
-
-- name: Remove snapd in case it was not installed
-  apt:
-    name: snapd
-    state: absent
-  when: snapd_install_ubuntu is changed and ansible_distribution == 'Ubuntu'
-
-- name: Remove snapd in case it was not installed
-  dnf:
-    name: snapd
-    state: absent
-  when: snapd_install_fedora is changed and ansible_distribution == 'Fedora'
+          - remove_again_check is not changed
+  when: has_snap
