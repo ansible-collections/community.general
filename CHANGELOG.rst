@@ -6,6 +6,21 @@ Community General Release Notes
 
 This changelog describes changes after version 2.0.0.
 
+v3.3.1
+======
+
+Release Summary
+---------------
+
+Extraordinary bugfix release to fix a fatal bug in ``snap``.
+
+Bugfixes
+--------
+
+- keycloak_authentication - fix bug when two identical executions are in the same authentication flow (https://github.com/ansible-collections/community.general/pull/2904).
+- module_helper module utils - avoid failing when non-zero ``rc`` is present on regular exit (https://github.com/ansible-collections/community.general/pull/2912).
+- snap - fix various bugs which prevented the module from working at all, and which resulted in ``state=absent`` fail on absent snaps (https://github.com/ansible-collections/community.general/issues/2835, https://github.com/ansible-collections/community.general/issues/2906, https://github.com/ansible-collections/community.general/pull/2912).
+
 v3.3.0
 ======
 
