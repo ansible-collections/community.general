@@ -1,0 +1,15 @@
+---
+- name: Install snapd
+  package:
+    name: "{{ snap_packages }}"
+    state: present
+  notify: Remove snapd
+
+- name: Make sure that snapd is running
+  service:
+    name: snapd
+    state: started
+
+- name: Inform that snap is installed
+  set_fact:
+    has_snap: true
