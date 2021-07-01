@@ -107,6 +107,8 @@ snaps_removed:
 
 import re
 
+from ansible.module_utils.common.text.converters import to_native
+
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
     CmdStateModuleHelper, ArgFormat, ModuleHelperException
 )
@@ -123,7 +125,7 @@ __state_map = dict(
 
 
 def _state_map(value):
-    return __state_map[value]
+    return [__state_map[value]]
 
 
 class Snap(CmdStateModuleHelper):
@@ -163,20 +165,20 @@ class Snap(CmdStateModuleHelper):
                 results[i].append(output[i])
 
         return [
-            '; '.join(results[0]),
+            '; '.join([to_native(x) for x in results[0]]),
             self._first_non_zero(results[1]),
             '\n'.join(results[2]),
             '\n'.join(results[3]),
         ]
 
     def snap_exists(self, snap_name):
-        return 0 == self.run_command(params=[{'state': 'info'}, {'name': [snap_name]}])[0]
+        return 0 == self.run_command(params=[{'state': 'info'}, {'name': snap_name}])[0]
 
     def is_snap_installed(self, snap_name):
-        return 0 == self.run_command(params=[{'state': 'list'}, {'name': [snap_name]}])[0]
+        return 0 == self.run_command(params=[{'state': 'list'}, {'name': snap_name}])[0]
 
     def is_snap_enabled(self, snap_name):
-        rc, out, err = self.run_command(params=[{'state': 'list'}, {'name': [snap_name]}])
+        rc, out, err = self.run_command(params=[{'state': 'list'}, {'name': snap_name}])
         if rc != 0:
             return None
         result = out.splitlines()[1]
@@ -196,7 +198,7 @@ class Snap(CmdStateModuleHelper):
         self.validate_input_snaps()  # if snap doesnt exist, it will explode when trying to install
         self.vars.meta('classic').set(output=True)
         self.vars.meta('channel').set(output=True)
-        actionable_snaps = [s for s in self.vars.name if self.is_snap_installed(s)]
+        actionable_snaps = [s for s in self.vars.name if not self.is_snap_installed(s)]
         if not actionable_snaps:
             return
         self.changed = True
@@ -207,9 +209,9 @@ class Snap(CmdStateModuleHelper):
         has_one_pkg_params = bool(self.vars.classic) or self.vars.channel != 'stable'
         has_multiple_snaps = len(actionable_snaps) > 1
         if has_one_pkg_params and has_multiple_snaps:
-            commands = [params + [s] for s in actionable_snaps]
+            commands = [params + [{'actionable_snaps': [s]}] for s in actionable_snaps]
         else:
-            commands = [params + actionable_snaps]
+            commands = [params + [{'actionable_snaps': actionable_snaps}]]
         self.vars.cmd, rc, out, err = self._run_multiple_commands(commands)
         if rc == 0:
             return
@@ -227,7 +229,7 @@ class Snap(CmdStateModuleHelper):
 
     def state_absent(self):
         self.validate_input_snaps()  # if snap doesnt exist, it will be absent by definition
-        actionable_snaps = [s for s in self.vars.name if not self.is_snap_installed(s)]
+        actionable_snaps = [s for s in self.vars.name if self.is_snap_installed(s)]
         if not actionable_snaps:
             return
         self.changed = True
@@ -235,7 +237,7 @@ class Snap(CmdStateModuleHelper):
         if self.module.check_mode:
             return
         params = ['classic', 'channel', 'state']  # get base cmd parts
-        commands = [params + actionable_snaps]
+        commands = [params + [{'actionable_snaps': actionable_snaps}]]
         self.vars.cmd, rc, out, err = self._run_multiple_commands(commands)
         if rc == 0:
             return
@@ -253,7 +255,7 @@ class Snap(CmdStateModuleHelper):
         if self.module.check_mode:
             return
         params = ['classic', 'channel', 'state']  # get base cmd parts
-        commands = [params + actionable_snaps]
+        commands = [params + [{'actionable_snaps': actionable_snaps}]]
         self.vars.cmd, rc, out, err = self._run_multiple_commands(commands)
         if rc == 0:
             return
@@ -271,7 +273,7 @@ class Snap(CmdStateModuleHelper):
         if self.module.check_mode:
             return
         params = ['classic', 'channel', 'state']  # get base cmd parts
-        commands = [params + actionable_snaps]
+        commands = [params + [{'actionable_snaps': actionable_snaps}]]
         self.vars.cmd, rc, out, err = self._run_multiple_commands(commands)
         if rc == 0:
             return
