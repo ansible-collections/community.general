@@ -68,41 +68,77 @@ options:
             - This parameter is not required for updating or deleting a client_scope.
 
     protocol:
-        type: str
         description:
-            - Protocol for this client_scope ("saml" or "openid-connect").
-            - This parameter is not required for updating or deleting a client_scope.
+            - Type of client (either C(openid-connect), C(saml) or C(wsfed)).
+        choices: ['openid-connect', 'saml', 'wsfed']
+        type: str
 
-    protocolMappers:
+    protocol_mappers:
+        description:
+            - a list of dicts defining protocol mappers for this client.
+              This is 'protocolMappers' in the Keycloak REST API.
+        aliases:
+            - protocolMappers
         type: list
-        description: 
-            - Allows for creating and managing protocol mappers for both types of clients 
-              (openid-connect and saml) within Keycloak.
         elements: dict
         suboptions:
-            config:
-                description: 
-                    - A map with key / value pairs for configuring the protocol mapper. 
-                    - The supported keys depends on the protocol mapper.
-                type: dict 
             protocol:
                 description:
-                    - The type of client (either openid-connect or saml). 
-                    - The type must match the type of the client.
+                    - This is either C(openid-connect), C(saml) or C(wsfed), this specifies for which protocol this protocol mapper
+                      is active.
+                choices: ['openid-connect', 'saml', 'wsfed']
                 type: str
-            protocolMapper: 
+
+            protocolMapper:
                 description:
-                    - The name of the protocol mapper.
-                    - The protocol mapper must be compatible with the specified client.
+                    - The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is
+                      impossible to provide since this may be extended through SPIs by the user of Keycloak,
+                      by default Keycloak as of 3.4 ships with at least
+                    - C(docker-v2-allow-all-mapper)
+                    - C(oidc-address-mapper)
+                    - C(oidc-full-name-mapper)
+                    - C(oidc-group-membership-mapper)
+                    - C(oidc-hardcoded-claim-mapper)
+                    - C(oidc-hardcoded-role-mapper)
+                    - C(oidc-role-name-mapper)
+                    - C(oidc-script-based-protocol-mapper)
+                    - C(oidc-sha256-pairwise-sub-mapper)
+                    - C(oidc-usermodel-attribute-mapper)
+                    - C(oidc-usermodel-client-role-mapper)
+                    - C(oidc-usermodel-property-mapper)
+                    - C(oidc-usermodel-realm-role-mapper)
+                    - C(oidc-usersessionmodel-note-mapper)
+                    - C(saml-group-membership-mapper)
+                    - C(saml-hardcode-attribute-mapper)
+                    - C(saml-hardcode-role-mapper)
+                    - C(saml-role-list-mapper)
+                    - C(saml-role-name-mapper)
+                    - C(saml-user-attribute-mapper)
+                    - C(saml-user-property-mapper)
+                    - C(saml-user-session-note-mapper)
+                    - An exhaustive list of available mappers on your installation can be obtained on
+                      the admin console by going to Server Info -> Providers and looking under
+                      'protocol-mapper'.
                 type: str
+
             name:
                 description:
-                    - The display name of this protocol mapper in the GUI.
+                    - The name of this protocol mapper.
                 type: str
-            id: 
-                description: 
-                    - Id of the protocol mapper.
+
+            id:
+                description:
+                    - Usually a UUID specifying the internal ID of this protocol mapper instance.
                 type: str
+
+            config:
+                description:
+                    - Dict specifying the configuration options for the protocol mapper; the
+                      contents differ depending on the value of I(protocolMapper) and are not documented
+                      other than by the source of the mappers and its parent class(es). An example is given
+                      below. It is easiest to obtain valid config values by dumping an already-existing
+                      protocol mapper configuration through check-mode in the I(existing) field.
+                type: dict
 
     attributes:
         type: dict
@@ -186,10 +222,24 @@ EXAMPLES = '''
     name: my-new_clientscope
     description: description-of-clientscope
     protocol: openid-connect
-    protocolMappers:
-        - protocol: openid-connect
-          name: my-new_clientscope
-          protocolMapper: oidc-group-membership-mapper
+    protocol_mappers:
+      - config:
+          access.token.claim: True
+          claim.name: "family_name"
+          id.token.claim: True
+          jsonType.label: String
+          user.attribute: lastName
+          userinfo.token.claim: True
+        name: family name
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-property-mapper
+      - config:
+          attribute.name: Role
+          attribute.nameformat: Basic
+          single: false
+        name: role list
+        protocol: saml
+        protocolMapper: saml-role-list-mapper
     attributes:
         attrib1: value1
         attrib2: value2
@@ -239,7 +289,7 @@ end_state:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError
+    keycloak_argument_spec, get_token, KeycloakError, is_struct_included
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -250,15 +300,24 @@ def main():
     :return:
     """
     argument_spec = keycloak_argument_spec()
+
+    protmapper_spec = dict(
+        id=dict(type='str'),
+        name=dict(type='str'),
+        protocol=dict(type='str', choices=['openid-connect', 'saml', 'wsfed']),
+        protocolMapper=dict(type='str'),
+        config=dict(type='dict'),
+    )
+
     meta_args = dict(
         state=dict(default='present', choices=['present', 'absent']),
         realm=dict(default='master'),
         id=dict(type='str'),
         name=dict(type='str'),
         description=dict(type='str'),
-        protocol=dict(type='str'),
+        protocol=dict(type='str', choices=['openid-connect', 'saml', 'wsfed']),
         attributes=dict(type='dict'),
-        protocolMappers=dict(type='list'),
+        protocol_mappers=dict(type='list', elements='dict', options=protmapper_spec, aliases=['protocolMappers']),
     )
 
     argument_spec.update(meta_args)
@@ -281,18 +340,17 @@ def main():
 
     realm = module.params.get('realm')
     state = module.params.get('state')
-    gid = module.params.get('id')
+    cid = module.params.get('id')
     name = module.params.get('name')
-    attributes = module.params.get('attributes')
-    protocol_mappers = module.params.get('protocolMappers')
+    protocol_mappers = module.params.get('protocol_mappers')
 
     before_clientscope = None         # current state of the group, for merging.
 
     # does the group already exist?
-    if gid is None:
+    if cid is None:
         before_clientscope = kc.get_clientscope_by_name(name, realm=realm)
     else:
-        before_clientscope = kc.get_clientscope_by_clientscopeid(gid, realm=realm)
+        before_clientscope = kc.get_clientscope_by_clientscopeid(cid, realm=realm)
 
     before_clientscope = {} if before_clientscope is None else before_clientscope
 
@@ -300,13 +358,24 @@ def main():
                           if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
                           module.params.get(x) is not None]
 
-    # build a changeset
-    changeset = {}
-    for param in clientscope_params:
-        new_param_value = module.params.get(param)
-        old_value = before_clientscope[param] if param in before_clientscope else None
-        if new_param_value != old_value:
-            changeset[camel(param)] = new_param_value
+    # Build a proposed changeset from parameters given to this module
+    changeset = dict()
+
+    for clientscope_param in clientscope_params:
+        new_param_value = module.params.get(clientscope_param)
+
+        # some lists in the Keycloak API are sorted, some are not.
+        if isinstance(new_param_value, list):
+            if clientscope_param in ['attributes']:
+                try:
+                    new_param_value = sorted(new_param_value)
+                except TypeError:
+                    pass
+        # Unfortunately, the ansible argument spec checker introduces variables with null values when
+        # they are not specified
+        if clientscope_param == 'protocol_mappers':
+            new_param_value = [dict((k, v) for k, v in x.items() if x[k] is not None) for x in new_param_value]
+        changeset[camel(clientscope_param)] = new_param_value
 
     # prepare the new group
     updated_clientscope = before_clientscope.copy()
@@ -359,8 +428,20 @@ def main():
             if module.check_mode:
                 module.exit_json(**result)
 
-            # do the update
+            # do the clientscope update
             kc.update_clientscope(updated_clientscope, realm=realm)
+
+            # do the protocolmappers update
+            if protocol_mappers is not None:
+                for protocol_mapper in protocol_mappers:
+                    # update if protocolmapper exist
+                    current_protocolmapper = kc.get_clientscope_protocolmapper_by_name(updated_clientscope['id'], protocol_mapper['name'], realm=realm)
+                    if current_protocolmapper is not None:
+                        protocol_mapper['id'] = current_protocolmapper['id']
+                        kc.update_clientscope_protocolmappers(updated_clientscope['id'], protocol_mapper, realm=realm)
+                    # create otherwise
+                    else:
+                        kc.create_clientscope_protocolmapper(updated_clientscope['id'], protocol_mapper, realm=realm)
 
             after_clientscope = kc.get_clientscope_by_clientscopeid(updated_clientscope['id'], realm=realm)
 

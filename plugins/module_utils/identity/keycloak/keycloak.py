@@ -53,6 +53,8 @@ URL_GROUP = "{url}/admin/realms/{realm}/groups/{groupid}"
 
 URL_CLIENTSCOPES = "{url}/admin/realms/{realm}/client-scopes"
 URL_CLIENTSCOPE = "{url}/admin/realms/{realm}/client-scopes/{id}"
+URL_CLIENTSCOPE_PROTOCOLMAPPERS = "{url}/admin/realms/{realm}/client-scopes/{id}/protocol-mappers/models"
+URL_CLIENTSCOPE_PROTOCOLMAPPER = "{url}/admin/realms/{realm}/client-scopes/{id}/protocol-mappers/models/{mapper_id}"
 
 URL_AUTHENTICATION_FLOWS = "{url}/admin/realms/{realm}/authentication/flows"
 URL_AUTHENTICATION_FLOW = "{url}/admin/realms/{realm}/authentication/flows/{id}"
@@ -515,6 +517,7 @@ class KeycloakAPI(object):
         get_clientscope_by_clientscopeid, passing in the ID of the group you wish to return.
 
         :param realm: Realm in which the clientscope resides; default 'master'.
+        :return The clientscopes of this realm (default "master")
         """
         clientscopes_url = URL_CLIENTSCOPES.format(url=self.baseurl, realm=realm)
         try:
@@ -638,6 +641,107 @@ class KeycloakAPI(object):
 
         except Exception as e:
             self.module.fail_json(msg="Unable to delete clientscope %s: %s" % (cid, str(e)))
+
+    def get_clientscope_protocolmappers(self, cid, realm="master"):
+        """ Fetch the name and ID of all clientscopes on the Keycloak server.
+
+        To fetch the full data of the group, make a subsequent call to
+        get_clientscope_by_clientscopeid, passing in the ID of the group you wish to return.
+
+        :param cid: id of clientscope (not name).
+        :param realm: Realm in which the clientscope resides; default 'master'.
+        :return The protocolmappers of this realm (default "master")
+        """
+        protocolmappers_url = URL_CLIENTSCOPE_PROTOCOLMAPPERS.format(id=cid, url=self.baseurl, realm=realm)
+        try:
+            return json.loads(to_native(open_url(protocolmappers_url, method="GET", headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.module.fail_json(msg="Could not fetch list of protocolmappers in realm %s: %s"
+                                      % (realm, str(e)))
+
+    def get_clientscope_protocolmapper_by_protocolmapperid(self, pid, cid, realm="master"):
+        """ Fetch a keycloak clientscope from the provided realm using the clientscope's unique ID.
+
+        If the clientscope does not exist, None is returned.
+
+        gid is a UUID provided by the Keycloak API
+
+        :param cid: UUID of the protocolmapper to be returned
+        :param cid: UUID of the clientscope to be returned
+        :param realm: Realm in which the clientscope resides; default 'master'.
+        """
+        protocolmapper_url = URL_CLIENTSCOPE_PROTOCOLMAPPER.format(url=self.baseurl, realm=realm, id=cid, mapper_id=pid)
+        try:
+            return json.loads(to_native(open_url(protocolmapper_url, method="GET", headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+
+        except HTTPError as e:
+            if e.code == 404:
+                return None
+            else:
+                self.module.fail_json(msg="Could not fetch protocolmapper %s in realm %s: %s"
+                                          % (pid, realm, str(e)))
+        except Exception as e:
+            self.module.fail_json(msg="Could not fetch protocolmapper %s in realm %s: %s"
+                                      % (cid, realm, str(e)))
+
+    def get_clientscope_protocolmapper_by_name(self, cid, name, realm="master"):
+        """ Fetch a keycloak clientscope within a realm based on its name.
+
+        The Keycloak API does not allow filtering of the clientscopes resource by name.
+        As a result, this method first retrieves the entire list of clientscopes - name and ID -
+        then performs a second query to fetch the group.
+
+        If the clientscope does not exist, None is returned.
+        :param cid: Id of the clientscope (not name).
+        :param name: Name of the protocolmapper to fetch.
+        :param realm: Realm in which the clientscope resides; default 'master'
+        """
+        try:
+            all_protocolmappers = self.get_clientscope_protocolmappers(cid, realm=realm)
+
+            for protocolmapper in all_protocolmappers:
+                if protocolmapper['name'] == name:
+                    return self.get_clientscope_protocolmapper_by_protocolmapperid(protocolmapper['id'], cid, realm=realm)
+
+            return None
+
+        except Exception as e:
+            self.module.fail_json(msg="Could not fetch protocolmapper %s in realm %s: %s"
+                                      % (name, realm, str(e)))
+
+    def create_clientscope_protocolmapper(self, cid, mapper_rep, realm="master"):
+        """ Create a Keycloak clientscope protocolmapper.
+
+        :param cid: Id of the clientscope.
+        :param mapper_rep: a ProtocolMapperRepresentation of the protocolmapper to be created. Must contain at minimum the field name.
+        :return: HTTPResponse object on success
+        """
+        protocolmappers_url = URL_CLIENTSCOPE_PROTOCOLMAPPERS.format(url=self.baseurl, id=cid, realm=realm)
+        try:
+            return open_url(protocolmappers_url, method='POST', headers=self.restheaders,
+                            data=json.dumps(mapper_rep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg="Could not create protocolmapper %s in realm %s: %s"
+                                      % (mapper_rep['name'], realm, str(e)))
+
+    def update_clientscope_protocolmappers(self, cid, mapper_rep, realm="master"):
+        """ Update an existing clientscope.
+
+        :param cid: Id of the clientscope.
+        :param mapper_rep: A ProtocolMapperRepresentation of the updated protocolmapper.
+        :return HTTPResponse object on success
+        """
+        protocolmapper_url = URL_CLIENTSCOPE_PROTOCOLMAPPER.format(url=self.baseurl, realm=realm, id=cid, mapper_id=mapper_rep['id'])
+
+        try:
+            return open_url(protocolmapper_url, method='PUT', headers=self.restheaders,
+                            data=json.dumps(mapper_rep), validate_certs=self.validate_certs)
+
+        except Exception as e:
+            self.module.fail_json(msg='Could not update protocolmappers for clientscope %s in realm %s: %s'
+                                      % (mapper_rep, realm, str(e)))
 
     def get_groups(self, realm="master"):
         """ Fetch the name and ID of all groups on the Keycloak server.
