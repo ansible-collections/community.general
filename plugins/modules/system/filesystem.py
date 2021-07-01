@@ -36,7 +36,7 @@ options:
     description:
       - Filesystem type to be created. This option is required with
         C(state=present) (or if I(state) is omitted).
-      - ufs support has been added in 3.3.0 of community.general.
+      - ufs support has been added in 3.4.0 of community.general.
     type: str
     aliases: [type]
   dev:
@@ -47,7 +47,7 @@ options:
         only works when applying to regular files, aka disk images.
       - Currently C(lvm) (Linux-only) and C(ufs) (FreeBSD-only) don't support
         a regular file as their target I(dev).
-      - Support for character devices on FreeBSD has been added in 3.3.0 of
+      - Support for character devices on FreeBSD has been added in 3.4.0 of
         comunity.general.
     type: path
     required: yes
