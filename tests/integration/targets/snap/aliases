@@ -3,4 +3,4 @@ skip/aix
 skip/freebsd
 skip/osx
 skip/macos
-disabled #FIXME 2609
+skip/docker

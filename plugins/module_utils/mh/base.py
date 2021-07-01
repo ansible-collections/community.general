@@ -59,4 +59,7 @@ class ModuleHelperBase(object):
         self.__init_module__()
         self.__run__()
         self.__quit_module__()
-        self.module.exit_json(changed=self.has_changed(), **self.output)
+        output = self.output
+        if 'failed' not in output:
+            output['failed'] = False
+        self.module.exit_json(changed=self.has_changed(), **output)

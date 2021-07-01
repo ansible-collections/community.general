@@ -1,0 +1,4 @@
+has_snap: false
+
+snap_packages:
+  - snapd
