@@ -148,7 +148,39 @@
 - name: verify that excluded sub file is still present
   file: path={{ output_dir }}/tmpdir/sub/subfile.txt state=file
 
-- name: remove temporary directory
+- name: prep our files in tmpdir again
+  copy: src={{ item }} dest={{ output_dir }}/tmpdir/{{ item }}
+  with_items:
+    - foo.txt
+    - bar.txt
+    - empty.txt
+    - sub
+    - sub/subfile.txt
+
+- name: archive using gz and remove src directory
+  archive:
+    path:
+      - "{{ output_dir }}/tmpdir/"
+    dest: "{{ output_dir }}/archive_remove_05.gz"
+    format: gz
+    remove: yes
+    exclude_path: "{{ output_dir }}/tmpdir/sub/subfile.txt"
+  register: archive_remove_result_05
+
+- name: verify that the files archived
+  file: path={{ output_dir }}/archive_remove_05.gz state=file
+
+- name: Verify source files were removed
   file:
     path: "{{ output_dir }}/tmpdir"
     state: absent
+  register: archive_source_file_removal_05
+
+- name: Verify that task status is success
+  assert:
+    that:
+      - archive_remove_result_05 is success
+      - archive_source_file_removal_05 is not changed
+
+- name: remove our gz
+  file: path="{{ output_dir }}/archive_remove_05.gz" state=absent
