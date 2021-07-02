@@ -216,7 +216,6 @@ class Npm(object):
             self.module.fail_json(msg="Failed to parse NPM output with error %s" % to_native(e))
         if 'dependencies' in data:
             for dep, props in data['dependencies'].items():
-                dep_version = dep + '@' + str(props['version'])
 
                 if 'missing' in props and props['missing']:
                     missing.append(dep)
@@ -224,7 +223,9 @@ class Npm(object):
                     missing.append(dep)
                 else:
                     installed.append(dep)
-                    installed.append(dep_version)
+                    if 'version' in props and props['version']:
+                        dep_version = dep + '@' + str(props['version'])
+                        installed.append(dep_version)
             if self.name_version and self.name_version not in installed:
                 missing.append(self.name)
         # Named dependency not installed
