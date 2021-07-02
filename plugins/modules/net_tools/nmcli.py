@@ -278,7 +278,7 @@ options:
               should be set during the team lifetime.
         type: str
         choices: [ same_all, by_active, only_active ]
-        version_added: 3.3.0
+        version_added: 3.4.0
     vlanid:
         description:
             - This is only used with VLAN - VLAN ID in range <0-4095>.
