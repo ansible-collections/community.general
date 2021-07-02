@@ -1,0 +1,3 @@
+bugfixes:
+  - npm - correctly handle cases where a dependency does not have a ``version`` property because it is either missing or invalid
+    (https://github.com/ansible-collections/community.general/issues/2917).
