@@ -212,7 +212,7 @@ def main():
                                              ['token', 'auth_realm', 'auth_username', 'auth_password']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
-    result = dict(changed=False, msg='', diff={}, role='')
+    result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
 
     # Obtain access token, initialize API
     try:
@@ -241,6 +241,7 @@ def main():
         for key, val in module.params['attributes'].items():
             module.params['attributes'][key] = [val] if not isinstance(val, list) else val
 
+    # convert module parameters to client representation parameters (if they belong in there)
     role_params = [x for x in module.params
                     if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'client_id'] and
                     module.params.get(x) is not None]
@@ -257,6 +258,9 @@ def main():
     updated_role = before_role.copy()
     updated_role.update(changeset)
 
+    result['proposed'] = changeset
+    result['existing'] = before_role
+
     # if before_role is none, the role doesn't exist.
     if before_role == {}:
         if state == 'absent':
@@ -264,7 +268,7 @@ def main():
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['msg'] = 'Role does not exist; doing nothing.'
-            result['role'] = dict()
+            result['end_state'] = dict()
             module.exit_json(**result)
 
         # for 'present', create a new role.
@@ -282,16 +286,18 @@ def main():
         kc.create_role(updated_role, clientid=clientid, realm=realm)
         after_role = kc.get_role_by_name(name, clientid=clientid, realm=realm)
 
-        result['role'] = after_role
-        result['msg'] = 'Role {name} has been created'.format(name=after_role['name'])
+        result['end_state'] = after_role
+
+        result['msg'] = 'Role {name} has been created'.format(name=name)
+        module.exit_json(**result)
 
     else:
         if state == 'present':
             # no changes
             if updated_role == before_role:
                 result['changed'] = False
-                result['role'] = updated_role
-                result['msg'] = "No changes required to role {name}.".format(name=before_role['name'])
+                result['end_state'] = updated_role
+                result['msg'] = "No changes required to role {name}.".format(name=name)
                 module.exit_json(**result)
 
             # update the existing role
@@ -306,15 +312,15 @@ def main():
             # do the update
             kc.update_role(updated_role, clientid=clientid, realm=realm)
 
-            after_role = kc.get_role_by_name(updated_role['name'], realm=realm)
+            after_role = kc.get_role_by_name(name, clientid=clientid, realm=realm)
 
-            result['role'] = after_role
-            result['msg'] = "Role {name} has been updated".format(name=after_role['name'])
+            result['end_state'] = after_role
 
+            result['msg'] = "Role {name} has been updated".format(name=name)
             module.exit_json(**result)
 
         elif state == 'absent':
-            result['role'] = dict()
+            result['end_state'] = dict()
 
             if module._diff:
                 result['diff'] = dict(before=before_role, after='')
@@ -326,7 +332,7 @@ def main():
             kc.delete_role(name, clientid=clientid, realm=realm)
 
             result['changed'] = True
-            result['msg'] = "Role {name} has been deleted".format(name=before_role['name'])
+            result['msg'] = "Role {name} has been deleted".format(name=name)
 
             module.exit_json(**result)
 
