@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - archive - fixed task failure when using the ``remove`` option with a ``path`` containing nested files for
+    ``format``s other than ``zip`` (https://github.com/ansible-collections/community.general/issues/2919).
