@@ -140,6 +140,6 @@
     - name: Assert package has been removed without setting classic to true
       assert:
         that:
-          - classic_remove_without_ture_classic is changed
-          - classic_remove_with_ture_classic is not changed
+          - classic_remove_without_true_classic is changed
+          - classic_remove_with_true_classic is not changed
   when: has_snap
