@@ -95,4 +95,51 @@
           - remove_check is changed
           - remove_again is not changed
           - remove_again_check is not changed
+
+#    - name: Make sure package from classic snap is not installed
+#      community.general.snap:
+#        name: nvim
+#        state: absent
+#
+#    - name: Install package from classic snap
+#      community.general.snap:
+#        name: nvim
+#        state: present
+#        classic: true
+#      register: classic_install
+#
+#    # testing classic idempotency
+#    - name: Install package from classic snap again
+#      community.general.snap:
+#        name: nvim
+#        state: present
+#        classic: true
+#      register: classic_install_again
+#
+#    - name: Assert package has been installed just once
+#      assert:
+#        that:
+#          - classic_install is changed
+#          - classic_install_again is not changed
+#
+#    # this is just testing if a package which has been installed
+#    # with true classic can be removed without setting classic to true
+#    - name: Remove package from classic snap without setting classic to true
+#      community.general.snap:
+#        name: nvim
+#        state: absent
+#      register: classic_remove_without_true_classic
+#
+#    - name: Remove package from classic snap with setting classic to true
+#      community.general.snap:
+#        name: nvim
+#        state: absent
+#        classic: true
+#      register: classic_remove_with_true_classic
+#
+#    - name: Assert package has been removed without setting classic to true
+#      assert:
+#        that:
+#          - classic_remove_without_ture_classic is changed
+#          - classic_remove_with_ture_classic is not changed
   when: has_snap
