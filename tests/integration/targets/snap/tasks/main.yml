@@ -95,4 +95,49 @@
           - remove_check is changed
           - remove_again is not changed
           - remove_again_check is not changed
+
+    - name: Make sure package from classic snap is not installed
+      community.general.snap:
+        name: nvim
+        state: absent
+
+    - name: Install package from classic snap
+      community.general.snap:
+        name: nvim
+        state: present
+        classic: true
+      register: classic_install
+
+    - name: Install package from classic snap again
+      community.general.snap:
+        name: nvim
+        state: present
+        classic: true
+      register: classic_install_again
+
+    - name: Assert package has been installed just once
+      assert:
+        that:
+          - classic_install is changed
+          - classic_install_again is not changed
+
+    - name: Remove package from classic snap
+      community.general.snap:
+        name: nvim
+        state: absent
+        classic: true
+      register: classic_remove
+
+    - name: Remove package from classic snap again
+      community.general.snap:
+        name: nvim
+        state: absent
+        classic: true
+      register: classic_remove_again
+
+    - name: Assert package has been removed just once
+      assert:
+        that:
+          - classic_remove is changed
+          - classic_remove_again is not changed
   when: has_snap
