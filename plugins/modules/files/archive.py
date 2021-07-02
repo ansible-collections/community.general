@@ -399,13 +399,14 @@ class Archive(object):
 
     def remove_targets(self):
         for path in self.successes:
-            try:
-                if os.path.isdir(path):
-                    shutil.rmtree(path)
-                else:
-                    os.remove(path)
-            except OSError:
-                self.errors.append(_to_native(path))
+            if os.path.exists(path):
+                try:
+                    if os.path.isdir(path):
+                        shutil.rmtree(path)
+                    else:
+                        os.remove(path)
+                except OSError:
+                    self.errors.append(_to_native(path))
         for path in self.paths:
             try:
                 if os.path.isdir(path):
