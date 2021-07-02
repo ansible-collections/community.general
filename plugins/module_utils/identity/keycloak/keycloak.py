@@ -638,7 +638,6 @@ class KeycloakAPI(object):
         try:
             return open_url(group_url, method='DELETE', headers=self.restheaders,
                             validate_certs=self.validate_certs)
-
         except Exception as e:
             self.module.fail_json(msg="Unable to delete group %s: %s" % (groupid, str(e)))
 
@@ -652,7 +651,6 @@ class KeycloakAPI(object):
         try:
             return json.loads(to_native(open_url(rolelist_url, method='GET', headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
-
         except ValueError as e:
             self.module.fail_json(msg='API returned incorrect JSON when trying to obtain list of roles for realm %s: %s'
                                       % (realm, str(e)))
@@ -671,7 +669,6 @@ class KeycloakAPI(object):
         try:
             return json.loads(to_native(open_url(role_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
-
         except HTTPError as e:
             if e.code == 404:
                 return None
@@ -692,7 +689,6 @@ class KeycloakAPI(object):
         try:
             return open_url(roles_url, method='POST', headers=self.restheaders,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
-
         except Exception as e:
             self.module.fail_json(msg='Could not create role %s in realm %s: %s'
                                       % (rolerep['name'], realm, str(e)))
@@ -707,7 +703,6 @@ class KeycloakAPI(object):
         try:
             return open_url(role_url, method='PUT', headers=self.restheaders,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
-
         except Exception as e:
             self.module.fail_json(msg='Could not update role %s in realm %s: %s'
                                       % (rolerep['name'], realm, str(e)))
@@ -722,30 +717,9 @@ class KeycloakAPI(object):
         try:
             return open_url(role_url, method='DELETE', headers=self.restheaders,
                             validate_certs=self.validate_certs)
-
         except Exception as e:
             self.module.fail_json(msg='Unable to delete role %s in realm %s: %s'
                                       % (name, clientid, realm, str(e)))
-
-    def get_realm_role_composites(self, name, realm='master'):
-        """ Obtains role representations for roles in a realm
-
-        :param name: The name of the role
-        :param realm: The realm in which this role resides, default "master".
-        :return: list of dicts of role representations
-        """
-        rolelist_url = URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=name)
-        try:
-            return json.loads(to_native(open_url(rolelist_url, method='GET', headers=self.restheaders,
-                                                 validate_certs=self.validate_certs).read()))
-
-        except ValueError as e:
-            self.module.fail_json(msg='API returned incorrect JSON when trying to obtain composites of role %s in realm %s: %s'
-                                      % (name, realm, str(e)))
-
-        except Exception as e:
-            self.module.fail_json(msg='Could not obtain composites of role %s in realm %s: %s'
-                                      % (name, realm, str(e)))
 
     def get_client_roles(self, clientid, realm='master'):
         """ Obtains role representations for client roles in a specific client
@@ -762,11 +736,9 @@ class KeycloakAPI(object):
         try:
             return json.loads(to_native(open_url(rolelist_url, method='GET', headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
-
         except ValueError as e:
             self.module.fail_json(msg='API returned incorrect JSON when trying to obtain list of roles for client %s in realm %s: %s'
                                       % (clientid, realm, str(e)))
-
         except Exception as e:
             self.module.fail_json(msg='Could not obtain list of roles for client %s in realm %s: %s'
                                       % (clientid, realm, str(e)))
@@ -788,14 +760,12 @@ class KeycloakAPI(object):
         try:
             return json.loads(to_native(open_url(role_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
-
         except HTTPError as e:
             if e.code == 404:
                 return None
             else:
                 self.module.fail_json(msg='Could not fetch role %s in client %s of realm %s: %s'
                                           % (name, clientid, realm, str(e)))
-
         except Exception as e:
             self.module.fail_json(msg='Could not fetch role %s for client %s in realm %s: %s'
                                       % (name, clientid, realm, str(e)))
@@ -816,7 +786,6 @@ class KeycloakAPI(object):
         try:
             return open_url(roles_url, method='POST', headers=self.restheaders,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
-
         except Exception as e:
             self.module.fail_json(msg='Could not create role %s for client %s in realm %s: %s'
                                       % (rolerep['name'], clientid, realm, str(e)))
@@ -837,7 +806,6 @@ class KeycloakAPI(object):
         try:
             return open_url(role_url, method='PUT', headers=self.restheaders,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
-
         except Exception as e:
             self.module.fail_json(msg='Could not update role %s for client %s in realm %s: %s'
                                       % (rolerep['name'], clientid, realm, str(e)))
@@ -857,7 +825,6 @@ class KeycloakAPI(object):
         try:
             return open_url(role_url, method='DELETE', headers=self.restheaders,
                             validate_certs=self.validate_certs)
-
         except Exception as e:
             self.module.fail_json(msg='Unable to delete role %s for client %s in realm %s: %s'
                                       % (name, clientid, realm, str(e)))
