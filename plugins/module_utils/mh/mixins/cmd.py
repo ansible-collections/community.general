@@ -174,11 +174,11 @@ class CmdMixin(object):
             options['environ_update'] = env_update
         rc, out, err = self.module.run_command(self.vars.cmd_args, *args, **options)
         if publish_rc:
-            self.update_output(rc=rc, stdout=out, stderr=err)
+            self.update_output(rc=rc)
         if publish_out:
-            self.update_output(rc=rc, stdout=out, stderr=err)
+            self.update_output(stdout=out)
         if publish_err:
-            self.update_output(rc=rc, stdout=out, stderr=err)
+            self.update_output(stderr=err)
         if process_output is None:
             _process = self.process_command_output
         else:
