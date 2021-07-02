@@ -88,6 +88,7 @@ class CmdMixin(object):
     """
     command = None
     command_args_formats = {}
+    command_output_as_result = True
     run_command_fixed_options = {}
     check_rc = False
     force_lang = "C"
@@ -166,7 +167,8 @@ class CmdMixin(object):
             self.update_output(force_lang=self.force_lang)
             options['environ_update'] = env_update
         rc, out, err = self.module.run_command(self.vars.cmd_args, *args, **options)
-        self.update_output(rc=rc, stdout=out, stderr=err)
+        if self.command_output_as_result:
+            self.update_output(rc=rc, stdout=out, stderr=err)
         if process_output is None:
             _process = self.process_command_output
         else:
