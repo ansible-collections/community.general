@@ -271,7 +271,7 @@ options:
         type: str
         choices: [ broadcast, roundrobin, activebackup, loadbalance, lacp ]
         default: roundrobin
-        version_added: 3.3.0
+        version_added: 3.4.0
     runner_hwaddr_policy:
         description:
             - This  defines  the policy of how hardware addresses of team device and port devices
