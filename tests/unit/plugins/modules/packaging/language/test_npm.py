@@ -52,6 +52,25 @@ class NPMModuleTestCase(ModuleTestCase):
             call(['/testbin/npm', 'install', '--global', 'coffee-script'], check_rc=True, cwd=None),
         ])
 
+    def test_present_missing(self):
+        set_module_args({
+            'name': 'coffee-script',
+            'global': 'true',
+            'state': 'present',
+        })
+        self.module_main_command.side_effect = [
+            (0, '{"dependencies": {"coffee-script": {"missing" : true}}}', ''),
+            (0, '{}', ''),
+        ]
+
+        result = self.module_main(AnsibleExitJson)
+
+        self.assertTrue(result['changed'])
+        self.module_main_command.assert_has_calls([
+            call(['/testbin/npm', 'list', '--json', '--long', '--global'], check_rc=False, cwd=None),
+            call(['/testbin/npm', 'install', '--global', 'coffee-script'], check_rc=True, cwd=None),
+        ])
+
     def test_present_version(self):
         set_module_args({
             'name': 'coffee-script',
