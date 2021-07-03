@@ -10,7 +10,7 @@
     name: snapd
     state: started
 
-- name: Create link /snap (RedHat-only)
+- name: Create link /snap
   file:
     src: /var/lib/snapd/snap
     dest: /snap
