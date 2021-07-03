@@ -42,6 +42,7 @@ options:
 
     name:
         type: str
+        required: true
         description:
             - Name of the role.
             - This parameter is required.
