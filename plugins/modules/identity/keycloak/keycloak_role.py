@@ -46,6 +46,11 @@ options:
             - Name of the role.
             - This parameter is required.
 
+    description:
+        type: str
+        description:
+            - The role description.
+
     realm:
         type: str
         description:
@@ -140,47 +145,45 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-role:
-  description: Role representation of the role after module execution (sample is truncated).
+msg:
+  description: Message as to what action was taken
   returned: always
-  type: complex
-  contains:
-    id:
-      description: GUID that identifies the role
-      type: str
-      returned: always
-      sample: aa3cb8d4-833c-41d7-a668-08fbfe317b5d
-    name:
-      description: Name of the role
-      type: str
-      returned: always
-      sample: role-test-123
-    description:
-      description: Description of the role
-      type: str
-      returned: always
-      sample: test role 123
-    clientRole:
-      description: Role is a client role
-      type: boolean
-      returned: always
-      sample: true
-    composite:
-      description: Role is composite
-      type: boolean
-      returned: always
-      sample: false
-    containerId:
-      description: Realm name or client UUID
-      type: str
-      returned: always
-      sample: b90ba0f6-e64d-4340-848d-b53ae0a47f2b
-    attributes:
-      description: Attributes applied to this group
-      type: dict
-      returned: always
-      sample:
-        attr1: ["val1", "val2", "val3"]
+  type: str
+  sample: "Role myrole has been updated"
+
+proposed:
+    description: Role representation of proposed changes to role
+    returned: always
+    type: dict
+    sample: {
+        "description": "My updated test description"
+    }
+existing:
+    description: Role representation of existing role
+    returned: always
+    type: dict
+    sample: {
+        "attributes": {},
+        "clientRole": true,
+        "composite": false,
+        "containerId": "9f03eb61-a826-4771-a9fd-930e06d2d36a",
+        "description": "My client test role",
+        "id": "561703dd-0f38-45ff-9a5a-0c978f794547",
+        "name": "myrole"
+    }
+end_state:
+    description: Role representation of role after module execution (sample is truncated)
+    returned: always
+    type: dict
+    sample: {
+        "attributes": {},
+        "clientRole": true,
+        "composite": false,
+        "containerId": "9f03eb61-a826-4771-a9fd-930e06d2d36a",
+        "description": "My updated client test role",
+        "id": "561703dd-0f38-45ff-9a5a-0c978f794547",
+        "name": "myrole"
+    }
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
@@ -196,21 +199,19 @@ def main():
     """
     argument_spec = keycloak_argument_spec()
     meta_args = dict(
-        state=dict(default='present', choices=['present', 'absent']),
-        realm=dict(default='master'),
-        client_id=dict(type='str'),
-        name=dict(type='str'),
+        state=dict(type='str', default='present', choices=['present', 'absent']),
+        name=dict(type='str', required=True),
         description=dict(type='str'),
+        realm=dict(type='str', default='master'),
+        client_id=dict(type='str'),
         attributes=dict(type='dict'),
-        composites=dict(type='dict'),
     )
 
     argument_spec.update(meta_args)
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
-                           required_one_of=([['id', 'name'],
-                                             ['token', 'auth_realm', 'auth_username', 'auth_password']]),
+                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
     result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
