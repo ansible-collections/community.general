@@ -731,7 +731,7 @@ class KeycloakAPI(object):
         cid = self.get_client_id(clientid, realm=realm)
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
-                                        % (clientid, realm))
+                                      % (clientid, realm))
         rolelist_url = URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid)
         try:
             return json.loads(to_native(open_url(rolelist_url, method='GET', headers=self.restheaders,
@@ -755,7 +755,7 @@ class KeycloakAPI(object):
         cid = self.get_client_id(clientid, realm=realm)
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
-                                        % (clientid, realm))
+                                      % (clientid, realm))
         role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=name)
         try:
             return json.loads(to_native(open_url(role_url, method="GET", headers=self.restheaders,
@@ -781,7 +781,7 @@ class KeycloakAPI(object):
         cid = self.get_client_id(clientid, realm=realm)
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
-                                        % (clientid, realm))
+                                      % (clientid, realm))
         roles_url = URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid)
         try:
             return open_url(roles_url, method='POST', headers=self.restheaders,
@@ -801,7 +801,7 @@ class KeycloakAPI(object):
         cid = self.get_client_id(clientid, realm=realm)
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
-                                        % (clientid, realm))
+                                      % (clientid, realm))
         role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=rolerep['name'])
         try:
             return open_url(role_url, method='PUT', headers=self.restheaders,
@@ -820,7 +820,7 @@ class KeycloakAPI(object):
         cid = self.get_client_id(clientid, realm=realm)
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
-                                        % (clientid, realm))
+                                      % (clientid, realm))
         role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=name)
         try:
             return open_url(role_url, method='DELETE', headers=self.restheaders,

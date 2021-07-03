@@ -237,8 +237,8 @@ def main():
 
     # convert module parameters to client representation parameters (if they belong in there)
     role_params = [x for x in module.params
-                    if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'client_id', 'composites'] and
-                    module.params.get(x) is not None]
+                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'client_id', 'composites'] and
+                   module.params.get(x) is not None]
 
     # does the role already exist?
     if clientid is None:
