@@ -719,7 +719,7 @@ class KeycloakAPI(object):
                             validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg='Unable to delete role %s in realm %s: %s'
-                                      % (name, clientid, realm, str(e)))
+                                      % (name, realm, str(e)))
 
     def get_client_roles(self, clientid, realm='master'):
         """ Obtains role representations for client roles in a specific client
