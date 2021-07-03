@@ -10,6 +10,12 @@
     name: snapd
     state: started
 
+- name: Create link /snap
+  file:
+    src: /var/lib/snapd/snap
+    dest: /snap
+    state: link
+
 - name: Inform that snap is installed
   set_fact:
     has_snap: true

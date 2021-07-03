@@ -1,0 +1,2 @@
+bugfixes:
+  - snap - fixed the order of the ``--classic`` parameter in the command line invocation (https://github.com/ansible-collections/community.general/issues/2916).
