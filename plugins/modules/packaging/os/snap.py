@@ -133,10 +133,10 @@ class Snap(CmdStateModuleHelper):
     module = dict(
         argument_spec={
             'name': dict(type='list', elements='str', required=True),
-            'state': dict(type='str', required=False, default='present',
+            'state': dict(type='str', default='present',
                           choices=['absent', 'present', 'enabled', 'disabled']),
-            'classic': dict(type='bool', required=False, default=False),
-            'channel': dict(type='str', required=False, default='stable'),
+            'classic': dict(type='bool', default=False),
+            'channel': dict(type='str', default='stable'),
         },
         supports_check_mode=True,
     )
@@ -205,7 +205,7 @@ class Snap(CmdStateModuleHelper):
         self.vars.snaps_installed = actionable_snaps
         if self.module.check_mode:
             return
-        params = ['classic', 'channel', 'state']  # get base cmd parts
+        params = ['state', 'classic', 'channel']  # get base cmd parts
         has_one_pkg_params = bool(self.vars.classic) or self.vars.channel != 'stable'
         has_multiple_snaps = len(actionable_snaps) > 1
         if has_one_pkg_params and has_multiple_snaps:
