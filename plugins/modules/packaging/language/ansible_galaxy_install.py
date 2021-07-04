@@ -97,24 +97,30 @@ RETURN = """
         baztian.xfce: v0.0.3
   type:
     description: The value of the I(type) parameter.
+    type: str
     returned: always
   name:
     description: The value of the I(name) parameter.
+    type: str
     returned: always
   dest:
     description: The value of the I(dest) parameter.
+    type: str
     returned: always
   requirements_file:
     description: The value of the I(requirements_file) parameter.
+    type: str
     returned: always
   force:
     description: The value of the I(force) parameter.
+    type: bool
     returned: always
   roles:
     description:
     - If I(requirements_file) is specified instead, returns dictionary with all the roles installed per path.
     - If I(name) is specified, returns that role name and the version installed per path.
     type: dict
+    returned: always when installing roles
     contains:
       "<path>":
         description: Roles and versions for that path
@@ -130,6 +136,7 @@ RETURN = """
     - If I(requirements_file) is specified instead, returns dictionary with all the collections installed per path.
     - If I(name) is specified, returns that collection name and the version installed per path.
     type: dict
+    returned: always when installing collections
     contains:
       "<path>":
         description: Collections and versions for that path
