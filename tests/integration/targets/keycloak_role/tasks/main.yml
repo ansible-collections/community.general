@@ -244,4 +244,3 @@
     that:
       - result is not changed
       - result.end_state == {}
-
