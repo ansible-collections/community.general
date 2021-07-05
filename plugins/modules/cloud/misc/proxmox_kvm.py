@@ -492,15 +492,13 @@ options:
       - Various module options used to have default values. This cause problems when
         user expects different behavior from proxmox by default or fill options which cause
         problems when they have been set.
-      - The default value is C(compatibility), which will ensure that the default values
+      - The default value is C(no_defaults), which will ensure that no default values
         are used when the values are not explicitly specified by the user.
-      - From community.general 4.0.0 on, the default value will switch to C(no_defaults). To avoid
-        deprecation warnings, please set I(proxmox_default_behavior) to an explicit
-        value.
       - This affects the I(acpi), I(autostart), I(balloon), I(boot), I(cores), I(cpu),
         I(cpuunits), I(force), I(format), I(kvm), I(memory), I(onboot), I(ostype), I(sockets),
         I(tablet), I(template), I(vga), options.
     type: str
+    default: "no_defaults"
     choices:
       - compatibility
       - no_defaults
@@ -1091,7 +1089,7 @@ def main():
             virtio=dict(type='dict'),
             vmid=dict(type='int'),
             watchdog=dict(),
-            proxmox_default_behavior=dict(type='str', choices=['compatibility', 'no_defaults']),
+            proxmox_default_behavior=dict(type='str', default="no_defaults", choices=['compatibility', 'no_defaults']),
         ),
         mutually_exclusive=[('delete', 'revert'), ('delete', 'update'), ('revert', 'update'), ('clone', 'update'), ('clone', 'delete'), ('clone', 'revert')],
         required_together=[('api_token_id', 'api_token_secret')],

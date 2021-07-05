@@ -163,13 +163,11 @@ options:
       - Various module options used to have default values. This cause problems when
         user expects different behavior from proxmox by default or fill options which cause
         problems when they have been set.
-      - The default value is C(compatibility), which will ensure that the default values
+      - The default value is C(no_defaults), which will ensure that no default values
         are used when the values are not explicitly specified by the user.
-      - From community.general 4.0.0 on, the default value will switch to C(no_defaults). To avoid
-        deprecation warnings, please set I(proxmox_default_behavior) to an explicit
-        value.
       - This affects the I(disk), I(cores), I(cpus), I(memory), I(onboot), I(swap), I(cpuunits) options.
     type: str
+    default: "no_defaults"
     choices:
       - compatibility
       - no_defaults
@@ -521,7 +519,7 @@ def main():
             unprivileged=dict(type='bool', default=False),
             description=dict(type='str'),
             hookscript=dict(type='str'),
-            proxmox_default_behavior=dict(type='str', choices=['compatibility', 'no_defaults']),
+            proxmox_default_behavior=dict(type='str', default="no_defaults", choices=['compatibility', 'no_defaults']),
         ),
         required_if=[('state', 'present', ['node', 'hostname', 'ostemplate'])],
         required_together=[('api_token_id', 'api_token_secret')],
