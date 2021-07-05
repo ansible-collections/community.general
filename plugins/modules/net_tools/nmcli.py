@@ -274,7 +274,7 @@ options:
         version_added: 3.4.0
     runner_hwaddr_policy:
         description:
-            - This  defines  the policy of how hardware addresses of team device and port devices
+            - This defines the policy of how hardware addresses of team device and port devices
               should be set during the team lifetime.
         type: str
         choices: [ same_all, by_active, only_active ]
