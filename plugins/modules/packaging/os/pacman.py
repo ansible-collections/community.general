@@ -254,7 +254,7 @@ def upgrade(module, pacman_path):
         # e.g., "ansible 2.7.1-1 -> 2.7.2-1"
         regex = re.compile(r'([\w+\-.@]+) (\S+-\S+) -> (\S+-\S+)')
         for p in data:
-            if 'ignored' not in p:
+            if '[ignored]' not in p:
                 m = regex.search(p)
                 packages.append(m.group(1))
                 if module._diff:
