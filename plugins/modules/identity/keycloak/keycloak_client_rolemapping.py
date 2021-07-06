@@ -26,16 +26,16 @@ description:
       be returned that way by this module. You may pass single values for attributes when calling the module,
       and this will be translated into a list suitable for the API.
 
-    - When updating a group, where possible provide the group ID to the module. This removes a lookup
-      to the API to translate the name into the group ID.
+    - When updating a client_rolemapping, where possible provide the role ID to the module. This removes a lookup
+      to the API to translate the name into the role ID.
 
 
 options:
     state:
         description:
             - State of the client_scope.
-            - On C(present), the group will be created if it does not yet exist, or updated with the parameters you provide.
-            - On C(absent), the group will be removed if it exists.
+            - On C(present), the client_rolemapping will be created if it does not yet exist, or updated with the parameters you provide.
+            - On C(absent), the client_rolemapping will be removed if it exists.
         default: 'present'
         type: str
         choices:
