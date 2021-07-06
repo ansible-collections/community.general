@@ -1121,13 +1121,6 @@ def main():
     vmid = module.params['vmid']
     validate_certs = module.params['validate_certs']
 
-    if module.params['proxmox_default_behavior'] is None:
-        module.params['proxmox_default_behavior'] = 'compatibility'
-        module.deprecate(
-            'The proxmox_default_behavior option will change its default value from "compatibility" to '
-            '"no_defaults" in community.general 4.0.0. To remove this warning, please specify an explicit value for it now',
-            version='4.0.0', collection_name='community.general'
-        )
     if module.params['proxmox_default_behavior'] == 'compatibility':
         old_default_values = dict(
             acpi=True,
