@@ -70,7 +70,7 @@
 
 - include_tasks: freebsd_setup.yml
   when:
-    - "ansible_system == 'FreeBSD'"
+    - 'ansible_system == "FreeBSD" and ansible_distribution_version is version("12.2", ">=")'
 
 - include_tasks: create_device.yml
   vars:
@@ -80,6 +80,6 @@
     grow: '{{ item.0.value.grow }}'
     action: '{{ item.1 }}'
   when:
-    - 'ansible_system == "FreeBSD"'
+    - 'ansible_system == "FreeBSD" and ansible_distribution_version is version("12.2", ">=")'
     - 'item.0.key in ["xfs", "vfat"]'
   loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'overwrite_another_fs', 'remove_fs'])|list }}"
