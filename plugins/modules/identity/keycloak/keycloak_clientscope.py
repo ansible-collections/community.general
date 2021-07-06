@@ -146,7 +146,7 @@ options:
         type: dict
         description:
             - A dict of key/value pairs to set as custom attributes for the client_scope.
-            - Values may be single values (e.g. a string) or a list of strings.
+            - Values may be single values (for example a string) or a list of strings.
 
 extends_documentation_fragment:
 - community.general.keycloak
