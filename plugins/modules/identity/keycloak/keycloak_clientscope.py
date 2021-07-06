@@ -86,7 +86,7 @@ options:
         suboptions:
             protocol:
                 description:
-                    - This is either C(openid-connect), C(saml) or C(wsfed), this specifies for which protocol this protocol mapper
+                    - This specifies for which protocol this protocol mapper
                       is active.
                 choices: ['openid-connect', 'saml', 'wsfed']
                 type: str
