@@ -28,16 +28,16 @@ description:
       be returned that way by this module. You may pass single values for attributes when calling the module,
       and this will be translated into a list suitable for the API.
 
-    - When updating a group, where possible provide the group ID to the module. This removes a lookup
-      to the API to translate the name into the group ID.
+    - When updating a client_scope, where possible provide the client_scope ID to the module. This removes a lookup
+      to the API to translate the name into the client_scope ID.
 
 
 options:
     state:
         description:
             - State of the client_scope.
-            - On C(present), the group will be created if it does not yet exist, or updated with the parameters you provide.
-            - On C(absent), the group will be removed if it exists.
+            - On C(present), the client_scope will be created if it does not yet exist, or updated with the parameters you provide.
+            - On C(absent), the client_scope will be removed if it exists.
         default: 'present'
         type: str
         choices:
@@ -53,7 +53,7 @@ options:
     realm:
         type: str
         description:
-            - They Keycloak realm under which this group resides.
+            - They Keycloak realm under which this client_scope resides.
         default: 'master'
 
     id:
@@ -77,8 +77,8 @@ options:
 
     protocol_mappers:
         description:
-            - a list of dicts defining protocol mappers for this client.
-              This is 'protocolMappers' in the Keycloak REST API.
+            - A list of dicts defining protocol mappers for this client.
+            - This is 'protocolMappers' in the Keycloak REST API.
         aliases:
             - protocolMappers
         type: list
@@ -87,7 +87,7 @@ options:
             protocol:
                 description:
                     - This specifies for which protocol this protocol mapper
-                      is active.
+                    - is active.
                 choices: ['openid-connect', 'saml', 'wsfed']
                 type: str
 
@@ -95,7 +95,7 @@ options:
                 description:
                     - The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is
                       impossible to provide since this may be extended through SPIs by the user of Keycloak,
-                      by default Keycloak as of 3.4 ships with at least:
+                      by default Keycloak as of 3.4 ships with at least
                     - C(docker-v2-allow-all-mapper)
                     - C(oidc-address-mapper)
                     - C(oidc-full-name-mapper)
@@ -295,6 +295,21 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 from ansible.module_utils.basic import AnsibleModule
 
 
+def sanitize_cr(clientscoperep):
+    """ Removes probably sensitive details from a clientscoperep representation
+
+    :param clientscoperep: the clientscoperep dict to be sanitized
+    :return: sanitized clientrep dict
+    """
+    result = clientscoperep.copy()
+    if 'secret' in result:
+        result['secret'] = 'no_log'
+    if 'attributes' in result:
+        if 'saml.signing.private.key' in result['attributes']:
+            result['attributes']['saml.signing.private.key'] = 'no_log'
+    return result
+
+
 def main():
     """
     Module execution
@@ -330,7 +345,7 @@ def main():
                                              ['token', 'auth_realm', 'auth_username', 'auth_password']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
-    result = dict(changed=False, msg='', diff={}, group='')
+    result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
 
     # Obtain access token, initialize API
     try:
@@ -346,9 +361,9 @@ def main():
     name = module.params.get('name')
     protocol_mappers = module.params.get('protocol_mappers')
 
-    before_clientscope = None         # current state of the group, for merging.
+    before_clientscope = None         # current state of the clientscope, for merging.
 
-    # does the group already exist?
+    # does the clientscope already exist?
     if cid is None:
         before_clientscope = kc.get_clientscope_by_name(name, realm=realm)
     else:
@@ -379,27 +394,27 @@ def main():
             new_param_value = [dict((k, v) for k, v in x.items() if x[k] is not None) for x in new_param_value]
         changeset[camel(clientscope_param)] = new_param_value
 
-    # prepare the new group
+    # prepare the new clientscope
     updated_clientscope = before_clientscope.copy()
     updated_clientscope.update(changeset)
 
-    # if before_clientscope is none, the group doesn't exist.
+    # if before_clientscope is none, the clientscope doesn't exist.
     if before_clientscope == {}:
         if state == 'absent':
             # nothing to do.
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['msg'] = 'Clientscope does not exist; doing nothing.'
-            result['group'] = dict()
+            result['end_state'] = dict()
             module.exit_json(**result)
 
-        # for 'present', create a new group.
+        # for 'present', create a new clientscope.
         result['changed'] = True
         if name is None:
-            module.fail_json(msg='name must be specified when creating a new group')
+            module.fail_json(msg='name must be specified when creating a new clientscope')
 
         if module._diff:
-            result['diff'] = dict(before='', after=updated_clientscope)
+            result['diff'] = dict(before='', after=sanitize_cr(updated_clientscope))
 
         if module.check_mode:
             module.exit_json(**result)
@@ -408,7 +423,7 @@ def main():
         kc.create_clientscope(updated_clientscope, realm=realm)
         after_clientscope = kc.get_clientscope_by_name(name, realm)
 
-        result['group'] = after_clientscope
+        result['end_state'] = sanitize_cr(after_clientscope)
         result['msg'] = 'Clientscope {name} has been created with ID {id}'.format(name=after_clientscope['name'],
                                                                                   id=after_clientscope['id'])
 
@@ -417,15 +432,15 @@ def main():
             # no changes
             if updated_clientscope == before_clientscope:
                 result['changed'] = False
-                result['group'] = updated_clientscope
+                result['end_state'] = sanitize_cr(updated_clientscope)
                 result['msg'] = "No changes required to clientscope {name}.".format(name=before_clientscope['name'])
                 module.exit_json(**result)
 
-            # update the existing group
+            # update the existing clientscope
             result['changed'] = True
 
             if module._diff:
-                result['diff'] = dict(before=before_clientscope, after=updated_clientscope)
+                result['diff'] = dict(before=sanitize_cr(before_clientscope), after=sanitize_cr(updated_clientscope))
 
             if module.check_mode:
                 module.exit_json(**result)
@@ -447,16 +462,16 @@ def main():
 
             after_clientscope = kc.get_clientscope_by_clientscopeid(updated_clientscope['id'], realm=realm)
 
-            result['group'] = after_clientscope
-            result['msg'] = "Group {id} has been updated".format(id=after_clientscope['id'])
+            result['end_state'] = after_clientscope
+            result['msg'] = "Clientscope {id} has been updated".format(id=after_clientscope['id'])
 
             module.exit_json(**result)
 
         elif state == 'absent':
-            result['group'] = dict()
+            result['end_state'] = dict()
 
             if module._diff:
-                result['diff'] = dict(before=before_clientscope, after='')
+                result['diff'] = dict(before=sanitize_cr(before_clientscope), after='')
 
             if module.check_mode:
                 module.exit_json(**result)
