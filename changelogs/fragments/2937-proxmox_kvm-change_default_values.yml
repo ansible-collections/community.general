@@ -1,4 +1,4 @@
 ---
-bugfixes:
+breaking_changes:
   - proxmox - the default of the ``proxmox_default_behavior`` has been changed from ``compatibility`` to ``no_defaults`` (https://github.com/ansible-collections/community.general/pull/2937).
   - proxmox_kvm - the default of the ``proxmox_default_behavior`` has been changed from ``compatibility`` to ``no_defaults`` (https://github.com/ansible-collections/community.general/pull/2937).
