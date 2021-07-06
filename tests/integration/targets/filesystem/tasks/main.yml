@@ -28,6 +28,7 @@
     action: '{{ item.1 }}'
   when:
     # FreeBSD limited support
+    - 'not (ansible_system == "FreeBSD" and ansible_distribution_version is version("12.2", "<"))'
     # Not available: btrfs, lvm, f2fs, ocfs2
     # All BSD systems use swap fs, but only Linux needs mkswap
     # Supported: ext2/3/4 (e2fsprogs), xfs (xfsprogs), reiserfs (progsreiserfs), vfat
