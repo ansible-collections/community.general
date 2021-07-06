@@ -13,6 +13,8 @@ module: keycloak_role
 
 short_description: Allows administration of Keycloak roles via Keycloak API
 
+version_added: 3.4.0
+
 description:
     - This module allows you to add, remove or modify Keycloak roles via the Keycloak REST API.
       It requires access to the REST API via OpenID Connect; the user connecting and the client being
