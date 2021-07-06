@@ -71,7 +71,7 @@ options:
 
     protocol:
         description:
-            - Type of client (either C(openid-connect), C(saml) or C(wsfed)).
+            - Type of client.
         choices: ['openid-connect', 'saml', 'wsfed']
         type: str
 
