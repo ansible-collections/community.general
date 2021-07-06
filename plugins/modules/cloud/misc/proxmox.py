@@ -165,6 +165,7 @@ options:
         problems when they have been set.
       - The default value is C(no_defaults), which will ensure that no default values
         are used when the values are not explicitly specified by the user.
+      - The default has been switched from C(compatibility) to C(no_defaults) in community.genral 4.0.0.
       - This affects the I(disk), I(cores), I(cpus), I(memory), I(onboot), I(swap), I(cpuunits) options.
     type: str
     default: "no_defaults"

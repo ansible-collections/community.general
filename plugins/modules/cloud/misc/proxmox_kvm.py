@@ -494,6 +494,7 @@ options:
         problems when they have been set.
       - The default value is C(no_defaults), which will ensure that no default values
         are used when the values are not explicitly specified by the user.
+      - The default has been switched from C(compatibility) to C(no_defaults) in community.genral 4.0.0.
       - This affects the I(acpi), I(autostart), I(balloon), I(boot), I(cores), I(cpu),
         I(cpuunits), I(force), I(format), I(kvm), I(memory), I(onboot), I(ostype), I(sockets),
         I(tablet), I(template), I(vga), options.
