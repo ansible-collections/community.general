@@ -139,7 +139,7 @@ options:
                       contents differ depending on the value of I(protocolMapper) and are not documented
                       other than by the source of the mappers and its parent class(es). An example is given
                       below. It is easiest to obtain valid config values by dumping an already-existing
-                      protocol mapper configuration through check-mode in the I(existing) field.
+                      protocol mapper configuration through check-mode in the C(existing) return value.
                 type: dict
 
     attributes:
