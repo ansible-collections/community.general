@@ -89,24 +89,6 @@ options:
         default:
         type: str
 
-    cachedir:
-        description:
-            - Specifies an alternative package cache location (the default is /var/cache/pacman/pkg).
-        type: path
-        version_added: 3.4.0
-
-    config:
-        description:
-            - Specifies an alternate configuration file.
-        type: path
-        version_added: 3.4.0
-
-    root:
-        description:
-            - Specifies an alternative installation root (default is /).
-        type: path
-        version_added: 3.4.0
-
 notes:
   - When used with a C(loop:) each package will be processed individually,
     it is much more efficient to pass the list directly to the I(name) option.
@@ -241,11 +223,11 @@ def query_package(module, pacman_path, name, extra_args, state="present"):
         return True, True, True
 
 
-def update_package_db(module, pacman_path, extra_args):
+def update_package_db(module, pacman_path):
     if module.params['force']:
         module.params["update_cache_extra_args"] += " --refresh --refresh"
 
-    cmd = "%s --sync --refresh %s %s" % (pacman_path, module.params["update_cache_extra_args"], extra_args)
+    cmd = "%s --sync --refresh %s" % (pacman_path, module.params["update_cache_extra_args"])
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
     if rc == 0:
@@ -254,9 +236,9 @@ def update_package_db(module, pacman_path, extra_args):
         module.fail_json(msg="could not update package db")
 
 
-def upgrade(module, pacman_path, extra_args):
-    cmdupgrade = "%s --sync --sysupgrade --quiet --noconfirm %s %s" % (pacman_path, module.params["upgrade_extra_args"], extra_args)
-    cmdneedrefresh = "%s --query --upgrades %s" % (pacman_path, extra_args)
+def upgrade(module, pacman_path):
+    cmdupgrade = "%s --sync --sysupgrade --quiet --noconfirm %s" % (pacman_path, module.params["upgrade_extra_args"])
+    cmdneedrefresh = "%s --query --upgrades" % (pacman_path)
     rc, stdout, stderr = module.run_command(cmdneedrefresh, check_rc=False)
     data = stdout.split('\n')
     data.remove('')
@@ -295,7 +277,7 @@ def upgrade(module, pacman_path, extra_args):
         module.exit_json(changed=False, msg='Nothing to upgrade', packages=packages)
 
 
-def remove_packages(module, pacman_path, packages, extra_args):
+def remove_packages(module, pacman_path, packages):
     data = []
     diff = {
         'before': '',
@@ -313,7 +295,7 @@ def remove_packages(module, pacman_path, packages, extra_args):
         if not installed:
             continue
 
-        cmd = "%s --remove --noconfirm --noprogressbar %s %s %s" % (pacman_path, module.params["extra_args"], package, extra_args)
+        cmd = "%s --remove --noconfirm --noprogressbar %s %s" % (pacman_path, module.params["extra_args"], package)
         rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
         if rc != 0:
@@ -334,7 +316,7 @@ def remove_packages(module, pacman_path, packages, extra_args):
     module.exit_json(changed=False, msg="package(s) already absent")
 
 
-def install_packages(module, pacman_path, state, packages, package_files, extra_args):
+def install_packages(module, pacman_path, state, packages, package_files):
     install_c = 0
     package_err = []
     message = ""
@@ -348,7 +330,7 @@ def install_packages(module, pacman_path, state, packages, package_files, extra_
     to_install_files = []
     for i, package in enumerate(packages):
         # if the package is installed and state == present or state == latest and is up-to-date then skip
-        installed, updated, latestError = query_package(module, pacman_path, package, extra_args)
+        installed, updated, latestError = query_package(module, pacman_path, package)
         if latestError and state == 'latest':
             package_err.append(package)
 
@@ -361,7 +343,7 @@ def install_packages(module, pacman_path, state, packages, package_files, extra_
             to_install_repos.append(package)
 
     if to_install_repos:
-        cmd = "%s --sync --noconfirm --noprogressbar --needed %s %s %s" % (pacman_path, module.params["extra_args"], " ".join(to_install_repos), extra_args)
+        cmd = "%s --sync --noconfirm --noprogressbar --needed %s %s" % (pacman_path, module.params["extra_args"], " ".join(to_install_repos))
         rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
         if rc != 0:
@@ -380,7 +362,7 @@ def install_packages(module, pacman_path, state, packages, package_files, extra_
             install_c += len(to_install_repos)
 
     if to_install_files:
-        cmd = "%s --upgrade --noconfirm --noprogressbar --needed %s %s %s" % (pacman_path, module.params["extra_args"], " ".join(to_install_files), extra_args)
+        cmd = "%s --upgrade --noconfirm --noprogressbar --needed %s %s" % (pacman_path, module.params["extra_args"], " ".join(to_install_files))
         rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
         if rc != 0:
@@ -407,7 +389,7 @@ def install_packages(module, pacman_path, state, packages, package_files, extra_
     module.exit_json(changed=False, msg="package(s) already installed. %s" % (message), diff=diff)
 
 
-def check_packages(module, pacman_path, packages, state, extra_args):
+def check_packages(module, pacman_path, packages, state):
     would_be_changed = []
     diff = {
         'before': '',
@@ -417,7 +399,7 @@ def check_packages(module, pacman_path, packages, state, extra_args):
     }
 
     for package in packages:
-        installed, updated, unknown = query_package(module, pacman_path, package, extra_args)
+        installed, updated, unknown = query_package(module, pacman_path, package)
         if ((state in ["present", "latest"] and not installed) or
                 (state == "absent" and installed) or
                 (state == "latest" and not updated)):
@@ -439,17 +421,17 @@ def check_packages(module, pacman_path, packages, state, extra_args):
         module.exit_json(changed=False, msg="package(s) already %s" % state, diff=diff)
 
 
-def expand_package_groups(module, pacman_path, pkgs, extra_args):
+def expand_package_groups(module, pacman_path, pkgs):
     expanded = []
 
-    __, stdout, __ = module.run_command([pacman_path, "--sync", "--groups", "--quiet", extra_args], check_rc=True)
+    __, stdout, __ = module.run_command([pacman_path, "--sync", "--groups", "--quiet"], check_rc=True)
     available_groups = stdout.splitlines()
 
     for pkg in pkgs:
         if pkg:  # avoid empty strings
             if pkg in available_groups:
                 # A group was found matching the package name: expand it
-                cmd = [pacman_path, "--sync", "--groups", "--quiet", pkg, extra_args]
+                cmd = [pacman_path, "--sync", "--groups", "--quiet", pkg]
                 rc, stdout, stderr = module.run_command(cmd, check_rc=True)
                 expanded.extend([name.strip() for name in stdout.splitlines()])
             else:
@@ -472,9 +454,6 @@ def main():
                 type='bool', default=False, aliases=['update-cache'],
                 deprecated_aliases=[dict(name='update-cache', version='5.0.0', collection_name='community.general')]),
             update_cache_extra_args=dict(type='str', default=''),
-            cachedir=dict(type='path'),
-            config=dict(type='path'),
-            root=dict(type='path'),
         ),
         required_one_of=[['name', 'update_cache', 'upgrade']],
         mutually_exclusive=[['name', 'upgrade']],
@@ -487,8 +466,6 @@ def main():
 
     # find pacman binary
     pacman_path = module.get_bin_path(p['executable'], True)
-
-    extra_args = ''
 
     if p['cachedir']:
         pacman_path = "%s %s --cachedir" % (pacman_path, p['cachedir'])
@@ -504,7 +481,7 @@ def main():
         p['state'] = 'absent'
 
     if p["update_cache"] and not module.check_mode:
-        update_package_db(module, pacman_path, extra_args)
+        update_package_db(module, pacman_path)
         if not (p['name'] or p['upgrade']):
             module.exit_json(changed=True, msg='Updated the package master lists')
 
@@ -512,10 +489,10 @@ def main():
         module.exit_json(changed=True, msg='Would have updated the package cache')
 
     if p['upgrade']:
-        upgrade(module, pacman_path, extra_args)
+        upgrade(module, pacman_path)
 
     if p['name']:
-        pkgs = expand_package_groups(module, pacman_path, p['name'], extra_args)
+        pkgs = expand_package_groups(module, pacman_path, p['name'])
 
         pkg_files = []
         for i, pkg in enumerate(pkgs):
@@ -530,12 +507,12 @@ def main():
                 pkg_files.append(None)
 
         if module.check_mode:
-            check_packages(module, pacman_path, pkgs, p['state'], extra_args)
+            check_packages(module, pacman_path, pkgs, p['state'])
 
         if p['state'] in ['present', 'latest']:
-            install_packages(module, pacman_path, p['state'], pkgs, pkg_files, extra_args)
+            install_packages(module, pacman_path, p['state'], pkgs, pkg_files)
         elif p['state'] == 'absent':
-            remove_packages(module, pacman_path, pkgs, extra_args)
+            remove_packages(module, pacman_path, pkgs)
     else:
         module.exit_json(changed=False, msg="No package specified to work on.")
 
