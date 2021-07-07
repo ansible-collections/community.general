@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - pacman - fix changed status when ignorepkg has been defined (https://github.com/ansible-collections/community.general/issues/1758).
