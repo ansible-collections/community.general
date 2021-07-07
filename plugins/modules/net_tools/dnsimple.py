@@ -216,8 +216,7 @@ def main():
             accounts = Accounts(client).list_accounts().data
             if len(accounts) != 1:
                 module.fail_json(msg="Provided dnsimple token is a user token with multiple accounts. Use an account token or a user token with access to a single account. See https://support.dnsimple.com/articles/api-access-token/")
-            else:
-                account = accounts[0]
+            account = accounts[0]
 
     except DNSimpleException as e:
         module.fail_json(msg="Unable to contact DNSimple: %s" % e.message)
