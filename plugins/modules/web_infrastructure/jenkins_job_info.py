@@ -33,12 +33,10 @@ options:
     type: str
     description:
       - Password to authenticate with the Jenkins server.
-      - This is a required parameter, if C(token) is not provided.
   token:
     type: str
     description:
       - API token used to authenticate with the Jenkins server.
-      - This is a required parameter, if C(password) is not provided.
   url:
     type: str
     description:
@@ -59,6 +57,11 @@ author:
 '''
 
 EXAMPLES = '''
+# Get all Jenkins jobs anonymously
+- community.general.jenkins_job_info:
+    user: admin
+  register: my_jenkins_job_info
+
 # Get all Jenkins jobs using basic auth
 - community.general.jenkins_job_info:
     user: admin
@@ -231,9 +234,6 @@ def main():
         mutually_exclusive=[
             ['password', 'token'],
             ['name', 'glob'],
-        ],
-        required_one_of=[
-            ['password', 'token'],
         ],
         supports_check_mode=True,
     )
