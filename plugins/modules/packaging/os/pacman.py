@@ -89,6 +89,23 @@ options:
         default:
         type: str
 
+    cachedir:
+        description:
+            - Specifies an alternative package cache location (the default is /var/cache/pacman/pkg).
+        type: path
+        version_added: 3.4.0
+    config:
+        description:
+            - Specifies an alternate configuration file.
+        type: path
+        version_added: 3.4.0
+    root:
+        description:
+            - Specifies an alternative installation root (default is /).
+        type: path
+        version_added: 3.4.0
+
+
 notes:
   - When used with a C(loop:) each package will be processed individually,
     it is much more efficient to pass the list directly to the I(name) option.
@@ -454,6 +471,9 @@ def main():
                 type='bool', default=False, aliases=['update-cache'],
                 deprecated_aliases=[dict(name='update-cache', version='5.0.0', collection_name='community.general')]),
             update_cache_extra_args=dict(type='str', default=''),
+            cachedir=dict(type='path'),
+            config=dict(type='path'),
+            root=dict(type='path'),
         ),
         required_one_of=[['name', 'update_cache', 'upgrade']],
         mutually_exclusive=[['name', 'upgrade']],
