@@ -189,6 +189,7 @@ def test_variable_meta_change():
     assert vd.d == {'a1': {'a11': 33, 'a12': 34, 'a13': 35}}
     assert vd.has_changed('d')
 
+
 class MockMH(object):
     changed = None
 
