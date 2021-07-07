@@ -488,11 +488,11 @@ def main():
     pacman_path = module.get_bin_path(p['executable'], True)
 
     if p['cachedir']:
-        pacman_path = "%s %s --cachedir" % (pacman_path, p['cachedir'])
+        pacman_path = "%s --cachedir %s" % (pacman_path, p['cachedir'])
     if p['config']:
-        pacman_path = "%s %s --config" % (pacman_path, p['config'])
+        pacman_path = "%s --config %s" % (pacman_path, p['config'])
     if p['root']:
-        pacman_path = "%s %s --root" % (pacman_path, p['root'])
+        pacman_path = "%s --root %s" % (pacman_path, p['root'])
 
     # normalize the state parameter
     if p['state'] in ['present', 'installed']:
