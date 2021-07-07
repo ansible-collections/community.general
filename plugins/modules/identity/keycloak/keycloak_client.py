@@ -324,6 +324,7 @@ options:
         type: dict
         aliases:
             - authenticationFlowBindingOverrides
+        version_added: 3.4.0
 
     protocol_mappers:
         description:
