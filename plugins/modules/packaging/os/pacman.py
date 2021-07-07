@@ -206,12 +206,12 @@ def get_name(module, pacman_output):
     module.fail_json(msg="get_name: fail to retrieve package name from pacman output")
 
 
-def query_package(module, pacman_path, name, state="present"):
+def query_package(module, pacman_path, name, extra_args, state="present"):
     """Query the package status in both the local system and the repository. Returns a boolean to indicate if the package is installed, a second
     boolean to indicate if the package is up-to-date and a third boolean to indicate whether online information were available
     """
     if state == "present":
-        lcmd = "%s --query %s" % (pacman_path, name)
+        lcmd = "%s --query %s %s" % (pacman_path, name, extra_args)
         lrc, lstdout, lstderr = module.run_command(lcmd, check_rc=False)
         if lrc != 0:
             # package is not installed locally
@@ -226,7 +226,7 @@ def query_package(module, pacman_path, name, state="present"):
         # get the version installed locally (if any)
         lversion = get_version(lstdout)
 
-        rcmd = "%s --sync --print-format \"%%n %%v\" %s" % (pacman_path, name)
+        rcmd = "%s --sync --print-format \"%%n %%v\" %s %s" % (pacman_path, name, extra_args)
         rrc, rstdout, rstderr = module.run_command(rcmd, check_rc=False)
         # get the version in the repository
         rversion = get_version(rstdout)
@@ -308,7 +308,7 @@ def remove_packages(module, pacman_path, packages):
     # Using a for loop in case of error, we can report the package that failed
     for package in packages:
         # Query the package first, to see if we even need to remove
-        installed, updated, unknown = query_package(module, pacman_path, package)
+        installed, updated, unknown = query_package(module, pacman_path, package, extra_args)
         if not installed:
             continue
 
