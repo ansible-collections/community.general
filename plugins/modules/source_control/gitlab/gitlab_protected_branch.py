@@ -16,7 +16,7 @@ author:
   - "Werner Dijkerman (@dj-wasabi)"
 requirements:
   - python >= 2.7
-  - python-gitlab python module >= v2.3.0
+  - python-gitlab >= 2.3.0
 extends_documentation_fragment:
 - community.general.auth_basic
 
@@ -76,11 +76,8 @@ RETURN = '''
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_native
 from ansible.module_utils.api import basic_auth_argument_spec
-from ansible.module_utils.six import string_types
-from ansible.module_utils.six import integer_types
-
+from distutils.version import LooseVersion
 
 GITLAB_IMP_ERR = None
 try:
@@ -176,6 +173,11 @@ def main():
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
+
+    gitlab_version = gitlab.__version__
+    if LooseVersion(gitlab_version) < LooseVersion('2.3.0'):
+            module.fail_json(msg="community.general.gitlab_proteched_branch requires python-gitlab Python module >= 2.3.0 (installed version: [%s])."
+                                " Please upgrade python-gitlab to version 2.3.0 or above." % gitlab_version)
 
     gitlab_instance = gitlabAuthentication(module)
     this_gitlab = GitlabProtectedBranch(module=module, project=project, gitlab_instance=gitlab_instance)
