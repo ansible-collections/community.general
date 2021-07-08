@@ -75,26 +75,20 @@ EXAMPLES = """
 """
 
 RETURN = """
-  installed:
-    description: Collections and roles effectively installed
+  installed_collections:
+    description: Collections effectively installed
     returned: success
-    type: complex
-    contains:
-      collections:
-        description: Collections and versions installed
-        returned: success
-        type: dict
-      roles:
-        description: Roles and versions installed
-        returned: success
-        type: dict
+    type: dict
     sample:
-      collections:
-        community.general: 3.1.0
-        community.docker: 1.6.1
-      roles:
-        ansistrano.deploy: 3.8.0
-        baztian.xfce: v0.0.3
+      community.general: 3.1.0
+      community.docker: 1.6.1
+  installed_roles:
+    description: Roles effectively installed
+    returned: success
+    type: dict
+    sample:
+      ansistrano.deploy: 3.8.0
+      baztian.xfce: v0.0.3
   type:
     description: The value of the I(type) parameter.
     type: str
@@ -126,7 +120,7 @@ RETURN = """
         description: Roles and versions for that path
         type: dict
     sample:
-      /home/az/.ansible/roles:
+      /home/user42/.ansible/roles:
         ansistrano.deploy: 3.9.0
         baztian.xfce: v0.0.3
       /custom/ansible/roles:
@@ -150,12 +144,18 @@ RETURN = """
 """
 
 import re
-import json
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import CmdModuleHelper, ArgFormat
 
 
 class AnsibleGalaxyInstall(CmdModuleHelper):
+    _RE_PATH = re.compile(r'^# (?P<path>.*)$')
+    _RE_COLL = re.compile(r'^(?P<elem>\w+\.\w+)\s+(?P<version>[\d\.]+)\s*$')
+    _RE_ROLE = re.compile(r'^- (?P<elem>\w+\.\w+),\s+(?P<version>[\d\.]+)\s*$')
+    _RE_OUTPUT = re.compile(r'^(?:(?P<collection>\w+\.\w+):(?P<cversion>[\d\.]+)'
+                            r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+))'
+                            r' was installed successfully$')
+
     output_params = ('type', 'name', 'dest', 'requirements_file', 'force')
     module = dict(
         argument_spec=dict(
@@ -178,79 +178,57 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
         requirements_file=dict(fmt=('-r', '{0}'),),
         dest=dict(fmt=('-p', '{0}'),),
         force=dict(fmt="--force", style=ArgFormat.BOOLEAN),
-        format=dict(fmt=["--format", "json"], style=ArgFormat.BOOLEAN),
     )
     check_rc = True
 
-    def __list_collections__(self):
-        params = ({'type': 'collection'}, {'galaxy_cmd': 'list'}, 'dest', 'format')
-        collections = self.run_command(params=params, process_output=lambda rc, out, err: out)
-        collections = json.loads(collections)
-        if self.vars.dest in collections:
-            collections = {self.vars.det: collections[self.vars.dest]}
-
-        if self.vars.name:
-            for path in collections:
-                c = {}
-                if self.vars.name in collections[path]:
-                    c[self.vars.name] = collections[path][self.vars.name]
-                collections[path] = c
-
-        for path in collections:
-            collections[path] = dict((k, v['version']) for k, v in collections[path].items())
-        return collections
-
-    def __list_roles__(self):
-        params = ({'type': 'role'}, {'galaxy_cmd': 'list'}, 'dest')
-        roles = self.run_command(params=params, process_output=lambda rc, out, err: out)
-        roles_dict = {}
+    def __list_element__(self, _type, path_re, elem_re):
+        params = ({'type': _type}, {'galaxy_cmd': 'list'}, 'dest')
+        elems = self.run_command(params=params, process_output=lambda rc, out, err: out)
+        elems_dict = {}
         current_path = None
-
-        re_rolepath = re.compile(r'^# (?P<path>.*)$')
-        re_role = re.compile(r'^- (?P<role>\w+\.\w+), (?P<version>[\d\.]+)$')
-        for line in roles.splitlines():
+        for line in elems.splitlines():
             if line.startswith("#"):
-                match = re_rolepath.match(line)
+                match = path_re.match(line)
                 if not match:
                     continue
-                if self.vars.dest and match.group('path') != self.vars.dest:
+                if self.vars.dest is not None and match.group('path') != self.vars.dest:
                     current_path = None
                     continue
                 current_path = match.group('path') if match else None
+                elems_dict[current_path] = {}
 
             elif current_path is not None:
-                match = re_role.match(line)
-                if not match or (self.vars.name and match.group('role') != self.vars.name):
+                match = elem_re.match(line)
+                if not match or (self.vars.name is not None and match.group('elem') != self.vars.name):
                     continue
-                roles_dict[current_path][match.group('role')] = match.group('version')
-        return roles_dict
+                elems_dict[current_path][match.group('elem')] = match.group('version')
+        return elems_dict
+
+    def __list_collections__(self):
+        return self.__list_element__('collection', self._RE_PATH, self._RE_COLL)
+
+    def __list_roles__(self):
+        return self.__list_element__('role', self._RE_PATH, self._RE_ROLE)
 
     def __run__(self):
-        self.vars.installed = {'collections': {}, 'roles': {}}
+        self.vars.set("installed_collections", {}, change=True)
+        self.vars.set("installed_roles", {}, change=True)
         if self.vars.type != "collection":
-            self.vars.set("roles", self.__list_roles__(), change=True)
+            self.vars.roles_before = self.__list_roles__()
         if self.vars.type != "roles":
-            self.vars.set("collections", self.__list_collections__(), change=True)
+            self.vars.collections_before = self.__list_collections__()
         params = ('type', {'galaxy_cmd': 'install'}, 'force', 'dest', 'requirements_file', 'name')
         self.run_command(params=params)
-        if self.vars.type != "collection":
-            self.vars.roles = self.__list_roles__()
-        if self.vars.type != "roles":
-            self.vars.collections = self.__list_collections__()
 
     def process_command_output(self, rc, out, err):
-        re_patt = re.compile(r'^(?:(?P<collection>\w+\.\w+):(?P<cversion>[\d\.]+)'
-                             r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+))'
-                             r' was installed successfully$')
-        self.vars.installed = {}
         for line in out.splitlines():
-            match = re_patt.match(line)
+            match = self._RE_OUTPUT.match(line)
             if not match:
                 continue
             if match.group("collection"):
-                self.vars.installed['collections'][match.group("collection")] = match.group("cversion")
+                self.vars.installed_collections[match.group("collection")] = match.group("cversion")
             else:
-                self.vars.installed['roles'][match.group("role")] = match.group("rversion")
+                self.vars.installed_roles[match.group("role")] = match.group("rversion")
 
 
 def main():
