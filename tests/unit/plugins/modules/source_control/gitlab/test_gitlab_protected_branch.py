@@ -7,6 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import pytest
+from distutils.version import LooseVersion
 
 from ansible_collections.community.general.plugins.modules.source_control.gitlab.gitlab_protected_branch import GitlabProtectedBranch
 
@@ -20,13 +21,19 @@ def _dummy(x):
 pytestmark = []
 try:
     from .gitlab import (GitlabModuleTestCase,
-                         python_version_match_requirement,
-                         resp_get_protected_branch, resp_get_project_by_name, resp_get_protected_branch_not_exist,
-                         resp_get_project, resp_delete_protected_branch, resp_get_user)
+                         python_version_match_requirement, python_gitlab_module_version,
+                         python_gitlab_version_match_requirement,
+                         resp_get_protected_branch, resp_get_project_by_name,
+                         resp_get_protected_branch_not_exist,
+                         resp_delete_protected_branch, resp_get_user)
 
     # GitLab module requirements
     if python_version_match_requirement():
         from gitlab.v4.objects import Project
+    gitlab_req_version = python_gitlab_version_match_requirement()
+    gitlab_module_version = python_gitlab_module_version()
+    if LooseVersion(gitlab_module_version) < LooseVersion(gitlab_req_version):
+        pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing (Wrong  version)"))
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
     # Need to set these to something so that we don't fail when parsing

@@ -13,7 +13,8 @@ from httmock import urlmatch  # noqa
 
 from ansible_collections.community.general.tests.unit.compat import unittest
 
-from gitlab import Gitlab
+# from gitlab import Gitlab
+import gitlab
 
 
 class FakeAnsibleModule(object):
@@ -33,7 +34,7 @@ class GitlabModuleTestCase(unittest.TestCase):
 
         self.mock_module = FakeAnsibleModule()
 
-        self.gitlab_instance = Gitlab("http://localhost", private_token="private_token", api_version=4)
+        self.gitlab_instance = gitlab.Gitlab("http://localhost", private_token="private_token", api_version=4)
 
 
 # Python 2.7+ is needed for python-gitlab
@@ -44,6 +45,11 @@ GITLAB_MINIMUM_PYTHON_VERSION = (2, 7)
 def python_version_match_requirement():
     return sys.version_info >= GITLAB_MINIMUM_PYTHON_VERSION
 
+def python_gitlab_module_version():
+    return gitlab.__version__
+
+def python_gitlab_version_match_requirement():
+    return "2.3.0"
 
 # Skip unittest test case if python version don't match requirement
 def unitest_python_version_check_requirement(unittest_testcase):
