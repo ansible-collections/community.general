@@ -45,11 +45,14 @@ GITLAB_MINIMUM_PYTHON_VERSION = (2, 7)
 def python_version_match_requirement():
     return sys.version_info >= GITLAB_MINIMUM_PYTHON_VERSION
 
+
 def python_gitlab_module_version():
     return gitlab.__version__
 
+
 def python_gitlab_version_match_requirement():
     return "2.3.0"
+
 
 # Skip unittest test case if python version don't match requirement
 def unitest_python_version_check_requirement(unittest_testcase):
