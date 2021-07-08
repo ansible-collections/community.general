@@ -1408,3 +1408,26 @@ releases:
     - 2912-snap-module-helper.yml
     - 3.3.1.yml
     release_date: '2021-07-01'
+  3.3.2:
+    changes:
+      bugfixes:
+      - archive - fixed task failure when using the ``remove`` option with a ``path``
+        containing nested files for ``format``s other than ``zip`` (https://github.com/ansible-collections/community.general/issues/2919).
+      - lvol - honor ``check_mode`` on thinpool (https://github.com/ansible-collections/community.general/issues/2934).
+      - module_helper module utils - fixed change-tracking for dictionaries and lists
+        (https://github.com/ansible-collections/community.general/pull/2951).
+      - npm - correctly handle cases where a dependency does not have a ``version``
+        property because it is either missing or invalid (https://github.com/ansible-collections/community.general/issues/2917).
+      - pacman - fix changed status when ignorepkg has been defined (https://github.com/ansible-collections/community.general/issues/1758).
+      - snap - fixed the order of the ``--classic`` parameter in the command line
+        invocation (https://github.com/ansible-collections/community.general/issues/2916).
+      release_summary: Extraordinary bugfix release to fix some annoying bugs.
+    fragments:
+    - 2918-snap-param-order.yml
+    - 2923-archive-remove-bugfix.yml
+    - 2924-npm-fix-package-json.yml
+    - 2935-lvol-support_check_mode_thinpool.yml
+    - 2936-pacman-fix_changed_status_when_ignorepkg_has_been_defined.yml
+    - 2951-mh-vars-deepcopy.yml
+    - 3.3.2.yml
+    release_date: '2021-07-08'
