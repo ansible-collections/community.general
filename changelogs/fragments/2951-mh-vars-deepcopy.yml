@@ -1,0 +1,2 @@
+bugfixes:
+  - module_helper module utils - fixed change-tracking for dictionaries and lists (https://github.com/ansible-collections/community.general/pull/2951).
