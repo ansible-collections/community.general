@@ -6,6 +6,8 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+import copy
+
 
 class VarMeta(object):
     NOTHING = object()
@@ -30,11 +32,11 @@ class VarMeta(object):
         if fact is not None:
             self.fact = fact
         if initial_value is not self.NOTHING:
-            self.initial_value = initial_value
+            self.initial_value = copy.deepcopy(initial_value)
 
     def set_value(self, value):
         if not self.init:
-            self.initial_value = value
+            self.initial_value = copy.deepcopy(value)
             self.init = True
         self.value = value
         return self
