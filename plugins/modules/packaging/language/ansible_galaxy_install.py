@@ -153,7 +153,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
     _RE_COLL = re.compile(r'^(?P<elem>\w+\.\w+)\s+(?P<version>[\d\.]+)\s*$')
     _RE_ROLE = re.compile(r'^- (?P<elem>\w+\.\w+),\s+(?P<version>[\d\.]+)\s*$')
     _RE_OUTPUT = re.compile(r'^(?:(?P<collection>\w+\.\w+):(?P<cversion>[\d\.]+)'
-                            r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+))'
+                            r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\))'
                             r' was installed successfully$')
 
     output_params = ('type', 'name', 'dest', 'requirements_file', 'force')
@@ -175,18 +175,20 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
     command_args_formats = dict(
         type=dict(fmt=lambda v: [] if v == 'both' else [v]),
         galaxy_cmd=dict(),
+        verbose=dict(),
         requirements_file=dict(fmt=('-r', '{0}'),),
         dest=dict(fmt=('-p', '{0}'),),
         force=dict(fmt="--force", style=ArgFormat.BOOLEAN),
     )
+    force_lang = "C.UTF-8"
     check_rc = True
 
     def __list_element__(self, _type, path_re, elem_re):
-        params = ({'type': _type}, {'galaxy_cmd': 'list'}, 'dest')
-        elems = self.run_command(params=params, process_output=lambda rc, out, err: out)
+        params = ({'type': _type}, {'galaxy_cmd': 'list'}, 'dest', {"verbose": "-vvv"})
+        elems = self.run_command(params=params, process_output=lambda rc, out, err: out.splitlines())
         elems_dict = {}
         current_path = None
-        for line in elems.splitlines():
+        for line in elems:
             if line.startswith("#"):
                 match = path_re.match(line)
                 if not match:

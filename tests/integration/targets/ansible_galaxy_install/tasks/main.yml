@@ -5,21 +5,44 @@
   community.general.ansible_galaxy_install:
     type: collection
     name: ansible.netcommon
-  register: install_0
+  register: install_c0
 
 - name: Assert collection was installed
   assert:
     that:
-    - install_0 is changed
-    - '"ansible.netcommon" in install_0.installed_collections'
+    - install_c0 is changed
+    - '"ansible.netcommon" in install_c0.installed_collections'
 
 - name: Install collection ansible.netcommon (again)
   community.general.ansible_galaxy_install:
     type: collection
     name: ansible.netcommon
-  register: install_1
+  register: install_c1
 
 - name: Assert collection was not installed
   assert:
     that:
-    - install_1 is not changed
+    - install_c1 is not changed
+
+- name: Install role ansistrano.deploy
+  community.general.ansible_galaxy_install:
+    type: role
+    name: ansistrano.deploy
+  register: install_r0
+
+- name: Assert collection was installed
+  assert:
+    that:
+    - install_r0 is changed
+    - '"ansistrano.deploy" in install_r0.installed_roles'
+
+- name: Install role ansistrano.deploy (again)
+  community.general.ansible_galaxy_install:
+    type: role
+    name: ansistrano.deploy
+  register: install_r1
+
+- name: Assert role was not installed
+  assert:
+    that:
+    - install_r1 is not changed
