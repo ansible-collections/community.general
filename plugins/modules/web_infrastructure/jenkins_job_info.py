@@ -33,12 +33,12 @@ options:
     type: str
     description:
       - Password to authenticate with the Jenkins server.
-      - This is mutually exclusive with C(token).
+      - This is mutually exclusive with I(token).
   token:
     type: str
     description:
       - API token used to authenticate with the Jenkins server.
-      - This is mutually exclusive with C(password).
+      - This is mutually exclusive with I(password).
   url:
     type: str
     description:
