@@ -1,6 +1,5 @@
 ---
-# tasks file for ansible_galaxy_install
-
+###################################################
 - name: Install collection ansible.netcommon
   community.general.ansible_galaxy_install:
     type: collection
@@ -24,6 +23,7 @@
     that:
     - install_c1 is not changed
 
+###################################################
 - name: Install role ansistrano.deploy
   community.general.ansible_galaxy_install:
     type: role
@@ -46,3 +46,37 @@
   assert:
     that:
     - install_r1 is not changed
+
+###################################################
+- name:
+  set_fact:
+    reqs_file: '{{ output_dir }}/reqs.yaml'
+
+- name: Copy requirements file
+  copy:
+    src: 'files/test.yml'
+    dest: '{{ reqs_file }}'
+
+- name: Install from requirements file
+  community.general.ansible_galaxy_install:
+    type: both
+    requirements_file: "{{ reqs_file }}"
+  register: install_rq0
+
+- name: Assert requirements file was installed
+  assert:
+    that:
+    - install_rq0 is changed
+    - '"geerlingguy.java" in install_rq0.installed_roles'
+    - '"geerlingguy.php_roles" in install_rq0.installed_collections'
+
+- name: Install from requirements file (again)
+  community.general.ansible_galaxy_install:
+    type: both
+    requirements_file: "{{ reqs_file }}"
+  register: install_rq1
+
+- name: Assert requirements file was not installed
+  assert:
+    that:
+    - install_rq1 is not changed
