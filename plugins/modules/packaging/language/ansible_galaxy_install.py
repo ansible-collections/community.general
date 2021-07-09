@@ -175,7 +175,6 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
     command_args_formats = dict(
         type=dict(fmt=lambda v: [] if v == 'both' else [v]),
         galaxy_cmd=dict(),
-        verbose=dict(),
         requirements_file=dict(fmt=('-r', '{0}'),),
         dest=dict(fmt=('-p', '{0}'),),
         force=dict(fmt="--force", style=ArgFormat.BOOLEAN),
@@ -184,7 +183,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
     check_rc = True
 
     def __list_element__(self, _type, path_re, elem_re):
-        params = ({'type': _type}, {'galaxy_cmd': 'list'}, 'dest', {"verbose": "-vvv"})
+        params = ({'type': _type}, {'galaxy_cmd': 'list'}, 'dest')
         elems = self.run_command(params=params, process_output=lambda rc, out, err: out.splitlines())
         elems_dict = {}
         current_path = None
