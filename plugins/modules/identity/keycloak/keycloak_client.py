@@ -318,6 +318,14 @@ options:
         aliases:
             - authorizationSettings
 
+    authentication_flow_binding_overrides:
+        description:
+            - Override realm authentication flow bindings.
+        type: dict
+        aliases:
+            - authenticationFlowBindingOverrides
+        version_added: 3.4.0
+
     protocol_mappers:
         description:
             - a list of dicts defining protocol mappers for this client.
@@ -593,6 +601,8 @@ EXAMPLES = '''
     default_roles:
       - test01
       - test02
+    authentication_flow_binding_overrides:
+        browser: 4c90336b-bf1d-4b87-916d-3677ba4e5fbb
     protocol_mappers:
       - config:
           access.token.claim: True
@@ -745,6 +755,7 @@ def main():
         use_template_config=dict(type='bool', aliases=['useTemplateConfig']),
         use_template_scope=dict(type='bool', aliases=['useTemplateScope']),
         use_template_mappers=dict(type='bool', aliases=['useTemplateMappers']),
+        authentication_flow_binding_overrides=dict(type='dict', aliases=['authenticationFlowBindingOverrides']),
         protocol_mappers=dict(type='list', elements='dict', options=protmapper_spec, aliases=['protocolMappers']),
         authorization_settings=dict(type='dict', aliases=['authorizationSettings']),
     )
