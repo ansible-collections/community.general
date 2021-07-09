@@ -90,7 +90,7 @@ class CmdMixin(object):
     command_args_formats = {}
     run_command_fixed_options = {}
     check_rc = False
-    force_lang = "C"
+    force_lang = "C.UTF-8"
 
     @property
     def module_formats(self):
