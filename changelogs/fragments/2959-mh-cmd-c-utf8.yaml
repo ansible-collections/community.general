@@ -1,0 +1,2 @@
+bugfixes:
+  - module_helper cmd module utils - changed default locale from C to C.UTF-8 (https://github.com/ansible-collections/community.general/pull/2959).
