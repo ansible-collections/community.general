@@ -19,6 +19,7 @@ options:
     description:
     - The type of installation performed by C(ansible-galaxy).
     - If I(type) is C(both), then I(requirements_file) must be passed and it may contain both roles and collections.
+    - "Note however that the opposite is not true: if using a I(requirements_file), then I(type) can be any of the three choices."
     type: str
     choices: [collection, role, both]
     required: yes
@@ -75,15 +76,15 @@ EXAMPLES = """
 """
 
 RETURN = """
-  installed_collections:
-    description: Collections effectively installed
+  new_collections:
+    description: New collections installed by this module
     returned: success
     type: dict
     sample:
       community.general: 3.1.0
       community.docker: 1.6.1
-  installed_roles:
-    description: Roles effectively installed
+  new_roles:
+    description: New roles installed by this module
     returned: success
     type: dict
     sample:
@@ -109,7 +110,7 @@ RETURN = """
     description: The value of the I(force) parameter.
     type: bool
     returned: always
-  roles:
+  installed_roles:
     description:
     - If I(requirements_file) is specified instead, returns dictionary with all the roles installed per path.
     - If I(name) is specified, returns that role name and the version installed per path.
@@ -125,7 +126,7 @@ RETURN = """
         baztian.xfce: v0.0.3
       /custom/ansible/roles:
         ansistrano.deploy: 3.8.0
-  collections:
+  installed_collections:
     description:
     - If I(requirements_file) is specified instead, returns dictionary with all the collections installed per path.
     - If I(name) is specified, returns that collection name and the version installed per path.
@@ -212,12 +213,12 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
         return self.__list_element__('role', self._RE_PATH, self._RE_ROLE)
 
     def __run__(self):
-        self.vars.set("installed_collections", {}, change=True)
-        self.vars.set("installed_roles", {}, change=True)
+        self.vars.set("new_collections", {}, change=True)
+        self.vars.set("new_roles", {}, change=True)
         if self.vars.type != "collection":
-            self.vars.roles_before = self.__list_roles__()
+            self.vars.installed_roles = self.__list_roles__()
         if self.vars.type != "roles":
-            self.vars.collections_before = self.__list_collections__()
+            self.vars.installed_collections = self.__list_collections__()
         params = ('type', {'galaxy_cmd': 'install'}, 'force', 'dest', 'requirements_file', 'name')
         self.run_command(params=params)
 
@@ -227,9 +228,9 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
             if not match:
                 continue
             if match.group("collection"):
-                self.vars.installed_collections[match.group("collection")] = match.group("cversion")
+                self.vars.new_collections[match.group("collection")] = match.group("cversion")
             else:
-                self.vars.installed_roles[match.group("role")] = match.group("rversion")
+                self.vars.new_roles[match.group("role")] = match.group("rversion")
 
 
 def main():
