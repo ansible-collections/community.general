@@ -1,0 +1,3 @@
+---
+minor_changes:
+- keycloak_authentication - diff mode is now displaying before and after state also when the authentication flow is updated (https://github.com/ansible-collections/community.general/pull/2963).
