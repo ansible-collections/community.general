@@ -366,9 +366,9 @@ def main():
             # Configure the executions for the flow
             if module.check_mode:
                 module.exit_json(**result)
-            diff = create_or_update_executions(kc=kc, config=new_auth_repr, realm=realm)
-            if diff is not None:
-                result['changed'] = True
+            changed, diff = create_or_update_executions(kc=kc, config=new_auth_repr, realm=realm)
+            result['changed'] = changed
+            if module._diff:
                 result['diff'] = diff
             # Get executions created
             exec_repr = kc.get_executions_representation(config=new_auth_repr, realm=realm)
