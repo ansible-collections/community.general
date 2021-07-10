@@ -23,3 +23,9 @@ tested_filesystems:
   f2fs: {fssize: '{{ f2fs_fssize|default(60) }}', grow: 'f2fs_version is version("1.10.0", ">=")'}
   lvm: {fssize: 20, grow: True}
   swap: {fssize: 10, grow: False}  # grow not implemented
+  ufs: {fssize: 10, grow: True}
+
+
+get_uuid_any: "blkid -c /dev/null -o value -s UUID {{ dev }}"
+get_uuid_ufs: "dumpfs {{ dev }} | awk -v sb=superblock -v id=id '$1 == sb && $4 == id {print $6$7}'"
+get_uuid_cmd: "{{ get_uuid_ufs if fstype == 'ufs' else get_uuid_any }}"

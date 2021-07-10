@@ -12,8 +12,8 @@
       - 'fs_result is success'
 
 - name: "Get UUID of created filesystem"
-  ansible.builtin.command:
-    cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
+  ansible.builtin.shell:
+    cmd: "{{ get_uuid_cmd }}"
   changed_when: false
   register: uuid
 
@@ -24,8 +24,8 @@
   register: fs2_result
 
 - name: "Get UUID of the filesystem"
-  ansible.builtin.command:
-    cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
+  ansible.builtin.shell:
+    cmd: "{{ get_uuid_cmd }}"
   changed_when: false
   register: uuid2
 
@@ -44,8 +44,8 @@
   register: fs3_result
 
 - name: "Get UUID of the new filesystem"
-  ansible.builtin.command:
-    cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
+  ansible.builtin.shell:
+    cmd: "{{ get_uuid_cmd }}"
   changed_when: false
   register: uuid3
 
@@ -71,6 +71,11 @@
         cmd: 'losetup -c {{ dev }}'
       when: fstype == 'lvm'
 
+    - name: "Resize memory disk for UFS"
+      ansible.builtin.command:
+        cmd: 'mdconfig -r -u {{ dev }} -s {{ fssize | int + 1 }}M'
+      when: fstype == 'ufs'
+
     - name: "Expand filesystem"
       community.general.filesystem:
         dev: '{{ dev }}'
@@ -79,8 +84,8 @@
       register: fs4_result
 
     - name: "Get UUID of the filesystem"
-      ansible.builtin.command:
-        cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
+      ansible.builtin.shell:
+        cmd: "{{ get_uuid_cmd }}"
       changed_when: false
       register: uuid4
 

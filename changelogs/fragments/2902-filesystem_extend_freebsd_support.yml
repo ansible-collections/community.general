@@ -1,0 +1,6 @@
+---
+minor_changes:
+  - filesystem - extend support for FreeBSD. Avoid potential data loss by checking
+    existence of a filesystem with ``fstyp`` (native command) if ``blkid`` (foreign
+    command) doesn't find one. Add support for character devices and ``ufs`` filesystem
+    type (https://github.com/ansible-collections/community.general/pull/2902).
