@@ -259,7 +259,7 @@ def create_or_update_executions(kc, config, realm='master'):
                         diff = exec_index - new_exec_index
                         kc.change_execution_priority(updated_exec["id"], diff, realm=realm)
                         after += str(kc.get_executions_representation(config, realm=realm)[new_exec_index]) + '\n'
-        return dict(before=before, after=after) if changed else None
+        return changed, dict(before=before, after=after)
     except Exception as e:
         kc.module.fail_json(msg='Could not create or update executions for authentication flow %s in realm %s: %s'
                             % (config["alias"], realm, str(e)))
