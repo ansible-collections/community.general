@@ -196,7 +196,10 @@ def create_or_update_executions(kc, config, realm='master'):
     :param config: Representation of the authentication flow including it's executions.
     :param realm: Realm
     :return: True if executions have been modified. False otherwise.
-    :return: Dict with key "before" and "after" to describe the changes, None if no modification
+    :return: tuple (changed, dict(before, after)
+        WHERE
+        bool changed indicates if changes have been made
+        dict(str, str) shows state before and after creation/update
     """
     try:
         changed = False
