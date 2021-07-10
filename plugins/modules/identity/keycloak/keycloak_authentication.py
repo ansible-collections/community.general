@@ -195,15 +195,10 @@ def create_or_update_executions(kc, config, realm='master'):
     :param kc: Keycloak API access.
     :param config: Representation of the authentication flow including it's executions.
     :param realm: Realm
-    :return: True if executions have been modified. False otherwise.
-<<<<<<< HEAD
     :return: tuple (changed, dict(before, after)
         WHERE
         bool changed indicates if changes have been made
         dict(str, str) shows state before and after creation/update
-=======
-    :return: Dict with key "before" and "after" to describe the changes, None if no modification
->>>>>>> Fix diff mode when updating authentication flow with keycloak_authentication module
     """
     try:
         changed = False
