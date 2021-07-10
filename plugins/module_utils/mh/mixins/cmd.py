@@ -152,7 +152,14 @@ class CmdMixin(object):
     def process_command_output(self, rc, out, err):
         return rc, out, err
 
-    def run_command(self, extra_params=None, params=None, process_output=None, *args, **kwargs):
+    def run_command(self,
+                    extra_params=None,
+                    params=None,
+                    process_output=None,
+                    publish_rc=True,
+                    publish_out=True,
+                    publish_err=True,
+                    *args, **kwargs):
         self.vars.cmd_args = self._calculate_args(extra_params, params)
         options = dict(self.run_command_fixed_options)
         options['check_rc'] = options.get('check_rc', self.check_rc)
@@ -166,7 +173,12 @@ class CmdMixin(object):
             self.update_output(force_lang=self.force_lang)
             options['environ_update'] = env_update
         rc, out, err = self.module.run_command(self.vars.cmd_args, *args, **options)
-        self.update_output(rc=rc, stdout=out, stderr=err)
+        if publish_rc:
+            self.update_output(rc=rc)
+        if publish_out:
+            self.update_output(stdout=out)
+        if publish_err:
+            self.update_output(stderr=err)
         if process_output is None:
             _process = self.process_command_output
         else:
