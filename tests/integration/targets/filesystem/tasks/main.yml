@@ -65,11 +65,12 @@
   loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'overwrite_another_fs', 'remove_fs'])|list }}"
 
 
-# With FreeBSD extended support
+# With FreeBSD extended support (util-linux is not available before 12.2)
 
 - include_tasks: freebsd_setup.yml
   when:
     - 'ansible_system == "FreeBSD"'
+    - 'ansible_distribution_version is version("12.2", ">=")'
 
 - include_tasks: create_device.yml
   vars:
@@ -80,5 +81,6 @@
     action: '{{ item.1 }}'
   when:
     - 'ansible_system == "FreeBSD"'
+    - 'ansible_distribution_version is version("12.2", ">=")'
     - 'item.0.key in ["xfs", "vfat"]'
   loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'overwrite_another_fs', 'remove_fs'])|list }}"
