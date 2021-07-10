@@ -9,7 +9,6 @@ __metaclass__ = type
 
 import pytest
 
-from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.inventory.data import InventoryData
 from ansible_collections.community.general.plugins.inventory.proxmox import InventoryModule
 
@@ -52,7 +51,12 @@ def get_json(url):
                  "disk": 1000,
                  "maxmem": 1000,
                  "uptime": 10000,
-                 "level": ""}]
+                 "level": ""},
+                {"type": "node",
+                 "node": "testnode2",
+                 "id": "node/testnode2",
+                 "status": "offline",
+                 "ssl_fingerprint": "yy"}]
     elif url == "https://localhost:8006/api2/json/pools":
         # _get_pools
         return [{"poolid": "test"}]
@@ -554,7 +558,6 @@ def test_populate(inventory, mocker):
     host_qemu_multi_nic = inventory.inventory.get_host('test-qemu-multi-nic')
     host_qemu_template = inventory.inventory.get_host('test-qemu-template')
     host_lxc = inventory.inventory.get_host('test-lxc')
-    host_node = inventory.inventory.get_host('testnode')
 
     # check if qemu-test is in the proxmox_pool_test group
     assert 'proxmox_pool_test' in inventory.inventory.groups
@@ -584,3 +587,6 @@ def test_populate(inventory, mocker):
 
     # check if qemu template is not present
     assert host_qemu_template is None
+
+    # check that offline node is in inventory
+    assert inventory.inventory.get_host('testnode2')
