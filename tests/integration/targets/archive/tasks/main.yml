@@ -22,6 +22,7 @@
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 # Make sure we start fresh
 
+# Test setup
 - name: Ensure zip is present to create test archive (yum)
   yum: name=zip state=latest
   when: ansible_facts.pkg_mgr == 'yum'
@@ -82,400 +83,45 @@
     - sub
     - sub/subfile.txt
 
-- name: archive using gz
-  archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_01.gz"
-    format: gz
-  register: archive_gz_result_01
-
-- debug: msg="{{ archive_gz_result_01 }}"
-
-- name: verify that the files archived
-  file: path={{output_dir}}/archive_01.gz state=file
-
-- name: check if gz file exists and includes all text files
-  assert:
-    that:
-      - "{{ archive_gz_result_01.changed }}"
-      - "{{ 'archived' in archive_gz_result_01 }}"
-      - "{{ archive_gz_result_01['archived'] | length }} == 3"
-
-- name: archive using zip
-  archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_01.zip"
-    format: zip
-  register: archive_zip_result_01
-
-- debug: msg="{{ archive_zip_result_01 }}"
-
-- name: verify that the files archived
-  file: path={{output_dir}}/archive_01.zip state=file
-
-- name: check if zip file exists
-  assert:
-    that:
-      - "{{ archive_zip_result_01.changed }}"
-      - "{{ 'archived' in archive_zip_result_01 }}"
-      - "{{ archive_zip_result_01['archived'] | length }} == 3"
-
-- name: archive using bz2
-  archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_01.bz2"
-    format: bz2
-  register: archive_bz2_result_01
-
-- debug: msg="{{ archive_bz2_result_01 }}"
-
-- name: verify that the files archived
-  file: path={{output_dir}}/archive_01.bz2 state=file
-
-- name: check if bzip file exists
-  assert:
-    that:
-      - "{{ archive_bz2_result_01.changed }}"
-      - "{{ 'archived' in archive_bz2_result_01 }}"
-      - "{{ archive_bz2_result_01['archived'] | length }} == 3"
-
-- name: archive using xz
-  archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_01.xz"
-    format: xz
-  register: archive_xz_result_01
-
-- debug: msg="{{ archive_xz_result_01 }}"
-
-- name: verify that the files archived
-  file: path={{output_dir}}/archive_01.xz state=file
-
-- name: check if xz file exists
-  assert:
-    that:
-      - "{{ archive_xz_result_01.changed }}"
-      - "{{ 'archived' in archive_xz_result_01 }}"
-      - "{{ archive_xz_result_01['archived'] | length }} == 3"
-
-- name: archive and set mode to 0600
-  archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_02.gz"
-    format: gz
-    mode: "u+rwX,g-rwx,o-rwx"
-  register: archive_bz2_result_02
-
-- name: Test that the file modes were changed
-  stat:
-    path: "{{ output_dir }}/archive_02.gz"
-  register: archive_02_gz_stat
-
-- debug: msg="{{ archive_02_gz_stat}}"
-
-- name: Test that the file modes were changed
-  assert:
-    that:
-      - archive_02_gz_stat is not changed
-      - "archive_02_gz_stat.stat.mode == '0600'"
-      - "'archived' in archive_bz2_result_02"
-      - "{{ archive_bz2_result_02['archived']| length}} == 3"
-
-- name: remove our gz
-  file: path="{{ output_dir }}/archive_02.gz" state=absent
-
-
-- name: archive and set mode to 0600
-  archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_02.zip"
-    format: zip
-    mode: "u+rwX,g-rwx,o-rwx"
-  register: archive_zip_result_02
-
-- name: Test that the file modes were changed
-  stat:
-    path: "{{ output_dir }}/archive_02.zip"
-  register: archive_02_zip_stat
-
-- name: Test that the file modes were changed
-  assert:
-    that:
-      - archive_02_zip_stat is not changed
-      - "archive_02_zip_stat.stat.mode == '0600'"
-      - "'archived' in archive_zip_result_02"
-      - "{{ archive_zip_result_02['archived']| length}} == 3"
-
-- name: remove our zip
-  file: path="{{ output_dir }}/archive_02.zip" state=absent
-
-
-- name: archive and set mode to 0600
-  archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_02.bz2"
-    format: bz2
-    mode: "u+rwX,g-rwx,o-rwx"
-  register: archive_bz2_result_02
-
-- name: Test that the file modes were changed
-  stat:
-    path: "{{ output_dir }}/archive_02.bz2"
-  register: archive_02_bz2_stat
-
-- name: Test that the file modes were changed
-  assert:
-    that:
-      - archive_02_bz2_stat is not changed
-      - "archive_02_bz2_stat.stat.mode == '0600'"
-      - "'archived' in archive_bz2_result_02"
-      - "{{ archive_bz2_result_02['archived']| length}} == 3"
-
-- name: remove our bz2
-  file: path="{{ output_dir }}/archive_02.bz2" state=absent
-
-- name: archive and set mode to 0600
-  archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_02.xz"
-    format: xz
-    mode: "u+rwX,g-rwx,o-rwx"
-  register: archive_xz_result_02
-
-- name: Test that the file modes were changed
-  stat:
-    path: "{{ output_dir }}/archive_02.xz"
-  register: archive_02_xz_stat
-
-- name: Test that the file modes were changed
-  assert:
-    that:
-      - archive_02_xz_stat is not changed
-      - "archive_02_xz_stat.stat.mode == '0600'"
-      - "'archived' in archive_xz_result_02"
-      - "{{ archive_xz_result_02['archived']| length}} == 3"
-
-- name: remove our xz
-  file: path="{{ output_dir }}/archive_02.xz" state=absent
-
-- name: archive multiple files as list
-  archive:
-    path:
-      - "{{ output_dir }}/empty.txt"
-      - "{{ output_dir }}/foo.txt"
-      - "{{ output_dir }}/bar.txt"
-    dest: "{{ output_dir }}/archive_list.gz"
-    format: gz
-  register: archive_gz_list_result
-
-- name: verify that the files archived
-  file: path={{output_dir}}/archive_list.gz state=file
-
-- name: check if gz file exists and includes all text files
-  assert:
-    that:
-      - "{{ archive_gz_list_result.changed }}"
-      - "{{ 'archived' in archive_gz_list_result }}"
-      - "{{ archive_gz_list_result['archived'] | length }} == 3"
-
-- name: remove our gz
-  file: path="{{ output_dir }}/archive_list.gz" state=absent
-
-- name: test that gz archive that contains non-ascii filenames
-  archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/test-archive-nonascii-くらとみ.tar.gz"
-    format: gz
-  register: nonascii_result_0
-
-- name: Check that file is really there
-  stat:
-    path: "{{ output_dir }}/test-archive-nonascii-くらとみ.tar.gz"
-  register: nonascii_stat0
-
-- name: Assert that nonascii tests succeeded
-  assert:
-    that:
-      - nonascii_result_0 is changed
-      - "nonascii_stat0.stat.exists == true"
-
-- name: remove nonascii test
-  file: path="{{ output_dir }}/test-archive-nonascii-くらとみ.tar.gz" state=absent
-
-- name: test that bz2 archive that contains non-ascii filenames
-  archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/test-archive-nonascii-くらとみ.bz2"
-    format: bz2
-  register: nonascii_result_1
-
-- name: Check that file is really there
-  stat:
-    path: "{{ output_dir }}/test-archive-nonascii-くらとみ.bz2"
-  register: nonascii_stat_1
-
-- name: Assert that nonascii tests succeeded
-  assert:
-    that:
-      - nonascii_result_1 is changed
-      - "nonascii_stat_1.stat.exists == true"
-
-- name: remove nonascii test
-  file: path="{{ output_dir }}/test-archive-nonascii-くらとみ.bz2" state=absent
-
-- name: test that xz archive that contains non-ascii filenames
-  archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/test-archive-nonascii-くらとみ.xz"
-    format: xz
-  register: nonascii_result_1
-
-- name: Check that file is really there
-  stat:
-    path: "{{ output_dir }}/test-archive-nonascii-くらとみ.xz"
-  register: nonascii_stat_1
-
-- name: Assert that nonascii tests succeeded
-  assert:
-    that:
-      - nonascii_result_1 is changed
-      - "nonascii_stat_1.stat.exists == true"
-
-- name: remove nonascii test
-  file: path="{{ output_dir }}/test-archive-nonascii-くらとみ.xz" state=absent
-
-- name: test that zip archive that contains non-ascii filenames
-  archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/test-archive-nonascii-くらとみ.zip"
-    format: zip
-  register: nonascii_result_2
-
-- name: Check that file is really there
-  stat:
-    path: "{{ output_dir }}/test-archive-nonascii-くらとみ.zip"
-  register: nonascii_stat_2
-
-- name: Assert that nonascii tests succeeded
-  assert:
-    that:
-      - nonascii_result_2 is changed
-      - "nonascii_stat_2.stat.exists == true"
-
-- name: remove nonascii test
-  file: path="{{ output_dir }}/test-archive-nonascii-くらとみ.zip" state=absent
-
-- name: Test exclusion_patterns option
-  archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/test-archive-exclusion-patterns.tgz"
-    exclusion_patterns: b?r.*
-  register: exclusion_patterns_result
-
-- name: Assert that exclusion_patterns only archives included files
-  assert:
-    that:
-      - exclusion_patterns_result is changed
-      - "'bar.txt' not in exclusion_patterns_result.archived"
-
-- name: Test that excluded paths do not influence archive root
-  archive:
-    path:
-      - "{{ output_dir }}/sub/subfile.txt"
-      - "{{ output_dir }}"
-    exclude_path:
-      - "{{ output_dir }}"
-    dest: "{{ output_dir }}/test-archive-root.tgz"
-  register: archive_root_result
-
-- name: Assert that excluded paths do not influence archive root
-  assert:
-    that:
-      - archive_root_result.arcroot != output_dir
-
-- name: Remove archive root test
-  file:
-    path: "{{ output_dir }}/test-archive-root.tgz"
-    state: absent
-
-- name: Test Single Target with format={{ item }}
-  archive:
-    path: "{{ output_dir }}/foo.txt"
-    dest: "{{ output_dir }}/test-single-target.{{ item }}"
-    format: "{{ item }}"
-  register: "single_target_test"
-  loop:
-    - zip
-    - tar
-    - gz
-    - bz2
-    - xz
-
-# Dummy tests until ``dest_state`` result value can be implemented
-- name: Assert that single target tests are effective
-  assert:
-    that:
-      - single_target_test.results[0] is changed
-      - single_target_test.results[1] is changed
-      - single_target_test.results[2] is changed
-      - single_target_test.results[3] is changed
-      - single_target_test.results[4] is changed
-
-- name: Retrieve contents of single target archives
-  ansible.builtin.unarchive:
-    src: "{{ output_dir }}/test-single-target.zip"
-    dest: .
-    list_files: true
-  check_mode: true
-  ignore_errors: true
-  register: single_target_test_contents
-
-- name: Assert that file names in single-file zip archives are preserved
-  assert:
-    that:
-      - "'oo.txt' not in single_target_test_contents.files"
-      - "'foo.txt' in single_target_test_contents.files"
-  # ``unarchive`` fails for RHEL and FreeBSD on ansible 2.x
-  when: single_target_test_contents is success and single_target_test_contents is not skipped
-
-- name: Remove single target test with format={{ item }}
-  file:
-    path: "{{ output_dir }}/test-single-target.{{ item }}"
-    state: absent
-  loop:
-    - zip
-    - tar
-    - gz
-    - bz2
-    - xz
-
-- name: Test that missing files result in incomplete state
-  archive:
-    path:
-      - "{{ output_dir }}/*.txt"
-      - "{{ output_dir }}/dne.txt"
-    exclude_path: "{{ output_dir }}/foo.txt"
-    dest: "{{ output_dir }}/test-incomplete-archive.tgz"
-  register: incomplete_archive_result
-
-- name: Assert that incomplete archive has incomplete state
-  assert:
-    that:
-      - incomplete_archive_result is changed
-      - "'{{ output_dir }}/dne.txt' in incomplete_archive_result.missing"
-      - "'{{ output_dir }}/foo.txt' not in incomplete_archive_result.missing"
-
-- name: Remove incomplete archive
-  file:
-    path: "{{ output_dir }}/test-incomplete-archive.tgz"
-    state: absent
-
+- name: Define formats to test
+  set_fact:
+    formats:
+      - tar
+      - zip
+      - gz
+      - bz2
+      - xz
+
+# Run tests
+- name: Run core tests
+  include_tasks:
+    file: ../tests/core.yml
+  loop: "{{ formats }}"
+  loop_control:
+    loop_var: format
+
+- name: Run exclusions tests
+  include_tasks:
+    file: ../tests/exclusions.yml
+  loop: "{{ formats }}"
+  loop_control:
+    loop_var: format
+
+- name: Run remove tests
+  include_tasks:
+    file: ../tests/remove.yml
+  loop: "{{ formats }}"
+  loop_control:
+    loop_var: format
+
+- name: Run broken link tests
+  include_tasks:
+    file: ../tests/broken-link.yml
+  loop: "{{ formats }}"
+  loop_control:
+    loop_var: format
+
+# Test cleanup
 - name: Remove backports.lzma if previously installed (pip)
   pip: name=backports.lzma state=absent
   when: backports_lzma_pip is changed
-
-- name: import remove tests
-  import_tasks: remove.yml
-
-- name: import broken-link tests
-  import_tasks: broken-link.yml
