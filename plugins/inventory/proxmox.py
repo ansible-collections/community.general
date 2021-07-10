@@ -369,6 +369,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 if node['type'] == 'node':
                     self.inventory.add_child(nodes_group, node['node'])
 
+                if node['status'] == 'offline':
+                    continue
+
                 # get node IP address
                 if self.get_option("want_proxmox_nodes_ansible_host"):
                     ip = self._get_node_ip(node['node'])
