@@ -159,7 +159,7 @@ class Plist:
         """Finds the plist file associated with a service"""
 
         launchd_paths = [
-            os.path.expanduser('~/Library/LaunchAgents'),
+            os.path.join(os.getenv('HOME'), 'Library/LaunchAgents'),
             '/Library/LaunchAgents',
             '/Library/LaunchDaemons',
             '/System/Library/LaunchAgents',
