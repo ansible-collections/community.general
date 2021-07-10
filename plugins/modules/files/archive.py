@@ -137,6 +137,16 @@ state:
         The state of the input C(path).
     type: str
     returned: always
+dest_state:
+    description:
+      - The state of the I(dest) file.
+      - C(absent) when the file does not exist.
+      - C(archive) when the file is an archive.
+      - C(compress) when the file is compressed, but not an archive.
+      - C(incomplete) when the file is an archive, but some files under I(path) were not found.
+    type: str
+    returned: success
+    version_added: 3.4.0
 missing:
     description: Any files that were missing from the source.
     type: list
@@ -435,6 +445,7 @@ class Archive(object):
         return {
             'archived': [_to_native(p) for p in self.successes],
             'dest': _to_native(self.destination),
+            'dest_state': self.destination_state,
             'changed': self.changed,
             'arcroot': _to_native(self.root),
             'missing': [_to_native(p) for p in self.not_found],

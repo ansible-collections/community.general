@@ -1,0 +1,31 @@
+---
+- block:
+    - name: Create link - broken link ({{ format }})
+      file:
+        src: /nowhere
+        dest: "{{ output_dir }}/nowhere.txt"
+        state: link
+        force: yes
+
+    - name: Archive - broken link ({{ format }})
+      archive:
+        path: "{{ output_dir }}/*.txt"
+        dest: "{{ output_dir }}/archive_broken_link.{{ format }}"
+        format: "{{ format }}"
+
+    - name: Verify archive exists - broken link ({{ format }})
+      file:
+        path: "{{ output_dir }}/archive_broken_link.{{ format }}"
+        state: file
+
+    - name: Remove archive - broken link ({{ format }})
+      file:
+        path: "{{ output_dir }}/archive_broken_link.{{ format }}"
+        state: absent
+
+    - name: Remove link - broken link ({{ format }})
+      file:
+        path: "{{ output_dir }}/nowhere.txt"
+        state: absent
+  # 'zip' does not support symlink's
+  when: format != 'zip'
