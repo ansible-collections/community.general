@@ -35,6 +35,10 @@
     # Available on FreeBSD but not on testbed (util-linux conflicts with e2fsprogs): wipefs, mkfs.minix
     - 'not (ansible_system == "FreeBSD" and item.1 in ["overwrite_another_fs", "remove_fs"])'
 
+    # Linux limited support
+    # Not available: ufs (this is FreeBSD's native fs)
+    - 'not (ansible_system == "Linux" and item.0.key == "ufs")'
+
     # Other limitations and corner cases
 
     # f2fs-tools and reiserfs-utils packages not available with RHEL/CentOS on CI
@@ -58,4 +62,25 @@
     - 'not (ansible_os_family == "Suse" and ansible_distribution_major_version|int != 42 and
             item.0.key == "xfs" and ansible_python.version.major == 2)'
 
+  loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'overwrite_another_fs', 'remove_fs'])|list }}"
+
+
+# With FreeBSD extended support (util-linux is not available before 12.2)
+
+- include_tasks: freebsd_setup.yml
+  when:
+    - 'ansible_system == "FreeBSD"'
+    - 'ansible_distribution_version is version("12.2", ">=")'
+
+- include_tasks: create_device.yml
+  vars:
+    image_file: '{{ remote_tmp_dir }}/img'
+    fstype: '{{ item.0.key }}'
+    fssize: '{{ item.0.value.fssize }}'
+    grow: '{{ item.0.value.grow }}'
+    action: '{{ item.1 }}'
+  when:
+    - 'ansible_system == "FreeBSD"'
+    - 'ansible_distribution_version is version("12.2", ">=")'
+    - 'item.0.key in ["xfs", "vfat"]'
   loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'overwrite_another_fs', 'remove_fs'])|list }}"

@@ -10,8 +10,8 @@
     cmd: 'mkfs.minix {{ dev }}'
 
 - name: 'Get UUID of the new filesystem'
-  ansible.builtin.command:
-    cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
+  ansible.builtin.shell:
+    cmd: "{{ get_uuid_cmd }}"
   changed_when: false
   register: uuid
 
@@ -23,8 +23,8 @@
   ignore_errors: True
 
 - name: 'Get UUID of the filesystem'
-  ansible.builtin.command:
-    cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
+  ansible.builtin.shell:
+    cmd: "{{ get_uuid_cmd }}"
   changed_when: false
   register: uuid2
 
@@ -42,8 +42,8 @@
   register: fs_result2
 
 - name: 'Get UUID of the new filesystem'
-  ansible.builtin.command:
-    cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
+  ansible.builtin.shell:
+    cmd: "{{ get_uuid_cmd }}"
   changed_when: false
   register: uuid3
 
