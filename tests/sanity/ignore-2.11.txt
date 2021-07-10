@@ -142,7 +142,6 @@ plugins/modules/storage/purestorage/purefb_facts.py validate-modules:parameter-l
 plugins/modules/storage/purestorage/purefb_facts.py validate-modules:return-syntax-error
 plugins/modules/system/gconftool2.py validate-modules:parameter-state-invalid-choice
 plugins/modules/system/iptables_state.py validate-modules:undocumented-parameter
-plugins/modules/system/launchd.py use-argspec-type-path  # False positive
 plugins/modules/system/osx_defaults.py validate-modules:parameter-state-invalid-choice
 plugins/modules/system/parted.py validate-modules:parameter-state-invalid-choice
 plugins/modules/system/puppet.py use-argspec-type-path
