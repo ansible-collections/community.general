@@ -583,10 +583,13 @@ class TarArchive(Archive):
         def py27_filter(tarinfo):
             return None if matches_exclusion_patterns(tarinfo.name, self.exclusion_patterns) else tarinfo
 
+        def py26_filter(path):
+            return legacy_filter(path, self.exclusion_patterns)
+
         if PY27:
             self.file.add(path, archive_name, recursive=False, filter=py27_filter)
         else:
-            self.file.add(path, archive_name, recursive=False, exclude=legacy_filter)
+            self.file.add(path, archive_name, recursive=False, exclude=py26_filter)
 
     def _get_checksums(self, path):
         try:
