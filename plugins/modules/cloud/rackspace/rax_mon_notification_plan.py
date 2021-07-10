@@ -32,16 +32,19 @@ options:
     required: true
   critical_state:
     type: list
+    elements: str
     description:
     - Notification list to use when the alarm state is CRITICAL. Must be an
       array of valid rax_mon_notification ids.
   warning_state:
     type: list
+    elements: str
     description:
     - Notification list to use when the alarm state is WARNING. Must be an array
       of valid rax_mon_notification ids.
   ok_state:
     type: list
+    elements: str
     description:
     - Notification list to use when the alarm state is OK. Must be an array of
       valid rax_mon_notification ids.
@@ -150,9 +153,9 @@ def main():
         dict(
             state=dict(default='present', choices=['present', 'absent']),
             label=dict(required=True),
-            critical_state=dict(type='list'),
-            warning_state=dict(type='list'),
-            ok_state=dict(type='list')
+            critical_state=dict(type='list', elements='str'),
+            warning_state=dict(type='list', elements='str'),
+            ok_state=dict(type='list', elements='str'),
         )
     )
 
