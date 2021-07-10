@@ -28,7 +28,6 @@
     action: '{{ item.1 }}'
   when:
     # FreeBSD limited support
-    - 'not (ansible_system == "FreeBSD" and ansible_distribution_version is version("12.2", "<"))'
     # Not available: btrfs, lvm, f2fs, ocfs2
     # All BSD systems use swap fs, but only Linux needs mkswap
     # Supported: ext2/3/4 (e2fsprogs), xfs (xfsprogs), reiserfs (progsreiserfs), vfat
@@ -70,7 +69,7 @@
 
 - include_tasks: freebsd_setup.yml
   when:
-    - 'ansible_system == "FreeBSD" and ansible_distribution_version is version("12.2", ">=")'
+    - 'ansible_system == "FreeBSD"'
 
 - include_tasks: create_device.yml
   vars:
@@ -80,6 +79,6 @@
     grow: '{{ item.0.value.grow }}'
     action: '{{ item.1 }}'
   when:
-    - 'ansible_system == "FreeBSD" and ansible_distribution_version is version("12.2", ">=")'
+    - 'ansible_system == "FreeBSD"'
     - 'item.0.key in ["xfs", "vfat"]'
   loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'overwrite_another_fs', 'remove_fs'])|list }}"
