@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - archive - staging fix for idempotency checks to be enabled in community.general 4.0.0
+    (https://github.com/ansible-collections/community.general/pull/2987).
