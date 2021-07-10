@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Copyright: (c) 2021, quidame <quidame@poivron.org>
 # Copyright: (c) 2013, Alexander Bulimov <lazywolf0@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -12,6 +13,7 @@ DOCUMENTATION = '''
 ---
 author:
   - Alexander Bulimov (@abulimov)
+  - quidame (@quidame)
 module: filesystem
 short_description: Makes a filesystem
 description:
@@ -30,25 +32,22 @@ options:
     default: present
     version_added: 1.3.0
   fstype:
-    choices: [ btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap ]
+    choices: [ btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap, ufs ]
     description:
       - Filesystem type to be created. This option is required with
         C(state=present) (or if I(state) is omitted).
-      - reiserfs support was added in 2.2.
-      - lvm support was added in 2.5.
-      - since 2.5, I(dev) can be an image file.
-      - vfat support was added in 2.5
-      - ocfs2 support was added in 2.6
-      - f2fs support was added in 2.7
-      - swap support was added in 2.8
+      - ufs support has been added in community.general 3.4.0.
     type: str
     aliases: [type]
   dev:
     description:
-      - Target path to block device or regular file.
-      - On systems not using block devices but character devices instead (as
-        FreeBSD), this module only works when applying to regular files, aka
-        disk images.
+      - Target path to block device (Linux) or character device (FreeBSD) or
+        regular file (both).
+      - When setting Linux-specific filesystem types on FreeBSD, this module
+        only works when applying to regular files, aka disk images.
+      - Currently C(lvm) (Linux-only) and C(ufs) (FreeBSD-only) don't support
+        a regular file as their target I(dev).
+      - Support for character devices on FreeBSD has been added in community.general 3.4.0.
     type: path
     required: yes
     aliases: [device]
@@ -60,7 +59,7 @@ options:
   resizefs:
     description:
       - If C(yes), if the block device and filesystem size differ, grow the filesystem into the space.
-      - Supported for C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs) and C(vfat) filesystems.
+      - Supported for C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs), C(ufs) and C(vfat) filesystems.
         Attempts to resize other filesystem types will fail.
       - XFS Will only grow if mounted. Currently, the module is based on commands
         from C(util-linux) package to perform operations, so resizing of XFS is
@@ -73,16 +72,24 @@ options:
       - List of options to be passed to mkfs command.
     type: str
 requirements:
-  - Uses tools related to the I(fstype) (C(mkfs)) and the C(blkid) command.
-  - When I(resizefs) is enabled, C(blockdev) command is required too.
+  - Uses specific tools related to the I(fstype) for creating or resizing a
+    filesystem (from packages e2fsprogs, xfsprogs, dosfstools, and so on).
+  - Uses generic tools mostly related to the Operating System (Linux or
+    FreeBSD) or available on both, as C(blkid).
+  - On FreeBSD, either C(util-linux) or C(e2fsprogs) package is required.
 notes:
-  - Potential filesystem on I(dev) are checked using C(blkid). In case C(blkid)
-    isn't able to detect an existing filesystem, this filesystem is overwritten
-    even if I(force) is C(no).
-  - On FreeBSD systems, either C(e2fsprogs) or C(util-linux) packages provide
-    a C(blkid) command that is compatible with this module, when applied to
-    regular files.
+  - Potential filesystems on I(dev) are checked using C(blkid). In case C(blkid)
+    is unable to detect a filesystem (and in case C(fstyp) on FreeBSD is also
+    unable to detect a filesystem), this filesystem is overwritten even if
+    I(force) is C(no).
+  - On FreeBSD systems, both C(e2fsprogs) and C(util-linux) packages provide
+    a C(blkid) command that is compatible with this module. However, these
+    packages conflict with each other, and only the C(util-linux) package
+    provides the command required to not fail when I(state=absent).
   - This module supports I(check_mode).
+seealso:
+  - module: community.general.filesize
+  - module: ansible.posix.mount
 '''
 
 EXAMPLES = '''
@@ -101,6 +108,11 @@ EXAMPLES = '''
   community.general.filesystem:
     dev: /dev/sdb1
     state: absent
+
+- name: Create a filesystem on top of a regular file
+  community.general.filesystem:
+    dev: /path/to/disk.img
+    fstype: vfat
 '''
 
 from distutils.version import LooseVersion
@@ -125,6 +137,10 @@ class Device(object):
             blockdev_cmd = self.module.get_bin_path("blockdev", required=True)
             dummy, out, dummy = self.module.run_command([blockdev_cmd, "--getsize64", self.path], check_rc=True)
             devsize_in_bytes = int(out)
+        elif stat.S_ISCHR(statinfo.st_mode) and platform.system() == 'FreeBSD':
+            diskinfo_cmd = self.module.get_bin_path("diskinfo", required=True)
+            dummy, out, dummy = self.module.run_command([diskinfo_cmd, self.path], check_rc=True)
+            devsize_in_bytes = int(out.split()[2])
         elif os.path.isfile(self.path):
             devsize_in_bytes = os.path.getsize(self.path)
         else:
@@ -423,6 +439,31 @@ class Swap(Filesystem):
     MKFS_FORCE_FLAGS = ['-f']
 
 
+class UFS(Filesystem):
+    MKFS = 'newfs'
+    INFO = 'dumpfs'
+    GROW = 'growfs'
+    GROW_MAX_SPACE_FLAGS = ['-y']
+
+    def get_fs_size(self, dev):
+        """Get providersize and fragment size and return their product."""
+        cmd = self.module.get_bin_path(self.INFO, required=True)
+        dummy, out, dummy = self.module.run_command([cmd, str(dev)], check_rc=True, environ_update=self.LANG_ENV)
+
+        fragmentsize = providersize = None
+        for line in out.splitlines():
+            if line.startswith('fsize'):
+                fragmentsize = int(line.split()[1])
+            elif 'providersize' in line:
+                providersize = int(line.split()[-1])
+            if None not in (fragmentsize, providersize):
+                break
+        else:
+            raise ValueError(out)
+
+        return fragmentsize * providersize
+
+
 FILESYSTEMS = {
     'ext2': Ext2,
     'ext3': Ext3,
@@ -436,6 +477,7 @@ FILESYSTEMS = {
     'ocfs2': Ocfs2,
     'LVM2_member': LVM,
     'swap': Swap,
+    'ufs': UFS,
 }
 
 
@@ -484,11 +526,16 @@ def main():
 
     dev = Device(module, dev)
 
+    # In case blkid/fstyp isn't able to identify an existing filesystem, device
+    # is considered as empty, then this existing filesystem would be overwritten
+    # even if force isn't enabled.
     cmd = module.get_bin_path('blkid', required=True)
     rc, raw_fs, err = module.run_command([cmd, '-c', os.devnull, '-o', 'value', '-s', 'TYPE', str(dev)])
-    # In case blkid isn't able to identify an existing filesystem, device is considered as empty,
-    # then this existing filesystem would be overwritten even if force isn't enabled.
     fs = raw_fs.strip()
+    if not fs and platform.system() == 'FreeBSD':
+        cmd = module.get_bin_path('fstyp', required=True)
+        rc, raw_fs, err = module.run_command([cmd, str(dev)])
+        fs = raw_fs.strip()
 
     if state == "present":
         if fstype in friendly_names:

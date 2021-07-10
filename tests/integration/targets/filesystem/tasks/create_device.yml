@@ -19,6 +19,17 @@
           ansible.builtin.set_fact:
             dev: "{{ loop_device_cmd.stdout }}"
 
+    - when: fstype == 'ufs'
+      block:
+        - name: 'Create a memory disk for UFS'
+          ansible.builtin.command:
+            cmd: 'mdconfig -a -f {{ dev }}'
+          register: memory_disk_cmd
+
+        - name: 'Switch to memory disk target for further tasks'
+          ansible.builtin.set_fact:
+            dev: "/dev/{{ memory_disk_cmd.stdout }}"
+
     - include_tasks: '{{ action }}.yml'
 
   always:
@@ -28,10 +39,16 @@
         removes: '{{ dev }}'
       when: fstype == 'lvm'
 
-    - name: 'Clean correct device for LVM'
+    - name: 'Detach memory disk used for UFS'
+      ansible.builtin.command:
+        cmd: 'mdconfig -d -u {{ dev }}'
+        removes: '{{ dev }}'
+      when: fstype == 'ufs'
+
+    - name: 'Clean correct device for LVM and UFS'
       ansible.builtin.set_fact:
         dev: '{{ image_file }}'
-      when: fstype == 'lvm'
+      when: fstype in ['lvm', 'ufs']
 
     - name: 'Remove disk image file'
       ansible.builtin.file:
