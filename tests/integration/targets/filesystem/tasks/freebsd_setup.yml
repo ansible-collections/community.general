@@ -1,0 +1,10 @@
+---
+- name: "Uninstall e2fsprogs"
+  ansible.builtin.package:
+    name: e2fsprogs
+    state: absent
+
+- name: "Install util-linux"
+  ansible.builtin.package:
+    name: util-linux
+    state: present

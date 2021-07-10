@@ -7,8 +7,8 @@
     fstype: '{{ fstype }}'
 
 - name: "Get filesystem UUID with 'blkid'"
-  ansible.builtin.command:
-    cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
+  ansible.builtin.shell:
+    cmd: "{{ get_uuid_cmd }}"
   changed_when: false
   register: blkid_ref
 
@@ -27,8 +27,8 @@
   check_mode: yes
 
 - name: "Get filesystem UUID with 'blkid' (should remain the same)"
-  ansible.builtin.command:
-    cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
+  ansible.builtin.shell:
+    cmd: "{{ get_uuid_cmd }}"
   changed_when: false
   register: blkid
 
@@ -46,8 +46,8 @@
   register: wipefs
 
 - name: "Get filesystem UUID with 'blkid' (should be empty)"
-  ansible.builtin.command:
-    cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
+  ansible.builtin.shell:
+    cmd: "{{ get_uuid_cmd }}"
   changed_when: false
   failed_when: false
   register: blkid
