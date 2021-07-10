@@ -1,0 +1,2 @@
+bugfixes:
+  - launchd - fixed sanity check in the module's code (https://github.com/ansible-collections/community.general/pull/2960).

@@ -62,7 +62,6 @@ plugins/modules/net_tools/nios/nios_zone.py validate-modules:deprecation-mismatc
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:invalid-documentation
 plugins/modules/source_control/github/github_deploy_key.py validate-modules:parameter-invalid
 plugins/modules/system/iptables_state.py validate-modules:undocumented-parameter
-plugins/modules/system/launchd.py use-argspec-type-path  # False positive
 plugins/modules/system/puppet.py use-argspec-type-path
 plugins/modules/system/puppet.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/runit.py validate-modules:parameter-type-not-in-doc  # deprecated param - removed in 4.0.0
