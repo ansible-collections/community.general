@@ -51,7 +51,17 @@ options:
         description:
           - The type of the monitor.
           - The types C(query alert), C(trace-analytics alert) and C(rum alert) were added in community.general 2.1.0.
-        choices: ['metric alert', 'service check', 'event alert', 'process alert', 'log alert', 'query alert', 'trace-analytics alert', 'rum alert']
+          - The type C(composite) was added in community.general 3.4.0.
+        choices:
+            - metric alert
+            - service check
+            - event alert
+            - process alert
+            - log alert
+            - query alert
+            - trace-analytics alert
+            - rum alert
+            - composite
         type: str
     query:
         description:
@@ -209,7 +219,8 @@ def main():
             app_key=dict(required=True, no_log=True),
             state=dict(required=True, choices=['present', 'absent', 'mute', 'unmute']),
             type=dict(choices=['metric alert', 'service check', 'event alert', 'process alert',
-                               'log alert', 'query alert', 'trace-analytics alert', 'rum alert']),
+                               'log alert', 'query alert', 'trace-analytics alert',
+                               'rum alert', 'composite']),
             name=dict(required=True),
             query=dict(),
             notification_message=dict(no_log=True),
