@@ -24,7 +24,6 @@ options:
             - If a hostname is given, it will be resolved to the IP address.
         type: str
     state:
-        required: true
         description:
             - On C(inMaintenence) put device in maintenence mode
             - On C(inHibernation) put device in hibernation mode
@@ -228,7 +227,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             device=dict(type='str', required=True, aliases=['host', 'name']),
-            state=dict(type='str', required=True, choices=['inMaintenance', 'inHibernation', 'isManaged'], default='isManaged'),
+            state=dict(type='str',  choices=['inMaintenance', 'inHibernation', 'isManaged'], default='isManaged'),
             url=dict(type='str', required=True, aliases=['oneclick_url']),
             url_username=dict(type='str', required=True, aliases=['oneclick_user']),
             url_password=dict(type='str', required=True, no_log=True, aliases=['oneclick_password']),
