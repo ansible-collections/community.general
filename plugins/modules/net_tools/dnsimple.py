@@ -310,10 +310,10 @@ def create_record(client, account, domain, name, record_type, content, ttl=None,
 
 def get_paginated_result(operation, **options):
     global DNSIMPLE_PAGINATION_PER_PAGE
-    records_pagination = operation(**options, per_page=DNSIMPLE_PAGINATION_PER_PAGE).pagination
+    records_pagination = operation(per_page=DNSIMPLE_PAGINATION_PER_PAGE, **options).pagination
     result_list = []
     for page in range(1, records_pagination.total_pages + 1):
-        page_data = operation(**options, per_page=DNSIMPLE_PAGINATION_PER_PAGE, page=page).data
+        page_data = operation(per_page=DNSIMPLE_PAGINATION_PER_PAGE, page=page, **options).data
         result_list.extend(page_data)
     return result_list
 
