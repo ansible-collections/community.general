@@ -174,7 +174,6 @@ if not HAS_DNSIMPLE:
     try:
         from dnsimple.dnsimple import __version__ as dnsimple_version
         from dnsimple import DNSimple
-        from dnsimple.dnsimple import __version__ as dnsimple_version
         from dnsimple.dnsimple import DNSimpleException
         HAS_DNSIMPLE = True
     except ImportError:
