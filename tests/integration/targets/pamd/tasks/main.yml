@@ -1,0 +1,27 @@
+# (c) 2021, Alexei Znamensky
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: Set value for temp limit configuration
+  set_fact:
+    test_limit_file: "/tmp/single_line"
+
+- name: Copy temporary limits.conf
+  copy:
+    src: single_line
+    dest: "{{ test_limit_file }}"
+
+- name: Test working on a single-line file works (2925)
+  community.general.pamd:
+    name: single_line
+    type: session
+    control: required
+    module_path: pam_lastlog.so
+    module_arguments: silent
+    state: args_absent
+    path: /tmp
+  register: single_line_output
+
+- name: Check if changes made
+  assert:
+    that:
+      - single_line_output is changed
