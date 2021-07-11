@@ -73,8 +73,9 @@ options:
     default: no
   sandbox:
     description:
-      - Use the DNSimple sandbox environment (requires a dedicated account in the dnsimple sandbox environment)
-      - Check https://developer.dnsimple.com/sandbox/ for more information
+      - Use the DNSimple sandbox environment.
+      - Requires a dedicated account in the dnsimple sandbox environment.
+      - Check U(https://developer.dnsimple.com/sandbox/) for more information.
     type: 'bool'
     default: no
 requirements:
