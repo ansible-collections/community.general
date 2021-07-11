@@ -71,6 +71,12 @@ options:
       - Only use with C(state) is set to C(present) on a record.
     type: 'bool'
     default: no
+  sandbox:
+    description:
+      - Use the DNSimple sandbox environment (requires a dedicated account in the dnsimple sandbox environment)
+      - Check https://developer.dnsimple.com/sandbox/ for more information
+    type: 'bool'
+    default: no
 requirements:
   - "dnsimple >= 1.0.0"
 author: "Alex Coomans (@drcapulet)"
@@ -175,10 +181,10 @@ if not HAS_DNSIMPLE:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib, env_fallback
 
 
-def dnsimple_client(account_email=None, account_api_token=None):
+def dnsimple_client(sandbox=False, account_email=None, account_api_token=None):
     if DNSIMPLE_MAJOR_VERSION > 1:
         if account_email and account_api_token:
-            client = Client(email=account_email, access_token=account_api_token)
+            client = Client(sandbox=sandbox, email=account_email, access_token=account_api_token)
         else:
             msg = "Option account_email or account_api_token not provided. " \
                   "Dnsimple authentiction with a .dnsimple config file is not " \
@@ -186,9 +192,9 @@ def dnsimple_client(account_email=None, account_api_token=None):
             raise DNSimpleException(msg)
     else:
         if account_email and account_api_token:
-            client = DNSimple(email=account_email, api_token=account_api_token)
+            client = DNSimple(sandbox=sandbox, email=account_email, api_token=account_api_token)
         else:
-            client = DNSimple()
+            client = DNSimple(sandbox=sandbox)
     return client
 
 
@@ -337,6 +343,7 @@ def main():
             priority=dict(type='int'),
             state=dict(type='str', choices=['present', 'absent'], default='present'),
             solo=dict(type='bool', default=False),
+            sandbox=dict(type='bool', default=False),
         ),
         required_together=[
             ['record', 'value']
@@ -360,9 +367,10 @@ def main():
     priority = module.params.get('priority')
     state = module.params.get('state')
     is_solo = module.params.get('solo')
+    sandbox = module.params.get('sandbox')
 
     try:
-        client = dnsimple_client(account_email, account_api_token)
+        client = dnsimple_client(sandbox, account_email, account_api_token)
         account = dnsimple_account(client)
         # Let's figure out what operation we want to do
         # No domain, return a list
