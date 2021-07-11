@@ -119,7 +119,7 @@ body:
       I am trying to do X with the collection from the main branch on GitHub and
 >>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
       I think that implementing a feature Y would be very helpful for me and
-      every other user of ansible-core because of Z.
+      every other user of community.general because of Z.
   validations:
     required: true
 
