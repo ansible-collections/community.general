@@ -24,7 +24,6 @@
   assert:
     that:
       - file_content_idempotency_after is not changed
-      - "{{ file_content_idempotency_before.archived | sort }} == {{ file_content_idempotency_after.archived | sort }}"
   when: "format in ('tar', 'zip')"
 
 - name: Remove archvie - file content idempotency ({{ format }})
@@ -95,8 +94,6 @@
   assert:
     that:
       - single_file_content_idempotency_after is not changed
-      - "{{ single_file_content_idempotency_before.archived | sort }} ==
-         {{ single_file_content_idempotency_after.archived | sort }}"
   when: "format in ('tar', 'zip')"
 
 - name: Remove archvie - single file content idempotency ({{ format }})
