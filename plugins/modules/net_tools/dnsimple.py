@@ -72,7 +72,7 @@ options:
     type: 'bool'
     default: no
 requirements:
-  - "dnsimple >= 2.0.0"
+  - "dnsimple >= 1.0.0"
 author: "Alex Coomans (@drcapulet)"
 '''
 
