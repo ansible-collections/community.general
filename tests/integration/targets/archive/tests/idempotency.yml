@@ -19,11 +19,13 @@
     format: "{{ format }}"
   register: file_content_idempotency_after
 
+# After idempotency fix result will be reliably changed for all formats
 - name: Assert task status is changed - file content idempotency ({{ format }})
   assert:
     that:
-      - file_content_idempotency_after is changed
+      - file_content_idempotency_after is not changed
       - "{{ file_content_idempotency_before.archived | sort }} == {{ file_content_idempotency_after.archived | sort }}"
+  when: "format in ('tar', 'zip')"
 
 - name: Remove archvie - file content idempotency ({{ format }})
   file:
@@ -53,10 +55,12 @@
     format: "{{ format }}"
   register: file_name_idempotency_after
 
+# After idempotency fix result will be reliably changed for all formats
 - name: Check task status - fime name idempotency ({{ format }})
   assert:
     that:
-      - file_name_idempotency_after is changed
+      - file_name_idempotency_after is not changed
+  when: "format in ('tar', 'zip')"
 
 - name: Remove archvie - file name idempotency ({{ format }})
   file:
@@ -86,12 +90,14 @@
     format: "{{ format }}"
   register: single_file_content_idempotency_after
 
+# After idempotency fix result will be reliably changed for all formats
 - name: Assert task status is changed - single file content idempotency ({{ format }})
   assert:
     that:
-      - single_file_content_idempotency_after is changed
+      - single_file_content_idempotency_after is not changed
       - "{{ single_file_content_idempotency_before.archived | sort }} ==
          {{ single_file_content_idempotency_after.archived | sort }}"
+  when: "format in ('tar', 'zip')"
 
 - name: Remove archvie - single file content idempotency ({{ format }})
   file:
@@ -121,17 +127,13 @@
     format: "{{ format }}"
   register: single_file_name_idempotency_after
 
+
+# After idempotency fix result will be reliably changed for all formats
 - name: Check task status - single file name idempotency ({{ format }})
   assert:
     that:
-      - single_file_name_idempotency_after.changed == status_map[format]
-  vars:
-    status_map:
-      tar: true
-      zip: true
-      gz: false
-      bz2: false
-      xz: false
+      - single_file_name_idempotency_after is not changed
+  when: "format in ('tar', 'zip')"
 
 - name: Remove archvie - single file name idempotency ({{ format }})
   file:

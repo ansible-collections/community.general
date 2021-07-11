@@ -182,7 +182,6 @@ import zipfile
 from fnmatch import fnmatch
 from sys import version_info
 from traceback import format_exc
-from zlib import crc32
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_native
@@ -204,8 +203,6 @@ else:
     except ImportError:
         LZMA_IMP_ERR = format_exc()
         HAS_LZMA = False
-
-ENABLE_IDEMPOTENCY_FIX = False
 
 PATH_SEP = to_bytes(os.sep)
 PY27 = version_info[0:2] >= (2, 7)
@@ -301,7 +298,6 @@ class Archive(object):
                 msg='Error, must specify "dest" when archiving multiple files or trees'
             )
 
-        self.original_checksums = self.destination_checksums()
         self.original_size = self.destination_size()
 
     def add(self, path, archive_name):
@@ -375,15 +371,7 @@ class Archive(object):
             )
 
     def compare_with_original(self):
-        if ENABLE_IDEMPOTENCY_FIX and self.original_checksums is not None:
-            self.changed |= self.original_checksums != self.destination_checksums()
-        else:
-            self.changed |= self.original_size != self.destination_size()
-
-    def destination_checksums(self):
-        if self.destination_exists() and self.destination_readable():
-            return self._get_checksums(self.destination)
-        return None
+        self.changed |= self.original_size != self.destination_size()
 
     def destination_exists(self):
         return self.destination and os.path.exists(self.destination)
@@ -511,10 +499,6 @@ class Archive(object):
     def _add(self, path, archive_name):
         pass
 
-    @abc.abstractmethod
-    def _get_checksums(self, path):
-        pass
-
 
 class ZipArchive(Archive):
     def __init__(self, module):
@@ -536,15 +520,6 @@ class ZipArchive(Archive):
     def _add(self, path, archive_name):
         if not legacy_filter(path, self.exclusion_patterns):
             self.file.write(path, archive_name)
-
-    def _get_checksums(self, path):
-        try:
-            archive = zipfile.ZipFile(_to_native_ascii(path), 'r')
-            checksums = set((info.filename, info.CRC) for info in archive.infolist())
-            archive.close()
-        except zipfile.BadZipfile:
-            checksums = set()
-        return checksums
 
 
 class TarArchive(Archive):
@@ -590,28 +565,6 @@ class TarArchive(Archive):
             self.file.add(path, archive_name, recursive=False, filter=py27_filter)
         else:
             self.file.add(path, archive_name, recursive=False, exclude=py26_filter)
-
-    def _get_checksums(self, path):
-        try:
-            if self.format == 'xz':
-                with lzma.open(_to_native_ascii(path), 'r') as f:
-                    archive = tarfile.open(fileobj=f)
-                    checksums = set((info.name, info.chksum) for info in archive.getmembers())
-                    archive.close()
-            else:
-                archive = tarfile.open(_to_native_ascii(path), 'r|' + self.format)
-                checksums = set((info.name, info.chksum) for info in archive.getmembers())
-                archive.close()
-        except (lzma.LZMAError, tarfile.ReadError, tarfile.CompressionError):
-            try:
-                # The python implementations of gzip, bz2, and lzma do not support restoring compressed files
-                # to their original names so only file checksum is returned
-                f = self._open_compressed_file(_to_native_ascii(path), 'r')
-                checksums = set([(b'', crc32(f.read()))])
-                f.close()
-            except Exception:
-                checksums = set()
-        return checksums
 
 
 def get_archive(module):

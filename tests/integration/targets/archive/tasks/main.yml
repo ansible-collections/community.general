@@ -22,11 +22,6 @@
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 # Make sure we start fresh
 
-# set global toggles
-- name: Toggle idempotency tests
-  set_fact:
-    enable_idempotency_tests: false
-
 # Test setup
 - name: Ensure zip is present to create test archive (yum)
   yum: name=zip state=latest
@@ -132,7 +127,6 @@
   loop: "{{ formats }}"
   loop_control:
     loop_var: format
-  when: enable_idempotency_tests
 
 # Test cleanup
 - name: Remove backports.lzma if previously installed (pip)
