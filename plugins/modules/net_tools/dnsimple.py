@@ -78,6 +78,7 @@ options:
       - Check U(https://developer.dnsimple.com/sandbox/) for more information.
     type: 'bool'
     default: no
+    version_added: 3.4.0
 requirements:
   - "dnsimple >= 1.0.0"
 author: "Alex Coomans (@drcapulet)"
