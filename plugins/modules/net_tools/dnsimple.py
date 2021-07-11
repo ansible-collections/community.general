@@ -353,7 +353,7 @@ def main():
     )
 
     if not HAS_DNSIMPLE:
-        module.fail_json(msg=missing_required_lib('dnsimple'), exception=str(DNSIMPLE_IMP_ERR))
+        module.fail_json(msg=missing_required_lib('dnsimple'), exception=DNSIMPLE_IMP_ERR[0])
 
     global DNSIMPLE_MAJOR_VERSION
     DNSIMPLE_MAJOR_VERSION = LooseVersion(dnsimple_version).version[0]
