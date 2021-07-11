@@ -1,3 +1,6 @@
+# (c) 2021, Alexei Znamensky
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 - include_tasks: msimple.yml
 - include_tasks: mdepfail.yml
 - include_tasks: mstate.yml
