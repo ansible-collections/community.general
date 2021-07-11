@@ -174,6 +174,7 @@ if not HAS_DNSIMPLE:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib, env_fallback
 
+
 def dnsimple_client(account_email=None, account_api_token=None):
     if DNSIMPLE_MAJOR_VERSION > 1:
         if account_email and account_api_token:
@@ -189,6 +190,7 @@ def dnsimple_client(account_email=None, account_api_token=None):
         else:
             client = DNSimple()
     return client
+
 
 def dnsimple_account(client):
     if DNSIMPLE_MAJOR_VERSION > 1:
@@ -206,14 +208,16 @@ def dnsimple_account(client):
         account = None
     return account
 
+
 def get_all_domains(client, account):
     if DNSIMPLE_MAJOR_VERSION > 1:
         domain_list = get_paginated_result(client.domains.list_domains, account_id=account.id)
         domains = [d.__dict__ for d in domain_list]
     else:
         domain_list = client.domains()
-        domains=[d['domain'] for d in domain_list]
+        domains = [d['domain'] for d in domain_list]
     return domains
+
 
 def get_domain(client, account, domain):
     if domain.isdigit():
@@ -237,6 +241,7 @@ def get_domain(client, account, domain):
             raise
     return dr
 
+
 def create_domain(client, account, domain):
     if DNSIMPLE_MAJOR_VERSION > 1:
         result = client.domains.create_domain(account.id, domain).data.__dict__
@@ -244,11 +249,13 @@ def create_domain(client, account, domain):
         result = client.add_domain(domain)['domain']
     return result
 
+
 def delete_domain(client, account, domain):
     if DNSIMPLE_MAJOR_VERSION > 1:
         client.domains.delete_domain(account.id, domain)
     else:
         client.delete(domain)
+
 
 def get_records(client, account, zone, dnsimple_filter=None):
     if DNSIMPLE_MAJOR_VERSION > 1:
@@ -261,11 +268,13 @@ def get_records(client, account, zone, dnsimple_filter=None):
         records = [r['record'] for r in client.records(str(zone), params=dnsimple_filter)]
     return records
 
+
 def delete_record(client, account, domain, rid):
     if DNSIMPLE_MAJOR_VERSION > 1:
         client.zones.delete_record(account.id, domain, rid)
     else:
         client.delete_record(str(domain), rid)
+
 
 def update_record(client, account, domain, rid, ttl=None, priority=None):
     if DNSIMPLE_MAJOR_VERSION > 1:
@@ -279,6 +288,7 @@ def update_record(client, account, domain, rid, ttl=None, priority=None):
             data['priority'] = priority
         result = client.update_record(str(domain), str(rid), data)['record']
     return result
+
 
 def create_record(client, account, domain, name, record_type, content, ttl=None, priority=None):
     if DNSIMPLE_MAJOR_VERSION > 1:
@@ -297,6 +307,7 @@ def create_record(client, account, domain, name, record_type, content, ttl=None,
         result = client.add_record(str(domain), data)['record']
     return result
 
+
 def get_paginated_result(operation, **options):
     global DNSIMPLE_PAGINATION_PER_PAGE
     records_pagination = operation(**options, per_page=DNSIMPLE_PAGINATION_PER_PAGE).pagination
@@ -305,6 +316,7 @@ def get_paginated_result(operation, **options):
         page_data = operation(**options, per_page=DNSIMPLE_PAGINATION_PER_PAGE, page=page).data
         result_list.extend(page_data)
     return result_list
+
 
 def main():
     module = AnsibleModule(
@@ -350,7 +362,7 @@ def main():
     is_solo = module.params.get('solo')
 
     try:
-        client  = dnsimple_client(account_email, account_api_token)
+        client = dnsimple_client(account_email, account_api_token)
         account = dnsimple_account(client)
         # Let's figure out what operation we want to do
         # No domain, return a list
@@ -458,6 +470,7 @@ def main():
         else:
             module.fail_json(msg="DNSimple exception: %s" % str(e.args[0]['message']))
     module.fail_json(msg="Unknown what you wanted me to do")
+
 
 if __name__ == '__main__':
     main()
