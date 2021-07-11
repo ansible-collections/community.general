@@ -21,7 +21,7 @@ body:
     placeholder: >-
       I am trying to do X with the collection from the main branch on GitHub and
       I think that implementing a feature Y would be very helpful for me and
-      every other user of ansible-core because of Z.
+      every other user of community.general because of Z.
   validations:
     required: true
 
