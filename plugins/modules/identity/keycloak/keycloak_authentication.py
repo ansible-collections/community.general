@@ -370,7 +370,7 @@ def main():
             if module.check_mode:
                 module.exit_json(**result)
             changed, diff = create_or_update_executions(kc=kc, config=new_auth_repr, realm=realm)
-            result['changed'] = changed
+            result['changed'] |= changed
             if module._diff:
                 result['diff'] = diff
             # Get executions created
