@@ -54,7 +54,7 @@ options:
         description:
             - if C(no), it will not use a proxy, even if one is defined in an environment
                 variable on the target hosts.
-        default: 'no'
+        default: false
         type: bool
     validate_certs:
         required: false
