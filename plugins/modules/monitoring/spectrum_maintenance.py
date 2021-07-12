@@ -77,7 +77,7 @@ EXAMPLES = '''
     state: 'inMaintenance'
   delegate_to: localhost
 
-- name: put device in Hibernating mode
+- name: Put device in Hibernating mode
   spectrum_maintenance:
     device: '{{ inventory_hostname }}'
     oneclick_url: http://oneclick.example.com:8080
@@ -86,7 +86,7 @@ EXAMPLES = '''
     state: 'inHibernation'
   delegate_to: localhost
 
-- name: put device back in isManaged
+- name: Put device back in isManaged
   spectrum_maintenance:
     device: '{{ inventory_hostname }}'
     oneclick_url: http://oneclick.example.com:8080
