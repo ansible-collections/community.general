@@ -68,7 +68,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: put device in Maintenance mode
+- name: Put device in Maintenance mode
   spectrum_maintenance:
     device: '{{ inventory_hostname }}'
     oneclick_url: http://oneclick.example.com:8080
