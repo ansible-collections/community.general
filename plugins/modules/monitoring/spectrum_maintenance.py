@@ -25,9 +25,9 @@ options:
         type: str
     state:
         description:
-            - On C(inMaintenence) put device in maintenence mode
-            - On C(inHibernation) put device in hibernation mode
-            - On C(isManaged) put device in isManaged mode
+            - On C(inMaintenance) put device in maintenance mode.
+            - On C(inHibernation) put device in hibernation mode.
+            - On C(isManaged) put device in managed mode.
         choices: ['inMaintenance', 'inHibernation', 'isManaged']
         default: 'isManaged'
         type: str
