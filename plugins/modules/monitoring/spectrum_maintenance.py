@@ -231,7 +231,7 @@ def main():
             url=dict(type='str', required=True, aliases=['oneclick_url']),
             url_username=dict(type='str', required=True, aliases=['oneclick_user']),
             url_password=dict(type='str', required=True, no_log=True, aliases=['oneclick_password']),
-            use_proxy=dict(type='bool', default='no'),
+            use_proxy=dict(type='bool', default=False),
             validate_certs=dict(type='bool', default='no')
         ),
         supports_check_mode=True
