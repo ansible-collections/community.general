@@ -185,7 +185,9 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
 
     def __list_element__(self, _type, path_re, elem_re):
         params = ({'type': _type}, {'galaxy_cmd': 'list'}, 'dest')
-        elems = self.run_command(params=params, process_output=lambda rc, out, err: out.splitlines())
+        elems = self.run_command(params=params,
+                                 publish_rc=False, publish_out=False, publish_err=False,
+                                 process_output=lambda rc, out, err: out.splitlines())
         elems_dict = {}
         current_path = None
         for line in elems:
