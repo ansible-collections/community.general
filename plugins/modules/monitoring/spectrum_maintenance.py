@@ -141,9 +141,7 @@ def get_ip():
 def get_model_handle_by_ip(device_ip):
     """Query Spectrum for the model_handle of an IP Address"""
     resource = '/models'
-    # landscape_min = "0x%x" % int(module.params.get('landscape'), 16)
-    # landscape_max = "0x%x" % (int(module.params.get('landscape'), 16) + 0x100000)
-
+   
     xml = """<?xml version="1.0" encoding="UTF-8"?>
         <rs:model-request throttlesize="10000"
         xmlns:rs="http://www.ca.com/spectrum/restful/schema/request"
@@ -193,17 +191,6 @@ def get_model_handle_by_ip(device_ip):
     is_not_hibernating = model.find('./*[@id="0x12aca"]').text
     hibernating_after_maintenance = model.find('./*[@id="0x12d8b"]').text
 
-    # model_address = model.find('./*[@id="0x12d7f"]').text
-
-    # derive the landscape handler from the model handler of the device
-    # model_landscape = "0x%x" % int(int(model_handle, 16) // 0x100000 * 0x100000)
-
-    # device = dict(
-    #    model_handle=model_handle
-    # address=model_address,
-    # landscape=model_landscape
-    # )
-
     return model_handle, is_managed, is_not_hibernating, hibernating_after_maintenance, result
 
 
@@ -211,14 +198,6 @@ def put_maintenance(mh, resource):
     # model / 0x10041f?attr = 0x1295d & val = 0
 
     result = put(resource)
-
-    # root = ET.fromstring(result)
-
-    # namespace = dict(ca='http://www.ca.com/spectrum/restful/schema/response')
-
-    # get the first device
-    # model = root.find('ca:model-responses', namespace).find('ca:model', namespace)
-
     return result
 
 
