@@ -61,7 +61,7 @@ options:
         description:
             - If C(no), SSL certificates will not be validated. This should only be used
                 on personally controlled sites using self-signed certificates.
-        default: 'no'
+        default: true
         type: bool
 notes:
    -  expects IP address as inventory_hostname
