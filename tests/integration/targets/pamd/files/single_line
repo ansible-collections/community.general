@@ -1,1 +1,0 @@
-session required pam_lastlog.so silent showfailed
