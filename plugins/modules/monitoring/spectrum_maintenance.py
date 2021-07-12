@@ -35,7 +35,7 @@ options:
         aliases: [ oneclick_url ]
         required: true
         description:
-            - HTTP, HTTPS URL of the Oneclick server in the form (http|https)://host.domain[:port]
+            - OneClick server URL in the form C((http|https)://host.domain[:port]).
         type: str
     url_username:
         aliases: [ oneclick_user ]
