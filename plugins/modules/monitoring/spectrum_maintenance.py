@@ -52,7 +52,7 @@ options:
     use_proxy:
         required: false
         description:
-            - if C(no), it will not use a proxy, even if one is defined in an environment
+            - if C(false), then a proxy will not be used even if one is defined in an environment
                 variable on the target hosts.
         default: false
         type: bool
