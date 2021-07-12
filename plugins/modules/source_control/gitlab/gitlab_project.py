@@ -114,6 +114,50 @@ options:
       - Used to create a personal project under a user's name.
     type: str
     version_added: "3.3.0"
+  allow_merge_on_skipped_pipeline:
+    description:
+      - allow merge when skipped pipelines exist
+    type: bool
+    required: false
+    default: false
+    version_added: "3.3.3"
+  only_allow_merge_if_all_discussions_are_resolved:
+    description:
+      - all discussions on a MR have to be resolved
+    type: bool
+    required: false
+    default: false
+    version_added: "3.3.3"
+  only_allow_merge_if_pipeline_succeeds:
+    description:
+      - only allow merges if pipeline succeeded
+    type: bool
+    required: false
+    default: false
+    version_added: "3.3.3"
+  packages_enabled:
+    description:
+      - enable github package repository
+    type: bool
+    required: false
+    default: false
+    version_added: "3.3.3"
+  remove_source_branch_after_merge:
+    description:
+      - remove the source branch agter merge
+    type: bool
+    required: false
+    default: false
+    version_added: "3.3.3"
+  squash_option:
+    description:
+      - squash commits when merging
+    type: str
+    required: false
+    default: 'default_off'
+    choises: ["never","always","default_off", "default_on"]
+    version_added: "3.3.3"
+
 '''
 
 EXAMPLES = r'''
@@ -214,6 +258,12 @@ class GitLabProject(object):
             'snippets_enabled': options['snippets_enabled'],
             'visibility': options['visibility'],
             'lfs_enabled': options['lfs_enabled'],
+            'allow_merge_on_skipped_pipeline': options['allow_merge_on_skipped_pipeline'],
+            'only_allow_merge_if_all_discussions_are_resolved': options['only_allow_merge_if_all_discussions_are_resolved'],
+            'only_allow_merge_if_pipeline_succeeds': options['only_allow_merge_if_pipeline_succeeds'],
+            'packages_enabled': options['packages_enabled'],
+            'remove_source_branch_after_merge': options['remove_source_branch_after_merge'],
+            'squash_option': options['squash_option'],
         }
         # Because we have already call userExists in main()
         if self.projectObject is None:
@@ -308,6 +358,12 @@ def main():
         state=dict(type='str', default="present", choices=["absent", "present"]),
         lfs_enabled=dict(default=False, type='bool'),
         username=dict(type='str'),
+        allow_merge_on_skipped_pipeline=dict(default=False, type='bool'),
+        only_allow_merge_if_all_discussions_are_resolved=dict(default=False, type='bool'),
+        only_allow_merge_if_pipeline_succeeds=dict(default=False, type='bool'),
+        packages_enabled=dict(default=False, type='bool'),
+        remove_source_branch_after_merge=dict(default=False, type='bool'),
+        squash_option=dict(type='str', default="default_off", choices=["never","always","default_off", "default_on"]),
     ))
 
     module = AnsibleModule(
@@ -340,6 +396,12 @@ def main():
     state = module.params['state']
     lfs_enabled = module.params['lfs_enabled']
     username = module.params['username']
+    allow_merge_on_skipped_pipeline = module.params['allow_merge_on_skipped_pipeline']
+    only_allow_merge_if_all_discussions_are_resolved = module.params['only_allow_merge_if_all_discussions_are_resolved']
+    only_allow_merge_if_pipeline_succeeds = module.params['only_allow_merge_if_pipeline_succeeds']
+    packages_enabled = module.params['packages_enabled']
+    remove_source_branch_after_merge = module.params['remove_source_branch_after_merge']
+    squash_option = module.params['squash_option']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -396,7 +458,15 @@ def main():
                                                 "snippets_enabled": snippets_enabled,
                                                 "visibility": visibility,
                                                 "import_url": import_url,
-                                                "lfs_enabled": lfs_enabled}):
+                                                "lfs_enabled": lfs_enabled,
+                                                "allow_merge_on_skipped_pipeline": allow_merge_on_skipped_pipeline,
+                                                "only_allow_merge_if_all_discussions_are_resolved": only_allow_merge_if_all_discussions_are_resolved,
+                                                "only_allow_merge_if_pipeline_succeeds": only_allow_merge_if_pipeline_succeeds,
+                                                "packages_enabled": packages_enabled,
+                                                "protectedbranches": protectedbranches,
+                                                "remove_source_branch_after_merge": remove_source_branch_after_merge,
+                                                "squash_option": squash_option
+                                                }):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.projectObject._attrs)
         module.exit_json(changed=False, msg="No need to update the project %s" % project_name, project=gitlab_project.projectObject._attrs)
