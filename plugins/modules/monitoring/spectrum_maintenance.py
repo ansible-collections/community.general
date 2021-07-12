@@ -141,7 +141,7 @@ def get_ip():
 def get_model_handle_by_ip(device_ip):
     """Query Spectrum for the model_handle of an IP Address"""
     resource = '/models'
-   
+
     xml = """<?xml version="1.0" encoding="UTF-8"?>
         <rs:model-request throttlesize="10000"
         xmlns:rs="http://www.ca.com/spectrum/restful/schema/request"
