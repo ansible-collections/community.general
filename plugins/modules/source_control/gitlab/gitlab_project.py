@@ -463,7 +463,6 @@ def main():
                                                 "only_allow_merge_if_all_discussions_are_resolved": only_allow_merge_if_all_discussions_are_resolved,
                                                 "only_allow_merge_if_pipeline_succeeds": only_allow_merge_if_pipeline_succeeds,
                                                 "packages_enabled": packages_enabled,
-                                                "protectedbranches": protectedbranches,
                                                 "remove_source_branch_after_merge": remove_source_branch_after_merge,
                                                 "squash_option": squash_option
                                                 }):
