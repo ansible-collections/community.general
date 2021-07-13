@@ -196,9 +196,15 @@ def create_or_update_executions(kc, config, realm='master'):
     :param config: Representation of the authentication flow including it's executions.
     :param realm: Realm
     :return: True if executions have been modified. False otherwise.
+    :return: tuple (changed, dict(before, after)
+        WHERE
+        bool changed indicates if changes have been made
+        dict(str, str) shows state before and after creation/update
     """
     try:
         changed = False
+        after = ""
+        before = ""
         if "authenticationExecutions" in config:
             # Get existing executions on the Keycloak server for this alias
             existing_executions = kc.get_executions_representation(config, realm=realm)
@@ -221,17 +227,21 @@ def create_or_update_executions(kc, config, realm='master'):
                             exclude_key.append(key)
                     # Compare the executions to see if it need changes
                     if not is_struct_included(new_exec, existing_executions[exec_index], exclude_key) or exec_index != new_exec_index:
-                        changed = True
+                        exec_found = True
+                        before += str(existing_executions[exec_index]) + '\n'
                     id_to_update = existing_executions[exec_index]["id"]
                     # Remove exec from list in case 2 exec with same name
                     existing_executions[exec_index].clear()
                 elif new_exec["providerId"] is not None:
                     kc.create_execution(new_exec, flowAlias=flow_alias_parent, realm=realm)
-                    changed = True
+                    exec_found = True
+                    after += str(new_exec) + '\n'
                 elif new_exec["displayName"] is not None:
                     kc.create_subflow(new_exec["displayName"], flow_alias_parent, realm=realm)
+                    exec_found = True
+                    after += str(new_exec) + '\n'
+                if exec_found:
                     changed = True
-                if changed:
                     if exec_index != -1:
                         # Update the existing execution
                         updated_exec = {
@@ -248,7 +258,8 @@ def create_or_update_executions(kc, config, realm='master'):
                             kc.update_authentication_executions(flow_alias_parent, updated_exec, realm=realm)
                         diff = exec_index - new_exec_index
                         kc.change_execution_priority(updated_exec["id"], diff, realm=realm)
-        return changed
+                        after += str(kc.get_executions_representation(config, realm=realm)[new_exec_index]) + '\n'
+        return changed, dict(before=before, after=after)
     except Exception as e:
         kc.module.fail_json(msg='Could not create or update executions for authentication flow %s in realm %s: %s'
                             % (config["alias"], realm, str(e)))
@@ -358,8 +369,10 @@ def main():
             # Configure the executions for the flow
             if module.check_mode:
                 module.exit_json(**result)
-            if create_or_update_executions(kc=kc, config=new_auth_repr, realm=realm):
-                result['changed'] = True
+            changed, diff = create_or_update_executions(kc=kc, config=new_auth_repr, realm=realm)
+            result['changed'] |= changed
+            if module._diff:
+                result['diff'] = diff
             # Get executions created
             exec_repr = kc.get_executions_representation(config=new_auth_repr, realm=realm)
             if exec_repr is not None:

@@ -343,7 +343,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
         self.assertEqual(len(mock_copy_auth_flow.mock_calls), 0)
         self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 1)
-        self.assertEqual(len(mock_get_executions_representation.mock_calls), 2)
+        self.assertEqual(len(mock_get_executions_representation.mock_calls), 3)
         self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
 
         # Verify that the module's changed status matches what is expected
@@ -434,7 +434,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
         self.assertEqual(len(mock_copy_auth_flow.mock_calls), 0)
         self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_get_executions_representation.mock_calls), 2)
+        self.assertEqual(len(mock_get_executions_representation.mock_calls), 3)
         self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
 
         # Verify that the module's changed status matches what is expected
@@ -611,7 +611,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
         self.assertEqual(len(mock_copy_auth_flow.mock_calls), 0)
         self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 1)
-        self.assertEqual(len(mock_get_executions_representation.mock_calls), 2)
+        self.assertEqual(len(mock_get_executions_representation.mock_calls), 3)
         self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 1)
 
         # Verify that the module's changed status matches what is expected
