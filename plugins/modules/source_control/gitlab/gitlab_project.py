@@ -120,35 +120,35 @@ options:
     type: bool
     required: false
     default: false
-    version_added: "3.3.3"
+    version_added: "3.4.0"
   only_allow_merge_if_all_discussions_are_resolved:
     description:
       - all discussions on a MR have to be resolved
     type: bool
     required: false
     default: false
-    version_added: "3.3.3"
+    version_added: "3.4.0"
   only_allow_merge_if_pipeline_succeeds:
     description:
       - only allow merges if pipeline succeeded
     type: bool
     required: false
     default: false
-    version_added: "3.3.3"
+    version_added: "3.4.0"
   packages_enabled:
     description:
       - enable github package repository
     type: bool
     required: false
     default: false
-    version_added: "3.3.3"
+    version_added: "3.4.0"
   remove_source_branch_after_merge:
     description:
       - remove the source branch agter merge
     type: bool
     required: false
     default: false
-    version_added: "3.3.3"
+    version_added: "3.4.0"
   squash_option:
     description:
       - squash commits when merging
@@ -156,7 +156,7 @@ options:
     required: false
     default: 'default_off'
     choices: ["never","always","default_off", "default_on"]
-    version_added: "3.3.3"
+    version_added: "3.4.0"
 
 '''
 
