@@ -155,7 +155,7 @@ options:
     type: str
     required: false
     default: 'default_off'
-    choises: ["never","always","default_off", "default_on"]
+    choices: ["never","always","default_off", "default_on"]
     version_added: "3.3.3"
 
 '''
@@ -363,7 +363,7 @@ def main():
         only_allow_merge_if_pipeline_succeeds=dict(default=False, type='bool'),
         packages_enabled=dict(default=False, type='bool'),
         remove_source_branch_after_merge=dict(default=False, type='bool'),
-        squash_option=dict(type='str', default="default_off", choices=["never","always","default_off", "default_on"]),
+        squash_option=dict(type='str', default="default_off", choices=["never", "always", "default_off", "default_on"]),
     ))
 
     module = AnsibleModule(
