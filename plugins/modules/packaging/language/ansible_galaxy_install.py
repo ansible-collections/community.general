@@ -48,7 +48,7 @@ options:
     - Force overwriting an existing role or collection.
     - Using I(force) as C(true) is mandatory when downgrading.
     type: bool
-    default: no
+    default: false
 """
 
 EXAMPLES = """
