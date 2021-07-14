@@ -1,0 +1,2 @@
+bugfixes:
+  - pamd - fixed problem with files containing only one or two lines (https://github.com/ansible-collections/community.general/issues/2925).
