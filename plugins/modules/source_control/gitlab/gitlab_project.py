@@ -463,7 +463,7 @@ def main():
                                                 "only_allow_merge_if_pipeline_succeeds": only_allow_merge_if_pipeline_succeeds,
                                                 "packages_enabled": packages_enabled,
                                                 "remove_source_branch_after_merge": remove_source_branch_after_merge,
-                                                "squash_option": squash_option
+                                                "squash_option": squash_option,
                                                 }):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.projectObject._attrs)
