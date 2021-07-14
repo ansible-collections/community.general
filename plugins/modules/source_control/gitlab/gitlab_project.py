@@ -116,7 +116,7 @@ options:
     version_added: "3.3.0"
   allow_merge_on_skipped_pipeline:
     description:
-      - allow merge when skipped pipelines exist
+      - Allow merge when skipped pipelines exist.
     type: bool
     required: false
     default: false
