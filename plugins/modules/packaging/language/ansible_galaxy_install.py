@@ -78,7 +78,7 @@ EXAMPLES = """
 
 RETURN = """
   new_collections:
-    description: New collections installed by this module
+    description: New collections installed by this module.
     returned: success
     type: dict
     sample:
