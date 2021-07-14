@@ -58,7 +58,9 @@ See [Ansible Using collections](https://docs.ansible.com/ansible/latest/user_gui
 
 ## Contributing to this collection
 
-The content of this collection is made by good people like you, a community of individuals collaborating on making the world better through developing automation software.
+The content of this collection is made by good people just like you, a community of individuals collaborating on making the world better through developing automation software.
+
+We are actively accepting new contributors.
 
 All types of contributions are very welcome.
 
