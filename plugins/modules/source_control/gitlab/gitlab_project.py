@@ -118,7 +118,6 @@ options:
     description:
       - Allow merge when skipped pipelines exist.
     type: bool
-    required: false
     default: false
     version_added: "3.4.0"
   only_allow_merge_if_all_discussions_are_resolved:
