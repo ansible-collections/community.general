@@ -12,6 +12,7 @@ module: ansible_galaxy_install
 author:
     - "Alexei Znamensky (@russoz)"
 short_description: Install Ansible roles or collections using ansible-galaxy
+version_added: 3.4.0
 description:
   - This module allows the installation of Ansible collections or roles using C(ansible-galaxy).
 options:
