@@ -57,7 +57,7 @@ options:
         choices: [ bond, bond-slave, bridge, bridge-slave, ethernet, generic, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi ]
     mode:
         description:
-            - This is the type of device or network connection that you wish to create for a bond, team or bridge.
+            - This is the type of device or network connection that you wish to create for a bond or bridge.
         type: str
         choices: [ 802.3ad, active-backup, balance-alb, balance-rr, balance-tlb, balance-xor, broadcast ]
         default: balance-rr
@@ -265,6 +265,20 @@ options:
               frame was received on.
         type: bool
         default: yes
+    runner:
+        description:
+            - This is the type of device or network connection that you wish to create for a team.
+        type: str
+        choices: [ broadcast, roundrobin, activebackup, loadbalance, lacp ]
+        default: roundrobin
+        version_added: 3.4.0
+    runner_hwaddr_policy:
+        description:
+            - This defines the policy of how hardware addresses of team device and port devices
+              should be set during the team lifetime.
+        type: str
+        choices: [ same_all, by_active, only_active ]
+        version_added: 3.4.0
     vlanid:
         description:
             - This is only used with VLAN - VLAN ID in range <0-4095>.
@@ -719,6 +733,8 @@ class Nmcli(object):
         self.hairpin = module.params['hairpin']
         self.path_cost = module.params['path_cost']
         self.mac = module.params['mac']
+        self.runner = module.params['runner']
+        self.runner_hwaddr_policy = module.params['runner_hwaddr_policy']
         self.vlanid = module.params['vlanid']
         self.vlandev = module.params['vlandev']
         self.flags = module.params['flags']
@@ -825,6 +841,11 @@ class Nmcli(object):
                 'bridge.max-age': self.maxage,
                 'bridge.priority': self.priority,
                 'bridge.stp': self.stp,
+            })
+        elif self.type == 'team':
+            options.update({
+                'team.runner': self.runner,
+                'team.runner-hwaddr-policy': self.runner_hwaddr_policy,
             })
         elif self.type == 'bridge-slave':
             options.update({
@@ -1214,6 +1235,11 @@ def main():
             ageingtime=dict(type='int', default=300),
             hairpin=dict(type='bool', default=True),
             path_cost=dict(type='int', default=100),
+            # team specific vars
+            runner=dict(type='str', default='roundrobin',
+                             choices=['broadcast', 'roundrobin', 'activebackup', 'loadbalance', 'lacp']),
+            # team active-backup runner specific options
+            runner_hwaddr_policy=dict(type='str', choices=['same_all', 'by_active', 'only_active']),
             # vlan specific vars
             vlanid=dict(type='int'),
             vlandev=dict(type='str'),
@@ -1245,6 +1271,10 @@ def main():
     # check for issues
     if nmcli.conn_name is None:
         nmcli.module.fail_json(msg="Please specify a name for the connection")
+    # team checks
+    if nmcli.type == "team":
+        if nmcli.runner_hwaddr_policy and not nmcli.runner == "activebackup":
+            nmcli.module.fail_json(msg="Runner-hwaddr-policy is only allowed for runner activebackup")
     # team-slave checks
     if nmcli.type == 'team-slave':
         if nmcli.master is None:
