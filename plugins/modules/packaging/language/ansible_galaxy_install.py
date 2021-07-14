@@ -72,7 +72,7 @@ EXAMPLES = """
   community.general.ansible_galaxy_install:
     type: collection
     name: community.network:3.0.2
-    force: yes
+    force: true
 
 """
 
