@@ -143,7 +143,7 @@ options:
     version_added: "3.4.0"
   remove_source_branch_after_merge:
     description:
-      - remove the source branch agter merge
+      - Remove the source branch after merge.
     type: bool
     required: false
     default: false
