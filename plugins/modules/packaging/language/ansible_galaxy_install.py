@@ -23,7 +23,7 @@ options:
     - "Note however that the opposite is not true: if using a I(requirements_file), then I(type) can be any of the three choices."
     type: str
     choices: [collection, role, both]
-    required: yes
+    required: true
   name:
     description:
     - Name of the collection or role being installed.
