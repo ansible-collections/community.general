@@ -119,7 +119,7 @@ RETURN = """
     returned: always when installing roles
     contains:
       "<path>":
-        description: Roles and versions for that path
+        description: Roles and versions for that path.
         type: dict
     sample:
       /home/user42/.ansible/roles:
