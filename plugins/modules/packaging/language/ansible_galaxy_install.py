@@ -85,7 +85,7 @@ RETURN = """
       community.general: 3.1.0
       community.docker: 1.6.1
   new_roles:
-    description: New roles installed by this module
+    description: New roles installed by this module.
     returned: success
     type: dict
     sample:
