@@ -279,7 +279,19 @@ ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+team.runner:                            roundrobin
 """
+
+TESTCASE_TEAM_HWADDR_POLICY_FAILS = [
+    {
+        'type': 'team',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'team0_non_existant',
+        'runner_hwaddr_policy': 'by_active',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    }
+]
 
 TESTCASE_TEAM_SLAVE = [
     {
@@ -1051,6 +1063,20 @@ def test_team_connection_unchanged(mocked_team_connection_unchanged, capfd):
     results = json.loads(out)
     assert not results.get('failed')
     assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_TEAM_HWADDR_POLICY_FAILS, indirect=['patch_ansible_module'])
+def test_team_connection_create_hwaddr_policy_fails(mocked_generic_connection_create, capfd):
+    """
+    Test : Team connection created
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert results.get('failed')
+    assert results['msg'] == "Runner-hwaddr-policy is only allowed for runner activebackup"
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_TEAM_SLAVE, indirect=['patch_ansible_module'])
