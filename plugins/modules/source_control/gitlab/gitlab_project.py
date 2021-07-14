@@ -357,7 +357,7 @@ def main():
         state=dict(type='str', default="present", choices=["absent", "present"]),
         lfs_enabled=dict(default=False, type='bool'),
         username=dict(type='str'),
-        allow_merge_on_skipped_pipeline=dict(default=False, type='bool'),
+        allow_merge_on_skipped_pipeline=dict(type='bool', default=False),
         only_allow_merge_if_all_discussions_are_resolved=dict(default=False, type='bool'),
         only_allow_merge_if_pipeline_succeeds=dict(default=False, type='bool'),
         packages_enabled=dict(default=False, type='bool'),
