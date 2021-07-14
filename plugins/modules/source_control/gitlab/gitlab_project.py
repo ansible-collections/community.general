@@ -118,42 +118,31 @@ options:
     description:
       - Allow merge when skipped pipelines exist.
     type: bool
-    default: false
     version_added: "3.4.0"
   only_allow_merge_if_all_discussions_are_resolved:
     description:
-      - all discussions on a MR have to be resolved
+      - All discussions on a MR have to be resolved.
     type: bool
-    required: false
-    default: false
     version_added: "3.4.0"
   only_allow_merge_if_pipeline_succeeds:
     description:
-      - only allow merges if pipeline succeeded
+      - Only allow merges if pipeline succeeded.
     type: bool
-    required: false
-    default: false
     version_added: "3.4.0"
   packages_enabled:
     description:
-      - enable github package repository
+      - Enable github package repository.
     type: bool
-    required: false
-    default: false
     version_added: "3.4.0"
   remove_source_branch_after_merge:
     description:
       - Remove the source branch after merge.
     type: bool
-    required: false
-    default: false
     version_added: "3.4.0"
   squash_option:
     description:
-      - squash commits when merging
+      - Squash commits when merging.
     type: str
-    required: false
-    default: 'default_off'
     choices: ["never", "always", "default_off", "default_on"]
     version_added: "3.4.0"
 
@@ -270,6 +259,7 @@ class GitLabProject(object):
                 'path': options['path'],
                 'import_url': options['import_url'],
             })
+            project_options = self.getOptionsWithValue(project_options)
             project = self.createProject(namespace, project_options)
             changed = True
         else:
@@ -302,6 +292,17 @@ class GitLabProject(object):
             self._module.fail_json(msg="Failed to create project: %s " % to_native(e))
 
         return project
+
+    '''
+    @param arguments Attributes of the project
+    '''
+    def getOptionsWithValue(self, arguments):
+        retArguments = dict()
+        for arg_key, arg_value in arguments.items():
+            if arguments[arg_key] is not None:
+                retArguments[arg_key] = arg_value
+
+        return retArguments
 
     '''
     @param project Project Object
@@ -357,12 +358,12 @@ def main():
         state=dict(type='str', default="present", choices=["absent", "present"]),
         lfs_enabled=dict(default=False, type='bool'),
         username=dict(type='str'),
-        allow_merge_on_skipped_pipeline=dict(type='bool', default=False),
-        only_allow_merge_if_all_discussions_are_resolved=dict(default=False, type='bool'),
-        only_allow_merge_if_pipeline_succeeds=dict(default=False, type='bool'),
-        packages_enabled=dict(default=False, type='bool'),
-        remove_source_branch_after_merge=dict(default=False, type='bool'),
-        squash_option=dict(type='str', default="default_off", choices=["never", "always", "default_off", "default_on"]),
+        allow_merge_on_skipped_pipeline=dict(type='bool'),
+        only_allow_merge_if_all_discussions_are_resolved=dict(type='bool'),
+        only_allow_merge_if_pipeline_succeeds=dict(type='bool'),
+        packages_enabled=dict(type='bool'),
+        remove_source_branch_after_merge=dict(type='bool'),
+        squash_option=dict(type='str', choices=["never", "always", "default_off", "default_on"]),
     ))
 
     module = AnsibleModule(
@@ -447,6 +448,7 @@ def main():
         module.exit_json(changed=False, msg="Project deleted or does not exists")
 
     if state == 'present':
+
         if gitlab_project.createOrUpdateProject(project_name, namespace, {
                                                 "path": project_path,
                                                 "description": project_description,
