@@ -154,7 +154,7 @@ options:
     type: str
     required: false
     default: 'default_off'
-    choices: ["never","always","default_off", "default_on"]
+    choices: ["never", "always", "default_off", "default_on"]
     version_added: "3.4.0"
 
 '''
