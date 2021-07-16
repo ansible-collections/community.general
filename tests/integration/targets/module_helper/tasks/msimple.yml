@@ -11,7 +11,7 @@
     that:
       - simple1.a == 80
       - simple1.abc == "abc"
-      - simple1.changed is false
+      - simple1 is not changed
       - simple1.value is none
 
 - name: test msimple 2
@@ -26,8 +26,8 @@
       - simple2.a == 101
       - 'simple2.msg == "Module failed with exception: a >= 100"'
       - simple2.abc == "abc"
-      - simple2.failed is true
-      - simple2.changed is false
+      - simple2 is failed
+      - simple2 is not changed
       - simple2.value is none
 
 - name: test msimple 3
@@ -42,7 +42,7 @@
       - simple3.a == 2
       - simple3.b == "potatoespotatoes"
       - simple3.c == "NoneNone"
-      - simple3.changed is false
+      - simple3 is not changed
 
 - name: test msimple 4
   msimple:
@@ -54,4 +54,4 @@
     that:
       - simple4.c == "abc change"
       - simple4.abc == "changed abc"
-      - simple4.changed is true
+      - simple4 is changed
