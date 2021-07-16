@@ -7,7 +7,7 @@
 - name: assert failing dependency
   assert:
     that:
-      - result.failed is true
+      - result is failed
       - '"Failed to import" in result.msg'
       - '"nopackagewiththisname" in result.msg'
       - '"ModuleNotFoundError:" in result.exception'
