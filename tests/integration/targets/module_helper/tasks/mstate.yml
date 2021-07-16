@@ -16,7 +16,7 @@
       - state1.b == "banana"
       - state1.c == "cashew"
       - state1.result == "abc"
-      - state1.changed is false
+      - state1 is not changed
 
 - name: test mstate 2
   mstate:
@@ -32,7 +32,7 @@
       - state2.b == "banana"
       - state2.c == "cashew"
       - state2.result == "80bananacashew"
-      - state2.changed is true
+      - state2 is changed
 
 - name: test mstate 3
   mstate:
@@ -47,7 +47,7 @@
       - state3.a == 3
       - state3.b == "banana"
       - state3.result == "bananabananabanana"
-      - state3.changed is true
+      - state3 is changed
 
 - name: test mstate 4
   mstate:
@@ -62,7 +62,7 @@
       - state4.a == 4
       - state4.c == "cashew"
       - state4.result == "cashewcashewcashewcashew"
-      - state4.changed is true
+      - state4 is changed
 
 - name: test mstate 5
   mstate:
@@ -79,4 +79,4 @@
       - state5.b == "foo"
       - state5.c == "bar"
       - state5.result == "foobarfoobarfoobarfoobarfoobar"
-      - state5.changed is true
+      - state5 is changed
