@@ -1,0 +1,11 @@
+{
+    "include_symlinks": false,
+    "prefixes": [
+        ".azure-pipelines/azure-pipelines.yml",
+        "tests/integration/targets/"
+    ],
+    "output": "path-message",
+    "requirements": [
+        "PyYAML"
+    ]
+}

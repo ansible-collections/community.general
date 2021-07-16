@@ -1,4 +1,3 @@
-notification/mqtt
 shippable/posix/group1
 skip/aix
 skip/osx
