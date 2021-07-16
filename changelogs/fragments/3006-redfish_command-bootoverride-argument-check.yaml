@@ -1,0 +1,3 @@
+bugfixes:
+  - redfish_command - fix extraneous error caused by missing ``bootdevice`` argument 
+    when using the ``DisableBootOverride`` sub-command (https://github.com/ansible-collections/community.general/issues/3005).
