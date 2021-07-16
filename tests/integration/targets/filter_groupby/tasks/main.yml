@@ -42,4 +42,4 @@
 
 - assert:
     that:
-      - result.msg == "Multiple sequence entries have attribute value 'a'"
+      - result.msg == "Multiple sequence entries have attribute value 'a'" or result.msg == "Multiple sequence entries have attribute value u'a'"
