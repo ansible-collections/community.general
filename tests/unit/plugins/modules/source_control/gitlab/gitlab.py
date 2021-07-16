@@ -13,7 +13,6 @@ from httmock import urlmatch  # noqa
 
 from ansible_collections.community.general.tests.unit.compat import unittest
 
-# from gitlab import Gitlab
 import gitlab
 
 

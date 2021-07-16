@@ -8,8 +8,8 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: gitlab_protected_branch
-short_description: (un)Marking existing branches for protection in Gitlab for an project.
-version_added: 3.3.0
+short_description: (un)Marking existing branches for protection.
+version_added: 3.4.0
 description:
   - (un)Marking existing branches for protection.
 author:
