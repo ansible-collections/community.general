@@ -40,7 +40,7 @@ options:
     description:
     - The path to the directory containing your collections or roles, according to the value of I(type).
     - >
-      Please notice that C(ansible-galaxy) will not install collections with I(type) C(both), when I(requirements_file)
+      Please notice that C(ansible-galaxy) will not install collections with I(type=both), when I(requirements_file)
       contains both roles and collections and I(dest) is specified.
     type: path
   force:
