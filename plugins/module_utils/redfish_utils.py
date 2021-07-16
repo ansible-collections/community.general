@@ -1582,13 +1582,14 @@ class RedfishUtils(object):
 
         boot = data[key]
 
-        annotation = 'BootSourceOverrideTarget@Redfish.AllowableValues'
-        if annotation in boot:
-            allowable_values = boot[annotation]
-            if isinstance(allowable_values, list) and bootdevice not in allowable_values:
-                return {'ret': False,
-                        'msg': "Boot device %s not in list of allowable values (%s)" %
-                               (bootdevice, allowable_values)}
+        if override_enabled != 'Disabled':
+            annotation = 'BootSourceOverrideTarget@Redfish.AllowableValues'
+            if annotation in boot:
+                allowable_values = boot[annotation]
+                if isinstance(allowable_values, list) and bootdevice not in allowable_values:
+                    return {'ret': False,
+                            'msg': "Boot device %s not in list of allowable values (%s)" %
+                                   (bootdevice, allowable_values)}
 
         # read existing values
         cur_enabled = boot.get('BootSourceOverrideEnabled')
