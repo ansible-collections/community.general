@@ -36,14 +36,6 @@ try:
         pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing (Wrong  version)"))
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
-    # Need to set these to something so that we don't fail when parsing
-    # GitlabModuleTestCase = object
-    # resp_get_protected_branch = _dummy
-    # resp_get_project_by_name = _dummy
-    # resp_get_protected_branch_not_exist = _dummy
-    # resp_get_project = _dummy
-    # resp_delete_protected_branch = _dummy
-    # resp_get_user = _dummy
 
 # Unit tests requirements
 try:
