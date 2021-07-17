@@ -13,7 +13,7 @@ from httmock import urlmatch  # noqa
 
 from ansible_collections.community.general.tests.unit.compat import unittest
 
-from gitlab import Gitlab
+import gitlab
 
 
 class FakeAnsibleModule(object):
@@ -33,7 +33,7 @@ class GitlabModuleTestCase(unittest.TestCase):
 
         self.mock_module = FakeAnsibleModule()
 
-        self.gitlab_instance = Gitlab("http://localhost", private_token="private_token", api_version=4)
+        self.gitlab_instance = gitlab.Gitlab("http://localhost", private_token="private_token", api_version=4)
 
 
 # Python 2.7+ is needed for python-gitlab
@@ -43,6 +43,14 @@ GITLAB_MINIMUM_PYTHON_VERSION = (2, 7)
 # Verify if the current Python version is higher than GITLAB_MINIMUM_PYTHON_VERSION
 def python_version_match_requirement():
     return sys.version_info >= GITLAB_MINIMUM_PYTHON_VERSION
+
+
+def python_gitlab_module_version():
+    return gitlab.__version__
+
+
+def python_gitlab_version_match_requirement():
+    return "2.3.0"
 
 
 # Skip unittest test case if python version don't match requirement
@@ -464,6 +472,32 @@ def resp_delete_project(url, request):
     content = ('{}')
     content = content.encode("utf-8")
 
+    return response(204, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1/protected_branches/master", method="get")
+def resp_get_protected_branch(url, request):
+    headers = {'content-type': 'application/json'}
+    content = ('{"id": 1, "name": "master", "push_access_levels": [{"access_level": 40, "access_level_description": "Maintainers"}],'
+               '"merge_access_levels": [{"access_level": 40, "access_level_description": "Maintainers"}],'
+               '"allow_force_push":false, "code_owner_approval_required": false}')
+    content = content.encode("utf-8")
+    return response(200, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1/protected_branches/master", method="get")
+def resp_get_protected_branch_not_exist(url, request):
+    headers = {'content-type': 'application/json'}
+    content = ('')
+    content = content.encode("utf-8")
+    return response(404, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1/protected_branches/master", method="delete")
+def resp_delete_protected_branch(url, request):
+    headers = {'content-type': 'application/json'}
+    content = ('')
+    content = content.encode("utf-8")
     return response(204, content, headers, None, 5, request)
 
 
