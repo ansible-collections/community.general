@@ -151,12 +151,15 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 
 
 class AnsibleGalaxyInstall(CmdModuleHelper):
-    _RE_PATH = re.compile(r'^# (?P<path>.*)$')
-    _RE_COLL = re.compile(r'^(?P<elem>\w+\.\w+)\s+(?P<version>[\d\.]+)\s*$')
-    _RE_ROLE = re.compile(r'^- (?P<elem>\w+\.\w+),\s+(?P<version>[\d\.]+)\s*$')
-    _RE_OUTPUT = re.compile(r'^(?:(?P<collection>\w+\.\w+):(?P<cversion>[\d\.]+)'
-                            r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\))'
-                            r' was installed successfully$')
+    _RE_LIST_PATH = re.compile(r'^# (?P<path>.*)$')
+    _RE_LIST_COLL = re.compile(r'^(?P<elem>\w+\.\w+)\s+(?P<version>[\d\.]+)\s*$')
+    _RE_LIST_ROLE = re.compile(r'^- (?P<elem>\w+\.\w+),\s+(?P<version>[\d\.]+)\s*$')
+    # Collection install output changed:
+    # ansible-base 2.10:  "coll.name (x.y.z)"
+    # ansible-core 2.11+: "coll.name:x.y.z"
+    _RE_INSTALL_OUTPUT = re.compile(r'^(?:(?P<collection>\w+\.\w+)(?: \(|:)(?P<cversion>[\d\.]+)\)?'
+                                    r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\))'
+                                    r' was installed successfully$')
 
     output_params = ('type', 'name', 'dest', 'requirements_file', 'force')
     module = dict(
@@ -184,11 +187,18 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
     force_lang = "C.UTF-8"
     check_rc = True
 
+    @staticmethod
+    def __process_output_list__(*args):
+        if "None of the provided paths were usable" in args[1]:
+            return []
+        return args[1].splitlines()
+
     def __list_element__(self, _type, path_re, elem_re):
         params = ({'type': _type}, {'galaxy_cmd': 'list'}, 'dest')
         elems = self.run_command(params=params,
                                  publish_rc=False, publish_out=False, publish_err=False,
-                                 process_output=lambda rc, out, err: out.splitlines())
+                                 process_output=self.__process_output_list__,
+                                 check_rc=False)
         elems_dict = {}
         current_path = None
         for line in elems:
@@ -210,10 +220,10 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
         return elems_dict
 
     def __list_collections__(self):
-        return self.__list_element__('collection', self._RE_PATH, self._RE_COLL)
+        return self.__list_element__('collection', self._RE_LIST_PATH, self._RE_LIST_COLL)
 
     def __list_roles__(self):
-        return self.__list_element__('role', self._RE_PATH, self._RE_ROLE)
+        return self.__list_element__('role', self._RE_LIST_PATH, self._RE_LIST_ROLE)
 
     def __run__(self):
         self.vars.set("new_collections", {}, change=True)
@@ -227,7 +237,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
 
     def process_command_output(self, rc, out, err):
         for line in out.splitlines():
-            match = self._RE_OUTPUT.match(line)
+            match = self._RE_INSTALL_OUTPUT.match(line)
             if not match:
                 continue
             if match.group("collection"):
