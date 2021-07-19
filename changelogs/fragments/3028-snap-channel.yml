@@ -1,0 +1,2 @@
+bugfixes:
+- "snap - fix formatting of ``--channel`` argument when the ``channel`` option is used (https://github.com/ansible-collections/community.general/pull/3028)."
