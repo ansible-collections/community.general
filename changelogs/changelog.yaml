@@ -1431,3 +1431,69 @@ releases:
     - 2951-mh-vars-deepcopy.yml
     - 3.3.2.yml
     release_date: '2021-07-08'
+  3.4.0:
+    changes:
+      bugfixes:
+      - launchd - fixed sanity check in the module's code (https://github.com/ansible-collections/community.general/pull/2960).
+      - pamd - fixed problem with files containing only one or two lines (https://github.com/ansible-collections/community.general/issues/2925).
+      - proxmox inventory plugin - fixed parsing failures when some cluster nodes
+        are offline (https://github.com/ansible-collections/community.general/issues/2931).
+      - redfish_command - fix extraneous error caused by missing ``bootdevice`` argument
+        when using the ``DisableBootOverride`` sub-command (https://github.com/ansible-collections/community.general/issues/3005).
+      - snap - fix formatting of ``--channel`` argument when the ``channel`` option
+        is used (https://github.com/ansible-collections/community.general/pull/3028).
+      minor_changes:
+      - archive - added ``dest_state`` return value to describe final state of ``dest``
+        after successful task execution (https://github.com/ansible-collections/community.general/pull/2913).
+      - archive - refactoring prior to fix for idempotency checks. The fix will be
+        a breaking change and only appear in community.general 4.0.0 (https://github.com/ansible-collections/community.general/pull/2987).
+      - datadog_monitor - allow creation of composite datadog monitors (https://github.com/ansible-collections/community.general/issues/2956).
+      - filesystem - extend support for FreeBSD. Avoid potential data loss by checking
+        existence of a filesystem with ``fstyp`` (native command) if ``blkid`` (foreign
+        command) doesn't find one. Add support for character devices and ``ufs`` filesystem
+        type (https://github.com/ansible-collections/community.general/pull/2902).
+      - gitlab_project - add new options ``allow_merge_on_skipped_pipeline``, ``only_allow_merge_if_all_discussions_are_resolved``,
+        ``only_allow_merge_if_pipeline_succeeds``, ``packages_enabled``, ``remove_source_branch_after_merge``,
+        ``squash_option`` (https://github.com/ansible-collections/community.general/pull/3002).
+      - jenkins_job_info - the ``password`` and ``token`` parameters can also be omitted
+        to retrieve only public information (https://github.com/ansible-collections/community.general/pull/2948).
+      - keycloak_authentication - enhanced diff mode to also return before and after
+        state when the authentication flow is updated (https://github.com/ansible-collections/community.general/pull/2963).
+      - keycloak_client - add ``authentication_flow_binding_overrides`` option (https://github.com/ansible-collections/community.general/pull/2949).
+      - module_helper module utils - added feature flag parameters to ``CmdMixin``
+        to control whether ``rc``, ``out`` and ``err`` are automatically added to
+        the module output (https://github.com/ansible-collections/community.general/pull/2922).
+      - nmcli - add ``runner`` and ``runner_hwaddr_policy`` options (https://github.com/ansible-collections/community.general/issues/2901).
+      - rax_mon_notification_plan - fixed validation checks by specifying type ``str``
+        as the ``elements`` of parameters ``ok_state``, ``warning_state`` and ``critical_state``
+        (https://github.com/ansible-collections/community.general/pull/2955).
+      release_summary: Regular bugfix and feature release.
+    fragments:
+    - 2901-nmcli_teaming.yml
+    - 2902-filesystem_extend_freebsd_support.yml
+    - 2913-archive-dest_state.yml
+    - 2922-mh-cmd-output-feature-flag.yml
+    - 2948-jenkins_job_info-remove_necessities_on_password_or_token.yml
+    - 2949-add_authentication-flow-binding_keycloak-client.yml
+    - 2955-rax_mon_notification_plan-added-elements-to-list-params.yaml
+    - 2958-datadog_monitor_support_composites.yml
+    - 2960-launchd-validation-check.yaml
+    - 2963-improve-diff-mode-on-keycloak_authentication.yml
+    - 2967-proxmox_inventory-offline-node-fix.yml
+    - 2987-archive-stage-idempotency-fix.yml
+    - 2989-pamd-single-line.yaml
+    - 3.4.0.yml
+    - 3001-enhance_gitlab_module.yml
+    - 3006-redfish_command-bootoverride-argument-check.yaml
+    - 3028-snap-channel.yml
+    modules:
+    - description: (un)Marking existing branches for protection
+      name: gitlab_protected_branch
+      namespace: source_control.gitlab
+    - description: Allows administration of Keycloak client_scopes via Keycloak API
+      name: keycloak_clientscope
+      namespace: identity.keycloak
+    - description: Allows administration of Keycloak roles via Keycloak API
+      name: keycloak_role
+      namespace: identity.keycloak
+    release_date: '2021-07-20'
