@@ -298,6 +298,8 @@ class Archive(object):
                 msg='Error, must specify "dest" when archiving multiple files or trees'
             )
 
+        self.original_size = self.destination_size()
+
     def add(self, path, archive_name):
         try:
             self._add(_to_native_ascii(path), _to_native(archive_name))
@@ -315,7 +317,7 @@ class Archive(object):
             self.destination_state = STATE_ARCHIVED
         else:
             try:
-                f_out = self._open_compressed_file(_to_native_ascii(self.destination))
+                f_out = self._open_compressed_file(_to_native_ascii(self.destination), 'wb')
                 with open(path, 'rb') as f_in:
                     shutil.copyfileobj(f_in, f_out)
                 f_out.close()
@@ -368,8 +370,14 @@ class Archive(object):
                 msg='Errors when writing archive at %s: %s' % (_to_native(self.destination), '; '.join(self.errors))
             )
 
+    def compare_with_original(self):
+        self.changed |= self.original_size != self.destination_size()
+
     def destination_exists(self):
         return self.destination and os.path.exists(self.destination)
+
+    def destination_readable(self):
+        return self.destination and os.access(self.destination, os.R_OK)
 
     def destination_size(self):
         return os.path.getsize(self.destination) if self.destination_exists() else 0
@@ -406,6 +414,15 @@ class Archive(object):
 
     def has_unfound_targets(self):
         return bool(self.not_found)
+
+    def remove_single_target(self, path):
+        try:
+            os.remove(path)
+        except OSError as e:
+            self.module.fail_json(
+                path=_to_native(path),
+                msg='Unable to remove source file: %s' % _to_native(e), exception=format_exc()
+            )
 
     def remove_targets(self):
         for path in self.successes:
@@ -453,14 +470,14 @@ class Archive(object):
             'expanded_exclude_paths': [_to_native(p) for p in self.expanded_exclude_paths],
         }
 
-    def _open_compressed_file(self, path):
+    def _open_compressed_file(self, path, mode):
         f = None
         if self.format == 'gz':
-            f = gzip.open(path, 'wb')
+            f = gzip.open(path, mode)
         elif self.format == 'bz2':
-            f = bz2.BZ2File(path, 'wb')
+            f = bz2.BZ2File(path, mode)
         elif self.format == 'xz':
-            f = lzma.LZMAFile(path, 'wb')
+            f = lzma.LZMAFile(path, mode)
         else:
             self.module.fail_json(msg="%s is not a valid format" % self.format)
 
@@ -542,7 +559,7 @@ class TarArchive(Archive):
             return None if matches_exclusion_patterns(tarinfo.name, self.exclusion_patterns) else tarinfo
 
         def py26_filter(path):
-            return matches_exclusion_patterns(path, self.exclusion_patterns)
+            return legacy_filter(path, self.exclusion_patterns)
 
         if PY27:
             self.file.add(path, archive_name, recursive=False, filter=py27_filter)
@@ -580,7 +597,6 @@ def main():
     check_mode = module.check_mode
 
     archive = get_archive(module)
-    size = archive.destination_size()
     archive.find_targets()
 
     if not archive.has_targets():
@@ -592,10 +608,9 @@ def main():
         else:
             archive.add_targets()
             archive.destination_state = STATE_INCOMPLETE if archive.has_unfound_targets() else STATE_ARCHIVED
+            archive.compare_with_original()
             if archive.remove:
                 archive.remove_targets()
-            if archive.destination_size() != size:
-                archive.changed = True
     else:
         if check_mode:
             if not archive.destination_exists():
@@ -603,16 +618,9 @@ def main():
         else:
             path = archive.paths[0]
             archive.add_single_target(path)
-            if archive.destination_size() != size:
-                archive.changed = True
+            archive.compare_with_original()
             if archive.remove:
-                try:
-                    os.remove(path)
-                except OSError as e:
-                    module.fail_json(
-                        path=_to_native(path),
-                        msg='Unable to remove source file: %s' % _to_native(e), exception=format_exc()
-                    )
+                archive.remove_single_target(path)
 
     if archive.destination_exists():
         archive.update_permissions()
