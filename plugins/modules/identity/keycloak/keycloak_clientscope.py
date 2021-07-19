@@ -93,9 +93,9 @@ options:
 
             protocolMapper:
                 description:
-                    - The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is
+                    - "The Keycloak-internal name of the type of this protocol-mapper. While an exhaustive list is
                       impossible to provide since this may be extended through SPIs by the user of Keycloak,
-                      by default Keycloak as of 3.4 ships with at least
+                      by default Keycloak as of 3.4 ships with at least:"
                     - C(docker-v2-allow-all-mapper)
                     - C(oidc-address-mapper)
                     - C(oidc-full-name-mapper)
