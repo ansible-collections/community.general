@@ -324,7 +324,7 @@ def main():
     create = module.params['create']
 
     if state == 'present' and not allow_no_value and value is None:
-        module.fail_json("Parameter 'value' must be defined if state=present and allow_no_value=False")
+        module.fail_json(msg="Parameter 'value' must be defined if state=present and allow_no_value=False")
 
     (changed, backup_file, diff, msg) = do_ini(module, path, section, option, value, state, backup, no_extra_spaces, create, allow_no_value)
 
