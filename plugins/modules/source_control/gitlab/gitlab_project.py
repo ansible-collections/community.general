@@ -121,7 +121,7 @@ options:
     version_added: "3.4.0"
   only_allow_merge_if_all_discussions_are_resolved:
     description:
-      - All discussions on a MR have to be resolved.
+      - All discussions on a merge request (MR) have to be resolved.
     type: bool
     version_added: "3.4.0"
   only_allow_merge_if_pipeline_succeeds:
@@ -131,7 +131,7 @@ options:
     version_added: "3.4.0"
   packages_enabled:
     description:
-      - Enable github package repository.
+      - Enable GitLab package repository.
     type: bool
     version_added: "3.4.0"
   remove_source_branch_after_merge:
@@ -297,12 +297,12 @@ class GitLabProject(object):
     @param arguments Attributes of the project
     '''
     def getOptionsWithValue(self, arguments):
-        retArguments = dict()
+        ret_arguments = dict()
         for arg_key, arg_value in arguments.items():
             if arguments[arg_key] is not None:
-                retArguments[arg_key] = arg_value
+                ret_arguments[arg_key] = arg_value
 
-        return retArguments
+        return ret_arguments
 
     '''
     @param project Project Object
@@ -363,7 +363,7 @@ def main():
         only_allow_merge_if_pipeline_succeeds=dict(type='bool'),
         packages_enabled=dict(type='bool'),
         remove_source_branch_after_merge=dict(type='bool'),
-        squash_option=dict(type='str', choices=["never", "always", "default_off", "default_on"]),
+        squash_option=dict(type='str', choices=['never', 'always', 'default_off', 'default_on']),
     ))
 
     module = AnsibleModule(
