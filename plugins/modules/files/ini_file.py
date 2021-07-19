@@ -327,12 +327,12 @@ def do_ini(module, filename, section=None, option=None, values=None,
                     for element in values[::-1]:
                         # items are added backwards, so traverse the list backwards to not confuse the user
                         # otherwise some of their options might appear in reverse order for whatever fancy reason ¯\_(ツ)_/¯
-                        if element:
+                        if element is not None:
                             # insert option=value line
                             section_lines.insert(index, assignment_format % (option, element))
                             msg = 'option added'
                             changed = True
-                        elif not element and allow_no_value:
+                        elif element is None and allow_no_value:
                             # insert option with no value line
                             section_lines.insert(index, u'%s\n' % option)
                             msg = 'option added'

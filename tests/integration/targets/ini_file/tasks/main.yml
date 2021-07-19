@@ -30,6 +30,14 @@
 - name: include tasks
   block:
 
+    - name: include tasks to perform basic tests
+      include_tasks: tests/00-basic.yml
+
+    - name: reset output file
+      file:
+        path: "{{ output_file }}"
+        state: absent
+
     - name: include tasks to perform tests with parameter "value"
       include_tasks: tests/01-value.yml
 
@@ -38,5 +46,8 @@
         path: "{{ output_file }}"
         state: absent
 
+    - name: include tasks to perform tests with parameter "values"
+      include_tasks: tests/02-values.yml
+
     - name: include tasks to test regressions
-      include_tasks: tests/02-regressions.yml
+      include_tasks: tests/03-regressions.yml
