@@ -1,0 +1,10 @@
+---
+url: http://localhost:8080/auth
+admin_realm: master
+admin_user: admin
+admin_password: password
+realm: myrealm
+client_id: myclient
+role: myrole
+description_1: desc 1
+description_2: desc 2
