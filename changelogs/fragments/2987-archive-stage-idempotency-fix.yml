@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - archive - refactoring prior to fix for idempotency checks. The fix will be a breaking change and only appear
+    in community.general 4.0.0 (https://github.com/ansible-collections/community.general/pull/2987).
