@@ -155,6 +155,7 @@ import traceback
 from distutils.version import LooseVersion
 import re
 
+
 class DNSimpleV1():
     """class which uses dnsimple-python < 2"""
 
@@ -269,7 +270,6 @@ class DNSimpleV2():
             account = accounts[0]
         self.account = account
 
-
     def get_all_domains(self):
         """returns a list of all domains"""
         domain_list = self._get_paginated_result(self.client.domains.list_domains, account_id=self.account.id)
@@ -298,9 +298,8 @@ class DNSimpleV2():
     def get_records(self, zone, dnsimple_filter=None):
         """return dns ressource records which match a specified filter"""
         records_list = self._get_paginated_result(self.client.zones.list_records,
-                                            account_id=self.account.id,
-                                            zone=zone,
-                                            filter=dnsimple_filter)
+                                                  account_id=self.account.id,
+                                                  zone=zone, filter=dnsimple_filter)
         return [d.__dict__ for d in records_list]
 
     def delete_record(self, domain, rid):
@@ -327,6 +326,7 @@ class DNSimpleV2():
             result_list.extend(page_data)
         return result_list
 
+
 DNSIMPLE_IMP_ERR = []
 HAS_DNSIMPLE = False
 try:
@@ -350,6 +350,7 @@ if not HAS_DNSIMPLE:
         DNSIMPLE_IMP_ERR.append(traceback.format_exc())
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib, env_fallback
+
 
 def main():
     module = AnsibleModule(
