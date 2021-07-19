@@ -41,7 +41,7 @@
       - archive_no_options is changed
       - "archive_no_options.dest_state == 'archive'"
       - "{{ archive_no_options.archived | length }} == 3"
-      -
+
 - name: Remove the archive - no options ({{ format }})
   file:
     path: "{{ output_dir }}/archive_no_options.{{ format }}"
