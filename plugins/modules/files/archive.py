@@ -204,17 +204,12 @@ else:
         LZMA_IMP_ERR = format_exc()
         HAS_LZMA = False
 
-PATH_SEP = to_bytes(os.sep)
 PY27 = version_info[0:2] >= (2, 7)
 
 STATE_ABSENT = 'absent'
 STATE_ARCHIVED = 'archive'
 STATE_COMPRESSED = 'compress'
 STATE_INCOMPLETE = 'incomplete'
-
-
-def add_trailing_separator(path):
-    return path if path.endswith(PATH_SEP) else path + PATH_SEP
 
 
 def expand_paths(paths):
@@ -454,13 +449,13 @@ class Archive(object):
 
     @property
     def root(self):
-        return add_trailing_separator(
-            os.path.dirname(os.path.commonprefix([add_trailing_separator(os.path.dirname(p)) for p in self.paths]))
+        return os.path.join(
+            os.path.dirname(os.path.commonprefix([os.path.join(os.path.dirname(p), b'') for p in self.paths])), b''
         )
 
     def _check_removal_safety(self):
         for path in self.paths:
-            if os.path.isdir(path) and self.destination.startswith(add_trailing_separator(path)):
+            if os.path.isdir(path) and self.destination.startswith(os.path.join(path, b'')):
                 self.module.fail_json(
                     path=b', '.join(self.paths),
                     msg='Error, created archive can not be contained in source paths when remove=true'
