@@ -121,6 +121,13 @@
   loop_control:
     loop_var: format
 
+- name: Run Idempotency tests
+  include_tasks:
+    file: ../tests/idempotency.yml
+  loop: "{{ formats }}"
+  loop_control:
+    loop_var: format
+
 # Test cleanup
 - name: Remove backports.lzma if previously installed (pip)
   pip: name=backports.lzma state=absent
