@@ -145,7 +145,7 @@ class Snap(CmdStateModuleHelper):
         actionable_snaps=dict(fmt=lambda v: v),
         state=dict(fmt=_state_map),
         classic=dict(fmt="--classic", style=ArgFormat.BOOLEAN),
-        channel=dict(fmt=lambda v: [] if v == 'stable' else ['--channel', '{0}']),
+        channel=dict(fmt=lambda v: [] if v == 'stable' else ['--channel', '{0}'.format(v)]),
     )
     check_rc = False
 
