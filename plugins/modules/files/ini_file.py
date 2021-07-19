@@ -282,8 +282,10 @@ def do_ini(module, filename, section=None, option=None, values=None,
 
     if state == 'present' and option:
         for index, line in enumerate(section_lines):
-            if match := match_opt(option, line):
-                if values and (matched_value := match.group(6)) in values:
+            if match_opt(option, line):
+                match = match_opt(option, line)
+                if values and match.group(6) in values:
+                    matched_value = match.group(6)
                     if not matched_value and allow_no_value:
                         # replace existing option with no value line(s)
                         newline = u'%s\n' % option
@@ -371,7 +373,6 @@ def do_ini(module, filename, section=None, option=None, values=None,
             section_lines = []
             msg = 'section removed'
             changed = True
-
 
     # reassemble the ini_lines after manipulation
     ini_lines = before + section_lines + after
