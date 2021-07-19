@@ -282,7 +282,7 @@ class Archive(object):
         self.expanded_paths, has_globs = expand_paths(paths)
         self.expanded_exclude_paths = expand_paths(module.params['exclude_path'])[0]
 
-        self.paths = list(set(self.expanded_paths) - set(self.expanded_exclude_paths))
+        self.paths = sorted(set(self.expanded_paths) - set(self.expanded_exclude_paths))
 
         if not self.paths:
             module.fail_json(

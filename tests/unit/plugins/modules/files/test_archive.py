@@ -69,7 +69,7 @@ class TestArchive(ModuleTestCase):
             supports_check_mode=True,
         )
 
-        self.os_path_isdir.side_effect = [True, True, False, False]
+        self.os_path_isdir.side_effect = [True, False, False, True]
 
         module.fail_json = Mock()
 
