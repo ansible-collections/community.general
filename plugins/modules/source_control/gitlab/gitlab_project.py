@@ -114,6 +114,38 @@ options:
       - Used to create a personal project under a user's name.
     type: str
     version_added: "3.3.0"
+  allow_merge_on_skipped_pipeline:
+    description:
+      - Allow merge when skipped pipelines exist.
+    type: bool
+    version_added: "3.4.0"
+  only_allow_merge_if_all_discussions_are_resolved:
+    description:
+      - All discussions on a merge request (MR) have to be resolved.
+    type: bool
+    version_added: "3.4.0"
+  only_allow_merge_if_pipeline_succeeds:
+    description:
+      - Only allow merges if pipeline succeeded.
+    type: bool
+    version_added: "3.4.0"
+  packages_enabled:
+    description:
+      - Enable GitLab package repository.
+    type: bool
+    version_added: "3.4.0"
+  remove_source_branch_after_merge:
+    description:
+      - Remove the source branch after merge.
+    type: bool
+    version_added: "3.4.0"
+  squash_option:
+    description:
+      - Squash commits when merging.
+    type: str
+    choices: ["never", "always", "default_off", "default_on"]
+    version_added: "3.4.0"
+
 '''
 
 EXAMPLES = r'''
@@ -214,6 +246,12 @@ class GitLabProject(object):
             'snippets_enabled': options['snippets_enabled'],
             'visibility': options['visibility'],
             'lfs_enabled': options['lfs_enabled'],
+            'allow_merge_on_skipped_pipeline': options['allow_merge_on_skipped_pipeline'],
+            'only_allow_merge_if_all_discussions_are_resolved': options['only_allow_merge_if_all_discussions_are_resolved'],
+            'only_allow_merge_if_pipeline_succeeds': options['only_allow_merge_if_pipeline_succeeds'],
+            'packages_enabled': options['packages_enabled'],
+            'remove_source_branch_after_merge': options['remove_source_branch_after_merge'],
+            'squash_option': options['squash_option'],
         }
         # Because we have already call userExists in main()
         if self.projectObject is None:
@@ -221,6 +259,7 @@ class GitLabProject(object):
                 'path': options['path'],
                 'import_url': options['import_url'],
             })
+            project_options = self.getOptionsWithValue(project_options)
             project = self.createProject(namespace, project_options)
             changed = True
         else:
@@ -253,6 +292,17 @@ class GitLabProject(object):
             self._module.fail_json(msg="Failed to create project: %s " % to_native(e))
 
         return project
+
+    '''
+    @param arguments Attributes of the project
+    '''
+    def getOptionsWithValue(self, arguments):
+        ret_arguments = dict()
+        for arg_key, arg_value in arguments.items():
+            if arguments[arg_key] is not None:
+                ret_arguments[arg_key] = arg_value
+
+        return ret_arguments
 
     '''
     @param project Project Object
@@ -308,6 +358,12 @@ def main():
         state=dict(type='str', default="present", choices=["absent", "present"]),
         lfs_enabled=dict(default=False, type='bool'),
         username=dict(type='str'),
+        allow_merge_on_skipped_pipeline=dict(type='bool'),
+        only_allow_merge_if_all_discussions_are_resolved=dict(type='bool'),
+        only_allow_merge_if_pipeline_succeeds=dict(type='bool'),
+        packages_enabled=dict(type='bool'),
+        remove_source_branch_after_merge=dict(type='bool'),
+        squash_option=dict(type='str', choices=['never', 'always', 'default_off', 'default_on']),
     ))
 
     module = AnsibleModule(
@@ -340,6 +396,12 @@ def main():
     state = module.params['state']
     lfs_enabled = module.params['lfs_enabled']
     username = module.params['username']
+    allow_merge_on_skipped_pipeline = module.params['allow_merge_on_skipped_pipeline']
+    only_allow_merge_if_all_discussions_are_resolved = module.params['only_allow_merge_if_all_discussions_are_resolved']
+    only_allow_merge_if_pipeline_succeeds = module.params['only_allow_merge_if_pipeline_succeeds']
+    packages_enabled = module.params['packages_enabled']
+    remove_source_branch_after_merge = module.params['remove_source_branch_after_merge']
+    squash_option = module.params['squash_option']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -386,6 +448,7 @@ def main():
         module.exit_json(changed=False, msg="Project deleted or does not exists")
 
     if state == 'present':
+
         if gitlab_project.createOrUpdateProject(project_name, namespace, {
                                                 "path": project_path,
                                                 "description": project_description,
@@ -396,7 +459,14 @@ def main():
                                                 "snippets_enabled": snippets_enabled,
                                                 "visibility": visibility,
                                                 "import_url": import_url,
-                                                "lfs_enabled": lfs_enabled}):
+                                                "lfs_enabled": lfs_enabled,
+                                                "allow_merge_on_skipped_pipeline": allow_merge_on_skipped_pipeline,
+                                                "only_allow_merge_if_all_discussions_are_resolved": only_allow_merge_if_all_discussions_are_resolved,
+                                                "only_allow_merge_if_pipeline_succeeds": only_allow_merge_if_pipeline_succeeds,
+                                                "packages_enabled": packages_enabled,
+                                                "remove_source_branch_after_merge": remove_source_branch_after_merge,
+                                                "squash_option": squash_option,
+                                                }):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.projectObject._attrs)
         module.exit_json(changed=False, msg="No need to update the project %s" % project_name, project=gitlab_project.projectObject._attrs)
