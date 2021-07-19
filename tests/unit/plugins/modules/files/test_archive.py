@@ -76,6 +76,6 @@ class TestArchive(ModuleTestCase):
         archive = get_archive(module)
 
         module.fail_json.assert_called_once_with(
-            path=', '.join(archive.paths),
+            path=b', '.join(archive.paths),
             msg='Error, created archive can not be contained in source paths when remove=true'
         )

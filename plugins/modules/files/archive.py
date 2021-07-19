@@ -346,11 +346,11 @@ class Archive(object):
                 if os.path.isdir(target):
                     for directory_path, directory_names, file_names in os.walk(target, topdown=True):
                         for directory_name in directory_names:
-                            full_path = add_trailing_separator(directory_path) + directory_name
+                            full_path = os.path.join(directory_path, directory_name)
                             self.add(full_path, strip_prefix(self.root, full_path))
 
                         for file_name in file_names:
-                            full_path = add_trailing_separator(directory_path) + file_name
+                            full_path = os.path.join(directory_path, file_name)
                             self.add(full_path, strip_prefix(self.root, full_path))
                 else:
                     self.add(target, strip_prefix(self.root, target))
@@ -462,7 +462,7 @@ class Archive(object):
         for path in self.paths:
             if os.path.isdir(path) and self.destination.startswith(add_trailing_separator(path)):
                 self.module.fail_json(
-                    path=', '.join(self.paths),
+                    path=b', '.join(self.paths),
                     msg='Error, created archive can not be contained in source paths when remove=true'
                 )
 
