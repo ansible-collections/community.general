@@ -335,6 +335,8 @@ class Archive(object):
                 )
 
     def add_targets(self):
+        root = self.root
+
         self.open()
         try:
             for target in self.targets:
@@ -342,13 +344,13 @@ class Archive(object):
                     for directory_path, directory_names, file_names in os.walk(target, topdown=True):
                         for directory_name in directory_names:
                             full_path = os.path.join(directory_path, directory_name)
-                            self.add(full_path, strip_prefix(self.root, full_path))
+                            self.add(full_path, strip_prefix(root, full_path))
 
                         for file_name in file_names:
                             full_path = os.path.join(directory_path, file_name)
-                            self.add(full_path, strip_prefix(self.root, full_path))
+                            self.add(full_path, strip_prefix(root, full_path))
                 else:
-                    self.add(target, strip_prefix(self.root, target))
+                    self.add(target, strip_prefix(root, target))
         except Exception as e:
             if self.format in ('zip', 'tar'):
                 archive_format = self.format
