@@ -49,6 +49,12 @@ options:
     - Using I(force) as C(true) is mandatory when downgrading.
     type: bool
     default: false
+  ack_ansible29:
+    description:
+    - Acknowledge using Ansible 2.9 with its limitations, and prevents the module from generating warnings about them.
+    - This option is completely ignored if using a version Ansible greater than C(2.9.x). 
+    type: bool
+    default: false
 """
 
 EXAMPLES = """
@@ -148,18 +154,29 @@ RETURN = """
 import re
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import CmdModuleHelper, ArgFormat
+try:
+    from ansible.module_utils.ansible_release import __version__ as _ansible_version
+    ansible_version = tuple(int(x) for x in _ansible_version.split('.')[:3])
+except ImportError:
+    ansible_version = ()
+ansible_lt_210 = ansible_version < (2, 10)
 
 
 class AnsibleGalaxyInstall(CmdModuleHelper):
     _RE_LIST_PATH = re.compile(r'^# (?P<path>.*)$')
     _RE_LIST_COLL = re.compile(r'^(?P<elem>\w+\.\w+)\s+(?P<version>[\d\.]+)\s*$')
     _RE_LIST_ROLE = re.compile(r'^- (?P<elem>\w+\.\w+),\s+(?P<version>[\d\.]+)\s*$')
-    # Collection install output changed:
-    # ansible-base 2.10:  "coll.name (x.y.z)"
-    # ansible-core 2.11+: "coll.name:x.y.z"
-    _RE_INSTALL_OUTPUT = re.compile(r'^(?:(?P<collection>\w+\.\w+)(?: \(|:)(?P<cversion>[\d\.]+)\)?'
-                                    r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\))'
-                                    r' was installed successfully$')
+    if ansible_lt_210:
+        _RE_INSTALL_OUTPUT = re.compile(r"^(?:.*Installing '(?P<collection>\w+\.\w+):(?P<cversion>[\d\.]+)'.*"
+                                        r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\)'
+                                        r' was installed successfully)$')
+    else:
+        # Collection install output changed:
+        # ansible-base 2.10:  "coll.name (x.y.z)"
+        # ansible-core 2.11+: "coll.name:x.y.z"
+        _RE_INSTALL_OUTPUT = re.compile(r'^(?:(?P<collection>\w+\.\w+)(?: \(|:)(?P<cversion>[\d\.]+)\)?'
+                                        r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\))'
+                                        r' was installed successfully$')
 
     output_params = ('type', 'name', 'dest', 'requirements_file', 'force')
     module = dict(
@@ -169,6 +186,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
             requirements_file=dict(type='path'),
             dest=dict(type='path'),
             force=dict(type='bool', default=False),
+            ack_ansible29=dict(type='bool', default=False),
         ),
         mutually_exclusive=[('name', 'requirements_file')],
         required_one_of=[('name', 'requirements_file')],
@@ -225,13 +243,34 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
     def __list_roles__(self):
         return self.__list_element__('role', self._RE_LIST_PATH, self._RE_LIST_ROLE)
 
-    def __run__(self):
+    def __changed__(self):
+        if ansible_lt_210:
+            return self.vars.ansible29_change
+        else:
+            return False
+
+    def __run29__(self):
+        self.vars.set("new_collections", {})
+        self.vars.set("new_roles", {})
+        self.vars.set("ansible29_change", False, change=True, output=False)
+        if not self.vars.ack_ansible29:
+            self.module.warn("Ansible 2.9 or older: unable to retrieve lists of roles and collections already installed")
+            if self.vars.requirements_file is not None:
+                self.module.warn("Ansible 2.9 or older: will install only roles from requirement files")
+
+    def __run210plus__(self):
         self.vars.set("new_collections", {}, change=True)
         self.vars.set("new_roles", {}, change=True)
         if self.vars.type != "collection":
             self.vars.installed_roles = self.__list_roles__()
         if self.vars.type != "roles":
             self.vars.installed_collections = self.__list_collections__()
+
+    def __run__(self):
+        if ansible_lt_210:
+            self.__run29__()
+        else:
+            self.__run210plus__()
         params = ('type', {'galaxy_cmd': 'install'}, 'force', 'dest', 'requirements_file', 'name')
         self.run_command(params=params)
 
@@ -242,8 +281,12 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
                 continue
             if match.group("collection"):
                 self.vars.new_collections[match.group("collection")] = match.group("cversion")
-            else:
+                if ansible_lt_210:
+                    self.vars.ansible29_change = True
+            elif match.group("role"):
                 self.vars.new_roles[match.group("role")] = match.group("rversion")
+                if ansible_lt_210:
+                    self.vars.ansible29_change = True
 
 
 def main():

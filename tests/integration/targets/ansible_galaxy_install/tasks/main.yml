@@ -63,12 +63,20 @@
     requirements_file: "{{ reqs_file }}"
   register: install_rq0
 
-- name: Assert requirements file was installed
+- name: Assert requirements file was installed (role)
   assert:
     that:
     - install_rq0 is changed
     - '"geerlingguy.java" in install_rq0.new_roles'
+
+- name: Assert requirements file was installed (collection if Ansible > 2.9.x)
+  assert:
+    that:
+    - install_rq0 is changed
     - '"geerlingguy.php_roles" in install_rq0.new_collections'
+  when:
+    - (ansible_version.major == 2 and ansible_version.minor > 9) or (ansible_version.major > 2)
+
 
 - name: Install from requirements file (again)
   community.general.ansible_galaxy_install:
