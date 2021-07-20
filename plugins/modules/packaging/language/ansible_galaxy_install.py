@@ -202,7 +202,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
         dest=dict(fmt=('-p', '{0}'),),
         force=dict(fmt="--force", style=ArgFormat.BOOLEAN),
     )
-    force_lang = "C.UTF-8"
+    force_lang = "en_US.UTF-8"
     check_rc = True
 
     @staticmethod
