@@ -56,7 +56,7 @@ options:
     description:
     - Force overwriting an existing role or collection.
     - Using I(force=true) is mandatory when downgrading.
-    - "B(Ansible 2.9): Must be C(true) to upgrade roles and collections."
+    - "B(Ansible 2.9 and 2.10): Must be C(true) to upgrade roles and collections."
     type: bool
     default: false
   ack_ansible29:
@@ -171,14 +171,14 @@ try:
     ansible_version = tuple(int(x) for x in _ansible_version.split('.')[:3])
 except ImportError:
     ansible_version = ()
-ansible_lt_210 = ansible_version < (2, 10)
+is_ansible29 = ansible_version < (2, 10)
 
 
 class AnsibleGalaxyInstall(CmdModuleHelper):
     _RE_LIST_PATH = re.compile(r'^# (?P<path>.*)$')
     _RE_LIST_COLL = re.compile(r'^(?P<elem>\w+\.\w+)\s+(?P<version>[\d\.]+)\s*$')
     _RE_LIST_ROLE = re.compile(r'^- (?P<elem>\w+\.\w+),\s+(?P<version>[\d\.]+)\s*$')
-    if ansible_lt_210:
+    if is_ansible29:
         _RE_INSTALL_OUTPUT = re.compile(r"^(?:.*Installing '(?P<collection>\w+\.\w+):(?P<cversion>[\d\.]+)'.*"
                                         r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\)'
                                         r' was installed successfully)$')
@@ -273,7 +273,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
             self.vars.installed_collections = self.__list_collections__()
 
     def __run__(self):
-        if ansible_lt_210:
+        if is_ansible29:
             self.__setup29__()
         else:
             self.__setup210plus__()
@@ -287,11 +287,11 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
                 continue
             if match.group("collection"):
                 self.vars.new_collections[match.group("collection")] = match.group("cversion")
-                if ansible_lt_210:
+                if is_ansible29:
                     self.vars.ansible29_change = True
             elif match.group("role"):
                 self.vars.new_roles[match.group("role")] = match.group("rversion")
-                if ansible_lt_210:
+                if is_ansible29:
                     self.vars.ansible29_change = True
 
 
