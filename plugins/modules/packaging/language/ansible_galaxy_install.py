@@ -163,29 +163,16 @@ RETURN = """
 import re
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import CmdModuleHelper, ArgFormat
-try:
-    from ansible.module_utils.ansible_release import __version__ as _ansible_version
-    ansible_version = tuple(int(x) for x in _ansible_version.split('.')[:3])
-except ImportError:
-    ansible_version = ()
-is_ansible29 = ansible_version < (2, 10)
 
 
 class AnsibleGalaxyInstall(CmdModuleHelper):
+    _RE_GALAXY_VERSION = re.compile(r'^ansible-galaxy(?: \[core)? (?P<version>\d+\.\d+\.\d+)(?:\.\w+)?(?:\])?')
     _RE_LIST_PATH = re.compile(r'^# (?P<path>.*)$')
     _RE_LIST_COLL = re.compile(r'^(?P<elem>\w+\.\w+)\s+(?P<version>[\d\.]+)\s*$')
     _RE_LIST_ROLE = re.compile(r'^- (?P<elem>\w+\.\w+),\s+(?P<version>[\d\.]+)\s*$')
-    if is_ansible29:
-        _RE_INSTALL_OUTPUT = re.compile(r"^(?:.*Installing '(?P<collection>\w+\.\w+):(?P<cversion>[\d\.]+)'.*"
-                                        r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\)'
-                                        r' was installed successfully)$')
-    else:
-        # Collection install output changed:
-        # ansible-base 2.10:  "coll.name (x.y.z)"
-        # ansible-core 2.11+: "coll.name:x.y.z"
-        _RE_INSTALL_OUTPUT = re.compile(r'^(?:(?P<collection>\w+\.\w+)(?: \(|:)(?P<cversion>[\d\.]+)\)?'
-                                        r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\))'
-                                        r' was installed successfully$')
+    _RE_INSTALL_OUTPUT = None  # Set after determining ansible version, see __init_module__()
+    ansible_version = None
+    is_ansible29 = None
 
     output_params = ('type', 'name', 'dest', 'requirements_file', 'force')
     module = dict(
@@ -213,6 +200,32 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
     )
     force_lang = "en_US.UTF-8"
     check_rc = True
+
+    def _get_ansible_galaxy_version(self):
+        ansible_galaxy = self.module.get_bin_path("ansible-galaxy", required=True)
+        dummy, out, dummy = self.module.run_command([ansible_galaxy, "--version"], check_rc=True)
+        line = out.splitlines()[0]
+        match = self._RE_GALAXY_VERSION.match(line)
+        if not match:
+            raise RuntimeError("Unable to determine ansible-galaxy version from: {0}".format(line))
+        version = match.group("version")
+        version = tuple(int(x) for x in version.split('.')[:3])
+        return version
+
+    def __init_module__(self):
+        self.ansible_version = self._get_ansible_galaxy_version()
+        self.is_ansible29 = self.ansible_version < (2, 10)
+        if self.is_ansible29:
+            self._RE_INSTALL_OUTPUT = re.compile(r"^(?:.*Installing '(?P<collection>\w+\.\w+):(?P<cversion>[\d\.]+)'.*"
+                                                 r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\)'
+                                                 r' was installed successfully)$')
+        else:
+            # Collection install output changed:
+            # ansible-base 2.10:  "coll.name (x.y.z)"
+            # ansible-core 2.11+: "coll.name:x.y.z"
+            self._RE_INSTALL_OUTPUT = re.compile(r'^(?:(?P<collection>\w+\.\w+)(?: \(|:)(?P<cversion>[\d\.]+)\)?'
+                                                 r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\))'
+                                                 r' was installed successfully$')
 
     @staticmethod
     def __process_output_list__(*args):
@@ -270,7 +283,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
             self.vars.installed_collections = self.__list_collections__()
 
     def __run__(self):
-        if is_ansible29:
+        if self.is_ansible29:
             self.__setup29__()
         else:
             self.__setup210plus__()
@@ -284,11 +297,11 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
                 continue
             if match.group("collection"):
                 self.vars.new_collections[match.group("collection")] = match.group("cversion")
-                if is_ansible29:
+                if self.is_ansible29:
                     self.vars.ansible29_change = True
             elif match.group("role"):
                 self.vars.new_roles[match.group("role")] = match.group("rversion")
-                if is_ansible29:
+                if self.is_ansible29:
                     self.vars.ansible29_change = True
 
 
