@@ -212,6 +212,14 @@ STATE_COMPRESSED = 'compress'
 STATE_INCOMPLETE = 'incomplete'
 
 
+def common_path(paths):
+    empty = b'' if paths and isinstance(paths[0], six.binary_type) else ''
+
+    return os.path.join(
+        os.path.dirname(os.path.commonprefix([os.path.join(os.path.dirname(p), empty) for p in paths])), empty
+    )
+
+
 def expand_paths(paths):
     expanded_path = []
     is_globby = False
@@ -287,6 +295,8 @@ class Archive(object):
                 msg='Error, no source paths were found'
             )
 
+        self.root = common_path(self.paths)
+
         if not self.must_archive:
             self.must_archive = any([has_globs, os.path.isdir(self.paths[0]), len(self.paths) > 1])
 
@@ -335,8 +345,6 @@ class Archive(object):
                 )
 
     def add_targets(self):
-        root = self.root
-
         self.open()
         try:
             for target in self.targets:
@@ -344,13 +352,13 @@ class Archive(object):
                     for directory_path, directory_names, file_names in os.walk(target, topdown=True):
                         for directory_name in directory_names:
                             full_path = os.path.join(directory_path, directory_name)
-                            self.add(full_path, strip_prefix(root, full_path))
+                            self.add(full_path, strip_prefix(self.root, full_path))
 
                         for file_name in file_names:
                             full_path = os.path.join(directory_path, file_name)
-                            self.add(full_path, strip_prefix(root, full_path))
+                            self.add(full_path, strip_prefix(self.root, full_path))
                 else:
-                    self.add(target, strip_prefix(root, target))
+                    self.add(target, strip_prefix(self.root, target))
         except Exception as e:
             if self.format in ('zip', 'tar'):
                 archive_format = self.format
@@ -448,12 +456,6 @@ class Archive(object):
             'expanded_paths': [_to_native(p) for p in self.expanded_paths],
             'expanded_exclude_paths': [_to_native(p) for p in self.expanded_exclude_paths],
         }
-
-    @property
-    def root(self):
-        return os.path.join(
-            os.path.dirname(os.path.commonprefix([os.path.join(os.path.dirname(p), b'') for p in self.paths])), b''
-        )
 
     def _check_removal_safety(self):
         for path in self.paths:
