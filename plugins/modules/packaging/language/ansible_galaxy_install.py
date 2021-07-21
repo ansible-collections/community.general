@@ -19,9 +19,6 @@ notes:
   - >
     B(Ansible 2.9/2.10): The C(ansible-galaxy) command changed significantly between Ansible 2.9 and
     ansible-base 2.10 (later ansible-core 2.11). See comments in the parameters.
-  - >
-    B(Python 2.6): The upcoming version 2.12 of C(ansible-core) is not compatible with Python 2.6, specifically the
-    C(ansible-galaxy) command will not compile.
 options:
   type:
     description:
