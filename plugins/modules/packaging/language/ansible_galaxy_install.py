@@ -16,17 +16,19 @@ version_added: 3.5.0
 description:
   - This module allows the installation of Ansible collections or roles using C(ansible-galaxy).
 notes:
-  - B(Ansible 2.9): The C(ansible-galaxy) command changed significantly between Ansible 2.9 and ansible-base 2.10 (later ansible-core 2.11). 
-    See comments in the parameters.
-  - B(Python 2.6): The development branch of C(ansible-core), at U(https://github.com/ansible/ansible/) is not compatible with Python 2.6,
-    specifically the C(ansible-galaxy) command will not compile.
+  - >
+    B(Ansible 2.9/2.10): The C(ansible-galaxy) command changed significantly between Ansible 2.9 and
+    ansible-base 2.10 (later ansible-core 2.11). See comments in the parameters.
+  - >
+    B(Python 2.6): The upcoming version 2.12 of C(ansible-core) is not compatible with Python 2.6, specifically the
+    C(ansible-galaxy) command will not compile.
 options:
   type:
     description:
     - The type of installation performed by C(ansible-galaxy).
     - If I(type) is C(both), then I(requirements_file) must be passed and it may contain both roles and collections.
     - "Note however that the opposite is not true: if using a I(requirements_file), then I(type) can be any of the three choices."
-    - B(Ansible 2.9): The option C(both) will have the same effect as C(role).
+    - "B(Ansible 2.9): The option C(both) will have the same effect as C(role)."
     type: str
     choices: [collection, role, both]
     required: true
@@ -41,7 +43,7 @@ options:
     - Path to a file containing a list of requirements to be installed.
     - It works for I(type) equals to C(collection) and C(role).
     - I(name) and I(requirements_file) are mutually exclusive.
-    - B(Ansible 2.9): It can only be used to install either a I(type=role) or I(type=collection), but not both at the same run.
+    - "B(Ansible 2.9): It can only be used to install either a I(type=role) or I(type=collection), but not both at the same run."
     type: path
   dest:
     description:
@@ -54,7 +56,7 @@ options:
     description:
     - Force overwriting an existing role or collection.
     - Using I(force=true) is mandatory when downgrading.
-    - B(Ansible 2.9): Must be C(true) to upgrade roles and collections.
+    - "B(Ansible 2.9): Must be C(true) to upgrade roles and collections."
     type: bool
     default: false
   ack_ansible29:
@@ -115,7 +117,7 @@ RETURN = """
     description:
     - If I(requirements_file) is specified instead, returns dictionary with all the roles installed per path.
     - If I(name) is specified, returns that role name and the version installed per path.
-    - B(Ansible 2.9): Returns empty because C(ansible-galaxy) has no C(list) subcommand.
+    - "B(Ansible 2.9): Returns empty because C(ansible-galaxy) has no C(list) subcommand."
     type: dict
     returned: always when installing roles
     contains:
@@ -132,7 +134,7 @@ RETURN = """
     description:
     - If I(requirements_file) is specified instead, returns dictionary with all the collections installed per path.
     - If I(name) is specified, returns that collection name and the version installed per path.
-    - B(Ansible 2.9): Returns empty because C(ansible-galaxy) has no C(list) subcommand.
+    - "B(Ansible 2.9): Returns empty because C(ansible-galaxy) has no C(list) subcommand."
     type: dict
     returned: always when installing collections
     contains:
