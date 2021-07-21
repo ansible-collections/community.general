@@ -19,6 +19,8 @@ notes:
   - >
     B(Ansible 2.9/2.10): The C(ansible-galaxy) command changed significantly between Ansible 2.9 and
     ansible-base 2.10 (later ansible-core 2.11). See comments in the parameters.
+requirements:
+  - Ansible 2.9, ansible-base 2.10, or ansible-core 2.11 or newer
 options:
   type:
     description:
