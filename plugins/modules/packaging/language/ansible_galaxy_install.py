@@ -42,7 +42,7 @@ options:
     - Path to a file containing a list of requirements to be installed.
     - It works for I(type) equals to C(collection) and C(role).
     - I(name) and I(requirements_file) are mutually exclusive.
-    - "B(Ansible 2.9): It can only be used to install either a I(type=role) or I(type=collection), but not both at the same run."
+    - "B(Ansible 2.9): It can only be used to install either I(type=role) or I(type=collection), but not both at the same run."
     type: path
   dest:
     description:
