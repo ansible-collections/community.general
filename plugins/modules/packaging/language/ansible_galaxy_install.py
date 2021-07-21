@@ -284,6 +284,8 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
 
     def __run__(self):
         if self.is_ansible29:
+            if self.vars.type == 'both':
+                raise ValueError("Type 'both' not supported in Ansible 2.9")
             self.__setup29__()
         else:
             self.__setup210plus__()
