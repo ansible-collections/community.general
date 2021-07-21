@@ -15,12 +15,18 @@ short_description: Install Ansible roles or collections using ansible-galaxy
 version_added: 3.5.0
 description:
   - This module allows the installation of Ansible collections or roles using C(ansible-galaxy).
+notes:
+  - B(Ansible 2.9): The C(ansible-galaxy) command changed significantly between Ansible 2.9 and ansible-base 2.10 (later ansible-core 2.11). 
+    See comments in the parameters.
+  - B(Python 2.6): The development branch of C(ansible-core), at U(https://github.com/ansible/ansible/) is not compatible with Python 2.6,
+    specifically the C(ansible-galaxy) command will not compile.
 options:
   type:
     description:
     - The type of installation performed by C(ansible-galaxy).
     - If I(type) is C(both), then I(requirements_file) must be passed and it may contain both roles and collections.
     - "Note however that the opposite is not true: if using a I(requirements_file), then I(type) can be any of the three choices."
+    - B(Ansible 2.9): The option C(both) will have the same effect as C(role).
     type: str
     choices: [collection, role, both]
     required: true
@@ -35,6 +41,7 @@ options:
     - Path to a file containing a list of requirements to be installed.
     - It works for I(type) equals to C(collection) and C(role).
     - I(name) and I(requirements_file) are mutually exclusive.
+    - B(Ansible 2.9): It can only be used to install either a I(type=role) or I(type=collection), but not both at the same run.
     type: path
   dest:
     description:
@@ -46,7 +53,8 @@ options:
   force:
     description:
     - Force overwriting an existing role or collection.
-    - Using I(force) as C(true) is mandatory when downgrading.
+    - Using I(force=true) is mandatory when downgrading.
+    - B(Ansible 2.9): Must be C(true) to upgrade roles and collections.
     type: bool
     default: false
   ack_ansible29:
@@ -83,20 +91,6 @@ EXAMPLES = """
 """
 
 RETURN = """
-  new_collections:
-    description: New collections installed by this module.
-    returned: success
-    type: dict
-    sample:
-      community.general: 3.1.0
-      community.docker: 1.6.1
-  new_roles:
-    description: New roles installed by this module.
-    returned: success
-    type: dict
-    sample:
-      ansistrano.deploy: 3.8.0
-      baztian.xfce: v0.0.3
   type:
     description: The value of the I(type) parameter.
     type: str
@@ -121,6 +115,7 @@ RETURN = """
     description:
     - If I(requirements_file) is specified instead, returns dictionary with all the roles installed per path.
     - If I(name) is specified, returns that role name and the version installed per path.
+    - B(Ansible 2.9): Returns empty because C(ansible-galaxy) has no C(list) subcommand.
     type: dict
     returned: always when installing roles
     contains:
@@ -137,6 +132,7 @@ RETURN = """
     description:
     - If I(requirements_file) is specified instead, returns dictionary with all the collections installed per path.
     - If I(name) is specified, returns that collection name and the version installed per path.
+    - B(Ansible 2.9): Returns empty because C(ansible-galaxy) has no C(list) subcommand.
     type: dict
     returned: always when installing collections
     contains:
@@ -149,6 +145,20 @@ RETURN = """
         community.general: 3.0.2
       /custom/ansible/ansible_collections:
         community.general: 3.1.0
+  new_collections:
+    description: New collections installed by this module.
+    returned: success
+    type: dict
+    sample:
+      community.general: 3.1.0
+      community.docker: 1.6.1
+  new_roles:
+    description: New roles installed by this module.
+    returned: success
+    type: dict
+    sample:
+      ansistrano.deploy: 3.8.0
+      baztian.xfce: v0.0.3
 """
 
 import re
@@ -243,22 +253,16 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
     def __list_roles__(self):
         return self.__list_element__('role', self._RE_LIST_PATH, self._RE_LIST_ROLE)
 
-    def __changed__(self):
-        if ansible_lt_210:
-            return self.vars.ansible29_change
-        else:
-            return False
-
-    def __run29__(self):
+    def __setup29__(self):
         self.vars.set("new_collections", {})
         self.vars.set("new_roles", {})
         self.vars.set("ansible29_change", False, change=True, output=False)
         if not self.vars.ack_ansible29:
             self.module.warn("Ansible 2.9 or older: unable to retrieve lists of roles and collections already installed")
-            if self.vars.requirements_file is not None:
+            if self.vars.requirements_file is not None and self.vars.type == 'both':
                 self.module.warn("Ansible 2.9 or older: will install only roles from requirement files")
 
-    def __run210plus__(self):
+    def __setup210plus__(self):
         self.vars.set("new_collections", {}, change=True)
         self.vars.set("new_roles", {}, change=True)
         if self.vars.type != "collection":
@@ -268,9 +272,9 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
 
     def __run__(self):
         if ansible_lt_210:
-            self.__run29__()
+            self.__setup29__()
         else:
-            self.__run210plus__()
+            self.__setup210plus__()
         params = ('type', {'galaxy_cmd': 'install'}, 'force', 'dest', 'requirements_file', 'name')
         self.run_command(params=params)
 
