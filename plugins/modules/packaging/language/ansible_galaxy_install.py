@@ -230,16 +230,16 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
                                                  r' was installed successfully$')
 
     @staticmethod
-    def __process_output_list__(*args):
+    def _process_output_list(*args):
         if "None of the provided paths were usable" in args[1]:
             return []
         return args[1].splitlines()
 
-    def __list_element__(self, _type, path_re, elem_re):
+    def _list_element(self, _type, path_re, elem_re):
         params = ({'type': _type}, {'galaxy_cmd': 'list'}, 'dest')
         elems = self.run_command(params=params,
                                  publish_rc=False, publish_out=False, publish_err=False,
-                                 process_output=self.__process_output_list__,
+                                 process_output=self._process_output_list,
                                  check_rc=False)
         elems_dict = {}
         current_path = None
@@ -261,13 +261,13 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
                 elems_dict[current_path][match.group('elem')] = match.group('version')
         return elems_dict
 
-    def __list_collections__(self):
-        return self.__list_element__('collection', self._RE_LIST_PATH, self._RE_LIST_COLL)
+    def _list_collections(self):
+        return self._list_element('collection', self._RE_LIST_PATH, self._RE_LIST_COLL)
 
-    def __list_roles__(self):
-        return self.__list_element__('role', self._RE_LIST_PATH, self._RE_LIST_ROLE)
+    def _list_roles(self):
+        return self._list_element('role', self._RE_LIST_PATH, self._RE_LIST_ROLE)
 
-    def __setup29__(self):
+    def _setup29(self):
         self.vars.set("new_collections", {})
         self.vars.set("new_roles", {})
         self.vars.set("ansible29_change", False, change=True, output=False)
@@ -276,21 +276,21 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
             if self.vars.requirements_file is not None and self.vars.type == 'both':
                 self.module.warn("Ansible 2.9 or older: will install only roles from requirement files")
 
-    def __setup210plus__(self):
+    def _setup210plus(self):
         self.vars.set("new_collections", {}, change=True)
         self.vars.set("new_roles", {}, change=True)
         if self.vars.type != "collection":
-            self.vars.installed_roles = self.__list_roles__()
+            self.vars.installed_roles = self._list_roles()
         if self.vars.type != "roles":
-            self.vars.installed_collections = self.__list_collections__()
+            self.vars.installed_collections = self._list_collections()
 
     def __run__(self):
         if self.is_ansible29:
             if self.vars.type == 'both':
                 raise ValueError("Type 'both' not supported in Ansible 2.9")
-            self.__setup29__()
+            self._setup29()
         else:
-            self.__setup210plus__()
+            self._setup210plus()
         params = ('type', {'galaxy_cmd': 'install'}, 'force', 'dest', 'requirements_file', 'name')
         self.run_command(params=params)
 
