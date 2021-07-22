@@ -186,7 +186,7 @@ class GitLabGroup(object):
                 'visibility': options['visibility'],
                 'project_creation_level': options['project_creation_level'],
                 'auto_devops_enabled': options['auto_devops_enabled'],
-                'subgroup_creation_level': options['subgroup_creation_level']
+                'subgroup_creation_level': options['subgroup_creation_level'],
             }
             if options.get('description'):
                 payload['description'] = options['description']
