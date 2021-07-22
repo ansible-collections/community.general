@@ -67,6 +67,7 @@ options:
     choices: ["developer", "maintainer", "noone"]
     default: developer
     type: str
+    version_added: 3.5.0
   auto_devops_enabled:
     description:
       - Default to Auto DevOps pipeline for all projects within this group
