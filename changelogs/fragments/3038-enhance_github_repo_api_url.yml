@@ -1,0 +1,2 @@
+minor_changes:
+  - github_repo - add new option ``api_url``  to allow working with on premises installations (https://github.com/ansible-collections/community.general/pull/3038).

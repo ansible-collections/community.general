@@ -66,6 +66,12 @@ options:
     - When I(state) is C(present), the repository will be created in the current user profile.
     type: str
     required: false
+  api_url:
+    description:
+    - URL to the GitHub API if not using github.com but you own instance.
+    type: str
+    default: 'https://api.github.com'
+    version_added: "3.5.0"
 requirements:
 - PyGithub>=1.54
 notes:
@@ -119,11 +125,14 @@ except Exception:
     HAS_GITHUB_PACKAGE = False
 
 
-def authenticate(username=None, password=None, access_token=None):
+def authenticate(username=None, password=None, access_token=None, api_url=None):
+    if not api_url:
+        return None
+
     if access_token:
-        return Github(base_url="https://api.github.com", login_or_token=access_token)
+        return Github(base_url=api_url, login_or_token=access_token)
     else:
-        return Github(base_url="https://api.github.com", login_or_token=username, password=password)
+        return Github(base_url=api_url, login_or_token=username, password=password)
 
 
 def create_repo(gh, name, organization=None, private=False, description='', check_mode=False):
@@ -185,7 +194,8 @@ def delete_repo(gh, name, organization=None, check_mode=False):
 
 def run_module(params, check_mode=False):
     gh = authenticate(
-        username=params['username'], password=params['password'], access_token=params['access_token'])
+        username=params['username'], password=params['password'], access_token=params['access_token'],
+        api_url=params['api_url'])
     if params['state'] == "absent":
         return delete_repo(
             gh=gh,
@@ -216,6 +226,7 @@ def main():
         organization=dict(type='str', required=False, default=None),
         private=dict(type='bool', required=False, default=False),
         description=dict(type='str', required=False, default=''),
+        api_url=dict(type='str', required=False, default='https://api.github.com'),
     )
     module = AnsibleModule(
         argument_spec=module_args,
