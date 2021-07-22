@@ -280,9 +280,9 @@ def main():
         state=dict(type='str', default="present", choices=["absent", "present"]),
         parent=dict(type='str'),
         visibility=dict(type='str', default="private", choices=["internal", "private", "public"]),
-        project_creation_level=dict(type='str', default="developer", choices=["developer", "maintainer", "noone"]),
+        project_creation_level=dict(type='str', default='developer', choices=['developer', 'maintainer', 'noone']),
         auto_devops_enabled=dict(type='bool'),
-        subgroup_creation_level=dict(type='str', default="maintainer", choices=["maintainer", "owner"]),
+        subgroup_creation_level=dict(type='str', default='maintainer', choices=['maintainer', 'owner']),
     ))
 
     module = AnsibleModule(
