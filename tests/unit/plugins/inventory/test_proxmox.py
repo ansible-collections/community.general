@@ -522,6 +522,21 @@ def get_json(url):
         }
 
 
+def get_vm_snapshots(node, vmtype, vmid, name):
+    return [
+        {"description": "",
+         "name": "clean",
+         "snaptime": 1000,
+         "vmstate": 0
+         },
+        {"name": "current",
+         "digest": "1234689abcdf",
+         "running": 0,
+         "description": "You are here!",
+         "parent": "clean"
+         }]
+
+
 def get_vm_status(node, vmtype, vmid, name):
     return True
 
@@ -549,6 +564,7 @@ def test_populate(inventory, mocker):
     inventory._get_auth = mocker.MagicMock(side_effect=get_auth)
     inventory._get_json = mocker.MagicMock(side_effect=get_json)
     inventory._get_vm_status = mocker.MagicMock(side_effect=get_vm_status)
+    inventory._get_vm_snapshots = mocker.MagicMock(side_effect=get_vm_snapshots)
     inventory.get_option = mocker.MagicMock(side_effect=get_option)
     inventory._populate()
 
