@@ -1,0 +1,7 @@
+bugfixes:
+- "fix of gitlab_group_members which had an issue with upstream api pagination leading to failing when more then 20 users in gitlab group."
+- "fix of gitlab_project_members which had an issue with upstream api pagination leading to failing when more then 20 users in gitlab project."
+minor_changes:
+- "added functionality to run module gitlab_group_members with a list of users using gitlab_users instead of gitlab_user."
+- "added functionality to run module gitlab_project_members with a list of users using gitlab_users instead of gitlab_user."
+- "added functionality to set all members exactly as given using gitlab_group_members or gitlab_project_members"
