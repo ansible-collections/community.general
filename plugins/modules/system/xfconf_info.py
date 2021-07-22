@@ -13,7 +13,7 @@ author:
 short_description: Retrieve XFCE4 configurations
 version_added: 3.5.0
 description:
-  - This module allows retrieving Xfce 4 configurations via xfconf-query.
+  - This module allows retrieving Xfce 4 configurations with the help of C(xfconf-query).
 options:
   channel:
     description:
