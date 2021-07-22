@@ -206,7 +206,7 @@ def main():
         project=dict(type='str', required=True),
         gitlab_user=dict(type='str', required=False),
         gitlab_users=dict(type='list', required=False),
-        state=dict(type='str', default='present', choices=['present', 'absent','present-exact']),
+        state=dict(type='str', default='present', choices=['present', 'absent', 'present-exact']),
         access_level=dict(type='str', required=False, choices=['guest', 'reporter', 'developer', 'maintainer'])
     ))
 
@@ -215,14 +215,14 @@ def main():
         mutually_exclusive=[
             ['api_username', 'api_token'],
             ['api_password', 'api_token'],
-            ['gitlab_user','gitlab_users'],
+            ['gitlab_user', 'gitlab_users'],
         ],
         required_together=[
             ['api_username', 'api_password'],
         ],
         required_one_of=[
             ['api_username', 'api_token'],
-            ['gitlab_user','gitlab_users'],
+            ['gitlab_user', 'gitlab_users'],
         ],
         required_if=[
             ['state', 'present', ['access_level']],
@@ -262,13 +262,13 @@ def main():
 
     members = []
     gitlab_users = []
-    if module.params['gitlab_user'] != None:
+    if module.params['gitlab_user'] is not None:
         # only single user given
         gitlab_users = [module.params['gitlab_user']]
         members = [project.get_member_in_a_project(gitlab_project_id, project.get_user_id(gitlab_users[0]))]
-        if members[0] == None:
+        if members[0] is None:
             members = []
-    elif module.params['gitlab_users'] != None:
+    elif module.params['gitlab_users'] is not None:
         # list of users given
         gitlab_users = module.params['gitlab_users']
         members = project.get_members_in_a_project(gitlab_project_id)
@@ -276,10 +276,10 @@ def main():
         # something went wrong
         module.fail_json(msg="Please give one of gitlab_user or gitlab_users.")
 
-    changed=False
-    error=False
-    changed_users=[]
-    changed_data=[]
+    changed= False
+    error= False
+    changed_users= []
+    changed_data= []
 
     for gitlab_user in gitlab_users:
         gitlab_user_id = project.get_user_id(gitlab_user)
@@ -289,12 +289,12 @@ def main():
             if state == 'absent':
                 changed_users.append("user '%s' not found, and thus also not part of the project" % gitlab_user)
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'OK',
-                    'msg': "user '%s' not found, and thus also not part of the project" % gitlab_user})
+                                     'msg': "user '%s' not found, and thus also not part of the project" % gitlab_user})
             else:
-                error=True
+                error= True
                 changed_users.append("user '%s' not found." % gitlab_user)
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'FAILED',
-                    'msg': "user '%s' not found." % gitlab_user})
+                                     'msg': "user '%s' not found." % gitlab_user})
 
         is_user_a_member = project.is_user_a_member(members, gitlab_user_id)
 
@@ -304,15 +304,15 @@ def main():
                 # add user to the project
                 if not module.check_mode:
                     project.add_member_to_project(gitlab_user_id, gitlab_project_id, access_level)
-                changed=True
+                changed= True
                 changed_users.append("Successfully added user '%s' to project" % gitlab_user)
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'CHANGED',
-                    'msg': "Successfully added user '%s' to project" % gitlab_user})
+                                     'msg': "Successfully added user '%s' to project" % gitlab_user})
             # state as absent
             else:
                 changed_users.append("User, '%s', is not a member in the project. No change to report" % gitlab_user)
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'OK',
-                    'msg': "User, '%s', is not a member in the project. No change to report" % gitlab_user})
+                                     'msg': "User, '%s', is not a member in the project. No change to report" % gitlab_user})
         # in case that a user is a member
         else:
             if state == 'present' or state == 'present-exact':
@@ -321,35 +321,35 @@ def main():
                 if user_access_level == access_level:
                     changed_users.append("User, '%s', is already a member in the project. No change to report" % gitlab_user)
                     changed_data.append({'gitlab_user': gitlab_user, 'result': 'OK',
-                    'msg': "User, '%s', is already a member in the project. No change to report" % gitlab_user})
+                                         'msg': "User, '%s', is already a member in the project. No change to report" % gitlab_user})
                 else:
                     # update the access level for the user
                     if not module.check_mode:
                         project.update_user_access_level(members, gitlab_user_id, access_level)
-                    changed = True
+                    changed= True
                     changed_users.append("Successfully updated the access level for the user, '%s'" % gitlab_user)
                     changed_data.append({'gitlab_user': gitlab_user, 'result': 'CHANGED',
-                    'msg': "Successfully updated the access level for the user, '%s'" % gitlab_user})
+                                         'msg': "Successfully updated the access level for the user, '%s'" % gitlab_user})
             else:
                 # remove the user from the project
                 if not module.check_mode:
                     project.remove_user_from_project(gitlab_user_id, gitlab_project_id)
-                changed=True
+                changed= True
                 changed_users.append("Successfully removed user, '%s', from the project" % gitlab_user)
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'CHANGED',
-                    'msg': "Successfully removed user, '%s', from the project" % gitlab_user})
+                                     'msg': "Successfully removed user, '%s', from the project" % gitlab_user})
 
     # if state = present-exact delete users which are in members having give access level but not in gitlab_users
     if state == 'present-exact':
         for member in members:
             if member.access_level == access_level and member.username.upper() not in [name.upper() for name in gitlab_users]:
                 project.remove_user_from_project(member.id, gitlab_project_id)
-                changed=True
+                changed= True
                 changed_users.append("Successfully removed user '%s', from project. Was not in given list" % member.username)
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'CHANGED',
-                        'msg': "Successfully removed user '%s', from project. Was not in given list" % member.username})
+                                     'msg': "Successfully removed user '%s', from project. Was not in given list" % member.username})
 
-    if module.params['gitlab_user'] != None and error:
+    if module.params['gitlab_user'] is not None and error:
         # if single user given and an error occurred return error for list errors will be per user
         module.fail_json(msg=changed_users[0])
     elif error:
@@ -362,6 +362,7 @@ def main():
             module.fail_json(msg='All tasks for all users given failed', result_data=changed_data)
 
     module.exit_json(changed=changed, result="\n".join(changed_users), result_data=changed_data)
+
 
 if __name__ == '__main__':
     main()
