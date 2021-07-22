@@ -205,7 +205,7 @@ def main():
         api_token=dict(type='str', required=True, no_log=True),
         project=dict(type='str', required=True),
         gitlab_user=dict(type='str', required=False),
-        gitlab_users=dict(type='list', required=False),
+        gitlab_users=dict(type='list', elements='str', required=False),
         state=dict(type='str', default='present', choices=['present', 'absent', 'present-exact']),
         access_level=dict(type='str', required=False, choices=['guest', 'reporter', 'developer', 'maintainer'])
     ))
