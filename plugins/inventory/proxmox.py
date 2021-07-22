@@ -313,11 +313,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         snapshots_key = 'snapshots'
         snapshots_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), snapshots_key.lower()))
 
-        snapshots = []
-
-        for snapshot in ret:
-            if snapshot['name'] != 'current':
-                snapshots.append(snapshot['name'])
+        snapshots = [snapshot['name'] for snapshot in ret if snapshot['name'] != 'current']
         self.inventory.set_variable(name, snapshots_key, snapshots)
 
     def to_safe(self, word):
