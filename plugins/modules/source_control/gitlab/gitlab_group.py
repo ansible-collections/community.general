@@ -70,14 +70,16 @@ options:
     version_added: 3.5.0
   auto_devops_enabled:
     description:
-      - Default to Auto DevOps pipeline for all projects within this group
+      - Default to Auto DevOps pipeline for all projects within this group.
     type: bool
+    version_added: 3.5.0
   subgroup_creation_level:
     description:
-      - Allowed to create subgroups
+      - Allowed to create subgroups.
     choices: ["maintainer", "owner"]
     default: maintainer
     type: str
+    version_added: 3.5.0
 '''
 
 EXAMPLES = '''
