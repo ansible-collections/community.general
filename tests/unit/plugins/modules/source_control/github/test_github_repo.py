@@ -159,7 +159,8 @@ class TestGithubRepo(unittest.TestCase):
             "name": "myrepo",
             "description": "Just for fun",
             "private": False,
-            "state": "present"
+            "state": "present",
+            "api_url": "https://api.github.com"
         })
 
         self.assertEqual(result['changed'], True)
@@ -177,7 +178,8 @@ class TestGithubRepo(unittest.TestCase):
             "name": "myrepo",
             "description": "Just for fun",
             "private": True,
-            "state": "present"
+            "state": "present",
+            "api_url": "https://api.github.com"
         })
         self.assertEqual(result['changed'], True)
         self.assertEqual(result['repo']['private'], True)
@@ -194,7 +196,8 @@ class TestGithubRepo(unittest.TestCase):
             "name": "myrepo",
             "description": "Just for fun",
             "private": True,
-            "state": "present"
+            "state": "present",
+            "api_url": "https://api.github.com"
         })
         self.assertEqual(result['changed'], True)
         self.assertEqual(result['repo']['private'], True)
@@ -211,7 +214,8 @@ class TestGithubRepo(unittest.TestCase):
             "name": "myrepo",
             "description": "Just for fun",
             "private": False,
-            "state": "absent"
+            "state": "absent",
+            "api_url": "https://api.github.com"
         })
         self.assertEqual(result['changed'], True)
 
@@ -227,7 +231,8 @@ class TestGithubRepo(unittest.TestCase):
             "name": "myrepo",
             "description": "Just for fun",
             "private": False,
-            "state": "absent"
+            "state": "absent",
+            "api_url": "https://api.github.com"
         })
         self.assertEqual(result['changed'], True)
 
@@ -243,7 +248,8 @@ class TestGithubRepo(unittest.TestCase):
             "name": "myrepo",
             "description": "Just for fun",
             "private": True,
-            "state": "absent"
+            "state": "absent",
+            "api_url": "https://api.github.com"
         })
         self.assertEqual(result['changed'], False)
 
