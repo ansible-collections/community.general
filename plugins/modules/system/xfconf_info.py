@@ -11,6 +11,7 @@ module: xfconf_info
 author:
     - "Alexei Znamensky (@russoz)"
 short_description: Retrieve XFCE4 configurations
+version_added: 3.5.0
 description:
   - This module allows retrieving Xfce 4 configurations via xfconf-query.
 options:
