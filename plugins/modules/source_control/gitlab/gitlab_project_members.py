@@ -276,10 +276,10 @@ def main():
         # something went wrong
         module.fail_json(msg="Please give one of gitlab_user or gitlab_users.")
 
-    changed= False
-    error= False
-    changed_users= []
-    changed_data= []
+    changed = False
+    error = False
+    changed_users = []
+    changed_data = []
 
     for gitlab_user in gitlab_users:
         gitlab_user_id = project.get_user_id(gitlab_user)
@@ -291,7 +291,7 @@ def main():
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'OK',
                                      'msg': "user '%s' not found, and thus also not part of the project" % gitlab_user})
             else:
-                error= True
+                error = True
                 changed_users.append("user '%s' not found." % gitlab_user)
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'FAILED',
                                      'msg': "user '%s' not found." % gitlab_user})
@@ -304,7 +304,7 @@ def main():
                 # add user to the project
                 if not module.check_mode:
                     project.add_member_to_project(gitlab_user_id, gitlab_project_id, access_level)
-                changed= True
+                changed = True
                 changed_users.append("Successfully added user '%s' to project" % gitlab_user)
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'CHANGED',
                                      'msg': "Successfully added user '%s' to project" % gitlab_user})
@@ -326,7 +326,7 @@ def main():
                     # update the access level for the user
                     if not module.check_mode:
                         project.update_user_access_level(members, gitlab_user_id, access_level)
-                    changed= True
+                    changed = True
                     changed_users.append("Successfully updated the access level for the user, '%s'" % gitlab_user)
                     changed_data.append({'gitlab_user': gitlab_user, 'result': 'CHANGED',
                                          'msg': "Successfully updated the access level for the user, '%s'" % gitlab_user})
@@ -334,7 +334,7 @@ def main():
                 # remove the user from the project
                 if not module.check_mode:
                     project.remove_user_from_project(gitlab_user_id, gitlab_project_id)
-                changed= True
+                changed = True
                 changed_users.append("Successfully removed user, '%s', from the project" % gitlab_user)
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'CHANGED',
                                      'msg': "Successfully removed user, '%s', from the project" % gitlab_user})
@@ -344,7 +344,7 @@ def main():
         for member in members:
             if member.access_level == access_level and member.username.upper() not in [name.upper() for name in gitlab_users]:
                 project.remove_user_from_project(member.id, gitlab_project_id)
-                changed= True
+                changed = True
                 changed_users.append("Successfully removed user '%s', from project. Was not in given list" % member.username)
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'CHANGED',
                                      'msg': "Successfully removed user '%s', from project. Was not in given list" % member.username})

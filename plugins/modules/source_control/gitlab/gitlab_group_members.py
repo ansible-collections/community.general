@@ -255,10 +255,10 @@ def main():
         # something went wrong
         module.fail_json(msg="Please give one of gitlab_user or gitlab_users.")
 
-    changed= False
-    error= False
-    changed_users= []
-    changed_data= []
+    changed = False
+    error = False
+    changed_users = []
+    changed_data = []
 
     for gitlab_user in gitlab_users:
         gitlab_user_id = group.get_user_id(gitlab_user)
@@ -270,7 +270,7 @@ def main():
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'OK',
                                      'msg': "user '%s' not found, and thus also not part of the group" % gitlab_user})
             else:
-                error= True
+                error = True
                 changed_users.append("user '%s' not found." % gitlab_user)
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'FAILED',
                                      'msg': "user '%s' not found." % gitlab_user})
@@ -283,7 +283,7 @@ def main():
                 # add user to the group
                 if not module.check_mode:
                     group.add_member_to_group(gitlab_user_id, gitlab_group_id, access_level)
-                changed= True
+                changed = True
                 changed_users.append("Successfully added user '%s' to group" % gitlab_user)
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'CHANGED',
                                      'msg': "Successfully added user '%s' to group" % gitlab_user})
@@ -313,17 +313,17 @@ def main():
                 # remove the user from the group
                 if not module.check_mode:
                     group.remove_user_from_group(gitlab_user_id, gitlab_group_id)
-                changed= True
+                changed = True
                 changed_users.append("Successfully removed user, '%s', from the group" % gitlab_user)
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'CHANGED',
                                      'msg': "Successfully removed user, '%s', from the group" % gitlab_user})
 
-    # if state = present-exact delete users which are in members having give access level but not in gitlab_users
+    # if state = present    -exact delete users which are in members having give access level but not in gitlab_users
     if state == 'present-exact':
         for member in members:
             if member.access_level == access_level and member.username.upper() not in [name.upper() for name in gitlab_users]:
                 group.remove_user_from_group(member.id, gitlab_group_id)
-                changed= True
+                changed = True
                 changed_users.append("Successfully removed user '%s', from group. Was not in given list" % member.username)
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'CHANGED',
                                      'msg': "Successfully removed user '%s', from group. Was not in given list" % member.username})
