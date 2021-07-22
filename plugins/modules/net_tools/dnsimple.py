@@ -409,7 +409,7 @@ def main():
             module.exit_json(changed=False, result=all_domains)
 
         # Domain & No record
-        if domain and record is None and not record_ids:
+        if record is None and not record_ids:
             if domain.isdigit():
                 typed_domain = int(domain)
             else:
@@ -435,7 +435,7 @@ def main():
                     module.exit_json(changed=False)
 
         # need the not none check since record could be an empty string
-        if domain and record is not None:
+        if record is not None:
             if not record_type:
                 module.fail_json(msg="Missing the record type")
             if not value:
@@ -482,7 +482,7 @@ def main():
                     module.exit_json(changed=False)
 
         # Make sure these record_ids either all exist or none
-        if domain and record_ids:
+        if record_ids:
             current_records = ds.get_records(domain, dnsimple_filter=None)
             current_record_ids = [str(d['id']) for d in current_records]
             wanted_record_ids = [str(r) for r in record_ids]
