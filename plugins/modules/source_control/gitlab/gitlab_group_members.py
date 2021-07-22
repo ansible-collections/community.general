@@ -5,9 +5,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-from re import T
-
-from gitlab.v4.objects import appearance
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -41,6 +38,7 @@ options:
         description:
             - A list of usernames to add to/remove from the GitLab group.
         type: list
+        elements: str
         version_added: 3.6.0
     access_level:
         description:

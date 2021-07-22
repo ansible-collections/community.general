@@ -59,6 +59,7 @@ options:
         description:
             - A list of usernames to add to/remove from the GitLab project.
         type: list
+        elements: str
         version_added: 3.6.0
     access_level:
         description:
