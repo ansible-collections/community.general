@@ -284,19 +284,18 @@ def get_json(url):
 
 
 def get_vm_snapshots(node, vmtype, vmid, name):
-    return [{
-      "description": "",
-      "name": "clean",
-      "snaptime": 1000,
-      "vmstate": 0
-    },
-    {
-      "name": "current",
-      "digest": "1234689abcdf",
-      "running": 0,
-      "description": "You are here!",
-      "parent": "clean"
-    }]
+    return [
+        {"description": "",
+         "name": "clean",
+         "snaptime": 1000,
+         "vmstate": 0
+         },
+        {"name": "current",
+         "digest": "1234689abcdf",
+         "running": 0,
+         "description": "You are here!",
+         "parent": "clean"
+         }]
 
 
 def get_vm_status(node, vmtype, vmid, name):
