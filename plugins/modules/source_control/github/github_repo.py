@@ -70,7 +70,6 @@ options:
     description:
     - URL to the GitHub API if not using github.com but you own instance.
     type: str
-    required: false
     default: 'https://api.github.com'
     version_added: "3.5.0"
 requirements:
