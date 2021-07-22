@@ -63,7 +63,7 @@ options:
     type: str
   project_creation_level:
     description:
-      - Determine if developers can create projects in the group
+      - Determine if developers can create projects in the group.
     choices: ["developer", "maintainer", "noone"]
     default: developer
     type: str
