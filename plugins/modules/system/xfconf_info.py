@@ -38,6 +38,7 @@ notes:
 EXAMPLES = """
 - name: Get list of all available channels
   community.general.xfconf_info: {}
+  register: result
 
 - name: Get list of all properties in a specific channel
   community.general.xfconf_info:
