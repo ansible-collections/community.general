@@ -54,13 +54,9 @@ options:
     gitlab_user:
         description:
             - The username of the member to add to/remove from the GitLab project.
-        type: str
-    gitlab_users:
-        description:
-            - A list of usernames to add to/remove from the GitLab project.
+        required: true
         type: list
-        elements: str
-        version_added: 3.6.0
+        element: str
     access_level:
         description:
             - The access level for the user.
@@ -72,11 +68,15 @@ options:
             - State of the member in the project.
             - On C(present), it adds a user to a GitLab project.
             - On C(absent), it removes a user from a GitLab project.
-            - On C(present-exact), it adds/removes users of the given access_level to match the given gitlab_users list.
-              If used with a single gitlab_user scope is reduced to this single user.
-        choices: ['present', 'absent', 'present-exact']
+        choices: ['present', 'absent']
         default: 'present'
         type: str
+    purge_users:
+        description:
+            - Adds/remove users of the given access_level to match the given gitlab_user list.
+        type: bool
+        default: False
+        version_added: 3.6.0
 notes:
     - Supports C(check_mode).
 '''
@@ -204,10 +204,10 @@ def main():
     argument_spec.update(dict(
         api_token=dict(type='str', required=True, no_log=True),
         project=dict(type='str', required=True),
-        gitlab_user=dict(type='str', required=False),
-        gitlab_users=dict(type='list', elements='str', required=False),
+        gitlab_user=dict(type='list', elements='str', required=True),
         state=dict(type='str', default='present', choices=['present', 'absent', 'present-exact']),
-        access_level=dict(type='str', required=False, choices=['guest', 'reporter', 'developer', 'maintainer'])
+        access_level=dict(type='str', required=False, choices=['guest', 'reporter', 'developer', 'maintainer']),
+        purge_users=dict(type='bool', required=False, default=False)
     ))
 
     module = AnsibleModule(
@@ -215,18 +215,15 @@ def main():
         mutually_exclusive=[
             ['api_username', 'api_token'],
             ['api_password', 'api_token'],
-            ['gitlab_user', 'gitlab_users'],
         ],
         required_together=[
             ['api_username', 'api_password'],
         ],
         required_one_of=[
             ['api_username', 'api_token'],
-            ['gitlab_user', 'gitlab_users'],
         ],
         required_if=[
             ['state', 'present', ['access_level']],
-            ['state', 'present-exact', ['access_level']],
         ],
         supports_check_mode=True,
     )
@@ -261,16 +258,15 @@ def main():
         module.fail_json(msg="project '%s' not found." % gitlab_project)
 
     members = []
-    gitlab_users = []
-    if module.params['gitlab_user'] is not None:
+    gitlab_users = module.params['gitlab_user']
+    purge_users = module.params['purge_users']
+    if len(gitlab_users) == 1:
         # only single user given
-        gitlab_users = [module.params['gitlab_user']]
         members = [project.get_member_in_a_project(gitlab_project_id, project.get_user_id(gitlab_users[0]))]
         if members[0] is None:
             members = []
-    elif module.params['gitlab_users'] is not None:
+    elif len(gitlab_users) > 1 or purge_users:
         # list of users given
-        gitlab_users = module.params['gitlab_users']
         members = project.get_members_in_a_project(gitlab_project_id)
     else:
         # something went wrong
@@ -300,7 +296,7 @@ def main():
 
         # check if the user is a member in the project
         if not is_user_a_member:
-            if state == 'present' or state == 'present-exact':
+            if state == 'present':
                 # add user to the project
                 if not module.check_mode:
                     project.add_member_to_project(gitlab_user_id, gitlab_project_id, access_level)
@@ -315,7 +311,7 @@ def main():
                                      'msg': "User, '%s', is not a member in the project. No change to report" % gitlab_user})
         # in case that a user is a member
         else:
-            if state == 'present' or state == 'present-exact':
+            if state == 'present':
                 # compare the access level
                 user_access_level = project.get_user_access_level(members, gitlab_user_id)
                 if user_access_level == access_level:
@@ -339,8 +335,8 @@ def main():
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'CHANGED',
                                      'msg': "Successfully removed user, '%s', from the project" % gitlab_user})
 
-    # if state = present-exact delete users which are in members having give access level but not in gitlab_users
-    if state == 'present-exact':
+    # if state = present and purge_users set delete users which are in members having give access level but not in gitlab_users
+    if state == 'present' and purge_users:
         for member in members:
             if member.access_level == access_level and member.username.upper() not in [name.upper() for name in gitlab_users]:
                 project.remove_user_from_project(member.id, gitlab_project_id)
@@ -349,7 +345,7 @@ def main():
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'CHANGED',
                                      'msg': "Successfully removed user '%s', from project. Was not in given list" % member.username})
 
-    if module.params['gitlab_user'] is not None and error:
+    if len(gitlab_user) == 1 and error:
         # if single user given and an error occurred return error for list errors will be per user
         module.fail_json(msg=changed_users[0])
     elif error:

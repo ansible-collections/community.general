@@ -5,8 +5,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-from typing_extensions import Required
-__metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
@@ -34,6 +32,7 @@ options:
     gitlab_user:
         description:
             - A username or a list of usernames to add to/remove from the GitLab group.
+        required: true
         type: list
         elements: str
     access_level:
@@ -47,9 +46,7 @@ options:
             - State of the member in the group.
             - On C(present), it adds a user to a GitLab group.
             - On C(absent), it removes a user from a GitLab group.
-            - On C(present-exact), it
-              If used with a single gitlab_user scope is reduced to this single user.
-        choices: ['present', 'absent', 'present-exact']
+        choices: ['present', 'absent']
         default: 'present'
         type: str
     purge_users:
@@ -185,12 +182,10 @@ def main():
     argument_spec.update(dict(
         api_token=dict(type='str', required=True, no_log=True),
         gitlab_group=dict(type='str', required=True),
-        gitlab_user=dict(type='str', required=False),
-        gitlab_users=dict(type='list', elements='str', required=False),
-        state=dict(type='str', default='present', choices=['present', 'absent', 'present-exact']),
+        gitlab_user=dict(type='list', elements='str', required=True),
+        state=dict(type='str', default='present', choices=['present', 'absent']),
         access_level=dict(type='str', required=False, choices=['guest', 'reporter', 'developer', 'maintainer', 'owner']),
         purge_users=dict(type='bool', required=False, default=False)
-
     ))
 
     module = AnsibleModule(
@@ -250,7 +245,6 @@ def main():
             members = []
     elif len(gitlab_users) > 1 or purge_users:
         # list of users given
-        gitlab_users = module.params['gitlab_users']
         members = group.get_members_in_a_group(gitlab_group_id)
     else:
         # something went wrong
@@ -280,7 +274,7 @@ def main():
 
         # check if the user is a member in the group
         if not is_user_a_member:
-            if state == 'present' or state == 'present-exact':
+            if state == 'present':
                 # add user to the group
                 if not module.check_mode:
                     group.add_member_to_group(gitlab_user_id, gitlab_group_id, access_level)
@@ -295,7 +289,7 @@ def main():
                                      'msg': "User, '%s', is not a member in the group. No change to report" % gitlab_user})
         # in case that a user is a member
         else:
-            if state == 'present' or state == 'present-exact':
+            if state == 'present':
                 # compare the access level
                 user_access_level = group.get_user_access_level(members, gitlab_user_id)
                 if user_access_level == access_level:
@@ -319,8 +313,8 @@ def main():
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'CHANGED',
                                      'msg': "Successfully removed user, '%s', from the group" % gitlab_user})
 
-    # if state = present    -exact delete users which are in members having give access level but not in gitlab_users
-    if state == 'present-exact':
+    # if state = present and purge_users set delete users which are in members having give access level but not in gitlab_users
+    if state == 'present' and purge_users:
         for member in members:
             if member.access_level == access_level and member.username.upper() not in [name.upper() for name in gitlab_users]:
                 group.remove_user_from_group(member.id, gitlab_group_id)
