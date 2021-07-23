@@ -39,7 +39,7 @@ options:
             - A list of usernames to add to/remove from the GitLab group.
         type: list
         elements: str
-        version_added: 3.6.0
+        version_added: 3.5.0
     access_level:
         description:
             - The access level for the user.
