@@ -5,6 +5,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+from typing_extensions import Required
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -32,14 +33,9 @@ options:
         type: str
     gitlab_user:
         description:
-            - The username of the member to add to/remove from the GitLab group.
-        type: str
-    gitlab_users:
-        description:
-            - A list of usernames to add to/remove from the GitLab group.
+            - A username or a list of usernames to add to/remove from the GitLab group.
         type: list
         elements: str
-        version_added: 3.6.0
     access_level:
         description:
             - The access level for the user.
@@ -51,11 +47,17 @@ options:
             - State of the member in the group.
             - On C(present), it adds a user to a GitLab group.
             - On C(absent), it removes a user from a GitLab group.
-            - On C(present-exact), it adds/removes users of the given access_level to match the given gitlab_users list.
+            - On C(present-exact), it
               If used with a single gitlab_user scope is reduced to this single user.
         choices: ['present', 'absent', 'present-exact']
         default: 'present'
         type: str
+    purge_users:
+        description:
+            - Adds/remove users of the given access_level to match the given gitlab_user list.
+        type: bool
+        default: False
+        version_added: 3.6.0
 notes:
     - Supports C(check_mode).
 '''
@@ -186,7 +188,9 @@ def main():
         gitlab_user=dict(type='str', required=False),
         gitlab_users=dict(type='list', elements='str', required=False),
         state=dict(type='str', default='present', choices=['present', 'absent', 'present-exact']),
-        access_level=dict(type='str', required=False, choices=['guest', 'reporter', 'developer', 'maintainer', 'owner'])
+        access_level=dict(type='str', required=False, choices=['guest', 'reporter', 'developer', 'maintainer', 'owner']),
+        purge_users=dict(type='bool', required=False, default=False)
+
     ))
 
     module = AnsibleModule(
@@ -194,18 +198,15 @@ def main():
         mutually_exclusive=[
             ['api_username', 'api_token'],
             ['api_password', 'api_token'],
-            ['gitlab_user', 'gitlab_users'],
         ],
         required_together=[
             ['api_username', 'api_password'],
         ],
         required_one_of=[
             ['api_username', 'api_token'],
-            ['gitlab_user', 'gitlab_users'],
         ],
         required_if=[
             ['state', 'present', ['access_level']],
-            ['state', 'present-exact', ['access_level']],
         ],
         supports_check_mode=True,
     )
@@ -240,20 +241,20 @@ def main():
         module.fail_json(msg="group '%s' not found." % gitlab_group)
 
     members = []
-    gitlab_users = []
-    if module.params['gitlab_user'] is not None:
+    gitlab_users = module.params['gitlab_user']
+    purge_users = module.params['purge_users']
+    if len(gitlab_users) == 1:
         # only single user given
-        gitlab_users = [module.params['gitlab_user']]
         members = [group.get_member_in_a_group(gitlab_group_id, group.get_user_id(gitlab_users[0]))]
         if members[0] is None:
             members = []
-    elif module.params['gitlab_users'] is not None:
+    elif len(gitlab_users) > 1 or purge_users:
         # list of users given
         gitlab_users = module.params['gitlab_users']
         members = group.get_members_in_a_group(gitlab_group_id)
     else:
         # something went wrong
-        module.fail_json(msg="Please give one of gitlab_user or gitlab_users.")
+        module.fail_json(msg="Please give at least one user or set purge_users true.")
 
     changed = False
     error = False
@@ -328,7 +329,7 @@ def main():
                 changed_data.append({'gitlab_user': gitlab_user, 'result': 'CHANGED',
                                      'msg': "Successfully removed user '%s', from group. Was not in given list" % member.username})
 
-    if module.params['gitlab_user'] is not None and error:
+    if len(gitlab_user) == 1 and error:
         # if single user given and an error occurred return error for list errors will be per user
         module.fail_json(msg=changed_users[0])
     elif error:

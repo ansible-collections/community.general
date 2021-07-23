@@ -1,6 +1,3 @@
-bugfixes:
-- gitlab_group_members - which had an issue with upstream api pagination leading to failing when more then 20 users in gitlab group (https://github.com/ansible-collections/community.general/issues/3041).
-- gitlab_project_members - which had an issue with upstream api pagination leading to failing when more then 20 users in gitlab project (https://github.com/ansible-collections/community.general/issues/3041).
 minor_changes:
 - added functionality to run module gitlab_group_members with a list of users using gitlab_users instead of gitlab_user (https://github.com/ansible-collections/community.general/pull/3047).
 - added functionality to run module gitlab_project_members with a list of users using gitlab_users instead of gitlab_user (https://github.com/ansible-collections/community.general/pull/3047).
