@@ -56,7 +56,7 @@ options:
             - The username of the member to add to/remove from the GitLab project.
         required: true
         type: list
-        element: str
+        elements: str
     access_level:
         description:
             - The access level for the user.
@@ -205,7 +205,7 @@ def main():
         api_token=dict(type='str', required=True, no_log=True),
         project=dict(type='str', required=True),
         gitlab_user=dict(type='list', elements='str', required=True),
-        state=dict(type='str', default='present', choices=['present', 'absent', 'present-exact']),
+        state=dict(type='str', default='present', choices=['present', 'absent']),
         access_level=dict(type='str', required=False, choices=['guest', 'reporter', 'developer', 'maintainer']),
         purge_users=dict(type='bool', required=False, default=False)
     ))
