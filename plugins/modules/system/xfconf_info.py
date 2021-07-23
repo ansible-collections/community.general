@@ -43,16 +43,19 @@ EXAMPLES = """
 - name: Get list of all properties in a specific channel
   community.general.xfconf_info:
     channel: xsettings
+  register: result
 
 - name: Retrieve the DPI value
   community.general.xfconf_info:
     channel: xsettings
     property: /Xft/DPI
+  register: result
 
 - name: Get workspace names (4)
   community.general.xfconf_info:
     channel: xfwm4
     property: /general/workspace_names
+  register: result
 """
 
 RETURN = '''
