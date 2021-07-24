@@ -227,7 +227,7 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
         self.vars.value = self.vars.previous_value
         self.vars.previous_value = None
         self.module.deprecate(
-            msg="State 'get' is deprecated. Please use the module xfconf_info instead.",
+            msg="State 'get' is deprecated. Please use the module xfconf_info instead",
             version="5.0.0", collection_name="community.general"
         )
 
