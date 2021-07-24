@@ -94,7 +94,8 @@ RETURN = '''
         - /Xft/HintStyle
         - /Xft/RGBA
   is_array:
-    description: Flag indicating whether the property is an array or not.
+    description:
+    - Flag indicating whether the property is an array or not.
     returned: success
     type: bool
   value:
