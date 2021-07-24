@@ -109,7 +109,7 @@ class GitLabGroup(object):
     # get all members in a group
     def get_members_in_a_group(self, gitlab_group_id):
         group = self._gitlab.groups.get(gitlab_group_id)
-        return group.members.list()
+        return group.members.list(all=True)
 
     # check if the user is a member of the group
     def is_user_a_member(self, members, gitlab_user_id):
