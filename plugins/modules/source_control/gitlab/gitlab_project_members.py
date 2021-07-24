@@ -130,7 +130,7 @@ class GitLabProjectMembers(object):
     # get all members in a project
     def get_members_in_a_project(self, gitlab_project_id):
         project = self._gitlab.projects.get(gitlab_project_id)
-        return project.members.list()
+        return project.members.list(all=True)
 
     # check if the user is a member of the project
     def is_user_a_member(self, members, gitlab_user_id):
