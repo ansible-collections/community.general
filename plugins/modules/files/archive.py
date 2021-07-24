@@ -204,7 +204,6 @@ else:
         LZMA_IMP_ERR = format_exc()
         HAS_LZMA = False
 
-PATH_SEP = to_bytes(os.sep)
 PY27 = version_info[0:2] >= (2, 7)
 
 STATE_ABSENT = 'absent'
@@ -213,16 +212,12 @@ STATE_COMPRESSED = 'compress'
 STATE_INCOMPLETE = 'incomplete'
 
 
-def _to_bytes(s):
-    return to_bytes(s, errors='surrogate_or_strict')
+def common_path(paths):
+    empty = b'' if paths and isinstance(paths[0], six.binary_type) else ''
 
-
-def _to_native(s):
-    return to_native(s, errors='surrogate_or_strict')
-
-
-def _to_native_ascii(s):
-    return to_native(s, errors='surrogate_or_strict', encoding='ascii')
+    return os.path.join(
+        os.path.dirname(os.path.commonprefix([os.path.join(os.path.dirname(p), empty) for p in paths])), empty
+    )
 
 
 def expand_paths(paths):
@@ -239,16 +234,32 @@ def expand_paths(paths):
     return expanded_path, is_globby
 
 
-def is_archive(path):
-    return re.search(br'\.(tar|tar\.(gz|bz2|xz)|tgz|tbz2|zip)$', os.path.basename(path), re.IGNORECASE)
-
-
 def legacy_filter(path, exclusion_patterns):
     return matches_exclusion_patterns(path, exclusion_patterns)
 
 
 def matches_exclusion_patterns(path, exclusion_patterns):
     return any(fnmatch(path, p) for p in exclusion_patterns)
+
+
+def is_archive(path):
+    return re.search(br'\.(tar|tar\.(gz|bz2|xz)|tgz|tbz2|zip)$', os.path.basename(path), re.IGNORECASE)
+
+
+def strip_prefix(prefix, string):
+    return string[len(prefix):] if string.startswith(prefix) else string
+
+
+def _to_bytes(s):
+    return to_bytes(s, errors='surrogate_or_strict')
+
+
+def _to_native(s):
+    return to_native(s, errors='surrogate_or_strict')
+
+
+def _to_native_ascii(s):
+    return to_native(s, errors='surrogate_or_strict', encoding='ascii')
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -266,7 +277,6 @@ class Archive(object):
         self.destination_state = STATE_ABSENT
         self.errors = []
         self.file = None
-        self.root = b''
         self.successes = []
         self.targets = []
         self.not_found = []
@@ -275,7 +285,7 @@ class Archive(object):
         self.expanded_paths, has_globs = expand_paths(paths)
         self.expanded_exclude_paths = expand_paths(module.params['exclude_path'])[0]
 
-        self.paths = list(set(self.expanded_paths) - set(self.expanded_exclude_paths))
+        self.paths = sorted(set(self.expanded_paths) - set(self.expanded_exclude_paths))
 
         if not self.paths:
             module.fail_json(
@@ -284,6 +294,8 @@ class Archive(object):
                 expanded_exclude_paths=_to_native(b', '.join(self.expanded_exclude_paths)),
                 msg='Error, no source paths were found'
             )
+
+        self.root = common_path(self.paths)
 
         if not self.must_archive:
             self.must_archive = any([has_globs, os.path.isdir(self.paths[0]), len(self.paths) > 1])
@@ -298,6 +310,9 @@ class Archive(object):
                 msg='Error, must specify "dest" when archiving multiple files or trees'
             )
 
+        if self.remove:
+            self._check_removal_safety()
+
         self.original_size = self.destination_size()
 
     def add(self, path, archive_name):
@@ -310,9 +325,8 @@ class Archive(object):
 
     def add_single_target(self, path):
         if self.format in ('zip', 'tar'):
-            archive_name = re.sub(br'^%s' % re.escape(self.root), b'', path)
             self.open()
-            self.add(path, archive_name)
+            self.add(path, strip_prefix(self.root, path))
             self.close()
             self.destination_state = STATE_ARCHIVED
         else:
@@ -333,25 +347,18 @@ class Archive(object):
     def add_targets(self):
         self.open()
         try:
-            match_root = re.compile(br'^%s' % re.escape(self.root))
             for target in self.targets:
                 if os.path.isdir(target):
                     for directory_path, directory_names, file_names in os.walk(target, topdown=True):
-                        if not directory_path.endswith(PATH_SEP):
-                            directory_path += PATH_SEP
-
                         for directory_name in directory_names:
-                            full_path = directory_path + directory_name
-                            archive_name = match_root.sub(b'', full_path)
-                            self.add(full_path, archive_name)
+                            full_path = os.path.join(directory_path, directory_name)
+                            self.add(full_path, strip_prefix(self.root, full_path))
 
                         for file_name in file_names:
-                            full_path = directory_path + file_name
-                            archive_name = match_root.sub(b'', full_path)
-                            self.add(full_path, archive_name)
+                            full_path = os.path.join(directory_path, file_name)
+                            self.add(full_path, strip_prefix(self.root, full_path))
                 else:
-                    archive_name = match_root.sub(b'', target)
-                    self.add(target, archive_name)
+                    self.add(target, strip_prefix(self.root, target))
         except Exception as e:
             if self.format in ('zip', 'tar'):
                 archive_format = self.format
@@ -384,26 +391,6 @@ class Archive(object):
 
     def find_targets(self):
         for path in self.paths:
-            # Use the longest common directory name among all the files as the archive root path
-            if self.root == b'':
-                self.root = os.path.dirname(path) + PATH_SEP
-            else:
-                for i in range(len(self.root)):
-                    if path[i] != self.root[i]:
-                        break
-
-                if i < len(self.root):
-                    self.root = os.path.dirname(self.root[0:i + 1])
-
-                self.root += PATH_SEP
-            # Don't allow archives to be created anywhere within paths to be removed
-            if self.remove and os.path.isdir(path):
-                prefix = path if path.endswith(PATH_SEP) else path + PATH_SEP
-                if self.destination.startswith(prefix):
-                    self.module.fail_json(
-                        path=', '.join(self.paths),
-                        msg='Error, created archive can not be contained in source paths when remove=true'
-                    )
             if not os.path.lexists(path):
                 self.not_found.append(path)
             else:
@@ -469,6 +456,14 @@ class Archive(object):
             'expanded_paths': [_to_native(p) for p in self.expanded_paths],
             'expanded_exclude_paths': [_to_native(p) for p in self.expanded_exclude_paths],
         }
+
+    def _check_removal_safety(self):
+        for path in self.paths:
+            if os.path.isdir(path) and self.destination.startswith(os.path.join(path, b'')):
+                self.module.fail_json(
+                    path=b', '.join(self.paths),
+                    msg='Error, created archive can not be contained in source paths when remove=true'
+                )
 
     def _open_compressed_file(self, path, mode):
         f = None
