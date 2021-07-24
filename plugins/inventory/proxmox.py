@@ -413,7 +413,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 node_qemu_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), ('%s_qemu' % node['node']).lower()))
                 self.inventory.add_group(node_qemu_group)
                 for qemu in self._get_qemu_per_node(node['node']):
-                    if qemu['template']:
+                    if qemu.get('template'):
                         continue
 
                     self.inventory.add_host(qemu['name'])
