@@ -284,8 +284,6 @@ class Archive(object):
         if self.remove:
             self._check_removal_safety()
 
-        self.original_size = self.destination_size()
-
     def add(self, path, archive_name):
         try:
             self._add(_to_native_ascii(path), _to_native(archive_name))
