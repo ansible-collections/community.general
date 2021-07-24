@@ -1,2 +1,2 @@
 bugfixes:
-  - proxmox_inventory_plugin - It would be nice to understand why template is not a required field in the qemu.conf causing the failure, but it can remain a mystery for now (https://github.com/ansible-collections/community.general/pull/3052).
+  - proxmox inventory plugin - fixed plugin failure when a ``qemu`` guest has no ``template`` key (https://github.com/ansible-collections/community.general/pull/3052).
