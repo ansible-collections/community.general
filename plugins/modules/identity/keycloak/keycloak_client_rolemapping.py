@@ -183,7 +183,9 @@ existing:
         }
     }
 end_state:
-    description: role_representation representation of role_representation after module execution (sample is truncated)
+    description:
+      - role_representation representation of role_representation after module execution.
+      - The sample is truncated.
     returned: always
     type: dict
     sample: {
