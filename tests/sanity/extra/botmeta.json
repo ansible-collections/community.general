@@ -1,0 +1,11 @@
+{
+    "include_symlinks": false,
+    "prefixes": [
+        ".github/BOTMETA.yml"
+    ],
+    "output": "path-line-column-message",
+    "requirements": [
+        "PyYAML",
+        "voluptuous==0.12.1"
+    ]
+}
