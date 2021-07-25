@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - proxmox_kvm - fix result of clone, should return newid instead of vmid
