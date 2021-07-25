@@ -5,7 +5,7 @@
   - name: set alternative (using link parameter)
     alternatives:
       name: dummy
-      path: '/usr/bin/dummy{{ item }}'
+      path: '/usr/bin/dummy{{ item }}'
       link: '/usr/bin/dummy'
     register: alternative
 
@@ -20,7 +20,7 @@
   - name: set alternative (without link parameter)
     alternatives:
       name: dummy
-      path: '/usr/bin/dummy{{ item }}'
+      path: '/usr/bin/dummy{{ item }}'
     register: alternative
 
   - name: check expected command was executed
@@ -40,11 +40,11 @@
       - 'cmd.stdout == "dummy" ~ item'
 
 - name: 'check mode (manual: alternatives file existed, it has been updated)'
-  shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual$"'
+  shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual$"'
   when: ansible_os_family != 'RedHat' or with_alternatives or item != 1
 
 - name: 'check mode (auto: alternatives file didn''t exist, it has been created)'
-  shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^auto$"'
+  shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^auto$"'
   when: ansible_os_family == 'RedHat' and not with_alternatives and item == 1
 
 - name: check that alternative has been updated
