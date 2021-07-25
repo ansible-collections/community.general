@@ -21,7 +21,7 @@
           - '{{ ansible_os_family }}.yml'
           - 'defaults.yml'
 
-  - include_tasks: '{{ item }}'
+  - include_tasks: '{{ item }}'
     with_first_found:
       - files:
         - 'install_{{ ansible_distribution }}.yml' # CentOS

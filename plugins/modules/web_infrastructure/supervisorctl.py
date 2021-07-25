@@ -132,12 +132,14 @@ def main():
     # we check error message for a pattern, so we need to make sure that's in C locale
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
 
-    if not supervisorctl_path:
-        supervisorctl_args = module.get_bin_path('supervisorctl')
-
-    if not (os.path.exists(supervisorctl_path) and is_executable(supervisorctl_path)):
-        module.fail_json(msg="Provided path to supervisorctl does not exist or isn't executable: %s" % supervisorctl_path)
-    supervisorctl_args = [supervisorctl_path]
+    if supervisorctl_path:
+        if os.path.exists(supervisorctl_path) and is_executable(supervisorctl_path):
+            supervisorctl_args = [supervisorctl_path]
+        else:
+            module.fail_json(
+                msg="Provided path to supervisorctl does not exist or isn't executable: %s" % supervisorctl_path)
+    else:
+        supervisorctl_args = [module.get_bin_path('supervisorctl', True)]
 
     if config:
         supervisorctl_args.extend(['-c', config])
