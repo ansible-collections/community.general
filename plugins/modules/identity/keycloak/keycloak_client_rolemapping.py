@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_client_rolemapping
 
-short_description: Allows administration of Keycloak client_rolemapping via Keycloak API
+short_description: Allows administration of Keycloak client_rolemapping with the Keycloak API
 version_added: 3.5.0
 
 description:
@@ -35,7 +35,7 @@ options:
     state:
         description:
             - State of the client_rolemapping.
-            - On C(present), the auth_keycloak_url  will be created if it does not yet exist, or updated with the parameters you provide.
+            - On C(present), the client_rolemapping will be created if it does not yet exist, or updated with the parameters you provide.
             - On C(absent), the client_rolemapping will be removed if it exists.
         default: 'present'
         type: str
@@ -58,14 +58,14 @@ options:
     gid:
         type: str
         description:
-            - Id of the group to be mapped
+            - Id of the group to be mapped.
             - This parameter is not required for updating or deleting the rolemapping but
               providing it will reduce the number of API calls required.
 
     client_id:
         type: str
         description:
-            - Name of the client to be mapped (different than cid).
+            - Name of the client to be mapped (different than I(cid)).
             - This parameter is required (can be replaced by cid for less API call).
 
     cid:
@@ -164,7 +164,7 @@ msg:
   sample: "Role role1 assigned to group group1."
 
 proposed:
-    description: role_representation representation of proposed changes to client_rolemapping
+    description: role_representation representation of proposed changes to client_rolemapping.
     returned: always
     type: dict
     sample: {
