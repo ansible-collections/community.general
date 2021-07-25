@@ -380,7 +380,7 @@ class KeycloakAPI(object):
 
     def create_client(self, clientrep, realm="master"):
         """ Create a client in keycloak
-        :param clientrep: Client representation of client to be created. Must at least contain field clientId
+        :param clientrep: Client representation of client to be created. Must at least contain field clientId.
         :param realm: realm for client to be created.
         :return: HTTPResponse object on success
         """
@@ -470,10 +470,6 @@ class KeycloakAPI(object):
         """
         available_rolemappings_url = URL_CLIENT_ROLEMAPPINGS_AVAILABLE.format(url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
-            # ret_val = open_url(available_rolemappings_url, method="GET", headers=self.restheaders,
-            #                                      validate_certs=self.validate_certs).read()
-            # self.module.fail_json(ret_val)
-            # self.module.fail_json(json.loads(ret_val))
             return json.loads(to_native(open_url(available_rolemappings_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
         except Exception as e:

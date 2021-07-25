@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_client_rolemapping
 
-short_description: Allows administration of Keycloak client_scopes with the Keycloak API
+short_description: Allows administration of Keycloak client_rolemapping via Keycloak API
 version_added: 3.5.0
 
 description:
@@ -34,8 +34,8 @@ description:
 options:
     state:
         description:
-            - State of the client_scope.
-            - On C(present), the client_rolemapping will be created if it does not yet exist, or updated with the parameters you provide.
+            - State of the client_rolemapping.
+            - On C(present), the auth_keycloak_url  will be created if it does not yet exist, or updated with the parameters you provide.
             - On C(absent), the client_rolemapping will be removed if it exists.
         default: 'present'
         type: str
@@ -164,7 +164,7 @@ msg:
   sample: "Role role1 assigned to group group1."
 
 proposed:
-    description: role_representation representation of proposed changes to client_scope
+    description: role_representation representation of proposed changes to client_rolemapping
     returned: always
     type: dict
     sample: {
