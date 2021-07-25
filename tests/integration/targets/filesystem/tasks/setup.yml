@@ -100,7 +100,7 @@
 
 - name: "Install dosfstools and lvm2 (Linux)"
   ansible.builtin.package:
-    name: '{{ item }}'
+    name: '{{ item }}'
   with_items:
     - dosfstools
     - lvm2

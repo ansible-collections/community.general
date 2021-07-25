@@ -5,9 +5,9 @@
 ####################################################################
 
 - ansible.builtin.debug:
-    msg: '{{ role_name }}'
+    msg: '{{ role_name }}'
 - ansible.builtin.debug:
-    msg: '{{ role_path|basename }}'
+    msg: '{{ role_path|basename }}'
 - import_tasks: setup.yml
 
 - include_vars: "{{ lookup('first_found', search) }}"
