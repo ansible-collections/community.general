@@ -1,0 +1,2 @@
+deprecated_features:
+  - xfconf - deprecate the ``get`` state. The new module ``xfconf_info`` should be used instead (https://github.com/ansible-collections/community.general/pull/3049).
