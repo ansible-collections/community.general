@@ -14,7 +14,7 @@ short_description: Allows administration of Keycloak client_scopes with the Keyc
 version_added: 3.5.0
 
 description:
-    - This module allows you to add, remove or modify Keycloak client_rolemapping via the Keycloak REST API.
+    - This module allows you to add, remove or modify Keycloak client_rolemapping with the Keycloak REST API.
       It requires access to the REST API via OpenID Connect; the user connecting and the client being
       used must have the requisite access rights. In a default Keycloak installation, admin-cli
       and an admin user would work, as would a separate client definition with the scope tailored
