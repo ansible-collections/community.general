@@ -46,16 +46,16 @@ options:
   msg:
     type: str
     description:
-      - The contents of the annotation message, in plain text.  Limited to 256 characters. Required for annotation.
+      - The contents of the annotation message, in plain text. Limited to 256 characters. Required for annotation.
   annotated_by:
     type: str
     description:
-      - The person or robot who the annotation should be attributed to.
+      - The person or robot who the annotation should be attributed to.
     default: "Ansible"
   level:
     type: str
     description:
-      - one of INFO/WARN/ERROR, defaults to INFO if not supplied.  May affect display.
+      - one of INFO/WARN/ERROR, defaults to INFO if not supplied. May affect display.
     choices: ['INFO', 'WARN', 'ERROR']
     default: 'INFO'
   instance_id:
