@@ -8,7 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    author: Michael Scherer (@msherer) <misc@zarb.org>
+    author: Michael Scherer (@mscherer) <misc@zarb.org>
     name: funcd
     short_description: Use funcd to connect to target
     description:
