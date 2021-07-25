@@ -159,11 +159,13 @@ files:
   $module_utils/redfish_utils.py:
     maintainers: $team_redfish
     labels: redfish_utils
-  $module_utils/remote_management/lxca/common.py: navalkp prabhosa
+  $module_utils/remote_management/lxca/common.py:
+    maintainers: navalkp prabhosa
   $module_utils/scaleway.py:
     maintainers: $team_scaleway
     labels: cloud scaleway
-  $module_utils/storage/hpe3par/hpe3par.py: farhan7500 gautamphegde
+  $module_utils/storage/hpe3par/hpe3par.py:
+    maintainers: farhan7500 gautamphegde
   $module_utils/utm_utils.py:
     maintainers: $team_e_spirit
     labels: utm_utils
@@ -508,7 +510,6 @@ files:
   $modules/notification/osx_say.py:
     maintainers: ansible mpdehaan
     labels: _osx_say
-    deprecated: true
   $modules/notification/bearychat.py:
     maintainers: tonyseek
   $modules/notification/campfire.py:
