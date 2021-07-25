@@ -1,0 +1,2 @@
+bugfixes:
+  - taiga - some constructs in the module fixed to work also in Python 3 (https://github.com/ansible-collections/community.general/pull/3067).
