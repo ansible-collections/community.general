@@ -2,7 +2,7 @@
   supervisorctl:
     name: 'pys:py1'
     state: started
-    config: '{{ remote_dir }}/supervisord.conf'
+    config: '{{ remote_dir }}/supervisord.conf'
   register: result
   when: credentials.username == ''
 
@@ -16,7 +16,7 @@
   register: result_with_auth
   when: credentials.username != ''
 
-- command: "supervisorctl -c {{ remote_dir }}/supervisord.conf {% if credentials.username %}-u {{ credentials.username }} -p {{ credentials.password }}{% endif %} status"
+- command: "supervisorctl -c {{ remote_dir }}/supervisord.conf {% if credentials.username %}-u {{ credentials.username }} -p {{ credentials.password }}{% endif %} status"
 
 - name: check that service is started
   assert:
@@ -32,7 +32,7 @@
   supervisorctl:
     name: pys:py1
     state: started
-    config: '{{ remote_dir }}/supervisord.conf'
+    config: '{{ remote_dir }}/supervisord.conf'
   register: result
   when: credentials.username == ''
 
@@ -65,7 +65,7 @@
   supervisorctl:
     name: 'pys:py1'
     state: started
-    config: '{{ remote_dir }}/supervisord.conf'
+    config: '{{ remote_dir }}/supervisord.conf'
   register: result
   when: credentials.username == ''
 
@@ -110,7 +110,7 @@
   supervisorctl:
     name: 'pys:py1'
     state: started
-    config: '{{ remote_dir }}/supervisord_not_here.conf'
+    config: '{{ remote_dir }}/supervisord_not_here.conf'
   register: result
   failed_when: result is success or result is not failed
 
@@ -118,7 +118,7 @@
   supervisorctl:
     name: 'invalid'
     state: started
-    config: '{{ remote_dir }}/supervisord.conf'
+    config: '{{ remote_dir }}/supervisord.conf'
   register: result
   failed_when: result is skip or (result is success or result is not failed)
   when: credentials.username == ''
@@ -127,7 +127,7 @@
   supervisorctl:
     name: 'invalid'
     state: started
-    config: '{{ remote_dir }}/supervisord.conf'
+    config: '{{ remote_dir }}/supervisord.conf'
     username: '{{ credentials.username }}wrong_creds'
     password: '{{ credentials.password }}same_here'
   register: result

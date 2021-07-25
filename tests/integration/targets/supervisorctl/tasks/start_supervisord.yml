@@ -1,5 +1,5 @@
 - name: start supervisord
-  command: 'supervisord -c {{ remote_dir }}/supervisord.conf'
+  command: 'supervisord -c {{ remote_dir }}/supervisord.conf'
 
 - name: wait_for supervisord
   ansible.builtin.wait_for:
