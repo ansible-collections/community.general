@@ -129,7 +129,7 @@ except ImportError:
     TAIGA_MODULE_IMPORTED = False
 
 
-def manage_issue(module, taiga_host, project_name, issue_subject, issue_priority,
+def manage_issue(taiga_host, project_name, issue_subject, issue_priority,
                  issue_status, issue_type, issue_severity, issue_description,
                  issue_attachment, issue_attachment_description,
                  issue_tags, state, check_mode=False):
@@ -157,34 +157,34 @@ def manage_issue(module, taiga_host, project_name, issue_subject, issue_priority
             username = getenv('TAIGA_USERNAME')
             password = getenv('TAIGA_PASSWORD')
             if not any([username, password]):
-                return (False, changed, "Missing credentials", {})
+                return False, changed, "Missing credentials", {}
             api.auth(username=username, password=password)
 
         user_id = api.me().id
-        project_list = filter(lambda x: x.name == project_name, api.projects.list(member=user_id))
+        project_list = list(filter(lambda x: x.name == project_name, api.projects.list(member=user_id)))
         if len(project_list) != 1:
-            return (False, changed, "Unable to find project %s" % project_name, {})
+            return False, changed, "Unable to find project %s" % project_name, {}
         project = project_list[0]
         project_id = project.id
 
-        priority_list = filter(lambda x: x.name == issue_priority, api.priorities.list(project=project_id))
+        priority_list = list(filter(lambda x: x.name == issue_priority, api.priorities.list(project=project_id)))
         if len(priority_list) != 1:
-            return (False, changed, "Unable to find issue priority %s for project %s" % (issue_priority, project_name), {})
+            return False, changed, "Unable to find issue priority %s for project %s" % (issue_priority, project_name), {}
         priority_id = priority_list[0].id
 
-        status_list = filter(lambda x: x.name == issue_status, api.issue_statuses.list(project=project_id))
+        status_list = list(filter(lambda x: x.name == issue_status, api.issue_statuses.list(project=project_id)))
         if len(status_list) != 1:
-            return (False, changed, "Unable to find issue status %s for project %s" % (issue_status, project_name), {})
+            return False, changed, "Unable to find issue status %s for project %s" % (issue_status, project_name), {}
         status_id = status_list[0].id
 
-        type_list = filter(lambda x: x.name == issue_type, project.list_issue_types())
+        type_list = list(filter(lambda x: x.name == issue_type, project.list_issue_types()))
         if len(type_list) != 1:
-            return (False, changed, "Unable to find issue type %s for project %s" % (issue_type, project_name), {})
+            return False, changed, "Unable to find issue type %s for project %s" % (issue_type, project_name), {}
         type_id = type_list[0].id
 
-        severity_list = filter(lambda x: x.name == issue_severity, project.list_severities())
+        severity_list = list(filter(lambda x: x.name == issue_severity, project.list_severities()))
         if len(severity_list) != 1:
-            return (False, changed, "Unable to find severity %s for project %s" % (issue_severity, project_name), {})
+            return False, changed, "Unable to find severity %s for project %s" % (issue_severity, project_name), {}
         severity_id = severity_list[0].id
 
         issue = {
@@ -199,7 +199,7 @@ def manage_issue(module, taiga_host, project_name, issue_subject, issue_priority
         }
 
         # An issue is identified by the project_name, the issue_subject and the issue_type
-        matching_issue_list = filter(lambda x: x.subject == issue_subject and x.type == type_id, project.list_issues())
+        matching_issue_list = list(filter(lambda x: x.subject == issue_subject and x.type == type_id, project.list_issues()))
         matching_issue_list_len = len(matching_issue_list)
 
         if matching_issue_list_len == 0:
@@ -209,16 +209,17 @@ def manage_issue(module, taiga_host, project_name, issue_subject, issue_priority
                 changed = True
                 if not check_mode:
                     # Create the issue
-                    new_issue = project.add_issue(issue_subject, priority_id, status_id, type_id, severity_id, tags=issue_tags, description=issue_description)
+                    new_issue = project.add_issue(issue_subject, priority_id, status_id, type_id, severity_id, tags=issue_tags,
+                                                  description=issue_description)
                     if issue_attachment:
                         new_issue.attach(issue_attachment, description=issue_attachment_description)
                         issue["attachment"] = issue_attachment
                         issue["attachment_description"] = issue_attachment_description
-                return (True, changed, "Issue created", issue)
+                return True, changed, "Issue created", issue
 
             else:
                 # If does not exist, do nothing
-                return (True, changed, "Issue does not exist", {})
+                return True, changed, "Issue does not exist", {}
 
         elif matching_issue_list_len == 1:
             # The issue exists in the project
@@ -228,19 +229,19 @@ def manage_issue(module, taiga_host, project_name, issue_subject, issue_priority
                 if not check_mode:
                     # Delete the issue
                     matching_issue_list[0].delete()
-                return (True, changed, "Issue deleted", {})
+                return True, changed, "Issue deleted", {}
 
             else:
                 # Do nothing
-                return (True, changed, "Issue already exists", {})
+                return True, changed, "Issue already exists", {}
 
         else:
             # More than 1 matching issue
-            return (False, changed, "More than one issue with subject %s in project %s" % (issue_subject, project_name), {})
+            return False, changed, "More than one issue with subject %s in project %s" % (issue_subject, project_name), {}
 
     except TaigaException as exc:
         msg = "An exception happened: %s" % to_native(exc)
-        return (False, changed, msg, {})
+        return False, changed, msg, {}
 
 
 def main():
@@ -257,15 +258,13 @@ def main():
             attachment=dict(type='path', required=False, default=None),
             attachment_description=dict(type='str', required=False, default=""),
             tags=dict(required=False, default=[], type='list', elements='str'),
-            state=dict(type='str', required=False, choices=['present', 'absent'],
-                       default='present'),
+            state=dict(type='str', required=False, choices=['present', 'absent'], default='present'),
         ),
         supports_check_mode=True
     )
 
     if not TAIGA_MODULE_IMPORTED:
-        module.fail_json(msg=missing_required_lib("python-taiga"),
-                         exception=TAIGA_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("python-taiga"), exception=TAIGA_IMP_ERR)
 
     taiga_host = module.params['taiga_host']
     project_name = module.params['project']
@@ -285,7 +284,6 @@ def main():
     state = module.params['state']
 
     return_status, changed, msg, issue_attr_dict = manage_issue(
-        module,
         taiga_host,
         project_name,
         issue_subject,
@@ -301,7 +299,7 @@ def main():
         check_mode=module.check_mode
     )
     if return_status:
-        if len(issue_attr_dict) > 0:
+        if issue_attr_dict:
             module.exit_json(changed=changed, msg=msg, issue=issue_attr_dict)
         else:
             module.exit_json(changed=changed, msg=msg)
