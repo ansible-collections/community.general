@@ -71,7 +71,7 @@ options:
     cid:
         type: str
         description:
-            - Id of the client to be mapped
+            - Id of the client to be mapped.
             - This parameter is not required for updating or deleting the rolemapping but
               providing it will reduce the number of API calls required.
 
