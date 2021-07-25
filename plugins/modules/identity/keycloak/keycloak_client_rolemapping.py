@@ -77,7 +77,7 @@ options:
 
     roles:
         description:
-            - Roles to be mapped to the group
+            - Roles to be mapped to the group.
         type: list
         elements: dict
         suboptions:
