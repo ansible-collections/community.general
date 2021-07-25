@@ -196,5 +196,6 @@ def main():
     for file in unmatched:
         print('%s:%d:%d: %s' % (FILENAME, 0, 0, 'Entry %s was not used' % file))
 
+
 if __name__ == '__main__':
     main()
