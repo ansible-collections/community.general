@@ -171,7 +171,9 @@ proposed:
       clientId: "test"
     }
 existing:
-    description: role_representation representation of existing role_representation (sample is truncated)
+    description:
+      - role_representation representation of existing role_representation.
+      - The sample is truncated.
     returned: always
     type: dict
     sample: {
