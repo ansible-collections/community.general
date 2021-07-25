@@ -101,16 +101,20 @@ from ansible.module_utils.basic import AnsibleModule, is_executable
 def main():
     arg_spec = dict(
         name=dict(type='str', required=True),
-        config=dict(required=False, type='path'),
-        server_url=dict(type='str', required=False),
-        username=dict(type='str', required=False),
-        password=dict(type='str', required=False, no_log=True),
-        supervisorctl_path=dict(required=False, type='path'),
+        config=dict(type='path'),
+        server_url=dict(type='str'),
+        username=dict(type='str'),
+        password=dict(type='str', no_log=True),
+        supervisorctl_path=dict(type='path'),
         state=dict(type='str', required=True, choices=['present', 'started', 'restarted', 'stopped', 'absent', 'signalled']),
-        signal=dict(type='str', required=False)
+        signal=dict(type='str'),
     )
 
-    module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
+    module = AnsibleModule(
+        argument_spec=arg_spec,
+        supports_check_mode=True,
+        required_if=[('state', 'signalled', ['signal'])],
+    )
 
     name = module.params['name']
     is_group = False
@@ -145,9 +149,6 @@ def main():
         supervisorctl_args.extend(['-u', username])
     if password:
         supervisorctl_args.extend(['-p', password])
-
-    if state == 'signalled' and not signal:
-        module.fail_json(msg="State 'signalled' requires a 'signal' value")
 
     def run_supervisorctl(cmd, name=None, **kwargs):
         args = list(supervisorctl_args)  # copy the master args
@@ -231,26 +232,24 @@ def main():
         if module.check_mode:
             module.exit_json(changed=True)
         run_supervisorctl('reread', check_rc=True)
-        rc, out, err = run_supervisorctl('add', name)
+        dummy, out, dummy = run_supervisorctl('add', name)
         if '%s: added process group' % name in out:
             module.exit_json(changed=True, name=name, state=state)
         else:
             module.fail_json(msg=out, name=name, state=state)
 
+    # from this point onwards, if there are no matching processes, module cannot go on.
+    if len(processes) == 0:
+        module.fail_json(name=name, msg="ERROR (no such process)")
+
     if state == 'started':
-        if len(processes) == 0:
-            module.fail_json(name=name, msg="ERROR (no such process)")
         take_action_on_processes(processes, lambda s: s not in ('RUNNING', 'STARTING'), 'start', 'started')
 
     if state == 'stopped':
-        if len(processes) == 0:
-            module.fail_json(name=name, msg="ERROR (no such process)")
         take_action_on_processes(processes, lambda s: s in ('RUNNING', 'STARTING'), 'stop', 'stopped')
 
     if state == 'signalled':
-        if len(processes) == 0:
-            module.fail_json(name=name, msg="ERROR (no such process)")
-        take_action_on_processes(processes, lambda s: s in ('RUNNING'), "signal %s" % signal, 'signalled')
+        take_action_on_processes(processes, lambda s: s in ('RUNNING',), "signal %s" % signal, 'signalled')
 
 
 if __name__ == '__main__':
