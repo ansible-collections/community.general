@@ -215,10 +215,10 @@
     path: "{{ output_file }}"
     section: mysqld
     option: "{{ item.o }}"
-    value: "{{ item.v }}"
+    value: "{{ item.v | d(omit) }}"
     allow_no_value: yes
   with_items:
-    - { o: "skip-name-resolve", v: null }
+    - { o: "skip-name-resolve" }
     - { o: "max_connections", v: "500" }
 
 - name: read content from output file
