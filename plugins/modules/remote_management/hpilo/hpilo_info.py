@@ -118,7 +118,8 @@ host_power_status:
     description: Power status of host
     returned: always
     type: str
-    sample: ON
+    sample: |
+      ON, OFF or UNKNOWN
 '''
 
 import re
@@ -251,7 +252,7 @@ def main():
         info['hw_memory_total'] = "{0} GB".format(info['hw_memory_total'])
 
     # Report host state
-    info['host_power_status'] = power_state or 'unknown'
+    info['host_power_status'] = power_state or 'UNKNOWN'
 
     module.exit_json(**info)
 
