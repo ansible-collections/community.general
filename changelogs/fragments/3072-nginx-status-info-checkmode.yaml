@@ -1,0 +1,2 @@
+bugfixes:
+  - nginx_status_info - disabled check mode in info module (https://github.com/ansible-collections/community.general/pull/3072).
