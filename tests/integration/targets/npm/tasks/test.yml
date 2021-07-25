@@ -5,7 +5,7 @@
 
 - vars:
     # sample: node-v8.2.0-linux-x64.tar.xz
-    node_path: '{{ remote_dir }}/{{ nodejs_path }}/bin'
+    node_path: '{{ remote_dir }}/{{ nodejs_path }}/bin'
     package: 'iconv-lite'
   block:
     - shell: npm --version
@@ -19,11 +19,11 @@
     - name: 'Install simple package without dependency'
       npm:
         path: '{{ remote_dir }}'
-        executable: '{{ node_path }}/npm'
+        executable: '{{ node_path }}/npm'
         state: present
         name: '{{ package }}'
       environment:
-        PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
       register: npm_install
 
     - assert:
@@ -38,7 +38,7 @@
         state: present
         name: '{{ package }}'
       environment:
-        PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
       register: npm_reinstall
 
     - name: Check there is no change
@@ -59,7 +59,7 @@
         state: present
         name: '{{ package }}'
       environment:
-        PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
+        PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
       register: npm_fix_install
 
     - name: Check result is changed and successful
