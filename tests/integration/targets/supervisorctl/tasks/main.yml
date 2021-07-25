@@ -21,7 +21,7 @@
           - '{{ ansible_os_family }}.yml'
           - 'defaults.yml'
 
-  - include_tasks: '{{ item }}'
+  - include_tasks: '{{ item }}'
     with_first_found:
       - files:
         - 'install_{{ ansible_distribution }}.yml' # CentOS
@@ -39,7 +39,7 @@
   when: ansible_os_family != 'RedHat' or ansible_distribution_major_version|int > 6
 
   always:
-  - include_tasks: '{{ item }}'
+  - include_tasks: '{{ item }}'
     when: ansible_os_family != 'RedHat' or ansible_distribution_major_version|int > 6
     with_first_found:
       - files:

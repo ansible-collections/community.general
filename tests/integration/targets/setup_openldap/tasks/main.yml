@@ -50,8 +50,8 @@
     - name: Copy initial config ldif file
       become: True
       copy:
-        src: 'files/{{ item }}'
-        dest: '/tmp/{{ item }}'
+        src: 'files/{{ item }}'
+        dest: '/tmp/{{ item }}'
         owner: root
         group: root
         mode: '0644'
