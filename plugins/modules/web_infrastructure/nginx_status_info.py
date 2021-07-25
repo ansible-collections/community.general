@@ -99,7 +99,8 @@ from ansible.module_utils.common.text.converters import to_text
 
 class NginxStatusInfo(object):
 
-    def __init__(self):
+    def __init__(self, module):
+        self.module = module
         self.url = module.params.get('url')
         self.timeout = module.params.get('timeout')
 
@@ -114,9 +115,9 @@ class NginxStatusInfo(object):
             'waiting': None,
             'data': None,
         }
-        (response, info) = fetch_url(module=module, url=self.url, force=True, timeout=self.timeout)
+        (response, info) = fetch_url(module=self.module, url=self.url, force=True, timeout=self.timeout)
         if not response:
-            module.fail_json(msg="No valid or no response from url %s within %s seconds (timeout)" % (self.url, self.timeout))
+            self.module.fail_json(msg="No valid or no response from url %s within %s seconds (timeout)" % (self.url, self.timeout))
 
         data = to_text(response.read(), errors='surrogate_or_strict')
         if not data:
@@ -138,16 +139,15 @@ class NginxStatusInfo(object):
 
 
 def main():
-    global module
     module = AnsibleModule(
         argument_spec=dict(
             url=dict(type='str', required=True),
             timeout=dict(type='int', default=10),
         ),
-        supports_check_mode=True,
+        supports_check_mode=False,
     )
 
-    nginx_status_info = NginxStatusInfo().run()
+    nginx_status_info = NginxStatusInfo(module).run()
     module.exit_json(changed=False, **nginx_status_info)
 
 
