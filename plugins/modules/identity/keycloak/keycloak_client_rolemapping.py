@@ -10,7 +10,8 @@ DOCUMENTATION = '''
 ---
 module: keycloak_client_rolemapping
 
-short_description: Allows administration of Keycloak client_scopes via Keycloak API
+short_description: Allows administration of Keycloak client_scopes with the Keycloak API
+version_added: 3.5.0
 
 description:
     - This module allows you to add, remove or modify Keycloak client_rolemapping via the Keycloak REST API.
