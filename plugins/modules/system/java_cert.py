@@ -351,7 +351,7 @@ def import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alia
         "-noprompt",
         "-srcstoretype",
         "pkcs12",
-        "-srckeystore"
+        "-srckeystore",
         pkcs12_path,
         "-srcalias",
         pkcs12_alias,
