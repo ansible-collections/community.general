@@ -358,7 +358,7 @@ def import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alia
         "-destkeystore",
         keystore_path,
         "-destalias",
-        alias
+        keystore_alias
     ]
     import_cmd += _get_keystore_type_keytool_parameters(keystore_type)
 
@@ -367,7 +367,7 @@ def import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alia
                                                              data="%s\n%s\n%s" % (pkcs12_pass, keystore_pass, keystore_pass),
                                                              check_rc=False)
 
-    diff = {'before': '\n', 'after': '%s\n' % alias}
+    diff = {'before': '\n', 'after': '%s\n' % keystore_alias}
     if import_rc == 0:
         module.exit_json(changed=True, msg=import_out,
                          rc=import_rc, cmd=import_cmd, stdout=import_out,
@@ -564,7 +564,7 @@ def main():
 
             if pkcs12_path:
                 import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alias,
-                                   keystore_path, keystore_pass, keystore_alias, keystore_type)
+                                   keystore_path, keystore_pass, cert_alias, keystore_type)
             else:
                 import_cert_path(module, executable, new_certificate, keystore_path,
                                  keystore_pass, cert_alias, keystore_type, trust_cacert)
