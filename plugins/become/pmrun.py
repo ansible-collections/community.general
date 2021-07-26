@@ -9,7 +9,7 @@ DOCUMENTATION = '''
     short_description: Privilege Manager run
     description:
         - This become plugins allows your remote/login user to execute commands as another user via the pmrun utility.
-    author: ansible (@core)
+    author: Ansible Core Team
     options:
         become_exe:
             description: Sudo executable
