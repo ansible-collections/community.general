@@ -129,7 +129,6 @@ def main():
     module = UTMModule(
         argument_spec=dict(
             name=dict(type='str', required=True),
-            supports_check_mode=True,
         )
     )
     try:
