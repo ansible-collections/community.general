@@ -362,10 +362,13 @@ def import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alia
     ]
     import_cmd += _get_keystore_type_keytool_parameters(keystore_type)
 
+    secret_data = "%s\n%s" % (keystore_pass, pkcs12_pass)
+    # Password of a new keystore must be entered twice, for confirmation
+    if not os.path.exists(keystore_path):
+        secret_data = "%s\n%s" % (keystore_pass, secret_data)
+
     # Use local certificate from local path and import it to a java keystore
-    (import_rc, import_out, import_err) = module.run_command(import_cmd,
-                                                             data="%s\n%s\n%s" % (keystore_pass, keystore_pass, pkcs12_pass),
-                                                             check_rc=False)
+    (import_rc, import_out, import_err) = module.run_command(import_cmd, data=secret_data, check_rc=False)
 
     diff = {'before': '\n', 'after': '%s\n' % keystore_alias}
     if import_rc == 0 and os.path.exists(keystore_path):
