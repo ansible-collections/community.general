@@ -232,9 +232,7 @@ def main():
             db=dict(default=None),
             login_user=dict(default='dbadmin'),
             login_password=dict(default=None, no_log=True),
-        ),
-        supports_check_mode=True,
-    )
+        ), supports_check_mode=True)
 
     if not pyodbc_found:
         module.fail_json(msg=missing_required_lib('pyodbc'), exception=PYODBC_IMP_ERR)
