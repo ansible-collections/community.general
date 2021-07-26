@@ -17,7 +17,7 @@ from voluptuous import Required, Schema, Invalid
 from voluptuous.humanize import humanize_error
 
 
-REPORT_MISSING_MAINTAINERS = False
+REPORT_NO_MAINTAINERS = False
 
 FILENAME = '.github/BOTMETA.yml'
 
@@ -73,20 +73,16 @@ def validate(filename, filedata):
         return
     # Compile lis tof all active and inactive maintainers
     all_maintainers = filedata['maintainers'] + filedata['ignore']
-    if not all_maintainers:
-        if REPORT_MISSING_MAINTAINERS:
-            print('%s:%d:%d: %s' % (FILENAME, 0, 0, 'No (active or inactive) maintainer mentioned for %s' % filename))
-        return
-    if filename.startswith('plugins/filter/'):
-        return
-    maintainers = read_authors(filename)
-    for maintainer in maintainers:
-        maintainer = extract_author_name(maintainer)
-        if maintainer is not None and maintainer not in all_maintainers:
-            msg = 'Author %s not mentioned as active or inactive maintainer for %s (mentioned are: %s)' % (
-                maintainer, filename, ', '.join(all_maintainers))
-            if REPORT_MISSING_MAINTAINERS:
+    if not filename.startswith('plugins/filter/'):
+        maintainers = read_authors(filename)
+        for maintainer in maintainers:
+            maintainer = extract_author_name(maintainer)
+            if maintainer is not None and maintainer not in all_maintainers:
+                msg = 'Author %s not mentioned as active or inactive maintainer for %s (mentioned are: %s)' % (
+                    maintainer, filename, ', '.join(all_maintainers))
                 print('%s:%d:%d: %s' % (FILENAME, 0, 0, msg))
+    if not all_maintainers and REPORT_NO_MAINTAINERS:
+        print('%s:%d:%d: %s' % (FILENAME, 0, 0, 'No (active or inactive) maintainer mentioned for %s' % filename))
 
 
 def main():
