@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - proxmox_kvm - fix result of clone, now returns ``newid`` instead of ``vmid`` (https://github.com/ansible-collections/community.general/pull/3034).
