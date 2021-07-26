@@ -115,11 +115,14 @@ hw_uuid:
     sample: 123456ABC78901D2
 
 host_power_status:
-    description: Power status of host
+    description:
+      - Power status of host.
+      - Will be one of C(ON), C(OFF) and C(UNKNOWN).
     returned: always
     type: str
     sample: |
       ON, OFF or UNKNOWN
+    version_added: 3.5.0
 '''
 
 import re
