@@ -364,16 +364,16 @@ def import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alia
 
     # Use local certificate from local path and import it to a java keystore
     (import_rc, import_out, import_err) = module.run_command(import_cmd,
-                                                             data="%s\n%s\n%s" % (pkcs12_pass, keystore_pass, keystore_pass),
+                                                             data="%s\n%s\n%s" % (keystore_pass, keystore_pass, pkcs12_pass),
                                                              check_rc=False)
 
     diff = {'before': '\n', 'after': '%s\n' % keystore_alias}
-    if import_rc == 0:
+    if import_rc == 0 and os.path.exists(keystore_path):
         module.exit_json(changed=True, msg=import_out,
                          rc=import_rc, cmd=import_cmd, stdout=import_out,
                          error=import_err, diff=diff)
     else:
-        module.fail_json(msg=import_out, rc=import_rc, cmd=import_cmd)
+        module.fail_json(msg=import_out, rc=import_rc, cmd=import_cmd, error=import_err)
 
 
 def import_cert_path(module, executable, path, keystore_path, keystore_pass, alias, keystore_type, trust_cacert):
