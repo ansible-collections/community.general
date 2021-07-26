@@ -11,15 +11,15 @@ DOCUMENTATION = r'''
 ---
 module: java_cert
 
-short_description: Uses keytool to import/remove key from java keystore (cacerts)
+short_description: Uses keytool to import/remove certificate to/from java keystore (cacerts)
 description:
-  - This is a wrapper module around keytool, which can be used to import/remove
-    certificates from a given java keystore.
+  - This is a wrapper module around keytool, which can be used to import certificates
+    and optionally private keys to a given java keystore, or remove them from it.
 options:
   cert_url:
     description:
       - Basic URL to fetch SSL certificate from.
-      - One of C(cert_url) or C(cert_path) is required to load certificate.
+      - Exactly one of C(cert_url), C(cert_path) or C(pkcs12_path) is required to load certificate.
     type: str
   cert_port:
     description:
@@ -30,7 +30,7 @@ options:
   cert_path:
     description:
       - Local path to load certificate from.
-      - One of C(cert_url) or C(cert_path) is required to load certificate.
+      - Exactly one of C(cert_url), C(cert_path) or C(pkcs12_path) is required to load certificate.
     type: path
   cert_alias:
     description:
@@ -46,6 +46,10 @@ options:
   pkcs12_path:
     description:
       - Local path to load PKCS12 keystore from.
+      - Unlike C(cert_url) and C(cert_path), the PKCS12 keystore embeds the private key matching
+        the certificate, and is used to import both the certificate and its private key into the
+        java keystore.
+      - Exactly one of C(cert_url), C(cert_path) or C(pkcs12_path) is required to load certificate.
     type: path
   pkcs12_password:
     description:
@@ -267,6 +271,7 @@ def _export_public_cert_from_pkcs12(module, executable, pkcs_file, alias, passwo
     export_cmd = [
         executable,
         "-list",
+        "-noprompt",
         "-keystore",
         pkcs_file,
         "-alias",
@@ -334,6 +339,44 @@ def _download_cert_url(module, executable, url, port):
                          rc=fetch_rc, cmd=fetch_cmd)
 
     return fetch_out
+
+
+def import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alias,
+                       keystore_path, keystore_pass, keystore_alias, keystore_type):
+    ''' Import pkcs12 from path into keystore located on
+        keystore_path as alias '''
+    import_cmd = [
+        executable,
+        "-importkeystore",
+        "-noprompt",
+        "-srcstoretype",
+        "pkcs12",
+        "-srckeystore",
+        pkcs12_path,
+        "-srcalias",
+        pkcs12_alias,
+        "-destkeystore",
+        keystore_path,
+        "-destalias",
+        keystore_alias
+    ]
+    import_cmd += _get_keystore_type_keytool_parameters(keystore_type)
+
+    secret_data = "%s\n%s" % (keystore_pass, pkcs12_pass)
+    # Password of a new keystore must be entered twice, for confirmation
+    if not os.path.exists(keystore_path):
+        secret_data = "%s\n%s" % (keystore_pass, secret_data)
+
+    # Use local certificate from local path and import it to a java keystore
+    (import_rc, import_out, import_err) = module.run_command(import_cmd, data=secret_data, check_rc=False)
+
+    diff = {'before': '\n', 'after': '%s\n' % keystore_alias}
+    if import_rc == 0 and os.path.exists(keystore_path):
+        module.exit_json(changed=True, msg=import_out,
+                         rc=import_rc, cmd=import_cmd, stdout=import_out,
+                         error=import_err, diff=diff)
+    else:
+        module.fail_json(msg=import_out, rc=import_rc, cmd=import_cmd, error=import_err)
 
 
 def import_cert_path(module, executable, path, keystore_path, keystore_pass, alias, keystore_type, trust_cacert):
@@ -522,8 +565,12 @@ def main():
                 # The existing certificate must first be deleted before we insert the correct one
                 delete_cert(module, executable, keystore_path, keystore_pass, cert_alias, keystore_type, exit_after=False)
 
-            import_cert_path(module, executable, new_certificate, keystore_path,
-                             keystore_pass, cert_alias, keystore_type, trust_cacert)
+            if pkcs12_path:
+                import_pkcs12_path(module, executable, pkcs12_path, pkcs12_pass, pkcs12_alias,
+                                   keystore_path, keystore_pass, cert_alias, keystore_type)
+            else:
+                import_cert_path(module, executable, new_certificate, keystore_path,
+                                 keystore_pass, cert_alias, keystore_type, trust_cacert)
 
     module.exit_json(changed=False)
 
