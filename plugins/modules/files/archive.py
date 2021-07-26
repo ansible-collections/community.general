@@ -247,20 +247,6 @@ def strip_prefix(prefix, string):
     return string[len(prefix):] if string.startswith(prefix) else string
 
 
-def tar_checksums(tar):
-    result = []
-    while True:
-        info = tar.next()
-        if info is None:
-            break
-
-        f = tar.extractfile(info)
-
-        result += (info.name, crc32(f.read()) if f is not None else 0)
-
-    return result
-
-
 def _to_bytes(s):
     return to_bytes(s, errors='surrogate_or_strict')
 
@@ -599,11 +585,11 @@ class TarArchive(Archive):
             if self.format == 'xz':
                 with lzma.open(_to_native_ascii(path), 'r') as f:
                     archive = tarfile.open(fileobj=f)
-                    checksums = set(tar_checksums(archive))
+                    checksums = set((info.name, info.chksum) for info in archive.getmembers())
                     archive.close()
             else:
                 archive = tarfile.open(_to_native_ascii(path), 'r|' + self.format)
-                checksums = set(tar_checksums(archive))
+                checksums = set((info.name, info.chksum) for info in archive.getmembers())
                 archive.close()
         except (lzma.LZMAError, tarfile.ReadError, tarfile.CompressionError):
             try:
