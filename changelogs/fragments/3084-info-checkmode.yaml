@@ -4,7 +4,6 @@ minor_changes:
   - memset_server_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
   - rax_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
   - smartos_image_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
-  - vertica_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
   - snmp_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
   - idrac_redfish_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
   - redfish_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
@@ -12,5 +11,3 @@ minor_changes:
   - utm_aaa_group_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
   - utm_ca_host_key_cert_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
   - utm_network_interface_address_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
-  - utm_proxy_frontend_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
-  - utm_proxy_location_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
