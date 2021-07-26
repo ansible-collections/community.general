@@ -7,6 +7,7 @@ __metaclass__ = type
 DOCUMENTATION = """
 name: dependent
 short_description: Composes a list with nested elements of other lists or dicts which can depend on previous loop variables
+author: Felix Fontein (@felixfontein)
 version_added: 3.1.0
 description:
   - "Takes the input lists and returns a list with elements that are lists, dictionaries,
