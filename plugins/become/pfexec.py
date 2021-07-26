@@ -9,7 +9,7 @@ DOCUMENTATION = '''
     short_description: profile based execution
     description:
         - This become plugins allows your remote/login user to execute commands as another user via the pfexec utility.
-    author: ansible (@core)
+    author: Ansible Core Team
     options:
         become_user:
             description:

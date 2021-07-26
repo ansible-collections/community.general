@@ -1,8 +1,5 @@
 {
     "include_symlinks": false,
-    "prefixes": [
-        ".github/BOTMETA.yml"
-    ],
     "output": "path-line-column-message",
     "requirements": [
         "PyYAML",
