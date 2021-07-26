@@ -1,36 +1,96 @@
 ---
-- name: Generate the self signed cert used as a place holder to create the java keystore
-  command: openssl req -x509 -newkey rsa:4096 -keyout {{ test_key_path }} -out {{ test_cert_path }} -days 365 -nodes -subj '/CN=localhost'
-  args:
-    creates: "{{ test_key_path }}"
+#
+# Prepare X509 and PKCS#12 materials
+#
+
+- name: Create private keys
+  community.crypto.openssl_privatekey:
+    path: "{{ item }}"
+    mode: "u=rw,go="
+  loop:
+    - "{{ test_key_path }}"
+    - "{{ test_key2_path }}"
+
+- name: Generate CSR for self-signed certificate used as a placeholder to create the java keystore
+  community.crypto.openssl_csr:
+    path: "{{ test_csr_path }}"
+    privatekey_path: "{{ test_key_path }}"
+    commonName: "localhost"
+
+- name: Generate CSR for self-signed certificate used for testing
+  community.crypto.openssl_csr:
+    path: "{{ test_csr2_path }}"
+    privatekey_path: "{{ test_key2_path }}"
+    commonName: "localhost"
+
+- name: Generate the self-signed cert used as a placeholder to create the java keystore
+  community.crypto.x509_certificate:
+    path: "{{ test_cert_path }}"
+    csr_path: "{{ test_csr_path }}"
+    privatekey_path: "{{ test_key_path }}"
+    provider: selfsigned
 
 - name: Generate the self signed cert we will use for testing
-  command: openssl req -x509 -newkey rsa:4096 -keyout '{{ test_key2_path }}' -out '{{ test_cert2_path }}' -days 365 -nodes -subj '/CN=localhost'
-  args:
-    creates: "{{ test_key2_path }}"
+  community.crypto.x509_certificate:
+    path: "{{ test_cert2_path }}"
+    csr_path: "{{ test_csr2_path }}"
+    privatekey_path: "{{ test_key2_path }}"
+    provider: selfsigned
 
 - name: Create the pkcs12 archive from the test x509 cert
-  command: >
-    openssl pkcs12
-    -in {{ test_cert_path }}
-    -inkey {{ test_key_path }}
-    -export
-    -name test_pkcs12_cert
-    -out {{ test_pkcs_path }}
-    -passout pass:"{{ test_keystore2_password }}"
+  community.crypto.openssl_pkcs12:
+    name: "test_pkcs12_cert"
+    path: "{{ test_pkcs_path }}"
+    passphrase: "{{ test_keystore2_password }}"
+    certificate_path: "{{ test_cert_path }}"
+    privatekey_path: "{{ test_key_path }}"
+  when:
+    - "not (ansible_os_family == 'RedHat' and ansible_distribution_version is version('8.0', '<'))"
+
+- name: Create the pkcs12 archive from the test x509 cert (command)
+  ansible.builtin.command:
+    cmd: >
+      openssl pkcs12 -export
+      -in {{ test_cert_path }}
+      -inkey {{ test_key_path }}
+      -name test_pkcs12_cert
+      -out {{ test_pkcs_path }}
+      -passout stdin
+    stdin: "{{ test_keystore2_password }}"
+  when:
+    - "ansible_os_family == 'RedHat'"
+    - "ansible_distribution_version is version('8.0', '<')"
 
 - name: Create the pkcs12 archive from the certificate we will be trying to add to the keystore
-  command: >
-    openssl pkcs12
-    -in {{ test_cert2_path }}
-    -inkey {{ test_key2_path }}
-    -export
-    -name test_pkcs12_cert
-    -out {{ test_pkcs2_path }}
-    -passout pass:"{{ test_keystore2_password }}"
+  community.crypto.openssl_pkcs12:
+    name: "test_pkcs12_cert"
+    path: "{{ test_pkcs2_path }}"
+    passphrase: "{{ test_keystore2_password }}"
+    certificate_path: "{{ test_cert2_path }}"
+    privatekey_path: "{{ test_key2_path }}"
+  when:
+    - "not (ansible_os_family == 'RedHat' and ansible_distribution_version is version('8.0', '<'))"
+
+- name: Create the pkcs12 archive from the certificate we will be trying to add to the keystore (command)
+  ansible.builtin.command:
+    cmd: >
+      openssl pkcs12 -export
+      -in {{ test_cert2_path }}
+      -inkey {{ test_key2_path }}
+      -name test_pkcs12_cert
+      -out {{ test_pkcs2_path }}
+      -passout stdin
+    stdin: "{{ test_keystore2_password }}"
+  when:
+    - "ansible_os_family == 'RedHat'"
+    - "ansible_distribution_version is version('8.0', '<')"
+
+#
+# Run tests
+#
 
 - name: try to create the test keystore based on the just created pkcs12, keystore_create flag not enabled
-  java_cert:
+  community.general.java_cert:
     cert_alias: test_pkcs12_cert
     pkcs12_alias: test_pkcs12_cert
     pkcs12_path: "{{ test_pkcs_path }}"
@@ -41,12 +101,12 @@
   register: result_x509_changed
 
 - name: Verify the x509 status is failed
-  assert:
+  ansible.builtin.assert:
     that:
       - result_x509_changed is failed
 
 - name: Create the test keystore based on the just created pkcs12
-  java_cert:
+  community.general.java_cert:
     cert_alias: test_pkcs12_cert
     pkcs12_alias: test_pkcs12_cert
     pkcs12_path: "{{ test_pkcs_path }}"
@@ -55,8 +115,19 @@
     keystore_pass: "{{ test_keystore2_password }}"
     keystore_create: yes
 
+- name: List newly created keystore content
+  ansible.builtin.command:
+    cmd: "keytool -list -keystore {{ test_keystore2_path }}"
+    stdin: "{{ test_keystore2_password }}"
+  register: keytool_list_keystore
+
+- name: Assert that the keystore has a private key entry
+  ansible.builtin.assert:
+    that:
+      - "keytool_list_keystore.stdout_lines[5] is match('test_pkcs12_cert,.*, PrivateKeyEntry, $')"
+
 - name: try to import from pkcs12 a non existing alias
-  java_cert:
+  community.general.java_cert:
     cert_alias: test_pkcs12_cert
     pkcs12_alias: non_existing_alias
     pkcs12_path: "{{ test_pkcs_path }}"
@@ -68,12 +139,12 @@
   register: result_x509_changed
 
 - name: Verify the x509 status is failed
-  assert:
+  ansible.builtin.assert:
     that:
       - result_x509_changed is failed
 
 - name:  import initial test certificate from file path
-  java_cert:
+  community.general.java_cert:
     cert_alias: test_cert
     cert_path: "{{ test_cert_path }}"
     keystore_path: "{{ test_keystore2_path }}"
@@ -83,7 +154,7 @@
   register: result_x509_changed
 
 - name: Verify the x509 status is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result_x509_changed is changed
 
@@ -92,7 +163,7 @@
     If the java_cert has been updated properly, then this task will report changed each time
     since the module will be comparing the hash of the certificate instead of validating that the alias
     simply exists
-  java_cert:
+  community.general.java_cert:
     cert_alias: test_cert
     cert_path: "{{ test_cert2_path }}"
     keystore_path: "{{ test_keystore2_path }}"
@@ -101,13 +172,13 @@
   register: result_x509_changed
 
 - name: Verify the x509 status is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result_x509_changed is changed
 
 - name: |
     We also want to make sure that the status doesnt change if we import the same cert
-  java_cert:
+  community.general.java_cert:
     cert_alias: test_cert
     cert_path: "{{ test_cert2_path }}"
     keystore_path: "{{ test_keystore2_path }}"
@@ -116,13 +187,13 @@
   register: result_x509_succeeded
 
 - name: Verify the x509 status is ok
-  assert:
+  ansible.builtin.assert:
     that:
       - result_x509_succeeded is succeeded
 
 - name: >
     Ensure the original pkcs12 cert is in the keystore
-  java_cert:
+  community.general.java_cert:
     cert_alias: test_pkcs12_cert
     pkcs12_alias: test_pkcs12_cert
     pkcs12_path: "{{ test_pkcs_path }}"
@@ -134,7 +205,7 @@
 - name: |
     Perform the same test, but we will now be testing the pkcs12 functionality
     If we add a different pkcs12 cert with the same alias, we should have a changed result, NOT the same
-  java_cert:
+  community.general.java_cert:
     cert_alias: test_pkcs12_cert
     pkcs12_alias: test_pkcs12_cert
     pkcs12_path: "{{ test_pkcs2_path }}"
@@ -145,13 +216,13 @@
   register: result_pkcs12_changed
 
 - name: Verify the pkcs12 status is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result_pkcs12_changed is changed
 
 - name: |
     We are requesting the same cert now, so the status should show OK
-  java_cert:
+  community.general.java_cert:
     cert_alias: test_pkcs12_cert
     pkcs12_alias: test_pkcs12_cert
     pkcs12_path: "{{ test_pkcs2_path }}"
@@ -161,7 +232,7 @@
   register: result_pkcs12_succeeded
 
 - name: Verify the pkcs12 status is ok
-  assert:
+  ansible.builtin.assert:
     that:
       - result_pkcs12_succeeded is succeeded
 
@@ -178,7 +249,7 @@
 - name: |
     Download the original cert.pem from our temporary server. The current cert should contain
      cert2.pem. Importing this cert should return a status of changed
-  java_cert:
+  community.general.java_cert:
     cert_alias: test_cert_localhost
     cert_url: localhost
     cert_port: "{{ test_ssl_port }}"
@@ -188,12 +259,12 @@
   register: result_url_changed
 
 - name: Verify that the url status is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result_url_changed is changed
 
 - name: Ensure we can remove the x509 cert
-  java_cert:
+  community.general.java_cert:
     cert_alias: test_cert
     keystore_path: "{{ test_keystore2_path }}"
     keystore_pass: "{{ test_keystore2_password }}"
@@ -201,12 +272,12 @@
   register: result_x509_absent
 
 - name: Verify the x509 cert is absent
-  assert:
+  ansible.builtin.assert:
     that:
       - result_x509_absent is changed
 
 - name: Ensure we can remove the certificate imported from pkcs12 archive
-  java_cert:
+  community.general.java_cert:
     cert_alias: test_pkcs12_cert
     keystore_path: "{{ test_keystore2_path }}"
     keystore_pass: "{{ test_keystore2_password }}"
@@ -214,6 +285,6 @@
   register: result_pkcs12_absent
 
 - name: Verify the pkcs12 archive is absent
-  assert:
+  ansible.builtin.assert:
     that:
       - result_pkcs12_absent is changed

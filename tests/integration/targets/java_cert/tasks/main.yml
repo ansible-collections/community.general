@@ -7,32 +7,34 @@
   block:
 
     - name: prep pkcs12 file
-      copy: src="{{ test_pkcs12_path }}" dest="{{output_dir}}/{{ test_pkcs12_path }}"
+      ansible.builtin.copy:
+        src: "{{ test_pkcs12_path }}"
+        dest: "{{ output_dir }}/{{ test_pkcs12_path }}"
 
     - name: import pkcs12
-      java_cert:
-        pkcs12_path: "{{output_dir}}/{{ test_pkcs12_path }}"
+      community.general.java_cert:
+        pkcs12_path: "{{ output_dir }}/{{ test_pkcs12_path }}"
         pkcs12_password: changeit
         pkcs12_alias: default
         cert_alias: default
-        keystore_path: "{{output_dir}}/{{ test_keystore_path }}"
+        keystore_path: "{{ output_dir }}/{{ test_keystore_path }}"
         keystore_pass: changeme_keystore
         keystore_create: yes
         state: present
       register: result_success
 
     - name: verify success
-      assert:
+      ansible.builtin.assert:
         that:
         - result_success is successful
 
     - name: import pkcs12 with wrong password
-      java_cert:
-        pkcs12_path: "{{output_dir}}/{{ test_pkcs12_path }}"
+      community.general.java_cert:
+        pkcs12_path: "{{ output_dir }}/{{ test_pkcs12_path }}"
         pkcs12_password: wrong_pass
         pkcs12_alias: default
         cert_alias: default_new
-        keystore_path: "{{output_dir}}/{{ test_keystore_path }}"
+        keystore_path: "{{ output_dir }}/{{ test_keystore_path }}"
         keystore_pass: changeme_keystore
         keystore_create: yes
         state: present
@@ -40,16 +42,16 @@
       register: result_wrong_pass
 
     - name: verify fail with wrong import password
-      assert:
+      ansible.builtin.assert:
         that:
         - result_wrong_pass is failed
 
     - name: test fail on mutually exclusive params
-      java_cert:
+      community.general.java_cert:
         cert_path: ca.crt
-        pkcs12_path: "{{output_dir}}/{{ test_pkcs12_path }}"
+        pkcs12_path: "{{ output_dir }}/{{ test_pkcs12_path }}"
         cert_alias: default
-        keystore_path: "{{output_dir}}/{{ test_keystore_path }}"
+        keystore_path: "{{ output_dir }}/{{ test_keystore_path }}"
         keystore_pass: changeme_keystore
         keystore_create: yes
         state: present
@@ -57,26 +59,26 @@
       register: result_excl_params
 
     - name: verify failed exclusive params
-      assert:
+      ansible.builtin.assert:
         that:
         - result_excl_params is failed
 
     - name: test fail on missing required params
-      java_cert:
-        keystore_path: "{{output_dir}}/{{ test_keystore_path }}"
+      community.general.java_cert:
+        keystore_path: "{{ output_dir }}/{{ test_keystore_path }}"
         keystore_pass: changeme_keystore
         state: absent
       ignore_errors: true
       register: result_missing_required_param
 
     - name: verify failed missing required params
-      assert:
+      ansible.builtin.assert:
         that:
         - result_missing_required_param is failed
 
     - name: delete object based on cert_alias parameter
-      java_cert:
-        keystore_path: "{{output_dir}}/{{ test_keystore_path }}"
+      community.general.java_cert:
+        keystore_path: "{{ output_dir }}/{{ test_keystore_path }}"
         keystore_pass: changeme_keystore
         cert_alias: default
         state: absent
@@ -84,15 +86,15 @@
       register: result_alias_deleted
 
     - name: verify object successfully deleted
-      assert:
+      ansible.builtin.assert:
         that:
         - result_alias_deleted is successful
 
-    - name: include extended test suite 
+    - name: include extended test suite
       import_tasks: state_change.yml
 
     - name: cleanup environment
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: absent
       loop:
@@ -101,7 +103,9 @@
         - "{{ test_keystore2_path }}"
         - "{{ test_cert_path }}"
         - "{{ test_key_path }}"
+        - "{{ test_csr_path }}"
         - "{{ test_cert2_path }}"
         - "{{ test_key2_path }}"
+        - "{{ test_csr2_path }}"
         - "{{ test_pkcs_path }}"
         - "{{ test_pkcs2_path }}"
