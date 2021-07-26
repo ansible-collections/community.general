@@ -34,3 +34,34 @@ You can also read [our Quick-start development guide](https://github.com/ansible
 If you want to test a PR locally, refer to [our testing guide](https://github.com/ansible/community-docs/blob/main/test_pr_locally_guide.rst) for instructions on how do it quickly.
 
 If you find any inconsistencies or places in this document which can be improved, feel free to raise an issue or pull request to fix it.
+
+## Creating new modules or plugins
+
+Creating new modules and plugins requires a bit more work than other Pull Requests.
+
+1. Please make sure that your new module or plugin is of interest to a larger audience. Very specialized modules or plugins that
+   can only be used by very few people should better be added to more specialized collections.
+
+2. When creating a new module or plugin, please make sure that you follow various guidelines:
+
+   - Follow [development conventions](https://docs.ansible.com/ansible/devel/dev_guide/developing_modules_best_practices.html);
+   - Follow [documentation standards](https://docs.ansible.com/ansible/devel/dev_guide/developing_modules_documenting.html) and
+     the [Ansible style guide](https://docs.ansible.com/ansible/devel/dev_guide/style_guide/index.html#style-guide);
+   - Make sure your modules and plugins are [GPL-3.0-or-later](https://www.gnu.org/licenses/gpl-3.0-standalone.html) licensed
+     (new module_utils can also be [BSD-2-clause](https://opensource.org/licenses/BSD-2-Clause) licensed);
+   - Make sure that new plugins and modules have tests (unit tests, integration tests, or both); it is preferable to have some tests
+     which run in CI.
+
+3. For modules and action plugins, make sure to create your module/plugin in the correct subdirectory, and create a symbolic link
+   from `plugins/modules/` respectively `plugins/action/` to the actual module/plugin code. (Other plugin types should not use
+   subdirectories.)
+
+   - Action plugins need to be accompanied by a module, even if the module file only contains documentation
+     (`DOCUMENTATION`, `EXAMPLES` and `RETURN`). The module must have the same name and directory path in `plugins/modules/`
+     than the action plugin has in `plugins/action/`.
+
+4. Make sure to add a BOTMETA entry for your new module/plugin in `.github/BOTMETA.yml`. Search for other plugins/modules in the
+   same directory to see how entries could look. You should list all authors either as `maintainers` or under `ignore`. People
+   listed as `maintainers` will be pinged for new issues and PRs that modify the module/plugin or its tests.
+
+   When you add a new plugin/module, we expect that you perform maintainer duty for at least some time after contributing it.

@@ -123,10 +123,12 @@ files:
     maintainers: Ajpantuso
   $filters/jc.py:
     maintainers: kellyjonbrazil
+  $filters/json_query.py: {}
   $filters/list.py:
     maintainers: vbotka
   $filters/path_join_shim.py:
     maintainers: felixfontein
+  $filters/random_mac.py: {}
   $filters/time.py:
     maintainers: resmo
   $filters/version_sort.py:
@@ -204,7 +206,7 @@ files:
   $lookups/random_string.py:
     maintainers: Akasurde
   $lookups/redis.py:
-    maintainers: jpmens
+    maintainers: $team_ansible_core jpmens
   $lookups/shelvefile.py: {}
   $lookups/tss.py:
     maintainers: amigus
@@ -591,8 +593,6 @@ files:
     maintainers: gthiemonge
   $modules/net_tools/haproxy.py:
     maintainers: ravibhure Normo
-  $modules/net_tools/:
-    maintainers: nerzhul
   $modules/net_tools/infinity/infinity.py:
     maintainers: MeganLiu
   $modules/net_tools/ip_netns.py:
@@ -616,8 +616,10 @@ files:
     ignore: andyhky
   $modules/net_tools/netcup_dns.py:
     maintainers: nbuchwitz
+  $modules/net_tools/nsupdate.py:
+    maintainers: nerzhul
   $modules/net_tools/omapi_host.py:
-    maintainers: amasolov
+    maintainers: amasolov nerzhul
   $modules/net_tools/pritunl/:
     maintainers: Lowess
   $modules/net_tools/nios/:
@@ -692,7 +694,7 @@ files:
     labels: rocketchat
     ignore: ramondelafuente
   $modules/notification/say.py:
-    maintainers: ansible mpdehaan
+    maintainers: $team_ansible_core mpdehaan
   $modules/notification/sendgrid.py:
     maintainers: makaimc
   $modules/notification/slack.py:
@@ -717,7 +719,7 @@ files:
   $modules/packaging/language/easy_install.py:
     maintainers: mattupstate
   $modules/packaging/language/gem.py:
-    maintainers: ansible johanwiren
+    maintainers: $team_ansible_core johanwiren
     labels: gem
   $modules/packaging/language/maven_artifact.py:
     maintainers: tumbl3w33d turb
@@ -978,7 +980,7 @@ files:
   $modules/system/dpkg_divert.py:
     maintainers: quidame
   $modules/system/facter.py:
-    maintainers: ansible gamethis
+    maintainers: $team_ansible_core gamethis
     labels: facter
   $modules/system/filesystem.py:
     maintainers: pilou- abulimov quidame
@@ -1023,7 +1025,7 @@ files:
   $modules/system/nosh.py:
     maintainers: tacatac
   $modules/system/ohai.py:
-    maintainers: ansible mpdehaan
+    maintainers: $team_ansible_core mpdehaan
     labels: ohai
   $modules/system/open_iscsi.py:
     maintainers: srvg
@@ -1104,7 +1106,7 @@ files:
   $modules/web_infrastructure/gunicorn.py:
     maintainers: agmezr
   $modules/web_infrastructure/htpasswd.py:
-    maintainers: ansible
+    maintainers: $team_ansible_core
     labels: htpasswd
   $modules/web_infrastructure/jboss.py:
     maintainers: $team_jboss jhoekx
@@ -1124,7 +1126,9 @@ files:
     labels: jira
   $modules/web_infrastructure/nginx_status_info.py:
     maintainers: resmo
-  $modules/web_infrastructure/:
+  $modules/web_infrastructure/rundeck_acl_policy.py:
+    maintainers: nerzhul
+  $modules/web_infrastructure/rundeck_project.py:
     maintainers: nerzhul
   $modules/web_infrastructure/sophos_utm/:
     maintainers: $team_e_spirit
