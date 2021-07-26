@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - java_cert - import private key as well as public certificate from PKCS#12
+    (https://github.com/ansible-collections/community.general/issues/2460).
