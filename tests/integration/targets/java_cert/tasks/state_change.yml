@@ -44,6 +44,22 @@
     passphrase: "{{ test_keystore2_password }}"
     certificate_path: "{{ test_cert_path }}"
     privatekey_path: "{{ test_key_path }}"
+  when:
+    - "not (ansible_os_family == 'RedHat' and ansible_distribution_version is version('8.0', '<'))"
+
+- name: Create the pkcs12 archive from the test x509 cert (command)
+  ansible.builtin.command:
+    cmd: >
+      openssl pkcs12 -export
+      -in {{ test_cert_path }}
+      -inkey {{ test_key_path }}
+      -name test_pkcs12_cert
+      -out {{ test_pkcs_path }}
+      -passout stdin
+    stdin: "{{ test_keystore2_password }}"
+  when:
+    - "ansible_os_family == 'RedHat'"
+    - "ansible_distribution_version is version('8.0', '<')"
 
 - name: Create the pkcs12 archive from the certificate we will be trying to add to the keystore
   community.crypto.openssl_pkcs12:
@@ -52,7 +68,22 @@
     passphrase: "{{ test_keystore2_password }}"
     certificate_path: "{{ test_cert2_path }}"
     privatekey_path: "{{ test_key2_path }}"
+  when:
+    - "not (ansible_os_family == 'RedHat' and ansible_distribution_version is version('8.0', '<'))"
 
+- name: Create the pkcs12 archive from the certificate we will be trying to add to the keystore (command)
+  ansible.builtin.command:
+    cmd: >
+      openssl pkcs12 -export
+      -in {{ test_cert2_path }}
+      -inkey {{ test_key2_path }}
+      -name test_pkcs12_cert
+      -out {{ test_pkcs2_path }}
+      -passout stdin
+    stdin: "{{ test_keystore2_password }}"
+  when:
+    - "ansible_os_family == 'RedHat'"
+    - "ansible_distribution_version is version('8.0', '<')"
 
 #
 # Run tests
@@ -83,6 +114,17 @@
     keystore_path: "{{ test_keystore2_path }}"
     keystore_pass: "{{ test_keystore2_password }}"
     keystore_create: yes
+
+- name: List newly created keystore content
+  ansible.builtin.command:
+    cmd: "keytool -list -keystore {{ test_keystore2_path }}"
+    stdin: "{{ test_keystore2_password }}"
+  register: keytool_list_keystore
+
+- name: Assert that the keystore has a private key entry
+  ansible.builtin.assert:
+    that:
+      - "keytool_list_keystore.stdout_lines[5] is match('test_pkcs12_cert,.*, PrivateKeyEntry, $')"
 
 - name: try to import from pkcs12 a non existing alias
   community.general.java_cert:
