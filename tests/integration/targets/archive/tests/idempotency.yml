@@ -23,6 +23,8 @@
   assert:
     that:
       - file_content_idempotency_after is changed
+  # Only ``zip`` archives are guaranteed to compare file content checksums rather than header checksums
+  when: "format == 'zip'"
 
 - name: Remove archive - file content idempotency ({{ format }})
   file:
@@ -89,6 +91,8 @@
   assert:
     that:
       - single_file_content_idempotency_after is changed
+  # ``tar`` archives are not guaranteed to identify changes to file content if the file meta properties are unchanged.
+  when: "format != 'tar'"
 
 - name: Remove archive - single file content idempotency ({{ format }})
   file:
