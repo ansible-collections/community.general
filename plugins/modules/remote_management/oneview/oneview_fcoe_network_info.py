@@ -82,7 +82,10 @@ class FcoeNetworkInfoModule(OneViewModuleBase):
             params=dict(type='dict'),
         )
 
-        super(FcoeNetworkInfoModule, self).__init__(additional_arg_spec=argument_spec)
+        super(FcoeNetworkInfoModule, self).__init__(
+            additional_arg_spec=argument_spec,
+            supports_check_mode=True,
+        )
         self.is_old_facts = self.module._name in ('oneview_fcoe_network_facts', 'community.general.oneview_fcoe_network_facts')
         if self.is_old_facts:
             self.module.deprecate("The 'oneview_fcoe_network_facts' module has been renamed to 'oneview_fcoe_network_info', "

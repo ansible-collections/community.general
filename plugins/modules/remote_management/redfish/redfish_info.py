@@ -318,7 +318,7 @@ def main():
         mutually_exclusive=[
             ('username', 'auth_token'),
         ],
-        supports_check_mode=False
+        supports_check_mode=True,
     )
     is_old_facts = module._name in ('redfish_facts', 'community.general.redfish_facts')
     if is_old_facts:
