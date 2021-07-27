@@ -163,7 +163,10 @@ class EnclosureInfoModule(OneViewModuleBase):
     )
 
     def __init__(self):
-        super(EnclosureInfoModule, self).__init__(additional_arg_spec=self.argument_spec)
+        super(EnclosureInfoModule, self).__init__(
+            additional_arg_spec=self.argument_spec,
+            supports_check_mode=True,
+        )
 
     def execute_module(self):
 

@@ -90,7 +90,10 @@ class SanManagerInfoModule(OneViewModuleBase):
     )
 
     def __init__(self):
-        super(SanManagerInfoModule, self).__init__(additional_arg_spec=self.argument_spec)
+        super(SanManagerInfoModule, self).__init__(
+            additional_arg_spec=self.argument_spec,
+            supports_check_mode=True,
+        )
         self.resource_client = self.oneview_client.san_managers
 
     def execute_module(self):
