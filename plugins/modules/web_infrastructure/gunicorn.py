@@ -157,8 +157,10 @@ def main():
     pid = params['pid']
 
     # use venv path if exists
-    opt_dir = [os.sep.join(venv, 'bin')] if venv else None
-    gunicorn_command = module.get_bin_path('gunicorn', opt_dirs=opt_dir)
+    if venv:
+        gunicorn_command = "/".join((venv, 'bin', 'gunicorn'))
+    else:
+        gunicorn_command = module.get_bin_path('gunicorn')
 
     # to daemonize the process
     options = ["-D"]
