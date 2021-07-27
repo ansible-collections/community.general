@@ -325,6 +325,15 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         status_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), status_key.lower()))
         self.inventory.set_variable(name, status_key, status)
 
+    def _get_vm_snapshots(self, node, vmid, vmtype, name):
+        ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/snapshot" % (self.proxmox_url, node, vmtype, vmid))
+
+        snapshots_key = 'snapshots'
+        snapshots_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), snapshots_key.lower()))
+
+        snapshots = [snapshot['name'] for snapshot in ret if snapshot['name'] != 'current']
+        self.inventory.set_variable(name, snapshots_key, snapshots)
+
     def to_safe(self, word):
         '''Converts 'bad' characters in a string to underscores so they can be used as Ansible groups
         #> ProxmoxInventory.to_safe("foo-bar baz")
@@ -393,9 +402,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                         elif lxc['status'] == 'running':
                             self.inventory.add_child(running_group, lxc['name'])
 
-                    # get LXC config for facts
+                    # get LXC config and snapshots for facts
                     if self.get_option('want_facts'):
                         self._get_vm_config(node['node'], lxc['vmid'], 'lxc', lxc['name'])
+                        self._get_vm_snapshots(node['node'], lxc['vmid'], 'lxc', lxc['name'])
 
                     self._apply_constructable(lxc["name"], self.inventory.get_host(lxc['name']).get_vars())
 
@@ -403,7 +413,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 node_qemu_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), ('%s_qemu' % node['node']).lower()))
                 self.inventory.add_group(node_qemu_group)
                 for qemu in self._get_qemu_per_node(node['node']):
-                    if qemu['template']:
+                    if qemu.get('template'):
                         continue
 
                     self.inventory.add_host(qemu['name'])
@@ -417,9 +427,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     elif qemu['status'] == 'running':
                         self.inventory.add_child(running_group, qemu['name'])
 
-                    # get QEMU config for facts
+                    # get QEMU config and snapshots for facts
                     if self.get_option('want_facts'):
                         self._get_vm_config(node['node'], qemu['vmid'], 'qemu', qemu['name'])
+                        self._get_vm_snapshots(node['node'], qemu['vmid'], 'qemu', qemu['name'])
 
                     self._apply_constructable(qemu["name"], self.inventory.get_host(qemu['name']).get_vars())
 

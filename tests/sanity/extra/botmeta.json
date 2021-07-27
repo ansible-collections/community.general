@@ -1,0 +1,8 @@
+{
+    "include_symlinks": false,
+    "output": "path-line-column-message",
+    "requirements": [
+        "PyYAML",
+        "voluptuous==0.12.1"
+    ]
+}

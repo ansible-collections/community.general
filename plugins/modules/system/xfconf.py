@@ -14,7 +14,7 @@ author:
     - "Alexei Znamensky (@russoz)"
 short_description: Edit XFCE4 Configurations
 description:
-  - This module allows for the manipulation of Xfce 4 Configuration via
+  - This module allows for the manipulation of Xfce 4 Configuration with the help of
     xfconf-query.  Please see the xfconf-query(1) man pages for more details.
 options:
   channel:
@@ -48,6 +48,7 @@ options:
     type: str
     description:
     - The action to take upon the property/value.
+    - State C(get) is deprecated and will be removed in community.general 5.0.0. Please use the module M(community.general.xfconf_info) instead.
     choices: [ get, present, absent ]
     default: "present"
   force_array:
@@ -225,6 +226,10 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
     def state_get(self):
         self.vars.value = self.vars.previous_value
         self.vars.previous_value = None
+        self.module.deprecate(
+            msg="State 'get' is deprecated. Please use the module community.general.xfconf_info instead",
+            version="5.0.0", collection_name="community.general"
+        )
 
     def state_absent(self):
         if not self.module.check_mode:
