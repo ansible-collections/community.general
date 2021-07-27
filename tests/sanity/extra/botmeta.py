@@ -17,7 +17,40 @@ from voluptuous import Required, Schema, Invalid
 from voluptuous.humanize import humanize_error
 
 
-REPORT_NO_MAINTAINERS = False
+IGNORE_NO_MAINTAINERS = [
+    'plugins/cache/memcached.py',
+    'plugins/cache/redis.py',
+    'plugins/callback/cgroup_memory_recap.py',
+    'plugins/callback/context_demo.py',
+    'plugins/callback/counter_enabled.py',
+    'plugins/callback/hipchat.py',
+    'plugins/callback/jabber.py',
+    'plugins/callback/log_plays.py',
+    'plugins/callback/logdna.py',
+    'plugins/callback/logentries.py',
+    'plugins/callback/null.py',
+    'plugins/callback/selective.py',
+    'plugins/callback/slack.py',
+    'plugins/callback/splunk.py',
+    'plugins/callback/yaml.py',
+    'plugins/inventory/nmap.py',
+    'plugins/inventory/virtualbox.py',
+    'plugins/connection/chroot.py',
+    'plugins/connection/iocage.py',
+    'plugins/connection/lxc.py',
+    'plugins/lookup/cartesian.py',
+    'plugins/lookup/chef_databag.py',
+    'plugins/lookup/consul_kv.py',
+    'plugins/lookup/credstash.py',
+    'plugins/lookup/cyberarkpassword.py',
+    'plugins/lookup/flattened.py',
+    'plugins/lookup/keyring.py',
+    'plugins/lookup/lastpass.py',
+    'plugins/lookup/passwordstore.py',
+    'plugins/lookup/shelvefile.py',
+    'plugins/filter/json_query.py',
+    'plugins/filter/random_mac.py',
+]
 
 FILENAME = '.github/BOTMETA.yml'
 
@@ -81,8 +114,11 @@ def validate(filename, filedata):
                 msg = 'Author %s not mentioned as active or inactive maintainer for %s (mentioned are: %s)' % (
                     maintainer, filename, ', '.join(all_maintainers))
                 print('%s:%d:%d: %s' % (FILENAME, 0, 0, msg))
-    if not all_maintainers and REPORT_NO_MAINTAINERS:
+    should_have_no_maintainer = filename in IGNORE_NO_MAINTAINERS
+    if not all_maintainers and not should_have_no_maintainer:
         print('%s:%d:%d: %s' % (FILENAME, 0, 0, 'No (active or inactive) maintainer mentioned for %s' % filename))
+    if all_maintainers and should_have_no_maintainer:
+        print('%s:%d:%d: %s' % (FILENAME, 0, 0, 'Please remove %s from the ignore list of %s' % (filename, sys.argv[0])))
 
 
 def main():
