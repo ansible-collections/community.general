@@ -1,4 +1,4 @@
-minor_changes:
+bugfixes:
   - ali_instance_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
   - memset_memstore_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
   - memset_server_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
