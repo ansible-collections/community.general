@@ -1,0 +1,24 @@
+bugfixes:
+  - ali_instance_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - memset_memstore_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - memset_server_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - xenserver_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - rax_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - smartos_image_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - snmp_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - oneview_datacenter_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - oneview_enclosure_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - oneview_ethernet_network_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - oneview_fc_network_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - oneview_fcoe_network_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - oneview_logical_interconnect_group_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - oneview_network_set_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - oneview_san_manager_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - idrac_redfish_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - redfish_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - xfconf_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - utm_aaa_group_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - utm_ca_host_key_cert_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - utm_network_interface_address_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - utm_proxy_frontend_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+  - utm_proxy_location_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
