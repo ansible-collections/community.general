@@ -114,7 +114,10 @@ class EthernetNetworkInfoModule(OneViewModuleBase):
     )
 
     def __init__(self):
-        super(EthernetNetworkInfoModule, self).__init__(additional_arg_spec=self.argument_spec)
+        super(EthernetNetworkInfoModule, self).__init__(
+            additional_arg_spec=self.argument_spec,
+            supports_check_mode=True,
+        )
 
         self.resource_client = self.oneview_client.ethernet_networks
 

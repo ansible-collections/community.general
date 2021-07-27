@@ -288,7 +288,7 @@ def main():
             ['username', 'level', 'integrity', 'authkey'],
             ['privacy', 'privkey'],
         ),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
 
     m_args = module.params
