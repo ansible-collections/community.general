@@ -201,7 +201,7 @@ class OneViewModuleBase(object):
 
     resource_client = None
 
-    def __init__(self, additional_arg_spec=None, validate_etag_support=False):
+    def __init__(self, additional_arg_spec=None, validate_etag_support=False, supports_check_mode=False):
         """
         OneViewModuleBase constructor.
 
@@ -210,7 +210,7 @@ class OneViewModuleBase(object):
         """
         argument_spec = self._build_argument_spec(additional_arg_spec, validate_etag_support)
 
-        self.module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=False)
+        self.module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=supports_check_mode)
 
         self._check_hpe_oneview_sdk()
         self._create_oneview_client()

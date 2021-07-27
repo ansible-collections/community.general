@@ -97,7 +97,7 @@ def main():
         argument_spec=dict(
             filters=dict(default=None),
         ),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
 
     image_facts = ImageFacts(module)

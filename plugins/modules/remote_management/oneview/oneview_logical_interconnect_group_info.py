@@ -96,7 +96,10 @@ class LogicalInterconnectGroupInfoModule(OneViewModuleBase):
             params=dict(type='dict'),
         )
 
-        super(LogicalInterconnectGroupInfoModule, self).__init__(additional_arg_spec=argument_spec)
+        super(LogicalInterconnectGroupInfoModule, self).__init__(
+            additional_arg_spec=argument_spec,
+            supports_check_mode=True,
+        )
 
     def execute_module(self):
         if self.module.params.get('name'):

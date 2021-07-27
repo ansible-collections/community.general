@@ -132,6 +132,7 @@ class XFConfInfo(CmdModuleHelper):
         required_by=dict(
             property=['channel']
         ),
+        supports_check_mode=True,
     )
 
     command = 'xfconf-query'
