@@ -409,7 +409,7 @@ class KeycloakAPI(object):
             self.module.fail_json(msg='Could not delete client %s in realm %s: %s'
                                       % (id, realm, str(e)))
 
-    def get_client_roles(self, cid, realm="master"):
+    def get_client_roles_by_id(self, cid, realm="master"):
         """ Fetch the roles of the a client on the Keycloak server.
 
         :param cid: ID of the client from which to obtain the rolemappings.
@@ -433,7 +433,7 @@ class KeycloakAPI(object):
         :param realm: Realm from which to obtain the rolemappings.
         :return: The ID of the role, None if not found.
         """
-        rolemappings = self.get_client_roles(cid, realm=realm)
+        rolemappings = self.get_client_roles_by_id(cid, realm=realm)
         for role in rolemappings:
             if name == role['name']:
                 return role['id']
