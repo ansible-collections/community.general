@@ -111,7 +111,7 @@ def main():
         host=dict(default=None),
         vm=dict(default=None),
     )
-    module = AnsibleModule(argument_spec)
+    module = AnsibleModule(argument_spec, supports_check_mode=True)
     is_old_facts = module._name in ('ovirt_tag_facts', 'community.general.ovirt_tag_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_tag_facts' module has been renamed to 'ovirt_tag_info', "

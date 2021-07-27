@@ -119,7 +119,7 @@ def main():
         case_sensitive=dict(default=True, type='bool'),
         max=dict(default=None, type='int'),
     )
-    module = AnsibleModule(argument_spec)
+    module = AnsibleModule(argument_spec, supports_check_mode=True)
     is_old_facts = module._name in ('ovirt_vm_facts', 'community.general.ovirt_vm_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_vm_facts' module has been renamed to 'ovirt_vm_info', "

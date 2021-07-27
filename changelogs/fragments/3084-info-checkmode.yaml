@@ -22,3 +22,31 @@ bugfixes:
   - utm_network_interface_address_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
   - utm_proxy_frontend_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
   - utm_proxy_location_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+# Added in backport:
+  - ovirt_affinity_label_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_api_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_cluster_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_datacenter_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_disk_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_event_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_external_provider_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_group_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_host_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_host_storage_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_network_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_nic_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_permission_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_quota_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_scheduling_policy_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_snapshot_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_storage_domain_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_storage_template_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_storage_vm_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_tag_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_template_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_user_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_vm_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ovirt_vmpool_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - gluster_heal_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - ome_device_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+  - purefa_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).

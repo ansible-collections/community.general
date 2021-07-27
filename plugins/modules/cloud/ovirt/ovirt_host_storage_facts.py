@@ -126,7 +126,7 @@ def main():
         iscsi=dict(default=None, type='dict'),
         fcp=dict(default=None, type='dict'),
     )
-    module = AnsibleModule(argument_spec)
+    module = AnsibleModule(argument_spec, supports_check_mode=True)
     is_old_facts = module._name in ('ovirt_host_storage_facts', 'community.general.ovirt_host_storage_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_host_storage_facts' module has been renamed to 'ovirt_host_storage_info', "
