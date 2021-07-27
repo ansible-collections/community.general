@@ -88,7 +88,8 @@ def main():
     module = UTMModule(
         argument_spec=dict(
             name=dict(type='str', required=True)
-        )
+        ),
+        supports_check_mode=True,
     )
     try:
         # This is needed because the bool value only accepts int values in the backend
