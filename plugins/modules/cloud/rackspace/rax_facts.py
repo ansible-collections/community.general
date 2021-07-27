@@ -124,6 +124,7 @@ def main():
         required_together=rax_required_together(),
         mutually_exclusive=[['address', 'id', 'name']],
         required_one_of=[['address', 'id', 'name']],
+        supports_check_mode=True,
     )
 
     if not HAS_PYRAX:

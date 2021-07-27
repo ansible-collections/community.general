@@ -83,7 +83,10 @@ class FcNetworkInfoModule(OneViewModuleBase):
             params=dict(required=False, type='dict')
         )
 
-        super(FcNetworkInfoModule, self).__init__(additional_arg_spec=argument_spec)
+        super(FcNetworkInfoModule, self).__init__(
+            additional_arg_spec=argument_spec,
+            supports_check_mode=True,
+        )
 
     def execute_module(self):
 

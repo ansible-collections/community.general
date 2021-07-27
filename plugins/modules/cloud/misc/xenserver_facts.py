@@ -160,7 +160,9 @@ def get_srs(session):
 
 
 def main():
-    module = AnsibleModule({})
+    module = AnsibleModule(
+        supports_check_mode=True,
+    )
 
     if not HAVE_XENAPI:
         module.fail_json(changed=False, msg="python xen api required for this module")

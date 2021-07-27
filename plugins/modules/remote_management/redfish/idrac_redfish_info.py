@@ -191,7 +191,7 @@ def main():
         mutually_exclusive=[
             ('username', 'auth_token'),
         ],
-        supports_check_mode=False
+        supports_check_mode=True,
     )
 
     category = module.params['category']

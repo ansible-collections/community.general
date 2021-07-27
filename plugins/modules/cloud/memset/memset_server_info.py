@@ -274,7 +274,7 @@ def main():
             api_key=dict(required=True, type='str', no_log=True),
             name=dict(required=True, type='str')
         ),
-        supports_check_mode=False
+        supports_check_mode=True,
     )
 
     # populate the dict with the user-provided vars.

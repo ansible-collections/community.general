@@ -109,8 +109,9 @@ def main():
     key_to_check_for_changes = []
     module = UTMModule(
         argument_spec=dict(
-            name=dict(type='str', required=True)
-        )
+            name=dict(type='str', required=True),
+        ),
+        supports_check_mode=True,
     )
     try:
         UTM(module, endpoint, key_to_check_for_changes, info_only=True).execute()
