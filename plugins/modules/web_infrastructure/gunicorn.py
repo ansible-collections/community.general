@@ -101,14 +101,12 @@ gunicorn:
 import os
 import time
 
-# import ansible utils
 from ansible.module_utils.basic import AnsibleModule
 
 
 def search_existing_config(config, option):
     ''' search in config file for specified option '''
     if config and os.path.isfile(config):
-        data_config = None
         with open(config, 'r') as f:
             for line in f:
                 if option in line:
@@ -135,15 +133,12 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             app=dict(required=True, type='str', aliases=['name']),
-            venv=dict(required=False, type='path', default=None, aliases=['virtualenv']),
-            config=dict(required=False, default=None, type='path', aliases=['conf']),
-            chdir=dict(required=False, type='path', default=None),
-            pid=dict(required=False, type='path', default=None),
-            user=dict(required=False, type='str'),
-            worker=dict(required=False,
-                        type='str',
-                        choices=['sync', 'eventlet', 'gevent', 'tornado ', 'gthread', 'gaiohttp']
-                        ),
+            venv=dict(type='path', aliases=['virtualenv']),
+            config=dict(type='path', aliases=['conf']),
+            chdir=dict(type='path'),
+            pid=dict(type='path'),
+            user=dict(type='str'),
+            worker=dict(type='str', choices=['sync', 'eventlet', 'gevent', 'tornado ', 'gthread', 'gaiohttp']),
         )
     )
 
@@ -165,7 +160,7 @@ def main():
     if venv:
         gunicorn_command = "/".join((venv, 'bin', 'gunicorn'))
     else:
-        gunicorn_command = 'gunicorn'
+        gunicorn_command = module.get_bin_path('gunicorn')
 
     # to daemonize the process
     options = ["-D"]
