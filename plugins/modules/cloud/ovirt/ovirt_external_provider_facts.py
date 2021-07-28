@@ -116,7 +116,7 @@ def main():
             aliases=['provider'],
         ),
     )
-    module = AnsibleModule(argument_spec)
+    module = AnsibleModule(argument_spec, supports_check_mode=True)
     is_old_facts = module._name in ('ovirt_external_provider_facts', 'community.general.ovirt_external_provider_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_external_provider_facts' module has been renamed to 'ovirt_external_provider_info', "

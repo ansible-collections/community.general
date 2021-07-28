@@ -191,7 +191,7 @@ def main():
         mutually_exclusive=[
             ('username', 'auth_token'),
         ],
-        supports_check_mode=False
+        supports_check_mode=True,
     )
     is_old_facts = module._name in ('idrac_redfish_facts', 'community.general.idrac_redfish_facts')
     if is_old_facts:

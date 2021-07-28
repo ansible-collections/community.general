@@ -95,7 +95,7 @@ def main():
         max=dict(default=None, type='int'),
         unregistered=dict(default=False, type='bool'),
     )
-    module = AnsibleModule(argument_spec)
+    module = AnsibleModule(argument_spec, supports_check_mode=True)
     is_old_facts = module._name in ('ovirt_storage_template_facts', 'community.general.ovirt_storage_template_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_storage_template_facts' module has been renamed to 'ovirt_storage_template_info', "

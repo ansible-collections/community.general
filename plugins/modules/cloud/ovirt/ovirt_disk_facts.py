@@ -85,7 +85,7 @@ def main():
     argument_spec = ovirt_info_full_argument_spec(
         pattern=dict(default='', required=False),
     )
-    module = AnsibleModule(argument_spec)
+    module = AnsibleModule(argument_spec, supports_check_mode=True)
     is_old_facts = module._name in ('ovirt_disk_facts', 'community.general.ovirt_disk_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_disk_facts' module has been renamed to 'ovirt_disk_info', "
