@@ -120,8 +120,7 @@ host_power_status:
       - Will be one of C(ON), C(OFF) and C(UNKNOWN).
     returned: always
     type: str
-    sample: |
-      ON, OFF or UNKNOWN
+    sample: ON
     version_added: 3.5.0
 '''
 
