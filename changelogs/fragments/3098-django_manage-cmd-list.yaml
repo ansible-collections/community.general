@@ -1,0 +1,2 @@
+bugfixes:
+  - django_manage - refactor to call ``run_command()`` passing command as a list instead of string (https://github.com/ansible-collections/community.general/pull/3098).
