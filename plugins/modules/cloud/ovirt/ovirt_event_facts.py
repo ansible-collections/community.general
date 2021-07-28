@@ -122,7 +122,7 @@ def main():
         query=dict(default='', required=False),
         wait=dict(default=True, type='bool', required=False)
     )
-    module = AnsibleModule(argument_spec)
+    module = AnsibleModule(argument_spec, supports_check_mode=True)
     is_old_facts = module._name in ('ovirt_event_facts', 'community.general.ovirt_event_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_event_facts' module has been renamed to 'ovirt_event_info', "

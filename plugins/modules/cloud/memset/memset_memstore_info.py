@@ -149,7 +149,7 @@ def main():
             api_key=dict(required=True, type='str', no_log=True),
             name=dict(required=True, type='str')
         ),
-        supports_check_mode=False
+        supports_check_mode=True,
     )
     if module._name in ('memset_memstore_facts', 'community.general.memset_memstore_facts'):
         module.deprecate("The 'memset_memstore_facts' module has been renamed to 'memset_memstore_info'",

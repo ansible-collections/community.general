@@ -305,7 +305,7 @@ def main():
             password=dict(required=True, no_log=True),
             timeout=dict(type='int', default=10)
         ),
-        supports_check_mode=False
+        supports_check_mode=True,
     )
     is_old_facts = module._name in ('redfish_facts', 'community.general.redfish_facts')
     if is_old_facts:

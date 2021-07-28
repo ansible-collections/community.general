@@ -128,7 +128,7 @@ def main():
         group_name=dict(default=None),
         namespace=dict(default=None),
     )
-    module = AnsibleModule(argument_spec)
+    module = AnsibleModule(argument_spec, supports_check_mode=True)
     is_old_facts = module._name in ('ovirt_permission_facts', 'community.general.ovirt_permission_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_permission_facts' module has been renamed to 'ovirt_permission_info', "

@@ -797,7 +797,7 @@ def main():
         gather_subset=dict(default='minimum', type='list',)
     ))
 
-    module = AnsibleModule(argument_spec, supports_check_mode=False)
+    module = AnsibleModule(argument_spec, supports_check_mode=True)
 
     array = get_system(module)
 

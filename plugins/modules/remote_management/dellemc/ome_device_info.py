@@ -374,7 +374,7 @@ def main():
         },
         required_if=[['fact_subset', 'detailed_inventory', ['system_query_options']],
                      ['fact_subset', 'subsystem_health', ['system_query_options']], ],
-        supports_check_mode=False)
+        supports_check_mode=True)
 
     try:
         _validate_inputs(module.params)
