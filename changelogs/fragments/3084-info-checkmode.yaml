@@ -50,3 +50,7 @@ bugfixes:
   - gluster_heal_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
   - ome_device_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
   - purefa_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+# Added in stable-1 backport:
+  - docker_stack_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3101).
+  - docker_stack_task_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3101).
+  - gcpubsub_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3101).
