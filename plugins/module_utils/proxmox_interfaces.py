@@ -6,7 +6,7 @@
 from __future__ import absolute_import, division, print_function
 
 from proxmoxer.core import ProxmoxAPI
-from plugins.module_utils.proxmox import ProxmoxAnsible
+from ansible_collections.community.general.plugins.module_utils.proxmox import ProxmoxAnsible
 from ansible.module_utils.basic import AnsibleModule
 __metaclass__ = type
 

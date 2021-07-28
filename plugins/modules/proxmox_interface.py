@@ -1,1 +1,1 @@
-plugins/modules/cloud/misc/proxmox_interface.py
+cloud/misc/proxmox_interface.py

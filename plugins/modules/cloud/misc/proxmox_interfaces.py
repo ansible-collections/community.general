@@ -6,9 +6,9 @@
 
 
 from __future__ import absolute_import, division, print_function
-from plugins.module_utils.proxmox import ProxmoxAnsible
-from plugins.module_utils.proxmox import proxmox_auth_argument_spec
-from plugins.module_utils.proxmox_interfaces import get_nics, delete_nic, create_nic, reload_interfaces, rollback_interfaces, update_nic, proxmox_map_interface_args, proxmox_interface_argument_spec
+from ansible_collections.communty.general.plugins.module_utils.proxmox import ProxmoxAnsible
+from ansible_collections.communty.general.plugins.module_utils.proxmox import proxmox_auth_argument_spec
+from ansible_collections.communty.general.plugins.module_utils.proxmox_interfaces import get_nics, delete_nic, create_nic, reload_interfaces, rollback_interfaces, update_nic, proxmox_map_interface_args, proxmox_interface_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 
 __metaclass__ = type
