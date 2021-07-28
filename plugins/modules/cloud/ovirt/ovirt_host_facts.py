@@ -104,7 +104,7 @@ def main():
         all_content=dict(default=False, type='bool'),
         cluster_version=dict(default=None, type='str'),
     )
-    module = AnsibleModule(argument_spec)
+    module = AnsibleModule(argument_spec, supports_check_mode=True)
     is_old_facts = module._name in ('ovirt_host_facts', 'community.general.ovirt_host_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_host_facts' module has been renamed to 'ovirt_host_info', "

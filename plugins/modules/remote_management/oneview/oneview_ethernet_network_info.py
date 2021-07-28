@@ -112,7 +112,10 @@ class EthernetNetworkInfoModule(OneViewModuleBase):
     )
 
     def __init__(self):
-        super(EthernetNetworkInfoModule, self).__init__(additional_arg_spec=self.argument_spec)
+        super(EthernetNetworkInfoModule, self).__init__(
+            additional_arg_spec=self.argument_spec,
+            supports_check_mode=True,
+        )
         self.is_old_facts = self.module._name in ('oneview_ethernet_network_facts', 'community.general.oneview_ethernet_network_facts')
         if self.is_old_facts:
             self.module.deprecate("The 'oneview_ethernet_network_facts' module has been renamed to 'oneview_ethernet_network_info', "

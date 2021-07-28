@@ -91,7 +91,7 @@ def main():
         vm=dict(required=True),
         name=dict(default=None),
     )
-    module = AnsibleModule(argument_spec)
+    module = AnsibleModule(argument_spec, supports_check_mode=True)
     is_old_facts = module._name in ('ovirt_nic_facts', 'community.general.ovirt_nic_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_nic_facts' module has been renamed to 'ovirt_nic_info', "

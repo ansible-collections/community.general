@@ -133,7 +133,10 @@ class NetworkSetInfoModule(OneViewModuleBase):
     )
 
     def __init__(self):
-        super(NetworkSetInfoModule, self).__init__(additional_arg_spec=self.argument_spec)
+        super(NetworkSetInfoModule, self).__init__(
+            additional_arg_spec=self.argument_spec,
+            supports_check_mode=True,
+        )
         self.is_old_facts = self.module._name in ('oneview_network_set_facts', 'community.general.oneview_network_set_facts')
         if self.is_old_facts:
             self.module.deprecate("The 'oneview_network_set_facts' module has been renamed to 'oneview_network_set_info', "

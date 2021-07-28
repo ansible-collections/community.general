@@ -159,6 +159,7 @@ def main():
             name=dict(type='str', required=True, aliases=['volume']),
             status_filter=dict(type='str', default='self-heal', choices=['self-heal', 'rebalance']),
         ),
+        supports_check_mode=True,
     )
     is_old_facts = module._name in ('gluster_heal_facts', 'community.general.gluster_heal_facts')
     if is_old_facts:

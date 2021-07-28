@@ -157,7 +157,10 @@ class EnclosureInfoModule(OneViewModuleBase):
     argument_spec = dict(name=dict(type='str'), options=dict(type='list'), params=dict(type='dict'))
 
     def __init__(self):
-        super(EnclosureInfoModule, self).__init__(additional_arg_spec=self.argument_spec)
+        super(EnclosureInfoModule, self).__init__(
+            additional_arg_spec=self.argument_spec,
+            supports_check_mode=True,
+        )
         self.is_old_facts = self.module._name in ('oneview_enclosure_facts', 'community.general.oneview_enclosure_facts')
         if self.is_old_facts:
             self.module.deprecate("The 'oneview_enclosure_facts' module has been renamed to 'oneview_enclosure_info', "

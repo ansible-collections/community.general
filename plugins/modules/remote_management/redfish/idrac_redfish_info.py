@@ -178,7 +178,7 @@ def main():
             password=dict(required=True, no_log=True),
             timeout=dict(type='int', default=10)
         ),
-        supports_check_mode=False
+        supports_check_mode=True,
     )
     is_old_facts = module._name in ('idrac_redfish_facts', 'community.general.idrac_redfish_facts')
     if is_old_facts:

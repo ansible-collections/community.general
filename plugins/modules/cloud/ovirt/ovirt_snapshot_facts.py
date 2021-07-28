@@ -81,7 +81,7 @@ def main():
         description=dict(default=None),
         snapshot_id=dict(default=None),
     )
-    module = AnsibleModule(argument_spec)
+    module = AnsibleModule(argument_spec, supports_check_mode=True)
     is_old_facts = module._name in ('ovirt_snapshot_facts', 'community.general.ovirt_snapshot_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_snapshot_facts' module has been renamed to 'ovirt_snapshot_info', "
