@@ -256,20 +256,20 @@ def main():
         argument_spec=dict(
             command=dict(required=True, type='str'),
             project_path=dict(required=True, type='path', aliases=['app_path', 'chdir']),
-            settings=dict(default=None, required=False, type='path'),
-            pythonpath=dict(default=None, required=False, type='path', aliases=['python_path']),
-            virtualenv=dict(default=None, required=False, type='path', aliases=['virtual_env']),
+            settings=dict(type='path'),
+            pythonpath=dict(type='path', aliases=['python_path']),
+            virtualenv=dict(type='path', aliases=['virtual_env']),
 
-            apps=dict(default=None, required=False),
-            cache_table=dict(default=None, required=False, type='str'),
-            clear=dict(default=False, required=False, type='bool'),
-            database=dict(default=None, required=False, type='str'),
-            failfast=dict(default=False, required=False, type='bool', aliases=['fail_fast']),
-            fixtures=dict(default=None, required=False, type='str'),
-            testrunner=dict(default=None, required=False, type='str', aliases=['test_runner']),
-            skip=dict(default=None, required=False, type='bool'),
-            merge=dict(default=None, required=False, type='bool'),
-            link=dict(default=None, required=False, type='bool'),
+            apps=dict(),
+            cache_table=dict(type='str'),
+            clear=dict(default=False, type='bool'),
+            database=dict(type='str'),
+            failfast=dict(default=False, type='bool', aliases=['fail_fast']),
+            fixtures=dict(type='str'),
+            testrunner=dict(type='str', aliases=['test_runner']),
+            skip=dict(type='bool'),
+            merge=dict(type='bool'),
+            link=dict(type='bool'),
         ),
     )
 
@@ -279,8 +279,6 @@ def main():
 
     for param in specific_params:
         value = module.params[param]
-        if param in specific_boolean_params:
-            value = module.boolean(value)
         if value and param not in command_allowed_param_map[command]:
             module.fail_json(msg='%s param is incompatible with command=%s' % (param, command))
 
@@ -290,23 +288,23 @@ def main():
 
     _ensure_virtualenv(module)
 
-    cmd = "./manage.py %s" % (command, )
+    cmd = ["./manage.py", command]
 
     if command in noinput_commands:
-        cmd = '%s --noinput' % cmd
+        cmd.append("--noinput")
 
     for param in general_params:
         if module.params[param]:
-            cmd = '%s --%s=%s' % (cmd, param, module.params[param])
+            cmd.append('--%s=%s' % (param, module.params[param]))
 
     for param in specific_boolean_params:
-        if module.boolean(module.params[param]):
-            cmd = '%s --%s' % (cmd, param)
+        if module.params[param]:
+            cmd.append('--%s' % param)
 
     # these params always get tacked on the end of the command
     for param in end_of_command_params:
         if module.params[param]:
-            cmd = '%s %s' % (cmd, module.params[param])
+            cmd.append(module.params[param])
 
     rc, out, err = module.run_command(cmd, cwd=project_path)
     if rc != 0:
