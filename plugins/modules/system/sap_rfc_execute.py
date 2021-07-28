@@ -1,0 +1,397 @@
+#!/usr/bin/python
+
+# Copyright: (c) 2021, Rainer Leber <rainerleber@gmail.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+from __future__ import (absolute_import, division, print_function)
+from sys import stderr
+__metaclass__ = type
+
+DOCUMENTATION = r'''
+---
+module: community.general.sap_rfc_execute
+
+short_description: Perform SAP RFC execution.
+
+version_added: "3.5.0"
+
+description: 
+    - The C(sap_rfc_execute) module will perform RFC execution on SAP Systems 
+      for tasks lists and general function modules.
+    - Tasks in the task list which requires manual activities will be confirmed automatically.
+
+options:
+    state:
+        description: 
+            - If the state C(show) is provided:
+                - The possible parameters are shown for each task.
+                  The returned values are in the neccesary format for C(task_parameters).
+                - The full list of parameters is exported to stdout in json format.
+        required: false
+        type: str
+    conn_username:
+        description: The required username for the SAP system. 
+        required: true
+        type: str
+    conn_password:
+        description: The required password for the SAP system.
+        required: true
+        type: str
+    host:
+        description: The required host for the SAP system. Can be either an FQDN or IP Address.
+        required: true
+        type: str
+    sysnr:
+        description:
+            - The system number of the SAP system.
+            - This value must be single quoted. Otherwise ansible treated this like a number and replace leading zeros.
+            - Defaults to C('01')
+        required: false
+        type: str
+    client:
+        description: 
+            - The client number to connect to.
+            - This value must be single quoted. Otherwise ansible treated this like a number and replace leading zeros.
+            - Defaults to C('001')
+        required: false
+        type: str
+    task_to_execute:
+        description: The task list which will be executed.
+        required: false
+        type: str
+    task_parameters:
+        description: 
+            - The tasks and the parameters for execution. 
+            - If the task list do not need any parameters. This could be empty.
+            - The list values must have brackets (see example).
+            - If only specific tasks from the task list should be executed. 
+              The tasks even when no parameter is needed must be provided.
+              Alongside with the module parameter C(tasks_skip: true).
+        required: false
+        type: list(list())
+    task_setting:
+        description:
+            - Setting for the execution of the task list.
+                Check Mode C(CHECKRUN)
+                Background Processing Active C(BATCH) - This is the default value,
+                Asynchronous Execution C(ASYNC),
+                Trace Mode C(TRACE),
+                Server Name C(BATCH_TARGET),
+        required: false
+        type: str
+    tasks_skip:
+        description:
+            - It is possible for tasks that they don't need parameters and run either. 
+              If this parameter is true only defined tasks in C(task_parameter) list will run. 
+        required: false
+        type: bool
+    general_function:
+        description: Provide a function module (FM) to execute. 
+        required: false
+        type: str
+    general_parameters:
+        description: FM parameters provided as a dictonary.
+        required: false
+        type: dict   
+
+notes:
+    - Does not support C(check_mode).
+author:
+    - Rainer Leber (@rainerleber)
+'''
+
+EXAMPLES = r'''
+# Pass in a message
+- name: Test task execution
+  community.general.sap_rfc_execute:
+      conn_username: DDIC
+      conn_password: Passwd1234
+      host: 10.1.8.10
+      sysnr: '01'
+      client: '000'
+      task_to_execute: SAP_BASIS_SSL_CHECK
+      task_settings: batch
+
+- name: Pass in input parameters
+  community.general.sap_rfc_execute:
+    state: present
+    conn_username: DDIC
+    conn_password: Passwd1234
+    host: 10.1.8.10
+    sysnr: '01'
+    client: '000'
+    task_to_execute: SAP_BASIS_SSL_CHECK
+    task_parameters :
+     - ['CL_STCT_CHECK_SEC_CRYPTO', 'P_OPT2', 'X']
+     - ['CL_STCT_CHECK_SEC_CRYPTO', 'P_OPT3', 'X']
+    task_settings: batch
+
+- name: Show all possible input parameters
+  community.general.sap_rfc_execute:
+    state: show
+    conn_username: DDIC
+    conn_password: Passwd1234
+    host: 10.1.8.10
+    sysnr: '01'
+    client: '000'
+    task_to_execute: SAP_BASIS_SSL_CHECK
+
+# Exported environement variables.
+- name: Hint if module will fail with error message: ImportError: libsapnwrfc.so ...
+  community.general.sap_rfc_execute:
+      conn_username: DDIC
+      conn_password: Passwd1234
+      host: 10.1.8.10
+      sysnr: '01'
+      client: '000'
+      task_to_execute: SAP_BASIS_SSL_CHECK
+      task_settings: batch
+  environment:
+      SAPNWRFC_HOME: /usr/local/sap/nwrfcsdk
+      LD_LIBRARY_PATH: /usr/local/sap/nwrfcsdk/lib
+'''
+
+RETURN = r'''
+# These are examples of possible return values, and in general should use other names for return values.
+original_message:
+    description: The original name param that was passed in.
+    type: str
+    returned: always
+    sample: 'hello world'
+message:
+    description: The output message that the test module generates.
+    type: str
+    returned: always
+    sample: 'goodbye'
+'''
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.json_utils import json
+from xml.etree import cElementTree as ElementTree
+from pyrfc import Connection
+
+
+def xml_dict(xml_raw):
+    # adapted from: http://code.activestate.com/recipes/410469-xml-as-dictionary/
+    list_out = []
+    dict_out = {}
+    if xml_raw.items():
+        dict_out.update(dict(xml_raw.items()))
+    for element in xml_raw:
+        if element:
+            # treat like dict - we assume that if the first two tags
+            # in a series are different, then they are all different.
+            if len(element) == 1 or element[0].tag != element[1].tag:
+                aDict = xml_dict(element)
+            # treat like list - if the first two tags
+            # in a series are the same, then the rest are the same.
+            else:
+                for list_return in element:
+                    if list_return:
+                        # treat like dict
+                        if len(list_return) == 1 or list_return[0].tag != list_return[1].tag:
+                            list_out.append(xml_dict(list_return))
+                        # treat like list
+                        elif list_return[0].tag == list_return[1].tag:
+                            list_out.append(list_out.xml_list(list_return))
+                    elif list_return.text:
+                        text = list_return.text.strip()
+                        if text:
+                            list_out.append(text)
+                # put the list in dictionary;
+                # the key is the tag name the list elements all share in common
+                # the value is the list itself
+                aDict = {element[0].tag: list_out}
+            # if the tag has attributes, add those to the dict
+            if element.items():
+                aDict.update(dict(element.items()))
+            dict_out.update({element.tag: aDict})
+        elif element.items():
+            dict_out.update({element.tag: dict(element.items())})
+        # if there are no child tags and no attributes, extract the text
+        else:
+            dict_out.update({element.tag: element.text})
+    return dict_out
+
+
+def call_rfc_method(connection, method_name, kwargs):
+    # PyRFC call function
+    resp = connection.call(method_name, **kwargs)
+
+    return resp
+
+
+def process_exec_settings(task_settings):
+    # porcesses task settings to objects
+    exec_settings = {}
+    for settings in task_settings:
+        exec_settings = {**exec_settings, **{settings.upper(): 'X'}}
+    return exec_settings
+
+
+def process_task_parameters(task_parameters):
+    parameter_list = []
+    raw_task_list = []
+    task_list = []
+    if task_parameters is not None:
+        for parameters in task_parameters:
+            if parameters[0].startswith('CL_'):
+                length = len(parameters)
+                raw_task_list = raw_task_list + [{'TASKNAME': parameters[0]}]
+                task_list = [i for n, i in enumerate(raw_task_list) if i not in raw_task_list[n + 1:]]
+                if length == 3:
+                    parameter_list = parameter_list + [{'TASKNAME': parameters[0], 'FIELDNAME': parameters[1], 'VALUE': parameters[2]}]
+            else:
+                return False
+    #
+    return [{'parameter_list': parameter_list}, {'task_list': task_list}]
+
+
+def run_module():
+    # define available arguments/parameters a user can pass to the module
+    module = AnsibleModule(
+        argument_spec=dict(
+            state=dict(required=False, default='present', choices=['show', 'present']),
+            # values for connection
+            conn_username=dict(type='str', required=True),
+            conn_password=dict(type='str', required=True, no_log=True),
+            host=dict(type='str', required=True),
+            sysnr=dict(type='str', required=False, default="01"),
+            client=dict(type='str', required=False, default="000"),
+            # values for execution tasks
+            task_to_execute=dict(type='str', required=False),
+            task_parameters=dict(type='list', required=False),
+            task_settings=dict(type='list', required=False, default=['BATCH']),
+            tasks_skip=dict(type='bool', required=False, default=False),
+            # values for general fm
+            general_function=dict(type='str', required=False),
+            general_parameters=dict(type='dict', required=False),
+        ),
+        required_one_of=[('general_function', 'task_to_execute')],
+        supports_check_mode=False,
+    )
+    result = dict(changed=False, msg='', results={}, out={}, stdout={},  stderr={}, )
+
+    params = module.params
+
+    state = params['state']
+
+    username = (params['conn_username']).upper()
+    password = params['conn_password']
+    host = params['host']
+    sysnr = params['sysnr']
+    client = params['client']
+
+    task_parameters = params['task_parameters']
+    task_to_execute = params['task_to_execute']
+    task_settings = params['task_settings']
+    tasks_skip = params['tasks_skip']
+
+    general_function = params['general_function']
+    general_parameters = params['general_parameters']
+
+    # basic RFC connection with pyrfc
+    connection_params = {'user': username, 'passwd': password, 'ashost': host, 'sysnr': sysnr, 'client': client}
+    try:
+        conn = Connection(**connection_params)
+    except Exception as err:
+        result['stderr'] = str(err)
+        result['msg'] = '''Something went wrong connecting to the SAP system.'''
+        module.fail_json(**result)
+
+    if task_to_execute is not None:
+        raw_params = call_rfc_method(conn, 'STC_TM_SCENARIO_GET_PARAMETERS', {'I_SCENARIO_ID': task_to_execute})
+        if state == "show":
+            try:
+                params_list = []
+                for tasks in raw_params['ET_PARAM_DEF']:
+                    params_list = params_list + [[tasks['TASKNAME'], tasks['FIELDNAME'], tasks['DEFAULTVAL']]]
+                result['results'] = params_list
+                result['stdout'] = json.dumps(raw_params['ET_PARAM_DEF'])
+                result['out'] = raw_params['ET_PARAM_DEF']
+            except Exception as err:
+                result['stderr'] = str(err)
+                result['msg'] = '''The task list maybe does not exsist.'''
+                module.fail_json(**result)
+
+        if state == "present":
+            exec_settings = process_exec_settings(task_settings)
+            converted_parameters = process_task_parameters(task_parameters)
+
+            if not converted_parameters:
+                result['msg'] = '''Parameters are malformed. Please provide the parameters in the following way:
+                                 [TASKNAME (starts with CL_), FIELDNAME, VALUE]. Try State Show'''
+                module.fail_json(**result)
+
+            # initialize session task
+            try:
+                session_init = call_rfc_method(conn, 'STC_TM_SESSION_BEGIN', {'I_SCENARIO_ID': task_to_execute, 'I_INIT_ONLY': 'X'})
+            except Exception as err:
+                result['stderr'] = str(err)
+                result['msg'] = '''The task list does not exsist.'''
+                module.exit_json(**result)
+
+            # Confirm Tasks which requires manual activities from Task List Run
+            for task in raw_params['ET_PARAMETER']:
+                call_rfc_method(conn, 'STC_TM_TASK_CONFIRM', {'I_SESSION_ID': session_init['E_SESSION_ID'], 'I_TASKNAME': task['TASKNAME']})
+
+            if tasks_skip:
+                for task in raw_params['ET_PARAMETER']:
+                    call_rfc_method(conn, 'STC_TM_TASK_SKIP',
+                                    {'I_SESSION_ID': session_init['E_SESSION_ID'],
+                                     'I_TASKNAME': task['TASKNAME'], 'I_SKIP_DEP_TASKS': 'X'})
+
+            # unskip defined tasks
+            if converted_parameters[1]['task_list'] != []:
+                for task in converted_parameters[1]['task_list']:
+                    call_rfc_method(conn, 'STC_TM_TASK_UNSKIP',
+                                    {'I_SESSION_ID': session_init['E_SESSION_ID'],
+                                     'I_TASKNAME': task['TASKNAME'], 'I_UNSKIP_DEP_TASKS': 'X'})
+
+            # set parameters from converted_parameters function
+            if converted_parameters[0]['parameter_list'] != []:
+                call_rfc_method(conn, 'STC_TM_SESSION_SET_PARAMETERS',
+                                {'I_SESSION_ID': session_init['E_SESSION_ID'],
+                                 'IT_PARAMETER': converted_parameters[0]['parameter_list']})
+
+            # start the task
+            try:
+                session_start = call_rfc_method(conn, 'STC_TM_SESSION_RESUME',
+                                                {'I_SESSION_ID': session_init['E_SESSION_ID'],
+                                                 'IS_EXEC_SETTINGS': exec_settings})
+            except Exception as err:
+                result['stderr'] = str(err)
+                result['msg'] = '''Something went wrong. See stderr.'''
+                module.exit_json(**result)
+
+            # get task logs because the execution may successfully but the tasks shows errors or warnings
+            # returned value is ABAPXML https://help.sap.com/doc/abapdocu_755_index_htm/7.55/en-US/abenabap_xslt_asxml_general.htm
+            session_log = call_rfc_method(conn, 'STC_TM_SESSION_GET_LOG', {'I_SESSION_ID': session_init['E_SESSION_ID']})
+            log_xml = ElementTree.XML(session_log['E_LOG'])
+            task_list = xml_dict(log_xml)['{http://www.sap.com/abapxml}values']['SESSION']['TASKLIST']
+
+            result['changed'] = True
+            result['msg'] = session_start['E_STATUS_DESCR']
+            result['stdout'] = json.dumps(task_list)
+            result['out'] = task_list
+
+    if general_function is not None:
+        if state == "present":
+            try:
+                general_out = call_rfc_method(conn, general_function, general_parameters)
+                result['changed'] = True
+                result['msg'] = general_out['E_STATUS_DESCR']
+                result['out'] = general_out
+            except Exception as err:
+                result['stderr'] = str(err)
+                result['msg'] = '''Something went wrong. See stderr.'''
+                module.exit_json(**result)
+
+    module.exit_json(**result)
+
+
+def main():
+    run_module()
+
+
+if __name__ == '__main__':
+    main()
