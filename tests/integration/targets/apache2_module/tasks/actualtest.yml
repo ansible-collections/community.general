@@ -88,6 +88,7 @@
       name: autoindex
       state: present
 
+  # mod_evasive is enabled by default upon the installation, so disable first and enable second, to preserve the config
   - name: disable evasive module
     community.general.apache2_module:
       name: evasive

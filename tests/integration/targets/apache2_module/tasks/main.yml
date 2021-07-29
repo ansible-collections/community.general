@@ -20,7 +20,7 @@
     state: present
   when: "ansible_os_family == 'Suse'"
 
-- name:
+- name: test apache2_module
   block:
     - name: get list of enabled modules
       shell: apache2ctl -M | sort
