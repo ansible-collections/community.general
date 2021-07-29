@@ -49,6 +49,8 @@ options:
      type: bool
      default: False
 requirements: ["a2enmod","a2dismod"]
+notes:
+  - Currently only systems based on Debian and SuSE support the C(a2enmod) and C(a2dismod) commands.
 '''
 
 EXAMPLES = '''
