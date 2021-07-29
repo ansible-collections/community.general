@@ -5,6 +5,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+from typing_extensions import Required
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -33,7 +34,6 @@ options:
     gitlab_user:
         description:
             - A username or a list of usernames to add to/remove from the GitLab group.
-        required: true
         type: list
         elements: str
     access_level:
@@ -72,6 +72,7 @@ options:
             - Adds/remove users of the given access_level to match the given gitlab_user/gitlab_users_access list.
               If omitted do not purge orphaned members.
         type: list
+        elements: str
         choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
         version_added: 3.6.0
 notes:
@@ -200,11 +201,11 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(dict(
         api_token=dict(type='str', required=True, no_log=True),
-        gitlab_group=dict(type='str'),
+        gitlab_group=dict(type='str', required=True),
         gitlab_user=dict(type='list', elements='str'),
         state=dict(type='str', default='present', choices=['present', 'absent']),
         access_level=dict(type='str', choices=['guest', 'reporter', 'developer', 'maintainer', 'owner']),
-        purge_users=dict(type='list', choices=['guest', 'reporter', 'developer', 'maintainer', 'owner']),
+        purge_users=dict(type='list', elements='str', choices=['guest', 'reporter', 'developer', 'maintainer', 'owner']),
         gitlab_users_access=dict(
             type='list',
             elements='dict',
