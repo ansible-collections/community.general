@@ -44,7 +44,7 @@ options:
         choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
     gitlab_users_access:
         description:
-            - Provide a list of dictionaries { user: username, access_level: xxx } to align users
+            - Provide a list of dictionaries user= username, access_level= xxx to align users
               access_levels given on a per user basis instead of a userlist to one given access level.
         type: list
         elements: dict
@@ -230,10 +230,10 @@ def main():
         required_one_of=[
             ['gitlab_user', 'gitlab_users_access'],
         ],
-# TODO: this is only true if gitlab_user and not gitlab_users_access is used
-#        required_if=[
-#            ['state', 'present', ['access_level']],
-#        ],
+        # TODO: this is only true if gitlab_user and not gitlab_users_access is used
+        #        required_if=[
+        #            ['state', 'present', ['access_level']],
+        #        ],
         supports_check_mode=True,
     )
 
