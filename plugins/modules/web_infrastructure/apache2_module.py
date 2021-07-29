@@ -50,7 +50,9 @@ options:
      default: False
 requirements: ["a2enmod","a2dismod"]
 notes:
-  - This does not work on RedHat-based distributions. It does work on Debian- and SuSE-based distributions. Whether it works on others depend on whether the C(a2enmod) and C(a2dismod) tools are available or not.
+  - This does not work on RedHat-based distributions.
+  - It does work on Debian- and SuSE-based distributions.
+  - Whether it works on others depend on whether the C(a2enmod) and C(a2dismod) tools are available or not.
 '''
 
 EXAMPLES = '''
