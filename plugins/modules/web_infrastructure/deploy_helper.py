@@ -359,8 +359,6 @@ class DeployHelper(object):
                 self.module.fail_json(msg="%s exists but is not a symbolic link" % path)
 
     def create_link(self, source, link_name):
-        changed = False
-
         if os.path.islink(link_name):
             norm_link = os.path.normpath(os.path.realpath(link_name))
             norm_source = os.path.normpath(os.path.realpath(source))
@@ -458,15 +456,18 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             path=dict(aliases=['dest'], required=True, type='path'),
-            release=dict(required=False, type='str', default=None),
-            releases_path=dict(required=False, type='str', default='releases'),
-            shared_path=dict(required=False, type='path', default='shared'),
-            current_path=dict(required=False, type='path', default='current'),
-            keep_releases=dict(required=False, type='int', default=5),
-            clean=dict(required=False, type='bool', default=True),
-            unfinished_filename=dict(required=False, type='str', default='DEPLOY_UNFINISHED'),
-            state=dict(required=False, choices=['present', 'absent', 'clean', 'finalize', 'query'], default='present')
+            release=dict(type='str'),
+            releases_path=dict(type='str', default='releases'),
+            shared_path=dict(type='path', default='shared'),
+            current_path=dict(type='path', default='current'),
+            keep_releases=dict(type='int', default=5),
+            clean=dict(type='bool', default=True),
+            unfinished_filename=dict(type='str', default='DEPLOY_UNFINISHED'),
+            state=dict(choices=['present', 'absent', 'clean', 'finalize', 'query'], default='present')
         ),
+        required_if=[
+            ('state', 'finalize', ['release']),
+        ],
         add_file_common_args=True,
         supports_check_mode=True
     )
@@ -493,8 +494,6 @@ def main():
         result['ansible_facts'] = {'deploy_helper': facts}
 
     elif deploy_helper.state == 'finalize':
-        if not deploy_helper.release:
-            module.fail_json(msg="'release' is a required parameter for state=finalize (try the 'deploy_helper.new_release' fact)")
         if deploy_helper.keep_releases <= 0:
             module.fail_json(msg="'keep_releases' should be at least 1")
 
