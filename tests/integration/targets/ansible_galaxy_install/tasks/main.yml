@@ -1,0 +1,95 @@
+---
+###################################################
+- name: Install collection netbox.netbox
+  community.general.ansible_galaxy_install:
+    type: collection
+    name: netbox.netbox
+  register: install_c0
+
+- name: Assert collection was installed
+  assert:
+    that:
+    - install_c0 is changed
+    - '"netbox.netbox" in install_c0.new_collections'
+
+- name: Install collection netbox.netbox (again)
+  community.general.ansible_galaxy_install:
+    type: collection
+    name: netbox.netbox
+  register: install_c1
+
+- name: Assert collection was not installed
+  assert:
+    that:
+    - install_c1 is not changed
+
+###################################################
+- name: Install role ansistrano.deploy
+  community.general.ansible_galaxy_install:
+    type: role
+    name: ansistrano.deploy
+  register: install_r0
+
+- name: Assert collection was installed
+  assert:
+    that:
+    - install_r0 is changed
+    - '"ansistrano.deploy" in install_r0.new_roles'
+
+- name: Install role ansistrano.deploy (again)
+  community.general.ansible_galaxy_install:
+    type: role
+    name: ansistrano.deploy
+  register: install_r1
+
+- name: Assert role was not installed
+  assert:
+    that:
+    - install_r1 is not changed
+
+###################################################
+- name:
+  set_fact:
+    reqs_file: '{{ output_dir }}/reqs.yaml'
+
+- name: Copy requirements file
+  copy:
+    src: 'files/test.yml'
+    dest: '{{ reqs_file }}'
+
+- name: Install from requirements file
+  community.general.ansible_galaxy_install:
+    type: both
+    requirements_file: "{{ reqs_file }}"
+  register: install_rq0
+  ignore_errors: true
+
+- name: Assert requirements file was installed (Ansible >2.9)
+  assert:
+    that:
+    - install_rq0 is changed
+    - '"geerlingguy.java" in install_rq0.new_roles'
+    - '"geerlingguy.php_roles" in install_rq0.new_collections'
+  when:
+    - (ansible_version.major != 2 or ansible_version.minor != 9)
+
+- name: Assert requirements file was installed (Ansible 2.9)
+  assert:
+    that:
+    - install_rq0 is failed
+    - install_rq0 is not changed
+  when:
+    - ansible_version.major == 2
+    - ansible_version.minor == 9
+
+- name: Install from requirements file (again)
+  community.general.ansible_galaxy_install:
+    type: both
+    requirements_file: "{{ reqs_file }}"
+  register: install_rq1
+  ignore_errors: true
+
+- name: Assert requirements file was not installed
+  assert:
+    that:
+    - install_rq1 is not changed

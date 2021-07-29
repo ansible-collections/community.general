@@ -707,6 +707,8 @@ files:
     maintainers: makaimc
   $modules/notification/typetalk.py:
     maintainers: tksmd
+  $modules/packaging/language/ansible_galaxy_install.py:
+    maintainers: russoz
   $modules/packaging/language/bower.py:
     maintainers: mwarkentin
   $modules/packaging/language/bundler.py:
