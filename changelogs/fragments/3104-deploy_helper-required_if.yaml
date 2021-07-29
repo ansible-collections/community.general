@@ -1,0 +1,2 @@
+bugfixes:
+  - deploy_helper - improved parameter checking by using standard Ansible construct (https://github.com/ansible-collections/community.general/pull/3104).
