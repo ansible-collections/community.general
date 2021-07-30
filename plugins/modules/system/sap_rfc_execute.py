@@ -269,7 +269,9 @@ def process_exec_settings(task_settings):
     # porcesses task settings to objects
     exec_settings = {}
     for settings in task_settings:
-        exec_settings = {**exec_settings, **{settings.upper(): 'X'}}
+        temp_dict = {settings.upper(): 'X'}
+        for key, value in temp_dict.items():
+            exec_settings[key] = value
     return exec_settings
 
 
