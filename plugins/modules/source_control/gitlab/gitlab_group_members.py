@@ -232,7 +232,7 @@ def main():
         ],
         # TODO: this is only true if gitlab_user and not gitlab_users_access is used
         #        required_if=[
-        #            ['state', 'present', ['access_level']],
+            ['state', 'present', ['access_level', 'gitlab_users_access'], True],
         #        ],
         supports_check_mode=True,
     )
