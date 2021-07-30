@@ -174,7 +174,7 @@ msg:
   returned: always
   sample: 'Successfull'
 out:
-  description: A complete description of the executed tasks.
+  description: A complete description of the executed tasks. If this is available.
   type: list
   elements: list
   returned: on success
