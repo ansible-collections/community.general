@@ -3,7 +3,6 @@
 # Copyright: (c) 2021, Rainer Leber <rainerleber@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import (absolute_import, division, print_function)
-from xml.etree.ElementTree import XML
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -212,6 +211,7 @@ out:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.json_utils import json
+from xml.etree.ElementTree import XML
 from pyrfc import Connection
 
 
