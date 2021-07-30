@@ -362,8 +362,12 @@ def main():
 
     # if state = present and purge_users set delete users which are in members having give access level but not in gitlab_users
     if state == 'present' and purge_users:
+        uppercase_names_in_gitlab_users_access = []
+        for name in gitlab_users_access:
+            uppercase_names_in_gitlab_users_access.append(name['name'].upper())
+
         for member in members:
-            if member.access_level in purge_users and member.username.upper() not in [name['name'].upper() for name in gitlab_users_access]:
+            if member.access_level in purge_users and member.username.upper() not in uppercase_names_in_gitlab_users_access:
                 group.remove_user_from_group(member.id, gitlab_group_id)
                 changed = True
                 changed_users.append("Successfully removed user '%s', from group. Was not in given list" % member.username)
@@ -372,15 +376,9 @@ def main():
 
     if len(gitlab_users_access) == 1 and error:
         # if single user given and an error occurred return error for list errors will be per user
-        module.fail_json(msg=changed_users[0])
+        module.fail_json(msg=changed_users[0], result_data=changed_data)
     elif error:
-        # iterate results, if all failed set to failed
-        single_good = False
-        for cd in changed_data:
-            if cd.result != 'FAILED':
-                single_good = True
-        if not single_good:
-            module.fail_json(msg='All tasks for all users given failed', result_data=changed_data)
+        module.fail_json(msg='All tasks for all users given failed', result_data=changed_data)
 
     module.exit_json(changed=changed, result="\n".join(changed_users), result_data=changed_data)
 
