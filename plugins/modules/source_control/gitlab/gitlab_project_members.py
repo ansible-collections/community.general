@@ -53,7 +53,7 @@ options:
         type: str
     gitlab_user:
         description:
-            - The username of the member to add to/remove from the GitLab project.
+            - The username or list of usernames of the member(s) to add to/remove from the GitLab project.
         required: true
         type: list
         elements: str
