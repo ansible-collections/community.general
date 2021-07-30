@@ -1060,6 +1060,8 @@ files:
     maintainers: jsumners
   $modules/system/sefcontext.py:
     maintainers: dagwieers
+  $modules/system/sap_rfc_execute:
+    maintainers: rainerleber
   $modules/system/selinux_permissive.py:
     maintainers: mscherer
   $modules/system/selogin.py:
