@@ -502,6 +502,8 @@ files:
     maintainers: elfelip Gaetan2907
   $modules/identity/keycloak/keycloak_clientscope.py:
     maintainers: Gaetan2907
+  $modules/identity/keycloak/keycloak_client_rolemapping.py:
+    maintainers: Gaetan2907
   $modules/identity/keycloak/keycloak_group.py:
     maintainers: adamgoossens
   $modules/identity/keycloak/keycloak_realm.py:
