@@ -23,11 +23,13 @@ options:
     user:
         description: A dedicated username. Defaults to C(SYSTEM).
         type: str
-        default: SYSTEM
+    userstore:
+        description: If true the user must be in hdbuserstore.
+        type: bool
     password:
         description: The password to connect to the database.
         type: str
-        required: true
+        required: false
     autocommit:
         description: Autocommit the statement.
         type: bool
@@ -119,8 +121,9 @@ def main():
             instance=dict(type='str', required=True),
             encrypted=dict(type='bool', required=False, default=False),
             host=dict(type='str', required=False),
-            user=dict(type='str', required=False, default="SYSTEM"),
-            password=dict(type='str', required=True, no_log=True),
+            user=dict(type='str', required=False),
+            userstore=dict(type='bool', required=False),
+            password=dict(type='str', required=False, no_log=True),
             database=dict(type='str', required=False),
             query=dict(type='list', elements='str', required=False),
             filepath=dict(type='list', elements='path', required=False),
@@ -136,6 +139,7 @@ def main():
     sid = (params['sid']).upper()
     instance = params['instance']
     user = params['user']
+    userstore = params['userstore']
     password = params['password']
     autocommit = params['autocommit']
     host = params['host']
@@ -155,13 +159,16 @@ def main():
     if encrypted is True:
         command.extend(['-attemptencrypt'])
     if autocommit is False:
-        command.extend(['-z'])
+        command.extend(['-z']) 
     if host is not None:
         command.extend(['-n', host])
     if database is not None:
         command.extend(['-d', database])
     # -x Suppresses additional output, such as the number of selected rows in a result set.
-    command.extend(['-x', '-i', instance, '-u', user, '-p', password])
+    if userstore:
+        command.extend(['-x', '-U', user])
+    else:
+        command.extend(['-x', '-i', instance, '-u', user, '-p', password])
 
     if filepath is not None:
         command.extend(['-I'])
