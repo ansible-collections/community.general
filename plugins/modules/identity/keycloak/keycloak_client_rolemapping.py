@@ -342,7 +342,6 @@ def main():
         result['msg'] = 'Nothing to do, roles %s are correctly mapped with group %s.' % (roles, group_name)
         module.exit_json(**result)
 
-    module.exit_json(**result)
 
 
 if __name__ == '__main__':
