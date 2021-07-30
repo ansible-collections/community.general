@@ -1,8 +1,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
-from locale import Error
-from unittest.main import main
 from unittest.mock import MagicMock
 __metaclass__ = type
 
@@ -17,7 +15,7 @@ from ansible_collections.community.general.plugins.modules.system import sap_rfc
 
 
 class TestSAPRfcModule(ModuleTestCase):
-    
+
     def setUp(self):
         super(TestSAPRfcModule, self).setUp()
         self.module = sap_rfc_execute
@@ -43,7 +41,7 @@ class TestSAPRfcModule(ModuleTestCase):
             "host": "10.1.8.9",
             "task_to_execute": "SAP_BASIS_SSL_CHECK"
         })
-        
+
         with patch.object(self.module, 'Connection') as conn:
             conn.return_value = ''
             with self.assertRaises(AnsibleFailJson) as result:
@@ -59,7 +57,7 @@ class TestSAPRfcModule(ModuleTestCase):
             "host": "10.1.8.9",
             "task_to_execute": "SAP_BASIS_SSL_CHECK"
         })
-                                    
+                           
         with self.assertRaises(AnsibleExitJson) as result:
             self.module.main()
         self.assertEqual(result.exception.args[0]['changed'], True)
@@ -76,12 +74,11 @@ class TestSAPRfcModule(ModuleTestCase):
         })
 
         with patch.object(self.module, 'call_rfc_method') as show_list:
-            show_list.return_value = {'ET_PARAM_DEF': 
-                                     [{'TASKNAME': 'CL_STCT_CHECK_SEC_CRYPTO', 'LNR': 1, 'FIELDNAME': 'P_OPT1', 'MANDATORY': '',
-                                     'DATATYPE': 'CHAR', 'LENG': '000001', 'DECIMALS': '000000', 'LOWERCASE': '',
-                                     'OUTPUTLEN': '000001', 'SIGNFLAG': '', 'CONVEXIT': '', 'DDTEXT': 'Warning', 'PASSWORD': '',
-                                     'READ_ONLY': '', 'CHECKBOX': '', 'RADIOBUTTON': 'X', 'RB_GROUP': 'ICM', 'DEFAULTVAL': 'X'},]}
+            show_list.return_value = {'ET_PARAM_DEF':
+                                      [{'TASKNAME': 'CL_STCT_CHECK_SEC_CRYPTO', 'LNR': 1, 'FIELDNAME': 'P_OPT1', 'MANDATORY': '',
+                                      'DATATYPE': 'CHAR', 'LENG': '000001', 'DECIMALS': '000000', 'LOWERCASE': '',
+                                      'OUTPUTLEN': '000001', 'SIGNFLAG': '', 'CONVEXIT': '', 'DDTEXT': 'Warning', 'PASSWORD': '',
+                                      'READ_ONLY': '', 'CHECKBOX': '', 'RADIOBUTTON': 'X', 'RB_GROUP': 'ICM', 'DEFAULTVAL': 'X'}]}
             with self.assertRaises(AnsibleExitJson) as success:
                 sap_rfc_execute.main()
-            self.assertEqual(success.exception.args[0]['results'][0], ['CL_STCT_CHECK_SEC_CRYPTO', 'P_OPT1', 'X'] )
-
+            self.assertEqual(success.exception.args[0]['results'][0], ['CL_STCT_CHECK_SEC_CRYPTO', 'P_OPT1', 'X'])
