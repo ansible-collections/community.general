@@ -10,14 +10,6 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.proxmox import ProxmoxAnsible
 import traceback
 
-PROXMOXER_IMP_ERR = None
-try:
-    from proxmoxer import ProxmoxAPI
-    HAS_PROXMOXER = True
-except ImportError:
-    HAS_PROXMOXER = False
-    PROXMOXER_IMP_ERR = traceback.format_exc()
-
 
 def proxmox_interface_argument_spec():
     return dict(
@@ -25,7 +17,6 @@ def proxmox_interface_argument_spec():
                   required=True
                   ),
         type=dict(type='str',
-                  required=True,
                   choices=[
                       'bridge',
                       'bond',
@@ -43,8 +34,9 @@ def proxmox_interface_argument_spec():
         address=dict(type='str'),
         address6=dict(type='str'),
         autostart=dict(type='bool',
-                       default=False
+                       default=True
                        ),
+        bond_primary=dict(type='str'),
         bond_mode=dict(type='str',
                        choices=[
                            'balance-rr',
@@ -66,9 +58,12 @@ def proxmox_interface_argument_spec():
                                        'layer3+4'
                                    ]
                                    ),
+        bridge_ports=dict(type='str'),
         bridge_vlan_ports=dict(type='bool'),
         cidr=dict(type='str'),
         cidr6=dict(type='str'),
+        comments=dict(type='str'),
+        comments6=dict(type='str'),
         gateway=dict(type='str'),
         gateway6=dict(type='str'),
         mtu=dict(type='int'),
@@ -92,7 +87,7 @@ def proxmox_interface_argument_spec():
     )
 
 
-def proxmox_map_interface_args(module: AnsibleModule):
+def proxmox_map_interface_args(module):
     ret = {}
     ret['iface'] = module.params['name']
     ret['type'] = module.params['type']
@@ -136,7 +131,7 @@ def proxmox_map_interface_args(module: AnsibleModule):
     return ret
 
 
-def get_nics(proxmox: ProxmoxAnsible):
+def get_nics(proxmox):
     """ Returns list of all interfaces on Proxmox node"""
     nics = []
     node = proxmox.module.params['node']
@@ -148,7 +143,7 @@ def get_nics(proxmox: ProxmoxAnsible):
     return nics
 
 
-def get_nic(proxmox_api: ProxmoxAPI, node: str, name: str):
+def get_nic(proxmox_api, node: str, name: str):
     ret = {}
     try:
         ret = proxmox_api.nodes(node).network.get(name)
@@ -157,35 +152,35 @@ def get_nic(proxmox_api: ProxmoxAPI, node: str, name: str):
     return ret
 
 
-def create_nic(proxmox_api: ProxmoxAPI, node: str, config: dict):
+def create_nic(proxmox_api, node: str, config: dict):
     try:
         proxmox_api.nodes(node).network.post(config)
     except Exception as e:
         raise e
 
 
-def delete_nic(proxmox_api: ProxmoxAPI, node: str, name: str):
+def delete_nic(proxmox_api, node: str, name: str):
     try:
         proxmox_api.nodes(node).network.delete(name)
     except Exception as e:
         raise e
 
 
-def update_nic(proxmox_api: ProxmoxAPI, node: str, name: str, config: dict):
+def update_nic(proxmox_api, node: str, name: str, config: dict):
     try:
         proxmox_api.nodes(node).network(name).post(config)
     except Exception as e:
         raise e
 
 
-def reload_interfaces(proxmox_api: ProxmoxAPI, node: str):
+def reload_interfaces(proxmox_api, node: str):
     try:
         proxmox_api.nodes(node).network.put()
     except Exception as e:
         raise e
 
 
-def rollback_interfaces(proxmox_api: ProxmoxAPI, node: str):
+def rollback_interfaces(proxmox_api, node: str):
     try:
         proxmox_api.nodes(node).network.delete()
     except Exception as e:

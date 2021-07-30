@@ -5,12 +5,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-from ansible_collections.community.general.plugins.module_utils.proxmox import (
-    ProxmoxAnsible, proxmox_auth_argument_spec)
-from ansible_collections.community.general.plugins.module_utils.proxmox_interfaces import (
-    get_nics, delete_nic, create_nic, reload_interfaces, rollback_interfaces, update_nic, proxmox_map_interface_args, proxmox_interface_argument_spec)
-from ansible.module_utils.basic import AnsibleModule
-
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -31,7 +25,7 @@ options:
     description:
       - Network interface type
     type: str
-    required: true
+    default: bridge
     choices:
     - bridge
     - bond
@@ -55,6 +49,7 @@ options:
     description:
       - Automatically start interface on boot.
     type: bool
+    default: true
   bond_primary:
     description:
       - Primary interface for active-backup bond.
@@ -157,7 +152,7 @@ options:
   vlan_id:
     description:
       - vlan-id for a custom named vlan interface (ifupdown2 only).
-    type: str
+    type: int
   vlan_raw_device:
     description:
       - Specify the raw interface for the vlan interface.
@@ -190,7 +185,7 @@ options:
     description:
       - Try to revert to previous configuration upon encountering errors
     type: bool
-    default: false
+    default: true
 extends_documentation_fragment:
   - community.general.proxmox.documentation
 '''
@@ -209,8 +204,8 @@ EXAMPLES = '''
     comment: 'This is a new VM bridge with the host inside'
     state: present
 
-- name: Create new OVS bridge on node02:
-  community.general.proxmox_interface
+- name: Create new OVS bridge on node02
+  community.general.proxmox_interface:
     api_user: john.doe@pve
     api_password: supersecret
     api_host: proxmoxhost
@@ -232,7 +227,7 @@ EXAMPLES = '''
     state: absent
 
 - name: Delete interface vmbr321 from node01 but don't apply changes
-  community.general.proxmox_interface
+  community.general.proxmox_interface:
     api_user: root@pam
     api_password: secret
     api_host: proxmoxhost
@@ -255,14 +250,30 @@ config_after:
   sample: same as in config
 '''
 
+import traceback
+
+PROXMOXER_IMP_ERR = None
+try:
+    from proxmoxer import ProxmoxAPI
+    HAS_PROXMOXER = True
+except ImportError:
+    HAS_PROXMOXER = False
+    PROXMOXER_IMP_ERR = traceback.format_exc()
+
+from ansible_collections.community.general.plugins.module_utils.proxmox import (
+    ProxmoxAnsible, proxmox_auth_argument_spec)
+from ansible_collections.community.general.plugins.module_utils.proxmox_interfaces import (
+    get_nics, delete_nic, create_nic, reload_interfaces, rollback_interfaces, update_nic, proxmox_map_interface_args, proxmox_interface_argument_spec)
+from ansible.module_utils.basic import AnsibleModule
+
 
 def main():
     interface_common_args = proxmox_interface_argument_spec()
     network_args = dict(
-        apply=dict(type=bool, default=True),
-        ignore_errors=dict(type=bool, default=False),
-        revert_on_error=dict(type=bool, default=True),
-        node=dict(type='str', requied=True),
+        apply=dict(type='bool', default=True),
+        ignore_errors=dict(type='bool', default=False),
+        revert_on_error=dict(type='bool', default=True),
+        node=dict(type='str', required=True),
     )
     module_args = proxmox_auth_argument_spec()
     module_args.update(interface_common_args)
@@ -271,10 +282,9 @@ def main():
     module = AnsibleModule(
         argument_spec=module_args,
         required_together=[('api_token_id', 'api_token_secret'),
-                           ('api_user', 'api_password'),
-                           ('state', 'present', ('config'))],
+                           ('api_user', 'api_password')],
         required_one_of=[('api_password', 'api_token_id')],
-        required_if=[('state', 'present', ('config',))],
+        required_if=[('state', 'present', ('name',))],
         supports_check_mode=False,
     )
     proxmox = ProxmoxAnsible(module)
