@@ -3,95 +3,94 @@
 # Copyright: (c) 2021, Rainer Leber <rainerleber@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import (absolute_import, division, print_function)
-from sys import stderr
+from xml.etree.ElementTree import XML
 __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: community.general.sap_rfc_execute
-
+module: sap_rfc_execute
 short_description: Perform SAP RFC execution.
-
 version_added: "3.5.0"
-
-description: 
-    - The C(sap_rfc_execute) module will perform RFC execution on SAP Systems 
-      for tasks lists and general function modules.
-    - Tasks in the task list which requires manual activities will be confirmed automatically.
+description:
+  - The C(sap_rfc_execute) module will perform RFC execution on SAP Systems
+    for tasks lists and general function modules.
+  - Tasks in the task list which requires manual activities will be confirmed automatically.
+  - This module will use the RFC Package C(STC_TM_API)
 
 options:
-    state:
-        description: 
-            - If the state C(show) is provided:
-                - The possible parameters are shown for each task.
-                  The returned values are in the neccesary format for C(task_parameters).
-                - The full list of parameters is exported to stdout in json format.
-        required: false
-        type: str
-    conn_username:
-        description: The required username for the SAP system. 
-        required: true
-        type: str
-    conn_password:
-        description: The required password for the SAP system.
-        required: true
-        type: str
-    host:
-        description: The required host for the SAP system. Can be either an FQDN or IP Address.
-        required: true
-        type: str
-    sysnr:
-        description:
-            - The system number of the SAP system.
-            - This value must be single quoted. Otherwise ansible treated this like a number and replace leading zeros.
-            - Defaults to C('01')
-        required: false
-        type: str
-    client:
-        description: 
-            - The client number to connect to.
-            - This value must be single quoted. Otherwise ansible treated this like a number and replace leading zeros.
-            - Defaults to C('001')
-        required: false
-        type: str
-    task_to_execute:
-        description: The task list which will be executed.
-        required: false
-        type: str
-    task_parameters:
-        description: 
-            - The tasks and the parameters for execution. 
-            - If the task list do not need any parameters. This could be empty.
-            - The list values must have brackets (see example).
-            - If only specific tasks from the task list should be executed. 
-              The tasks even when no parameter is needed must be provided.
-              Alongside with the module parameter C(tasks_skip: true).
-        required: false
-        type: list(list())
-    task_setting:
-        description:
-            - Setting for the execution of the task list.
-                Check Mode C(CHECKRUN)
-                Background Processing Active C(BATCH) - This is the default value,
-                Asynchronous Execution C(ASYNC),
-                Trace Mode C(TRACE),
-                Server Name C(BATCH_TARGET),
-        required: false
-        type: str
-    tasks_skip:
-        description:
-            - It is possible for tasks that they don't need parameters and run either. 
-              If this parameter is true only defined tasks in C(task_parameter) list will run. 
-        required: false
-        type: bool
-    general_function:
-        description: Provide a function module (FM) to execute. 
-        required: false
-        type: str
-    general_parameters:
-        description: FM parameters provided as a dictonary.
-        required: false
-        type: dict   
+  state:
+    description:
+      - If the state C(show) is provided
+        The possible parameters are shown for each task.
+        The returned values are in the neccesary format for C(task_parameters).
+      - The full list of parameters is exported to stdout in json format.
+    required: false
+    type: str
+  conn_username:
+    description: The required username for the SAP system.
+    required: true
+    type: str
+  con_password:
+    description: The required password for the SAP system.
+    required: true
+    type: str
+  host:
+    description: The required host for the SAP system. Can be either an FQDN or IP Address.
+    required: true
+    type: str
+  sysnr:
+    description:
+      - The system number of the SAP system.
+      - This value must be single quoted. Otherwise ansible treated this like a number and replace leading zeros.
+      - Defaults to C('01')
+    required: false
+    type: str
+  client:
+    description:
+      - The client number to connect to.
+      - This value must be single quoted. Otherwise ansible treated this like a number and replace leading zeros.
+      - Defaults to C('001')
+    required: false
+    type: str
+  task_to_execute:
+    description: The task list which will be executed.
+    required: false
+    type: str
+  task_parameters:
+    description:
+      - The tasks and the parameters for execution.
+      - If the task list do not need any parameters. This could be empty.
+      - The list values must have brackets (see example).
+      - If only specific tasks from the task list should be executed.
+        The tasks even when no parameter is needed must be provided.
+        Alongside with the module parameter C(tasks_skip=true).
+    required: false
+    type: list
+    elements: list
+  task_setting:
+    description:
+      - Setting for the execution of the task list. This can be one of the following as in TCODE SE80 described.
+          Check Mode C(CHECKRUN)
+          Background Processing Active C(BATCH) - This is the default value,
+          Asynchronous Execution C(ASYNC),
+          Trace Mode C(TRACE),
+          Server Name C(BATCH_TARGET),
+    required: false
+    type: str
+  tasks_skip:
+    description:
+      - It is possible for tasks that they don't need parameters and run either.
+        If this parameter is true only defined tasks in C(task_parameter) list will run.
+    required: false
+    type: bool
+  general_function:
+      description: Provide a function module (FM) to execute.
+      required: false
+      type: str
+  general_parameters:
+      description: FM parameters provided as a dictonary.
+      required: false
+      type: dict
 
 notes:
     - Does not support C(check_mode).
@@ -103,13 +102,13 @@ EXAMPLES = r'''
 # Pass in a message
 - name: Test task execution
   community.general.sap_rfc_execute:
-      conn_username: DDIC
-      conn_password: Passwd1234
-      host: 10.1.8.10
-      sysnr: '01'
-      client: '000'
-      task_to_execute: SAP_BASIS_SSL_CHECK
-      task_settings: batch
+    conn_username: DDIC
+    conn_password: Passwd1234
+    host: 10.1.8.10
+    sysnr: '01'
+    client: '000'
+    task_to_execute: SAP_BASIS_SSL_CHECK
+    task_settings: batch
 
 - name: Pass in input parameters
   community.general.sap_rfc_execute:
@@ -136,37 +135,83 @@ EXAMPLES = r'''
     task_to_execute: SAP_BASIS_SSL_CHECK
 
 # Exported environement variables.
-- name: Hint if module will fail with error message: ImportError: libsapnwrfc.so ...
+- name: Hint if module will fail with error message like ImportError libsapnwrfc.so...
   community.general.sap_rfc_execute:
-      conn_username: DDIC
-      conn_password: Passwd1234
-      host: 10.1.8.10
-      sysnr: '01'
-      client: '000'
-      task_to_execute: SAP_BASIS_SSL_CHECK
-      task_settings: batch
+    conn_username: DDIC
+    conn_password: Passwd1234
+    host: 10.1.8.10
+    sysnr: '01'
+    client: '000'
+    task_to_execute: SAP_BASIS_SSL_CHECK
+    task_settings: batch
   environment:
-      SAPNWRFC_HOME: /usr/local/sap/nwrfcsdk
-      LD_LIBRARY_PATH: /usr/local/sap/nwrfcsdk/lib
+    SAPNWRFC_HOME: /usr/local/sap/nwrfcsdk
+    LD_LIBRARY_PATH: /usr/local/sap/nwrfcsdk/lib
 '''
 
 RETURN = r'''
 # These are examples of possible return values, and in general should use other names for return values.
-original_message:
-    description: The original name param that was passed in.
-    type: str
-    returned: always
-    sample: 'hello world'
-message:
-    description: The output message that the test module generates.
-    type: str
-    returned: always
-    sample: 'goodbye'
+results:
+  description: The return value for state C(show).
+  type: list
+  elements: list
+  returned: on success
+  sample:  '[
+        [
+            "CL_STCT_CHECK_SEC_CRYPTO",
+            "P_OPT1",
+            "X"
+        ],
+        [
+            "CL_STCT_CHECK_SEC_CRYPTO",
+            "P_OPT2",
+            ""
+        ]
+    ]'
+msg:
+  description: A small execution description
+  type: str
+  returned: always
+  sample: 'Successfull'
+out:
+  description: A complete description of the executed tasks.
+  type: list
+  elements: list
+  returned: on success
+  sample: [...,{
+              "LOG": {
+                  "STCTM_S_LOG": [
+                      {
+                          "ACTIVITY": "U_CONFIG",
+                          "ACTIVITY_DESCR": "Configuration changed",
+                          "DETAILS": null,
+                          "EXEC_ID": "20210728184903.815739",
+                          "FIELD": null,
+                          "ID": "STC_TASK",
+                          "LOG_MSG_NO": "000000",
+                          "LOG_NO": null,
+                          "MESSAGE": "For radiobutton group ICM too many options are set; choose only one option",
+                          "MESSAGE_V1": "ICM",
+                          "MESSAGE_V2": null,
+                          "MESSAGE_V3": null,
+                          "MESSAGE_V4": null,
+                          "NUMBER": "048",
+                          "PARAMETER": null,
+                          "PERIOD": "M",
+                          "PERIOD_DESCR": "Maintenance",
+                          "ROW": "0",
+                          "SRC_LINE": "170",
+                          "SRC_OBJECT": "CL_STCTM_REPORT_UI            IF_STCTM_UI_TASK~SET_PARAMETERS",
+                          "SYSTEM": null,
+                          "TIMESTMP": "20210728184903",
+                          "TSTPNM": "DDIC",
+                          "TYPE": "E"
+                      },...
+                    ]}}]
 '''
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.json_utils import json
-from xml.etree import cElementTree as ElementTree
 from pyrfc import Connection
 
 
@@ -269,7 +314,7 @@ def run_module():
         required_one_of=[('general_function', 'task_to_execute')],
         supports_check_mode=False,
     )
-    result = dict(changed=False, msg='', results={}, out={}, stdout={},  stderr={}, )
+    result = dict(changed=False, msg='', results=[], out={}, stdout={}, stderr={}, )
 
     params = module.params
 
@@ -299,19 +344,21 @@ def run_module():
         module.fail_json(**result)
 
     if task_to_execute is not None:
-        raw_params = call_rfc_method(conn, 'STC_TM_SCENARIO_GET_PARAMETERS', {'I_SCENARIO_ID': task_to_execute})
+        try:
+            raw_params = call_rfc_method(conn, 'STC_TM_SCENARIO_GET_PARAMETERS', {'I_SCENARIO_ID': task_to_execute})
+        except Exception as err:
+            result['stderr'] = str(err)
+            result['msg'] = '''The task list does not exsist.'''
+            module.fail_json(**result)
+
         if state == "show":
-            try:
-                params_list = []
-                for tasks in raw_params['ET_PARAM_DEF']:
-                    params_list = params_list + [[tasks['TASKNAME'], tasks['FIELDNAME'], tasks['DEFAULTVAL']]]
-                result['results'] = params_list
-                result['stdout'] = json.dumps(raw_params['ET_PARAM_DEF'])
-                result['out'] = raw_params['ET_PARAM_DEF']
-            except Exception as err:
-                result['stderr'] = str(err)
-                result['msg'] = '''The task list maybe does not exsist.'''
-                module.fail_json(**result)
+            params_list = []
+            for tasks in raw_params['ET_PARAM_DEF']:
+                params_list = params_list + [[tasks['TASKNAME'], tasks['FIELDNAME'], tasks['DEFAULTVAL']]]
+            result['results'] = params_list
+            result['stdout'] = json.dumps(raw_params['ET_PARAM_DEF'])
+            result['out'] = raw_params['ET_PARAM_DEF']
+            result['changed'] = True
 
         if state == "present":
             exec_settings = process_exec_settings(task_settings)
@@ -323,12 +370,7 @@ def run_module():
                 module.fail_json(**result)
 
             # initialize session task
-            try:
-                session_init = call_rfc_method(conn, 'STC_TM_SESSION_BEGIN', {'I_SCENARIO_ID': task_to_execute, 'I_INIT_ONLY': 'X'})
-            except Exception as err:
-                result['stderr'] = str(err)
-                result['msg'] = '''The task list does not exsist.'''
-                module.exit_json(**result)
+            session_init = call_rfc_method(conn, 'STC_TM_SESSION_BEGIN', {'I_SCENARIO_ID': task_to_execute, 'I_INIT_ONLY': 'X'})
 
             # Confirm Tasks which requires manual activities from Task List Run
             for task in raw_params['ET_PARAMETER']:
@@ -361,13 +403,16 @@ def run_module():
             except Exception as err:
                 result['stderr'] = str(err)
                 result['msg'] = '''Something went wrong. See stderr.'''
-                module.exit_json(**result)
+                module.fail_json(**result)
 
             # get task logs because the execution may successfully but the tasks shows errors or warnings
             # returned value is ABAPXML https://help.sap.com/doc/abapdocu_755_index_htm/7.55/en-US/abenabap_xslt_asxml_general.htm
             session_log = call_rfc_method(conn, 'STC_TM_SESSION_GET_LOG', {'I_SESSION_ID': session_init['E_SESSION_ID']})
-            log_xml = ElementTree.XML(session_log['E_LOG'])
-            task_list = xml_dict(log_xml)['{http://www.sap.com/abapxml}values']['SESSION']['TASKLIST']
+            try:
+                log_xml = XML(session_log['E_LOG'])
+                task_list = xml_dict(log_xml)['{http://www.sap.com/abapxml}values']['SESSION']['TASKLIST']
+            except Exception:
+                task_list = "No logs available."
 
             result['changed'] = True
             result['msg'] = session_start['E_STATUS_DESCR']
