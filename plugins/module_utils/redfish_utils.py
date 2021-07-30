@@ -13,6 +13,12 @@ from ansible.module_utils.six.moves import http_client
 from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
 from ansible.module_utils.six.moves.urllib.parse import urlparse
 
+#To support HPE operations
+import os
+from os.path import expanduser
+
+home = expanduser("~/Documents")
+
 GET_HEADERS = {'accept': 'application/json', 'OData-Version': '4.0'}
 POST_HEADERS = {'content-type': 'application/json', 'accept': 'application/json',
                 'OData-Version': '4.0'}
@@ -65,11 +71,23 @@ class RedfishUtils(object):
         req_headers = dict(GET_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
-            resp = open_url(uri, method="GET", headers=req_headers,
-                            url_username=username, url_password=password,
-                            force_basic_auth=basic_auth, validate_certs=False,
+            #To support HPE operations
+            if os.path.isfile(home + "/sessionfile.txt"):
+            # if "Hpe" in self.creds.keys():
+                f = open(home + "/sessionfile.txt")
+                session_id = f.readline()
+                resp = open_url(uri, method="GET", headers=GET_HEADERS, sessionid= session_id,
+                            url_username=None,
+                            url_password=None,
+                            force_basic_auth=False, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+                            use_proxy=False, timeout=self.timeout)
+            else:
+                resp = open_url(uri, method="GET", headers=req_headers,
+                                url_username=username, url_password=password,
+                                force_basic_auth=basic_auth, validate_certs=False,
+                                follow_redirects='all',
+                                use_proxy=True, timeout=self.timeout)
             data = json.loads(to_native(resp.read()))
             headers = dict((k.lower(), v) for (k, v) in resp.info().items())
         except HTTPError as e:
@@ -91,12 +109,29 @@ class RedfishUtils(object):
         req_headers = dict(POST_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
-            resp = open_url(uri, data=json.dumps(pyld),
-                            headers=req_headers, method="POST",
-                            url_username=username, url_password=password,
-                            force_basic_auth=basic_auth, validate_certs=False,
+            #To support HPE operations
+            if "iLOlogin" in pyld.keys() or os.path.isfile(home + "/sessionfile.txt"):
+                if "iLOlogin" in pyld.keys():
+                    del pyld["iLOlogin"]
+                    session_id = None
+                if os.path.isfile(home + "/sessionfile.txt"):
+                    f = open(home + "/sessionfile.txt")
+                    session_id = f.readline()
+                
+                resp = open_url(uri, data=json.dumps(pyld), sessionid= session_id,
+                            headers=POST_HEADERS, method="POST",
+                            url_username=None,
+                            url_password=None,
+                            force_basic_auth=True, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+                            use_proxy=False, timeout=self.timeout)
+            else:
+                resp = open_url(uri, data=json.dumps(pyld),
+                                headers=req_headers, method="POST",
+                                url_username=username, url_password=password,
+                                force_basic_auth=basic_auth, validate_certs=False,
+                                follow_redirects='all',
+                                use_proxy=True, timeout=self.timeout)
             headers = dict((k.lower(), v) for (k, v) in resp.info().items())
         except HTTPError as e:
             msg = self._get_extended_message(e)
@@ -127,12 +162,24 @@ class RedfishUtils(object):
                 req_headers['If-Match'] = etag
         username, password, basic_auth = self._auth_params(req_headers)
         try:
-            resp = open_url(uri, data=json.dumps(pyld),
-                            headers=req_headers, method="PATCH",
-                            url_username=username, url_password=password,
-                            force_basic_auth=basic_auth, validate_certs=False,
+            #To support HPE operations
+            if os.path.isfile(home + "/sessionfile.txt"):
+                f = open(home + "/sessionfile.txt")
+                session_id = f.readline()
+                resp = open_url(uri, data=json.dumps(pyld),
+                            headers=headers, method="PATCH", sessionid = session_id,
+                            url_username=None,
+                            url_password=None,
+                            force_basic_auth=True, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+                            use_proxy=False, timeout=self.timeout)
+            else:
+                resp = open_url(uri, data=json.dumps(pyld),
+                                headers=req_headers, method="PATCH",
+                                url_username=username, url_password=password,
+                                force_basic_auth=basic_auth, validate_certs=False,
+                                follow_redirects='all',
+                                use_proxy=True, timeout=self.timeout)
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
@@ -153,12 +200,24 @@ class RedfishUtils(object):
         username, password, basic_auth = self._auth_params(req_headers)
         try:
             data = json.dumps(pyld) if pyld else None
-            resp = open_url(uri, data=data,
-                            headers=req_headers, method="DELETE",
-                            url_username=username, url_password=password,
-                            force_basic_auth=basic_auth, validate_certs=False,
+            #To support HPE operations
+            if os.path.isfile(home + "/sessionfile.txt"):
+                f = open(home + "/sessionfile.txt")
+                session_id = f.readline()
+                resp = open_url(uri, data=json.dumps(pyld),
+                            headers=DELETE_HEADERS, method="DELETE", sessionid=session_id,
+                            url_username=None,
+                            url_password=None,
+                            force_basic_auth=False, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=True, timeout=self.timeout)
+                            use_proxy=False, timeout=self.timeout)
+            else:
+                resp = open_url(uri, data=data,
+                                headers=req_headers, method="DELETE",
+                                url_username=username, url_password=password,
+                                force_basic_auth=basic_auth, validate_certs=False,
+                                follow_redirects='all',
+                                use_proxy=True, timeout=self.timeout)
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
@@ -1291,6 +1350,9 @@ class RedfishUtils(object):
                         title = key
                     result['entries'][title] = action.get('TransferProtocol@Redfish.AllowableValues',
                                                           ["Key TransferProtocol@Redfish.AllowableValues not found"])
+                    #To support HPE operations
+                    if "Oem" in data.keys():
+                        result['entries'][title] = action
             else:
                 return {'ret': "False", 'msg': "Actions list is empty."}
         else:
@@ -1826,6 +1888,11 @@ class RedfishUtils(object):
                 return response
             result['ret'] = True
             data = response['data']
+            #To support HPE operations
+            if "Oem" in data.keys():
+                if "Hpe" in data["Oem"].keys():
+                    properties = ['Name', 'Reading', 'ReadingUnits', 'Status']
+
             if key in data:
                 # match: found an entry for "Thermal" information = fans
                 thermal_uri = data[key]["@odata.id"]
