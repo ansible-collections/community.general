@@ -273,8 +273,8 @@ def main():
         module.fail_json(msg="group '%s' not found." % gitlab_group)
 
     members = []
-    gitlab_users_access = []
     if module.params['gitlab_user'] is not None:
+        gitlab_users_access = []
         gitlab_users = module.params['gitlab_user']
         for glu in gitlab_users:
             gitlab_users_access.append({'name': glu, 'access_level': access_level})
@@ -315,6 +315,7 @@ def main():
                 changed_users.append("user '%s' not found." % gitlab_user['name'])
                 changed_data.append({'gitlab_user': gitlab_user['name'], 'result': 'FAILED',
                                      'msg': "user '%s' not found." % gitlab_user['name']})
+        continue
 
         is_user_a_member = group.is_user_a_member(members, gitlab_user_id)
 
