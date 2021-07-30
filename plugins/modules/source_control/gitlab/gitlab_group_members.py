@@ -228,12 +228,12 @@ def main():
             ['gitlab_user', 'access_level'],
         ],
         required_one_of=[
+            ['api_username', 'api_token'],
             ['gitlab_user', 'gitlab_users_access'],
         ],
-        # TODO: this is only true if gitlab_user and not gitlab_users_access is used
-        #        required_if=[
+        required_if=[
             ['state', 'present', ['access_level', 'gitlab_users_access'], True],
-        #        ],
+        ],
         supports_check_mode=True,
     )
 
