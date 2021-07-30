@@ -70,6 +70,7 @@ options:
         description:
             - Adds/remove users of the given access_level to match the given gitlab_user/gitlab_users_access list.
               If omitted do not purge orphaned members.
+            - Is only used when I(state=present).
         type: list
         elements: str
         choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
