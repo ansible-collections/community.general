@@ -273,8 +273,8 @@ def main():
         module.fail_json(msg="group '%s' not found." % gitlab_group)
 
     members = []
-    gitlab_users_access = []
     if module.params['gitlab_user'] is not None:
+        gitlab_users_access = []
         gitlab_users = module.params['gitlab_user']
         for glu in gitlab_users:
             gitlab_users_access.append({'name': glu, 'access_level': access_level})
