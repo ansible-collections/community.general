@@ -5,10 +5,12 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-from ansible_collections.community.general.plugins.module_utils.proxmox import ProxmoxAnsible
-from ansible_collections.community.general.plugins.module_utils.proxmox_interfaces import delete_nic, update_nic, create_nic, reload_interfaces, get_nics, proxmox_map_interface_args, proxmox_interface_argument_spec
-from ansible_collections.community.general.plugins.module_utils.proxmox import proxmox_auth_argument_spec
-from ansible.module_utils.basic import AnsibleModule, env_fallback
+from ansible_collections.community.general.plugins.module_utils.proxmox import (
+    ProxmoxAnsible, proxmox_auth_argument_spec)
+from ansible_collections.community.general.plugins.module_utils.proxmox_interfaces import (
+    get_nics, delete_nic, create_nic, reload_interfaces, rollback_interfaces, update_nic, proxmox_map_interface_args, proxmox_interface_argument_spec)
+from ansible.module_utils.basic import AnsibleModule
+
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -18,12 +20,8 @@ short_description: Management network interface on a Proxmox VE cluster.
 version_added: 3.5.0
 description:
   - Allows you to create/update/delete a network interface of a Proxmox VE node.
-author: "Andreas Botzner (@andreas.botzner) <andreas@botzner.com>"
+author: "Andreas Botzner (@botzner_andreas) <andreas@botzner.com>"
 options:
-description: Interface configuration
-type: list
-elements: dict
-suboptions:
   name:
     description:
       - Name of the network interface.
@@ -164,11 +162,6 @@ suboptions:
     description:
       - Specify the raw interface for the vlan interface.
     type: str
-  apply:
-    description:
-      - Reload interfaces and make configuration persistent
-    type: bool
-    default: True
   node:
     description:
       - Name of the cluster node.
@@ -181,8 +174,23 @@ suboptions:
     choices:
       - present
       - absent
-      - gathered
     default: present
+  apply:
+    description:
+      - Reload interfaces and make configuration persistent after going
+      - though list of interfaces
+    type: bool
+    default: true
+  ignore_errors:
+    description:
+      - Ignore Errors when changing an interface
+    type: bool
+    default: false
+  revert_on_error:
+    description:
+      - Try to revert to previous configuration upon encountering errors
+    type: bool
+    default: false
 extends_documentation_fragment:
   - community.general.proxmox.documentation
 '''
@@ -201,6 +209,19 @@ EXAMPLES = '''
     comment: 'This is a new VM bridge with the host inside'
     state: present
 
+- name: Create new OVS bridge on node02:
+  community.general.proxmox_interface
+    api_user: john.doe@pve
+    api_password: supersecret
+    api_host: proxmoxhost
+    node: node02
+    type: ovs_bridge
+    name: vmbr23
+    cidr: 10.34.43.22/23
+    gateway: 10.34.43.1
+    bridge_ports: eth1
+    ovs_options: 'some OVS options'
+
 - name: Delete interface vmbr123 from node01
   community.general.proxmox_interface:
     api_user: root@pam
@@ -210,26 +231,22 @@ EXAMPLES = '''
     node: node01
     state: absent
 
-- name: Gather info about interface eth1 from node01
+- name: Delete interface vmbr321 from node01 but don't apply changes
   community.general.proxmox_interface
     api_user: root@pam
     api_password: secret
     api_host: proxmoxhost
     name: eth1
     node: node01
-    state: gathered
+    apply: false
 '''
 
 RETURN = '''
-
 config:
   description: The configuration as structured data before module execution
   returned: always
   type: list
   sample:
-   - [{'exists': 1, 'type': 'eth', 'families': ['inet', 'inet6'], 'method6': 'static', 'netmask6': '64', 'address': '10.0.0.12', 'priority': 4, 'active': 1,
-   - 'cidr6': 'abcd:abcd:abcd::2/64', 'gateway6': 'fe80::1', 'autostart': 1, 'method': 'static', 'address6': 'abcd:abcd:ab:abcd::2', 'netmask': '26',
-   - 'iface': 'ens32', 'gateway': '10.0.0.1', 'cidr': '10.0.0.10/24'}]
 
 config_after:
   description: The configuration as structured data after module completion
@@ -239,25 +256,17 @@ config_after:
 '''
 
 
-def reload_interfaces(proxmox: ProxmoxAnsible):
-    if proxmox.module.params['apply']:
-        try:
-            proxmox.proxmox_api.nodes(
-                proxmox.module.params['node']).network.put()
-        except Exception as e:
-            proxmox.module.fail_json(msg="Failed to reload and apply interfaces on node {0}"
-                                     + " with exception: {1}".format(proxmox.module.params['node'], str(e)))
-
-
 def main():
     interface_common_args = proxmox_interface_argument_spec()
     network_args = dict(
         apply=dict(type=bool, default=True),
-        node=dict(type='str', requied=True)
+        ignore_errors=dict(type=bool, default=False),
+        revert_on_error=dict(type=bool, default=True),
+        node=dict(type='str', requied=True),
     )
     module_args = proxmox_auth_argument_spec()
+    module_args.update(interface_common_args)
     module_args.update(network_args)
-    module_args.updated(interface_common_args)
 
     module = AnsibleModule(
         argument_spec=module_args,
@@ -266,66 +275,79 @@ def main():
                            ('state', 'present', ('config'))],
         required_one_of=[('api_password', 'api_token_id')],
         required_if=[('state', 'present', ('config',))],
-        supports_check_mode=True,
+        supports_check_mode=False,
     )
     proxmox = ProxmoxAnsible(module)
 
     state = module.params['state']
     name = module.params['name']
     node = module.params['node']
+    ignore_errors = module.params['ignore_errors']
+    revert_on_error = module.params['revert_on_error']
+    apply = module.params['apply']
 
     result = {'changed': False}
-    nics = get_nics(module=module, proxmox=proxmox, node=node)
+    msg = []
+    errors = []
+    nics = dict(get_nics(proxmox))
     result['config'] = nics
 
-    if state is 'gathered':
-        module.exit_json(**result)
-
-    config = proxmox_map_interface_args(module)
+    interface_args = proxmox_map_interface_args(module)
 
     present_nics = set(nic['iface'] for nic in nics)
 
     if name in present_nics:
-        if state is 'absent':
+        if state == 'absent':
             try:
                 delete_nic(proxmox.proxmox_api, node, name)
                 result['changed'] = True
-                result['msg'] = 'Successfully deleted interface {0}'.format(
-                    name)
+                msg.append('Successfully deleted interface {0}'.format(name))
             except Exception as e:
-                print(str(e))
-                module.exit_json(
-                    node=node,
-                    msg='Failed to delete interface {-} from node {1} with error: {2}'.format(
-                        name, node, str(e)))
+                errors.append('Failed to delete interface {0} from node {1} with error: {2}'.format(
+                    name, node, str(e)))
         else:
             try:
-                update_nic(proxmox.proxmox_api, node, name, config)
+                update_nic(proxmox.proxmox_api, node, name, interface_args)
                 result['changed'] = True
-                result['msg'] = 'Successfully updated interface {0}'.format(
-                    name)
+                msg.append('Successfully updated interface {0}'.format(name))
             except Exception as e:
-                module.exit_json(
-                    node=node,
-                    msg='Failed to update interface {0} from node {1} with error: {2}'.format(
-                        name, node, str(e)))
+                errors.append('Failed to update interface {0} from node {1} with error: {2}'.format(
+                    name, node, str(e)))
     else:
-        if state is 'present':
-            create_nic(proxmox, node, config)
+        if state == 'present':
+            create_nic(proxmox, node, interface_args)
             result['changed'] = True
-            result['msg'] = 'Successfully created interface {0}'.format(name)
+            msg.append('Successfully created interface {0}'.format(name))
         else:
-            result['msg'] = 'Interface {0} not present'.format(name)
+            msg.append('Interface {0} not present'.format(name))
 
-    if proxmox.module.params['reload_interfaces']:
+    result['errors'] = errors
+    result['msg'] = msg
+    if not errors or ignore_errors:
+        if not apply:
+            module.exit_json(**result)
+        else:
+            try:
+                reload_interfaces(proxmox.proxmox_api, node)
+                result['msg'].append(
+                    'Successfully reloaded and applied interface changes on node {0}'.format(node))
+                module.exit_json(**result)
+            except Exception as e:
+                result['errors'].append(
+                    'Failed to reload interfaces on node: {0} with error: {1}'.format(node, str(e)))
+    elif revert_on_error:
         try:
-            reload_interfaces(proxmox)
+            rollback_interfaces(proxmox.proxmox_api, node)
+            result['msg'].append(
+                'Successfully rolled back uncommitted changes on node {0}'.format(node))
+            result['changed'] = False
+            module.exit_json(**result)
         except Exception as e:
-            proxmox.module.fail_json(msg="Failed to reload and apply interfaces on node {0}"
-                                     + " with exception: {1}".format(node, str(e)))
-    if result['changed'] is True:
-        result['after'] = get_nics(proxmox)
-    module.exit_json(**result)
+            result['errors'].append(
+                "Failed to revert interfaces on node: {0} with error {1}".format(node, str(e)))
+            module.fail_json(**result)
+    else:
+        module.fail_json(**result)
 
 
 if __name__ == '__main__':

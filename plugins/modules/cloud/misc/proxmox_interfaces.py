@@ -4,12 +4,13 @@
 # Copyright: (c) 2021, Andreas Botzner (@andreas.botzner) <andreas@botzner.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-
 from __future__ import absolute_import, division, print_function
-from ansible_collections.communty.general.plugins.module_utils.proxmox import ProxmoxAnsible
-from ansible_collections.communty.general.plugins.module_utils.proxmox import proxmox_auth_argument_spec
-from ansible_collections.communty.general.plugins.module_utils.proxmox_interfaces import get_nics, delete_nic, create_nic, reload_interfaces, rollback_interfaces, update_nic, proxmox_map_interface_args, proxmox_interface_argument_spec
+from ansible_collections.community.general.plugins.module_utils.proxmox import (
+    ProxmoxAnsible, proxmox_auth_argument_spec)
+from ansible_collections.community.general.plugins.module_utils.proxmox_interfaces import (
+    get_nics, delete_nic, create_nic, reload_interfaces, rollback_interfaces, update_nic, proxmox_map_interface_args, proxmox_interface_argument_spec)
 from ansible.module_utils.basic import AnsibleModule
+
 
 __metaclass__ = type
 
@@ -20,7 +21,7 @@ short_description: Management network interfaces on a Proxmox node.
 version_added: 3.5.0
 description:
   - Allows you to create/update/delete network interfaces of a Proxmox node.
-author: "Andreas Botzner (@andreas.botzner) <andreas@botzner.com>"
+author: "Andreas Botzner (@botzner_andreas) <andreas@botzner.com>"
 options:
   config:
     description: Interface configuration
@@ -183,8 +184,6 @@ options:
     type: string
     choices:
       - present
-      - gathered
-    default: gathered
   apply:
     description:
       - Reload interfaces and make configuration persistent after going
@@ -205,7 +204,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Create new VM bridge on node01
-  community.general.proxmox_networks:
+  community.general.proxmox_interfaces:
     api_user: root@pam
     api_password: secret
     api_host: proxmoxhost
@@ -219,15 +218,15 @@ EXAMPLES = '''
     state: present
 
 - name: Get list of network devices of node01
-  community.general.proxmox_networks:
+  community.general.proxmox_interfaces:
     api_user: root@pam
     api_password: secret
     api_host: proxmoxhost
     node: node01
-    state: gathered
+    state: restarted
 
-- name: Delete NIC net0 targeting the vm by name
-  community.general.proxmox_nic:
+- name: Delete a list of interfaces from node01 and try to revert on error
+  community.general.proxmox_interfaces:
     api_user: root@pam
     api_password: secret
     api_host: proxmoxhost
@@ -281,8 +280,7 @@ def main():
         ignore_errors=dict(type=bool, default=False),
         apply=dict(type=bool, default=True),
         revert_on_error=dict(type=bool, default=False),
-        state=dict(choices=['gathered', 'present',
-                   'reloaded'], default='gathered')
+        state=dict(type=str, choices=['present'], default='present')
     )
     network_args.update(nic_args)
     module_args.update(network_args)
@@ -294,7 +292,7 @@ def main():
                            ('state', 'present', ('config'))],
         required_one_of=[('api_password', 'api_token_id')],
         required_if=[('state', 'present', ('config',))],
-        supports_check_mode=True,
+        supports_check_mode=False,
     )
     proxmox = ProxmoxAnsible(module)
 
@@ -310,16 +308,15 @@ def main():
     errors = []
     nics = dict(get_nics(proxmox))
     result['config'] = nics
-    if state is 'gathered':
-        module.exit_json(**result)
-    if state is 'reloaded':
+
+    if state == 'reloaded':
         try:
             reload_interfaces(proxmox.proxmox_api, node)
             result['msg'] = 'Successfully reloaded and applied interface changes on node {0}'.format(
                 node)
             module.exit_json(**result)
         except Exception as e:
-            result['msg'] = 'Failed to reload interfaces on node: {0} with error {1}'.format(
+            result['errors'] = 'Failed to reload interfaces on node: {0} with error {1}'.format(
                 node, str(e))
             module.fail_json(**result)
 
@@ -327,8 +324,9 @@ def main():
 
     for nic in config:
         name = nic['name']
+        interface_args = proxmox_map_interface_args(module)
         if name in present_nics:
-            if nic['state'] is 'absent':
+            if nic['state'] == 'absent':
                 try:
                     delete_nic(proxmox.proxmox_api, node, name)
                     msg.append(
@@ -341,7 +339,7 @@ def main():
                         break
             else:
                 try:
-                    update_nic(proxmox.proxmox_api, node, name, config)
+                    update_nic(proxmox.proxmox_api, node, name, interface_args)
                     msg.append('Successfully updated interface: {0}')
                     result['changed'] = True
                 except Exception as e:
@@ -350,9 +348,9 @@ def main():
                     if not ignore_errors:
                         break
         else:
-            if nic['state'] is 'present':
+            if nic['state'] == 'present':
                 try:
-                    create_nic(proxmox.proxmox_api, node, config)
+                    create_nic(proxmox.proxmox_api, node, interface_args)
                     msg.append(
                         'Successfully created interface {0}'.format(name))
                     result['changed'] = True
@@ -382,12 +380,12 @@ def main():
         try:
             rollback_interfaces(proxmox.proxmox_api, node)
             result['msg'].append(
-                'Successfully rolled back uncommitted changes on node{0}'.format(node))
+                'Successfully rolled back uncommitted changes on node {0}'.format(node))
             result['changed'] = False
             module.exit_json(**result)
         except Exception as e:
             result['errors'].append(
-                "Failed to revert interfaces on node: {0} with error {1}".format(node, str(e)))
+                'Failed to roll back configuration on node {0} with error: {1}'.format(node, str(e)))
             module.fail_json(**result)
     else:
         module.fail_json(**result)

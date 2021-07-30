@@ -4,11 +4,19 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-
-from proxmoxer.core import ProxmoxAPI
-from ansible_collections.community.general.plugins.module_utils.proxmox import ProxmoxAnsible
-from ansible.module_utils.basic import AnsibleModule
 __metaclass__ = type
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.proxmox import ProxmoxAnsible
+import traceback
+
+PROXMOXER_IMP_ERR = None
+try:
+    from proxmoxer import ProxmoxAPI
+    HAS_PROXMOXER = True
+except ImportError:
+    HAS_PROXMOXER = False
+    PROXMOXER_IMP_ERR = traceback.format_exc()
 
 
 def proxmox_interface_argument_spec():
@@ -80,9 +88,6 @@ def proxmox_interface_argument_spec():
                        'present'
                    ],
                    default='present'
-                   ),
-        apply=dict(type=bool,
-                   default=True
                    )
     )
 
@@ -110,7 +115,7 @@ def proxmox_map_interface_args(module: AnsibleModule):
     ret['ovs_ports'] = module.params['ovs_ports']
     ret['slaves'] = module.params['slaves']
     ret['vlan-raw-device'] = module.params['vlan_raw_device']
-    ret['autostart'] = 1 if modules.params['autostart'] else 0
+    ret['autostart'] = 1 if module.params['autostart'] else 0
     ret['bridge_vlan_ports'] = 1 if module.params['bridge_vlan_ports'] else 0
     if module.params['mtu'] <= 65520 and module.params['mtu'] >= 1280:
         ret['mtu'] = module.params['mtu']
