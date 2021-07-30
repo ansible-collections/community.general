@@ -23,13 +23,15 @@ options:
         The possible parameters are shown for each task.
         The returned values are in the neccesary format for C(task_parameters).
       - The full list of parameters is exported to stdout in json format.
+    choices: ['show', 'present']
     required: false
+    default: present
     type: str
   conn_username:
     description: The required username for the SAP system.
     required: true
     type: str
-  con_password:
+  conn_password:
     description: The required password for the SAP system.
     required: true
     type: str
@@ -43,12 +45,14 @@ options:
       - This value must be single quoted. Otherwise ansible treated this like a number and replace leading zeros.
       - Defaults to C('01')
     required: false
+    default: '00'
     type: str
   client:
     description:
       - The client number to connect to.
       - This value must be single quoted. Otherwise ansible treated this like a number and replace leading zeros.
       - Defaults to C('001')
+    default : '000'
     required: false
     type: str
   task_to_execute:
@@ -66,7 +70,7 @@ options:
     required: false
     type: list
     elements: list
-  task_setting:
+  task_settings:
     description:
       - Setting for the execution of the task list. This can be one of the following as in TCODE SE80 described.
           Check Mode C(CHECKRUN)
@@ -74,12 +78,15 @@ options:
           Asynchronous Execution C(ASYNC),
           Trace Mode C(TRACE),
           Server Name C(BATCH_TARGET),
+    default: ['BATCH']
     required: false
-    type: str
+    type: list
+    elements: str
   tasks_skip:
     description:
       - It is possible for tasks that they don't need parameters and run either.
         If this parameter is true only defined tasks in C(task_parameter) list will run.
+    default: False
     required: false
     type: bool
   general_function:
@@ -115,7 +122,7 @@ EXAMPLES = r'''
     conn_username: DDIC
     conn_password: Passwd1234
     host: 10.1.8.10
-    sysnr: '01'
+    sysnr: '00'
     client: '000'
     task_to_execute: SAP_BASIS_SSL_CHECK
     task_parameters :
@@ -129,7 +136,7 @@ EXAMPLES = r'''
     conn_username: DDIC
     conn_password: Passwd1234
     host: 10.1.8.10
-    sysnr: '01'
+    sysnr: '00'
     client: '000'
     task_to_execute: SAP_BASIS_SSL_CHECK
 
@@ -139,7 +146,7 @@ EXAMPLES = r'''
     conn_username: DDIC
     conn_password: Passwd1234
     host: 10.1.8.10
-    sysnr: '01'
+    sysnr: '00'
     client: '000'
     task_to_execute: SAP_BASIS_SSL_CHECK
     task_settings: batch
@@ -209,10 +216,17 @@ out:
                     ]}}]
 '''
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.json_utils import json
 from xml.etree.ElementTree import XML
-from pyrfc import Connection
+import traceback
+try:
+    from pyrfc import Connection
+except ImportError:
+    HAS_ANOTHER_LIBRARY = False
+    ANOTHER_LIBRARY_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_ANOTHER_LIBRARY = True
 
 
 def xml_dict(xml_raw):
@@ -302,12 +316,12 @@ def run_module():
             conn_username=dict(type='str', required=True),
             conn_password=dict(type='str', required=True, no_log=True),
             host=dict(type='str', required=True),
-            sysnr=dict(type='str', required=False, default="01"),
+            sysnr=dict(type='str', required=False, default="00"),
             client=dict(type='str', required=False, default="000"),
             # values for execution tasks
             task_to_execute=dict(type='str', required=False),
-            task_parameters=dict(type='list', required=False),
-            task_settings=dict(type='list', required=False, default=['BATCH']),
+            task_parameters=dict(type='list', elements='list', required=False),
+            task_settings=dict(type='list', elements='str', required=False, default=['BATCH']),
             tasks_skip=dict(type='bool', required=False, default=False),
             # values for general fm
             general_function=dict(type='str', required=False),
@@ -335,6 +349,11 @@ def run_module():
 
     general_function = params['general_function']
     general_parameters = params['general_parameters']
+
+    if not HAS_ANOTHER_LIBRARY:
+        module.fail_json(
+            msg=missing_required_lib('pyrfc'),
+            exception=ANOTHER_LIBRARY_IMPORT_ERROR)
 
     # basic RFC connection with pyrfc
     connection_params = {'user': username, 'passwd': password, 'ashost': host, 'sysnr': sysnr, 'client': client}
