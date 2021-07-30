@@ -49,6 +49,9 @@ options:
      type: bool
      default: False
 requirements: ["a2enmod","a2dismod"]
+notes:
+  - This does not work on RedHat-based distributions. It does work on Debian- and SuSE-based distributions.
+    Whether it works on others depend on whether the C(a2enmod) and C(a2dismod) tools are available or not.
 '''
 
 EXAMPLES = '''
@@ -109,13 +112,14 @@ import re
 # import module snippets
 from ansible.module_utils.basic import AnsibleModule
 
+_re_threaded = re.compile(r'threaded: *yes')
+
 
 def _run_threaded(module):
     control_binary = _get_ctl_binary(module)
+    result, stdout, stderr = module.run_command([control_binary, "-V"])
 
-    result, stdout, stderr = module.run_command("%s -V" % control_binary)
-
-    return bool(re.search(r'threaded:[ ]*yes', stdout))
+    return bool(_re_threaded.search(stdout))
 
 
 def _get_ctl_binary(module):
@@ -124,15 +128,12 @@ def _get_ctl_binary(module):
         if ctl_binary is not None:
             return ctl_binary
 
-    module.fail_json(
-        msg="Neither of apache2ctl nor apachctl found."
-            " At least one apache control binary is necessary."
-    )
+    module.fail_json(msg="Neither of apache2ctl nor apachctl found. At least one apache control binary is necessary.")
 
 
 def _module_is_enabled(module):
     control_binary = _get_ctl_binary(module)
-    result, stdout, stderr = module.run_command("%s -M" % control_binary)
+    result, stdout, stderr = module.run_command([control_binary, "-M"])
 
     if result != 0:
         error_msg = "Error executing %s: %s" % (control_binary, stderr)
@@ -168,7 +169,7 @@ def create_apache_identifier(name):
 
     # re expressions to extract subparts of names
     re_workarounds = [
-        ('php', r'^(php\d)\.'),
+        ('php', re.compile(r'^(php\d)\.')),
     ]
 
     for a2enmod_spelling, module_name in text_workarounds:
@@ -178,7 +179,7 @@ def create_apache_identifier(name):
     for search, reexpr in re_workarounds:
         if search in name:
             try:
-                rematch = re.search(reexpr, name)
+                rematch = reexpr.search(name)
                 return rematch.group(1) + '_module'
             except AttributeError:
                 pass
@@ -201,15 +202,15 @@ def _set_state(module, state):
                              result=success_msg,
                              warnings=module.warnings)
 
-        a2mod_binary = module.get_bin_path(a2mod_binary)
+        a2mod_binary = [module.get_bin_path(a2mod_binary)]
         if a2mod_binary is None:
             module.fail_json(msg="%s not found. Perhaps this system does not use %s to manage apache" % (a2mod_binary, a2mod_binary))
 
         if not want_enabled and force:
             # force exists only for a2dismod on debian
-            a2mod_binary += ' -f'
+            a2mod_binary.append('-f')
 
-        result, stdout, stderr = module.run_command("%s %s" % (a2mod_binary, name))
+        result, stdout, stderr = module.run_command(a2mod_binary + [name])
 
         if _module_is_enabled(module) == want_enabled:
             module.exit_json(changed=True,
@@ -241,10 +242,10 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True),
-            identifier=dict(required=False, type='str'),
-            force=dict(required=False, type='bool', default=False),
+            identifier=dict(type='str'),
+            force=dict(type='bool', default=False),
             state=dict(default='present', choices=['absent', 'present']),
-            ignore_configcheck=dict(required=False, type='bool', default=False),
+            ignore_configcheck=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
     )
@@ -253,7 +254,7 @@ def main():
 
     name = module.params['name']
     if name == 'cgi' and _run_threaded(module):
-        module.fail_json(msg="Your MPM seems to be threaded. No automatic actions on module %s possible." % name)
+        module.fail_json(msg="Your MPM seems to be threaded. No automatic actions on module cgi possible.")
 
     if not module.params['identifier']:
         module.params['identifier'] = create_apache_identifier(module.params['name'])
