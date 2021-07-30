@@ -1,4 +1,4 @@
 minor_changes:
-- added functionality to run module gitlab_group_members with a list of users using gitlab_users instead of gitlab_user (https://github.com/ansible-collections/community.general/pull/3047).
-- added functionality to run module gitlab_project_members with a list of users using gitlab_users instead of gitlab_user (https://github.com/ansible-collections/community.general/pull/3047).
-- added functionality to set all members exactly as given using gitlab_group_members or gitlab_project_members (https://github.com/ansible-collections/community.general/pull/3047).
+- gitlab_group_members - ``gitlab_user`` can now also be a list of users (https://github.com/ansible-collections/community.general/pull/3047).
+- gitlab_project_members - ``gitlab_user`` can now also be a list of users (https://github.com/ansible-collections/community.general/pull/3047).
+- gitlab_group_members, gitlab_project_members - added functionality to set all members exactly as given (https://github.com/ansible-collections/community.general/pull/3047).
