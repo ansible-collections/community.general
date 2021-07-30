@@ -315,6 +315,7 @@ def main():
                 changed_users.append("user '%s' not found." % gitlab_user['name'])
                 changed_data.append({'gitlab_user': gitlab_user['name'], 'result': 'FAILED',
                                      'msg': "user '%s' not found." % gitlab_user['name']})
+        continue
 
         is_user_a_member = group.is_user_a_member(members, gitlab_user_id)
 
