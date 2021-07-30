@@ -143,7 +143,7 @@ def get_nics(proxmox):
     return nics
 
 
-def get_nic(proxmox_api, node: str, name: str):
+def get_nic(proxmox_api, node, name):
     ret = {}
     try:
         ret = proxmox_api.nodes(node).network.get(name)
@@ -152,35 +152,35 @@ def get_nic(proxmox_api, node: str, name: str):
     return ret
 
 
-def create_nic(proxmox_api, node: str, config: dict):
+def create_nic(proxmox_api, node, config):
     try:
         proxmox_api.nodes(node).network.post(config)
     except Exception as e:
         raise e
 
 
-def delete_nic(proxmox_api, node: str, name: str):
+def delete_nic(proxmox_api, node, name):
     try:
         proxmox_api.nodes(node).network.delete(name)
     except Exception as e:
         raise e
 
 
-def update_nic(proxmox_api, node: str, name: str, config: dict):
+def update_nic(proxmox_api, node, name, config):
     try:
         proxmox_api.nodes(node).network(name).post(config)
     except Exception as e:
         raise e
 
 
-def reload_interfaces(proxmox_api, node: str):
+def reload_interfaces(proxmox_api, node):
     try:
         proxmox_api.nodes(node).network.put()
     except Exception as e:
         raise e
 
 
-def rollback_interfaces(proxmox_api, node: str):
+def rollback_interfaces(proxmox_api, node):
     try:
         proxmox_api.nodes(node).network.delete()
     except Exception as e:
