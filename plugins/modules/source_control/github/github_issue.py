@@ -41,7 +41,7 @@ author:
 '''
 
 RETURN = '''
-get_status:
+issue_status:
     description: State of the GitHub issue
     type: str
     returned: success
