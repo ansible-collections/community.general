@@ -10,14 +10,14 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
 sys.modules['pyrfc'] = MagicMock()
 sys.modules['pyrfc.Connection'] = MagicMock()
 
-from ansible_collections.community.general.plugins.modules.system import sap_rfc_execute
+from ansible_collections.community.general.plugins.modules.system import sap_task_list_execute
 
 
 class TestSAPRfcModule(ModuleTestCase):
 
     def setUp(self):
         super(TestSAPRfcModule, self).setUp()
-        self.module = sap_rfc_execute
+        self.module = sap_task_list_execute
 
     def tearDown(self):
         super(TestSAPRfcModule, self).tearDown()
@@ -79,5 +79,5 @@ class TestSAPRfcModule(ModuleTestCase):
                                         'OUTPUTLEN': '000001', 'SIGNFLAG': '', 'CONVEXIT': '', 'DDTEXT': 'Warning', 'PASSWORD': '',
                                         'READ_ONLY': '', 'CHECKBOX': '', 'RADIOBUTTON': 'X', 'RB_GROUP': 'ICM', 'DEFAULTVAL': 'X'}]}
             with self.assertRaises(AnsibleExitJson) as success:
-                sap_rfc_execute.main()
+                sap_task_list_execute.main()
             self.assertEqual(success.exception.args[0]['results'][0], ['CL_STCT_CHECK_SEC_CRYPTO', 'P_OPT1', 'X'])

@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 # Copyright: (c) 2021, Rainer Leber <rainerleber@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -7,21 +8,21 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: sap_rfc_execute
-short_description: Perform SAP RFC execution.
+module: sap_task_list_execute
+short_description: Perform SAP Task list execution.
 version_added: "3.5.0"
 description:
-  - The C(sap_rfc_execute) module will perform RFC execution on SAP Systems
-    for tasks lists and general function modules.
+  - The C(sap_task_list_execute) module will perform RFC execution on SAP Systems
+    for tasks lists.
   - Tasks in the task list which requires manual activities will be confirmed automatically.
-  - This module will use the RFC Package C(STC_TM_API)
+  - This module will use the RFC Package C(STC_TM_API).
 
 options:
   state:
     description:
       - If the state C(show) is provided
         The possible parameters are shown for each task.
-        The returned values are in the neccesary format for C(task_parameters).
+        The returned values are in the necessary format for C(task_parameters).
       - The full list of parameters is exported to stdout in json format.
     choices: ['show', 'present']
     required: false
@@ -57,7 +58,7 @@ options:
     type: str
   task_to_execute:
     description: The task list which will be executed.
-    required: false
+    required: true
     type: str
   task_parameters:
     description:
@@ -89,14 +90,6 @@ options:
     default: False
     required: false
     type: bool
-  general_function:
-      description: Provide a function module (FM) to execute.
-      required: false
-      type: str
-  general_parameters:
-      description: FM parameters provided as a dictonary.
-      required: false
-      type: dict
 
 notes:
     - Does not support C(check_mode).
@@ -107,7 +100,7 @@ author:
 EXAMPLES = r'''
 # Pass in a message
 - name: Test task execution
-  community.general.sap_rfc_execute:
+  community.general.sap_task_list_execute:
     conn_username: DDIC
     conn_password: Passwd1234
     host: 10.1.8.10
@@ -117,7 +110,7 @@ EXAMPLES = r'''
     task_settings: batch
 
 - name: Pass in input parameters
-  community.general.sap_rfc_execute:
+  community.general.sap_task_list_execute:
     state: present
     conn_username: DDIC
     conn_password: Passwd1234
@@ -131,7 +124,7 @@ EXAMPLES = r'''
     task_settings: batch
 
 - name: Show all possible input parameters
-  community.general.sap_rfc_execute:
+  community.general.sap_task_list_execute:
     state: show
     conn_username: DDIC
     conn_password: Passwd1234
@@ -142,7 +135,7 @@ EXAMPLES = r'''
 
 # Exported environement variables.
 - name: Hint if module will fail with error message like ImportError libsapnwrfc.so...
-  community.general.sap_rfc_execute:
+  community.general.sap_task_list_execute:
     conn_username: DDIC
     conn_password: Passwd1234
     host: 10.1.8.10
@@ -311,23 +304,19 @@ def run_module():
     # define available arguments/parameters a user can pass to the module
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(required=False, default='present', choices=['show', 'present']),
+            state=dict(default='present', choices=['show', 'present']),
             # values for connection
             conn_username=dict(type='str', required=True),
             conn_password=dict(type='str', required=True, no_log=True),
             host=dict(type='str', required=True),
-            sysnr=dict(type='str', required=False, default="00"),
-            client=dict(type='str', required=False, default="000"),
+            sysnr=dict(type='str', default="00"),
+            client=dict(type='str', default="000"),
             # values for execution tasks
-            task_to_execute=dict(type='str', required=False),
+            task_to_execute=dict(type='str', required=True),
             task_parameters=dict(type='list', elements='list', required=False),
-            task_settings=dict(type='list', elements='str', required=False, default=['BATCH']),
-            tasks_skip=dict(type='bool', required=False, default=False),
-            # values for general fm
-            general_function=dict(type='str', required=False),
-            general_parameters=dict(type='dict', required=False),
+            task_settings=dict(type='list', elements='str', default=['BATCH']),
+            tasks_skip=dict(type='bool', default=False),
         ),
-        required_one_of=[('general_function', 'task_to_execute')],
         supports_check_mode=False,
     )
     result = dict(changed=False, msg='', results=[], out={}, stdout={}, stderr={}, )
@@ -347,9 +336,6 @@ def run_module():
     task_settings = params['task_settings']
     tasks_skip = params['tasks_skip']
 
-    general_function = params['general_function']
-    general_parameters = params['general_parameters']
-
     if not HAS_ANOTHER_LIBRARY:
         module.fail_json(
             msg=missing_required_lib('pyrfc'),
@@ -361,7 +347,7 @@ def run_module():
         conn = Connection(**connection_params)
     except Exception as err:
         result['stderr'] = str(err)
-        result['msg'] = '''Something went wrong connecting to the SAP system.'''
+        result['msg'] = 'Something went wrong connecting to the SAP system.'
         module.fail_json(**result)
 
     if task_to_execute is not None:
@@ -369,7 +355,7 @@ def run_module():
             raw_params = call_rfc_method(conn, 'STC_TM_SCENARIO_GET_PARAMETERS', {'I_SCENARIO_ID': task_to_execute})
         except Exception as err:
             result['stderr'] = str(err)
-            result['msg'] = '''The task list does not exsist.'''
+            result['msg'] = 'The task list does not exsist.'
             module.fail_json(**result)
 
         if state == "show":
@@ -386,8 +372,8 @@ def run_module():
             converted_parameters = process_task_parameters(task_parameters)
 
             if not converted_parameters:
-                result['msg'] = '''Parameters are malformed. Please provide the parameters in the following way:
-                                 [TASKNAME (starts with CL_), FIELDNAME, VALUE]. Try State Show'''
+                result['msg'] = ('Parameters are malformed. Please provide the parameters in the following way:'
+                                 '[TASKNAME (starts with CL_), FIELDNAME, VALUE]. Try State Show')
                 module.fail_json(**result)
 
             # initialize session task
@@ -423,7 +409,7 @@ def run_module():
                                                  'IS_EXEC_SETTINGS': exec_settings})
             except Exception as err:
                 result['stderr'] = str(err)
-                result['msg'] = '''Something went wrong. See stderr.'''
+                result['msg'] = 'Something went wrong. See stderr.'
                 module.fail_json(**result)
 
             # get task logs because the execution may successfully but the tasks shows errors or warnings
@@ -439,18 +425,6 @@ def run_module():
             result['msg'] = session_start['E_STATUS_DESCR']
             result['stdout'] = json.dumps(task_list)
             result['out'] = task_list
-
-    if general_function is not None:
-        if state == "present":
-            try:
-                general_out = call_rfc_method(conn, general_function, general_parameters)
-                result['changed'] = True
-                result['msg'] = general_out['E_STATUS_DESCR']
-                result['out'] = general_out
-            except Exception as err:
-                result['stderr'] = str(err)
-                result['msg'] = '''Something went wrong. See stderr.'''
-                module.exit_json(**result)
 
     module.exit_json(**result)
 
