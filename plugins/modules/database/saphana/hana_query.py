@@ -93,6 +93,17 @@ EXAMPLES = r'''
     - /tmp/HANA_CPU_UtilizationPerCore_2.00.020+.txt
     - /tmp/HANA.txt
     host: "localhost"
+
+- name: Run several queries from user store
+  community.general.hana_query:
+    sid: "hdb"
+    instance: "01"
+    user: hdbstoreuser
+    userstore: true
+    query:
+    - "select user_name from users;"
+    - select * from users;
+    autocommit: False
 '''
 
 RETURN = r'''
@@ -121,15 +132,15 @@ def main():
         argument_spec=dict(
             sid=dict(type='str', required=True),
             instance=dict(type='str', required=True),
-            encrypted=dict(type='bool', required=False, default=False),
+            encrypted=dict(type='bool', default=False),
             host=dict(type='str', required=False),
-            user=dict(type='str', required=True, default="SYSTEM"),
-            userstore=dict(type='bool', required=False, default=False),
+            user=dict(type='str', default="SYSTEM"),
+            userstore=dict(type='bool', default=False),
             password=dict(type='str', required=False, no_log=True),
             database=dict(type='str', required=False),
             query=dict(type='list', elements='str', required=False),
             filepath=dict(type='list', elements='path', required=False),
-            autocommit=dict(type='bool', required=False, default=True),
+            autocommit=dict(type='bool', default=True),
         ),
         required_one_of=[('query', 'filepath')],
         supports_check_mode=False,
@@ -161,7 +172,7 @@ def main():
     if encrypted is True:
         command.extend(['-attemptencrypt'])
     if autocommit is False:
-        command.extend(['-z']) 
+        command.extend(['-z'])
     if host is not None:
         command.extend(['-n', host])
     if database is not None:
