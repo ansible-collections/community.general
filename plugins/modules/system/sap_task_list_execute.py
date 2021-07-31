@@ -273,7 +273,7 @@ def call_rfc_method(connection, method_name, kwargs):
 
 
 def process_exec_settings(task_settings):
-    # porcesses task settings to objects
+    # processes task settings to objects
     exec_settings = {}
     for settings in task_settings:
         temp_dict = {settings.upper(): 'X'}
