@@ -23,12 +23,10 @@ options:
     user:
         description: A dedicated username. Defaults to C(SYSTEM).
         type: str
-        required: false
         default: SYSTEM
     userstore:
         description: If true the user must be in hdbuserstore.
         type: bool
-        required: false
         default: false
     password:
         description: The password to connect to the database.
@@ -125,7 +123,7 @@ def main():
             instance=dict(type='str', required=True),
             encrypted=dict(type='bool', required=False, default=False),
             host=dict(type='str', required=False),
-            user=dict(type='str', required=True, default='SYSTEM'),
+            user=dict(type='str', required=True, default="SYSTEM"),
             userstore=dict(type='bool', required=False),
             password=dict(type='str', required=False, no_log=True),
             database=dict(type='str', required=False),
