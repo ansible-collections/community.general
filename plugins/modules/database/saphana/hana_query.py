@@ -124,7 +124,7 @@ def main():
             encrypted=dict(type='bool', required=False, default=False),
             host=dict(type='str', required=False),
             user=dict(type='str', required=True, default="SYSTEM"),
-            userstore=dict(type='bool', required=False),
+            userstore=dict(type='bool', required=False, default=False),
             password=dict(type='str', required=False, no_log=True),
             database=dict(type='str', required=False),
             query=dict(type='list', elements='str', required=False),
