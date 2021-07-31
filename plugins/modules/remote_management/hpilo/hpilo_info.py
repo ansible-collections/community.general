@@ -113,6 +113,15 @@ hw_uuid:
     returned: always
     type: str
     sample: 123456ABC78901D2
+
+host_power_status:
+    description:
+      - Power status of host.
+      - Will be one of C(ON), C(OFF) and C(UNKNOWN).
+    returned: always
+    type: str
+    sample: ON
+    version_added: 3.5.0
 '''
 
 import re
@@ -177,6 +186,7 @@ def main():
     # TODO: Count number of CPUs, DIMMs and total memory
     try:
         data = ilo.get_host_data()
+        power_state = ilo.get_host_power_status()
     except hpilo.IloCommunicationError as e:
         module.fail_json(msg=to_native(e))
 
@@ -242,6 +252,9 @@ def main():
 
         # reformat into a text friendly format
         info['hw_memory_total'] = "{0} GB".format(info['hw_memory_total'])
+
+    # Report host state
+    info['host_power_status'] = power_state or 'UNKNOWN'
 
     module.exit_json(**info)
 
