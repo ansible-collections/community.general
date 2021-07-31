@@ -21,7 +21,7 @@ options:
         type: str
         required: true
     user:
-        description: A dedicated username. Defaults to C(SYSTEM).
+        description: A dedicated username. The user could be also in hdbuserstore. Defaults to C(SYSTEM).
         type: str
         default: SYSTEM
     userstore:
