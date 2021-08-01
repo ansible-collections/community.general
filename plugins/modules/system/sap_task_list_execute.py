@@ -20,11 +20,10 @@ description:
 options:
   state:
     description:
-      - If the state C(show) is provided
-        The possible parameters are shown for each task.
+      - If the state C(available_params) is provided the possible parameters are shown for each task.
         The returned values are in the necessary format for C(task_parameters).
       - The full list of parameters is exported to stdout in json format.
-    choices: ['show', 'present']
+    choices: ['available_params', 'present']
     required: false
     default: present
     type: str
@@ -64,13 +63,13 @@ options:
     description:
       - The tasks and the parameters for execution.
       - If the task list do not need any parameters. This could be empty.
-      - The list values must have brackets (see example).
+      - The list values must have curly brackets (see example).
       - If only specific tasks from the task list should be executed.
         The tasks even when no parameter is needed must be provided.
-        Alongside with the module parameter C(tasks_skip=true).
+        Alongside with the module parameter C(task_skip=true).
     required: false
     type: list
-    elements: list
+    elements: dict
   task_settings:
     description:
       - Setting for the execution of the task list. This can be one of the following as in TCODE SE80 described.
@@ -83,7 +82,7 @@ options:
     required: false
     type: list
     elements: str
-  tasks_skip:
+  task_skip:
     description:
       - It is possible for tasks that they don't need parameters and run either.
         If this parameter is true only defined tasks in C(task_parameter) list will run.
@@ -119,13 +118,13 @@ EXAMPLES = r'''
     client: '000'
     task_to_execute: SAP_BASIS_SSL_CHECK
     task_parameters :
-     - ['CL_STCT_CHECK_SEC_CRYPTO', 'P_OPT2', 'X']
-     - ['CL_STCT_CHECK_SEC_CRYPTO', 'P_OPT3', 'X']
+      - { 'TASKNAME': 'CL_STCT_CHECK_SEC_CRYPTO', 'FIELDNAME': 'P_OPT2', 'VALUE': 'X' }
+      - { 'TASKNAME': 'CL_STCT_CHECK_SEC_CRYPTO', 'FIELDNAME': 'P_OPT3', 'VALUE': 'X' }
     task_settings: batch
 
 - name: Show all possible input parameters
   community.general.sap_task_list_execute:
-    state: show
+    state: available_params
     conn_username: DDIC
     conn_password: Passwd1234
     host: 10.1.8.10
@@ -151,22 +150,22 @@ EXAMPLES = r'''
 RETURN = r'''
 # These are examples of possible return values, and in general should use other names for return values.
 results:
-  description: The return value for state C(show).
+  description: The return value for state C(available_params).
   type: list
-  elements: list
+  elements: dict
   returned: on success
-  sample:  '[
-        [
-            "CL_STCT_CHECK_SEC_CRYPTO",
-            "P_OPT1",
-            "X"
-        ],
-        [
-            "CL_STCT_CHECK_SEC_CRYPTO",
-            "P_OPT2",
-            ""
-        ]
-    ]'
+  sample:  [
+        {
+            'TASKNAME': 'CL_STCT_CHECK_SEC_CRYPTO',
+            'FIELDNAME': 'P_OPT2',
+            'VALUE': 'X'
+        },
+        {
+            'TASKNAME': 'CL_STCT_CHECK_SEC_CRYPTO',
+            'FIELDNAME': 'P_OPT3',
+            'VALUE': 'X'
+        }
+    ]
 msg:
   description: A small execution description
   type: str
@@ -226,7 +225,7 @@ def xml_dict(xml_raw):
     # adapted from: http://code.activestate.com/recipes/410469-xml-as-dictionary/
     list_out = []
     dict_out = {}
-    if xml_raw.items():
+    if xml_raw:
         dict_out.update(dict(xml_raw.items()))
     for element in xml_raw:
         if element:
@@ -267,9 +266,7 @@ def xml_dict(xml_raw):
 
 def call_rfc_method(connection, method_name, kwargs):
     # PyRFC call function
-    resp = connection.call(method_name, **kwargs)
-
-    return resp
+    return connection.call(method_name, **kwargs)
 
 
 def process_exec_settings(task_settings):
@@ -282,29 +279,11 @@ def process_exec_settings(task_settings):
     return exec_settings
 
 
-def process_task_parameters(task_parameters):
-    parameter_list = []
-    raw_task_list = []
-    task_list = []
-    if task_parameters is not None:
-        for parameters in task_parameters:
-            if parameters[0].startswith('CL_'):
-                length = len(parameters)
-                raw_task_list = raw_task_list + [{'TASKNAME': parameters[0]}]
-                task_list = [i for n, i in enumerate(raw_task_list) if i not in raw_task_list[n + 1:]]
-                if length == 3:
-                    parameter_list = parameter_list + [{'TASKNAME': parameters[0], 'FIELDNAME': parameters[1], 'VALUE': parameters[2]}]
-            else:
-                return False
-    #
-    return [{'parameter_list': parameter_list}, {'task_list': task_list}]
-
-
 def run_module():
     # define available arguments/parameters a user can pass to the module
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['show', 'present']),
+            state=dict(default='present', choices=['available_params', 'present']),
             # values for connection
             conn_username=dict(type='str', required=True),
             conn_password=dict(type='str', required=True, no_log=True),
@@ -313,13 +292,13 @@ def run_module():
             client=dict(type='str', default="000"),
             # values for execution tasks
             task_to_execute=dict(type='str', required=True),
-            task_parameters=dict(type='list', elements='list', required=False),
+            task_parameters=dict(type='list', elements='dict', required=False),
             task_settings=dict(type='list', elements='str', default=['BATCH']),
-            tasks_skip=dict(type='bool', default=False),
+            task_skip=dict(type='bool', default=False),
         ),
         supports_check_mode=False,
     )
-    result = dict(changed=False, msg='', results=[], out={}, stdout={}, stderr={}, )
+    result = dict(changed=False, msg='', results=[], out={}, json_out={}, error={}, )
 
     params = module.params
 
@@ -334,7 +313,7 @@ def run_module():
     task_parameters = params['task_parameters']
     task_to_execute = params['task_to_execute']
     task_settings = params['task_settings']
-    tasks_skip = params['tasks_skip']
+    task_skip = params['task_skip']
 
     if not HAS_ANOTHER_LIBRARY:
         module.fail_json(
@@ -346,61 +325,60 @@ def run_module():
     try:
         conn = Connection(**connection_params)
     except Exception as err:
-        result['stderr'] = str(err)
+        result['error'] = str(err)
         result['msg'] = 'Something went wrong connecting to the SAP system.'
         module.fail_json(**result)
 
     if task_to_execute is not None:
         try:
-            raw_params = call_rfc_method(conn, 'STC_TM_SCENARIO_GET_PARAMETERS', {'I_SCENARIO_ID': task_to_execute})
+            raw_params = call_rfc_method(conn, 'STC_TM_SCENARIO_GET_PARAMETERS',
+                                         {'I_SCENARIO_ID': task_to_execute})
         except Exception as err:
-            result['stderr'] = str(err)
+            result['error'] = str(err)
             result['msg'] = 'The task list does not exsist.'
             module.fail_json(**result)
 
-        if state == "show":
+        if state == "available_params":
             params_list = []
             for tasks in raw_params['ET_PARAM_DEF']:
-                params_list = params_list + [[tasks['TASKNAME'], tasks['FIELDNAME'], tasks['DEFAULTVAL']]]
+                params_list = params_list + [{'TASKNAME': tasks['TASKNAME'], 'FIELDNAME': tasks['FIELDNAME'], 'VALUE': tasks['DEFAULTVAL']}]
             result['results'] = params_list
-            result['stdout'] = json.dumps(raw_params['ET_PARAM_DEF'])
+            result['json_out'] = json.dumps(raw_params['ET_PARAM_DEF'])
             result['out'] = raw_params['ET_PARAM_DEF']
             result['changed'] = True
 
         if state == "present":
             exec_settings = process_exec_settings(task_settings)
-            converted_parameters = process_task_parameters(task_parameters)
-
-            if not converted_parameters:
-                result['msg'] = ('Parameters are malformed. Please provide the parameters in the following way:'
-                                 '[TASKNAME (starts with CL_), FIELDNAME, VALUE]. Try State Show')
-                module.fail_json(**result)
 
             # initialize session task
-            session_init = call_rfc_method(conn, 'STC_TM_SESSION_BEGIN', {'I_SCENARIO_ID': task_to_execute, 'I_INIT_ONLY': 'X'})
+            session_init = call_rfc_method(conn, 'STC_TM_SESSION_BEGIN',
+                                           {'I_SCENARIO_ID': task_to_execute,
+                                            'I_INIT_ONLY': 'X'})
 
             # Confirm Tasks which requires manual activities from Task List Run
             for task in raw_params['ET_PARAMETER']:
-                call_rfc_method(conn, 'STC_TM_TASK_CONFIRM', {'I_SESSION_ID': session_init['E_SESSION_ID'], 'I_TASKNAME': task['TASKNAME']})
+                call_rfc_method(conn, 'STC_TM_TASK_CONFIRM',
+                                {'I_SESSION_ID': session_init['E_SESSION_ID'],
+                                 'I_TASKNAME': task['TASKNAME']})
 
-            if tasks_skip:
+            if task_skip:
                 for task in raw_params['ET_PARAMETER']:
                     call_rfc_method(conn, 'STC_TM_TASK_SKIP',
                                     {'I_SESSION_ID': session_init['E_SESSION_ID'],
                                      'I_TASKNAME': task['TASKNAME'], 'I_SKIP_DEP_TASKS': 'X'})
 
             # unskip defined tasks
-            if converted_parameters[1]['task_list'] != []:
-                for task in converted_parameters[1]['task_list']:
+            if task_parameters is not None:
+                for task in task_parameters:
                     call_rfc_method(conn, 'STC_TM_TASK_UNSKIP',
                                     {'I_SESSION_ID': session_init['E_SESSION_ID'],
                                      'I_TASKNAME': task['TASKNAME'], 'I_UNSKIP_DEP_TASKS': 'X'})
 
-            # set parameters from converted_parameters function
-            if converted_parameters[0]['parameter_list'] != []:
+            # set parameters
+            if task_parameters is not None:
                 call_rfc_method(conn, 'STC_TM_SESSION_SET_PARAMETERS',
                                 {'I_SESSION_ID': session_init['E_SESSION_ID'],
-                                 'IT_PARAMETER': converted_parameters[0]['parameter_list']})
+                                 'IT_PARAMETER': task_parameters})
 
             # start the task
             try:
@@ -408,22 +386,23 @@ def run_module():
                                                 {'I_SESSION_ID': session_init['E_SESSION_ID'],
                                                  'IS_EXEC_SETTINGS': exec_settings})
             except Exception as err:
-                result['stderr'] = str(err)
-                result['msg'] = 'Something went wrong. See stderr.'
+                result['error'] = str(err)
+                result['msg'] = 'Something went wrong. See error.'
                 module.fail_json(**result)
 
             # get task logs because the execution may successfully but the tasks shows errors or warnings
             # returned value is ABAPXML https://help.sap.com/doc/abapdocu_755_index_htm/7.55/en-US/abenabap_xslt_asxml_general.htm
-            session_log = call_rfc_method(conn, 'STC_TM_SESSION_GET_LOG', {'I_SESSION_ID': session_init['E_SESSION_ID']})
+            session_log = call_rfc_method(conn, 'STC_TM_SESSION_GET_LOG',
+                                          {'I_SESSION_ID': session_init['E_SESSION_ID']})
             try:
                 log_xml = XML(session_log['E_LOG'])
                 task_list = xml_dict(log_xml)['{http://www.sap.com/abapxml}values']['SESSION']['TASKLIST']
-            except Exception:
+            except KeyError:
                 task_list = "No logs available."
 
             result['changed'] = True
             result['msg'] = session_start['E_STATUS_DESCR']
-            result['stdout'] = json.dumps(task_list)
+            result['json_out'] = json.dumps(task_list)
             result['out'] = task_list
 
     module.exit_json(**result)

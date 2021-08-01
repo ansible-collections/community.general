@@ -56,16 +56,42 @@ class TestSAPRfcModule(ModuleTestCase):
             "host": "10.1.8.9",
             "task_to_execute": "SAP_BASIS_SSL_CHECK"
         })
+        with patch.object(self.module, 'XML') as XML:
+            XML.input = b'''<?xml version="1.0" encoding="utf-8"?>
+                            <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+                            <asx:values>
+                                <VERSION>1.2</VERSION>
+                                <SESSION>
+                                <TASKLIST>SAP_BASIS_SSL_CHECK</TASKLIST>
+                                </SESSION>
+                            </asx:values>
+                            </asx:abap>'''
+            with patch.object(self.module, 'xml_dict') as xml_dict:
+                xml_dict.return_value = {'{http://www.sap.com/abapxml}values': {'SESSION': {'TASKLIST': 'SAP_BASIS_SSL_CHECK'}}}
+                with self.assertRaises(AnsibleExitJson) as result:
+                    sap_task_list_execute.main()
+        self.assertEqual(result.exception.args[0]['out'], 'SAP_BASIS_SSL_CHECK')
 
-        with self.assertRaises(AnsibleExitJson) as result:
-            self.module.main()
-        self.assertEqual(result.exception.args[0]['changed'], True)
-
-    def test_show(self):
-        """tests show success"""
+    def test_success_no_log(self):
+        """test execute task list success without logs"""
 
         set_module_args({
-            "state": "show",
+            "conn_username": "DDIC",
+            "conn_password": "Test1234",
+            "host": "10.1.8.9",
+            "task_to_execute": "SAP_BASIS_SSL_CHECK"
+        })
+        with patch.object(self.module, 'XML') as XML:
+            XML.input = ''
+            with self.assertRaises(AnsibleExitJson) as result:
+                sap_task_list_execute.main()
+        self.assertEqual(result.exception.args[0]['out'], 'No logs available.')
+
+    def test_show(self):
+        """tests show available params success"""
+
+        set_module_args({
+            "state": "available_params",
             "conn_username": "DDIC",
             "conn_password": "Test1234",
             "host": "10.1.8.9",
@@ -80,4 +106,4 @@ class TestSAPRfcModule(ModuleTestCase):
                                         'READ_ONLY': '', 'CHECKBOX': '', 'RADIOBUTTON': 'X', 'RB_GROUP': 'ICM', 'DEFAULTVAL': 'X'}]}
             with self.assertRaises(AnsibleExitJson) as success:
                 sap_task_list_execute.main()
-            self.assertEqual(success.exception.args[0]['results'][0], ['CL_STCT_CHECK_SEC_CRYPTO', 'P_OPT1', 'X'])
+            self.assertEqual(success.exception.args[0]['results'][0], {'TASKNAME': 'CL_STCT_CHECK_SEC_CRYPTO', 'FIELDNAME': 'P_OPT1', 'VALUE': 'X'})
