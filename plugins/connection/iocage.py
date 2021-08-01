@@ -1,3 +1,4 @@
+# coding: utf-8 -*-
 # Based on jail.py
 # (c) 2013, Michael Scherer <misc@zarb.org>
 # (c) 2015, Toshio Kuratomi <tkuratomi@ansible.com>
