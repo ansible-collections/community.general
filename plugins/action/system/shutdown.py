@@ -1,3 +1,4 @@
+# coding: utf-8 -*-
 # Copyright: (c) 2020, Amin Vakil <info@aminvakil.com>
 # Copyright: (c) 2016-2018, Matt Davis <mdavis@ansible.com>
 # Copyright: (c) 2018, Sam Doran <sdoran@redhat.com>

@@ -1,3 +1,4 @@
+# coding: utf-8 -*-
 # Copyright: (c) 2017, Allyson Bowles <@akatch>
 # Copyright: (c) 2012-2014, Michael DeHaan <michael.dehaan@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
