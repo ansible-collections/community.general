@@ -28,6 +28,7 @@ options:
         description: If true the user must be in hdbuserstore.
         type: bool
         default: false
+        version_added: 3.5.0
     password:
         description: The password to connect to the database.
         type: str
@@ -143,6 +144,7 @@ def main():
             autocommit=dict(type='bool', default=True),
         ),
         required_one_of=[('query', 'filepath')],
+        required_if=['userstore', False, ['password']], 
         supports_check_mode=False,
     )
     rc, out, err, out_raw = [0, [], "", ""]
