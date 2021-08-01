@@ -1,3 +1,4 @@
+# coding: utf-8 -*-
 # (c) 2013, Jan-Piet Mens <jpmens(at)gmail.com>
 # (m) 2016, Mihai Moldovanu <mihaim@tfm.ro>
 # (m) 2017, Juan Manuel Parrilla <jparrill@redhat.com>
