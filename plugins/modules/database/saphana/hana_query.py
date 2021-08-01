@@ -144,7 +144,7 @@ def main():
             autocommit=dict(type='bool', default=True),
         ),
         required_one_of=[('query', 'filepath')],
-        required_if=['userstore', False, ['password']], 
+        required_if=[('userstore', False, ['password'])], 
         supports_check_mode=False,
     )
     rc, out, err, out_raw = [0, [], "", ""]
