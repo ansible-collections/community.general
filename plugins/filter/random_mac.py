@@ -1,3 +1,4 @@
+# coding: utf-8 -*-
 # (c) 2020 Ansible Project
 #
 # This file is part of Ansible
