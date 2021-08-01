@@ -91,7 +91,6 @@ options:
     description:
       - This option is silently ignored. This module always modifies file
         size in-place.
-    type: bool
 
 notes:
   - This module supports C(check_mode) and C(diff).
