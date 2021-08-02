@@ -87,6 +87,10 @@ options:
       - I(force=true) and I(sparse=true) are mutually exclusive.
     type: bool
     default: false
+  unsafe_writes:
+    description:
+      - This option is silently ignored. This module always modifies file
+        size in-place.
 
 notes:
   - This module supports C(check_mode) and C(diff).
