@@ -89,9 +89,9 @@ options:
   boot_override_mode:
     required: false
     description:
-      - Boot mode when using an override 
+      - Boot mode when using an override
     type: str
-    choices: [ Legacy, UEFI ] 
+    choices: [ Legacy, UEFI ]
   uefi_target:
     required: false
     description:
@@ -293,11 +293,11 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
 
-  - name: Set one-time boot to BiosSetup 
+  - name: Set one-time boot to BiosSetup
     community.general.redfish_command:
       category: Systems
       command: SetOneTimeBoot
-      bootnext: BiosSetup 
+      bootnext: BiosSetup
       boot_override_mode: Legacy
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
