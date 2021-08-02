@@ -12,8 +12,9 @@ module: sap_task_list_execute
 short_description: Perform SAP Task list execution.
 version_added: "3.5.0"
 description:
-  - The C(sap_task_list_execute) module will perform RFC execution on SAP Systems
-    for tasks lists.
+  - The C(sap_task_list_execute) module depends on C(pyrfc) Python library (version 2.4.0 and upwards).
+    Depending on distribution you are using, you may need to install additional packages to
+    have these available.
   - Tasks in the task list which requires manual activities will be confirmed automatically.
   - This module will use the RFC Package C(STC_TM_API).
 
@@ -63,13 +64,28 @@ options:
     description:
       - The tasks and the parameters for execution.
       - If the task list do not need any parameters. This could be empty.
-      - The list values must have curly brackets (see example).
+      - The list values must have curly brackets to declare a dictonary
+        and contain the following keys in uppercase C(TASKNAME), C(FIELDNAME), C(VALUE).
+        See examples.
       - If only specific tasks from the task list should be executed.
         The tasks even when no parameter is needed must be provided.
         Alongside with the module parameter C(task_skip=true).
     required: false
     type: list
     elements: dict
+    suboptions:
+      TASKNAME:
+        description: The name of the task in the task list.
+        type: str
+        required: true
+      FIELDNAME:
+        description: The name of the field of the task.
+        type: str
+        required: false
+      VALUE:
+        description: The value which have to be set.
+        type: str
+        required: false
   task_settings:
     description:
       - Setting for the execution of the task list. This can be one of the following as in TCODE SE80 described.
@@ -215,10 +231,10 @@ import traceback
 try:
     from pyrfc import Connection
 except ImportError:
-    HAS_ANOTHER_LIBRARY = False
+    HAS_PYRFC_LIBRARY = False
     ANOTHER_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 else:
-    HAS_ANOTHER_LIBRARY = True
+    HAS_PYRFC_LIBRARY = True
 
 
 def xml_dict(xml_raw):
@@ -280,6 +296,13 @@ def process_exec_settings(task_settings):
 
 
 def run_module():
+
+    params_spec = dict(
+        TASKNAME=dict(type='str', required=True),
+        FIELDNAME=dict(type='str'),
+        VALUE=dict(type='str'),
+    )
+
     # define available arguments/parameters a user can pass to the module
     module = AnsibleModule(
         argument_spec=dict(
@@ -292,7 +315,7 @@ def run_module():
             client=dict(type='str', default="000"),
             # values for execution tasks
             task_to_execute=dict(type='str', required=True),
-            task_parameters=dict(type='list', elements='dict', required=False),
+            task_parameters=dict(type='list', elements='dict', options=params_spec),
             task_settings=dict(type='list', elements='str', default=['BATCH']),
             task_skip=dict(type='bool', default=False),
         ),
@@ -315,7 +338,7 @@ def run_module():
     task_settings = params['task_settings']
     task_skip = params['task_skip']
 
-    if not HAS_ANOTHER_LIBRARY:
+    if not HAS_PYRFC_LIBRARY:
         module.fail_json(
             msg=missing_required_lib('pyrfc'),
             exception=ANOTHER_LIBRARY_IMPORT_ERROR)
