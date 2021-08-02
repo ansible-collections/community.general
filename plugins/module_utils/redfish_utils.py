@@ -17,7 +17,7 @@ from ansible.module_utils.six.moves.urllib.parse import urlparse
 import os
 from os.path import expanduser
 
-home = expanduser("~/Documents")
+HOME = expanduser("~/Documents")
 
 GET_HEADERS = {'accept': 'application/json', 'OData-Version': '4.0'}
 POST_HEADERS = {'content-type': 'application/json', 'accept': 'application/json',
@@ -72,10 +72,11 @@ class RedfishUtils(object):
         username, password, basic_auth = self._auth_params(req_headers)
         try:
             #To support HPE operations
-            if os.path.isfile(home + "/sessionfile.txt"):
+            session_file = os.path.join(HOME,"sessionfile.txt")
+            if os.path.isfile(session_file):
             # if "Hpe" in self.creds.keys():
-                f = open(home + "/sessionfile.txt")
-                session_id = f.readline()
+                with open(session_file) as f:
+                  session_id = f.readline()
                 resp = open_url(uri, method="GET", headers=GET_HEADERS, sessionid= session_id,
                             url_username=None,
                             url_password=None,
@@ -110,13 +111,14 @@ class RedfishUtils(object):
         username, password, basic_auth = self._auth_params(req_headers)
         try:
             #To support HPE operations
-            if "iLOlogin" in pyld.keys() or os.path.isfile(home + "/sessionfile.txt"):
-                if "iLOlogin" in pyld.keys():
+            session_file = os.path.join(HOME,"sessionfile.txt")
+            if "iLOlogin" in pyld or os.path.isfile(session_file):
+                if "iLOlogin" in pyld:
                     del pyld["iLOlogin"]
                     session_id = None
-                if os.path.isfile(home + "/sessionfile.txt"):
-                    f = open(home + "/sessionfile.txt")
-                    session_id = f.readline()
+                if os.path.isfile(session_file):
+                    with open(session_file) as f:
+                      session_id = f.readline()
                 
                 resp = open_url(uri, data=json.dumps(pyld), sessionid= session_id,
                             headers=POST_HEADERS, method="POST",
@@ -163,9 +165,10 @@ class RedfishUtils(object):
         username, password, basic_auth = self._auth_params(req_headers)
         try:
             #To support HPE operations
-            if os.path.isfile(home + "/sessionfile.txt"):
-                f = open(home + "/sessionfile.txt")
-                session_id = f.readline()
+            session_file = os.path.join(HOME,"sessionfile.txt")
+            if os.path.isfile(session_file):
+                with open(session_file) as f:
+                  session_id = f.readline()
                 resp = open_url(uri, data=json.dumps(pyld),
                             headers=headers, method="PATCH", sessionid = session_id,
                             url_username=None,
@@ -201,9 +204,10 @@ class RedfishUtils(object):
         try:
             data = json.dumps(pyld) if pyld else None
             #To support HPE operations
-            if os.path.isfile(home + "/sessionfile.txt"):
-                f = open(home + "/sessionfile.txt")
-                session_id = f.readline()
+            session_file = os.path.join(HOME,"sessionfile.txt")
+            if os.path.isfile(session_file):
+                with open(session_file) as f:
+                  session_id = f.readline()
                 resp = open_url(uri, data=json.dumps(pyld),
                             headers=DELETE_HEADERS, method="DELETE", sessionid=session_id,
                             url_username=None,
