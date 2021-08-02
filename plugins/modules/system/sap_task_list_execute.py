@@ -84,7 +84,7 @@ options:
         required: false
       VALUE:
         description: The value which have to be set.
-        type: str
+        type: raw
         required: false
   task_settings:
     description:
@@ -300,7 +300,7 @@ def run_module():
     params_spec = dict(
         TASKNAME=dict(type='str', required=True),
         FIELDNAME=dict(type='str'),
-        VALUE=dict(type='str'),
+        VALUE=dict(type='raw'),
     )
 
     # define available arguments/parameters a user can pass to the module
