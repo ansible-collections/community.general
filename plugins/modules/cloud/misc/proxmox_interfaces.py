@@ -322,7 +322,8 @@ def main():
 
     if state == 'reloaded':
         try:
-            updi = reload_interfaces(proxmox.proxmox_api, node)
+            upid = reload_interfaces(proxmox.proxmox_api, node)
+            result['upid'] = upid
             result['msg'] = 'Successfully reloaded and applied interface changes on node {0}'.format(
                 node)
             module.exit_json(**result)
@@ -330,6 +331,8 @@ def main():
             result['errors'] = 'Failed to reload interfaces on node: {0} with error {1}'.format(
                 node, str(e))
             module.fail_json(**result)
+
+    check_doublicates(module)
 
     present_nics = set(nic['iface'] for nic in nics)
 

@@ -239,3 +239,16 @@ def get_process_status(proxmox_api, node, upid):
         return ret
     except Exception as e:
         raise e
+
+
+def check_doublicates(module):
+    config = module.params['config']
+    ifaces = list(nic['iface'] for nic in config)
+    ifaces_set = set()
+    for iface in ifaces:
+        if iface in ifaces_set:
+            module.fail_json(
+                msg="Interface {0} can only be present once in list".format(iface))
+        else:
+            ifaces_set.add(iface)
+    raise Exception("Interface not present. Could not update!")
