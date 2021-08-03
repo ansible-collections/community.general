@@ -55,3 +55,26 @@ def test_map_interface_args(capfd, mocker):
     ret = proxmox_utils.proxmox_map_interface_args(module.params)
     print(ret)
     assert expected == ret
+
+
+def test_check_no_doublicates(capfd, mocker):
+    module = mocker.MagicMock()
+    params = {'config': [{'name': 'vmbr0', 'type': 'bridge'},
+                         {'name': 'vmrb1', 'type': 'bridge'}]}
+
+    module.params = params
+    module.fail_json.assert_not_called()
+    proxmox_utils.check_doublicates(module)
+    module.fail_json.assert_not_called()
+
+
+def test_check_doublicates(capfd, mocker):
+    module = mocker.MagicMock()
+    iface = 'vmbr0'
+    params = {'config': [{'name': iface, 'type': 'bridge'},
+                         {'name': iface, 'type': 'bridge'}]}
+
+    module.params = params
+    proxmox_utils.check_doublicates(module)
+    module.fail_json.assert_called_once_with(
+        msg="Interface {0} can only be present once in list".format(iface))
