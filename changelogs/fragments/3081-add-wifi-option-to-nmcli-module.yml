@@ -1,0 +1,2 @@
+minor_changes:
+- nmcli - add ``wifi`` option to support managing Wi-Fi Settings (I.E. ``hidden`` & ``mode``) (https://github.com/ansible-collections/community.general/pull/3081).
