@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
-#
-# Copyright: (c) 2020, Andreas Botzner <andreas at botzner.com>
+
+# Copyright: (c) 2021, Andreas Botzner (@botzner_andreas) <andreas at botzner dot com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.proxmox import ProxmoxAnsible
-import traceback
 
 
 def proxmox_interface_argument_spec():
@@ -87,47 +85,78 @@ def proxmox_interface_argument_spec():
     )
 
 
-def proxmox_map_interface_args(module):
+def proxmox_map_interface_args(params):
     ret = {}
-    ret['iface'] = module.params['name']
-    ret['type'] = module.params['type']
-    ret['address'] = module.params['address']
-    ret['address6'] = module.params['address6']
-    ret['bond-primary'] = module.params['bond_mode']
-    ret['bond_mode'] = module.params['bond_mode']
-    ret['bond_xmit_hash_policy'] = module.params['bond_xmit_hash_policy']
-    ret['bridge_ports'] = module.params['bridge_ports']
-    ret['cidr'] = module.params['cidr']
-    ret['cidr6'] = module.params['cidr6']
-    ret['gateway'] = module.params['gateway']
-    ret['comments'] = module.params['comments']
-    ret['comments6'] = module.params['comments6']
-    ret['gateway6'] = module.params['gateway6']
-    ret['netmask'] = module.params['netmask']
-    ret['ovs_bonds'] = module.params['ovs_bonds']
-    ret['ovs_bridge'] = module.params['ovs_bridge']
-    ret['ovs_options'] = module.params['ovs_options']
-    ret['ovs_ports'] = module.params['ovs_ports']
-    ret['slaves'] = module.params['slaves']
-    ret['vlan-raw-device'] = module.params['vlan_raw_device']
-    ret['autostart'] = 1 if module.params['autostart'] else 0
-    ret['bridge_vlan_ports'] = 1 if module.params['bridge_vlan_ports'] else 0
-    if module.params['mtu'] <= 65520 and module.params['mtu'] >= 1280:
-        ret['mtu'] = module.params['mtu']
-    else:
-        module.fail_json(msg="MTU has to be between 1280 and 65520")
-    if module.params['netmask6'] >= 0 and module.params['netmask6'] <= 128:
-        ret['netmask6'] = module.params['netmask6']
-    else:
-        module.fail_json(msg='netmask6 has to be between 0 and 128')
-    if module.params['ovs_tag'] >= 1 and module.params['ovs_tag'] <= 4094:
-        ret['ovs_tag'] = module.params['ovs_tag']
-    else:
-        module.fail_json(msg='ovs_tag has to be between 1 and 4094')
-    if module.params['vlan_id'] >= 1 and module.params['vlan_id'] <= 4094:
-        ret['vlan-id'] = module.params['vlan_id']
-    else:
-        module.fail_json(msg='vlan_id has to be between 1 and 4094')
+    if params['name'] is not None:
+        ret['iface'] = params['name']
+    if params['type'] is not None:
+        ret['type'] = params['type']
+    if params['address'] is not None:
+        ret['address'] = params['address']
+    if params['address6'] is not None:
+        ret['address6'] = params['address6']
+    if params['autostart'] is not None:
+        ret['autostart'] = '1' if params['autostart'] else '0'
+    if params['bond_primary'] is not None:
+        ret['bond-primary'] = params['bond_primary']
+    if params['bond_mode'] is not None:
+        ret['bond_mode'] = params['bond_mode']
+    if params['bond_xmit_hash_policy'] is not None:
+        ret['bond_xmit_hash_policy'] = params['bond_xmit_hash_policy']
+    if params['bridge_ports'] is not None:
+        ret['bridge_ports'] = params['bridge_ports']
+    if params['bridge_vlan_ports'] is not None:
+        ret['bridge_vlan_ports'] = 1 if params['bridge_vlan_ports'] else 0
+    if params['cidr'] is not None:
+        ret['cidr'] = params['cidr']
+    if params['cidr6'] is not None:
+        ret['cidr6'] = params['cidr6']
+    if params['gateway'] is not None:
+        ret['gateway'] = params['gateway']
+    if params['gateway6'] is not None:
+        ret['gateway6'] = params['gateway6']
+    if params['comments'] is not None:
+        ret['comments'] = params['comments']
+    if params['comments6'] is not None:
+        ret['comments6'] = params['comments6']
+    if params['mtu'] is not None:
+        if int(params['mtu']) <= 65520 and int(params['mtu']) >= 1280:
+            ret['mtu'] = params['mtu']
+        else:
+            raise ValueError(
+                'MTU has to be be between 1280 and 65520 but was {0}'.format(params['mtu']))
+    if params['netmask'] is not None:
+        ret['netmask'] = params['netmask']
+    if params['netmask6'] is not None:
+        if int(params['netmask6']) >= 0 and int(params['netmask6']) <= 128:
+            ret['netmask6'] = params['netmask6']
+        else:
+            raise ValueError(
+                'netmaks6 has to be between 0 and 128 but was {0}'.format(params['netmaks6']))
+    if params['ovs_bonds'] is not None:
+        ret['ovs_bonds'] = params['ovs_bonds']
+    if params['ovs_options'] is not None:
+        ret['ovs_options'] = params['ovs_options']
+    if params['ovs_bridge'] is not None:
+        ret['ovs_bridge'] = params['ovs_bridge']
+    if params['ovs_ports'] is not None:
+        ret['ovs_ports'] = params['ovs_ports']
+    if params['ovs_tag'] is not None:
+        if int(params['ovs_tag']) >= 1 and int(params['ovs_tag']) <= 4094:
+            ret['ovs_tag'] = params['ovs_tag']
+        else:
+            raise ValueError(
+                'ovs_tag has to be between 1 and 4094 but was {0}'.format(params['ovs_tag']))
+    if params['slaves'] is not None:
+        ret['slaves'] = params['slaves']
+    if params['vlan_id'] is not None:
+        if int(params['vlan_id']) >= 1 and int(params['vlan_id']) <= 4094:
+            ret['vlan-id'] = params['vlan_id']
+        else:
+            raise Exception('vlan_id has to be between 1 and 4094 but was {0}'.format(
+                params['vlan_id']))
+    if params['vlan_raw_device'] is not None:
+        ret['vlan-raw-device'] = params['vlan_raw_device']
     return ret
 
 
@@ -154,7 +183,7 @@ def get_nic(proxmox_api, node, name):
 
 def create_nic(proxmox_api, node, config):
     try:
-        proxmox_api.nodes(node).network.post(config)
+        proxmox_api.nodes(node).network.post(**config)
     except Exception as e:
         raise e
 
@@ -166,16 +195,28 @@ def delete_nic(proxmox_api, node, name):
         raise e
 
 
+"""
+Updates an interface with specified configuration
+"""
+
+
 def update_nic(proxmox_api, node, name, config):
     try:
-        proxmox_api.nodes(node).network(name).post(config)
+        proxmox_api.nodes(node).network(name).put(**config)
     except Exception as e:
         raise e
 
 
+"""
+Starts task to reload interfaces on node.
+Returns UPID string if successful
+"""
+
+
 def reload_interfaces(proxmox_api, node):
     try:
-        proxmox_api.nodes(node).network.put()
+        ret = proxmox_api.nodes(node).network.put()
+        return ret
     except Exception as e:
         raise e
 
@@ -183,5 +224,18 @@ def reload_interfaces(proxmox_api, node):
 def rollback_interfaces(proxmox_api, node):
     try:
         proxmox_api.nodes(node).network.delete()
+    except Exception as e:
+        raise e
+
+
+"""
+Tries to get the status of task on a Proxmox node.
+"""
+
+
+def get_process_status(proxmox_api, node, upid):
+    try:
+        ret = proxmox_api.nodes(node).tasks(upid).status().get()
+        return ret
     except Exception as e:
         raise e

@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2021, Andreas Botzner (@andreas.botzner) <andreas@botzner.com>
+# Copyright: (c) 2021, Andreas Botzner (@botzner_andreas) <andreas at botzner dot com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
+
 
 DOCUMENTATION = r'''
 ---
@@ -14,7 +15,7 @@ short_description: Management network interfaces on a Proxmox node.
 version_added: 3.5.0
 description:
   - Allows you to create/update/delete network interfaces of a Proxmox node.
-author: "Andreas Botzner (@botzner_andreas) <andreas@botzner.com>"
+author: "Andreas Botzner (@botzner_andreas) <andreas at botzner dot com>"
 options:
   config:
     description: Interface configuration
@@ -181,6 +182,7 @@ options:
     default: present
     choices:
       - present
+      - reloaded
   apply:
     description:
       - Reload interfaces and make configuration persistent after going
@@ -202,36 +204,38 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = '''
-- name: Create new VM bridge on node01
-  community.general.proxmox_interfaces:
-    api_user: root@pam
-    api_password: secret
-    api_host: proxmoxhost
-    config:
-      - node: node01
-        type: bridge
-        name: vmrb56
-        address: 192.168.5.4
-        netmask: 255.255.255.0
-        comment: 'This is a new VM bridge with the host inside'
-    state: present
-
-- name: Get list of network devices of node01
+- name: Change a list of interfaces
   community.general.proxmox_interfaces:
     api_user: root@pam
     api_password: secret
     api_host: proxmoxhost
     node: node01
-    state: restarted
+    config:
+      - name: vmrb135
+        type: bridge
+        address: 10.189.5.37
+        netmask: 255.255.255.0
+        mtu: 5555
+      - name: vmrb56
+        type: bridge
+        address: 192.168.5.4
+        netmask: 255.255.255.0
+        comments: 'This is a new VM bridge with the host inside'
+    state: present
 
 - name: Delete a list of interfaces from node01 and try to revert on error
   community.general.proxmox_interfaces:
     api_user: root@pam
     api_password: secret
     api_host: proxmoxhost
-    name: my_vm
-    interface: net0
-    state: absent
+    node: node01
+    config:
+      - name: vmbr34
+        state: absent
+      - name: vmbr48
+        state: absent
+    apply: true
+    revert_on_error: true
 '''
 
 RETURN = '''
@@ -247,6 +251,11 @@ after:
   type: list
   sample:
     - '{some different JSON data here}'
+upid:
+  description: UPID of the svreload:networking task
+  returned: when changed and reload_interfaces is enabled
+  type: str
+  sample: 'UPID:node01:00003098:16036ACE:6216F174:srvreload:networking:root@pam:'
 errors:
   description: Errors that occurred and where ignored
   returned: when failed
@@ -272,18 +281,6 @@ from ansible_collections.community.general.plugins.module_utils.proxmox_interfac
 from ansible.module_utils.basic import AnsibleModule
 
 
-def handle_reload(proxmox, result):
-    node = proxmox.module.params['node']
-    try:
-        reload_interfaces(proxmox.proxmox_api, node)
-        result['msg'].append(
-            'Successfully reloaded and applied interface changes on node {0}'.format(node))
-        proxmox.module.exit_json(**result)
-    except Exception as e:
-        result['errors'].append(
-            'Failed to reload interfaces on node: {0} with error {1}'.format(node, str(e)))
-
-
 def main():
     nic_args = proxmox_interface_argument_spec()
     module_args = proxmox_auth_argument_spec()
@@ -294,7 +291,8 @@ def main():
         ignore_errors=dict(type='bool', default=False),
         apply=dict(type='bool', default=True),
         revert_on_error=dict(type='bool', default=False),
-        state=dict(type='str', choices=['present'], default='present')
+        state=dict(type='str', choices=[
+                   'present', 'reloaded'], default='present')
     )
     module_args.update(network_args)
 
@@ -306,6 +304,7 @@ def main():
         required_if=[('state', 'present', ('config',))],
         supports_check_mode=False,
     )
+
     proxmox = ProxmoxAnsible(module)
 
     state = module.params['state']
@@ -318,12 +317,12 @@ def main():
     result = {'changed': False}
     msg = []
     errors = []
-    nics = dict(get_nics(proxmox))
+    nics = get_nics(proxmox)
     result['config'] = nics
 
     if state == 'reloaded':
         try:
-            reload_interfaces(proxmox.proxmox_api, node)
+            updi = reload_interfaces(proxmox.proxmox_api, node)
             result['msg'] = 'Successfully reloaded and applied interface changes on node {0}'.format(
                 node)
             module.exit_json(**result)
@@ -336,7 +335,10 @@ def main():
 
     for nic in config:
         name = nic['name']
-        interface_args = proxmox_map_interface_args(module)
+        try:
+            interface_args = proxmox_map_interface_args(nic)
+        except ValueError as e:
+            module.fail_json(str(e))
         if name in present_nics:
             if nic['state'] == 'absent':
                 try:
@@ -368,7 +370,7 @@ def main():
                     result['changed'] = True
                 except Exception as e:
                     errors.append('Failed to create interface: {0} with exception: {1}'.format(
-                        nic['nic'], str(e)))
+                        name, str(e)))
                     if not ignore_errors:
                         break
             else:
@@ -380,7 +382,8 @@ def main():
             module.exit_json(**result)
         else:
             try:
-                reload_interfaces(proxmox.proxmox_api, node)
+                upid = reload_interfaces(proxmox.proxmox_api, node)
+                result['upid'] = upid
                 result['msg'].append(
                     'Successfully reloaded and applied interface changes on node {0}'.format(node))
                 module.exit_json(**result)
