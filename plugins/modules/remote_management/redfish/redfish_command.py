@@ -88,7 +88,7 @@ options:
     type: int
   boot_override_mode:
     description:
-      - Boot mode when using an override
+      - Boot mode when using an override.
     type: str
     choices: [ Legacy, UEFI ]
     version_added: 3.5.0
