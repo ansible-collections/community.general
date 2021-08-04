@@ -1565,6 +1565,7 @@ class RedfishUtils(object):
         uefi_target = boot_opts.get('uefi_target')
         boot_next = boot_opts.get('boot_next')
         override_enabled = boot_opts.get('override_enabled')
+        boot_override_mode = boot_opts.get('boot_override_mode')
 
         if not bootdevice and override_enabled != 'Disabled':
             return {'ret': False,
@@ -1596,6 +1597,10 @@ class RedfishUtils(object):
         target = boot.get('BootSourceOverrideTarget')
         cur_uefi_target = boot.get('UefiTargetBootSourceOverride')
         cur_boot_next = boot.get('BootNext')
+        cur_override_mode = boot.get('BootSourceOverrideMode')
+
+        if not boot_override_mode:
+            boot_override_mode = cur_override_mode
 
         if override_enabled == 'Disabled':
             payload = {
@@ -1632,12 +1637,13 @@ class RedfishUtils(object):
                 }
             }
         else:
-            if cur_enabled == override_enabled and target == bootdevice:
+            if cur_enabled == override_enabled and target == bootdevice and cur_override_mode == boot_override_mode:
                 # If properties are already set, no changes needed
                 return {'ret': True, 'changed': False}
             payload = {
                 'Boot': {
                     'BootSourceOverrideEnabled': override_enabled,
+                    'BootSourceOverrideMode': boot_override_mode,
                     'BootSourceOverrideTarget': bootdevice
                 }
             }
