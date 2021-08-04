@@ -5,7 +5,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-import pprint
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -73,6 +72,7 @@ options:
         description:
             - A redis config or db key.
         type: str
+        aliases: [ key ]
     value:
         description:
             - A redis config value. When memory size is needed, it is possible
@@ -142,6 +142,7 @@ EXAMPLES = '''
     value: bar
 
 - name: Increment key foo on remote host
+  community.general.redis:
     login_host: redishost
     login_password: secret
     login_user: someuser
@@ -149,6 +150,7 @@ EXAMPLES = '''
     key: foo
 
 - name: Get key foo from remote host
+  community.general.redis:
     login_host: redishost
     login_password: secret
     login_user: someuser
@@ -208,7 +210,7 @@ def main():
             login_password=dict(type='str', no_log=True),
             login_host=dict(type='str', default='localhost'),
             login_port=dict(type='int', default=6379),
-            login_user=dict(type='str', default='default'),
+            login_user=dict(type='str'),
             master_host=dict(type='str'),
             master_port=dict(type='int'),
             replica_mode=dict(type='str', default='replica', choices=[
