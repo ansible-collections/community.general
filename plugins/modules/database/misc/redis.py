@@ -219,8 +219,8 @@ def main():
             value=dict(type='str')
         ),
         required_if=[('command', 'set', ('name', 'value')),
-                     ('command', 'get', ('name')),
-                     ('command', 'incr', ('name'))],
+                     ('command', 'get', ('name',)),
+                     ('command', 'incr', ('name',))],
         supports_check_mode=True,
     )
 
@@ -229,7 +229,7 @@ def main():
             'redis'), exception=REDIS_IMP_ERR)
 
     login_password = module.params['login_password']
-    login_user = module.params['login_password']
+    login_user = module.params['login_user']
     login_host = module.params['login_host']
     login_port = module.params['login_port']
     command = module.params['command']
@@ -372,7 +372,7 @@ def main():
     elif command == 'set':
         name = module.params['name']
         value = module.params['value']
-        pprint.pp(module.params)
+        # pprint.pp(module.params)
 
         r = redis.StrictRedis(host=login_host,
                               port=login_port,
