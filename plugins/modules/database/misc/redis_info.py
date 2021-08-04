@@ -215,18 +215,21 @@ def main():
     )
 
     if not HAS_REDIS_PACKAGE:
-        module.fail_json(msg=missing_required_lib('redis'), exception=REDIS_IMP_ERR)
+        module.fail_json(msg=missing_required_lib(
+            'redis'), exception=REDIS_IMP_ERR)
 
     login_host = module.params['login_host']
     login_port = module.params['login_port']
     login_password = module.params['login_password']
 
     # Connect and check
-    client = redis_client(host=login_host, port=login_port, password=login_password)
+    client = redis_client(host=login_host, port=login_port,
+                          password=login_password)
     try:
         client.ping()
     except Exception as e:
-        module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
+        module.fail_json(msg="unable to connect to database: %s" %
+                         to_native(e), exception=traceback.format_exc())
 
     info = client.info()
     module.exit_json(changed=False, info=info)
