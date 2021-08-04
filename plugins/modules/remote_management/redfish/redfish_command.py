@@ -87,7 +87,6 @@ options:
     default: 10
     type: int
   boot_override_mode:
-    required: false
     description:
       - Boot mode when using an override
     type: str
