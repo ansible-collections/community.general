@@ -277,7 +277,8 @@ except ImportError:
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
     ProxmoxAnsible, proxmox_auth_argument_spec)
 from ansible_collections.community.general.plugins.module_utils.proxmox_interfaces import (
-    get_nics, delete_nic, create_nic, reload_interfaces, rollback_interfaces, update_nic, proxmox_map_interface_args, proxmox_interface_argument_spec, check_doublicates)
+    get_nics, delete_nic, create_nic, reload_interfaces, rollback_interfaces,
+    update_nic, proxmox_map_interface_args, proxmox_interface_argument_spec, check_doublicates)
 from ansible.module_utils.basic import AnsibleModule
 
 
