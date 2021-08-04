@@ -86,6 +86,12 @@ options:
       - Timeout in seconds for URL requests to OOB controller
     default: 10
     type: int
+  boot_override_mode:
+    description:
+      - Boot mode when using an override.
+    type: str
+    choices: [ Legacy, UEFI ]
+    version_added: 3.5.0
   uefi_target:
     required: false
     description:
@@ -283,6 +289,16 @@ EXAMPLES = '''
       command: EnableContinuousBootOverride
       resource_id: 437XR1138R2
       bootdevice: "{{ bootdevice }}"
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+  - name: Set one-time boot to BiosSetup
+    community.general.redfish_command:
+      category: Systems
+      command: SetOneTimeBoot
+      bootnext: BiosSetup
+      boot_override_mode: Legacy
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
@@ -591,6 +607,7 @@ def main():
             timeout=dict(type='int', default=10),
             uefi_target=dict(),
             boot_next=dict(),
+            boot_override_mode=dict(choices=['Legacy', 'UEFI']),
             resource_id=dict(),
             update_image_uri=dict(),
             update_protocol=dict(),
@@ -662,7 +679,8 @@ def main():
     boot_opts = {
         'bootdevice': module.params['bootdevice'],
         'uefi_target': module.params['uefi_target'],
-        'boot_next': module.params['boot_next']
+        'boot_next': module.params['boot_next'],
+        'boot_override_mode': module.params['boot_override_mode'],
     }
 
     # VirtualMedia options
