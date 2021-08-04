@@ -14,13 +14,12 @@ module: dnsimple
 short_description: Interface with dnsimple.com (a DNS hosting service)
 description:
    - "Manages domains and records via the DNSimple API, see the docs: U(http://developer.dnsimple.com/)."
-notes:
-  - DNSimple API v1 is deprecated. Please install dnsimple-python>=1.0.0 which uses v2 API.
 options:
   account_email:
     description:
       - Account email. If omitted, the environment variables C(DNSIMPLE_EMAIL) and C(DNSIMPLE_API_TOKEN) will be looked for.
       - "If those aren't found, a C(.dnsimple) file will be looked for, see: U(https://github.com/mikemaccana/dnsimple-python#getting-started)."
+      - "C(.dnsimple) config files are only supported in dnsimple-python<2.0.0"
     type: str
   account_api_token:
     description:
@@ -72,6 +71,14 @@ options:
       - Only use with C(state) is set to C(present) on a record.
     type: 'bool'
     default: no
+  sandbox:
+    description:
+      - Use the DNSimple sandbox environment.
+      - Requires a dedicated account in the dnsimple sandbox environment.
+      - Check U(https://developer.dnsimple.com/sandbox/) for more information.
+    type: 'bool'
+    default: no
+    version_added: 3.5.0
 requirements:
   - "dnsimple >= 1.0.0"
 author: "Alex Coomans (@drcapulet)"
@@ -144,38 +151,227 @@ EXAMPLES = '''
 
 RETURN = r"""# """
 
-import os
 import traceback
 from distutils.version import LooseVersion
+import re
 
-DNSIMPLE_IMP_ERR = None
+
+class DNSimpleV1():
+    """class which uses dnsimple-python < 2"""
+
+    def __init__(self, account_email, account_api_token, sandbox, module):
+        """init"""
+        self.module = module
+        self.account_email = account_email
+        self.account_api_token = account_api_token
+        self.sandbox = sandbox
+        self.dnsimple_client()
+
+    def dnsimple_client(self):
+        """creates a dnsimple client object"""
+        if self.account_email and self.account_api_token:
+            self.client = DNSimple(sandbox=self.sandbox, email=self.account_email, api_token=self.account_api_token)
+        else:
+            self.client = DNSimple(sandbox=self.sandbox)
+
+    def get_all_domains(self):
+        """returns a list of all domains"""
+        domain_list = self.client.domains()
+        return [d['domain'] for d in domain_list]
+
+    def get_domain(self, domain):
+        """returns a single domain by name or id"""
+        try:
+            dr = self.client.domain(domain)['domain']
+        except DNSimpleException as e:
+            exception_string = str(e.args[0]['message'])
+            if re.match(r"^Domain .+ not found$", exception_string):
+                dr = None
+            else:
+                raise
+        return dr
+
+    def create_domain(self, domain):
+        """create a single domain"""
+        return self.client.add_domain(domain)['domain']
+
+    def delete_domain(self, domain):
+        """delete a single domain"""
+        self.client.delete(domain)
+
+    def get_records(self, domain, dnsimple_filter=None):
+        """return dns ressource records which match a specified filter"""
+        return [r['record'] for r in self.client.records(str(domain), params=dnsimple_filter)]
+
+    def delete_record(self, domain, rid):
+        """delete a single dns ressource record"""
+        self.client.delete_record(str(domain), rid)
+
+    def update_record(self, domain, rid, ttl=None, priority=None):
+        """update a single dns ressource record"""
+        data = {}
+        if ttl:
+            data['ttl'] = ttl
+        if priority:
+            data['priority'] = priority
+        return self.client.update_record(str(domain), str(rid), data)['record']
+
+    def create_record(self, domain, name, record_type, content, ttl=None, priority=None):
+        """create a single dns ressource record"""
+        data = {
+            'name': name,
+            'type': record_type,
+            'content': content,
+        }
+        if ttl:
+            data['ttl'] = ttl
+        if priority:
+            data['priority'] = priority
+        return self.client.add_record(str(domain), data)['record']
+
+
+class DNSimpleV2():
+    """class which uses dnsimple-python >= 2"""
+
+    def __init__(self, account_email, account_api_token, sandbox, module):
+        """init"""
+        self.module = module
+        self.account_email = account_email
+        self.account_api_token = account_api_token
+        self.sandbox = sandbox
+        self.pagination_per_page = 30
+        self.dnsimple_client()
+        self.dnsimple_account()
+
+    def dnsimple_client(self):
+        """creates a dnsimple client object"""
+        if self.account_email and self.account_api_token:
+            client = Client(sandbox=self.sandbox, email=self.account_email, access_token=self.account_api_token)
+        else:
+            msg = "Option account_email or account_api_token not provided. " \
+                  "Dnsimple authentiction with a .dnsimple config file is not " \
+                  "supported with dnsimple-python>=2.0.0"
+            raise DNSimpleException(msg)
+        client.identity.whoami()
+        self.client = client
+
+    def dnsimple_account(self):
+        """select a dnsimple account. If a user token is used for authentication,
+        this user must only have access to a single account"""
+        account = self.client.identity.whoami().data.account
+        # user supplied a user token instead of account api token
+        if not account:
+            accounts = Accounts(self.client).list_accounts().data
+            if len(accounts) != 1:
+                msg = "The provided dnsimple token is a user token with multiple accounts." \
+                    "Use an account token or a user token with access to a single account." \
+                    "See https://support.dnsimple.com/articles/api-access-token/"
+                raise DNSimpleException(msg)
+            account = accounts[0]
+        self.account = account
+
+    def get_all_domains(self):
+        """returns a list of all domains"""
+        domain_list = self._get_paginated_result(self.client.domains.list_domains, account_id=self.account.id)
+        return [d.__dict__ for d in domain_list]
+
+    def get_domain(self, domain):
+        """returns a single domain by name or id"""
+        try:
+            dr = self.client.domains.get_domain(self.account.id, domain).data.__dict__
+        except DNSimpleException as e:
+            exception_string = str(e.message)
+            if re.match(r"^Domain .+ not found$", exception_string):
+                dr = None
+            else:
+                raise
+        return dr
+
+    def create_domain(self, domain):
+        """create a single domain"""
+        return self.client.domains.create_domain(self.account.id, domain).data.__dict__
+
+    def delete_domain(self, domain):
+        """delete a single domain"""
+        self.client.domains.delete_domain(self.account.id, domain)
+
+    def get_records(self, zone, dnsimple_filter=None):
+        """return dns ressource records which match a specified filter"""
+        records_list = self._get_paginated_result(self.client.zones.list_records,
+                                                  account_id=self.account.id,
+                                                  zone=zone, filter=dnsimple_filter)
+        return [d.__dict__ for d in records_list]
+
+    def delete_record(self, domain, rid):
+        """delete a single dns ressource record"""
+        self.client.zones.delete_record(self.account.id, domain, rid)
+
+    def update_record(self, domain, rid, ttl=None, priority=None):
+        """update a single dns ressource record"""
+        zr = ZoneRecordUpdateInput(ttl=ttl, priority=priority)
+        result = self.client.zones.update_record(self.account.id, str(domain), str(rid), zr).data.__dict__
+        return result
+
+    def create_record(self, domain, name, record_type, content, ttl=None, priority=None):
+        """create a single dns ressource record"""
+        zr = ZoneRecordInput(name=name, type=record_type, content=content, ttl=ttl, priority=priority)
+        return self.client.zones.create_record(self.account.id, str(domain), zr).data.__dict__
+
+    def _get_paginated_result(self, operation, **options):
+        """return all results of a paginated api response"""
+        records_pagination = operation(per_page=self.pagination_per_page, **options).pagination
+        result_list = []
+        for page in range(1, records_pagination.total_pages + 1):
+            page_data = operation(per_page=self.pagination_per_page, page=page, **options).data
+            result_list.extend(page_data)
+        return result_list
+
+
+DNSIMPLE_IMP_ERR = []
+HAS_DNSIMPLE = False
 try:
-    from dnsimple import DNSimple
-    from dnsimple.dnsimple import __version__ as dnsimple_version
-    from dnsimple.dnsimple import DNSimpleException
+    # try to import dnsimple >= 2.0.0
+    from dnsimple import Client, DNSimpleException
+    from dnsimple.service import Accounts
+    from dnsimple.version import version as dnsimple_version
+    from dnsimple.struct.zone_record import ZoneRecordUpdateInput, ZoneRecordInput
     HAS_DNSIMPLE = True
 except ImportError:
-    DNSIMPLE_IMP_ERR = traceback.format_exc()
-    HAS_DNSIMPLE = False
+    DNSIMPLE_IMP_ERR.append(traceback.format_exc())
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+if not HAS_DNSIMPLE:
+    # try to import dnsimple < 2.0.0
+    try:
+        from dnsimple.dnsimple import __version__ as dnsimple_version
+        from dnsimple import DNSimple
+        from dnsimple.dnsimple import DNSimpleException
+        HAS_DNSIMPLE = True
+    except ImportError:
+        DNSIMPLE_IMP_ERR.append(traceback.format_exc())
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib, env_fallback
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            account_email=dict(type='str'),
-            account_api_token=dict(type='str', no_log=True),
+            account_email=dict(type='str', fallback=(env_fallback, ['DNSIMPLE_EMAIL'])),
+            account_api_token=dict(type='str',
+                                   no_log=True,
+                                   fallback=(env_fallback, ['DNSIMPLE_API_TOKEN'])),
             domain=dict(type='str'),
             record=dict(type='str'),
             record_ids=dict(type='list', elements='str'),
-            type=dict(type='str', choices=['A', 'ALIAS', 'CNAME', 'MX', 'SPF', 'URL', 'TXT', 'NS', 'SRV', 'NAPTR', 'PTR', 'AAAA', 'SSHFP', 'HINFO',
+            type=dict(type='str', choices=['A', 'ALIAS', 'CNAME', 'MX', 'SPF',
+                                           'URL', 'TXT', 'NS', 'SRV', 'NAPTR',
+                                           'PTR', 'AAAA', 'SSHFP', 'HINFO',
                                            'POOL', 'CAA']),
             ttl=dict(type='int', default=3600),
             value=dict(type='str'),
             priority=dict(type='int'),
             state=dict(type='str', choices=['present', 'absent'], default='present'),
             solo=dict(type='bool', default=False),
+            sandbox=dict(type='bool', default=False),
         ),
         required_together=[
             ['record', 'value']
@@ -184,11 +380,7 @@ def main():
     )
 
     if not HAS_DNSIMPLE:
-        module.fail_json(msg=missing_required_lib('dnsimple'), exception=DNSIMPLE_IMP_ERR)
-
-    if LooseVersion(dnsimple_version) < LooseVersion('1.0.0'):
-        module.fail_json(msg="Current version of dnsimple Python module [%s] uses 'v1' API which is deprecated."
-                             " Please upgrade to version 1.0.0 and above to use dnsimple 'v2' API." % dnsimple_version)
+        module.fail_json(msg=missing_required_lib('dnsimple'), exception=DNSIMPLE_IMP_ERR[0])
 
     account_email = module.params.get('account_email')
     account_api_token = module.params.get('account_api_token')
@@ -201,29 +393,29 @@ def main():
     priority = module.params.get('priority')
     state = module.params.get('state')
     is_solo = module.params.get('solo')
+    sandbox = module.params.get('sandbox')
 
-    if account_email and account_api_token:
-        client = DNSimple(email=account_email, api_token=account_api_token)
-    elif os.environ.get('DNSIMPLE_EMAIL') and os.environ.get('DNSIMPLE_API_TOKEN'):
-        client = DNSimple(email=os.environ.get('DNSIMPLE_EMAIL'), api_token=os.environ.get('DNSIMPLE_API_TOKEN'))
-    else:
-        client = DNSimple()
+    DNSIMPLE_MAJOR_VERSION = LooseVersion(dnsimple_version).version[0]
 
     try:
+        if DNSIMPLE_MAJOR_VERSION > 1:
+            ds = DNSimpleV2(account_email, account_api_token, sandbox, module)
+        else:
+            ds = DNSimpleV1(account_email, account_api_token, sandbox, module)
         # Let's figure out what operation we want to do
-
         # No domain, return a list
         if not domain:
-            domains = client.domains()
-            module.exit_json(changed=False, result=[d['domain'] for d in domains])
+            all_domains = ds.get_all_domains()
+            module.exit_json(changed=False, result=all_domains)
 
         # Domain & No record
-        if domain and record is None and not record_ids:
-            domains = [d['domain'] for d in client.domains()]
+        if record is None and not record_ids:
             if domain.isdigit():
-                dr = next((d for d in domains if d['id'] == int(domain)), None)
+                typed_domain = int(domain)
             else:
-                dr = next((d for d in domains if d['name'] == domain), None)
+                typed_domain = str(domain)
+            dr = ds.get_domain(typed_domain)
+            # domain does not exist
             if state == 'present':
                 if dr:
                     module.exit_json(changed=False, result=dr)
@@ -231,105 +423,91 @@ def main():
                     if module.check_mode:
                         module.exit_json(changed=True)
                     else:
-                        module.exit_json(changed=True, result=client.add_domain(domain)['domain'])
-
+                        response = ds.create_domain(domain)
+                        module.exit_json(changed=True, result=response)
             # state is absent
             else:
                 if dr:
                     if not module.check_mode:
-                        client.delete(domain)
+                        ds.delete_domain(domain)
                     module.exit_json(changed=True)
                 else:
                     module.exit_json(changed=False)
 
         # need the not none check since record could be an empty string
-        if domain and record is not None:
-            records = [r['record'] for r in client.records(str(domain), params={'name': record})]
-
+        if record is not None:
             if not record_type:
                 module.fail_json(msg="Missing the record type")
-
             if not value:
                 module.fail_json(msg="Missing the record value")
 
-            rr = next((r for r in records if r['name'] == record and r['type'] == record_type and r['content'] == value), None)
-
+            records_list = ds.get_records(domain, dnsimple_filter={'name': record})
+            rr = next((r for r in records_list if r['name'] == record and r['type'] == record_type and r['content'] == value), None)
             if state == 'present':
                 changed = False
                 if is_solo:
                     # delete any records that have the same name and record type
-                    same_type = [r['id'] for r in records if r['name'] == record and r['type'] == record_type]
+                    same_type = [r['id'] for r in records_list if r['name'] == record and r['type'] == record_type]
                     if rr:
                         same_type = [rid for rid in same_type if rid != rr['id']]
                     if same_type:
                         if not module.check_mode:
                             for rid in same_type:
-                                client.delete_record(str(domain), rid)
+                                ds.delete_record(domain, rid)
                         changed = True
                 if rr:
                     # check if we need to update
                     if rr['ttl'] != ttl or rr['priority'] != priority:
-                        data = {}
-                        if ttl:
-                            data['ttl'] = ttl
-                        if priority:
-                            data['priority'] = priority
                         if module.check_mode:
                             module.exit_json(changed=True)
                         else:
-                            module.exit_json(changed=True, result=client.update_record(str(domain), str(rr['id']), data)['record'])
+                            response = ds.update_record(domain, rr['id'], ttl, priority)
+                            module.exit_json(changed=True, result=response)
                     else:
                         module.exit_json(changed=changed, result=rr)
                 else:
                     # create it
-                    data = {
-                        'name': record,
-                        'type': record_type,
-                        'content': value,
-                    }
-                    if ttl:
-                        data['ttl'] = ttl
-                    if priority:
-                        data['priority'] = priority
                     if module.check_mode:
                         module.exit_json(changed=True)
                     else:
-                        module.exit_json(changed=True, result=client.add_record(str(domain), data)['record'])
-
+                        response = ds.create_record(domain, record, record_type, value, ttl, priority)
+                        module.exit_json(changed=True, result=response)
             # state is absent
             else:
                 if rr:
                     if not module.check_mode:
-                        client.delete_record(str(domain), rr['id'])
+                        ds.delete_record(domain, rr['id'])
                     module.exit_json(changed=True)
                 else:
                     module.exit_json(changed=False)
 
         # Make sure these record_ids either all exist or none
-        if domain and record_ids:
-            current_records = [str(r['record']['id']) for r in client.records(str(domain))]
-            wanted_records = [str(r) for r in record_ids]
+        if record_ids:
+            current_records = ds.get_records(domain, dnsimple_filter=None)
+            current_record_ids = [str(d['id']) for d in current_records]
+            wanted_record_ids = [str(r) for r in record_ids]
             if state == 'present':
-                difference = list(set(wanted_records) - set(current_records))
+                difference = list(set(wanted_record_ids) - set(current_record_ids))
                 if difference:
                     module.fail_json(msg="Missing the following records: %s" % difference)
                 else:
                     module.exit_json(changed=False)
-
             # state is absent
             else:
-                difference = list(set(wanted_records) & set(current_records))
+                difference = list(set(wanted_record_ids) & set(current_record_ids))
                 if difference:
                     if not module.check_mode:
                         for rid in difference:
-                            client.delete_record(str(domain), rid)
+                            ds.delete_record(domain, rid)
                     module.exit_json(changed=True)
                 else:
                     module.exit_json(changed=False)
 
     except DNSimpleException as e:
-        module.fail_json(msg="Unable to contact DNSimple: %s" % e.message)
-
+        if DNSIMPLE_MAJOR_VERSION > 1:
+            module.fail_json(msg="DNSimple exception: %s" % e.message)
+        else:
+            module.fail_json(msg="DNSimple exception: %s" % str(e.args[0]['message']))
     module.fail_json(msg="Unknown what you wanted me to do")
 
 
