@@ -681,7 +681,7 @@ def main():
         'bootdevice': module.params['bootdevice'],
         'uefi_target': module.params['uefi_target'],
         'boot_next': module.params['boot_next'],
-        'boot_override_mode': module.params['boot_override_mode']
+        'boot_override_mode': module.params['boot_override_mode'],
     }
 
     # VirtualMedia options
