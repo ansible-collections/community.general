@@ -92,6 +92,7 @@ options:
       - Boot mode when using an override
     type: str
     choices: [ Legacy, UEFI ]
+    version_added: 3.5.0
   uefi_target:
     required: false
     description:
