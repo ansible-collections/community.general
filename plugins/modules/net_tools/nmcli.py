@@ -342,6 +342,14 @@ options:
             - Name of the Wireless router or the access point.
        type: str
        version_added: 3.0.0
+    wifi:
+       description:
+            - 'The configuration of the Wifi connection. The valid attributes are listed on:
+              U(https://networkmanager.dev/docs/api/latest/settings-802-11-wireless.html).'
+            - 'For instance to create a hidden AP mode Wifi connection:
+              C({hidden: true, mode: ap}).'
+       type: dict
+       version_added: 3.5.0
 '''
 
 EXAMPLES = r'''
@@ -658,6 +666,18 @@ EXAMPLES = r'''
     autoconnect: true
     state: present
 
+- name: Create a hidden AP mode wifi connection
+  community.general.nmcli:
+    type: wifi
+    conn_name: ChocoMaster
+    ifname: wlo1
+    ssid: ChocoMaster
+    wifi:
+      hidden: true
+      mode: ap
+    autoconnect: true
+    state: present
+
 '''
 
 RETURN = r"""#
@@ -750,6 +770,7 @@ class Nmcli(object):
         self.dhcp_client_id = module.params['dhcp_client_id']
         self.zone = module.params['zone']
         self.ssid = module.params['ssid']
+        self.wifi = module.params['wifi']
         self.wifi_sec = module.params['wifi_sec']
 
         if self.method4:
@@ -878,8 +899,17 @@ class Nmcli(object):
             })
         elif self.type == 'wifi':
             options.update({
+                '802-11-wireless.ssid': self.ssid,
                 'connection.slave-type': 'bond' if self.master else None,
             })
+            if self.wifi:
+                for name, value in self.wifi.items():
+                    # Disregard 'ssid' via 'wifi.ssid'
+                    if name == 'ssid':
+                        continue
+                    options.update({
+                        '802-11-wireless.%s' % name: value
+                    })
         # Convert settings values based on the situation.
         for setting, value in options.items():
             setting_type = self.settings_type(setting)
@@ -978,7 +1008,8 @@ class Nmcli(object):
                        'ipv4.ignore-auto-routes',
                        'ipv4.may-fail',
                        'ipv6.ignore-auto-dns',
-                       'ipv6.ignore-auto-routes'):
+                       'ipv6.ignore-auto-routes',
+                       '802-11-wireless.hidden'):
             return bool
         elif setting in ('ipv4.dns',
                          'ipv4.dns-search',
@@ -1030,6 +1061,12 @@ class Nmcli(object):
         if self.type == "wifi":
             cmd.append('ssid')
             cmd.append(self.ssid)
+            if self.wifi:
+                for name, value in self.wifi.items():
+                    # Disallow setting 'ssid' via 'wifi.ssid'
+                    if name == 'ssid':
+                        continue
+                    cmd += ['802-11-wireless.%s' % name, value]
             if self.wifi_sec:
                 for name, value in self.wifi_sec.items():
                     cmd += ['wifi-sec.%s' % name, value]
@@ -1255,6 +1292,7 @@ def main():
             ip_tunnel_local=dict(type='str'),
             ip_tunnel_remote=dict(type='str'),
             ssid=dict(type='str'),
+            wifi=dict(type='dict'),
             wifi_sec=dict(type='dict', no_log=True),
         ),
         mutually_exclusive=[['never_default4', 'gw4']],
