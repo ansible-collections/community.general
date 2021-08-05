@@ -1,0 +1,2 @@
+minor_changes:
+  - hana_query - added the abillity to use hdbuserstore (https://github.com/ansible-collections/community.general/pull/3125).
