@@ -5,7 +5,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-from ansible_collections.community.general.plugins.modules.proxmox_nic import RETURN
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -19,10 +18,12 @@ options:
     key:
         description:
             - Database key.
+        required: True
         type: str
     value:
         description:
             - Value that key should be set to.
+        required: True
         type: str
 notes:
    - Requires the redis-py Python package on the remote host. You can
@@ -30,13 +31,11 @@ notes:
      https://github.com/andymccurdy/redis-py
 
 extends_documentation_fragment:
-  - community.general.proxmox.documentation
-  - community.general.proxmox.selection
+  - community.general.redis.documentation
 
 seealso:
     - module: community.general.redis_info
     - module: community.general.redis
-requirements: [ redis ]
 '''
 
 EXAMPLES = '''
@@ -84,7 +83,7 @@ from ansible_collections.community.general.plugins.module_utils.redis import (
 def main():
     redis_auth_args = redis_auth_argument_spec()
     module_args = dict(
-        key=dict(type='str', required=True),
+        key=dict(type='str', required=True, no_log=False),
         value=dict(type='str', required=True)
     )
     module_args.update(redis_auth_args)
@@ -106,7 +105,7 @@ def main():
 
     old_value = None
     try:
-        old_value = redis.connection.get('key')
+        old_value = redis.connection.get(key)
     except Exception as e:
         msg = 'Failed to get value of key: {0} with exception: {1}'.format(
             key, str(e))
@@ -121,8 +120,9 @@ def main():
         result['msg'] = msg
         module.exit_json(**result)
     try:
-        redis.connection.set('key', 'value')
+        redis.connection.set(key, value)
         msg = 'Set key: {0} to {1}'.format(key, value)
+        result['msg'] = msg
         result['changed'] = True
         module.exit_json(**result)
     except Exception as e:

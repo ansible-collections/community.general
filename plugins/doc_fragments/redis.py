@@ -22,8 +22,8 @@ options:
     default: 6379
     type: int
   login_user:
-   description:
-     - Specify the user to authenticate with.
+    description:
+      - Specify the user to authenticate with.
     type: str
   login_password:
     description:
@@ -36,10 +36,11 @@ options:
       - This should only be turned off for personally controlled sites or with
       - localhost as target.
     type: bool
-    default: no
+    default: True
   ssl_ca_certs:
     description:
       - Path to root certificates file. If not set and C(validate_certs) is
       - set to I(True), certifi ca-certificates will be used.
-requirements: [ "proxmoxer", "certifi" ]
+    type: str
+requirements: [ "redis", "certifi" ]
 '''

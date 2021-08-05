@@ -5,7 +5,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-from ansible_collections.community.general.plugins.modules.proxmox_nic import RETURN
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -13,26 +12,25 @@ DOCUMENTATION = '''
 module: redis_data_info
 short_description: Get value of key in Redis database
 description:
-   - Get value of keys in Redis database
+  - Get value of keys in Redis database
 author: "Andreas Botzner (@botzner_andreas)"
 options:
-    key:
-        description:
-            - Database key.
-        type: str
+  key:
+    description:
+      - Database key.
+    type: str
+    required: True
 notes:
-   - Requires the redis-py Python package on the remote host. You can
-     install it with pip (pip install redis) or with a package manager.
-     https://github.com/andymccurdy/redis-py
+  - Requires the redis-py Python package on the remote host. You can
+    install it with pip (pip install redis) or with a package manager.
+    https://github.com/andymccurdy/redis-py
 
 extends_documentation_fragment:
-  - community.general.proxmox.documentation
-  - community.general.proxmox.selection
+  - community.general.redis.documentation
 
 seealso:
-    - module: community.general.redis_info
-    - module: community.general.redis
-requirements: [ redis ]
+  - module: community.general.redis_info
+  - module: community.general.redis
 '''
 
 EXAMPLES = '''
@@ -55,21 +53,16 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-old_value:
-  description: Value of key before setting.
-  returned: always
-  type: str
-  sample: 'old_value_of_key'
 value:
   description: Value key was set to
   returned: on success
   type: str
-  sample: 'new_value_of_key'
+  sample: 'value_of_some_key'
 msg:
   description: A short message.
   returned: always
   type: str
-  sample: ''
+  sample: 'Got key: foo with value: bar'
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -80,14 +73,13 @@ from ansible_collections.community.general.plugins.module_utils.redis import (
 def main():
     redis_auth_args = redis_auth_argument_spec()
     module_args = dict(
-        key=dict(type='str', required=True),
-        value=dict(type='str', required=True)
+        key=dict(type='str', required=True, no_log=False),
     )
     module_args.update(redis_auth_args)
 
     module = AnsibleModule(
         argument_spec=module_args,
-        supports_check_mode=True,
+        supports_check_mode=False,
     )
     import_errors = fail_imports()
     if len(import_errors) != 0:
@@ -96,34 +88,18 @@ def main():
     redis = RedisAnsible(module)
 
     key = module.params['key']
-    value = module.params['value']
-
     result = {'changed': False}
 
-    old_value = None
+    value = None
     try:
-        old_value = redis.connection.get('key')
+        value = redis.connection.get(key)
+        msg = 'Got key: {0} with value: {1}'.format(key, value)
+        result['msg'] = msg
+        result['value'] = value
+        module.exit_json(**result)
     except Exception as e:
         msg = 'Failed to get value of key: {0} with exception: {1}'.format(
             key, str(e))
-        result['msg'] = msg
-        module.fail_json(**result)
-
-    result['old_value'] = old_value
-    result['value'] = value
-    if module.check_mode or old_value == value:
-        msg = 'Key: {0} had value: {1} now has value {2}'.format(
-            key, old_value, value)
-        result['msg'] = msg
-        module.exit_json(**result)
-    try:
-        redis.connection.set('key', 'value')
-        msg = 'Set key: {0} to {1}'.format(key, value)
-        result['changed'] = True
-        module.exit_json(**result)
-    except Exception as e:
-        msg = 'Failed to set key: {0} to value: {1} with exception: {2}'.format(
-            key, value, str(e))
         result['msg'] = msg
         module.fail_json(**result)
 

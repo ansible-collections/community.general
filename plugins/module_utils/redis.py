@@ -43,7 +43,7 @@ def redis_auth_argument_spec():
         login_password=dict(type='str',
                             no_log=True
                             ),
-        login_port=dict(type='int'),
+        login_port=dict(type='int', default=6379),
         validate_certs=dict(type='bool',
                             default=True
                             ),
