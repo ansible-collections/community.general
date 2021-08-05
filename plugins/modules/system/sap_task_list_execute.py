@@ -64,7 +64,7 @@ options:
     description:
       - The tasks and the parameters for execution.
       - If the task list do not need any parameters. This could be empty.
-      - The list values must have curly brackets to declare a dictonary
+      - The list values must be dictionaries
         and contain the following keys in uppercase C(TASKNAME), C(FIELDNAME), C(VALUE).
         See examples.
       - If only specific tasks from the task list should be executed.
@@ -102,8 +102,7 @@ options:
     description:
       - It is possible for tasks that they don't need parameters and run either.
         If this parameter is true only defined tasks in C(task_parameter) list will run.
-    default: False
-    required: false
+    default: false
     type: bool
 
 notes:
@@ -135,7 +134,9 @@ EXAMPLES = r'''
     task_to_execute: SAP_BASIS_SSL_CHECK
     task_parameters :
       - { 'TASKNAME': 'CL_STCT_CHECK_SEC_CRYPTO', 'FIELDNAME': 'P_OPT2', 'VALUE': 'X' }
-      - { 'TASKNAME': 'CL_STCT_CHECK_SEC_CRYPTO', 'FIELDNAME': 'P_OPT3', 'VALUE': 'X' }
+      - TASKNAME: CL_STCT_CHECK_SEC_CRYPTO
+        FIELDNAME: P_OPT3
+        VALUE: X
     task_settings: batch
 
 - name: Show all possible input parameters
