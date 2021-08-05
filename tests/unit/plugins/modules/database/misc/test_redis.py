@@ -3,16 +3,13 @@
 # Copyright: (c) 2021, Andreas Botzner <andreas at botzner dot com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import absolute_import
+from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
 import pytest
 import json
-import redis
 
-from ansible_collections.community.general.tests.unit.compat.mock import MagicMock
-from ansible_collections.community.general.plugins.module_utils import redis
 from ansible_collections.community.general.plugins.modules.database.misc import redis_set, redis_incr, redis_data_info
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 

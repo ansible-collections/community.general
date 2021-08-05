@@ -13,7 +13,7 @@ module: redis_incr
 short_description: Increment keys in Redis
 description:
    - Increment integer keys in Redis database by 1 and get new value.
-author: "Andreas Botzner (@botzner_andreas)"
+author: "Andreas Botzner (@paginabianca)"
 options:
   key:
     description:

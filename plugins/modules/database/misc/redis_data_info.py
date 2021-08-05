@@ -13,7 +13,7 @@ module: redis_data_info
 short_description: Get value of key in Redis database
 description:
   - Get value of keys in Redis database
-author: "Andreas Botzner (@botzner_andreas)"
+author: "Andreas Botzner (@paginabianca)"
 options:
   key:
     description:

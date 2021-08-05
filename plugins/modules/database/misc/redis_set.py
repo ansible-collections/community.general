@@ -13,7 +13,7 @@ module: redis_set
 short_description: Set key value pairs in Redis
 description:
    - Set key value pairs in Redis database.
-author: "Andreas Botzner (@botzner_andreas)"
+author: "Andreas Botzner (@paginabianca)"
 options:
     key:
         description:
