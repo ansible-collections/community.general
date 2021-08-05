@@ -51,10 +51,11 @@ options:
     type:
         description:
             - This is the type of device or network connection that you wish to create or modify.
+            - Type C(dummy) is added in community.general 3.5.0.
             - Type C(generic) is added in Ansible 2.5.
             - Type C(infiniband) is added in community.general 2.0.0.
         type: str
-        choices: [ bond, bond-slave, bridge, bridge-slave, ethernet, generic, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi ]
+        choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi ]
     mode:
         description:
             - This is the type of device or network connection that you wish to create for a bond or bridge.
@@ -775,6 +776,8 @@ class Nmcli(object):
 
         if self.method4:
             self.ipv4_method = self.method4
+        elif self.type == 'dummy' and not self.ip4:
+            self.ipv4_method = 'disabled'
         elif self.ip4:
             self.ipv4_method = 'manual'
         else:
@@ -782,6 +785,8 @@ class Nmcli(object):
 
         if self.method6:
             self.ipv6_method = self.method6
+        elif self.type == 'dummy' and not self.ip6:
+            self.ipv6_method = 'disabled'
         elif self.ip6:
             self.ipv6_method = 'manual'
         else:
@@ -938,6 +943,7 @@ class Nmcli(object):
         return self.type in (
             'bond',
             'bridge',
+            'dummy',
             'ethernet',
             'generic',
             'infiniband',
@@ -956,6 +962,7 @@ class Nmcli(object):
     @property
     def mtu_conn_type(self):
         return self.type in (
+            'dummy',
             'ethernet',
             'team-slave',
         )
@@ -1092,7 +1099,7 @@ class Nmcli(object):
 
     @property
     def create_connection_up(self):
-        if self.type in ('bond', 'ethernet', 'infiniband', 'wifi'):
+        if self.type in ('bond', 'dummy', 'ethernet', 'infiniband', 'wifi'):
             if (self.mtu is not None) or (self.dns4 is not None) or (self.dns6 is not None):
                 return True
         elif self.type == 'team':
@@ -1218,6 +1225,7 @@ def main():
                           'bond-slave',
                           'bridge',
                           'bridge-slave',
+                          'dummy',
                           'ethernet',
                           'generic',
                           'infiniband',
