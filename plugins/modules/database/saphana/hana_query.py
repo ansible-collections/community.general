@@ -31,7 +31,11 @@ options:
         default: false
         version_added: 3.5.0
     password:
-        description: The password to connect to the database.
+        description:
+          - The password to connect to the database.
+          - "B(Note:) Since the passwords have to be passed as command line arguments, I(userstore=true) should
+            be used whenever possible, as command line arguments can be seen by other users
+            on the same machine."
         type: str
     autocommit:
         description: Autocommit the statement.
