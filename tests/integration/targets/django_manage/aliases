@@ -5,3 +5,4 @@ skip/macos
 skip/osx
 skip/rhel8.2
 skip/rhel8.3
+skip/rhel8.4
