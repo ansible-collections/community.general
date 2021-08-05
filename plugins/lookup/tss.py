@@ -133,6 +133,7 @@ from ansible.plugins.lookup import LookupBase
 
 display = Display()
 
+
 class LookupModule(LookupBase):
     @staticmethod
     def Client(server_parameters):
