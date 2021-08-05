@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli - add ``dummy`` interface support (https://github.com/ansible-collections/community.general/issues/724).
