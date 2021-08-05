@@ -186,8 +186,8 @@ stages:
               test: macos/11.1
             - name: RHEL 7.9
               test: rhel/7.9
-            - name: RHEL 8.3
-              test: rhel/8.3
+            - name: RHEL 8.4
+              test: rhel/8.4
             - name: FreeBSD 12.2
               test: freebsd/12.2
             - name: FreeBSD 13.0
