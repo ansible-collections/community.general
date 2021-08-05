@@ -19,14 +19,6 @@ description:
   - This module will use the RFC Package C(STC_TM_API).
 
 options:
-  state:
-    description:
-      - If the state C(available_params) is provided the possible parameters are shown for each task.
-        The returned values are in the necessary format for C(task_parameters).
-    choices: ['available_params', 'present']
-    required: false
-    default: present
-    type: str
   conn_username:
     description: The required username for the SAP system.
     required: true
@@ -118,7 +110,6 @@ EXAMPLES = r'''
 
 - name: Pass in input parameters
   community.general.sap_task_list_execute:
-    state: present
     conn_username: DDIC
     conn_password: Passwd1234
     host: 10.1.8.10
@@ -131,16 +122,6 @@ EXAMPLES = r'''
         FIELDNAME: P_OPT3
         VALUE: X
     task_settings: batch
-
-- name: Show all possible input parameters
-  community.general.sap_task_list_execute:
-    state: available_params
-    conn_username: DDIC
-    conn_password: Passwd1234
-    host: 10.1.8.10
-    sysnr: '00'
-    client: '000'
-    task_to_execute: SAP_BASIS_SSL_CHECK
 
 # Exported environement variables.
 - name: Hint if module will fail with error message like ImportError libsapnwrfc.so...
@@ -158,24 +139,6 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-# These are examples of possible return values, and in general should use other names for return values.
-results:
-  description: The return value for state C(available_params).
-  type: list
-  elements: dict
-  returned: on success
-  sample:  [
-        {
-            'TASKNAME': 'CL_STCT_CHECK_SEC_CRYPTO',
-            'FIELDNAME': 'P_OPT2',
-            'VALUE': 'X'
-        },
-        {
-            'TASKNAME': 'CL_STCT_CHECK_SEC_CRYPTO',
-            'FIELDNAME': 'P_OPT3',
-            'VALUE': 'X'
-        }
-    ]
 msg:
   description: A small execution description
   type: str
@@ -300,7 +263,6 @@ def run_module():
     # define available arguments/parameters a user can pass to the module
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['available_params', 'present']),
             # values for connection
             conn_username=dict(type='str', required=True),
             conn_password=dict(type='str', required=True, no_log=True),
@@ -318,8 +280,6 @@ def run_module():
     result = dict(changed=False, msg='', results=[], out={}, json_out={}, error={}, )
 
     params = module.params
-
-    state = params['state']
 
     username = (params['conn_username']).upper()
     password = params['conn_password']
@@ -355,72 +315,62 @@ def run_module():
             result['msg'] = 'The task list does not exsist.'
             module.fail_json(**result)
 
-        if state == "available_params":
-            params_list = []
-            for tasks in raw_params['ET_PARAM_DEF']:
-                params_list = params_list + [{'TASKNAME': tasks['TASKNAME'], 'FIELDNAME': tasks['FIELDNAME'], 'VALUE': tasks['DEFAULTVAL']}]
-            result['results'] = params_list
-            result['json_out'] = json.dumps(raw_params['ET_PARAM_DEF'])
-            result['out'] = raw_params['ET_PARAM_DEF']
-            result['changed'] = True
+        exec_settings = process_exec_settings(task_settings)
 
-        if state == "present":
-            exec_settings = process_exec_settings(task_settings)
+        # initialize session task
+        session_init = call_rfc_method(conn, 'STC_TM_SESSION_BEGIN',
+                                       {'I_SCENARIO_ID': task_to_execute,
+                                        'I_INIT_ONLY': 'X'})
 
-            # initialize session task
-            session_init = call_rfc_method(conn, 'STC_TM_SESSION_BEGIN',
-                                           {'I_SCENARIO_ID': task_to_execute,
-                                            'I_INIT_ONLY': 'X'})
+        # Confirm Tasks which requires manual activities from Task List Run
+        for task in raw_params['ET_PARAMETER']:
+            call_rfc_method(conn, 'STC_TM_TASK_CONFIRM',
+                            {'I_SESSION_ID': session_init['E_SESSION_ID'],
+                             'I_TASKNAME': task['TASKNAME']})
 
-            # Confirm Tasks which requires manual activities from Task List Run
+        if task_skip:
             for task in raw_params['ET_PARAMETER']:
-                call_rfc_method(conn, 'STC_TM_TASK_CONFIRM',
+                call_rfc_method(conn, 'STC_TM_TASK_SKIP',
                                 {'I_SESSION_ID': session_init['E_SESSION_ID'],
-                                 'I_TASKNAME': task['TASKNAME']})
+                                 'I_TASKNAME': task['TASKNAME'], 'I_SKIP_DEP_TASKS': 'X'})
 
-            if task_skip:
-                for task in raw_params['ET_PARAMETER']:
-                    call_rfc_method(conn, 'STC_TM_TASK_SKIP',
-                                    {'I_SESSION_ID': session_init['E_SESSION_ID'],
-                                     'I_TASKNAME': task['TASKNAME'], 'I_SKIP_DEP_TASKS': 'X'})
-
-            # unskip defined tasks
-            if task_parameters is not None:
-                for task in task_parameters:
-                    call_rfc_method(conn, 'STC_TM_TASK_UNSKIP',
-                                    {'I_SESSION_ID': session_init['E_SESSION_ID'],
-                                     'I_TASKNAME': task['TASKNAME'], 'I_UNSKIP_DEP_TASKS': 'X'})
-
-            # set parameters
-            if task_parameters is not None:
-                call_rfc_method(conn, 'STC_TM_SESSION_SET_PARAMETERS',
+        # unskip defined tasks
+        if task_parameters is not None:
+            for task in task_parameters:
+                call_rfc_method(conn, 'STC_TM_TASK_UNSKIP',
                                 {'I_SESSION_ID': session_init['E_SESSION_ID'],
-                                 'IT_PARAMETER': task_parameters})
+                                 'I_TASKNAME': task['TASKNAME'], 'I_UNSKIP_DEP_TASKS': 'X'})
 
-            # start the task
-            try:
-                session_start = call_rfc_method(conn, 'STC_TM_SESSION_RESUME',
-                                                {'I_SESSION_ID': session_init['E_SESSION_ID'],
-                                                 'IS_EXEC_SETTINGS': exec_settings})
-            except Exception as err:
-                result['error'] = str(err)
-                result['msg'] = 'Something went wrong. See error.'
-                module.fail_json(**result)
+        # set parameters
+        if task_parameters is not None:
+            call_rfc_method(conn, 'STC_TM_SESSION_SET_PARAMETERS',
+                            {'I_SESSION_ID': session_init['E_SESSION_ID'],
+                             'IT_PARAMETER': task_parameters})
 
-            # get task logs because the execution may successfully but the tasks shows errors or warnings
-            # returned value is ABAPXML https://help.sap.com/doc/abapdocu_755_index_htm/7.55/en-US/abenabap_xslt_asxml_general.htm
-            session_log = call_rfc_method(conn, 'STC_TM_SESSION_GET_LOG',
-                                          {'I_SESSION_ID': session_init['E_SESSION_ID']})
-            try:
-                log_xml = XML(session_log['E_LOG'])
-                task_list = xml_dict(log_xml)['{http://www.sap.com/abapxml}values']['SESSION']['TASKLIST']
-            except KeyError:
-                task_list = "No logs available."
+        # start the task
+        try:
+            session_start = call_rfc_method(conn, 'STC_TM_SESSION_RESUME',
+                                            {'I_SESSION_ID': session_init['E_SESSION_ID'],
+                                             'IS_EXEC_SETTINGS': exec_settings})
+        except Exception as err:
+            result['error'] = str(err)
+            result['msg'] = 'Something went wrong. See error.'
+            module.fail_json(**result)
 
-            result['changed'] = True
-            result['msg'] = session_start['E_STATUS_DESCR']
-            result['json_out'] = json.dumps(task_list)
-            result['out'] = task_list
+        # get task logs because the execution may successfully but the tasks shows errors or warnings
+        # returned value is ABAPXML https://help.sap.com/doc/abapdocu_755_index_htm/7.55/en-US/abenabap_xslt_asxml_general.htm
+        session_log = call_rfc_method(conn, 'STC_TM_SESSION_GET_LOG',
+                                      {'I_SESSION_ID': session_init['E_SESSION_ID']})
+        try:
+            log_xml = XML(session_log['E_LOG'])
+            task_list = xml_dict(log_xml)['{http://www.sap.com/abapxml}values']['SESSION']['TASKLIST']
+        except KeyError:
+            task_list = "No logs available."
+
+        result['changed'] = True
+        result['msg'] = session_start['E_STATUS_DESCR']
+        result['json_out'] = json.dumps(task_list)
+        result['out'] = task_list
 
     module.exit_json(**result)
 
