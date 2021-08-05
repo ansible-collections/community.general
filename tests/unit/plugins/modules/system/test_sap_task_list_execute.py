@@ -86,24 +86,3 @@ class TestSAPRfcModule(ModuleTestCase):
             with self.assertRaises(AnsibleExitJson) as result:
                 sap_task_list_execute.main()
         self.assertEqual(result.exception.args[0]['out'], 'No logs available.')
-
-    def test_show(self):
-        """tests show available params success"""
-
-        set_module_args({
-            "state": "available_params",
-            "conn_username": "DDIC",
-            "conn_password": "Test1234",
-            "host": "10.1.8.9",
-            "task_to_execute": "SAP_BASIS_SSL_CHECK"
-        })
-
-        with patch.object(self.module, 'call_rfc_method') as show_list:
-            show_list.return_value = {'ET_PARAM_DEF':
-                                      [{'TASKNAME': 'CL_STCT_CHECK_SEC_CRYPTO', 'LNR': 1, 'FIELDNAME': 'P_OPT1', 'MANDATORY': '',
-                                        'DATATYPE': 'CHAR', 'LENG': '000001', 'DECIMALS': '000000', 'LOWERCASE': '',
-                                        'OUTPUTLEN': '000001', 'SIGNFLAG': '', 'CONVEXIT': '', 'DDTEXT': 'Warning', 'PASSWORD': '',
-                                        'READ_ONLY': '', 'CHECKBOX': '', 'RADIOBUTTON': 'X', 'RB_GROUP': 'ICM', 'DEFAULTVAL': 'X'}]}
-            with self.assertRaises(AnsibleExitJson) as success:
-                sap_task_list_execute.main()
-            self.assertEqual(success.exception.args[0]['results'][0], {'TASKNAME': 'CL_STCT_CHECK_SEC_CRYPTO', 'FIELDNAME': 'P_OPT1', 'VALUE': 'X'})
