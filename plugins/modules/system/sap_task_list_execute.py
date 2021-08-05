@@ -82,7 +82,7 @@ options:
         type: raw
   task_settings:
     description:
-      - Setting for the execution of the task list. This can be one of the following as in TCODE SE80 described:
+      - Setting for the execution of the task list. This can be the following as in TCODE SE80 described.
           Check Mode C(CHECKRUN),
           Background Processing Active C(BATCH) (this is the default value),
           Asynchronous Execution C(ASYNC),
