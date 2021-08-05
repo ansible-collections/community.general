@@ -1,0 +1,2 @@
+minor_changes:
+  - pkgin - In case of ``pkgin`` tool failue, display returned standard output ``stdout`` and standard error ``stderr``. It is improving the debugging process in case ``pkgin`` failures (https://github.com/ansible-collections/community.general/issues/3146).
