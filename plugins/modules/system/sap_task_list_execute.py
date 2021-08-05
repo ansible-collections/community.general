@@ -23,7 +23,6 @@ options:
     description:
       - If the state C(available_params) is provided the possible parameters are shown for each task.
         The returned values are in the necessary format for C(task_parameters).
-      - The full list of parameters is exported to stdout in json format.
     choices: ['available_params', 'present']
     required: false
     default: present
@@ -88,12 +87,12 @@ options:
         required: false
   task_settings:
     description:
-      - Setting for the execution of the task list. This can be one of the following as in TCODE SE80 described.
-          Check Mode C(CHECKRUN)
-          Background Processing Active C(BATCH) - This is the default value,
+      - Setting for the execution of the task list. This can be one of the following as in TCODE SE80 described:
+          Check Mode C(CHECKRUN),
+          Background Processing Active C(BATCH) (this is the default value),
           Asynchronous Execution C(ASYNC),
           Trace Mode C(TRACE),
-          Server Name C(BATCH_TARGET),
+          Server Name C(BATCH_TARGET).
     default: ['BATCH']
     required: false
     type: list
