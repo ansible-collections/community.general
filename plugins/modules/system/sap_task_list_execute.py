@@ -306,71 +306,61 @@ def run_module():
         result['msg'] = 'Something went wrong connecting to the SAP system.'
         module.fail_json(**result)
 
-    if task_to_execute is not None:
-        try:
-            raw_params = call_rfc_method(conn, 'STC_TM_SCENARIO_GET_PARAMETERS',
-                                         {'I_SCENARIO_ID': task_to_execute})
-        except Exception as err:
-            result['error'] = str(err)
-            result['msg'] = 'The task list does not exsist.'
-            module.fail_json(**result)
-
-        exec_settings = process_exec_settings(task_settings)
-
-        # initialize session task
-        session_init = call_rfc_method(conn, 'STC_TM_SESSION_BEGIN',
-                                       {'I_SCENARIO_ID': task_to_execute,
-                                        'I_INIT_ONLY': 'X'})
-
-        # Confirm Tasks which requires manual activities from Task List Run
+    try:
+        raw_params = call_rfc_method(conn, 'STC_TM_SCENARIO_GET_PARAMETERS',
+                                     {'I_SCENARIO_ID': task_to_execute})
+    except Exception as err:
+        result['error'] = str(err)
+        result['msg'] = 'The task list does not exsist.'
+        module.fail_json(**result)
+    exec_settings = process_exec_settings(task_settings)
+    # initialize session task
+    session_init = call_rfc_method(conn, 'STC_TM_SESSION_BEGIN',
+                                   {'I_SCENARIO_ID': task_to_execute,
+                                    'I_INIT_ONLY': 'X'})
+    # Confirm Tasks which requires manual activities from Task List Run
+    for task in raw_params['ET_PARAMETER']:
+        call_rfc_method(conn, 'STC_TM_TASK_CONFIRM',
+                        {'I_SESSION_ID': session_init['E_SESSION_ID'],
+                         'I_TASKNAME': task['TASKNAME']})
+    if task_skip:
         for task in raw_params['ET_PARAMETER']:
-            call_rfc_method(conn, 'STC_TM_TASK_CONFIRM',
+            call_rfc_method(conn, 'STC_TM_TASK_SKIP',
                             {'I_SESSION_ID': session_init['E_SESSION_ID'],
-                             'I_TASKNAME': task['TASKNAME']})
-
-        if task_skip:
-            for task in raw_params['ET_PARAMETER']:
-                call_rfc_method(conn, 'STC_TM_TASK_SKIP',
-                                {'I_SESSION_ID': session_init['E_SESSION_ID'],
-                                 'I_TASKNAME': task['TASKNAME'], 'I_SKIP_DEP_TASKS': 'X'})
-
-        # unskip defined tasks
-        if task_parameters is not None:
-            for task in task_parameters:
-                call_rfc_method(conn, 'STC_TM_TASK_UNSKIP',
-                                {'I_SESSION_ID': session_init['E_SESSION_ID'],
-                                 'I_TASKNAME': task['TASKNAME'], 'I_UNSKIP_DEP_TASKS': 'X'})
-
-        # set parameters
-        if task_parameters is not None:
-            call_rfc_method(conn, 'STC_TM_SESSION_SET_PARAMETERS',
+                             'I_TASKNAME': task['TASKNAME'], 'I_SKIP_DEP_TASKS': 'X'})
+    # unskip defined tasks
+    if task_parameters is not None:
+        for task in task_parameters:
+            call_rfc_method(conn, 'STC_TM_TASK_UNSKIP',
                             {'I_SESSION_ID': session_init['E_SESSION_ID'],
-                             'IT_PARAMETER': task_parameters})
-
-        # start the task
-        try:
-            session_start = call_rfc_method(conn, 'STC_TM_SESSION_RESUME',
-                                            {'I_SESSION_ID': session_init['E_SESSION_ID'],
-                                             'IS_EXEC_SETTINGS': exec_settings})
-        except Exception as err:
-            result['error'] = str(err)
-            result['msg'] = 'Something went wrong. See error.'
-            module.fail_json(**result)
-
-        # get task logs because the execution may successfully but the tasks shows errors or warnings
-        # returned value is ABAPXML https://help.sap.com/doc/abapdocu_755_index_htm/7.55/en-US/abenabap_xslt_asxml_general.htm
-        session_log = call_rfc_method(conn, 'STC_TM_SESSION_GET_LOG',
-                                      {'I_SESSION_ID': session_init['E_SESSION_ID']})
-        try:
-            log_xml = XML(session_log['E_LOG'])
-            task_list = xml_dict(log_xml)['{http://www.sap.com/abapxml}values']['SESSION']['TASKLIST']
-        except KeyError:
-            task_list = "No logs available."
-
-        result['changed'] = True
-        result['msg'] = session_start['E_STATUS_DESCR']
-        result['json_out'] = json.dumps(task_list)
-        result['out'] = task_list
+                             'I_TASKNAME': task['TASKNAME'], 'I_UNSKIP_DEP_TASKS': 'X'})
+    # set parameters
+    if task_parameters is not None:
+        call_rfc_method(conn, 'STC_TM_SESSION_SET_PARAMETERS',
+                        {'I_SESSION_ID': session_init['E_SESSION_ID'],
+                         'IT_PARAMETER': task_parameters})
+    # start the task
+    try:
+        session_start = call_rfc_method(conn, 'STC_TM_SESSION_RESUME',
+                                        {'I_SESSION_ID': session_init['E_SESSION_ID'],
+                                         'IS_EXEC_SETTINGS': exec_settings})
+    except Exception as err:
+        result['error'] = str(err)
+        result['msg'] = 'Something went wrong. See error.'
+        module.fail_json(**result)
+    # get task logs because the execution may successfully but the tasks shows errors or warnings
+    # returned value is ABAPXML https://help.sap.com/doc/abapdocu_755_index_htm/7.55/en-US/abenabap_xslt_asxml_general.htm
+    session_log = call_rfc_method(conn, 'STC_TM_SESSION_GET_LOG',
+                                  {'I_SESSION_ID': session_init['E_SESSION_ID']})
+    try:
+        log_xml = XML(session_log['E_LOG'])
+        task_list = xml_dict(log_xml)['{http://www.sap.com/abapxml}values']['SESSION']['TASKLIST']
+    except KeyError:
+        task_list = "No logs available."
+    result['changed'] = True
+    result['msg'] = session_start['E_STATUS_DESCR']
+    result['json_out'] = json.dumps(task_list)
+    result['out'] = task_list
 
     module.exit_json(**result)
 
