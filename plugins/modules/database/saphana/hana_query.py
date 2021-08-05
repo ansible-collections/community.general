@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 # Copyright: (c) 2021, Rainer Leber <rainerleber@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -21,13 +22,21 @@ options:
         type: str
         required: true
     user:
-        description: A dedicated username. Defaults to C(SYSTEM).
+        description: A dedicated username. The user could be also in hdbuserstore. Defaults to C(SYSTEM).
         type: str
         default: SYSTEM
+    userstore:
+        description: If C(true) the user must be in hdbuserstore.
+        type: bool
+        default: false
+        version_added: 3.5.0
     password:
-        description: The password to connect to the database.
+        description:
+          - The password to connect to the database.
+          - "B(Note:) Since the passwords have to be passed as command line arguments, I(userstore=true) should
+            be used whenever possible, as command line arguments can be seen by other users
+            on the same machine."
         type: str
-        required: true
     autocommit:
         description: Autocommit the statement.
         type: bool
@@ -89,6 +98,17 @@ EXAMPLES = r'''
     - /tmp/HANA_CPU_UtilizationPerCore_2.00.020+.txt
     - /tmp/HANA.txt
     host: "localhost"
+
+- name: Run several queries from user store
+  community.general.hana_query:
+    sid: "hdb"
+    instance: "01"
+    user: hdbstoreuser
+    userstore: true
+    query:
+    - "select user_name from users;"
+    - select * from users;
+    autocommit: False
 '''
 
 RETURN = r'''
@@ -117,16 +137,18 @@ def main():
         argument_spec=dict(
             sid=dict(type='str', required=True),
             instance=dict(type='str', required=True),
-            encrypted=dict(type='bool', required=False, default=False),
+            encrypted=dict(type='bool', default=False),
             host=dict(type='str', required=False),
-            user=dict(type='str', required=False, default="SYSTEM"),
-            password=dict(type='str', required=True, no_log=True),
+            user=dict(type='str', default="SYSTEM"),
+            userstore=dict(type='bool', default=False),
+            password=dict(type='str', no_log=True),
             database=dict(type='str', required=False),
             query=dict(type='list', elements='str', required=False),
             filepath=dict(type='list', elements='path', required=False),
-            autocommit=dict(type='bool', required=False, default=True),
+            autocommit=dict(type='bool', default=True),
         ),
         required_one_of=[('query', 'filepath')],
+        required_if=[('userstore', False, ['password'])],
         supports_check_mode=False,
     )
     rc, out, err, out_raw = [0, [], "", ""]
@@ -136,6 +158,7 @@ def main():
     sid = (params['sid']).upper()
     instance = params['instance']
     user = params['user']
+    userstore = params['userstore']
     password = params['password']
     autocommit = params['autocommit']
     host = params['host']
@@ -161,7 +184,10 @@ def main():
     if database is not None:
         command.extend(['-d', database])
     # -x Suppresses additional output, such as the number of selected rows in a result set.
-    command.extend(['-x', '-i', instance, '-u', user, '-p', password])
+    if userstore:
+        command.extend(['-x', '-U', user])
+    else:
+        command.extend(['-x', '-i', instance, '-u', user, '-p', password])
 
     if filepath is not None:
         command.extend(['-I'])
