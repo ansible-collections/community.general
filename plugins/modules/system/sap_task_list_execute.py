@@ -191,7 +191,7 @@ msg:
 out:
   description: A complete description of the executed tasks. If this is available.
   type: list
-  elements: list
+  elements: dict
   returned: on success
   sample: [...,{
               "LOG": {
