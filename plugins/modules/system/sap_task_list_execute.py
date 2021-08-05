@@ -277,7 +277,7 @@ def run_module():
         ),
         supports_check_mode=False,
     )
-    result = dict(changed=False, msg='', results=[], out={}, json_out={}, error={}, )
+    result = dict(changed=False, msg='', out={}, json_out={}, error={}, )
 
     params = module.params
 
