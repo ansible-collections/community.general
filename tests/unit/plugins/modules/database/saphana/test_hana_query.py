@@ -64,3 +64,39 @@ class Testhana_query(ModuleTestCase):
                 {'username': 'myuser', 'name': 'my user'},
             ]])
         self.assertEqual(run_command.call_count, 1)
+
+    def test_hana_userstore_query(self):
+        """Check that result is processed with userstore."""
+        set_module_args({
+            'sid': "HDB",
+            'instance': "01",
+            'encrypted': False,
+            'host': "localhost",
+            'user': "SYSTEM",
+            'userstore': True,
+            'database': "HDB",
+            'query': "SELECT * FROM users;"
+        })
+        with patch.object(basic.AnsibleModule, 'run_command') as run_command:
+            run_command.return_value = 0, 'username,name\n  testuser,test user  \n myuser, my user   \n', ''
+            with self.assertRaises(AnsibleExitJson) as result:
+                hana_query.main()
+            self.assertEqual(result.exception.args[0]['query_result'], [[
+                {'username': 'testuser', 'name': 'test user'},
+                {'username': 'myuser', 'name': 'my user'},
+            ]])
+        self.assertEqual(run_command.call_count, 1)
+
+    def test_hana_failed_no_passwd(self):
+        """Check that result is failed with no password."""
+        with self.assertRaises(AnsibleFailJson):
+            set_module_args({
+                'sid': "HDB",
+                'instance': "01",
+                'encrypted': False,
+                'host': "localhost",
+                'user': "SYSTEM",
+                'database': "HDB",
+                'query': "SELECT * FROM users;"
+            })
+            self.module.main()
