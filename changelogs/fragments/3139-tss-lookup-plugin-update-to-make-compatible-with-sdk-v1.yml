@@ -1,0 +1,3 @@
+bugfixes:
+  - Fixed issue `#3057` by bringing the plugin in line with recent breaking changes the SecretServer Python SDK.
+    (https://github.com/ansible-collections/community.general/pull/3139) 
