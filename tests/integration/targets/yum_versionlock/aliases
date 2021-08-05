@@ -3,3 +3,4 @@ skip/aix
 skip/freebsd
 skip/osx
 skip/macos
+skip/rhel8.4  # TODO make sure that tests work on 8.4 as well!
