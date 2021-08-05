@@ -44,7 +44,6 @@ options:
       - The system number of the SAP system.
       - This value must be single quoted. Otherwise ansible treated this like a number and replace leading zeros.
       - Defaults to C('01')
-    required: false
     default: '00'
     type: str
   client:
@@ -53,7 +52,6 @@ options:
       - This value must be single quoted. Otherwise ansible treated this like a number and replace leading zeros.
       - Defaults to C('001')
     default : '000'
-    required: false
     type: str
   task_to_execute:
     description: The task list which will be executed.
@@ -69,7 +67,6 @@ options:
       - If only specific tasks from the task list should be executed.
         The tasks even when no parameter is needed must be provided.
         Alongside with the module parameter C(task_skip=true).
-    required: false
     type: list
     elements: dict
     suboptions:
@@ -80,11 +77,9 @@ options:
       FIELDNAME:
         description: The name of the field of the task.
         type: str
-        required: false
       VALUE:
         description: The value which have to be set.
         type: raw
-        required: false
   task_settings:
     description:
       - Setting for the execution of the task list. This can be one of the following as in TCODE SE80 described:
@@ -94,7 +89,6 @@ options:
           Trace Mode C(TRACE),
           Server Name C(BATCH_TARGET).
     default: ['BATCH']
-    required: false
     type: list
     elements: str
   task_skip:
