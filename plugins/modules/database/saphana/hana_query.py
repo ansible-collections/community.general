@@ -26,14 +26,13 @@ options:
         type: str
         default: SYSTEM
     userstore:
-        description: If true the user must be in hdbuserstore.
+        description: If C(true) the user must be in hdbuserstore.
         type: bool
         default: false
         version_added: 3.5.0
     password:
         description: The password to connect to the database.
         type: str
-        required: false
     autocommit:
         description: Autocommit the statement.
         type: bool
@@ -138,7 +137,7 @@ def main():
             host=dict(type='str', required=False),
             user=dict(type='str', default="SYSTEM"),
             userstore=dict(type='bool', default=False),
-            password=dict(type='str', required=False, no_log=True),
+            password=dict(type='str', no_log=True),
             database=dict(type='str', required=False),
             query=dict(type='list', elements='str', required=False),
             filepath=dict(type='list', elements='path', required=False),
