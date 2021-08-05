@@ -10,19 +10,15 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: redis_set
-short_description: Set key value pairs in Redis
+module: redis_data_info
+short_description: Get value of key in Redis database
 description:
-   - Set key value pairs in Redis database.
+   - Get value of keys in Redis database
 author: "Andreas Botzner (@botzner_andreas)"
 options:
     key:
         description:
             - Database key.
-        type: str
-    value:
-        description:
-            - Value that key should be set to.
         type: str
 notes:
    - Requires the redis-py Python package on the remote host. You can

@@ -20,7 +20,7 @@ options:
             - C(config) ensures a configuration setting on an instance.
             - C(flush) flushes all the instance or a specified db.
             - C(replica) sets a redis instance in replica or master mode. (C(slave) is an alias for C(replica).)
-        choices: [ config, flush, replica, slave, set, get, incr ]
+        choices: [ config, flush, replica, slave ]
         type: str
     login_password:
         description:
@@ -38,8 +38,9 @@ options:
         type: int
     login_user:
         description:
-            - The username to authenticate with
+            - The user to authenticate as.
         type: str
+        version_added: 3.5.0
     master_host:
         description:
             - The host of the master instance [replica command]
@@ -70,15 +71,13 @@ options:
         type: str
     name:
         description:
-            - A redis config or db key.
+            - A redis config key.
         type: str
-        aliases: [ key ]
     value:
         description:
             - A redis config value. When memory size is needed, it is possible
               to specify it in the usal form of 1KB, 2M, 400MB where the base is 1024.
               Units are case insensitive i.e. 1m = 1mb = 1M = 1MB.
-            - Or a redis db value
         type: str
 
 notes:
@@ -134,28 +133,6 @@ EXAMPLES = '''
     command: config
     name: lua-time-limit
     value: 100
-
-- name: Set key foo to bar on local redis
-  community.general.redis:
-    command: set
-    name: foo
-    value: bar
-
-- name: Increment key foo on remote host
-  community.general.redis:
-    login_host: redishost
-    login_password: secret
-    login_user: someuser
-    command: incr
-    key: foo
-
-- name: Get key foo from remote host
-  community.general.redis:
-    login_host: redishost
-    login_password: secret
-    login_user: someuser
-    command: get
-    name: foo
 '''
 
 import traceback
@@ -205,35 +182,29 @@ def flush(client, db=None):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            command=dict(type='str', choices=[
-                         'config', 'flush', 'replica', 'slave', 'set', 'get', 'incr']),
+            command=dict(type='str', choices=['config', 'flush', 'replica', 'slave']),
             login_password=dict(type='str', no_log=True),
             login_host=dict(type='str', default='localhost'),
             login_port=dict(type='int', default=6379),
             login_user=dict(type='str'),
             master_host=dict(type='str'),
             master_port=dict(type='int'),
-            replica_mode=dict(type='str', default='replica', choices=[
-                              'master', 'replica', 'slave'], aliases=["slave_mode"]),
+            replica_mode=dict(type='str', default='replica', choices=['master', 'replica', 'slave'], aliases=["slave_mode"]),
             db=dict(type='int'),
             flush_mode=dict(type='str', default='all', choices=['all', 'db']),
-            name=dict(type='str', aliases=['key']),
+            name=dict(type='str'),
             value=dict(type='str')
         ),
-        required_if=[('command', 'set', ('name', 'value')),
-                     ('command', 'get', ('name',)),
-                     ('command', 'incr', ('name',))],
         supports_check_mode=True,
     )
 
     if not redis_found:
-        module.fail_json(msg=missing_required_lib(
-            'redis'), exception=REDIS_IMP_ERR)
+        module.fail_json(msg=missing_required_lib('redis'), exception=REDIS_IMP_ERR)
 
     login_password = module.params['login_password']
-    login_user = module.params['login_user']
     login_host = module.params['login_host']
     login_port = module.params['login_port']
+    login_user = module.params['login_user']
     command = module.params['command']
     if command == "slave":
         command = "replica"
@@ -249,21 +220,17 @@ def main():
         # Check if we have all the data
         if mode == "replica":  # Only need data if we want to be replica
             if not master_host:
-                module.fail_json(
-                    msg='In replica mode master host must be provided')
+                module.fail_json(msg='In replica mode master host must be provided')
 
             if not master_port:
-                module.fail_json(
-                    msg='In replica mode master port must be provided')
+                module.fail_json(msg='In replica mode master port must be provided')
 
         # Connect and check
-        r = redis.StrictRedis(
-            host=login_host, port=login_port, username=login_user, password=login_password)
+        r = redis.StrictRedis(host=login_host, port=login_port, username=login_user, password=login_password)
         try:
             r.ping()
         except Exception as e:
-            module.fail_json(msg="unable to connect to database: %s" %
-                             to_native(e), exception=traceback.format_exc())
+            module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
 
         # Check if we are already in the mode that we want
         info = r.info()
@@ -307,17 +274,14 @@ def main():
         # Check if we have all the data
         if mode == "db":
             if db is None:
-                module.fail_json(
-                    msg="In db mode the db number must be provided")
+                module.fail_json(msg="In db mode the db number must be provided")
 
         # Connect and check
-        r = redis.StrictRedis(host=login_host, port=login_port,
-                              username=login_user, password=login_password, db=db)
+        r = redis.StrictRedis(host=login_host, port=login_port, username=login_user, password=login_password, db=db)
         try:
             r.ping()
         except Exception as e:
-            module.fail_json(msg="unable to connect to database: %s" %
-                             to_native(e), exception=traceback.format_exc())
+            module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
 
         # Do the stuff
         # (Check Check_mode before commands so the commands aren't evaluated
@@ -344,20 +308,17 @@ def main():
         except ValueError:
             value = module.params['value']
 
-        r = redis.StrictRedis(
-            host=login_host, port=login_port, username=login_user, password=login_password)
+        r = redis.StrictRedis(host=login_host, port=login_port, username=login_user, password=login_password)
 
         try:
             r.ping()
         except Exception as e:
-            module.fail_json(msg="unable to connect to database: %s" %
-                             to_native(e), exception=traceback.format_exc())
+            module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
 
         try:
             old_value = r.config_get(name)[name]
         except Exception as e:
-            module.fail_json(msg="unable to read config: %s" %
-                             to_native(e), exception=traceback.format_exc())
+            module.fail_json(msg="unable to read config: %s" % to_native(e), exception=traceback.format_exc())
         changed = old_value != value
 
         if module.check_mode or not changed:
@@ -366,93 +327,8 @@ def main():
             try:
                 r.config_set(name, value)
             except Exception as e:
-                module.fail_json(msg="unable to write config: %s" %
-                                 to_native(e), exception=traceback.format_exc())
+                module.fail_json(msg="unable to write config: %s" % to_native(e), exception=traceback.format_exc())
             module.exit_json(changed=changed, name=name, value=value)
-
-    # set Command section -----------
-    elif command == 'set':
-        name = module.params['name']
-        value = module.params['value']
-        # pprint.pp(module.params)
-
-        r = redis.StrictRedis(host=login_host,
-                              port=login_port,
-                              username=login_user,
-                              password=login_password
-                              )
-        try:
-            r.ping()
-        except Exception as e:
-            module.fail_json(msg="unable to connect to database: %s" %
-                             to_native(e), exception=traceback.format_exc())
-
-        try:
-            old_value = r.get(name)
-        except Exception as e:
-            module.fail_json(msg="unable to read key: %s" %
-                             to_native(e), exception=traceback.format_exc())
-        changed = old_value != value
-
-        if module.check_mode or not changed:
-            module.exit_json(changed=changed, name=name, value=value)
-        else:
-            try:
-                r.set(name, value)
-            except Exception as e:
-                module.fail_json(msg="unable to set key: %s" %
-                                 to_native(e), exception=traceback.format_exc())
-            module.exit_json(changed=changed, name=name, value=value)
-    elif command == 'get':
-        name = module.params['name']
-
-        r = redis.StrictRedis(host=login_host,
-                              port=login_port,
-                              username=login_user,
-                              password=login_password
-                              )
-        try:
-            r.ping()
-        except Exception as e:
-            module.fail_json(msg="unable to connect to database: %s" %
-                             to_native(e), exception=traceback.format_exc())
-        try:
-            old_value = r.get(name)
-        except Exception as e:
-            module.fail_json(msg="unable to read key: %s" %
-                             to_native(e), exception=traceback.format_exc())
-        module.exit_json(changed=False, name=name, value=old_value)
-    elif command == 'incr':
-        name = module.params['name']
-
-        r = redis.StrictRedis(host=login_host,
-                              port=login_port,
-                              username=login_user,
-                              password=login_password
-                              )
-        try:
-            r.ping()
-        except Exception as e:
-            module.fail_json(msg="unable to connect to database: %s" %
-                             to_native(e), exception=traceback.format_exc())
-        try:
-            old_value = r.get(name)
-        except Exception as e:
-            module.fail_json(msg="unable to read key: %s" %
-                             to_native(e), exception=traceback.format_exc())
-        changed = True
-
-        if module.check_mode:
-            module.exit_json(changed=changed, name=name,
-                             value=int(old_value) + 1)
-        else:
-            try:
-                new_value = r.incr(name)
-            except Exception as e:
-                module.fail_json(msg="unable to set key: %s" %
-                                 to_native(e), exception=traceback.format_exc())
-            module.exit_json(changed=changed, name=name, value=new_value)
-        pass
     else:
         module.fail_json(msg='A valid command must be provided')
 

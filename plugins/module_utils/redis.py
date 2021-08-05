@@ -4,6 +4,8 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
+from ansible.module_utils.basic import missing_required_lib
 __metaclass__ = type
 
 import traceback
@@ -20,8 +22,17 @@ try:
     import certifi
     HAS_CERTIFI_PACKAGE = True
 except ImportError:
-    REDIS_IMP_ERR = traceback.format_exc()
+    CERTIFI_IMPORT_ERROR = traceback.format_exc()
     HAS_CERTIFI_PACKAGE = False
+
+
+def fail_imports():
+    ret = ''
+    if not HAS_REDIS_PACKAGE:
+        ret += missing_required_lib('redis') + '\n'
+    if not HAS_CERTIFI_PACKAGE:
+        ret += missing_required_lib('certifi')
+    return ret
 
 
 def redis_auth_argument_spec():
