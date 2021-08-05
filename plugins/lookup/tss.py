@@ -112,12 +112,13 @@ EXAMPLES = r"""
       - ansible.builtin.debug:
           msg: the password is {{ secret_password }}
 """
-
+from distutils.version import LooseVersion
 from ansible.errors import AnsibleError, AnsibleOptionsError
 
 sdk_is_missing = False
 
 try:
+    from thycotic import __version__ as sdk_version
     from thycotic.secrets.server import (
         SecretServer,
         SecretServerError,
@@ -132,20 +133,23 @@ from ansible.plugins.lookup import LookupBase
 
 display = Display()
 
-
 class LookupModule(LookupBase):
     @staticmethod
     def Client(server_parameters):
-        authorizer = PasswordGrantAuthorizer(
-            server_parameters["base_url"],
-            server_parameters["username"],
-            server_parameters["password"],
-            server_parameters["token_path_uri"],
-        )
 
-        return SecretServer(
-            server_parameters["base_url"], authorizer, server_parameters["api_path_uri"]
-        )
+        if LooseVersion(sdk_version) < LooseVersion('1.0.0'):
+            return SecretServer(**server_parameters)
+        else:
+            authorizer = PasswordGrantAuthorizer(
+                server_parameters["base_url"],
+                server_parameters["username"],
+                server_parameters["password"],
+                server_parameters["token_path_uri"],
+            )
+
+            return SecretServer(
+                server_parameters["base_url"], authorizer, server_parameters["api_path_uri"]
+            )
 
     def run(self, terms, variables, **kwargs):
         if sdk_is_missing:
