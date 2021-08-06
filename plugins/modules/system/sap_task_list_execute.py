@@ -34,15 +34,15 @@ options:
   sysnr:
     description:
       - The system number of the SAP system.
-      - This value must be single quoted. Otherwise ansible treated this like a number and replace leading zeros.
-      - Defaults to C('01')
+      - You must quote the value to ensure retaining the leading zeros.
+      - Defaults to C('00')
     default: '00'
     type: str
   client:
     description:
       - The client number to connect to.
-      - This value must be single quoted. Otherwise ansible treated this like a number and replace leading zeros.
-      - Defaults to C('001')
+      - You must quote the value to ensure retaining the leading zeros.
+      - Defaults to C('000')
     default : '000'
     type: str
   task_to_execute:
@@ -53,9 +53,6 @@ options:
     description:
       - The tasks and the parameters for execution.
       - If the task list do not need any parameters. This could be empty.
-      - The list values must be dictionaries
-        and contain the following keys in uppercase C(TASKNAME), C(FIELDNAME), C(VALUE).
-        See examples.
       - If only specific tasks from the task list should be executed.
         The tasks even when no parameter is needed must be provided.
         Alongside with the module parameter C(task_skip=true).
@@ -75,18 +72,15 @@ options:
   task_settings:
     description:
       - Setting for the execution of the task list. This can be the following as in TCODE SE80 described.
-          Check Mode C(CHECKRUN),
-          Background Processing Active C(BATCH) (this is the default value),
-          Asynchronous Execution C(ASYNC),
-          Trace Mode C(TRACE),
-          Server Name C(BATCH_TARGET).
+          Check Mode C(CHECKRUN), Background Processing Active C(BATCH) (this is the default value),
+          Asynchronous Execution C(ASYNC), Trace Mode C(TRACE), Server Name C(BATCH_TARGET).
     default: ['BATCH']
     type: list
     elements: str
   task_skip:
     description:
-      - It is possible for tasks that they don't need parameters and run either.
-        If this parameter is true only defined tasks in C(task_parameter) list will run.
+      - If this parameter is true not defined tasks in C(task_parameters) are skipped.
+      - This could be the case when only certain tasks should run from the task list.
     default: false
     type: bool
 
@@ -189,7 +183,7 @@ try:
     from pyrfc import Connection
 except ImportError:
     HAS_PYRFC_LIBRARY = False
-    ANOTHER_LIBRARY_IMPORT_ERROR = traceback.format_exc()
+    PYRFC_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 else:
     HAS_PYRFC_LIBRARY = True
 
@@ -295,12 +289,11 @@ def run_module():
     if not HAS_PYRFC_LIBRARY:
         module.fail_json(
             msg=missing_required_lib('pyrfc'),
-            exception=ANOTHER_LIBRARY_IMPORT_ERROR)
+            exception=PYRFC_LIBRARY_IMPORT_ERROR)
 
     # basic RFC connection with pyrfc
-    connection_params = {'user': username, 'passwd': password, 'ashost': host, 'sysnr': sysnr, 'client': client}
     try:
-        conn = Connection(**connection_params)
+        conn = Connection({'user': username, 'passwd': password, 'ashost': host, 'sysnr': sysnr, 'client': client})
     except Exception as err:
         result['error'] = str(err)
         result['msg'] = 'Something went wrong connecting to the SAP system.'
