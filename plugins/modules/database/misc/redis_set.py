@@ -25,6 +25,28 @@ options:
             - Value that key should be set to.
         required: True
         type: str
+    expiration:
+        description:
+            - Expiration time in milliseconds.
+        required: False
+        type: int
+    non_existing:
+        description:
+            - Only set key if it does not already exist.
+        required: False
+        type: bool
+    existing:
+        description:
+            - Only set key if it already exists.
+        required: False
+        type: bool
+    keep_ttl:
+        description:
+            - Retain the time to live associated with the key.
+        required: False
+        type: bool
+
+
 notes:
    - Requires the redis-py Python package on the remote host. You can
      install it with pip (pip install redis) or with a package manager.
@@ -45,6 +67,24 @@ EXAMPLES = '''
     login_password: supersecret
     key: foo
     value: bar
+
+- name: Set key foo=bar if non existing with expiration of 30s
+  community.general.redis_set:
+    login_host: localhost
+    login_password: supersecret
+    key: foo
+    value: bar
+    non_existing: true
+    expiration: 30000
+
+- name: Set key foo=bar if existing and keep current TTL
+  community.general.redis_set:
+    login_host: localhost
+    login_pasword: supersecret
+    key: foo
+    value: bar
+    existing: yes
+    keep_ttl: yes
 
 - name: Set key foo=bar on redishost with custom ca-cert file
   community.general.redis:
@@ -84,14 +124,19 @@ def main():
     redis_auth_args = redis_auth_argument_spec()
     module_args = dict(
         key=dict(type='str', required=True, no_log=False),
-        value=dict(type='str', required=True)
+        value=dict(type='str', required=True),
+        expiration=dict(type='int', required=False),
+        non_existing=dict(type='bool', required=False),
+        existing=dict(type='bool', required=False),
+        keep_ttl=dict(type='bool', required=False),
     )
     module_args.update(redis_auth_args)
 
     module = AnsibleModule(
         argument_spec=module_args,
-        supports_check_mode=True,
-    )
+        supports_check_mode=False,
+        mutually_exclusive=[['non_existing', 'existing'],
+                            ['keep_ttl', 'expiration']],)
     import_errors = fail_imports()
     if len(import_errors) != 0:
         module.fail_json(msg=import_errors)
@@ -100,6 +145,12 @@ def main():
 
     key = module.params['key']
     value = module.params['value']
+    px = module.params['expiration']
+    nx = module.params['non_existing']
+    xx = module.params['existing']
+    keepttl = module.params['keep_ttl']
+    set_args = {'name': key, 'value': value, 'px': px,
+                'nx': nx, 'xx': xx, 'keepttl': keepttl}
 
     result = {'changed': False}
 
@@ -114,13 +165,22 @@ def main():
 
     result['old_value'] = old_value
     result['value'] = value
-    if module.check_mode or old_value == value:
+    if old_value == value:
         msg = 'Key: {0} had value: {1} now has value {2}'.format(
             key, old_value, value)
         result['msg'] = msg
         module.exit_json(**result)
     try:
-        redis.connection.set(key, value)
+        ret = redis.connection.set(**set_args)
+        if ret is None:
+            if nx:
+                msg = 'Could not set key: {0} to {1}. Key already present.'.format(
+                    key, value)
+            else:
+                msg = 'Could not set key: {0} to {1}. Key not present.'.format(
+                    key, value)
+            result['msg'] = msg
+            module.fail_json(**result)
         msg = 'Set key: {0} to {1}'.format(key, value)
         result['msg'] = msg
         result['changed'] = True

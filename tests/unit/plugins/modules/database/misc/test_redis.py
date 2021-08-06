@@ -10,7 +10,8 @@ __metaclass__ = type
 import pytest
 import json
 
-from ansible_collections.community.general.plugins.modules.database.misc import redis_set, redis_incr, redis_data_info
+from ansible_collections.community.general.plugins.modules.database.misc import (
+    redis_set, redis_incr, redis_data_info, redis_del)
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 
 
@@ -21,27 +22,6 @@ def test_redis_set_without_arguments(capfd):
     out, err = capfd.readouterr()
     assert not err
     assert json.loads(out)['failed']
-
-
-def test_redis_set_check_mode(capfd, mocker):
-    set_module_args({'login_host': 'localhost',
-                     'login_user': 'root',
-                     'login_password': 'secret',
-                     'key': 'foo',
-                     'value': 'baz',
-                     '_ansible_check_mode': True})
-    mocker.patch(
-        'redis.Redis.get',
-        return_value='bar'
-    )
-    with pytest.raises(SystemExit):
-        redis_set.main()
-    out, err = capfd.readouterr()
-    assert not err
-    assert json.loads(out)['old_value'] == 'bar'
-    assert json.loads(
-        out)['msg'] == 'Key: foo had value: bar now has value baz'
-    assert not json.loads(out)['changed'] is True
 
 
 def test_redis_set_key(capfd, mocker):
@@ -62,6 +42,50 @@ def test_redis_set_key(capfd, mocker):
     assert json.loads(
         out)['msg'] == 'Set key: foo to baz'
     assert json.loads(out)['changed'] is True
+
+
+def test_redis_set_existing_key_nx(capfd, mocker):
+    set_module_args({'login_host': 'localhost',
+                     'login_user': 'root',
+                     'login_password': 'secret',
+                     'key': 'foo',
+                     'value': 'baz',
+                     'non_existing': True,
+                     '_ansible_check_mode': False})
+    mocker.patch('redis.Redis.get', return_value='bar')
+    mocker.patch('redis.Redis.set', return_value=None)
+    with pytest.raises(SystemExit):
+        redis_set.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert json.loads(out)['old_value'] == 'bar'
+    assert json.loads(
+        out)['msg'] == 'Could not set key: foo to baz. Key already present.'
+    assert json.loads(out)['changed'] is False
+    assert json.loads(out)['failed'] is True
+
+
+def test_redis_set_non_existing_key_xx(capfd, mocker):
+    set_module_args({'login_host': 'localhost',
+                     'login_user': 'root',
+                     'login_password': 'secret',
+                     'key': 'foo',
+                     'value': 'baz',
+                     'existing': True,
+                     '_ansible_check_mode': False})
+    mocker.patch('redis.Redis.get', return_value=None)
+    mocker.patch('redis.Redis.set', return_value=None)
+    with pytest.raises(SystemExit):
+        redis_set.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert json.loads(out)['old_value'] is None
+    assert json.loads(
+        out)['msg'] == 'Could not set key: foo to baz. Key not present.'
+    assert json.loads(out)['changed'] is False
+    assert json.loads(out)['failed'] is True
 
 
 def test_redis_incr_without_arguments(capfd):
@@ -126,7 +150,7 @@ def test_redis_incrbyfloat(capfd, mocker):
     assert json.loads(out)['changed'] is True
 
 
-def test_redis_incrby_wrong_value(capfd, mocker):
+def test_redis_incrby_wrong_value(capfd):
     set_module_args({'login_host': 'localhost',
                      'login_user': 'root',
                      'login_password': 'secret',
@@ -150,3 +174,42 @@ def test_redis_data_info_without_arguments(capfd):
     out, err = capfd.readouterr()
     assert not err
     assert json.loads(out)['failed']
+
+
+def test_redis_del_without_arguments(capfd):
+    set_module_args({})
+    with pytest.raises(SystemExit) as results:
+        redis_del.main()
+    out, err = capfd.readouterr()
+    assert not err
+    assert json.loads(out)['failed']
+
+
+def test_redis_del_present_key(capfd, mocker):
+    set_module_args({'login_host': 'localhost',
+                     'login_user': 'root',
+                     'login_password': 'secret',
+                     'key': 'foo', })
+    mocker.patch('redis.Redis.delete', return_value=1)
+    with pytest.raises(SystemExit):
+        redis_del.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert json.loads(out)['msg'] == 'Deleted key: foo'
+    assert json.loads(out)['changed'] is True
+
+
+def test_redis_del_absent_key(capfd, mocker):
+    set_module_args({'login_host': 'localhost',
+                     'login_user': 'root',
+                     'login_password': 'secret',
+                     'key': 'foo', })
+    mocker.patch('redis.Redis.delete', return_value=0)
+    with pytest.raises(SystemExit):
+        redis_del.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert json.loads(out)['msg'] == 'Key: foo not present'
+    assert json.loads(out)['changed'] is False
