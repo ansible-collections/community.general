@@ -1070,19 +1070,6 @@ class Nmcli(object):
         else:
             ifname = self.ifname
 
-        if self.type == "wifi":
-            cmd.append('ssid')
-            cmd.append(self.ssid)
-            if self.wifi:
-                for name, value in self.wifi.items():
-                    # Disallow setting 'ssid' via 'wifi.ssid'
-                    if name == 'ssid':
-                        continue
-                    cmd += ['802-11-wireless.%s' % name, value]
-            if self.wifi_sec:
-                for name, value in self.wifi_sec.items():
-                    cmd += ['802-11-wireless-security.%s' % name, value]
-
         options = {
             'connection.interface-name': ifname,
         }
