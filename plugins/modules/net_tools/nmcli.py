@@ -792,6 +792,8 @@ class Nmcli(object):
         else:
             self.ipv6_method = None
 
+        self.edit_commands = []
+
     def execute_command(self, cmd, use_unsafe_shell=False, data=None):
         if isinstance(cmd, list):
             cmd = [to_text(item) for item in cmd]
@@ -1078,6 +1080,9 @@ class Nmcli(object):
 
         # Constructing the command.
         for key, value in options.items():
+            if key in self.wifi_sec_secret_options():
+                self.edit_commands += ['set ' + key + ' ' + value]
+                continue
             if value is not None:
                 cmd.extend([key, value])
 
@@ -1085,6 +1090,8 @@ class Nmcli(object):
 
     def create_connection(self):
         status = self.connection_update('create')
+        if self.edit_commands:
+            status = self.edit_connection()
         if self.create_connection_up:
             status = self.up_connection()
         return status
@@ -1105,7 +1112,17 @@ class Nmcli(object):
         return self.execute_command(cmd)
 
     def modify_connection(self):
-        return self.connection_update('modify')
+        status = self.connection_update('modify')
+        if self.edit_commands:
+            status = self.edit_connection()
+        return status
+
+    def edit_connection(self):
+        self.edit_commands += ['save', 'quit']
+        data = "\n".join(self.edit_commands)
+        self.edit_commands = []
+        cmd = [self.nmcli_bin, 'con', 'edit', self.conn_name]
+        return self.execute_command(cmd, data=data)
 
     def show_connection(self):
         cmd = [self.nmcli_bin, '--show-secrets', 'con', 'show', self.conn_name]
@@ -1200,6 +1217,17 @@ class Nmcli(object):
         }
         options.update(self.connection_options(detect_change=True))
         return self._compare_conn_params(self.show_connection(), options)
+
+    @staticmethod
+    def wifi_sec_secret_options():
+        return [
+            '802-11-wireless-security.leap-password',
+            '802-11-wireless-security.psk',
+            '802-11-wireless-security.wep-key0',
+            '802-11-wireless-security.wep-key1',
+            '802-11-wireless-security.wep-key2',
+            '802-11-wireless-security.wep-key3'
+        ]
 
 
 def main():

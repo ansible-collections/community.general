@@ -1655,7 +1655,7 @@ def test_create_secure_wireless(mocked_generic_connection_create, capfd):
     with pytest.raises(SystemExit):
         nmcli.main()
 
-    assert nmcli.Nmcli.execute_command.call_count == 1
+    assert nmcli.Nmcli.execute_command.call_count == 2
     arg_list = nmcli.Nmcli.execute_command.call_args_list
     add_args, add_kw = arg_list[0]
 
@@ -1671,9 +1671,14 @@ def test_create_secure_wireless(mocked_generic_connection_create, capfd):
     for param in ['connection.interface-name', 'wireless_non_existant',
                   'ipv4.addresses', '10.10.10.10/24',
                   '802-11-wireless.ssid', 'Brittany',
-                  '802-11-wireless-security.key-mgmt', 'wpa-psk',
-                  '802-11-wireless-security.psk', 'VERY_SECURE_PASSWORD']:
+                  '802-11-wireless-security.key-mgmt', 'wpa-psk']:
         assert param in add_args_text
+
+    edit_args, edit_kw = arg_list[1]
+    assert edit_args[0][0] == '/usr/bin/nmcli'
+    assert edit_args[0][1] == 'con'
+    assert edit_args[0][2] == 'edit'
+    assert edit_args[0][3] == 'non_existent_nw_device'
 
     out, err = capfd.readouterr()
     results = json.loads(out)
