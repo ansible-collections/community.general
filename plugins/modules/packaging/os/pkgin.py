@@ -251,7 +251,7 @@ def remove_packages(module, packages):
             format_pkgin_command(module, "remove", package))
 
         if not module.check_mode and query_package(module, package) in [PackageState.PRESENT, PackageState.OUTDATED]:
-            module.fail_json(msg="failed to remove %s: %s" % (package, out))
+            module.fail_json(msg="failed to remove %s: %s" % (package, out), stdout=out, stderr=err)
 
         remove_c += 1
 
@@ -276,14 +276,14 @@ def install_packages(module, packages):
             format_pkgin_command(module, "install", package))
 
         if not module.check_mode and not query_package(module, package) in [PackageState.PRESENT, PackageState.OUTDATED]:
-            module.fail_json(msg="failed to install %s: %s" % (package, out))
+            module.fail_json(msg="failed to install %s: %s" % (package, out), stdout=out, stderr=err)
 
         install_c += 1
 
     if install_c > 0:
         module.exit_json(changed=True, msg=format_action_message(module, "installed", install_c))
 
-    module.exit_json(changed=False, msg="package(s) already present")
+    module.exit_json(changed=False, msg="package(s) already present", stdout=out, stderr=err)
 
 
 def update_package_db(module):
@@ -296,7 +296,7 @@ def update_package_db(module):
         else:
             return True, "updated repository database"
     else:
-        module.fail_json(msg="could not update package db")
+        module.fail_json(msg="could not update package db", stdout=out, stderr=err)
 
 
 def do_upgrade_packages(module, full=False):
@@ -312,7 +312,7 @@ def do_upgrade_packages(module, full=False):
         if re.search('^nothing to do.\n$', out):
             module.exit_json(changed=False, msg="nothing left to upgrade")
     else:
-        module.fail_json(msg="could not %s packages" % cmd)
+        module.fail_json(msg="could not %s packages" % cmd, stdout=out, stderr=err)
 
 
 def upgrade_packages(module):
@@ -332,7 +332,7 @@ def clean_cache(module):
         # so assume it did.
         module.exit_json(changed=True, msg="cleaned caches")
     else:
-        module.fail_json(msg="could not clean package cache")
+        module.fail_json(msg="could not clean package cache", stdout=out, stderr=err)
 
 
 def main():
