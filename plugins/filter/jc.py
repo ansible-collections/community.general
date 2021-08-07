@@ -1,4 +1,4 @@
-# coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # (c) 2015, Filipe Niero Felisbino <filipenf@gmail.com>
 #
 # This file is part of Ansible
