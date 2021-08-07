@@ -9,6 +9,8 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
 
 sys.modules['pyrfc'] = MagicMock()
 sys.modules['pyrfc.Connection'] = MagicMock()
+sys.modules['xmltodict'] = MagicMock()
+sys.modules['xmltodict.parse'] = MagicMock()
 
 from ansible_collections.community.general.plugins.modules.system import sap_task_list_execute
 
@@ -56,21 +58,20 @@ class TestSAPRfcModule(ModuleTestCase):
             "host": "10.1.8.9",
             "task_to_execute": "SAP_BASIS_SSL_CHECK"
         })
-        with patch.object(self.module, 'XML') as XML:
-            XML.input = b'''<?xml version="1.0" encoding="utf-8"?>
-                            <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
-                            <asx:values>
-                                <VERSION>1.2</VERSION>
-                                <SESSION>
-                                <TASKLIST>SAP_BASIS_SSL_CHECK</TASKLIST>
-                                </SESSION>
-                            </asx:values>
-                            </asx:abap>'''
-            with patch.object(self.module, 'xml_dict') as xml_dict:
-                xml_dict.return_value = {'{http://www.sap.com/abapxml}values': {'SESSION': {'TASKLIST': 'SAP_BASIS_SSL_CHECK'}}}
-                with self.assertRaises(AnsibleExitJson) as result:
-                    sap_task_list_execute.main()
-        self.assertEqual(result.exception.args[0]['out'], 'SAP_BASIS_SSL_CHECK')
+        with patch.object(self.module, 'xml_to_dict') as XML:
+            XML.return_value = {'item': [{'TASK': {'CHECK_STATUS_DESCR': 'Check successfully',
+                                                   'STATUS_DESCR': 'Executed successfully', 'TASKNAME': 'CL_STCT_CHECK_SEC_CRYPTO',
+                                                   'LNR': '1', 'DESCRIPTION': 'Check SAP Cryptographic Library', 'DOCU_EXIST': 'X',
+                                                   'LOG_EXIST': 'X', 'ACTION_SKIP': None, 'ACTION_UNSKIP': None, 'ACTION_CONFIRM': None,
+                                                   'ACTION_MAINTAIN': None}}]}
+
+            with self.assertRaises(AnsibleExitJson) as result:
+                sap_task_list_execute.main()
+        self.assertEqual(result.exception.args[0]['out'], {'item': [{'TASK': {'CHECK_STATUS_DESCR': 'Check successfully',
+                                                                              'STATUS_DESCR': 'Executed successfully', 'TASKNAME': 'CL_STCT_CHECK_SEC_CRYPTO',
+                                                                              'LNR': '1', 'DESCRIPTION': 'Check SAP Cryptographic Library', 'DOCU_EXIST': 'X',
+                                                                              'LOG_EXIST': 'X', 'ACTION_SKIP': None, 'ACTION_UNSKIP': None,
+                                                                              'ACTION_CONFIRM': None, 'ACTION_MAINTAIN': None}}]})
 
     def test_success_no_log(self):
         """test execute task list success without logs"""
@@ -81,8 +82,8 @@ class TestSAPRfcModule(ModuleTestCase):
             "host": "10.1.8.9",
             "task_to_execute": "SAP_BASIS_SSL_CHECK"
         })
-        with patch.object(self.module, 'XML') as XML:
-            XML.input = ''
+        with patch.object(self.module, 'xml_to_dict') as XML:
+            XML.return_value = "No logs available."
             with self.assertRaises(AnsibleExitJson) as result:
                 sap_task_list_execute.main()
         self.assertEqual(result.exception.args[0]['out'], 'No logs available.')
