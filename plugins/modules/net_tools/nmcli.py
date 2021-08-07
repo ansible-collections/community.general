@@ -709,7 +709,7 @@ class Nmcli(object):
     platform = 'Generic'
     distribution = None
 
-    wifi_sec_secret_options = [
+    WIFI_SEC_SECRET_OPTIONS = [
         '802-11-wireless-security.leap-password',
         '802-11-wireless-security.psk',
         '802-11-wireless-security.wep-key0',
@@ -1089,7 +1089,7 @@ class Nmcli(object):
 
         # Constructing the command.
         for key, value in options.items():
-            if key in self.wifi_sec_secret_options:
+            if key in self.WIFI_SEC_SECRET_OPTIONS:
                 self.edit_commands += ['set %s %s' % (key, value)]
                 continue
             if value is not None:
