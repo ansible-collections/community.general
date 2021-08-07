@@ -709,6 +709,15 @@ class Nmcli(object):
     platform = 'Generic'
     distribution = None
 
+    wifi_sec_secret_options = [
+        '802-11-wireless-security.leap-password',
+        '802-11-wireless-security.psk',
+        '802-11-wireless-security.wep-key0',
+        '802-11-wireless-security.wep-key1',
+        '802-11-wireless-security.wep-key2',
+        '802-11-wireless-security.wep-key3'
+    ]
+
     def __init__(self, module):
         self.module = module
         self.state = module.params['state']
@@ -1080,7 +1089,7 @@ class Nmcli(object):
 
         # Constructing the command.
         for key, value in options.items():
-            if key in self.wifi_sec_secret_options():
+            if key in self.wifi_sec_secret_options:
                 self.edit_commands += ['set ' + key + ' ' + value]
                 continue
             if value is not None:
@@ -1217,17 +1226,6 @@ class Nmcli(object):
         }
         options.update(self.connection_options(detect_change=True))
         return self._compare_conn_params(self.show_connection(), options)
-
-    @staticmethod
-    def wifi_sec_secret_options():
-        return [
-            '802-11-wireless-security.leap-password',
-            '802-11-wireless-security.psk',
-            '802-11-wireless-security.wep-key0',
-            '802-11-wireless-security.wep-key1',
-            '802-11-wireless-security.wep-key2',
-            '802-11-wireless-security.wep-key3'
-        ]
 
 
 def main():
