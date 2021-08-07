@@ -332,10 +332,10 @@ options:
        version_added: 2.0.0
     wifi_sec:
        description:
-            - 'The security configuration of the Wifi connection. The valid attributes are listed on:'
-            - 'U(https://developer.gnome.org/NetworkManager/stable/settings-802-11-wireless-security.html)'
-            - 'For instance to use common WPA-PSK auth with a password:'
-            - '- C({key-mgmt: wpa-psk, psk: my_password})'
+            - 'The security configuration of the WiFi connection. The valid attributes are listed on:
+              U(https://networkmanager.dev/docs/api/latest/settings-802-11-wireless-security.html).'
+            - 'For instance to use common WPA-PSK auth with a password:
+              C({key-mgmt: wpa-psk, psk: my_password}).'
        type: dict
        version_added: 3.0.0
     ssid:
@@ -345,9 +345,9 @@ options:
        version_added: 3.0.0
     wifi:
        description:
-            - 'The configuration of the Wifi connection. The valid attributes are listed on:
+            - 'The configuration of the WiFi connection. The valid attributes are listed on:
               U(https://networkmanager.dev/docs/api/latest/settings-802-11-wireless.html).'
-            - 'For instance to create a hidden AP mode Wifi connection:
+            - 'For instance to create a hidden AP mode WiFi connection:
               C({hidden: true, mode: ap}).'
        type: dict
        version_added: 3.5.0
@@ -915,6 +915,11 @@ class Nmcli(object):
                     options.update({
                         '802-11-wireless.%s' % name: value
                     })
+            if self.wifi_sec:
+                for name, value in self.wifi_sec.items():
+                    options.update({
+                        '802-11-wireless-security.%s' % name: value
+                    })
         # Convert settings values based on the situation.
         for setting, value in options.items():
             setting_type = self.settings_type(setting)
@@ -1065,19 +1070,6 @@ class Nmcli(object):
         else:
             ifname = self.ifname
 
-        if self.type == "wifi":
-            cmd.append('ssid')
-            cmd.append(self.ssid)
-            if self.wifi:
-                for name, value in self.wifi.items():
-                    # Disallow setting 'ssid' via 'wifi.ssid'
-                    if name == 'ssid':
-                        continue
-                    cmd += ['802-11-wireless.%s' % name, value]
-            if self.wifi_sec:
-                for name, value in self.wifi_sec.items():
-                    cmd += ['wifi-sec.%s' % name, value]
-
         options = {
             'connection.interface-name': ifname,
         }
@@ -1116,7 +1108,7 @@ class Nmcli(object):
         return self.connection_update('modify')
 
     def show_connection(self):
-        cmd = [self.nmcli_bin, 'con', 'show', self.conn_name]
+        cmd = [self.nmcli_bin, '--show-secrets', 'con', 'show', self.conn_name]
 
         (rc, out, err) = self.execute_command(cmd)
 

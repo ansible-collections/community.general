@@ -1,0 +1,3 @@
+minor_changes:
+  - nmcli - add ``wifi-sec`` option change detection to support managing secure Wi-Fi connections
+    (https://github.com/ansible-collections/community.general/pull/3136).
