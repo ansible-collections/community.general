@@ -920,9 +920,6 @@ class Nmcli(object):
             })
             if self.wifi:
                 for name, value in self.wifi.items():
-                    # Disregard 'ssid' via 'wifi.ssid'
-                    if name == 'ssid':
-                        continue
                     options.update({
                         '802-11-wireless.%s' % name: value
                     })
@@ -1173,6 +1170,36 @@ class Nmcli(object):
 
         return conn_info
 
+    def get_available_options(self, return_type=None, set_option=None):
+        if not return_type:
+            if self.type == 'wifi':
+                return_type = '802-11-wireless'
+            else:
+                return_type == self.type
+
+        if set_option:
+            commands = ['set %s.%s %s' % (return_type, set_option, set_option)]
+        else:
+            commands = []
+
+        commands += ['print %s' % return_type, 'quit', 'yes']
+        data = "\n".join(commands)
+        cmd = [self.nmcli_bin, 'con', 'edit', 'type', self.type]
+
+        (rc, out, err) = self.execute_command(cmd, data=data)
+
+        if rc != 0:
+            raise NmcliModuleError(err)
+
+        options = []
+        for line in out.splitlines():
+            if (line.startswith('%s.' % return_type)):
+                pair = line.split(':', 1)
+                key = pair[0].strip()
+                options.append(key)
+
+        return options
+
     def _compare_conn_params(self, conn_info, options):
         changed = False
         diff_before = dict()
@@ -1343,6 +1370,38 @@ def main():
             nmcli.module.fail_json(msg="Please specify a name for the master when type is %s" % nmcli.type)
         if nmcli.ifname is None:
             nmcli.module.fail_json(msg="Please specify an interface name for the connection when type is %s" % nmcli.type)
+    if nmcli.type == 'wifi':
+        if nmcli.wifi:
+            available_options = nmcli.get_available_options()
+            unsupported_options = []
+            for name, value in nmcli.wifi.items():
+                if name == 'ssid':
+                    nmcli.module.warn("The option 'wifi.ssid' must only be specified with 'ssid', disregarding")
+                    unsupported_options.append(name)
+                if '802-11-wireless.%s' % name not in available_options:
+                    nmcli.module.warn(
+                        "The option 'wifi.%s' is invalid/unsupported, disregarding. Valid options are ['%s']" % (
+                            name,
+                            "', '".join(available_options).replace('802-11-wireless.', '')
+                        )
+                    )
+                    unsupported_options.append(name)
+            for unsupported_option in unsupported_options:
+                del nmcli.wifi[unsupported_option]
+        if nmcli.wifi_sec:
+            available_options = nmcli.get_available_options(return_type='802-11-wireless-security', set_option='psk')
+            unsupported_options = []
+            for name, value in nmcli.wifi_sec.items():
+                if '802-11-wireless-security.%s' % name not in available_options:
+                    nmcli.module.warn(
+                        "The option 'wifi_sec.%s' is invalid/unsupported, disregarding. Valid options are ['%s']" % (
+                            name,
+                            "', '".join(available_options).replace('802-11-wireless-security.', '')
+                        )
+                    )
+                    unsupported_options.append(name)
+            for unsupported_option in unsupported_options:
+                del nmcli.wifi_sec[unsupported_option]
 
     try:
         if nmcli.state == 'absent':
