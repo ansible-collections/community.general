@@ -1127,9 +1127,7 @@ class Nmcli(object):
         return status
 
     def edit_connection(self):
-        self.edit_commands += ['save', 'quit']
-        data = "\n".join(self.edit_commands)
-        self.edit_commands = []
+        data = "\n".join(self.edit_commands + ['save', 'quit'])
         cmd = [self.nmcli_bin, 'con', 'edit', self.conn_name]
         return self.execute_command(cmd, data=data)
 
