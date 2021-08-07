@@ -1,4 +1,4 @@
-# coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Based on local.py by Michael DeHaan <michael.dehaan@gmail.com>
 # and chroot.py by  Maykel Moya <mmoya@speedyrails.com>
 # Copyright (c) 2013, Michael Scherer <misc@zarb.org>

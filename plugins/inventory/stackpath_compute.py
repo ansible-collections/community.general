@@ -1,4 +1,4 @@
-# coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Copyright (c) 2020 Shay Rybak <shay.rybak@stackpath.com>
 # Copyright (c) 2020 Ansible Project
 # GNU General Public License v3.0+
