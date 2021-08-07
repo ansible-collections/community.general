@@ -709,14 +709,14 @@ class Nmcli(object):
     platform = 'Generic'
     distribution = None
 
-    WIFI_SEC_SECRET_OPTIONS = [
+    WIFI_SEC_SECRET_OPTIONS = (
         '802-11-wireless-security.leap-password',
         '802-11-wireless-security.psk',
         '802-11-wireless-security.wep-key0',
         '802-11-wireless-security.wep-key1',
         '802-11-wireless-security.wep-key2',
         '802-11-wireless-security.wep-key3'
-    ]
+    )
 
     def __init__(self, module):
         self.module = module
