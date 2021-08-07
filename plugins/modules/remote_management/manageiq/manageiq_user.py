@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 #
 # (c) 2017, Daniel Korn <korndaniel1@gmail.com>
 #
