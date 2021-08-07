@@ -1,4 +1,4 @@
-# coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Based on the buildah connection plugin
 # Copyright (c) 2017 Ansible Project
 #               2018 Kushal Das
