@@ -18,6 +18,10 @@ description:
   - Tasks in the task list which requires manual activities will be confirmed automatically.
   - This module will use the RFC Package C(STC_TM_API).
 
+requirements:
+  - pyrfc >= 2.4.0
+  - xmltodict
+
 options:
   conn_username:
     description: The required username for the SAP system.
@@ -177,7 +181,6 @@ out:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.json_utils import json
-from xml.etree.ElementTree import XML
 import traceback
 try:
     from pyrfc import Connection
@@ -186,49 +189,13 @@ except ImportError:
     PYRFC_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 else:
     HAS_PYRFC_LIBRARY = True
-
-
-def xml_dict(xml_raw):
-    # adapted from: http://code.activestate.com/recipes/410469-xml-as-dictionary/
-    list_out = []
-    dict_out = {}
-    if xml_raw:
-        dict_out.update(dict(xml_raw.items()))
-    for element in xml_raw:
-        if element:
-            # treat like dict - we assume that if the first two tags
-            # in a series are different, then they are all different.
-            if len(element) == 1 or element[0].tag != element[1].tag:
-                aDict = xml_dict(element)
-            # treat like list - if the first two tags
-            # in a series are the same, then the rest are the same.
-            else:
-                for list_return in element:
-                    if list_return:
-                        # treat like dict
-                        if len(list_return) == 1 or list_return[0].tag != list_return[1].tag:
-                            list_out.append(xml_dict(list_return))
-                        # treat like list
-                        elif list_return[0].tag == list_return[1].tag:
-                            list_out.append(list_out.xml_list(list_return))
-                    elif list_return.text:
-                        text = list_return.text.strip()
-                        if text:
-                            list_out.append(text)
-                # put the list in dictionary;
-                # the key is the tag name the list elements all share in common
-                # the value is the list itself
-                aDict = {element[0].tag: list_out}
-            # if the tag has attributes, add those to the dict
-            if element.items():
-                aDict.update(dict(element.items()))
-            dict_out.update({element.tag: aDict})
-        elif element.items():
-            dict_out.update({element.tag: dict(element.items())})
-        # if there are no child tags and no attributes, extract the text
-        else:
-            dict_out.update({element.tag: element.text})
-    return dict_out
+try:
+    import xmltodict
+except ImportError:
+    HAS_XMLTODICT_LIBRARY = False
+    XMLTODICT_LIBRARY_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_XMLTODICT_LIBRARY = True
 
 
 def call_rfc_method(connection, method_name, kwargs):
@@ -244,6 +211,15 @@ def process_exec_settings(task_settings):
         for key, value in temp_dict.items():
             exec_settings[key] = value
     return exec_settings
+
+
+def xml_to_dict(xml_raw):
+    try:
+        xml_parsed = xmltodict.parse(xml_raw, dict_constructor=dict)
+        xml_dict = xml_parsed['asx:abap']['asx:values']['SESSION']['TASKLIST']
+    except KeyError:
+        xml_dict = "No logs available."
+    return xml_dict
 
 
 def run_module():
@@ -291,9 +267,14 @@ def run_module():
             msg=missing_required_lib('pyrfc'),
             exception=PYRFC_LIBRARY_IMPORT_ERROR)
 
+    if not HAS_XMLTODICT_LIBRARY:
+        module.fail_json(
+            msg=missing_required_lib('pyrfc'),
+            exception=XMLTODICT_LIBRARY_IMPORT_ERROR)
+
     # basic RFC connection with pyrfc
     try:
-        conn = Connection({'user': username, 'passwd': password, 'ashost': host, 'sysnr': sysnr, 'client': client})
+        conn = Connection(**{'user': username, 'passwd': password, 'ashost': host, 'sysnr': sysnr, 'client': client})
     except Exception as err:
         result['error'] = str(err)
         result['msg'] = 'Something went wrong connecting to the SAP system.'
@@ -345,11 +326,9 @@ def run_module():
     # returned value is ABAPXML https://help.sap.com/doc/abapdocu_755_index_htm/7.55/en-US/abenabap_xslt_asxml_general.htm
     session_log = call_rfc_method(conn, 'STC_TM_SESSION_GET_LOG',
                                   {'I_SESSION_ID': session_init['E_SESSION_ID']})
-    try:
-        log_xml = XML(session_log['E_LOG'])
-        task_list = xml_dict(log_xml)['{http://www.sap.com/abapxml}values']['SESSION']['TASKLIST']
-    except KeyError:
-        task_list = "No logs available."
+
+    task_list = xml_to_dict(session_log['E_LOG'])
+
     result['changed'] = True
     result['msg'] = session_start['E_STATUS_DESCR']
     result['json_out'] = json.dumps(task_list)
