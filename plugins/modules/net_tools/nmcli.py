@@ -1090,7 +1090,7 @@ class Nmcli(object):
         # Constructing the command.
         for key, value in options.items():
             if key in self.wifi_sec_secret_options:
-                self.edit_commands += ['set ' + key + ' ' + value]
+                self.edit_commands += ['set %s %s' % (key, value)]
                 continue
             if value is not None:
                 cmd.extend([key, value])
