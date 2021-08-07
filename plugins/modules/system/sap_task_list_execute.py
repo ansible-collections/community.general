@@ -269,7 +269,7 @@ def run_module():
 
     if not HAS_XMLTODICT_LIBRARY:
         module.fail_json(
-            msg=missing_required_lib('pyrfc'),
+            msg=missing_required_lib('xmltodict'),
             exception=XMLTODICT_LIBRARY_IMPORT_ERROR)
 
     # basic RFC connection with pyrfc
