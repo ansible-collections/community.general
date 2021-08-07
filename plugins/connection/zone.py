@@ -1,4 +1,4 @@
-# coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Based on local.py (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
 # and chroot.py     (c) 2013, Maykel Moya <mmoya@speedyrails.com>
 # and jail.py       (c) 2013, Michael Scherer <misc@zarb.org>
