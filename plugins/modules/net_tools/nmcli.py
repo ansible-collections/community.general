@@ -709,6 +709,15 @@ class Nmcli(object):
     platform = 'Generic'
     distribution = None
 
+    SECRET_OPTIONS = (
+        '802-11-wireless-security.leap-password',
+        '802-11-wireless-security.psk',
+        '802-11-wireless-security.wep-key0',
+        '802-11-wireless-security.wep-key1',
+        '802-11-wireless-security.wep-key2',
+        '802-11-wireless-security.wep-key3'
+    )
+
     def __init__(self, module):
         self.module = module
         self.state = module.params['state']
@@ -791,6 +800,8 @@ class Nmcli(object):
             self.ipv6_method = 'manual'
         else:
             self.ipv6_method = None
+
+        self.edit_commands = []
 
     def execute_command(self, cmd, use_unsafe_shell=False, data=None):
         if isinstance(cmd, list):
@@ -1079,12 +1090,17 @@ class Nmcli(object):
         # Constructing the command.
         for key, value in options.items():
             if value is not None:
+                if key in self.SECRET_OPTIONS:
+                    self.edit_commands += ['set %s %s' % (key, value)]
+                    continue
                 cmd.extend([key, value])
 
         return self.execute_command(cmd)
 
     def create_connection(self):
         status = self.connection_update('create')
+        if status[0] == 0 and self.edit_commands:
+            status = self.edit_connection()
         if self.create_connection_up:
             status = self.up_connection()
         return status
@@ -1105,7 +1121,15 @@ class Nmcli(object):
         return self.execute_command(cmd)
 
     def modify_connection(self):
-        return self.connection_update('modify')
+        status = self.connection_update('modify')
+        if status[0] == 0 and self.edit_commands:
+            status = self.edit_connection()
+        return status
+
+    def edit_connection(self):
+        data = "\n".join(self.edit_commands + ['save', 'quit'])
+        cmd = [self.nmcli_bin, 'con', 'edit', self.conn_name]
+        return self.execute_command(cmd, data=data)
 
     def show_connection(self):
         cmd = [self.nmcli_bin, '--show-secrets', 'con', 'show', self.conn_name]
