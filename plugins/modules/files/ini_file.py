@@ -205,11 +205,11 @@ def do_ini(module, filename, section=None, option=None, value=None,
                     for i in range(index, 0, -1):
                         # search backwards for previous non-blank or non-comment line
                         if not non_blank_non_comment_pattern.match(ini_lines[i - 1]):
-                            if option and value:
+                            if option and value is not None:
                                 ini_lines.insert(i, assignment_format % (option, value))
                                 msg = 'option added'
                                 changed = True
-                            elif option and not value and allow_no_value:
+                            elif option and value is None and allow_no_value:
                                 ini_lines.insert(i, '%s\n' % option)
                                 msg = 'option added'
                                 changed = True
@@ -225,7 +225,7 @@ def do_ini(module, filename, section=None, option=None, value=None,
                 if state == 'present':
                     # change the existing option line
                     if match_opt(option, line):
-                        if not value and allow_no_value:
+                        if value is None and allow_no_value:
                             newline = u'%s\n' % option
                         else:
                             newline = assignment_format % (option, value)
@@ -324,7 +324,7 @@ def main():
     create = module.params['create']
 
     if state == 'present' and not allow_no_value and value is None:
-        module.fail_json("Parameter 'value' must not be empty if state=present and allow_no_value=False")
+        module.fail_json("Parameter 'value' must be defined if state=present and allow_no_value=False")
 
     (changed, backup_file, diff, msg) = do_ini(module, path, section, option, value, state, backup, no_extra_spaces, create, allow_no_value)
 
