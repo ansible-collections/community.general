@@ -528,25 +528,8 @@ TESTCASE_DEFAULT_WIRELESS_SHOW_OUTPUT = """\
 802-11-wireless.ap-isolation:           -1 (default)
 """
 
-TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT = """\
-802-11-wireless.ssid:                   --
-802-11-wireless.mode:                   infrastructure
-802-11-wireless.band:                   --
-802-11-wireless.channel:                0
-802-11-wireless.bssid:                  --
-802-11-wireless.rate:                   0
-802-11-wireless.tx-power:               0
-802-11-wireless.mac-address:            --
-802-11-wireless.cloned-mac-address:     --
-802-11-wireless.generate-mac-address-mask:--
-802-11-wireless.mac-address-blacklist:  --
-802-11-wireless.mac-address-randomization:default
-802-11-wireless.mtu:                    auto
-802-11-wireless.seen-bssids:            --
-802-11-wireless.hidden:                 no
-802-11-wireless.powersave:              0 (default)
-802-11-wireless.wake-on-wlan:           0x1 (default)
-802-11-wireless.ap-isolation:           -1 (default)
+TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT = \
+    TESTCASE_DEFAULT_WIRELESS_SHOW_OUTPUT + """\
 802-11-wireless-security.key-mgmt:      --
 802-11-wireless-security.wep-tx-keyidx: 0
 802-11-wireless-security.auth-alg:      --
