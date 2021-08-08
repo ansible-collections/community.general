@@ -136,7 +136,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 msg:
-  description: A small execution description
+  description: A small execution description.
   type: str
   returned: always
   sample: 'Successful'
