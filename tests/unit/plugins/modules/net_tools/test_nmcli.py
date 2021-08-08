@@ -1740,7 +1740,7 @@ def test_create_secure_wireless_failure(mocked_secure_wireless_create_failure, c
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert results.get('failed')
-    assert not 'changed' in results
+    assert 'changed' not in results
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_SECURE_WIRELESS, indirect=['patch_ansible_module'])
@@ -1813,7 +1813,7 @@ def test_modify_secure_wireless_failure(mocked_secure_wireless_modify_failure, c
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert results.get('failed')
-    assert not 'changed' in results
+    assert 'changed' not in results
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_DUMMY_STATIC, indirect=['patch_ansible_module'])
