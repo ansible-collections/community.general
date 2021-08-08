@@ -215,10 +215,10 @@
     path: "{{ output_file }}"
     section: mysqld
     option: "{{ item.o }}"
-    value: "{{ item.v }}"
+    value: "{{ item.v | d(omit) }}"
     allow_no_value: yes
   with_items:
-    - { o: "skip-name-resolve", v: null }
+    - { o: "skip-name-resolve" }
     - { o: "max_connections", v: "500" }
 
 - name: read content from output file
@@ -459,12 +459,23 @@
         option: like
         value: tea
         state: absent
-    - name: Test with empty string
+
+    # See https://github.com/ansible-collections/community.general/issues/3031
+    - name: Tests with empty strings
       ini_file:
         path: "{{ output_file }}"
-        section: extensions
-        option: evolve
+        section: "{{ item.section | d('extensions') }}"
+        option: "{{ item.option }}"
         value: ""
+        allow_no_value: "{{ item.no_value | d(omit) }}"
+      loop:
+        - option: evolve
+        - option: regress
+        - section: foobar
+          option: foo
+          no_value: true
+        - option: improve
+          no_value: true
 
 - name: read content from output file
   slurp:
@@ -473,7 +484,7 @@
 
 - name: set expected content and get current ini file content
   set_fact:
-    expected15: "\n[extensions]\nevolve = \n"
+    expected15: "\n[extensions]\nevolve = \nregress = \nimprove = \n[foobar]\nfoo = \n"
     content15: "{{ output_content.content | b64decode }}"
 - debug: var=content15
 - name: Verify content of ini file is as expected
