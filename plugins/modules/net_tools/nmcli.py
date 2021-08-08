@@ -1098,9 +1098,17 @@ class Nmcli(object):
         return self.execute_command(cmd)
 
     def create_connection(self):
-        status = self.connection_update('create')
+        (rc, out, err) = self.connection_update('create')
+        if rc != 0:
+            raise NmcliModuleError(err)
+        else:
+            status = (rc, out, err)
         if self.edit_commands:
-            status = self.edit_connection()
+            (rc, out, err) = self.edit_connection()
+            if rc != 0:
+                raise NmcliModuleError(err)
+            else:
+                status = (rc, out, err)
         if self.create_connection_up:
             status = self.up_connection()
         return status
@@ -1121,9 +1129,17 @@ class Nmcli(object):
         return self.execute_command(cmd)
 
     def modify_connection(self):
-        status = self.connection_update('modify')
+        (rc, out, err) = self.connection_update('modify')
+        if rc != 0:
+            raise NmcliModuleError(err)
+        else:
+            status = (rc, out, err)
         if self.edit_commands:
-            status = self.edit_connection()
+            (rc, out, err) = self.edit_connection()
+            if rc != 0:
+                raise NmcliModuleError(err)
+            else:
+                status = (rc, out, err)
         return status
 
     def edit_connection(self):
