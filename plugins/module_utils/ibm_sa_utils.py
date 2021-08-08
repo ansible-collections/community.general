@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright (C) 2018 IBM CORPORATION
 # Author(s): Tzur Eliyahu <tzure@il.ibm.com>
 #

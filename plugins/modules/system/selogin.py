@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 # (c) 2017, Petr Lautrbach <plautrba@redhat.com>
 # Based on seport.py module (c) 2014, Dan Keder <dan.keder@gmail.com>
