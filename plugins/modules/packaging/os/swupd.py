@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 # (c) 2017, Alberto Murillo <alberto.murillo.silva@intel.com>
 #

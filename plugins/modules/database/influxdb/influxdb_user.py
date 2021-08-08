@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 # Copyright: (c) 2017, Vitaliy Zhhuta <zhhuta () gmail.com>
 # insipred by Kamil Szczygiel <kamil.szczygiel () intel.com> influxdb_database module

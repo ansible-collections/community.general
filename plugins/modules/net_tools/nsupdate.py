@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 # (c) 2016, Marcin Skarbek <github@skarbek.name>
 # (c) 2016, Andreas Olsson <andreas@arrakis.se>

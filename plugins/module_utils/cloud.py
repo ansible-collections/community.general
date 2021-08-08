@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # (c) 2016 Allen Sanabria, <asanabria@linuxdynasty.org>
 #
