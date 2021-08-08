@@ -1170,12 +1170,11 @@ class Nmcli(object):
 
         return conn_info
 
-    def get_available_options(self, return_type=None, set_option=None):
-        if not return_type:
-            if self.type == 'wifi':
-                return_type = '802-11-wireless'
-            else:
-                return_type == self.type
+    def get_available_options(self, return_type, set_option=None):
+        options = []
+
+        if return_type == '802-11-wireless-security' and set_option is None:
+            set_option = 'psk'
 
         if set_option:
             commands = ['set %s.%s %s' % (return_type, set_option, set_option)]
@@ -1191,7 +1190,6 @@ class Nmcli(object):
         if rc != 0:
             raise NmcliModuleError(err)
 
-        options = []
         for line in out.splitlines():
             if (line.startswith('%s.' % return_type)):
                 pair = line.split(':', 1)
@@ -1372,7 +1370,7 @@ def main():
             nmcli.module.fail_json(msg="Please specify an interface name for the connection when type is %s" % nmcli.type)
     if nmcli.type == 'wifi':
         if nmcli.wifi:
-            available_options = nmcli.get_available_options()
+            available_options = nmcli.get_available_options('802-11-wireless')
             unsupported_options = []
             for name, value in nmcli.wifi.items():
                 if name == 'ssid':
@@ -1389,7 +1387,7 @@ def main():
             for unsupported_option in unsupported_options:
                 del nmcli.wifi[unsupported_option]
         if nmcli.wifi_sec:
-            available_options = nmcli.get_available_options(return_type='802-11-wireless-security', set_option='psk')
+            available_options = nmcli.get_available_options('802-11-wireless-security')
             unsupported_options = []
             for name, value in nmcli.wifi_sec.items():
                 if '802-11-wireless-security.%s' % name not in available_options:
