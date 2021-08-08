@@ -274,7 +274,7 @@ def run_module():
 
     # basic RFC connection with pyrfc
     try:
-        conn = Connection(**{'user': username, 'passwd': password, 'ashost': host, 'sysnr': sysnr, 'client': client})
+        conn = Connection(user=username, passwd=password, ashost=host, sysnr=sysnr, client=client)
     except Exception as err:
         result['error'] = str(err)
         result['msg'] = 'Something went wrong connecting to the SAP system.'
