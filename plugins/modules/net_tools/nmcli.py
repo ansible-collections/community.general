@@ -1089,10 +1089,10 @@ class Nmcli(object):
 
         # Constructing the command.
         for key, value in options.items():
-            if key in self.SECRET_OPTIONS:
-                self.edit_commands += ['set %s %s' % (key, value)]
-                continue
             if value is not None:
+                if key in self.SECRET_OPTIONS:
+                    self.edit_commands += ['set %s %s' % (key, value)]
+                    continue
                 cmd.extend([key, value])
 
         return self.execute_command(cmd)
