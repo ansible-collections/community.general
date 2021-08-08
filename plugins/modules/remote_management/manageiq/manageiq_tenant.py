@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 #
 # (c) 2018, Evert Mulder (base on manageiq_user.py by Daniel Korn <korndaniel1@gmail.com>)
 #

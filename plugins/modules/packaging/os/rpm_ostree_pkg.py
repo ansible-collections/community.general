@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 # Copyright: (c) 2018, Dusty Mabe <dusty@dustymabe.com>
 # Copyright: (c) 2018, Ansible Project
 # Copyright: (c) 2021, Abhijeet Kasurde <akasurde@redhat.com>
