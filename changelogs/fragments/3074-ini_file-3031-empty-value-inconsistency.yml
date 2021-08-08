@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - ini_file - fix inconsistency between empty value and no value
+    (https://github.com/ansible-collections/community.general/issues/3031).
