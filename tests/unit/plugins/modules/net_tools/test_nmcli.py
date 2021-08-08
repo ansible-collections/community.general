@@ -745,7 +745,11 @@ def mocked_ethernet_connection_dhcp_to_static(mocker):
 @pytest.fixture
 def mocked_wireless_create(mocker):
     mocker_set(mocker,
-               execute_return=(0, TESTCASE_DEFAULT_WIRELESS_SHOW_OUTPUT, ""))
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_DEFAULT_WIRELESS_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
 
 
 @pytest.fixture
