@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 # (c) 2017, Arie Bregman <abregman@redhat.com>
 #
 # This file is a module for Ansible that interacts with Network Manager

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright (c) 2017, Eike Frost <ei@kefro.st>
 #
 # This code is part of Ansible, but is an independent component.

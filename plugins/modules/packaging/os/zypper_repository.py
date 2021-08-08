@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 
 # (c) 2013, Matthias Vogelgesang <matthias.vogelgesang@gmail.com>
 # (c) 2014, Justin Lecher <jlec@gentoo.org>
