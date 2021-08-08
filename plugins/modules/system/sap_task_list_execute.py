@@ -245,7 +245,7 @@ def run_module():
         ),
         supports_check_mode=False,
     )
-    result = dict(changed=False, msg='', out={}, json_out={})
+    result = dict(changed=False, msg='', out={})
 
     params = module.params
 
@@ -329,7 +329,6 @@ def run_module():
 
     result['changed'] = True
     result['msg'] = session_start['E_STATUS_DESCR']
-    result['json_out'] = json.dumps(task_list)
     result['out'] = task_list
 
     module.exit_json(**result)
