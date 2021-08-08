@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 """short_description: Check or wait for migrations between nodes"""
 
 # Copyright: (c) 2018, Albert Autin
