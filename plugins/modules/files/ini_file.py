@@ -214,7 +214,7 @@ def do_ini(module, filename, section=None, option=None, value=None,
                     # change the existing option line
                     if match_opt(option, line):
                         if value is None and allow_no_value:
-                            newline = u'%s\n' % option
+                            newline = '%s\n' % option
                         else:
                             newline = assignment_format % (option, value)
                         option_changed = ini_lines[index] != newline
