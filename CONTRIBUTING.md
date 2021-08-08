@@ -26,6 +26,7 @@ Also, consider taking up a valuable, reviewed, but abandoned pull request which 
 * All commits of a pull request branch will be squashed into one commit at last. That does not mean you must have only one commit on your pull request, though!
 * Please try not to force-push if it is not needed, so reviewers and other users looking at your pull request later can see the pull request commit history.
 * Do not add merge commits to your PR. The bot will complain and you will have to rebase ([instructions for rebasing](https://docs.ansible.com/ansible/latest/dev_guide/developing_rebasing.html)) to remove them before your PR can be merged. To avoid that git automatically does merges during pulls, you can configure it to do rebases instead by running `git config pull.rebase true` inside the respository checkout.
+* Make sure your PR includes a [changelog fragment](https://docs.ansible.com/ansible/devel/community/development_process.html#changelogs-how-to). (You must not include a fragment for new modules or new plugins, except for test and filter plugins. Also you shouldn't include one for docs-only changes. If you're not sure, simply don't include one, we'll tell you whether one is needed or not :) )
 
 You can also read [our Quick-start development guide](https://github.com/ansible/community-docs/blob/main/create_pr_quick_start_guide.rst).
 
