@@ -9,14 +9,14 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: sap_task_list_execute
-short_description: Perform SAP Task list execution.
+short_description: Perform SAP Task list execution
 version_added: "3.5.0"
 description:
   - The C(sap_task_list_execute) module depends on C(pyrfc) Python library (version 2.4.0 and upwards).
     Depending on distribution you are using, you may need to install additional packages to
     have these available.
   - Tasks in the task list which requires manual activities will be confirmed automatically.
-  - This module will use the RFC Package C(STC_TM_API).
+  - This module will use the RFC package C(STC_TM_API).
 
 requirements:
   - pyrfc >= 2.4.0
@@ -39,15 +39,13 @@ options:
     description:
       - The system number of the SAP system.
       - You must quote the value to ensure retaining the leading zeros.
-      - Defaults to C('00')
     default: '00'
     type: str
   client:
     description:
       - The client number to connect to.
       - You must quote the value to ensure retaining the leading zeros.
-      - Defaults to C('000')
-    default : '000'
+    default: '000'
     type: str
   task_to_execute:
     description: The task list which will be executed.
@@ -59,7 +57,7 @@ options:
       - If the task list do not need any parameters. This could be empty.
       - If only specific tasks from the task list should be executed.
         The tasks even when no parameter is needed must be provided.
-        Alongside with the module parameter C(task_skip=true).
+        Alongside with the module parameter I(task_skip=true).
     type: list
     elements: dict
     suboptions:
@@ -83,7 +81,7 @@ options:
     elements: str
   task_skip:
     description:
-      - If this parameter is true not defined tasks in C(task_parameters) are skipped.
+      - If this parameter is C(true) not defined tasks in I(task_parameters) are skipped.
       - This could be the case when only certain tasks should run from the task list.
     default: false
     type: bool
@@ -141,7 +139,7 @@ msg:
   description: A small execution description
   type: str
   returned: always
-  sample: 'Successfull'
+  sample: 'Successful'
 out:
   description: A complete description of the executed tasks. If this is available.
   type: list
@@ -247,11 +245,11 @@ def run_module():
         ),
         supports_check_mode=False,
     )
-    result = dict(changed=False, msg='', out={}, json_out={}, error={}, )
+    result = dict(changed=False, msg='', out={}, json_out={})
 
     params = module.params
 
-    username = (params['conn_username']).upper()
+    username = params['conn_username'].upper()
     password = params['conn_password']
     host = params['host']
     sysnr = params['sysnr']
