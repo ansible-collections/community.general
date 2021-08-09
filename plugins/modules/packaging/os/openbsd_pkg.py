@@ -241,7 +241,7 @@ def package_present(names, pkg_spec, module):
                     # "file:/local/package/directory/ is empty" message on stderr
                     # while still installing the package, so we need to look for
                     # for a message like "packagename-1.0: ok" just in case.
-                    match = re.search(r"\W%s-[^:]+: ok\W" % pkg_spec[name]['stem'], pkg_spec[name]['stdout'])
+                    match = re.search(r"\W%s-[^:]+: ok\W" % re.escape(pkg_spec[name]['stem']), pkg_spec[name]['stdout'])
 
                     if match:
                         # It turns out we were able to install the package.
@@ -295,7 +295,7 @@ def package_latest(names, pkg_spec, module):
             pkg_spec[name]['changed'] = False
             for installed_name in pkg_spec[name]['installed_names']:
                 module.debug("package_latest(): checking for pre-upgrade package name: %s" % installed_name)
-                match = re.search(r"\W%s->.+: ok\W" % installed_name, pkg_spec[name]['stdout'])
+                match = re.search(r"\W%s->.+: ok\W" % re.escape(installed_name), pkg_spec[name]['stdout'])
                 if match:
                     module.debug("package_latest(): pre-upgrade package name match: %s" % installed_name)
 
