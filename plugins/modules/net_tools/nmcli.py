@@ -1173,8 +1173,8 @@ class Nmcli(object):
     def get_available_options(self, return_type, set_option=None):
         options = []
 
-        if return_type == '802-11-wireless-security' and set_option is None:
-            set_option = 'psk'
+        if return_type == '802-11-wireless-security':
+            set_option = set_option or 'psk'
 
         if set_option:
             commands = ['set %s.%s %s' % (return_type, set_option, set_option)]
