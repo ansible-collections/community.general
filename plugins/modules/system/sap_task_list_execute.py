@@ -300,14 +300,13 @@ def run_module():
             call_rfc_method(conn, 'STC_TM_TASK_SKIP',
                             {'I_SESSION_ID': session_init['E_SESSION_ID'],
                              'I_TASKNAME': task['TASKNAME'], 'I_SKIP_DEP_TASKS': 'X'})
-    # unskip defined tasks
+    # unskip defined tasks and set parameters
     if task_parameters is not None:
         for task in task_parameters:
             call_rfc_method(conn, 'STC_TM_TASK_UNSKIP',
                             {'I_SESSION_ID': session_init['E_SESSION_ID'],
                              'I_TASKNAME': task['TASKNAME'], 'I_UNSKIP_DEP_TASKS': 'X'})
-    # set parameters
-    if task_parameters is not None:
+
         call_rfc_method(conn, 'STC_TM_SESSION_SET_PARAMETERS',
                         {'I_SESSION_ID': session_init['E_SESSION_ID'],
                          'IT_PARAMETER': task_parameters})
