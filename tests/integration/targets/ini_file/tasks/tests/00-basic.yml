@@ -17,6 +17,7 @@
   assert:
     that:
       - result_basic_1 is not changed
+      - result_basic_1 is failed
       - "result_basic_1.msg == 'parameters are mutually exclusive: value|values'"
 
 
@@ -33,4 +34,5 @@
   assert:
     that:
       - result_basic_2 is not changed
+      - result_basic_2 is failed
       - result_basic_2.msg == "Destination {{ non_existing_file }} does not exist!"

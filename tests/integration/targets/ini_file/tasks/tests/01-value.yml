@@ -16,6 +16,7 @@
   assert:
     that:
       - result_value_1 is not changed
+      - result_value_1 is failed
       - result_value_1.msg == "Parameter 'value(s)' must be defined if state=present and allow_no_value=False."
 
 
@@ -32,6 +33,7 @@
   assert:
     that:
       - result_value_2 is not changed
+      - result_value_2 is failed
       - result_value_2.msg == "Parameter 'value(s)' must be defined if state=present and allow_no_value=False."
 
 

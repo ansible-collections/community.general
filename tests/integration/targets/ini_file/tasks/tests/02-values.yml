@@ -16,6 +16,7 @@
   assert:
     that:
       - result1 is not changed
+      - result1 is failed
       - result1.msg == "Parameter 'value(s)' must be defined if state=present and allow_no_value=False."
 
 
@@ -32,6 +33,7 @@
   assert:
     that:
       - result2 is not changed
+      - result2 is failed
       - result2.msg == "Parameter 'value(s)' must be defined if state=present and allow_no_value=False."
 
 
@@ -76,6 +78,7 @@
     values:
       - lemonade
     state: absent
+    exclusive: false
   register: result4
 
 - name: test-values 4 - read content from output file
