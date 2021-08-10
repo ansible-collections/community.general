@@ -194,7 +194,7 @@ class Zfs(object):
             self.module.fail_json(msg=err)
 
     def set_properties_if_changed(self):
-        diff = {'before': {}, 'after': {}}
+        diff = {'before': {'name': self.name}, 'after': {'name': self.name}}
         current_properties = self.get_current_properties()
         for prop, value in self.properties.items():
             current_value = current_properties.get(prop, None)
@@ -274,12 +274,14 @@ def main():
             result['diff'] = zfs.set_properties_if_changed()
         else:
             zfs.create()
-            result['diff'] = {'before': {'state': 'absent'}, 'after': {'state': state}}
+            result['diff'] = {'before': {'name': name, 'state': 'absent'},
+                               'after': {'name': name, 'state': state}}
 
     elif state == 'absent':
         if zfs.exists():
             zfs.destroy()
-            result['diff'] = {'before': {'state': 'present'}, 'after': {'state': state}}
+            result['diff'] = {'before': {'name': name, 'state': 'present'},
+                               'after': {'name': name, 'state': state}}
 
     result.update(zfs.properties)
     result['changed'] = zfs.changed
