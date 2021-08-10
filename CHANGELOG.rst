@@ -6,6 +6,92 @@ Community General Release Notes
 
 This changelog describes changes after version 1.0.0.
 
+v2.5.5
+======
+
+Release Summary
+---------------
+
+Maintenance release.
+
+Bugfixes
+--------
+
+- ali_instance_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- archive - fixed ``exclude_path`` values causing incorrect archive root (https://github.com/ansible-collections/community.general/pull/2816).
+- archive - fixed improper file names for single file zip archives (https://github.com/ansible-collections/community.general/issues/2818).
+- archive - fixed incorrect ``state`` result value documentation (https://github.com/ansible-collections/community.general/pull/2816).
+- archive - fixed task failure when using the ``remove`` option with a ``path`` containing nested files for ``format``s other than ``zip`` (https://github.com/ansible-collections/community.general/issues/2919).
+- archive - fixing archive root determination when longest common root is ``/`` (https://github.com/ansible-collections/community.general/pull/3036).
+- deploy_helper - improved parameter checking by using standard Ansible construct (https://github.com/ansible-collections/community.general/pull/3104).
+- ejabberd_user - replaced in-code check with ``required_if``, using ``get_bin_path()`` for the command, passing args to ``run_command()`` as list instead of string (https://github.com/ansible-collections/community.general/pull/3093).
+- gitlab_group_members - fixes issue when gitlab group has more then 20 members, pagination problem (https://github.com/ansible-collections/community.general/issues/3041).
+- gitlab_project_members - fixes issue when gitlab group has more then 20 members, pagination problem (https://github.com/ansible-collections/community.general/issues/3041).
+- gluster_heal_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- idrac_redfish_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- ini_file - fix inconsistency between empty value and no value (https://github.com/ansible-collections/community.general/issues/3031).
+- java_cert - import private key as well as public certificate from PKCS#12 (https://github.com/ansible-collections/community.general/issues/2460).
+- launchd - fixed sanity check in the module's code (https://github.com/ansible-collections/community.general/pull/2960).
+- lvol - honor ``check_mode`` on thinpool (https://github.com/ansible-collections/community.general/issues/2934).
+- memset_memstore_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- memset_server_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- npm - correctly handle cases where a dependency does not have a ``version`` property because it is either missing or invalid (https://github.com/ansible-collections/community.general/issues/2917).
+- ome_device_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- oneview_datacenter_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_enclosure_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_ethernet_network_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_fc_network_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_fcoe_network_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_logical_interconnect_group_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_network_set_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_san_manager_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- openbsd_pkg - fix regexp matching crash. This bug could trigger on package names with special characters, for example ``g++`` (https://github.com/ansible-collections/community.general/pull/3161).
+- ovirt_affinity_label_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_api_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_cluster_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_datacenter_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_disk_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_event_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_external_provider_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_group_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_host_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_host_storage_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_network_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_nic_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_permission_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_quota_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_scheduling_policy_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_snapshot_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_storage_domain_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_storage_template_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_storage_vm_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_tag_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_template_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_user_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_vm_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_vmpool_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- pacman - fix changed status when ignorepkg has been defined (https://github.com/ansible-collections/community.general/issues/1758).
+- pamd - fixed problem with files containing only one or two lines (https://github.com/ansible-collections/community.general/issues/2925).
+- pids - avoid crashes for older ``psutil`` versions, like on RHEL6 and RHEL7 (https://github.com/ansible-collections/community.general/pull/2808).
+- proxmox inventory plugin - fixed parsing failures when some cluster nodes are offline (https://github.com/ansible-collections/community.general/issues/2931).
+- proxmox inventory plugin - fixed plugin failure when a ``qemu`` guest has no ``template`` key (https://github.com/ansible-collections/community.general/pull/3052).
+- proxmox_kvm - fix result of clone, now returns ``newid`` instead of ``vmid`` (https://github.com/ansible-collections/community.general/pull/3034).
+- purefa_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- rax_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- redfish_command - fix extraneous error caused by missing ``bootdevice`` argument when using the ``DisableBootOverride`` sub-command (https://github.com/ansible-collections/community.general/issues/3005).
+- redfish_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- smartos_image_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- snmp_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- taiga - some constructs in the module fixed to work also in Python 3 (https://github.com/ansible-collections/community.general/pull/3067).
+- tss lookup plugin - fixed incompatibility with ``python-tss-sdk`` version 1.0.0 (https://github.com/ansible-collections/community.general/issues/3057, https://github.com/ansible-collections/community.general/pull/3139).
+- utm_aaa_group_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- utm_ca_host_key_cert_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- utm_network_interface_address_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- utm_proxy_frontend_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- utm_proxy_location_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- xenserver_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- xfconf_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+
 v2.5.4
 ======
 

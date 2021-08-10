@@ -1,4 +1,0 @@
----
-bugfixes:
-  - archive - fixing archive root determination when longest common root is ``/``
-    (https://github.com/ansible-collections/community.general/pull/3036).
