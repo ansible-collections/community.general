@@ -6,6 +6,103 @@ Community General Release Notes
 
 This changelog describes changes after version 2.0.0.
 
+v3.5.0
+======
+
+Release Summary
+---------------
+
+Regular bugfix and feature release.
+
+Minor Changes
+-------------
+
+- apache2_module - minor refactoring improving code quality, readability and speed (https://github.com/ansible-collections/community.general/pull/3106).
+- dnsimple - module rewrite to include support for python-dnsimple>=2.0.0; also add ``sandbox`` parameter (https://github.com/ansible-collections/community.general/pull/2946).
+- github_repo - add new option ``api_url``  to allow working with on premises installations (https://github.com/ansible-collections/community.general/pull/3038).
+- gunicorn - search for ``gunicorn`` binary in more paths (https://github.com/ansible-collections/community.general/pull/3092).
+- hana_query - added the abillity to use hdbuserstore (https://github.com/ansible-collections/community.general/pull/3125).
+- hpilo_info - added ``host_power_status`` return value to report power state of machine with ``OFF``, ``ON`` or ``UNKNOWN`` (https://github.com/ansible-collections/community.general/pull/3079).
+- nmcli - add ``dummy`` interface support (https://github.com/ansible-collections/community.general/issues/724).
+- nmcli - add ``wifi-sec`` option change detection to support managing secure Wi-Fi connections (https://github.com/ansible-collections/community.general/pull/3136).
+- nmcli - add ``wifi`` option to support managing Wi-Fi settings such as ``hidden`` or ``mode`` (https://github.com/ansible-collections/community.general/pull/3081).
+- pkgin - in case of ``pkgin`` tool failue, display returned standard output ``stdout`` and standard error ``stderr`` to ease debugging (https://github.com/ansible-collections/community.general/issues/3146).
+- proxmox inventory plugin - added snapshots to host facts (https://github.com/ansible-collections/community.general/pull/3044).
+- redfish_command - add ``boot_override_mode`` argument to BootSourceOverride commands (https://github.com/ansible-collections/community.general/issues/3134).
+- supervisorctl - using standard Ansible mechanism to validate ``signalled`` state required parameter (https://github.com/ansible-collections/community.general/pull/3068).
+
+Security Fixes
+--------------
+
+- nmcli - do not pass WiFi secrets on the ``nmcli`` command line. Use ``nmcli con edit`` instead and pass secrets as ``stdin`` (https://github.com/ansible-collections/community.general/issues/3145).
+
+Bugfixes
+--------
+
+- ali_instance_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- archive - fixing archive root determination when longest common root is ``/`` (https://github.com/ansible-collections/community.general/pull/3036).
+- deploy_helper - improved parameter checking by using standard Ansible construct (https://github.com/ansible-collections/community.general/pull/3104).
+- django_manage - refactor to call ``run_command()`` passing command as a list instead of string (https://github.com/ansible-collections/community.general/pull/3098).
+- ejabberd_user - replaced in-code check with ``required_if``, using ``get_bin_path()`` for the command, passing args to ``run_command()`` as list instead of string (https://github.com/ansible-collections/community.general/pull/3093).
+- gitlab_group_members - fixes issue when gitlab group has more then 20 members, pagination problem (https://github.com/ansible-collections/community.general/issues/3041).
+- gitlab_project_members - fixes issue when gitlab group has more then 20 members, pagination problem (https://github.com/ansible-collections/community.general/issues/3041).
+- idrac_redfish_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- ini_file - fix inconsistency between empty value and no value (https://github.com/ansible-collections/community.general/issues/3031).
+- java_cert - import private key as well as public certificate from PKCS#12 (https://github.com/ansible-collections/community.general/issues/2460).
+- memset_memstore_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- memset_server_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_datacenter_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_enclosure_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_ethernet_network_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_fc_network_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_fcoe_network_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_logical_interconnect_group_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_network_set_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_san_manager_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- openbsd_pkg - fix regexp matching crash. This bug could trigger on package names with special characters, for example ``g++`` (https://github.com/ansible-collections/community.general/pull/3161).
+- pids - avoid crashes for older ``psutil`` versions, like on RHEL6 and RHEL7 (https://github.com/ansible-collections/community.general/pull/2808).
+- proxmox inventory plugin - fixed plugin failure when a ``qemu`` guest has no ``template`` key (https://github.com/ansible-collections/community.general/pull/3052).
+- proxmox_kvm - fix result of clone, now returns ``newid`` instead of ``vmid`` (https://github.com/ansible-collections/community.general/pull/3034).
+- rax_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- redfish_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- smartos_image_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- snmp_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- supervisorctl - state ``signalled`` was not working (https://github.com/ansible-collections/community.general/pull/3068).
+- taiga - some constructs in the module fixed to work also in Python 3 (https://github.com/ansible-collections/community.general/pull/3067).
+- tss lookup plugin - fixed incompatibility with ``python-tss-sdk`` version 1.0.0 (https://github.com/ansible-collections/community.general/issues/3057, https://github.com/ansible-collections/community.general/pull/3139).
+- utm_aaa_group_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- utm_ca_host_key_cert_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- utm_network_interface_address_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- utm_proxy_frontend_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- utm_proxy_location_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- xenserver_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- xfconf_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+
+New Modules
+-----------
+
+Identity
+~~~~~~~~
+
+keycloak
+^^^^^^^^
+
+- keycloak_client_rolemapping - Allows administration of Keycloak client_rolemapping with the Keycloak API
+
+Packaging
+~~~~~~~~~
+
+language
+^^^^^^^^
+
+- ansible_galaxy_install - Install Ansible roles or collections using ansible-galaxy
+
+System
+~~~~~~
+
+- sap_task_list_execute - Perform SAP Task list execution
+- xfconf_info - Retrieve XFCE4 configurations
+
 v3.4.0
 ======
 

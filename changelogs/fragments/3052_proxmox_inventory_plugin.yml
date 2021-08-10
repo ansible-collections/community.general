@@ -1,2 +1,0 @@
-bugfixes:
-  - proxmox inventory plugin - fixed plugin failure when a ``qemu`` guest has no ``template`` key (https://github.com/ansible-collections/community.general/pull/3052).
