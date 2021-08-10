@@ -50,4 +50,4 @@
       include_tasks: tests/02-values.yml
 
     - name: include tasks to test regressions
-      include_tasks: tests/03-regressions.yml
+      include_tasks: tests/03-encoding.yml

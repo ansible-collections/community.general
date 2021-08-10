@@ -217,7 +217,7 @@
       - content9 == expected9
 
 
-- name: "test-values 10 - remove non-existant 'fav=cocktail' from section '[drinks]' in specified file"
+- name: "test-values 10 - remove non-existent 'fav=cocktail' from section '[drinks]' in specified file"
   ini_file:
     path: "{{ output_file }}"
     section: drinks
@@ -392,7 +392,7 @@
       - result16.msg == 'OK'
 
 
-- name: "test-values 17 - Ensure option 'refreshment' is 'abesent' in section '[drinks]'"
+- name: "test-values 17 - Ensure option 'refreshment' is 'absent' in section '[drinks]'"
   ini_file:
     path: "{{ output_file }}"
     section: drinks

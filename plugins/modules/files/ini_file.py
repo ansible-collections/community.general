@@ -135,7 +135,7 @@ EXAMPLES = r'''
     option: beverage
     value: lemon juice
     mode: '0600'
-    state: add
+    state: present
     exclusive: no
 
 - name: Ensure multiple values "beverage=coke" and "beverage=pepsi" are in section "[drinks]" in specified file
