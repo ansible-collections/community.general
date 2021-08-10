@@ -375,11 +375,11 @@ class Archive(object):
                 msg='Errors when writing archive at %s: %s' % (_to_native(self.destination), '; '.join(self.errors))
             )
 
-    def compare_with_original(self):
+    def is_different_from_original(self):
         if self.original_checksums is None:
-            self.changed |= self.original_size != self.destination_size()
+            return self.original_size != self.destination_size()
         else:
-            self.changed |= self.original_checksums != self.destination_checksums()
+            return self.original_checksums != self.destination_checksums()
 
     def destination_checksums(self):
         if self.destination_exists() and self.destination_readable():
@@ -644,7 +644,7 @@ def main():
         else:
             archive.add_targets()
             archive.destination_state = STATE_INCOMPLETE if archive.has_unfound_targets() else STATE_ARCHIVED
-            archive.compare_with_original()
+            archive.changed |= archive.is_different_from_original()
             if archive.remove:
                 archive.remove_targets()
     else:
@@ -654,7 +654,7 @@ def main():
         else:
             path = archive.paths[0]
             archive.add_single_target(path)
-            archive.compare_with_original()
+            archive.changed |= archive.is_different_from_original()
             if archive.remove:
                 archive.remove_single_target(path)
 
