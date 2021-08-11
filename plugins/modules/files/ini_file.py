@@ -47,14 +47,14 @@ options:
     description:
       - The string value to be associated with an I(option).
       - May be omitted when removing an I(option).
-      - Mutually exclusive with C(values).
+      - Mutually exclusive with I(values).
       - I(value=v) is equivalent to I(values=[v]).
     type: str
   values:
     description:
       - The string value to be associated with an I(option).
       - May be omitted when removing an I(option).
-      - Mutually exclusive with C(value).
+      - Mutually exclusive with I(value).
       - I(value=v) is equivalent to I(values=[v]).
     type: list
     elements: str
@@ -360,7 +360,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
                     section_lines = new_section_lines
             elif not exclusive and len(values) > 0:
                 # delete specified option=value line(s)
-                new_section_lines = [line for line in section_lines if not (match_active_opt(option, line) and match_active_opt(option, line).group(6) in values)]
+                new_section_lines = [i for i in section_lines if not (match_active_opt(option, i) and match_active_opt(option, i).group(6) in values)]
                 if section_lines != new_section_lines:
                     changed = True
                     msg = 'option changed'
