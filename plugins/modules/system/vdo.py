@@ -729,7 +729,8 @@ def run_module():
         # the activate_vdo() operation succeeded, as 'vdoactivatestatus'
         # will have the activated status prior to the activate_vdo()
         # call.
-        if vdoactivatestatus == 'enabled' or module.params['activated'] and module.params['running'] and desiredvdo not in runningvdolist:
+        if (vdoactivatestatus == 'enabled' or module.params['activated'] == 'yes') and \
+                module.params['running'] == 'yes' and desiredvdo not in runningvdolist:
             start_vdo(module, desiredvdo, vdocmd)
             if not result['changed']:
                 result['changed'] = True
