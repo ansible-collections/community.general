@@ -248,7 +248,7 @@
     that:
       - result10 is changed
       - result10.msg == 'option changed'
-      -  content10 == expected10
+      - content10 == expected10
 
 
 - name: "test-values 11 - Ensure 'fav=lemonade' and 'beverage=coke' is 'present' in section '[drinks]'"
