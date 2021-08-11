@@ -67,9 +67,11 @@ options:
     default: no
   state:
     description:
-      - If set to C(absent) all matching I(option) lines are removed.
+      - If set to C(absent) and I(exclusive) set to C(yes) all matching I(option) lines are removed.
+      - If set to C(absent) and I(exclusive) set to C(no) the specified C(option=value) lines are removed,
+        but the other I(option)s with the same name are not touched.
       - If set to C(present) and I(exclusive) set to C(no) the specified C(option=values) lines are added,
-        but the others are not touched.
+        but the other I(option)s with the same name are not touched.
       - If set to C(present) and I(exclusive) set to C(yes) all given C(option=values) lines will be
         added and the other I(option)s with the same name are removed.
     type: str
@@ -77,10 +79,10 @@ options:
     default: present
   exclusive:
     description:
-      - If set to C(yes) (default) and I(state) set to C(present) all given C(option=values) lines will be added and
-        the other I(option)s with the same name are removed.
-      - If set to C(no) and I(state) set to C(present) only the specified I(value(s)) are added, but the
-        others are not modified.
+      - If set to C(yes) (default), all matching I(option) lines are removed when I(state=absent),
+        or replaced when I(state=present).
+      - If set to C(no), only the specified I(value(s)) are added when I(state=present),
+        or removed when I(state=absent), and existing ones are not modified.
     type: bool
     default: yes
     version_added: 3.5.0
@@ -188,10 +190,11 @@ def do_ini(module, filename, section=None, option=None, values=None,
         section = to_text(section)
     if option is not None:
         option = to_text(option)
-    if values is not None:
-        values_unique = []
-        [values_unique.append(to_text(value)) for value in values if value not in values_unique and value is not None]
-        values = values_unique
+
+    # deduplicate entries in values
+    values_unique = []
+    [values_unique.append(to_text(value)) for value in values if value not in values_unique and value is not None]
+    values = values_unique
 
     diff = dict(
         before='',
@@ -348,26 +351,20 @@ def do_ini(module, filename, section=None, option=None, values=None,
 
     if state == 'absent':
         if option:
-            # delete specified option line(s)
-            new_section_lines = [line for line in section_lines if not (match_active_opt(option, line) and match_active_opt(option, line).group(6) in values)]
-            if section_lines != new_section_lines:
-                changed = True
-                msg = 'option changed'
-                section_lines = new_section_lines
-        else:
-            # drop the entire section
-            section_lines = []
-            msg = 'section removed'
-            changed = True
-
-    if state == 'absent' and len(values) == 0:
-        if option:
-            # delete the existing option line(s)
-            new_section_lines = [line for line in section_lines if not match_active_opt(option, line)]
-            if section_lines != new_section_lines:
-                changed = True
-                msg = 'option changed'
-                section_lines = new_section_lines
+            if exclusive:
+                # delete all option line(s) with given option and ignore value
+                new_section_lines = [line for line in section_lines if not (match_active_opt(option, line))]
+                if section_lines != new_section_lines:
+                    changed = True
+                    msg = 'option changed'
+                    section_lines = new_section_lines
+            elif not exclusive and len(values) > 0:
+                # delete specified option=value line(s)
+                new_section_lines = [line for line in section_lines if not (match_active_opt(option, line) and match_active_opt(option, line).group(6) in values)]
+                if section_lines != new_section_lines:
+                    changed = True
+                    msg = 'option changed'
+                    section_lines = new_section_lines
         else:
             # drop the entire section
             section_lines = []
@@ -456,11 +453,6 @@ def main():
 
     if state == 'present' and not allow_no_value and value is None and not values:
         module.fail_json(msg="Parameter 'value(s)' must be defined if state=present and allow_no_value=False.")
-
-    if state == 'present' and not allow_no_value and not value and values:
-        for element in values:
-            if element is None:
-                module.fail_json(msg="Parameter 'value(s)' must be defined if state=present and allow_no_value=False.")
 
     if value is not None:
         values = [value]

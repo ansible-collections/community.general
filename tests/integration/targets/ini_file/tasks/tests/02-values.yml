@@ -230,22 +230,46 @@
     state: absent
   register: result10
 
+- name: test-values 10 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-values 10 - set expected content and get current ini file content
+  set_fact:
+    expected10: |
+
+      [drinks]
+    content10: "{{ output_content.content | b64decode }}"
+
+
 - name: test-values 10 - Ensure unchanged
   assert:
     that:
-      - result10 is not changed
-      - result10.msg == 'OK'
+      - result10 is changed
+      - result10.msg == 'option changed'
+      -  content10 == expected10
 
 
-- name: "test-values 11 - Ensure 'beverage=coke' is 'present' in section '[drinks]'"
-  ini_file:
-    path: "{{ output_file }}"
-    section: drinks
-    option: beverage
-    values:
-      - coke
-    state: present
-  register: result11
+- name: "test-values 11 - Ensure 'fav=lemonade' and 'beverage=coke' is 'present' in section '[drinks]'"
+  block:
+    - name: "test-values 11 - resetting ini_fie: Ensure 'fav=lemonade' is 'present' in section '[drinks]'"
+      ini_file:
+        path: "{{ output_file }}"
+        section: drinks
+        option: fav
+        values:
+          - lemonade
+        state: present
+    - name: "test-values 11 - Ensure 'beverage=coke' is 'present' in section '[drinks]'"
+      ini_file:
+        path: "{{ output_file }}"
+        section: drinks
+        option: beverage
+        values:
+          - coke
+        state: present
+      register: result11
 
 - name: test-values 11 - read content from output file
   slurp:
@@ -821,3 +845,169 @@
   assert:
     that:
       - content28 == expected28
+
+
+- name: test-value 29 - Create starting ini file
+  copy:
+    content: |
+      [drinks]
+      fav = cocktail
+      beverage = water
+      fav = lemonade
+      beverage = orange juice
+    dest: "{{ output_file }}"
+
+- name: "test-value 29 - Test 'state=absent' with 'exclusive=true' with multiple options in ini_file"
+  ini_file:
+    path: "{{ output_file }}"
+    section: drinks
+    option: fav
+    values:
+      - cocktail
+    state: absent
+  register: result29
+
+- name: test-value 29 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-value 29 - set expected content and get current ini file content
+  set_fact:
+    expected29: |
+      [drinks]
+      beverage = water
+      beverage = orange juice
+    content29: "{{ output_content.content | b64decode }}"
+
+- name: test-value 29 - Verify content of ini file is as expected
+  assert:
+    that:
+      - result29 is changed
+      - result29.msg == 'option changed'
+      - content29 == expected29
+
+
+- name: test-value 30 - Create starting ini file
+  copy:
+    content: |
+      [drinks]
+      fav = cocktail
+      beverage = water
+      fav = lemonade
+      beverage = orange juice
+    dest: "{{ output_file }}"
+
+- name: "test-value 30 - Test 'state=absent' with 'exclusive=false' with multiple options in ini_file"
+  ini_file:
+    path: "{{ output_file }}"
+    section: drinks
+    option: fav
+    values:
+      - cocktail
+    state: absent
+    exclusive: false
+  register: result30
+
+- name: test-value 30 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-value 30 - set expected content and get current ini file content
+  set_fact:
+    expected30: |
+      [drinks]
+      beverage = water
+      fav = lemonade
+      beverage = orange juice
+    content30: "{{ output_content.content | b64decode }}"
+
+- name: test-value 30 - Verify content of ini file is as expected
+  assert:
+    that:
+      - result30 is changed
+      - result30.msg == 'option changed'
+      - content30 == expected30
+
+
+- name: test-value 31 - Create starting ini file
+  copy:
+    content: |
+      [drinks]
+      fav = cocktail
+      beverage = water
+      fav = lemonade
+      beverage = orange juice
+    dest: "{{ output_file }}"
+
+- name: "test-value 31 - Test 'state=absent' with 'exclusive=true' and no value given with multiple options in ini_file"
+  ini_file:
+    path: "{{ output_file }}"
+    section: drinks
+    option: fav
+    state: absent
+  register: result31
+
+- name: test-value 31 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-value 31 - set expected content and get current ini file content
+  set_fact:
+    expected31: |
+      [drinks]
+      beverage = water
+      beverage = orange juice
+    content31: "{{ output_content.content | b64decode }}"
+
+- name: test-value 31 - Verify content of ini file is as expected
+  assert:
+    that:
+      - result31 is changed
+      - result31.msg == 'option changed'
+      - content31 == expected31
+
+
+- name: test-value 32 - Create starting ini file
+  copy:
+    content: |
+      [drinks]
+      fav = cocktail
+      beverage = water
+      fav = lemonade
+      beverage = orange juice
+    dest: "{{ output_file }}"
+
+- name: "test-value 32 - Test 'state=absent' with 'exclusive=false' and no value given with multiple options in ini_file"
+  ini_file:
+    path: "{{ output_file }}"
+    section: drinks
+    option: fav
+    state: absent
+    exclusive: false
+  register: result32
+  diff: true
+
+- name: test-value 32 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-value 32 - set expected content and get current ini file content
+  set_fact:
+    expected32: |
+      [drinks]
+      fav = cocktail
+      beverage = water
+      fav = lemonade
+      beverage = orange juice
+    content32: "{{ output_content.content | b64decode }}"
+
+- name: test-value 32 - Verify content of ini file is as expected
+  assert:
+    that:
+      - result32 is not changed
+      - result32.msg == 'OK'
+      - content32 == expected32
