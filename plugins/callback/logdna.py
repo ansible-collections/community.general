@@ -78,7 +78,7 @@ def get_mac():
 
 # Getting hostname of system:
 def get_hostname():
-    return str(socket.gethostname()).split('.local')[0]
+    return str(socket.gethostname()).split('.local', 1)[0]
 
 
 # Getting IP of system:
