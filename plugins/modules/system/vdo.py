@@ -531,7 +531,7 @@ def run_module():
         if module.params['compression'] == 'disabled':
             rc, out, err = module.run_command([vdocmd, "disableCompression", "--name=%s" % desiredvdo])
 
-        if module.params['deduplication'] is not None and module.params['deduplication'] == 'disabled':
+        if module.params['deduplication'] == 'disabled':
             rc, out, err = module.run_command([vdocmd, "disableDeduplication", "--name=%s" % desiredvdo])
 
         if module.params['activated'] == 'no':
