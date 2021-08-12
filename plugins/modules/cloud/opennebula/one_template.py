@@ -213,8 +213,8 @@ class TemplateModule(OpenNebulaModule):
     def get_template_by_id(self, template_id):
         return self.get_template(lambda template: (template.ID == template_id))
 
-    def get_template_by_name(self, template_name):
-        return self.get_template(lambda template: (template.NAME == template_name))
+    def get_template_by_name(self, name):
+        return self.get_template(lambda template: (template.NAME == name))
 
     def get_template_instance(self, requested_id, requested_name):
         if requested_id:
