@@ -118,14 +118,16 @@ from ansible.errors import AnsibleError, AnsibleOptionsError
 sdk_is_missing = False
 
 try:
-    from thycotic import __version__ as sdk_version
-    from thycotic.secrets.server import (
-        SecretServer,
-        SecretServerError,
-        PasswordGrantAuthorizer,
-    )
+    from thycotic.secrets.server import SecretServer, SecretServerError
 except ImportError:
     sdk_is_missing = True
+
+# Added for backwards compatability - See issue #3192
+# https://github.com/ansible-collections/community.general/issues/3192
+try:
+    from thycotic import __version__ as sdk_version
+except:
+    sdk_version = "0.0.5"
 
 from ansible.utils.display import Display
 from ansible.plugins.lookup import LookupBase
@@ -141,6 +143,10 @@ class LookupModule(LookupBase):
         if LooseVersion(sdk_version) < LooseVersion('1.0.0'):
             return SecretServer(**server_parameters)
         else:
+            # The Password Authorizer became available in v1.0.0 and beyond.
+            # Import only if sdk_version requires it.
+            from thycotic.secrets.server import PasswordGrantAuthorizer
+
             authorizer = PasswordGrantAuthorizer(
                 server_parameters["base_url"],
                 server_parameters["username"],
