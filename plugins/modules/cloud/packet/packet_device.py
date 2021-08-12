@@ -509,11 +509,10 @@ def wait_for_devices_active(module, packet_conn, watched_devices):
 def wait_for_public_IPv(module, packet_conn, created_devices):
 
     def has_public_ip(addr_list, ip_v):
-        return any([a['public'] and a['address_family'] == ip_v and
-                    a['address'] for a in addr_list])
+        return any(a['public'] and a['address_family'] == ip_v and a['address'] for a in addr_list)
 
     def all_have_public_ip(ds, ip_v):
-        return all([has_public_ip(d.ip_addresses, ip_v) for d in ds])
+        return all(has_public_ip(d.ip_addresses, ip_v) for d in ds)
 
     address_family = module.params.get('wait_for_public_IPv')
 

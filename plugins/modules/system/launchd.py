@@ -141,14 +141,14 @@ class Plist:
         self.__changed = False
         self.__service = service
 
-        state, pid, dummy, dummy = LaunchCtlList(module, service).run()
+        state, pid, dummy, dummy = LaunchCtlList(module, self.__service).run()
 
         # Check if readPlist is available or not
         self.old_plistlib = hasattr(plistlib, 'readPlist')
 
-        self.__file = self.__find_service_plist(service)
+        self.__file = self.__find_service_plist(self.__service)
         if self.__file is None:
-            msg = 'Unable to infer the path of %s service plist file' % service
+            msg = 'Unable to infer the path of %s service plist file' % self.__service
             if pid is None and state == ServiceState.UNLOADED:
                 msg += ' and it was not found among active services'
             module.fail_json(msg=msg)

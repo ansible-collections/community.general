@@ -565,7 +565,7 @@ class MavenDownloader:
                     return "Cannot find %s checksum from %s" % (checksum_alg, remote_url)
             try:
                 # Check if remote checksum only contains md5/sha1 or md5/sha1 + filename
-                _remote_checksum = remote_checksum.split(None)[0]
+                _remote_checksum = remote_checksum.split(None, 1)[0]
                 remote_checksum = _remote_checksum
                 # remote_checksum is empty so we continue and keep original checksum string
                 # This should not happen since we check for remote_checksum before
