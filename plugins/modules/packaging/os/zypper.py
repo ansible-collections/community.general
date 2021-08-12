@@ -29,6 +29,7 @@ author:
 short_description: Manage packages on SUSE and openSUSE
 description:
     - Manage packages on SUSE and openSUSE using the zypper and rpm tools.
+    - Also supports transactional updates, by running zypper inside C(/sbin/transactional-update --continue --drop-if-no-change --quiet run).
 options:
     name:
         description:
@@ -213,6 +214,7 @@ EXAMPLES = '''
     ZYPP_LOCK_TIMEOUT: 20
 '''
 
+import os.path
 import xml
 import re
 from xml.dom.minidom import parseString as parseXML
@@ -337,6 +339,8 @@ def get_cmd(m, subcommand):
     is_install = subcommand in ['install', 'update', 'patch', 'dist-upgrade']
     is_refresh = subcommand == 'refresh'
     cmd = [m.get_bin_path('zypper', required=True), '--quiet', '--non-interactive', '--xmlout']
+    if transactional_updates():
+        cmd = [m.get_bin_path('transactional-update', required=True), '--continue', '--drop-if-no-change', '--quiet', 'run'] + cmd
     if m.params['extra_args_precommand']:
         args_list = m.params['extra_args_precommand'].split()
         cmd.extend(args_list)
@@ -490,6 +494,10 @@ def repo_refresh(m):
     result, retvals['rc'], retvals['stdout'], retvals['stderr'] = parse_zypper_xml(m, cmd)
 
     return retvals
+
+
+def transactional_updates():
+    return os.path.exists('/var/lib/misc/transactional-update.state')
 
 # ===========================================
 # Main control flow
