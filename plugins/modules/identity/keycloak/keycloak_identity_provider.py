@@ -235,7 +235,6 @@ options:
 extends_documentation_fragment:
 - community.general.keycloak
 
-
 author:
     - Laurent Paumier (@laurpaum)
 '''
