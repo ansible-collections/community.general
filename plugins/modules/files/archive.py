@@ -182,6 +182,7 @@ import zipfile
 from fnmatch import fnmatch
 from sys import version_info
 from traceback import format_exc
+from zlib import crc32
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_bytes, to_native
@@ -232,10 +233,6 @@ def expand_paths(paths):
             e_paths = [b_path]
         expanded_path.extend(e_paths)
     return expanded_path, is_globby
-
-
-def legacy_filter(path, exclusion_patterns):
-    return matches_exclusion_patterns(path, exclusion_patterns)
 
 
 def matches_exclusion_patterns(path, exclusion_patterns):
@@ -313,6 +310,7 @@ class Archive(object):
         if self.remove:
             self._check_removal_safety()
 
+        self.original_checksums = self.destination_checksums()
         self.original_size = self.destination_size()
 
     def add(self, path, archive_name):
@@ -377,8 +375,16 @@ class Archive(object):
                 msg='Errors when writing archive at %s: %s' % (_to_native(self.destination), '; '.join(self.errors))
             )
 
-    def compare_with_original(self):
-        self.changed |= self.original_size != self.destination_size()
+    def is_different_from_original(self):
+        if self.original_checksums is None:
+            return self.original_size != self.destination_size()
+        else:
+            return self.original_checksums != self.destination_checksums()
+
+    def destination_checksums(self):
+        if self.destination_exists() and self.destination_readable():
+            return self._get_checksums(self.destination)
+        return None
 
     def destination_exists(self):
         return self.destination and os.path.exists(self.destination)
@@ -494,6 +500,10 @@ class Archive(object):
     def _add(self, path, archive_name):
         pass
 
+    @abc.abstractmethod
+    def _get_checksums(self, path):
+        pass
+
 
 class ZipArchive(Archive):
     def __init__(self, module):
@@ -513,8 +523,17 @@ class ZipArchive(Archive):
         self.file = zipfile.ZipFile(_to_native_ascii(self.destination), 'w', zipfile.ZIP_DEFLATED, True)
 
     def _add(self, path, archive_name):
-        if not legacy_filter(path, self.exclusion_patterns):
+        if not matches_exclusion_patterns(path, self.exclusion_patterns):
             self.file.write(path, archive_name)
+
+    def _get_checksums(self, path):
+        try:
+            archive = zipfile.ZipFile(_to_native_ascii(path), 'r')
+            checksums = set((info.filename, info.CRC) for info in archive.infolist())
+            archive.close()
+        except zipfile.BadZipfile:
+            checksums = set()
+        return checksums
 
 
 class TarArchive(Archive):
@@ -554,12 +573,34 @@ class TarArchive(Archive):
             return None if matches_exclusion_patterns(tarinfo.name, self.exclusion_patterns) else tarinfo
 
         def py26_filter(path):
-            return legacy_filter(path, self.exclusion_patterns)
+            return matches_exclusion_patterns(path, self.exclusion_patterns)
 
         if PY27:
             self.file.add(path, archive_name, recursive=False, filter=py27_filter)
         else:
             self.file.add(path, archive_name, recursive=False, exclude=py26_filter)
+
+    def _get_checksums(self, path):
+        try:
+            if self.format == 'xz':
+                with lzma.open(_to_native_ascii(path), 'r') as f:
+                    archive = tarfile.open(fileobj=f)
+                    checksums = set((info.name, info.chksum) for info in archive.getmembers())
+                    archive.close()
+            else:
+                archive = tarfile.open(_to_native_ascii(path), 'r|' + self.format)
+                checksums = set((info.name, info.chksum) for info in archive.getmembers())
+                archive.close()
+        except (lzma.LZMAError, tarfile.ReadError, tarfile.CompressionError):
+            try:
+                # The python implementations of gzip, bz2, and lzma do not support restoring compressed files
+                # to their original names so only file checksum is returned
+                f = self._open_compressed_file(_to_native_ascii(path), 'r')
+                checksums = set([(b'', crc32(f.read()))])
+                f.close()
+            except Exception:
+                checksums = set()
+        return checksums
 
 
 def get_archive(module):
@@ -603,7 +644,7 @@ def main():
         else:
             archive.add_targets()
             archive.destination_state = STATE_INCOMPLETE if archive.has_unfound_targets() else STATE_ARCHIVED
-            archive.compare_with_original()
+            archive.changed |= archive.is_different_from_original()
             if archive.remove:
                 archive.remove_targets()
     else:
@@ -613,7 +654,7 @@ def main():
         else:
             path = archive.paths[0]
             archive.add_single_target(path)
-            archive.compare_with_original()
+            archive.changed |= archive.is_different_from_original()
             if archive.remove:
                 archive.remove_single_target(path)
 
