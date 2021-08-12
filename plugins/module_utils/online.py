@@ -101,7 +101,7 @@ class Online(object):
 
     @staticmethod
     def get_user_agent_string(module):
-        return "ansible %s Python %s" % (module.ansible_version, sys.version.split(' ')[0])
+        return "ansible %s Python %s" % (module.ansible_version, sys.version.split(' ', 1)[0])
 
     def get(self, path, data=None, headers=None):
         return self.send('GET', path, data, headers)

@@ -526,8 +526,8 @@ def main():
                     lines = [(numbered_line_re.match(line), '(v6)' in line) for line in numbered_state.splitlines()]
                     lines = [(int(matcher.group(1)), ipv6) for (matcher, ipv6) in lines if matcher]
                     last_number = max([no for (no, ipv6) in lines]) if lines else 0
-                    has_ipv4 = any([not ipv6 for (no, ipv6) in lines])
-                    has_ipv6 = any([ipv6 for (no, ipv6) in lines])
+                    has_ipv4 = any(not ipv6 for (no, ipv6) in lines)
+                    has_ipv6 = any(ipv6 for (no, ipv6) in lines)
                     if relative_to_cmd == 'first-ipv4':
                         relative_to = 1
                     elif relative_to_cmd == 'last-ipv4':

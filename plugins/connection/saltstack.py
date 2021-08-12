@@ -51,7 +51,7 @@ class Connection(ConnectionBase):
         self._connected = True
         return self
 
-    def exec_command(self, cmd, sudoable=False, in_data=None):
+    def exec_command(self, cmd, in_data=None, sudoable=False):
         """ run a command on the remote minion """
         super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
 

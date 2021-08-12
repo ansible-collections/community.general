@@ -168,7 +168,7 @@ def get_sshkey_selector(module):
             return k.key == select_dict['key']
         else:
             # if key string not specified, all the fields must match
-            return all([select_dict[f] == getattr(k, f) for f in select_dict])
+            return all(select_dict[f] == getattr(k, f) for f in select_dict)
     return selector
 
 
