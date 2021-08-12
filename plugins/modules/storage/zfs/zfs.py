@@ -194,7 +194,7 @@ class Zfs(object):
             self.module.fail_json(msg=err)
 
     def set_properties_if_changed(self):
-        diff = {'before': {'name': self.name}, 'after': {'name': self.name}}
+        diff = {'before': {}, 'after': {}}
         current_properties = self.get_current_properties()
         for prop, value in self.properties.items():
             current_value = current_properties.get(prop, None)
@@ -205,12 +205,13 @@ class Zfs(object):
         if self.module.check_mode:
             return diff
         updated_properties = self.get_current_properties()
-        for prop in self.properties:
+        for prop in diff['before']:
             value = updated_properties.get(prop, None)
             if value is None:
                 self.module.fail_json(msg="zfsprop was not present after being successfully set: %s" % prop)
-            if current_properties.get(prop, None) != value:
+            if diff['before'][prop] != value:
                 self.changed = True
+            diff['after'][prop] = value
         return diff
 
     def get_current_properties(self):
@@ -274,14 +275,17 @@ def main():
             result['diff'] = zfs.set_properties_if_changed()
         else:
             zfs.create()
-            result['diff'] = {'before': {'name': name, 'state': 'absent'},
-                               'after': {'name': name, 'state': state}}
+            result['diff'] = {'before': {'state': 'absent'}, 'after': {'state': state}}
 
     elif state == 'absent':
         if zfs.exists():
             zfs.destroy()
-            result['diff'] = {'before': {'name': name, 'state': 'present'},
-                               'after': {'name': name, 'state': state}}
+            result['diff'] = {'before': {'state': 'present'}, 'after': {'state': state}}
+        else:
+            result['diff'] = {}
+
+    result['diff']['before_header'] = name
+    result['diff']['after_header'] = name
 
     result.update(zfs.properties)
     result['changed'] = zfs.changed
