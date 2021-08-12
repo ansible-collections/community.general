@@ -556,7 +556,7 @@ class MavenDownloader:
                     return "Cannot find md5 from " + remote_url
             try:
                 # Check if remote md5 only contains md5 or md5 + filename
-                _remote_md5 = remote_md5.split(None)[0]
+                _remote_md5 = remote_md5.split(None, 1)[0]
                 remote_md5 = _remote_md5
                 # remote_md5 is empty so we continue and keep original md5 string
                 # This should not happen since we check for remote_md5 before
