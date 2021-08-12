@@ -58,7 +58,7 @@ options:
       - I(value=v) is equivalent to I(values=[v]).
     type: list
     elements: str
-    version_added: 3.5.0
+    version_added: 3.6.0
   backup:
     description:
       - Create a backup file including the timestamp information so you can get
@@ -85,7 +85,7 @@ options:
         or removed when I(state=absent), and existing ones are not modified.
     type: bool
     default: yes
-    version_added: 3.5.0
+    version_added: 3.6.0
   no_extra_spaces:
     description:
       - Do not insert spaces before and after '=' symbol.
