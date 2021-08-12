@@ -142,7 +142,7 @@ class Scaleway(object):
 
     @staticmethod
     def get_user_agent_string(module):
-        return "ansible %s Python %s" % (module.ansible_version, sys.version.split(' ')[0])
+        return "ansible %s Python %s" % (module.ansible_version, sys.version.split(' ', 1)[0])
 
     def get(self, path, data=None, headers=None, params=None):
         return self.send(method='GET', path=path, data=data, headers=headers, params=params)
