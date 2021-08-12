@@ -12,3 +12,5 @@ bugfixes:
 - "maven_artifact - improve split call to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3199)."
 - "launchd - use private attribute to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3199)."
 - "ufw - use generator to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3199)."
+- "scaleway inventory script - improve split call to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3195)."
+- "vbox inventory script - change function argument name to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3195)."
