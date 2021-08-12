@@ -235,7 +235,7 @@ class InventoryModule(BaseInventoryPlugin):
 
         self.headers = {
             'Authorization': "Bearer %s" % token,
-            'User-Agent': "ansible %s Python %s" % (ansible_version, python_version.split(' ')[0]),
+            'User-Agent': "ansible %s Python %s" % (ansible_version, python_version.split(' ', 1)[0]),
             'Content-type': 'application/json'
         }
 
