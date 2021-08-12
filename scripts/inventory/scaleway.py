@@ -51,7 +51,7 @@ class ScalewayAPI:
     def __init__(self, auth_token, region):
         self.session = requests.session()
         self.session.headers.update({
-            'User-Agent': 'Ansible Python/%s' % (sys.version.split(' ')[0])
+            'User-Agent': 'Ansible Python/%s' % (sys.version.split(' ', 1)[0])
         })
         self.session.headers.update({
             'X-Auth-Token': auth_token.encode('latin1')
