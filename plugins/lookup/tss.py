@@ -126,7 +126,7 @@ except ImportError:
 # https://github.com/ansible-collections/community.general/issues/3192
 try:
     from thycotic import __version__ as sdk_version
-except:
+except ImportError:
     sdk_version = "0.0.5"
 
 from ansible.utils.display import Display
