@@ -154,12 +154,12 @@ class CacheModuleKeys(MutableSet):
     def __len__(self):
         return len(self._keyset)
 
-    def add(self, key):
-        self._keyset[key] = time.time()
+    def add(self, value):
+        self._keyset[value] = time.time()
         self._cache.set(self.PREFIX, self._keyset)
 
-    def discard(self, key):
-        del self._keyset[key]
+    def discard(self, value):
+        del self._keyset[value]
         self._cache.set(self.PREFIX, self._keyset)
 
     def remove_by_timerange(self, s_min, s_max):
