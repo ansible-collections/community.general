@@ -19,12 +19,12 @@
     format: "{{ format }}"
   register: file_content_idempotency_after
 
-# After idempotency fix result will be reliably changed for all formats
 - name: Assert task status is changed - file content idempotency ({{ format }})
   assert:
     that:
-      - file_content_idempotency_after is not changed
-  when: "format in ('tar', 'zip')"
+      - file_content_idempotency_after is changed
+  # Only ``zip`` archives are guaranteed to compare file content checksums rather than header checksums
+  when: "format == 'zip'"
 
 - name: Remove archive - file content idempotency ({{ format }})
   file:
@@ -54,12 +54,10 @@
     format: "{{ format }}"
   register: file_name_idempotency_after
 
-# After idempotency fix result will be reliably changed for all formats
 - name: Check task status - file name idempotency ({{ format }})
   assert:
     that:
-      - file_name_idempotency_after is not changed
-  when: "format in ('tar', 'zip')"
+      - file_name_idempotency_after is changed
 
 - name: Remove archive - file name idempotency ({{ format }})
   file:
@@ -89,12 +87,12 @@
     format: "{{ format }}"
   register: single_file_content_idempotency_after
 
-# After idempotency fix result will be reliably changed for all formats
 - name: Assert task status is changed - single file content idempotency ({{ format }})
   assert:
     that:
-      - single_file_content_idempotency_after is not changed
-  when: "format in ('tar', 'zip')"
+      - single_file_content_idempotency_after is changed
+  # ``tar`` archives are not guaranteed to identify changes to file content if the file meta properties are unchanged.
+  when: "format != 'tar'"
 
 - name: Remove archive - single file content idempotency ({{ format }})
   file:
@@ -125,11 +123,12 @@
   register: single_file_name_idempotency_after
 
 
-# After idempotency fix result will be reliably changed for all formats
+# The gz, bz2, and xz formats do not store the original file name
+# so it is not possible to identify a change in this scenario.
 - name: Check task status - single file name idempotency ({{ format }})
   assert:
     that:
-      - single_file_name_idempotency_after is not changed
+      - single_file_name_idempotency_after is changed
   when: "format in ('tar', 'zip')"
 
 - name: Remove archive - single file name idempotency ({{ format }})
