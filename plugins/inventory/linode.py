@@ -78,6 +78,7 @@ groups:
   webservers: "'web' in (tags|list)"
   mailservers: "'mail' in (tags|list)"
 compose:
+  ansible_ssh_host: ipv4[0]
   ansible_port: 2222
 '''
 
