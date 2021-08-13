@@ -129,6 +129,12 @@ try:
 except ImportError:
     sdk_version = "0.0.5"
 
+try:
+    from thycotic.secrets.server import PasswordGrantAuthorizer
+    sdK_version_below_v1 = False
+except ImportError:
+    sdK_version_below_v1 = True
+
 from ansible.utils.display import Display
 from ansible.plugins.lookup import LookupBase
 
@@ -140,12 +146,12 @@ class LookupModule(LookupBase):
     @staticmethod
     def Client(server_parameters):
 
-        if LooseVersion(sdk_version) < LooseVersion('1.0.0'):
+        if LooseVersion(sdk_version) < LooseVersion('1.0.0') or sdK_version_below_v1:
             return SecretServer(**server_parameters)
         else:
             # The Password Authorizer became available in v1.0.0 and beyond.
             # Import only if sdk_version requires it.
-            from thycotic.secrets.server import PasswordGrantAuthorizer
+            # from thycotic.secrets.server import PasswordGrantAuthorizer
 
             authorizer = PasswordGrantAuthorizer(
                 server_parameters["base_url"],
