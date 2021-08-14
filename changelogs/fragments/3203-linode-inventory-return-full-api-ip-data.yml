@@ -1,0 +1,2 @@
+minor_changes:
+  - "Adds the api_style configuration key for Linode dynamic inventories. Set to 'api' to get more detailed network details back from the remote Linode host."
