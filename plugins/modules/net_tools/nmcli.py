@@ -332,10 +332,14 @@ options:
        version_added: 2.0.0
     wifi_sec:
        description:
-            - 'The security configuration of the WiFi connection. The valid attributes are listed on:
+            - The security configuration of the WiFi connection.
+            - Note the list of attribute choices may vary depending on which version of NetworkManager/nmcli
+              is installed on the host.
+            - 'An up-to-date list of supported attributes can be found here:
               U(https://networkmanager.dev/docs/api/latest/settings-802-11-wireless-security.html).'
             - 'For instance to use common WPA-PSK auth with a password:
               C({key-mgmt: wpa-psk, psk: my_password}).'
+       choices: [ key-mgmt, wep-tx-keyidx, auth-alg, proto, pairwise, group, pmf, leap-username, wep-key0, wep-key1, wep-key2, wep-key3, wep-key-flags, wep-key-type, psk, psk-flags, leap-password, leap-password-flags, wps-method, fils ]
        type: dict
        version_added: 3.0.0
     ssid:
@@ -345,11 +349,23 @@ options:
        version_added: 3.0.0
     wifi:
        description:
-            - 'The configuration of the WiFi connection. The valid attributes are listed on:
+            - The configuration of the WiFi connection.
+            - Note the list of attribute choices may vary depending on which version of NetworkManager/nmcli
+              is installed on the host.
+            - 'An up-to-date list of supported attributes can be found here:
               U(https://networkmanager.dev/docs/api/latest/settings-802-11-wireless.html).'
             - 'For instance to create a hidden AP mode WiFi connection:
               C({hidden: true, mode: ap}).'
+       choices: [ mode, band, channel, bssid, rate, tx-power, mac-address, cloned-mac-address, generate-mac-address-mask, mac-address-blacklist, mac-address-randomization, mtu, seen-bssids, hidden, powersave, wake-on-wlan, ap-isolation ]
        type: dict
+       version_added: 3.5.0
+    ignore_unsupported_suboptions:
+       description:
+            - Ignore suboptions which are invalid or unsupported by the version of NetworkManager/nmcli
+              installed on the host.
+            - Only 'wifi' and 'wifi_sec' options are currently affected.
+       type: bool
+       default: no
        version_added: 3.5.0
 '''
 
@@ -721,6 +737,7 @@ class Nmcli(object):
     def __init__(self, module):
         self.module = module
         self.state = module.params['state']
+        self.ignore_unsupported_suboptions = module.params['ignore_unsupported_suboptions']
         self.autoconnect = module.params['autoconnect']
         self.conn_name = module.params['conn_name']
         self.master = module.params['master']
@@ -1199,20 +1216,32 @@ class Nmcli(object):
 
         return properties
 
-    def check_supported_properties(self, setting, items):
+    def check_supported_properties(self, setting):
+        if setting == '802-11-wireless':
+            setting_key = 'wifi'
+        elif setting == '802-11-wireless-security':
+            setting_key = 'wifi_sec'
+        else:
+            setting_key = setting
+
         supported_properties = self.get_supported_properties(setting)
         unsupported_properties = []
-        for name, value in items:
-            if name not in supported_properties:
-                self.module.warn(
-                    "The option '%s.%s' is invalid/unsupported, disregarding. Valid options are ['%s']" % (
-                        setting,
-                        name,
-                        "', '".join(supported_properties)
-                    )
-                )
-                unsupported_properties.append(name)
-        return unsupported_properties
+
+        for property, value in getattr(self, setting_key).items():
+            if property not in supported_properties:
+                unsupported_properties.append(property)
+
+        if unsupported_properties:
+            msg_options = []
+            for property in unsupported_properties:
+                msg_options.append('%s.%s' % (setting_key, property))
+                del getattr(self, setting_key)[property]
+
+            msg = 'Invalid or unsupported option(s): "%s"' % '", "'.join(msg_options)
+            if self.ignore_unsupported_suboptions:
+                self.module.warn(msg)
+            else:
+                self.module.fail_json(msg=msg)
 
     def _compare_conn_params(self, conn_info, options):
         changed = False
@@ -1271,6 +1300,7 @@ def main():
     # Parsing argument file
     module = AnsibleModule(
         argument_spec=dict(
+            ignore_unsupported_suboptions=dict(type='bool', default=False),
             autoconnect=dict(type='bool', default=True),
             state=dict(type='str', required=True, choices=['absent', 'present']),
             conn_name=dict(type='str', required=True),
@@ -1356,6 +1386,7 @@ def main():
             ip_tunnel_dev=dict(type='str'),
             ip_tunnel_local=dict(type='str'),
             ip_tunnel_remote=dict(type='str'),
+            # 802-11-wireless* specific vars
             ssid=dict(type='str'),
             wifi=dict(type='dict'),
             wifi_sec=dict(type='dict', no_log=True),
@@ -1386,16 +1417,12 @@ def main():
             nmcli.module.fail_json(msg="Please specify an interface name for the connection when type is %s" % nmcli.type)
     if nmcli.type == 'wifi':
         if nmcli.wifi:
-            unsupported_properties = nmcli.check_supported_properties('802-11-wireless', nmcli.wifi.items())
             if 'ssid' in nmcli.wifi:
-                nmcli.module.warn("The option 'wifi.ssid' must only be specified with 'ssid', disregarding")
-                unsupported_properties.append('ssid')
-            for unsupported_property in unsupported_properties:
-                del nmcli.wifi[unsupported_property]
+                module.warn("Ignoring option 'wifi.ssid', it must be specified with option 'ssid'")
+                del nmcli.wifi['ssid']
+            nmcli.check_supported_properties('802-11-wireless')
         if nmcli.wifi_sec:
-            unsupported_properties = nmcli.check_supported_properties('802-11-wireless-security', nmcli.wifi_sec.items())
-            for unsupported_property in unsupported_properties:
-                del nmcli.wifi_sec[unsupported_property]
+            nmcli.check_supported_properties('802-11-wireless-security')
 
     try:
         if nmcli.state == 'absent':
