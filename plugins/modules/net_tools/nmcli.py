@@ -1170,18 +1170,18 @@ class Nmcli(object):
 
         return conn_info
 
-    def get_available_options(self, return_type, set_option=None):
-        options = []
+    def get_supported_properties(self, setting, set_property=None, set_value='FAKEVALUE'):
+        properties = []
 
-        if return_type == '802-11-wireless-security':
-            set_option = set_option or 'psk'
+        if setting == '802-11-wireless-security':
+            set_property = set_property or 'psk'
 
-        if set_option:
-            commands = ['set %s.%s %s' % (return_type, set_option, set_option)]
+        if set_property:
+            commands = ['set %s.%s %s' % (setting, set_property, set_value)]
         else:
             commands = []
 
-        commands += ['print %s' % return_type, 'quit', 'yes']
+        commands += ['print %s' % setting, 'quit', 'yes']
         data = "\n".join(commands)
         cmd = [self.nmcli_bin, 'con', 'edit', 'type', self.type]
 
@@ -1191,12 +1191,28 @@ class Nmcli(object):
             raise NmcliModuleError(err)
 
         for line in out.splitlines():
-            if (line.startswith('%s.' % return_type)):
+            prefix = '%s.' % setting
+            if (line.startswith(prefix)):
                 pair = line.split(':', 1)
-                key = pair[0].strip()
-                options.append(key)
+                property = pair[0].strip().replace(prefix, '')
+                properties.append(property)
 
-        return options
+        return properties
+
+    def check_supported_properties(self, setting, items):
+        supported_properties = self.get_supported_properties(setting)
+        unsupported_properties = []
+        for name, value in items:
+            if name not in supported_properties:
+                self.module.warn(
+                    "The option '%s.%s' is invalid/unsupported, disregarding. Valid options are ['%s']" % (
+                        setting,
+                        name,
+                        "', '".join(supported_properties)
+                    )
+                )
+                unsupported_properties.append(name)
+        return unsupported_properties
 
     def _compare_conn_params(self, conn_info, options):
         changed = False
@@ -1370,36 +1386,16 @@ def main():
             nmcli.module.fail_json(msg="Please specify an interface name for the connection when type is %s" % nmcli.type)
     if nmcli.type == 'wifi':
         if nmcli.wifi:
-            available_options = nmcli.get_available_options('802-11-wireless')
-            unsupported_options = []
-            for name, value in nmcli.wifi.items():
-                if name == 'ssid':
-                    nmcli.module.warn("The option 'wifi.ssid' must only be specified with 'ssid', disregarding")
-                    unsupported_options.append(name)
-                if '802-11-wireless.%s' % name not in available_options:
-                    nmcli.module.warn(
-                        "The option 'wifi.%s' is invalid/unsupported, disregarding. Valid options are ['%s']" % (
-                            name,
-                            "', '".join(available_options).replace('802-11-wireless.', '')
-                        )
-                    )
-                    unsupported_options.append(name)
-            for unsupported_option in unsupported_options:
-                del nmcli.wifi[unsupported_option]
+            unsupported_properties = nmcli.check_supported_properties('802-11-wireless', nmcli.wifi.items())
+            if 'ssid' in nmcli.wifi:
+                nmcli.module.warn("The option 'wifi.ssid' must only be specified with 'ssid', disregarding")
+                unsupported_properties.append('ssid')
+            for unsupported_property in unsupported_properties:
+                del nmcli.wifi[unsupported_property]
         if nmcli.wifi_sec:
-            available_options = nmcli.get_available_options('802-11-wireless-security')
-            unsupported_options = []
-            for name, value in nmcli.wifi_sec.items():
-                if '802-11-wireless-security.%s' % name not in available_options:
-                    nmcli.module.warn(
-                        "The option 'wifi_sec.%s' is invalid/unsupported, disregarding. Valid options are ['%s']" % (
-                            name,
-                            "', '".join(available_options).replace('802-11-wireless-security.', '')
-                        )
-                    )
-                    unsupported_options.append(name)
-            for unsupported_option in unsupported_options:
-                del nmcli.wifi_sec[unsupported_option]
+            unsupported_properties = nmcli.check_supported_properties('802-11-wireless-security', nmcli.wifi_sec.items())
+            for unsupported_property in unsupported_properties:
+                del nmcli.wifi_sec[unsupported_property]
 
     try:
         if nmcli.state == 'absent':
