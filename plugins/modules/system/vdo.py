@@ -389,31 +389,31 @@ def add_vdooptions(params):
     vdocmdoptions = ""
     options = []
 
-    if params['logicalsize'] is not None:
+    if params.get('logicalsize') is not None:
         options.append("--vdoLogicalSize=" + params['logicalsize'])
 
-    if params['blockmapcachesize'] is not None:
+    if params.get('blockmapcachesize') is not None:
         options.append("--blockMapCacheSize=" + params['blockmapcachesize'])
 
-    if params['readcache'] == 'enabled':
+    if params.get('readcache') == 'enabled':
         options.append("--readCache=enabled")
 
-    if params['readcachesize'] is not None:
+    if params.get('readcachesize') is not None:
         options.append("--readCacheSize=" + params['readcachesize'])
 
-    if params['slabsize'] is not None:
+    if params.get('slabsize') is not None:
         options.append("--vdoSlabSize=" + params['slabsize'])
 
-    if params['emulate512']:
+    if params.get('emulate512'):
         options.append("--emulate512=enabled")
 
-    if params['indexmem'] is not None:
+    if params.get('indexmem') is not None:
         options.append("--indexMem=" + params['indexmem'])
 
-    if params['indexmode'] == 'sparse':
+    if params.get('indexmode') == 'sparse':
         options.append("--sparseIndex=enabled")
 
-    if params['force']:
+    if params.get('force'):
         options.append("--force")
 
     # Entering an invalid thread config results in a cryptic
@@ -422,19 +422,19 @@ def add_vdooptions(params):
     # output a more helpful message, but one would have to log
     # onto that system to read the error.  For now, heed the thread
     # limit warnings in the DOCUMENTATION section above.
-    if params['ackthreads'] is not None:
+    if params.get('ackthreads') is not None:
         options.append("--vdoAckThreads=" + params['ackthreads'])
 
-    if params['biothreads'] is not None:
+    if params.get('biothreads') is not None:
         options.append("--vdoBioThreads=" + params['biothreads'])
 
-    if params['cputhreads'] is not None:
+    if params.get('cputhreads') is not None:
         options.append("--vdoCpuThreads=" + params['cputhreads'])
 
-    if params['logicalthreads'] is not None:
+    if params.get('logicalthreads') is not None:
         options.append("--vdoLogicalThreads=" + params['logicalthreads'])
 
-    if params['physicalthreads'] is not None:
+    if params.get('physicalthreads') is not None:
         options.append("--vdoPhysicalThreads=" + params['physicalthreads'])
 
     return vdocmdoptions
@@ -547,7 +547,7 @@ def run_module():
 
     # Modify the current parameters of a VDO that exists.
     if desiredvdo in vdolist and state == 'present':
-        rc, vdostatusoutput, err = module.run_command([vdocmd, "disableDeduplication"])
+        rc, vdostatusoutput, err = module.run_command([vdocmd, "status"])
         vdostatusyaml = yaml.load(vdostatusoutput)
 
         # An empty dictionary to contain dictionaries of VDO statistics
@@ -612,7 +612,7 @@ def run_module():
         diffparams = {}
 
         # Check for differences between the playbook parameters and the
-        # current parameters.  This will need a comparison function;
+        # current parameters. This will need a comparison function;
         # since AnsibleModule params are all strings, compare them as
         # strings (but if it's None; skip).
         for key in currentparams.keys():
@@ -679,7 +679,7 @@ def run_module():
 
         diffsizeparams = {}
         for key in sizeparams.keys():
-            if module.params[key] is not None and sizeparams[key] != module.params[key]:
+            if module.params[key] is not None and str(sizeparams[key]) != module.params[key]:
                 diffsizeparams[key] = module.params[key]
 
         if module.params['growphysical']:
