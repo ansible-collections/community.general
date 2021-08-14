@@ -8,12 +8,18 @@ __metaclass__ = type
 DOCUMENTATION = '''
     name: icinga2
     short_description: Icinga2 inventory source
-    description: Returns Ansible inventory from CSV
+    author:
+        - Cliff Hults (@BongoEADGC6) <cliff.hults@gmail.com>
+    requirements:
+        - requests >= 1.1
+    description:
+        - Get inventory hosts from the Icinga2 API.
+        - "Uses a configuration file as an inventory source, it must end in C(.icinga2.yml) or C(.icinga2.yaml)"
     options:
       plugin:
           description: Name of the plugin
           required: true
-          choices: ['icinga2', 'community.general.icinga2']
+          choices: ['community.general.icinga2']
       url:
         description: Root URL of Icinga2 API 
         required: true
@@ -34,15 +40,6 @@ url: http://localhost:5665
 user: ansible
 password: secure
 validate_certs: false
-keyed_groups:
-  - key: icinga2_tags_parsed
-    separator: ""
-    prefix: group
-groups:
-  webservers: "'web' in (icinga2_tags_parsed|list)"
-  mailservers: "'mail' in (icinga2_tags_parsed|list)"
-compose:
-  ansible_port: 2222
 '''
 import re
 import json
