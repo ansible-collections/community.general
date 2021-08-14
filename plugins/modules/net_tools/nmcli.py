@@ -339,7 +339,9 @@ options:
               U(https://networkmanager.dev/docs/api/latest/settings-802-11-wireless-security.html).'
             - 'For instance to use common WPA-PSK auth with a password:
               C({key-mgmt: wpa-psk, psk: my_password}).'
-       choices: [ key-mgmt, wep-tx-keyidx, auth-alg, proto, pairwise, group, pmf, leap-username, wep-key0, wep-key1, wep-key2, wep-key3, wep-key-flags, wep-key-type, psk, psk-flags, leap-password, leap-password-flags, wps-method, fils ]
+       choices: [ key-mgmt, wep-tx-keyidx, auth-alg, proto, pairwise, group, pmf, leap-username,
+                  wep-key0, wep-key1, wep-key2, wep-key3, wep-key-flags, wep-key-type, psk, psk-flags,
+                  leap-password, leap-password-flags, wps-method, fils ]
        type: dict
        version_added: 3.0.0
     ssid:
@@ -356,7 +358,9 @@ options:
               U(https://networkmanager.dev/docs/api/latest/settings-802-11-wireless.html).'
             - 'For instance to create a hidden AP mode WiFi connection:
               C({hidden: true, mode: ap}).'
-       choices: [ mode, band, channel, bssid, rate, tx-power, mac-address, cloned-mac-address, generate-mac-address-mask, mac-address-blacklist, mac-address-randomization, mtu, seen-bssids, hidden, powersave, wake-on-wlan, ap-isolation ]
+       choices: [ mode, band, channel, bssid, rate, tx-power, mac-address, cloned-mac-address,
+                  generate-mac-address-mask, mac-address-blacklist, mac-address-randomization, mtu,
+                  seen-bssids, hidden, powersave, wake-on-wlan, ap-isolation ]
        type: dict
        version_added: 3.5.0
     ignore_unsupported_suboptions:
