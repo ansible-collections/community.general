@@ -347,11 +347,9 @@ options:
                 type: str
                 choices: [ open, shared, leap ]
             fils:
-                description: Indicates whether Fast Initial Link Setup (802.11ai) must be enabled for the connection. One of
-                             C(NM_SETTING_WIRELESS_SECURITY_FILS_DEFAULT) (0) (use global default value), C(NM_SETTING_WIRELESS_SECURITY_FILS_DISABLE) (1)
-                             (disable FILS), C(NM_SETTING_WIRELESS_SECURITY_FILS_OPTIONAL) (2) (enable FILS if the supplicant and the access point support it)
-                             or C(NM_SETTING_WIRELESS_SECURITY_FILS_REQUIRED) (3) (enable FILS and fail if not supported). When set to
-                             C(NM_SETTING_WIRELESS_SECURITY_FILS_DEFAULT) (0) and no global default is set, FILS will be optionally enabled.
+                description: Indicates whether Fast Initial Link Setup (802.11ai) must be enabled for the connection. One of C(0) (use global default value),
+                             C(1) (disable FILS), C(2) (enable FILS if the supplicant and the access point support it) or C(3) (enable FILS and fail if not
+                             supported). When set to C(0) and no global default is set, FILS will be optionally enabled.
                 type: int
                 choices: [ 0, 1, 2, 3 ]
                 default: 0
@@ -385,11 +383,9 @@ options:
                 elements: str
                 choices: [ tkip, ccmp ]
             pmf:
-                description: Indicates whether Protected Management Frames (802.11w) must be enabled for the connection. One of
-                             C(NM_SETTING_WIRELESS_SECURITY_PMF_DEFAULT) (0) (use global default value), C(NM_SETTING_WIRELESS_SECURITY_PMF_DISABLE) (1)
-                             (disable PMF), C(NM_SETTING_WIRELESS_SECURITY_PMF_OPTIONAL) (2) (enable PMF if the supplicant and the access point support it) or
-                             C(NM_SETTING_WIRELESS_SECURITY_PMF_REQUIRED) (3) (enable PMF and fail if not supported). When set to
-                             C(NM_SETTING_WIRELESS_SECURITY_PMF_DEFAULT) (0) and no global default is set, PMF will be optionally enabled.
+                description: Indicates whether Protected Management Frames (802.11w) must be enabled for the connection. One of C(0) (use global default
+                             value), C(1) (disable PMF), C(2) (enable PMF if the supplicant and the access point support it) or C(3) (enable PMF and fail if
+                             not supported). When set to C(0) and no global default is set, PMF will be optionally enabled.
                 type: int
                 choices: [ 0, 1, 2, 3 ]
                 default: 0
@@ -413,9 +409,9 @@ options:
                 type: list
                 elements: int
             wep-key-type:
-                description: Controls the interpretation of WEP keys. Allowed values are C(NM_WEP_KEY_TYPE_KEY) (1), in which case the key is either a 10- or
-                             26-character hexadecimal string, or a 5- or 13-character ASCII password; or C(NM_WEP_KEY_TYPE_PASSPHRASE) (2), in which case the
-                             passphrase is provided as a string and will be hashed using the de-facto MD5 method to derive the actual WEP key.
+                description: Controls the interpretation of WEP keys. Allowed values are C(1), in which case the key is either a 10- or 26-character
+                             hexadecimal string, or a 5- or 13-character ASCII password; or C(2), in which case the passphrase is provided as a string and will
+                             be hashed using the de-facto MD5 method to derive the actual WEP key.
                 type: int
                 choices: [ 1, 2 ]
             wep-key0:
@@ -465,11 +461,11 @@ options:
        suboptions:
             ap-isolation:
                 description: Configures AP isolation, which prevents communication between wireless devices connected to this AP. This property can be set to a
-                             value different from C(NM_TERNARY_DEFAULT) (-1) only when the interface is configured in AP mode. If set to C(NM_TERNARY_TRUE)
-                             (1), devices are not able to communicate with each other. This increases security because it protects devices against attacks from
-                             other clients in the network. At the same time, it prevents devices to access resources on the same wireless networks as file
-                             shares, printers, etc. If set to C(NM_TERNARY_FALSE) (0), devices can talk to each other. When set to C(NM_TERNARY_DEFAULT) (-1),
-                             the global default is used; in case the global default is unspecified it is assumed to be C(NM_TERNARY_FALSE) (0).
+                             value different from C(-1) only when the interface is configured in AP mode. If set to C(1), devices are not able to communicate
+                             with each other. This increases security because it protects devices against attacks from other clients in the network. At the
+                             same time, it prevents devices to access resources on the same wireless networks as file shares, printers, etc. If set to C(0),
+                             devices can talk to each other. When set to C(-1), the global default is used; in case the global default is unspecified it is
+                             assumed to be C(0).
                 type: int
                 choices: [ -1, 0, 1 ]
                 default: -1
@@ -531,10 +527,9 @@ options:
                 type: list
                 elements: str
             mac-address-randomization:
-                description: One of C(NM_SETTING_MAC_RANDOMIZATION_DEFAULT) (0) (never randomize unless the user has set a global default to randomize and the
-                             supplicant supports randomization), C(NM_SETTING_MAC_RANDOMIZATION_NEVER) (1) (never randomize the MAC address), or
-                             C(NM_SETTING_MAC_RANDOMIZATION_ALWAYS) (2) (always randomize the MAC address). This property is deprecated for
-                             C(cloned-mac-address).
+                description: One of C(0) (never randomize unless the user has set a global default to randomize and the supplicant supports randomization),
+                             C(1) (never randomize the MAC address), or C(2) (always randomize the MAC address). This property is deprecated for
+                             I(cloned-mac-address).
                 type: int
                 default: 0
                 choices: [ 0, 1, 2 ]
@@ -552,9 +547,8 @@ options:
                 type: int
                 default: 0
             powersave:
-                description: One of C(NM_SETTING_WIRELESS_POWERSAVE_DISABLE) (2) (disable Wi-Fi power saving), C(NM_SETTING_WIRELESS_POWERSAVE_ENABLE) (3)
-                             (enable Wi-Fi power saving), C(NM_SETTING_WIRELESS_POWERSAVE_IGNORE) (1) (don't touch currently configure setting) or
-                             C(NM_SETTING_WIRELESS_POWERSAVE_DEFAULT) (0) (use the globally configured value). All other values are reserved.
+                description: One of C(2) (disable Wi-Fi power saving), C(3) (enable Wi-Fi power saving), C(1) (don't touch currently configure setting) or C(0)
+                             (use the globally configured value). All other values are reserved.
                 type: int
                 default: 0
                 choices: [ 0, 1, 2, 3 ]
@@ -580,8 +574,7 @@ options:
                              C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_MAGIC) (0x8), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_GTK_REKEY_FAILURE) (0x10),
                              C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_EAP_IDENTITY_REQUEST) (0x20), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_4WAY_HANDSHAKE) (0x40),
                              C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_RFKILL_RELEASE) (0x80), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_TCP) (0x100) or the special values
-                             C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_DEFAULT) (0x1) (to use global settings) and C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_IGNORE) (0x8000)
-                             (to disable management of Wake-on-LAN in NetworkManager).
+                             C(0x1) (to use global settings) and C(0x8000) (to disable management of Wake-on-LAN in NetworkManager).
                              Note the sum of all option values must be specified in order to combine multiple options.
                 type: int
                 default: 1
