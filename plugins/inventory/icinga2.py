@@ -122,18 +122,18 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if response.status == 404 and json_data['status'] == "No objects found.":
             raise AnsibleParserError(
                 "API returned no data -- Response: %s - %s"
-                        % (response.status, json_data['status']))
+                % (response.status, json_data['status']))
         if response.status == 401:
             raise AnsibleParserError(
                 "API was unable to complete query -- Response: %s - %s"
-                        % (response.status, json_data['status']))
+                % (response.status, json_data['status']))
         if response.status == 500:
             raise AnsibleParserError(
                 "API Response - %s - %s"
-                        % (json_data['status'], json_data['errors']))
+                % (json_data['status'], json_data['errors']))
         raise AnsibleParserError(
                 "Unexpected data returned - %s - %s"
-                    % (json_data['status'], json_data['errors']))
+                % (json_data['status'], json_data['errors']))
 
     def _query_hosts(self, hosts=None, attrs=None, joins=None, host_filter=None):
         query_hosts_url = "{}/objects/hosts".format(self.icinga2_url)
