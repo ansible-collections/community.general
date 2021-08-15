@@ -381,7 +381,7 @@ def sanitize(idp):
 def get_identity_provider_with_mappers(kc, alias, realm):
     idp = kc.get_identity_provider(alias, realm)
     if idp is not None:
-        idp['mappers'] = kc.get_identity_provider_mappers(alias, realm)
+        idp['mappers'] = sorted(kc.get_identity_provider_mappers(alias, realm), key=lambda x: x.get('name'))
     if idp is None:
         idp = dict()
     return idp
@@ -420,8 +420,7 @@ def main():
         store_token=dict(type='bool', aliases=['storeToken']),
         trust_email=dict(type='bool', aliases=['trustEmail']),
         update_profile_first_login_mode=dict(type='str', aliases=['accessCodeLifespan']),
-        # mappers=dict(type='list', elements='dict', options=mapper_spec),
-        mappers=dict(type='list', elements='dict', default=[]),
+        mappers=dict(type='list', elements='dict', options=mapper_spec),
     )
 
     argument_spec.update(meta_args)
@@ -458,9 +457,18 @@ def main():
 
     for param in idp_params:
         new_param_value = module.params.get(param)
-        old_value = before_idp[param] if param in before_idp else None
-        if new_param_value != old_value:
-            changeset[camel(param)] = new_param_value
+
+        # sort mappers by name
+        if isinstance(new_param_value, list):
+            if param in ['mappers']:
+                new_param_value = sorted(new_param_value, key=lambda x: x.get('name'))
+
+        # Unfortunately, the ansible argument spec checker introduces variables with null values when
+        # they are not specified
+        if param == 'mappers':
+            new_param_value = [dict((k, v) for k, v in x.items() if x[k] is not None) for x in new_param_value]
+
+        changeset[camel(param)] = new_param_value
 
     # prepare the new representation
     updated_idp = before_idp.copy()
