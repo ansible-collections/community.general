@@ -1,0 +1,38 @@
+---
+## basiscs
+
+- name: test-basic 1 - specify both "value" and "values" and fail
+  ini_file:
+    path: "{{ output_file }}"
+    section: drinks
+    option: fav
+    value: lemonade
+    values:
+      - coke
+      - sprite
+  register: result_basic_1
+  ignore_errors: true
+
+- name: test-basic 1 - verify error message
+  assert:
+    that:
+      - result_basic_1 is not changed
+      - result_basic_1 is failed
+      - "result_basic_1.msg == 'parameters are mutually exclusive: value|values'"
+
+
+- name: test-basic 2 - set "create=no" on non-existing file and fail
+  ini_file:
+    path: "{{ non_existing_file }}"
+    section: food
+    create: false
+    value: banana
+  register: result_basic_2
+  ignore_errors: true
+
+- name: test-basic 2 - verify error message
+  assert:
+    that:
+      - result_basic_2 is not changed
+      - result_basic_2 is failed
+      - result_basic_2.msg == "Destination {{ non_existing_file }} does not exist!"

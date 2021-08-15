@@ -47,7 +47,18 @@ options:
     description:
       - The string value to be associated with an I(option).
       - May be omitted when removing an I(option).
+      - Mutually exclusive with I(values).
+      - I(value=v) is equivalent to I(values=[v]).
     type: str
+  values:
+    description:
+      - The string value to be associated with an I(option).
+      - May be omitted when removing an I(option).
+      - Mutually exclusive with I(value).
+      - I(value=v) is equivalent to I(values=[v]).
+    type: list
+    elements: str
+    version_added: 3.6.0
   backup:
     description:
       - Create a backup file including the timestamp information so you can get
@@ -56,10 +67,25 @@ options:
     default: no
   state:
     description:
-      - If set to C(absent) the option or section will be removed if present instead of created.
+      - If set to C(absent) and I(exclusive) set to C(yes) all matching I(option) lines are removed.
+      - If set to C(absent) and I(exclusive) set to C(no) the specified C(option=value) lines are removed,
+        but the other I(option)s with the same name are not touched.
+      - If set to C(present) and I(exclusive) set to C(no) the specified C(option=values) lines are added,
+        but the other I(option)s with the same name are not touched.
+      - If set to C(present) and I(exclusive) set to C(yes) all given C(option=values) lines will be
+        added and the other I(option)s with the same name are removed.
     type: str
     choices: [ absent, present ]
     default: present
+  exclusive:
+    description:
+      - If set to C(yes) (default), all matching I(option) lines are removed when I(state=absent),
+        or replaced when I(state=present).
+      - If set to C(no), only the specified I(value(s)) are added when I(state=present),
+        or removed when I(state=absent), and existing ones are not modified.
+    type: bool
+    default: yes
+    version_added: 3.6.0
   no_extra_spaces:
     description:
       - Do not insert spaces before and after '=' symbol.
@@ -103,6 +129,27 @@ EXAMPLES = r'''
     option: temperature
     value: cold
     backup: yes
+
+- name: Add "beverage=lemon juice" is in section "[drinks]" in specified file
+  community.general.ini_file:
+    path: /etc/conf
+    section: drinks
+    option: beverage
+    value: lemon juice
+    mode: '0600'
+    state: present
+    exclusive: no
+
+- name: Ensure multiple values "beverage=coke" and "beverage=pepsi" are in section "[drinks]" in specified file
+  community.general.ini_file:
+    path: /etc/conf
+    section: drinks
+    option: beverage
+    values:
+      - coke
+      - pepsi
+    mode: '0600'
+    state: present
 '''
 
 import io
@@ -117,24 +164,37 @@ from ansible.module_utils.common.text.converters import to_bytes, to_text
 
 def match_opt(option, line):
     option = re.escape(option)
-    return re.match('[#;]?( |\t)*%s( |\t)*(=|$)' % option, line)
+    return re.match('[#;]?( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
 
 
 def match_active_opt(option, line):
     option = re.escape(option)
-    return re.match('( |\t)*%s( |\t)*(=|$)' % option, line)
+    return re.match('( |\t)*(%s)( |\t)*(=|$)( |\t)*(.*)' % option, line)
 
 
-def do_ini(module, filename, section=None, option=None, value=None,
-           state='present', backup=False, no_extra_spaces=False, create=True,
-           allow_no_value=False):
+def update_section_line(changed, section_lines, index, changed_lines, newline, msg):
+    option_changed = section_lines[index] != newline
+    changed = changed or option_changed
+    if option_changed:
+        msg = 'option changed'
+    section_lines[index] = newline
+    changed_lines[index] = 1
+    return (changed, msg)
+
+
+def do_ini(module, filename, section=None, option=None, values=None,
+           state='present', exclusive=True, backup=False, no_extra_spaces=False,
+           create=True, allow_no_value=False):
 
     if section is not None:
         section = to_text(section)
     if option is not None:
         option = to_text(option)
-    if value is not None:
-        value = to_text(value)
+
+    # deduplicate entries in values
+    values_unique = []
+    [values_unique.append(to_text(value)) for value in values if value not in values_unique and value is not None]
+    values = values_unique
 
     diff = dict(
         before='',
@@ -145,7 +205,7 @@ def do_ini(module, filename, section=None, option=None, value=None,
 
     if not os.path.exists(filename):
         if not create:
-            module.fail_json(rc=257, msg='Destination %s does not exist !' % filename)
+            module.fail_json(rc=257, msg='Destination %s does not exist!' % filename)
         destpath = os.path.dirname(filename)
         if not os.path.exists(destpath) and not module.check_mode:
             os.makedirs(destpath)
@@ -185,74 +245,134 @@ def do_ini(module, filename, section=None, option=None, value=None,
         section = fake_section_name
 
     within_section = not section
-    section_start = 0
+    section_start = section_end = 0
     msg = 'OK'
     if no_extra_spaces:
         assignment_format = u'%s=%s\n'
     else:
         assignment_format = u'%s = %s\n'
 
+    option_no_value_present = False
+
     non_blank_non_comment_pattern = re.compile(to_text(r'^[ \t]*([#;].*)?$'))
 
+    before = after = []
+    section_lines = []
+
     for index, line in enumerate(ini_lines):
+        # find start and end of section
         if line.startswith(u'[%s]' % section):
             within_section = True
             section_start = index
         elif line.startswith(u'['):
             if within_section:
-                if state == 'present':
-                    # insert missing option line at the end of the section
-                    for i in range(index, 0, -1):
-                        # search backwards for previous non-blank or non-comment line
-                        if not non_blank_non_comment_pattern.match(ini_lines[i - 1]):
-                            if option and value is not None:
-                                ini_lines.insert(i, assignment_format % (option, value))
-                                msg = 'option added'
-                                changed = True
-                            elif option and value is None and allow_no_value:
-                                ini_lines.insert(i, '%s\n' % option)
-                                msg = 'option added'
-                                changed = True
-                            break
-                elif state == 'absent' and not option:
-                    # remove the entire section
-                    del ini_lines[section_start:index]
-                    msg = 'section removed'
+                section_end = index
+                break
+
+    before = ini_lines[0:section_start]
+    section_lines = ini_lines[section_start:section_end]
+    after = ini_lines[section_end:len(ini_lines)]
+
+    # Keep track of changed section_lines
+    changed_lines = [0] * len(section_lines)
+
+    # handling multiple instances of option=value when state is 'present' with/without exclusive is a bit complex
+    #
+    # 1. edit all lines where we have a option=value pair with a matching value in values[]
+    # 2. edit all the remaing lines where we have a matching option
+    # 3. delete remaining lines where we have a matching option
+    # 4. insert missing option line(s) at the end of the section
+
+    if state == 'present' and option:
+        for index, line in enumerate(section_lines):
+            if match_opt(option, line):
+                match = match_opt(option, line)
+                if values and match.group(6) in values:
+                    matched_value = match.group(6)
+                    if not matched_value and allow_no_value:
+                        # replace existing option with no value line(s)
+                        newline = u'%s\n' % option
+                        option_no_value_present = True
+                    else:
+                        # replace existing option=value line(s)
+                        newline = assignment_format % (option, matched_value)
+                    (changed, msg) = update_section_line(changed, section_lines, index, changed_lines, newline, msg)
+                    values.remove(matched_value)
+                elif not values and allow_no_value:
+                    # replace existing option with no value line(s)
+                    newline = u'%s\n' % option
+                    (changed, msg) = update_section_line(changed, section_lines, index, changed_lines, newline, msg)
+                    option_no_value_present = True
+                    break
+
+    if state == 'present' and exclusive and not allow_no_value:
+        # override option with no value to option with value if not allow_no_value
+        if len(values) > 0:
+            for index, line in enumerate(section_lines):
+                if not changed_lines[index] and match_active_opt(option, section_lines[index]):
+                    newline = assignment_format % (option, values.pop(0))
+                    (changed, msg) = update_section_line(changed, section_lines, index, changed_lines, newline, msg)
+                    if len(values) == 0:
+                        break
+        # remove all remaining option occurrences from the rest of the section
+        for index in range(len(section_lines) - 1, 0, -1):
+            if not changed_lines[index] and match_active_opt(option, section_lines[index]):
+                del section_lines[index]
+                del changed_lines[index]
+                changed = True
+                msg = 'option changed'
+
+    if state == 'present':
+        # insert missing option line(s) at the end of the section
+        for index in range(len(section_lines), 0, -1):
+            # search backwards for previous non-blank or non-comment line
+            if not non_blank_non_comment_pattern.match(section_lines[index - 1]):
+                if option and values:
+                    # insert option line(s)
+                    for element in values[::-1]:
+                        # items are added backwards, so traverse the list backwards to not confuse the user
+                        # otherwise some of their options might appear in reverse order for whatever fancy reason ¯\_(ツ)_/¯
+                        if element is not None:
+                            # insert option=value line
+                            section_lines.insert(index, assignment_format % (option, element))
+                            msg = 'option added'
+                            changed = True
+                        elif element is None and allow_no_value:
+                            # insert option with no value line
+                            section_lines.insert(index, u'%s\n' % option)
+                            msg = 'option added'
+                            changed = True
+                elif option and not values and allow_no_value and not option_no_value_present:
+                    # insert option with no value line(s)
+                    section_lines.insert(index, u'%s\n' % option)
+                    msg = 'option added'
                     changed = True
                 break
+
+    if state == 'absent':
+        if option:
+            if exclusive:
+                # delete all option line(s) with given option and ignore value
+                new_section_lines = [line for line in section_lines if not (match_active_opt(option, line))]
+                if section_lines != new_section_lines:
+                    changed = True
+                    msg = 'option changed'
+                    section_lines = new_section_lines
+            elif not exclusive and len(values) > 0:
+                # delete specified option=value line(s)
+                new_section_lines = [i for i in section_lines if not (match_active_opt(option, i) and match_active_opt(option, i).group(6) in values)]
+                if section_lines != new_section_lines:
+                    changed = True
+                    msg = 'option changed'
+                    section_lines = new_section_lines
         else:
-            if within_section and option:
-                if state == 'present':
-                    # change the existing option line
-                    if match_opt(option, line):
-                        if value is None and allow_no_value:
-                            newline = u'%s\n' % option
-                        else:
-                            newline = assignment_format % (option, value)
-                        option_changed = ini_lines[index] != newline
-                        changed = changed or option_changed
-                        if option_changed:
-                            msg = 'option changed'
-                        ini_lines[index] = newline
-                        if option_changed:
-                            # remove all possible option occurrences from the rest of the section
-                            index = index + 1
-                            while index < len(ini_lines):
-                                line = ini_lines[index]
-                                if line.startswith(u'['):
-                                    break
-                                if match_active_opt(option, line):
-                                    del ini_lines[index]
-                                else:
-                                    index = index + 1
-                        break
-                elif state == 'absent':
-                    # delete the existing line
-                    if match_active_opt(option, line):
-                        del ini_lines[index]
-                        changed = True
-                        msg = 'option changed'
-                        break
+            # drop the entire section
+            section_lines = []
+            msg = 'section removed'
+            changed = True
+
+    # reassemble the ini_lines after manipulation
+    ini_lines = before + section_lines + after
 
     # remove the fake section line
     del ini_lines[0]
@@ -261,9 +381,10 @@ def do_ini(module, filename, section=None, option=None, value=None,
     if not within_section and state == 'present':
         ini_lines.append(u'[%s]\n' % section)
         msg = 'section and option added'
-        if option and value is not None:
-            ini_lines.append(assignment_format % (option, value))
-        elif option and value is None and allow_no_value:
+        if option and values:
+            for value in values:
+                ini_lines.append(assignment_format % (option, value))
+        elif option and not values and allow_no_value:
             ini_lines.append(u'%s\n' % option)
         else:
             msg = 'only section added'
@@ -303,12 +424,17 @@ def main():
             section=dict(type='str', required=True),
             option=dict(type='str'),
             value=dict(type='str'),
+            values=dict(type='list', elements='str'),
             backup=dict(type='bool', default=False),
             state=dict(type='str', default='present', choices=['absent', 'present']),
+            exclusive=dict(type='bool', default=True),
             no_extra_spaces=dict(type='bool', default=False),
             allow_no_value=dict(type='bool', default=False),
             create=dict(type='bool', default=True)
         ),
+        mutually_exclusive=[
+            ['value', 'values']
+        ],
         add_file_common_args=True,
         supports_check_mode=True,
     )
@@ -317,16 +443,23 @@ def main():
     section = module.params['section']
     option = module.params['option']
     value = module.params['value']
+    values = module.params['values']
     state = module.params['state']
+    exclusive = module.params['exclusive']
     backup = module.params['backup']
     no_extra_spaces = module.params['no_extra_spaces']
     allow_no_value = module.params['allow_no_value']
     create = module.params['create']
 
-    if state == 'present' and not allow_no_value and value is None:
-        module.fail_json("Parameter 'value' must be defined if state=present and allow_no_value=False")
+    if state == 'present' and not allow_no_value and value is None and not values:
+        module.fail_json(msg="Parameter 'value(s)' must be defined if state=present and allow_no_value=False.")
 
-    (changed, backup_file, diff, msg) = do_ini(module, path, section, option, value, state, backup, no_extra_spaces, create, allow_no_value)
+    if value is not None:
+        values = [value]
+    elif values is None:
+        values = []
+
+    (changed, backup_file, diff, msg) = do_ini(module, path, section, option, values, state, exclusive, backup, no_extra_spaces, create, allow_no_value)
 
     if not module.check_mode and os.path.exists(path):
         file_args = module.load_file_common_arguments(module.params)
