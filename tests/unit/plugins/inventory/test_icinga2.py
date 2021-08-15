@@ -30,37 +30,37 @@ def check_api():
 
 # NOTE: when updating/adding replies to this function,
 # be sure to only add only the _contents_ of the 'data' dict in the API reply
-def query_hosts(url):
-    if url == "https://localhost:8006/v1/objects/hosts":
-        # _get_nodes
-        json_host_data = {
-            [
-                {
-                    'attrs': {
-                        'address': 'test-host1.home.local',
-                        'groups': ['home-servers', 'servers-dell'],
-                        'state': 0.0,
-                        'state_type': 1.0
-                    },
-                    'joins': {},
-                    'meta': {},
-                    'name': 'test-host1',
-                    'type': 'Host'
+def query_hosts(attrs):
+    #if url == "https://localhost:8006/v1/objects/hosts":
+    # _get_hosts
+    json_host_data = {
+        [
+            {
+                'attrs': {
+                    'address': 'test-host1.home.local',
+                    'groups': ['home-servers', 'servers-dell'],
+                    'state': 0.0,
+                    'state_type': 1.0
                 },
-                {
-                    'attrs': {
-                        'address': 'test-host2.home.local',
-                        'groups': ['home-servers', 'servers-hp'],
-                        'state': 1.0,
-                        'state_type': 1.0
-                    },
-                    'joins': {},
-                    'meta': {},
-                    'name': 'test-host2',
-                    'type': 'Host'
-                }
-            ]
-        }
+                'joins': {},
+                'meta': {},
+                'name': 'test-host1',
+                'type': 'Host'
+            },
+            {
+                'attrs': {
+                    'address': 'test-host2.home.local',
+                    'groups': ['home-servers', 'servers-hp'],
+                    'state': 1.0,
+                    'state_type': 1.0
+                },
+                'joins': {},
+                'meta': {},
+                'name': 'test-host2',
+                'type': 'Host'
+            }
+        ]
+    }
     return json_host_data
 
 
