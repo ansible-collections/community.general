@@ -9,7 +9,6 @@ __metaclass__ = type
 
 import pytest
 
-from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.inventory.data import InventoryData
 from ansible_collections.community.general.plugins.inventory.icinga2 import InventoryModule
 
@@ -50,7 +49,7 @@ def query_hosts(url):
                 },
                 {
                     'attrs': {
-                        'address': 'test-host2.home.local'
+                        'address': 'test-host2.home.local',
                         'groups': ['home-servers', 'servers-hp'],
                         'state': 1.0,
                         'state_type': 1.0
@@ -62,7 +61,7 @@ def query_hosts(url):
                 }
             ]
         }
-        return json_host_data
+    return json_host_data
 
 
 def test_populate(inventory, mocker):
@@ -83,7 +82,7 @@ def test_populate(inventory, mocker):
     # check if host in the home-servers group
     assert 'home-servers' in inventory.inventory.groups
     group_data = inventory.inventory.groups['home-servers']
-    assert 'test-host1' in group_data.hosts 
+    assert 'test-host1' in group_data.hosts
 
     # check if host state rules apply properyl
     assert host_info1.get_vars()['state'] == 'on'
