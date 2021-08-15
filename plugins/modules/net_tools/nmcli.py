@@ -507,8 +507,8 @@ options:
                 description:
                     - 802.11 frequency band of the network.
                     - One of C(a) for 5GHz 802.11a or C(bg) for 2.4GHz 802.11.
-                    - This will lock associations to the Wi-Fi network to the specific band, i.e. if C(a) is specified, the device will not associate with the
-                      same network in the 2.4GHz band even if the network's settings are compatible.
+                    - This will lock associations to the Wi-Fi network to the specific band, so for example, if C(a) is specified, the device will not
+                      associate with the same network in the 2.4GHz band even if the network's settings are compatible.
                     - This setting depends on specific driver capability and may not work with all drivers.
                 type: str
                 choices: [ a, bg ]
@@ -565,7 +565,7 @@ options:
             mac-address-blacklist:
                 description:
                     - A list of permanent MAC addresses of Wi-Fi devices to which this connection should never apply.
-                    - Each MAC address should be given in the standard hex-digits-and-colons notation (eg C(00:11:22:33:44:55)).
+                    - Each MAC address should be given in the standard hex-digits-and-colons notation (for example, C(00:11:22:33:44:55)).
                 type: list
                 elements: str
             mac-address-randomization:
@@ -579,7 +579,7 @@ options:
             mac-address:
                 description:
                     - If specified, this connection will only apply to the Wi-Fi device whose permanent MAC address matches.
-                    - This property does not change the MAC address of the device (i.e. MAC spoofing).
+                    - This property does not change the MAC address of the device (for example for MAC spoofing).
                 type: str
             mode:
                 description: Wi-Fi network mode. If blank, C(infrastructure) is assumed.
@@ -601,7 +601,7 @@ options:
             rate:
                 description:
                     - If non-zero, directs the device to only use the specified bitrate for communication with the access point.
-                    - Units are in Kb/s, ie C(5500) = 5.5 Mbit/s.
+                    - Units are in Kb/s, so for example C(5500) = 5.5 Mbit/s.
                     - This property is highly driver dependent and not all devices support setting a static bitrate.
                 type: int
                 default: 0
@@ -620,7 +620,7 @@ options:
                       C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_EAP_IDENTITY_REQUEST) (C(0x20)), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_4WAY_HANDSHAKE) (C(0x40)),
                       C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_RFKILL_RELEASE) (C(0x80)), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_TCP) (C(0x100)) or the special values
                       C(0x1) (to use global settings) and C(0x8000) (to disable management of Wake-on-LAN in NetworkManager).
-                    - Note the sum of all option values must be specified in order to combine multiple options.
+                    - Note the option values' sum must be specified in order to combine multiple options.
                 type: int
                 default: 1
        version_added: 3.5.0
