@@ -23,7 +23,7 @@ DOCUMENTATION = '''
         type: string
         choices: ['community.general.icinga2']
       url:
-        description: Root URL of Icinga2 API 
+        description: Root URL of Icinga2 API
         type: string
         required: true
       user:
@@ -101,16 +101,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _post_request(self, request_url, data=None):
         self.display.vvv("Requested URL: %s" % request_url)
         request_args = {
-                'headers': self.headers,
-                'auth': (self.icinga2_user, self.icinga2_password),
-                'verify': self.ssl_verify
-                }
+            'headers': self.headers,
+            'auth': (self.icinga2_user, self.icinga2_password),
+            'verify': self.ssl_verify
+        }
         request_args = {
-                'headers': self.headers,
-                'url_username': self.icinga2_user,
-                'url_password': self.icinga2_password,
-                'validate_certs': self.ssl_verify
-                }
+            'headers': self.headers,
+            'url_username': self.icinga2_user,
+            'url_password': self.icinga2_password,
+            'validate_certs': self.ssl_verify
+        }
         if data is not None:
             request_args['data'] = json.dumps(data)
         self.display.vvv("Request Args: %s" % request_args)
