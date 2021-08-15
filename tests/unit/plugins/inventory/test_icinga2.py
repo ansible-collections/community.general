@@ -74,6 +74,8 @@ def test_populate(inventory, mocker):
     inventory._query_hosts = mocker.MagicMock(side_effect=query_hosts)
     inventory._populate()
 
+    # Start with a pass
+    passing = True
     # get different hosts
     host1_info = inventory.inventory.get_host('test-host1.home.local')
     print(host1_info)
@@ -88,8 +90,12 @@ def test_populate(inventory, mocker):
     group2_data = inventory.inventory.groups['servers_hp']
     print(group2_data.hosts)
     print(type(group2_data.hosts)
-    assert "test-host1.home.local" not in group2_data.hosts
-    assert "test-host1.home.local" in group1_data.hosts
+    if "test-host1.home.local" in group2_data.hosts:
+        passing = False
+    if "test-host1.home.local" not in group1_data.hosts:
+        passing = False
+    assert passing
+
 
     # check if host state rules apply properyl
     assert host1_info.get_vars()['state'] == 'on'
