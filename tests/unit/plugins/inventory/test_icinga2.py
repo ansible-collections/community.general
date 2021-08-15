@@ -83,14 +83,15 @@ def test_populate(inventory, mocker):
     # check if host in the home_servers group
     assert 'home_servers' in inventory.inventory.groups
     group1_data = inventory.inventory.groups['home_servers']
-    group1_test_data = ['test-host1.home.local', 'test-host2.home.local']
+    group1_test_data = [host1_info, host2_info]
     print(group1_data.hosts)
-    print(type(group1_data.hosts))
-    group2_data = inventory.inventory.groups['servers_hp']
-    group2_test_data = ['test-host2.home.local']
-    print(group2_data.hosts)
-    print(type(group2_data.hosts))
+    print(group1_test_data)
     assert group1_data.hosts == group1_test_data
+    # Test servers_hp group
+    group2_data = inventory.inventory.groups['servers_hp']
+    group2_test_data = [host2_info]
+    print(group2_data.hosts)
+    print(group2_test_data)
     assert group2_data.hosts == group2_test_data
 
     # check if host state rules apply properyl
