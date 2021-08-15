@@ -201,9 +201,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                     self.inventory.set_variable(
                         instance.label,
                         ip_type,
-                        self._ip_data(
-                            filter(lambda entry: entry.type == ip_type, ips)
-                        )
+                        self._ip_data([ip for ip in ips if ip.type == ip_type])
                     )
 
     def _ip_data(self, ip_list):
