@@ -83,7 +83,7 @@ def test_populate(inventory, mocker):
     # check if host in the home_servers group
     assert 'home_servers' in inventory.inventory.groups
     group1_data = inventory.inventory.groups['home_servers']
-    group1_test_data = ['test-host1.home.local','test-host2.home.local']
+    group1_test_data = ['test-host1.home.local', 'test-host2.home.local']
     print(group1_data.hosts)
     print(type(group1_data.hosts))
     group2_data = inventory.inventory.groups['servers_hp']
