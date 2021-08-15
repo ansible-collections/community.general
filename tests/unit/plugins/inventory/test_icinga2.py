@@ -25,13 +25,13 @@ def test_verify_file_bad_config(inventory):
     assert inventory.verify_file('foobar.icinga2.yml') is False
 
 
-def get_auth():
+def check_api():
     return True
 
 
 # NOTE: when updating/adding replies to this function,
 # be sure to only add only the _contents_ of the 'data' dict in the API reply
-def get_json(url):
+def query_hosts(url):
     if url == "https://localhost:8006/v1/objects/hosts":
         # _get_nodes
         json_host_data = {
@@ -52,7 +52,7 @@ def get_json(url):
                     'attrs': {
                         'address': 'test-host2.home.local'
                         'groups': ['home-servers', 'servers-hp'],
-                        'state': 0.0,
+                        'state': 1.0,
                         'state_type': 1.0
                     },
                     'joins': {},
@@ -72,24 +72,19 @@ def test_populate(inventory, mocker):
     inventory.icinga2_url = 'https://localhost:5665' + '/v1'
 
     # bypass authentication and API fetch calls
-    inventory._get_auth = mocker.MagicMock(side_effect=get_auth)
-    inventory._get_json = mocker.MagicMock(side_effect=get_json)
-    inventory._get_vm_status = mocker.MagicMock(side_effect=get_vm_status)
-    inventory.get_option = mocker.MagicMock(side_effect=get_option)
+    inventory._check_api = mocker.MagicMock(side_effect=check_api)
+    inventory._query_hosts = mocker.MagicMock(side_effect=query_hosts)
     inventory._populate()
 
     # get different hosts
-    host_qemu = inventory.inventory.get_host('test-qemu')
-    host_qemu_windows = inventory.inventory.get_host('test-qemu-windows')
-    host_qemu_multi_nic = inventory.inventory.get_host('test-qemu-multi-nic')
-    host_qemu_template = inventory.inventory.get_host('test-qemu-template')
-    host_lxc = inventory.inventory.get_host('test-lxc')
-    host_node = inventory.inventory.get_host('testnode')
+    host_info1 = inventory.inventory.get_host('test-host1')
+    host_info2 = inventory.inventory.get_host('test-host2')
 
-    # check if qemu-test is in the icinga2_pool_test group
-    assert 'icinga2_pool_test' in inventory.inventory.groups
-    group_qemu = inventory.inventory.groups['icinga2_pool_test']
-    assert group_qemu.hosts == [host_qemu]
+    # check if host in the home-servers group
+    assert 'home-servers' in inventory.inventory.groups
+    group_data = inventory.inventory.groups['home-servers']
+    assert 'test-host1' in group_data.hosts 
 
-    # check if qemu-test has eth0 interface in agent_interfaces fact
-    assert 'eth0' in [d['name'] for d in host_qemu.get_vars()['icinga2_agent_interfaces']]
+    # check if host state rules apply properyl
+    assert host_info1.get_vars()['state'] == 'on'
+    assert host_info2.get_vars()['state'] == 'off'
