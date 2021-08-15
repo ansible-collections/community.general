@@ -45,6 +45,9 @@ class ModuleHelper(VarsMixin, DependencyMixin, ModuleHelperBase):
     def _vars_changed(self):
         return any(self.vars.has_changed(v) for v in self.vars.change_vars())
 
+    def __changed__(self):
+        return False
+
     def has_changed(self):
         return self.changed or self._vars_changed()
 
