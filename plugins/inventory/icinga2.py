@@ -3,35 +3,41 @@
 # Copyright (c) 2018 Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import (absolute_import, division, print_function)
+
 __metaclass__ = type
 
 DOCUMENTATION = '''
     name: icinga2
-    short_description: Icinga2 inventory source
+    short_description: Icinga2 inventory source.
+    version_added: 3.6.0
     author:
         - Cliff Hults (@BongoEADGC6) <cliff.hults@gmail.com>
-    requirements:
-        - requests >= 1.1
     description:
         - Get inventory hosts from the Icinga2 API.
-        - "Uses a configuration file as an inventory source, it must end in C(.icinga2.yml) or C(.icinga2.yaml)"
+        - "Uses a configuration file as an inventory source, it must end in
+          C(.icinga2.yml) or C(.icinga2.yaml)."
     options:
       plugin:
-          description: Name of the plugin
-          required: true
-          choices: ['community.general.icinga2']
+        description: Name of the plugin.
+        required: true
+        type: string
+        choices: ['community.general.icinga2']
       url:
         description: Root URL of Icinga2 API 
+        type: string
         required: true
       user:
         description: API username
+        type: string
         required: true
       password:
         description: API password
+        type: string
         required: true
       validate_certs:
         description: Enable SSL certificate verification
-        required: true
+        type: boolean
+        default: true
 '''
 EXAMPLES = '''
 # my.icinga2.yml
@@ -41,24 +47,13 @@ user: ansible
 password: secure
 validate_certs: false
 '''
-import re
+
 import json
 
-from ansible.module_utils.common._collections_compat import MutableMapping
-from distutils.version import LooseVersion
-
-from ansible.errors import AnsibleError, AnsibleParserError
+from ansible.errors import AnsibleParserError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
-from ansible.module_utils.six.moves.urllib.parse import urlencode
+from ansible.module_utils.urls import open_url
 
-# 3rd party imports
-try:
-    import requests
-    if LooseVersion(requests.__version__) < LooseVersion('1.1.0'):
-        raise ImportError
-    HAS_REQUESTS = True
-except ImportError:
-    HAS_REQUESTS = False
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     ''' Host inventory parser for ansible using Icinga2 as source. '''
@@ -71,6 +66,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         # from config
         self.icinga2_url = None
+        self.icinga2_user = None
+        self.icinga2_password = None
+        self.ssl_verify = None
 
         self.cache_key = None
         self.use_cache = None
@@ -82,52 +80,63 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if path.endswith(('icinga2.yaml', 'icinga2.yml')):
                 valid = True
             else:
-                self.display.vvv('Skipping due to inventory source not ending in "icinga2.yaml" nor "icinga2.yml"')
+                self.display.vvv('Skipping due to inventory source \
+                        not ending in "icinga2.yaml" nor "icinga2.yml"')
         return valid
 
     def _api_connect(self):
         self.headers = {
-                'User-Agent': "ansible-icinga2-inv",
-                'Accept': "application/json",
-                }
+            'User-Agent': "ansible-icinga2-inv",
+            'Accept': "application/json",
+        }
         api_status_url = self.icinga2_url + "/status"
-        api_status = requests.get(api_status_url, 
-                auth=(self.icinga2_user, self.icinga2_password), 
-                verify=self.ssl_verify)
-        api_status.raise_for_status()
+        request_args = {
+            'headers': self.headers,
+            'url_username': self.icinga2_user,
+            'url_password': self.icinga2_password,
+            'validate_certs': self.ssl_verify
+        }
+        open_url(api_status_url, **request_args)
 
-    def _post_request(self, request_url, headers, data=None):
-        #logging.debug("Requested URL: %s" % request_url)
+    def _post_request(self, request_url, data=None):
+        self.display.vvv("Requested URL: %s" % request_url)
         request_args = {
                 'headers': self.headers,
                 'auth': (self.icinga2_user, self.icinga2_password),
                 'verify': self.ssl_verify
                 }
-        if data != None:
+        request_args = {
+                'headers': self.headers,
+                'url_username': self.icinga2_user,
+                'url_password': self.icinga2_password,
+                'validate_certs': self.ssl_verify
+                }
+        if data is not None:
             request_args['data'] = json.dumps(data)
-        #logging.debug("Request Args: %s" % request_args)
-        response = requests.post(request_url, **request_args)
-        if 200 <= response.status_code <= 299:
-            if len(response.json()['results']) == 0:
-                print("Query returned 0 results")
-                sys.exit(0)
-            else:
-                return response.json()
-        elif response.status_code == 404 and response.json()['status'] == "No objects found.":
-            print("API was Unable to complete query -- Response: %s - %s" % (response.status_code, response.json()['status']))
-            sys.exit(1)
-        elif response.status_code == 401:
-            print("API was Unable to complete query -- Response: %s - %s" % (response.status_code, response.json()['status']))
-            sys.exit(1)
-        elif response.status_code == 500:
-            print("API Response - %s - %s" % (response.json()['status'], response.json()['errors']))
-            sys.exit(1)
-        else:
-            #logging.debug("Returned Data: %s" % response.json())
-            response.raise_for_status()
+        self.display.vvv("Request Args: %s" % request_args)
+        response = open_url(request_url, **request_args)
+        response_body = response.read()
+        json_data = json.loads(response_body.decode('utf-8'))
+        if 200 <= response.status <= 299:
+            return json_data
+        if response.status == 404 and json_data['status'] == "No objects found.":
+            raise AnsibleParserError(
+                "API returned no data -- Response: %s - %s"
+                        % (response.status, json_data['status']))
+        if response.status == 401:
+            raise AnsibleParserError(
+                "API was unable to complete query -- Response: %s - %s"
+                        % (response.status, json_data['status']))
+        if response.status == 500:
+            raise AnsibleParserError(
+                "API Response - %s - %s"
+                        % (json_data['status'], json_data['errors']))
+        raise AnsibleParserError(
+                "Unexpected data returned - %s - %s"
+                    % (json_data['status'], json_data['errors']))
 
-    def _query_hosts(self, hosts=None, attrs=None, joins=None, filter=None):
-        query_hosts_url= "{}/objects/hosts".format(self.icinga2_url)
+    def _query_hosts(self, hosts=None, attrs=None, joins=None, host_filter=None):
+        query_hosts_url = "{}/objects/hosts".format(self.icinga2_url)
         self.headers['X-HTTP-Method-Override'] = 'GET'
         data_dict = dict()
         if hosts:
@@ -135,18 +144,18 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 query_hosts_url += "/%s" % hosts[0]
             elif len(hosts) > 1:
                 data_dict['hosts'] = hosts
-        if attrs != None:
+        if attrs is not None:
             data_dict['attrs'] = attrs
-        if joins != None:
+        if joins is not None:
             data_dict['joins'] = joins
-        if filter != None:
-            data_dict['filter'] = filter
-        host_dict = self._post_request(query_hosts_url, self.headers, data_dict)
+        if host_filter is not None:
+            data_dict['filter'] = host_filter
+        host_dict = self._post_request(query_hosts_url, data_dict)
         return host_dict
 
     def get_inventory_from_icinga(self):
         """Query for all hosts """
-        #logging.info("Querying Icinga2 for inventory")
+        self.display.vvv("Querying Icinga2 for inventory")
         query_args = {
             "attrs": ["address", "state_type", "state", "groups"],
         }
@@ -154,7 +163,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         results_json = self._query_hosts(**query_args)['results']
         ansible_inv = self._convert_inv(results_json)
         return ansible_inv
-    
+
     def _populate(self):
         groups = self._to_json(self.get_inventory_from_icinga())
         return groups
@@ -165,7 +174,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _convert_inv(self, json_data):
         """Convert Icinga2 API data to JSON format for Ansible"""
-        groups_dict = {"_meta": {"hostvars" : {}}}
+        groups_dict = {"_meta": {"hostvars": {}}}
         for entry in json_data:
             host_name = entry['name']
             host_attrs = entry['attrs']
@@ -180,18 +189,15 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 if group not in self.inventory.groups.keys():
                     self.inventory.add_group(group)
                 self.inventory.add_child(group, host_addr)
-            #self.inventory.set_variable(host_addr, 'ansible_host', host_attrs)
             self.inventory.set_variable(host_addr, 'address', host_addr)
             self.inventory.set_variable(host_addr, 'hostname', host_name)
-            self.inventory.set_variable(host_addr, 'state', host_attrs['state'])
+            self.inventory.set_variable(host_addr, 'state',
+                                        host_attrs['state'])
             self.inventory.set_variable(host_addr, 'state_type',
-                    host_attrs['state_type'])
+                                        host_attrs['state_type'])
         return groups_dict
-    
+
     def parse(self, inventory, loader, path, cache=True):
-        if not HAS_REQUESTS:
-            raise AnsibleError('This module requires Python Requests 1.1.0 or higher: '
-                               'https://github.com/psf/requests.')
 
         super(InventoryModule, self).parse(inventory, loader, path)
 
@@ -203,7 +209,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self.icinga2_user = self.get_option('user')
             self.icinga2_password = self.get_option('password')
             self.ssl_verify = self.get_option('validate_certs')
-            ## Not currently enabled
+            # Not currently enabled
             # self.host_filter = self.get_option('host_filter')
             # self.cache_key = self.get_cache_key(path)
             # self.use_cache = cache and self.get_option('cache')
