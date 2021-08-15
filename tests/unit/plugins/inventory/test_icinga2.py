@@ -37,7 +37,7 @@ def query_hosts(hosts=None, attrs=None, joins=None, host_filter=None):
             {
                 'attrs': {
                     'address': 'test-host1.home.local',
-                    'groups': ['home-servers', 'servers-dell'],
+                    'groups': ['home_servers', 'servers_dell'],
                     'state': 0.0,
                     'state_type': 1.0
                 },
@@ -49,7 +49,7 @@ def query_hosts(hosts=None, attrs=None, joins=None, host_filter=None):
             {
                 'attrs': {
                     'address': 'test-host2.home.local',
-                    'groups': ['home-servers', 'servers-hp'],
+                    'groups': ['home_servers', 'servers_hp'],
                     'state': 1.0,
                     'state_type': 1.0
                 },
@@ -77,6 +77,7 @@ def test_populate(inventory, mocker):
     # get different hosts
     host_info1 = inventory.inventory.get_host('test-host1.home.local')
     host_info2 = inventory.inventory.get_host('test-host2.home.local')
+    print(host_info1)
 
     # check if host in the home-servers group
     assert 'home-servers' in inventory.inventory.groups
