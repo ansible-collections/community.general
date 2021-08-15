@@ -1,0 +1,41 @@
+---
+
+# Regression test for https://github.com/ansible-collections/community.general/pull/2578#issuecomment-868092282
+- name: Create UTF-8 test file
+  copy:
+    content: !!binary |
+      W2FwcDptYWluXQphdmFpbGFibGVfbGFuZ3VhZ2VzID0gZW4gZnIgZXMgZGUgcHQgamEgbHQgemhf
+      VFcgaWQgZGEgcHRfQlIgcnUgc2wgaXQgbmxfTkwgdWsgdGEgc2kgY3MgbmIgaHUKIyBGdWxsIGxh
+      bmd1YWdlIG5hbWVzIGluIG5hdGl2ZSBsYW5ndWFnZSAoY29tbWEgc2VwYXJhdGVkKQphdmFpbGFi
+      bGVfbGFuZ3VhZ2VzX2Z1bGwgPSBFbmdsaXNoLCBGcmFuw6dhaXMsIEVzcGHDsW9sLCBEZXV0c2No
+      LCBQb3J0dWd1w6pzLCDml6XmnKzoqp4sIExpZXR1dm9zLCDkuK3mlocsIEluZG9uZXNpYSwgRGFu
+      c2ssIFBvcnR1Z3XDqnMgKEJyYXNpbCksINCg0YPRgdGB0LrQuNC5LCBTbG92ZW7FocSNaW5hLCBJ
+      dGFsaWFubywgTmVkZXJsYW5kcywg0KPQutGA0LDRl9C90YHRjNC60LAsIOCupOCuruCuv+CutOCv
+      jSwg4LeD4LeS4LaC4LeE4La9LCDEjGVza3ksIEJva23DpWwsIE1hZ3lhcgo=
+    dest: '{{ output_file }}'
+- name: Add entries
+  ini_file:
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    path: '{{ output_file }}'
+    create: true
+  loop:
+    - section: app:main
+      option: sqlalchemy.url
+      value: postgresql://app:secret@database/app
+    - section: handler_filelog
+      option: args
+      value: (sys.stderr,)
+    - section: handler_filelog
+      option: class
+      value: StreamHandler
+    - section: handler_exc_handler
+      option: args
+      value: (sys.stderr,)
+    - section: båz
+      option: ﬀöø
+      value: ḃâŗ
+    - section: båz
+      option: ﬀöø
+      value: bar
