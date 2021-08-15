@@ -31,7 +31,6 @@ def check_api():
 # NOTE: when updating/adding replies to this function,
 # be sure to only add only the _contents_ of the 'data' dict in the API reply
 def query_hosts(attrs):
-    #if url == "https://localhost:8006/v1/objects/hosts":
     # _get_hosts
     json_host_data = {
         [
