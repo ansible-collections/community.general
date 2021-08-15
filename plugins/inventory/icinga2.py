@@ -136,7 +136,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 % (json_data['status'], json_data['errors']))
 
     def _query_hosts(self, hosts=None, attrs=None, joins=None, host_filter=None):
-        query_hosts_url = "{}/objects/hosts".format(self.icinga2_url)
+        query_hosts_url = "{1}/objects/hosts".format(self.icinga2_url)
         self.headers['X-HTTP-Method-Override'] = 'GET'
         data_dict = dict()
         if hosts:
@@ -213,9 +213,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             # self.host_filter = self.get_option('host_filter')
             # self.cache_key = self.get_cache_key(path)
             # self.use_cache = cache and self.get_option('cache')
-        except Exception as e:
+        except Exception as error:
             raise AnsibleParserError(
-                    'All correct options required: {}'.format(e))
+                    'All correct options required: {1}'.format(error))
         # Test connection to API
         self._api_connect()
 
