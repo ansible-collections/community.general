@@ -370,6 +370,23 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 from ansible.module_utils.basic import AnsibleModule
 
 
+def sanitize(idp):
+    result = idp.copy()
+    if 'config' in result:
+        result['config'] = sanitize(result['config'])
+    if 'clientSecret' in result:
+        result['clientSecret'] = 'no_log'
+    return result
+
+def get_identity_provider_with_mappers(kc, alias, realm):
+    idp = kc.get_identity_provider(alias, realm)
+    if idp is not None:
+        idp['mappers'] = kc.get_identity_provider_mappers(alias, realm)
+    if idp is None:
+        idp = dict()
+    return idp
+
+
 def main():
     """
     Module execution
@@ -377,6 +394,14 @@ def main():
     :return:
     """
     argument_spec = keycloak_argument_spec()
+
+    mapper_spec = dict(
+        id=dict(type='str'),
+        name=dict(type='str'),
+        identityProviderAlias=dict(type='str'),
+        identityProviderMapper=dict(type='str'),
+        config=dict(type='dict'),
+    )
 
     meta_args = dict(
         state=dict(type='str', default='present', choices=['present', 'absent']),
@@ -395,6 +420,8 @@ def main():
         store_token=dict(type='bool', aliases=['storeToken']),
         trust_email=dict(type='bool', aliases=['trustEmail']),
         update_profile_first_login_mode=dict(type='str', aliases=['accessCodeLifespan']),
+        # mappers=dict(type='list', elements='dict', options=mapper_spec),
+        mappers=dict(type='list', elements='dict', default=[]),
     )
 
     argument_spec.update(meta_args)
@@ -424,10 +451,7 @@ def main():
                    module.params.get(x) is not None]
 
     # does the identity provider already exist?
-    before_idp = kc.get_identity_provider(alias, realm)
-
-    if before_idp is None:
-        before_idp = dict()
+    before_idp = get_identity_provider_with_mappers(kc, alias, realm)
 
     # build a changeset
     changeset = dict()
@@ -442,8 +466,8 @@ def main():
     updated_idp = before_idp.copy()
     updated_idp.update(changeset)
 
-    result['proposed'] = changeset
-    result['existing'] = before_idp
+    result['proposed'] = sanitize(changeset)
+    result['existing'] = sanitize(before_idp)
 
     # if before_idp is none, the identity provider doesn't exist.
     if before_idp == dict():
@@ -456,20 +480,24 @@ def main():
             result['msg'] = 'Identity provider does not exist; doing nothing.'
             module.exit_json(**result)
 
-        # for 'present', create a new role.
+        # for 'present', create a new identity provider.
         result['changed'] = True
 
         if module._diff:
-            result['diff'] = dict(before='', after=updated_idp)
+            result['diff'] = dict(before='', after=sanitize(updated_idp))
 
         if module.check_mode:
             module.exit_json(**result)
 
         # do it for real!
+        updated_idp = updated_idp.copy()
+        mappers = updated_idp.pop('mappers', [])
         kc.create_identity_provider(updated_idp, realm)
-        after_idp = kc.get_identity_provider(alias, realm)
+        for mapper in mappers:
+            kc.create_identity_provider_mapper(mapper, alias, realm)
+        after_idp = get_identity_provider_with_mappers(kc, alias, realm)
 
-        result['end_state'] = after_idp
+        result['end_state'] = sanitize(after_idp)
 
         result['msg'] = 'Identity provider {alias} has been created'.format(alias=alias)
         module.exit_json(**result)
@@ -479,7 +507,7 @@ def main():
             # no changes
             if updated_idp == before_idp:
                 result['changed'] = False
-                result['end_state'] = updated_idp
+                result['end_state'] = sanitize(updated_idp)
                 result['msg'] = "No changes required to identity provider {alias}.".format(alias=alias)
                 module.exit_json(**result)
 
@@ -487,16 +515,32 @@ def main():
             result['changed'] = True
 
             if module._diff:
-                result['diff'] = dict(before=before_idp, after=updated_idp)
+                result['diff'] = dict(before=sanitize(before_idp), after=sanitize(updated_idp))
 
             if module.check_mode:
                 module.exit_json(**result)
 
             # do the update
+            updated_idp = updated_idp.copy()
+            updated_mappers = updated_idp.pop('mappers', [])
+            old_mappers = kc.get_identity_provider_mappers(alias, realm)
             kc.update_identity_provider(updated_idp, realm)
-            after_idp = kc.get_identity_provider(alias, realm)
+            # create or update mappers
+            for tmp_mapper in updated_mappers:
+                old_mapper = next((m for m in old_mappers if m['name'] == tmp_mapper['name']), None)
+                if old_mapper is not None:
+                    old_mapper.update(tmp_mapper)
+                    kc.update_identity_provider_mapper(old_mapper, alias, realm)
+                else:
+                    kc.create_identity_provider_mapper(tmp_mapper, alias, realm)
+            # remove unwanted mappers
+            for tmp_mapper in old_mappers:
+                if next((m for m in updated_mappers if m['name'] == tmp_mapper['name']), None) is None:
+                    kc.delete_identity_provider_mapper(tmp_mapper['id'], alias, realm)
 
-            result['end_state'] = after_idp
+            after_idp = get_identity_provider_with_mappers(kc, alias, realm)
+
+            result['end_state'] = sanitize(after_idp)
 
             result['msg'] = "Identity provider {alias} has been updated".format(alias=alias)
             module.exit_json(**result)
@@ -505,7 +549,7 @@ def main():
             result['changed'] = True
 
             if module._diff:
-                result['diff'] = dict(before=before_idp, after='')
+                result['diff'] = dict(before=sanitize(before_idp), after='')
 
             if module.check_mode:
                 module.exit_json(**result)
