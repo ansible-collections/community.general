@@ -456,8 +456,7 @@ options:
     wifi:
        description:
             - The configuration of the WiFi connection.
-            - Note the list of suboption attributes may vary depending on which version of NetworkManager/nmcli
-              is installed on the host.
+            - Note the list of suboption attributes may vary depending on which version of NetworkManager/nmcli is installed on the host.
             - 'An up-to-date list of supported attributes can be found here:
               U(https://networkmanager.dev/docs/api/latest/settings-802-11-wireless.html).'
             - 'For instance to create a hidden AP mode WiFi connection:
