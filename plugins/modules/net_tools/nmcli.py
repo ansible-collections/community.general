@@ -341,67 +341,67 @@ options:
        type: dict
        suboptions:
             auth-alg:
-                description: When WEP is used (ie, key-mgmt = "none" or "ieee8021x") indicate the 802.11 authentication algorithm required by the AP here. One
-                             of "open" for Open System, "shared" for Shared Key, or "leap" for Cisco LEAP. When using Cisco LEAP (ie, key-mgmt = "ieee8021x"
-                             and auth-alg = "leap") the "leap-username" and "leap-password" properties must be specified.
+                description: When WEP is used (ie, I(key-mgmt) = C(none) or C(ieee8021x)) indicate the 802.11 authentication algorithm required by the AP here.
+                             One of C(open) for Open System, C(shared) for Shared Key, or C(leap) for Cisco LEAP. When using Cisco LEAP (ie, I(key-mgmt) =
+                             C(ieee8021x) and I(auth-alg) = C(leap)) the I(leap-username) and I(leap-password) properties must be specified.
                 type: str
                 choices: [ open, shared, leap ]
             fils:
                 description: Indicates whether Fast Initial Link Setup (802.11ai) must be enabled for the connection. One of
-                             NM_SETTING_WIRELESS_SECURITY_FILS_DEFAULT (0) (use global default value), NM_SETTING_WIRELESS_SECURITY_FILS_DISABLE (1) (disable
-                             FILS), NM_SETTING_WIRELESS_SECURITY_FILS_OPTIONAL (2) (enable FILS if the supplicant and the access point support it) or
-                             NM_SETTING_WIRELESS_SECURITY_FILS_REQUIRED (3) (enable FILS and fail if not supported). When set to
-                             NM_SETTING_WIRELESS_SECURITY_FILS_DEFAULT (0) and no global default is set, FILS will be optionally enabled.
+                             C(NM_SETTING_WIRELESS_SECURITY_FILS_DEFAULT) (0) (use global default value), C(NM_SETTING_WIRELESS_SECURITY_FILS_DISABLE) (1)
+                             (disable FILS), C(NM_SETTING_WIRELESS_SECURITY_FILS_OPTIONAL) (2) (enable FILS if the supplicant and the access point support it)
+                             or C(NM_SETTING_WIRELESS_SECURITY_FILS_REQUIRED) (3) (enable FILS and fail if not supported). When set to
+                             C(NM_SETTING_WIRELESS_SECURITY_FILS_DEFAULT) (0) and no global default is set, FILS will be optionally enabled.
                 type: int
                 choices: [ 0, 1, 2, 3 ]
                 default: 0
             group:
                 description: A list of group/broadcast encryption algorithms which prevents connections to Wi-Fi networks that do not utilize one of the
-                             algorithms in the list. For maximum compatibility leave this property empty. Each list element may be one of "wep40", "wep104",
-                             "tkip", or "ccmp".
+                             algorithms in the list. For maximum compatibility leave this property empty. Each list element may be one of C(wep40), C(wep104),
+                             C(tkip), or C(ccmp).
                 type: list
                 elements: str
                 choices: [ wep40, wep104, tkip, ccmp ]
             key-mgmt:
-                description: Key management used for the connection. One of "none" (WEP or no password protection), "ieee8021x" (Dynamic WEP), "owe"
-                             (Opportunistic Wireless Encryption), "wpa-psk" (WPA2 + WPA3 personal), "sae" (WPA3 personal only), "wpa-eap" (WPA2 + WPA3
-                             enterprise) or "wpa-eap-suite-b-192" (WPA3 enterprise only). This property must be set for any Wi-Fi connection that uses
+                description: Key management used for the connection. One of C(none) (WEP or no password protection), C(ieee8021x) (Dynamic WEP), C(owe)
+                             (Opportunistic Wireless Encryption), C(wpa-psk) (WPA2 + WPA3 personal), C(sae) (WPA3 personal only), C(wpa-eap) (WPA2 + WPA3
+                             enterprise) or C(wpa-eap-suite-b-192) (WPA3 enterprise only). This property must be set for any Wi-Fi connection that uses
                              security.
                 type: str
                 choices: [ none, ieee8021x, owe, wpa-psk, sae, wpa-eap, wpa-eap-suite-b-192 ]
             leap-password-flags:
-                description: Flags indicating how to handle the "leap-password" property.
+                description: Flags indicating how to handle the I(leap-password) property.
                 type: list
                 elements: int
             leap-password:
-                description: The login password for legacy LEAP connections (ie, key-mgmt = "ieee8021x" and auth-alg = "leap").
+                description: The login password for legacy LEAP connections (ie, I(key-mgmt) = C(ieee8021x) and I(auth-alg) = C(leap)).
                 type: str
             leap-username:
-                description: The login username for legacy LEAP connections (ie, key-mgmt = "ieee8021x" and auth-alg = "leap").
+                description: The login username for legacy LEAP connections (ie, I(key-mgmt) = C(ieee8021x) and I(auth-alg) = C(leap)).
                 type: str
             pairwise:
                 description: A list of pairwise encryption algorithms which prevents connections to Wi-Fi networks that do not utilize one of the algorithms in
-                             the list. For maximum compatibility leave this property empty. Each list element may be one of "tkip" or "ccmp".
+                             the list. For maximum compatibility leave this property empty. Each list element may be one of C(tkip) or C(ccmp).
                 type: list
                 elements: str
                 choices: [ tkip, ccmp ]
             pmf:
                 description: Indicates whether Protected Management Frames (802.11w) must be enabled for the connection. One of
-                             NM_SETTING_WIRELESS_SECURITY_PMF_DEFAULT (0) (use global default value), NM_SETTING_WIRELESS_SECURITY_PMF_DISABLE (1) (disable
-                             PMF), NM_SETTING_WIRELESS_SECURITY_PMF_OPTIONAL (2) (enable PMF if the supplicant and the access point support it) or
-                             NM_SETTING_WIRELESS_SECURITY_PMF_REQUIRED (3) (enable PMF and fail if not supported). When set to
-                             NM_SETTING_WIRELESS_SECURITY_PMF_DEFAULT (0) and no global default is set, PMF will be optionally enabled.
+                             C(NM_SETTING_WIRELESS_SECURITY_PMF_DEFAULT) (0) (use global default value), C(NM_SETTING_WIRELESS_SECURITY_PMF_DISABLE) (1)
+                             (disable PMF), C(NM_SETTING_WIRELESS_SECURITY_PMF_OPTIONAL) (2) (enable PMF if the supplicant and the access point support it) or
+                             C(NM_SETTING_WIRELESS_SECURITY_PMF_REQUIRED) (3) (enable PMF and fail if not supported). When set to
+                             C(NM_SETTING_WIRELESS_SECURITY_PMF_DEFAULT) (0) and no global default is set, PMF will be optionally enabled.
                 type: int
                 choices: [ 0, 1, 2, 3 ]
                 default: 0
             proto:
-                description: List of strings specifying the allowed WPA protocol versions to use. Each element may be one "wpa" (allow WPA) or "rsn" (allow
+                description: List of strings specifying the allowed WPA protocol versions to use. Each element may be one C(wpa) (allow WPA) or C(rsn) (allow
                              WPA2/RSN). If not specified, both WPA and RSN connections are allowed.
                 type: list
                 elements: str
                 choices: [ wpa, rsn ]
             psk-flags:
-                description: Flags indicating how to handle the "psk" property.
+                description: Flags indicating how to handle the I(psk) property.
                 type: list
                 elements: int
             psk:
@@ -410,41 +410,42 @@ options:
                              a passphrase of any length for SAE authentication.
                 type: str
             wep-key-flags:
-                description: Flags indicating how to handle the "wep-key0", "wep-key1", "wep-key2", and "wep-key3" properties.
+                description: Flags indicating how to handle the I(wep-key0), I(wep-key1), I(wep-key2), and I(wep-key3) properties.
                 type: list
                 elements: int
             wep-key-type:
-                description: Controls the interpretation of WEP keys. Allowed values are NM_WEP_KEY_TYPE_KEY (1), in which case the key is either a 10- or
-                             26-character hexadecimal string, or a 5- or 13-character ASCII password; or NM_WEP_KEY_TYPE_PASSPHRASE (2), in which case the
+                description: Controls the interpretation of WEP keys. Allowed values are C(NM_WEP_KEY_TYPE_KEY) (1), in which case the key is either a 10- or
+                             26-character hexadecimal string, or a 5- or 13-character ASCII password; or C(NM_WEP_KEY_TYPE_PASSPHRASE) (2), in which case the
                              passphrase is provided as a string and will be hashed using the de-facto MD5 method to derive the actual WEP key.
                 type: int
                 choices: [ 1, 2 ]
             wep-key0:
-                description: Index 0 WEP key. This is the WEP key used in most networks. See the "wep-key-type" property for a description of how this key is
+                description: Index 0 WEP key. This is the WEP key used in most networks. See the I(wep-key-type) property for a description of how this key is
                              interpreted.
                 type: str
             wep-key1:
-                description: Index 1 WEP key. This WEP index is not used by most networks. See the "wep-key-type" property for a description of how this key is
-                             interpreted.
+                description: Index 1 WEP key. This WEP index is not used by most networks. See the I(wep-key-type) property for a description of how this key
+                             is interpreted.
                 type: str
             wep-key2:
-                description: Index 2 WEP key. This WEP index is not used by most networks. See the "wep-key-type" property for a description of how this key is
-                             interpreted.
+                description: Index 2 WEP key. This WEP index is not used by most networks. See the I(wep-key-type) property for a description of how this key
+                             is interpreted.
                 type: str
             wep-key3:
-                description: Index 3 WEP key. This WEP index is not used by most networks. See the "wep-key-type" property for a description of how this key is
-                             interpreted.
+                description: Index 3 WEP key. This WEP index is not used by most networks. See the I(wep-key-type) property for a description of how this key
+                             is interpreted.
                 type: str
             wep-tx-keyidx:
-                description: When static WEP is used (ie, key-mgmt = "none") and a non-default WEP key index is used by the AP, put that WEP key index here.
-                             Valid values are 0 (default key) through 3. Note that some consumer access points (like the Linksys WRT54G) number the keys 1 - 4.
+                description: When static WEP is used (ie, I(key-mgmt) = C(none)) and a non-default WEP key index is used by the AP, put that WEP key index
+                             here. Valid values are C(0) (default key) through C(3). Note that some consumer access points (like the Linksys WRT54G) number the
+                             keys C(1) - C(4).
                 type: int
                 choices: [ 0, 1, 2, 3 ]
                 default: 0
             wps-method:
                 description: Flags indicating which mode of WPS is to be used if any. There's little point in changing the default setting as NetworkManager
                              will automatically determine whether it's feasible to start WPS enrollment from the Access Point capabilities. WPS can be disabled
-                             by setting this property to a value of 1.
+                             by setting this property to a value of C(1).
                 type: int
                 default: 0
        version_added: 3.0.0
@@ -465,21 +466,23 @@ options:
        suboptions:
             ap-isolation:
                 description: Configures AP isolation, which prevents communication between wireless devices connected to this AP. This property can be set to a
-                             value different from NM_TERNARY_DEFAULT (-1) only when the interface is configured in AP mode. If set to NM_TERNARY_TRUE (1),
-                             devices are not able to communicate with each other. This increases security because it protects devices against attacks from
+                             value different from C(NM_TERNARY_DEFAULT) (-1) only when the interface is configured in AP mode. If set to C(NM_TERNARY_TRUE)
+                             (1), devices are not able to communicate with each other. This increases security because it protects devices against attacks from
                              other clients in the network. At the same time, it prevents devices to access resources on the same wireless networks as file
-                             shares, printers, etc. If set to NM_TERNARY_FALSE (0), devices can talk to each other. When set to NM_TERNARY_DEFAULT (-1), the
-                             global default is used; in case the global default is unspecified it is assumed to be NM_TERNARY_FALSE (0).
+                             shares, printers, etc. If set to C(NM_TERNARY_FALSE) (0), devices can talk to each other. When set to C(NM_TERNARY_DEFAULT) (-1),
+                             the global default is used; in case the global default is unspecified it is assumed to be C(NM_TERNARY_FALSE) (0).
                 type: int
+                choices: [ -1, 0, 1 ]
+                default: -1
             assigned-mac-address:
                 description: The new field for the cloned MAC address. It can be either a hardware address in ASCII representation, or one of the special
-                             values "preserve", "permanent", "random" or "stable". This field replaces the deprecated "cloned-mac-address" on D-Bus, which can
-                             only contain explicit hardware addresses. Note that this property only exists in D-Bus API. libnm and nmcli continue to call this
-                             property "cloned-mac-address".
+                             values C(preserve), C(permanent), C(random) or C(stable). This field replaces the deprecated I(cloned-mac-address) on D-Bus, which
+                             can only contain explicit hardware addresses. Note that this property only exists in D-Bus API. libnm and nmcli continue to call
+                             this property I(cloned-mac-address).
                 type: str
             band:
-                description: 802.11 frequency band of the network. One of "a" for 5GHz 802.11a or "bg" for 2.4GHz 802.11. This will lock associations to the
-                             Wi-Fi network to the specific band, i.e. if "a" is specified, the device will not associate with the same network in the 2.4GHz
+                description: 802.11 frequency band of the network. One of C(a) for 5GHz 802.11a or C(bg) for 2.4GHz 802.11. This will lock associations to the
+                             Wi-Fi network to the specific band, i.e. if C(a) is specified, the device will not associate with the same network in the 2.4GHz
                              band even if the network's settings are compatible. This setting depends on specific driver capability and may not work with all
                              drivers.
                 type: str
@@ -491,22 +494,22 @@ options:
                 type: str
             channel:
                 description: Wireless channel to use for the Wi-Fi connection. The device will only join (or create for Ad-Hoc networks) a Wi-Fi network on the
-                             specified channel. Because channel numbers overlap between bands, this property also requires the "band" property to be set.
+                             specified channel. Because channel numbers overlap between bands, this property also requires the I(band) property to be set.
                 type: int
                 default: 0
             cloned-mac-address:
-                description: This D-Bus field is deprecated in favor of "assigned-mac-address" which is more flexible and allows specifying special variants
-                             like "random". For libnm and nmcli, this field is called "cloned-mac-address".
+                description: This D-Bus field is deprecated in favor of I(assigned-mac-address) which is more flexible and allows specifying special variants
+                             like C(random). For libnm and nmcli, this field is called I(cloned-mac-address).
                 type: str
             generate-mac-address-mask:
-                description: With "cloned-mac-address" setting "random" or "stable", by default all bits of the MAC address are scrambled and a
+                description: With I(cloned-mac-address) setting C(random) or C(stable), by default all bits of the MAC address are scrambled and a
                              locally-administered, unicast MAC address is created. This property allows to specify that certain bits are fixed. Note that the
                              least significant bit of the first MAC address will always be unset to create a unicast MAC address. If the property is NULL, it
                              is eligible to be overwritten by a default connection setting. If the value is still NULL or an empty string, the default is to
                              create a locally-administered, unicast MAC address. If the value contains one MAC address, this address is used as mask. The set
                              bits of the mask are to be filled with the current MAC address of the device, while the unset bits are subject to randomization.
                              Setting "FE:FF:FF:00:00:00" means to preserve the OUI of the current MAC address and only randomize the lower 3 bytes using the
-                             "random" or "stable" algorithm. If the value contains one additional MAC address after the mask, this address is used instead of
+                             C(random) or C(stable) algorithm. If the value contains one additional MAC address after the mask, this address is used instead of
                              the current MAC address to fill the bits that shall not be randomized. For example, a value of
                              "FE:FF:FF:00:00:00 68:F7:28:00:00:00" will set the OUI of the MAC address to 68:F7:28, while the lower bits are randomized. A
                              value of "02:00:00:00:00:00 00:00:00:00:00:00" will create a fully scrambled globally-administered, burned-in MAC address. If the
@@ -529,9 +532,10 @@ options:
                 type: list
                 elements: str
             mac-address-randomization:
-                description: One of NM_SETTING_MAC_RANDOMIZATION_DEFAULT (0) (never randomize unless the user has set a global default to randomize and the
-                             supplicant supports randomization), NM_SETTING_MAC_RANDOMIZATION_NEVER (1) (never randomize the MAC address), or
-                             NM_SETTING_MAC_RANDOMIZATION_ALWAYS (2) (always randomize the MAC address). This property is deprecated for 'cloned-mac-address'.
+                description: One of C(NM_SETTING_MAC_RANDOMIZATION_DEFAULT) (0) (never randomize unless the user has set a global default to randomize and the
+                             supplicant supports randomization), C(NM_SETTING_MAC_RANDOMIZATION_NEVER) (1) (never randomize the MAC address), or
+                             C(NM_SETTING_MAC_RANDOMIZATION_ALWAYS) (2) (always randomize the MAC address). This property is deprecated for
+                             C(cloned-mac-address).
                 type: int
                 default: 0
                 choices: [ 0, 1, 2 ]
@@ -540,7 +544,7 @@ options:
                              change the MAC address of the device (i.e. MAC spoofing).
                 type: str
             mode:
-                description: Wi-Fi network mode; one of "infrastructure", "mesh", "adhoc" or "ap". If blank, infrastructure is assumed.
+                description: Wi-Fi network mode; one of C(infrastructure), C(mesh), C(adhoc) or C(ap). If blank, infrastructure is assumed.
                 type: str
                 choices: [ infrastructure, mesh, adhoc, ap ]
                 default: infrastructure
@@ -549,15 +553,15 @@ options:
                 type: int
                 default: 0
             powersave:
-                description: One of NM_SETTING_WIRELESS_POWERSAVE_DISABLE (2) (disable Wi-Fi power saving), NM_SETTING_WIRELESS_POWERSAVE_ENABLE (3) (enable
-                             Wi-Fi power saving), NM_SETTING_WIRELESS_POWERSAVE_IGNORE (1) (don't touch currently configure setting) or
-                             NM_SETTING_WIRELESS_POWERSAVE_DEFAULT (0) (use the globally configured value). All other values are reserved.
+                description: One of C(NM_SETTING_WIRELESS_POWERSAVE_DISABLE) (2) (disable Wi-Fi power saving), C(NM_SETTING_WIRELESS_POWERSAVE_ENABLE) (3)
+                             (enable Wi-Fi power saving), C(NM_SETTING_WIRELESS_POWERSAVE_IGNORE) (1) (don't touch currently configure setting) or
+                             C(NM_SETTING_WIRELESS_POWERSAVE_DEFAULT) (0) (use the globally configured value). All other values are reserved.
                 type: int
                 default: 0
                 choices: [ 0, 1, 2, 3 ]
             rate:
                 description: If non-zero, directs the device to only use the specified bitrate for communication with the access point. Units are in Kb/s, ie
-                             5500 = 5.5 Mbit/s. This property is highly driver dependent and not all devices support setting a static bitrate.
+                             C(5500) = 5.5 Mbit/s. This property is highly driver dependent and not all devices support setting a static bitrate.
                 type: int
                 default: 0
             seen-bssids:
@@ -573,20 +577,19 @@ options:
                 default: 0
             wake-on-wlan:
                 description: The NMSettingWirelessWakeOnWLan options to enable. Not all devices support all options. May be any combination of
-                             NM_SETTING_WIRELESS_WAKE_ON_WLAN_ANY (0x2), NM_SETTING_WIRELESS_WAKE_ON_WLAN_DISCONNECT (0x4),
-                             NM_SETTING_WIRELESS_WAKE_ON_WLAN_MAGIC (0x8), NM_SETTING_WIRELESS_WAKE_ON_WLAN_GTK_REKEY_FAILURE (0x10),
-                             NM_SETTING_WIRELESS_WAKE_ON_WLAN_EAP_IDENTITY_REQUEST (0x20), NM_SETTING_WIRELESS_WAKE_ON_WLAN_4WAY_HANDSHAKE (0x40),
-                             NM_SETTING_WIRELESS_WAKE_ON_WLAN_RFKILL_RELEASE (0x80), NM_SETTING_WIRELESS_WAKE_ON_WLAN_TCP (0x100) or the special values
-                             NM_SETTING_WIRELESS_WAKE_ON_WLAN_DEFAULT (0x1) (to use global settings) and NM_SETTING_WIRELESS_WAKE_ON_WLAN_IGNORE (0x8000) (to
-                             disable management of Wake-on-LAN in NetworkManager).
+                             C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_ANY) (0x2), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_DISCONNECT) (0x4),
+                             C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_MAGIC) (0x8), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_GTK_REKEY_FAILURE) (0x10),
+                             C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_EAP_IDENTITY_REQUEST) (0x20), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_4WAY_HANDSHAKE) (0x40),
+                             C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_RFKILL_RELEASE) (0x80), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_TCP) (0x100) or the special values
+                             C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_DEFAULT) (0x1) (to use global settings) and C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_IGNORE) (0x8000)
+                             (to disable management of Wake-on-LAN in NetworkManager).
                 type: int
                 default: 1
        version_added: 3.5.0
     ignore_unsupported_suboptions:
        description:
-            - Ignore suboptions which are invalid or unsupported by the version of NetworkManager/nmcli
-              installed on the host.
-            - Only 'wifi' and 'wifi_sec' options are currently affected.
+            - Ignore suboptions which are invalid or unsupported by the version of NetworkManager/nmcli installed on the host.
+            - Only I(wifi) and I(wifi_sec) options are currently affected.
        type: bool
        default: no
        version_added: 3.6.0
