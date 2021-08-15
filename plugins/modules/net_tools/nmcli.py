@@ -583,6 +583,7 @@ options:
                              C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_RFKILL_RELEASE) (0x80), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_TCP) (0x100) or the special values
                              C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_DEFAULT) (0x1) (to use global settings) and C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_IGNORE) (0x8000)
                              (to disable management of Wake-on-LAN in NetworkManager).
+                             Note the sum of all option values must be specified in order to combine multiple options.
                 type: int
                 default: 1
        version_added: 3.5.0
