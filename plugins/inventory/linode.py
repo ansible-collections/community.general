@@ -78,6 +78,10 @@ groups:
   webservers: "'web' in (tags|list)"
   mailservers: "'mail' in (tags|list)"
 compose:
+  # By default, Ansible tries to connect to the label of the instance.
+  # Since that might not be a valid name to connect to, you can
+  # replace it with the first IPv4 address of the linode as follows:
+  ansible_ssh_host: ipv4[0]
   ansible_port: 2222
 '''
 
