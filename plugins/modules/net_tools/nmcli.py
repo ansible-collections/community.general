@@ -589,7 +589,7 @@ options:
             - Only 'wifi' and 'wifi_sec' options are currently affected.
        type: bool
        default: no
-       version_added: 3.5.0
+       version_added: 3.6.0
 '''
 
 EXAMPLES = r'''
