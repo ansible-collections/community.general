@@ -89,7 +89,7 @@ def test_populate(inventory, mocker):
     print(type(group1_data.hosts))
     group2_data = inventory.inventory.groups['servers_hp']
     print(group2_data.hosts)
-    print(type(group2_data.hosts)
+    print(type(group2_data.hosts))
     if "test-host1.home.local" in group2_data.hosts:
         passing = False
     if "test-host1.home.local" not in group1_data.hosts:
