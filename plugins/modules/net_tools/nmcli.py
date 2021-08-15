@@ -357,8 +357,7 @@ options:
                 default: 0
             group:
                 description: A list of group/broadcast encryption algorithms which prevents connections to Wi-Fi networks that do not utilize one of the
-                             algorithms in the list. For maximum compatibility leave this property empty. Each list element may be one of C(wep40), C(wep104),
-                             C(tkip), or C(ccmp).
+                             algorithms in the list. For maximum compatibility leave this property empty.
                 type: list
                 elements: str
                 choices: [ wep40, wep104, tkip, ccmp ]
@@ -381,7 +380,7 @@ options:
                 type: str
             pairwise:
                 description: A list of pairwise encryption algorithms which prevents connections to Wi-Fi networks that do not utilize one of the algorithms in
-                             the list. For maximum compatibility leave this property empty. Each list element may be one of C(tkip) or C(ccmp).
+                             the list. For maximum compatibility leave this property empty.
                 type: list
                 elements: str
                 choices: [ tkip, ccmp ]
@@ -508,13 +507,13 @@ options:
                              is eligible to be overwritten by a default connection setting. If the value is still NULL or an empty string, the default is to
                              create a locally-administered, unicast MAC address. If the value contains one MAC address, this address is used as mask. The set
                              bits of the mask are to be filled with the current MAC address of the device, while the unset bits are subject to randomization.
-                             Setting "FE:FF:FF:00:00:00" means to preserve the OUI of the current MAC address and only randomize the lower 3 bytes using the
+                             Setting C(FE:FF:FF:00:00:00) means to preserve the OUI of the current MAC address and only randomize the lower 3 bytes using the
                              C(random) or C(stable) algorithm. If the value contains one additional MAC address after the mask, this address is used instead of
                              the current MAC address to fill the bits that shall not be randomized. For example, a value of
-                             "FE:FF:FF:00:00:00 68:F7:28:00:00:00" will set the OUI of the MAC address to 68:F7:28, while the lower bits are randomized. A
-                             value of "02:00:00:00:00:00 00:00:00:00:00:00" will create a fully scrambled globally-administered, burned-in MAC address. If the
+                             C(FE:FF:FF:00:00:00 68:F7:28:00:00:00) will set the OUI of the MAC address to 68:F7:28, while the lower bits are randomized. A
+                             value of C(02:00:00:00:00:00 00:00:00:00:00:00) will create a fully scrambled globally-administered, burned-in MAC address. If the
                              value contains more than one additional MAC addresses, one of them is chosen randomly. For example,
-                             "02:00:00:00:00:00 00:00:00:00:00:00 02:00:00:00:00:00" will create a fully scrambled MAC address, randomly locally or globally
+                             C(02:00:00:00:00:00 00:00:00:00:00:00 02:00:00:00:00:00) will create a fully scrambled MAC address, randomly locally or globally
                              administered.
                 type: str
             hidden:
@@ -528,7 +527,7 @@ options:
                 default: false
             mac-address-blacklist:
                 description: A list of permanent MAC addresses of Wi-Fi devices to which this connection should never apply. Each MAC address should be given
-                             in the standard hex-digits-and-colons notation (eg "00:11:22:33:44:55").
+                             in the standard hex-digits-and-colons notation (eg C(00:11:22:33:44:55)).
                 type: list
                 elements: str
             mac-address-randomization:
@@ -544,7 +543,7 @@ options:
                              change the MAC address of the device (i.e. MAC spoofing).
                 type: str
             mode:
-                description: Wi-Fi network mode; one of C(infrastructure), C(mesh), C(adhoc) or C(ap). If blank, infrastructure is assumed.
+                description: Wi-Fi network mode. If blank, C(infrastructure) is assumed.
                 type: str
                 choices: [ infrastructure, mesh, adhoc, ap ]
                 default: infrastructure
@@ -565,7 +564,7 @@ options:
                 type: int
                 default: 0
             seen-bssids:
-                description: A list of BSSIDs (each BSSID formatted as a MAC address like "00:11:22:33:44:55") that have been detected as part of the Wi-Fi
+                description: A list of BSSIDs (each BSSID formatted as a MAC address like C(00:11:22:33:44:55)) that have been detected as part of the Wi-Fi
                              network. NetworkManager internally tracks previously seen BSSIDs. The property is only meant for reading and reflects the BSSID
                              list of NetworkManager. The changes you make to this property will not be preserved.
                 type: list
