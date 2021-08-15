@@ -132,8 +132,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 "API Response - %s - %s"
                 % (json_data['status'], json_data['errors']))
         raise AnsibleParserError(
-                "Unexpected data returned - %s - %s"
-                % (json_data['status'], json_data['errors']))
+            "Unexpected data returned - %s - %s"
+            % (json_data['status'], json_data['errors']))
 
     def _query_hosts(self, hosts=None, attrs=None, joins=None, host_filter=None):
         query_hosts_url = "{1}/objects/hosts".format(self.icinga2_url)
@@ -215,7 +215,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             # self.use_cache = cache and self.get_option('cache')
         except Exception as error:
             raise AnsibleParserError(
-                    'All correct options required: {1}'.format(error))
+                'All correct options required: {1}'.format(error))
         # Test connection to API
         self._api_connect()
 
