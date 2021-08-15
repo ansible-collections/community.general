@@ -93,7 +93,7 @@ plugin: community.general.linode
 access_token: foobar
 ip_style: api
 compose:
-  ansible_host: "ipv4 | json_query('[?public==`false`].address') | first"
+  ansible_host: "ipv4 | community.general.json_query('[?public==`false`].address') | first"
 '''
 
 import os
