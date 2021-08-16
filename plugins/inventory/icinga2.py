@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Guido Günther <agx@sigxcpu.org>, Daniel Lobato Garcia <dlobatog@redhat.com>
-# Copyright (c) 2018 Ansible Project
+# Copyright (c) 2021 Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import (absolute_import, division, print_function)
 
@@ -23,7 +22,7 @@ DOCUMENTATION = '''
         type: string
         choices: ['community.general.icinga2']
       url:
-        description: Root URL of Icinga2 API
+        description: Root URL of Icinga2 API.
         type: string
         required: true
       user:
@@ -34,8 +33,12 @@ DOCUMENTATION = '''
         description: API password
         type: string
         required: true
+      host_filter:
+        description: An Icinga2 API valid host filter
+        type: string
+        required: false
       validate_certs:
-        description: Enable SSL certificate verification
+        description: SSL certificate verification setting.
         type: boolean
         default: true
 '''
@@ -45,6 +48,7 @@ plugin: community.general.icinga2
 url: http://localhost:5665
 user: ansible
 password: secure
+host_filter: \"linux-servers\" in host.groups
 validate_certs: false
 '''
 
@@ -69,19 +73,18 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.icinga2_user = None
         self.icinga2_password = None
         self.ssl_verify = None
+        self.host_filter = None
 
         self.cache_key = None
         self.use_cache = None
 
     def verify_file(self, path):
-
         valid = False
         if super(InventoryModule, self).verify_file(path):
             if path.endswith(('icinga2.yaml', 'icinga2.yml')):
                 valid = True
             else:
-                self.display.vvv('Skipping due to inventory source \
-                        not ending in "icinga2.yaml" nor "icinga2.yml"')
+                self.display.vvv('Skipping due to inventory source not ending in "icinga2.yaml" nor "icinga2.yml"')
         return valid
 
     def _api_connect(self):
@@ -102,17 +105,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.display.vvv("Requested URL: %s" % request_url)
         request_args = {
             'headers': self.headers,
-            'auth': (self.icinga2_user, self.icinga2_password),
-            'verify': self.ssl_verify
-        }
-        request_args = {
-            'headers': self.headers,
             'url_username': self.icinga2_user,
             'url_password': self.icinga2_password,
             'validate_certs': self.ssl_verify
         }
         if data is not None:
             request_args['data'] = json.dumps(data)
+            # request_args['data'] = data
         self.display.vvv("Request Args: %s" % request_args)
         response = open_url(request_url, **request_args)
         response_body = response.read()
@@ -136,22 +135,20 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             % (json_data['status'], json_data['errors']))
 
     def _query_hosts(self, hosts=None, attrs=None, joins=None, host_filter=None):
-        query_hosts_url = "{1}/objects/hosts".format(self.icinga2_url)
+        query_hosts_url = "{0}/objects/hosts".format(self.icinga2_url)
         self.headers['X-HTTP-Method-Override'] = 'GET'
         data_dict = dict()
         if hosts:
-            if len(hosts) == 1:
-                query_hosts_url += "/%s" % hosts[0]
-            elif len(hosts) > 1:
-                data_dict['hosts'] = hosts
+            data_dict['hosts'] = hosts
         if attrs is not None:
             data_dict['attrs'] = attrs
         if joins is not None:
             data_dict['joins'] = joins
         if host_filter is not None:
-            data_dict['filter'] = host_filter
+            data_dict['filter'] = host_filter.replace("\\\"","\"")
+            self.display.vvv(host_filter)
         host_dict = self._post_request(query_hosts_url, data_dict)
-        return host_dict
+        return host_dict['results']
 
     def get_inventory_from_icinga(self):
         """Query for all hosts """
@@ -159,8 +156,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         query_args = {
             "attrs": ["address", "state_type", "state", "groups"],
         }
+        if self.host_filter is not None:
+            query_args['host_filter'] = self.host_filter
         # Icinga2 API Call
-        results_json = self._query_hosts(**query_args)['results']
+        results_json = self._query_hosts(**query_args)
+        # Manipulate returned API data to Ansible inventory spec
         ansible_inv = self._convert_inv(results_json)
         return ansible_inv
 
@@ -203,19 +203,17 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         # read config from file, this sets 'options'
         self._read_config_data(path)
-        try:
-            # Store the options from the YAML file
-            self.icinga2_url = self.get_option('url').rstrip('/') + '/v1'
-            self.icinga2_user = self.get_option('user')
-            self.icinga2_password = self.get_option('password')
-            self.ssl_verify = self.get_option('validate_certs')
-            # Not currently enabled
-            # self.host_filter = self.get_option('host_filter')
-            # self.cache_key = self.get_cache_key(path)
-            # self.use_cache = cache and self.get_option('cache')
-        except Exception as error:
-            raise AnsibleParserError(
-                'All correct options required: {1}'.format(error))
+
+        # Store the options from the YAML file
+        self.icinga2_url = self.get_option('url').rstrip('/') + '/v1'
+        self.icinga2_user = self.get_option('user')
+        self.icinga2_password = self.get_option('password')
+        self.ssl_verify = self.get_option('validate_certs')
+        self.host_filter = self.get_option('host_filter')
+        # Not currently enabled
+        # self.cache_key = self.get_cache_key(path)
+        # self.use_cache = cache and self.get_option('cache')
+
         # Test connection to API
         self._api_connect()
 
