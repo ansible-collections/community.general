@@ -67,5 +67,3 @@ class ModuleHelperBase(object):
     @classmethod
     def execute(cls, module=None):
         cls(module).run()
-
-    make_it_so = execute
