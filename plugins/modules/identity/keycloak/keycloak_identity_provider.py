@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2021, Laurent Paumier <laurent.paumier@fnac.net>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -241,44 +240,43 @@ author:
 
 EXAMPLES = '''
 - name: Create OIDC identity provider, authentication with credentials
-    community.general.keycloak_identity_provider:
-      state: present
-      auth_keycloak_url: https://auth.example.com/auth
-      auth_realm: master
-      auth_username: admin
-      auth_password: admin
-      realm: myrealm
-      alias: oidc-idp
-      display_name: OpenID Connect IdP
-      enabled: true
-      provider_id: oidc
-      config:
-        issuer: https://idp.example.com
-        authorizationUrl: https://idp.example.com/auth
-        tokenUrl: https://idp.example.com/token
-        userInfoUrl: https://idp.example.com/userinfo
-        clientAuthMethod: client_secret_post
-        clientId: my-client
-        clientSecret: secret
+  community.general.keycloak_identity_provider:
+    state: present
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    auth_username: admin
+    auth_password: admin
+    realm: myrealm
+    alias: oidc-idp
+    display_name: OpenID Connect IdP
+    enabled: true
+    provider_id: oidc
+    config:
+      issuer: https://idp.example.com
+      authorizationUrl: https://idp.example.com/auth
+      tokenUrl: https://idp.example.com/token
+      userInfoUrl: https://idp.example.com/userinfo
+      clientAuthMethod: client_secret_post
+      clientId: my-client
+      clientSecret: secret
 
 - name: Create SAML identity provider, authentication with credentials
-    community.general.keycloak_identity_provider:
-      state: present
-      auth_keycloak_url: https://auth.example.com/auth
-      auth_realm: master
-      auth_username: admin
-      auth_password: admin
-      realm: myrealm
-      alias: saml-idp
-      display_name: SAML IdP
-      enabled: true
-      provider_id: saml
-      config:
-        entityId: https://auth.example.com/auth/realms/myrealm
-        singleSignOnServiceUrl: https://idp.example.com/login
-        wantAuthnRequestsSigned: true
-        wantAssertionsSigned: true
-
+  community.general.keycloak_identity_provider:
+    state: present
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    auth_username: admin
+    auth_password: admin
+    realm: myrealm
+    alias: saml-idp
+    display_name: SAML IdP
+    enabled: true
+    provider_id: saml
+    config:
+      entityId: https://auth.example.com/auth/realms/myrealm
+      singleSignOnServiceUrl: https://idp.example.com/login
+      wantAuthnRequestsSigned: true
+      wantAssertionsSigned: true
 '''
 
 RETURN = '''
@@ -378,6 +376,7 @@ def sanitize(idp):
         result['clientSecret'] = 'no_log'
     return result
 
+
 def get_identity_provider_with_mappers(kc, alias, realm):
     idp = kc.get_identity_provider(alias, realm)
     if idp is not None:
@@ -446,8 +445,8 @@ def main():
 
     # convert module parameters to client representation parameters (if they belong in there)
     idp_params = [x for x in module.params
-                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
-                   module.params.get(x) is not None]
+                  if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
+                  module.params.get(x) is not None]
 
     # does the identity provider already exist?
     before_idp = get_identity_provider_with_mappers(kc, alias, realm)
@@ -531,7 +530,7 @@ def main():
             # do the update
             updated_idp = updated_idp.copy()
             updated_mappers = updated_idp.pop('mappers', [])
-            old_mappers = kc.get_identity_provider_mappers(alias, realm)
+            old_mappers = before_idp['mappers'].copy()
             kc.update_identity_provider(updated_idp, realm)
             # create or update mappers
             for tmp_mapper in updated_mappers:
