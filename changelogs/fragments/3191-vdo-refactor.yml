@@ -1,0 +1,4 @@
+minor_changes:
+  - vdo - minor refactoring of the code (https://github.com/ansible-collections/community.general/pull/3191).
+bugfixes:
+  - vdo - boolean arguments now compared with proper ``true`` and ``false`` values instead of string representations like ``"yes"`` or ``"no"`` (https://github.com/ansible-collections/community.general/pull/3191).
