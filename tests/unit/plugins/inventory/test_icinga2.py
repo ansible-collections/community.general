@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2020, Jeffrey van Pelt <jeff@vanpelt.one>
+# Copyright (c) 2021, Cliff Hults <cliff.hlts@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 #
 # The API responses used in these tests were recorded from PVE version 6.2.
@@ -31,7 +31,7 @@ def check_api():
 # NOTE: when updating/adding replies to this function,
 # be sure to only add only the _contents_ of the 'data' dict in the API reply
 def query_hosts(hosts=None, attrs=None, joins=None, host_filter=None):
-    # _get_hosts
+    # _get_hosts - list of dicts
     json_host_data = [
         {
             'attrs': {
