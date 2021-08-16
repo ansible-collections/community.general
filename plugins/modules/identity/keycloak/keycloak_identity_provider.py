@@ -63,7 +63,7 @@ options:
 
     store_token:
         description:
-            - Enable/disable if tokens must be stored after authenticating users.
+            - Enable/disable whether tokens must be stored after authenticating users.
         aliases:
             - storeToken
         type: bool
