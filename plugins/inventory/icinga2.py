@@ -145,7 +145,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if joins is not None:
             data_dict['joins'] = joins
         if host_filter is not None:
-            data_dict['filter'] = host_filter.replace("\\\"","\"")
+            data_dict['filter'] = host_filter.replace("\\\"", "\"")
             self.display.vvv(host_filter)
         host_dict = self._post_request(query_hosts_url, data_dict)
         return host_dict['results']
