@@ -248,7 +248,7 @@ class CPANMinus(CmdMixin, ModuleHelper):
 
 
 def main():
-    CPANMinus.make_it_so()
+    CPANMinus.execute()
 
 
 if __name__ == '__main__':
