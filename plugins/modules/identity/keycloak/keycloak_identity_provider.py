@@ -37,7 +37,7 @@ options:
 
     realm:
         description:
-            - The Keycloak realm under which the identity provider resides.
+            - The Keycloak realm under which this identity provider resides.
         default: 'master'
         type: str
 
@@ -51,6 +51,8 @@ options:
     display_name:
         description:
             - Friendly name for identity provider.
+        aliases:
+            - displayName
         type: str
 
     enabled:
@@ -87,20 +89,6 @@ options:
             - linkOnly
         type: bool
 
-    hide_on_login_page:
-        description:
-            - If hidden, login with this provider is possible only if requested explicitly, for example using the 'kc_idp_hint' parameter.
-        aliases:
-            - hideOnLoginPage
-        type: bool
-
-    gui_order:
-        description:
-            - Number defining order of the provider in GUI (for example, on Login page).
-        aliases:
-            - guiOrder
-        type: int
-
     first_broker_login_flow_alias:
         description:
             - Alias of authentication flow, which is triggered after first login with this identity provider.
@@ -115,12 +103,20 @@ options:
             - postBrokerLoginFlowAlias
         type: str
 
-    sync_mode:
+    update_profile_first_login_mode:
         description:
-            - Default sync mode for all mappers. The sync mode determines when user data will be synced using the mappers.
+            - Force users to update their profile right after the authentication finishes and before the account
+              is actually created in Keycloak.
         aliases:
-            - syncMode
+            - updateProfileFirstLoginMode
         type: str
+
+    authenticate_by_default:
+        description:
+            - Specifies if particular provider should be used by default for authentication even before displaying login screen.
+        aliases:
+            - authenticateByDefault
+        type: bool
 
     provider_id:
         description:
@@ -136,6 +132,27 @@ options:
               identity provider configuration through check-mode in the I(existing) field.
         type: dict
         suboptions:
+            hide_on_login_page:
+                description:
+                    - If hidden, login with this provider is possible only if requested explicitly, for example using the 'kc_idp_hint' parameter.
+                aliases:
+                    - hideOnLoginPage
+                type: bool
+
+            gui_order:
+                description:
+                    - Number defining order of the provider in GUI (for example, on Login page).
+                aliases:
+                    - guiOrder
+                type: int
+
+            sync_mode:
+                description:
+                    - Default sync mode for all mappers. The sync mode determines when user data will be synced using the mappers.
+                aliases:
+                    - syncMode
+                type: str
+
             issuer:
                 description:
                     - The issuer identifier for the issuer of the response. If not provided, no validation will be performed.
@@ -226,10 +243,36 @@ options:
                     - Way to identify and track external users from the assertion.
                 type: str
 
-            syncMode:
+    mappers:
+        description:
+            - A list of dicts defining mappers associated with this Identity Provider.
+        type: list
+        elements: dict
+        suboptions:
+            id:
                 description:
-                    - Default sync mode for all mappers. The sync mode determines when user data will be synced using the mappers.
+                    - Unique ID of this mapper.
                 type: str
+
+            name:
+                description:
+                    - Name of the mapper.
+                type: str
+
+            identityProviderAlias:
+                description:
+                    - Alias of the identity provider for this mapper.
+                type: str
+
+            identityProviderMapper:
+                description:
+                    - Type of mapper.
+                type: str
+
+            config:
+                description:
+                    - Dict specifying the configuration options for the mapper; the contents differ depending on the value of I(identityProviderMapper).
+                type: dict
 
 extends_documentation_fragment:
 - community.general.keycloak
@@ -412,13 +455,12 @@ def main():
         display_name=dict(type='str', aliases=['displayName']),
         enabled=dict(type='bool'),
         first_broker_login_flow_alias=dict(type='str', aliases=['firstBrokerLoginFlowAlias']),
-        internal_id=dict(type='str', aliases=['internalId']),
         link_only=dict(type='bool', aliases=['linkOnly']),
         post_broker_login_flow_alias=dict(type='str', aliases=['postBrokerLoginFlowAlias']),
         provider_id=dict(type='str', aliases=['providerId']),
         store_token=dict(type='bool', aliases=['storeToken']),
         trust_email=dict(type='bool', aliases=['trustEmail']),
-        update_profile_first_login_mode=dict(type='str', aliases=['accessCodeLifespan']),
+        update_profile_first_login_mode=dict(type='str', aliases=['updateProfileFirstLoginMode']),
         mappers=dict(type='list', elements='dict', options=mapper_spec),
     )
 
@@ -530,12 +572,13 @@ def main():
             # do the update
             updated_idp = updated_idp.copy()
             updated_mappers = updated_idp.pop('mappers', [])
-            old_mappers = before_idp['mappers'].copy()
+            old_mappers = before_idp['mappers']
             kc.update_identity_provider(updated_idp, realm)
             # create or update mappers
             for tmp_mapper in updated_mappers:
                 old_mapper = next((m for m in old_mappers if m['name'] == tmp_mapper['name']), None)
                 if old_mapper is not None:
+                    old_mapper = old_mapper.copy()
                     old_mapper.update(tmp_mapper)
                     kc.update_identity_provider_mapper(old_mapper, alias, realm)
                 else:

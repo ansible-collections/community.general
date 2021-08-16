@@ -20,8 +20,8 @@ from ansible.module_utils.six import StringIO
 
 
 @contextmanager
-def patch_keycloak_api(get_identity_provider, create_identity_provider=None, update_identity_provider=None, delete_identity_provider=None, \
-                       get_identity_provider_mappers=None, create_identity_provider_mapper=None, update_identity_provider_mapper=None, \
+def patch_keycloak_api(get_identity_provider, create_identity_provider=None, update_identity_provider=None, delete_identity_provider=None,
+                       get_identity_provider_mappers=None, create_identity_provider_mapper=None, update_identity_provider_mapper=None,
                        delete_identity_provider_mapper=None):
     """Mock context manager for patching the methods in PwPolicyIPAClient that contact the IPA server
 
@@ -150,7 +150,7 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 }
             }]
         }
-        return_value_idp = [
+        return_value_idp_get = [
             None,
             {
                 "addReadTokenRoleOnCreate": False,
@@ -177,7 +177,7 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 "updateProfileFirstLoginMode": "on",
             }
         ]
-        return_value_mappers = [
+        return_value_mappers_get = [
             [{
                 "config": {
                     "claim": "first_name",
@@ -188,8 +188,7 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 "identityProviderAlias": "oidc-idp",
                 "identityProviderMapper": "oidc-user-attribute-idp-mapper",
                 "name": "first_name"
-            },
-            {
+            }, {
                 "config": {
                     "claim": "last_name",
                     "syncMode": "INHERIT",
@@ -201,7 +200,8 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 "name": "last_name"
             }]
         ]
-        return_value_created = [None, None, None]
+        return_value_idp_created = [None]
+        return_value_mapper_created = [None, None]
         changed = True
 
         set_module_args(module_args)
@@ -209,10 +209,10 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
         # Run the module
 
         with mock_good_connection():
-            with patch_keycloak_api(get_identity_provider=return_value_idp, get_identity_provider_mappers=return_value_mappers, \
-                create_identity_provider=return_value_created, create_identity_provider_mapper=return_value_created) \
-                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider, \
-                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper, \
+            with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
+                                    create_identity_provider=return_value_idp_created, create_identity_provider_mapper=return_value_mapper_created) \
+                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
+                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
                         mock_delete_identity_provider_mapper):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
@@ -226,7 +226,7 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
 
     def test_create_when_present(self):
-        """Update identity provider with change"""
+        """Update existing identity provider"""
 
         module_args = {
             'auth_keycloak_url': 'http://keycloak.url/auth',
@@ -270,7 +270,7 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 }
             }]
         }
-        return_value_idp = [
+        return_value_idp_get = [
             {
                 "addReadTokenRoleOnCreate": False,
                 "alias": "oidc-idp",
@@ -285,7 +285,7 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                     "tokenUrl": "https://idp.example.com/token",
                     "userInfoUrl": "https://idp.example.com/userinfo"
                 },
-                "displayName": "OpenID Connect IdP",
+                "displayName": "OpenID Connect IdP changeme",
                 "enabled": True,
                 "firstBrokerLoginFlowAlias": "first broker login",
                 "internalId": "7ab437d5-f2bb-4ecc-91a8-315349454da6",
@@ -320,8 +320,18 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 "updateProfileFirstLoginMode": "on",
             }
         ]
-        return_value_mappers = [
-            [],
+        return_value_mappers_get = [
+            [{
+                "config": {
+                    "claim": "first_name_changeme",
+                    "syncMode": "INHERIT",
+                    "user.attribute": "first_name_changeme"
+                },
+                "id": "5fde49bb-93bd-4f5d-97d6-c5d0c1d07aef",
+                "identityProviderAlias": "oidc-idp",
+                "identityProviderMapper": "oidc-user-attribute-idp-mapper",
+                "name": "first_name"
+            }],
             [{
                 "config": {
                     "claim": "first_name",
@@ -332,8 +342,7 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 "identityProviderAlias": "oidc-idp",
                 "identityProviderMapper": "oidc-user-attribute-idp-mapper",
                 "name": "first_name"
-            },
-            {
+            }, {
                 "config": {
                     "claim": "last_name",
                     "syncMode": "INHERIT",
@@ -345,7 +354,9 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 "name": "last_name"
             }]
         ]
-        return_value_created = [None, None, None]
+        return_value_idp_updated = [None]
+        return_value_mapper_updated = [None]
+        return_value_mapper_created = [None]
         changed = True
 
         set_module_args(module_args)
@@ -353,10 +364,11 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
         # Run the module
 
         with mock_good_connection():
-            with patch_keycloak_api(get_identity_provider=return_value_idp, get_identity_provider_mappers=return_value_mappers, \
-                update_identity_provider=return_value_created, create_identity_provider_mapper=return_value_created) \
-                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider, \
-                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper, \
+            with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
+                                    update_identity_provider=return_value_idp_updated, update_identity_provider_mapper=return_value_mapper_updated,
+                                    create_identity_provider_mapper=return_value_mapper_created) \
+                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
+                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
                         mock_delete_identity_provider_mapper):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
@@ -364,7 +376,43 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
         self.assertEqual(len(mock_get_identity_provider.mock_calls), 2)
         self.assertEqual(len(mock_get_identity_provider_mappers.mock_calls), 2)
         self.assertEqual(len(mock_update_identity_provider.mock_calls), 1)
-        self.assertEqual(len(mock_create_identity_provider_mapper.mock_calls), 2)
+        self.assertEqual(len(mock_update_identity_provider_mapper.mock_calls), 1)
+        self.assertEqual(len(mock_create_identity_provider_mapper.mock_calls), 1)
+
+        # Verify that the module's changed status matches what is expected
+        self.assertIs(exec_info.exception.args[0]['changed'], changed)
+
+    def test_delete_when_absent(self):
+        """Remove an absent identity provider"""
+
+        module_args = {
+            'auth_keycloak_url': 'http://keycloak.url/auth',
+            'auth_password': 'admin',
+            'auth_realm': 'master',
+            'auth_username': 'admin',
+            'auth_client_id': 'admin-cli',
+            'validate_certs': True,
+            'realm': 'realm-name',
+            'alias': 'oidc-idp',
+            'state': 'absent',
+        }
+        return_value_idp_get = [None]
+        changed = False
+
+        set_module_args(module_args)
+
+        # Run the module
+
+        with mock_good_connection():
+            with patch_keycloak_api(get_identity_provider=return_value_idp_get) \
+                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
+                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
+                        mock_delete_identity_provider_mapper):
+                with self.assertRaises(AnsibleExitJson) as exec_info:
+                    self.module.main()
+
+        self.assertEqual(len(mock_get_identity_provider.mock_calls), 1)
+        self.assertEqual(len(mock_delete_identity_provider.mock_calls), 0)
 
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
@@ -383,7 +431,7 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
             'alias': 'oidc-idp',
             'state': 'absent',
         }
-        return_value_idp = [
+        return_value_idp_get = [
             {
                 "addReadTokenRoleOnCreate": False,
                 "alias": "oidc-idp",
@@ -410,8 +458,7 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
             },
             None
         ]
-        return_value_mappers = [
-            [],
+        return_value_mappers_get = [
             [{
                 "config": {
                     "claim": "email",
@@ -424,7 +471,7 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 "name": "email"
             }]
         ]
-        return_value_deleted = [None]
+        return_value_idp_deleted = [None]
         changed = True
 
         set_module_args(module_args)
@@ -432,10 +479,10 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
         # Run the module
 
         with mock_good_connection():
-            with patch_keycloak_api(get_identity_provider=return_value_idp, get_identity_provider_mappers=return_value_mappers, \
-                delete_identity_provider=return_value_deleted) \
-                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider, \
-                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper, \
+            with patch_keycloak_api(get_identity_provider=return_value_idp_get, get_identity_provider_mappers=return_value_mappers_get,
+                                    delete_identity_provider=return_value_idp_deleted) \
+                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider,
+                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper,
                         mock_delete_identity_provider_mapper):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
@@ -443,41 +490,6 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
         self.assertEqual(len(mock_get_identity_provider.mock_calls), 1)
         self.assertEqual(len(mock_get_identity_provider_mappers.mock_calls), 1)
         self.assertEqual(len(mock_delete_identity_provider.mock_calls), 1)
-
-        # Verify that the module's changed status matches what is expected
-        self.assertIs(exec_info.exception.args[0]['changed'], changed)
-
-    def test_delete_when_absent(self):
-        """Remove an absent identity provider"""
-
-        module_args = {
-            'auth_keycloak_url': 'http://keycloak.url/auth',
-            'auth_password': 'admin',
-            'auth_realm': 'master',
-            'auth_username': 'admin',
-            'auth_client_id': 'admin-cli',
-            'validate_certs': True,
-            'realm': 'realm-name',
-            'alias': 'oidc-idp',
-            'state': 'absent',
-        }
-        return_value_idp = [None]
-        changed = False
-
-        set_module_args(module_args)
-
-        # Run the module
-
-        with mock_good_connection():
-            with patch_keycloak_api(get_identity_provider=return_value_idp) \
-                    as (mock_get_identity_provider, mock_create_identity_provider, mock_update_identity_provider, mock_delete_identity_provider, \
-                        mock_get_identity_provider_mappers, mock_create_identity_provider_mapper, mock_update_identity_provider_mapper, \
-                        mock_delete_identity_provider_mapper):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
-
-        self.assertEqual(len(mock_get_identity_provider.mock_calls), 1)
-        self.assertEqual(len(mock_delete_identity_provider.mock_calls), 0)
 
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
