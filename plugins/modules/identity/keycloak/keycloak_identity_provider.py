@@ -70,7 +70,7 @@ options:
 
     add_read_token_role_on_create:
         description:
-            - Enable/disable if new users can read any stored tokens. This assigns the broker.read-token role.
+            - Enable/disable if new users can read any stored tokens. This assigns the C(broker.read-token) role.
         aliases:
             - addReadTokenRoleOnCreate
         type: bool
