@@ -32,32 +32,32 @@ def check_api():
 # be sure to only add only the _contents_ of the 'data' dict in the API reply
 def query_hosts(hosts=None, attrs=None, joins=None, host_filter=None):
     # _get_hosts
-    json_host_data = {
-        {
-            'attrs': {
-                'address': 'test-host1.home.local',
-                'groups': ['home_servers', 'servers_dell'],
-                'state': 0.0,
-                'state_type': 1.0
+    json_host_data = [
+            {
+                'attrs': {
+                    'address': 'test-host1.home.local',
+                    'groups': ['home_servers', 'servers_dell'],
+                    'state': 0.0,
+                    'state_type': 1.0
+                },
+                'joins': {},
+                'meta': {},
+                'name': 'test-host1',
+                'type': 'Host'
             },
-            'joins': {},
-            'meta': {},
-            'name': 'test-host1',
-            'type': 'Host'
-        },
-        {
-            'attrs': {
-                'address': 'test-host2.home.local',
-                'groups': ['home_servers', 'servers_hp'],
-                'state': 1.0,
-                'state_type': 1.0
-            },
-            'joins': {},
-            'meta': {},
-            'name': 'test-host2',
-            'type': 'Host'
-        }
-    }
+            {
+                'attrs': {
+                    'address': 'test-host2.home.local',
+                    'groups': ['home_servers', 'servers_hp'],
+                    'state': 1.0,
+                    'state_type': 1.0
+                },
+                'joins': {},
+                'meta': {},
+                'name': 'test-host2',
+                'type': 'Host'
+            }
+    ]
     return json_host_data
 
 
