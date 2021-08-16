@@ -70,7 +70,7 @@ options:
 
     add_read_token_role_on_create:
         description:
-            - Enable/disable if new users can read any stored tokens. This assigns the C(broker.read-token) role.
+            - Enable/disable whether new users can read any stored tokens. This assigns the C(broker.read-token) role.
         aliases:
             - addReadTokenRoleOnCreate
         type: bool
@@ -114,14 +114,14 @@ options:
 
     authenticate_by_default:
         description:
-            - Specifies if particular provider should be used by default for authentication even before displaying login screen.
+            - Specifies if this identity provider should be used by default for authentication even before displaying login screen.
         aliases:
             - authenticateByDefault
         type: bool
 
     provider_id:
         description:
-            - Protocol used by this provider (oidc, saml, ...).
+            - Protocol used by this provider (supported values are C(oidc) or C(saml)).
         aliases:
             - providerId
         type: str
@@ -135,7 +135,7 @@ options:
         suboptions:
             hide_on_login_page:
                 description:
-                    - If hidden, login with this provider is possible only if requested explicitly, for example using the 'kc_idp_hint' parameter.
+                    - If hidden, login with this provider is possible only if requested explicitly, for example using the C(kc_idp_hint) parameter.
                 aliases:
                     - hideOnLoginPage
                 type: bool
@@ -176,7 +176,7 @@ options:
 
             userInfoUrl:
                 description:
-                    - The User Info Url.
+                    - The User Info URL.
                 type: str
 
             clientAuthMethod:
@@ -221,12 +221,12 @@ options:
 
             singleSignOnServiceUrl:
                 description:
-                    - The Url that must be used to send authentication requests (SAML AuthnRequest).
+                    - The URL that must be used to send authentication requests (SAML AuthnRequest).
                 type: str
 
             singleLogoutServiceUrl:
                 description:
-                    - The Url that must be used to send logout requests.
+                    - The URL that must be used to send logout requests.
                 type: str
 
             backchannelSupported:
@@ -331,7 +331,7 @@ msg:
   sample: "Identity provider my-idp has been created"
 
 proposed:
-    description: Role representation of proposed changes to role
+    description: Representation of proposed changes to identity provider
     returned: always
     type: dict
     sample: {
@@ -349,7 +349,7 @@ proposed:
     }
 
 existing:
-    description: Role representation of existing role
+    description: Representation of existing identity provider
     returned: always
     type: dict
     sample: {
@@ -378,7 +378,7 @@ existing:
     }
 
 end_state:
-    description: Role representation of role after module execution (sample is truncated)
+    description: Representation of identity provider after module execution
     returned: always
     type: dict
     sample: {
