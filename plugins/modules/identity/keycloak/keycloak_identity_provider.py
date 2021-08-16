@@ -161,7 +161,7 @@ options:
 
             authorizationUrl:
                 description:
-                    - The Authorization Url.
+                    - The Authorization URL.
                 type: str
 
             tokenUrl:
