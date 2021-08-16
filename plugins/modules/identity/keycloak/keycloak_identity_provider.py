@@ -45,7 +45,7 @@ options:
 
     alias:
         description:
-            - The alias uniquely identifies an identity provider and it is also used to build the redirect uri.
+            - The alias uniquely identifies an identity provider and it is also used to build the redirect URI.
             - This parameter is required.
         required: true
         type: str
