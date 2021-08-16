@@ -12,6 +12,8 @@ module: keycloak_identity_provider
 
 short_description: Allows administration of Keycloak identity providers via Keycloak API
 
+version_added: 3.6.0
+
 description:
     - This module allows you to add, remove or modify Keycloak identity providers via the Keycloak REST API.
       It requires access to the REST API via OpenID Connect; the user connecting and the client being
