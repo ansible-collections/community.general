@@ -131,7 +131,7 @@ class Snap(CmdStateModuleHelper):
         argument_spec={
             'name': dict(type='list', elements='str', required=True),
             'state': dict(type='str', default='present',
-                          choices=['absent', 'present', 'enabled', 'disabled', 'alias', 'unalias']),
+                          choices=['absent', 'present', 'enabled', 'disabled']),
             'classic': dict(type='bool', default=False),
             'channel': dict(type='str', default='stable'),
         },
