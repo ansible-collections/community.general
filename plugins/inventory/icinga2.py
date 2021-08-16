@@ -42,7 +42,7 @@ DOCUMENTATION = '''
         type: boolean
         default: true
 '''
-EXAMPLES = '''
+EXAMPLES = r'''
 # my.icinga2.yml
 plugin: community.general.icinga2
 url: http://localhost:5665
