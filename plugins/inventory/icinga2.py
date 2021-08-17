@@ -43,6 +43,7 @@ DOCUMENTATION = '''
         type: boolean
         default: true
 '''
+
 EXAMPLES = r'''
 # my.icinga2.yml
 plugin: community.general.icinga2
