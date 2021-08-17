@@ -272,8 +272,7 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
 
 
 def main():
-    xfconf = XFConfProperty()
-    xfconf.run()
+    XFConfProperty.execute()
 
 
 if __name__ == '__main__':
