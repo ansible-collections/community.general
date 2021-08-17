@@ -242,6 +242,12 @@ options:
             - enabledEventTypes
         type: list
         elements: str
+    events_enabled:
+        description:
+            - The realm events enabled.
+        aliases:
+            - eventsEnabled
+        type: bool
     events_expiration:
         description:
             - The realm events expiration.
@@ -254,7 +260,7 @@ options:
         aliases:
             - eventsListeners
         type: list
-        elements: dict
+        elements: str
     failure_factor:
         description:
             - The realm failure factor.
@@ -626,8 +632,9 @@ def main():
         email_theme=dict(type='str', aliases=['emailTheme']),
         enabled=dict(type='bool'),
         enabled_event_types=dict(type='list', elements='str', aliases=['enabledEventTypes']),
+        events_enabled=dict(type='bool', aliases=['eventsEnabled']),
         events_expiration=dict(type='int', aliases=['eventsExpiration']),
-        events_listeners=dict(type='list', elements='dict', aliases=['eventsListeners']),
+        events_listeners=dict(type='list', elements='str', aliases=['eventsListeners']),
         failure_factor=dict(type='int', aliases=['failureFactor']),
         internationalization_enabled=dict(type='bool', aliases=['internationalizationEnabled']),
         login_theme=dict(type='str', aliases=['loginTheme']),
