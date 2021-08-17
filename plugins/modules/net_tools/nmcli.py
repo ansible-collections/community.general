@@ -963,6 +963,7 @@ class Nmcli(object):
             'ethernet',
             'generic',
             'infiniband',
+            'sit',
             'team',
             'vlan',
             'wifi'
