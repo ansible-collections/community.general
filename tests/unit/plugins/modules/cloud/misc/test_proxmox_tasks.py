@@ -13,6 +13,7 @@ import json
 import pprint
 
 from ansible_collections.community.general.plugins.modules.cloud.misc import proxmox_tasks_info
+from ansible_collections.community.general.plugins.module_utils.proxmox import ProxmoxAnsible
 from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
     AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
@@ -192,19 +193,14 @@ def test_get_tasks(connect_mock, capfd, mocker):
                      'api_user': 'root@pam',
                      'api_password': 'supersecret',
                      'node': NODE})
-    api_mock = fake_api()
-    connect_mock.nodes.tasks.get.return_value = "REEEEEE"
-    pprint.pp("CNCT mock")
-    pprint.pp(connect_mock.nodes.tasks.get())
-    pprint.pp("Connect mock")
-    pprint.pp(connect_mock().nodes().tasks.get())
+
+    connect_mock.nodes.tasks.get.return_value = TASKS
+
     with pytest.raises(SystemExit):
         proxmox_tasks_info.main()
     out, err = capfd.readouterr()
     pprint.pp("[connect_mock] CALLS calls")
     pprint.pp(connect_mock.call_args_list)
-    pprint.pp("[api_mock] CALLS calls")
-    pprint.pp(api_mock.call_args_list)
     pprint.pp(out)
     out = out.split('\n\n')[1]
     # pprint.pp(out)
