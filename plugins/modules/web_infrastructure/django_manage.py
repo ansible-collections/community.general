@@ -158,6 +158,7 @@ EXAMPLES = """
 
 import os
 import sys
+import shlex
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -273,7 +274,8 @@ def main():
         ),
     )
 
-    command = module.params['command']
+    command_split = shlex.split(module.params['command'])
+    command = command_split[0]
     project_path = module.params['project_path']
     virtualenv = module.params['virtualenv']
 
@@ -288,9 +290,9 @@ def main():
 
     _ensure_virtualenv(module)
 
-    cmd = ["./manage.py", command]
+    cmd = ["./manage.py"] + command_split
 
-    if command in noinput_commands:
+    if command in noinput_commands and '--noinput' not in command_split:
         cmd.append("--noinput")
 
     for param in general_params:
