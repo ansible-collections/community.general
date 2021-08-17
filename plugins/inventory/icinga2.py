@@ -27,19 +27,19 @@ DOCUMENTATION = '''
         type: string
         required: true
       user:
-        description: API username
+        description: Username to query the API.
         type: string
         required: true
       password:
-        description: API password
+        description: Password to query the API..
         type: string
         required: true
       host_filter:
-        description: An Icinga2 API valid host filter
+        description: An Icinga2 API valid host filter.
         type: string
         required: false
       validate_certs:
-        description: SSL certificate verification setting.
+        description: Enables or disables SSL certificate verification.
         type: boolean
         default: true
 '''
