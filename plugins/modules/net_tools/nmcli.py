@@ -403,7 +403,7 @@ options:
             proto:
                 description:
                     - List of strings specifying the allowed WPA protocol versions to use.
-                    - Each element may be one C(wpa) (allow WPA) or C(rsn) (allow WPA2/RSN).
+                    - Each element may be C(wpa) (allow WPA) or C(rsn) (allow WPA2/RSN).
                     - If not specified, both WPA and RSN connections are allowed.
                 type: list
                 elements: str
