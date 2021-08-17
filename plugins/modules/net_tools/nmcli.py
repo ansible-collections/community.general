@@ -1456,7 +1456,7 @@ class Nmcli(object):
 
         if setting == '802-11-wireless-security':
             set_property = 'psk'
-            set_value='FAKEVALUE'
+            set_value = 'FAKEVALUE'
             commands = ['set %s.%s %s' % (setting, set_property, set_value)]
         else:
             commands = []
