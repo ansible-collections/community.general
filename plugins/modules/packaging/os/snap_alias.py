@@ -151,7 +151,7 @@ class SnapAlias(CmdStateModuleHelper):
 
 
 def main():
-    SnapAlias().run()
+    SnapAlias.execute()
 
 
 if __name__ == '__main__':
