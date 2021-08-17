@@ -63,3 +63,7 @@ class ModuleHelperBase(object):
         if 'failed' not in output:
             output['failed'] = False
         self.module.exit_json(changed=self.has_changed(), **output)
+
+    @classmethod
+    def execute(cls, module=None):
+        cls(module).run()
