@@ -12,13 +12,13 @@ DOCUMENTATION = r'''
 ---
 module: proxmox_interfaces
 short_description: Management network interfaces on a Proxmox node.
-version_added: 3.5.0
+version_added: 3.6.0
 description:
   - Allows you to create/update/delete network interfaces of a Proxmox node.
-author: "Andreas Botzner (@botzner_andreas) <andreas at botzner dot com>"
+author: "Andreas Botzner (@paginabianca) <andreas at botzner dot com>"
 options:
   config:
-    description: Interface configuration
+    description: Interface configuration.
     required: true
     type: list
     elements: dict
@@ -30,7 +30,7 @@ options:
         required: true
       type:
         description:
-          - Network interface type
+          - Network interface type.
         type: str
         default: bridge
         choices:
@@ -46,11 +46,11 @@ options:
         - unknown
       address:
         description:
-          - IPv4 address of the interface
+          - IPv4 address of the interface.
         type: str
       address6:
         description:
-          - IPv6 address of the interface
+          - IPv6 address of the interface.
         type: str
       autostart:
         description:
@@ -63,7 +63,7 @@ options:
         type: str
       bond_mode:
         description:
-          - Bonding mode
+          - Bonding mode of the interface.
         type: str
         choices:
           - balance-rr
@@ -78,7 +78,7 @@ options:
           - lacp-balance-tcp
       bond_xmit_hash_policy:
         description:
-          - Selects the transmit hash policy to use for slave selection in balance-xor and 802.3ad
+          - Selects the transmit hash policy to use for slave selection in balance-xor and 802.3ad.
         type: str
         choices:
           - layer2
@@ -94,19 +94,15 @@ options:
         type: bool
       cidr:
         description:
-          - IPv4 CIDR
+          - IPv4 CIDR of the interface.
         type: str
       cidr6:
         description:
-          - IPv6 CIDR
+          - IPv6 CIDR of the interface.
         type: str
       comments:
         description:
-          - Comments
-        type: str
-      comments6:
-        description:
-          - Comments
+          - Comments added to the int
         type: str
       gateway:
         description:
@@ -118,12 +114,12 @@ options:
         type: str
       mtu:
         description:
-          - MTU,
+          - The MTU.
           - Value should be C(1280 ≤ n ≤ 65520).
         type: int
       netmask:
         description:
-          - Network mask
+          - The network mask.
         type: str
       netmask6:
         description:
@@ -177,7 +173,7 @@ options:
     required: true
   state:
     description:
-      - The state of the configuration after module completion
+      - The state of the configuration after module completion.
     type: str
     default: present
     choices:
@@ -186,17 +182,17 @@ options:
   apply:
     description:
       - Reload interfaces and make configuration persistent after going
-      - though list of interfaces
+        though list of interfaces.
     type: bool
     default: true
   ignore_errors:
     description:
-      - Ignore Errors when creating multiple interfaces
+      - Ignore Errors when creating multiple interfaces.
     type: bool
     default: false
   revert_on_error:
     description:
-      - Try to revert to previous configuration upon encountering errors
+      - Try to revert to previous configuration upon encountering errors.
     type: bool
     default: false
 extends_documentation_fragment:
