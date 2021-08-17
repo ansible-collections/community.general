@@ -462,7 +462,7 @@ options:
             wps-method:
                 description:
                     - Flags indicating which mode of WPS is to be used if any.
-                    - There's little point in changing the default setting as NetworkManager will automatically determine whether it's feasible to start WPS
+                    - There is little point in changing the default setting as NetworkManager will automatically determine whether it is feasible to start WPS
                       enrollment from the Access Point capabilities.
                     - WPS can be disabled by setting this property to a value of C(1).
                 type: int
