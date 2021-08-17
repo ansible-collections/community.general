@@ -415,7 +415,7 @@ options:
             psk:
                 description:
                     - Pre-Shared-Key for WPA networks.
-                    - For WPA-PSK, it's either an ASCII passphrase of 8 to 63 characters that is (as specified in the 802.11i standard) hashed to derive the
+                    - For WPA-PSK, it is either an ASCII passphrase of 8 to 63 characters that is (as specified in the 802.11i standard) hashed to derive the
                       actual key, or the key in form of 64 hexadecimal character.
                     - The WPA3-Personal networks use a passphrase of any length for SAE authentication.
                 type: str
