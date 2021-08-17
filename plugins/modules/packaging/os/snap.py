@@ -233,13 +233,13 @@ class Snap(CmdStateModuleHelper):
         raise ModuleHelperException(msg=msg)
 
     def state_absent(self):
-        self._generic_state_action(self.is_snap_installed, "snaps_removed")
+        self._generic_state_action(self.is_snap_installed, "snaps_removed", ['classic', 'channel', 'state'])
 
     def state_enabled(self):
-        self._generic_state_action(lambda s: not self.is_snap_enabled(s), "snaps_enabled")
+        self._generic_state_action(lambda s: not self.is_snap_enabled(s), "snaps_enabled", ['classic', 'channel', 'state'])
 
     def state_disabled(self):
-        self._generic_state_action(self.is_snap_enabled, "snaps_disabled")
+        self._generic_state_action(self.is_snap_enabled, "snaps_disabled", ['classic', 'channel', 'state'])
 
 
 def main():
