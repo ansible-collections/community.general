@@ -1451,13 +1451,12 @@ class Nmcli(object):
 
         return conn_info
 
-    def get_supported_properties(self, setting, set_property=None, set_value='FAKEVALUE'):
+    def get_supported_properties(self, setting):
         properties = []
 
         if setting == '802-11-wireless-security':
-            set_property = set_property or 'psk'
-
-        if set_property:
+            set_property = 'psk'
+            set_value='FAKEVALUE'
             commands = ['set %s.%s %s' % (setting, set_property, set_value)]
         else:
             commands = []
