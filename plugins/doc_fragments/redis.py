@@ -34,7 +34,7 @@ options:
     description:
       - Specify whether or not to validate SSL certificates.
       - This should only be turned off for personally controlled sites or with
-      - localhost as target.
+        C(localhost) as target.
     type: bool
     default: True
   ssl_ca_certs:
@@ -43,4 +43,9 @@ options:
       - set to I(True), certifi ca-certificates will be used.
     type: str
 requirements: [ "redis", "certifi" ]
+
+notes:
+  - Requires the C(redis) Python package on the remote host. You can
+    install it with pip (C(pip install redis)) or with a package manager.
+    Information on the library can be found at U(https://github.com/andymccurdy/redis-py).
 '''

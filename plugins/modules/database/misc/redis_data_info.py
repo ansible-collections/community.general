@@ -21,10 +21,6 @@ options:
       - Database key.
     type: str
     required: True
-notes:
-  - Requires the redis-py Python package on the remote host. You can
-    install it with pip (pip install redis) or with a package manager.
-    https://github.com/andymccurdy/redis-py
 
 extends_documentation_fragment:
   - community.general.redis.documentation
@@ -35,22 +31,20 @@ seealso:
 '''
 
 EXAMPLES = '''
-- name: Set key foo=bar on loalhost with no username
-  community.general.redis_set:
+- name: Get key foo=bar from loalhost with no username
+  community.general.redis_data_info:
     login_host: localhost
     login_password: supersecret
     key: foo
-    value: bar
 
-- name: Set key foo=bar on redishost with custom ca-cert file
-  community.general.redis:
+- name: Get key foo=bar on redishost with custom ca-cert file
+  community.general.redis_data_info:
     login_host: redishost
     login_password: supersecret
     login_user: somuser
     validate_certs: yes
     ssl_ca_certs: /path/to/ca/certs
     key: foo
-    value: bar
 '''
 
 RETURN = '''
@@ -84,6 +78,7 @@ def main():
 
     module = AnsibleModule(
         argument_spec=module_args,
+        supports_check_mode=False,
     )
     import_errors = fail_imports()
     if len(import_errors) != 0:

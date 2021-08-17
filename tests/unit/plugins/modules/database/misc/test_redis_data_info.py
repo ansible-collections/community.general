@@ -36,7 +36,7 @@ def test_redis_data_info_existing_key(capfd, mocker):
     out, err = capfd.readouterr()
     print(out)
     assert not err
-    assert json.loads(out)['exists'] == True
+    assert json.loads(out)['exists']
     assert json.loads(out)['value'] == 'bar'
 
 
@@ -52,5 +52,5 @@ def test_redis_data_info_absent_key(capfd, mocker):
     out, err = capfd.readouterr()
     print(out)
     assert not err
-    assert json.loads(out)['exists'] == False
+    assert not json.loads(out)['exists']
     assert 'value' not in json.loads(out)
