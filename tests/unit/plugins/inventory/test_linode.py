@@ -62,7 +62,7 @@ def test_empty_config_query_options(inventory):
     assert regions == types == tags == []
 
 
-def test_conig_query_options(inventory):
+def test_config_query_options(inventory):
     regions, types, tags = inventory._get_query_options({
         'regions': ['eu-west', 'us-east'],
         'types': ['g5-standard-2', 'g6-standard-2'],
