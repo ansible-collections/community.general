@@ -629,7 +629,7 @@ options:
             - Ignore suboptions which are invalid or unsupported by the version of NetworkManager/nmcli installed on the host.
             - Only I(wifi) and I(wifi_sec) options are currently affected.
        type: bool
-       default: no
+       default: false
        version_added: 3.6.0
 '''
 
