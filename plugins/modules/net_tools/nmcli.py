@@ -342,7 +342,7 @@ options:
        suboptions:
             auth-alg:
                 description:
-                    - When WEP is used (ie, I(key-mgmt) = C(none) or C(ieee8021x)) indicate the 802.11 authentication algorithm required by the AP here.
+                    - When WEP is used (that is, if I(key-mgmt) = C(none) or C(ieee8021x)) indicate the 802.11 authentication algorithm required by the AP here.
                     - One of C(open) for Open System, C(shared) for Shared Key, or C(leap) for Cisco LEAP.
                     - When using Cisco LEAP (that is, if I(key-mgmt=ieee8021x) and I(auth-alg=leap)) the I(leap-username) and I(leap-password) properties
                       must be specified.
@@ -378,10 +378,10 @@ options:
                 type: list
                 elements: int
             leap-password:
-                description: The login password for legacy LEAP connections (ie, I(key-mgmt) = C(ieee8021x) and I(auth-alg) = C(leap)).
+                description: The login password for legacy LEAP connections (that is, if I(key-mgmt=ieee8021x) and I(auth-alg=leap)).
                 type: str
             leap-username:
-                description: The login username for legacy LEAP connections (ie, I(key-mgmt) = C(ieee8021x) and I(auth-alg) = C(leap)).
+                description: The login username for legacy LEAP connections (that is, if I(key-mgmt=ieee8021x) and I(auth-alg=leap)).
                 type: str
             pairwise:
                 description:
@@ -453,7 +453,7 @@ options:
                 type: str
             wep-tx-keyidx:
                 description:
-                    - When static WEP is used (ie, I(key-mgmt) = C(none)) and a non-default WEP key index is used by the AP, put that WEP key index here.
+                    - When static WEP is used (that is, if I(key-mgmt=none)) and a non-default WEP key index is used by the AP, put that WEP key index here.
                     - Valid values are C(0) (default key) through C(3).
                     - Note that some consumer access points (like the Linksys WRT54G) number the keys C(1) - C(4).
                 type: int
