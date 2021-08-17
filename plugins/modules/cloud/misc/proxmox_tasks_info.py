@@ -123,7 +123,9 @@ class ProxmoxTaskInfoAnsible(ProxmoxAnsible):
 
     def get_tasks(self, node):
         tasks = self.proxmox_api.nodes(node).tasks.get()
+        pprint.pp('PRINTING TASKS:')
         pprint.pp(tasks)
+        pprint.pp("done printing tasks")
         return [ProxmoxTask(task) for task in tasks]
 
 
@@ -169,7 +171,6 @@ def main():
         tasks = proxmox.get_task(upid=upid, node=node)
     else:
         tasks = proxmox.get_tasks(node=node)
-    pprint.pp(tasks)
     if tasks is not None:
         result['proxmox_tasks'] = [task.info for task in tasks]
     module.exit_json(**result)
