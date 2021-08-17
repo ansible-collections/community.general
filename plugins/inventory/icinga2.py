@@ -31,7 +31,7 @@ DOCUMENTATION = '''
         type: string
         required: true
       password:
-        description: Password to query the API..
+        description: Password to query the API.
         type: string
         required: true
       host_filter:
