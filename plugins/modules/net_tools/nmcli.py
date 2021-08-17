@@ -344,7 +344,7 @@ options:
                 description:
                     - When WEP is used (ie, I(key-mgmt) = C(none) or C(ieee8021x)) indicate the 802.11 authentication algorithm required by the AP here.
                     - One of C(open) for Open System, C(shared) for Shared Key, or C(leap) for Cisco LEAP.
-                    - When using Cisco LEAP (ie, I(key-mgmt) = C(ieee8021x) and I(auth-alg) = C(leap)) the I(leap-username) and I(leap-password) properties
+                    - When using Cisco LEAP (that is, if I(key-mgmt=ieee8021x) and I(auth-alg=leap)) the I(leap-username) and I(leap-password) properties
                       must be specified.
                 type: str
                 choices: [ open, shared, leap ]
