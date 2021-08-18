@@ -278,7 +278,7 @@ def main():
         gitlab_users_access = []
         gitlab_users = module.params['gitlab_user']
         for gl_user in gitlab_users:
-            gitlab_users_access.append({'name': glu, 'access_level': access_level})
+            gitlab_users_access.append({'name': gl_user, 'access_level': access_level})
     elif module.params['gitlab_users_access'] is not None:
         gitlab_users_access = module.params['gitlab_users_access']
         for i in range(len(gitlab_users_access)):
