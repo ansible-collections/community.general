@@ -51,6 +51,7 @@ options:
             name:
                 description: A username or a list of usernames to add to/remove from the GitLab group.
                 type: str
+                required: true
             access_level:
                 description:
                     - The access level for the user.
