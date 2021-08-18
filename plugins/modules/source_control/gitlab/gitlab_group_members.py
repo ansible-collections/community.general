@@ -256,10 +256,6 @@ def main():
     access_level = module.params['access_level']
     purge_users = module.params['purge_users']
 
-    # convert access level string input to int
-    if access_level:
-        access_level = access_level_int[access_level]
-
     if purge_users:
         for i in range(len(purge_users)):
             purge_users[i] = access_level_int[purge_users[i]]
@@ -280,7 +276,7 @@ def main():
         gitlab_users_access = []
         gitlab_users = module.params['gitlab_user']
         for gl_user in gitlab_users:
-            gitlab_users_access.append({'name': gl_user, 'access_level': access_level})
+            gitlab_users_access.append({'name': gl_user, 'access_level': access_level_int[access_level]})
     elif module.params['gitlab_users_access'] is not None:
         gitlab_users_access = module.params['gitlab_users_access']
         for i in range(len(gitlab_users_access)):
@@ -296,8 +292,8 @@ def main():
         # list of users given
         members = group.get_members_in_a_group(gitlab_group_id)
     else:
-        # something went wrong
-        module.fail_json(msg="Please give at least one user or set purge_users true.")
+        module.exit_json(changed= 'OK', result="Nothing to do, please give at least one user or set purge_users true.",
+            result_data=[])
 
     changed = False
     error = False
