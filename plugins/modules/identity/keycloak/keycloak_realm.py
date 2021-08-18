@@ -244,7 +244,7 @@ options:
         elements: str
     events_enabled:
         description:
-            - The realm events enabled.
+            - Enables or disables login events for this realm.
         aliases:
             - eventsEnabled
         type: bool
