@@ -58,6 +58,7 @@ options:
                     - Required if I(state=present), user state is set to present.
                 type: str
                 choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
+                required: true
         version_added: 3.6.0
     state:
         description:
