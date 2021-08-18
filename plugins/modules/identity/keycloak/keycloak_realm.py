@@ -248,6 +248,7 @@ options:
         aliases:
             - eventsEnabled
         type: bool
+        version_added: 3.6.0
     events_expiration:
         description:
             - The realm events expiration.
