@@ -195,7 +195,7 @@ def resp_get_group(url, request):
                '"web_url": "http://localhost:3000/groups/foo-bar", "request_access_enabled": false,'
                '"full_name": "Foobar Group", "full_path": "foo-bar",'
                '"project_creation_level": "maintainer", "auto_devops_enabled": false,'
-               '"subgroup_creation_level": "maintainer"'
+               '"subgroup_creation_level": "maintainer",'
                '"file_template_project_id": 1, "parent_id": null, "projects": [{"id": 1,"description": null, "default_branch": "master",'
                '"ssh_url_to_repo": "git@example.com:diaspora/diaspora-client.git",'
                '"http_url_to_repo": "http://example.com/diaspora/diaspora-client.git",'
