@@ -84,7 +84,11 @@ class TestGitlabGroup(GitlabModuleTestCase):
 
     @with_httmock(resp_create_subgroup)
     def test_create_subgroup(self):
-        group = self.moduleUtil.createGroup({'name': "BarFoo Group", 'path': "bar-foo", "parent_id": 1, 'project_creation_level': "noone", 'auto_devops_enabled': "false"})
+        group = self.moduleUtil.createGroup({'name': "BarFoo Group",
+                                             'path': "bar-foo",
+                                             'parent_id': 1,
+                                             'project_creation_level': "noone",
+                                             'auto_devops_enabled': "false"})
 
         self.assertEqual(type(group), Group)
         self.assertEqual(group.name, "BarFoo Group")
@@ -97,7 +101,10 @@ class TestGitlabGroup(GitlabModuleTestCase):
     @with_httmock(resp_get_group)
     def test_update_group(self):
         group = self.gitlab_instance.groups.get(1)
-        changed, newGroup = self.moduleUtil.updateGroup(group, {'name': "BarFoo Group", "visibility": "private", 'project_creation_level': "maintainer", 'auto_devops_enabled': "false"})
+        changed, newGroup = self.moduleUtil.updateGroup(group, {'name': "BarFoo Group",
+                                                                'visibility': "private",
+                                                                'project_creation_level': "maintainer",
+                                                                'auto_devops_enabled': "false"})
 
         self.assertEqual(changed, True)
         self.assertEqual(newGroup.name, "BarFoo Group")
