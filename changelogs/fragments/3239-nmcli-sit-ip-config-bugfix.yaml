@@ -1,0 +1,2 @@
+bugfixes:
+  - "nmcli - Parse ip4/ip6 configuration arguments for sit tunnels (https://github.com/ansible-collections/community.general/pull/3239)."
