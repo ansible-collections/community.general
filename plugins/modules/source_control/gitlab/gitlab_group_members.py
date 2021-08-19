@@ -5,7 +5,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-__metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
@@ -212,8 +211,8 @@ def main():
             type='list',
             elements='dict',
             options=dict(
-                name=dict(type='str'),
-                access_level=dict(type='str', choices=['guest', 'reporter', 'developer', 'maintainer', 'owner']),
+                name=dict(type='str', required=True),
+                access_level=dict(type='str', choices=['guest', 'reporter', 'developer', 'maintainer', 'owner'], required=True),
             )
         ),
     ))
@@ -292,8 +291,8 @@ def main():
         # list of users given
         members = group.get_members_in_a_group(gitlab_group_id)
     else:
-        module.exit_json(changed= 'OK', result="Nothing to do, please give at least one user or set purge_users true.",
-            result_data=[])
+        module.exit_json(changed='OK', result="Nothing to do, please give at least one user or set purge_users true.",
+                         result_data=[])
 
     changed = False
     error = False
