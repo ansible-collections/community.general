@@ -1887,7 +1887,7 @@ class RedfishUtils(object):
                       'LowerThresholdCritical', 'LowerThresholdFatal',
                       'LowerThresholdNonCritical', 'MaxReadingRangeTemp',
                       'MinReadingRangeTemp', 'ReadingCelsius', 'RelatedItem',
-                      'SensorNumber']
+                      'SensorNumber', 'Status']
 
         # Go through list
         for chassis_uri in self.chassis_uris:
