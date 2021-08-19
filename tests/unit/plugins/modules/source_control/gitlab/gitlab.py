@@ -194,6 +194,7 @@ def resp_get_group(url, request):
                '"lfs_enabled": true, "avatar_url": "http://localhost:3000/uploads/group/avatar/1/foo.jpg",'
                '"web_url": "http://localhost:3000/groups/foo-bar", "request_access_enabled": false,'
                '"full_name": "Foobar Group", "full_path": "foo-bar",'
+               '"newGroup.project_creation_level": "maintainer", "auto_devops_enabled": False,'
                '"file_template_project_id": 1, "parent_id": null, "projects": [{"id": 1,"description": null, "default_branch": "master",'
                '"ssh_url_to_repo": "git@example.com:diaspora/diaspora-client.git",'
                '"http_url_to_repo": "http://example.com/diaspora/diaspora-client.git",'
@@ -225,7 +226,9 @@ def resp_create_group(url, request):
                '"lfs_enabled": true, "avatar_url": "http://localhost:3000/uploads/group/avatar/1/foo.jpg",'
                '"web_url": "http://localhost:3000/groups/foo-bar", "request_access_enabled": false,'
                '"full_name": "Foobar Group", "full_path": "foo-bar",'
-               '"file_template_project_id": 1, "parent_id": null}')
+               '"file_template_project_id": 1, "parent_id": null,'
+               '"project_creation_level": "developer", "auto_devops_enabled": true,'
+               '"subgroup_creation_level": "maintainer"}')
     content = content.encode("utf-8")
     return response(200, content, headers, None, 5, request)
 
@@ -238,7 +241,8 @@ def resp_create_subgroup(url, request):
                '"lfs_enabled": true, "avatar_url": "http://localhost:3000/uploads/group/avatar/2/bar.jpg",'
                '"web_url": "http://localhost:3000/groups/foo-bar/bar-foo", "request_access_enabled": false,'
                '"full_name": "BarFoo Group", "full_path": "foo-bar/bar-foo",'
-               '"file_template_project_id": 1, "parent_id": 1}')
+               '"file_template_project_id": 1, "parent_id": 1,'
+               '"project_creation_level": "noone", "auto_devops_enabled": false}')
     content = content.encode("utf-8")
     return response(200, content, headers, None, 5, request)
 
