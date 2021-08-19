@@ -1,1 +1,1 @@
-plugins/modules/cloud/misc/proxmox_tasks_info.py
+cloud/misc/proxmox_tasks_info.py
