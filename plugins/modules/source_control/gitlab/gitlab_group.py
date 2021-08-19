@@ -67,19 +67,19 @@ options:
     choices: ["developer", "maintainer", "noone"]
     default: developer
     type: str
-    version_added: 3.5.0
+    version_added: 3.6.0
   auto_devops_enabled:
     description:
       - Default to Auto DevOps pipeline for all projects within this group.
     type: bool
-    version_added: 3.5.0
+    version_added: 3.6.0
   subgroup_creation_level:
     description:
       - Allowed to create subgroups.
     choices: ["maintainer", "owner"]
     default: maintainer
     type: str
-    version_added: 3.5.0
+    version_added: 3.6.0
 '''
 
 EXAMPLES = '''
@@ -112,6 +112,20 @@ EXAMPLES = '''
     path: my_first_group
     state: present
     parent: "super_parent/parent"
+
+# Other group which only allows sub-groups - no projects
+- name: "Create GitLab Group for SubGroups only"
+  community.general.gitlab_group:
+    api_url: https://gitlab.example.com/
+    validate_certs: True
+    api_username: dj-wasabi
+    api_password: "MySecretPassword"
+    name: my_main_group
+    path: my_main_group
+    state: present
+    project_creation_level: noone
+    auto_devops_enabled: false
+    subgroup_creation_level: maintainer
 '''
 
 RETURN = '''
