@@ -61,7 +61,6 @@ def proxmox_interface_argument_spec():
         cidr=dict(type='str'),
         cidr6=dict(type='str'),
         comments=dict(type='str'),
-        comments6=dict(type='str'),
         gateway=dict(type='str'),
         gateway6=dict(type='str'),
         mtu=dict(type='int'),
@@ -117,8 +116,6 @@ def proxmox_map_interface_args(params):
         ret['gateway6'] = params['gateway6']
     if params['comments'] is not None:
         ret['comments'] = params['comments']
-    if params['comments6'] is not None:
-        ret['comments6'] = params['comments6']
     if params['mtu'] is not None:
         if int(params['mtu']) <= 65520 and int(params['mtu']) >= 1280:
             ret['mtu'] = params['mtu']

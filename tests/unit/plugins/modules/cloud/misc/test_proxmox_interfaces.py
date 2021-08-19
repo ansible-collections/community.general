@@ -36,7 +36,6 @@ def test_map_interface_args(capfd, mocker):
               'gateway': None,
               'gateway6': None,
               'comments': None,
-              'comments6': None,
               'netmask': None,
               'ovs_tag': None,
               'ovs_bonds': None,
