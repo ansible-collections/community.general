@@ -45,6 +45,16 @@ options:
             - section: tss_lookup
               key: password
         required: true
+    domain:
+        default: ""
+        description: The domain with which to request the OAuth2 Access Grant.
+        env:
+            - name: TSS_DOMAIN
+        ini:
+            - section: tss_lookup
+              key: domain
+        required: false
+        version_added: 3.6.0
     api_path_uri:
         default: /api/v1
         description: The path to append to the base URL to form a valid REST
@@ -130,14 +140,14 @@ except ImportError:
     sdk_version = "0.0.5"
 
 try:
-    from thycotic.secrets.server import PasswordGrantAuthorizer
+    from thycotic.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer
+
     sdK_version_below_v1 = False
 except ImportError:
     sdK_version_below_v1 = True
 
 from ansible.utils.display import Display
 from ansible.plugins.lookup import LookupBase
-
 
 display = Display()
 
@@ -147,18 +157,34 @@ class LookupModule(LookupBase):
     def Client(server_parameters):
 
         if LooseVersion(sdk_version) < LooseVersion('1.0.0') or sdK_version_below_v1:
-            return SecretServer(**server_parameters)
-        else:
-            # The Password Authorizer became available in v1.0.0 and beyond.
-            # Import only if sdk_version requires it.
-            # from thycotic.secrets.server import PasswordGrantAuthorizer
-
-            authorizer = PasswordGrantAuthorizer(
+            return SecretServer(
                 server_parameters["base_url"],
                 server_parameters["username"],
                 server_parameters["password"],
+                server_parameters["api_path_uri"],
                 server_parameters["token_path_uri"],
             )
+        else:
+            # The Password Authorizer and Domain Password Authorizer
+            # became available in v1.0.0 and beyond.
+            # Import only if sdk_version requires it.
+            # from thycotic.secrets.server import PasswordGrantAuthorizer
+
+            if server_parameters["domain"]:
+                authorizer = DomainPasswordGrantAuthorizer(
+                    server_parameters["base_url"],
+                    server_parameters["username"],
+                    server_parameters["domain"],
+                    server_parameters["password"],
+                    server_parameters["token_path_uri"],
+                )
+            else:
+                authorizer = PasswordGrantAuthorizer(
+                    server_parameters["base_url"],
+                    server_parameters["username"],
+                    server_parameters["password"],
+                    server_parameters["token_path_uri"],
+                )
 
             return SecretServer(
                 server_parameters["base_url"], authorizer, server_parameters["api_path_uri"]
@@ -175,6 +201,7 @@ class LookupModule(LookupBase):
                 "base_url": self.get_option("base_url"),
                 "username": self.get_option("username"),
                 "password": self.get_option("password"),
+                "domain": self.get_option("domain"),
                 "api_path_uri": self.get_option("api_path_uri"),
                 "token_path_uri": self.get_option("token_path_uri"),
             }
