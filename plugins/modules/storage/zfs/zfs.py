@@ -205,13 +205,14 @@ class Zfs(object):
         if self.module.check_mode:
             return diff
         updated_properties = self.get_current_properties()
-        for prop in diff['before']:
+        for prop in self.properties:
             value = updated_properties.get(prop, None)
             if value is None:
                 self.module.fail_json(msg="zfsprop was not present after being successfully set: %s" % prop)
-            if diff['before'][prop] != value:
+            if current_properties.get(prop, None) != value:
                 self.changed = True
-            diff['after'][prop] = value
+            if prop in diff['after']:
+                diff['after'][prop] = value
         return diff
 
     def get_current_properties(self):
