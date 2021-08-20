@@ -1699,7 +1699,7 @@ def main():
         if nmcli.wifi_sec:
             unsupported_properties['wifi_sec'] = nmcli.check_for_unsupported_properties('802-11-wireless-security')
         if nmcli.ignore_unsupported_suboptions and unsupported_properties:
-            for setting_key, properties in unsupported_properties:
+            for setting_key, properties in unsupported_properties.items():
                 for property in properties:
                     del getattr(nmcli, setting_key)[property]
 
