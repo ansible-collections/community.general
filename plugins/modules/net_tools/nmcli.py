@@ -979,6 +979,7 @@ class Nmcli(object):
     A subclass may wish to override the following action methods:-
             - create_connection()
             - delete_connection()
+            - edit_connection()
             - modify_connection()
             - show_connection()
             - up_connection()
@@ -1090,6 +1091,11 @@ class Nmcli(object):
         else:
             cmd = to_text(cmd)
         return self.module.run_command(cmd, use_unsafe_shell=use_unsafe_shell, data=data)
+
+    def execute_edit_commands(self, commands):
+        cmd = [self.nmcli_bin, 'con', 'edit', self.conn_name]
+        data = "\n".join(commands)
+        return self.execute_command(cmd, data=data)
 
     def connection_options(self, detect_change=False):
         # Options common to multiple connection types.
@@ -1412,9 +1418,8 @@ class Nmcli(object):
         return status
 
     def edit_connection(self):
-        data = "\n".join(self.edit_commands + ['save', 'quit'])
-        cmd = [self.nmcli_bin, 'con', 'edit', self.conn_name]
-        return self.execute_command(cmd, data=data)
+        commands = self.edit_commands + ['save', 'quit']
+        return self.execute_edit_commands(commands)
 
     def show_connection(self):
         cmd = [self.nmcli_bin, '--show-secrets', 'con', 'show', self.conn_name]
@@ -1469,10 +1474,8 @@ class Nmcli(object):
             commands = []
 
         commands += ['print %s' % setting, 'quit', 'yes']
-        data = "\n".join(commands)
-        cmd = [self.nmcli_bin, 'con', 'edit', 'type', self.type]
 
-        (rc, out, err) = self.execute_command(cmd, data=data)
+        (rc, out, err) = self.execute_edit_commands(commands)
 
         if rc != 0:
             raise NmcliModuleError(err)
