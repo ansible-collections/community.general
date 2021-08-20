@@ -388,6 +388,12 @@ TESTCASE_IPIP_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
 connection.interface-name:              ipip-existent_nw_device
 connection.autoconnect:                 yes
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 ip-tunnel.mode:                         ipip
 ip-tunnel.parent:                       non_existent_ipip_device
 ip-tunnel.local:                        192.168.225.5
