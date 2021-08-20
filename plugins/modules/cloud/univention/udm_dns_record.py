@@ -66,6 +66,14 @@ EXAMPLES = '''
       a:
          - 192.0.2.1
          - 2001:0db8::42
+
+- name: Create a DNS PTR record on a UCS
+  community.general.udm_dns_record:
+    name: 192.0.2.1
+    zone: 192.0.2
+    type: ptr_record
+    data:
+      ptr_record: "www.example.com."
 '''
 
 
@@ -124,14 +132,19 @@ def main():
     changed = False
     diff = None
 
+    workzone = zone
+    workname = name
+    if type == 'ptr_record':
+        workzone = ('.').join(reversed(zone.split('.'))) + ".in-addr.arpa"
+        workname = ('.').join(reversed(name.split('.')[len(zone.split('.')):]))
+
     obj = list(ldap_search(
-        '(&(objectClass=dNSZone)(zoneName={0})(relativeDomainName={1}))'.format(zone, name),
+        '(&(objectClass=dNSZone)(zoneName={0})(relativeDomainName={1}))'.format(workzone, workname),
         attr=['dNSZone']
     ))
-
     exists = bool(len(obj))
-    container = 'zoneName={0},cn=dns,{1}'.format(zone, base_dn())
-    dn = 'relativeDomainName={0},{1}'.format(name, container)
+    container = 'zoneName={0},cn=dns,{1}'.format(workzone, base_dn())
+    dn = 'relativeDomainName={0},{1}'.format(workname, container)
 
     if state == 'present':
         try:
@@ -139,18 +152,24 @@ def main():
                 so = forward_zone.lookup(
                     config(),
                     uldap(),
-                    '(zone={0})'.format(zone),
+                    '(zone={0})'.format(workzone),
                     scope='domain',
                 ) or reverse_zone.lookup(
                     config(),
                     uldap(),
-                    '(zone={0})'.format(zone),
+                    '(zoneName={0})'.format(workzone),
                     scope='domain',
                 )
                 obj = umc_module_for_add('dns/{0}'.format(type), container, superordinate=so[0])
             else:
                 obj = umc_module_for_edit('dns/{0}'.format(type), dn)
-            obj['name'] = name
+
+            if type == 'ptr_record':
+                obj['ip'] = name
+                obj['address'] = workname
+            else:
+                obj['name'] = name
+
             for k, v in data.items():
                 obj[k] = v
             diff = obj.diff()
