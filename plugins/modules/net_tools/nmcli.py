@@ -1317,7 +1317,14 @@ class Nmcli(object):
                          'ipv4.routes',
                          'ipv4.route-metric'
                          'ipv6.dns',
-                         'ipv6.dns-search'):
+                         'ipv6.dns-search',
+                         '802-11-wireless-security.group',
+                         '802-11-wireless-security.leap-password-flags',
+                         '802-11-wireless-security.pairwise',
+                         '802-11-wireless-security.proto',
+                         '802-11-wireless-security.psk-flags',
+                         '802-11-wireless-security.wep-key-flags',
+                         '802-11-wireless.mac-address-blacklist'):
             return list
         return str
 
