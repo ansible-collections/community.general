@@ -70,7 +70,6 @@ class TestGitlabGroup(GitlabModuleTestCase):
                                              'path': "foo-bar",
                                              'description': "An interesting group",
                                              'project_creation_level': "developer",
-                                             'auto_devops_enabled': "true",
                                              'subgroup_creation_level': "maintainer"})
 
         self.assertEqual(type(group), Group)
@@ -78,7 +77,6 @@ class TestGitlabGroup(GitlabModuleTestCase):
         self.assertEqual(group.path, "foo-bar")
         self.assertEqual(group.description, "An interesting group")
         self.assertEqual(group.project_creation_level, "developer")
-        self.assertEqual(group.auto_devops_enabled, True)
         self.assertEqual(group.subgroup_creation_level, "maintainer")
         self.assertEqual(group.id, 1)
 
@@ -87,14 +85,12 @@ class TestGitlabGroup(GitlabModuleTestCase):
         group = self.moduleUtil.createGroup({'name': "BarFoo Group",
                                              'path': "bar-foo",
                                              'parent_id': 1,
-                                             'project_creation_level': "noone",
-                                             'auto_devops_enabled': "false"})
+                                             'project_creation_level': "noone"})
 
         self.assertEqual(type(group), Group)
         self.assertEqual(group.name, "BarFoo Group")
         self.assertEqual(group.full_path, "foo-bar/bar-foo")
         self.assertEqual(group.project_creation_level, "noone")
-        self.assertEqual(group.auto_devops_enabled, False)
         self.assertEqual(group.id, 2)
         self.assertEqual(group.parent_id, 1)
 
@@ -103,14 +99,12 @@ class TestGitlabGroup(GitlabModuleTestCase):
         group = self.gitlab_instance.groups.get(1)
         changed, newGroup = self.moduleUtil.updateGroup(group, {'name': "BarFoo Group",
                                                                 'visibility': "private",
-                                                                'project_creation_level': "maintainer",
-                                                                'auto_devops_enabled': "false"})
+                                                                'project_creation_level': "maintainer"})
 
         self.assertEqual(changed, True)
         self.assertEqual(newGroup.name, "BarFoo Group")
         self.assertEqual(newGroup.visibility, "private")
         self.assertEqual(newGroup.project_creation_level, "maintainer")
-        self.assertEqual(newGroup.auto_devops_enabled, False)
 
         changed, newGroup = self.moduleUtil.updateGroup(group, {'name': "BarFoo Group"})
 
