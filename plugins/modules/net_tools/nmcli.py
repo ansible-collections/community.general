@@ -1092,8 +1092,8 @@ class Nmcli(object):
             cmd = to_text(cmd)
         return self.module.run_command(cmd, use_unsafe_shell=use_unsafe_shell, data=data)
 
-    def execute_edit_commands(self, commands):
-        cmd = [self.nmcli_bin, 'con', 'edit', self.conn_name]
+    def execute_edit_commands(self, commands, arguments=[]):
+        cmd = [self.nmcli_bin, 'con', 'edit'] + arguments
         data = "\n".join(commands)
         return self.execute_command(cmd, data=data)
 
@@ -1419,7 +1419,7 @@ class Nmcli(object):
 
     def edit_connection(self):
         commands = self.edit_commands + ['save', 'quit']
-        return self.execute_edit_commands(commands)
+        return self.execute_edit_commands(commands, arguments=[self.conn_name])
 
     def show_connection(self):
         cmd = [self.nmcli_bin, '--show-secrets', 'con', 'show', self.conn_name]
@@ -1475,7 +1475,7 @@ class Nmcli(object):
 
         commands += ['print %s' % setting, 'quit', 'yes']
 
-        (rc, out, err) = self.execute_edit_commands(commands)
+        (rc, out, err) = self.execute_edit_commands(commands, arguments=['type', self.type])
 
         if rc != 0:
             raise NmcliModuleError(err)
