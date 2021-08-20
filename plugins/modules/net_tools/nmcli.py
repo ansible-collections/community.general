@@ -332,11 +332,141 @@ options:
        version_added: 2.0.0
     wifi_sec:
        description:
-            - 'The security configuration of the WiFi connection. The valid attributes are listed on:
+            - The security configuration of the WiFi connection.
+            - Note the list of suboption attributes may vary depending on which version of NetworkManager/nmcli is installed on the host.
+            - 'An up-to-date list of supported attributes can be found here:
               U(https://networkmanager.dev/docs/api/latest/settings-802-11-wireless-security.html).'
             - 'For instance to use common WPA-PSK auth with a password:
               C({key-mgmt: wpa-psk, psk: my_password}).'
        type: dict
+       suboptions:
+            auth-alg:
+                description:
+                    - When WEP is used (that is, if I(key-mgmt) = C(none) or C(ieee8021x)) indicate the 802.11 authentication algorithm required by the AP here.
+                    - One of C(open) for Open System, C(shared) for Shared Key, or C(leap) for Cisco LEAP.
+                    - When using Cisco LEAP (that is, if I(key-mgmt=ieee8021x) and I(auth-alg=leap)) the I(leap-username) and I(leap-password) properties
+                      must be specified.
+                type: str
+                choices: [ open, shared, leap ]
+            fils:
+                description:
+                    - Indicates whether Fast Initial Link Setup (802.11ai) must be enabled for the connection.
+                    - One of C(0) (use global default value), C(1) (disable FILS), C(2) (enable FILS if the supplicant and the access point support it) or C(3)
+                      (enable FILS and fail if not supported).
+                    - When set to C(0) and no global default is set, FILS will be optionally enabled.
+                type: int
+                choices: [ 0, 1, 2, 3 ]
+                default: 0
+            group:
+                description:
+                    - A list of group/broadcast encryption algorithms which prevents connections to Wi-Fi networks that do not utilize one of the algorithms in
+                      the list.
+                    - For maximum compatibility leave this property empty.
+                type: list
+                elements: str
+                choices: [ wep40, wep104, tkip, ccmp ]
+            key-mgmt:
+                description:
+                    - Key management used for the connection.
+                    - One of C(none) (WEP or no password protection), C(ieee8021x) (Dynamic WEP), C(owe) (Opportunistic Wireless Encryption), C(wpa-psk) (WPA2
+                      + WPA3 personal), C(sae) (WPA3 personal only), C(wpa-eap) (WPA2 + WPA3 enterprise) or C(wpa-eap-suite-b-192) (WPA3 enterprise only).
+                    - This property must be set for any Wi-Fi connection that uses security.
+                type: str
+                choices: [ none, ieee8021x, owe, wpa-psk, sae, wpa-eap, wpa-eap-suite-b-192 ]
+            leap-password-flags:
+                description: Flags indicating how to handle the I(leap-password) property.
+                type: list
+                elements: int
+            leap-password:
+                description: The login password for legacy LEAP connections (that is, if I(key-mgmt=ieee8021x) and I(auth-alg=leap)).
+                type: str
+            leap-username:
+                description: The login username for legacy LEAP connections (that is, if I(key-mgmt=ieee8021x) and I(auth-alg=leap)).
+                type: str
+            pairwise:
+                description:
+                    - A list of pairwise encryption algorithms which prevents connections to Wi-Fi networks that do not utilize one of the algorithms in the
+                      list.
+                    - For maximum compatibility leave this property empty.
+                type: list
+                elements: str
+                choices: [ tkip, ccmp ]
+            pmf:
+                description:
+                    - Indicates whether Protected Management Frames (802.11w) must be enabled for the connection.
+                    - One of C(0) (use global default value), C(1) (disable PMF), C(2) (enable PMF if the supplicant and the access point support it) or C(3)
+                      (enable PMF and fail if not supported).
+                    - When set to C(0) and no global default is set, PMF will be optionally enabled.
+                type: int
+                choices: [ 0, 1, 2, 3 ]
+                default: 0
+            proto:
+                description:
+                    - List of strings specifying the allowed WPA protocol versions to use.
+                    - Each element may be C(wpa) (allow WPA) or C(rsn) (allow WPA2/RSN).
+                    - If not specified, both WPA and RSN connections are allowed.
+                type: list
+                elements: str
+                choices: [ wpa, rsn ]
+            psk-flags:
+                description: Flags indicating how to handle the I(psk) property.
+                type: list
+                elements: int
+            psk:
+                description:
+                    - Pre-Shared-Key for WPA networks.
+                    - For WPA-PSK, it is either an ASCII passphrase of 8 to 63 characters that is (as specified in the 802.11i standard) hashed to derive the
+                      actual key, or the key in form of 64 hexadecimal character.
+                    - The WPA3-Personal networks use a passphrase of any length for SAE authentication.
+                type: str
+            wep-key-flags:
+                description: Flags indicating how to handle the I(wep-key0), I(wep-key1), I(wep-key2), and I(wep-key3) properties.
+                type: list
+                elements: int
+            wep-key-type:
+                description:
+                    - Controls the interpretation of WEP keys.
+                    - Allowed values are C(1), in which case the key is either a 10- or 26-character hexadecimal string, or a 5- or 13-character ASCII
+                      password; or C(2), in which case the passphrase is provided as a string and will be hashed using the de-facto MD5 method to derive the
+                      actual WEP key.
+                type: int
+                choices: [ 1, 2 ]
+            wep-key0:
+                description:
+                    - Index 0 WEP key. This is the WEP key used in most networks.
+                    - See the I(wep-key-type) property for a description of how this key is interpreted.
+                type: str
+            wep-key1:
+                description:
+                    - Index 1 WEP key. This WEP index is not used by most networks.
+                    - See the I(wep-key-type) property for a description of how this key is interpreted.
+                type: str
+            wep-key2:
+                description:
+                    - Index 2 WEP key. This WEP index is not used by most networks.
+                    - See the I(wep-key-type) property for a description of how this key is interpreted.
+                type: str
+            wep-key3:
+                description:
+                    - Index 3 WEP key. This WEP index is not used by most networks.
+                    - See the I(wep-key-type) property for a description of how this key is interpreted.
+                type: str
+            wep-tx-keyidx:
+                description:
+                    - When static WEP is used (that is, if I(key-mgmt=none)) and a non-default WEP key index is used by the AP, put that WEP key index here.
+                    - Valid values are C(0) (default key) through C(3).
+                    - Note that some consumer access points (like the Linksys WRT54G) number the keys C(1) - C(4).
+                type: int
+                choices: [ 0, 1, 2, 3 ]
+                default: 0
+            wps-method:
+                description:
+                    - Flags indicating which mode of WPS is to be used if any.
+                    - There is little point in changing the default setting as NetworkManager will automatically determine whether it is feasible to start WPS
+                      enrollment from the Access Point capabilities.
+                    - WPS can be disabled by setting this property to a value of C(1).
+                type: int
+                default: 0
        version_added: 3.0.0
     ssid:
        description:
@@ -345,12 +475,162 @@ options:
        version_added: 3.0.0
     wifi:
        description:
-            - 'The configuration of the WiFi connection. The valid attributes are listed on:
+            - The configuration of the WiFi connection.
+            - Note the list of suboption attributes may vary depending on which version of NetworkManager/nmcli is installed on the host.
+            - 'An up-to-date list of supported attributes can be found here:
               U(https://networkmanager.dev/docs/api/latest/settings-802-11-wireless.html).'
             - 'For instance to create a hidden AP mode WiFi connection:
               C({hidden: true, mode: ap}).'
        type: dict
+       suboptions:
+            ap-isolation:
+                description:
+                    - Configures AP isolation, which prevents communication between wireless devices connected to this AP.
+                    - This property can be set to a value different from C(-1) only when the interface is configured in AP mode.
+                    - If set to C(1), devices are not able to communicate with each other. This increases security because it protects devices against attacks
+                      from other clients in the network. At the same time, it prevents devices to access resources on the same wireless networks as file
+                      shares, printers, etc.
+                    - If set to C(0), devices can talk to each other.
+                    - When set to C(-1), the global default is used; in case the global default is unspecified it is assumed to be C(0).
+                type: int
+                choices: [ -1, 0, 1 ]
+                default: -1
+            assigned-mac-address:
+                description:
+                    - The new field for the cloned MAC address.
+                    - It can be either a hardware address in ASCII representation, or one of the special values C(preserve), C(permanent), C(random) or
+                      C(stable).
+                    - This field replaces the deprecated I(cloned-mac-address) on D-Bus, which can only contain explicit hardware addresses.
+                    - Note that this property only exists in D-Bus API. libnm and nmcli continue to call this property I(cloned-mac-address).
+                type: str
+            band:
+                description:
+                    - 802.11 frequency band of the network.
+                    - One of C(a) for 5GHz 802.11a or C(bg) for 2.4GHz 802.11.
+                    - This will lock associations to the Wi-Fi network to the specific band, so for example, if C(a) is specified, the device will not
+                      associate with the same network in the 2.4GHz band even if the network's settings are compatible.
+                    - This setting depends on specific driver capability and may not work with all drivers.
+                type: str
+                choices: [ a, bg ]
+            bssid:
+                description:
+                    - If specified, directs the device to only associate with the given access point.
+                    - This capability is highly driver dependent and not supported by all devices.
+                    - Note this property does not control the BSSID used when creating an Ad-Hoc network and is unlikely to in the future.
+                type: str
+            channel:
+                description:
+                    - Wireless channel to use for the Wi-Fi connection.
+                    - The device will only join (or create for Ad-Hoc networks) a Wi-Fi network on the specified channel.
+                    - Because channel numbers overlap between bands, this property also requires the I(band) property to be set.
+                type: int
+                default: 0
+            cloned-mac-address:
+                description:
+                    - This D-Bus field is deprecated in favor of I(assigned-mac-address) which is more flexible and allows specifying special variants like
+                      C(random).
+                    - For libnm and nmcli, this field is called I(cloned-mac-address).
+                type: str
+            generate-mac-address-mask:
+                description:
+                    - With I(cloned-mac-address) setting C(random) or C(stable), by default all bits of the MAC address are scrambled and a
+                      locally-administered, unicast MAC address is created. This property allows to specify that certain bits are fixed.
+                    - Note that the least significant bit of the first MAC address will always be unset to create a unicast MAC address.
+                    - If the property is C(null), it is eligible to be overwritten by a default connection setting.
+                    - If the value is still c(null) or an empty string, the default is to create a locally-administered, unicast MAC address.
+                    - If the value contains one MAC address, this address is used as mask. The set bits of the mask are to be filled with the current MAC
+                      address of the device, while the unset bits are subject to randomization.
+                    - Setting C(FE:FF:FF:00:00:00) means to preserve the OUI of the current MAC address and only randomize the lower 3 bytes using the
+                      C(random) or C(stable) algorithm.
+                    - If the value contains one additional MAC address after the mask, this address is used instead of the current MAC address to fill the bits
+                      that shall not be randomized.
+                    - For example, a value of C(FE:FF:FF:00:00:00 68:F7:28:00:00:00) will set the OUI of the MAC address to 68:F7:28, while the lower bits are
+                      randomized.
+                    - A value of C(02:00:00:00:00:00 00:00:00:00:00:00) will create a fully scrambled globally-administered, burned-in MAC address.
+                    - If the value contains more than one additional MAC addresses, one of them is chosen randomly. For example,
+                      C(02:00:00:00:00:00 00:00:00:00:00:00 02:00:00:00:00:00) will create a fully scrambled MAC address, randomly locally or globally
+                      administered.
+                type: str
+            hidden:
+                description:
+                    - If C(true), indicates that the network is a non-broadcasting network that hides its SSID. This works both in infrastructure and AP mode.
+                    - In infrastructure mode, various workarounds are used for a more reliable discovery of hidden networks, such as probe-scanning the SSID.
+                      However, these workarounds expose inherent insecurities with hidden SSID networks, and thus hidden SSID networks should be used with
+                      caution.
+                    - In AP mode, the created network does not broadcast its SSID.
+                    - Note that marking the network as hidden may be a privacy issue for you (in infrastructure mode) or client stations (in AP mode), as the
+                      explicit probe-scans are distinctly recognizable on the air.
+                type: bool
+                default: false
+            mac-address-blacklist:
+                description:
+                    - A list of permanent MAC addresses of Wi-Fi devices to which this connection should never apply.
+                    - Each MAC address should be given in the standard hex-digits-and-colons notation (for example, C(00:11:22:33:44:55)).
+                type: list
+                elements: str
+            mac-address-randomization:
+                description:
+                    - One of C(0) (never randomize unless the user has set a global default to randomize and the supplicant supports randomization), C(1)
+                      (never randomize the MAC address), or C(2) (always randomize the MAC address).
+                    - This property is deprecated for I(cloned-mac-address).
+                type: int
+                default: 0
+                choices: [ 0, 1, 2 ]
+            mac-address:
+                description:
+                    - If specified, this connection will only apply to the Wi-Fi device whose permanent MAC address matches.
+                    - This property does not change the MAC address of the device (for example for MAC spoofing).
+                type: str
+            mode:
+                description: Wi-Fi network mode. If blank, C(infrastructure) is assumed.
+                type: str
+                choices: [ infrastructure, mesh, adhoc, ap ]
+                default: infrastructure
+            mtu:
+                description: If non-zero, only transmit packets of the specified size or smaller, breaking larger packets up into multiple Ethernet frames.
+                type: int
+                default: 0
+            powersave:
+                description:
+                    - One of C(2) (disable Wi-Fi power saving), C(3) (enable Wi-Fi power saving), C(1) (don't touch currently configure setting) or C(0) (use
+                      the globally configured value).
+                    - All other values are reserved.
+                type: int
+                default: 0
+                choices: [ 0, 1, 2, 3 ]
+            rate:
+                description:
+                    - If non-zero, directs the device to only use the specified bitrate for communication with the access point.
+                    - Units are in Kb/s, so for example C(5500) = 5.5 Mbit/s.
+                    - This property is highly driver dependent and not all devices support setting a static bitrate.
+                type: int
+                default: 0
+            tx-power:
+                description:
+                    - If non-zero, directs the device to use the specified transmit power.
+                    - Units are dBm.
+                    - This property is highly driver dependent and not all devices support setting a static transmit power.
+                type: int
+                default: 0
+            wake-on-wlan:
+                description:
+                    - The NMSettingWirelessWakeOnWLan options to enable. Not all devices support all options.
+                    - May be any combination of C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_ANY) (C(0x2)), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_DISCONNECT) (C(0x4)),
+                      C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_MAGIC) (C(0x8)), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_GTK_REKEY_FAILURE) (C(0x10)),
+                      C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_EAP_IDENTITY_REQUEST) (C(0x20)), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_4WAY_HANDSHAKE) (C(0x40)),
+                      C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_RFKILL_RELEASE) (C(0x80)), C(NM_SETTING_WIRELESS_WAKE_ON_WLAN_TCP) (C(0x100)) or the special values
+                      C(0x1) (to use global settings) and C(0x8000) (to disable management of Wake-on-LAN in NetworkManager).
+                    - Note the option values' sum must be specified in order to combine multiple options.
+                type: int
+                default: 1
        version_added: 3.5.0
+    ignore_unsupported_suboptions:
+       description:
+            - Ignore suboptions which are invalid or unsupported by the version of NetworkManager/nmcli installed on the host.
+            - Only I(wifi) and I(wifi_sec) options are currently affected.
+       type: bool
+       default: false
+       version_added: 3.6.0
 '''
 
 EXAMPLES = r'''
@@ -699,6 +979,7 @@ class Nmcli(object):
     A subclass may wish to override the following action methods:-
             - create_connection()
             - delete_connection()
+            - edit_connection()
             - modify_connection()
             - show_connection()
             - up_connection()
@@ -721,6 +1002,7 @@ class Nmcli(object):
     def __init__(self, module):
         self.module = module
         self.state = module.params['state']
+        self.ignore_unsupported_suboptions = module.params['ignore_unsupported_suboptions']
         self.autoconnect = module.params['autoconnect']
         self.conn_name = module.params['conn_name']
         self.master = module.params['master']
@@ -809,6 +1091,12 @@ class Nmcli(object):
         else:
             cmd = to_text(cmd)
         return self.module.run_command(cmd, use_unsafe_shell=use_unsafe_shell, data=data)
+
+    def execute_edit_commands(self, commands, arguments):
+        arguments = arguments or []
+        cmd = [self.nmcli_bin, 'con', 'edit'] + arguments
+        data = "\n".join(commands)
+        return self.execute_command(cmd, data=data)
 
     def connection_options(self, detect_change=False):
         # Options common to multiple connection types.
@@ -920,9 +1208,6 @@ class Nmcli(object):
             })
             if self.wifi:
                 for name, value in self.wifi.items():
-                    # Disregard 'ssid' via 'wifi.ssid'
-                    if name == 'ssid':
-                        continue
                     options.update({
                         '802-11-wireless.%s' % name: value
                     })
@@ -1039,7 +1324,14 @@ class Nmcli(object):
                          'ipv4.routes',
                          'ipv4.route-metric'
                          'ipv6.dns',
-                         'ipv6.dns-search'):
+                         'ipv6.dns-search',
+                         '802-11-wireless-security.group',
+                         '802-11-wireless-security.leap-password-flags',
+                         '802-11-wireless-security.pairwise',
+                         '802-11-wireless-security.proto',
+                         '802-11-wireless-security.psk-flags',
+                         '802-11-wireless-security.wep-key-flags',
+                         '802-11-wireless.mac-address-blacklist'):
             return list
         return str
 
@@ -1127,9 +1419,8 @@ class Nmcli(object):
         return status
 
     def edit_connection(self):
-        data = "\n".join(self.edit_commands + ['save', 'quit'])
-        cmd = [self.nmcli_bin, 'con', 'edit', self.conn_name]
-        return self.execute_command(cmd, data=data)
+        commands = self.edit_commands + ['save', 'quit']
+        return self.execute_edit_commands(commands, arguments=[self.conn_name])
 
     def show_connection(self):
         cmd = [self.nmcli_bin, '--show-secrets', 'con', 'show', self.conn_name]
@@ -1172,6 +1463,60 @@ class Nmcli(object):
                     conn_info[key] = value
 
         return conn_info
+
+    def get_supported_properties(self, setting):
+        properties = []
+
+        if setting == '802-11-wireless-security':
+            set_property = 'psk'
+            set_value = 'FAKEVALUE'
+            commands = ['set %s.%s %s' % (setting, set_property, set_value)]
+        else:
+            commands = []
+
+        commands += ['print %s' % setting, 'quit', 'yes']
+
+        (rc, out, err) = self.execute_edit_commands(commands, arguments=['type', self.type])
+
+        if rc != 0:
+            raise NmcliModuleError(err)
+
+        for line in out.splitlines():
+            prefix = '%s.' % setting
+            if (line.startswith(prefix)):
+                pair = line.split(':', 1)
+                property = pair[0].strip().replace(prefix, '')
+                properties.append(property)
+
+        return properties
+
+    def check_for_unsupported_properties(self, setting):
+        if setting == '802-11-wireless':
+            setting_key = 'wifi'
+        elif setting == '802-11-wireless-security':
+            setting_key = 'wifi_sec'
+        else:
+            setting_key = setting
+
+        supported_properties = self.get_supported_properties(setting)
+        unsupported_properties = []
+
+        for property, value in getattr(self, setting_key).items():
+            if property not in supported_properties:
+                unsupported_properties.append(property)
+
+        if unsupported_properties:
+            msg_options = []
+            for property in unsupported_properties:
+                msg_options.append('%s.%s' % (setting_key, property))
+
+            msg = 'Invalid or unsupported option(s): "%s"' % '", "'.join(msg_options)
+            if self.ignore_unsupported_suboptions:
+                self.module.warn(msg)
+            else:
+                self.module.fail_json(msg=msg)
+
+        return unsupported_properties
 
     def _compare_conn_params(self, conn_info, options):
         changed = False
@@ -1230,6 +1575,7 @@ def main():
     # Parsing argument file
     module = AnsibleModule(
         argument_spec=dict(
+            ignore_unsupported_suboptions=dict(type='bool', default=False),
             autoconnect=dict(type='bool', default=True),
             state=dict(type='str', required=True, choices=['absent', 'present']),
             conn_name=dict(type='str', required=True),
@@ -1315,6 +1661,7 @@ def main():
             ip_tunnel_dev=dict(type='str'),
             ip_tunnel_local=dict(type='str'),
             ip_tunnel_remote=dict(type='str'),
+            # 802-11-wireless* specific vars
             ssid=dict(type='str'),
             wifi=dict(type='dict'),
             wifi_sec=dict(type='dict', no_log=True),
@@ -1343,6 +1690,19 @@ def main():
             nmcli.module.fail_json(msg="Please specify a name for the master when type is %s" % nmcli.type)
         if nmcli.ifname is None:
             nmcli.module.fail_json(msg="Please specify an interface name for the connection when type is %s" % nmcli.type)
+    if nmcli.type == 'wifi':
+        unsupported_properties = {}
+        if nmcli.wifi:
+            if 'ssid' in nmcli.wifi:
+                module.warn("Ignoring option 'wifi.ssid', it must be specified with option 'ssid'")
+                del nmcli.wifi['ssid']
+            unsupported_properties['wifi'] = nmcli.check_for_unsupported_properties('802-11-wireless')
+        if nmcli.wifi_sec:
+            unsupported_properties['wifi_sec'] = nmcli.check_for_unsupported_properties('802-11-wireless-security')
+        if nmcli.ignore_unsupported_suboptions and unsupported_properties:
+            for setting_key, properties in unsupported_properties.items():
+                for property in properties:
+                    del getattr(nmcli, setting_key)[property]
 
     try:
         if nmcli.state == 'absent':
