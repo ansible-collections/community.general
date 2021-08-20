@@ -94,7 +94,7 @@ class TestGitlabGroup(GitlabModuleTestCase):
         self.assertEqual(group.name, "BarFoo Group")
         self.assertEqual(group.full_path, "foo-bar/bar-foo")
         self.assertEqual(group.project_creation_level, "noone")
-        self.assertEqual(group.auto_devops_enabled, false)
+        self.assertEqual(group.auto_devops_enabled, False)
         self.assertEqual(group.id, 2)
         self.assertEqual(group.parent_id, 1)
 
@@ -110,7 +110,7 @@ class TestGitlabGroup(GitlabModuleTestCase):
         self.assertEqual(newGroup.name, "BarFoo Group")
         self.assertEqual(newGroup.visibility, "private")
         self.assertEqual(newGroup.project_creation_level, "maintainer")
-        self.assertEqual(newGroup.auto_devops_enabled, false)
+        self.assertEqual(newGroup.auto_devops_enabled, False)
 
         changed, newGroup = self.moduleUtil.updateGroup(group, {'name': "BarFoo Group"})
 
