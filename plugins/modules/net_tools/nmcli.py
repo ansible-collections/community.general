@@ -1489,7 +1489,7 @@ class Nmcli(object):
 
         return properties
 
-    def check_supported_properties(self, setting):
+    def check_for_unsupported_properties(self, setting):
         if setting == '802-11-wireless':
             setting_key = 'wifi'
         elif setting == '802-11-wireless-security':
@@ -1508,13 +1508,14 @@ class Nmcli(object):
             msg_options = []
             for property in unsupported_properties:
                 msg_options.append('%s.%s' % (setting_key, property))
-                del getattr(self, setting_key)[property]
 
             msg = 'Invalid or unsupported option(s): "%s"' % '", "'.join(msg_options)
             if self.ignore_unsupported_suboptions:
                 self.module.warn(msg)
             else:
                 self.module.fail_json(msg=msg)
+
+        return unsupported_properties
 
     def _compare_conn_params(self, conn_info, options):
         changed = False
@@ -1689,13 +1690,18 @@ def main():
         if nmcli.ifname is None:
             nmcli.module.fail_json(msg="Please specify an interface name for the connection when type is %s" % nmcli.type)
     if nmcli.type == 'wifi':
+        unsupported_properties = {}
         if nmcli.wifi:
             if 'ssid' in nmcli.wifi:
                 module.warn("Ignoring option 'wifi.ssid', it must be specified with option 'ssid'")
                 del nmcli.wifi['ssid']
-            nmcli.check_supported_properties('802-11-wireless')
+            unsupported_properties['wifi'] = nmcli.check_for_unsupported_properties('802-11-wireless')
         if nmcli.wifi_sec:
-            nmcli.check_supported_properties('802-11-wireless-security')
+            unsupported_properties['wifi_sec'] = nmcli.check_for_unsupported_properties('802-11-wireless-security')
+        if nmcli.ignore_unsupported_suboptions and unsupported_properties:
+            for setting_key, properties in unsupported_properties:
+                for property in properties:
+                    del getattr(nmcli, setting_key)[property]
 
     try:
         if nmcli.state == 'absent':
