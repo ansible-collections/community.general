@@ -507,6 +507,51 @@ TESTCASE_SECURE_WIRELESS = [
     }
 ]
 
+TESTCASE_DEFAULT_WIRELESS_SHOW_OUTPUT = """\
+802-11-wireless.ssid:                   --
+802-11-wireless.mode:                   infrastructure
+802-11-wireless.band:                   --
+802-11-wireless.channel:                0
+802-11-wireless.bssid:                  --
+802-11-wireless.rate:                   0
+802-11-wireless.tx-power:               0
+802-11-wireless.mac-address:            --
+802-11-wireless.cloned-mac-address:     --
+802-11-wireless.generate-mac-address-mask:--
+802-11-wireless.mac-address-blacklist:  --
+802-11-wireless.mac-address-randomization:default
+802-11-wireless.mtu:                    auto
+802-11-wireless.seen-bssids:            --
+802-11-wireless.hidden:                 no
+802-11-wireless.powersave:              0 (default)
+802-11-wireless.wake-on-wlan:           0x1 (default)
+802-11-wireless.ap-isolation:           -1 (default)
+"""
+
+TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT = \
+    TESTCASE_DEFAULT_WIRELESS_SHOW_OUTPUT + """\
+802-11-wireless-security.key-mgmt:      --
+802-11-wireless-security.wep-tx-keyidx: 0
+802-11-wireless-security.auth-alg:      --
+802-11-wireless-security.proto:         --
+802-11-wireless-security.pairwise:      --
+802-11-wireless-security.group:         --
+802-11-wireless-security.pmf:           0 (default)
+802-11-wireless-security.leap-username: --
+802-11-wireless-security.wep-key0:      --
+802-11-wireless-security.wep-key1:      --
+802-11-wireless-security.wep-key2:      --
+802-11-wireless-security.wep-key3:      --
+802-11-wireless-security.wep-key-flags: 0 (none)
+802-11-wireless-security.wep-key-type:  unknown
+802-11-wireless-security.psk:           testingtestingtesting
+802-11-wireless-security.psk-flags:     0 (none)
+802-11-wireless-security.leap-password: --
+802-11-wireless-security.leap-password-flags:0 (none)
+802-11-wireless-security.wps-method:    0x0 (default)
+802-11-wireless-security.fils:          0 (default)
+"""
+
 TESTCASE_DUMMY_STATIC = [
     {
         'type': 'dummy',
@@ -698,9 +743,47 @@ def mocked_ethernet_connection_dhcp_to_static(mocker):
 
 
 @pytest.fixture
+def mocked_wireless_create(mocker):
+    mocker_set(mocker,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_DEFAULT_WIRELESS_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
+
+
+@pytest.fixture
+def mocked_secure_wireless_create(mocker):
+    mocker_set(mocker,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+                   (0, "", ""),
+               ))
+
+
+@pytest.fixture
 def mocked_secure_wireless_create_failure(mocker):
     mocker_set(mocker,
-               execute_return=(1, "", ""))
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT, ""),
+                   (1, "", ""),
+               ))
+
+
+@pytest.fixture
+def mocked_secure_wireless_modify(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+                   (0, "", ""),
+                   (0, "", ""),
+               ))
 
 
 @pytest.fixture
@@ -709,6 +792,7 @@ def mocked_secure_wireless_modify_failure(mocker):
                connection_exists=True,
                execute_return=None,
                execute_side_effect=(
+                   (0, TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT, ""),
                    (0, "", ""),
                    (1, "", ""),
                ))
@@ -1629,7 +1713,7 @@ def test_ethernet_connection_static_unchanged(mocked_ethernet_connection_static_
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_WIRELESS, indirect=['patch_ansible_module'])
-def test_create_wireless(mocked_generic_connection_create, capfd):
+def test_create_wireless(mocked_wireless_create, capfd):
     """
     Test : Create wireless connection
     """
@@ -1637,10 +1721,22 @@ def test_create_wireless(mocked_generic_connection_create, capfd):
     with pytest.raises(SystemExit):
         nmcli.main()
 
-    assert nmcli.Nmcli.execute_command.call_count == 1
+    assert nmcli.Nmcli.execute_command.call_count == 2
     arg_list = nmcli.Nmcli.execute_command.call_args_list
-    add_args, add_kw = arg_list[0]
 
+    get_available_options_args, get_available_options_kw = arg_list[0]
+    assert get_available_options_args[0][0] == '/usr/bin/nmcli'
+    assert get_available_options_args[0][1] == 'con'
+    assert get_available_options_args[0][2] == 'edit'
+    assert get_available_options_args[0][3] == 'type'
+    assert get_available_options_args[0][4] == 'wifi'
+
+    get_available_options_data = get_available_options_kw['data'].split()
+    for param in ['print', '802-11-wireless',
+                  'quit', 'yes']:
+        assert param in get_available_options_data
+
+    add_args, add_kw = arg_list[1]
     assert add_args[0][0] == '/usr/bin/nmcli'
     assert add_args[0][1] == 'con'
     assert add_args[0][2] == 'add'
@@ -1664,7 +1760,7 @@ def test_create_wireless(mocked_generic_connection_create, capfd):
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_SECURE_WIRELESS, indirect=['patch_ansible_module'])
-def test_create_secure_wireless(mocked_generic_connection_create, capfd):
+def test_create_secure_wireless(mocked_secure_wireless_create, capfd):
     """
     Test : Create secure wireless connection
     """
@@ -1672,10 +1768,22 @@ def test_create_secure_wireless(mocked_generic_connection_create, capfd):
     with pytest.raises(SystemExit):
         nmcli.main()
 
-    assert nmcli.Nmcli.execute_command.call_count == 2
+    assert nmcli.Nmcli.execute_command.call_count == 3
     arg_list = nmcli.Nmcli.execute_command.call_args_list
-    add_args, add_kw = arg_list[0]
 
+    get_available_options_args, get_available_options_kw = arg_list[0]
+    assert get_available_options_args[0][0] == '/usr/bin/nmcli'
+    assert get_available_options_args[0][1] == 'con'
+    assert get_available_options_args[0][2] == 'edit'
+    assert get_available_options_args[0][3] == 'type'
+    assert get_available_options_args[0][4] == 'wifi'
+
+    get_available_options_data = get_available_options_kw['data'].split()
+    for param in ['print', '802-11-wireless-security',
+                  'quit', 'yes']:
+        assert param in get_available_options_data
+
+    add_args, add_kw = arg_list[1]
     assert add_args[0][0] == '/usr/bin/nmcli'
     assert add_args[0][1] == 'con'
     assert add_args[0][2] == 'add'
@@ -1691,7 +1799,7 @@ def test_create_secure_wireless(mocked_generic_connection_create, capfd):
                   '802-11-wireless-security.key-mgmt', 'wpa-psk']:
         assert param in add_args_text
 
-    edit_args, edit_kw = arg_list[1]
+    edit_args, edit_kw = arg_list[2]
     assert edit_args[0][0] == '/usr/bin/nmcli'
     assert edit_args[0][1] == 'con'
     assert edit_args[0][2] == 'edit'
@@ -1718,10 +1826,22 @@ def test_create_secure_wireless_failure(mocked_secure_wireless_create_failure, c
     with pytest.raises(SystemExit):
         nmcli.main()
 
-    assert nmcli.Nmcli.execute_command.call_count == 1
+    assert nmcli.Nmcli.execute_command.call_count == 2
     arg_list = nmcli.Nmcli.execute_command.call_args_list
-    add_args, add_kw = arg_list[0]
 
+    get_available_options_args, get_available_options_kw = arg_list[0]
+    assert get_available_options_args[0][0] == '/usr/bin/nmcli'
+    assert get_available_options_args[0][1] == 'con'
+    assert get_available_options_args[0][2] == 'edit'
+    assert get_available_options_args[0][3] == 'type'
+    assert get_available_options_args[0][4] == 'wifi'
+
+    get_available_options_data = get_available_options_kw['data'].split()
+    for param in ['print', '802-11-wireless-security',
+                  'quit', 'yes']:
+        assert param in get_available_options_data
+
+    add_args, add_kw = arg_list[1]
     assert add_args[0][0] == '/usr/bin/nmcli'
     assert add_args[0][1] == 'con'
     assert add_args[0][2] == 'add'
@@ -1744,17 +1864,36 @@ def test_create_secure_wireless_failure(mocked_secure_wireless_create_failure, c
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_SECURE_WIRELESS, indirect=['patch_ansible_module'])
-def test_modify_secure_wireless(mocked_generic_connection_modify, capfd):
+def test_modify_secure_wireless(mocked_secure_wireless_modify, capfd):
     """
     Test : Modify secure wireless connection
     """
 
     with pytest.raises(SystemExit):
         nmcli.main()
-    assert nmcli.Nmcli.execute_command.call_count == 2
+    assert nmcli.Nmcli.execute_command.call_count == 4
     arg_list = nmcli.Nmcli.execute_command.call_args_list
-    add_args, add_kw = arg_list[0]
 
+    get_available_options_args, get_available_options_kw = arg_list[0]
+    assert get_available_options_args[0][0] == '/usr/bin/nmcli'
+    assert get_available_options_args[0][1] == 'con'
+    assert get_available_options_args[0][2] == 'edit'
+    assert get_available_options_args[0][3] == 'type'
+    assert get_available_options_args[0][4] == 'wifi'
+
+    get_available_options_data = get_available_options_kw['data'].split()
+    for param in ['print', '802-11-wireless-security',
+                  'quit', 'yes']:
+        assert param in get_available_options_data
+
+    show_args, show_kw = arg_list[1]
+    assert show_args[0][0] == '/usr/bin/nmcli'
+    assert show_args[0][1] == '--show-secrets'
+    assert show_args[0][2] == 'con'
+    assert show_args[0][3] == 'show'
+    assert show_args[0][4] == 'non_existent_nw_device'
+
+    add_args, add_kw = arg_list[2]
     assert add_args[0][0] == '/usr/bin/nmcli'
     assert add_args[0][1] == 'con'
     assert add_args[0][2] == 'modify'
@@ -1767,7 +1906,7 @@ def test_modify_secure_wireless(mocked_generic_connection_modify, capfd):
                   '802-11-wireless-security.key-mgmt', 'wpa-psk']:
         assert param in add_args_text
 
-    edit_args, edit_kw = arg_list[1]
+    edit_args, edit_kw = arg_list[3]
     assert edit_args[0][0] == '/usr/bin/nmcli'
     assert edit_args[0][1] == 'con'
     assert edit_args[0][2] == 'edit'
@@ -1794,10 +1933,29 @@ def test_modify_secure_wireless_failure(mocked_secure_wireless_modify_failure, c
     with pytest.raises(SystemExit):
         nmcli.main()
 
-    assert nmcli.Nmcli.execute_command.call_count == 2
+    assert nmcli.Nmcli.execute_command.call_count == 3
     arg_list = nmcli.Nmcli.execute_command.call_args_list
-    add_args, add_kw = arg_list[1]
 
+    get_available_options_args, get_available_options_kw = arg_list[0]
+    assert get_available_options_args[0][0] == '/usr/bin/nmcli'
+    assert get_available_options_args[0][1] == 'con'
+    assert get_available_options_args[0][2] == 'edit'
+    assert get_available_options_args[0][3] == 'type'
+    assert get_available_options_args[0][4] == 'wifi'
+
+    get_available_options_data = get_available_options_kw['data'].split()
+    for param in ['print', '802-11-wireless-security',
+                  'quit', 'yes']:
+        assert param in get_available_options_data
+
+    show_args, show_kw = arg_list[1]
+    assert show_args[0][0] == '/usr/bin/nmcli'
+    assert show_args[0][1] == '--show-secrets'
+    assert show_args[0][2] == 'con'
+    assert show_args[0][3] == 'show'
+    assert show_args[0][4] == 'non_existent_nw_device'
+
+    add_args, add_kw = arg_list[2]
     assert add_args[0][0] == '/usr/bin/nmcli'
     assert add_args[0][1] == 'con'
     assert add_args[0][2] == 'modify'
