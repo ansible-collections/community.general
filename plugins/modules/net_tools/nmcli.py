@@ -1092,7 +1092,8 @@ class Nmcli(object):
             cmd = to_text(cmd)
         return self.module.run_command(cmd, use_unsafe_shell=use_unsafe_shell, data=data)
 
-    def execute_edit_commands(self, commands, arguments=[]):
+    def execute_edit_commands(self, commands, arguments):
+        arguments = arguments or []
         cmd = [self.nmcli_bin, 'con', 'edit'] + arguments
         data = "\n".join(commands)
         return self.execute_command(cmd, data=data)
