@@ -5,6 +5,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+from os import truncate
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -135,84 +136,55 @@ class GitLabProject(object):
     @param mirror_keep_divergent_refs Keep divergent refs?
     @param mirror_only_protected_branches Mirror only protected banches?
     '''
-    def createOrUpdateMirror(self, mirror_url, mirror_enabled, mirror_keep_divergent_refs, mirror_only_protected_branches):
+    def createOrUpdateMirror(self, mirror_url, mirror_enabled, mirror_keep_divergent_refs = None, mirror_only_protected_branches = None):
         changed = False
+        mirror_exists = False
 
         mirrors = self.projectObject.remote_mirrors.list()
         urlParts = mirror_url.split('@')
         for mirror in mirrors:
-          if urlParts[1] in mirror.url:
-            # mirror exists, update if needed
-            if mirror.enabled != mirror_enabled:
-              mirror.enabled = mirror_enabled
+            if urlParts[1] in mirror.url:
+                mirror_exists = True
+                save_mirror = False
+                # mirror exists, update if needed
+                if mirror.enabled != mirror_enabled:
+                    mirror.enabled = mirror_enabled
+                    save_mirror = True
+                if mirror_keep_divergent_refs != None and mirror.keep_divergent_refs != mirror_keep_divergent_refs:
+                    mirror.keep_divergent_refs = mirror_keep_divergent_refs
+                    save_mirror = True
+                if mirror_only_protected_branches != None and mirror.only_protected_branches != mirror_only_protected_branches:
+                    mirror.only_protected_branches = mirror_only_protected_branches
+                    save_mirror = True
 
-
-        # Because we have already call userExists in main()
-        if self.projectObject is None:
-            project_options.update({
-                'path': options['path'],
-                'import_url': options['import_url'],
-            })
-            project_options = self.getOptionsWithValue(project_options)
-            project = self.createProject(namespace, project_options)
-            changed = True
-        else:
-            changed, project = self.updateProject(self.projectObject, project_options)
-
-        self.projectObject = project
-        if changed:
-            if self._module.check_mode:
-                self._module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name)
-
-            try:
-                project.save()
-            except Exception as e:
-                self._module.fail_json(msg="Failed update project: %s " % e)
-            return True
-        return False
-
-    '''
-    @param namespace Namespace Object (User or Group)
-    @param arguments Attributes of the project
-    '''
-    def createProject(self, namespace, arguments):
-        if self._module.check_mode:
-            return True
-
-        arguments['namespace_id'] = namespace.id
-        try:
-            project = self._gitlab.projects.create(arguments)
-        except (gitlab.exceptions.GitlabCreateError) as e:
-            self._module.fail_json(msg="Failed to create project: %s " % to_native(e))
-
-        return project
-
-    '''
-    @param arguments Attributes of the project
-    '''
-    def getOptionsWithValue(self, arguments):
-        ret_arguments = dict()
-        for arg_key, arg_value in arguments.items():
-            if arguments[arg_key] is not None:
-                ret_arguments[arg_key] = arg_value
-
-        return ret_arguments
-
-    '''
-    @param project Project Object
-    @param arguments Attributes of the project
-    '''
-    def updateProject(self, project, arguments):
-        changed = False
-
-        for arg_key, arg_value in arguments.items():
-            if arguments[arg_key] is not None:
-                if getattr(project, arg_key) != arguments[arg_key]:
-                    setattr(project, arg_key, arguments[arg_key])
+                if save_mirror:
                     changed = True
+                    if self._module.check_mode:
+                        self._module.exit_json(changed=True, msg="Successfully updated the project remote mirror %s" % mirror_url)
+                    try:
+                        mirror.save()
+                    except Exception as e:
+                        self._module.fail_json(msg="Failed to update remote mirror: %s " % e)
 
-        return (changed, project)
+        # create a new mirror
+        if not mirror_exists:
+            create_data = {'url' : mirror_url,
+                           'enabled': mirror_enabled}
+            if mirror_keep_divergent_refs != None:
+              create_data['keep_divergent_refs'] = mirror_keep_divergent_refs
+            if mirror_only_protected_branches != None:
+              create_data['only_protected_branches'] = mirror_only_protected_branches
 
+            if self._module.check_mode:
+                self._module.exit_json(changed=True, msg="Successfully updated the project remote mirror %s" % mirror_url)
+            try:
+                mirror = self.projectObject.remote_mirrors.create(create_data)
+            except Exception as e:
+                self._module.fail_json(msg="Failed to create remote mirror: %s " % e)
+
+            changed = True
+
+        return changed
 
     '''
     @param namespace User/Group object
@@ -300,10 +272,12 @@ def main():
     if project_exists:
       if state == 'present':
           if gitlab_project.createOrUpdateMirror(mirror_url, mirror_enabled, mirror_keep_divergent_refs, mirror_only_protected_branches):
-
-              module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.projectObject._attrs)
-          module.exit_json(changed=False, msg="No need to update the project %s" % project_name, project=gitlab_project.projectObject._attrs)
-
+              module.exit_json(changed=True, msg="Successfully created or updated the remote mirror to %s" % project_name, project=gitlab_project.projectObject._attrs)
+          else:
+              module.exit_json(changed=False, msg="No need to update/create the remote mirror to %s" % project_name, project=gitlab_project.projectObject._attrs)
+      elif state == 'absent':
+          # as GitLab API does currently not support removing remote mirrors only way is to deactivate it
+          if gitlab_project.createOrUpdateMirror(mirror_url, False):
 
 if __name__ == '__main__':
     main()
