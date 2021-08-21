@@ -36,9 +36,10 @@ DOCUMENTATION = '''
         description: If 0 each record is returned as a dictionary, otherwise a string
         default: 1
       retry_servfail:
-        description: retry a nameserver if it returns SERVFAIL
-        default: False
-        type: boolean
+        description: Retry a nameserver if it returns SERVFAIL.
+        default: false
+        type: bool
+        version_added: 3.6.0
     notes:
       - ALL is not a record per-se, merely the listed fields are available for any record results you retrieve in the form of a dictionary.
       - While the 'dig' lookup plugin supports anything which dnspython supports out of the box, only a subset can be converted into a dictionary.
