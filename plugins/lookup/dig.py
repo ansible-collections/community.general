@@ -310,10 +310,7 @@ class LookupModule(LookupBase):
                     except Exception as e:
                         raise AnsibleError("dns lookup illegal CLASS: %s" % to_native(e))
                 elif opt == 'retry_servfail':
-                    try:
-                        myres.retry_servfail = bool(arg)
-                    except Exception as e:
-                        raise AnsibleError("dns lookup retry_servfail: %s" % to_native(e))
+                    myres.retry_servfail = bool(arg)
 
                 continue
 
