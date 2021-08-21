@@ -77,7 +77,7 @@ EXAMPLES = """
 - ansible.builtin.debug:
     msg: "XMPP service for gmail.com. is available at {{ item.target }} on port {{ item.port }}"
   with_items: "{{ lookup('community.general.dig', '_xmpp-server._tcp.gmail.com./SRV', 'flat=0', wantlist=True) }}"
-  
+
 - name: retry nameservers that return SERVFAIL
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.dig', 'example.org./A', 'retry_servfail=True') }}"
