@@ -25,13 +25,10 @@ class MockSecretServer(MagicMock):
 
 class TestLookupModule(TestCase):
     def setUp(self):
-        tss.sdk_is_missing = False
+        tss.HAS_TSS_SDK = True
         self.lookup = lookup_loader.get("community.general.tss")
 
-    @patch(
-        "ansible_collections.community.general.plugins.lookup.tss.LookupModule.Client",
-        MockSecretServer(),
-    )
+    @patch("ansible_collections.community.general.plugins.lookup.tss.SecretServer", MockSecretServer())
     def test_get_secret_json(self):
         self.assertListEqual(
             [MockSecretServer.RESPONSE],
