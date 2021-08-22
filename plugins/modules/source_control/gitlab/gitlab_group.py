@@ -65,7 +65,6 @@ options:
     description:
       - Determine if developers can create projects in the group.
     choices: ["developer", "maintainer", "noone"]
-    default: developer
     type: str
     version_added: 3.6.0
   auto_devops_enabled:
@@ -77,7 +76,6 @@ options:
     description:
       - Allowed to create subgroups.
     choices: ["maintainer", "owner"]
-    default: maintainer
     type: str
     version_added: 3.6.0
 '''
