@@ -506,6 +506,8 @@ files:
     maintainers: Gaetan2907
   $modules/identity/keycloak/keycloak_group.py:
     maintainers: adamgoossens
+  $modules/identity/keycloak/keycloak_identity_provider.py:
+    maintainers: laurpaum
   $modules/identity/keycloak/keycloak_realm.py:
     maintainers: kris2kris
   $modules/identity/keycloak/keycloak_role.py:
