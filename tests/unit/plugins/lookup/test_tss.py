@@ -55,70 +55,64 @@ class TestTSSClient(TestCase):
 
     def test_from_params(self):
         with patch(make_absolute('HAS_TSS_AUTHORIZER'), False):
-            client = tss.TSSClient.from_params(**self.server_params)
-            self.assertIsInstance(client, tss.TSSClientV0)
+            self.assert_client_version('v0')
 
             with patch.dict(self.server_params, {'domain': 'foo'}):
                 with self.assertRaises(tss.AnsibleError):
-                    tss.TSSClient.from_params(**self.server_params)
+                    self._get_client()
 
         with patch.multiple(TSS_IMPORT_PATH,
                             HAS_TSS_AUTHORIZER=True,
                             PasswordGrantAuthorizer=DEFAULT,
                             DomainPasswordGrantAuthorizer=DEFAULT):
 
-            client = tss.TSSClient.from_params(**self.server_params)
-            self.assertIsInstance(client, tss.TSSClientV1)
+            self.assert_client_version('v1')
 
             with patch.dict(self.server_params, {'domain': 'foo'}):
-                client = tss.TSSClient.from_params(**self.server_params)
-                self.assertIsInstance(client, tss.TSSClientV1)
+                self.assert_client_version('v1')
+
+    def assert_client_version(self, version):
+        version_to_class = {
+            'v0': tss.TSSClientV0,
+            'v1': tss.TSSClientV1
+        }
+
+        client = self._get_client()
+        self.assertIsInstance(client, version_to_class[version])
+
+    def _get_client(self):
+        return tss.TSSClient.from_params(**self.server_params)
 
 
 class TestLookupModule(TestCase):
     def setUp(self):
         self.lookup = lookup_loader.get("community.general.tss")
+        self.valid_terms = [1]
+        self.invalid_terms = ['foo']
 
     @patch.multiple(TSS_IMPORT_PATH,
                     HAS_TSS_SDK=False,
                     SecretServer=MockSecretServer)
     def test_missing_sdk(self):
         with self.assertRaises(tss.AnsibleError):
-            self.lookup.run([], [], **{})
+            self._run_lookup(self.valid_terms)
 
     @patch.multiple(TSS_IMPORT_PATH,
                     HAS_TSS_SDK=True,
-                    SecretServer=MockSecretServer)
+                    SecretServerError=SecretServerError)
     def test_get_secret_json(self):
-        self.assertListEqual(
-            [MockSecretServer.RESPONSE],
-            self.lookup.run(
-                [1],
-                [],
-                **{"base_url": "dummy", "username": "dummy", "password": "dummy", }
-            ),
-        )
+        with patch(make_absolute('SecretServer'), MockSecretServer):
+            self.assertListEqual([MockSecretServer.RESPONSE], self._run_lookup(self.valid_terms))
 
-    @patch.multiple(TSS_IMPORT_PATH,
-                    HAS_TSS_SDK=True,
-                    SecretServer=MockFaultySecretServer,
-                    SecretServerError=SecretServerError)
-    def test_get_secret_json_server_error(self):
-        with self.assertRaises(tss.AnsibleError):
-            self.lookup.run(
-                [1],
-                [],
-                **{"base_url": "dummy", "username": "dummy", "password": "dummy"}
-            )
+            with self.assertRaises(tss.AnsibleOptionsError):
+                self._run_lookup(self.invalid_terms)
 
-    @patch.multiple(TSS_IMPORT_PATH,
-                    HAS_TSS_SDK=True,
-                    SecretServer=MockSecretServer,
-                    SecretServerError=SecretServerError)
-    def test_get_secret_json_invalid_term(self):
-        with self.assertRaises(tss.AnsibleOptionsError):
-            self.lookup.run(
-                ['foo'],
-                [],
-                **{"base_url": "dummy", "username": "dummy", "password": "dummy"}
-            )
+        with patch(make_absolute('SecretServer'), MockFaultySecretServer):
+            with self.assertRaises(tss.AnsibleError):
+                self._run_lookup(self.valid_terms)
+
+    def _run_lookup(self, terms, variables=None, **kwargs):
+        variables = variables or []
+        kwargs = kwargs or {"base_url": "dummy", "username": "dummy", "password": "dummy"}
+
+        return self.lookup.run(terms, variables, **kwargs)
