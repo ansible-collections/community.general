@@ -228,8 +228,8 @@ def main():
         state=dict(type='str', required=False, default="present",
                    choices=["present", "absent"]),
         organization=dict(type='str', required=False, default=None),
-        private=dict(type='bool', required=False, default=False),
-        description=dict(type='str', required=False, default=''),
+        private=dict(type='bool'),
+        description=dict(type='str'),
         api_url=dict(type='str', required=False, default='https://api.github.com'),
     )
     module = AnsibleModule(

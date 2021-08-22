@@ -201,7 +201,8 @@ class TestGithubRepo(unittest.TestCase):
             "name": "myrepo",
             "description": None,
             "private": None,
-            "state": "present"
+            "state": "present",
+            "api_url": "https://api.github.com"
         })
 
         self.assertEqual(result['changed'], True)
@@ -255,7 +256,8 @@ class TestGithubRepo(unittest.TestCase):
             "name": "myrepo",
             "description": None,
             "private": None,
-            "state": "present"
+            "state": "present",
+            "api_url": "https://api.github.com"
         })
         self.assertEqual(result['changed'], False)
         self.assertEqual(result['repo']['private'], True)
