@@ -37,8 +37,6 @@ class MockSecretServer(MagicMock):
 
 
 class MockFaultySecretServer(MagicMock):
-    RESPONSE = '{"foo": "bar"}'
-
     def get_secret_json(self, path):
         raise SecretServerError
 
