@@ -47,7 +47,9 @@ options:
         required: true
     domain:
         default: ""
-        description: The domain with which to request the OAuth2 Access Grant.
+        description:
+          - The domain with which to request the OAuth2 Access Grant.
+          - Requires C(python-tss-sdk) version 1.0.0 or greater.
         env:
             - name: TSS_DOMAIN
         ini:
@@ -136,6 +138,7 @@ try:
     HAS_TSS_SDK = True
 except ImportError:
     SecretServer = None
+    SecretServerError = None
     HAS_TSS_SDK = False
 
 try:
@@ -143,6 +146,8 @@ try:
 
     HAS_TSS_AUTHORIZER = True
 except ImportError:
+    PasswordGrantAuthorizer = None
+    DomainPasswordGrantAuthorizer = None
     HAS_TSS_AUTHORIZER = False
 
 
@@ -180,6 +185,9 @@ class TSSClient(object):
 class TSSClientV0(TSSClient):
     def __init__(self, **server_parameters):
         super(TSSClientV0, self).__init__()
+
+        if server_parameters.get("domain"):
+            raise AnsibleError("The 'domain' option requires 'python-tss-sdk' version 1.0.0 or greater")
 
         self._client = SecretServer(
             server_parameters["base_url"],
