@@ -17,6 +17,11 @@ from ansible_collections.community.general.plugins.lookup import tss
 from ansible.plugins.loader import lookup_loader
 
 
+class SecretServerError(Exception):
+    def __init__(self):
+        self.message = ''
+
+
 TSS_IMPORT_PATH = 'ansible_collections.community.general.plugins.lookup.tss'
 
 
@@ -31,8 +36,11 @@ class MockSecretServer(MagicMock):
         return self.RESPONSE
 
 
-class SecretServerError(Exception):
-    pass
+class MockFaultySecretServer(MagicMock):
+    RESPONSE = '{"foo": "bar"}'
+
+    def get_secret_json(self, path):
+        raise SecretServerError
 
 
 @patch(make_absolute('SecretServer'), MockSecretServer())
@@ -69,12 +77,20 @@ class TestTSSClient(TestCase):
                 self.assertIsInstance(client, tss.TSSClientV1)
 
 
-@patch(make_absolute('SecretServer'), MockSecretServer())
 class TestLookupModule(TestCase):
     def setUp(self):
-        tss.HAS_TSS_SDK = True
         self.lookup = lookup_loader.get("community.general.tss")
 
+    @patch.multiple(TSS_IMPORT_PATH,
+                    HAS_TSS_SDK=False,
+                    SecretServer=MockSecretServer)
+    def test_missing_sdk(self):
+        with self.assertRaises(tss.AnsibleError):
+            self.lookup.run([], [], **{})
+
+    @patch.multiple(TSS_IMPORT_PATH,
+                    HAS_TSS_SDK=True,
+                    SecretServer=MockSecretServer)
     def test_get_secret_json(self):
         self.assertListEqual(
             [MockSecretServer.RESPONSE],
@@ -85,7 +101,22 @@ class TestLookupModule(TestCase):
             ),
         )
 
-    @patch(make_absolute('SecretServerError'), SecretServerError)
+    @patch.multiple(TSS_IMPORT_PATH,
+                    HAS_TSS_SDK=True,
+                    SecretServer=MockFaultySecretServer,
+                    SecretServerError=SecretServerError)
+    def test_get_secret_json_server_error(self):
+        with self.assertRaises(tss.AnsibleError):
+            self.lookup.run(
+                [1],
+                [],
+                **{"base_url": "dummy", "username": "dummy", "password": "dummy"}
+            )
+
+    @patch.multiple(TSS_IMPORT_PATH,
+                    HAS_TSS_SDK=True,
+                    SecretServer=MockSecretServer,
+                    SecretServerError=SecretServerError)
     def test_get_secret_json_invalid_term(self):
         with self.assertRaises(tss.AnsibleOptionsError):
             self.lookup.run(
