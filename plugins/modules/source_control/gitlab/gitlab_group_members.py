@@ -286,7 +286,7 @@ def main():
             if user_level['access_level']:
                 user_level['access_level'] = access_level_int[user_level['access_level']]
 
-    if len(gitlab_users_access) == 1:
+    if len(gitlab_users_access) == 1 and not purge_users:
         # only single user given
         members = [group.get_member_in_a_group(gitlab_group_id, group.get_user_id(gitlab_users_access[0]['name']))]
         if members[0] is None:
