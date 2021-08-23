@@ -44,8 +44,10 @@ options:
         choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
     gitlab_users_access:
         description:
-            - Provide a list of dictionaries user= username, access_level= xxx to align users
-              access_levels given on a per user basis instead of a userlist to one given access level.
+            - Provide a list of user to access level mappings.
+            - Every dictionary in this list specifies a user (by username) and the access level the user should have.
+            - Mutually exclusive with I(gitlab_user) and I(access_level).
+            - Use together with I(purge_users) to remove all users not specified here from the group.
         type: list
         elements: dict
         suboptions:
