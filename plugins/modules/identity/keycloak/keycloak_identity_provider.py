@@ -504,7 +504,7 @@ def main():
             changeset[camel(param)] = new_param_value
 
     # special handling of mappers list to allow change detection
-    changeset['mappers'] = before_idp['mappers'].copy()
+    changeset['mappers'] = before_idp.get('mappers', list())
     if module.params.get('mappers') is not None:
         for new_mapper in module.params.get('mappers'):
             old_mapper = next((x for x in changeset['mappers'] if x['name'] == new_mapper['name']), None)
