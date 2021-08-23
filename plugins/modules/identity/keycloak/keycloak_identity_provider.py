@@ -417,7 +417,7 @@ def sanitize(idp):
     if 'config' in result:
         result['config'] = sanitize(result['config'])
     if 'clientSecret' in result:
-        result['clientSecret'] = 'no_log'
+        result['clientSecret'] = '**********'
     return result
 
 
@@ -488,7 +488,7 @@ def main():
 
     # convert module parameters to client representation parameters (if they belong in there)
     idp_params = [x for x in module.params
-                  if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
+                  if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'mappers'] and
                   module.params.get(x) is not None]
 
     # does the identity provider already exist?
@@ -499,18 +499,23 @@ def main():
 
     for param in idp_params:
         new_param_value = module.params.get(param)
+        old_value = before_idp[camel(param)] if camel(param) in before_idp else None
+        if new_param_value != old_value:
+            changeset[camel(param)] = new_param_value
 
-        # sort mappers by name
-        if isinstance(new_param_value, list):
-            if param in ['mappers']:
-                new_param_value = sorted(new_param_value, key=lambda x: x.get('name'))
-
-        # Unfortunately, the ansible argument spec checker introduces variables with null values when
-        # they are not specified
-        if param == 'mappers':
-            new_param_value = [dict((k, v) for k, v in x.items() if x[k] is not None) for x in new_param_value]
-
-        changeset[camel(param)] = new_param_value
+    # special handling of mappers list to allow change detection
+    changeset['mappers'] = before_idp['mappers'].copy()
+    if module.params.get('mappers') is not None:
+        for new_mapper in module.params.get('mappers'):
+            old_mapper = next((x for x in changeset['mappers'] if x['name'] == new_mapper['name']), None)
+            new_mapper = dict((k, v) for k, v in new_mapper.items() if new_mapper[k] is not None)
+            if old_mapper is not None:
+                old_mapper.update(new_mapper)
+            else:
+                changeset['mappers'].append(new_mapper)
+        # remove mappers if not present in module params
+        changeset['mappers'] = [x for x in changeset['mappers']
+                                if [y for y in module.params.get('mappers', []) if y['name'] == x['name']] != []]
 
     # prepare the new representation
     updated_idp = before_idp.copy()
@@ -573,21 +578,15 @@ def main():
             # do the update
             updated_idp = updated_idp.copy()
             updated_mappers = updated_idp.pop('mappers', [])
-            old_mappers = before_idp['mappers']
             kc.update_identity_provider(updated_idp, realm)
-            # create or update mappers
-            for tmp_mapper in updated_mappers:
-                old_mapper = next((m for m in old_mappers if m['name'] == tmp_mapper['name']), None)
-                if old_mapper is not None:
-                    old_mapper = old_mapper.copy()
-                    old_mapper.update(tmp_mapper)
-                    kc.update_identity_provider_mapper(old_mapper, alias, realm)
+            for mapper in updated_mappers:
+                if mapper.get('id') is not None:
+                    kc.update_identity_provider_mapper(mapper, alias, realm)
                 else:
-                    kc.create_identity_provider_mapper(tmp_mapper, alias, realm)
-            # remove unwanted mappers
-            for tmp_mapper in old_mappers:
-                if next((m for m in updated_mappers if m['name'] == tmp_mapper['name']), None) is None:
-                    kc.delete_identity_provider_mapper(tmp_mapper['id'], alias, realm)
+                    kc.create_identity_provider_mapper(mapper, alias, realm)
+            for mapper in [x for x in before_idp['mappers']
+                           if [y for y in updated_mappers if y["name"] == x['name']] == []]:
+                kc.delete_identity_provider_mapper(mapper['id'], alias, realm)
 
             after_idp = get_identity_provider_with_mappers(kc, alias, realm)
 
