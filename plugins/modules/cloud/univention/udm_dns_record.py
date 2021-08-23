@@ -7,7 +7,6 @@
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
-import ipaddress
 
 
 DOCUMENTATION = '''
@@ -107,6 +106,7 @@ from ansible_collections.community.general.plugins.module_utils.univention_umc i
     config,
     uldap,
 )
+import ipaddress
 
 
 def main():
@@ -150,7 +150,7 @@ def main():
             subnet_offset = ipaddr_rev.find(zone)
             if subnet_offset == -1:
                 raise Exception("IP address is not part of zone.")
-            workname = ipaddr_rev[0:subnet_offset-1]
+            workname = ipaddr_rev[0:subnet_offset - 1]
         except Exception as e:
             module.fail_json(
                 msg='handling PTR record for {0} in zone {1} failed: {2}'.format(name, zone, e)
