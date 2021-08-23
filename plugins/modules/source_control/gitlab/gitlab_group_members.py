@@ -40,6 +40,7 @@ options:
         description:
             - The access level for the user.
             - Required if I(state=present), user state is set to present.
+            - Mutually exclusive with I(gitlab_users_access).
         type: str
         choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
     gitlab_users_access:
