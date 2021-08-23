@@ -17,16 +17,16 @@ from ansible_collections.community.general.plugins.lookup import tss
 from ansible.plugins.loader import lookup_loader
 
 
-class SecretServerError(Exception):
-    def __init__(self):
-        self.message = ''
-
-
 TSS_IMPORT_PATH = 'ansible_collections.community.general.plugins.lookup.tss'
 
 
 def make_absolute(name):
     return '.'.join([TSS_IMPORT_PATH, name])
+
+
+class SecretServerError(Exception):
+    def __init__(self):
+        self.message = ''
 
 
 class MockSecretServer(MagicMock):
@@ -85,31 +85,32 @@ class TestTSSClient(TestCase):
 
 
 class TestLookupModule(TestCase):
+    VALID_TERMS = [1]
+    INVALID_TERMS = ['foo']
+
     def setUp(self):
         self.lookup = lookup_loader.get("community.general.tss")
-        self.valid_terms = [1]
-        self.invalid_terms = ['foo']
 
     @patch.multiple(TSS_IMPORT_PATH,
                     HAS_TSS_SDK=False,
                     SecretServer=MockSecretServer)
     def test_missing_sdk(self):
         with self.assertRaises(tss.AnsibleError):
-            self._run_lookup(self.valid_terms)
+            self._run_lookup(self.VALID_TERMS)
 
     @patch.multiple(TSS_IMPORT_PATH,
                     HAS_TSS_SDK=True,
                     SecretServerError=SecretServerError)
     def test_get_secret_json(self):
         with patch(make_absolute('SecretServer'), MockSecretServer):
-            self.assertListEqual([MockSecretServer.RESPONSE], self._run_lookup(self.valid_terms))
+            self.assertListEqual([MockSecretServer.RESPONSE], self._run_lookup(self.VALID_TERMS))
 
             with self.assertRaises(tss.AnsibleOptionsError):
-                self._run_lookup(self.invalid_terms)
+                self._run_lookup(self.INVALID_TERMS)
 
         with patch(make_absolute('SecretServer'), MockFaultySecretServer):
             with self.assertRaises(tss.AnsibleError):
-                self._run_lookup(self.valid_terms)
+                self._run_lookup(self.VALID_TERMS)
 
     def _run_lookup(self, terms, variables=None, **kwargs):
         variables = variables or []
