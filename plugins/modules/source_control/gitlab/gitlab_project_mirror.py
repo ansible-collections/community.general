@@ -139,7 +139,7 @@ class GitLabProject(object):
     def createOrUpdateMirror(self, mirror_url, mirror_enabled, mirror_keep_divergent_refs = None, mirror_only_protected_branches = None):
         changed = False
         mirror_exists = False
-
+        self._module.fail_json(msg="Hier")
         mirrors = self.projectObject.remote_mirrors.list()
         urlParts = mirror_url.split('@')
         for mirror in mirrors:
@@ -265,11 +265,14 @@ def main():
     except gitlab.exceptions.GitlabGetError as e:
         module.fail_json(msg="Failed to find the namespace for the given user: %s" % to_native(e))
 
+    module.fail_json(msg=namespace)
+
     if not namespace:
         module.fail_json(msg="Failed to find the namespace for the project")
     project_exists = gitlab_project.existsProject(namespace, project_path)
 
     if project_exists:
+
       if state == 'present':
           if gitlab_project.createOrUpdateMirror(mirror_url, mirror_enabled, mirror_keep_divergent_refs, mirror_only_protected_branches):
               module.exit_json(changed=True, msg="Successfully created or updated the remote mirror to %s" % project_name, project=gitlab_project.projectObject._attrs)
@@ -278,6 +281,9 @@ def main():
       elif state == 'absent':
           # as GitLab API does currently not support removing remote mirrors only way is to deactivate it
           if gitlab_project.createOrUpdateMirror(mirror_url, False):
+            module.exit_json(changed=True, msg="Successfully disabled remote mirror to %s" % project_name, project=gitlab_project.projectObject._attrs)
+          else:
+            module.exit_json(changed=False, msg="No need to change remote mirror to %s" % project_name, project=gitlab_project.projectObject._attrs)
 
 if __name__ == '__main__':
     main()
