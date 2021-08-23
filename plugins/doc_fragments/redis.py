@@ -30,17 +30,22 @@ options:
       - Specify the password to authenticate with.
       - Usually not used when target is localhost.
     type: str
+  ssl:
+    description:
+      - Specify whether or not to use SSL for the connection.
+    type: bool
+    default: true
   validate_certs:
     description:
       - Specify whether or not to validate SSL certificates.
       - This should only be turned off for personally controlled sites or with
         C(localhost) as target.
     type: bool
-    default: True
+    default: true
   ssl_ca_certs:
     description:
-      - Path to root certificates file. If not set and C(validate_certs) is
-      - set to I(True), certifi ca-certificates will be used.
+      - Path to root certificates file. If not set and C(ssl) is
+      - set to C(True), certifi ca-certificates will be used.
     type: str
 requirements: [ "redis", "certifi" ]
 

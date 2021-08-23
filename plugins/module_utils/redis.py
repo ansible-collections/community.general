@@ -45,6 +45,8 @@ def redis_auth_argument_spec():
                             no_log=True
                             ),
         login_port=dict(type='int', default=6379),
+        ssl=dict(type='bool',
+                 default=True),
         validate_certs=dict(type='bool',
                             default=True
                             ),
@@ -64,19 +66,21 @@ class RedisAnsible(object):
         login_user = self.module.params['login_user']
         login_password = self.module.params['login_password']
         login_port = self.module.params['login_port']
+        ssl = self.module.params['ssl']
         validate_certs = self.module.params['validate_certs']
         ssl_ca_certs = self.module.params['ssl_ca_certs']
-        if ssl_ca_certs is None:
+        if ssl and ssl_ca_certs is None:
             ssl_ca_certs = str(certifi.where())
 
         try:
-            if validate_certs:
+            if ssl:
                 return Redis(host=login_host,
                              port=login_port,
                              username=login_user,
                              password=login_password,
                              ssl_ca_certs=ssl_ca_certs,
-                             ssl=validate_certs,)
+                             ssl_cert_reqs=validate_certs,
+                             ssl=ssl,)
             else:
                 return Redis(host=login_host,
                              port=login_port,

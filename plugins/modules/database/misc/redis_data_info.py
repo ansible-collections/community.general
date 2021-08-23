@@ -13,7 +13,7 @@ module: redis_data_info
 short_description: Get value of key in Redis database
 version_added: 3.6.0
 description:
-  - Get value of keys in Redis database
+  - Get value of keys in Redis database.
 author: "Andreas Botzner (@paginabianca)"
 options:
   key:
@@ -42,7 +42,7 @@ EXAMPLES = '''
     login_host: redishost
     login_password: supersecret
     login_user: somuser
-    validate_certs: yes
+    validate_certs: true
     ssl_ca_certs: /path/to/ca/certs
     key: foo
 '''
@@ -53,7 +53,7 @@ exists:
   returned: on success
   type: bool
 value:
-  description: Value key was set to
+  description: Value key was set to.
   returned: if existing
   type: str
   sample: 'value_of_some_key'
@@ -93,16 +93,16 @@ def main():
     try:
         value = redis.connection.get(key)
     except Exception as e:
-        msg = 'Failed to get value of key: {0} with exception: {1}'.format(
+        msg = 'Failed to get value of key "{0}" with exception: {1}'.format(
             key, str(e))
         result['msg'] = msg
         module.fail_json(**result)
 
     if value is None:
-        msg = 'Key: {0} does not exist in database'.format(key)
+        msg = 'Key "{0}" does not exist in database'.format(key)
         result['exists'] = False
     else:
-        msg = 'Got key: {0} with value: {1}'.format(key, value)
+        msg = 'Got key "{0}"'.format(key)
         result['value'] = value
         result['exists'] = True
     result['msg'] = msg
