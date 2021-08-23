@@ -370,7 +370,8 @@ def main():
 
         for member in members:
             if member.access_level in purge_users and member.username.upper() not in uppercase_names_in_gitlab_users_access:
-                group.remove_user_from_group(member.id, gitlab_group_id)
+                if not module.check_mode:
+                    group.remove_user_from_group(member.id, gitlab_group_id)
                 changed = True
                 changed_users.append("Successfully removed user '%s', from group. Was not in given list" % member.username)
                 changed_data.append({'gitlab_user': member.username, 'result': 'CHANGED',
