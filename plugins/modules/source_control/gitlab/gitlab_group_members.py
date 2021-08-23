@@ -380,7 +380,7 @@ def main():
         # if single user given and an error occurred return error for list errors will be per user
         module.fail_json(msg=changed_users[0], result_data=changed_data)
     elif error:
-        module.fail_json(msg='All tasks for all users given failed', result_data=changed_data)
+        module.fail_json(msg='Was not able to find at least one user that should be present', result_data=changed_data)
 
     module.exit_json(changed=changed, result="\n".join(changed_users), result_data=changed_data)
 
