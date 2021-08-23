@@ -14,8 +14,8 @@ module: proxmox_tasks_info
 short_description: Retrieve information about one or more Proxmox VE tasks
 version_added: 3.6.0
 description:
-  - Retrieve information about one or more Proxmox VE tasks
-author: "Andreas Botzner (@paginabianca) <andreas at botzner dot com>"
+  - Retrieve information about one or more Proxmox VE tasks.
+author: 'Andreas Botzner (@paginabianca) <andreas at botzner dot com>'
 options:
   node:
     description:
@@ -27,7 +27,8 @@ options:
       - Return specific task.
     aliases: ['upid', 'name']
     type: str
-extends_documentation_fragment: community.general.proxmox.documentation
+extends_documentation_fragment:
+    - community.general.proxmox.documentation
 '''
 
 
@@ -36,18 +37,19 @@ EXAMPLES = '''
   community.general.proxmox_task_info:
     api_host: proxmoxhost
     api_user: root@pam
-    api_password: "{{ password | default(omit) }}"
-    api_token_id: "{{ token_id | default(omit) }}"
-    api_token_secret: "{{ token_secret | default(omit) }}"
+    api_password: '{{ password | default(omit) }}'
+    api_token_id: '{{ token_id | default(omit) }}'
+    api_token_secret: '{{ token_secret | default(omit) }}'
     node: node01
   register: result
+
 - name: Retrieve information about specific tasks on node01
   community.general.proxmox_group_info:
     api_host: proxmoxhost
     api_user: root@pam
-    api_password: "{{ password | default(omit) }}"
-    api_token_id: "{{ token_id | default(omit) }}"
-    api_token_secret: "{{ token_secret | default(omit) }}"
+    api_password: '{{ password | default(omit) }}'
+    api_token_id: '{{ token_id | default(omit) }}'
+    api_token_secret: '{{ token_secret | default(omit) }}'
     task: 'UPID:node01:00003263:16167ACE:621EE230:srvreload:networking:root@pam:'
     node: node01
   register: proxmox_tasks
@@ -56,8 +58,8 @@ EXAMPLES = '''
 
 RETURN = '''
 proxmox_groups:
-    description: List of tasks
-    returned: always, but can be empty
+    description: List of tasks.
+    returned: on success
     type: list
     elements: dict
     contains:
@@ -98,20 +100,23 @@ proxmox_groups:
         returned: on success, can be absent
         type: int
       status:
-        description: Status of the task
+        description: Status of the task.
         returned: on success, can be absent
         type: str
       failed:
-        description: If the task failed
+        description: If the task failed.
         returned: when status is defined
         type: bool
+msg:
+    description: Short message.
+    returned: on failure
+    type: str
+    sample: 'Task: UPID:xyz:xyz does not exist on node: proxmoxnode'
 '''
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
     proxmox_auth_argument_spec, ProxmoxAnsible, HAS_PROXMOXER, PROXMOXER_IMP_ERR)
-
-import pprint
 
 
 class ProxmoxTaskInfoAnsible(ProxmoxAnsible):
@@ -123,9 +128,6 @@ class ProxmoxTaskInfoAnsible(ProxmoxAnsible):
 
     def get_tasks(self, node):
         tasks = self.proxmox_api.nodes(node).tasks.get()
-        pprint.pp('PRINTING TASKS:')
-        pprint.pp(tasks)
-        pprint.pp("done printing tasks")
         return [ProxmoxTask(task) for task in tasks]
 
 
@@ -143,7 +145,7 @@ class ProxmoxTask:
 
 def proxmox_task_info_argument_spec():
     return dict(
-        task=dict(type='str', aliases=['upid', 'name']),
+        task=dict(type='str', aliases=['upid', 'name'], required=False),
         node=dict(type='str', required=True),
     )
 
@@ -173,8 +175,12 @@ def main():
         tasks = proxmox.get_tasks(node=node)
     if tasks is not None:
         result['proxmox_tasks'] = [task.info for task in tasks]
-    module.exit_json(**result)
+        module.exit_json(**result)
+    else:
+        result['msg'] = 'Task: {0} does not exist on node: {1}.'.format(
+            upid, node)
+        module.fail_json(**result)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
