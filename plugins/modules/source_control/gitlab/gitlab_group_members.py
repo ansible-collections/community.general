@@ -282,9 +282,9 @@ def main():
             gitlab_users_access.append({'name': gl_user, 'access_level': access_level_int[access_level]})
     elif module.params['gitlab_users_access'] is not None:
         gitlab_users_access = module.params['gitlab_users_access']
-        for i in range(len(gitlab_users_access)):
-            if gitlab_users_access[i]['access_level']:
-                gitlab_users_access[i]['access_level'] = access_level_int[gitlab_users_access[i]['access_level']]
+        for user_level in gitlab_users_access:
+            if user_level['access_level']:
+                user_level['access_level'] = access_level_int[user_level['access_level']]
 
     if len(gitlab_users_access) == 1:
         # only single user given
