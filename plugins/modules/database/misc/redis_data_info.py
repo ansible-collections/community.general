@@ -99,7 +99,7 @@ def main():
         module.fail_json(**result)
 
     if value is None:
-        msg = 'Key: {0} does not exist in databse'.format(key)
+        msg = 'Key: {0} does not exist in database'.format(key)
         result['exists'] = False
     else:
         msg = 'Got key: {0} with value: {1}'.format(key, value)
