@@ -1143,6 +1143,22 @@ class Nmcli(object):
                 'connection.master': self.master,
             })
 
+        # Connections that support WiFi.
+        if self.wifi_conn_type:
+            options.update({
+                '802-11-wireless.ssid': self.ssid,
+            })
+            if self.wifi:
+                for name, value in self.wifi.items():
+                    options.update({
+                        '802-11-wireless.%s' % name: value
+                    })
+            if self.wifi_sec:
+                for name, value in self.wifi_sec.items():
+                    options.update({
+                        '802-11-wireless-security.%s' % name: value
+                    })
+
         # Options specific to a connection type.
         if self.type == 'bond':
             options.update({
@@ -1203,19 +1219,8 @@ class Nmcli(object):
             })
         elif self.type == 'wifi':
             options.update({
-                '802-11-wireless.ssid': self.ssid,
                 'connection.slave-type': 'bond' if self.master else None,
             })
-            if self.wifi:
-                for name, value in self.wifi.items():
-                    options.update({
-                        '802-11-wireless.%s' % name: value
-                    })
-            if self.wifi_sec:
-                for name, value in self.wifi_sec.items():
-                    options.update({
-                        '802-11-wireless-security.%s' % name: value
-                    })
         # Convert settings values based on the situation.
         for setting, value in options.items():
             setting_type = self.settings_type(setting)
@@ -1285,8 +1290,11 @@ class Nmcli(object):
             'bond-slave',
             'bridge-slave',
             'team-slave',
-            'wifi',
         )
+
+    @property
+    def wifi_conn_type(self):
+        return (self.ssid is not None) and (self.type == 'wifi' or self.slave_conn_type)
 
     @property
     def tunnel_conn_type(self):
@@ -1464,7 +1472,7 @@ class Nmcli(object):
 
         return conn_info
 
-    def get_supported_properties(self, setting):
+    def get_supported_properties(self, setting, type):
         properties = []
 
         if setting == '802-11-wireless-security':
@@ -1476,7 +1484,7 @@ class Nmcli(object):
 
         commands += ['print %s' % setting, 'quit', 'yes']
 
-        (rc, out, err) = self.execute_edit_commands(commands, arguments=['type', self.type])
+        (rc, out, err) = self.execute_edit_commands(commands, arguments=['type', type])
 
         if rc != 0:
             raise NmcliModuleError(err)
@@ -1493,12 +1501,15 @@ class Nmcli(object):
     def check_for_unsupported_properties(self, setting):
         if setting == '802-11-wireless':
             setting_key = 'wifi'
+            type = 'wifi'
         elif setting == '802-11-wireless-security':
             setting_key = 'wifi_sec'
+            type = 'wifi'
         else:
             setting_key = setting
+            type = self.type
 
-        supported_properties = self.get_supported_properties(setting)
+        supported_properties = self.get_supported_properties(setting, type)
         unsupported_properties = []
 
         for property, value in getattr(self, setting_key).items():
@@ -1667,6 +1678,7 @@ def main():
             wifi_sec=dict(type='dict', no_log=True),
         ),
         mutually_exclusive=[['never_default4', 'gw4']],
+        required_by={'wifi': 'ssid', 'wifi_sec': 'ssid'},
         required_if=[("type", "wifi", [("ssid")])],
         supports_check_mode=True,
     )
@@ -1690,7 +1702,7 @@ def main():
             nmcli.module.fail_json(msg="Please specify a name for the master when type is %s" % nmcli.type)
         if nmcli.ifname is None:
             nmcli.module.fail_json(msg="Please specify an interface name for the connection when type is %s" % nmcli.type)
-    if nmcli.type == 'wifi':
+    if nmcli.wifi_conn_type:
         unsupported_properties = {}
         if nmcli.wifi:
             if 'ssid' in nmcli.wifi:
