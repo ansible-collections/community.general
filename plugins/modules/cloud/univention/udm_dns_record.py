@@ -7,6 +7,7 @@
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
+import ipaddress
 
 
 DOCUMENTATION = '''
@@ -66,6 +67,22 @@ EXAMPLES = '''
       a:
          - 192.0.2.1
          - 2001:0db8::42
+
+- name: Create a DNS v4 PTR record on a UCS
+  community.general.udm_dns_record:
+    name: 192.0.2.1
+    zone: 2.0.192.in-addr.arpa
+    type: ptr_record
+    data:
+      ptr_record: "www.example.com."
+
+- name: Create a DNS v6 PTR record on a UCS
+  community.general.udm_dns_record:
+    name: 2001:db8:0:0:0:ff00:42:8329
+    zone: 2.4.0.0.0.0.f.f.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa
+    type: ptr_record
+    data:
+      ptr_record: "www.example.com."
 '''
 
 
@@ -124,14 +141,28 @@ def main():
     changed = False
     diff = None
 
+    workname = name
+    if type == 'ptr_record':
+        try:
+            ipaddr_rev = ipaddress.ip_address(name).reverse_pointer
+            if zone.find('arpa') == -1:
+                raise Exception("Zone must be reversed zone for ptr_record. (e.g. 1.1.192.in-addr.arpa)")
+            subnet_offset = ipaddr_rev.find(zone)
+            if subnet_offset == -1:
+                raise Exception("IP address is not part of zone.")
+            workname = ipaddr_rev[0:subnet_offset-1]
+        except Exception as e:
+            module.fail_json(
+                msg='handling PTR record for {0} in zone {1} failed: {2}'.format(name, zone, e)
+            )
+
     obj = list(ldap_search(
-        '(&(objectClass=dNSZone)(zoneName={0})(relativeDomainName={1}))'.format(zone, name),
+        '(&(objectClass=dNSZone)(zoneName={0})(relativeDomainName={1}))'.format(zone, workname),
         attr=['dNSZone']
     ))
-
     exists = bool(len(obj))
     container = 'zoneName={0},cn=dns,{1}'.format(zone, base_dn())
-    dn = 'relativeDomainName={0},{1}'.format(name, container)
+    dn = 'relativeDomainName={0},{1}'.format(workname, container)
 
     if state == 'present':
         try:
@@ -144,13 +175,21 @@ def main():
                 ) or reverse_zone.lookup(
                     config(),
                     uldap(),
-                    '(zone={0})'.format(zone),
+                    '(zoneName={0})'.format(zone),
                     scope='domain',
                 )
+                if len(so) == 0:
+                    raise Exception("Did not find zone '{0}' in Univention".format(zone))
                 obj = umc_module_for_add('dns/{0}'.format(type), container, superordinate=so[0])
             else:
                 obj = umc_module_for_edit('dns/{0}'.format(type), dn)
-            obj['name'] = name
+
+            if type == 'ptr_record':
+                obj['ip'] = name
+                obj['address'] = workname
+            else:
+                obj['name'] = name
+
             for k, v in data.items():
                 obj[k] = v
             diff = obj.diff()
