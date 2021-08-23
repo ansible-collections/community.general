@@ -33,6 +33,7 @@ options:
     gitlab_user:
         description:
             - A username or a list of usernames to add to/remove from the GitLab group.
+            - Mutually exclusive with I(gitlab_users_access).
         type: list
         elements: str
     access_level:
