@@ -90,7 +90,7 @@ options:
         type: str
       bridge_vlan_ports:
         description:
-          - Enable bridge vlan support.
+          - Enable bridge VLAN support.
         type: bool
       cidr:
         description:
@@ -145,20 +145,20 @@ options:
         type: str
       ovs_tag:
         description:
-          - Specify a VLan tag (used by OVSPort, OVSIntPort, OVSBond)
+          - Specify a VLAN tag (used by OVSPort, OVSIntPort, OVSBond).
           - Value should be C(1 ≤ n ≤ 4094).
         type: int
       slaves:
         description:
-          - Specify a VLan tag (used by OVSPort, OVSIntPort, OVSBond)
+          - Specify a VLAN tag (used by OVSPort, OVSIntPort, OVSBond).
         type: str
       vlan_id:
         description:
-          - vlan-id for a custom named vlan interface (ifupdown2 only).
+          - vlan-id for a custom named VLAN interface (ifupdown2 only).
         type: int
       vlan_raw_device:
         description:
-          - Specify the raw interface for the vlan interface.
+          - Specify the raw interface for the VLAN interface.
         type: str
       state:
         description:
