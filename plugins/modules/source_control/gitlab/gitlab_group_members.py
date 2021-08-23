@@ -261,8 +261,7 @@ def main():
     purge_users = module.params['purge_users']
 
     if purge_users:
-        for i in range(len(purge_users)):
-            purge_users[i] = access_level_int[purge_users[i]]
+        purge_users = [access_level_int[level] for level in purge_users]
 
     # connect to gitlab server
     gl = gitlabAuthentication(module)
