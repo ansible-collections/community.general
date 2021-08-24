@@ -405,6 +405,7 @@ ipv6.ignore-auto-routes:                no
 ip-tunnel.mode:                         gre
 ip-tunnel.parent:                       non_existent_gre_device
 ip-tunnel.local:                        192.168.225.5
+ip-tunnel.remote:                       192.168.225.6
 ip-tunnel.input-key:                    1
 ip-tunnel.output-key:                   2
 """
