@@ -15,6 +15,9 @@ short_description: Management network interfaces on a Proxmox node.
 version_added: 3.6.0
 description:
   - Allows you to create/update/delete network interfaces of a Proxmox node.
+  - The module tries to understand what interface configurations get updated
+    and applies that changes. Interfaces that already have the a the specified
+    configuration, are not changed.
 author: "Andreas Botzner (@paginabianca) <andreas at botzner dot com>"
 options:
   config:
@@ -44,14 +47,6 @@ options:
         - OVSPort
         - OVSIntPort
         - unknown
-      address:
-        description:
-          - IPv4 address of the interface.
-        type: str
-      address6:
-        description:
-          - IPv6 address of the interface.
-        type: str
       autostart:
         description:
           - Automatically start interface on boot.
@@ -116,15 +111,6 @@ options:
         description:
           - The MTU.
           - Value should be C(1280 ≤ n ≤ 65520).
-        type: int
-      netmask:
-        description:
-          - The network mask.
-        type: str
-      netmask6:
-        description:
-          - Network mask for IPv6.
-          - Value should be C(0 ≤ n ≤ 128).
         type: int
       ovs_bonds:
         description:
@@ -209,15 +195,14 @@ EXAMPLES = '''
     config:
       - name: vmrb135
         type: bridge
-        address: 10.189.5.37
-        netmask: 255.255.255.0
+        cidr: 10.189.5.37/24
         mtu: 5555
       - name: vmrb56
         type: bridge
-        address: 192.168.5.4
-        netmask: 255.255.255.0
+        cidr: 192.168.5.4/24
         comments: 'This is a new VM bridge with the host inside'
     state: present
+    apply: true
 
 - name: Delete a list of interfaces from node01 and try to revert on error
   community.general.proxmox_interfaces:
@@ -235,18 +220,37 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-before:
-  description: The configuration as structured data before module execution
+diff:
+  description: List of changes that where applied to an individual interface.
+  returned: always
+  type: dict
+  elements: dict
+  sample:
+    vmrb12:
+      cidr:
+        before: 10.0.0.1/24
+        after: 192.168.0.1/24
+      type:
+        before: unknown
+        after: bridge
+    vmbr56:
+      cidr:
+        before:
+        after: 10.0.0.1/254
+      type:
+        before:
+        after: bridge
+
+msg:
+  description: A list of messages.
   returned: always
   type: list
+  elements: string
   sample:
-    - '{some example JSON here}'
-after:
-  description: The configuration as structured data after module completion
-  returned: when changed
-  type: list
-  sample:
-    - '{some different JSON data here}'
+    - Successfully updated interface: vmbr8
+    - Successfully updated interface: vmbr37
+    - Successfully reloaded and applied interface changes on node node01
+
 upid:
   description: UPID of the svreload:networking task
   returned: when changed and reload_interfaces is enabled
@@ -274,7 +278,8 @@ from ansible_collections.community.general.plugins.module_utils.proxmox import (
     ProxmoxAnsible, proxmox_auth_argument_spec)
 from ansible_collections.community.general.plugins.module_utils.proxmox_interfaces import (
     get_nics, delete_nic, create_nic, reload_interfaces, rollback_interfaces,
-    update_nic, proxmox_map_interface_args, proxmox_interface_argument_spec, check_doublicates)
+    update_nic, proxmox_map_interface_args, proxmox_interface_argument_spec, check_doublicates,
+    get_config_diff)
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -299,7 +304,7 @@ def main():
                            ('api_user', 'api_password')],
         required_one_of=[('api_password', 'api_token_id')],
         required_if=[('state', 'present', ('config',))],
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
 
     proxmox = ProxmoxAnsible(module)
@@ -315,7 +320,6 @@ def main():
     msg = []
     errors = []
     nics = get_nics(proxmox)
-    result['config'] = nics
 
     if state == 'reloaded':
         try:
@@ -330,10 +334,23 @@ def main():
             module.fail_json(**result)
 
     check_doublicates(module)
+    present_nics = {nic['iface'] for nic in nics}
+    diff = get_config_diff(nics, config)
+    config = {nic['name']: nic for nic in config}
 
-    present_nics = set(nic['iface'] for nic in nics)
+    if diff is None:
+        result['msg'] = 'No configuration changes.'
+        module.exit_json(**result)
 
-    for nic in config:
+    result['diff'] = diff
+    if module.check_mode:
+        module.exit_json(**result)
+
+    for key in config:
+        if key not in diff:
+            msg.append('Interface {0} did not change'.format(key))
+            continue
+        nic = config[key]
         name = nic['name']
         try:
             interface_args = proxmox_map_interface_args(nic)
@@ -354,7 +371,8 @@ def main():
             else:
                 try:
                     update_nic(proxmox.proxmox_api, node, name, interface_args)
-                    msg.append('Successfully updated interface: {0}')
+                    msg.append(
+                        'Successfully updated interface {0}'.format(name))
                     result['changed'] = True
                 except Exception as e:
                     errors.append(
@@ -397,10 +415,10 @@ def main():
             result['msg'].append(
                 'Successfully rolled back uncommitted changes on node {0}'.format(node))
             result['changed'] = False
-            module.exit_json(**result)
         except Exception as e:
             result['errors'].append(
                 'Failed to roll back configuration on node {0} with error: {1}'.format(node, str(e)))
+        finally:
             module.fail_json(**result)
     else:
         module.fail_json(**result)
