@@ -26,50 +26,60 @@ extends_documentation_fragment:
 - community.general.auth_basic
 
 options:
-  api_token:
-    description:
-      - GitLab token for logging in.
-    type: str
-  group:
-    description:
-      - Id or the full path of the group of which the projects belongs to.
-    type: str
-  project:
-    description:
-      - The name of the project.
-    required: true
-    type: str
-  path:
-    description:
-      - The path of the project you want to create, this will be server_url/<group>/path.
-      - If not supplied, name will be used.
-    type: str
-  enabled:
-    description:
-      - Is this remote mirror currently enabled?
-    type: bool
-    default: true
-  url:
-    description:
-      - URL to the git repo to mirror to in the form https://<user>:<token>@<fqdn>/<path>/<to>/<repo>.git".
-    type: str
-    required: true
-  only_protected_branches:
-    description:
-      - Mirror only protected or all branches?
-    type: bool
-  keep_divergent_refs:
-    description:
-      - Should divergent refs beeing kept?
-    type: bool
-  state:
-    description:
-      - Create/update or delete mirror
-      - Due to not beeing able to check the secrets one have to recreate if secrets change, use state=recreate
-      - Possible values are present and absent and recreate.
-    default: present
-    type: str
-    choices: ["present", "recreate"]
+    api_token:
+        description:
+            - GitLab token for logging in.
+      type: str
+    validate_certs:
+        description:
+            - Whether or not to validate TLS/SSL certificates when supplying a HTTPS endpoint.
+            - Should only be set to C(false) if you can guarantee that you are talking to the correct server
+              and no man-in-the-middle attack can happen.
+        default: true
+        type: bool
+    api_username:
+        description:
+            - The username to use for authentication against the API.
+        type: str
+    api_password:
+        description:
+            - The password to use for authentication against the API.
+        type: str
+    group:
+        description:
+            - Id or the full path of the group of which the projects belongs to.
+        type: str
+    project:
+        description:
+            - The name of the project.
+        required: true
+        type: str
+    enabled:
+        description:
+            - Is this remote mirror currently enabled?
+        type: bool
+        default: true
+    url:
+        description:
+            - URL to the git repo to mirror to in the form https://<user>:<token>@<fqdn>/<path>/<to>/<repo>.git".
+        type: str
+        required: true
+    only_protected_branches:
+        description:
+            - Mirror only protected or all branches?
+        type: bool
+    keep_divergent_refs:
+        description:
+            - Should divergent refs beeing kept?
+        type: bool
+    state:
+        description:
+            - Create/update or delete mirror
+            - Due to not beeing able to check the secrets one have to recreate if secrets change, use state=recreate
+            - Possible values are present and absent and recreate.
+        default: present
+        type: str
+        choices: ["present", "absent"]
 '''
 
 EXAMPLES = r'''
@@ -90,21 +100,11 @@ msg:
   type: str
   sample: "Success"
 
-result:
-  description: json parsed response from the server.
-  returned: always
-  type: dict
-
 error:
   description: the error message returned by the GitLab API.
   returned: failed
   type: str
   sample: "400: path is already in use"
-
-mirror:
-  description: API object.
-  returned: always
-  type: dict
 '''
 
 import traceback
@@ -208,12 +208,11 @@ def main():
         api_token=dict(type='str', no_log=True),
         group=dict(type='str'),
         project=dict(type='str', required=True),
-        path=dict(type='str'),
         url=dict(type='str', required=True),
         enabled=dict(type='bool'),
         only_protected_branches=dict(type='bool'),
         keep_divergent_refs=dict(type='bool'),
-        state=dict(type='str', default="present", choices=["recreate", "present"]),
+        state=dict(type='str', default="present", choices=["present","absent"]),
     ))
 
     module = AnsibleModule(
