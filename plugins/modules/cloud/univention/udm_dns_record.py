@@ -34,11 +34,13 @@ options:
         description:
             - "Name of the record, this is also the DNS record. E.g. www for
                www.example.com."
+            - For PTR records this has to be the IP address.
     zone:
         type: str
         required: true
         description:
             - Corresponding DNS zone for this record, e.g. example.com.
+            - For PTR records this has to be the full reverse zone (e.g. 1.1.192.in-addr.arpa).
     type:
         type: str
         required: true
@@ -112,6 +114,7 @@ try:
     HAVE_IPADDRESS = True
 except ImportError:
     pass
+
 
 def main():
     module = AnsibleModule(
