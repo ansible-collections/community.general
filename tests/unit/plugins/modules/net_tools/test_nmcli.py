@@ -745,11 +745,13 @@ def mocked_vxlan_connection_unchanged(mocker):
                connection_exists=True,
                execute_return=(0, TESTCASE_VXLAN_SHOW_OUTPUT, ""))
 
+
 @pytest.fixture
 def mocked_gre_connection_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
                execute_return=(0, TESTCASE_GRE_SHOW_OUTPUT, ""))
+
 
 @pytest.fixture
 def mocked_ipip_connection_unchanged(mocker):
