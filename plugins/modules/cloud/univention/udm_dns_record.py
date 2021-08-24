@@ -88,6 +88,7 @@ EXAMPLES = '''
 RETURN = '''#'''
 
 HAVE_UNIVENTION = False
+HAVE_IPADDRESS = False
 try:
     from univention.admin.handlers.dns import (
         forward_zone,
@@ -106,8 +107,11 @@ from ansible_collections.community.general.plugins.module_utils.univention_umc i
     config,
     uldap,
 )
-import ipaddress
-
+try:
+    import ipaddress
+    HAVE_IPADDRESS = True
+except ImportError:
+    pass
 
 def main():
     module = AnsibleModule(
@@ -143,6 +147,8 @@ def main():
 
     workname = name
     if type == 'ptr_record':
+        if not HAVE_IPADDRESS:
+            module.fail_json(msg="This module requires the 'ipaddress' python module to manage PTR records.")
         try:
             ipaddr_rev = ipaddress.ip_address(name).reverse_pointer
             if zone.find('arpa') == -1:
