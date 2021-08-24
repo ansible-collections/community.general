@@ -55,7 +55,7 @@ options:
             - Type C(generic) is added in Ansible 2.5.
             - Type C(infiniband) is added in community.general 2.0.0.
         type: str
-        choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi ]
+        choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi ]
     mode:
         description:
             - This is the type of device or network connection that you wish to create for a bond or bridge.
@@ -1690,8 +1690,8 @@ def main():
             ip_tunnel_local=dict(type='str'),
             ip_tunnel_remote=dict(type='str'),
             # ip-tunnel type gre specific vars
-            ip_tunnel_input_key=dict(type='str'),
-            ip_tunnel_output_key=dict(type='str'),
+            ip_tunnel_input_key=dict(type='str', no_log=True),
+            ip_tunnel_output_key=dict(type='str', no_log=True),
             # 802-11-wireless* specific vars
             ssid=dict(type='str'),
             wifi=dict(type='dict'),
