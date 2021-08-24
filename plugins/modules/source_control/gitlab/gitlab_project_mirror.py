@@ -139,9 +139,12 @@ class GitLabProject(object):
     def createOrUpdateMirror(self, mirror_url, mirror_enabled, mirror_keep_divergent_refs = None, mirror_only_protected_branches = None):
         changed = False
         mirror_exists = False
-        self._module.fail_json(msg="Hier")
         mirrors = self.projectObject.remote_mirrors.list()
-        urlParts = mirror_url.split('@')
+        if '@' in mirror_url:
+            urlParts = mirror_url.split('@')
+        else:
+            urlParts = mirror_url.split('//')
+
         for mirror in mirrors:
             if urlParts[1] in mirror.url:
                 mirror_exists = True
@@ -254,7 +257,6 @@ def main():
         group = findGroup(gitlab_instance, group_identifier)
         if group is None:
             module.fail_json(msg="Failed to find project: group %s doesn't exists" % group_identifier)
-
         namespace_id = group.id
 
     if not namespace_id:
@@ -265,14 +267,11 @@ def main():
     except gitlab.exceptions.GitlabGetError as e:
         module.fail_json(msg="Failed to find the namespace for the given user: %s" % to_native(e))
 
-    module.fail_json(msg=namespace)
-
     if not namespace:
         module.fail_json(msg="Failed to find the namespace for the project")
     project_exists = gitlab_project.existsProject(namespace, project_path)
 
     if project_exists:
-
       if state == 'present':
           if gitlab_project.createOrUpdateMirror(mirror_url, mirror_enabled, mirror_keep_divergent_refs, mirror_only_protected_branches):
               module.exit_json(changed=True, msg="Successfully created or updated the remote mirror to %s" % project_name, project=gitlab_project.projectObject._attrs)
