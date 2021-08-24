@@ -314,15 +314,23 @@ options:
        type: str
     ip_tunnel_dev:
         description:
-            - This is used with IPIP/SIT - parent device this IPIP/SIT tunnel, can use ifname.
+            - This is used with GRE/IPIP/SIT - parent device this GRE/IPIP/SIT tunnel, can use ifname.
         type: str
     ip_tunnel_remote:
        description:
-            - This is used with IPIP/SIT - IPIP/SIT destination IP address.
+            - This is used with GRE/IPIP/SIT - GRE/IPIP/SIT destination IP address.
        type: str
     ip_tunnel_local:
        description:
-            - This is used with IPIP/SIT - IPIP/SIT local IP address.
+            - This is used with GRE/IPIP/SIT - GRE/IPIP/SIT local IP address.
+       type: str
+    ip_tunnel_input_key:
+       description:
+            - This is used with GRE - The key used for tunnel input packets
+       type: str
+    ip_tunnel_output_key:
+       description:
+            - This is used with GRE - The key used for tunnel output packets
        type: str
     zone:
        description:
@@ -896,6 +904,14 @@ EXAMPLES = r'''
       vxlan_local: 192.168.1.2
       vxlan_remote: 192.168.1.5
 
+  - name: Add gre
+    community.general.nmcli:
+      type: gre
+      conn_name: gre_test1
+      ip_tunnel_dev: eth0
+      ip_tunnel_local: 192.168.1.2
+      ip_tunnel_remote: 192.168.1.5
+
   - name: Add ipip
     community.general.nmcli:
       type: ipip
@@ -1058,6 +1074,8 @@ class Nmcli(object):
         self.ip_tunnel_dev = module.params['ip_tunnel_dev']
         self.ip_tunnel_local = module.params['ip_tunnel_local']
         self.ip_tunnel_remote = module.params['ip_tunnel_remote']
+        self.ip_tunnel_input_key = module.params['ip_tunnel_input_key']
+        self.ip_tunnel_output_key = module.params['ip_tunnel_output_key']
         self.nmcli_bin = self.module.get_bin_path('nmcli', True)
         self.dhcp_client_id = module.params['dhcp_client_id']
         self.zone = module.params['zone']
@@ -1190,6 +1208,11 @@ class Nmcli(object):
                 'ip-tunnel.parent': self.ip_tunnel_dev,
                 'ip-tunnel.remote': self.ip_tunnel_remote,
             })
+            if self.type == 'gre':
+                options.update({
+                    'ip-tunnel.input-key': self.ip_tunnel_input_key,
+                    'ip-tunnel.output-key': self.ip_tunnel_output_key
+                })
         elif self.type == 'vlan':
             options.update({
                 'vlan.id': self.vlanid,
@@ -1247,6 +1270,7 @@ class Nmcli(object):
             'dummy',
             'ethernet',
             'generic',
+            'gre',
             'infiniband',
             'ipip',
             'sit',
@@ -1293,6 +1317,7 @@ class Nmcli(object):
     @property
     def tunnel_conn_type(self):
         return self.type in (
+            'gre',
             'ipip',
             'sit',
         )
@@ -1592,6 +1617,7 @@ def main():
                           'dummy',
                           'ethernet',
                           'generic',
+                          'gre',
                           'infiniband',
                           'ipip',
                           'sit',
@@ -1663,6 +1689,9 @@ def main():
             ip_tunnel_dev=dict(type='str'),
             ip_tunnel_local=dict(type='str'),
             ip_tunnel_remote=dict(type='str'),
+            # ip-tunnel type gre specific vars
+            ip_tunnel_input_key=dict(type='str'),
+            ip_tunnel_output_key=dict(type='str'),
             # 802-11-wireless* specific vars
             ssid=dict(type='str'),
             wifi=dict(type='dict'),
