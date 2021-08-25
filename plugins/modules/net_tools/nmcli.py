@@ -331,7 +331,8 @@ options:
        version_added: 3.6.0
     ip_tunnel_output_key:
        description:
-            - This is used with GRE - The key used for tunnel output packets
+            - The key used for tunnel output packets.
+            - Only used when I(type=gre).
        type: str
        version_added: 3.6.0
     zone:
