@@ -328,6 +328,7 @@ options:
        description:
             - This is used with GRE - The key used for tunnel input packets
        type: str
+       version_added: 3.6.0
     ip_tunnel_output_key:
        description:
             - This is used with GRE - The key used for tunnel output packets
