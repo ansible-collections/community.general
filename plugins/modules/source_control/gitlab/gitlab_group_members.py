@@ -364,7 +364,7 @@ def main():
                         error = True
                         changed_users.append("Failed to updated the access level for the user, '%s'" % gitlab_user['name'])
                         changed_data.append({'gitlab_user': gitlab_user['name'], 'result': 'FAILED',
-                                             'msg': "Not allowed to add the access level for the member, %s: %s" % (gitlab_user_id, e)})
+                                             'msg': "Not allowed to add the access level for the member, %s: %s" % (gitlab_user['name'], e)})
             # state as absent
             else:
                 changed_users.append("User, '%s', is not a member in the group. No change to report" % gitlab_user['name'])
@@ -392,7 +392,7 @@ def main():
                             error = True
                             changed_users.append("Failed to updated the access level for the user, '%s'" % gitlab_user['name'])
                             changed_data.append({'gitlab_user': gitlab_user['name'], 'result': 'FAILED',
-                                                 'msg': "Not allowed to update the access level for the member, %s: %s" % (gitlab_user_id, e)})
+                                                 'msg': "Not allowed to update the access level for the member, %s: %s" % (gitlab_user['name'], e)})
             else:
                 # remove the user from the group
                 if not module.check_mode:
