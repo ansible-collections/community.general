@@ -47,7 +47,9 @@ options:
         required: true
     domain:
         default: ""
-        description: The domain with which to request the OAuth2 Access Grant.
+        description:
+          - The domain with which to request the OAuth2 Access Grant.
+          - Requires C(python-tss-sdk) version 1.0.0 or greater.
         env:
             - name: TSS_DOMAIN
         ini:
@@ -122,100 +124,125 @@ EXAMPLES = r"""
       - ansible.builtin.debug:
           msg: the password is {{ secret_password }}
 """
-from distutils.version import LooseVersion
-from ansible.errors import AnsibleError, AnsibleOptionsError
 
-sdk_is_missing = False
+import abc
+
+from ansible.errors import AnsibleError, AnsibleOptionsError
+from ansible.module_utils import six
+from ansible.plugins.lookup import LookupBase
+from ansible.utils.display import Display
 
 try:
     from thycotic.secrets.server import SecretServer, SecretServerError
-except ImportError:
-    sdk_is_missing = True
 
-# Added for backwards compatability - See issue #3192
-# https://github.com/ansible-collections/community.general/issues/3192
-try:
-    from thycotic import __version__ as sdk_version
+    HAS_TSS_SDK = True
 except ImportError:
-    sdk_version = "0.0.5"
+    SecretServer = None
+    SecretServerError = None
+    HAS_TSS_SDK = False
 
 try:
     from thycotic.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer
 
-    sdK_version_below_v1 = False
+    HAS_TSS_AUTHORIZER = True
 except ImportError:
-    sdK_version_below_v1 = True
+    PasswordGrantAuthorizer = None
+    DomainPasswordGrantAuthorizer = None
+    HAS_TSS_AUTHORIZER = False
 
-from ansible.utils.display import Display
-from ansible.plugins.lookup import LookupBase
 
 display = Display()
 
 
-class LookupModule(LookupBase):
-    @staticmethod
-    def Client(server_parameters):
+@six.add_metaclass(abc.ABCMeta)
+class TSSClient(object):
+    def __init__(self):
+        self._client = None
 
-        if LooseVersion(sdk_version) < LooseVersion('1.0.0') or sdK_version_below_v1:
-            return SecretServer(
+    @staticmethod
+    def from_params(**server_parameters):
+        if HAS_TSS_AUTHORIZER:
+            return TSSClientV1(**server_parameters)
+        else:
+            return TSSClientV0(**server_parameters)
+
+    def get_secret(self, term):
+        display.debug("tss_lookup term: %s" % term)
+
+        secret_id = self._term_to_secret_id(term)
+        display.vvv(u"Secret Server lookup of Secret with ID %d" % secret_id)
+
+        return self._client.get_secret_json(secret_id)
+
+    @staticmethod
+    def _term_to_secret_id(term):
+        try:
+            return int(term)
+        except ValueError:
+            raise AnsibleOptionsError("Secret ID must be an integer")
+
+
+class TSSClientV0(TSSClient):
+    def __init__(self, **server_parameters):
+        super(TSSClientV0, self).__init__()
+
+        if server_parameters.get("domain"):
+            raise AnsibleError("The 'domain' option requires 'python-tss-sdk' version 1.0.0 or greater")
+
+        self._client = SecretServer(
+            server_parameters["base_url"],
+            server_parameters["username"],
+            server_parameters["password"],
+            server_parameters["api_path_uri"],
+            server_parameters["token_path_uri"],
+        )
+
+
+class TSSClientV1(TSSClient):
+    def __init__(self, **server_parameters):
+        super(TSSClientV1, self).__init__()
+
+        authorizer = self._get_authorizer(**server_parameters)
+        self._client = SecretServer(
+            server_parameters["base_url"], authorizer, server_parameters["api_path_uri"]
+        )
+
+    @staticmethod
+    def _get_authorizer(**server_parameters):
+        if server_parameters.get("domain"):
+            return DomainPasswordGrantAuthorizer(
                 server_parameters["base_url"],
                 server_parameters["username"],
+                server_parameters["domain"],
                 server_parameters["password"],
-                server_parameters["api_path_uri"],
                 server_parameters["token_path_uri"],
             )
-        else:
-            # The Password Authorizer and Domain Password Authorizer
-            # became available in v1.0.0 and beyond.
-            # Import only if sdk_version requires it.
-            # from thycotic.secrets.server import PasswordGrantAuthorizer
 
-            if server_parameters["domain"]:
-                authorizer = DomainPasswordGrantAuthorizer(
-                    server_parameters["base_url"],
-                    server_parameters["username"],
-                    server_parameters["domain"],
-                    server_parameters["password"],
-                    server_parameters["token_path_uri"],
-                )
-            else:
-                authorizer = PasswordGrantAuthorizer(
-                    server_parameters["base_url"],
-                    server_parameters["username"],
-                    server_parameters["password"],
-                    server_parameters["token_path_uri"],
-                )
+        return PasswordGrantAuthorizer(
+            server_parameters["base_url"],
+            server_parameters["username"],
+            server_parameters["password"],
+            server_parameters["token_path_uri"],
+        )
 
-            return SecretServer(
-                server_parameters["base_url"], authorizer, server_parameters["api_path_uri"]
-            )
 
+class LookupModule(LookupBase):
     def run(self, terms, variables, **kwargs):
-        if sdk_is_missing:
+        if not HAS_TSS_SDK:
             raise AnsibleError("python-tss-sdk must be installed to use this plugin")
 
         self.set_options(var_options=variables, direct=kwargs)
 
-        secret_server = LookupModule.Client(
-            {
-                "base_url": self.get_option("base_url"),
-                "username": self.get_option("username"),
-                "password": self.get_option("password"),
-                "domain": self.get_option("domain"),
-                "api_path_uri": self.get_option("api_path_uri"),
-                "token_path_uri": self.get_option("token_path_uri"),
-            }
+        tss = TSSClient.from_params(
+            base_url=self.get_option("base_url"),
+            username=self.get_option("username"),
+            password=self.get_option("password"),
+            domain=self.get_option("domain"),
+            api_path_uri=self.get_option("api_path_uri"),
+            token_path_uri=self.get_option("token_path_uri"),
         )
-        result = []
 
-        for term in terms:
-            display.debug("tss_lookup term: %s" % term)
-            try:
-                id = int(term)
-                display.vvv(u"Secret Server lookup of Secret with ID %d" % id)
-                result.append(secret_server.get_secret_json(id))
-            except ValueError:
-                raise AnsibleOptionsError("Secret ID must be an integer")
-            except SecretServerError as error:
-                raise AnsibleError("Secret Server lookup failure: %s" % error.message)
-        return result
+        try:
+            return [tss.get_secret(term) for term in terms]
+        except SecretServerError as error:
+            raise AnsibleError("Secret Server lookup failure: %s" % error.message)
