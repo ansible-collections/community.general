@@ -102,6 +102,51 @@ EXAMPLES = r'''
     gitlab_group: groupname
     gitlab_user: username
     state: absent
+
+- name: Add a list of Users to A GitLab Group
+  gitlab_group_members:
+    api_url: 'https://gitlab.example.com'
+    api_token: 'Your-Private-Token'
+    gitlab_group: groupname
+    gitlab_user:
+      - user1
+      - user2
+    access_level: developer
+    state: present
+
+- name: Add a list of Users with Dedicated Access Levels to A GitLab Group
+  gitlab_group_members:
+    api_url: 'https://gitlab.example.com'
+    api_token: 'Your-Private-Token'
+    gitlab_group: groupname
+    gitlab_users_access:
+      - name: user1
+        access_level: developer
+      - name: user2
+        access_level: maintainer
+    state: present
+
+- name: Add a user, remove all others which might be on this access level
+  gitlab_group_members:
+    api_url: 'https://gitlab.example.com'
+    api_token: 'Your-Private-Token'
+    gitlab_group: groupname
+    gitlab_user: username
+    access_level: developer
+    pruge_users: developer
+    state: present
+
+- name: Remove a list of Users with Dedicated Access Levels to A GitLab Group
+  gitlab_group_members:
+    api_url: 'https://gitlab.example.com'
+    api_token: 'Your-Private-Token'
+    gitlab_group: groupname
+    gitlab_users_access:
+      - name: user1
+        access_level: developer
+      - name: user2
+        access_level: maintainer
+    state: absent
 '''
 
 RETURN = r''' # '''
