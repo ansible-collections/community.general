@@ -333,6 +333,7 @@ options:
        description:
             - This is used with GRE - The key used for tunnel output packets
        type: str
+       version_added: 3.6.0
     zone:
        description:
             - The trust level of the connection.
