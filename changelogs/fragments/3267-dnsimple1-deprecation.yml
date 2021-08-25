@@ -1,0 +1,3 @@
+---
+deprecated_features:
+  - "add deprecation warning if python-dnsimple < 2.0.0 is used (https://github.com/ansible-collections/community.general/pull/2946#discussion_r667624693)"
