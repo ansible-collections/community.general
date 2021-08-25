@@ -326,7 +326,8 @@ options:
        type: str
     ip_tunnel_input_key:
        description:
-            - This is used with GRE - The key used for tunnel input packets
+            - The key used for tunnel input packets.
+            - Only used when I(type=gre).
        type: str
        version_added: 3.6.0
     ip_tunnel_output_key:
