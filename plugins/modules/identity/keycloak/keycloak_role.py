@@ -77,6 +77,7 @@ options:
         description:
             - A list of the other roles that composited together by this role.
         elements: dict
+        version_added: 3.6.0
         suboptions:
           client_id:
             type: str
