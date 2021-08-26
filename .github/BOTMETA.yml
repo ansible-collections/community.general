@@ -1101,7 +1101,8 @@ files:
   $modules/web_infrastructure/apache2_mod_proxy.py:
     maintainers: oboukili
   $modules/web_infrastructure/apache2_module.py:
-    maintainers: berendt n0trax robinro
+    maintainers: berendt n0trax
+    ignore: robinro
   $modules/web_infrastructure/deploy_helper.py:
     maintainers: ramondelafuente
   $modules/web_infrastructure/django_manage.py:
