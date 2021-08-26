@@ -21,6 +21,7 @@ description:
 requirements:
     - Python >= 2.6
     - Univention
+    - ipaddress (for I(type=ptr_record))
 options:
     state:
         type: str
@@ -40,7 +41,7 @@ options:
         required: true
         description:
             - Corresponding DNS zone for this record, e.g. example.com.
-            - For PTR records this has to be the full reverse zone (e.g. 1.1.192.in-addr.arpa).
+            - For PTR records this has to be the full reverse zone (for example C(1.1.192.in-addr.arpa)).
     type:
         type: str
         required: true
@@ -101,6 +102,7 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.univention_umc import (
     umc_module_for_add,
     umc_module_for_edit,
@@ -151,14 +153,14 @@ def main():
     workname = name
     if type == 'ptr_record':
         if not HAVE_IPADDRESS:
-            module.fail_json(msg="This module requires the 'ipaddress' python module to manage PTR records.")
+            module.fail_json(msg=missing_required_lib('ipaddress'))
         try:
-            ipaddr_rev = ipaddress.ip_address(name).reverse_pointer
-            if zone.find('arpa') == -1:
+            if 'arpa' not in zone:
                 raise Exception("Zone must be reversed zone for ptr_record. (e.g. 1.1.192.in-addr.arpa)")
+            ipaddr_rev = ipaddress.ip_address(name).reverse_pointer
             subnet_offset = ipaddr_rev.find(zone)
             if subnet_offset == -1:
-                raise Exception("IP address is not part of zone.")
+                raise Exception("reversed IP address {0} is not part of zone.".format(ipaddr_rev))
             workname = ipaddr_rev[0:subnet_offset - 1]
         except Exception as e:
             module.fail_json(
