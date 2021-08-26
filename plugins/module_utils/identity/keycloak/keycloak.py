@@ -1617,7 +1617,7 @@ class KeycloakAPI(object):
         :param resource_data: [Optional] The data to send as JSON in the body of the request.
         """
         try:
-            kwargs = {'method':'DELETE', 'headers':self.restheaders, 'validate_certs': self.validate_certs}
+            kwargs = {'method': 'DELETE', 'headers': self.restheaders, 'validate_certs': self.validate_certs}
             if resource_data:
                 kwargs['data'] = json.dumps(resource_data)
             return open_url(request_url, **kwargs)
@@ -1632,6 +1632,6 @@ def role_composites_sorter(composites):
     return list(
         sorted(
             composites,
-            key=lambda x: x['client_id'] + ":ROLE:"+ x['name'] if x['client_id'] else "REALM_ROLE:" + x['name']
+            key=lambda x: x['client_id'] + ":ROLE:" + x['name'] if x['client_id'] else "REALM_ROLE:" + x['name']
         )
     )

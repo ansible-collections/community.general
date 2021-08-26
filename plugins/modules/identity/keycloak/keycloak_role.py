@@ -270,7 +270,7 @@ def main():
 
     sync_composites = 'composites' in role_params
     if sync_composites:
-        module.params['composites'] =  role_composites_sorter(module.params['composites'])
+        module.params['composites'] = role_composites_sorter(module.params['composites'])
 
     # does the role already exist?
     if clientid is None:
