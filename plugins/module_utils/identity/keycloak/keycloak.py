@@ -920,7 +920,6 @@ class KeycloakAPI(object):
         :param name: Name of the group to fetch.
         :param realm: Realm in which the group resides; default 'master'
         """
-        groups_url = URL_GROUPS.format(url=self.baseurl, realm=realm)
         try:
             all_groups = self.get_groups(realm=realm)
 
