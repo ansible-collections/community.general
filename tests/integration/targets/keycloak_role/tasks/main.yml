@@ -24,26 +24,82 @@
       state: present
   register: client
 
+- name: Create sample roles for composite testing.
+  community.general.keycloak_role: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args1:
+      realm: "{{ realm }}"
+      description: "{{ description_1 }}"
+      state: present
+    call_args: "{{call_args1 | combine(item) }}"
+  loop:
+    - {name: "testrole1-for-composite"}
+    - {name: "testrole2-for-composite", client_id: null}
+    - {name: "testrole3-for-composite", client_id: "{{ client_id }}"}
+    - {name: "testrole4-for-composite", client_id: "{{ client_id }}"}
+
 - include_tasks: create_update_delete_tests.yml
   vars:
     test_props: "{{ item }}"
   loop:
-    - test_name: "1. Realm role test"
+    - test_name: "1.1 Realm role test"
       expect_to_be_realm: true
+      expect_composite_length_at_create: false
+      expect_composite_length_at_update: false
       create_args:
         name: "{{ role }}"
         description: "{{ description_1 }}"
       update_args:
         name: "{{ role }}"
         description: "{{ description_2 }}"
-         
-    - test_name: "2. Client role test"
+
+    - test_name: "1.2 Realm role test creating with composites"
+      expect_to_be_realm: true
+      expect_composite_length_at_create: 3
+      expect_composite_length_at_update: 1
+      create_args:
+        name: "{{ role }}"
+        description: "{{ description_1 }}"
+        composites:
+          # Note: This also checks that having client_id set to null and being absent do the same thing.
+          - {name: "testrole1-for-composite", client_id: null}
+          - {name: "testrole2-for-composite"}
+          - {name: "testrole4-for-composite", client_id: "{{ client_id }}"}
+      update_args:
+        name: "{{ role }}"
+        description: "{{ description_2 }}"
+        composites:
+          - {name: "testrole3-for-composite", client_id: "{{ client_id }}"}
+
+    - test_name: "2.1 Client role test"
       expect_to_be_realm: false
+      expect_composite_length_at_create: false
+      expect_composite_length_at_update: false
       create_args:
         name: "{{ role }}"
-        client_id: "{{ client_id }}"        
+        client_id: "{{ client_id }}"
         description: "{{ description_1 }}"
       update_args:
         name: "{{ role }}"
-        client_id: "{{ client_id }}"        
+        client_id: "{{ client_id }}"
         description: "{{ description_2 }}"
+
+    - test_name: "2.2 Client role test"
+      expect_to_be_realm: false
+      expect_composite_length_at_create: 2
+      expect_composite_length_at_update: 1
+      create_args:
+        name: "{{ role }}"
+        client_id: "{{ client_id }}"
+        description: "{{ description_1 }}"
+        composites:
+          - {name: "testrole2-for-composite"}
+          - {name: "testrole3-for-composite", client_id: "{{ client_id }}"}
+      update_args:
+        name: "{{ role }}"
+        client_id: "{{ client_id }}"
+        description: "{{ description_2 }}"
+        composites:
+          - {name: "testrole1-for-composite", client_id: null}
+
+

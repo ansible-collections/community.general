@@ -1015,7 +1015,7 @@ class KeycloakAPI(object):
             self.module.fail_json(msg='Could not obtain list of roles for realm %s: %s'
                                       % (realm, str(e)))
 
-    def get_realm_role(self, name, realm='master'):
+    def get_realm_role(self, name, realm='master', fetch_composites=True):
         """ Fetch a keycloak role from the provided realm using the role's name.
 
         If the role does not exist, None is returned.
@@ -1025,6 +1025,10 @@ class KeycloakAPI(object):
         """
         role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=name)
         data = self._get_request(role_url, 'role %s in realm %s' % (name, realm), none_for_404=True)
+
+        if data and fetch_composites:
+            data['composites'] = self._get_realm_role_composites(name, realm)
+
         return data
 
     def create_realm_role(self, rolerep, realm='master'):
@@ -1033,7 +1037,9 @@ class KeycloakAPI(object):
         :param rolerep: a RoleRepresentation of the role to be created. Must contain at minimum the field name.
         :return: HTTPResponse object on success
         """
+        rolerep = rolerep.copy()
         role_name = rolerep['name']
+        new_role_composites = rolerep.pop("composites", [])
 
         self._post_request(
             URL_REALM_ROLES.format(url=self.baseurl, realm=realm),
@@ -1041,13 +1047,41 @@ class KeycloakAPI(object):
             "role %s in realm %s" % (role_name, realm)
         )
 
+        if new_role_composites:
+            self._post_request(
+                URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=role_name),
+                [{"id": self._composite_role_to_id(x, realm)} for x in new_role_composites],
+                'composites in role %s in realm %s' % (role_name, realm)
+            )
+
     def update_realm_role(self, rolerep, realm='master'):
         """ Update an existing realm role.
 
         :param rolerep: A RoleRepresentation of the updated role.
         :return HTTPResponse object on success
         """
+        rolerep = rolerep.copy()
         role_name = rolerep['name']
+
+        if "composites" in rolerep:
+            desired_role_composites = rolerep.pop("composites")
+            existing_role_composites = self._get_realm_role_composites(name=role_name, realm=realm)
+
+            obsolete_role_composites = [x for x in existing_role_composites if x not in desired_role_composites]
+            new_role_composites = [x for x in desired_role_composites if x not in existing_role_composites]
+
+            if new_role_composites:
+                self._post_request(
+                    URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=role_name),
+                    [{"id": self._composite_role_to_id(x, realm)} for x in new_role_composites],
+                    'composites in role %s in realm %s' % (role_name, realm)
+                )
+            if obsolete_role_composites:
+                self._delete_request(
+                    URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=role_name),
+                    'composites in role %s in realm %s' % (role_name, realm),
+                    resource_data=[{"id": self._composite_role_to_id(x, realm)} for x in obsolete_role_composites]
+                )
 
         self._put_request(
             URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=role_name),
@@ -1088,7 +1122,7 @@ class KeycloakAPI(object):
             self.module.fail_json(msg='Could not obtain list of roles for client %s in realm %s: %s'
                                       % (clientid, realm, str(e)))
 
-    def get_client_role(self, name, clientid, realm='master'):
+    def get_client_role(self, name, clientid, realm='master', fetch_composites=True):
         """ Fetch a keycloak client role from the provided realm using the role's name.
 
         :param name: Name of the role to fetch.
@@ -1103,6 +1137,10 @@ class KeycloakAPI(object):
                                       % (clientid, realm))
         role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=name)
         data = self._get_request(role_url, 'role %s in client %s of realm %s' % (name, clientid, realm), none_for_404=True)
+
+        if data and fetch_composites:
+            data['composites'] = self._get_client_role_composites(cid, name, realm)
+
         return data
 
     def create_client_role(self, rolerep, clientid, realm='master'):
@@ -1118,13 +1156,22 @@ class KeycloakAPI(object):
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
 
+        rolerep = rolerep.copy()
         role_name = rolerep['name']
+        new_role_composites = rolerep.pop("composites", [])
 
         self._post_request(
             URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid),
             rolerep,
             "role %s for client %s in realm %s" % (role_name, clientid, realm)
         )
+
+        if new_role_composites:
+            self._post_request(
+                URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=role_name),
+                [{"id": self._composite_role_to_id(x, realm)} for x in new_role_composites],
+                'composites in role %s in realm %s' % (role_name, realm)
+            )
 
     def update_client_role(self, rolerep, clientid, realm="master"):
         """ Update an existing client role.
@@ -1134,12 +1181,33 @@ class KeycloakAPI(object):
         :param realm: Realm in which the role resides
         :return HTTPResponse object on success
         """
+        rolerep = rolerep.copy()
         role_name = rolerep['name']
 
         cid = self.get_client_id(clientid, realm=realm)
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
+
+        if "composites" in rolerep:
+            desired_role_composites = rolerep.pop("composites", [])
+            existing_role_composites = self._get_client_role_composites(cid=cid, name=role_name, realm=realm)
+
+            obsolete_role_composites = [x for x in existing_role_composites if x not in desired_role_composites]
+            new_role_composites = [x for x in desired_role_composites if x not in existing_role_composites]
+
+            if new_role_composites:
+                self._post_request(
+                    URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=role_name),
+                    [{"id": self._composite_role_to_id(x, realm)} for x in new_role_composites],
+                    'composites in role %s in realm %s' % (role_name, realm)
+                )
+            if obsolete_role_composites:
+                self._delete_request(
+                    URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=role_name),
+                    'composites in role %s in realm %s' % (role_name, realm),
+                    resource_data=[{"id": self._composite_role_to_id(x, realm)} for x in obsolete_role_composites]
+                )
 
         self._put_request(
             URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=role_name),
@@ -1162,6 +1230,87 @@ class KeycloakAPI(object):
             URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=name),
             "%s for client %s in realm %s" % (name, clientid, realm)
         )
+
+    def _get_realm_role_composites(self, name, realm='master'):
+        """
+        Gets the composite roles associated with a realm role.
+        :param name: The name of the role
+        :param realm: Realm in which the role resides
+        :returns list of dicts: A list of dicts containing 'client_id' and 'name'
+        """
+        raw_composites = self._get_request(
+            URL_REALM_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, name=name),
+            'composites of role %s in realm %s' % (name, realm)
+        )
+        return self._map_role_composites(realm, raw_composites)
+
+    def _get_client_role_composites(self, cid, name, realm):
+        """
+        Gets the composite roles associated with a client role.
+        :param cid: The clients internal keycloak id.
+        :param name: The name of the role
+        :param realm: Realm in which the role resides
+        :returns list of dicts: A list of dicts containing 'client_id' and 'name'
+        """
+        raw_composites = self._get_request(
+            URL_CLIENT_ROLE_COMPOSITES.format(url=self.baseurl, realm=realm, id=cid, name=name),
+            'composites of role %s in client with cid, %s in realm %s' % (name, cid, realm)
+        )
+        return self._map_role_composites(realm, raw_composites)
+
+    def _map_role_composites(self, realm, raw_composites):
+        """
+        Maps the raw composites result to more management records containing
+        a dict of client_id (name not keycloaks internal id), and role name.
+
+        :param realm: Realm in which the role resides
+        :param raw_composites: A list of dicts being the response from querying the composites.
+        :returns list of dicts: A list of dicts containing 'client_id' and 'name'
+        """
+        # Determine client names based on the containersIds - 1. Create a map
+        client_container_ids = set([x['containerId'] for x in raw_composites if x['clientRole']])
+        client_container_ids_map = {}
+        for container_id in client_container_ids:
+            realm_info = self._get_request(
+                URL_CLIENT.format(url=self.baseurl, realm=realm, id=container_id),
+                "Client with id %s in realm %s" % (container_id, realm)
+            )
+            client_container_ids_map[container_id] = realm_info['clientId']
+
+        # Determine client names based on the containersIds - 2. Apply the map
+        for composite in raw_composites:
+            if composite['clientRole']:
+                composite['clientId'] = client_container_ids_map.get(container_id, None)
+
+        return role_composites_sorter(
+            [{'client_id': x.get('clientId'), 'name': x['name']} for x in raw_composites],
+        )
+
+    def _composite_role_to_id(self, composite_role_info, realm):
+        """
+        Determine Keycloaks id for the client or realm role.
+        :param composite_role_info: A dict containing the keys, 'client_id', and 'name'
+        :return str:
+        """
+        client_id = composite_role_info['client_id']
+        role_name = composite_role_info['name']
+
+        if client_id:
+            r = self._get_request(
+                URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=self.get_client_id(client_id, realm=realm)),
+                'roles in client %s in realm %s' % (client_id, realm)
+            )
+            filtered_r = [x for x in r if x['name'] == role_name]
+            if not filtered_r:
+                raise Exception('Role %s could not be found in client %s in realm %s' % (role_name, client_id, realm))
+
+            return filtered_r[0]['id']
+        else:
+            r = self._get_request(
+                URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=role_name),
+                'role %s in in realm %s' % (role_name, realm)
+            )
+            return r['id']
 
     def get_authentication_flow_by_alias(self, alias, realm='master'):
         """
@@ -1474,3 +1623,15 @@ class KeycloakAPI(object):
             return open_url(request_url, **kwargs)
         except Exception as e:
             self.module.fail_json(msg='Could not delete %s: %s' % (resource_description, str(e)))
+
+
+def role_composites_sorter(composites):
+    """
+    Provides a sort function to sort the composites to ensure that change detection is effective.
+    """
+    return list(
+        sorted(
+            composites,
+            key=lambda x: x['client_id'] + ":ROLE:"+ x['name'] if x['client_id'] else "REALM_ROLE:" + x['name']
+        )
+    )

@@ -18,6 +18,7 @@
       - result.existing == {}
       - result.end_state.name == "{{ test_props.create_args.name }}"
       - result.end_state.containerId == "{{ realm }}" or test_props.expect_to_be_realm == False
+      - test_props.expect_composite_length_at_create == false or result.end_state.composites|length == test_props.expect_composite_length_at_create
 
 - name: "{{test_props.test_name}} - Updates with no change"
   community.general.keycloak_role: "{{ auth_args | combine(call_args) }}"
@@ -56,6 +57,7 @@
       - result is changed
       - result.existing.description == "{{ test_props.create_args.description }}"
       - result.end_state.description == "{{ test_props.update_args.description }}"
+      - test_props.expect_composite_length_at_update == false or result.end_state.composites|length == test_props.expect_composite_length_at_update
 
 - name: "{{test_props.test_name}} - Delete existing realm role"
   community.general.keycloak_role: "{{ auth_args | combine(call_args) }}"

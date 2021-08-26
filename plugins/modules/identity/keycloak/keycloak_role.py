@@ -72,6 +72,11 @@ options:
             - A dict of key/value pairs to set as custom attributes for the role.
             - Values may be single values (e.g. a string) or a list of strings.
 
+    composites:
+        type: list
+        description:
+            - A list dicts containing the keys client_id, and name for roles to be added into the composite.
+
 extends_documentation_fragment:
 - community.general.keycloak
 
@@ -103,7 +108,7 @@ EXAMPLES = '''
     token: TOKEN
   delegate_to: localhost
 
-- name: Create a Keycloak client role
+- name: Create a Keycloak client role and when updated remove any composites that might exist.
   community.general.keycloak_role:
     name: my-new-kc-role
     realm: MyCustomRealm
@@ -114,6 +119,7 @@ EXAMPLES = '''
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
+    composites: []
   delegate_to: localhost
 
 - name: Delete a Keycloak role
@@ -125,6 +131,11 @@ EXAMPLES = '''
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
+    composites:
+      - client_id: null
+        name: "another-realm-role-name"
+      - client_id: "some-client-id"
+        name: "the-client-role-name"
   delegate_to: localhost
 
 - name: Create a keycloak role with some custom attributes
@@ -190,7 +201,7 @@ end_state:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError
+    keycloak_argument_spec, get_token, KeycloakError, role_composites_sorter
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -201,6 +212,10 @@ def main():
     :return:
     """
     argument_spec = keycloak_argument_spec()
+    composite_spec = dict(
+        client_id=dict(type='str'),
+        name=dict(type='str'),
+    )
     meta_args = dict(
         state=dict(type='str', default='present', choices=['present', 'absent']),
         name=dict(type='str', required=True),
@@ -208,6 +223,7 @@ def main():
         realm=dict(type='str', default='master'),
         client_id=dict(type='str'),
         attributes=dict(type='dict'),
+        composites=dict(type='list', elements='dict', options=composite_spec),
     )
 
     argument_spec.update(meta_args)
@@ -241,14 +257,18 @@ def main():
 
     # convert module parameters to client representation parameters (if they belong in there)
     role_params = [x for x in module.params
-                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'client_id', 'composites'] and
+                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'client_id'] and
                    module.params.get(x) is not None]
+
+    sync_composites = 'composites' in role_params
+    if sync_composites:
+        module.params['composites'] =  role_composites_sorter(module.params['composites'])
 
     # does the role already exist?
     if clientid is None:
-        before_role = kc.get_realm_role(name, realm)
+        before_role = kc.get_realm_role(name, realm, fetch_composites=sync_composites)
     else:
-        before_role = kc.get_client_role(name, clientid, realm)
+        before_role = kc.get_client_role(name, clientid, realm, fetch_composites=sync_composites)
 
     if before_role is None:
         before_role = dict()
@@ -295,10 +315,10 @@ def main():
         # do it for real!
         if clientid is None:
             kc.create_realm_role(desired_role, realm)
-            after_role = kc.get_realm_role(name, realm)
+            after_role = kc.get_realm_role(name, realm, fetch_composites=sync_composites)
         else:
             kc.create_client_role(desired_role, clientid, realm)
-            after_role = kc.get_client_role(name, clientid, realm)
+            after_role = kc.get_client_role(name, clientid, realm, fetch_composites=sync_composites)
 
         result['end_state'] = after_role
 
