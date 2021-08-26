@@ -1022,20 +1022,11 @@ class KeycloakAPI(object):
         If the role does not exist, None is returned.
         :param name: Name of the role to fetch.
         :param realm: Realm in which the role resides; default 'master'.
+        :return: Dict of role representation on success, otherwise None.
         """
         role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=name)
-        try:
-            return json.loads(to_native(open_url(role_url, method="GET", headers=self.restheaders,
-                                                 validate_certs=self.validate_certs).read()))
-        except HTTPError as e:
-            if e.code == 404:
-                return None
-            else:
-                self.module.fail_json(msg='Could not fetch role %s in realm %s: %s'
-                                          % (name, realm, str(e)))
-        except Exception as e:
-            self.module.fail_json(msg='Could not fetch role %s in realm %s: %s'
-                                      % (name, realm, str(e)))
+        data = self._get_request(role_url, 'role %s in realm %s' % (name, realm), none_for_404=True)
+        return data
 
     def create_realm_role(self, rolerep, realm='master'):
         """ Create a Keycloak realm role.
@@ -1107,7 +1098,7 @@ class KeycloakAPI(object):
         :param name: Name of the role to fetch.
         :param clientid: Client id for the client role
         :param realm: Realm in which the role resides
-        :return: Dict of role representation
+        :return: Dict of role representation on success, otherwise None.
         If the role does not exist, None is returned.
         """
         cid = self.get_client_id(clientid, realm=realm)
@@ -1115,18 +1106,8 @@ class KeycloakAPI(object):
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
         role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=name)
-        try:
-            return json.loads(to_native(open_url(role_url, method="GET", headers=self.restheaders,
-                                                 validate_certs=self.validate_certs).read()))
-        except HTTPError as e:
-            if e.code == 404:
-                return None
-            else:
-                self.module.fail_json(msg='Could not fetch role %s in client %s of realm %s: %s'
-                                          % (name, clientid, realm, str(e)))
-        except Exception as e:
-            self.module.fail_json(msg='Could not fetch role %s for client %s in realm %s: %s'
-                                      % (name, clientid, realm, str(e)))
+        data = self._get_request(role_url, 'role %s in client %s of realm %s' % (name, clientid, realm), none_for_404=True)
+        return data
 
     def create_client_role(self, rolerep, clientid, realm='master'):
         """ Create a Keycloak client role.
@@ -1437,3 +1418,22 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Could not get executions for authentication flow %s in realm %s: %s'
                                   % (config["alias"], realm, str(e)))
+
+    def _get_request(self, request_url, resource_description, none_for_404=False):
+        """
+        Performs a GET request on the keycloak API, and raises the appropriate failure messages
+        when the endpoint responds with an error.
+        :param request_url: The URL being requested.
+        :param resource_description: A clear description of the resource being obtained to use in the failure message.
+        :param none_for_404: If set to True, then return None instead of raising an exception when a 404 error occurs.
+        """
+        try:
+            return json.loads(to_native(open_url(request_url, method='GET', headers=self.restheaders, validate_certs=self.validate_certs).read()))
+        except ValueError as e:
+            self.module.fail_json(msg='API returned incorrect JSON when trying to obtain %s: %s' % (resource_description, str(e)))
+        except HTTPError as e:
+            if none_for_404 and e.code == 404:
+                return None
+            self.module.fail_json(msg='Could not obtain %s: %s' % (resource_description, str(e)))
+        except Exception as e:
+            self.module.fail_json(msg='Could not obtain %s: %s' % (resource_description, str(e)))
