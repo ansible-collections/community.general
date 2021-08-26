@@ -1062,13 +1062,10 @@ class KeycloakAPI(object):
         :param name: The name of the role.
         :param realm: The realm in which this role resides, default "master".
         """
-        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=name)
-        try:
-            return open_url(role_url, method='DELETE', headers=self.restheaders,
-                            validate_certs=self.validate_certs)
-        except Exception as e:
-            self.module.fail_json(msg='Unable to delete role %s in realm %s: %s'
-                                      % (name, realm, str(e)))
+        self._delete_request(
+            URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=name),
+            "role %s in realm %s" % (name, realm)
+        )
 
     def get_client_roles(self, clientid, realm='master'):
         """ Obtains role representations for client roles in a specific client
@@ -1162,13 +1159,10 @@ class KeycloakAPI(object):
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
-        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=name)
-        try:
-            return open_url(role_url, method='DELETE', headers=self.restheaders,
-                            validate_certs=self.validate_certs)
-        except Exception as e:
-            self.module.fail_json(msg='Unable to delete role %s for client %s in realm %s: %s'
-                                      % (name, clientid, realm, str(e)))
+        self._delete_request(
+            URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=name),
+            "%s for client %s in realm %s" % (name, clientid, realm)
+        )
 
     def get_authentication_flow_by_alias(self, alias, realm='master'):
         """
@@ -1465,3 +1459,19 @@ class KeycloakAPI(object):
             return open_url(request_url, method="POST", headers=self.restheaders, data=json.dumps(resource_data), validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg="Could not create %s: %s" % (resource_description, str(e)))
+
+    def _delete_request(self, request_url, resource_description, resource_data=None):
+        """
+        Performs a POST request on the keycloak API, and raises the appropriate failure messages
+        when the endpoint responds with an error.
+        :param request_url: The URL being requested.
+        :param resource_description: A clear description of the resource being updated to use in the failure message.
+        :param resource_data: [Optional] The data to send as JSON in the body of the request.
+        """
+        try:
+            kwargs = {'method':'DELETE', 'headers':self.restheaders, 'validate_certs': self.validate_certs}
+            if resource_data:
+                kwargs['data'] = json.dumps(resource_data)
+            return open_url(request_url, **kwargs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not delete %s: %s' % (resource_description, str(e)))
