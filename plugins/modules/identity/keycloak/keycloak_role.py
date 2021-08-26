@@ -302,6 +302,9 @@ def main():
 
         result['end_state'] = after_role
 
+        if module._diff:
+            result['diff'] = dict(before='', after=after_role)
+
         result['msg'] = 'Role {name} has been created'.format(name=name)
         module.exit_json(**result)
 
@@ -332,6 +335,9 @@ def main():
                 after_role = kc.get_client_role(name, clientid, realm)
 
             result['end_state'] = after_role
+
+            if module._diff:
+                result['diff'] = dict(before=before_role, after=after_role)
 
             result['msg'] = "Role {name} has been updated".format(name=name)
             module.exit_json(**result)
