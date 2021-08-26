@@ -1,2 +1,2 @@
 minor_changes:
-  - "redfish_utils redfish_command redfish_config - Add parameter to disable etag use for PUT/POST/PATCH requests when found in GET request. (https://github.com/ansible-collections/community.general/pull/3268)."
+  - "redfish_command and redfish_config - add parameter to disable etag use for PUT/POST/PATCH requests when found in GET request (https://github.com/ansible-collections/community.general/pull/3268)."
