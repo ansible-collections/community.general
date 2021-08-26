@@ -126,7 +126,8 @@ options:
     description:
       - Disable etag use for PUT/POST/PATCH requests when found in GET request
     type: bool
-    default: False
+    default: false
+    version_added: 3.6.0
   update_image_uri:
     required: false
     description:
