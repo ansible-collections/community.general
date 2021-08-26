@@ -101,5 +101,3 @@
         description: "{{ description_2 }}"
         composites:
           - {name: "testrole1-for-composite", client_id: null}
-
-
