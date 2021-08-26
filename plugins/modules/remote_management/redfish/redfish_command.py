@@ -122,7 +122,6 @@ options:
     type: str
     version_added: '0.2.0'
   disable_etag:
-    required: false
     description:
       - Disable etag use for PUT/POST/PATCH requests when found in GET request.
     type: bool
