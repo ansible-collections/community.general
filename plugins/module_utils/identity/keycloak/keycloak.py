@@ -1034,13 +1034,13 @@ class KeycloakAPI(object):
         :param rolerep: a RoleRepresentation of the role to be created. Must contain at minimum the field name.
         :return: HTTPResponse object on success
         """
-        roles_url = URL_REALM_ROLES.format(url=self.baseurl, realm=realm)
-        try:
-            return open_url(roles_url, method='POST', headers=self.restheaders,
-                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
-        except Exception as e:
-            self.module.fail_json(msg='Could not create role %s in realm %s: %s'
-                                      % (rolerep['name'], realm, str(e)))
+        role_name = rolerep['name']
+
+        self._post_request(
+            URL_REALM_ROLES.format(url=self.baseurl, realm=realm),
+            rolerep,
+            "role %s in realm %s" % (role_name, realm)
+        )
 
     def update_realm_role(self, rolerep, realm='master'):
         """ Update an existing realm role.
@@ -1121,13 +1121,14 @@ class KeycloakAPI(object):
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
-        roles_url = URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid)
-        try:
-            return open_url(roles_url, method='POST', headers=self.restheaders,
-                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
-        except Exception as e:
-            self.module.fail_json(msg='Could not create role %s for client %s in realm %s: %s'
-                                      % (rolerep['name'], clientid, realm, str(e)))
+
+        role_name = rolerep['name']
+
+        self._post_request(
+            URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid),
+            rolerep,
+            "role %s for client %s in realm %s" % (role_name, clientid, realm)
+        )
 
     def update_client_role(self, rolerep, clientid, realm="master"):
         """ Update an existing client role.
@@ -1451,3 +1452,16 @@ class KeycloakAPI(object):
             return open_url(request_url, method='PUT', headers=self.restheaders, data=json.dumps(resource_data), validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg='Could not set data for %s: %s' % (resource_description, str(e)))
+
+    def _post_request(self, request_url, resource_data, resource_description):
+        """
+        Performs a POST request on the keycloak API, and raises the appropriate failure messages
+        when the endpoint responds with an error.
+        :param request_url: The URL being requested.
+        :param resource_data: The data to send as JSON in the body of the request.
+        :param resource_description: A clear description of the resource being updated to use in the failure message.
+        """
+        try:
+            return open_url(request_url, method="POST", headers=self.restheaders, data=json.dumps(resource_data), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg="Could not create %s: %s" % (resource_description, str(e)))
