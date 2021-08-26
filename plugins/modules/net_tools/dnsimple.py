@@ -404,7 +404,7 @@ def main():
             ds = DNSimpleV2(account_email, account_api_token, sandbox, module)
         else:
             module.deprecate(
-                'Support for python-dnsimple < 2 is deprected. '
+                'Support for python-dnsimple < 2 is deprecated. '
                 'Update python-dnsimple to version >= 2.0.0',
                 version='5.0.0', collection_name='community.general'
             )
