@@ -63,6 +63,12 @@ TESTCASE_CONNECTION = [
         '_ansible_check_mode': True,
     },
     {
+        'type': 'gre',
+        'conn_name': 'non_existent_nw_device',
+        'state': 'absent',
+        '_ansible_check_mode': True,
+    },
+    {
         'type': 'ipip',
         'conn_name': 'non_existent_nw_device',
         'state': 'absent',
@@ -369,6 +375,39 @@ connection.autoconnect:                 yes
 vxlan.id:                               11
 vxlan.local:                            192.168.225.5
 vxlan.remote:                           192.168.225.6
+"""
+
+TESTCASE_GRE = [
+    {
+        'type': 'gre',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'gre-existent_nw_device',
+        'ip_tunnel_dev': 'non_existent_gre_device',
+        'ip_tunnel_local': '192.168.225.5',
+        'ip_tunnel_remote': '192.168.225.6',
+        'ip_tunnel_input_key': '1',
+        'ip_tunnel_output_key': '2',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    }
+]
+
+TESTCASE_GRE_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              gre-existent_nw_device
+connection.autoconnect:                 yes
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+ip-tunnel.mode:                         gre
+ip-tunnel.parent:                       non_existent_gre_device
+ip-tunnel.local:                        192.168.225.5
+ip-tunnel.remote:                       192.168.225.6
+ip-tunnel.input-key:                    1
+ip-tunnel.output-key:                   2
 """
 
 TESTCASE_IPIP = [
@@ -706,6 +745,13 @@ def mocked_vxlan_connection_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
                execute_return=(0, TESTCASE_VXLAN_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_gre_connection_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_GRE_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
@@ -1628,6 +1674,83 @@ def test_eth_dhcp_client_id_con_create(mocked_generic_connection_create, capfd):
     results = json.loads(out)
     assert not results.get('failed')
     assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GRE, indirect=['patch_ansible_module'])
+def test_create_gre(mocked_generic_connection_create, capfd):
+    """
+    Test if gre created
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert args[0][0] == '/usr/bin/nmcli'
+    assert args[0][1] == 'con'
+    assert args[0][2] == 'add'
+    assert args[0][3] == 'type'
+    assert args[0][4] == 'ip-tunnel'
+    assert args[0][5] == 'con-name'
+    assert args[0][6] == 'non_existent_nw_device'
+
+    args_text = list(map(to_text, args[0]))
+    for param in ['connection.interface-name', 'gre-existent_nw_device',
+                  'ip-tunnel.local', '192.168.225.5',
+                  'ip-tunnel.mode', 'gre',
+                  'ip-tunnel.parent', 'non_existent_gre_device',
+                  'ip-tunnel.remote', '192.168.225.6',
+                  'ip-tunnel.input-key', '1',
+                  'ip-tunnel.output-key', '2']:
+        assert param in args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GRE, indirect=['patch_ansible_module'])
+def test_gre_mod(mocked_generic_connection_modify, capfd):
+    """
+    Test if gre modified
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert args[0][0] == '/usr/bin/nmcli'
+    assert args[0][1] == 'con'
+    assert args[0][2] == 'modify'
+    assert args[0][3] == 'non_existent_nw_device'
+
+    args_text = list(map(to_text, args[0]))
+    for param in ['ip-tunnel.local', '192.168.225.5', 'ip-tunnel.remote', '192.168.225.6']:
+        assert param in args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GRE, indirect=['patch_ansible_module'])
+def test_gre_connection_unchanged(mocked_gre_connection_unchanged, capfd):
+    """
+    Test : GRE connection unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_DHCP, indirect=['patch_ansible_module'])
