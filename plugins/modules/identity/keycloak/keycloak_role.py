@@ -263,8 +263,8 @@ def main():
             changeset[camel(param)] = new_param_value
 
     # prepare the new role
-    updated_role = before_role.copy()
-    updated_role.update(changeset)
+    desired_role = before_role.copy()
+    desired_role.update(changeset)
 
     result['proposed'] = changeset
     result['existing'] = before_role
@@ -287,17 +287,17 @@ def main():
             module.fail_json(msg='name must be specified when creating a new role')
 
         if module._diff:
-            result['diff'] = dict(before='', after=updated_role)
+            result['diff'] = dict(before='', after=desired_role)
 
         if module.check_mode:
             module.exit_json(**result)
 
         # do it for real!
         if clientid is None:
-            kc.create_realm_role(updated_role, realm)
+            kc.create_realm_role(desired_role, realm)
             after_role = kc.get_realm_role(name, realm)
         else:
-            kc.create_client_role(updated_role, clientid, realm)
+            kc.create_client_role(desired_role, clientid, realm)
             after_role = kc.get_client_role(name, clientid, realm)
 
         result['end_state'] = after_role
@@ -308,9 +308,9 @@ def main():
     else:
         if state == 'present':
             # no changes
-            if updated_role == before_role:
+            if desired_role == before_role:
                 result['changed'] = False
-                result['end_state'] = updated_role
+                result['end_state'] = desired_role
                 result['msg'] = "No changes required to role {name}.".format(name=name)
                 module.exit_json(**result)
 
@@ -318,17 +318,17 @@ def main():
             result['changed'] = True
 
             if module._diff:
-                result['diff'] = dict(before=before_role, after=updated_role)
+                result['diff'] = dict(before=before_role, after=desired_role)
 
             if module.check_mode:
                 module.exit_json(**result)
 
             # do the update
             if clientid is None:
-                kc.update_realm_role(updated_role, realm)
+                kc.update_realm_role(desired_role, realm)
                 after_role = kc.get_realm_role(name, realm)
             else:
-                kc.update_client_role(updated_role, clientid, realm)
+                kc.update_client_role(desired_role, clientid, realm)
                 after_role = kc.get_client_role(name, clientid, realm)
 
             result['end_state'] = after_role
