@@ -77,7 +77,7 @@ options:
         description:
             - A list of the other roles that composited together by this role.
         elements: dict
-        contains:
+        suboptions:
           client_id:
             type: str
             description: The name of the client (not the cid), can be null for a role client.
