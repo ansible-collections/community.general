@@ -1048,13 +1048,13 @@ class KeycloakAPI(object):
         :param rolerep: A RoleRepresentation of the updated role.
         :return HTTPResponse object on success
         """
-        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=rolerep['name'])
-        try:
-            return open_url(role_url, method='PUT', headers=self.restheaders,
-                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
-        except Exception as e:
-            self.module.fail_json(msg='Could not update role %s in realm %s: %s'
-                                      % (rolerep['name'], realm, str(e)))
+        role_name = rolerep['name']
+
+        self._put_request(
+            URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=role_name),
+            rolerep,
+            "role %s in realm %s" % (role_name, realm)
+        )
 
     def delete_realm_role(self, name, realm='master'):
         """ Delete a realm role.
@@ -1137,17 +1137,18 @@ class KeycloakAPI(object):
         :param realm: Realm in which the role resides
         :return HTTPResponse object on success
         """
+        role_name = rolerep['name']
+
         cid = self.get_client_id(clientid, realm=realm)
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
-        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=rolerep['name'])
-        try:
-            return open_url(role_url, method='PUT', headers=self.restheaders,
-                            data=json.dumps(rolerep), validate_certs=self.validate_certs)
-        except Exception as e:
-            self.module.fail_json(msg='Could not update role %s for client %s in realm %s: %s'
-                                      % (rolerep['name'], clientid, realm, str(e)))
+
+        self._put_request(
+            URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=role_name),
+            rolerep,
+            "role %s for client %s in realm %s" % (role_name, clientid, realm)
+        )
 
     def delete_client_role(self, name, clientid, realm="master"):
         """ Delete a role. One of name or roleid must be provided.
@@ -1437,3 +1438,16 @@ class KeycloakAPI(object):
             self.module.fail_json(msg='Could not obtain %s: %s' % (resource_description, str(e)))
         except Exception as e:
             self.module.fail_json(msg='Could not obtain %s: %s' % (resource_description, str(e)))
+
+    def _put_request(self, request_url, resource_data, resource_description):
+        """
+        Performs a PUT request on the keycloak API, and raises the appropriate failure messages
+        when the endpoint responds with an error.
+        :param request_url: The URL being requested.
+        :param resource_data: The data to send as JSON in the body of the request.
+        :param resource_description: A clear description of the resource being updated to use in the failure message.
+        """
+        try:
+            return open_url(request_url, method='PUT', headers=self.restheaders, data=json.dumps(resource_data), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not set data for %s: %s' % (resource_description, str(e)))
