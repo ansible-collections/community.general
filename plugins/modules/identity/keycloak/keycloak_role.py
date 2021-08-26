@@ -75,7 +75,15 @@ options:
     composites:
         type: list
         description:
-            - A list dicts containing the keys client_id, and name for roles to be added into the composite.
+            - A list of the other roles that composited together by this role.
+        elements: dict
+        contains:
+          client_id:
+            type: str
+            description: The name of the client (not the cid), can be null for a role client.
+          name:
+            type: str
+            description: The name of the role.
 
 extends_documentation_fragment:
 - community.general.keycloak
