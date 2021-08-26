@@ -1,0 +1,2 @@
+minor_changes:
+  - "nmcli - add ``gre`` tunnel support (https://github.com/ansible-collections/community.general/issues/3105, https://github.com/ansible-collections/community.general/pull/3262)."
