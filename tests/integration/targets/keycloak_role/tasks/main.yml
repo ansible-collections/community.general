@@ -1,246 +1,49 @@
 ---
+- name: Delete realm
+  community.general.keycloak_realm: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      id: "{{ realm }}"
+      realm: "{{ realm }}"
+      state: absent
+
 - name: Create realm
-  community.general.keycloak_realm:
-    auth_keycloak_url: "{{ url }}"
-    auth_realm: "{{ admin_realm }}"
-    auth_username: "{{ admin_user }}"
-    auth_password: "{{ admin_password }}"
-    id: "{{ realm }}"
-    realm: "{{ realm }}"
-    state: present
+  community.general.keycloak_realm: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      id: "{{ realm }}"
+      realm: "{{ realm }}"
+      state: present
 
 - name: Create client
-  community.general.keycloak_client:
-    auth_keycloak_url: "{{ url }}"
-    auth_realm: "{{ admin_realm }}"
-    auth_username: "{{ admin_user }}"
-    auth_password: "{{ admin_password }}"
-    realm: "{{ realm }}"
-    client_id: "{{ client_id }}"
-    state: present
+  community.general.keycloak_client: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      realm: "{{ realm }}"
+      client_id: "{{ client_id }}"
+      state: present
   register: client
 
-- name: Create new realm role
-  community.general.keycloak_role:
-    auth_keycloak_url: "{{ url }}"
-    auth_realm: "{{ admin_realm }}"
-    auth_username: "{{ admin_user }}"
-    auth_password: "{{ admin_password }}"
-    realm: "{{ realm }}"
-    name: "{{ role }}"
-    description: "{{ description_1 }}"
-    state: present
-  register: result
-
-- name: Debug
-  debug:
-    var: result
-
-- name: Assert realm role created
-  assert:
-    that:
-      - result is changed
-      - result.existing == {}
-      - result.end_state.name == "{{ role }}"
-      - result.end_state.containerId == "{{ realm }}"
-
-- name: Create existing realm role
-  community.general.keycloak_role:
-    auth_keycloak_url: "{{ url }}"
-    auth_realm: "{{ admin_realm }}"
-    auth_username: "{{ admin_user }}"
-    auth_password: "{{ admin_password }}"
-    realm: "{{ realm }}"
-    name: "{{ role }}"
-    description: "{{ description_1 }}"
-    state: present
-  register: result
-
-- name: Debug
-  debug:
-    var: result
-
-- name: Assert realm role unchanged
-  assert:
-    that:
-      - result is not changed
-
-- name: Update realm role
-  community.general.keycloak_role:
-    auth_keycloak_url: "{{ url }}"
-    auth_realm: "{{ admin_realm }}"
-    auth_username: "{{ admin_user }}"
-    auth_password: "{{ admin_password }}"
-    realm: "{{ realm }}"
-    name: "{{ role }}"
-    description: "{{ description_2 }}"
-    state: present
-  register: result
-
-- name: Debug
-  debug:
-    var: result
-
-- name: Assert realm role updated
-  assert:
-    that:
-      - result is changed
-      - result.existing.description == "{{ description_1 }}"
-      - result.end_state.description == "{{ description_2 }}"
-
-- name: Delete existing realm role
-  community.general.keycloak_role:
-    auth_keycloak_url: "{{ url }}"
-    auth_realm: "{{ admin_realm }}"
-    auth_username: "{{ admin_user }}"
-    auth_password: "{{ admin_password }}"
-    realm: "{{ realm }}"
-    name: "{{ role }}"
-    state: absent
-  register: result
-
-- name: Debug
-  debug:
-    var: result
-
-- name: Assert realm role deleted
-  assert:
-    that:
-      - result is changed
-      - result.end_state == {}
-
-- name: Delete absent realm role
-  community.general.keycloak_role:
-    auth_keycloak_url: "{{ url }}"
-    auth_realm: "{{ admin_realm }}"
-    auth_username: "{{ admin_user }}"
-    auth_password: "{{ admin_password }}"
-    realm: "{{ realm }}"
-    name: "{{ role }}"
-    state: absent
-  register: result
-
-- name: Debug
-  debug:
-    var: result
-
-- name: Assert realm role unchanged
-  assert:
-    that:
-      - result is not changed
-      - result.end_state == {}
-
-- name: Create new client role
-  community.general.keycloak_role:
-    auth_keycloak_url: "{{ url }}"
-    auth_realm: "{{ admin_realm }}"
-    auth_username: "{{ admin_user }}"
-    auth_password: "{{ admin_password }}"
-    realm: "{{ realm }}"
-    client_id: "{{ client_id }}"
-    name: "{{ role }}"
-    description: "{{ description_1 }}"
-    state: present
-  register: result
-
-- name: Debug
-  debug:
-    var: result
-
-- name: Assert client role created
-  assert:
-    that:
-      - result is changed
-      - result.existing == {}
-      - result.end_state.name == "{{ role }}"
-      - result.end_state.containerId == "{{ client.end_state.id }}"
-
-- name: Create existing client role
-  community.general.keycloak_role:
-    auth_keycloak_url: "{{ url }}"
-    auth_realm: "{{ admin_realm }}"
-    auth_username: "{{ admin_user }}"
-    auth_password: "{{ admin_password }}"
-    realm: "{{ realm }}"
-    client_id: "{{ client_id }}"
-    name: "{{ role }}"
-    description: "{{ description_1 }}"
-    state: present
-  register: result
-
-- name: Debug
-  debug:
-    var: result
-
-- name: Assert client role unchanged
-  assert:
-    that:
-      - result is not changed
-
-- name: Update client role
-  community.general.keycloak_role:
-    auth_keycloak_url: "{{ url }}"
-    auth_realm: "{{ admin_realm }}"
-    auth_username: "{{ admin_user }}"
-    auth_password: "{{ admin_password }}"
-    realm: "{{ realm }}"
-    client_id: "{{ client_id }}"
-    name: "{{ role }}"
-    description: "{{ description_2 }}"
-    state: present
-  register: result
-
-- name: Debug
-  debug:
-    var: result
-
-- name: Assert client role updated
-  assert:
-    that:
-      - result is changed
-      - result.existing.description == "{{ description_1 }}"
-      - result.end_state.description == "{{ description_2 }}"
-
-- name: Delete existing client role
-  community.general.keycloak_role:
-    auth_keycloak_url: "{{ url }}"
-    auth_realm: "{{ admin_realm }}"
-    auth_username: "{{ admin_user }}"
-    auth_password: "{{ admin_password }}"
-    realm: "{{ realm }}"
-    client_id: "{{ client_id }}"
-    name: "{{ role }}"
-    state: absent
-  register: result
-
-- name: Debug
-  debug:
-    var: result
-
-- name: Assert client role deleted
-  assert:
-    that:
-      - result is changed
-      - result.end_state == {}
-
-- name: Delete absent client role
-  community.general.keycloak_role:
-    auth_keycloak_url: "{{ url }}"
-    auth_realm: "{{ admin_realm }}"
-    auth_username: "{{ admin_user }}"
-    auth_password: "{{ admin_password }}"
-    realm: "{{ realm }}"
-    client_id: "{{ client_id }}"
-    name: "{{ role }}"
-    state: absent
-  register: result
-
-- name: Debug
-  debug:
-    var: result
-
-- name: Assert client role unchanged
-  assert:
-    that:
-      - result is not changed
-      - result.end_state == {}
+- include_tasks: create_update_delete_tests.yml
+  vars:
+    test_props: "{{ item }}"
+  loop:
+    - test_name: "1. Realm role test"
+      expect_to_be_realm: true
+      create_args:
+        name: "{{ role }}"
+        description: "{{ description_1 }}"
+      update_args:
+        name: "{{ role }}"
+        description: "{{ description_2 }}"
+         
+    - test_name: "2. Client role test"
+      expect_to_be_realm: false
+      create_args:
+        name: "{{ role }}"
+        client_id: "{{ client_id }}"        
+        description: "{{ description_1 }}"
+      update_args:
+        name: "{{ role }}"
+        client_id: "{{ client_id }}"        
+        description: "{{ description_2 }}"

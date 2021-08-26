@@ -8,3 +8,10 @@ client_id: myclient
 role: myrole
 description_1: desc 1
 description_2: desc 2
+
+auth_args:
+  auth_keycloak_url: "{{ url }}"
+  auth_realm: "{{ admin_realm }}"
+  auth_username: "{{ admin_user }}"
+  auth_password: "{{ admin_password }}"
+

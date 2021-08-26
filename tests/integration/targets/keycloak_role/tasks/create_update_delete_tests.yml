@@ -1,0 +1,97 @@
+- name: "{{test_props.test_name}} - Create new role"
+  community.general.keycloak_role: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args0:
+      realm: "{{ realm }}"
+      state: present
+    call_args: "{{ call_args0 | combine(test_props.create_args) }}"
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: "{{test_props.test_name}} - Assert created"
+  assert:
+    that:
+      - result is changed
+      - result.existing == {}
+      - result.end_state.name == "{{ test_props.create_args.name }}"
+      - result.end_state.containerId == "{{ realm }}" or test_props.expect_to_be_realm == False
+
+- name: "{{test_props.test_name}} - Updates with no change"
+  community.general.keycloak_role: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args0:
+      realm: "{{ realm }}"
+      state: present
+    call_args: "{{ call_args0 | combine(test_props.create_args) }}"
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: "{{test_props.test_name}} - Assert role unchanged"
+  assert:
+    that:
+      - result is not changed
+
+- name: "{{test_props.test_name}} - Update role"
+  community.general.keycloak_role: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args0:
+      realm: "{{ realm }}"
+      state: present
+    call_args: "{{ call_args0 | combine(test_props.update_args) }}"
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: "{{test_props.test_name}} - Assert role updated"
+  assert:
+    that:
+      - result is changed
+      - result.existing.description == "{{ test_props.create_args.description }}"
+      - result.end_state.description == "{{ test_props.update_args.description }}"
+
+- name: "{{test_props.test_name}} - Delete existing realm role"
+  community.general.keycloak_role: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args0:
+      realm: "{{ realm }}"
+      state: absent
+    call_args: "{{ call_args0 | combine(test_props.create_args) }}"
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: "{{test_props.test_name}} - Assert role deleted"
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+
+- name: "{{test_props.test_name}} - Delete absent role"
+  community.general.keycloak_role: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args0:
+      realm: "{{ realm }}"
+      state: absent
+    call_args: "{{ call_args0 | combine(test_props.create_args) }}"
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: "{{test_props.test_name}} - Assert role unchanged"
+  assert:
+    that:
+      - result is not changed
+      - result.end_state == {}
+
