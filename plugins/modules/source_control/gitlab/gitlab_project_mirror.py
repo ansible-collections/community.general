@@ -232,7 +232,6 @@ def main():
 
     group_identifier = module.params['group']
     project_name = module.params['project']
-    project_path = module.params['path']
     state = module.params['state']
     mirror_url = module.params['url']
     mirror_enabled = module.params['enabled']
@@ -243,10 +242,6 @@ def main():
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
     gitlab_instance = gitlabAuthentication(module)
-
-    # Set project_path to project_name if it is empty.
-    if project_path is None:
-        project_path = project_name.replace(" ", "_")
 
     gitlab_project = GitLabProject(module, gitlab_instance)
 
@@ -268,7 +263,7 @@ def main():
 
     if not namespace:
         module.fail_json(msg="Failed to find the namespace for the project")
-    project_exists = gitlab_project.existsProject(namespace, project_path)
+    project_exists = gitlab_project.existsProject(namespace, project_name)
 
     if project_exists:
       if state == 'present':
