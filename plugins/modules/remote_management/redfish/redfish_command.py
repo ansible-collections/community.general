@@ -121,6 +121,12 @@ options:
       - The ID of the System, Manager or Chassis to modify
     type: str
     version_added: '0.2.0'
+  disable_etag:
+    required: false
+    description:
+      - Disable etag use for PUT/POST/PATCH requests when found in GET request
+    type: bool
+    default: False
   update_image_uri:
     required: false
     description:
@@ -609,6 +615,7 @@ def main():
             boot_next=dict(),
             boot_override_mode=dict(choices=['Legacy', 'UEFI']),
             resource_id=dict(),
+            disable_etag=dict(type='bool', default=False),
             update_image_uri=dict(),
             update_protocol=dict(),
             update_targets=dict(type='list', elements='str', default=[]),
@@ -667,6 +674,9 @@ def main():
     # System, Manager or Chassis ID to modify
     resource_id = module.params['resource_id']
 
+    # Flag to disable etag
+    disable_etag = module.params['disable_etag']
+
     # update options
     update_opts = {
         'update_image_uri': module.params['update_image_uri'],
@@ -689,7 +699,7 @@ def main():
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
     rf_utils = RedfishUtils(creds, root_uri, timeout, module,
-                            resource_id=resource_id, data_modification=True)
+                            resource_id=resource_id, data_modification=True, disable_etag=disable_etag)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:

@@ -29,7 +29,7 @@ FAIL_MSG = 'Issuing a data modification command without specifying the '\
 class RedfishUtils(object):
 
     def __init__(self, creds, root_uri, timeout, module, resource_id=None,
-                 data_modification=False):
+                 data_modification=False, disable_etag=False):
         self.root_uri = root_uri
         self.creds = creds
         self.timeout = timeout
@@ -37,6 +37,7 @@ class RedfishUtils(object):
         self.service_root = '/redfish/v1/'
         self.resource_id = resource_id
         self.data_modification = data_modification
+        self.disable_etag = disable_etag
         self._init_session()
 
     def _auth_params(self, headers):
@@ -114,14 +115,16 @@ class RedfishUtils(object):
 
     def patch_request(self, uri, pyld):
         req_headers = dict(PATCH_HEADERS)
-        r = self.get_request(uri)
-        if r['ret']:
-            # Get etag from etag header or @odata.etag property
-            etag = r['headers'].get('etag')
-            if not etag:
-                etag = r['data'].get('@odata.etag')
-            if etag:
-                req_headers['If-Match'] = etag
+
+        if not self.disable_etag:
+            r = self.get_request(uri)
+            if r['ret']:
+                # Get etag from etag header or @odata.etag property
+                etag = r['headers'].get('etag')
+                if not etag:
+                    etag = r['data'].get('@odata.etag')
+                if etag:
+                    req_headers['If-Match'] = etag
         username, password, basic_auth = self._auth_params(req_headers)
         try:
             resp = open_url(uri, data=json.dumps(pyld),

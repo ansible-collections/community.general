@@ -78,6 +78,12 @@ options:
       - The ID of the System, Manager or Chassis to modify
     type: str
     version_added: '0.2.0'
+  disable_etag:
+    required: false
+    description:
+      - Disable etag use for PUT/POST/PATCH requests when found in GET request
+    type: bool
+    default: False
   nic_addr:
     required: false
     description:
@@ -233,6 +239,7 @@ def main():
                 default={}
             ),
             resource_id=dict(),
+            disable_etag=dict(type='bool', default=False),
             nic_addr=dict(default='null'),
             nic_config=dict(
                 type='dict',
@@ -271,6 +278,9 @@ def main():
     # System, Manager or Chassis ID to modify
     resource_id = module.params['resource_id']
 
+    # Flag to disable etag
+    disable_etag = module.params['disable_etag']
+
     # manager nic
     nic_addr = module.params['nic_addr']
     nic_config = module.params['nic_config']
@@ -278,7 +288,7 @@ def main():
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
     rf_utils = RedfishUtils(creds, root_uri, timeout, module,
-                            resource_id=resource_id, data_modification=True)
+                            resource_id=resource_id, data_modification=True, disable_etag=disable_etag)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
