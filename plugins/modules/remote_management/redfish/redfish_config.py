@@ -79,11 +79,11 @@ options:
     type: str
     version_added: '0.2.0'
   disable_etag:
-    required: false
     description:
-      - Disable etag use for PUT/POST/PATCH requests when found in GET request
+      - Disable etag use for PUT/POST/PATCH requests when found in GET request.
     type: bool
-    default: False
+    default: false
+    version_added: 3.6.0
   nic_addr:
     required: false
     description:
