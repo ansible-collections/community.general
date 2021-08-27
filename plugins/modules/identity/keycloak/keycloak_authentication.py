@@ -271,9 +271,11 @@ def create_or_update_executions(kc, config, realm='master'):
 def main():
     """
     Module execution
+
     :return:
     """
     argument_spec = keycloak_argument_spec()
+
     meta_args = dict(
         realm=dict(type='str', required=True),
         alias=dict(type='str', required=True),
@@ -292,6 +294,7 @@ def main():
         state=dict(choices=["absent", "present"], default='present'),
         force=dict(type='bool', default=False),
     )
+
     argument_spec.update(meta_args)
 
     module = AnsibleModule(argument_spec=argument_spec,
@@ -301,6 +304,7 @@ def main():
                            )
 
     result = dict(changed=False, msg='', flow={})
+
     # Obtain access token, initialize API
     try:
         connection_header = get_token(module.params)
@@ -308,6 +312,7 @@ def main():
         module.fail_json(msg=str(e))
 
     kc = KeycloakAPI(module, connection_header)
+
     realm = module.params.get('realm')
     state = module.params.get('state')
     force = module.params.get('force')
@@ -323,24 +328,33 @@ def main():
     }
 
     auth_repr = kc.get_authentication_flow_by_alias(alias=new_auth_repr["alias"], realm=realm)
-    if auth_repr == {}:  # Authentication flow does not exist
-        if state == 'present':  # If desired state is present
+
+    # Cater for when it doesn't exist (an empty dict)
+    if auth_repr == {}:
+        if state == 'present':
+            # Process a creation
             result['changed'] = True
+
             if module._diff:
                 result['diff'] = dict(before='', after=new_auth_repr)
+
             if module.check_mode:
                 module.exit_json(**result)
+
             # If copyFrom is defined, create authentication flow from a copy
             if "copyFrom" in new_auth_repr and new_auth_repr["copyFrom"] is not None:
                 auth_repr = kc.copy_auth_flow(config=new_auth_repr, realm=realm)
             else:  # Create an empty authentication flow
                 auth_repr = kc.create_empty_auth_flow(config=new_auth_repr, realm=realm)
+
             # If the authentication still not exist on the server, raise an exception.
             if auth_repr is None:
                 result['msg'] = "Authentication just created not found: " + str(new_auth_repr)
                 module.fail_json(**result)
+
             # Configure the executions for the flow
             create_or_update_executions(kc=kc, config=new_auth_repr, realm=realm)
+
             # Get executions created
             exec_repr = kc.get_executions_representation(config=new_auth_repr, realm=realm)
             if exec_repr is not None:
@@ -350,8 +364,11 @@ def main():
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['msg'] = new_auth_repr["alias"] + ' absent'
-    else:  # The authentication flow already exist
-        if state == 'present':  # if desired state is present
+
+    else:
+        if state == 'present':
+            # Process an update
+
             if force:  # If force option is true
                 # Delete the actual authentication flow
                 result['changed'] = True
@@ -370,25 +387,34 @@ def main():
                     result['msg'] = "Authentication just created not found: " + str(new_auth_repr)
                     module.fail_json(**result)
             # Configure the executions for the flow
+
             if module.check_mode:
                 module.exit_json(**result)
             changed, diff = create_or_update_executions(kc=kc, config=new_auth_repr, realm=realm)
             result['changed'] |= changed
+
             if module._diff:
                 result['diff'] = diff
+
             # Get executions created
             exec_repr = kc.get_executions_representation(config=new_auth_repr, realm=realm)
             if exec_repr is not None:
                 auth_repr["authenticationExecutions"] = exec_repr
             result['flow'] = auth_repr
-        elif state == 'absent':  # If desired state is absent
+
+        elif state == 'absent':
+            # Process a deletion (because state was not 'present')
             result['changed'] = True
-            # Delete the authentication flow alias.
+
             if module._diff:
                 result['diff'] = dict(before=auth_repr, after='')
+
             if module.check_mode:
                 module.exit_json(**result)
+
+            # delete it
             kc.delete_authentication_flow_by_id(id=auth_repr["id"], realm=realm)
+
             result['msg'] = 'Authentication flow: {alias} id: {id} is deleted'.format(alias=new_auth_repr['alias'],
                                                                                       id=auth_repr["id"])
 

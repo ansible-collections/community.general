@@ -302,6 +302,7 @@ def main():
         full_scope_allowed=dict(type='bool'),
         protocol_mappers=dict(type='list', elements='dict', options=protmapper_spec),
     )
+
     argument_spec.update(meta_args)
 
     module = AnsibleModule(argument_spec=argument_spec,
@@ -317,19 +318,20 @@ def main():
         connection_header = get_token(module.params)
     except KeycloakError as e:
         module.fail_json(msg=str(e))
+
     kc = KeycloakAPI(module, connection_header)
 
     realm = module.params.get('realm')
     state = module.params.get('state')
     cid = module.params.get('id')
 
-    # convert module parameters to client representation parameters (if they belong in there)
+    # Filter and map the parameters names that apply to the client template
     clientt_params = [x for x in module.params
                       if x not in ['state', 'auth_keycloak_url', 'auth_client_id', 'auth_realm',
                                    'auth_client_secret', 'auth_username', 'auth_password',
                                    'validate_certs', 'realm'] and module.params.get(x) is not None]
 
-    # See whether the client template already exists in Keycloak
+    # See if it already exists in Keycloak
     if cid is None:
         before_clientt = kc.get_client_template_by_name(module.params.get('name'), realm=realm)
         if before_clientt is not None:
@@ -355,23 +357,24 @@ def main():
                 pass
         changeset[camel(clientt_param)] = new_param_value
 
-    # Whether creating or updating a client, take the before-state and merge the changeset into it
+    # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_clientt = before_clientt.copy()
     desired_clientt.update(changeset)
 
     result['proposed'] = changeset
 
-    # If the client template does not exist yet, before_client is still empty
+    # Cater for when it doesn't exist (an empty dict)
     if before_clientt == dict():
         if state == 'absent':
-            # do nothing and exit
+            # Do nothing and exit
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['msg'] = 'Client template does not exist, doing nothing.'
             module.exit_json(**result)
 
-        # create new client template
+        # Process a creation
         result['changed'] = True
+
         if 'name' not in desired_clientt:
             module.fail_json(msg='name needs to be specified when creating a new client')
 
@@ -381,6 +384,7 @@ def main():
         if module.check_mode:
             module.exit_json(**result)
 
+        # create it
         kc.create_client_template(desired_clientt, realm=realm)
         after_clientt = kc.get_client_template_by_name(desired_clientt['name'], realm=realm)
 
@@ -388,9 +392,11 @@ def main():
 
         result['msg'] = 'Client template %s has been created.' % desired_clientt['name']
         module.exit_json(**result)
+
     else:
         if state == 'present':
-            # update existing client template
+            # Process an update
+
             result['changed'] = True
             if module.check_mode:
                 # We can only compare the current client template with the proposed updates we have
@@ -400,6 +406,7 @@ def main():
 
                 module.exit_json(**result)
 
+            # do the update
             kc.update_client_template(cid, desired_clientt, realm=realm)
 
             after_clientt = kc.get_client_template_by_id(cid, realm=realm)
@@ -412,9 +419,11 @@ def main():
 
             result['msg'] = 'Client template %s has been updated.' % desired_clientt['name']
             module.exit_json(**result)
+
         else:
-            # Delete existing client
+            # Process a deletion (because state was not 'present')
             result['changed'] = True
+
             if module._diff:
                 result['diff']['before'] = before_clientt
                 result['diff']['after'] = ''
@@ -422,9 +431,12 @@ def main():
             if module.check_mode:
                 module.exit_json(**result)
 
+            # delete it
             kc.delete_client_template(cid, realm=realm)
             result['proposed'] = dict()
+
             result['end_state'] = dict()
+
             result['msg'] = 'Client template %s has been deleted.' % before_clientt['name']
             module.exit_json(**result)
 

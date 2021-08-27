@@ -676,6 +676,7 @@ def main():
         verify_email=dict(type='bool', aliases=['verifyEmail']),
         wait_increment_seconds=dict(type='int', aliases=['waitIncrementSeconds']),
     )
+
     argument_spec.update(meta_args)
 
     module = AnsibleModule(argument_spec=argument_spec,
@@ -699,6 +700,8 @@ def main():
 
     # convert module parameters to realm representation parameters (if they belong in there)
     params_to_ignore = list(keycloak_argument_spec().keys()) + ['state']
+
+    # Filter and map the parameters names that apply to the role
     realm_params = [x for x in module.params
                     if x not in params_to_ignore and
                     module.params.get(x) is not None]
@@ -713,7 +716,7 @@ def main():
         new_param_value = module.params.get(realm_param)
         changeset[camel(realm_param)] = new_param_value
 
-    # Whether creating or updating a realm, take the before-state and merge the changeset into it
+    # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_realm = before_realm.copy()
     desired_realm.update(changeset)
 
@@ -721,17 +724,18 @@ def main():
     before_realm_sanitized = sanitize_cr(before_realm)
     result['existing'] = before_realm_sanitized
 
-    # If the realm does not exist yet, before_realm is still empty
+    # Cater for when it doesn't exist (an empty dict)
     if not before_realm:
         if state == 'absent':
-            # do nothing and exit
+            # Do nothing and exit
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['msg'] = 'Realm does not exist, doing nothing.'
             module.exit_json(**result)
 
-        # create new realm
+        # Process a creation
         result['changed'] = True
+
         if 'id' not in desired_realm:
             module.fail_json(msg='id needs to be specified when creating a new realm')
 
@@ -741,6 +745,7 @@ def main():
         if module.check_mode:
             module.exit_json(**result)
 
+        # create it
         kc.create_realm(desired_realm)
         after_realm = kc.get_realm_by_id(desired_realm['id'])
 
@@ -748,9 +753,12 @@ def main():
 
         result['msg'] = 'Realm %s has been created.' % desired_realm['id']
         module.exit_json(**result)
+
     else:
         if state == 'present':
-            # update existing realm
+            # Process an update
+
+            # doing an update
             result['changed'] = True
             if module.check_mode:
                 # We can only compare the current realm with the proposed updates we have
@@ -761,21 +769,26 @@ def main():
 
                 module.exit_json(**result)
 
+            # do the update
             kc.update_realm(desired_realm, realm=realm)
 
             after_realm = kc.get_realm_by_id(realm=realm)
+
             if before_realm == after_realm:
                 result['changed'] = False
             if module._diff:
                 result['diff'] = dict(before=before_realm_sanitized,
                                       after=sanitize_cr(after_realm))
+
             result['end_state'] = sanitize_cr(after_realm)
 
             result['msg'] = 'Realm %s has been updated.' % desired_realm['id']
             module.exit_json(**result)
+
         else:
-            # Delete existing realm
+            # Process a deletion (because state was not 'present')
             result['changed'] = True
+
             if module._diff:
                 result['diff']['before'] = before_realm_sanitized
                 result['diff']['after'] = ''
@@ -783,9 +796,12 @@ def main():
             if module.check_mode:
                 module.exit_json(**result)
 
+            # delete it
             kc.delete_realm(realm=realm)
+
             result['proposed'] = dict()
             result['end_state'] = dict()
+
             result['msg'] = 'Realm %s has been deleted.' % before_realm['id']
             module.exit_json(**result)
 
