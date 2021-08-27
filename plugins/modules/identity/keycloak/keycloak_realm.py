@@ -707,7 +707,10 @@ def main():
                     module.params.get(x) is not None]
 
     # See whether the realm already exists in Keycloak
-    before_realm = kc.get_realm_by_id(realm=realm) or {}
+    before_realm = kc.get_realm_by_id(realm=realm)
+
+    if before_realm is None:
+        before_realm = dict()
 
     # Build a proposed changeset from parameters given to this module
     changeset = dict()

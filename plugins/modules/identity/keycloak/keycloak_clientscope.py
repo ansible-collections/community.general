@@ -366,15 +366,14 @@ def main():
                           if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
                           module.params.get(x) is not None]
 
-    before_clientscope = None         # current state of the clientscope, for merging.
-
     # See if it already exists in Keycloak
     if cid is None:
         before_clientscope = kc.get_clientscope_by_name(name, realm=realm)
     else:
         before_clientscope = kc.get_clientscope_by_clientscopeid(cid, realm=realm)
 
-    before_clientscope = dict() if before_clientscope is None else before_clientscope
+    if before_clientscope is None:
+        before_clientscope = dict()
 
     # Build a proposed changeset from parameters given to this module
     changeset = dict()
