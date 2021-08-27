@@ -268,13 +268,13 @@ def main():
                     module.params.get(x) is not None]
 
     # See if it already exists in Keycloak
-    before_group = None         # current state of the group, for merging.
     if gid is None:
         before_group = kc.get_group_by_name(name, realm=realm)
     else:
         before_group = kc.get_group_by_groupid(gid, realm=realm)
 
-    before_group = dict() if before_group is None else before_group
+    if before_group is None:
+        before_group = dict()
 
     # Build a proposed changeset from parameters given to this module
     changeset = dict()
