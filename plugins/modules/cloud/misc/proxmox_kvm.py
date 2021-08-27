@@ -1201,8 +1201,9 @@ def main():
             module.fail_json(vmid=vmid, msg='VM with vmid = %s does not exist in cluster' % vmid)
 
         # Ensure the choosen VM name doesn't already exist when cloning
-        if get_vmid(proxmox, name):
-            module.exit_json(changed=False, vmid=vmid, msg="VM with name <%s> already exists" % name)
+        existing_vmid = get_vmid(proxmox, name)
+        if existing_vmid:
+            module.exit_json(changed=False, vmid=existing_vmid[0], msg="VM with name <%s> already exists" % name)
 
         # Ensure the choosen VM id doesn't already exist when cloning
         if get_vm(proxmox, newid):
