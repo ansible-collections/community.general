@@ -339,7 +339,7 @@ def main():
             result['msg'] = "Role {name} has been updated".format(name=name)
             module.exit_json(**result)
 
-        elif state == 'absent':
+        else:
             # Process a deletion (because state was not 'present')
             result['changed'] = True
 

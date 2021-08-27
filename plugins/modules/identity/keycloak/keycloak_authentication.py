@@ -399,7 +399,7 @@ def main():
                 auth_repr["authenticationExecutions"] = exec_repr
             result['flow'] = auth_repr
 
-        elif state == 'absent':
+        else:
             # Process a deletion (because state was not 'present')
             result['changed'] = True
 
