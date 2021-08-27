@@ -26,13 +26,17 @@ except ImportError:
     HAS_CERTIFI_PACKAGE = False
 
 
-def fail_imports():
-    ret = ''
+def fail_imports(module):
+    errors = []
+    traceback = []
     if not HAS_REDIS_PACKAGE:
-        ret += missing_required_lib('redis') + '\n'
+        errors += missing_required_lib('redis') + '\n'
+        traceback += REDIS_IMP_ERR
     if not HAS_CERTIFI_PACKAGE:
-        ret += missing_required_lib('certifi')
-    return ret
+        errors += missing_required_lib('certifi')
+        traceback += CERTIFI_IMPORT_ERROR
+    if errors:
+        module.fail_json(errors=errors, traceback=traceback)
 
 
 def redis_auth_argument_spec():

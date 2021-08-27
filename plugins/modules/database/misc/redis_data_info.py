@@ -20,10 +20,10 @@ options:
     description:
       - Database key.
     type: str
-    required: True
+    required: true
 
 extends_documentation_fragment:
-  - community.general.redis.documentation
+  - community.general.redis
 
 seealso:
   - module: community.general.redis_info
@@ -80,9 +80,7 @@ def main():
         argument_spec=module_args,
         supports_check_mode=True,
     )
-    import_errors = fail_imports()
-    if len(import_errors) != 0:
-        module.fail_json(msg=import_errors)
+    fail_imports(module)
 
     redis = RedisAnsible(module)
 
