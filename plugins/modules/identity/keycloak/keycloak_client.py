@@ -833,7 +833,7 @@ def main():
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
             result['end_state'] = dict()
-            result['msg'] = 'Client does not exist, doing nothing.'
+            result['msg'] = 'Client does not exist; doing nothing.'
             module.exit_json(**result)
 
         # Process a creation
