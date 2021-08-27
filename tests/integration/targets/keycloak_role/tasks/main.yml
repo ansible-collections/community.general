@@ -1,4 +1,17 @@
 ---
+- name: "Wait for keycloak to be available"
+  command: "curl --silent {{ url }}/realms/{{admin_realm}}/"
+  args:
+    # Ignore warning as the suggestion to use get_url requires the output to be written to a file.
+    # We are just wanting to check the stdout.
+    warn: false
+  register: result
+  # We expect some JSON output that contains this key:
+  until: result.stdout.find("account-service") != -1
+  retries: 60
+  delay: 1
+  changed_when: false
+
 - name: Delete realm
   community.general.keycloak_realm: "{{ auth_args | combine(call_args) }}"
   vars:
