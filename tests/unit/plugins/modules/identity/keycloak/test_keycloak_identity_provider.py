@@ -174,7 +174,6 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 "providerId": "oidc",
                 "storeToken": False,
                 "trustEmail": False,
-                "updateProfileFirstLoginMode": "on",
             }
         ]
         return_value_mappers_get = [
@@ -293,7 +292,6 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 "providerId": "oidc",
                 "storeToken": False,
                 "trustEmail": False,
-                "updateProfileFirstLoginMode": "on",
             },
             {
                 "addReadTokenRoleOnCreate": False,
@@ -317,7 +315,6 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 "providerId": "oidc",
                 "storeToken": False,
                 "trustEmail": False,
-                "updateProfileFirstLoginMode": "on",
             }
         ]
         return_value_mappers_get = [
@@ -454,7 +451,6 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 "providerId": "oidc",
                 "storeToken": False,
                 "trustEmail": False,
-                "updateProfileFirstLoginMode": "on",
             },
             None
         ]

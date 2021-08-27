@@ -104,14 +104,6 @@ options:
             - postBrokerLoginFlowAlias
         type: str
 
-    update_profile_first_login_mode:
-        description:
-            - Force users to update their profile right after the authentication finishes and before the account
-              is actually created in Keycloak.
-        aliases:
-            - updateProfileFirstLoginMode
-        type: str
-
     authenticate_by_default:
         description:
             - Specifies if this identity provider should be used by default for authentication even before displaying login screen.
@@ -374,7 +366,6 @@ existing:
         "providerId": "oidc",
         "storeToken": false,
         "trustEmail": false,
-        "updateProfileFirstLoginMode": "on"
     }
 
 end_state:
@@ -402,7 +393,6 @@ end_state:
         "providerId": "oidc",
         "storeToken": false,
         "trustEmail": false,
-        "updateProfileFirstLoginMode": "on"
     }
 
 '''
@@ -461,7 +451,6 @@ def main():
         provider_id=dict(type='str', aliases=['providerId']),
         store_token=dict(type='bool', aliases=['storeToken']),
         trust_email=dict(type='bool', aliases=['trustEmail']),
-        update_profile_first_login_mode=dict(type='str', aliases=['updateProfileFirstLoginMode']),
         mappers=dict(type='list', elements='dict', options=mapper_spec),
     )
 
