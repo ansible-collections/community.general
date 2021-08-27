@@ -363,7 +363,7 @@ def main():
 
     before_clientscope = None         # current state of the clientscope, for merging.
 
-    # does the clientscope already exist?
+    # See if it already exists in Keycloak
     if cid is None:
         before_clientscope = kc.get_clientscope_by_name(name, realm=realm)
     else:
@@ -371,6 +371,7 @@ def main():
 
     before_clientscope = {} if before_clientscope is None else before_clientscope
 
+    # Filter and map the parameters names that apply to the client scope
     clientscope_params = [x for x in module.params
                           if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
                           module.params.get(x) is not None]
@@ -394,22 +395,23 @@ def main():
             new_param_value = [dict((k, v) for k, v in x.items() if x[k] is not None) for x in new_param_value]
         changeset[camel(clientscope_param)] = new_param_value
 
-    # prepare the new clientscope
+    # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_clientscope = before_clientscope.copy()
     desired_clientscope.update(changeset)
 
-    # if before_clientscope is none, the clientscope doesn't exist.
+    # Cater for when it doesn't exist (an empty dict)
     if before_clientscope == {}:
         if state == 'absent':
-            # nothing to do.
+            # Do nothing and exit
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['msg'] = 'Clientscope does not exist; doing nothing.'
             result['end_state'] = dict()
             module.exit_json(**result)
 
-        # for 'present', create a new clientscope.
+        # Process a creation
         result['changed'] = True
+
         if name is None:
             module.fail_json(msg='name must be specified when creating a new clientscope')
 
@@ -419,16 +421,19 @@ def main():
         if module.check_mode:
             module.exit_json(**result)
 
-        # do it for real!
+        # create it
         kc.create_clientscope(desired_clientscope, realm=realm)
         after_clientscope = kc.get_clientscope_by_name(name, realm)
 
         result['end_state'] = sanitize_cr(after_clientscope)
+
         result['msg'] = 'Clientscope {name} has been created with ID {id}'.format(name=after_clientscope['name'],
                                                                                   id=after_clientscope['id'])
 
     else:
         if state == 'present':
+            # Process an update
+
             # no changes
             if desired_clientscope == before_clientscope:
                 result['changed'] = False
@@ -436,7 +441,7 @@ def main():
                 result['msg'] = "No changes required to clientscope {name}.".format(name=before_clientscope['name'])
                 module.exit_json(**result)
 
-            # update the existing clientscope
+            # doing an update
             result['changed'] = True
 
             if module._diff:
@@ -445,7 +450,7 @@ def main():
             if module.check_mode:
                 module.exit_json(**result)
 
-            # do the clientscope update
+            # do the update
             kc.update_clientscope(desired_clientscope, realm=realm)
 
             # do the protocolmappers update
@@ -463,11 +468,12 @@ def main():
             after_clientscope = kc.get_clientscope_by_clientscopeid(desired_clientscope['id'], realm=realm)
 
             result['end_state'] = after_clientscope
-            result['msg'] = "Clientscope {id} has been updated".format(id=after_clientscope['id'])
 
+            result['msg'] = "Clientscope {id} has been updated".format(id=after_clientscope['id'])
             module.exit_json(**result)
 
         elif state == 'absent':
+            # Process a deletion (because state was not 'present')
             result['end_state'] = dict()
 
             if module._diff:
@@ -476,13 +482,13 @@ def main():
             if module.check_mode:
                 module.exit_json(**result)
 
-            # delete for real
+            # delete it
             cid = before_clientscope['id']
             kc.delete_clientscope(cid=cid, realm=realm)
 
             result['changed'] = True
-            result['msg'] = "Clientscope {name} has been deleted".format(name=before_clientscope['name'])
 
+            result['msg'] = "Clientscope {name} has been deleted".format(name=before_clientscope['name'])
             module.exit_json(**result)
 
     module.exit_json(**result)

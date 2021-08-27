@@ -222,6 +222,7 @@ def main():
     :return:
     """
     argument_spec = keycloak_argument_spec()
+
     meta_args = dict(
         state=dict(default='present', choices=['present', 'absent']),
         realm=dict(default='master'),
@@ -254,9 +255,8 @@ def main():
     name = module.params.get('name')
     attributes = module.params.get('attributes')
 
+    # See if it already exists in Keycloak
     before_group = None         # current state of the group, for merging.
-
-    # does the group already exist?
     if gid is None:
         before_group = kc.get_group_by_name(name, realm=realm)
     else:
@@ -271,34 +271,37 @@ def main():
         for key, val in module.params['attributes'].items():
             module.params['attributes'][key] = [val] if not isinstance(val, list) else val
 
+    # Filter and map the parameters names that apply to the group
     group_params = [x for x in module.params
                     if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
                     module.params.get(x) is not None]
 
-    # build a changeset
+    # Build a proposed changeset from parameters given to this module
     changeset = {}
+
     for param in group_params:
         new_param_value = module.params.get(param)
         old_value = before_group[param] if param in before_group else None
         if new_param_value != old_value:
             changeset[camel(param)] = new_param_value
 
-    # prepare the new group
+    # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_group = before_group.copy()
     desired_group.update(changeset)
 
-    # if before_group is none, the group doesn't exist.
+    # Cater for when it doesn't exist (an empty dict)
     if before_group == {}:
         if state == 'absent':
-            # nothing to do.
+            # Do nothing and exit
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['msg'] = 'Group does not exist; doing nothing.'
             result['group'] = dict()
             module.exit_json(**result)
 
-        # for 'present', create a new group.
+        # Process a creation
         result['changed'] = True
+
         if name is None:
             module.fail_json(msg='name must be specified when creating a new group')
 
@@ -308,7 +311,7 @@ def main():
         if module.check_mode:
             module.exit_json(**result)
 
-        # do it for real!
+        # create it
         kc.create_group(desired_group, realm=realm)
         after_group = kc.get_group_by_name(name, realm)
 
@@ -318,6 +321,8 @@ def main():
 
     else:
         if state == 'present':
+            # Process an update
+
             # no changes
             if desired_group == before_group:
                 result['changed'] = False
@@ -325,7 +330,7 @@ def main():
                 result['msg'] = "No changes required to group {name}.".format(name=before_group['name'])
                 module.exit_json(**result)
 
-            # update the existing group
+            # doing an update
             result['changed'] = True
 
             if module._diff:
@@ -340,11 +345,12 @@ def main():
             after_group = kc.get_group_by_groupid(desired_group['id'], realm=realm)
 
             result['group'] = after_group
-            result['msg'] = "Group {id} has been updated".format(id=after_group['id'])
 
+            result['msg'] = "Group {id} has been updated".format(id=after_group['id'])
             module.exit_json(**result)
 
         elif state == 'absent':
+            # Process a deletion (because state was not 'present')
             result['group'] = dict()
 
             if module._diff:
@@ -353,13 +359,13 @@ def main():
             if module.check_mode:
                 module.exit_json(**result)
 
-            # delete for real
+            # delete it
             gid = before_group['id']
             kc.delete_group(groupid=gid, realm=realm)
 
             result['changed'] = True
-            result['msg'] = "Group {name} has been deleted".format(name=before_group['name'])
 
+            result['msg'] = "Group {name} has been deleted".format(name=before_group['name'])
             module.exit_json(**result)
 
     module.exit_json(**result)
