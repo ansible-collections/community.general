@@ -1,2 +1,2 @@
 minor_changes:
-  - kernel_blacklist - Create directory for the blacklist file when it's missing (https://github.com/ansible-collections/community.general/pull/3158).
+  - kernel_blacklist - create directory for the blacklist file when it is missing (https://github.com/ansible-collections/community.general/pull/3158).
