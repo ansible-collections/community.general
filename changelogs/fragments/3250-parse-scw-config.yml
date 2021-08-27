@@ -1,0 +1,2 @@
+minor_changes:
+  - scaleway plugin inventory - parse scw-cli config file for ``oauth_token`` (https://github.com/ansible-collections/community.general/pull/3250).
