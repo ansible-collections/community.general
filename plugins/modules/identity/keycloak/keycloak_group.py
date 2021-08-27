@@ -358,6 +358,7 @@ def main():
 
         else:
             # Process a deletion (because state was not 'present')
+            result['changed'] = True
             result['group'] = dict()
 
             if module._diff:
@@ -371,7 +372,6 @@ def main():
             kc.delete_group(groupid=gid, realm=realm)
 
             result['end_state'] = dict()
-            result['changed'] = True
 
             result['msg'] = "Group {name} has been deleted".format(name=before_group['name'])
             module.exit_json(**result)
