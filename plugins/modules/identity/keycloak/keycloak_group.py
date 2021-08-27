@@ -296,8 +296,8 @@ def main():
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
-            result['msg'] = 'Group does not exist; doing nothing.'
             result['end_state'] = dict()
+            result['msg'] = 'Group does not exist; doing nothing.'
             module.exit_json(**result)
 
         # Process a creation
