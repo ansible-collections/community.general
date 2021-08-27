@@ -793,8 +793,7 @@ def main():
             result['changed'] = True
 
             if module._diff:
-                result['diff']['before'] = before_realm_sanitized
-                result['diff']['after'] = ''
+                result['diff'] = dict(before=before_realm_sanitized, after='')
 
             if module.check_mode:
                 module.exit_json(**result)

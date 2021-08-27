@@ -413,8 +413,8 @@ def main():
             if before_clientt == after_clientt:
                 result['changed'] = False
             if module._diff:
-                result['diff'] = dict(before=before_clientt,
-                                      after=after_clientt)
+                result['diff'] = dict(before=before_clientt, after=after_clientt)
+
             result['end_state'] = after_clientt
 
             result['msg'] = 'Client template %s has been updated.' % desired_clientt['name']
@@ -425,8 +425,7 @@ def main():
             result['changed'] = True
 
             if module._diff:
-                result['diff']['before'] = before_clientt
-                result['diff']['after'] = ''
+                result['diff'] = dict(before=before_clientt, after='')
 
             if module.check_mode:
                 module.exit_json(**result)
