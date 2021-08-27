@@ -395,8 +395,8 @@ def main():
         changeset[camel(clientscope_param)] = new_param_value
 
     # prepare the new clientscope
-    updated_clientscope = before_clientscope.copy()
-    updated_clientscope.update(changeset)
+    desired_clientscope = before_clientscope.copy()
+    desired_clientscope.update(changeset)
 
     # if before_clientscope is none, the clientscope doesn't exist.
     if before_clientscope == {}:
@@ -414,13 +414,13 @@ def main():
             module.fail_json(msg='name must be specified when creating a new clientscope')
 
         if module._diff:
-            result['diff'] = dict(before='', after=sanitize_cr(updated_clientscope))
+            result['diff'] = dict(before='', after=sanitize_cr(desired_clientscope))
 
         if module.check_mode:
             module.exit_json(**result)
 
         # do it for real!
-        kc.create_clientscope(updated_clientscope, realm=realm)
+        kc.create_clientscope(desired_clientscope, realm=realm)
         after_clientscope = kc.get_clientscope_by_name(name, realm)
 
         result['end_state'] = sanitize_cr(after_clientscope)
@@ -430,9 +430,9 @@ def main():
     else:
         if state == 'present':
             # no changes
-            if updated_clientscope == before_clientscope:
+            if desired_clientscope == before_clientscope:
                 result['changed'] = False
-                result['end_state'] = sanitize_cr(updated_clientscope)
+                result['end_state'] = sanitize_cr(desired_clientscope)
                 result['msg'] = "No changes required to clientscope {name}.".format(name=before_clientscope['name'])
                 module.exit_json(**result)
 
@@ -440,27 +440,27 @@ def main():
             result['changed'] = True
 
             if module._diff:
-                result['diff'] = dict(before=sanitize_cr(before_clientscope), after=sanitize_cr(updated_clientscope))
+                result['diff'] = dict(before=sanitize_cr(before_clientscope), after=sanitize_cr(desired_clientscope))
 
             if module.check_mode:
                 module.exit_json(**result)
 
             # do the clientscope update
-            kc.update_clientscope(updated_clientscope, realm=realm)
+            kc.update_clientscope(desired_clientscope, realm=realm)
 
             # do the protocolmappers update
             if protocol_mappers is not None:
                 for protocol_mapper in protocol_mappers:
                     # update if protocolmapper exist
-                    current_protocolmapper = kc.get_clientscope_protocolmapper_by_name(updated_clientscope['id'], protocol_mapper['name'], realm=realm)
+                    current_protocolmapper = kc.get_clientscope_protocolmapper_by_name(desired_clientscope['id'], protocol_mapper['name'], realm=realm)
                     if current_protocolmapper is not None:
                         protocol_mapper['id'] = current_protocolmapper['id']
-                        kc.update_clientscope_protocolmappers(updated_clientscope['id'], protocol_mapper, realm=realm)
+                        kc.update_clientscope_protocolmappers(desired_clientscope['id'], protocol_mapper, realm=realm)
                     # create otherwise
                     else:
-                        kc.create_clientscope_protocolmapper(updated_clientscope['id'], protocol_mapper, realm=realm)
+                        kc.create_clientscope_protocolmapper(desired_clientscope['id'], protocol_mapper, realm=realm)
 
-            after_clientscope = kc.get_clientscope_by_clientscopeid(updated_clientscope['id'], realm=realm)
+            after_clientscope = kc.get_clientscope_by_clientscopeid(desired_clientscope['id'], realm=realm)
 
             result['end_state'] = after_clientscope
             result['msg'] = "Clientscope {id} has been updated".format(id=after_clientscope['id'])

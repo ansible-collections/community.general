@@ -818,8 +818,8 @@ def main():
         changeset[camel(client_param)] = new_param_value
 
     # Whether creating or updating a client, take the before-state and merge the changeset into it
-    updated_client = before_client.copy()
-    updated_client.update(changeset)
+    desired_client = before_client.copy()
+    desired_client.update(changeset)
 
     result['proposed'] = sanitize_cr(changeset)
     result['existing'] = sanitize_cr(before_client)
@@ -835,21 +835,21 @@ def main():
 
         # create new client
         result['changed'] = True
-        if 'clientId' not in updated_client:
+        if 'clientId' not in desired_client:
             module.fail_json(msg='client_id needs to be specified when creating a new client')
 
         if module._diff:
-            result['diff'] = dict(before='', after=sanitize_cr(updated_client))
+            result['diff'] = dict(before='', after=sanitize_cr(desired_client))
 
         if module.check_mode:
             module.exit_json(**result)
 
-        kc.create_client(updated_client, realm=realm)
-        after_client = kc.get_client_by_clientid(updated_client['clientId'], realm=realm)
+        kc.create_client(desired_client, realm=realm)
+        after_client = kc.get_client_by_clientid(desired_client['clientId'], realm=realm)
 
         result['end_state'] = sanitize_cr(after_client)
 
-        result['msg'] = 'Client %s has been created.' % updated_client['clientId']
+        result['msg'] = 'Client %s has been created.' % desired_client['clientId']
         module.exit_json(**result)
     else:
         if state == 'present':
@@ -859,12 +859,12 @@ def main():
                 # We can only compare the current client with the proposed updates we have
                 if module._diff:
                     result['diff'] = dict(before=sanitize_cr(before_client),
-                                          after=sanitize_cr(updated_client))
-                result['changed'] = (before_client != updated_client)
+                                          after=sanitize_cr(desired_client))
+                result['changed'] = (before_client != desired_client)
 
                 module.exit_json(**result)
 
-            kc.update_client(cid, updated_client, realm=realm)
+            kc.update_client(cid, desired_client, realm=realm)
 
             after_client = kc.get_client_by_id(cid, realm=realm)
             if before_client == after_client:
@@ -874,7 +874,7 @@ def main():
                                       after=sanitize_cr(after_client))
             result['end_state'] = sanitize_cr(after_client)
 
-            result['msg'] = 'Client %s has been updated.' % updated_client['clientId']
+            result['msg'] = 'Client %s has been updated.' % desired_client['clientId']
             module.exit_json(**result)
         else:
             # Delete existing client

@@ -284,8 +284,8 @@ def main():
             changeset[camel(param)] = new_param_value
 
     # prepare the new group
-    updated_group = before_group.copy()
-    updated_group.update(changeset)
+    desired_group = before_group.copy()
+    desired_group.update(changeset)
 
     # if before_group is none, the group doesn't exist.
     if before_group == {}:
@@ -303,13 +303,13 @@ def main():
             module.fail_json(msg='name must be specified when creating a new group')
 
         if module._diff:
-            result['diff'] = dict(before='', after=updated_group)
+            result['diff'] = dict(before='', after=desired_group)
 
         if module.check_mode:
             module.exit_json(**result)
 
         # do it for real!
-        kc.create_group(updated_group, realm=realm)
+        kc.create_group(desired_group, realm=realm)
         after_group = kc.get_group_by_name(name, realm)
 
         result['group'] = after_group
@@ -319,9 +319,9 @@ def main():
     else:
         if state == 'present':
             # no changes
-            if updated_group == before_group:
+            if desired_group == before_group:
                 result['changed'] = False
-                result['group'] = updated_group
+                result['group'] = desired_group
                 result['msg'] = "No changes required to group {name}.".format(name=before_group['name'])
                 module.exit_json(**result)
 
@@ -329,15 +329,15 @@ def main():
             result['changed'] = True
 
             if module._diff:
-                result['diff'] = dict(before=before_group, after=updated_group)
+                result['diff'] = dict(before=before_group, after=desired_group)
 
             if module.check_mode:
                 module.exit_json(**result)
 
             # do the update
-            kc.update_group(updated_group, realm=realm)
+            kc.update_group(desired_group, realm=realm)
 
-            after_group = kc.get_group_by_groupid(updated_group['id'], realm=realm)
+            after_group = kc.get_group_by_groupid(desired_group['id'], realm=realm)
 
             result['group'] = after_group
             result['msg'] = "Group {id} has been updated".format(id=after_group['id'])

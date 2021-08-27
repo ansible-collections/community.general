@@ -714,8 +714,8 @@ def main():
         changeset[camel(realm_param)] = new_param_value
 
     # Whether creating or updating a realm, take the before-state and merge the changeset into it
-    updated_realm = before_realm.copy()
-    updated_realm.update(changeset)
+    desired_realm = before_realm.copy()
+    desired_realm.update(changeset)
 
     result['proposed'] = sanitize_cr(changeset)
     before_realm_sanitized = sanitize_cr(before_realm)
@@ -732,21 +732,21 @@ def main():
 
         # create new realm
         result['changed'] = True
-        if 'id' not in updated_realm:
+        if 'id' not in desired_realm:
             module.fail_json(msg='id needs to be specified when creating a new realm')
 
         if module._diff:
-            result['diff'] = dict(before='', after=sanitize_cr(updated_realm))
+            result['diff'] = dict(before='', after=sanitize_cr(desired_realm))
 
         if module.check_mode:
             module.exit_json(**result)
 
-        kc.create_realm(updated_realm)
-        after_realm = kc.get_realm_by_id(updated_realm['id'])
+        kc.create_realm(desired_realm)
+        after_realm = kc.get_realm_by_id(desired_realm['id'])
 
         result['end_state'] = sanitize_cr(after_realm)
 
-        result['msg'] = 'Realm %s has been created.' % updated_realm['id']
+        result['msg'] = 'Realm %s has been created.' % desired_realm['id']
         module.exit_json(**result)
     else:
         if state == 'present':
@@ -756,12 +756,12 @@ def main():
                 # We can only compare the current realm with the proposed updates we have
                 if module._diff:
                     result['diff'] = dict(before=before_realm_sanitized,
-                                          after=sanitize_cr(updated_realm))
-                result['changed'] = (before_realm != updated_realm)
+                                          after=sanitize_cr(desired_realm))
+                result['changed'] = (before_realm != desired_realm)
 
                 module.exit_json(**result)
 
-            kc.update_realm(updated_realm, realm=realm)
+            kc.update_realm(desired_realm, realm=realm)
 
             after_realm = kc.get_realm_by_id(realm=realm)
             if before_realm == after_realm:
@@ -771,7 +771,7 @@ def main():
                                       after=sanitize_cr(after_realm))
             result['end_state'] = sanitize_cr(after_realm)
 
-            result['msg'] = 'Realm %s has been updated.' % updated_realm['id']
+            result['msg'] = 'Realm %s has been updated.' % desired_realm['id']
             module.exit_json(**result)
         else:
             # Delete existing realm
