@@ -889,8 +889,7 @@ def main():
             result['changed'] = True
 
             if module._diff:
-                result['diff']['before'] = sanitize_cr(before_client)
-                result['diff']['after'] = ''
+                result['diff'] = dict(before=sanitize_cr(before_client), after='')
 
             if module.check_mode:
                 module.exit_json(**result)
