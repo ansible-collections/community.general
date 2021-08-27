@@ -733,6 +733,7 @@ def main():
             # Do nothing and exit
             if module._diff:
                 result['diff'] = dict(before='', after='')
+            result['end_state'] = dict()
             result['msg'] = 'Realm does not exist, doing nothing.'
             module.exit_json(**result)
 
@@ -779,11 +780,12 @@ def main():
 
             if before_realm == after_realm:
                 result['changed'] = False
+
+            result['end_state'] = sanitize_cr(after_realm)
+
             if module._diff:
                 result['diff'] = dict(before=before_realm_sanitized,
                                       after=sanitize_cr(after_realm))
-
-            result['end_state'] = sanitize_cr(after_realm)
 
             result['msg'] = 'Realm %s has been updated.' % desired_realm['id']
             module.exit_json(**result)

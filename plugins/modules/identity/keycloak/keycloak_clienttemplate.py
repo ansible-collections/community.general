@@ -369,6 +369,7 @@ def main():
             # Do nothing and exit
             if module._diff:
                 result['diff'] = dict(before='', after='')
+            result['end_state'] = dict()
             result['msg'] = 'Client template does not exist, doing nothing.'
             module.exit_json(**result)
 
@@ -412,10 +413,11 @@ def main():
             after_clientt = kc.get_client_template_by_id(cid, realm=realm)
             if before_clientt == after_clientt:
                 result['changed'] = False
-            if module._diff:
-                result['diff'] = dict(before=before_clientt, after=after_clientt)
 
             result['end_state'] = after_clientt
+
+            if module._diff:
+                result['diff'] = dict(before=before_clientt, after=after_clientt)
 
             result['msg'] = 'Client template %s has been updated.' % desired_clientt['name']
             module.exit_json(**result)

@@ -296,6 +296,7 @@ def main():
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['msg'] = 'Group does not exist; doing nothing.'
+            result['end_state'] = dict()
             result['group'] = dict()
             module.exit_json(**result)
 
@@ -315,6 +316,8 @@ def main():
         kc.create_group(desired_group, realm=realm)
         after_group = kc.get_group_by_name(name, realm)
 
+        result['end_state'] = after_group
+
         result['group'] = after_group
         result['msg'] = 'Group {name} has been created with ID {id}'.format(name=after_group['name'],
                                                                             id=after_group['id'])
@@ -328,6 +331,7 @@ def main():
             if desired_group == before_group:
                 result['changed'] = False
                 result['group'] = desired_group
+                result['end_state'] = desired_group
                 result['msg'] = "No changes required to group {name}.".format(name=before_group['name'])
                 module.exit_json(**result)
 
@@ -346,6 +350,7 @@ def main():
             after_group = kc.get_group_by_groupid(desired_group['id'], realm=realm)
 
             result['group'] = after_group
+            result['end_state'] = after_group
 
             result['msg'] = "Group {id} has been updated".format(id=after_group['id'])
             module.exit_json(**result)
@@ -364,6 +369,7 @@ def main():
             gid = before_group['id']
             kc.delete_group(groupid=gid, realm=realm)
 
+            result['end_state'] = dict()
             result['changed'] = True
 
             result['msg'] = "Group {name} has been deleted".format(name=before_group['name'])

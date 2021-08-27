@@ -404,8 +404,8 @@ def main():
             # Do nothing and exit
             if module._diff:
                 result['diff'] = dict(before='', after='')
-            result['msg'] = 'Clientscope does not exist; doing nothing.'
             result['end_state'] = dict()
+            result['msg'] = 'Clientscope does not exist; doing nothing.'
             module.exit_json(**result)
 
         # Process a creation
@@ -473,7 +473,6 @@ def main():
 
         else:
             # Process a deletion (because state was not 'present')
-            result['end_state'] = dict()
 
             if module._diff:
                 result['diff'] = dict(before=sanitize_cr(before_clientscope), after='')
@@ -485,6 +484,7 @@ def main():
             cid = before_clientscope['id']
             kc.delete_clientscope(cid=cid, realm=realm)
 
+            result['end_state'] = dict()
             result['changed'] = True
 
             result['msg'] = "Clientscope {name} has been deleted".format(name=before_clientscope['name'])
