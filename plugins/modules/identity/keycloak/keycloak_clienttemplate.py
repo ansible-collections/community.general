@@ -356,8 +356,8 @@ def main():
         changeset[camel(clientt_param)] = new_param_value
 
     # Whether creating or updating a client, take the before-state and merge the changeset into it
-    updated_clientt = before_clientt.copy()
-    updated_clientt.update(changeset)
+    desired_clientt = before_clientt.copy()
+    desired_clientt.update(changeset)
 
     result['proposed'] = changeset
 
@@ -372,21 +372,21 @@ def main():
 
         # create new client template
         result['changed'] = True
-        if 'name' not in updated_clientt:
+        if 'name' not in desired_clientt:
             module.fail_json(msg='name needs to be specified when creating a new client')
 
         if module._diff:
-            result['diff'] = dict(before='', after=updated_clientt)
+            result['diff'] = dict(before='', after=desired_clientt)
 
         if module.check_mode:
             module.exit_json(**result)
 
-        kc.create_client_template(updated_clientt, realm=realm)
-        after_clientt = kc.get_client_template_by_name(updated_clientt['name'], realm=realm)
+        kc.create_client_template(desired_clientt, realm=realm)
+        after_clientt = kc.get_client_template_by_name(desired_clientt['name'], realm=realm)
 
         result['end_state'] = after_clientt
 
-        result['msg'] = 'Client template %s has been created.' % updated_clientt['name']
+        result['msg'] = 'Client template %s has been created.' % desired_clientt['name']
         module.exit_json(**result)
     else:
         if state == 'present':
@@ -396,11 +396,11 @@ def main():
                 # We can only compare the current client template with the proposed updates we have
                 if module._diff:
                     result['diff'] = dict(before=before_clientt,
-                                          after=updated_clientt)
+                                          after=desired_clientt)
 
                 module.exit_json(**result)
 
-            kc.update_client_template(cid, updated_clientt, realm=realm)
+            kc.update_client_template(cid, desired_clientt, realm=realm)
 
             after_clientt = kc.get_client_template_by_id(cid, realm=realm)
             if before_clientt == after_clientt:
@@ -410,7 +410,7 @@ def main():
                                       after=after_clientt)
             result['end_state'] = after_clientt
 
-            result['msg'] = 'Client template %s has been updated.' % updated_clientt['name']
+            result['msg'] = 'Client template %s has been updated.' % desired_clientt['name']
             module.exit_json(**result)
         else:
             # Delete existing client
