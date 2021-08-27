@@ -349,7 +349,7 @@ def main():
             result['msg'] = "Group {id} has been updated".format(id=after_group['id'])
             module.exit_json(**result)
 
-        elif state == 'absent':
+        else:
             # Process a deletion (because state was not 'present')
             result['group'] = dict()
 

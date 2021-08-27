@@ -472,7 +472,7 @@ def main():
             result['msg'] = "Clientscope {id} has been updated".format(id=after_clientscope['id'])
             module.exit_json(**result)
 
-        elif state == 'absent':
+        else:
             # Process a deletion (because state was not 'present')
             result['end_state'] = dict()
 
