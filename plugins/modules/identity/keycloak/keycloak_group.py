@@ -295,6 +295,7 @@ def main():
             # Do nothing and exit
             if module._diff:
                 result['diff'] = dict(before='', after='')
+            result['changed'] = False
             result['msg'] = 'Group does not exist; doing nothing.'
             result['end_state'] = dict()
             result['group'] = dict()

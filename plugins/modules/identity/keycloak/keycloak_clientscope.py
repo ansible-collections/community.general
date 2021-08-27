@@ -404,6 +404,7 @@ def main():
             # Do nothing and exit
             if module._diff:
                 result['diff'] = dict(before='', after='')
+            result['changed'] = False
             result['end_state'] = dict()
             result['msg'] = 'Clientscope does not exist; doing nothing.'
             module.exit_json(**result)
