@@ -361,6 +361,11 @@ def main():
     name = module.params.get('name')
     protocol_mappers = module.params.get('protocol_mappers')
 
+    # Filter and map the parameters names that apply to the client scope
+    clientscope_params = [x for x in module.params
+                          if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
+                          module.params.get(x) is not None]
+
     before_clientscope = None         # current state of the clientscope, for merging.
 
     # See if it already exists in Keycloak
@@ -370,11 +375,6 @@ def main():
         before_clientscope = kc.get_clientscope_by_clientscopeid(cid, realm=realm)
 
     before_clientscope = dict() if before_clientscope is None else before_clientscope
-
-    # Filter and map the parameters names that apply to the client scope
-    clientscope_params = [x for x in module.params
-                          if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
-                          module.params.get(x) is not None]
 
     # Build a proposed changeset from parameters given to this module
     changeset = dict()
