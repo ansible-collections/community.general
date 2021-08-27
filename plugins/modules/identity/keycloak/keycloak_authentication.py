@@ -331,7 +331,11 @@ def main():
 
     # Cater for when it doesn't exist (an empty dict)
     if auth_repr == dict():
-        if state == 'present':
+        if state == 'absent':
+            if module._diff:
+                result['diff'] = dict(before='', after='')
+            result['msg'] = new_auth_repr["alias"] + ' absent'
+        elif state == 'present':
             # Process a creation
             result['changed'] = True
 
@@ -360,10 +364,6 @@ def main():
             if exec_repr is not None:
                 auth_repr["authenticationExecutions"] = exec_repr
             result['flow'] = auth_repr
-        elif state == 'absent':  # If desired state is absent.
-            if module._diff:
-                result['diff'] = dict(before='', after='')
-            result['msg'] = new_auth_repr["alias"] + ' absent'
 
     else:
         if state == 'present':
