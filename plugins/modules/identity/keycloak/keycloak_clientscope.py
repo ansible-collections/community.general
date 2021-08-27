@@ -474,6 +474,7 @@ def main():
 
         else:
             # Process a deletion (because state was not 'present')
+            result['changed'] = True
 
             if module._diff:
                 result['diff'] = dict(before=sanitize_cr(before_clientscope), after='')
@@ -486,7 +487,6 @@ def main():
             kc.delete_clientscope(cid=cid, realm=realm)
 
             result['end_state'] = dict()
-            result['changed'] = True
 
             result['msg'] = "Clientscope {name} has been deleted".format(name=before_clientscope['name'])
             module.exit_json(**result)
