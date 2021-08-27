@@ -26,6 +26,15 @@ DOCUMENTATION = r'''
             description: Marks this as an instance of the 'linode' plugin.
             required: true
             choices: ['linode', 'community.general.linode']
+        ip_style:
+            description: Populate hostvars with all information available from the Linode APIv4.
+            type: string
+            default:
+                - plain
+            choices:
+                - plain
+                - api
+            version_added: 3.6.0
         access_token:
             description: The Linode account personal access token.
             required: true
@@ -83,6 +92,13 @@ compose:
   # replace it with the first IPv4 address of the linode as follows:
   ansible_ssh_host: ipv4[0]
   ansible_port: 2222
+
+# Example where control traffic limited to internal network
+plugin: community.general.linode
+access_token: foobar
+ip_style: api
+compose:
+  ansible_host: "ipv4 | community.general.json_query('[?public==`false`].address') | first"
 '''
 
 import os
@@ -170,14 +186,44 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
     def _add_hostvars_for_instances(self):
         """Add hostvars for instances in the dynamic inventory."""
+        ip_style = self.get_option('ip_style')
         for instance in self.instances:
             hostvars = instance._raw_json
             for hostvar_key in hostvars:
+                if ip_style == 'api' and hostvar_key in ['ipv4', 'ipv6']:
+                    continue
                 self.inventory.set_variable(
                     instance.label,
                     hostvar_key,
                     hostvars[hostvar_key]
                 )
+            if ip_style == 'api':
+                ips = instance.ips.ipv4.public + instance.ips.ipv4.private
+                ips += [instance.ips.ipv6.slaac, instance.ips.ipv6.link_local]
+                ips += instance.ips.ipv6.pools
+
+                for ip_type in set(ip.type for ip in ips):
+                    self.inventory.set_variable(
+                        instance.label,
+                        ip_type,
+                        self._ip_data([ip for ip in ips if ip.type == ip_type])
+                    )
+
+    def _ip_data(self, ip_list):
+        data = []
+        for ip in list(ip_list):
+            data.append(
+                {
+                    'address': ip.address,
+                    'subnet_mask': ip.subnet_mask,
+                    'gateway': ip.gateway,
+                    'public': ip.public,
+                    'prefix': ip.prefix,
+                    'rdns': ip.rdns,
+                    'type': ip.type
+                }
+            )
+        return data
 
     def _validate_option(self, name, desired_type, option_value):
         """Validate user specified configuration data against types."""

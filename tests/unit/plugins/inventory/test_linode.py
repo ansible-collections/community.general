@@ -49,6 +49,7 @@ def test_access_token_lookup(inventory):
 def test_validate_option(inventory):
     assert ['eu-west'] == inventory._validate_option('regions', list, 'eu-west')
     assert ['eu-west'] == inventory._validate_option('regions', list, ['eu-west'])
+    assert 'api' == inventory._validate_option('ip_style', str, 'api')
 
 
 def test_validation_option_bad_option(inventory):
