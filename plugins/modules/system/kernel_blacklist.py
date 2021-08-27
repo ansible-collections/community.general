@@ -45,7 +45,8 @@ import os
 import re
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_text
+from ansible.module_utils.common.text.converters import to_text
+
 
 class Blacklist(object):
     def __init__(self, module, filename, checkmode):
@@ -60,7 +61,7 @@ class Blacklist(object):
                 try:
                     os.makedirs(destpath)
                 except Exception as e:
-                    module.fail_json(msg='Error creating %s (%s)' % (to_text(destpath), to_text(e)))
+                    self.module.fail_json(msg='Error creating %s (%s)' % (to_text(destpath), to_text(e)))
             open(self.filename, 'a').close()
             return True
         elif self.checkmode and not os.path.exists(self.filename):
