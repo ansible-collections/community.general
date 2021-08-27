@@ -255,15 +255,6 @@ def main():
     name = module.params.get('name')
     attributes = module.params.get('attributes')
 
-    # See if it already exists in Keycloak
-    before_group = None         # current state of the group, for merging.
-    if gid is None:
-        before_group = kc.get_group_by_name(name, realm=realm)
-    else:
-        before_group = kc.get_group_by_groupid(gid, realm=realm)
-
-    before_group = dict() if before_group is None else before_group
-
     # attributes in Keycloak have their values returned as lists
     # via the API. attributes is a dict, so we'll transparently convert
     # the values to lists.
@@ -275,6 +266,15 @@ def main():
     group_params = [x for x in module.params
                     if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
                     module.params.get(x) is not None]
+
+    # See if it already exists in Keycloak
+    before_group = None         # current state of the group, for merging.
+    if gid is None:
+        before_group = kc.get_group_by_name(name, realm=realm)
+    else:
+        before_group = kc.get_group_by_groupid(gid, realm=realm)
+
+    before_group = dict() if before_group is None else before_group
 
     # Build a proposed changeset from parameters given to this module
     changeset = dict()
