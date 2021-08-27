@@ -369,7 +369,7 @@ def main():
     else:
         before_clientscope = kc.get_clientscope_by_clientscopeid(cid, realm=realm)
 
-    before_clientscope = {} if before_clientscope is None else before_clientscope
+    before_clientscope = dict() if before_clientscope is None else before_clientscope
 
     # Filter and map the parameters names that apply to the client scope
     clientscope_params = [x for x in module.params
@@ -400,7 +400,7 @@ def main():
     desired_clientscope.update(changeset)
 
     # Cater for when it doesn't exist (an empty dict)
-    if before_clientscope == {}:
+    if before_clientscope == dict():
         if state == 'absent':
             # Do nothing and exit
             if module._diff:

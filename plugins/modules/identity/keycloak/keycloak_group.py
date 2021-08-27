@@ -262,7 +262,7 @@ def main():
     else:
         before_group = kc.get_group_by_groupid(gid, realm=realm)
 
-    before_group = {} if before_group is None else before_group
+    before_group = dict() if before_group is None else before_group
 
     # attributes in Keycloak have their values returned as lists
     # via the API. attributes is a dict, so we'll transparently convert
@@ -277,7 +277,7 @@ def main():
                     module.params.get(x) is not None]
 
     # Build a proposed changeset from parameters given to this module
-    changeset = {}
+    changeset = dict()
 
     for param in group_params:
         new_param_value = module.params.get(param)
@@ -290,7 +290,7 @@ def main():
     desired_group.update(changeset)
 
     # Cater for when it doesn't exist (an empty dict)
-    if before_group == {}:
+    if before_group == dict():
         if state == 'absent':
             # Do nothing and exit
             if module._diff:
