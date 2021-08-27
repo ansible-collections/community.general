@@ -298,7 +298,6 @@ def main():
             result['changed'] = False
             result['msg'] = 'Group does not exist; doing nothing.'
             result['end_state'] = dict()
-            result['group'] = dict()
             module.exit_json(**result)
 
         # Process a creation
@@ -319,7 +318,6 @@ def main():
 
         result['end_state'] = after_group
 
-        result['group'] = after_group
         result['msg'] = 'Group {name} has been created with ID {id}'.format(name=after_group['name'],
                                                                             id=after_group['id'])
         module.exit_json(**result)
@@ -331,7 +329,6 @@ def main():
             # no changes
             if desired_group == before_group:
                 result['changed'] = False
-                result['group'] = desired_group
                 result['end_state'] = desired_group
                 result['msg'] = "No changes required to group {name}.".format(name=before_group['name'])
                 module.exit_json(**result)
@@ -350,7 +347,6 @@ def main():
 
             after_group = kc.get_group_by_groupid(desired_group['id'], realm=realm)
 
-            result['group'] = after_group
             result['end_state'] = after_group
 
             result['msg'] = "Group {id} has been updated".format(id=after_group['id'])
@@ -359,7 +355,6 @@ def main():
         else:
             # Process a deletion (because state was not 'present')
             result['changed'] = True
-            result['group'] = dict()
 
             if module._diff:
                 result['diff'] = dict(before=before_group, after='')
