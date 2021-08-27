@@ -1,0 +1,2 @@
+minor_changes:
+  - "linode inventory plugin - adds the ``ip_style`` configuration key. Set to ``api`` to get more detailed network details back from the remote Linode host (https://github.com/ansible-collections/community.general/pull/3203)."
