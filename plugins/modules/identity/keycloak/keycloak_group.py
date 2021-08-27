@@ -318,6 +318,7 @@ def main():
         result['group'] = after_group
         result['msg'] = 'Group {name} has been created with ID {id}'.format(name=after_group['name'],
                                                                             id=after_group['id'])
+        module.exit_json(**result)
 
     else:
         if state == 'present':

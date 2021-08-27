@@ -332,9 +332,12 @@ def main():
     # Cater for when it doesn't exist (an empty dict)
     if auth_repr == dict():
         if state == 'absent':
+            # Do nothing and exit
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['msg'] = new_auth_repr["alias"] + ' absent'
+            module.exit_json(**result)
+
         elif state == 'present':
             # Process a creation
             result['changed'] = True
@@ -417,6 +420,7 @@ def main():
 
             result['msg'] = 'Authentication flow: {alias} id: {id} is deleted'.format(alias=new_auth_repr['alias'],
                                                                                       id=auth_repr["id"])
+            module.exit_json(**result)
 
     module.exit_json(**result)
 
