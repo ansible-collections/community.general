@@ -1,5 +1,6 @@
 unittest2 ; python_version < '2.7'
 importlib ; python_version < '2.7'
+requests >= 2.25.0 ; python_version >= '3.6'  # Ansible 2.10's default container seems to have < 2.25.0 installed, causing installation of python-gitlab >= 2.10.1 to fail
 
 # requirement for the memcached cache plugin
 python-memcached
