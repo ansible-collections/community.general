@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Copyright: (c) 2021, Alexei Znamensky (russoz) <russoz@gmail.com>
 # Copyright: (c) 2018, Stanislas Lange (angristan) <angristan@pm.me>
 # Copyright: (c) 2018, Victor Carceler <vcarceler@iespuigcastellar.xeill.net>
 
@@ -12,17 +13,13 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: snap
-
 short_description: Manages snaps
-
-
 description:
     - "Manages snaps packages."
-
 options:
     name:
         description:
-            - Name of the snap to install or remove. Can be a list of snaps.
+            - Name of the snaps.
         required: true
         type: list
         elements: str
@@ -117,10 +114,10 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 __state_map = dict(
     present='install',
     absent='remove',
-    info='info',  # not public
-    list='list',  # not public
     enabled='enable',
     disabled='disable',
+    info='info',  # not public
+    list='list',  # not public
 )
 
 
@@ -171,9 +168,6 @@ class Snap(CmdStateModuleHelper):
             '\n'.join(results[3]),
         ]
 
-    def snap_exists(self, snap_name):
-        return 0 == self.run_command(params=[{'state': 'info'}, {'name': snap_name}])[0]
-
     def is_snap_installed(self, snap_name):
         return 0 == self.run_command(params=[{'state': 'list'}, {'name': snap_name}])[0]
 
@@ -188,14 +182,7 @@ class Snap(CmdStateModuleHelper):
         notes = match.group('notes')
         return "disabled" not in notes.split(',')
 
-    def validate_input_snaps(self):
-        """Ensure that all exist."""
-        for snap_name in self.vars.name:
-            if not self.snap_exists(snap_name):
-                raise ModuleHelperException(msg="No snap matching '%s' available." % snap_name)
-
     def state_present(self):
-        self.validate_input_snaps()  # if snap doesnt exist, it will explode when trying to install
         self.vars.meta('classic').set(output=True)
         self.vars.meta('channel').set(output=True)
         actionable_snaps = [s for s in self.vars.name if not self.is_snap_installed(s)]
@@ -227,59 +214,32 @@ class Snap(CmdStateModuleHelper):
                   "error output for more details.".format(cmd=self.vars.cmd)
         raise ModuleHelperException(msg=msg)
 
-    def state_absent(self):
-        self.validate_input_snaps()  # if snap doesnt exist, it will be absent by definition
-        actionable_snaps = [s for s in self.vars.name if self.is_snap_installed(s)]
+    def _generic_state_action(self, actionable_func, actionable_var, params=None):
+        actionable_snaps = [s for s in self.vars.name if actionable_func(s)]
         if not actionable_snaps:
             return
         self.changed = True
-        self.vars.snaps_removed = actionable_snaps
+        self.vars[actionable_var] = actionable_snaps
         if self.module.check_mode:
             return
-        params = ['classic', 'channel', 'state']  # get base cmd parts
+        if params is None:
+            params = ['state']
         commands = [params + [{'actionable_snaps': actionable_snaps}]]
         self.vars.cmd, rc, out, err = self._run_multiple_commands(commands)
         if rc == 0:
             return
-        msg = "Ooops! Snap removal failed while executing '{cmd}', please examine logs and " \
+        msg = "Ooops! Snap operation failed while executing '{cmd}', please examine logs and " \
               "error output for more details.".format(cmd=self.vars.cmd)
         raise ModuleHelperException(msg=msg)
+
+    def state_absent(self):
+        self._generic_state_action(self.is_snap_installed, "snaps_removed", ['classic', 'channel', 'state'])
 
     def state_enabled(self):
-        self.validate_input_snaps()
-        actionable_snaps = [s for s in self.vars.name if self.is_snap_enabled(s) is False]
-        if not actionable_snaps:
-            return
-        self.changed = True
-        self.vars.snaps_enabled = actionable_snaps
-        if self.module.check_mode:
-            return
-        params = ['classic', 'channel', 'state']  # get base cmd parts
-        commands = [params + [{'actionable_snaps': actionable_snaps}]]
-        self.vars.cmd, rc, out, err = self._run_multiple_commands(commands)
-        if rc == 0:
-            return
-        msg = "Ooops! Snap enabling failed while executing '{cmd}', please examine logs and " \
-              "error output for more details.".format(cmd=self.vars.cmd)
-        raise ModuleHelperException(msg=msg)
+        self._generic_state_action(lambda s: not self.is_snap_enabled(s), "snaps_enabled", ['classic', 'channel', 'state'])
 
     def state_disabled(self):
-        self.validate_input_snaps()
-        actionable_snaps = [s for s in self.vars.name if self.is_snap_enabled(s) is True]
-        if not actionable_snaps:
-            return
-        self.changed = True
-        self.vars.snaps_enabled = actionable_snaps
-        if self.module.check_mode:
-            return
-        params = ['classic', 'channel', 'state']  # get base cmd parts
-        commands = [params + [{'actionable_snaps': actionable_snaps}]]
-        self.vars.cmd, rc, out, err = self._run_multiple_commands(commands)
-        if rc == 0:
-            return
-        msg = "Ooops! Snap disabling failed while executing '{cmd}', please examine logs and " \
-              "error output for more details.".format(cmd=self.vars.cmd)
-        raise ModuleHelperException(msg=msg)
+        self._generic_state_action(self.is_snap_enabled, "snaps_disabled", ['classic', 'channel', 'state'])
 
 
 def main():
