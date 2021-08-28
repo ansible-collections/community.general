@@ -82,7 +82,8 @@ options:
     version_added: 3.5.0
 requirements:
   - "dnsimple >= 1.0.0"
-  - "Support for C(dnsimple < 2) is deprecated and will be removed in community.general 5.0.0"
+notes:
+  - "Support for C(dnsimple < 2) is deprecated and will be removed in community.general 5.0.0."
 author: "Alex Coomans (@drcapulet)"
 '''
 
