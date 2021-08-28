@@ -8,12 +8,14 @@ __metaclass__ = type
 
 import sys
 
+import pytest
+
 from httmock import response  # noqa
 from httmock import urlmatch  # noqa
 
 from ansible_collections.community.general.tests.unit.compat import unittest
 
-import gitlab
+gitlab = pytest.importorskip('gitlab')
 
 
 class FakeAnsibleModule(object):
