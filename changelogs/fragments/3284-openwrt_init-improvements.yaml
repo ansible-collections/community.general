@@ -1,0 +1,4 @@
+minor_changes:
+  - openwrt_init - minor refactoring (https://github.com/ansible-collections/community.general/pull/3284).
+bugfixes:
+  - openwrt_init - calling ``run_command`` with arguments as ``list`` instead of ``str`` (https://github.com/ansible-collections/community.general/pull/3284).
