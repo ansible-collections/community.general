@@ -1,0 +1,2 @@
+minor_changes:
+  - snap - improved module error handling, especially for the case when snap server is down (https://github.com/ansible-collections/community.general/issues/2970).
