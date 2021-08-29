@@ -1,0 +1,1 @@
+release_summary: Fix check mode support for ``_info`` and ``_facts`` modules.
