@@ -40,7 +40,7 @@
   register: pamd_file_slurp_noargs
 - name: Check if changes made (3260)
   vars:
-    line_array: "{{ (pamd_file_slurp_noargs.content|b64decode|split('\n'))[2]|split }}"
+    line_array: "{{ (pamd_file_slurp_noargs.content|b64decode).split('\n')[2].split() }}"
   assert:
     that:
       - pamd_file_output_noargs is changed
