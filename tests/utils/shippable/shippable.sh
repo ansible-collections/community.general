@@ -232,4 +232,4 @@ fi
 ansible-test env --dump --show --timeout "${timeout}" --color -v
 
 if [ "${SHIPPABLE_BUILD_ID:-}" ]; then "tests/utils/shippable/check_matrix.py"; fi
-"tests/utils/shippable/${script}.sh" "${test}"
+"tests/utils/shippable/${script}.sh" "${test}" "${ansible_version}"
