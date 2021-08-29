@@ -16,6 +16,7 @@ class ArgFormat(object):
     BOOLEAN = 0
     PRINTF = 1
     FORMAT = 2
+    BOOLEAN_NOT = 3
 
     @staticmethod
     def stars_deco(num):
@@ -50,12 +51,14 @@ class ArgFormat(object):
 
         _fmts = {
             ArgFormat.BOOLEAN: lambda _fmt, v: ([_fmt] if bool(v) else []),
+            ArgFormat.BOOLEAN_NOT: lambda _fmt, v: ([] if bool(v) else [_fmt]),
             ArgFormat.PRINTF: printf_fmt,
             ArgFormat.FORMAT: lambda _fmt, v: [_fmt.format(v)],
         }
 
         self.name = name
         self.stars = stars
+        self.style = style
 
         if fmt is None:
             fmt = "{0}"
@@ -76,7 +79,7 @@ class ArgFormat(object):
             self.arg_format = (self.stars_deco(stars))(self.arg_format)
 
     def to_text(self, value):
-        if value is None:
+        if value is None and self.style != ArgFormat.BOOLEAN_NOT:
             return []
         func = self.arg_format
         return [str(p) for p in func(value)]
