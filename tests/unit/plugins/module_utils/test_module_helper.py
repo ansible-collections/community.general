@@ -24,6 +24,12 @@ ARG_FORMATS = dict(
                           False, []),
     simple_boolean_none=("--superflag", ArgFormat.BOOLEAN, 0,
                          None, []),
+    simple_boolean_not_true=("--superflag", ArgFormat.BOOLEAN_NOT, 0,
+                             True, []),
+    simple_boolean_not_false=("--superflag", ArgFormat.BOOLEAN_NOT, 0,
+                              False, ["--superflag"]),
+    simple_boolean_not_none=("--superflag", ArgFormat.BOOLEAN_NOT, 0,
+                             None, ["--superflag"]),
     single_printf=("--param=%s", ArgFormat.PRINTF, 0,
                    "potatoes", ["--param=potatoes"]),
     single_printf_no_substitution=("--param", ArgFormat.PRINTF, 0,
@@ -65,7 +71,7 @@ def test_arg_format(fmt, style, stars, value, expected):
     af = ArgFormat('name', fmt, style, stars)
     actual = af.to_text(value)
     print("formatted string = {0}".format(actual))
-    assert actual == expected
+    assert actual == expected, "actual = {0}".format(actual)
 
 
 ARG_FORMATS_FAIL = dict(
@@ -218,7 +224,7 @@ CAUSE_CHG_DECO_IDS = sorted(CAUSE_CHG_DECO.keys())
 
 @pytest.mark.parametrize(CAUSE_CHG_DECO_PARAMS,
                          [[CAUSE_CHG_DECO[tc][param]
-                           for param in CAUSE_CHG_DECO_PARAMS]
+                          for param in CAUSE_CHG_DECO_PARAMS]
                           for tc in CAUSE_CHG_DECO_IDS],
                          ids=CAUSE_CHG_DECO_IDS)
 def test_cause_changes_deco(method, expect_exception, expect_changed):
