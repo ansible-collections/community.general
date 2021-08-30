@@ -8,14 +8,14 @@ DOCUMENTATION = '''
     author: Victor Martinez (@v1v)  <VictorMartinezRubio@gmail.com>
     name: opentelemetry
     type: notification
-    short_description: create distributed traces with OpenTelemetry.
-    version_added: historical
+    short_description: Create distributed traces with OpenTelemetry
+    version_added: 3.5.0
     description:
-      - This callback create distributed traces for each ansible task with OpenTelemetry.
+      - This callback create distributed traces for each Ansible task with OpenTelemetry.
     options:
       include_setup_tasks:
         name: Include setup tasks
-        default: True
+        default: true
         description: Should the setup tasks be included in the distributed traces
         env:
           - name: INCLUDE_SETUP_TASKS
