@@ -1,0 +1,2 @@
+bugfixes:
+  - udm_dns_record - fixed managing of PTR records, which can never have worked before (https://github.com/ansible-collections/community.general/pull/3256).
