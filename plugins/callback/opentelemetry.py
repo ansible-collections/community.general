@@ -14,43 +14,42 @@ DOCUMENTATION = '''
       - This callback create distributed traces for each Ansible task with OpenTelemetry.
     options:
       include_setup_tasks:
-        name: Include setup tasks
         default: true
-        description: Should the setup tasks be included in the distributed traces
+        description:
+          - Should the setup tasks be included in the distributed traces
         env:
-          - name: INCLUDE_SETUP_TASKS
+          - name: OPENTELEMETRY_INCLUDE_SETUP_TASKS
       hide_task_arguments:
-        name: Hide the arguments for a task
-        default: False
-        description: Hide the arguments for a task
+        default: false
+        description:
+          - Hide the arguments for a task
         env:
-          - name: HIDE_TASK_ARGUMENTS
+          - name: OPENTELEMETRY_HIDE_TASK_ARGUMENTS
       service_name:
-        name: Set the service name.
         default: ansible
-        description: Hide the arguments for a task
+        description:
+          - Hide the arguments for a task
         env:
           - name: OTEL_SERVICE_NAME
       otel_exporter:
-        name: Use the OTEL exporter and its environment variables. https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html
-        default: False
-        description: Use the OTEL exporter and its environment variables. https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html
+        default: false
+        description:
+          - Use the OTEL exporter and its environment variables. See U(https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html).
         env:
           - name: OTEL_EXPORTER
       insecure_otel_exporter:
-        name: Use insecure connection.
-        default: False
-        description: Use insecure connection.
+        default: false
+        description:
+          - Use insecure connection.
         env:
           - name: OTEL_EXPORTER_INSECURE
       span_id:
-        name: A valid span identifier to be used as the parent span.
         default: None
-        description: A valid span identifier to be used as the parent span.
+        description:
+          - A valid span identifier to be used as the parent span.
         env:
           - name: SPAN_ID
       trace_id:
-        name: A valid trace identifier to be used as the parent trace.
         default: None
         description: A valid trace identifier to be used as the parent trace.
         env:
@@ -101,16 +100,16 @@ class CallbackModule(CallbackBase):
     This plugin makes use of the following environment variables:
         SPAN_ID (optional): A valid span identifier to be used as the parent span.
         TRACE_ID (optional): A valid trace identifier to be used as the parent trace.
-        INCLUDE_SETUP_TASKS (optional): Should the setup tasks be includedt
-                                     Default: True
-        HIDE_TASK_ARGUMENTS (optional): Hide the arguments for a task
-                                     Default: False
+        OPENTELEMETRY_INCLUDE_SETUP_TASKS (optional): Should the setup tasks be included
+                                     Default: true
+        OPENTELEMETRY_HIDE_TASK_ARGUMENTS (optional): Hide the arguments for a task
+                                     Default: false
         OTEL_SERVICE_NAME (optional): The service name
                                      Default: ansible
         OTEL_EXPORTER (optional): Use the OTEL exporter and its environment variables. https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html
-                                     Default: False
+                                     Default: false
         OTEL_EXPORTER_INSECURE (optional): Insecure connection
-                                     Default: False
+                                     Default: false
     Requires:
         opentelemetry-api
         opentelemetry-exporter-otlp
@@ -125,11 +124,11 @@ class CallbackModule(CallbackBase):
     def __init__(self):
         super(CallbackModule, self).__init__()
 
-        self._include_setup_tasks = os.getenv('INCLUDE_SETUP_TASKS', 'True').lower()
-        self._hide_task_arguments = os.getenv('HIDE_TASK_ARGUMENTS', 'False').lower()
+        self._include_setup_tasks = os.getenv('OPENTELEMETRY_INCLUDE_SETUP_TASKS', 'true').lower() == 'true'
+        self._hide_task_arguments = os.getenv('OPENTELEMETRY_HIDE_TASK_ARGUMENTS', 'false').lower() == 'true'
         self._service = os.getenv('OTEL_SERVICE_NAME', 'ansible').lower()
-        self._otel_exporter = os.getenv('OTEL_EXPORTER', 'False').lower() == 'true'
-        self._insecure_otel_exporter = os.getenv('OTEL_EXPORTER_INSECURE', 'False').lower() == 'true'
+        self._otel_exporter = os.getenv('OTEL_EXPORTER', 'false').lower() == 'true'
+        self._insecure_otel_exporter = os.getenv('OTEL_EXPORTER_INSECURE', 'false').lower() == 'true'
         self._span_id = os.getenv('SPAN_ID', None)
         self._trace_id = os.getenv('TRACE_ID', None)
         self._playbook_path = None
@@ -177,7 +176,7 @@ class CallbackModule(CallbackBase):
         action = task.action
         args = None
 
-        if not task.no_log and self._hide_task_arguments == 'false':
+        if not task.no_log and not self._hide_task_arguments:
             args = ', '.join(('%s=%s' % a for a in task.args.items()))
 
         self._task_data[uuid] = TaskData(uuid, name, path, play, action, args)
@@ -261,7 +260,7 @@ class CallbackModule(CallbackBase):
         for task_uuid, task_data in self._task_data.items():
             if parent_start_time is None:
                 parent_start_time = task_data.start
-            if self._include_setup_tasks == 'false' and task_data.action == 'setup':
+            if not self._include_setup_tasks and task_data.action == 'setup':
                 ##if task_data.action in C._ACTION_SETUP:  supported from 2.11.0
                 continue
             tasks.append(task_data)
