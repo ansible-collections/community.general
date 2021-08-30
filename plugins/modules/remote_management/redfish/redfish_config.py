@@ -91,6 +91,16 @@ options:
       - setting dict of EthernetInterface on OOB controller
     type: dict
     version_added: '0.2.0'
+  strip_etag_quotes:
+    required: false
+    description:
+      - Removes surrounding quotes of etag used in If-Match header
+        of PATCH requests
+      - Only use this option to resolve bad vendor implementation where
+        If-Match only matches the unquoted etag string
+    type: bool
+    default: False
+    version_added: 3.6.0
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''
@@ -237,7 +247,8 @@ def main():
             nic_config=dict(
                 type='dict',
                 default={}
-            )
+            ),
+            strip_etag_quotes=dict(type='bool', default=False)
         ),
         required_together=[
             ('username', 'password'),
@@ -275,10 +286,13 @@ def main():
     nic_addr = module.params['nic_addr']
     nic_config = module.params['nic_config']
 
+    # Etag options
+    strip_etag_quotes = module.params['strip_etag_quotes']
+
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
     rf_utils = RedfishUtils(creds, root_uri, timeout, module,
-                            resource_id=resource_id, data_modification=True)
+                            resource_id=resource_id, data_modification=True, strip_etag_quotes=strip_etag_quotes)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
