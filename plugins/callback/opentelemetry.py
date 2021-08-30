@@ -16,19 +16,19 @@ DOCUMENTATION = '''
       include_setup_tasks:
         default: true
         description:
-          - Should the setup tasks be included in the distributed traces
+          - Should the setup tasks be included in the distributed traces.
         env:
           - name: OPENTELEMETRY_INCLUDE_SETUP_TASKS
       hide_task_arguments:
         default: false
         description:
-          - Hide the arguments for a task
+          - Hide the arguments for a task.
         env:
           - name: OPENTELEMETRY_HIDE_TASK_ARGUMENTS
       service_name:
         default: ansible
         description:
-          - Hide the arguments for a task
+          - The service name resource attribute.
         env:
           - name: OTEL_SERVICE_NAME
       otel_exporter:
@@ -37,12 +37,6 @@ DOCUMENTATION = '''
           - Use the OTEL exporter and its environment variables. See U(https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html).
         env:
           - name: OTEL_EXPORTER
-      insecure_otel_exporter:
-        default: false
-        description:
-          - Use insecure connection.
-        env:
-          - name: OTEL_EXPORTER_INSECURE
     requirements:
       - opentelemetry-api (python lib)
       - opentelemetry-exporter-otlp (python lib)
@@ -87,15 +81,13 @@ class CallbackModule(CallbackBase):
     """
     This callback creates distributed traces.
     This plugin makes use of the following environment variables:
-        OPENTELEMETRY_INCLUDE_SETUP_TASKS (optional): Should the setup tasks be included
+        OPENTELEMETRY_INCLUDE_SETUP_TASKS (optional): Should the setup tasks be included in the distributed traces
                                      Default: true
         OPENTELEMETRY_HIDE_TASK_ARGUMENTS (optional): Hide the arguments for a task
                                      Default: false
         OTEL_SERVICE_NAME (optional): The service name
                                      Default: ansible
         OTEL_EXPORTER (optional): Use the OTEL exporter and its environment variables. https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html
-                                     Default: false
-        OTEL_EXPORTER_INSECURE (optional): Insecure connection
                                      Default: false
     Requires:
         opentelemetry-api
@@ -115,11 +107,12 @@ class CallbackModule(CallbackBase):
         self._hide_task_arguments = os.getenv('OPENTELEMETRY_HIDE_TASK_ARGUMENTS', 'false').lower() == 'true'
         self._service = os.getenv('OTEL_SERVICE_NAME', 'ansible').lower()
         self._otel_exporter = os.getenv('OTEL_EXPORTER', 'false').lower() == 'true'
-        self._insecure_otel_exporter = os.getenv('OTEL_EXPORTER_INSECURE', 'false').lower() == 'true'
         self._playbook_path = None
         self._playbook_name = None
         self._play_name = None
         self._task_data = None
+		# See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
+        self.insecure_otel_exporter = os.getenv('OTEL_EXPORTER_OTLP_INSECURE', 'false').lower() == 'true'
         self.errors = 0
         self.disabled = False
 
@@ -130,7 +123,7 @@ class CallbackModule(CallbackBase):
 
         if not self._otel_exporter:
             self.disabled = True
-            self._display.warning('The `OTEL_EXPORTER` has been set to False.'
+            self._display.warning('The `OTEL_EXPORTER` has been set to False. '
                                   'Disabling the `opentelemetry` callback plugin.')
 
         if HAS_ORDERED_DICT:
@@ -252,7 +245,7 @@ class CallbackModule(CallbackBase):
         processor = SimpleSpanProcessor(ConsoleSpanExporter())
 
         if self._otel_exporter:
-            processor = BatchSpanProcessor(OTLPSpanExporter(insecure=self._insecure_otel_exporter))
+            processor = BatchSpanProcessor(OTLPSpanExporter(insecure=self.insecure_otel_exporter))
 
         trace.get_tracer_provider().add_span_processor(processor)
 
