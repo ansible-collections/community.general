@@ -43,7 +43,7 @@ options:
     description:
       - ID or full path of the project in the form of group/name.
     type: str
-    version_added: '3.3.3'
+    version_added: '3.6.0'
   description:
     description:
       - The unique name of the runner.
