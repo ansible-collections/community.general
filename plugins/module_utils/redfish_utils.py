@@ -121,6 +121,8 @@ class RedfishUtils(object):
             if not etag:
                 etag = r['data'].get('@odata.etag')
             if etag:
+                # Clean etag and apply If-Match
+                etag = etag.strip("'\"")
                 req_headers['If-Match'] = etag
         username, password, basic_auth = self._auth_params(req_headers)
         try:
