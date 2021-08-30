@@ -370,14 +370,14 @@ def main():
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
     gitlab_instance = gitlabAuthentication(module)
-    glproject = None
+    gitlab_project = None
     if project:
         try:
-            glproject = gitlab_instance.projects.get(project)
+            gitlab_project = gitlab_instance.projects.get(project)
         except gitlab.exceptions.GitlabGetError as e:
             module.fail_json(msg='No such a project %s' % project, exception=to_native(e))
 
-    gitlab_runner = GitLabRunner(module, gitlab_instance, glproject)
+    gitlab_runner = GitLabRunner(module, gitlab_instance, gitlab_project)
     runner_exists = gitlab_runner.existsRunner(runner_description, owned)
 
     if state == 'absent':
