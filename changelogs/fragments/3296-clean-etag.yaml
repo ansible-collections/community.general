@@ -1,0 +1,2 @@
+minor_changes:
+  - "redfish_utils - clean etag of quotes before patch since some vendors double quote header etag (https://github.com/ansible-collections/community.general/pull/3296)."
