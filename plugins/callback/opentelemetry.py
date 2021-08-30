@@ -43,17 +43,6 @@ DOCUMENTATION = '''
           - Use insecure connection.
         env:
           - name: OTEL_EXPORTER_INSECURE
-      span_id:
-        default: None
-        description:
-          - A valid span identifier to be used as the parent span.
-        env:
-          - name: SPAN_ID
-      trace_id:
-        default: None
-        description: A valid trace identifier to be used as the parent trace.
-        env:
-          - name: TRACE_ID
     requirements:
       - opentelemetry-api (python lib)
       - opentelemetry-exporter-otlp (python lib)
@@ -98,8 +87,6 @@ class CallbackModule(CallbackBase):
     """
     This callback creates distributed traces.
     This plugin makes use of the following environment variables:
-        SPAN_ID (optional): A valid span identifier to be used as the parent span.
-        TRACE_ID (optional): A valid trace identifier to be used as the parent trace.
         OPENTELEMETRY_INCLUDE_SETUP_TASKS (optional): Should the setup tasks be included
                                      Default: true
         OPENTELEMETRY_HIDE_TASK_ARGUMENTS (optional): Hide the arguments for a task
@@ -129,8 +116,6 @@ class CallbackModule(CallbackBase):
         self._service = os.getenv('OTEL_SERVICE_NAME', 'ansible').lower()
         self._otel_exporter = os.getenv('OTEL_EXPORTER', 'false').lower() == 'true'
         self._insecure_otel_exporter = os.getenv('OTEL_EXPORTER_INSECURE', 'false').lower() == 'true'
-        self._span_id = os.getenv('SPAN_ID', None)
-        self._trace_id = os.getenv('TRACE_ID', None)
         self._playbook_path = None
         self._playbook_name = None
         self._play_name = None
@@ -154,12 +139,6 @@ class CallbackModule(CallbackBase):
             self.disabled = True
             self._display.warning('The `ordereddict` python module is not installed. '
                                   'Disabling the `opentelemetry` callback plugin.')
-
-        if not self._span_id is None:
-            self._display.warning('The `span_id` has not been implemented yet.')
-
-        if not self._trace_id is None:
-            self._display.warning('The `trace_id` has not been implemented yet.')
 
 
     def _start_task(self, task):
