@@ -21,6 +21,7 @@ description:
 requirements:
     - Python >= 2.6
     - Univention
+    - ipaddress (for I(type=ptr_record))
 options:
     state:
         type: str
@@ -34,11 +35,13 @@ options:
         description:
             - "Name of the record, this is also the DNS record. E.g. www for
                www.example.com."
+            - For PTR records this has to be the IP address.
     zone:
         type: str
         required: true
         description:
             - Corresponding DNS zone for this record, e.g. example.com.
+            - For PTR records this has to be the full reverse zone (for example C(1.1.192.in-addr.arpa)).
     type:
         type: str
         required: true
@@ -66,12 +69,29 @@ EXAMPLES = '''
       a:
          - 192.0.2.1
          - 2001:0db8::42
+
+- name: Create a DNS v4 PTR record on a UCS
+  community.general.udm_dns_record:
+    name: 192.0.2.1
+    zone: 2.0.192.in-addr.arpa
+    type: ptr_record
+    data:
+      ptr_record: "www.example.com."
+
+- name: Create a DNS v6 PTR record on a UCS
+  community.general.udm_dns_record:
+    name: 2001:db8:0:0:0:ff00:42:8329
+    zone: 2.4.0.0.0.0.f.f.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa
+    type: ptr_record
+    data:
+      ptr_record: "www.example.com."
 '''
 
 
 RETURN = '''#'''
 
 HAVE_UNIVENTION = False
+HAVE_IPADDRESS = False
 try:
     from univention.admin.handlers.dns import (
         forward_zone,
@@ -82,6 +102,7 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.univention_umc import (
     umc_module_for_add,
     umc_module_for_edit,
@@ -90,6 +111,11 @@ from ansible_collections.community.general.plugins.module_utils.univention_umc i
     config,
     uldap,
 )
+try:
+    import ipaddress
+    HAVE_IPADDRESS = True
+except ImportError:
+    pass
 
 
 def main():
@@ -124,14 +150,30 @@ def main():
     changed = False
     diff = None
 
+    workname = name
+    if type == 'ptr_record':
+        if not HAVE_IPADDRESS:
+            module.fail_json(msg=missing_required_lib('ipaddress'))
+        try:
+            if 'arpa' not in zone:
+                raise Exception("Zone must be reversed zone for ptr_record. (e.g. 1.1.192.in-addr.arpa)")
+            ipaddr_rev = ipaddress.ip_address(name).reverse_pointer
+            subnet_offset = ipaddr_rev.find(zone)
+            if subnet_offset == -1:
+                raise Exception("reversed IP address {0} is not part of zone.".format(ipaddr_rev))
+            workname = ipaddr_rev[0:subnet_offset - 1]
+        except Exception as e:
+            module.fail_json(
+                msg='handling PTR record for {0} in zone {1} failed: {2}'.format(name, zone, e)
+            )
+
     obj = list(ldap_search(
-        '(&(objectClass=dNSZone)(zoneName={0})(relativeDomainName={1}))'.format(zone, name),
+        '(&(objectClass=dNSZone)(zoneName={0})(relativeDomainName={1}))'.format(zone, workname),
         attr=['dNSZone']
     ))
-
     exists = bool(len(obj))
     container = 'zoneName={0},cn=dns,{1}'.format(zone, base_dn())
-    dn = 'relativeDomainName={0},{1}'.format(name, container)
+    dn = 'relativeDomainName={0},{1}'.format(workname, container)
 
     if state == 'present':
         try:
@@ -144,13 +186,21 @@ def main():
                 ) or reverse_zone.lookup(
                     config(),
                     uldap(),
-                    '(zone={0})'.format(zone),
+                    '(zoneName={0})'.format(zone),
                     scope='domain',
                 )
+                if len(so) == 0:
+                    raise Exception("Did not find zone '{0}' in Univention".format(zone))
                 obj = umc_module_for_add('dns/{0}'.format(type), container, superordinate=so[0])
             else:
                 obj = umc_module_for_edit('dns/{0}'.format(type), dn)
-            obj['name'] = name
+
+            if type == 'ptr_record':
+                obj['ip'] = name
+                obj['address'] = workname
+            else:
+                obj['name'] = name
+
             for k, v in data.items():
                 obj[k] = v
             diff = obj.diff()
