@@ -158,6 +158,7 @@ EXAMPLES = """
 
 import os
 import sys
+import shlex
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -273,61 +274,62 @@ def main():
         ),
     )
 
-    command = module.params['command']
+    command_split = shlex.split(module.params['command'])
+    command_bin = command_split[0]
     project_path = module.params['project_path']
     virtualenv = module.params['virtualenv']
 
     for param in specific_params:
         value = module.params[param]
-        if value and param not in command_allowed_param_map[command]:
-            module.fail_json(msg='%s param is incompatible with command=%s' % (param, command))
+        if value and param not in command_allowed_param_map[command_bin]:
+            module.fail_json(msg='%s param is incompatible with command=%s' % (param, command_bin))
 
-    for param in command_required_param_map.get(command, ()):
+    for param in command_required_param_map.get(command_bin, ()):
         if not module.params[param]:
-            module.fail_json(msg='%s param is required for command=%s' % (param, command))
+            module.fail_json(msg='%s param is required for command=%s' % (param, command_bin))
 
     _ensure_virtualenv(module)
 
-    cmd = ["./manage.py", command]
+    run_cmd_args = ["./manage.py"] + command_split
 
-    if command in noinput_commands:
-        cmd.append("--noinput")
+    if command_bin in noinput_commands and '--noinput' not in command_split:
+        run_cmd_args.append("--noinput")
 
     for param in general_params:
         if module.params[param]:
-            cmd.append('--%s=%s' % (param, module.params[param]))
+            run_cmd_args.append('--%s=%s' % (param, module.params[param]))
 
     for param in specific_boolean_params:
         if module.params[param]:
-            cmd.append('--%s' % param)
+            run_cmd_args.append('--%s' % param)
 
     # these params always get tacked on the end of the command
     for param in end_of_command_params:
         if module.params[param]:
-            cmd.append(module.params[param])
+            run_cmd_args.append(module.params[param])
 
-    rc, out, err = module.run_command(cmd, cwd=project_path)
+    rc, out, err = module.run_command(run_cmd_args, cwd=project_path)
     if rc != 0:
-        if command == 'createcachetable' and 'table' in err and 'already exists' in err:
+        if command_bin == 'createcachetable' and 'table' in err and 'already exists' in err:
             out = 'already exists.'
         else:
             if "Unknown command:" in err:
-                _fail(module, cmd, err, "Unknown django command: %s" % command)
-            _fail(module, cmd, out, err, path=os.environ["PATH"], syspath=sys.path)
+                _fail(module, run_cmd_args, err, "Unknown django command: %s" % command_bin)
+            _fail(module, run_cmd_args, out, err, path=os.environ["PATH"], syspath=sys.path)
 
     changed = False
 
     lines = out.split('\n')
-    filt = globals().get(command + "_filter_output", None)
+    filt = globals().get(command_bin + "_filter_output", None)
     if filt:
         filtered_output = list(filter(filt, lines))
         if len(filtered_output):
             changed = True
-    check_changed = globals().get("{0}_check_changed".format(command), None)
+    check_changed = globals().get("{0}_check_changed".format(command_bin), None)
     if check_changed:
         changed = check_changed(out)
 
-    module.exit_json(changed=changed, out=out, cmd=cmd, app_path=project_path, project_path=project_path,
+    module.exit_json(changed=changed, out=out, cmd=run_cmd_args, app_path=project_path, project_path=project_path,
                      virtualenv=virtualenv, settings=module.params['settings'], pythonpath=module.params['pythonpath'])
 
 
