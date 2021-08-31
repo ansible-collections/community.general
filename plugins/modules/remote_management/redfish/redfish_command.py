@@ -215,7 +215,7 @@ options:
         C(If-Match) only matches the unquoted etag string.
     type: bool
     default: false
-    version_added: 3.6.0
+    version_added: 3.7.0
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''
