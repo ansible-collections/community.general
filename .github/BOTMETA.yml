@@ -1108,7 +1108,8 @@ files:
   $modules/web_infrastructure/deploy_helper.py:
     maintainers: ramondelafuente
   $modules/web_infrastructure/django_manage.py:
-    maintainers: scottanderson42 russoz tastychutney
+    maintainers: russoz
+    ignore: scottanderson42 tastychutney
     labels: django_manage
   $modules/web_infrastructure/ejabberd_user.py:
     maintainers: privateip
