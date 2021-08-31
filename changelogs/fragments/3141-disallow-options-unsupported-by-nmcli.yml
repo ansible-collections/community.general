@@ -1,3 +1,0 @@
-minor_changes:
-  - nmcli - query ``nmcli`` directly to determine available WiFi options
-    (https://github.com/ansible-collections/community.general/pull/3141).
