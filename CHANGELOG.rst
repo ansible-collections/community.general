@@ -5,6 +5,71 @@ Community General Release Notes
 .. contents:: Topics
 
 
+v1.3.12
+=======
+
+Release Summary
+---------------
+
+Fix check mode support for ``_info`` and ``_facts`` modules.
+
+Bugfixes
+--------
+
+- ali_instance_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- docker_stack_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3101).
+- docker_stack_task_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3101).
+- gcpubsub_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3101).
+- gluster_heal_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- idrac_redfish_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- memset_memstore_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- memset_server_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- ome_device_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- oneview_datacenter_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_enclosure_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_ethernet_network_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_fc_network_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_fcoe_network_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_logical_interconnect_group_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_network_set_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- oneview_san_manager_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- ovirt_affinity_label_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_api_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_cluster_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_datacenter_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_disk_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_event_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_external_provider_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_group_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_host_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_host_storage_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_network_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_nic_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_permission_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_quota_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_scheduling_policy_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_snapshot_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_storage_domain_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_storage_template_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_storage_vm_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_tag_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_template_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_user_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_vm_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- ovirt_vmpool_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- purefa_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3095).
+- rax_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- redfish_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- smartos_image_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- snmp_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- utm_aaa_group_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- utm_ca_host_key_cert_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- utm_network_interface_address_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- utm_proxy_frontend_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- utm_proxy_location_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- xenserver_facts - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+- xfconf_info - added support to check mode (https://github.com/ansible-collections/community.general/pull/3084).
+
 v1.3.11
 =======
 
