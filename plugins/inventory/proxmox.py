@@ -89,7 +89,7 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 # Minimal example which will not gather additional facts for QEMU/LXC guests
-# By not specifying a url the plugin will attempt to connect to the controller host on port 8006
+# By not specifying a URL the plugin will attempt to connect to the controller host on port 8006
 # my.proxmox.yml
 plugin: community.general.proxmox
 user: ansible@pve
