@@ -78,6 +78,11 @@ URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY = "{url}/admin/realms/{realm}/authen
 URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY = "{url}/admin/realms/{realm}/authentication/executions/{id}/lower-priority"
 URL_AUTHENTICATION_CONFIG = "{url}/admin/realms/{realm}/authentication/config/{id}"
 
+URL_IDENTITY_PROVIDERS = "{url}/admin/realms/{realm}/identity-provider/instances"
+URL_IDENTITY_PROVIDER = "{url}/admin/realms/{realm}/identity-provider/instances/{alias}"
+URL_IDENTITY_PROVIDER_MAPPERS = "{url}/admin/realms/{realm}/identity-provider/instances/{alias}/mappers"
+URL_IDENTITY_PROVIDER_MAPPER = "{url}/admin/realms/{realm}/identity-provider/instances/{alias}/mappers/{id}"
+
 
 def keycloak_argument_spec():
     """
@@ -1437,3 +1442,162 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Could not get executions for authentication flow %s in realm %s: %s'
                                   % (config["alias"], realm, str(e)))
+
+    def get_identity_providers(self, realm='master'):
+        """ Fetch representations for identity providers in a realm
+        :param realm: realm to be queried
+        :return: list of representations for identity providers
+        """
+        idps_url = URL_IDENTITY_PROVIDERS.format(url=self.baseurl, realm=realm)
+        try:
+            return json.loads(to_native(open_url(idps_url, method='GET', headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+        except ValueError as e:
+            self.module.fail_json(msg='API returned incorrect JSON when trying to obtain list of identity providers for realm %s: %s'
+                                      % (realm, str(e)))
+        except Exception as e:
+            self.module.fail_json(msg='Could not obtain list of identity providers for realm %s: %s'
+                                      % (realm, str(e)))
+
+    def get_identity_provider(self, alias, realm='master'):
+        """ Fetch identity provider representation from a realm using the idp's alias.
+        If the identity provider does not exist, None is returned.
+        :param alias: Alias of the identity provider to fetch.
+        :param realm: Realm in which the identity provider resides; default 'master'.
+        """
+        idp_url = URL_IDENTITY_PROVIDER.format(url=self.baseurl, realm=realm, alias=alias)
+        try:
+            return json.loads(to_native(open_url(idp_url, method="GET", headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+        except HTTPError as e:
+            if e.code == 404:
+                return None
+            else:
+                self.module.fail_json(msg='Could not fetch identity provider %s in realm %s: %s'
+                                          % (alias, realm, str(e)))
+        except Exception as e:
+            self.module.fail_json(msg='Could not fetch identity provider %s in realm %s: %s'
+                                      % (alias, realm, str(e)))
+
+    def create_identity_provider(self, idprep, realm='master'):
+        """ Create an identity provider.
+        :param idprep: Identity provider representation of the idp to be created.
+        :param realm: Realm in which this identity provider resides, default "master".
+        :return: HTTPResponse object on success
+        """
+        idps_url = URL_IDENTITY_PROVIDERS.format(url=self.baseurl, realm=realm)
+        try:
+            return open_url(idps_url, method='POST', headers=self.restheaders,
+                            data=json.dumps(idprep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create identity provider %s in realm %s: %s'
+                                      % (idprep['alias'], realm, str(e)))
+
+    def update_identity_provider(self, idprep, realm='master'):
+        """ Update an existing identity provider.
+        :param idprep: Identity provider representation of the idp to be updated.
+        :param realm: Realm in which this identity provider resides, default "master".
+        :return HTTPResponse object on success
+        """
+        idp_url = URL_IDENTITY_PROVIDER.format(url=self.baseurl, realm=realm, alias=idprep['alias'])
+        try:
+            return open_url(idp_url, method='PUT', headers=self.restheaders,
+                            data=json.dumps(idprep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not update identity provider %s in realm %s: %s'
+                                      % (idprep['alias'], realm, str(e)))
+
+    def delete_identity_provider(self, alias, realm='master'):
+        """ Delete an identity provider.
+        :param alias: Alias of the identity provider.
+        :param realm: Realm in which this identity provider resides, default "master".
+        """
+        idp_url = URL_IDENTITY_PROVIDER.format(url=self.baseurl, realm=realm, alias=alias)
+        try:
+            return open_url(idp_url, method='DELETE', headers=self.restheaders,
+                            validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Unable to delete identity provider %s in realm %s: %s'
+                                      % (alias, realm, str(e)))
+
+    def get_identity_provider_mappers(self, alias, realm='master'):
+        """ Fetch representations for identity provider mappers
+        :param alias: Alias of the identity provider.
+        :param realm: realm to be queried
+        :return: list of representations for identity provider mappers
+        """
+        mappers_url = URL_IDENTITY_PROVIDER_MAPPERS.format(url=self.baseurl, realm=realm, alias=alias)
+        try:
+            return json.loads(to_native(open_url(mappers_url, method='GET', headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+        except ValueError as e:
+            self.module.fail_json(msg='API returned incorrect JSON when trying to obtain list of identity provider mappers for idp %s in realm %s: %s'
+                                      % (alias, realm, str(e)))
+        except Exception as e:
+            self.module.fail_json(msg='Could not obtain list of identity provider mappers for idp %s in realm %s: %s'
+                                      % (alias, realm, str(e)))
+
+    def get_identity_provider_mapper(self, mid, alias, realm='master'):
+        """ Fetch identity provider representation from a realm using the idp's alias.
+        If the identity provider does not exist, None is returned.
+        :param mid: Unique ID of the mapper to fetch.
+        :param alias: Alias of the identity provider.
+        :param realm: Realm in which the identity provider resides; default 'master'.
+        """
+        mapper_url = URL_IDENTITY_PROVIDER_MAPPER.format(url=self.baseurl, realm=realm, alias=alias, id=mid)
+        try:
+            return json.loads(to_native(open_url(mapper_url, method="GET", headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+        except HTTPError as e:
+            if e.code == 404:
+                return None
+            else:
+                self.module.fail_json(msg='Could not fetch mapper %s for identity provider %s in realm %s: %s'
+                                          % (mid, alias, realm, str(e)))
+        except Exception as e:
+            self.module.fail_json(msg='Could not fetch mapper %s for identity provider %s in realm %s: %s'
+                                      % (mid, alias, realm, str(e)))
+
+    def create_identity_provider_mapper(self, mapper, alias, realm='master'):
+        """ Create an identity provider mapper.
+        :param mapper: IdentityProviderMapperRepresentation of the mapper to be created.
+        :param alias: Alias of the identity provider.
+        :param realm: Realm in which this identity provider resides, default "master".
+        :return: HTTPResponse object on success
+        """
+        mappers_url = URL_IDENTITY_PROVIDER_MAPPERS.format(url=self.baseurl, realm=realm, alias=alias)
+        try:
+            return open_url(mappers_url, method='POST', headers=self.restheaders,
+                            data=json.dumps(mapper), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create identity provider mapper %s for idp %s in realm %s: %s'
+                                      % (mapper['name'], alias, realm, str(e)))
+
+    def update_identity_provider_mapper(self, mapper, alias, realm='master'):
+        """ Update an existing identity provider.
+        :param mapper: IdentityProviderMapperRepresentation of the mapper to be updated.
+        :param alias: Alias of the identity provider.
+        :param realm: Realm in which this identity provider resides, default "master".
+        :return HTTPResponse object on success
+        """
+        mapper_url = URL_IDENTITY_PROVIDER_MAPPER.format(url=self.baseurl, realm=realm, alias=alias, id=mapper['id'])
+        try:
+            return open_url(mapper_url, method='PUT', headers=self.restheaders,
+                            data=json.dumps(mapper), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not update mapper %s for identity provider %s in realm %s: %s'
+                                      % (mapper['id'], alias, realm, str(e)))
+
+    def delete_identity_provider_mapper(self, mid, alias, realm='master'):
+        """ Delete an identity provider.
+        :param mid: Unique ID of the mapper to delete.
+        :param alias: Alias of the identity provider.
+        :param realm: Realm in which this identity provider resides, default "master".
+        """
+        mapper_url = URL_IDENTITY_PROVIDER_MAPPER.format(url=self.baseurl, realm=realm, alias=alias, id=mid)
+        try:
+            return open_url(mapper_url, method='DELETE', headers=self.restheaders,
+                            validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Unable to delete mapper %s for identity provider %s in realm %s: %s'
+                                      % (mid, alias, realm, str(e)))
