@@ -13,7 +13,7 @@
     state: present
 
 - name: Add a User to A GitLab Group
-  gitlab_group_members:  
+  gitlab_group_members:
     api_url: '{{ gitlab_server_url }}'
     api_token: '{{ gitlab_api_access_token }}'
     gitlab_group: '{{ gitlab_group_name }}'
@@ -28,3 +28,46 @@
     gitlab_group: '{{ gitlab_group_name }}'
     gitlab_user: '{{ username }}'
     state: absent
+
+- name: Add a list of Users to A GitLab Group
+  gitlab_group_members:
+    api_url: '{{ gitlab_server_url }}'
+    api_token: '{{ gitlab_api_access_token }}'
+    gitlab_group: '{{ gitlab_group_name }}'
+    gitlab_user: '{{ userlist }}'
+    access_level: '{{ gitlab_access_level }}'
+    state: present
+
+- name: Remove a list of Users to A GitLab Group
+  gitlab_group_members:
+    api_url: '{{ gitlab_server_url }}'
+    api_token: '{{ gitlab_api_access_token }}'
+    gitlab_group: '{{ gitlab_group_name }}'
+    gitlab_user: '{{ userlist }}'
+    state: absent
+
+- name: Add a list of Users with Dedicated Access Levels to A GitLab Group
+  gitlab_group_members:
+    api_url: '{{ gitlab_server_url }}'
+    api_token: '{{ gitlab_api_access_token }}'
+    gitlab_group: '{{ gitlab_group_name }}'
+    gitlab_users_access: '{{ dedicated_access_users }}'
+    state: present
+
+- name: Remove a list of Users with Dedicated Access Levels to A GitLab Group
+  gitlab_group_members:
+    api_url: '{{ gitlab_server_url }}'
+    api_token: '{{ gitlab_api_access_token }}'
+    gitlab_group: '{{ gitlab_group_name }}'
+    gitlab_users_access: '{{ dedicated_access_users }}'
+    state: absent
+
+- name: Add a user, remove all others which might be on this access level
+  gitlab_group_members:
+    api_url: '{{ gitlab_server_url }}'
+    api_token: '{{ gitlab_api_access_token }}'
+    gitlab_group: '{{ gitlab_group_name }}'
+    gitlab_user: '{{ username }}'
+    access_level: '{{ gitlab_access_level }}'
+    pruge_users: '{{ gitlab_access_level }}'
+    state: present
