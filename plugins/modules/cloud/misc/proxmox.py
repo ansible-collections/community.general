@@ -32,7 +32,14 @@ options:
     type: str
   disk:
     description:
-      - hard disk size in GB for instance
+      - This option was previously described as "hard disk size in GB for instance" however several formats describing
+        a lxc mount are permitted.
+      - Older versions of Proxmox will accept a numeric value for size using the I(storage) parameter to automatically
+        choose which storage to allocate from, however new versions enforce the C(<STORAGE>:<SIZE>) syntax.
+      - "Additional options are available by using some combination of the following key-value pairs as a
+        comma-delimited list C([volume=]<volume> [,acl=<1|0>] [,mountoptions=<opt[;opt...]>] [,quota=<1|0>]
+        [,replicate=<1|0>] [,ro=<1|0>] [,shared=<1|0>] [,size=<DiskSize>])."
+      - See U(https://pve.proxmox.com/wiki/Linux_Container) for a full description.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(3). Note that the default value of I(proxmox_default_behavior)
         changes in community.general 4.0.0.
