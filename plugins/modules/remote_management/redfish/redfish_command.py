@@ -208,14 +208,13 @@ options:
           - The transfer method to use with the image
         type: str
   strip_etag_quotes:
-    required: false
     description:
-      - Removes surrounding quotes of etag used in If-Match header
-        of PATCH requests
+      - Removes surrounding quotes of etag used in C(If-Match) header
+        of C(PATCH) requests.
       - Only use this option to resolve bad vendor implementation where
-        If-Match only matches the unquoted etag string
+        C(If-Match) only matches the unquoted etag string.
     type: bool
-    default: False
+    default: false
     version_added: 3.6.0
 
 author: "Jose Delarosa (@jose-delarosa)"
@@ -642,7 +641,7 @@ def main():
                     transfer_method=dict(),
                 )
             ),
-            strip_etag_quotes=dict(type='bool', default=False)
+            strip_etag_quotes=dict(type='bool', default=False),
         ),
         required_together=[
             ('username', 'password'),
