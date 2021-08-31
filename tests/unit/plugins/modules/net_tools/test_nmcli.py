@@ -2241,7 +2241,7 @@ def test_create_gsm(mocked_generic_connection_create, capfd):
                   'gsm.apn', 'internet.telekom',
                   'gsm.username', 't-mobile',
                   'gsm.password', 'tm',
-                  'gsm.pin', '1234',]:
+                  'gsm.pin', '1234']:
         assert param in args_text
 
     out, err = capfd.readouterr()
@@ -2269,7 +2269,7 @@ def test_gsm_mod(mocked_generic_connection_modify, capfd):
 
     args_text = list(map(to_text, args[0]))
     for param in ['gsm.username', 't-mobile',
-                  'gsm.password', 'tm',]:
+                  'gsm.password', 'tm']:
         assert param in args_text
 
     out, err = capfd.readouterr()

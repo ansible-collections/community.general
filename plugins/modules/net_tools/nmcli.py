@@ -704,7 +704,7 @@ options:
                            asked to retrieve it
                       C(2) I(NOT_SAVED): This secret should not be saved, but should be requested from the user each time it is needed
                       C(4) I(NOT_REQUIRED): In situations where it cannot be automatically determined that the secret is required
-                           (some VPNs and PPP providers don't require all secrets) this flag indicates that the specific secret is not required'
+                           (some VPNs and PPP providers do not require all secrets) this flag indicates that the specific secret is not required'
                 type: int
                 choices: [ 0, 1, 2 , 4 ]
                 default: 0
