@@ -77,8 +77,8 @@ class PSAdapterError(Exception):
 
 @six.add_metaclass(abc.ABCMeta)
 class PSAdapter(object):
-    GET_PIDS_ATTRS = ('name', 'cmdline')
-    GET_MATCHING_PIDS_ATTRS = ('name', 'exe', 'cmdline')
+    NAME_ATTRS = ('name', 'cmdline')
+    PATTERN_ATTRS = ('name', 'exe', 'cmdline')
 
     def __init__(self, psutil):
         self._psutil = psutil
@@ -94,23 +94,28 @@ class PSAdapter(object):
             return PSAdapter530(psutil)
 
     def get_pids_by_name(self, name):
-        return [p.pid for p in self._process_iter(*self.GET_PIDS_ATTRS) if self._has_name(p, name)]
+        return [p.pid for p in self._process_iter(*self.NAME_ATTRS) if self._has_name(p, name)]
 
     def _process_iter(self, *attrs):
         return self._psutil.process_iter()
 
     def _has_name(self, proc, name):
-        proc_name, proc_cmd = self._get_proc_attributes(proc, *self.GET_PIDS_ATTRS)
-        return compare_lower(proc_name, name) or (proc_cmd and compare_lower(proc_cmd[0], name))
+        attributes = self._get_proc_attributes(proc, *self.NAME_ATTRS)
+        return (compare_lower(attributes['name'], name) or
+                attributes['cmdline'] and compare_lower(attributes['cmdline'][0], name))
+
+    def _get_proc_attributes(self, proc, *attributes):
+        return dict((attribute, self._get_attribute_from_proc(proc, attribute)) for attribute in attributes)
 
     @staticmethod
     @abc.abstractmethod
-    def _get_proc_attributes(proc, *attributes):
+    def _get_attribute_from_proc(proc, attribute):
         pass
 
     def get_pids_by_pattern(self, pattern, ignore_case):
-        return [p.pid for p in self._process_iter(*self.GET_MATCHING_PIDS_ATTRS)
-                if self._matches_pattern(p, pattern, ignore_case)]
+        return [
+            p.pid for p in self._process_iter(*self.PATTERN_ATTRS) if self._matches_pattern(p, pattern, ignore_case)
+        ]
 
     def _matches_pattern(self, proc, pattern, ignore_case):
         flags = 0
@@ -123,10 +128,10 @@ class PSAdapter(object):
             raise PSAdapterError("'%s' is not a valid regular expression: %s" % (self._pattern, to_native(e)))
 
         # See https://psutil.readthedocs.io/en/latest/#find-process-by-name for more information
-        proc_name, proc_exe, proc_cmd = self._get_proc_attributes(proc, *self.GET_MATCHING_PIDS_ATTRS)
-        matches_name = regex.search(to_native(proc_name))
-        matches_exe = proc_exe and regex.search(basename(to_native(proc_exe)))
-        matches_cmd = proc_cmd and regex.search(to_native(' '.join(proc_cmd)))
+        attributes = self._get_proc_attributes(proc, *self.PATTERN_ATTRS)
+        matches_name = regex.search(to_native(attributes['name']))
+        matches_exe = attributes['exe'] and regex.search(basename(to_native(attributes['exe'])))
+        matches_cmd = attributes['cmdline'] and regex.search(to_native(' '.join(attributes['cmdline'])))
 
         return any([matches_name, matches_exe, matches_cmd])
 
@@ -136,8 +141,8 @@ class PSAdapter100(PSAdapter):
         super(PSAdapter100, self).__init__(psutil)
 
     @staticmethod
-    def _get_proc_attributes(proc, *attributes):
-        return [getattr(proc, attribute) for attribute in attributes]
+    def _get_attribute_from_proc(proc, attribute):
+        return getattr(proc, attribute)
 
 
 class PSAdapter200(PSAdapter):
@@ -145,9 +150,9 @@ class PSAdapter200(PSAdapter):
         super(PSAdapter200, self).__init__(psutil)
 
     @staticmethod
-    def _get_proc_attributes(proc, *attributes):
-        proc_methods = [getattr(proc, attribute) for attribute in attributes]
-        return [method() for method in proc_methods]
+    def _get_attribute_from_proc(proc, attribute):
+        method = getattr(proc, attribute)
+        return method()
 
 
 class PSAdapter530(PSAdapter):
@@ -158,8 +163,8 @@ class PSAdapter530(PSAdapter):
         return self._psutil.process_iter(attrs=attrs)
 
     @staticmethod
-    def _get_proc_attributes(proc, *attributes):
-        return [proc.info[attribute] for attribute in attributes]
+    def _get_attribute_from_proc(proc, attribute):
+        return proc.info[attribute]
 
 
 def compare_lower(a, b):
