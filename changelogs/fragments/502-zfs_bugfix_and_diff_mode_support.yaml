@@ -1,0 +1,4 @@
+bugfixes:
+  - zfs - treated received properties as local (https://github.com/ansible-collections/community.general/pull/502).
+minor_changes:
+  - zfs - added diff mode support (https://github.com/ansible-collections/community.general/pull/502).
