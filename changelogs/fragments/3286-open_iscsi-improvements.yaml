@@ -1,0 +1,4 @@
+minor_changes:
+  - open_iscsi - minor refactoring (https://github.com/ansible-collections/community.general/pull/3286).
+bugfixes:
+  - open_iscsi - calling ``run_command`` with arguments as ``list`` instead of ``str`` (https://github.com/ansible-collections/community.general/pull/3286).
