@@ -1,0 +1,2 @@
+bugfixes:
+  - django_manage - argument ``command`` is being splitted again as it should (https://github.com/ansible-collections/community.general/issues/3215).
