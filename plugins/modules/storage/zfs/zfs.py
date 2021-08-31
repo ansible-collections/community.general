@@ -194,12 +194,16 @@ class Zfs(object):
             self.module.fail_json(msg=err)
 
     def set_properties_if_changed(self):
+        diff = {'before': {'extra_zfs_properties': {}}, 'after': {'extra_zfs_properties': {}}}
         current_properties = self.get_current_properties()
         for prop, value in self.properties.items():
-            if current_properties.get(prop, None) != value:
+            current_value = current_properties.get(prop, None)
+            if current_value != value:
                 self.set_property(prop, value)
+                diff['before']['extra_zfs_properties'][prop] = current_value
+                diff['after']['extra_zfs_properties'][prop] = value
         if self.module.check_mode:
-            return
+            return diff
         updated_properties = self.get_current_properties()
         for prop in self.properties:
             value = updated_properties.get(prop, None)
@@ -207,6 +211,9 @@ class Zfs(object):
                 self.module.fail_json(msg="zfsprop was not present after being successfully set: %s" % prop)
             if current_properties.get(prop, None) != value:
                 self.changed = True
+            if prop in diff['after']['extra_zfs_properties']:
+                diff['after']['extra_zfs_properties'][prop] = value
+        return diff
 
     def get_current_properties(self):
         cmd = [self.zfs_cmd, 'get', '-H', '-p', '-o', "property,value,source"]
@@ -220,7 +227,7 @@ class Zfs(object):
             # include source '-' so that creation-only properties are not removed
             # to avoids errors when the dataset already exists and the property is not changed
             # this scenario is most likely when the same playbook is run more than once
-            if source == 'local' or source == '-':
+            if source == 'local' or source == 'received' or source == '-':
                 properties[prop] = value
         # Add alias for enhanced sharing properties
         if self.enhanced_sharing:
@@ -266,13 +273,20 @@ def main():
 
     if state == 'present':
         if zfs.exists():
-            zfs.set_properties_if_changed()
+            result['diff'] = zfs.set_properties_if_changed()
         else:
             zfs.create()
+            result['diff'] = {'before': {'state': 'absent'}, 'after': {'state': state}}
 
     elif state == 'absent':
         if zfs.exists():
             zfs.destroy()
+            result['diff'] = {'before': {'state': 'present'}, 'after': {'state': state}}
+        else:
+            result['diff'] = {}
+
+    result['diff']['before_header'] = name
+    result['diff']['after_header'] = name
 
     result.update(zfs.properties)
     result['changed'] = zfs.changed
