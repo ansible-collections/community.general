@@ -218,6 +218,14 @@ auth       required pam_deny.so
         test_rule = PamdRule('auth', 'sufficient', 'pam_unix.so', 'nullok try_first_pass')
         self.assertNotIn(str(test_rule), str(self.pamd))
 
+    def test_update_rule_remove_module_args(self):
+        self.assertTrue(self.pamd.update_rule('auth', 'sufficient', 'pam_unix.so', new_args=''))
+        test_rule = PamdRule('auth', 'sufficient', 'pam_unix.so', '')
+        self.assertIn(str(test_rule), str(self.pamd))
+
+        test_rule = PamdRule('auth', 'sufficient', 'pam_unix.so', 'nullok try_first_pass')
+        self.assertNotIn(str(test_rule), str(self.pamd))
+
     def test_update_first_three(self):
         self.assertTrue(self.pamd.update_rule('auth', 'required', 'pam_env.so',
                                               new_type='one', new_control='two', new_path='three'))
