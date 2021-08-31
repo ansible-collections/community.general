@@ -2271,9 +2271,8 @@ def test_gsm_mod(mocked_generic_connection_modify, capfd):
 
     args_text = list(map(to_text, args[0]))
     for param in [
-            'gsm.apn', 'web.vodafone.de',
-            'gsm.username', '',
-            'gsm.password', '',
+            'gsm.username', 't-mobile',
+            'gsm.password', 'tm',
         ]:
         assert param in args_text
 
