@@ -649,7 +649,7 @@ options:
             - Note the list of suboption attributes may vary depending on which version of NetworkManager/nmcli is installed on the host.
             - 'An up-to-date list of supported attributes can be found here:
               U(https://networkmanager.dev/docs/api/latest/settings-gsm.html)'
-            - 'For instance to use apn, pin, username and password:'
+            - 'For instance to use apn, pin, username and password:
               C({apn: provider.apn, pin: 1234, username: apn.username, password: apn.password})'
         type: dict
         suboptions:
@@ -698,13 +698,13 @@ options:
             password-flags:
                 description:
                     - NMSettingSecretFlags indicating how to handle the I(password) property.
-                    - Following choices are allowed:
+                    - 'Following choices are allowed:
                       C(0) I(NONE): The system is responsible for providing and storing this secret (default),
                       C(1) I(AGENT_OWNED): A user secret agent is responsible for providing and storing this secret; when it is required agents will be
                            asked to retrieve it
                       C(2) I(NOT_SAVED): This secret should not be saved, but should be requested from the user each time it is needed
-                      C(4) I(NOT_REQUIRED): in situations where it cannot be automatically determined that the secret is required
-                           (some VPNs and PPP providers don't require all secrets) this flag indicates that the specific secret is not required
+                      C(4) I(NOT_REQUIRED): In situations where it cannot be automatically determined that the secret is required
+                           (some VPNs and PPP providers don't require all secrets) this flag indicates that the specific secret is not required'
                 type: int
                 choices: [ 0, 1, 2 , 4 ]
                 default: 0
@@ -728,13 +728,14 @@ options:
             sim-operator-id:
                 description:
                     - A MCC/MNC string like I(310260) or I(21601I) identifying the specific mobile network operator which this connection applies to.
-                    - If given, the connection will apply to any device also allowed by I(device-id) and I(sim-id) which contains a SIM card provisioned by the given operator.
+                    - 'If given, the connection will apply to any device also allowed by I(device-id) and I(sim-id) which contains a SIM card provisioned by
+                        the given operator.'
                 type: string
             username:
                 description:
                     - The username used to authenticate with the network, if required.
                     - Many providers do not require a username, or accept any username.
-                    - But if a username is required, it is specified here.           
+                    - But if a username is required, it is specified here.
 '''
 
 EXAMPLES = r'''

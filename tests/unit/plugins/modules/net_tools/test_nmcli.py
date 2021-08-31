@@ -2237,13 +2237,11 @@ def test_create_gsm(mocked_generic_connection_create, capfd):
     assert args[0][6] == 'non_existent_nw_device'
 
     args_text = list(map(to_text, args[0]))
-    for param in [
-            'connection.interface-name', 'gsm_non_existant',
-            'gsm.apn', 'internet.telekom',
-            'gsm.username', 't-mobile',
-            'gsm.password', 'tm',
-            'gsm.pin', '1234',
-        ]:
+    for param in ['connection.interface-name', 'gsm_non_existant',
+                  'gsm.apn', 'internet.telekom',
+                  'gsm.username', 't-mobile',
+                  'gsm.password', 'tm',
+                  'gsm.pin', '1234',]:
         assert param in args_text
 
     out, err = capfd.readouterr()
@@ -2270,10 +2268,8 @@ def test_gsm_mod(mocked_generic_connection_modify, capfd):
     assert args[0][3] == 'non_existent_nw_device'
 
     args_text = list(map(to_text, args[0]))
-    for param in [
-            'gsm.username', 't-mobile',
-            'gsm.password', 'tm',
-        ]:
+    for param in ['gsm.username', 't-mobile',
+                  'gsm.password', 'tm',]:
         assert param in args_text
 
     out, err = capfd.readouterr()
