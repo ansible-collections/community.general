@@ -54,9 +54,12 @@ pids:
   sample: [100,200]
 '''
 
+import abc
 import re
+from distutils.version import LooseVersion
 from os.path import basename
 
+from ansible.module_utils import six
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
@@ -68,6 +71,97 @@ except ImportError:
     HAS_PSUTIL = False
 
 
+class PSAdapterError(Exception):
+    pass
+
+
+@six.add_metaclass(abc.ABCMeta)
+class PSAdapter(object):
+    GET_PIDS_ATTRS = ('name', 'cmdline')
+    GET_MATCHING_PIDS_ATTRS = ('name', 'exe', 'cmdline')
+
+    def __init__(self, psutil):
+        self._psutil = psutil
+
+    @staticmethod
+    def from_package(psutil):
+        version = LooseVersion(psutil.__version__)
+        if version < LooseVersion('2.0.0'):
+            return PSAdapter100(psutil)
+        elif version < LooseVersion('5.3.0'):
+            return PSAdapter200(psutil)
+        else:
+            return PSAdapter530(psutil)
+
+    def get_pids_by_name(self, name):
+        return [p.pid for p in self._process_iter(*self.GET_PIDS_ATTRS) if self._has_name(p, name)]
+
+    def _process_iter(self, *attrs):
+        return self._psutil.process_iter()
+
+    def _has_name(self, proc, name):
+        proc_name, proc_cmd = self._get_proc_attributes(proc, *self.GET_PIDS_ATTRS)
+        return compare_lower(proc_name, name) or (proc_cmd and compare_lower(proc_cmd[0], name))
+
+    @staticmethod
+    @abc.abstractmethod
+    def _get_proc_attributes(proc, *attributes):
+        pass
+
+    def get_pids_by_pattern(self, pattern, ignore_case):
+        return [p.pid for p in self._process_iter(*self.GET_MATCHING_PIDS_ATTRS)
+                if self._matches_pattern(p, pattern, ignore_case)]
+
+    def _matches_pattern(self, proc, pattern, ignore_case):
+        flags = 0
+        if ignore_case:
+            flags |= re.I
+
+        try:
+            regex = re.compile(pattern, flags)
+        except re.error as e:
+            raise PSAdapterError("'%s' is not a valid regular expression: %s" % (self._pattern, to_native(e)))
+
+        # See https://psutil.readthedocs.io/en/latest/#find-process-by-name for more information
+        proc_name, proc_exe, proc_cmd = self._get_proc_attributes(proc, *self.GET_MATCHING_PIDS_ATTRS)
+        matches_name = regex.search(to_native(proc_name))
+        matches_exe = proc_exe and regex.search(basename(to_native(proc_exe)))
+        matches_cmd = proc_cmd and regex.search(to_native(' '.join(proc_cmd)))
+
+        return any([matches_name, matches_exe, matches_cmd])
+
+
+class PSAdapter100(PSAdapter):
+    def __init__(self, psutil):
+        super(PSAdapter100, self).__init__(psutil)
+
+    @staticmethod
+    def _get_proc_attributes(proc, *attributes):
+        return [getattr(proc, attribute) for attribute in attributes]
+
+
+class PSAdapter200(PSAdapter):
+    def __init__(self, psutil):
+        super(PSAdapter200, self).__init__(psutil)
+
+    @staticmethod
+    def _get_proc_attributes(proc, *attributes):
+        proc_methods = [getattr(proc, attribute) for attribute in attributes]
+        return [method() for method in proc_methods]
+
+
+class PSAdapter530(PSAdapter):
+    def __init__(self, psutil):
+        super(PSAdapter530, self).__init__(psutil)
+
+    def _process_iter(self, *attrs):
+        return self._psutil.process_iter(attrs=attrs)
+
+    @staticmethod
+    def _get_proc_attributes(proc, *attributes):
+        return [proc.info[attribute] for attribute in attributes]
+
+
 def compare_lower(a, b):
     if a is None or b is None:
         # this could just be "return False" but would lead to surprising behavior if both a and b are None
@@ -76,38 +170,36 @@ def compare_lower(a, b):
     return a.lower() == b.lower()
 
 
-def get_pid(name):
-    pids = []
+class Pids(object):
+    def __init__(self, module):
+        if not HAS_PSUTIL:
+            module.fail_json(msg=missing_required_lib('psutil'))
 
-    try:
-        for proc in psutil.process_iter(attrs=['name', 'cmdline']):
-            if compare_lower(proc.info['name'], name) or \
-                    proc.info['cmdline'] and compare_lower(proc.info['cmdline'][0], name):
-                pids.append(proc.pid)
-    except TypeError:  # EL6, EL7: process_iter() takes no arguments (1 given)
-        for proc in psutil.process_iter():
-            try:  # EL7
-                proc_name, proc_cmdline = proc.name(), proc.cmdline()
-            except TypeError:  # EL6: 'str' object is not callable
-                proc_name, proc_cmdline = proc.name, proc.cmdline
-            if compare_lower(proc_name, name) or \
-                    proc_cmdline and compare_lower(proc_cmdline[0], name):
-                pids.append(proc.pid)
-    return pids
+        self._ps = PSAdapter.from_package(psutil)
 
+        self._module = module
+        self._name = module.params['name']
+        self._pattern = module.params['pattern']
+        self._ignore_case = module.params['ignore_case']
 
-def get_matching_command_pids(pattern, ignore_case):
-    flags = 0
-    if ignore_case:
-        flags |= re.I
+        self._pids = []
 
-    regex = re.compile(pattern, flags)
-    # See https://psutil.readthedocs.io/en/latest/#find-process-by-name for more information
-    return [p.pid for p in psutil.process_iter(["name", "exe", "cmdline"])
-            if regex.search(to_native(p.info["name"]))
-            or (p.info["exe"] and regex.search(basename(to_native(p.info["exe"]))))
-            or (p.info["cmdline"] and regex.search(to_native(' '.join(p.cmdline()))))
-            ]
+    def execute(self):
+        if self._name:
+            self._pids = self._ps.get_pids_by_name(self._name)
+        else:
+            try:
+                self._pids = self._ps.get_pids_by_pattern(self._pattern, self._ignore_case)
+            except PSAdapterError as e:
+                self._module.fail_json(msg=to_native(e))
+
+        return self._module.exit_json(**self.result)
+
+    @property
+    def result(self):
+        return {
+            'pids': self._pids,
+        }
 
 
 def main():
@@ -126,22 +218,7 @@ def main():
         supports_check_mode=True,
     )
 
-    if not HAS_PSUTIL:
-        module.fail_json(msg=missing_required_lib('psutil'))
-
-    name = module.params["name"]
-    pattern = module.params["pattern"]
-    ignore_case = module.params["ignore_case"]
-
-    if name:
-        response = dict(pids=get_pid(name))
-    else:
-        try:
-            response = dict(pids=get_matching_command_pids(pattern, ignore_case))
-        except re.error as e:
-            module.fail_json(msg="'%s' is not a valid regular expression: %s" % (pattern, to_native(e)))
-
-    module.exit_json(**response)
+    Pids(module).execute()
 
 
 if __name__ == '__main__':
