@@ -753,8 +753,8 @@ def parse_module_arguments(module_arguments, return_none=False):
     # But if return_none is True, then return None
     if module_arguments is None:
         return None if return_none else []
-    if isinstance(module_arguments, list) and len(module_arguments) == 1 and module_arguments[0] is None:
-        return None if return_none else []
+    if isinstance(module_arguments, list) and len(module_arguments) == 1 and not module_arguments[0]:
+        return []
 
     if not isinstance(module_arguments, list):
         module_arguments = [module_arguments]
