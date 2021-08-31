@@ -88,13 +88,24 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
+# Minimal example which will not gather additional facts for QEMU/LXC guests
+# By not specifying a URL the plugin will attempt to connect to the controller host on port 8006
 # my.proxmox.yml
 plugin: community.general.proxmox
-url: http://localhost:8006
 user: ansible@pve
 password: secure
-validate_certs: no
+
+# More complete example demonstrating the use of 'want_facts' and the constructed options
+# Note that using facts returned by 'want_facts' in constructed options requires 'want_facts=true'
+# my.proxmox.yml
+plugin: community.general.proxmox
+url: http://pve.domain.com:8006
+user: ansible@pve
+password: secure
+validate_certs: false
+want_facts: true
 keyed_groups:
+    # proxmox_tags_parsed is an example of a fact only returned when 'want_facts=true'
   - key: proxmox_tags_parsed
     separator: ""
     prefix: group
