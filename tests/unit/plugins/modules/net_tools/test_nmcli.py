@@ -666,11 +666,12 @@ TESTCASE_GSM_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
 connection.type:                        gsm
 connection.interface-name:              gsm_non_existant
-gsm.number:                             *99#
+gsm.auto-config:                        no
+gsm.number:                             --
 gsm.username:                           t-mobile
 gsm.password:                           tm
 gsm.password-flags:                     0 (none)
-gsm.apn:                                internet.telekom
+gsm.apn:                                "internet.telekom"
 gsm.network-id:                         --
 gsm.pin:                                1234
 gsm.pin-flags:                          0 (none)
@@ -679,7 +680,6 @@ gsm.device-id:                          --
 gsm.sim-id:                             --
 gsm.sim-operator-id:                    --
 gsm.mtu:                                auto
-gsm.auto-config:                        no
 """
 
 
