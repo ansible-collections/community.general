@@ -113,10 +113,57 @@ class OpenTelemetrySource(object):
 
         with tracer.start_as_current_span(ansible_playbook, start_time=parent_start_time) as parent:
             parent.set_status(status)
-            for task_data in tasks:
-                for host_uuid, host_data in task_data.host_data.items():
-                    with tracer.start_as_current_span(task_data.name, start_time=task_data.start, end_on_exit=False) as span:
-                        self._update_span_data(task_data, host_data, span)
+            for task in tasks:
+                for host_uuid, host_data in task.host_data.items():
+                    with tracer.start_as_current_span(task.name, start_time=task.start, end_on_exit=False) as span:
+                        self.update_span_data(task, host_data, span)
+
+    def update_span_data(self, task_data, host_data, span):
+        """ update the span with the given TaskData and HostData """
+
+        name = '[%s] %s: %s' % (host_data.name, task_data.play, task_data.name)
+
+        message = 'success'
+        status = Status(status_code=StatusCode.OK)
+        if host_data.status == 'included':
+            rc = 0
+        else:
+            res = host_data.result._result
+            rc = res.get('rc', 0)
+            if host_data.status == 'failed':
+                if 'exception' in res:
+                    message = res['exception'].strip().split('\n')[-1]
+                elif 'msg' in res:
+                    message = res['msg']
+                else:
+                    message = 'failed'
+                status = Status(status_code=StatusCode.ERROR)
+            elif host_data.status == 'skipped':
+                if 'skip_reason' in res:
+                    message = res['skip_reason']
+                else:
+                    message = 'skipped'
+                status = Status(status_code=StatusCode.UNSET)
+
+        span.set_status(status)
+        self.set_span_attribute(span, "ansible.task.args", task_data.args)
+        self.set_span_attribute(span, "ansible.task.module", task_data.action)
+        self.set_span_attribute(span, "ansible.task.message", message)
+        self.set_span_attribute(span, "ansible.task.name", name)
+        self.set_span_attribute(span, "ansible.task.result", rc)
+        self.set_span_attribute(span, "ansible.task.host.name", host_data.name)
+        self.set_span_attribute(span, "ansible.task.host.status", host_data.status)
+        span.end(end_time=host_data.finish)
+
+    def set_span_attribute(self, span, attributeName, attributeValue):
+        """ update the span attribute with the given attribute and value if not None """
+
+        if span is None:
+            self._display.warning('span object is None. Please double check if that is expected.')
+        else:
+            if not attributeValue is None:
+                span.set_attribute(attributeName, attributeValue)
+
 
 class CallbackModule(CallbackBase):
     """
@@ -234,53 +281,6 @@ class CallbackModule(CallbackBase):
                 status = 'failed'
 
         task_data.add_host(HostData(host_uuid, host_name, status, result))
-
-    def _update_span_data(self, task_data, host_data, span):
-        """ update the span with the given TaskData and HostData """
-
-        name = '[%s] %s: %s' % (host_data.name, task_data.play, task_data.name)
-
-        message = "success"
-        status = Status(status_code=StatusCode.OK)
-        if host_data.status == 'included':
-            rc = 0
-        else:
-            res = host_data.result._result
-            rc = res.get('rc', 0)
-            if host_data.status == 'failed':
-                if 'exception' in res:
-                    message = res['exception'].strip().split('\n')[-1]
-                elif 'msg' in res:
-                    message = res['msg']
-                else:
-                    message = 'failed'
-                status = Status(status_code=StatusCode.ERROR)
-            elif host_data.status == 'skipped':
-                if 'skip_reason' in res:
-                    message = res['skip_reason']
-                else:
-                    message = 'skipped'
-                status = Status(status_code=StatusCode.UNSET)
-
-        span.set_status(status)
-        self._set_span_attribute(span, "ansible.task.args", task_data.args)
-        self._set_span_attribute(span, "ansible.task.module", task_data.action)
-        self._set_span_attribute(span, "ansible.task.message", message)
-        self._set_span_attribute(span, "ansible.task.name", name)
-        self._set_span_attribute(span, "ansible.task.result", rc)
-        self._set_span_attribute(span, "ansible.task.host.name", host_data.name)
-        self._set_span_attribute(span, "ansible.task.host.status", host_data.status)
-        span.end(end_time=host_data.finish)
-
-    def _set_span_attribute(self, span, attributeName, attributeValue):
-        """ update the span attribute with the given attribute and value if not None """
-
-        if span is None:
-            self._display.warning('span object is None. Please double check if that is expected.')
-        else:
-            if not attributeValue is None:
-                span.set_attribute(attributeName, attributeValue)
-
 
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
