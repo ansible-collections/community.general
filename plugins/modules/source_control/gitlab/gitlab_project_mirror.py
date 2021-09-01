@@ -33,7 +33,7 @@ options:
     api_token:
         description:
             - GitLab token for logging in.
-      type: str
+        type: str
     validate_certs:
         description:
             - Whether or not to validate TLS/SSL certificates when supplying a HTTPS endpoint.
@@ -251,8 +251,8 @@ def main():
                                  project=gitlab_project.projectObject._attrs)
             else:
                 module.exit_json(changed=False,
-                msg="No need to update/create the remote mirror to %s" % project_name,
-                project=gitlab_project.projectObject._attrs)
+                                 msg="No need to update/create the remote mirror to %s" % project_name,
+                                 project=gitlab_project.projectObject._attrs)
         elif state == 'absent':
             # as GitLab API does currently not support removing remote mirrors return error to user
             module.fail_json(msg="GitLab API does not support removing mirrors. Either do it manually using GUI or update mirror with enabled=false.")

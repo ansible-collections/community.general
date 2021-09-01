@@ -641,6 +641,7 @@ def resp_delete_runner(url, request):
 PROJECT REMOTE MIRRORS API
 '''
 
+
 @urlmatch(scheme="http", netloc="localhost", path=r'projects/1/remote_mirrors$', method="get")
 def resp_remote_mirrors_list(url, request):
     headers = {'content-type': 'application/json'}
@@ -654,6 +655,7 @@ def resp_remote_mirrors_list(url, request):
                '"url": "https://*****:*****@gitlab.com/gitlab-org/security/gitlab.git"}]')
     content = content.encode("utf-8")
     return response(200, content, headers, None, 5, request)
+
 
 @urlmatch(scheme="http", netloc="localhost", path=r'projects/1/remote_mirrors$', method="post")
 def resp_remote_mirrors_create(url, request):
