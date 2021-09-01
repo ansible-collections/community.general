@@ -81,7 +81,7 @@ options:
                     - The access level for the user.
                     - Required if I(state=present), user state is set to present.
                 type: str
-                choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
+                choices: ['guest', 'reporter', 'developer', 'maintainer']
                 required: true
         version_added: 3.7.0
     state:
@@ -126,7 +126,7 @@ EXAMPLES = r'''
     state: absent
 
 - name: Add a list of Users to A GitLab project
-  gitlab_project_members:
+  community.general.gitlab_project_members:
     api_url: 'https://gitlab.example.com'
     api_token: 'Your-Private-Token'
     gitlab_project: projectname
@@ -137,7 +137,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Add a list of Users with Dedicated Access Levels to A GitLab project
-  gitlab_project_members:
+  community.general.gitlab_project_members:
     api_url: 'https://gitlab.example.com'
     api_token: 'Your-Private-Token'
     project: projectname
@@ -149,7 +149,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Add a user, remove all others which might be on this access level
-  gitlab_project_members:
+  community.general.gitlab_project_members:
     api_url: 'https://gitlab.example.com'
     api_token: 'Your-Private-Token'
     project: projectname
@@ -159,7 +159,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Remove a list of Users with Dedicated Access Levels to A GitLab project
-  gitlab_project_members:
+  community.general.gitlab_project_members:
     api_url: 'https://gitlab.example.com'
     api_token: 'Your-Private-Token'
     project: projectname
@@ -228,27 +228,14 @@ class GitLabProjectMembers(object):
 
     # add user to a project
     def add_member_to_project(self, gitlab_user_id, gitlab_project_id, access_level):
-        try:
-            project = self._gitlab.projects.get(gitlab_project_id)
-            add_member = project.members.create(
-                {'user_id': gitlab_user_id, 'access_level': access_level})
-
-            if add_member:
-                return add_member.username
-
-        except (gitlab.exceptions.GitlabCreateError) as e:
-            self._module.fail_json(
-                msg="Failed to add member to the project, project ID %s: %s" % (gitlab_project_id, e))
+        project = self._gitlab.projects.get(gitlab_project_id)
+        add_member = project.members.create(
+            {'user_id': gitlab_user_id, 'access_level': access_level})
 
     # remove user from a project
     def remove_user_from_project(self, gitlab_user_id, gitlab_project_id):
-        try:
             project = self._gitlab.projects.get(gitlab_project_id)
             project.members.delete(gitlab_user_id)
-
-        except (gitlab.exceptions.GitlabDeleteError) as e:
-            self._module.fail_json(
-                msg="Failed to remove member from GitLab project, ID %s: %s" % (gitlab_project_id, e))
 
     # get user's access level
     def get_user_access_level(self, members, gitlab_user_id):
@@ -260,13 +247,8 @@ class GitLabProjectMembers(object):
     def update_user_access_level(self, members, gitlab_user_id, access_level):
         for member in members:
             if member.id == gitlab_user_id:
-                try:
-                    member.access_level = access_level
-                    member.save()
-                except (gitlab.exceptions.GitlabCreateError) as e:
-                    self._module.fail_json(
-                        msg="Failed to update the access level for the member, %s: %s" % (gitlab_user_id, e))
-
+                member.access_level = access_level
+                member.save()
 
 def main():
     argument_spec = basic_auth_argument_spec()
