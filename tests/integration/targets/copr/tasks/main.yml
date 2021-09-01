@@ -6,7 +6,7 @@
       host: copr.fedorainfracloud.org
       state: enabled
       name: '@copr/integration_tests'
-      chroot: centos-stream-x86_64
+      chroot: fedora-rawhide-x86_64
     register: result
 
   - name: assert that the copr project was enabled
@@ -21,7 +21,7 @@
     copr:
       state: enabled
       name: '@copr/integration_tests'
-      chroot: centos-stream-x86_64
+      chroot: fedora-rawhide-x86_64
     register: result
 
   - name: assert that the copr project was enabled
@@ -46,7 +46,7 @@
     copr:
       state: disabled
       name: '@copr/integration_tests'
-      chroot: centos-stream-x86_64
+      chroot: fedora-rawhide-x86_64
     register: result
 
   - name: assert that the copr project was disabled
@@ -61,4 +61,4 @@
         host: copr.fedorainfracloud.org
         state: absent
         name: '@copr/integration_tests'
-        chroot: centos-stream-x86_64
+        chroot: fedora-rawhide-x86_64
