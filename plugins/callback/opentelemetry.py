@@ -25,7 +25,7 @@ DOCUMENTATION = '''
           - Hide the arguments for a task.
         env:
           - name: OPENTELEMETRY_HIDE_TASK_ARGUMENTS
-      service_name:
+      otel_service_name:
         default: ansible
         description:
           - The service name resource attribute.
@@ -46,6 +46,8 @@ DOCUMENTATION = '''
 import os
 import sys
 import time
+
+from os.path import basename
 
 from ansible import constants as C
 from ansible.plugins.callback import CallbackBase
@@ -77,6 +79,11 @@ except ImportError:
         HAS_ORDERED_DICT = False
 
 
+class OpenTelemetrySource(object):
+    def __init__(self):
+        self.ansible_playbook = ""
+        self.ansible_version = ""
+
 class CallbackModule(CallbackBase):
     """
     This callback creates distributed traces.
@@ -85,7 +92,7 @@ class CallbackModule(CallbackBase):
                                      Default: true
         OPENTELEMETRY_HIDE_TASK_ARGUMENTS (optional): Hide the arguments for a task
                                      Default: false
-        OTEL_SERVICE_NAME (optional): The service name
+        OTEL_SERVICE_NAME (optional): The service name resource attribute.
                                      Default: ansible
         OTEL_EXPORTER (optional): Use the OTEL exporter and its environment variables. https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html
                                      Default: false
@@ -100,17 +107,16 @@ class CallbackModule(CallbackBase):
     CALLBACK_NAME = 'community.general.opentelemetry'
     CALLBACK_NEEDS_ENABLED = True
 
-    def __init__(self):
-        super(CallbackModule, self).__init__()
-
-        self._include_setup_tasks = os.getenv('OPENTELEMETRY_INCLUDE_SETUP_TASKS', 'true').lower() == 'true'
-        self._hide_task_arguments = os.getenv('OPENTELEMETRY_HIDE_TASK_ARGUMENTS', 'false').lower() == 'true'
-        self._service = os.getenv('OTEL_SERVICE_NAME', 'ansible').lower()
-        self._otel_exporter = os.getenv('OTEL_EXPORTER', 'false').lower() == 'true'
-        self._playbook_path = None
-        self._playbook_name = None
-        self._play_name = None
-        self._task_data = None
+    def __init__(self, display=None):
+        super(CallbackModule, self).__init__(display=display)
+        self.include_setup_tasks = None
+        self.hide_task_arguments = None
+        self.otel_service_name = None
+        self.otel_exporter = None
+        self.ansible_playbook = None
+        self.play_name = None
+        self.task_data = None
+        self.opentelemetry = OpenTelemetrySource()
 		# See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
         self.insecure_otel_exporter = os.getenv('OTEL_EXPORTER_OTLP_INSECURE', 'false').lower() == 'true'
         self.errors = 0
@@ -121,37 +127,54 @@ class CallbackModule(CallbackBase):
             self._display.warning('The `opentelemetry-api`, `opentelemetry-exporter-otlp` or `opentelemetry-sdk` python modules are not installed. '
                                   'Disabling the `opentelemetry` callback plugin.')
 
-        if not self._otel_exporter:
-            self.disabled = True
-            self._display.warning('The `OTEL_EXPORTER` has been set to False. '
-                                  'Disabling the `opentelemetry` callback plugin.')
-
         if HAS_ORDERED_DICT:
-            self._task_data = OrderedDict()
+            self.task_data = OrderedDict()
         else:
             self.disabled = True
             self._display.warning('The `ordereddict` python module is not installed. '
                                   'Disabling the `opentelemetry` callback plugin.')
 
+    def set_options(self, task_keys=None, var_options=None, direct=None):
+        super(CallbackModule, self).set_options(task_keys=task_keys,
+                                                var_options=var_options,
+                                                direct=direct)
+
+        self.include_setup_tasks = self.get_option('include_setup_tasks')
+
+        self.hide_task_arguments = self.get_option('hide_task_arguments')
+
+        self.otel_service_name = self.get_option('otel_service_name')
+
+        if self.otel_service_name is None:
+            self.otel_service_name = os.getenv('OTEL_SERVICE_NAME', 'ansible').lower()
+
+        self.otel_exporter = self.get_option('otel_exporter')
+        if self.otel_exporter is None:
+            self.otel_service_name = os.getenv('OTEL_EXPORTER', 'false').lower() == 'true'
+
+        if not self.otel_exporter:
+            self.disabled = True
+            self._display.warning('The `OTEL_EXPORTER` has been set to False. '
+                                  'Disabling the `opentelemetry` callback plugin.')
 
     def _start_task(self, task):
         """ record the start of a task for one or more hosts """
 
         uuid = task._uuid
 
-        if uuid in self._task_data:
+        if uuid in self.task_data:
             return
 
-        play = self._play_name
+        play = self.play_name
         name = task.get_name().strip()
         path = task.get_path()
         action = task.action
         args = None
 
-        if not task.no_log and not self._hide_task_arguments:
+        if not task.no_log and not self.hide_task_arguments:
             args = ', '.join(('%s=%s' % a for a in task.args.items()))
 
-        self._task_data[uuid] = TaskData(uuid, name, path, play, action, args)
+        self.task_data[uuid] = TaskData(uuid, name, path, play, action, args)
 
     def _finish_task(self, status, result):
         """ record the results of a task for a single host """
@@ -165,7 +188,7 @@ class CallbackModule(CallbackBase):
             host_uuid = 'include'
             host_name = 'include'
 
-        task_data = self._task_data[task_uuid]
+        task_data = self.task_data[task_uuid]
 
         # ignore failure if expected and toggle result if asked for
         if status == 'failed' and 'EXPECTED FAILURE' in task_data.name:
@@ -229,10 +252,10 @@ class CallbackModule(CallbackBase):
 
         tasks = []
         parent_start_time = None
-        for task_uuid, task_data in self._task_data.items():
+        for task_uuid, task_data in self.task_data.items():
             if parent_start_time is None:
                 parent_start_time = task_data.start
-            if not self._include_setup_tasks and task_data.action == 'setup':
+            if not self.include_setup_tasks and task_data.action == 'setup':
                 ##if task_data.action in C._ACTION_SETUP:  supported from 2.11.0
                 continue
             tasks.append(task_data)
@@ -259,11 +282,10 @@ class CallbackModule(CallbackBase):
                         self._update_span_data(task_data, host_data, span)
 
     def v2_playbook_on_start(self, playbook):
-        self._playbook_path = playbook._file_name
-        self._playbook_name = os.path.splitext(os.path.basename(self._playbook_path))[0]
+        self.ansible_playbook = basename(playbook._file_name)
 
     def v2_playbook_on_play_start(self, play):
-        self._play_name = play.get_name()
+        self.play_name = play.get_name()
 
     def v2_runner_on_no_hosts(self, task):
         self._start_task(task)
@@ -299,6 +321,7 @@ class CallbackModule(CallbackBase):
 
     def v2_runner_on_async_failed(self, result, **kwargs):
         self.errors += 1
+
 
 class TaskData:
     """
