@@ -52,7 +52,7 @@ class TestGitlabProjectMirror(GitlabModuleTestCase):
         super(TestGitlabProjectMirror, self).setUp()
 
         self.moduleUtil = GitLabProjectMirror(module=self.mock_module, gitlab_instance=self.gitlab_instance)
-        self.moduleUtil.existsProject(self, 'project')
+        self.moduleUtil.existsProject('project')
 
     @with_httmock(resp_remote_mirrors_list)
     @with_httmock(resp_remote_mirrors_create)
