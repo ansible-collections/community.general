@@ -13,6 +13,7 @@ import traceback
 REDIS_IMP_ERR = None
 try:
     from redis import Redis
+    from redis import __version__ as redis_version
     HAS_REDIS_PACKAGE = True
 except ImportError:
     REDIS_IMP_ERR = traceback.format_exc()
@@ -75,15 +76,19 @@ class RedisAnsible(object):
         ca_certs = self.module.params['ca_certs']
         if tls and ca_certs is None:
             ca_certs = str(certifi.where())
-
+        if tuple(map(int, redis_version.split('.'))) < (3, 4, 0) and login_user is not None:
+            self.module.fail_json(
+                msg='The option `username` in only supported with redis >= 3.4.0.')
+        params = {'host': login_host,
+                  'port': login_port,
+                  'password': login_password,
+                  'ssl_ca_certs': ca_certs,
+                  'ssl_cert_reqs': validate_certs,
+                  'ssl': tls}
+        if login_user is not None:
+            params['username'] = login_user
         try:
-            return Redis(host=login_host,
-                         port=login_port,
-                         username=login_user,
-                         password=login_password,
-                         ssl_ca_certs=ca_certs,
-                         ssl_cert_reqs=validate_certs,
-                         ssl=tls)
+            return Redis(**params)
         except Exception as e:
             self.module.fail_json(msg='{0}'.format(str(e)))
         return None
