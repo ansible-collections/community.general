@@ -286,7 +286,7 @@ def main():
             options=dict(
                 name=dict(type='str', required=True),
                 access_level=dict(type='str', choices=[
-                                  'guest', 'reporter', 'developer', 'maintainer', 'owner'], required=True),
+                                  'guest', 'reporter', 'developer', 'maintainer'], required=True),
             )
         ),
     ))
