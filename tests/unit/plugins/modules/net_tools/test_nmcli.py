@@ -835,6 +835,13 @@ def mocked_ethernet_connection_static_unchanged(mocker):
 
 
 @pytest.fixture
+def mocked_gsm_connection_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_GSM_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
 def mocked_ethernet_connection_dhcp_to_static(mocker):
     mocker_set(mocker,
                connection_exists=True,
