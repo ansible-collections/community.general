@@ -659,7 +659,7 @@ options:
                     - The APN often determines how the user will be billed for their network usage and whether the user has access to the Internet or
                       just a provider-specific walled-garden, so it is important to use the correct APN for the user's mobile broadband plan.
                     - The APN may only be composed of the characters a-z, 0-9, ., and - per GSM 03.60 Section 14.9.
-                type: string
+                type: str
             auto-config:
                 description: When C(true), the settings such as C(APN), username, or password will default to values that match the network
                     the modem will register to in the Mobile Broadband Provider database.
@@ -669,7 +669,7 @@ options:
                 description:
                     - The device unique identifier (as given by the C(WWAN) management service) which this connection applies to.
                     - If given, the connection will only apply to the specified device.
-                type: string
+                type: str
             home-only:
                 description:
                     - When C(true), only connections to the home network will be allowed.
@@ -685,16 +685,16 @@ options:
                     - The Network ID (GSM LAI format, ie MCC-MNC) to force specific network registration.
                     - If the Network ID is specified, NetworkManager will attempt to force the device to register only on the specified network.
                     - This can be used to ensure that the device does not roam when direct roaming control of the device is not otherwise possible.
-                type: string
+                type: str
             number:
                 description: Legacy setting that used to help establishing PPP data sessions for GSM-based modems.
-                type: string
+                type: str
             password:
                 description:
                     - The password used to authenticate with the network, if required.
                     - Many providers do not require a password, or accept any password.
                     - But if a password is required, it is specified here.
-                type: string
+                type: str
             password-flags:
                 description:
                     - NMSettingSecretFlags indicating how to handle the I(password) property.
@@ -712,7 +712,7 @@ options:
                 description:
                     - If the SIM is locked with a PIN it must be unlocked before any other operations are requested.
                     - Specify the PIN here to allow operation of the device.
-                type: string
+                type: str
             pin-flags:
                 description:
                     - NMSettingSecretFlags indicating how to handle the I(pin) property.
@@ -724,13 +724,13 @@ options:
                 description:
                     - The SIM card unique identifier (as given by the C(WWAN) management service) which this connection applies to.
                     - If given, the connection will apply to any device also allowed by I(device-id) which contains a SIM card matching the given identifier.
-                type: string
+                type: str
             sim-operator-id:
                 description:
                     - A MCC/MNC string like I(310260) or I(21601I) identifying the specific mobile network operator which this connection applies to.
                     - 'If given, the connection will apply to any device also allowed by I(device-id) and I(sim-id) which contains a SIM card provisioned by
                         the given operator.'
-                type: string
+                type: str
             username:
                 description:
                     - The username used to authenticate with the network, if required.
