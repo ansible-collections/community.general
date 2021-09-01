@@ -74,7 +74,7 @@ options:
         type: str
     purge_users:
         description:
-            - Adds/remove users of the given access_level to match the given gitlab_user/gitlab_users_access list.
+            - Adds/remove users of the given access_level to match the given I(gitlab_user)/I(gitlab_users_access) list.
               If omitted do not purge orphaned members.
             - Is only used when I(state=present).
         type: list
@@ -104,7 +104,7 @@ EXAMPLES = r'''
     state: absent
 
 - name: Add a list of Users to A GitLab Group
-  gitlab_group_members:
+  community.general.gitlab_group_members:
     api_url: 'https://gitlab.example.com'
     api_token: 'Your-Private-Token'
     gitlab_group: groupname
@@ -115,7 +115,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Add a list of Users with Dedicated Access Levels to A GitLab Group
-  gitlab_group_members:
+  community.general.gitlab_group_members:
     api_url: 'https://gitlab.example.com'
     api_token: 'Your-Private-Token'
     gitlab_group: groupname
@@ -127,7 +127,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Add a user, remove all others which might be on this access level
-  gitlab_group_members:
+  community.general.gitlab_group_members:
     api_url: 'https://gitlab.example.com'
     api_token: 'Your-Private-Token'
     gitlab_group: groupname
@@ -137,7 +137,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Remove a list of Users with Dedicated Access Levels to A GitLab Group
-  gitlab_group_members:
+  community.general.gitlab_group_members:
     api_url: 'https://gitlab.example.com'
     api_token: 'Your-Private-Token'
     gitlab_group: groupname
