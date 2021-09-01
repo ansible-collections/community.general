@@ -92,15 +92,14 @@ options:
     type: dict
     version_added: '0.2.0'
   strip_etag_quotes:
-    required: false
     description:
-      - Removes surrounding quotes of etag used in If-Match header
-        of PATCH requests
+      - Removes surrounding quotes of etag used in C(If-Match) header
+        of C(PATCH) requests.
       - Only use this option to resolve bad vendor implementation where
-        If-Match only matches the unquoted etag string
+        C(If-Match) only matches the unquoted etag string.
     type: bool
-    default: False
-    version_added: 3.6.0
+    default: false
+    version_added: 3.7.0
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''
