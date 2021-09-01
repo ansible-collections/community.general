@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab_project_mirror - add module to manage gitlab remote mirrors (https://github.com/ansible-collections/community.general/pull/3323)

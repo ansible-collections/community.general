@@ -21,6 +21,7 @@ description:
     this limits idempotency.
 author:
   - Max-Florian Bidlingmaier (@suukit) Max-Florian.Bidlingmaier@sap.com
+version_added: '3.7.0'
 
 requirements:
   - python >= 2.7
