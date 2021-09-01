@@ -120,8 +120,7 @@ class CoprModule(object):
     @property
     def short_chroot(self):
         """str: Chroot (distribution-version-architecture) shorten to distribution-version."""
-        chroot_parts = self.chroot.split("-")
-        return "{0}-{1}".format(chroot_parts[0], chroot_parts[1])
+        return self.chroot.rsplit('-', 1)[0]
 
     @property
     def arch(self):
@@ -193,18 +192,20 @@ class CoprModule(object):
         Returns:
             Information about the repository.
         """
-        distribution, version = self.short_chroot.split("-")
+        distribution, version = self.short_chroot.split('-', 1)
         chroot = self.short_chroot
         while True:
             repo_info, status_code = self._get(chroot)
             if repo_info:
                 return repo_info
             if distribution == "rhel":
-                chroot = "centos-stream"
+                chroot = "centos-stream-8"
                 distribution = "centos"
             elif distribution == "centos":
-                if version == "stream":
+                if version == "stream-8":
                     version = "8"
+                elif version == "stream-9":
+                    version = "9"
                 chroot = "epel-{0}".format(version)
                 distribution = "epel"
             else:
