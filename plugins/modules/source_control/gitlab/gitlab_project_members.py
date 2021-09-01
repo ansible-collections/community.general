@@ -83,7 +83,7 @@ options:
                 type: str
                 choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
                 required: true
-        version_added: 3.6.0
+        version_added: 3.7.0
     state:
         description:
             - State of the member in the project.
