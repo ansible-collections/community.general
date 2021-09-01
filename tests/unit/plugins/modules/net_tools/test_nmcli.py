@@ -666,6 +666,15 @@ TESTCASE_GSM_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
 connection.type:                        gsm
 connection.interface-name:              gsm_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            auto
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 gsm.auto-config:                        no
 gsm.number:                             --
 gsm.username:                           t-mobile
@@ -835,13 +844,6 @@ def mocked_ethernet_connection_static_unchanged(mocker):
 
 
 @pytest.fixture
-def mocked_gsm_connection_unchanged(mocker):
-    mocker_set(mocker,
-               connection_exists=True,
-               execute_return=(0, TESTCASE_GSM_SHOW_OUTPUT, ""))
-
-
-@pytest.fixture
 def mocked_ethernet_connection_dhcp_to_static(mocker):
     mocker_set(mocker,
                connection_exists=True,
@@ -913,6 +915,13 @@ def mocked_dummy_connection_static_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
                execute_return=(0, TESTCASE_DUMMY_STATIC_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_gsm_connection_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_GSM_SHOW_OUTPUT, ""))
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_BOND, indirect=['patch_ansible_module'])
