@@ -667,7 +667,7 @@ connection.id:                          non_existent_nw_device
 connection.type:                        gsm
 connection.interface-name:              gsm_non_existant
 gsm.number:                             *99#
-gsm.username:                           tm-mobile
+gsm.username:                           t-mobile
 gsm.password:                           tm
 gsm.password-flags:                     0 (none)
 gsm.apn:                                internet.telekom
