@@ -84,6 +84,31 @@ class OpenTelemetrySource(object):
         self.ansible_playbook = ""
         self.ansible_version = ""
 
+    def finish_task(self, task_data, status, result):
+        """ record the results of a task for a single host """
+
+        task_uuid = result._task._uuid
+
+        if hasattr(result, '_host'):
+            host_uuid = result._host._uuid
+            host_name = result._host.name
+        else:
+            host_uuid = 'include'
+            host_name = 'include'
+
+        task = task_data[task_uuid]
+
+        # ignore failure if expected and toggle result if asked for
+        if status == 'failed' and 'EXPECTED FAILURE' in task.name:
+            status = 'ok'
+        elif 'TOGGLE RESULT' in task.name:
+            if status == 'failed':
+                status = 'ok'
+            elif status == 'ok':
+                status = 'failed'
+
+        task.add_host(HostData(host_uuid, host_name, status, result))
+
     def generate_distributed_traces(self, include_setup_tasks, otel_service_name, otel_exporter, ansible_playbook, task_data, status):
         """ generate distributed traces from the collected TaskData and HostData """
 
@@ -257,31 +282,6 @@ class CallbackModule(CallbackBase):
 
         self.task_data[uuid] = TaskData(uuid, name, path, play, action, args)
 
-    def _finish_task(self, status, result):
-        """ record the results of a task for a single host """
-
-        task_uuid = result._task._uuid
-
-        if hasattr(result, '_host'):
-            host_uuid = result._host._uuid
-            host_name = result._host.name
-        else:
-            host_uuid = 'include'
-            host_name = 'include'
-
-        task_data = self.task_data[task_uuid]
-
-        # ignore failure if expected and toggle result if asked for
-        if status == 'failed' and 'EXPECTED FAILURE' in task_data.name:
-            status = 'ok'
-        elif 'TOGGLE RESULT' in task_data.name:
-            if status == 'failed':
-                status = 'ok'
-            elif status == 'ok':
-                status = 'failed'
-
-        task_data.add_host(HostData(host_uuid, host_name, status, result))
-
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
 
@@ -302,23 +302,39 @@ class CallbackModule(CallbackBase):
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         self.errors += 1
-        self._finish_task('failed', result)
+        self.opentelemetry.finish_task(
+            self.task_data,
+            'failed',
+            result
+        )
 
     def v2_runner_on_ok(self, result):
-        self._finish_task('ok', result)
+        self.opentelemetry.finish_task(
+            self.task_data,
+            'ok',
+            result
+        )
 
     def v2_runner_on_skipped(self, result):
-        self._finish_task('skipped', result)
+        self.opentelemetry.finish_task(
+            self.task_data,
+            'skipped',
+            result
+        )
 
     def v2_playbook_on_include(self, included_file):
-        self._finish_task('included', included_file)
+        self.opentelemetry.finish_task(
+            self.task_data,
+            'included',
+            included_file
+        )
 
     def v2_playbook_on_stats(self, stats):
         if self.errors == 0:
             status = Status(status_code=StatusCode.OK)
         else:
             status = Status(status_code=StatusCode.ERROR)
-        self.generate_distributed_traces(
+        self.opentelemetry.generate_distributed_traces(
             self.include_setup_tasks,
             self.otel_service_name,
             self.otel_exporter,
