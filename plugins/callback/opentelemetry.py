@@ -12,7 +12,7 @@ DOCUMENTATION = '''
     version_added: 3.5.0
     description:
       - This callback create distributed traces for each Ansible task with OpenTelemetry.
-      - You can configure the OTEL exporter with some environment variables. See U(https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html).
+      - You can configure the OTEL exporter with environment variables. See U(https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html).
     options:
       include_setup_tasks:
         default: true
@@ -104,7 +104,7 @@ class OpenTelemetrySource(object):
         self.host = socket.gethostname()
         try:
             self.ip_address = socket.gethostbyname(socket.gethostname())
-        except:
+        except Exception as e:
             self.ip_address = None
         self.user = getpass.getuser()
 
@@ -165,7 +165,7 @@ class OpenTelemetrySource(object):
             if parent_start_time is None:
                 parent_start_time = task.start
             if not include_setup_tasks and task.action == 'setup':
-                ##if task.action in C._ACTION_SETUP:  supported from 2.11.0
+                # if task.action in C._ACTION_SETUP:  supported from 2.11.0
                 continue
             tasks.append(task)
 
@@ -187,11 +187,11 @@ class OpenTelemetrySource(object):
         with tracer.start_as_current_span(ansible_playbook, start_time=parent_start_time) as parent:
             parent.set_status(status)
             # Populate trace metadata attributes
-            if not self.ansible_version is None:
+            if self.ansible_version is not None:
                 parent.set_attribute("ansible.version", self.ansible_version)
             parent.set_attribute("ansible.session", self.session)
             parent.set_attribute("ansible.host.name", self.host)
-            if not self.ip_address is None:
+            if self.ip_address is not None:
                 parent.set_attribute("ansible.host.ip", self.ip_address)
             parent.set_attribute("ansible.host.user", self.user)
             for task in tasks:
@@ -242,7 +242,7 @@ class OpenTelemetrySource(object):
         if span is None:
             self._display.warning('span object is None. Please double check if that is expected.')
         else:
-            if not attributeValue is None:
+            if attributeValue is not None:
                 span.set_attribute(attributeName, attributeValue)
 
 
@@ -423,9 +423,9 @@ class TaskData:
         self.play = play
         self.host_data = OrderedDict()
         if sys.version_info >= (3, 7):
-          self.start = time.time_ns()
+            self.start = time.time_ns()
         else:
-          self.start = _time_ns()
+            self.start = _time_ns()
         self.action = action
         self.args = args
 
@@ -451,6 +451,6 @@ class HostData:
         self.status = status
         self.result = result
         if sys.version_info >= (3, 7):
-          self.finish = time.time_ns()
+            self.finish = time.time_ns()
         else:
-          self.finish = _time_ns()
+            self.finish = _time_ns()
