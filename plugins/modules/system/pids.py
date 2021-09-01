@@ -125,7 +125,7 @@ class PSAdapter(object):
         try:
             regex = re.compile(pattern, flags)
         except re.error as e:
-            raise PSAdapterError("'%s' is not a valid regular expression: %s" % (self._pattern, to_native(e)))
+            raise PSAdapterError("'%s' is not a valid regular expression: %s" % (pattern, to_native(e)))
 
         # See https://psutil.readthedocs.io/en/latest/#find-process-by-name for more information
         attributes = self._get_proc_attributes(proc, *self.PATTERN_ATTRS)
