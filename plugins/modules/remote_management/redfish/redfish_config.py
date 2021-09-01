@@ -247,7 +247,7 @@ def main():
                 type='dict',
                 default={}
             ),
-            strip_etag_quotes=dict(type='bool', default=False)
+            strip_etag_quotes=dict(type='bool', default=False),
         ),
         required_together=[
             ('username', 'password'),
