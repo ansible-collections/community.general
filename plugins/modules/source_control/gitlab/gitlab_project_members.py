@@ -100,7 +100,7 @@ options:
         type: list
         elements: str
         choices: ['guest', 'reporter', 'developer', 'maintainer']
-        version_added: 3.6.0
+        version_added: 3.7.0
 notes:
     - Supports C(check_mode).
 '''
