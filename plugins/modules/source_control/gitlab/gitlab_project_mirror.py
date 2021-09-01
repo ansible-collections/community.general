@@ -135,7 +135,7 @@ class GitLabProjectMirror(object):
     @param mirror_keep_divergent_refs Keep divergent refs?
     @param mirror_only_protected_branches Mirror only protected banches?
     '''
-    def createOrUpdateMirror(self, mirror_url, mirror_enabled, mirror_keep_divergent_refs = None, mirror_only_protected_branches = None):
+    def createOrUpdateMirror(self, mirror_url, mirror_enabled, mirror_keep_divergent_refs=None, mirror_only_protected_branches=None):
         changed = False
         mirror_exists = False
         mirrors = self.projectObject.remote_mirrors.list()
@@ -152,10 +152,10 @@ class GitLabProjectMirror(object):
                 if mirror.enabled != mirror_enabled:
                     mirror.enabled = mirror_enabled
                     save_mirror = True
-                if mirror_keep_divergent_refs != None and mirror.keep_divergent_refs != mirror_keep_divergent_refs:
+                if mirror_keep_divergent_refs is not None and mirror.keep_divergent_refs != mirror_keep_divergent_refs:
                     mirror.keep_divergent_refs = mirror_keep_divergent_refs
                     save_mirror = True
-                if mirror_only_protected_branches != None and mirror.only_protected_branches != mirror_only_protected_branches:
+                if mirror_only_protected_branches is not None and mirror.only_protected_branches != mirror_only_protected_branches:
                     mirror.only_protected_branches = mirror_only_protected_branches
                     save_mirror = True
 
@@ -170,12 +170,12 @@ class GitLabProjectMirror(object):
 
         # create a new mirror
         if not mirror_exists:
-            create_data = {'url' : mirror_url,
+            create_data = {'url': mirror_url,
                            'enabled': mirror_enabled}
             if mirror_keep_divergent_refs is not None:
-              create_data['keep_divergent_refs'] = mirror_keep_divergent_refs
+                create_data['keep_divergent_refs'] = mirror_keep_divergent_refs
             if mirror_only_protected_branches is not None:
-              create_data['only_protected_branches'] = mirror_only_protected_branches
+                create_data['only_protected_branches'] = mirror_only_protected_branches
 
             if self._module.check_mode:
                 self._module.exit_json(changed=True, msg="Successfully updated the project remote mirror %s" % mirror_url)
@@ -209,7 +209,7 @@ def main():
         enabled=dict(type='bool'),
         only_protected_branches=dict(type='bool'),
         keep_divergent_refs=dict(type='bool'),
-        state=dict(type='str', default="present", choices=["present","absent"]),
+        state=dict(type='str', default="present", choices=["present", "absent"]),
     ))
 
     module = AnsibleModule(
@@ -244,14 +244,19 @@ def main():
     project_exists = gitlab_project.existsProject(project_name)
 
     if project_exists:
-      if state == 'present':
-          if gitlab_project.createOrUpdateMirror(mirror_url, mirror_enabled, mirror_keep_divergent_refs, mirror_only_protected_branches):
-              module.exit_json(changed=True, msg="Successfully created or updated the remote mirror to %s" % project_name, project=gitlab_project.projectObject._attrs)
-          else:
-              module.exit_json(changed=False, msg="No need to update/create the remote mirror to %s" % project_name, project=gitlab_project.projectObject._attrs)
-      elif state == 'absent':
-          # as GitLab API does currently not support removing remote mirrors return error to user
-          module.fail_json(msg="GitLab API does not support removing mirrors. Either do it manually using GUI or update mirror with enabled=false.")
+        if state == 'present':
+            if gitlab_project.createOrUpdateMirror(mirror_url, mirror_enabled, mirror_keep_divergent_refs, mirror_only_protected_branches):
+                module.exit_json(changed=True,
+                                 msg="Successfully created or updated the remote mirror to %s" % project_name,
+                                 project=gitlab_project.projectObject._attrs)
+            else:
+                module.exit_json(changed=False,
+                msg="No need to update/create the remote mirror to %s" % project_name,
+                project=gitlab_project.projectObject._attrs)
+        elif state == 'absent':
+            # as GitLab API does currently not support removing remote mirrors return error to user
+            module.fail_json(msg="GitLab API does not support removing mirrors. Either do it manually using GUI or update mirror with enabled=false.")
+
 
 if __name__ == '__main__':
     main()

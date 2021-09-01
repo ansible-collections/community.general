@@ -26,7 +26,7 @@ try:
                          resp_get_project_by_name,
                          resp_remote_mirrors_list,
                          resp_remote_mirrors_create,
-                        )
+                         )
 
     # GitLab module requirements
     if python_version_match_requirement():
