@@ -276,7 +276,7 @@ def main():
         gitlab_user=dict(type='list', elements='str'),
         state=dict(type='str', default='present',
                    choices=['present', 'absent']),
-        access_level=dict(type='str', required=False, choices=[
+        access_level=dict(type='str', choices=[
                           'guest', 'reporter', 'developer', 'maintainer']),
         purge_users=dict(type='list', elements='str', choices=[
                          'guest', 'reporter', 'developer', 'maintainer']),
