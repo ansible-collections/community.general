@@ -14,10 +14,13 @@ module: gitlab_project_mirror
 short_description: Creates/updates/deletes GitLab Project Remote Mirror
 description:
   - When the remote mirror does not exist for the project, it will be created.
-  - Gitlab API does not allow to delete a remote mirror as of July 2021.
   - When changes are made to the remote mirror, the mirror will be updated.
+  - Gitlab API does not allow to delete a remote mirror as of July 2021. There is an request upstream
+    (https://gitlab.com/gitlab-org/gitlab/-/issues/287786)
+  - Gitlab API does not allow to change (parts) of the URL. As credentials are part of it they can not be checked/changed,
+    this limits idempotency.
 author:
-  - Max-Florian Bidlingmaier (@suukit)
+  - Max-Florian Bidlingmaier (@suukit) Max-Florian.Bidlingmaier@sap.com
 
 requirements:
   - python >= 2.7
@@ -45,10 +48,6 @@ options:
         description:
             - The password to use for authentication against the API.
         type: str
-    group:
-        description:
-            - Id or the full path of the group of which the projects belongs to.
-        type: str
     project:
         description:
             - The name of the project.
@@ -61,7 +60,7 @@ options:
         default: true
     url:
         description:
-            - URL to the git repo to mirror to in the form https://<user>:<token>@<fqdn>/<path>/<to>/<repo>.git".
+            - URL to the git repo to mirror to in the form https://<user>:<token>@<fqdn>/<path>/<to>/<repo>.git.
         type: str
         required: true
     only_protected_branches:
@@ -74,9 +73,9 @@ options:
         type: bool
     state:
         description:
-            - Create/update or delete mirror
-            - Due to not beeing able to check the secrets one have to recreate if secrets change, use state=recreate
-            - Possible values are present and absent and recreate.
+            - Create/update mirror
+            - Due to not beeing able to check the secrets one have to recreate and deactivate on secrets change.
+            - Possible values are present and absent.
         default: present
         type: str
         choices: ["present", "absent"]
@@ -88,7 +87,6 @@ EXAMPLES = r'''
     api_url: https://gitlab.example.com/
     api_token: "{{ api_token }}"
     name: a project
-    group: "10481470"
     url: "https://gituser:gittoken@gitserver.example.com/somerepo.git"
     enabled: true
 '''
@@ -124,7 +122,7 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.gitlab import findGroup, findProject, gitlabAuthentication
 
 
-class GitLabProject(object):
+class GitLabProjectMirror(object):
     def __init__(self, module, gitlab_instance):
         self._module = module
         self._gitlab = gitlab_instance
@@ -173,9 +171,9 @@ class GitLabProject(object):
         if not mirror_exists:
             create_data = {'url' : mirror_url,
                            'enabled': mirror_enabled}
-            if mirror_keep_divergent_refs != None:
+            if mirror_keep_divergent_refs is not None:
               create_data['keep_divergent_refs'] = mirror_keep_divergent_refs
-            if mirror_only_protected_branches != None:
+            if mirror_only_protected_branches is not None:
               create_data['only_protected_branches'] = mirror_only_protected_branches
 
             if self._module.check_mode:
@@ -190,12 +188,11 @@ class GitLabProject(object):
         return changed
 
     '''
-    @param namespace User/Group object
-    @param name Name of the project
+    @param path Name/path of the project
     '''
-    def existsProject(self, namespace, path):
+    def existsProject(self, path):
         # When project exists, object will be stored in self.projectObject.
-        project = findProject(self._gitlab, namespace.full_path + '/' + path)
+        project = findProject(self._gitlab, path)
         if project:
             self.projectObject = project
             return True
@@ -206,7 +203,6 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(dict(
         api_token=dict(type='str', no_log=True),
-        group=dict(type='str'),
         project=dict(type='str', required=True),
         url=dict(type='str', required=True),
         enabled=dict(type='bool'),
@@ -230,7 +226,6 @@ def main():
         supports_check_mode=True,
     )
 
-    group_identifier = module.params['group']
     project_name = module.params['project']
     state = module.params['state']
     mirror_url = module.params['url']
@@ -243,27 +238,9 @@ def main():
 
     gitlab_instance = gitlabAuthentication(module)
 
-    gitlab_project = GitLabProject(module, gitlab_instance)
+    gitlab_project = GitLabProjectMirror(module, gitlab_instance)
 
-    namespace = None
-    namespace_id = None
-    if group_identifier:
-        group = findGroup(gitlab_instance, group_identifier)
-        if group is None:
-            module.fail_json(msg="Failed to find project: group %s doesn't exists" % group_identifier)
-        namespace_id = group.id
-
-    if not namespace_id:
-        module.fail_json(msg="Failed to find the namespace or group ID which is required to look up the namespace")
-
-    try:
-        namespace = gitlab_instance.namespaces.get(namespace_id)
-    except gitlab.exceptions.GitlabGetError as e:
-        module.fail_json(msg="Failed to find the namespace for the given user: %s" % to_native(e))
-
-    if not namespace:
-        module.fail_json(msg="Failed to find the namespace for the project")
-    project_exists = gitlab_project.existsProject(namespace, project_name)
+    project_exists = gitlab_project.existsProject(project_name)
 
     if project_exists:
       if state == 'present':
@@ -272,11 +249,8 @@ def main():
           else:
               module.exit_json(changed=False, msg="No need to update/create the remote mirror to %s" % project_name, project=gitlab_project.projectObject._attrs)
       elif state == 'absent':
-          # as GitLab API does currently not support removing remote mirrors only way is to deactivate it
-          if gitlab_project.createOrUpdateMirror(mirror_url, False):
-            module.exit_json(changed=True, msg="Successfully disabled remote mirror to %s" % project_name, project=gitlab_project.projectObject._attrs)
-          else:
-            module.exit_json(changed=False, msg="No need to change remote mirror to %s" % project_name, project=gitlab_project.projectObject._attrs)
+          # as GitLab API does currently not support removing remote mirrors return error to user
+          module.fail_json(msg="GitLab API does not support removing mirrors. Either do it manually using GUI or update mirror with enabled=false.")
 
 if __name__ == '__main__':
     main()

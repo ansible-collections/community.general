@@ -1,0 +1,43 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for gitlab_project_mirror module
+#
+# Copyright: (c) 2021, Max Bidlingmaier <Max-Florian.Bidlingmaier@sap.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: Install required library
+  pip:
+    name: python-gitlab
+    state: present
+
+- name: Make sure mirror is present
+  community.general.gitlab_project_mirror:
+    api_url: "{{ gitlab_server_url }}"
+    api_token: "{{ gitlab_api_access_token }}"
+    project: "{{ gitlab_project }}"
+    url: "{{ gitlab_project_remote_mirror_url }}"
+    state: present
+  register: gitlab_project_mirror_state
+
+# as GitLab API does not allow to delete mirrors we can't be sure about this mirror is newly created
+# - name: Test member added to project
+#   assert:
+#     that:
+#       - gitlab_project_mirror_state is changed
+
+- name: Make sure mirror is present
+  community.general.gitlab_project_mirror:
+    api_url: "{{ gitlab_server_url }}"
+    api_token: "{{ gitlab_api_access_token }}"
+    project: "{{ gitlab_project }}"
+    url: "{{ gitlab_project_remote_mirror_url }}"
+    state: present
+  register: gitlab_project_mirror_state_again
+
+- name: Test module is idempotent
+  assert:
+    that:
+      - gitlab_project_mirror_state_again is not changed

@@ -1,0 +1,4 @@
+gitlab_server_url: https://gitlab.com
+gitlab_api_access_token: "token"
+gitlab_project: some_project
+gitlab_project_remote_mirror_url: "http://user:token@testmirror.local"

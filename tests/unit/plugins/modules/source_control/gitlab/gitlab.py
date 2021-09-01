@@ -635,3 +635,32 @@ def resp_delete_runner(url, request):
     content = ('{}')
     content = content.encode("utf-8")
     return response(204, content, headers, None, 5, request)
+
+
+'''
+PROJECT REMOTE MIRRORS API
+'''
+
+@urlmatch(scheme="http", netloc="localhost", path=r'projects/1/remote_mirrors$', method="get")
+def resp_remote_mirrors_list(url, request):
+    headers = {'content-type': 'application/json'}
+    content = ('[{"enabled": true, "id": 101486, "last_error": null,'
+               '"last_successful_update_at": "2020-01-06T17:32:02.823Z",'
+               '"last_update_at": "2020-01-06T17:32:02.823Z",'
+               '"last_update_started_at": "2020-01-06T17:31:55.864Z",'
+               '"only_protected_branches": true,'
+               '"keep_divergent_refs": true,'
+               '"update_status": "finished",'
+               '"url": "https://*****:*****@gitlab.com/gitlab-org/security/gitlab.git"}]')
+    content = content.encode("utf-8")
+    return response(200, content, headers, None, 5, request)
+
+@urlmatch(scheme="http", netloc="localhost", path=r'projects/1/remote_mirrors$', method="post")
+def resp_remote_mirrors_create(url, request):
+    headers = {'content-type': 'application/json'}
+    content = ('{"enabled": false, "id": 101486, "last_error": null, "last_successful_update_at": null,'
+               '"last_update_at": null, "last_update_started_at": null, "only_protected_branches": false,'
+               '"keep_divergent_refs": false, "update_status": "none",'
+               '"url": "https://*****:*****@example.com/gitlab/example.git"}')
+    content = content.encode("utf-8")
+    return response(200, content, headers, None, 5, request)
