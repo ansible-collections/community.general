@@ -12,6 +12,7 @@ DOCUMENTATION = '''
     version_added: 3.5.0
     description:
       - This callback create distributed traces for each Ansible task with OpenTelemetry.
+      - You can configure the OTEL exporter with some environment variables. See U(https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html).
     options:
       include_setup_tasks:
         default: true
@@ -25,27 +26,43 @@ DOCUMENTATION = '''
           - Hide the arguments for a task.
         env:
           - name: OPENTELEMETRY_HIDE_TASK_ARGUMENTS
+      console_output:
+        default: false
+        description:
+          - Print distributed traces in the terminal.
+        env:
+          - name: OPENTELEMETRY_CONSOLE_OUTPUT
       otel_service_name:
         default: ansible
         description:
           - The service name resource attribute.
         env:
           - name: OTEL_SERVICE_NAME
-      otel_exporter:
-        default: false
-        description:
-          - Use the OTEL exporter and its environment variables. See U(https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html).
-        env:
-          - name: OTEL_EXPORTER
     requirements:
       - opentelemetry-api (python lib)
       - opentelemetry-exporter-otlp (python lib)
       - opentelemetry-sdk (python lib)
 '''
 
+
+EXAMPLES = '''
+examples: |
+  Whitelist the plugin in ansible.cfg:
+    [defaults]
+    callback_whitelist = community.general.opentelemetry
+
+  Set the environment variable:
+    export OTEL_EXPORTER_OTLP_ENDPOINT=<your endpoint (OTLP/HTTP)>
+    export OTEL_EXPORTER_OTLP_HEADERS="authorization=Bearer your_otel_token"
+    export OTEL_SERVICE_NAME=your_service_name
+'''
+
+import getpass
 import os
+import socket
 import sys
 import time
+import uuid
 
 from os.path import basename
 
@@ -80,9 +97,18 @@ except ImportError:
 
 
 class OpenTelemetrySource(object):
-    def __init__(self):
+    def __init__(self, display):
         self.ansible_playbook = ""
-        self.ansible_version = ""
+        self.ansible_version = None
+        self.session = str(uuid.uuid4())
+        self.host = socket.gethostname()
+        try:
+            self.ip_address = socket.gethostbyname(socket.gethostname())
+        except:
+            self.ip_address = None
+        self.user = getpass.getuser()
+
+        self._display = display
 
     def start_task(self, task_data, hide_task_arguments, play_name, task):
         """ record the start of a task for one or more hosts """
@@ -116,6 +142,9 @@ class OpenTelemetrySource(object):
 
         task = task_data[task_uuid]
 
+        if self.ansible_version is None and result._task_fields['args'].get('_ansible_version'):
+            self.ansible_version = result._task_fields['args'].get('_ansible_version')
+
         # ignore failure if expected and toggle result if asked for
         if status == 'failed' and 'EXPECTED FAILURE' in task.name:
             status = 'ok'
@@ -127,7 +156,7 @@ class OpenTelemetrySource(object):
 
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def generate_distributed_traces(self, include_setup_tasks, otel_service_name, otel_exporter, ansible_playbook, task_data, status):
+    def generate_distributed_traces(self, insecure_otel_exporter, include_setup_tasks, otel_service_name, console_output, ansible_playbook, task_data, status):
         """ generate distributed traces from the collected TaskData and HostData """
 
         tasks = []
@@ -145,10 +174,11 @@ class OpenTelemetrySource(object):
                 resource=Resource.create({SERVICE_NAME: otel_service_name})
             )
         )
-        processor = SimpleSpanProcessor(ConsoleSpanExporter())
 
-        if otel_exporter:
-            processor = BatchSpanProcessor(OTLPSpanExporter(insecure=self.insecure_otel_exporter))
+        if console_output:
+            processor = SimpleSpanProcessor(ConsoleSpanExporter())
+        else:
+            processor = BatchSpanProcessor(OTLPSpanExporter(insecure=insecure_otel_exporter))
 
         trace.get_tracer_provider().add_span_processor(processor)
 
@@ -156,6 +186,14 @@ class OpenTelemetrySource(object):
 
         with tracer.start_as_current_span(ansible_playbook, start_time=parent_start_time) as parent:
             parent.set_status(status)
+            # Populate trace metadata attributes
+            if not self.ansible_version is None:
+                parent.set_attribute("ansible.version", self.ansible_version)
+            parent.set_attribute("ansible.session", self.session)
+            parent.set_attribute("ansible.host.name", self.host)
+            if not self.ip_address is None:
+                parent.set_attribute("ansible.host.ip", self.ip_address)
+            parent.set_attribute("ansible.host.user", self.user)
             for task in tasks:
                 for host_uuid, host_data in task.host_data.items():
                     with tracer.start_as_current_span(task.name, start_time=task.start, end_on_exit=False) as span:
@@ -218,8 +256,8 @@ class CallbackModule(CallbackBase):
                                      Default: false
         OTEL_SERVICE_NAME (optional): The service name resource attribute.
                                      Default: ansible
-        OTEL_EXPORTER (optional): Use the OTEL exporter and its environment variables. https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html
-                                     Default: false
+        OTEL_CONSOLE_OUTPUT (optional): Print distributed traces in the terminal.
+                                     Default: true
     Requires:
         opentelemetry-api
         opentelemetry-exporter-otlp
@@ -236,13 +274,11 @@ class CallbackModule(CallbackBase):
         self.include_setup_tasks = None
         self.hide_task_arguments = None
         self.otel_service_name = None
-        self.otel_exporter = None
+        self.console_output = None
+        self.insecure_otel_exporter = None
         self.ansible_playbook = None
         self.play_name = None
         self.task_data = None
-        self.opentelemetry = OpenTelemetrySource()
-        # See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
-        self.insecure_otel_exporter = os.getenv('OTEL_EXPORTER_OTLP_INSECURE', 'false').lower() == 'true'
         self.errors = 0
         self.disabled = False
 
@@ -258,28 +294,36 @@ class CallbackModule(CallbackBase):
             self._display.warning('The `ordereddict` python module is not installed. '
                                   'Disabling the `opentelemetry` callback plugin.')
 
+        self.opentelemetry = OpenTelemetrySource(display=self._display)
+
+    def transform_option_to_boolean_or_default(self, option_name, default):
+        """ Look for the given option and if a string boolean then convert to a boolean type """
+
+        value = self.get_option(option_name)
+        if value is None:
+            return default
+        if isinstance(value, str):
+            return value.lower() in ['true']
+        return value
+
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super(CallbackModule, self).set_options(task_keys=task_keys,
                                                 var_options=var_options,
                                                 direct=direct)
 
-        self.include_setup_tasks = self.get_option('include_setup_tasks')
+        self.include_setup_tasks = self.transform_option_to_boolean_or_default('include_setup_tasks', True)
 
-        self.hide_task_arguments = self.get_option('hide_task_arguments')
+        self.hide_task_arguments = self.transform_option_to_boolean_or_default('hide_task_arguments', False)
 
         self.otel_service_name = self.get_option('otel_service_name')
 
         if self.otel_service_name is None:
-            self.otel_service_name = os.getenv('OTEL_SERVICE_NAME', 'ansible').lower()
+            self.otel_service_name = 'ansible'
 
-        self.otel_exporter = self.get_option('otel_exporter')
-        if self.otel_exporter is None:
-            self.otel_service_name = os.getenv('OTEL_EXPORTER', 'false').lower() == 'true'
+        self.console_output = self.transform_option_to_boolean_or_default('console_output', False)
 
-        if not self.otel_exporter:
-            self.disabled = True
-            self._display.warning('The `OTEL_EXPORTER` has been set to False. '
-                                  'Disabling the `opentelemetry` callback plugin.')
+        # See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
+        self.insecure_otel_exporter = os.getenv('OTEL_EXPORTER_OTLP_INSECURE', 'false').lower() == 'true'
 
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
@@ -290,32 +334,32 @@ class CallbackModule(CallbackBase):
     def v2_runner_on_no_hosts(self, task):
         self.opentelemetry.start_task(
             self.task_data,
-			self.hide_task_arguments,
-			self.play_name,
+            self.hide_task_arguments,
+            self.play_name,
             task
         )
 
     def v2_playbook_on_task_start(self, task, is_conditional):
         self.opentelemetry.start_task(
             self.task_data,
-			self.hide_task_arguments,
-			self.play_name,
+            self.hide_task_arguments,
+            self.play_name,
             task
         )
 
     def v2_playbook_on_cleanup_task_start(self, task):
         self.opentelemetry.start_task(
             self.task_data,
-			self.hide_task_arguments,
-			self.play_name,
+            self.hide_task_arguments,
+            self.play_name,
             task
         )
 
     def v2_playbook_on_handler_task_start(self, task):
         self.opentelemetry.start_task(
             self.task_data,
-			self.hide_task_arguments,
-			self.play_name,
+            self.hide_task_arguments,
+            self.play_name,
             task
         )
 
@@ -354,9 +398,10 @@ class CallbackModule(CallbackBase):
         else:
             status = Status(status_code=StatusCode.ERROR)
         self.opentelemetry.generate_distributed_traces(
+            self.insecure_otel_exporter,
             self.include_setup_tasks,
             self.otel_service_name,
-            self.otel_exporter,
+            self.console_output,
             self.ansible_playbook,
             self.task_data,
             status
