@@ -94,7 +94,7 @@ options:
         type: str
     purge_users:
         description:
-            - Adds/remove users of the given access_level to match the given gitlab_user/gitlab_users_access list.
+            - Adds/remove users of the given access_level to match the given I(gitlab_user)/I(gitlab_users_access) list.
               If omitted do not purge orphaned members.
             - Is only used when I(state=present).
         type: list
