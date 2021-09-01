@@ -110,12 +110,12 @@ class OpenTelemetrySource(object):
 
         self._display = display
 
-    def start_task(self, task_data, hide_task_arguments, play_name, task):
+    def start_task(self, tasks_data, hide_task_arguments, play_name, task):
         """ record the start of a task for one or more hosts """
 
         uuid = task._uuid
 
-        if uuid in task_data:
+        if uuid in tasks_data:
             return
 
         name = task.get_name().strip()
@@ -126,9 +126,9 @@ class OpenTelemetrySource(object):
         if not task.no_log and not hide_task_arguments:
             args = ', '.join(('%s=%s' % a for a in task.args.items()))
 
-        task_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
+        tasks_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
 
-    def finish_task(self, task_data, status, result):
+    def finish_task(self, tasks_data, status, result):
         """ record the results of a task for a single host """
 
         task_uuid = result._task._uuid
@@ -140,7 +140,7 @@ class OpenTelemetrySource(object):
             host_uuid = 'include'
             host_name = 'include'
 
-        task = task_data[task_uuid]
+        task = tasks_data[task_uuid]
 
         if self.ansible_version is None and result._task_fields['args'].get('_ansible_version'):
             self.ansible_version = result._task_fields['args'].get('_ansible_version')
@@ -156,12 +156,12 @@ class OpenTelemetrySource(object):
 
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def generate_distributed_traces(self, insecure_otel_exporter, include_setup_tasks, otel_service_name, console_output, ansible_playbook, task_data, status):
+    def generate_distributed_traces(self, insecure_otel_exporter, include_setup_tasks, otel_service_name, console_output, ansible_playbook, tasks_data, status):
         """ generate distributed traces from the collected TaskData and HostData """
 
         tasks = []
         parent_start_time = None
-        for task_uuid, task in task_data.items():
+        for task_uuid, task in tasks_data.items():
             if parent_start_time is None:
                 parent_start_time = task.start
             if not include_setup_tasks and task.action == 'setup':
@@ -278,7 +278,7 @@ class CallbackModule(CallbackBase):
         self.insecure_otel_exporter = None
         self.ansible_playbook = None
         self.play_name = None
-        self.task_data = None
+        self.tasks_data = None
         self.errors = 0
         self.disabled = False
 
@@ -288,7 +288,7 @@ class CallbackModule(CallbackBase):
                                   'Disabling the `opentelemetry` callback plugin.')
 
         if HAS_ORDERED_DICT:
-            self.task_data = OrderedDict()
+            self.tasks_data = OrderedDict()
         else:
             self.disabled = True
             self._display.warning('The `ordereddict` python module is not installed. '
@@ -333,7 +333,7 @@ class CallbackModule(CallbackBase):
 
     def v2_runner_on_no_hosts(self, task):
         self.opentelemetry.start_task(
-            self.task_data,
+            self.tasks_data,
             self.hide_task_arguments,
             self.play_name,
             task
@@ -341,7 +341,7 @@ class CallbackModule(CallbackBase):
 
     def v2_playbook_on_task_start(self, task, is_conditional):
         self.opentelemetry.start_task(
-            self.task_data,
+            self.tasks_data,
             self.hide_task_arguments,
             self.play_name,
             task
@@ -349,7 +349,7 @@ class CallbackModule(CallbackBase):
 
     def v2_playbook_on_cleanup_task_start(self, task):
         self.opentelemetry.start_task(
-            self.task_data,
+            self.tasks_data,
             self.hide_task_arguments,
             self.play_name,
             task
@@ -357,7 +357,7 @@ class CallbackModule(CallbackBase):
 
     def v2_playbook_on_handler_task_start(self, task):
         self.opentelemetry.start_task(
-            self.task_data,
+            self.tasks_data,
             self.hide_task_arguments,
             self.play_name,
             task
@@ -366,28 +366,28 @@ class CallbackModule(CallbackBase):
     def v2_runner_on_failed(self, result, ignore_errors=False):
         self.errors += 1
         self.opentelemetry.finish_task(
-            self.task_data,
+            self.tasks_data,
             'failed',
             result
         )
 
     def v2_runner_on_ok(self, result):
         self.opentelemetry.finish_task(
-            self.task_data,
+            self.tasks_data,
             'ok',
             result
         )
 
     def v2_runner_on_skipped(self, result):
         self.opentelemetry.finish_task(
-            self.task_data,
+            self.tasks_data,
             'skipped',
             result
         )
 
     def v2_playbook_on_include(self, included_file):
         self.opentelemetry.finish_task(
-            self.task_data,
+            self.tasks_data,
             'included',
             included_file
         )
@@ -403,7 +403,7 @@ class CallbackModule(CallbackBase):
             self.otel_service_name,
             self.console_output,
             self.ansible_playbook,
-            self.task_data,
+            self.tasks_data,
             status
         )
 
