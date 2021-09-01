@@ -84,6 +84,40 @@ class OpenTelemetrySource(object):
         self.ansible_playbook = ""
         self.ansible_version = ""
 
+    def generate_distributed_traces(self, include_setup_tasks, otel_service_name, otel_exporter, ansible_playbook, task_data, status):
+        """ generate distributed traces from the collected TaskData and HostData """
+
+        tasks = []
+        parent_start_time = None
+        for task_uuid, task in task_data.items():
+            if parent_start_time is None:
+                parent_start_time = task.start
+            if not include_setup_tasks and task.action == 'setup':
+                ##if task.action in C._ACTION_SETUP:  supported from 2.11.0
+                continue
+            tasks.append(task)
+
+        trace.set_tracer_provider(
+            TracerProvider(
+                resource=Resource.create({SERVICE_NAME: otel_service_name})
+            )
+        )
+        processor = SimpleSpanProcessor(ConsoleSpanExporter())
+
+        if otel_exporter:
+            processor = BatchSpanProcessor(OTLPSpanExporter(insecure=self.insecure_otel_exporter))
+
+        trace.get_tracer_provider().add_span_processor(processor)
+
+        tracer = trace.get_tracer(__name__)
+
+        with tracer.start_as_current_span(ansible_playbook, start_time=parent_start_time) as parent:
+            parent.set_status(status)
+            for task_data in tasks:
+                for host_uuid, host_data in task_data.host_data.items():
+                    with tracer.start_as_current_span(task_data.name, start_time=task_data.start, end_on_exit=False) as span:
+                        self._update_span_data(task_data, host_data, span)
+
 class CallbackModule(CallbackBase):
     """
     This callback creates distributed traces.
@@ -117,7 +151,7 @@ class CallbackModule(CallbackBase):
         self.play_name = None
         self.task_data = None
         self.opentelemetry = OpenTelemetrySource()
-		# See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
+        # See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
         self.insecure_otel_exporter = os.getenv('OTEL_EXPORTER_OTLP_INSECURE', 'false').lower() == 'true'
         self.errors = 0
         self.disabled = False
@@ -247,39 +281,6 @@ class CallbackModule(CallbackBase):
             if not attributeValue is None:
                 span.set_attribute(attributeName, attributeValue)
 
-    def _generate_distributed_traces(self, status):
-        """ generate distributed traces from the collected TaskData and HostData """
-
-        tasks = []
-        parent_start_time = None
-        for task_uuid, task_data in self.task_data.items():
-            if parent_start_time is None:
-                parent_start_time = task_data.start
-            if not self.include_setup_tasks and task_data.action == 'setup':
-                ##if task_data.action in C._ACTION_SETUP:  supported from 2.11.0
-                continue
-            tasks.append(task_data)
-
-        trace.set_tracer_provider(
-            TracerProvider(
-                resource=Resource.create({SERVICE_NAME: self._service})
-            )
-        )
-        processor = SimpleSpanProcessor(ConsoleSpanExporter())
-
-        if self._otel_exporter:
-            processor = BatchSpanProcessor(OTLPSpanExporter(insecure=self.insecure_otel_exporter))
-
-        trace.get_tracer_provider().add_span_processor(processor)
-
-        tracer = trace.get_tracer(__name__)
-
-        with tracer.start_as_current_span(self._playbook_name, start_time=parent_start_time) as parent:
-            parent.set_status(status)
-            for task_data in tasks:
-                for host_uuid, host_data in task_data.host_data.items():
-                    with tracer.start_as_current_span(task_data.name, start_time=task_data.start, end_on_exit=False) as span:
-                        self._update_span_data(task_data, host_data, span)
 
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
@@ -317,7 +318,14 @@ class CallbackModule(CallbackBase):
             status = Status(status_code=StatusCode.OK)
         else:
             status = Status(status_code=StatusCode.ERROR)
-        self._generate_distributed_traces(status)
+        self.generate_distributed_traces(
+            self.include_setup_tasks,
+            self.otel_service_name,
+            self.otel_exporter,
+            self.ansible_playbook,
+            self.task_data,
+            status
+        )
 
     def v2_runner_on_async_failed(self, result, **kwargs):
         self.errors += 1
