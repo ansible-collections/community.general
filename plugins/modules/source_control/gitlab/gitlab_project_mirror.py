@@ -5,7 +5,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-from os import truncate
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -206,7 +205,7 @@ def main():
         api_token=dict(type='str', no_log=True),
         project=dict(type='str', required=True),
         url=dict(type='str', required=True),
-        enabled=dict(type='bool'),
+        enabled=dict(type='bool', default=True),
         only_protected_branches=dict(type='bool'),
         keep_divergent_refs=dict(type='bool'),
         state=dict(type='str', default="present", choices=["present", "absent"]),

@@ -9,7 +9,7 @@ __metaclass__ = type
 import pytest
 from distutils.version import LooseVersion
 
-from ansible_collections.community.general.plugins.modules.source_control.gitlab.gitlab_project_mirror import GitlabProjectMirror
+from ansible_collections.community.general.plugins.modules.source_control.gitlab.gitlab_project_mirror import GitLabProjectMirror
 
 
 def _dummy(x):
