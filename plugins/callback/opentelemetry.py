@@ -84,6 +84,24 @@ class OpenTelemetrySource(object):
         self.ansible_playbook = ""
         self.ansible_version = ""
 
+    def start_task(self, task_data, hide_task_arguments, play_name, task):
+        """ record the start of a task for one or more hosts """
+
+        uuid = task._uuid
+
+        if uuid in task_data:
+            return
+
+        name = task.get_name().strip()
+        path = task.get_path()
+        action = task.action
+        args = None
+
+        if not task.no_log and not hide_task_arguments:
+            args = ', '.join(('%s=%s' % a for a in task.args.items()))
+
+        task_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
+
     def finish_task(self, task_data, status, result):
         """ record the results of a task for a single host """
 
@@ -263,25 +281,6 @@ class CallbackModule(CallbackBase):
             self._display.warning('The `OTEL_EXPORTER` has been set to False. '
                                   'Disabling the `opentelemetry` callback plugin.')
 
-    def _start_task(self, task):
-        """ record the start of a task for one or more hosts """
-
-        uuid = task._uuid
-
-        if uuid in self.task_data:
-            return
-
-        play = self.play_name
-        name = task.get_name().strip()
-        path = task.get_path()
-        action = task.action
-        args = None
-
-        if not task.no_log and not self.hide_task_arguments:
-            args = ', '.join(('%s=%s' % a for a in task.args.items()))
-
-        self.task_data[uuid] = TaskData(uuid, name, path, play, action, args)
-
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
 
@@ -289,16 +288,36 @@ class CallbackModule(CallbackBase):
         self.play_name = play.get_name()
 
     def v2_runner_on_no_hosts(self, task):
-        self._start_task(task)
+        self.opentelemetry.start_task(
+            self.task_data,
+			self.hide_task_arguments,
+			self.play_name,
+            task
+        )
 
     def v2_playbook_on_task_start(self, task, is_conditional):
-        self._start_task(task)
+        self.opentelemetry.start_task(
+            self.task_data,
+			self.hide_task_arguments,
+			self.play_name,
+            task
+        )
 
     def v2_playbook_on_cleanup_task_start(self, task):
-        self._start_task(task)
+        self.opentelemetry.start_task(
+            self.task_data,
+			self.hide_task_arguments,
+			self.play_name,
+            task
+        )
 
     def v2_playbook_on_handler_task_start(self, task):
-        self._start_task(task)
+        self.opentelemetry.start_task(
+            self.task_data,
+			self.hide_task_arguments,
+			self.play_name,
+            task
+        )
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         self.errors += 1
