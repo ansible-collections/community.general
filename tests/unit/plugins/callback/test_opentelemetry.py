@@ -14,6 +14,7 @@ import json
 
 from collections import OrderedDict
 
+
 class TestOpentelemetry(unittest.TestCase):
     @patch('ansible_collections.community.general.plugins.callback.opentelemetry.socket')
     def setUp(self, mock_socket):
@@ -46,4 +47,3 @@ class TestOpentelemetry(unittest.TestCase):
         )
 
         tasks_data['myuuid'].uuid = 'myuuid'
-
