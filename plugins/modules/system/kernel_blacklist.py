@@ -54,11 +54,10 @@ class Blacklist(StateModuleHelper):
         argument_spec=dict(
             name=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
-            blacklist_file=dict(type='str'),
+            blacklist_file=dict(type='str', default='/etc/modprobe.d/blacklist-ansible.conf'),
         ),
         supports_check_mode=True,
     )
-    default_file = '/etc/modprobe.d/blacklist-ansible.conf'
 
     def __init_module__(self):
         self.vars.filename = self.default_file if not self.vars.blacklist_file else self.vars.blacklist_file
@@ -66,9 +65,10 @@ class Blacklist(StateModuleHelper):
         if not self.vars.file_exists:
             open(self.vars.filename, 'a').close()
             self.vars.file_exists = True
-
-        with open(self.vars.filename) as fd:
-            self.vars.set('lines', fd.readlines(), change=True, diff=True)
+            self.vars.set('lines', [], change=True, diff=True)
+        else:
+            with open(self.vars.filename) as fd:
+                self.vars.set('lines', fd.readlines(), change=True, diff=True)
         self.vars.set('is_blacklisted', self._is_module_blocked(), change=True)
 
         self.pattern = re.compile(r'^blacklist\s+' + self.vars.name + '$')
