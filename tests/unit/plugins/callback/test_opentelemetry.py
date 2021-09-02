@@ -6,7 +6,7 @@ __metaclass__ = type
 
 from ansible.executor.task_result import TaskResult
 from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch, call, MagicMock, Mock
+from ansible_collections.community.general.tests.unit.compat.mock import patch, Mock
 from ansible_collections.community.general.plugins.callback.opentelemetry import OpenTelemetrySource
 from datetime import datetime
 
@@ -16,24 +16,24 @@ from collections import OrderedDict
 
 
 class TestOpentelemetry(unittest.TestCase):
+    @patch('ansible_collections.community.general.plugins.callback.opentelemetry.play')
+    @patch('ansible_collections.community.general.plugins.callback.opentelemetry.task')
     @patch('ansible_collections.community.general.plugins.callback.opentelemetry.socket')
-    def setUp(self, mock_socket):
+    def setUp(self, mock_socket, mock_task, mock_play):
         mock_socket.gethostname.return_value = 'my-host'
         mock_socket.gethostbyname.return_value = '1.2.3.4'
+        mock_task.get_name.return_value = 'mytask'
+        mock_task.get_path.return_value = 'mypath'
+        mock_task.action = 'myaction'
+        mock_task.no_log = False
+        mock_task._role = 'myrole'
+        mock_task._uuid = 'myuuid'
+        mock_task.args = {}
+        mock_play.get_name.return_value = 'myplay'
         self.opentelemetry = OpenTelemetrySource(display=None)
-        self.mock_task = Mock('MockTask')
-        self.mock_task.get_name.return_value = 'mytask'
-        self.mock_task.get_path.return_value = 'mypath'
-        self.mock_task.action = 'myaction'
-        self.mock_task.no_log = False
-        self.mock_task._role = 'myrole'
-        self.mock_task._uuid = 'myuuid'
-        self.mock_task.args = {}
         self.task_fields = {'args': {}}
         self.mock_host = Mock('MockHost')
         self.mock_host.name = 'myhost'
-        self.mock_play = Mock('MockPlay')
-        self.mock_play.get_name.return_value = 'myplay'
 
     def test_start_task(self):
         result = TaskResult(host=self.mock_host, task=self.mock_task, return_data={}, task_fields=self.task_fields)
