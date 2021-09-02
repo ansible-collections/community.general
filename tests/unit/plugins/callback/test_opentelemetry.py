@@ -31,6 +31,7 @@ class TestOpentelemetry(unittest.TestCase):
         self.mock_task.get_name = MagicMock(return_value='mytask')
         self.mock_task.get_path = MagicMock(return_value='/mypath')
         self.my_task = TaskData('myuuid', 'mytask', '/mypath', 'myplay', 'myaction', '')
+        self.my_task_result = TaskResult(host=self.mock_host, task=self.mock_task, return_data={}, task_fields=self.task_fields)
 
     def test_start_task(self):
         tasks_data = OrderedDict()
@@ -51,14 +52,13 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(task_data.args, '')
 
     def test_finish_task_with_a_host_match(self):
-        result = TaskResult(host=self.mock_host, task=self.mock_task, return_data={}, task_fields=self.task_fields)
         tasks_data = OrderedDict()
         tasks_data['myuuid'] = self.my_task
 
         self.opentelemetry.finish_task(
             tasks_data,
             'ok',
-            result
+            self.my_task_result
         )
 
         task_data = tasks_data['myuuid']
