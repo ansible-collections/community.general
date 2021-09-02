@@ -241,8 +241,6 @@ class CallbackModule(CallbackBase):
     """
     This callback creates distributed traces.
     This plugin makes use of the following environment variables:
-        OPENTELEMETRY_INCLUDE_SETUP_TASKS (optional): Should the setup tasks be included in the distributed traces
-                                     Default: true
         OPENTELEMETRY_HIDE_TASK_ARGUMENTS (optional): Hide the arguments for a task
                                      Default: false
         OTEL_SERVICE_NAME (optional): The service name resource attribute.
