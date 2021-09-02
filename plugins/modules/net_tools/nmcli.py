@@ -648,9 +648,9 @@ options:
             - The configuration of the GSM connection.
             - Note the list of suboption attributes may vary depending on which version of NetworkManager/nmcli is installed on the host.
             - 'An up-to-date list of supported attributes can be found here:
-              U(https://networkmanager.dev/docs/api/latest/settings-gsm.html)'
+              U(https://networkmanager.dev/docs/api/latest/settings-gsm.html).'
             - 'For instance to use apn, pin, username and password:
-              C({apn: provider.apn, pin: 1234, username: apn.username, password: apn.password})'
+              C({apn: provider.apn, pin: 1234, username: apn.username, password: apn.password}).'
         type: dict
         suboptions:
             apn:
@@ -661,7 +661,7 @@ options:
                     - The APN may only be composed of the characters a-z, 0-9, ., and - per GSM 03.60 Section 14.9.
                 type: str
             auto-config:
-                description: When C(true), the settings such as C(APN), username, or password will default to values that match the network
+                description: When C(true), the settings such as I(gsm.apn), I(gsm.username), or I(gsm.password) will default to values that match the network
                     the modem will register to in the Mobile Broadband Provider database.
                 type: bool
                 default: false
@@ -699,12 +699,12 @@ options:
                 description:
                     - NMSettingSecretFlags indicating how to handle the I(password) property.
                     - 'Following choices are allowed:
-                      C(0) I(NONE): The system is responsible for providing and storing this secret (default),
-                      C(1) I(AGENT_OWNED): A user secret agent is responsible for providing and storing this secret; when it is required agents will be
+                      C(0) B(NONE): The system is responsible for providing and storing this secret (default),
+                      C(1) B(AGENT_OWNED): A user secret agent is responsible for providing and storing this secret; when it is required agents will be
                            asked to retrieve it
-                      C(2) I(NOT_SAVED): This secret should not be saved, but should be requested from the user each time it is needed
-                      C(4) I(NOT_REQUIRED): In situations where it cannot be automatically determined that the secret is required
-                           (some VPNs and PPP providers do not require all secrets) this flag indicates that the specific secret is not required'
+                      C(2) B(NOT_SAVED): This secret should not be saved, but should be requested from the user each time it is needed
+                      C(4) B(NOT_REQUIRED): In situations where it cannot be automatically determined that the secret is required
+                           (some VPNs and PPP providers do not require all secrets) this flag indicates that the specific secret is not required.'
                 type: int
                 choices: [ 0, 1, 2 , 4 ]
                 default: 0
@@ -715,20 +715,20 @@ options:
                 type: str
             pin-flags:
                 description:
-                    - NMSettingSecretFlags indicating how to handle the I(pin) property.
-                    - See C(password-flags) for NMSettingSecretFlags coices
+                    - NMSettingSecretFlags indicating how to handle the I(gsm.pin) property.
+                    - See I(gsm.password-flags) for NMSettingSecretFlags choices.
                 type: int
                 choices: [ 0, 1, 2 , 4 ]
                 default: 0
             sim-id:
                 description:
                     - The SIM card unique identifier (as given by the C(WWAN) management service) which this connection applies to.
-                    - If given, the connection will apply to any device also allowed by I(device-id) which contains a SIM card matching the given identifier.
+                    - If given, the connection will apply to any device also allowed by I(gsm.device-id) which contains a SIM card matching the given identifier.
                 type: str
             sim-operator-id:
                 description:
-                    - A MCC/MNC string like I(310260) or I(21601I) identifying the specific mobile network operator which this connection applies to.
-                    - 'If given, the connection will apply to any device also allowed by I(device-id) and I(sim-id) which contains a SIM card provisioned by
+                    - A MCC/MNC string like C(310260) or C(21601I) identifying the specific mobile network operator which this connection applies to.
+                    - 'If given, the connection will apply to any device also allowed by I(gsm.device-id) and I(gsm.sim-id) which contains a SIM card provisioned by
                         the given operator.'
                 type: str
             username:
