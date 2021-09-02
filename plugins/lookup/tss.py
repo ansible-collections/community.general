@@ -58,9 +58,9 @@ options:
         required: false
         version_added: 3.6.0
     token:
-        default: ""
         description:
           - Existing token for Thycotic authorizer.
+          - Requires C(python-tss-sdk) version 1.0.0 or greater.
         env:
             - name: TSS_TOKEN
         ini:
