@@ -36,7 +36,7 @@ options:
         ini:
             - section: tss_lookup
               key: username
-        required: true
+        required: false
     password:
         description: The password associated with the supplied username.
         env:
@@ -44,7 +44,7 @@ options:
         ini:
             - section: tss_lookup
               key: password
-        required: true
+        required: false
     domain:
         default: ""
         description:
@@ -57,6 +57,17 @@ options:
               key: domain
         required: false
         version_added: 3.6.0
+    token:
+        default: ""
+        description:
+          - Existing token for Thycotic authorizer.
+        env:
+            - name: TSS_TOKEN
+        ini:
+            - section: tss_lookup
+              key: token
+        required: false
+        version_added: 3.7.0
     api_path_uri:
         default: /api/v1
         description: The path to append to the base URL to form a valid REST
@@ -142,12 +153,13 @@ except ImportError:
     HAS_TSS_SDK = False
 
 try:
-    from thycotic.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer
+    from thycotic.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
 
     HAS_TSS_AUTHORIZER = True
 except ImportError:
     PasswordGrantAuthorizer = None
     DomainPasswordGrantAuthorizer = None
+    AccessTokenAuthorizer = None
     HAS_TSS_AUTHORIZER = False
 
 
@@ -218,6 +230,11 @@ class TSSClientV1(TSSClient):
                 server_parameters["token_path_uri"],
             )
 
+        if server_parameters.get("token"):
+            return AccessTokenAuthorizer(
+                server_parameters["token"],
+            )
+
         return PasswordGrantAuthorizer(
             server_parameters["base_url"],
             server_parameters["username"],
@@ -238,6 +255,7 @@ class LookupModule(LookupBase):
             username=self.get_option("username"),
             password=self.get_option("password"),
             domain=self.get_option("domain"),
+            token=self.get_option("token"),
             api_path_uri=self.get_option("api_path_uri"),
             token_path_uri=self.get_option("token_path_uri"),
         )
