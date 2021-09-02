@@ -98,4 +98,3 @@ class TestOpentelemetry(unittest.TestCase):
 
         result = callbackModule.transform_to_boolean_or_default('false', True)
         self.assertFalse(result)
-
