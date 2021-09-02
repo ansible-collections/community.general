@@ -723,13 +723,14 @@ options:
             sim-id:
                 description:
                     - The SIM card unique identifier (as given by the C(WWAN) management service) which this connection applies to.
-                    - If given, the connection will apply to any device also allowed by I(gsm.device-id) which contains a SIM card matching the given identifier.
+                    - 'If given, the connection will apply to any device also allowed by I(gsm.device-id) which contains a SIM card matching
+                        the given identifier.'
                 type: str
             sim-operator-id:
                 description:
                     - A MCC/MNC string like C(310260) or C(21601I) identifying the specific mobile network operator which this connection applies to.
-                    - 'If given, the connection will apply to any device also allowed by I(gsm.device-id) and I(gsm.sim-id) which contains a SIM card provisioned by
-                        the given operator.'
+                    - 'If given, the connection will apply to any device also allowed by I(gsm.device-id) and I(gsm.sim-id) which contains a SIM card
+                        provisioned by the given operator.'
                 type: str
             username:
                 description:
@@ -1690,7 +1691,7 @@ class Nmcli(object):
                 if key == 'gsm.apn' and current_value[0] == '"':
                     # Depending on version nmcli adds double-qoutes to gsm.apn
                     # Need to strip them in order to compare both
-                    current_value = current_value[1:-1]
+                    current_value = current_value.strip('"')
             else:
                 # parameter does not exist
                 current_value = None
