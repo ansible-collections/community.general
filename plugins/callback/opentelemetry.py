@@ -299,7 +299,11 @@ class CallbackModule(CallbackBase):
     def transform_option_to_boolean_or_default(self, option_name, default):
         """ Look for the given option and if a string boolean then convert to a boolean type """
 
-        value = self.get_option(option_name)
+        return self.transform_to_boolean_or_default(self.get_option(option_name), default)
+
+    def transform_to_boolean_or_default(self, value, default):
+        """ Transform string boolean to boolean or apply default value """
+
         if value is None:
             return default
         if isinstance(value, str):

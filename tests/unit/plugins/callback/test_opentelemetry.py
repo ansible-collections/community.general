@@ -8,9 +8,7 @@ from ansible.playbook.task import Task
 from ansible.executor.task_result import TaskResult
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock, Mock
-from ansible_collections.community.general.plugins.callback.opentelemetry import OpenTelemetrySource, TaskData
-from datetime import datetime
-
+from ansible_collections.community.general.plugins.callback.opentelemetry import OpenTelemetrySource, TaskData, CallbackModule
 from collections import OrderedDict
 
 
@@ -85,4 +83,19 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(host_data.uuid, 'include')
         self.assertEqual(host_data.name, 'include')
         self.assertEqual(host_data.status, 'ok')
+
+    def test_transform_to_boolean_or_default(self):
+        callbackModule = CallbackModule()
+
+        result = callbackModule.transform_to_boolean_or_default(None, False)
+        self.assertFalse(result)
+
+        result = callbackModule.transform_to_boolean_or_default('', False)
+        self.assertFalse(result)
+
+        result = callbackModule.transform_to_boolean_or_default('true', False)
+        self.assertTrue(result)
+
+        result = callbackModule.transform_to_boolean_or_default('false', True)
+        self.assertFalse(result)
 
