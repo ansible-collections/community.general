@@ -10,13 +10,16 @@ from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock, Mock
 from ansible_collections.community.general.plugins.callback.opentelemetry import OpenTelemetrySource, TaskData, CallbackModule
 from collections import OrderedDict
+from datetime import datetime
 
 
 class TestOpentelemetry(unittest.TestCase):
+    @patch('ansible_collections.community.general.plugins.callback.opentelemetry._time_ns')
     @patch('ansible_collections.community.general.plugins.callback.opentelemetry.socket')
-    def setUp(self, mock_socket):
+    def setUp(self, mock_socket, mock__time_ns):
         mock_socket.gethostname.return_value = 'my-host'
         mock_socket.gethostbyname.return_value = '1.2.3.4'
+        mock__time_ns.return_value = datetime(2020, 12, 1)
         self.opentelemetry = OpenTelemetrySource(display=None)
         self.task_fields = {'args': {}}
         self.mock_host = Mock('MockHost')
