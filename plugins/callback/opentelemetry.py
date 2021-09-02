@@ -9,17 +9,11 @@ DOCUMENTATION = '''
     name: opentelemetry
     type: notification
     short_description: Create distributed traces with OpenTelemetry
-    version_added: 3.5.0
+    version_added: 2.5.0
     description:
       - This callback create distributed traces for each Ansible task with OpenTelemetry.
       - You can configure the OTEL exporter with environment variables. See U(https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html).
     options:
-      include_setup_tasks:
-        default: true
-        description:
-          - Should the setup tasks be included in the distributed traces.
-        env:
-          - name: OPENTELEMETRY_INCLUDE_SETUP_TASKS
       hide_task_arguments:
         default: false
         description:
@@ -156,7 +150,7 @@ class OpenTelemetrySource(object):
 
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def generate_distributed_traces(self, insecure_otel_exporter, include_setup_tasks, otel_service_name, console_output, ansible_playbook, tasks_data, status):
+    def generate_distributed_traces(self, insecure_otel_exporter, otel_service_name, console_output, ansible_playbook, tasks_data, status):
         """ generate distributed traces from the collected TaskData and HostData """
 
         tasks = []
@@ -164,9 +158,6 @@ class OpenTelemetrySource(object):
         for task_uuid, task in tasks_data.items():
             if parent_start_time is None:
                 parent_start_time = task.start
-            if not include_setup_tasks and task.action == 'setup':
-                # if task.action in C._ACTION_SETUP:  supported from 2.11.0
-                continue
             tasks.append(task)
 
         trace.set_tracer_provider(
@@ -271,7 +262,6 @@ class CallbackModule(CallbackBase):
 
     def __init__(self, display=None):
         super(CallbackModule, self).__init__(display=display)
-        self.include_setup_tasks = None
         self.hide_task_arguments = None
         self.otel_service_name = None
         self.console_output = None
@@ -314,8 +304,6 @@ class CallbackModule(CallbackBase):
         super(CallbackModule, self).set_options(task_keys=task_keys,
                                                 var_options=var_options,
                                                 direct=direct)
-
-        self.include_setup_tasks = self.transform_option_to_boolean_or_default('include_setup_tasks', True)
 
         self.hide_task_arguments = self.transform_option_to_boolean_or_default('hide_task_arguments', False)
 
@@ -403,7 +391,6 @@ class CallbackModule(CallbackBase):
             status = Status(status_code=StatusCode.ERROR)
         self.opentelemetry.generate_distributed_traces(
             self.insecure_otel_exporter,
-            self.include_setup_tasks,
             self.otel_service_name,
             self.console_output,
             self.ansible_playbook,
