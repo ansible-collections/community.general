@@ -20,7 +20,7 @@ class TestOpentelemetry(unittest.TestCase):
     def setUp(self, mock_socket):
         mock_socket.gethostname.return_value = 'my-host'
         mock_socket.gethostbyname.return_value = '1.2.3.4'
-        self.opentelemetry = OpenTelemetrySource()
+        self.opentelemetry = OpenTelemetrySource(display=None)
         self.mock_task = Mock('MockTask')
         self.mock_task.get_name.return_value = 'mytask'
         self.mock_task.get_path.return_value = 'mypath'

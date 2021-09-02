@@ -239,7 +239,7 @@ class OpenTelemetrySource(object):
     def set_span_attribute(self, span, attributeName, attributeValue):
         """ update the span attribute with the given attribute and value if not None """
 
-        if span is None:
+        if span is None and self._display is not None:
             self._display.warning('span object is None. Please double check if that is expected.')
         else:
             if attributeValue is not None:
