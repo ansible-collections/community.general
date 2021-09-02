@@ -10,16 +10,21 @@ from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock, Mock
 from ansible_collections.community.general.plugins.callback.opentelemetry import OpenTelemetrySource, TaskData, CallbackModule
 from collections import OrderedDict
-from datetime import datetime
+import sys
+
+OPENTELEMETRY_MINIMUM_PYTHON_VERSION = (3, 7)
 
 
 class TestOpentelemetry(unittest.TestCase):
-    @patch('ansible_collections.community.general.plugins.callback.opentelemetry._time_ns')
     @patch('ansible_collections.community.general.plugins.callback.opentelemetry.socket')
-    def setUp(self, mock_socket, mock__time_ns):
+    def setUp(self, mock_socket):
+        # TODO: this python version validation won't be needed as long as the _time_ns call is mocked.
+        if sys.version_info < OPENTELEMETRY_MINIMUM_PYTHON_VERSION:
+            self.skipTest("Python %s+ is needed for OpenTelemetry" %
+                          ",".join(map(str, OPENTELEMETRY_MINIMUM_PYTHON_VERSION)))
+
         mock_socket.gethostname.return_value = 'my-host'
         mock_socket.gethostbyname.return_value = '1.2.3.4'
-        mock__time_ns.return_value = datetime(2020, 12, 1)
         self.opentelemetry = OpenTelemetrySource(display=None)
         self.task_fields = {'args': {}}
         self.mock_host = Mock('MockHost')
