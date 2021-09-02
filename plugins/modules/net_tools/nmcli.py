@@ -1688,7 +1688,7 @@ class Nmcli(object):
                     value = value.upper()
                     # ensure current_value is also converted to uppercase in case nmcli changes behaviour
                     current_value = current_value.upper()
-                if key == 'gsm.apn' and current_value[0] == '"':
+                if key == 'gsm.apn':
                     # Depending on version nmcli adds double-qoutes to gsm.apn
                     # Need to strip them in order to compare both
                     current_value = current_value.strip('"')
