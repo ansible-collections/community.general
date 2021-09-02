@@ -156,16 +156,12 @@ def make_option_dict(line, iface, option, value, address_family):
     return {'line': line, 'iface': iface, 'option': option, 'value': value, 'line_type': 'option', 'address_family': address_family}
 
 
-def get_value_from_line(s):
-    space_re = re.compile(r'\s+')
-    for m in space_re.finditer(s):
-        pass
-    value_end = m.start()
-    option = s.split()[0]
-    option_start = s.find(option)
-    option_len = len(option)
-    value_start = re.search(r'\s', s[option_len + option_start:]).end() + option_len + option_start
-    return s[value_start:value_end]
+def get_option_value(line):
+    patt = re.compile(r'^\s+(?P<option>\S+)\s+(?P<value>([\'"].*[\'"]|\S?.*\S))\s*$')
+    match = patt.match(line)
+    if not match:
+        return None, None
+    return match.group("option"), match.group("value")
 
 
 def read_interfaces_file(module, filename):
@@ -236,9 +232,8 @@ def read_interfaces_lines(module, line_strings):
             currently_processing = "NONE"
         else:
             if currently_processing == "IFACE":
-                option_name = words[0]
+                option_name, value = get_option_value(line)
                 # TODO: if option_name in currif.options
-                value = get_value_from_line(line)
                 lines.append(make_option_dict(line, iface_name, option_name, value, address_family))
                 if option_name in ["pre-up", "up", "down", "post-up"]:
                     currif[option_name].append(value)
@@ -273,7 +268,6 @@ def set_interface_option(module, lines, iface, option, raw_value, state, address
 
     if state == "present":
         if len(target_options) < 1:
-            changed = True
             # add new option
             last_line_dict = iface_lines[-1]
             changed, lines = add_option_after_line(option, value, iface, lines, last_line_dict, iface_options, address_family)
