@@ -133,7 +133,7 @@ class OpenTelemetrySource(object):
 
         task_uuid = result._task._uuid
 
-        if hasattr(result, '_host'):
+        if hasattr(result, '_host') and result._host is not None:
             host_uuid = result._host._uuid
             host_name = result._host.name
         else:
