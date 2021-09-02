@@ -221,6 +221,11 @@ class TSSClientV1(TSSClient):
 
     @staticmethod
     def _get_authorizer(**server_parameters):
+        if server_parameters.get("token"):
+            return AccessTokenAuthorizer(
+                server_parameters["token"],
+            )
+
         if server_parameters.get("domain"):
             return DomainPasswordGrantAuthorizer(
                 server_parameters["base_url"],
@@ -228,11 +233,6 @@ class TSSClientV1(TSSClient):
                 server_parameters["domain"],
                 server_parameters["password"],
                 server_parameters["token_path_uri"],
-            )
-
-        if server_parameters.get("token"):
-            return AccessTokenAuthorizer(
-                server_parameters["token"],
             )
 
         return PasswordGrantAuthorizer(
