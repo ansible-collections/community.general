@@ -38,7 +38,9 @@ options:
               key: username
         required: false
     password:
-        description: The password associated with the supplied username.
+        description:
+            - The password associated with the supplied username.
+            - Required when I(token) is not provided.
         env:
             - name: TSS_PASSWORD
         ini:
@@ -60,6 +62,7 @@ options:
     token:
         description:
           - Existing token for Thycotic authorizer.
+          - If provided, I(username) and I(password) are not needed.
           - Requires C(python-tss-sdk) version 1.0.0 or greater.
         env:
             - name: TSS_TOKEN
