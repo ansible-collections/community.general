@@ -269,29 +269,30 @@ def set_interface_option(module, lines, iface, option, raw_value, state, address
         if not target_options:
             # add new option
             last_line_dict = iface_lines[-1]
-            changed, lines = add_option_after_line(option, value, iface, lines, last_line_dict, iface_options, address_family)
-        else:
-            if option in ["pre-up", "up", "down", "post-up"]:
-                if len(list(filter(lambda i: i['value'] == value, target_options))) < 1:
-                    changed, lines = add_option_after_line(option, value, iface, lines, target_options[-1], iface_options, address_family)
-            else:
-                # if more than one option found edit the last one
-                if target_options[-1]['value'] != value:
-                    changed = True
-                    target_option = target_options[-1]
-                    old_line = target_option['line']
-                    old_value = target_option['value']
-                    address_family = target_option['address_family']
-                    prefix_start = old_line.find(option)
-                    option_len = len(option)
-                    old_value_position = re.search(r"\s+".join(map(re.escape, old_value.split())), old_line[prefix_start + option_len:])
-                    start = old_value_position.start() + prefix_start + option_len
-                    end = old_value_position.end() + prefix_start + option_len
-                    line = old_line[:start] + value + old_line[end:]
-                    index = len(lines) - lines[::-1].index(target_option) - 1
-                    lines[index] = make_option_dict(line, iface, option, value, address_family)
-    elif state == "absent":
-        if len(target_options) >= 1:
+            return add_option_after_line(option, value, iface, lines, last_line_dict, iface_options, address_family)
+
+        if option in ["pre-up", "up", "down", "post-up"] and all(ito for ito in target_options if ito['value'] != value):
+            return add_option_after_line(option, value, iface, lines, target_options[-1], iface_options, address_family)
+
+        # if more than one option found edit the last one
+        if target_options[-1]['value'] != value:
+            changed = True
+            target_option = target_options[-1]
+            old_line = target_option['line']
+            old_value = target_option['value']
+            address_family = target_option['address_family']
+            prefix_start = old_line.find(option)
+            option_len = len(option)
+            old_value_position = re.search(r"\s+".join(map(re.escape, old_value.split())), old_line[prefix_start + option_len:])
+            start = old_value_position.start() + prefix_start + option_len
+            end = old_value_position.end() + prefix_start + option_len
+            line = old_line[:start] + value + old_line[end:]
+            index = len(lines) - lines[::-1].index(target_option) - 1
+            lines[index] = make_option_dict(line, iface, option, value, address_family)
+            return changed, lines
+
+    if state == "absent":
+        if target_options:
             if option in ["pre-up", "up", "down", "post-up"] and value is not None and value != "None":
                 for target_option in [ito for ito in target_options if ito['value'] == value]:
                     changed = True
