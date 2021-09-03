@@ -1,4 +1,5 @@
 minor_changes:
   - tss lookup plugin - added ``token`` parameter for token authorization;
-    ``username`` and ``password`` are optional when ``token`` is provided
+    ``username`` and ``password`` are optional when ``token`` is provided;
+    updated examples because ``base_url`` is already requried everywhere
     (https://github.com/ansible-collections/community.general/pull/3327).

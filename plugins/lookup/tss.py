@@ -100,18 +100,6 @@ _list:
 EXAMPLES = r"""
 - hosts: localhost
   vars:
-      secret: "{{ lookup('community.general.tss', 1) }}"
-  tasks:
-      - ansible.builtin.debug:
-          msg: >
-            the password is {{
-              (secret['items']
-                | items2dict(key_name='slug',
-                             value_name='itemValue'))['password']
-            }}
-
-- hosts: localhost
-  vars:
       secret: >-
         {{
             lookup(
@@ -133,8 +121,37 @@ EXAMPLES = r"""
 
 - hosts: localhost
   vars:
+      secret: >-
+        {{
+            lookup(
+                'community.general.tss',
+                102,
+                base_url='https://secretserver.domain.com/SecretServer/',
+                username='user.name',
+                password='password',
+                domain='domain'
+            )
+        }}
+  tasks:
+      - ansible.builtin.debug:
+          msg: >
+            the password is {{
+              (secret['items']
+                | items2dict(key_name='slug',
+                             value_name='itemValue'))['password']
+            }}
+
+- hosts: localhost
+  vars:
       secret_password: >-
-        {{ ((lookup('community.general.tss', 1) | from_json).get('items') | items2dict(key_name='slug', value_name='itemValue'))['password'] }}"
+        {{
+            ((lookup(
+                'community.general.tss',
+                102,
+                base_url='https://secretserver.domain.com/SecretServer/',
+                token='thycotic_access_token',
+            )  | from_json).get('items') | items2dict(key_name='slug', value_name='itemValue'))['password']
+        }}
   tasks:
       - ansible.builtin.debug:
           msg: the password is {{ secret_password }}
