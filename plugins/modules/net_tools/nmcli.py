@@ -54,6 +54,7 @@ options:
             - Type C(dummy) is added in community.general 3.5.0.
             - Type C(generic) is added in Ansible 2.5.
             - Type C(infiniband) is added in community.general 2.0.0.
+            - Type C(gsm) is added in community.general 3.7.0.
         type: str
         choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi, gsm ]
     mode:
@@ -652,6 +653,7 @@ options:
             - 'For instance to use apn, pin, username and password:
               C({apn: provider.apn, pin: 1234, username: apn.username, password: apn.password}).'
         type: dict
+        version_added: 3.7.0
         suboptions:
             apn:
                 description:
