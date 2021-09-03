@@ -151,7 +151,7 @@ def test_get_tasks(connect_mock, capfd, mocker):
     out, err = capfd.readouterr()
     assert not err
     assert len(json.loads(out)['proxmox_tasks']) != 0
-    assert json.loads(out)['changed'] is False
+    assert not json.loads(out)['changed']
 
 
 @patch('ansible_collections.community.general.plugins.module_utils.proxmox.ProxmoxAnsible._connect')
