@@ -182,7 +182,6 @@ def read_interfaces_lines(module, line_strings):
             lines.append(line_dict(line))
             continue
         if words[0] == "mapping":
-            # currmap = calloc(1, sizeof *currmap);
             lines.append(line_dict(line))
             currently_processing = "MAPPING"
         elif words[0] in ("source", "source-dir", "source-directory", "auto", "allow-", "no-auto-down", "no-scripts"):
@@ -224,7 +223,7 @@ def read_interfaces_lines(module, line_strings):
                 lines.append(line_dict(line))
             else:
                 module.fail_json(msg="misplaced option %s in line %d" % (line, i + 1))
-                return None, None
+
     return lines, ifaces
 
 
@@ -300,7 +299,7 @@ def add_option_after_line(option, value, iface, lines, last_line_dict, iface_opt
     suffix_start = last_line.rfind(last_line.split()[-1]) + len(last_line.split()[-1])
     prefix = last_line[:prefix_start]
 
-    if len(iface_options) < 1:
+    if not iface_options:
         # interface has no options, ident
         prefix += "    "
 
