@@ -261,13 +261,12 @@ def set_interface_option(module, lines, iface, option, raw_value, state, address
     if len(iface_lines) < 1:
         # interface not found
         module.fail_json(msg="Error: interface %s not found" % iface)
-        return changed, None
 
-    iface_options = list(filter(lambda i: i['line_type'] == 'option', iface_lines))
-    target_options = list(filter(lambda i: i['option'] == option, iface_options))
+    iface_options = [il for il in iface_lines if il['line_type'] == 'option']
+    target_options = [io for io in iface_options if io['option'] == option]
 
     if state == "present":
-        if len(target_options) < 1:
+        if not target_options:
             # add new option
             last_line_dict = iface_lines[-1]
             changed, lines = add_option_after_line(option, value, iface, lines, last_line_dict, iface_options, address_family)
@@ -294,13 +293,13 @@ def set_interface_option(module, lines, iface, option, raw_value, state, address
     elif state == "absent":
         if len(target_options) >= 1:
             if option in ["pre-up", "up", "down", "post-up"] and value is not None and value != "None":
-                for target_option in filter(lambda i: i['value'] == value, target_options):
+                for target_option in [ito for ito in target_options if ito['value'] == value]:
                     changed = True
-                    lines = list(filter(lambda ln: ln != target_option, lines))
+                    lines = [ln for ln in lines if ln != target_option]
             else:
                 changed = True
                 for target_option in target_options:
-                    lines = list(filter(lambda ln: ln != target_option, lines))
+                    lines = [ln for ln in lines if ln != target_option]
     else:
         module.fail_json(msg="Error: unsupported state %s, has to be either present or absent" % state)
 
