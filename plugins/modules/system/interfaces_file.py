@@ -178,23 +178,14 @@ def read_interfaces_lines(module, line_strings):
     currently_processing = None
     for i, line in enumerate(line_strings):
         words = line.split()
-        if len(words) < 1:
-            lines.append(line_dict(line))
-            continue
-        if words[0][0] == "#":
+        if not words or words[0].startswith("#"):
             lines.append(line_dict(line))
             continue
         if words[0] == "mapping":
             # currmap = calloc(1, sizeof *currmap);
             lines.append(line_dict(line))
             currently_processing = "MAPPING"
-        elif words[0] == "source":
-            lines.append(line_dict(line))
-            currently_processing = "NONE"
-        elif words[0] == "source-dir":
-            lines.append(line_dict(line))
-            currently_processing = "NONE"
-        elif words[0] == "source-directory":
+        elif words[0] in ("source", "source-dir", "source-directory", "auto", "allow-", "no-auto-down", "no-scripts"):
             lines.append(line_dict(line))
             currently_processing = "NONE"
         elif words[0] == "iface":
@@ -218,18 +209,6 @@ def read_interfaces_lines(module, line_strings):
             ifaces[iface_name] = currif
             lines.append({'line': line, 'iface': iface_name, 'line_type': 'iface', 'params': currif, 'address_family': address_family})
             currently_processing = "IFACE"
-        elif words[0] == "auto":
-            lines.append(line_dict(line))
-            currently_processing = "NONE"
-        elif words[0].startswith("allow-"):
-            lines.append(line_dict(line))
-            currently_processing = "NONE"
-        elif words[0] == "no-auto-down":
-            lines.append(line_dict(line))
-            currently_processing = "NONE"
-        elif words[0] == "no-scripts":
-            lines.append(line_dict(line))
-            currently_processing = "NONE"
         else:
             if currently_processing == "IFACE":
                 option_name, value = get_option_value(line)
@@ -258,7 +237,7 @@ def set_interface_option(module, lines, iface, option, raw_value, state, address
         iface_lines = [item for item in iface_lines
                        if "address_family" in item and item["address_family"] == address_family]
 
-    if len(iface_lines) < 1:
+    if not iface_lines:
         # interface not found
         module.fail_json(msg="Error: interface %s not found" % iface)
 
@@ -301,8 +280,6 @@ def set_interface_option(module, lines, iface, option, raw_value, state, address
                 changed = True
                 for target_option in target_options:
                     lines = [ln for ln in lines if ln != target_option]
-    else:
-        module.fail_json(msg="Error: unsupported state %s, has to be either present or absent" % state)
 
     return changed, lines
 
