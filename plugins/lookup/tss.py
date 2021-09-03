@@ -51,6 +51,7 @@ options:
         default: ""
         description:
           - The domain with which to request the OAuth2 Access Grant.
+          - Optional when I(token) is not provided.
           - Requires C(python-tss-sdk) version 1.0.0 or greater.
         env:
             - name: TSS_DOMAIN
