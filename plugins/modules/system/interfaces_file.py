@@ -311,11 +311,9 @@ def add_option_after_line(option, value, iface, lines, last_line_dict, iface_opt
 
 
 def write_changes(module, lines, dest):
-
     tmpfd, tmpfile = tempfile.mkstemp()
-    f = os.fdopen(tmpfd, 'wb')
-    f.write(to_bytes(''.join(lines), errors='surrogate_or_strict'))
-    f.close()
+    with os.fdopen(tmpfd, 'wb') as f:
+        f.write(to_bytes(''.join(lines), errors='surrogate_or_strict'))
     module.atomic_move(tmpfile, os.path.realpath(dest))
 
 
