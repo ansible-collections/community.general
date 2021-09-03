@@ -234,8 +234,8 @@ class GitLabProjectMembers(object):
 
     # remove user from a project
     def remove_user_from_project(self, gitlab_user_id, gitlab_project_id):
-            project = self._gitlab.projects.get(gitlab_project_id)
-            project.members.delete(gitlab_user_id)
+        project = self._gitlab.projects.get(gitlab_project_id)
+        project.members.delete(gitlab_user_id)
 
     # get user's access level
     def get_user_access_level(self, members, gitlab_user_id):
@@ -249,6 +249,7 @@ class GitLabProjectMembers(object):
             if member.id == gitlab_user_id:
                 member.access_level = access_level
                 member.save()
+
 
 def main():
     argument_spec = basic_auth_argument_spec()
