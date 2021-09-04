@@ -36,11 +36,18 @@ options:
             GET /1.0/containers/<name>
             U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#10containersname)
             are different, they this module tries to apply the configurations.
-          - The key starts with 'volatile.' are ignored for this comparison.
           - Not all config values are supported to apply the existing container.
             Maybe you need to delete and recreate a container.
         type: dict
         required: false
+    ignore_volatile_options:
+            description:
+            - Previously, 'volatile.'-options were ignored and, as a result,
+              reapplied for each execution.
+              The default behavior is retained and can be changed by setting it to false.
+              In the future, the behavior of the 'volatile.'-options not to ignore the standard.
+            type: boolean
+            default: True
     profiles:
         description:
           - Profile to be used by the container
@@ -176,6 +183,7 @@ EXAMPLES = '''
     - name: Create a started container
       community.general.lxd_container:
         name: mycontainer
+        ignore_volatile_options: True
         state: started
         source:
           type: image
@@ -209,6 +217,7 @@ EXAMPLES = '''
     - name: Create a started container
       community.general.lxd_container:
         name: mycontainer
+        ignore_volatile_options: True
         state: started
         source:
           type: image
@@ -279,6 +288,7 @@ EXAMPLES = '''
     - name: Create LXD container
       community.general.lxd_container:
         name: new-container-1
+        ignore_volatile_options: True
         state: started
         source:
           type: image
@@ -289,6 +299,7 @@ EXAMPLES = '''
     - name: Create container on another node
       community.general.lxd_container:
         name: new-container-2
+        ignore_volatile_options: True
         state: started
         source:
           type: image
@@ -557,7 +568,15 @@ class LXDContainerManagement(object):
     def _needs_to_change_container_config(self, key):
         if key not in self.config:
             return False
-        if key == 'config':
+        if key == 'config' and not self.config['ignore_volatile_options']:  # next default behavior
+            old_configs = dict((k, v) for k, v in self.old_container_json['metadata'][key].items())
+            for k, v in self.config['config'].items():
+                if k not in old_configs:
+                    return True
+                if old_configs[k] != v:
+                    return True
+            return False
+        elif key == 'config' and self.config['ignore_volatile_options']:  # old behavior to ignore "volatile"-options
             old_configs = dict((k, v) for k, v in self.old_container_json['metadata'][key].items() if not k.startswith('volatile.'))
             for k, v in self.config['config'].items():
                 if k not in old_configs:
@@ -651,6 +670,10 @@ def main():
             config=dict(
                 type='dict',
             ),
+            ignore_volatile_options=dict(
+                type='bool',
+                default=True
+            ),
             devices=dict(
                 type='dict',
             ),
@@ -703,7 +726,9 @@ def main():
         ),
         supports_check_mode=False,
     )
-
+    if module.params['ignore_volatile_options']:
+        module.deprecate(
+            'The default behavior ignore the "volatile."-options. This will change in the future. Please test your scripts by "ignore_volatile_options: False"')
     lxd_manage = LXDContainerManagement(module=module)
     lxd_manage.run()
 
