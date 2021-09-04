@@ -46,7 +46,7 @@ options:
               reapplied for each execution.
               The default behavior is retained and can be changed by setting it to false.
               In the future, the behavior of the 'volatile.'-options not to ignore the standard.
-            type: boolean
+            type: bool
             default: True
     profiles:
         description:
@@ -568,16 +568,16 @@ class LXDContainerManagement(object):
     def _needs_to_change_container_config(self, key):
         if key not in self.config:
             return False
-        if key == 'config' and not self.config['ignore_volatile_options']:  # next default behavior
-            old_configs = dict((k, v) for k, v in self.old_container_json['metadata'][key].items())
+        if key == 'config' and self.config['ignore_volatile_options']:  # old behavior to ignore "volatile"-options
+            old_configs = dict((k, v) for k, v in self.old_container_json['metadata'][key].items() if not k.startswith('volatile.'))
             for k, v in self.config['config'].items():
                 if k not in old_configs:
                     return True
                 if old_configs[k] != v:
                     return True
             return False
-        elif key == 'config':  # old behavior to ignore "volatile"-options
-            old_configs = dict((k, v) for k, v in self.old_container_json['metadata'][key].items() if not k.startswith('volatile.'))
+        elif key == 'config':  # next default behavior
+            old_configs = dict((k, v) for k, v in self.old_container_json['metadata'][key].items())
             for k, v in self.config['config'].items():
                 if k not in old_configs:
                     return True
@@ -728,7 +728,8 @@ def main():
     )
     if module.params['ignore_volatile_options']:
         module.deprecate(
-            'The default behavior ignore the "volatile."-options. This will change in the future. Please test your scripts by "ignore_volatile_options: False"')
+            'The default behavior ignore the "volatile."-options. This will change in the future. Please test your scripts by "ignore_volatile_options: False"',
+            version='4.0.0', collection_name='community.general')
     lxd_manage = LXDContainerManagement(module=module)
     lxd_manage.run()
 
