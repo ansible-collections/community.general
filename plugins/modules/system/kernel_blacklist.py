@@ -33,6 +33,7 @@ options:
         description:
             - If specified, use this blacklist file instead of
               C(/etc/modprobe.d/blacklist-ansible.conf).
+        default: /etc/modprobe.d/blacklist-ansible.conf
 '''
 
 EXAMPLES = '''
