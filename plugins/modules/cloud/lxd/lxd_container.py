@@ -576,7 +576,7 @@ class LXDContainerManagement(object):
                 if old_configs[k] != v:
                     return True
             return False
-        elif key == 'config' and self.config['ignore_volatile_options']:  # old behavior to ignore "volatile"-options
+        elif key == 'config':  # old behavior to ignore "volatile"-options
             old_configs = dict((k, v) for k, v in self.old_container_json['metadata'][key].items() if not k.startswith('volatile.'))
             for k, v in self.config['config'].items():
                 if k not in old_configs:
