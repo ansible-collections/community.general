@@ -568,7 +568,7 @@ class LXDContainerManagement(object):
     def _needs_to_change_container_config(self, key):
         if key not in self.config:
             return False
-        if key == 'config' and self.config['ignore_volatile_options']:  # old behavior to ignore "volatile"-options
+        if key == 'config' and self.ignore_volatile_options:  # old behavior to ignore "volatile"-options
             old_configs = dict((k, v) for k, v in self.old_container_json['metadata'][key].items() if not k.startswith('volatile.'))
             for k, v in self.config['config'].items():
                 if k not in old_configs:
@@ -625,6 +625,7 @@ class LXDContainerManagement(object):
         try:
             if self.trust_password is not None:
                 self.client.authenticate(self.trust_password)
+            self.ignore_volatile_options = self.module.params['ignore_volatile_options']
 
             self.old_container_json = self._get_container_json()
             self.old_state = self._container_json_to_module_state(self.old_container_json)
