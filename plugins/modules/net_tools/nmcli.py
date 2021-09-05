@@ -54,8 +54,9 @@ options:
             - Type C(dummy) is added in community.general 3.5.0.
             - Type C(generic) is added in Ansible 2.5.
             - Type C(infiniband) is added in community.general 2.0.0.
+            - Type C(gsm) is added in community.general 3.7.0.
         type: str
-        choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi ]
+        choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi, gsm ]
     mode:
         description:
             - This is the type of device or network connection that you wish to create for a bond or bridge.
@@ -183,7 +184,7 @@ options:
     mtu:
         description:
             - The connection MTU, e.g. 9000. This can't be applied when creating the interface and is done once the interface has been created.
-            - Can be used when modifying Team, VLAN, Ethernet (Future plans to implement wifi, pppoe, infiniband)
+            - Can be used when modifying Team, VLAN, Ethernet (Future plans to implement wifi, gsm, pppoe, infiniband)
             - This parameter defaults to C(1500) when unset.
         type: int
     dhcp_client_id:
@@ -643,6 +644,101 @@ options:
        type: bool
        default: false
        version_added: 3.6.0
+    gsm:
+        description:
+            - The configuration of the GSM connection.
+            - Note the list of suboption attributes may vary depending on which version of NetworkManager/nmcli is installed on the host.
+            - 'An up-to-date list of supported attributes can be found here:
+              U(https://networkmanager.dev/docs/api/latest/settings-gsm.html).'
+            - 'For instance to use apn, pin, username and password:
+              C({apn: provider.apn, pin: 1234, username: apn.username, password: apn.password}).'
+        type: dict
+        version_added: 3.7.0
+        suboptions:
+            apn:
+                description:
+                    - The GPRS Access Point Name specifying the APN used when establishing a data session with the GSM-based network.
+                    - The APN often determines how the user will be billed for their network usage and whether the user has access to the Internet or
+                      just a provider-specific walled-garden, so it is important to use the correct APN for the user's mobile broadband plan.
+                    - The APN may only be composed of the characters a-z, 0-9, ., and - per GSM 03.60 Section 14.9.
+                type: str
+            auto-config:
+                description: When C(true), the settings such as I(gsm.apn), I(gsm.username), or I(gsm.password) will default to values that match the network
+                    the modem will register to in the Mobile Broadband Provider database.
+                type: bool
+                default: false
+            device-id:
+                description:
+                    - The device unique identifier (as given by the C(WWAN) management service) which this connection applies to.
+                    - If given, the connection will only apply to the specified device.
+                type: str
+            home-only:
+                description:
+                    - When C(true), only connections to the home network will be allowed.
+                    - Connections to roaming networks will not be made.
+                type: bool
+                default: false
+            mtu:
+                description: If non-zero, only transmit packets of the specified size or smaller, breaking larger packets up into multiple Ethernet frames.
+                type: int
+                default: 0
+            network-id:
+                description:
+                    - The Network ID (GSM LAI format, ie MCC-MNC) to force specific network registration.
+                    - If the Network ID is specified, NetworkManager will attempt to force the device to register only on the specified network.
+                    - This can be used to ensure that the device does not roam when direct roaming control of the device is not otherwise possible.
+                type: str
+            number:
+                description: Legacy setting that used to help establishing PPP data sessions for GSM-based modems.
+                type: str
+            password:
+                description:
+                    - The password used to authenticate with the network, if required.
+                    - Many providers do not require a password, or accept any password.
+                    - But if a password is required, it is specified here.
+                type: str
+            password-flags:
+                description:
+                    - NMSettingSecretFlags indicating how to handle the I(password) property.
+                    - 'Following choices are allowed:
+                      C(0) B(NONE): The system is responsible for providing and storing this secret (default),
+                      C(1) B(AGENT_OWNED): A user secret agent is responsible for providing and storing this secret; when it is required agents will be
+                           asked to retrieve it
+                      C(2) B(NOT_SAVED): This secret should not be saved, but should be requested from the user each time it is needed
+                      C(4) B(NOT_REQUIRED): In situations where it cannot be automatically determined that the secret is required
+                           (some VPNs and PPP providers do not require all secrets) this flag indicates that the specific secret is not required.'
+                type: int
+                choices: [ 0, 1, 2 , 4 ]
+                default: 0
+            pin:
+                description:
+                    - If the SIM is locked with a PIN it must be unlocked before any other operations are requested.
+                    - Specify the PIN here to allow operation of the device.
+                type: str
+            pin-flags:
+                description:
+                    - NMSettingSecretFlags indicating how to handle the I(gsm.pin) property.
+                    - See I(gsm.password-flags) for NMSettingSecretFlags choices.
+                type: int
+                choices: [ 0, 1, 2 , 4 ]
+                default: 0
+            sim-id:
+                description:
+                    - The SIM card unique identifier (as given by the C(WWAN) management service) which this connection applies to.
+                    - 'If given, the connection will apply to any device also allowed by I(gsm.device-id) which contains a SIM card matching
+                        the given identifier.'
+                type: str
+            sim-operator-id:
+                description:
+                    - A MCC/MNC string like C(310260) or C(21601I) identifying the specific mobile network operator which this connection applies to.
+                    - 'If given, the connection will apply to any device also allowed by I(gsm.device-id) and I(gsm.sim-id) which contains a SIM card
+                        provisioned by the given operator.'
+                type: str
+            username:
+                description:
+                    - The username used to authenticate with the network, if required.
+                    - Many providers do not require a username, or accept any username.
+                    - But if a username is required, it is specified here.
 '''
 
 EXAMPLES = r'''
@@ -979,6 +1075,19 @@ EXAMPLES = r'''
     autoconnect: true
     state: present
 
+- name: Create a gsm connection
+  community.general.nmcli:
+    type: gsm
+    conn_name: my-gsm-provider
+    ifname: cdc-wdm0
+    gsm:
+        apn: my.provider.apn
+        username: my-provider-username
+        password: my-provider-password
+        pin: my-sim-pin
+    autoconnect: true
+    state: present
+
 '''
 
 RETURN = r"""#
@@ -1086,6 +1195,7 @@ class Nmcli(object):
         self.ssid = module.params['ssid']
         self.wifi = module.params['wifi']
         self.wifi_sec = module.params['wifi_sec']
+        self.gsm = module.params['gsm']
 
         if self.method4:
             self.ipv4_method = self.method4
@@ -1243,6 +1353,12 @@ class Nmcli(object):
                     options.update({
                         '802-11-wireless-security.%s' % name: value
                     })
+        elif self.type == 'gsm':
+            if self.gsm:
+                for name, value in self.gsm.items():
+                    options.update({
+                        'gsm.%s' % name: value,
+                    })
         # Convert settings values based on the situation.
         for setting, value in options.items():
             setting_type = self.settings_type(setting)
@@ -1280,7 +1396,8 @@ class Nmcli(object):
             'sit',
             'team',
             'vlan',
-            'wifi'
+            'wifi',
+            'gsm',
         )
 
     @property
@@ -1573,6 +1690,10 @@ class Nmcli(object):
                     value = value.upper()
                     # ensure current_value is also converted to uppercase in case nmcli changes behaviour
                     current_value = current_value.upper()
+                if key == 'gsm.apn':
+                    # Depending on version nmcli adds double-qoutes to gsm.apn
+                    # Need to strip them in order to compare both
+                    current_value = current_value.strip('"')
             else:
                 # parameter does not exist
                 current_value = None
@@ -1630,6 +1751,7 @@ def main():
                           'vlan',
                           'vxlan',
                           'wifi',
+                          'gsm',
                       ]),
             ip4=dict(type='str'),
             gw4=dict(type='str'),
@@ -1700,6 +1822,7 @@ def main():
             ssid=dict(type='str'),
             wifi=dict(type='dict'),
             wifi_sec=dict(type='dict', no_log=True),
+            gsm=dict(type='dict'),
         ),
         mutually_exclusive=[['never_default4', 'gw4']],
         required_if=[("type", "wifi", [("ssid")])],
