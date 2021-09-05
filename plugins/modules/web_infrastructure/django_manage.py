@@ -305,6 +305,8 @@ def main():
 
     # these params always get tacked on the end of the command
     for param in end_of_command_params:
+        if param == 'fixtures':
+            module.params[param] = module.params[param].split()
         if module.params[param]:
             run_cmd_args.append(module.params[param])
 
