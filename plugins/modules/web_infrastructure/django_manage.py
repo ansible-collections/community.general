@@ -306,8 +306,8 @@ def main():
     # these params always get tacked on the end of the command
     for param in end_of_command_params:
         if param in ('fixtures', 'apps'):
-            module.params[param] = module.params[param].split()
-        if module.params[param]:
+            run_cmd_args.extend(module.params[param].split())
+        else:
             run_cmd_args.append(module.params[param])
 
     rc, out, err = module.run_command(run_cmd_args, cwd=project_path)
