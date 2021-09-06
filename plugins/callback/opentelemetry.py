@@ -97,6 +97,7 @@ except ImportError:
 else:
     ORDER_LIBRARY_IMPORT_ERROR = None
 
+
 class OpenTelemetrySource(object):
     def __init__(self, display):
         self.ansible_playbook = ""
