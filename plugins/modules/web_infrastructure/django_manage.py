@@ -307,7 +307,7 @@ def main():
     for param in end_of_command_params:
         if module.params[param]:
             if param in ('fixtures', 'apps'):
-                run_cmd_args.extend(module.params[param].split())
+                run_cmd_args.extend(shlex.split(module.params[param]))
             else:
                 run_cmd_args.append(module.params[param])
 
