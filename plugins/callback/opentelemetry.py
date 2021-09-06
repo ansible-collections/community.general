@@ -64,6 +64,8 @@ import uuid
 from os.path import basename
 
 from ansible import constants as C
+from ansible.errors import AnsibleError
+from ansible.module_utils.six import raise_from
 from ansible.plugins.callback import CallbackBase
 
 try:
@@ -78,20 +80,22 @@ try:
         BatchSpanProcessor
     )
     from opentelemetry.util._time import _time_ns
-    HAS_OTEL = True
-except ImportError:
-    HAS_OTEL = False
+except ImportError as imp_exc:
+    OTEL_LIBRARY_IMPORT_ERROR = imp_exc
+else:
+    OTEL_LIBRARY_IMPORT_ERROR = None
 
 try:
     from collections import OrderedDict
-    HAS_ORDERED_DICT = True
 except ImportError:
     try:
         from ordereddict import OrderedDict
-        HAS_ORDERED_DICT = True
-    except ImportError:
-        HAS_ORDERED_DICT = False
-
+    except ImportError as imp_exc:
+        ORDER_LIBRARY_IMPORT_ERROR = imp_exc
+    else:
+        ORDER_LIBRARY_IMPORT_ERROR = None
+else:
+    ORDER_LIBRARY_IMPORT_ERROR = None
 
 class OpenTelemetrySource(object):
     def __init__(self, display):
@@ -264,17 +268,17 @@ class CallbackModule(CallbackBase):
         self.errors = 0
         self.disabled = False
 
-        if not HAS_OTEL:
-            self.disabled = True
-            self._display.warning('The `opentelemetry-api`, `opentelemetry-exporter-otlp` or `opentelemetry-sdk` python modules are not installed. '
-                                  'Disabling the `opentelemetry` callback plugin.')
+        if OTEL_LIBRARY_IMPORT_ERROR:
+            raise_from(
+                AnsibleError('The `opentelemetry-api`, `opentelemetry-exporter-otlp` or `opentelemetry-sdk` must be installed to use this plugin'),
+                OTEL_LIBRARY_IMPORT_ERROR)
 
-        if HAS_ORDERED_DICT:
-            self.tasks_data = OrderedDict()
+        if ORDER_LIBRARY_IMPORT_ERROR:
+            raise_from(
+                AnsibleError('The `ordereddict` must be installed to use this plugin'),
+                ORDER_LIBRARY_IMPORT_ERROR)
         else:
-            self.disabled = True
-            self._display.warning('The `ordereddict` python module is not installed. '
-                                  'Disabling the `opentelemetry` callback plugin.')
+            self.tasks_data = OrderedDict()
 
         self.opentelemetry = OpenTelemetrySource(display=self._display)
 
