@@ -142,15 +142,6 @@ class OpenTelemetrySource(object):
         if self.ansible_version is None and result._task_fields['args'].get('_ansible_version'):
             self.ansible_version = result._task_fields['args'].get('_ansible_version')
 
-        # ignore failure if expected and toggle result if asked for
-        if status == 'failed' and 'EXPECTED FAILURE' in task.name:
-            status = 'ok'
-        elif 'TOGGLE RESULT' in task.name:
-            if status == 'failed':
-                status = 'ok'
-            elif status == 'ok':
-                status = 'failed'
-
         task.add_host(HostData(host_uuid, host_name, status, result))
 
     def generate_distributed_traces(self, insecure_otel_exporter, otel_service_name, console_output, ansible_playbook, tasks_data, status):
