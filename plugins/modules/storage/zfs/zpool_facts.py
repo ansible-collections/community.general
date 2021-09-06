@@ -148,17 +148,16 @@ class ZPoolFacts(object):
 
         rc, out, err = self.module.run_command(cmd, check_rc=True)
 
-        if rc == 0:
-            for line in out.splitlines():
-                pool, property, value = line.split('\t')
+        for line in out.splitlines():
+            pool, prop, value = line.split('\t')
 
-                self._pools[pool].update({property: value})
+            self._pools[pool].update({prop: value})
 
-            for k, v in iteritems(self._pools):
-                v.update({'name': k})
-                self.facts.append(v)
+        for k, v in iteritems(self._pools):
+            v.update({'name': k})
+            self.facts.append(v)
 
-            return {'ansible_zfs_pools': self.facts}
+        return {'ansible_zfs_pools': self.facts}
 
 
 def main():
