@@ -36,7 +36,6 @@ options:
         ini:
             - section: tss_lookup
               key: username
-        required: false
     password:
         description:
             - The password associated with the supplied username.
@@ -46,7 +45,6 @@ options:
         ini:
             - section: tss_lookup
               key: password
-        required: false
     domain:
         default: ""
         description:
@@ -70,7 +68,6 @@ options:
         ini:
             - section: tss_lookup
               key: token
-        required: false
         version_added: 3.7.0
     api_path_uri:
         default: /api/v1
