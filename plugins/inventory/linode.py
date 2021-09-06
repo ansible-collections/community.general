@@ -29,8 +29,7 @@ DOCUMENTATION = r'''
         ip_style:
             description: Populate hostvars with all information available from the Linode APIv4.
             type: string
-            default:
-                - plain
+            default: plain
             choices:
                 - plain
                 - api

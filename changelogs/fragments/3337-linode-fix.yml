@@ -1,0 +1,2 @@
+bugfixes:
+  - "linode inventory plugin - fix default value of new option ``ip_style`` (https://github.com/ansible-collections/community.general/issues/3337)."
