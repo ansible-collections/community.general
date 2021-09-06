@@ -16,19 +16,21 @@ DOCUMENTATION = '''
     options:
       hide_task_arguments:
         default: false
-        type: boolean
+        type: bool
         description:
           - Hide the arguments for a task.
         env:
           - name: OPENTELEMETRY_HIDE_TASK_ARGUMENTS
       console_output:
         default: false
+        type: bool
         description:
           - Print distributed traces in the terminal.
         env:
           - name: OPENTELEMETRY_CONSOLE_OUTPUT
       otel_service_name:
         default: ansible
+        type: str
         description:
           - The service name resource attribute.
         env:
@@ -246,8 +248,8 @@ class CallbackModule(CallbackBase):
                                      Default: false
         OTEL_SERVICE_NAME (optional): The service name resource attribute.
                                      Default: ansible
-        OTEL_CONSOLE_OUTPUT (optional): Print distributed traces in the terminal.
-                                     Default: true
+        OPENTELEMETRY_CONSOLE_OUTPUT (optional): Print distributed traces in the terminal.
+                                     Default: false
     Requires:
         opentelemetry-api
         opentelemetry-exporter-otlp
