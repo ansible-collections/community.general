@@ -176,45 +176,45 @@ class TestKeycloakUserFederation(ModuleTestCase):
             'auth_username': 'admin',
             'auth_password': 'admin',
             'realm': 'realm-name',
-            'name': 'ldap'
-            'state': 'present'
-            'provider_id': 'ldap'
-            'provider_type': 'org.keycloak.storage.UserStorageProvider'
+            'name': 'ldap',
+            'state': 'present',
+            'provider_id': 'ldap',
+            'provider_type': 'org.keycloak.storage.UserStorageProvider',
             'config': {
-                'priority': 0
-                'enabled': True
-                'cachePolicy': 'DEFAULT'
-                'batchSizeForSync': 1000
-                'editMode': 'READ_ONLY'
-                'importEnabled': True
-                'syncRegistrations': False
-                'vendor': 'other'
-                'usernameLDAPAttribute': 'uid'
-                'rdnLDAPAttribute': 'uid'
-                'uuidLDAPAttribute': 'entryUUID'
-                'userObjectClasses': 'inetOrgPerson, organizationalPerson'
-                'connectionUrl': 'ldaps://ldap.example.com:636'
-                'usersDn': 'ou=Users,dc=example,dc=com'
-                'authType': 'none'
-                'searchScope': 1
-                'validatePasswordPolicy': False
-                'trustEmail': False
-                'useTruststoreSpi': 'ldapsOnly'
-                'connectionPooling': True
-                'pagination': True
-                'allowKerberosAuthentication': False
-                'debug': False
-                'useKerberosForPasswordAuthentication': False
+                'priority': 0,
+                'enabled': True,
+                'cachePolicy': 'DEFAULT',
+                'batchSizeForSync': 1000,
+                'editMode': 'READ_ONLY',
+                'importEnabled': True,
+                'syncRegistrations': False,
+                'vendor': 'other',
+                'usernameLDAPAttribute': 'uid',
+                'rdnLDAPAttribute': 'uid',
+                'uuidLDAPAttribute': 'entryUUID',
+                'userObjectClasses': 'inetOrgPerson, organizationalPerson',
+                'connectionUrl': 'ldaps://ldap.example.com:636',
+                'usersDn': 'ou=Users,dc=example,dc=com',
+                'authType': 'none',
+                'searchScope': 1,
+                'validatePasswordPolicy': False,
+                'trustEmail': False,
+                'useTruststoreSpi': 'ldapsOnly',
+                'connectionPooling': True,
+                'pagination': True,
+                'allowKerberosAuthentication': False,
+                'debug': False,
+                'useKerberosForPasswordAuthentication': False,
             },
             'mappers': [
                 {
-                    'name': 'full name'
-                    'providerId': 'full-name-ldap-mapper'
-                    'providerType': 'org.keycloak.storage.ldap.mappers.LDAPStorageMapper'
+                    'name': 'full name',
+                    'providerId': 'full-name-ldap-mapper',
+                    'providerType': 'org.keycloak.storage.ldap.mappers.LDAPStorageMapper',
                     'config': {
-                        'ldap.full.name.attribute': 'cn'
-                        'read.only': True
-                        'write.only': False
+                        'ldap.full.name.attribute': 'cn',
+                        'read.only': True,
+                        'write.only': False,
                     }
                 }
             ]
