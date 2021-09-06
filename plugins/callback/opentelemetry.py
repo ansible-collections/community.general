@@ -9,13 +9,14 @@ DOCUMENTATION = '''
     name: opentelemetry
     type: notification
     short_description: Create distributed traces with OpenTelemetry
-    version_added: 2.5.0
+    version_added: 3.7.0
     description:
       - This callback create distributed traces for each Ansible task with OpenTelemetry.
       - You can configure the OTEL exporter with environment variables. See U(https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html).
     options:
       hide_task_arguments:
         default: false
+        type: boolean
         description:
           - Hide the arguments for a task.
         env:
