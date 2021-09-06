@@ -27,7 +27,8 @@ options:
     state:
         description:
             - State of the user federation.
-            - On C(present), the user federation will be created if it does not yet exist, or updated with the parameters you provide.
+            - On C(present), the user federation will be created if it does not yet exist, or updated with
+              the parameters you provide.
             - On C(absent), the user federation will be removed if it exists.
         default: 'present'
         type: str
@@ -43,8 +44,8 @@ options:
 
     id:
         description:
-            - The id uniquely identifies a user federation.
-        required: true
+            - The unique ID for this user federation. If left empty, the user federation will be searched
+              by its `name`.
         type: str
 
     name:
@@ -52,47 +53,73 @@ options:
             - Display name of provider when linked in admin console.
         type: str
 
+    provider_id:
+        description:
+            - Provider for this user federation (supported values are C(ldap) or C(kerberos)).
+        aliases:
+            - providerId
+        type: str
+        choices:
+            - ldap
+            - kerberos
+
+    provider_type:
+        description:
+            - Component type for user federation (only supported value is C(org.keycloak.storage.UserStorageProvider)).
+        aliases:
+            - providerType
+        default: org.keycloak.storage.UserStorageProvider
+        type: str
+
+    parent_id:
+        description:
+            - Unique ID for this user federation. Realm ID will be used if left blank.
+        aliases:
+            - parentId
+        type: str
+
     config:
         description:
-            - Dict specifying the configuration options for the provider; the contents differ depending on the value of I(providerId).
-              Examples are given below for C(oidc) and C(saml). It is easiest to obtain valid config values by dumping an already-existing
-              user federation configuration through check-mode in the I(existing) field.
+            - Dict specifying the configuration options for the provider; the contents differ depending on
+              the value of I(provider_id). Examples are given below for C(ldap) and C(kerberos). It is easiest
+              to obtain valid config values by dumping an already-existing user federation configuration
+              through check-mode in the I(existing) field.
         type: dict
         suboptions:
             enabled:
                 description:
                     - Enable/disable this user federation.
+                default: True
                 type: bool
 
             priority:
                 description:
                     - Priority of provider when doing a user lookup. Lowest first.
+                default: 0
                 type: int
 
-            import_enabled:
+            importEnabled:
                 description:
-                    - If true, LDAP users will be imported into Keycloak DB and synced by the configured sync policies.
-                aliases:
-                    - importEnabled
+                    - If C(True), LDAP users will be imported into Keycloak DB and synced by the configured
+                      sync policies.
+                default: True
                 type: bool
 
-            edit_mode:
+            editMode:
                 description:
-                    - READ_ONLY is a read-only LDAP store. WRITABLE means data will be synced back to LDAP on demand. UNSYNCED
-                    means user data will be imported, but not synced back to LDAP.
-                aliases:
-                    - editMode
+                    - C(READ_ONLY) is a read-only LDAP store. C(WRITABLE) means data will be synced back to LDAP
+                      on demand. C(UNSYNCED) means user data will be imported, but not synced back to LDAP.
                 type: str
                 choices:
                     - READ_ONLY
                     - WRITABLE
                     - UNSYNCED
 
-            sync_registrations:
+            syncRegistrations:
                 description:
-                    - Should newly created users be created within LDAP store? Priority effects which provider is chosen to sync the new user.
-                aliases:
-                    - syncRegistrations
+                    - Should newly created users be created within LDAP store? Priority effects which
+                      provider is chosen to sync the new user.
+                default: False
                 type: bool
 
             vendor:
@@ -100,234 +127,220 @@ options:
                     - LDAP vendor (provider).
                 type: str
 
-            username_ldap_attribute:
+            usernameLDAPAttribute:
                 description:
-                    - Name of LDAP attribute, which is mapped as Keycloak username. For many LDAP server vendors it can be 'uid'. For Active
-                    directory it can be 'sAMAccountName' or 'cn'. The attribute should be filled for all LDAP user records you want to import
-                    from LDAP to Keycloak.
-                aliases:
-                    - usernameLDAPAttribute
+                    - Name of LDAP attribute, which is mapped as Keycloak username. For many LDAP server
+                      vendors it can be C(uid). For Active directory it can be C(sAMAccountName) or C(cn).
+                      The attribute should be filled for all LDAP user records you want to import from
+                      LDAP to Keycloak.
                 type: str
 
-            rdn_ldap_attribute:
+            rdnLDAPAttribute:
                 description:
-                    - Name of LDAP attribute, which is used as RDN (top attribute) of typical user DN. Usually it's the same as Username LDAP
-                    attribute, however it is not required. For example for Active directory, it is common to use 'cn' as RDN attribute when
-                    username attribute might be 'sAMAccountName'.
-                aliases:
-                    - rdnLDAPAttribute
+                    - Name of LDAP attribute, which is used as RDN (top attribute) of typical user DN.
+                      Usually it's the same as Username LDAP attribute, however it is not required. For
+                      example for Active directory, it is common to use C(cn) as RDN attribute when
+                      username attribute might be C(sAMAccountName).
                 type: str
 
-            uuid_ldap_attribute:
+            uuidLDAPAttribute:
                 description:
-                    - Name of LDAP attribute, which is used as unique object identifier (UUID) for objects in LDAP. For many LDAP server vendors,
-                    it is 'entryUUID'; however some are different. For example for Active directory it should be 'objectGUID'. If your LDAP server
-                    does not support the notion of UUID, you can use any other attribute that is supposed to be unique among LDAP users in tree.
-                aliases:
-                    - uuidLDAPAttribute
+                    - Name of LDAP attribute, which is used as unique object identifier (UUID) for objects
+                      in LDAP. For many LDAP server vendors, it is C(entryUUID); however some are different.
+                      For example for Active directory it should be C(objectGUID). If your LDAP server does
+                      not support the notion of UUID, you can use any other attribute that is supposed to
+                      be unique among LDAP users in tree.
                 type: str
 
-            user_object_classes:
+            userObjectClasses:
                 description:
-                    - All values of LDAP objectClass attribute for users in LDAP divided by comma. For example: 'inetOrgPerson, organizationalPerson'.
-                    Newly created Keycloak users will be written to LDAP with all those object classes and existing LDAP user records are found just
-                    if they contain all those object classes.
-                aliases:
-                    - userObjectClasses
+                    - All values of LDAP objectClass attribute for users in LDAP divided by comma.
+                      For example C(inetOrgPerson, organizationalPerson). Newly created Keycloak users
+                      will be written to LDAP with all those object classes and existing LDAP user records
+                      are found just if they contain all those object classes.
                 type: str
 
-            connection_url:
+            connectionUrl:
                 description:
                     - Connection URL to your LDAP server.
-                aliases:
-                    - connectionUrl
                 type: str
 
-            users_dn:
+            usersDn:
                 description:
                     - Full DN of LDAP tree where your users are. This DN is the parent of LDAP users.
-                aliases:
-                    - usersDn
                 type: str
 
-            customUser_search_filter:
+            customUserSearchFilter:
                 description:
-                    - Additional LDAP Filter for filtering searched users. Leave this empty if you don't need additional filter.
-                aliases:
-                    - customUserSearchFilter
+                    - Additional LDAP Filter for filtering searched users. Leave this empty if you don't
+                      need additional filter.
                 type: str
 
-            search_scope:
+            searchScope:
                 description:
-                    - For one level, the search applies only for users in the DNs specified by User DNs. For subtree, the search applies to the
-                    whole subtree. See LDAP documentation for more details
-                aliases:
-                    - searchScope
+                    - For one level, the search applies only for users in the DNs specified by User DNs.
+                      For subtree, the search applies to the whole subtree. See LDAP documentation for
+                      more details
+                default: '1'
                 type: str
+                choices:
+                    - 1
+                    - 2
 
-            auth_type:
+            authType:
                 description:
-                    - Type of the Authentication method used during LDAP Bind operation. It is used in most of the requests sent to the LDAP server.
-                    Currently only 'none' (anonymous LDAP authentication) or 'simple' (Bind credential + Bind password authentication) mechanisms are available.
-                aliases:
-                    - authType
+                    - Type of the Authentication method used during LDAP Bind operation. It is used in
+                      most of the requests sent to the LDAP server.
+                default: 'none'
                 type: str
+                choices:
+                    - none
+                    - simple
 
-            bind_dn:
+            bindDn:
                 description:
                     - DN of LDAP user which will be used by Keycloak to access LDAP server.
-                aliases:
-                    - bindDn
                 type: str
 
-            bind_credential:
+            bindCredential:
                 description:
-                    - Password of LDAP admin. This field is able to obtain its value from vault, use ${vault.ID} format.
-                aliases:
-                    - bindCredential
+                    - Password of LDAP admin.
                 type: str
 
-            start_tls:
+            startTls:
                 description:
                     - Encrypts the connection to LDAP using STARTTLS, which will disable connection pooling.
-                aliases:
-                    - startTls
+                default: False
                 type: bool
 
-            use_password_modify_extended_op:
+            usePasswordModifyExtendedOp:
                 description:
-                    - Use the LDAPv3 Password Modify Extended Operation (RFC-3062). The password modify extended operation usually requires
-                    that LDAP user already has password in the LDAP server. So when this is used with 'Sync Registrations', it can be good to
-                    add also 'Hardcoded LDAP attribute mapper' with randomly generated initial password.
-                aliases:
-                    - usePasswordModifyExtendedOp
+                    - Use the LDAPv3 Password Modify Extended Operation (RFC-3062). The password modify
+                      extended operation usually requires that LDAP user already has password in the LDAP
+                      server. So when this is used with 'Sync Registrations', it can be good to add also
+                      'Hardcoded LDAP attribute mapper' with randomly generated initial password.
+                default: False
                 type: bool
 
-            validate_password_policy:
+            validatePasswordPolicy:
                 description:
-                    - Determines if Keycloak should validate the password with the realm password policy before updating it.
-                aliases:
-                    - validatePasswordPolicy
+                    - Determines if Keycloak should validate the password with the realm password policy
+                      before updating it.
+                default: False
                 type: bool
 
-            trust_email:
+            trustEmail:
                 description:
-                    - If enabled, email provided by this provider is not verified even if verification is enabled for the realm.
-                aliases:
-                    - trustEmail
+                    - If enabled, email provided by this provider is not verified even if verification is
+                      enabled for the realm.
+                default: False
                 type: bool
 
-            use_truststore_spi:
+            useTruststoreSpi:
                 description:
-                    - Specifies whether LDAP connection will use the truststore SPI with the truststore configured in standalone.xml/domain.xml.
-                    'Always' means that it will always use it. 'Never' means that it will not use it. 'Only for ldaps' means that it will use if
-                    your connection URL use ldaps. Note even if standalone.xml/domain.xml is not configured, the default Java cacerts or certificate
-                    specified by 'javax.net.ssl.trustStore' property will be used.
-                aliases:
-                    - useTruststoreSpi
+                    - Specifies whether LDAP connection will use the truststore SPI with the truststore
+                      configured in standalone.xml/domain.xml. C(Always) means that it will always use it.
+                      C(Never) means that it will not use it. C(Only for ldaps) means that it will use if
+                      your connection URL use ldaps. Note even if standalone.xml/domain.xml is not
+                      configured, the default Java cacerts or certificate specified by
+                      'javax.net.ssl.trustStore' property will be used.
                 type: str
+                choices:
+                    - always
+                    - ldapsOnly
+                    - never
 
-            connection_timeout:
+            connectionTimeout:
                 description:
                     - LDAP Connection Timeout in milliseconds.
-                aliases:
-                    - connectionTimeout
                 type: int
 
-            read_timeout:
+            readTimeout:
                 description:
                     - LDAP Read Timeout in milliseconds. This timeout applies for LDAP read operations.
-                aliases:
-                    - readTimeout
                 type: int
 
             pagination:
                 description:
                     - Does the LDAP server support pagination.
+                default: True
                 type: bool
 
-            connection_pooling:
+            connectionPooling:
                 description:
                     - Determines if Keycloak should use connection pooling for accessing LDAP server.
-                aliases:
-                    - connectionPooling
+                default: True
                 type: bool
 
-            connection_pooling_authentication:
+            connectionPoolingAuthentication:
                 description:
-                    - A list of space-separated authentication types of connections that may be pooled. Valid types are "none", "simple", and "DIGEST-MD5".
-                aliases:
-                    - connectionPoolingAuthentication
+                    - A list of space-separated authentication types of connections that may be pooled.
+                type: str
+                choices:
+                    - none
+                    - simple
+                    - DIGEST-MD5
+
+            connectionPoolingDebug:
+                description:
+                    - A string that indicates the level of debug output to produce. Example valid values are
+                      C(fine) (trace connection creation and removal) and C(all) (all debugging information).
                 type: str
 
-            connection_pooling_debug:
+            connectionPoolingInitSize:
                 description:
-                    - A string that indicates the level of debug output to produce. Valid values are "fine" (trace connection creation and removal) and "all" (all debugging information).
-                aliases:
-                    - connectionPoolingDebug
+                    - The string representation of an integer that represents the number of connections per
+                      connection identity to create when initially creating a connection for the identity.
                 type: str
 
-            connection_pooling_init_size:
+            connectionPoolingMaxSize:
                 description:
-                    - The string representation of an integer that represents the number of connections per connection identity to create when initially creating a connection for the identity.
-                aliases:
-                    - connectionPoolingInitSize
+                    - The string representation of an integer that represents the maximum number of
+                      connections per connection identity that can be maintained concurrently.
                 type: str
 
-            connection_pooling_max_size:
+            connectionPoolingPrefSize:
                 description:
-                    - The string representation of an integer that represents the maximum number of connections per connection identity that can be maintained concurrently.
-                aliases:
-                    - connectionPoolingMaxSize
+                    - The string representation of an integer that represents the preferred number of
+                      connections per connection identity that should be maintained concurrently.
                 type: str
 
-            connection_pooling_pref_size:
+            connectionPoolingProtocol:
                 description:
-                    - The string representation of an integer that represents the preferred number of connections per connection identity that should be maintained concurrently.
-                aliases:
-                    - connectionPoolingPrefSize
+                    - A list of space-separated protocol types of connections that may be pooled.
+                      Valid types are C(plain) and C(ssl).
                 type: str
 
-            connection_pooling_protocol:
+            connectionPoolingTimeout:
                 description:
-                    - A list of space-separated protocol types of connections that may be pooled. Valid types are "plain" and "ssl".
-                aliases:
-                    - connectionPoolingProtocol
+                    - The string representation of an integer that represents the number of milliseconds
+                      that an idle connection may remain in the pool without being closed and removed
+                      from the pool.
                 type: str
 
-            connection_pooling_timeout:
+            allowKerberosAuthentication:
                 description:
-                    - The string representation of an integer that represents the number of milliseconds that an idle connection may remain in the pool without being closed and removed from the pool.
-                aliases:
-                    - connectionPoolingTimeout
-                type: str
-
-            allow_kerberos_authentication:
-                description:
-                    - Enable/disable HTTP authentication of users with SPNEGO/Kerberos tokens. The data about authenticated users will be provisioned from this LDAP server.
-                aliases:
-                    - allowKerberosAuthentication
+                    - Enable/disable HTTP authentication of users with SPNEGO/Kerberos tokens. The data
+                      about authenticated users will be provisioned from this LDAP server.
+                default: False
                 type: bool
 
-            kerberos_realm:
+            kerberosRealm:
                 description:
                     - Name of kerberos realm.
-                aliases:
-                    - kerberosRealm
                 type: str
 
-            server_principal:
+            serverPrincipal:
                 description:
-                    - Full name of server principal for HTTP service including server and domain name. For example 'HTTP/host.foo.org@FOO.ORG'. Use '*' to accept any service principal in the KeyTab file.
-                aliases:
-                    - serverPrincipal
+                    - Full name of server principal for HTTP service including server and domain name. For
+                      example C(HTTP/host.foo.org@FOO.ORG). Use C(*) to accept any service principal in the
+                      KeyTab file.
                 type: str
 
-            key_tab:
+            keyTab:
                 description:
-                    - Location of Kerberos KeyTab file containing the credentials of server principal. For example /etc/krb5.keytab.
-                aliases:
-                    - keyTab
+                    - Location of Kerberos KeyTab file containing the credentials of server principal. For
+                      example C(/etc/krb5.keytab).
                 type: str
 
             debug:
@@ -335,85 +348,71 @@ options:
                     - Enable/disable debug logging to standard output for Krb5LoginModule.
                 type: bool
 
-            use_kerberos_for_password_authentication:
+            useKerberosForPasswordAuthentication:
                 description:
-                    - Use Kerberos login module for authenticate username/password against Kerberos server instead of authenticating against LDAP server with Directory Service API.
-                aliases:
-                    - useKerberosForPasswordAuthentication
+                    - Use Kerberos login module for authenticate username/password against Kerberos server
+                      instead of authenticating against LDAP server with Directory Service API.
+                default: False
                 type: str
 
-            allow_password_authentication:
+            allowPasswordAuthentication:
                 description:
                     - Enable/disable possibility of username/password authentication against Kerberos database.
-                aliases:
-                    - allowPasswordAuthentication
                 type: bool
 
-            batch_size_for_sync:
+            batchSizeForSync:
                 description:
                     - Count of LDAP users to be imported from LDAP to Keycloak within a single transaction.
-                aliases:
-                    - batchSizeForSync
+                default: 1000
                 type: int
 
-            full_sync_period:
+            fullSyncPeriod:
                 description:
                     - Period for full synchronization in seconds.
-                aliases:
-                    - fullSyncPeriod
+                default: -1
                 type: int
 
-            changed_sync_period:
+            changedSyncPeriod:
                 description:
                     - Period for synchronization of changed or newly created LDAP users in seconds.
-                aliases:
-                    - changedSyncPeriod
+                default: -1
                 type: int
 
-            update_profile_first_login:
+            updateProfileFirstLogin:
                 description:
                     - Update profile on first login.
-                aliases:
-                    - updateProfileFirstLogin
                 type: bool
 
-            cache_policy:
+            cachePolicy:
                 description:
                     - Cache Policy for this storage provider.
-                      'DEFAULT' is whatever the default settings are for the global cache.
-                      'EVICT_DAILY' is a time of day every day that the cache will be invalidated.
-                      'EVICT_WEEKLY' is a day of the week and time the cache will be invalidated.
-                      'MAX-LIFESPAN' is the time in milliseconds that will be the lifespan of a cache entry.
-                aliases:
-                    - cachePolicy
                 type: str
+                default: 'DEFAULT'
+                choices:
+                    - DEFAULT
+                    - EVICT_DAILY
+                    - EVICT_WEEKLY
+                    - MAX_LIFESPAN
+                    - NO_CACHE
 
-            eviction_day:
+            evictionDay:
                 description:
                     - Day of the week the entry will become invalid on.
-                aliases:
-                    - evictionDay
                 type: str
 
-            eviction_hour:
+            evictionHour:
                 description:
                     - Hour of day the entry will become invalid on.
-                aliases:
-                    - evictionHour
                 type: str
 
-            eviction_minute:
+            evictionMinute:
                 description:
                     - Minute of day the entry will become invalid on.
-                aliases:
-                    - evictionMinute
                 type: str
 
-            max_lifespan:
+            maxLifespan:
                 description:
                     - Max lifespan of cache entry in milliseconds.
-                aliases:
-                    - maxLifespan
                 type: str
 
     mappers:
@@ -444,7 +443,8 @@ options:
 
             config:
                 description:
-                    - Dict specifying the configuration options for the mapper; the contents differ depending on the value of I(identityProviderMapper).
+                    - Dict specifying the configuration options for the mapper; the contents differ
+                      depending on the value of I(identityProviderMapper).
                 type: dict
 
 extends_documentation_fragment:
@@ -537,10 +537,10 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-  description: Message as to what action was taken
-  returned: always
-  type: str
-  sample: "No changes required to user federation 164bb483-c613-482e-80fe-7f1431308799."
+    description: Message as to what action was taken
+    returned: always
+    type: str
+    sample: "No changes required to user federation 164bb483-c613-482e-80fe-7f1431308799."
 
 proposed:
     description: Representation of proposed changes to user federation
@@ -692,16 +692,16 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     config_spec = dict(
-        allowKerberosAuthentication=dict(type='bool'),
+        allowKerberosAuthentication=dict(type='bool', default=False),
         allowPasswordAuthentication=dict(type='bool'),
-        authType=dict(type='str'),
-        batchSizeForSync=dict(type='int'),
-        bindCredential=dict(type='str'),
+        authType=dict(type='str', choices=['none', 'simple'], default='none'),
+        batchSizeForSync=dict(type='int', default=1000),
+        bindCredential=dict(type='str', no_log=True),
         bindDn=dict(type='str'),
-        cachePolicy=dict(type='str'),
-        changedSyncPeriod=dict(type='int'),
-        connectionPooling=dict(type='bool'),
-        connectionPoolingAuthentication=dict(type='str'),
+        cachePolicy=dict(type='str', choices=['DEFAULT', 'EVICT_DAILY', 'EVICT_WEEKLY', 'MAX_LIFESPAN', 'NO_CACHE'], default='DEFAULT'),
+        changedSyncPeriod=dict(type='int', default=-1),
+        connectionPooling=dict(type='bool', default=True),
+        connectionPoolingAuthentication=dict(type='str', choices=['none', 'simple', 'DIGEST-MD5']),
         connectionPoolingDebug=dict(type='str'),
         connectionPoolingInitSize=dict(type='int'),
         connectionPoolingMaxSize=dict(type='int'),
@@ -712,34 +712,34 @@ def main():
         connectionUrl=dict(type='str'),
         customUserSearchFilter=dict(type='str'),
         debug=dict(type='bool'),
-        editMode=dict(type='str'),
-        enabled=dict(type='bool'),
+        editMode=dict(type='str', choices=['READ_ONLY', 'WRITABLE', 'UNSYNCED'], default='READ_ONLY'),
+        enabled=dict(type='bool', default=True),
         evictionDay=dict(type='str'),
         evictionHour=dict(type='str'),
         evictionMinute=dict(type='str'),
-        fullSyncPeriod=dict(type='int'),
-        importEnabled=dict(type='bool'),
+        fullSyncPeriod=dict(type='int', default=-1),
+        importEnabled=dict(type='bool', default=True),
         kerberosRealm=dict(type='str'),
         keyTab=dict(type='str'),
         maxLifespan=dict(type='int'),
-        pagination=dict(type='bool'),
-        priority=dict(type='int'),
+        pagination=dict(type='bool', default=True),
+        priority=dict(type='int', default=0),
         rdnLDAPAttribute=dict(type='str'),
         readTimeout=dict(type='int'),
-        searchScope=dict(type='str'),
+        searchScope=dict(type='str', choices=['1', '2'], default='1'),
         serverPrincipal=dict(type='str'),
-        startTls=dict(type='bool'),
-        syncRegistrations=dict(type='bool'),
-        trustEmail=dict(type='bool'),
+        startTls=dict(type='bool', default=False),
+        syncRegistrations=dict(type='bool', default=False),
+        trustEmail=dict(type='bool', default=False),
         updateProfileFirstLogin=dict(type='bool'),
-        useKerberosForPasswordAuthentication=dict(type='bool'),
-        usePasswordModifyExtendedOp=dict(type='str'),
-        useTruststoreSpi=dict(type='str'),
+        useKerberosForPasswordAuthentication=dict(type='bool', default=False),
+        usePasswordModifyExtendedOp=dict(type='str', default=False),
+        useTruststoreSpi=dict(type='str', choices=['always', 'ldapsOnly', 'never'], default='ldapsOnly'),
         userObjectClasses=dict(type='str'),
         usernameLDAPAttribute=dict(type='str'),
         usersDn=dict(type='str'),
         uuidLDAPAttribute=dict(type='str'),
-        validatePasswordPolicy=dict(type='bool'),
+        validatePasswordPolicy=dict(type='bool', default=False),
         vendor=dict(type='str'),
     )
 
@@ -753,14 +753,14 @@ def main():
     )
 
     meta_args = dict(
+        config=dict(type='dict', options=config_spec),
         state=dict(type='str', default='present', choices=['present', 'absent']),
         realm=dict(type='str', default='master'),
         id=dict(type='str'),
         name=dict(type='str'),
-        provider_id=dict(type='str', aliases=['providerId']),
+        provider_id=dict(type='str', aliases=['providerId'], choices=['ldap', 'kerberos']),
         provider_type=dict(type='str', aliases=['providerType'], default='org.keycloak.storage.UserStorageProvider'),
         parent_id=dict(type='str', aliases=['parentId']),
-        config=dict(type='dict', options=config_spec),
         mappers=dict(type='list', elements='dict', options=mapper_spec),
     )
 
