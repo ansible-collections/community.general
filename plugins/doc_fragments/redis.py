@@ -24,7 +24,7 @@ options:
   login_user:
     description:
       - Specify the user to authenticate with.
-      - Requires I(redis >=3.4.0).
+      - Requires L(redis,https://pypi.org/project/redis) >= 3.4.0.
     type: str
   login_password:
     description:

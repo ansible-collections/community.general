@@ -31,13 +31,13 @@ def fail_imports(module):
     errors = []
     traceback = []
     if not HAS_REDIS_PACKAGE:
-        errors += missing_required_lib('redis') + '\n'
-        traceback += REDIS_IMP_ERR
+        errors.append(missing_required_lib('redis'))
+        traceback.append(REDIS_IMP_ERR)
     if not HAS_CERTIFI_PACKAGE:
-        errors += missing_required_lib('certifi')
-        traceback += CERTIFI_IMPORT_ERROR
+        errors.append(missing_required_lib('certifi'))
+        traceback.append(CERTIFI_IMPORT_ERROR)
     if errors:
-        module.fail_json(errors=errors, traceback=traceback)
+        module.fail_json(errors=errors, traceback='\n'.join(traceback))
 
 
 def redis_auth_argument_spec():
@@ -46,7 +46,6 @@ def redis_auth_argument_spec():
                         default='localhost',),
         login_user=dict(type='str'),
         login_password=dict(type='str',
-
                             no_log=True
                             ),
         login_port=dict(type='int', default=6379),

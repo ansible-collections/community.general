@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: redis_data_info
 short_description: Get value of key in Redis database
-version_added: 3.6.0
+version_added: 3.7.0
 description:
   - Get value of keys in Redis database.
 author: "Andreas Botzner (@paginabianca)"
