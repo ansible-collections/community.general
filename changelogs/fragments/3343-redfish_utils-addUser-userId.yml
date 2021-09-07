@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_utils - if given, add account id of user that should be created to http request (https://github.com/ansible-collections/community.general/pull/3343/)
