@@ -157,7 +157,7 @@ def make_option_dict(line, iface, option, value, address_family):
 
 
 def get_option_value(line):
-    patt = re.compile(r'^\s+(?P<option>\S+)\s+(?P<value>([\'"].*[\'"]|\S?.*\S))\s*$')
+    patt = re.compile(r'^\s+(?P<option>\S+)\s+(?P<value>\S?.*\S)\s*$')
     match = patt.match(line)
     if not match:
         return None, None
