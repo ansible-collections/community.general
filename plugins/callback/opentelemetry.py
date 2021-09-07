@@ -20,14 +20,14 @@ DOCUMENTATION = '''
         description:
           - Hide the arguments for a task.
         env:
-          - name: OPENTELEMETRY_HIDE_TASK_ARGUMENTS
+          - name: ANSIBLE_OPENTELEMETRY_HIDE_TASK_ARGUMENTS
       console_output:
         default: false
         type: bool
         description:
           - Print distributed traces in the terminal.
         env:
-          - name: OPENTELEMETRY_CONSOLE_OUTPUT
+          - name: ANSIBLE_OPENTELEMETRY_CONSOLE_OUTPUT
       otel_service_name:
         default: ansible
         type: str
@@ -240,11 +240,11 @@ class CallbackModule(CallbackBase):
     """
     This callback creates distributed traces.
     This plugin makes use of the following environment variables:
-        OPENTELEMETRY_HIDE_TASK_ARGUMENTS (optional): Hide the arguments for a task
+        ANSIBLE_OPENTELEMETRY_HIDE_TASK_ARGUMENTS (optional): Hide the arguments for a task
                                      Default: false
         OTEL_SERVICE_NAME (optional): The service name resource attribute.
                                      Default: ansible
-        OPENTELEMETRY_CONSOLE_OUTPUT (optional): Print distributed traces in the terminal.
+        ANSIBLE_OPENTELEMETRY_CONSOLE_OUTPUT (optional): Print distributed traces in the terminal.
                                      Default: false
     Requires:
         opentelemetry-api
