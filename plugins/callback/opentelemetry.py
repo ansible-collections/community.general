@@ -12,7 +12,9 @@ DOCUMENTATION = '''
     version_added: 3.7.0
     description:
       - This callback create distributed traces for each Ansible task with OpenTelemetry.
-      - You can configure the OTEL exporter with environment variables. See U(https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html).
+      - You can configure the OpenTelemetry exporter and SDL with environment variables.
+      - See U(https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html).
+      - See U(https://opentelemetry-python.readthedocs.io/en/latest/sdk/environment_variables.html#opentelemetry-sdk-environment-variables).
     options:
       hide_task_arguments:
         default: false
@@ -239,17 +241,6 @@ class OpenTelemetrySource(object):
 class CallbackModule(CallbackBase):
     """
     This callback creates distributed traces.
-    This plugin makes use of the following environment variables:
-        ANSIBLE_OPENTELEMETRY_HIDE_TASK_ARGUMENTS (optional): Hide the arguments for a task
-                                     Default: false
-        OTEL_SERVICE_NAME (optional): The service name resource attribute.
-                                     Default: ansible
-        ANSIBLE_OPENTELEMETRY_CONSOLE_OUTPUT (optional): Print distributed traces in the terminal.
-                                     Default: false
-    Requires:
-        opentelemetry-api
-        opentelemetry-exporter-otlp
-        opentelemetry-sdk
     """
 
     CALLBACK_VERSION = 2.0
