@@ -73,7 +73,7 @@ options:
 
     parent_id:
         description:
-            - Unique ID for this user federation. Realm ID will be used if left blank.
+            - Unique ID for the parent of this user federation. Realm ID will be automatically used if left blank.
         aliases:
             - parentId
         type: str
@@ -244,6 +244,7 @@ options:
                       your connection URL use ldaps. Note even if standalone.xml/domain.xml is not
                       configured, the default Java cacerts or certificate specified by
                       'javax.net.ssl.trustStore' property will be used.
+                default: ldapsOnly
                 type: str
                 choices:
                     - always
@@ -289,21 +290,21 @@ options:
 
             connectionPoolingInitSize:
                 description:
-                    - The string representation of an integer that represents the number of connections per
-                      connection identity to create when initially creating a connection for the identity.
-                type: str
+                    - The number of connections per connection identity to create when initially creating a
+                      connection for the identity.
+                type: int
 
             connectionPoolingMaxSize:
                 description:
-                    - The string representation of an integer that represents the maximum number of
-                      connections per connection identity that can be maintained concurrently.
-                type: str
+                    - The maximum number of connections per connection identity that can be maintained
+                      concurrently.
+                type: int
 
             connectionPoolingPrefSize:
                 description:
-                    - The string representation of an integer that represents the preferred number of
-                      connections per connection identity that should be maintained concurrently.
-                type: str
+                    - The preferred number of connections per connection identity that should be maintained
+                      concurrently.
+                type: int
 
             connectionPoolingProtocol:
                 description:
@@ -313,10 +314,9 @@ options:
 
             connectionPoolingTimeout:
                 description:
-                    - The string representation of an integer that represents the number of milliseconds
-                      that an idle connection may remain in the pool without being closed and removed
-                      from the pool.
-                type: str
+                    - The number of milliseconds that an idle connection may remain in the pool without
+                      being closed and removed from the pool.
+                type: int
 
             allowKerberosAuthentication:
                 description:
@@ -353,7 +353,7 @@ options:
                     - Use Kerberos login module for authenticate username/password against Kerberos server
                       instead of authenticating against LDAP server with Directory Service API.
                 default: False
-                type: str
+                type: bool
 
             allowPasswordAuthentication:
                 description:
@@ -413,7 +413,7 @@ options:
             maxLifespan:
                 description:
                     - Max lifespan of cache entry in milliseconds.
-                type: str
+                type: int
 
     mappers:
         description:
@@ -428,17 +428,23 @@ options:
 
             name:
                 description:
-                    - Name of the mapper.
+                    - Name of the mapper. If no ID is given, the mapper will be searched by name.
                 type: str
 
-            identityProviderAlias:
+            parentId:
                 description:
-                    - Alias of the user federation for this mapper.
+                    - Unique ID for the parent of this mapper. ID of the user federation will automatically
+                      be used if left blank.
                 type: str
 
-            identityProviderMapper:
+            providerId:
                 description:
-                    - Type of mapper.
+                    - The mapper type for this mapper (for instance C(user-attribute-ldap-mapper)).
+                type: str
+
+            providerType:
+                description:
+                    - Component type for this mapper (only supported value is C(org.keycloak.storage.ldap.mappers.LDAPStorageMapper)).
                 type: str
 
             config:
@@ -712,7 +718,7 @@ def main():
         connectionUrl=dict(type='str'),
         customUserSearchFilter=dict(type='str'),
         debug=dict(type='bool'),
-        editMode=dict(type='str', choices=['READ_ONLY', 'WRITABLE', 'UNSYNCED'], default='READ_ONLY'),
+        editMode=dict(type='str', choices=['READ_ONLY', 'WRITABLE', 'UNSYNCED']),
         enabled=dict(type='bool', default=True),
         evictionDay=dict(type='str'),
         evictionHour=dict(type='str'),
@@ -720,7 +726,7 @@ def main():
         fullSyncPeriod=dict(type='int', default=-1),
         importEnabled=dict(type='bool', default=True),
         kerberosRealm=dict(type='str'),
-        keyTab=dict(type='str'),
+        keyTab=dict(type='str', no_log=False),
         maxLifespan=dict(type='int'),
         pagination=dict(type='bool', default=True),
         priority=dict(type='int', default=0),
@@ -733,7 +739,7 @@ def main():
         trustEmail=dict(type='bool', default=False),
         updateProfileFirstLogin=dict(type='bool'),
         useKerberosForPasswordAuthentication=dict(type='bool', default=False),
-        usePasswordModifyExtendedOp=dict(type='str', default=False),
+        usePasswordModifyExtendedOp=dict(type='bool', default=False, no_log=False),
         useTruststoreSpi=dict(type='str', choices=['always', 'ldapsOnly', 'never'], default='ldapsOnly'),
         userObjectClasses=dict(type='str'),
         usernameLDAPAttribute=dict(type='str'),

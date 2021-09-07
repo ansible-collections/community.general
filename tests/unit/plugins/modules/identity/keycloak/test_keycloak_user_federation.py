@@ -20,11 +20,11 @@ from ansible.module_utils.six import StringIO
 
 
 @contextmanager
-def patch_keycloak_api(get_component, create_component=None, update_component=None, delete_component=None):
+def patch_keycloak_api(get_components=None, get_component=None, create_component=None, update_component=None, delete_component=None):
     """Mock context manager for patching the methods in KeycloakAPI
     """
 
-    obj = keycloak_component.KeycloakAPI
+    obj = keycloak_user_federation.KeycloakAPI
     with patch.object(obj, 'get_components', side_effect=get_components) \
             as mock_get_components:
         with patch.object(obj, 'get_component', side_effect=get_component) \
@@ -35,7 +35,7 @@ def patch_keycloak_api(get_component, create_component=None, update_component=No
                         as mock_update_component:
                     with patch.object(obj, 'delete_component', side_effect=delete_component) \
                             as mock_delete_component:
-                        yield mock_get_component, mock_create_component, mock_update_component, mock_delete_component
+                        yield mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component
 
 
 def get_response(object_with_future_response, method, get_id_call_count):
@@ -153,7 +153,7 @@ class TestKeycloakUserFederation(ModuleTestCase):
         # Run the module
 
         with mock_good_connection():
-            with patch_keycloak_api(get_components=return_value_components_get, create_component=return_value_component_created) \
+            with patch_keycloak_api(get_components=return_value_components_get, create_component=return_value_component_create) \
                     as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
@@ -161,183 +161,6 @@ class TestKeycloakUserFederation(ModuleTestCase):
         self.assertEqual(len(mock_get_components.mock_calls), 1)
         self.assertEqual(len(mock_get_component.mock_calls), 0)
         self.assertEqual(len(mock_create_component.mock_calls), 1)
-        self.assertEqual(len(mock_update_component.mock_calls), 0)
-        self.assertEqual(len(mock_delete_component.mock_calls), 0)
-
-        # Verify that the module's changed status matches what is expected
-        self.assertIs(exec_info.exception.args[0]['changed'], changed)
-
-    def test_create_ldap_with_mappers(self):
-        """Add a new user federation with mappers"""
-
-        module_args = {
-            'auth_keycloak_url': 'http://keycloak.url/auth',
-            'auth_realm': 'master',
-            'auth_username': 'admin',
-            'auth_password': 'admin',
-            'realm': 'realm-name',
-            'name': 'ldap',
-            'state': 'present',
-            'provider_id': 'ldap',
-            'provider_type': 'org.keycloak.storage.UserStorageProvider',
-            'config': {
-                'priority': 0,
-                'enabled': True,
-                'cachePolicy': 'DEFAULT',
-                'batchSizeForSync': 1000,
-                'editMode': 'READ_ONLY',
-                'importEnabled': True,
-                'syncRegistrations': False,
-                'vendor': 'other',
-                'usernameLDAPAttribute': 'uid',
-                'rdnLDAPAttribute': 'uid',
-                'uuidLDAPAttribute': 'entryUUID',
-                'userObjectClasses': 'inetOrgPerson, organizationalPerson',
-                'connectionUrl': 'ldaps://ldap.example.com:636',
-                'usersDn': 'ou=Users,dc=example,dc=com',
-                'authType': 'none',
-                'searchScope': 1,
-                'validatePasswordPolicy': False,
-                'trustEmail': False,
-                'useTruststoreSpi': 'ldapsOnly',
-                'connectionPooling': True,
-                'pagination': True,
-                'allowKerberosAuthentication': False,
-                'debug': False,
-                'useKerberosForPasswordAuthentication': False,
-            },
-            'mappers': [
-                {
-                    'name': 'full name',
-                    'providerId': 'full-name-ldap-mapper',
-                    'providerType': 'org.keycloak.storage.ldap.mappers.LDAPStorageMapper',
-                    'config': {
-                        'ldap.full.name.attribute': 'cn',
-                        'read.only': True,
-                        'write.only': False,
-                    }
-                }
-            ]
-        }
-        return_value_components_get = [
-            [], []
-        ]
-        return_value_component_create = [
-            {
-                "id": "eb691537-b73c-4cd8-b481-6031c26499d8",
-                "name": "ldap",
-                "providerId": "ldap",
-                "providerType": "org.keycloak.storage.UserStorageProvider",
-                "parentId": "ldap",
-                "config": {
-                    "pagination": [
-                        "true"
-                    ],
-                    "connectionPooling": [
-                        "true"
-                    ],
-                    "usersDn": [
-                        "ou=Users,dc=example,dc=com"
-                    ],
-                    "cachePolicy": [
-                        "DEFAULT"
-                    ],
-                    "useKerberosForPasswordAuthentication": [
-                        "false"
-                    ],
-                    "importEnabled": [
-                        "true"
-                    ],
-                    "enabled": [
-                        "true"
-                    ],
-                    "usernameLDAPAttribute": [
-                        "uid"
-                    ],
-                    "vendor": [
-                        "other"
-                    ],
-                    "uuidLDAPAttribute": [
-                        "entryUUID"
-                    ],
-                    "connectionUrl": [
-                        "ldaps://ldap.example.com:636"
-                    ],
-                    "allowKerberosAuthentication": [
-                        "false"
-                    ],
-                    "syncRegistrations": [
-                        "false"
-                    ],
-                    "authType": [
-                        "none"
-                    ],
-                    "debug": [
-                        "false"
-                    ],
-                    "searchScope": [
-                        "1"
-                    ],
-                    "useTruststoreSpi": [
-                        "ldapsOnly"
-                    ],
-                    "trustEmail": [
-                        "false"
-                    ],
-                    "priority": [
-                        "0"
-                    ],
-                    "userObjectClasses": [
-                        "inetOrgPerson, organizationalPerson"
-                    ],
-                    "rdnLDAPAttribute": [
-                        "uid"
-                    ],
-                    "editMode": [
-                        "READ_ONLY"
-                    ],
-                    "validatePasswordPolicy": [
-                        "false"
-                    ],
-                    "batchSizeForSync": [
-                        "1000"
-                    ]
-                }
-            },
-            {
-                "id": "2dfadafd-8b34-495f-a98b-153e71a22311",
-                "name": "full name",
-                "providerId": "full-name-ldap-mapper",
-                "providerType": "org.keycloak.storage.ldap.mappers.LDAPStorageMapper",
-                "parentId": "eb691537-b73c-4cd8-b481-6031c26499d8",
-                "config": {
-                    "ldap.full.name.attribute": [
-                        "cn"
-                    ],
-                    "read.only": [
-                        "true"
-                    ],
-                    "write.only": [
-                        "false"
-                    ]
-                }
-            }
-        ]
-        changed = True
-
-        set_module_args(module_args)
-
-        # Run the module
-
-        with mock_good_connection():
-            with patch_keycloak_api(get_components=return_value_components_get, create_component=return_value_component_created) \
-                    as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
-                with self.assertRaises(AnsibleExitJson) as exec_info:
-                    self.module.main()
-
-        self.assertEqual(len(mock_get_components.mock_calls), 2)
-        self.assertEqual(len(mock_get_component.mock_calls), 0)
-        self.assertEqual(len(mock_create_component.mock_calls), 2)
         self.assertEqual(len(mock_update_component.mock_calls), 0)
         self.assertEqual(len(mock_delete_component.mock_calls), 0)
 
@@ -461,6 +284,183 @@ class TestKeycloakUserFederation(ModuleTestCase):
         self.assertEqual(len(mock_get_component.mock_calls), 1)
         self.assertEqual(len(mock_create_component.mock_calls), 0)
         self.assertEqual(len(mock_update_component.mock_calls), 1)
+        self.assertEqual(len(mock_delete_component.mock_calls), 0)
+
+        # Verify that the module's changed status matches what is expected
+        self.assertIs(exec_info.exception.args[0]['changed'], changed)
+
+    def test_create_with_mappers(self):
+        """Add a new user federation with mappers"""
+
+        module_args = {
+            'auth_keycloak_url': 'http://keycloak.url/auth',
+            'auth_realm': 'master',
+            'auth_username': 'admin',
+            'auth_password': 'admin',
+            'realm': 'realm-name',
+            'name': 'ldap',
+            'state': 'present',
+            'provider_id': 'ldap',
+            'provider_type': 'org.keycloak.storage.UserStorageProvider',
+            'config': {
+                'priority': 0,
+                'enabled': True,
+                'cachePolicy': 'DEFAULT',
+                'batchSizeForSync': 1000,
+                'editMode': 'READ_ONLY',
+                'importEnabled': True,
+                'syncRegistrations': False,
+                'vendor': 'other',
+                'usernameLDAPAttribute': 'uid',
+                'rdnLDAPAttribute': 'uid',
+                'uuidLDAPAttribute': 'entryUUID',
+                'userObjectClasses': 'inetOrgPerson, organizationalPerson',
+                'connectionUrl': 'ldaps://ldap.example.com:636',
+                'usersDn': 'ou=Users,dc=example,dc=com',
+                'authType': 'none',
+                'searchScope': 1,
+                'validatePasswordPolicy': False,
+                'trustEmail': False,
+                'useTruststoreSpi': 'ldapsOnly',
+                'connectionPooling': True,
+                'pagination': True,
+                'allowKerberosAuthentication': False,
+                'debug': False,
+                'useKerberosForPasswordAuthentication': False,
+            },
+            'mappers': [
+                {
+                    'name': 'full name',
+                    'providerId': 'full-name-ldap-mapper',
+                    'providerType': 'org.keycloak.storage.ldap.mappers.LDAPStorageMapper',
+                    'config': {
+                        'ldap.full.name.attribute': 'cn',
+                        'read.only': True,
+                        'write.only': False,
+                    }
+                }
+            ]
+        }
+        return_value_components_get = [
+            []
+        ]
+        return_value_component_create = [
+            {
+                "id": "eb691537-b73c-4cd8-b481-6031c26499d8",
+                "name": "ldap",
+                "providerId": "ldap",
+                "providerType": "org.keycloak.storage.UserStorageProvider",
+                "parentId": "ldap",
+                "config": {
+                    "pagination": [
+                        "true"
+                    ],
+                    "connectionPooling": [
+                        "true"
+                    ],
+                    "usersDn": [
+                        "ou=Users,dc=example,dc=com"
+                    ],
+                    "cachePolicy": [
+                        "DEFAULT"
+                    ],
+                    "useKerberosForPasswordAuthentication": [
+                        "false"
+                    ],
+                    "importEnabled": [
+                        "true"
+                    ],
+                    "enabled": [
+                        "true"
+                    ],
+                    "usernameLDAPAttribute": [
+                        "uid"
+                    ],
+                    "vendor": [
+                        "other"
+                    ],
+                    "uuidLDAPAttribute": [
+                        "entryUUID"
+                    ],
+                    "connectionUrl": [
+                        "ldaps://ldap.example.com:636"
+                    ],
+                    "allowKerberosAuthentication": [
+                        "false"
+                    ],
+                    "syncRegistrations": [
+                        "false"
+                    ],
+                    "authType": [
+                        "none"
+                    ],
+                    "debug": [
+                        "false"
+                    ],
+                    "searchScope": [
+                        "1"
+                    ],
+                    "useTruststoreSpi": [
+                        "ldapsOnly"
+                    ],
+                    "trustEmail": [
+                        "false"
+                    ],
+                    "priority": [
+                        "0"
+                    ],
+                    "userObjectClasses": [
+                        "inetOrgPerson, organizationalPerson"
+                    ],
+                    "rdnLDAPAttribute": [
+                        "uid"
+                    ],
+                    "editMode": [
+                        "READ_ONLY"
+                    ],
+                    "validatePasswordPolicy": [
+                        "false"
+                    ],
+                    "batchSizeForSync": [
+                        "1000"
+                    ]
+                }
+            },
+            {
+                "id": "2dfadafd-8b34-495f-a98b-153e71a22311",
+                "name": "full name",
+                "providerId": "full-name-ldap-mapper",
+                "providerType": "org.keycloak.storage.ldap.mappers.LDAPStorageMapper",
+                "parentId": "eb691537-b73c-4cd8-b481-6031c26499d8",
+                "config": {
+                    "ldap.full.name.attribute": [
+                        "cn"
+                    ],
+                    "read.only": [
+                        "true"
+                    ],
+                    "write.only": [
+                        "false"
+                    ]
+                }
+            }
+        ]
+        changed = True
+
+        set_module_args(module_args)
+
+        # Run the module
+
+        with mock_good_connection():
+            with patch_keycloak_api(get_components=return_value_components_get, create_component=return_value_component_create) \
+                    as (mock_get_components, mock_get_component, mock_create_component, mock_update_component, mock_delete_component):
+                with self.assertRaises(AnsibleExitJson) as exec_info:
+                    self.module.main()
+
+        self.assertEqual(len(mock_get_components.mock_calls), 1)
+        self.assertEqual(len(mock_get_component.mock_calls), 0)
+        self.assertEqual(len(mock_create_component.mock_calls), 2)
+        self.assertEqual(len(mock_update_component.mock_calls), 0)
         self.assertEqual(len(mock_delete_component.mock_calls), 0)
 
         # Verify that the module's changed status matches what is expected
