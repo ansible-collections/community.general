@@ -113,11 +113,6 @@ class PSAdapter(object):
         pass
 
     def get_pids_by_pattern(self, pattern, ignore_case):
-        return [
-            p.pid for p in self._process_iter(*self.PATTERN_ATTRS) if self._matches_pattern(p, pattern, ignore_case)
-        ]
-
-    def _matches_pattern(self, proc, pattern, ignore_case):
         flags = 0
         if ignore_case:
             flags |= re.I
@@ -127,6 +122,9 @@ class PSAdapter(object):
         except re.error as e:
             raise PSAdapterError("'%s' is not a valid regular expression: %s" % (pattern, to_native(e)))
 
+        return [p.pid for p in self._process_iter(*self.PATTERN_ATTRS) if self._matches_regex(p, regex)]
+
+    def _matches_regex(self, proc, regex):
         # See https://psutil.readthedocs.io/en/latest/#find-process-by-name for more information
         attributes = self._get_proc_attributes(proc, *self.PATTERN_ATTRS)
         matches_name = regex.search(to_native(attributes['name']))
