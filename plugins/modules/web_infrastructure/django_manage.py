@@ -62,7 +62,7 @@ options:
   clear:
     description:
       - Clear the existing files before trying to copy or link the original file.
-      - Used only with the 'collectstatic' command. The C(--noinput) argument will be added automatically.
+      - Used only with the C(collectstatic) command. The C(--noinput) argument will be added automatically.
     required: false
     default: no
     type: bool
@@ -109,9 +109,9 @@ options:
     required: false
     aliases: [test_runner]
 notes:
-  - C(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the virtualenv parameter
+  - C(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the I(virtualenv) parameter
     is specified.
-  - This module will create a virtualenv if the virtualenv parameter is specified and a virtualenv does not already
+  - This module will create a virtualenv if the I(virtualenv) parameter is specified and a virtual environment does not already
     exist at the given location.
   - This module assumes English error messages for the C(createcachetable) command to detect table existence,
     unfortunately.
@@ -306,7 +306,10 @@ def main():
     # these params always get tacked on the end of the command
     for param in end_of_command_params:
         if module.params[param]:
-            run_cmd_args.append(module.params[param])
+            if param in ('fixtures', 'apps'):
+                run_cmd_args.extend(shlex.split(module.params[param]))
+            else:
+                run_cmd_args.append(module.params[param])
 
     rc, out, err = module.run_command(run_cmd_args, cwd=project_path)
     if rc != 0:
