@@ -66,7 +66,7 @@ options:
       - Determine if developers can create projects in the group.
     choices: ["developer", "maintainer", "noone"]
     type: str
-    version_added: 3.6.0
+    version_added: 3.7.0
   auto_devops_enabled:
     description:
       - Default to Auto DevOps pipeline for all projects within this group.
