@@ -35,6 +35,7 @@
     src: "{{ find_sleep.stdout }}"
     dest: "{{ remote_tmp_dir }}/{{ random_name }}"
     mode: "0777"
+    remote_src: true
 
 - name: Copy helper script
   copy:
