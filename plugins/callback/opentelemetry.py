@@ -272,7 +272,22 @@ class CallbackModule(CallbackBase):
         else:
             self.tasks_data = OrderedDict()
 
+        if (self.is_otel_exporter_disabled()) :
+            raise_from(
+                AnsibleError('The OTEL endpoint environment variable is not configured.'),
+                None)
+
         self.opentelemetry = OpenTelemetrySource(display=self._display)
+
+    def is_otel_exporter_disabled(self):
+        """
+		verify if the environment variable context was configured to point to an OTEL endpoint
+		Wee https://opentelemetry-python.readthedocs.io/en/latest/sdk/environment_variables.html
+		"""
+        return (os.getenv('OTEL_EXPORTER_OTLP_ENDPOINT', None) is None and
+                os.getenv('OTEL_EXPORTER_OTLP_TRACES_ENDPOINT', None) is None and
+                os.getenv('OTEL_EXPORTER_ZIPKIN_ENDPOINT', None) is None and
+                os.getenv('OTEL_EXPORTER_JAEGER_ENDPOINT', None) is None)
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super(CallbackModule, self).set_options(task_keys=task_keys,
