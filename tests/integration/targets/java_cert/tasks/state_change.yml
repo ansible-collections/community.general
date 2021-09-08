@@ -242,7 +242,7 @@
     dest: "{{ remote_tmp_dir }}"
 
 - name: Create an SSL server that we will use for testing URL imports
-  command: python {{ remote_tmp_dir }}/setupSSLServer.py {{ remote_tmp_dir }} {{ test_ssl_port }}
+  command: "{{ ansible_python.executable }} {{ remote_tmp_dir }}/setupSSLServer.py {{ remote_tmp_dir }} {{ test_ssl_port }}"
   async: 10
   poll: 0
 
