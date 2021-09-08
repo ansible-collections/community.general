@@ -31,11 +31,13 @@
   register: find_sleep
 
 - name: "Copying 'sleep' binary"
-  copy:
-    src: "{{ find_sleep.stdout }}"
-    dest: "{{ remote_tmp_dir }}/{{ random_name }}"
-    mode: "0777"
-    remote_src: true
+  command: cp {{ find_sleep.stdout }} {{ remote_tmp_dir }}/{{ random_name }}
+  # The following does not work on macOS 11.1 (it uses shutil.copystat, and that will die with a PermissionError):
+  # copy:
+  #   src: "{{ find_sleep.stdout }}"
+  #   dest: "{{ remote_tmp_dir }}/{{ random_name }}"
+  #   mode: "0777"
+  #   remote_src: true
 
 - name: Copy helper script
   copy:
