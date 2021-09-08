@@ -11,6 +11,7 @@ DOCUMENTATION = '''
 ---
 module: redis_set
 short_description: Set key value pairs in Redis
+version_added: 3.7.0
 description:
    - Set key value pairs in Redis database.
 author: "Andreas Botzner (@paginabianca)"
@@ -59,12 +60,11 @@ extends_documentation_fragment:
 
 seealso:
     - module: community.general.redis_data_info
-    - module: community.general.redis_incr
     - module: community.general.redis
 '''
 
 EXAMPLES = '''
-- name: Set key foo=bar on loalhost with no username
+- name: Set key foo=bar on localhost with no username
   community.general.redis_set:
     login_host: localhost
     login_password: supersecret
@@ -85,7 +85,7 @@ EXAMPLES = '''
 - name: Set key foo=bar if existing and keep current TTL
   community.general.redis_set:
     login_host: localhost
-    login_pasword: supersecret
+    login_password: supersecret
     key: foo
     value: bar
     existing: yes
@@ -95,13 +95,13 @@ EXAMPLES = '''
   community.general.redis:
     login_host: redishost
     login_password: supersecret
-    login_user: somuser
+    login_user: someuser
     validate_certs: yes
     ssl_ca_certs: /path/to/ca/certs
     key: foo
     value: bar
 
-- name: Delete key foo=bar on loalhost with no username
+- name: Delete key foo=bar on localhost with no username
   community.general.redis_set:
     login_host: localhost
     login_password: supersecret
@@ -124,7 +124,7 @@ msg:
   description: A short message.
   returned: always
   type: str
-  sample: ''
+  sample: 'Set key: foo to bar'
 '''
 
 from ansible.module_utils.basic import AnsibleModule
