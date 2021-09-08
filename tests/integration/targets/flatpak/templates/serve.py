@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!{{ ansible_python.executable }}
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type

@@ -51,7 +51,7 @@
     no_dependencies: true
 
 - name: Copy HTTP server
-  copy:
+  template:
     src: serve.py
     dest: '{{ remote_tmp_dir }}/serve.py'
     mode: '0755'
