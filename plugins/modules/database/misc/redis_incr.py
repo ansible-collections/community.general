@@ -11,6 +11,7 @@ DOCUMENTATION = '''
 ---
 module: redis_incr
 short_description: Increment keys in Redis
+version_added: 3.7.0
 description:
    - Increment integers or float keys in Redis database and get new value.
    - Default increment for all keys is 1. For specific increments use the
@@ -21,11 +22,11 @@ options:
     description:
       - Database key.
     type: str
-    required: True
+    required: true
   increment_int:
     description:
       - Integer amount to increment the key by.
-    required: False
+    required: false
     type: int
   increment_float:
     description:
@@ -33,7 +34,7 @@ options:
       - This only works with keys that contain float values
         in their string representation.
     type: str
-    required: False
+    required: false
 
 
 extends_documentation_fragment:
@@ -46,7 +47,7 @@ seealso:
 '''
 
 EXAMPLES = '''
-- name: Increment integer key foo on loalhost with no username and print new value
+- name: Increment integer key foo on localhost with no username and print new value
   community.general.redis_incr:
     login_host: localhost
     login_password: supersecret
@@ -98,9 +99,7 @@ def main():
         supports_check_mode=False,
         mutually_exclusive=[['increment_int', 'increment_float']],
     )
-    import_errors = fail_imports()
-    if len(import_errors) != 0:
-        module.fail_json(msg=import_errors)
+    fail_imports(module)
 
     redis = RedisAnsible(module)
     key = module.params['key']
