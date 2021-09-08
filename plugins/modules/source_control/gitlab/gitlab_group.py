@@ -71,7 +71,7 @@ options:
     description:
       - Default to Auto DevOps pipeline for all projects within this group.
     type: bool
-    version_added: 3.6.0
+    version_added: 3.7.0
   subgroup_creation_level:
     description:
       - Allowed to create subgroups.
