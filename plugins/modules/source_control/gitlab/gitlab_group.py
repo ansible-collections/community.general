@@ -77,7 +77,7 @@ options:
       - Allowed to create subgroups.
     choices: ["maintainer", "owner"]
     type: str
-    version_added: 3.6.0
+    version_added: 3.7.0
 '''
 
 EXAMPLES = '''
