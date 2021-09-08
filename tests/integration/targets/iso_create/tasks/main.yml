@@ -18,10 +18,18 @@
 
 # - include_tasks: prepare_dest_dir.yml
 
+- name: Copy files and directories
+  copy:
+    src: '{{ item }}'
+    dest: '{{ remote_tmp_dir }}/{{ item }}'
+  loop:
+    - test1.cfg
+    - test_dir
+
 - name: Test check mode
   iso_create:
     src_files:
-      - "{{ role_path }}/files/test1.cfg"
+      - "{{ remote_tmp_dir }}/test1.cfg"
     dest_iso: "{{ output_test_dir }}/test.iso"
     interchange_level: 3
   register: iso_result
@@ -41,7 +49,7 @@
 - name: Create iso file with a specified file
   iso_create:
     src_files:
-      - "{{ role_path }}/files/test1.cfg"
+      - "{{ remote_tmp_dir }}/test1.cfg"
     dest_iso: "{{ output_test_dir }}/test.iso"
     interchange_level: 3
   register: iso_result
@@ -60,8 +68,8 @@
 - name: Create iso file with a specified file and folder
   iso_create:
     src_files:
-      - "{{ role_path }}/files/test1.cfg"
-      - "{{ role_path }}/files/test_dir"
+      - "{{ remote_tmp_dir }}/test1.cfg"
+      - "{{ remote_tmp_dir }}/test_dir"
     dest_iso: "{{ output_test_dir }}/test1.iso"
     interchange_level: 3
   register: iso_result
@@ -80,7 +88,7 @@
 - name: Create iso file with volume identification string
   iso_create:
     src_files:
-      - "{{ role_path }}/files/test1.cfg"
+      - "{{ remote_tmp_dir }}/test1.cfg"
     dest_iso: "{{ output_test_dir }}/test2.iso"
     vol_ident: "OEMDRV"
   register: iso_result
@@ -99,7 +107,7 @@
 - name: Create iso file with Rock Ridge extention
   iso_create:
     src_files:
-      - "{{ role_path }}/files/test1.cfg"
+      - "{{ remote_tmp_dir }}/test1.cfg"
     dest_iso: "{{ output_test_dir }}/test3.iso"
     rock_ridge: "1.09"
   register: iso_result
@@ -118,7 +126,7 @@
 - name: Create iso file with Joliet extention
   iso_create:
     src_files:
-      - "{{ role_path }}/files/test1.cfg"
+      - "{{ remote_tmp_dir }}/test1.cfg"
     dest_iso: "{{ output_test_dir }}/test4.iso"
     joliet: 3
   register: iso_result
@@ -137,7 +145,7 @@
 - name: Create iso file with UDF enabled
   iso_create:
     src_files:
-      - "{{ role_path }}/files/test1.cfg"
+      - "{{ remote_tmp_dir }}/test1.cfg"
     dest_iso: "{{ output_test_dir }}/test5.iso"
     udf: True
   register: iso_result

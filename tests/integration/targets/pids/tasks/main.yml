@@ -36,8 +36,13 @@
     dest: "{{ remote_tmp_dir }}/{{ random_name }}"
     mode: "0777"
 
+- name: Copy helper script
+  copy:
+    src: obtainpid.sh
+    dest: "{{ remote_tmp_dir }}/obtainpid.sh"
+
 - name: "Running the copy of 'sleep' binary"
-  command: "sh {{ role_path }}/files/obtainpid.sh '{{ remote_tmp_dir }}/{{ random_name }}' '{{ remote_tmp_dir }}/obtainpid.txt'"
+  command: "sh {{ remote_tmp_dir }}/obtainpid.sh '{{ remote_tmp_dir }}/{{ random_name }}' '{{ remote_tmp_dir }}/obtainpid.txt'"
 
   async: 100
   poll: 0
