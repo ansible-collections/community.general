@@ -274,33 +274,19 @@ class CallbackModule(CallbackBase):
 
         self.opentelemetry = OpenTelemetrySource(display=self._display)
 
-    def transform_option_to_boolean_or_default(self, option_name, default):
-        """ Look for the given option and if a string boolean then convert to a boolean type """
-
-        return self.transform_to_boolean_or_default(self.get_option(option_name), default)
-
-    def transform_to_boolean_or_default(self, value, default):
-        """ Transform string boolean to boolean or apply default value """
-
-        if value is None:
-            return default
-        if isinstance(value, str):
-            return value.lower() in ['true']
-        return value
-
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super(CallbackModule, self).set_options(task_keys=task_keys,
                                                 var_options=var_options,
                                                 direct=direct)
 
-        self.hide_task_arguments = self.transform_option_to_boolean_or_default('hide_task_arguments', False)
+        self.hide_task_arguments = self.get_option('hide_task_arguments')
 
         self.otel_service_name = self.get_option('otel_service_name')
 
         if self.otel_service_name is None:
             self.otel_service_name = 'ansible'
 
-        self.console_output = self.transform_option_to_boolean_or_default('console_output', False)
+        self.console_output = self.get_option('console_output')
 
         # See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
         self.insecure_otel_exporter = os.getenv('OTEL_EXPORTER_OTLP_INSECURE', 'false').lower() == 'true'

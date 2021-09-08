@@ -91,18 +91,3 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(host_data.uuid, 'include')
         self.assertEqual(host_data.name, 'include')
         self.assertEqual(host_data.status, 'ok')
-
-    def test_transform_to_boolean_or_default(self):
-        callbackModule = CallbackModule()
-
-        result = callbackModule.transform_to_boolean_or_default(None, False)
-        self.assertFalse(result)
-
-        result = callbackModule.transform_to_boolean_or_default('', False)
-        self.assertFalse(result)
-
-        result = callbackModule.transform_to_boolean_or_default('true', False)
-        self.assertTrue(result)
-
-        result = callbackModule.transform_to_boolean_or_default('false', True)
-        self.assertFalse(result)
