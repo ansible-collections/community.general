@@ -17,14 +17,14 @@
   slurp:
     src: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
   loop: "{{ java_keystore_certs }}"
-  when: remote_cert
+  when: not remote_cert
   register: certificates
 
 - name: Read certificate keys
   slurp:
     src: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.key' }}"
   loop: "{{ java_keystore_certs }}"
-  when: remote_cert
+  when: not remote_cert
   register: certificate_keys
 
 - name: Create a Java keystore for the given ({{ 'remote' if remote_cert else 'local' }}) certificates (check mode)
