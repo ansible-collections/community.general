@@ -13,12 +13,26 @@
     label: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.jks' }}"
 
 
+- name: Read certificates
+  slurp:
+    src: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
+  loop: "{{ java_keystore_certs }}"
+  when: remote_cert
+  register: certificates
+
+- name: Read certificate keys
+  slurp:
+    src: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.key' }}"
+  loop: "{{ java_keystore_certs }}"
+  when: remote_cert
+  register: certificate_keys
+
 - name: Create a Java keystore for the given ({{ 'remote' if remote_cert else 'local' }}) certificates (check mode)
   community.general.java_keystore: &java_keystore_params
     name: example
     dest: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.jks' }}"
-    certificate: "{{ omit if remote_cert else lookup('file', remote_tmp_dir ~ '/' ~ item.name ~ '.pem') }}"
-    private_key: "{{ omit if remote_cert else lookup('file', remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.key') }}"
+    certificate: "{{ omit if remote_cert else (certificates.results[loop_index].content | b64decode) }}"
+    private_key: "{{ omit if remote_cert else (certificate_keys.results[loop_index].content | b64decode) }}"
     certificate_path: "{{ omit if not remote_cert else remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
     private_key_path: "{{ omit if not remote_cert else remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.key' }}"
     private_key_passphrase: "{{ item.passphrase | d(omit) }}"
@@ -26,36 +40,48 @@
     ssl_backend: "{{ ssl_backend }}"
     keystore_type: "{{ item.keystore_type | d(omit) }}"
   loop: "{{ java_keystore_certs }}"
+  loop_control:
+    index_var: loop_index
   check_mode: yes
   register: result_check
 
 - name: Create a Java keystore for the given certificates
   community.general.java_keystore: *java_keystore_params
   loop: "{{ java_keystore_certs }}"
+  loop_control:
+    index_var: loop_index
   register: result
 
 
 - name: Create a Java keystore for the given certificates (idempotency, check mode)
   community.general.java_keystore: *java_keystore_params
   loop: "{{ java_keystore_certs }}"
+  loop_control:
+    index_var: loop_index
   check_mode: yes
   register: result_idem_check
 
 - name: Create a Java keystore for the given certificates (idempotency)
   community.general.java_keystore: *java_keystore_params
   loop: "{{ java_keystore_certs }}"
+  loop_control:
+    index_var: loop_index
   register: result_idem
 
 
 - name: Create a Java keystore for the given certificates (certificate changed, check mode)
   community.general.java_keystore: *java_keystore_params
   loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
   check_mode: yes
   register: result_change_check
 
 - name: Create a Java keystore for the given certificates (certificate changed)
   community.general.java_keystore: *java_keystore_params
   loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
   register: result_change
 
 
@@ -64,6 +90,8 @@
     <<: *java_keystore_params
     name: foobar
   loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
   check_mode: yes
   register: result_alias_change_check
 
@@ -72,6 +100,8 @@
     <<: *java_keystore_params
     name: foobar
   loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
   register: result_alias_change
 
 
@@ -81,6 +111,8 @@
     name: foobar
     password: hunter2
   loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
   check_mode: yes
   register: result_pw_change_check
 
@@ -90,6 +122,8 @@
     name: foobar
     password: hunter2
   loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
   register: result_pw_change
 
 
@@ -100,6 +134,8 @@
     password: hunter2
     keystore_type: pkcs12
   loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
   check_mode: yes
   register: result_type_pkcs12_check
 
@@ -110,6 +146,8 @@
     password: hunter2
     keystore_type: jks
   loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
   check_mode: yes
   register: result_type_jks_check
 
@@ -120,6 +158,8 @@
     password: hunter2
     keystore_type: jks
   loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
   register: result_type_jks
 
 
@@ -136,6 +176,8 @@
     password: short
     keystore_type: jks
   loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
   register: result_fail_jks
   ignore_errors: true
 
@@ -153,6 +195,8 @@
     password: hunter2
     keystore_type: pkcs12
   loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
   check_mode: yes
   register: result_type_change_check
 
@@ -163,6 +207,8 @@
     password: hunter2
     keystore_type: pkcs12
   loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
   register: result_type_change
 
 
@@ -172,6 +218,8 @@
     name: foobar
     password: hunter2
   loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
   check_mode: yes
   register: result_type_omit_check
 
@@ -181,6 +229,8 @@
     name: foobar
     password: hunter2
   loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
   register: result_type_omit
 
 
