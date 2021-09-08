@@ -257,10 +257,8 @@ def main():
         api_token=dict(type='str', required=True, no_log=True),
         project=dict(type='str', required=True),
         gitlab_user=dict(type='list', elements='str'),
-        state=dict(type='str', default='present',
-                   choices=['present', 'absent']),
-        access_level=dict(type='str', choices=[
-                          'guest', 'reporter', 'developer', 'maintainer']),
+        state=dict(type='str', default='present', choices=['present', 'absent']),
+        access_level=dict(type='str', choices=['guest', 'reporter', 'developer', 'maintainer']),
         purge_users=dict(type='list', elements='str', choices=[
                          'guest', 'reporter', 'developer', 'maintainer']),
         gitlab_users_access=dict(
@@ -297,8 +295,7 @@ def main():
     )
 
     if not HAS_PY_GITLAB:
-        module.fail_json(msg=missing_required_lib(
-            'python-gitlab', url='https://python-gitlab.readthedocs.io/en/stable/'), exception=GITLAB_IMP_ERR)
+        module.fail_json(msg=missing_required_lib('python-gitlab', url='https://python-gitlab.readthedocs.io/en/stable/'), exception=GITLAB_IMP_ERR)
 
     access_level_int = {
         'guest': gitlab.GUEST_ACCESS,
