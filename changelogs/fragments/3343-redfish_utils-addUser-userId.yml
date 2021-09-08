@@ -1,2 +1,2 @@
-minor_changes:
+bugfixes:
   - redfish_utils module utils - if given, add account ID of user that should be created to HTTP request (https://github.com/ansible-collections/community.general/pull/3343/).
