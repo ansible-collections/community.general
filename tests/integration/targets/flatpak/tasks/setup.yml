@@ -51,13 +51,13 @@
     no_dependencies: true
 
 - name: Copy HTTP server
-  template:
-    src: serve.py.j2
+  copy:
+    src: serve.py
     dest: '{{ remote_tmp_dir }}/serve.py'
     mode: '0755'
 
 - name: Start HTTP server
-  command: '{{ remote_tmp_dir }}/serve.py 127.0.0.1 8000 /tmp/flatpak/'
+  command: '{{ ansible_python.executable }} {{ remote_tmp_dir }}/serve.py 127.0.0.1 8000 /tmp/flatpak/'
   async: 120
   poll: 0
   register: webserver_status
