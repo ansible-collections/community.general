@@ -52,7 +52,7 @@
 
 - name: Copy HTTP server
   template:
-    src: serve.py
+    src: serve.py.j2
     dest: '{{ remote_tmp_dir }}/serve.py'
     mode: '0755'
 
