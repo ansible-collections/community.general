@@ -9,9 +9,14 @@ __metaclass__ = type
 
 import pytest
 import json
+from redis import __version__
 
 from ansible_collections.community.general.plugins.modules.database.misc import redis_set
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
+
+HAS_REDIS_USERNAME_OPTION = True
+if tuple(map(int, __version__.split('.'))) < (3, 4, 0):
+    HAS_REDIS_USERNAME_OPTION = False
 
 
 def test_redis_set_without_arguments(capfd):
@@ -23,6 +28,7 @@ def test_redis_set_without_arguments(capfd):
     assert json.loads(out)['failed']
 
 
+@pytest.mark.skipif(not HAS_REDIS_USERNAME_OPTION, reason="Redis version < 3.4.0")
 def test_redis_set_key(capfd, mocker):
     set_module_args({'login_host': 'localhost',
                      'login_user': 'root',
@@ -43,6 +49,7 @@ def test_redis_set_key(capfd, mocker):
     assert json.loads(out)['changed'] is True
 
 
+@pytest.mark.skipif(not HAS_REDIS_USERNAME_OPTION, reason="Redis version < 3.4.0")
 def test_redis_set_existing_key_nx(capfd, mocker):
     set_module_args({'login_host': 'localhost',
                      'login_user': 'root',
@@ -65,6 +72,7 @@ def test_redis_set_existing_key_nx(capfd, mocker):
     assert json.loads(out)['failed'] is True
 
 
+@pytest.mark.skipif(not HAS_REDIS_USERNAME_OPTION, reason="Redis version < 3.4.0")
 def test_redis_set_non_existing_key_xx(capfd, mocker):
     set_module_args({'login_host': 'localhost',
                      'login_user': 'root',
@@ -87,6 +95,7 @@ def test_redis_set_non_existing_key_xx(capfd, mocker):
     assert json.loads(out)['failed'] is True
 
 
+@pytest.mark.skipif(not HAS_REDIS_USERNAME_OPTION, reason="Redis version < 3.4.0")
 def test_redis_set_delete_present_key(capfd, mocker):
     set_module_args({'login_host': 'localhost',
                      'login_user': 'root',
@@ -103,6 +112,7 @@ def test_redis_set_delete_present_key(capfd, mocker):
     assert json.loads(out)['changed'] is True
 
 
+@pytest.mark.skipif(not HAS_REDIS_USERNAME_OPTION, reason="Redis version < 3.4.0")
 def test_redis_set_delete_absent_key(capfd, mocker):
     set_module_args({'login_host': 'localhost',
                      'login_user': 'root',
@@ -117,3 +127,55 @@ def test_redis_set_delete_absent_key(capfd, mocker):
     assert not err
     assert json.loads(out)['msg'] == 'Key: foo not present'
     assert json.loads(out)['changed'] is False
+
+
+@pytest.mark.skipif(HAS_REDIS_USERNAME_OPTION, reason="Redis version > 3.4.0")
+def test_redis_set_fail_username(capfd, mocker):
+    set_module_args({'login_host': 'localhost',
+                     'login_user': 'root',
+                     'login_password': 'secret',
+                     'key': 'foo',
+                     'value': 'baz',
+                     '_ansible_check_mode': False})
+    with pytest.raises(SystemExit):
+        redis_set.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert json.loads(out)['failed']
+    assert json.loads(
+        out)['msg'] == 'The option `username` in only supported with redis >= 3.4.0.'
+
+
+def test_redis_set_key_no_username(capfd, mocker):
+    set_module_args({'login_host': 'localhost',
+                     'login_password': 'secret',
+                     'key': 'foo',
+                     'value': 'baz',
+                     '_ansible_check_mode': False})
+    mocker.patch('redis.Redis.get', return_value='bar')
+    mocker.patch('redis.Redis.set', return_value=True)
+    with pytest.raises(SystemExit):
+        redis_set.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert json.loads(out)['old_value'] == 'bar'
+    assert json.loads(out)['msg'] == 'Set key: foo to baz'
+    assert json.loads(out)['changed'] is True
+
+
+def test_redis_delete_key_no_username(capfd, mocker):
+    set_module_args({'login_host': 'localhost',
+                     'login_password': 'secret',
+                     'key': 'foo',
+                     'state': 'absent',
+                     '_ansible_check_mode': False})
+    mocker.patch('redis.Redis.delete', return_value=1)
+    with pytest.raises(SystemExit):
+        redis_set.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert json.loads(out)['msg'] == 'Deleted key: foo'
+    assert json.loads(out)['changed'] is True
