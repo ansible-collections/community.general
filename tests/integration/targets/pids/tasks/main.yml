@@ -33,11 +33,11 @@
 - name: "Copying 'sleep' binary"
   copy:
     src: "{{ find_sleep.stdout }}"
-    dest: "{{ output_dir }}/{{ random_name }}"
+    dest: "{{ remote_tmp_dir }}/{{ random_name }}"
     mode: "0777"
 
 - name: "Running the copy of 'sleep' binary"
-  command: "sh {{ role_path }}/files/obtainpid.sh '{{ output_dir }}/{{ random_name }}' '{{ output_dir }}/obtainpid.txt'"
+  command: "sh {{ role_path }}/files/obtainpid.sh '{{ remote_tmp_dir }}/{{ random_name }}' '{{ remote_tmp_dir }}/obtainpid.txt'"
 
   async: 100
   poll: 0
@@ -74,7 +74,7 @@
 
 - name: "Reading pid from the file"
   slurp:
-    src:  "{{ output_dir }}/obtainpid.txt"
+    src:  "{{ remote_tmp_dir }}/obtainpid.txt"
   register: newpid
 
 - name: "Verify that the Process IDs (PIDs) returned is not empty and also equal to the PIDs obtained in console"

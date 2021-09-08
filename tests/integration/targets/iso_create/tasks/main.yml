@@ -14,7 +14,7 @@
 - debug: var=install_pycdlib
 
 - set_fact:
-    output_dir_test: '{{ output_dir }}/test_iso_create'
+    output_test_dir: '{{ remote_tmp_dir }}/test_iso_create'
 
 # - include_tasks: prepare_dest_dir.yml
 
@@ -22,7 +22,7 @@
   iso_create:
     src_files:
       - "{{ role_path }}/files/test1.cfg"
-    dest_iso: "{{ output_dir_test }}/test.iso"
+    dest_iso: "{{ output_test_dir }}/test.iso"
     interchange_level: 3
   register: iso_result
   check_mode: yes
@@ -30,7 +30,7 @@
 
 - name: Check if iso file created
   stat:
-    path: "{{ output_dir_test }}/test.iso"
+    path: "{{ output_test_dir }}/test.iso"
   register: iso_file
 - debug: var=iso_file
 - assert:
@@ -42,14 +42,14 @@
   iso_create:
     src_files:
       - "{{ role_path }}/files/test1.cfg"
-    dest_iso: "{{ output_dir_test }}/test.iso"
+    dest_iso: "{{ output_test_dir }}/test.iso"
     interchange_level: 3
   register: iso_result
 - debug: var=iso_result
 
 - name: Check if iso file created
   stat:
-    path: "{{ output_dir_test }}/test.iso"
+    path: "{{ output_test_dir }}/test.iso"
   register: iso_file
 
 - assert:
@@ -62,14 +62,14 @@
     src_files:
       - "{{ role_path }}/files/test1.cfg"
       - "{{ role_path }}/files/test_dir"
-    dest_iso: "{{ output_dir_test }}/test1.iso"
+    dest_iso: "{{ output_test_dir }}/test1.iso"
     interchange_level: 3
   register: iso_result
 - debug: var=iso_result
 
 - name: Check if iso file created
   stat:
-    path: "{{ output_dir_test }}/test1.iso"
+    path: "{{ output_test_dir }}/test1.iso"
   register: iso_file
 
 - assert:
@@ -81,14 +81,14 @@
   iso_create:
     src_files:
       - "{{ role_path }}/files/test1.cfg"
-    dest_iso: "{{ output_dir_test }}/test2.iso"
+    dest_iso: "{{ output_test_dir }}/test2.iso"
     vol_ident: "OEMDRV"
   register: iso_result
 - debug: var=iso_result
 
 - name: Check if iso file created
   stat:
-    path: "{{ output_dir_test }}/test2.iso"
+    path: "{{ output_test_dir }}/test2.iso"
   register: iso_file
 
 - assert:
@@ -100,14 +100,14 @@
   iso_create:
     src_files:
       - "{{ role_path }}/files/test1.cfg"
-    dest_iso: "{{ output_dir_test }}/test3.iso"
+    dest_iso: "{{ output_test_dir }}/test3.iso"
     rock_ridge: "1.09"
   register: iso_result
 - debug: var=iso_result
 
 - name: Check if iso file created
   stat:
-    path: "{{ output_dir_test }}/test3.iso"
+    path: "{{ output_test_dir }}/test3.iso"
   register: iso_file
 
 - assert:
@@ -119,14 +119,14 @@
   iso_create:
     src_files:
       - "{{ role_path }}/files/test1.cfg"
-    dest_iso: "{{ output_dir_test }}/test4.iso"
+    dest_iso: "{{ output_test_dir }}/test4.iso"
     joliet: 3
   register: iso_result
 - debug: var=iso_result
 
 - name: Check if iso file created
   stat:
-    path: "{{ output_dir_test }}/test4.iso"
+    path: "{{ output_test_dir }}/test4.iso"
   register: iso_file
 
 - assert:
@@ -138,14 +138,14 @@
   iso_create:
     src_files:
       - "{{ role_path }}/files/test1.cfg"
-    dest_iso: "{{ output_dir_test }}/test5.iso"
+    dest_iso: "{{ output_test_dir }}/test5.iso"
     udf: True
   register: iso_result
 - debug: var=iso_result
 
 - name: Check if iso file created
   stat:
-    path: "{{ output_dir_test }}/test5.iso"
+    path: "{{ output_test_dir }}/test5.iso"
   register: iso_file
 
 - assert:
