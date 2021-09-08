@@ -69,8 +69,32 @@
   register: result_idem
 
 
+- name: Read certificates (new)
+  slurp:
+    src: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
+  loop: "{{ java_keystore_new_certs }}"
+  when: not remote_cert
+  register: certificates_new
+
+- name: Read certificate keys (new)
+  slurp:
+    src: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.key' }}"
+  loop: "{{ java_keystore_new_certs }}"
+  when: not remote_cert
+  register: certificate_keys_new
+
 - name: Create a Java keystore for the given certificates (certificate changed, check mode)
-  community.general.java_keystore: *java_keystore_params
+  community.general.java_keystore: &java_keystore_params_new_certs
+    name: example
+    dest: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.jks' }}"
+    certificate: "{{ omit if remote_cert else (certificates_new.results[loop_index].content | b64decode) }}"
+    private_key: "{{ omit if remote_cert else (certificate_keys_new.results[loop_index].content | b64decode) }}"
+    certificate_path: "{{ omit if not remote_cert else remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
+    private_key_path: "{{ omit if not remote_cert else remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.key' }}"
+    private_key_passphrase: "{{ item.passphrase | d(omit) }}"
+    password: changeit
+    ssl_backend: "{{ ssl_backend }}"
+    keystore_type: "{{ item.keystore_type | d(omit) }}"
   loop: "{{ java_keystore_new_certs }}"
   loop_control:
     index_var: loop_index
@@ -78,7 +102,7 @@
   register: result_change_check
 
 - name: Create a Java keystore for the given certificates (certificate changed)
-  community.general.java_keystore: *java_keystore_params
+  community.general.java_keystore: *java_keystore_params_new_certs
   loop: "{{ java_keystore_new_certs }}"
   loop_control:
     index_var: loop_index
@@ -87,7 +111,7 @@
 
 - name: Create a Java keystore for the given certificates (alias changed, check mode)
   community.general.java_keystore:
-    <<: *java_keystore_params
+    <<: *java_keystore_params_new_certs
     name: foobar
   loop: "{{ java_keystore_new_certs }}"
   loop_control:
@@ -97,7 +121,7 @@
 
 - name: Create a Java keystore for the given certificates (alias changed)
   community.general.java_keystore:
-    <<: *java_keystore_params
+    <<: *java_keystore_params_new_certs
     name: foobar
   loop: "{{ java_keystore_new_certs }}"
   loop_control:
@@ -107,7 +131,7 @@
 
 - name: Create a Java keystore for the given certificates (password changed, check mode)
   community.general.java_keystore:
-    <<: *java_keystore_params
+    <<: *java_keystore_params_new_certs
     name: foobar
     password: hunter2
   loop: "{{ java_keystore_new_certs }}"
@@ -118,7 +142,7 @@
 
 - name: Create a Java keystore for the given certificates (password changed)
   community.general.java_keystore:
-    <<: *java_keystore_params
+    <<: *java_keystore_params_new_certs
     name: foobar
     password: hunter2
   loop: "{{ java_keystore_new_certs }}"
@@ -129,7 +153,7 @@
 
 - name: Create a Java keystore for the given certificates (force keystore type pkcs12, check mode)
   community.general.java_keystore:
-    <<: *java_keystore_params
+    <<: *java_keystore_params_new_certs
     name: foobar
     password: hunter2
     keystore_type: pkcs12
@@ -141,7 +165,7 @@
 
 - name: Create a Java keystore for the given certificates (force keystore type jks, check mode)
   community.general.java_keystore:
-    <<: *java_keystore_params
+    <<: *java_keystore_params_new_certs
     name: foobar
     password: hunter2
     keystore_type: jks
@@ -153,7 +177,7 @@
 
 - name: Create a Java keystore for the given certificates (force keystore type jks)
   community.general.java_keystore:
-    <<: *java_keystore_params
+    <<: *java_keystore_params_new_certs
     name: foobar
     password: hunter2
     keystore_type: jks
@@ -171,7 +195,7 @@
 
 - name: Fail to create a Java keystore for the given certificates (password too short)
   community.general.java_keystore:
-    <<: *java_keystore_params
+    <<: *java_keystore_params_new_certs
     name: foobar
     password: short
     keystore_type: jks
@@ -190,7 +214,7 @@
 
 - name: Create a Java keystore for the given certificates (keystore type changed, check mode)
   community.general.java_keystore:
-    <<: *java_keystore_params
+    <<: *java_keystore_params_new_certs
     name: foobar
     password: hunter2
     keystore_type: pkcs12
@@ -202,7 +226,7 @@
 
 - name: Create a Java keystore for the given certificates (keystore type changed)
   community.general.java_keystore:
-    <<: *java_keystore_params
+    <<: *java_keystore_params_new_certs
     name: foobar
     password: hunter2
     keystore_type: pkcs12
@@ -214,7 +238,7 @@
 
 - name: Create a Java keystore for the given certificates (omit keystore type, check mode)
   community.general.java_keystore:
-    <<: *java_keystore_params
+    <<: *java_keystore_params_new_certs
     name: foobar
     password: hunter2
   loop: "{{ java_keystore_new_certs }}"
@@ -225,7 +249,7 @@
 
 - name: Create a Java keystore for the given certificates (omit keystore type)
   community.general.java_keystore:
-    <<: *java_keystore_params
+    <<: *java_keystore_params_new_certs
     name: foobar
     password: hunter2
   loop: "{{ java_keystore_new_certs }}"
