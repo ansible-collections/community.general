@@ -152,9 +152,7 @@ def main():
         required_if=[('state', 'present', ('value',))],
         mutually_exclusive=[['non_existing', 'existing'],
                             ['keep_ttl', 'expiration']],)
-    import_errors = fail_imports()
-    if len(import_errors) != 0:
-        module.fail_json(msg=import_errors)
+    fail_imports(module)
 
     redis = RedisAnsible(module)
 
