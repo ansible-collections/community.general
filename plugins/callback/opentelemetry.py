@@ -12,7 +12,7 @@ DOCUMENTATION = '''
     version_added: 3.7.0
     description:
       - This callback create distributed traces for each Ansible task with OpenTelemetry.
-      - You can configure the OpenTelemetry exporter and SDL with environment variables.
+      - You can configure the OpenTelemetry exporter and SDK with environment variables.
       - See U(https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html).
       - See U(https://opentelemetry-python.readthedocs.io/en/latest/sdk/environment_variables.html#opentelemetry-sdk-environment-variables).
     options:
