@@ -1,8 +1,8 @@
 ---
 - name: Archive - file content idempotency ({{ format }})
   archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_file_content_idempotency.{{ format }}"
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_file_content_idempotency.{{ format }}"
     format: "{{ format }}"
   register: file_content_idempotency_before
 
@@ -10,12 +10,12 @@
   lineinfile:
     line: bar.txt
     regexp: "^foo.txt$"
-    path: "{{ output_dir }}/foo.txt"
+    path: "{{ remote_tmp_dir }}/foo.txt"
 
 - name: Archive second time - file content idempotency ({{ format }})
   archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_file_content_idempotency.{{ format }}"
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_file_content_idempotency.{{ format }}"
     format: "{{ format }}"
   register: file_content_idempotency_after
 
@@ -28,29 +28,29 @@
 
 - name: Remove archive - file content idempotency ({{ format }})
   file:
-    path: "{{ output_dir }}/archive_file_content_idempotency.{{ format }}"
+    path: "{{ remote_tmp_dir }}/archive_file_content_idempotency.{{ format }}"
     state: absent
 
 - name: Modify file back - file content idempotency ({{ format }})
   lineinfile:
     line: foo.txt
     regexp: "^bar.txt$"
-    path: "{{ output_dir }}/foo.txt"
+    path: "{{ remote_tmp_dir }}/foo.txt"
 
 - name: Archive - file name idempotency ({{ format }})
   archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_file_name_idempotency.{{ format }}"
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_file_name_idempotency.{{ format }}"
     format: "{{ format }}"
   register: file_name_idempotency_before
 
 - name: Rename file - file name idempotency ({{ format }})
-  command: "mv {{ output_dir}}/foo.txt {{ output_dir }}/fii.txt"
+  command: "mv {{ remote_tmp_dir }}/foo.txt {{ remote_tmp_dir }}/fii.txt"
 
 - name: Archive again - file name idempotency ({{ format }})
   archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_file_name_idempotency.{{ format }}"
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_file_name_idempotency.{{ format }}"
     format: "{{ format }}"
   register: file_name_idempotency_after
 
@@ -63,16 +63,16 @@
 
 - name: Remove archive - file name idempotency ({{ format }})
   file:
-    path: "{{ output_dir }}/archive_file_name_idempotency.{{ format }}"
+    path: "{{ remote_tmp_dir }}/archive_file_name_idempotency.{{ format }}"
     state: absent
 
 - name: Rename file back - file name idempotency ({{ format }})
-  command: "mv {{ output_dir }}/fii.txt {{ output_dir }}/foo.txt"
+  command: "mv {{ remote_tmp_dir }}/fii.txt {{ remote_tmp_dir }}/foo.txt"
 
 - name: Archive - single file content idempotency ({{ format }})
   archive:
-    path: "{{ output_dir }}/foo.txt"
-    dest: "{{ output_dir }}/archive_single_file_content_idempotency.{{ format }}"
+    path: "{{ remote_tmp_dir }}/foo.txt"
+    dest: "{{ remote_tmp_dir }}/archive_single_file_content_idempotency.{{ format }}"
     format: "{{ format }}"
   register: single_file_content_idempotency_before
 
@@ -80,12 +80,12 @@
   lineinfile:
     line: bar.txt
     regexp: "^foo.txt$"
-    path: "{{ output_dir }}/foo.txt"
+    path: "{{ remote_tmp_dir }}/foo.txt"
 
 - name: Archive second time - single file content idempotency ({{ format }})
   archive:
-    path: "{{ output_dir }}/foo.txt"
-    dest: "{{ output_dir }}/archive_single_file_content_idempotency.{{ format }}"
+    path: "{{ remote_tmp_dir }}/foo.txt"
+    dest: "{{ remote_tmp_dir }}/archive_single_file_content_idempotency.{{ format }}"
     format: "{{ format }}"
   register: single_file_content_idempotency_after
 
@@ -98,29 +98,29 @@
 
 - name: Remove archive - single file content idempotency ({{ format }})
   file:
-    path: "{{ output_dir }}/archive_single_file_content_idempotency.{{ format }}"
+    path: "{{ remote_tmp_dir }}/archive_single_file_content_idempotency.{{ format }}"
     state: absent
 
 - name: Modify file back - single file content idempotency ({{ format }})
   lineinfile:
     line: foo.txt
     regexp: "^bar.txt$"
-    path: "{{ output_dir }}/foo.txt"
+    path: "{{ remote_tmp_dir }}/foo.txt"
 
 - name: Archive - single file name idempotency ({{ format }})
   archive:
-    path: "{{ output_dir }}/foo.txt"
-    dest: "{{ output_dir }}/archive_single_file_name_idempotency.{{ format }}"
+    path: "{{ remote_tmp_dir }}/foo.txt"
+    dest: "{{ remote_tmp_dir }}/archive_single_file_name_idempotency.{{ format }}"
     format: "{{ format }}"
   register: single_file_name_idempotency_before
 
 - name: Rename file - single file name idempotency ({{ format }})
-  command: "mv {{ output_dir}}/foo.txt {{ output_dir }}/fii.txt"
+  command: "mv {{ remote_tmp_dir }}/foo.txt {{ remote_tmp_dir }}/fii.txt"
 
 - name: Archive again - single file name idempotency ({{ format }})
   archive:
-    path: "{{ output_dir }}/fii.txt"
-    dest: "{{ output_dir }}/archive_single_file_name_idempotency.{{ format }}"
+    path: "{{ remote_tmp_dir }}/fii.txt"
+    dest: "{{ remote_tmp_dir }}/archive_single_file_name_idempotency.{{ format }}"
     format: "{{ format }}"
   register: single_file_name_idempotency_after
 
@@ -134,8 +134,8 @@
 
 - name: Remove archive - single file name idempotency ({{ format }})
   file:
-    path: "{{ output_dir }}/archive_single_file_name_idempotency.{{ format }}"
+    path: "{{ remote_tmp_dir }}/archive_single_file_name_idempotency.{{ format }}"
     state: absent
 
 - name: Rename file back - single file name idempotency ({{ format }})
-  command: "mv {{ output_dir }}/fii.txt {{ output_dir }}/foo.txt"
+  command: "mv {{ remote_tmp_dir }}/fii.txt {{ remote_tmp_dir }}/foo.txt"
