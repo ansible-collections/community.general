@@ -2,3 +2,4 @@
 dependencies:
   - setup_pkg_mgr
   - setup_openssl
+  - setup_remote_tmp_dir

@@ -19,8 +19,8 @@
 
 - name: Extract the iso
   iso_extract:
-    image: '{{ output_dir_test }}/test.iso'
-    dest: '{{ output_dir_test }}'
+    image: '{{ output_test_dir }}/test.iso'
+    dest: '{{ output_test_dir }}'
     files:
     - 1.txt
     - 2.txt
@@ -32,8 +32,8 @@
 
 - name: Extract the iso again
   iso_extract:
-    image: '{{ output_dir_test }}/test.iso'
-    dest: '{{ output_dir_test }}'
+    image: '{{ output_test_dir }}/test.iso'
+    dest: '{{ output_test_dir }}'
     files:
     - 1.txt
     - 2.txt

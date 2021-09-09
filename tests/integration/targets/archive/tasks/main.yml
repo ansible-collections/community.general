@@ -75,7 +75,7 @@
   register: backports_lzma_pip
 
 - name: prep our files
-  copy: src={{ item }} dest={{output_dir}}/{{ item }}
+  copy: src={{ item }} dest={{remote_tmp_dir}}/{{ item }}
   with_items:
     - foo.txt
     - bar.txt
