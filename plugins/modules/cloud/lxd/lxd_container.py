@@ -42,14 +42,14 @@ options:
         required: false
     ignore_volatile_options:
         description:
-            - If set to C(true), options starting with C(volatile.) are ignored. As a result,
-              they are reapplied for each execution.
-            - This default behavior can be changed by setting this option to C(false).
-            - The default value C(true) will be deprecated in community.general 4.0.0,
-              and will change to C(false) in community.general 5.0.0.
-            type: bool
-            default: true
-            version_added: 3.7.0
+          - If set to C(true), options starting with C(volatile.) are ignored. As a result,
+            they are reapplied for each execution.
+          - This default behavior can be changed by setting this option to C(false).
+          - The default value C(true) will be deprecated in community.general 4.0.0
+            and will change to C(false) in community.general 5.0.0.
+        type: bool
+        default: true
+        version_added: 3.7.0
     profiles:
         description:
           - Profile to be used by the container
