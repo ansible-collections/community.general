@@ -5,7 +5,7 @@
 ####################################################################
 
 - name: record the output directory
-  set_fact: deploy_helper_test_root={{output_dir}}/deploy_helper_test_root
+  set_fact: deploy_helper_test_root={{remote_tmp_dir}}/deploy_helper_test_root
 
 - name: State=query with default parameters
   deploy_helper: path={{ deploy_helper_test_root }} state=query
