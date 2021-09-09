@@ -157,7 +157,7 @@ automerge: true
 >>>>>>> afcf87d21f (Enable bot automerge)
 files:
   plugins/:
-    supershipit: quidame Ajpantuso
+    supershipit: quidame
   changelogs/: {}
   changelogs/fragments/:
     support: community

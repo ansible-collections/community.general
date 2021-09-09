@@ -69,5 +69,6 @@ Individuals who have been asked to become a part of this group have generally be
 | ------------------- | -------------------- | ------------------ | -------------------- |
 | Alexei Znamensky    | russoz               | russoz             |                      |
 | Andrew Klychkov     | andersson007         | andersson007_      |                      |
+| Andrew Pantuso      | Ajpantuso            | ajpantuso          |                      |
 | Felix Fontein       | felixfontein         | felixfontein       |                      |
 | John R Barker       | gundalow             | gundalow           |                      |
