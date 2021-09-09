@@ -35,19 +35,21 @@ options:
             obtained from
             GET /1.0/containers/<name>
             U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#10containersname)
-            are different, they this module tries to apply the configurations.
+          - The key starts with 'volatile.' are ignored for this comparison when I(ignore_volatile_options=true).
           - Not all config values are supported to apply the existing container.
             Maybe you need to delete and recreate a container.
         type: dict
         required: false
     ignore_volatile_options:
-            description:
-            - Previously, 'volatile.'-options were ignored and, as a result,
-              reapplied for each execution.
-              The default behavior is retained and can be changed by setting it to false.
-              In the future, the behavior of the 'volatile.'-options not to ignore the standard.
+        description:
+            - If set to C(true), options starting with C(volatile.) are ignored. As a result,
+              they are reapplied for each execution.
+            - This default behavior can be changed by setting this option to C(false).
+            - The default value C(true) will be deprecated in community.general 4.0.0,
+              and will change to C(false) in community.general 5.0.0.
             type: bool
-            default: True
+            default: true
+            version_added: 3.7.0
     profiles:
         description:
           - Profile to be used by the container
@@ -183,7 +185,7 @@ EXAMPLES = '''
     - name: Create a started container
       community.general.lxd_container:
         name: mycontainer
-        ignore_volatile_options: True
+        ignore_volatile_options: true
         state: started
         source:
           type: image
