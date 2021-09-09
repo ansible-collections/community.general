@@ -7,7 +7,7 @@
   block:
     - name: Create private keys
       community.crypto.openssl_privatekey:
-        path: "{{ output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
+        path: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
         size: 2048  # this should work everywhere
         # The following is more efficient, but might not work everywhere:
         # type: ECC
@@ -21,8 +21,8 @@
 
     - name: Create CSRs
       community.crypto.openssl_csr:
-        path: "{{ output_dir ~ '/' ~ item.name ~ '.csr' }}"
-        privatekey_path: "{{ output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
+        path: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.csr' }}"
+        privatekey_path: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
         privatekey_passphrase: "{{ item.passphrase | default(omit) }}"
         commonName: "{{ item.commonName }}"
       loop:
@@ -41,9 +41,9 @@
 
     - name: Create certificates
       community.crypto.x509_certificate:
-        path: "{{ output_dir ~ '/' ~ item.name ~ '.pem' }}"
-        csr_path: "{{ output_dir ~ '/' ~ item.name ~ '.csr' }}"
-        privatekey_path: "{{ output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
+        path: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
+        csr_path: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.csr' }}"
+        privatekey_path: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
         privatekey_passphrase: "{{ item.passphrase | default(omit) }}"
         provider: selfsigned
       loop:
@@ -60,67 +60,113 @@
           passphrase: hunter2
           commonName: example.org
 
-    - name: Create a Java key store for the given certificates (check mode)
-      community.general.java_keystore: &create_key_store_data
-        name: example
-        certificate: "{{ lookup('file', output_dir ~ '/' ~ item.name ~ '.pem') }}"
-        private_key: "{{ lookup('file', output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key') }}"
-        private_key_passphrase: "{{ item.passphrase | default(omit) }}"
-        password: changeit
-        dest: "{{ output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.jks' }}"
+    - name: Read certificates
+      slurp:
+        src: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
       loop: &create_key_store_loop
         - name: cert
         - name: cert-pw
           passphrase: hunter2
+      register: certificates
+
+    - name: Read certificate keys
+      slurp:
+        src: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.key' }}"
+      loop: *create_key_store_loop
+      register: certificate_keys
+
+    - name: Create a Java key store for the given certificates (check mode)
+      community.general.java_keystore: &create_key_store_data
+        name: example
+        certificate: "{{ certificates.results[loop_index].content | b64decode }}"
+        private_key: "{{ certificate_keys.results[loop_index].content | b64decode }}"
+        private_key_passphrase: "{{ item.passphrase | default(omit) }}"
+        password: changeit
+        dest: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.jks' }}"
+      loop: *create_key_store_loop
+      loop_control:
+        index_var: loop_index
       check_mode: yes
       register: result_check
 
     - name: Create a Java key store for the given certificates
       community.general.java_keystore: *create_key_store_data
       loop: *create_key_store_loop
+      loop_control:
+        index_var: loop_index
       register: result
 
     - name: Create a Java key store for the given certificates (idempotency, check mode)
       community.general.java_keystore: *create_key_store_data
       loop: *create_key_store_loop
+      loop_control:
+        index_var: loop_index
       check_mode: yes
       register: result_idem_check
 
     - name: Create a Java key store for the given certificates (idempotency)
       community.general.java_keystore: *create_key_store_data
       loop: *create_key_store_loop
+      loop_control:
+        index_var: loop_index
       register: result_idem
 
-    - name: Create a Java key store for the given certificates (certificate changed, check mode)
-      community.general.java_keystore: *create_key_store_data
+    - name: Read certificates (new)
+      slurp:
+        src: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
       loop: &create_key_store_loop_new_certs
         - name: cert2
           keyname: cert
         - name: cert2-pw
           keyname: cert-pw
           passphrase: hunter2
+      register: certificates_new
+
+    - name: Read certificate keys (new)
+      slurp:
+        src: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.key' }}"
+      loop: *create_key_store_loop_new_certs
+      register: certificate_keys_new
+
+    - name: Create a Java key store for the given certificates (certificate changed, check mode)
+      community.general.java_keystore: &create_key_store_data_new_certs
+        name: example
+        certificate: "{{ certificates_new.results[loop_index].content | b64decode }}"
+        private_key: "{{ certificate_keys_new.results[loop_index].content | b64decode }}"
+        private_key_passphrase: "{{ item.passphrase | default(omit) }}"
+        password: changeit
+        dest: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.jks' }}"
+      loop: *create_key_store_loop_new_certs
+      loop_control:
+        index_var: loop_index
       check_mode: yes
       register: result_change_check
 
     - name: Create a Java key store for the given certificates (certificate changed)
-      community.general.java_keystore: *create_key_store_data
+      community.general.java_keystore: *create_key_store_data_new_certs
       loop: *create_key_store_loop_new_certs
+      loop_control:
+        index_var: loop_index
       register: result_change
 
     - name: Create a Java key store for the given certificates (password changed, check mode)
       community.general.java_keystore:
-        <<: *create_key_store_data
+        <<: *create_key_store_data_new_certs
         password: hunter2
       loop: *create_key_store_loop_new_certs
+      loop_control:
+        index_var: loop_index
       check_mode: yes
       register: result_pw_change_check
       when: false  # FIXME: module currently crashes
 
     - name: Create a Java key store for the given certificates (password changed)
       community.general.java_keystore:
-        <<: *create_key_store_data
+        <<: *create_key_store_data_new_certs
         password: hunter2
       loop: *create_key_store_loop_new_certs
+      loop_control:
+        index_var: loop_index
       register: result_pw_change
       when: false  # FIXME: module currently crashes
 

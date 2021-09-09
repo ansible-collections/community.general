@@ -2,21 +2,21 @@
 - name: Create broken link
   file:
     src: /nowhere
-    dest: "{{ output_dir }}/nowhere.txt"
+    dest: "{{ remote_tmp_dir }}/nowhere.txt"
     state: link
     force: yes
 
 - name: Archive broken link (tar.gz)
   archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_broken_link.tar.gz"
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_broken_link.tar.gz"
 
 - name: Archive broken link (tar.bz2)
   archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_broken_link.tar.bz2"
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_broken_link.tar.bz2"
 
 - name: Archive broken link (zip)
   archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_broken_link.zip"
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_broken_link.zip"
