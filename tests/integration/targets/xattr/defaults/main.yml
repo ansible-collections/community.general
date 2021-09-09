@@ -1,1 +1,1 @@
-test_file: "{{ output_dir }}/foo.txt"
+test_file: "{{ remote_tmp_dir }}/foo.txt"

@@ -31,13 +31,21 @@
   register: find_sleep
 
 - name: "Copying 'sleep' binary"
+  command: cp {{ find_sleep.stdout }} {{ remote_tmp_dir }}/{{ random_name }}
+  # The following does not work on macOS 11.1 (it uses shutil.copystat, and that will die with a PermissionError):
+  # copy:
+  #   src: "{{ find_sleep.stdout }}"
+  #   dest: "{{ remote_tmp_dir }}/{{ random_name }}"
+  #   mode: "0777"
+  #   remote_src: true
+
+- name: Copy helper script
   copy:
-    src: "{{ find_sleep.stdout }}"
-    dest: "{{ output_dir }}/{{ random_name }}"
-    mode: "0777"
+    src: obtainpid.sh
+    dest: "{{ remote_tmp_dir }}/obtainpid.sh"
 
 - name: "Running the copy of 'sleep' binary"
-  command: "sh {{ role_path }}/files/obtainpid.sh '{{ output_dir }}/{{ random_name }}' '{{ output_dir }}/obtainpid.txt'"
+  command: "sh {{ remote_tmp_dir }}/obtainpid.sh '{{ remote_tmp_dir }}/{{ random_name }}' '{{ remote_tmp_dir }}/obtainpid.txt'"
 
   async: 100
   poll: 0
@@ -74,7 +82,7 @@
 
 - name: "Reading pid from the file"
   slurp:
-    src:  "{{ output_dir }}/obtainpid.txt"
+    src:  "{{ remote_tmp_dir }}/obtainpid.txt"
   register: newpid
 
 - name: "Verify that the Process IDs (PIDs) returned is not empty and also equal to the PIDs obtained in console"

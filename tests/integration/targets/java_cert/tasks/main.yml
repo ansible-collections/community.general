@@ -9,15 +9,15 @@
     - name: prep pkcs12 file
       ansible.builtin.copy:
         src: "{{ test_pkcs12_path }}"
-        dest: "{{ output_dir }}/{{ test_pkcs12_path }}"
+        dest: "{{ remote_tmp_dir }}/{{ test_pkcs12_path }}"
 
     - name: import pkcs12
       community.general.java_cert:
-        pkcs12_path: "{{ output_dir }}/{{ test_pkcs12_path }}"
+        pkcs12_path: "{{ remote_tmp_dir }}/{{ test_pkcs12_path }}"
         pkcs12_password: changeit
         pkcs12_alias: default
         cert_alias: default
-        keystore_path: "{{ output_dir }}/{{ test_keystore_path }}"
+        keystore_path: "{{ remote_tmp_dir }}/{{ test_keystore_path }}"
         keystore_pass: changeme_keystore
         keystore_create: yes
         state: present
@@ -30,11 +30,11 @@
 
     - name: import pkcs12 with wrong password
       community.general.java_cert:
-        pkcs12_path: "{{ output_dir }}/{{ test_pkcs12_path }}"
+        pkcs12_path: "{{ remote_tmp_dir }}/{{ test_pkcs12_path }}"
         pkcs12_password: wrong_pass
         pkcs12_alias: default
         cert_alias: default_new
-        keystore_path: "{{ output_dir }}/{{ test_keystore_path }}"
+        keystore_path: "{{ remote_tmp_dir }}/{{ test_keystore_path }}"
         keystore_pass: changeme_keystore
         keystore_create: yes
         state: present
@@ -49,9 +49,9 @@
     - name: test fail on mutually exclusive params
       community.general.java_cert:
         cert_path: ca.crt
-        pkcs12_path: "{{ output_dir }}/{{ test_pkcs12_path }}"
+        pkcs12_path: "{{ remote_tmp_dir }}/{{ test_pkcs12_path }}"
         cert_alias: default
-        keystore_path: "{{ output_dir }}/{{ test_keystore_path }}"
+        keystore_path: "{{ remote_tmp_dir }}/{{ test_keystore_path }}"
         keystore_pass: changeme_keystore
         keystore_create: yes
         state: present
@@ -65,7 +65,7 @@
 
     - name: test fail on missing required params
       community.general.java_cert:
-        keystore_path: "{{ output_dir }}/{{ test_keystore_path }}"
+        keystore_path: "{{ remote_tmp_dir }}/{{ test_keystore_path }}"
         keystore_pass: changeme_keystore
         state: absent
       ignore_errors: true
@@ -78,7 +78,7 @@
 
     - name: delete object based on cert_alias parameter
       community.general.java_cert:
-        keystore_path: "{{ output_dir }}/{{ test_keystore_path }}"
+        keystore_path: "{{ remote_tmp_dir }}/{{ test_keystore_path }}"
         keystore_pass: changeme_keystore
         cert_alias: default
         state: absent
@@ -98,8 +98,8 @@
         path: "{{ item }}"
         state: absent
       loop:
-        - "{{ output_dir }}/{{ test_pkcs12_path }}"
-        - "{{ output_dir }}/{{ test_keystore_path }}"
+        - "{{ remote_tmp_dir }}/{{ test_pkcs12_path }}"
+        - "{{ remote_tmp_dir }}/{{ test_keystore_path }}"
         - "{{ test_keystore2_path }}"
         - "{{ test_cert_path }}"
         - "{{ test_key_path }}"
