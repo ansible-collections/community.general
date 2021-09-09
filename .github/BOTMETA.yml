@@ -1,7 +1,7 @@
 automerge: true
 files:
   plugins/:
-    supershipit: quidame Ajpantuso
+    supershipit: quidame
   changelogs/: {}
   changelogs/fragments/:
     support: community
