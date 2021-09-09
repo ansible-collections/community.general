@@ -50,7 +50,7 @@
 ###################################################
 - name:
   set_fact:
-    reqs_file: '{{ output_dir }}/reqs.yaml'
+    reqs_file: '{{ remote_tmp_dir }}/reqs.yaml'
 
 - name: Copy requirements file
   copy:

@@ -9,15 +9,15 @@
     extra_args: "-c {{ remote_constraints }}"
 
 - set_fact:
-    output_dir_test: '{{ output_dir }}/test_ssh_config'
+    output_test_dir: '{{ remote_tmp_dir }}/test_ssh_config'
 
 - set_fact:
-    ssh_config_test: '{{ output_dir_test }}/ssh_config_test'
-    ssh_private_key: '{{ output_dir_test }}/fake_id_rsa'
+    ssh_config_test: '{{ output_test_dir }}/ssh_config_test'
+    ssh_private_key: '{{ output_test_dir }}/fake_id_rsa'
 
 - name: create a temporary directory
   file:
-    path: "{{ output_dir_test }}"
+    path: "{{ output_test_dir }}"
     state: directory
 
 - name: Copy sample config file
