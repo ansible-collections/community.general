@@ -23,7 +23,7 @@
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
 - set_fact:
-    output_dir_test: '{{ output_dir }}/test_iso_extract'
+    output_test_dir: '{{ remote_tmp_dir }}/test_iso_extract'
 
 - name: Install 7zip
   import_tasks: 7zip.yml

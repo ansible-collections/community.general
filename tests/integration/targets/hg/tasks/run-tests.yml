@@ -6,14 +6,14 @@
 
 - name: set where to extract the repo
   set_fact:
-    checkout_dir: "{{ output_dir }}/hg_project_test"
+    checkout_dir: "{{ remote_tmp_dir }}/hg_project_test"
 
 - name: set what repo to use
   set_fact:
     repo: "http://hg.pf.osdn.net/view/a/ak/akasurde/hg_project_test"
 
-- name: clean out the output_dir
-  shell: rm -rf {{ output_dir }}/*
+- name: clean out the remote_tmp_dir
+  shell: rm -rf {{ remote_tmp_dir }}/*
 
 - name: verify that mercurial is installed so this test can continue
   shell: which hg

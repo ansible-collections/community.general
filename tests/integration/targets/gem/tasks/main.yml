@@ -122,7 +122,7 @@
   gem:
     name: gist
     state: present
-    install_dir: "{{ output_dir }}/gems"
+    install_dir: "{{ remote_tmp_dir }}/gems"
   ignore_errors: yes
   register: install_gem_fail_result
 
@@ -141,12 +141,12 @@
     name: gist
     state: present
     user_install: no
-    install_dir: "{{ output_dir }}/gems"
+    install_dir: "{{ remote_tmp_dir }}/gems"
   register: install_gem_result
 
 - name: Find gems in custom directory
   find:
-    paths: "{{ output_dir }}/gems/gems"
+    paths: "{{ remote_tmp_dir }}/gems/gems"
     file_type: directory
     contains: gist
   register: gem_search
@@ -163,12 +163,12 @@
     name: gist
     state: absent
     user_install: no
-    install_dir: "{{ output_dir }}/gems"
+    install_dir: "{{ remote_tmp_dir }}/gems"
   register: install_gem_result
 
 - name: Find gems in custom directory
   find:
-    paths: "{{ output_dir }}/gems/gems"
+    paths: "{{ remote_tmp_dir }}/gems/gems"
     file_type: directory
     contains: gist
   register: gem_search
@@ -184,14 +184,14 @@
   gem:
     name: gist
     state: present
-    bindir: "{{ output_dir }}/custom_bindir"
+    bindir: "{{ remote_tmp_dir }}/custom_bindir"
     norc: yes
     user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
   register: install_gem_result
 
 - name: Get stats of gem executable
   stat:
-    path: "{{ output_dir }}/custom_bindir/gist"
+    path: "{{ remote_tmp_dir }}/custom_bindir/gist"
   register: gem_bindir_stat
 
 - name: Ensure gem executable was installed in custom directory
@@ -204,14 +204,14 @@
   gem:
     name: gist
     state: absent
-    bindir: "{{ output_dir }}/custom_bindir"
+    bindir: "{{ remote_tmp_dir }}/custom_bindir"
     norc: yes
     user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
   register: install_gem_result
 
 - name: Get stats of gem executable
   stat:
-    path: "{{ output_dir }}/custom_bindir/gist"
+    path: "{{ remote_tmp_dir }}/custom_bindir/gist"
   register: gem_bindir_stat
 
 - name: Ensure gem executable was removed from custom directory

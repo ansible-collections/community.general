@@ -239,12 +239,16 @@
 - name: Copy the ssl server script
   copy:
     src: "setupSSLServer.py"
-    dest: "{{ output_dir }}"
+    dest: "{{ remote_tmp_dir }}"
 
 - name: Create an SSL server that we will use for testing URL imports
-  command: python {{ output_dir }}/setupSSLServer.py {{ output_dir }} {{ test_ssl_port }}
+  command: "{{ ansible_python.executable }} {{ remote_tmp_dir }}/setupSSLServer.py {{ remote_tmp_dir }} {{ test_ssl_port }}"
   async: 10
   poll: 0
+
+- name: "Wait for one second to make sure that the serve script has actually been started"
+  pause:
+    seconds: 1
 
 - name: |
     Download the original cert.pem from our temporary server. The current cert should contain

@@ -25,14 +25,14 @@
 # Core functionality tests
 - name: Archive - no options ({{ format }})
   archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_no_opts.{{ format }}"
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_no_opts.{{ format }}"
     format: "{{ format }}"
   register: archive_no_options
 
 - name: Verify that archive exists - no options ({{ format }})
   file:
-    path: "{{output_dir}}/archive_no_opts.{{ format }}"
+    path: "{{remote_tmp_dir}}/archive_no_opts.{{ format }}"
     state: file
 
 - name: Verify that archive result is changed and includes all files - no options ({{ format }})
@@ -44,20 +44,20 @@
 
 - name: Remove the archive - no options ({{ format }})
   file:
-    path: "{{ output_dir }}/archive_no_options.{{ format }}"
+    path: "{{ remote_tmp_dir }}/archive_no_options.{{ format }}"
     state: absent
 
 - name: Archive - file options ({{ format }})
   archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_file_options.{{ format }}"
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_file_options.{{ format }}"
     format: "{{ format }}"
     mode: "u+rwX,g-rwx,o-rwx"
   register: archive_file_options
 
 - name: Retrieve archive file information - file options ({{ format }})
   stat:
-    path: "{{ output_dir }}/archive_file_options.{{ format }}"
+    path: "{{ remote_tmp_dir }}/archive_file_options.{{ format }}"
   register: archive_file_options_stat
 
 - name: Test that the file modes were changed
@@ -69,19 +69,19 @@
 
 - name: Remove the archive - file options ({{ format }})
   file:
-    path: "{{ output_dir }}/archive_file_options.{{ format }}"
+    path: "{{ remote_tmp_dir }}/archive_file_options.{{ format }}"
     state: absent
 
 - name: Archive - non-ascii ({{ format }})
   archive:
-    path: "{{ output_dir }}/*.txt"
-    dest: "{{ output_dir }}/archive_nonascii_くらとみ.{{ format }}"
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_nonascii_くらとみ.{{ format }}"
     format: "{{ format }}"
   register: archive_nonascii
 
 - name: Retrieve archive file information - non-ascii ({{ format }})
   stat:
-    path: "{{ output_dir }}/archive_nonascii_くらとみ.{{ format }}"
+    path: "{{ remote_tmp_dir }}/archive_nonascii_くらとみ.{{ format }}"
   register: archive_nonascii_stat
 
 - name: Test that archive exists - non-ascii ({{ format }})
@@ -92,13 +92,13 @@
 
 - name: Remove the archive - non-ascii ({{ format }})
   file:
-    path: "{{ output_dir }}/archive_nonascii_くらとみ.{{ format }}"
+    path: "{{ remote_tmp_dir }}/archive_nonascii_くらとみ.{{ format }}"
     state: absent
 
 - name: Archive - single target ({{ format }})
   archive:
-    path: "{{ output_dir }}/foo.txt"
-    dest: "{{ output_dir }}/archive_single_target.{{ format }}"
+    path: "{{ remote_tmp_dir }}/foo.txt"
+    dest: "{{ remote_tmp_dir }}/archive_single_target.{{ format }}"
     format: "{{ format }}"
   register: archive_single_target
 
@@ -117,7 +117,7 @@
 - block:
     - name: Retrieve contents of archive - single target ({{ format }})
       ansible.builtin.unarchive:
-        src: "{{ output_dir }}/archive_single_target.{{ format }}"
+        src: "{{ remote_tmp_dir }}/archive_single_target.{{ format }}"
         dest: .
         list_files: true
       check_mode: true
@@ -135,22 +135,22 @@
 
 - name: Remove archive - single target ({{ format }})
   file:
-    path: "{{ output_dir }}/archive_single_target.{{ format }}"
+    path: "{{ remote_tmp_dir }}/archive_single_target.{{ format }}"
     state: absent
 
 - name: Archive - path list ({{ format }})
   archive:
     path:
-      - "{{ output_dir }}/empty.txt"
-      - "{{ output_dir }}/foo.txt"
-      - "{{ output_dir }}/bar.txt"
-    dest: "{{ output_dir }}/archive_path_list.{{ format }}"
+      - "{{ remote_tmp_dir }}/empty.txt"
+      - "{{ remote_tmp_dir }}/foo.txt"
+      - "{{ remote_tmp_dir }}/bar.txt"
+    dest: "{{ remote_tmp_dir }}/archive_path_list.{{ format }}"
     format: "{{ format }}"
   register: archive_path_list
 
 - name: Verify that archive exists - path list ({{ format }})
   file:
-    path: "{{output_dir}}/archive_path_list.{{ format }}"
+    path: "{{remote_tmp_dir}}/archive_path_list.{{ format }}"
     state: file
 
 - name: Assert that archive contains all files - path list ({{ format }})
@@ -161,16 +161,16 @@
 
 - name: Remove archive - path list ({{ format }})
   file:
-    path: "{{ output_dir }}/archive_path_list.{{ format }}"
+    path: "{{ remote_tmp_dir }}/archive_path_list.{{ format }}"
     state: absent
 
 - name: Archive - missing paths ({{ format }})
   archive:
     path:
-      - "{{ output_dir }}/*.txt"
-      - "{{ output_dir }}/dne.txt"
-    exclude_path: "{{ output_dir }}/foo.txt"
-    dest: "{{ output_dir }}/archive_missing_paths.{{ format }}"
+      - "{{ remote_tmp_dir }}/*.txt"
+      - "{{ remote_tmp_dir }}/dne.txt"
+    exclude_path: "{{ remote_tmp_dir }}/foo.txt"
+    dest: "{{ remote_tmp_dir }}/archive_missing_paths.{{ format }}"
     format: "{{ format }}"
   register: archive_missing_paths
 
@@ -179,10 +179,10 @@
     that:
       - archive_missing_paths is changed
       - "archive_missing_paths.dest_state == 'incomplete'"
-      - "'{{ output_dir }}/dne.txt' in archive_missing_paths.missing"
-      - "'{{ output_dir }}/foo.txt' not in archive_missing_paths.missing"
+      - "'{{ remote_tmp_dir }}/dne.txt' in archive_missing_paths.missing"
+      - "'{{ remote_tmp_dir }}/foo.txt' not in archive_missing_paths.missing"
 
 - name: Remove archive - missing paths ({{ format }})
   file:
-    path: "{{ output_dir }}/archive_missing_paths.{{ format }}"
+    path: "{{ remote_tmp_dir }}/archive_missing_paths.{{ format }}"
     state: absent
