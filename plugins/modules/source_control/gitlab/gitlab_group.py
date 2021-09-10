@@ -61,6 +61,23 @@ options:
     choices: ["private", "internal", "public"]
     default: private
     type: str
+  project_creation_level:
+    description:
+      - Determine if developers can create projects in the group.
+    choices: ["developer", "maintainer", "noone"]
+    type: str
+    version_added: 3.7.0
+  auto_devops_enabled:
+    description:
+      - Default to Auto DevOps pipeline for all projects within this group.
+    type: bool
+    version_added: 3.7.0
+  subgroup_creation_level:
+    description:
+      - Allowed to create subgroups.
+    choices: ["maintainer", "owner"]
+    type: str
+    version_added: 3.7.0
 '''
 
 EXAMPLES = '''
@@ -93,6 +110,20 @@ EXAMPLES = '''
     path: my_first_group
     state: present
     parent: "super_parent/parent"
+
+# Other group which only allows sub-groups - no projects
+- name: "Create GitLab Group for SubGroups only"
+  community.general.gitlab_group:
+    api_url: https://gitlab.example.com/
+    validate_certs: True
+    api_username: dj-wasabi
+    api_password: "MySecretPassword"
+    name: my_main_group
+    path: my_main_group
+    state: present
+    project_creation_level: noone
+    auto_devops_enabled: false
+    subgroup_creation_level: maintainer
 '''
 
 RETURN = '''
@@ -166,7 +197,10 @@ class GitLabGroup(object):
                 'name': name,
                 'path': options['path'],
                 'parent_id': parent_id,
-                'visibility': options['visibility']
+                'visibility': options['visibility'],
+                'project_creation_level': options['project_creation_level'],
+                'auto_devops_enabled': options['auto_devops_enabled'],
+                'subgroup_creation_level': options['subgroup_creation_level'],
             }
             if options.get('description'):
                 payload['description'] = options['description']
@@ -176,7 +210,11 @@ class GitLabGroup(object):
             changed, group = self.updateGroup(self.groupObject, {
                 'name': name,
                 'description': options['description'],
-                'visibility': options['visibility']})
+                'visibility': options['visibility'],
+                'project_creation_level': options['project_creation_level'],
+                'auto_devops_enabled': options['auto_devops_enabled'],
+                'subgroup_creation_level': options['subgroup_creation_level'],
+            })
 
         self.groupObject = group
         if changed:
@@ -258,6 +296,9 @@ def main():
         state=dict(type='str', default="present", choices=["absent", "present"]),
         parent=dict(type='str'),
         visibility=dict(type='str', default="private", choices=["internal", "private", "public"]),
+        project_creation_level=dict(type='str', choices=['developer', 'maintainer', 'noone']),
+        auto_devops_enabled=dict(type='bool'),
+        subgroup_creation_level=dict(type='str', choices=['maintainer', 'owner']),
     ))
 
     module = AnsibleModule(
@@ -281,6 +322,9 @@ def main():
     state = module.params['state']
     parent_identifier = module.params['parent']
     group_visibility = module.params['visibility']
+    project_creation_level = module.params['project_creation_level']
+    auto_devops_enabled = module.params['auto_devops_enabled']
+    subgroup_creation_level = module.params['subgroup_creation_level']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -314,7 +358,10 @@ def main():
         if gitlab_group.createOrUpdateGroup(group_name, parent_group, {
                                             "path": group_path,
                                             "description": description,
-                                            "visibility": group_visibility}):
+                                            "visibility": group_visibility,
+                                            "project_creation_level": project_creation_level,
+                                            "auto_devops_enabled": auto_devops_enabled,
+                                            "subgroup_creation_level": subgroup_creation_level}):
             module.exit_json(changed=True, msg="Successfully created or updated the group %s" % group_name, group=gitlab_group.groupObject._attrs)
         else:
             module.exit_json(changed=False, msg="No need to update the group %s" % group_name, group=gitlab_group.groupObject._attrs)
