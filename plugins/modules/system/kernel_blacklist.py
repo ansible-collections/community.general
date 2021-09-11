@@ -64,7 +64,8 @@ class Blacklist(StateModuleHelper):
         self.vars.filename = self.vars.blacklist_file
         self.vars.set('file_exists', os.path.exists(self.vars.filename), output=False, change=True)
         if not self.vars.file_exists:
-            open(self.vars.filename, 'a').close()
+            with open(self.vars.filename, 'a'):
+                pass
             self.vars.file_exists = True
             self.vars.set('lines', [], change=True, diff=True)
         else:
