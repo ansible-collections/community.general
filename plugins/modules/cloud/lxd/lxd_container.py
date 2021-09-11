@@ -47,6 +47,7 @@ options:
           - The default value C(true) will be deprecated in community.general 4.0.0,
             and will change to C(false) in community.general 5.0.0.
         type: bool
+        default: true
         required: false
         version_added: 3.7.0
     profiles:
