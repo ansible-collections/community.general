@@ -47,7 +47,7 @@ options:
           - The default value C(true) will be deprecated in community.general 4.0.0,
             and will change to C(false) in community.general 5.0.0.
         type: bool
-        default: true
+        required: false
         version_added: 3.7.0
     profiles:
         description:
@@ -626,7 +626,7 @@ class LXDContainerManagement(object):
         try:
             if self.trust_password is not None:
                 self.client.authenticate(self.trust_password)
-            self.ignore_volatile_options = self.module.params['ignore_volatile_options']
+            self.ignore_volatile_options = self.module.params.get('ignore_volatile_options', default=True)
 
             self.old_container_json = self._get_container_json()
             self.old_state = self._container_json_to_module_state(self.old_container_json)
