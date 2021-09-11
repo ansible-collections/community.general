@@ -626,7 +626,8 @@ class LXDContainerManagement(object):
         try:
             if self.trust_password is not None:
                 self.client.authenticate(self.trust_password)
-            self.ignore_volatile_options = self.module.params.get('ignore_volatile_options', default=True)
+            #  self.ignore_volatile_options = self.module.params.get('ignore_volatile_options', default=True)
+            self.ignore_volatile_options = self.module.params.get('ignore_volatile_options')
 
             self.old_container_json = self._get_container_json()
             self.old_state = self._container_json_to_module_state(self.old_container_json)
@@ -674,6 +675,7 @@ def main():
             ),
             ignore_volatile_options=dict(
                 type='bool',
+                default=True
             ),
             devices=dict(
                 type='dict',
@@ -727,7 +729,8 @@ def main():
         ),
         supports_check_mode=False,
     )
-    # if module.params['ignore_volatile_options']:
+    # if module.params['ignore_volatile_options'] is None:
+    #     module.params['ignore_volatile_options'] = True
     #     module.deprecate(
     #         'If the keyword "volatile" is used in a playbook in the config section, a
     #         "changed" message will appear with every run, even without a change to the playbook.
