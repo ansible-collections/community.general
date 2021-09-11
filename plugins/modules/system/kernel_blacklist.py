@@ -73,7 +73,7 @@ class Blacklist(StateModuleHelper):
                 self.vars.set('lines', fd.readlines(), change=True, diff=True)
         self.vars.set('is_blacklisted', self._is_module_blocked(), change=True)
 
-        self.pattern = re.compile(r'^blacklist\s+' + self.vars.name + '$')
+        self.pattern = re.compile(r'^blacklist\s+{0}$'.format(re.escape(self.vars.name)))
 
     def _is_module_blocked(self):
         for line in self.vars.lines:
