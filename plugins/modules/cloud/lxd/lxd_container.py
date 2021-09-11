@@ -569,7 +569,7 @@ class LXDContainerManagement(object):
     def _needs_to_change_container_config(self, key):
         if key not in self.config:
             return False
-        if key == 'config' and self.ignore_volatile_options:  # old behavior to ignore "volatile"-options
+        if key == 'config' and self.ignore_volatile_options:  # the old behavior is to ignore configurations by keyword "volatile"
             old_configs = dict((k, v) for k, v in self.old_container_json['metadata'][key].items() if not k.startswith('volatile.'))
             for k, v in self.config['config'].items():
                 if k not in old_configs:
@@ -674,7 +674,6 @@ def main():
             ),
             ignore_volatile_options=dict(
                 type='bool',
-                default=True
             ),
             devices=dict(
                 type='dict',
@@ -730,9 +729,10 @@ def main():
     )
     # if module.params['ignore_volatile_options']:
     #     module.deprecate(
-    #         'The default behavior ignore the "volatile."-options. This will change in the future.
-    #         Please test your scripts by
-    #         "ignore_volatile_options: False"', version='5.0.0', collection_name='community.general')
+    #         'If the keyword "volatile" is used in a playbook in the config section, a
+    #         "changed" message will appear with every run, even without a change to the playbook.
+    #         This will change in the future.
+    #         Please test your scripts by "ignore_volatile_options: false"', version='5.0.0', collection_name='community.general')
     lxd_manage = LXDContainerManagement(module=module)
     lxd_manage.run()
 
