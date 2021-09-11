@@ -32,8 +32,7 @@ options:
           - 'The config for the container (e.g. {"limits.cpu": "2"}).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1)'
           - If the container already exists and its "config" value in metadata
-            obtained from
-            GET /1.0/containers/<name>
+            obtained from GET /1.0/containers/<name>
             U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#10containersname)
           - The key starts with 'volatile.' are ignored for this comparison when I(ignore_volatile_options=true).
           - Not all config values are supported to apply the existing container.
@@ -45,7 +44,7 @@ options:
           - If set to C(true), options starting with C(volatile.) are ignored. As a result,
             they are reapplied for each execution.
           - This default behavior can be changed by setting this option to C(false).
-          - The default value C(true) will be deprecated in community.general 4.0.0
+          - The default value C(true) will be deprecated in community.general 4.0.0,
             and will change to C(false) in community.general 5.0.0.
         type: bool
         default: true
@@ -219,7 +218,7 @@ EXAMPLES = '''
     - name: Create a started container
       community.general.lxd_container:
         name: mycontainer
-        ignore_volatile_options: True
+        ignore_volatile_options: true
         state: started
         source:
           type: image
@@ -290,7 +289,7 @@ EXAMPLES = '''
     - name: Create LXD container
       community.general.lxd_container:
         name: new-container-1
-        ignore_volatile_options: True
+        ignore_volatile_options: true
         state: started
         source:
           type: image
@@ -301,7 +300,7 @@ EXAMPLES = '''
     - name: Create container on another node
       community.general.lxd_container:
         name: new-container-2
-        ignore_volatile_options: True
+        ignore_volatile_options: true
         state: started
         source:
           type: image
@@ -729,10 +728,11 @@ def main():
         ),
         supports_check_mode=False,
     )
-    if module.params['ignore_volatile_options']:
-        module.deprecate(
-            'The default behavior ignore the "volatile."-options. This will change in the future. Please test your scripts by "ignore_volatile_options: False"',
-            version='4.0.0', collection_name='community.general')
+    # if module.params['ignore_volatile_options']:
+    #     module.deprecate(
+    #         'The default behavior ignore the "volatile."-options. This will change in the future.
+    #         Please test your scripts by
+    #         "ignore_volatile_options: False"', version='5.0.0', collection_name='community.general')
     lxd_manage = LXDContainerManagement(module=module)
     lxd_manage.run()
 
