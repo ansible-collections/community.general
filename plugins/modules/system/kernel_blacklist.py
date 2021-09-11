@@ -61,7 +61,7 @@ class Blacklist(StateModuleHelper):
     )
 
     def __init_module__(self):
-        self.vars.filename = self.default_file if not self.vars.blacklist_file else self.vars.blacklist_file
+        self.vars.filename = self.vars.blacklist_file
         self.vars.set('file_exists', os.path.exists(self.vars.filename), output=False, change=True)
         if not self.vars.file_exists:
             open(self.vars.filename, 'a').close()
