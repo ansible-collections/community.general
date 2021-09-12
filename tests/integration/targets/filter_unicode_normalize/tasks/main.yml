@@ -1,0 +1,39 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Test 'NFC' normalization
+  assert:
+    that:
+      - u_umlaut != u_umlaut_combining
+      - u_umlaut_combining != (u_umlaut_combining | community.general.unicode_normalize)
+      - u_umlaut == (u_umlaut_combining | community.general.unicode_normalize)
+
+- name: Test 'NFKC' normalization
+  assert:
+    that:
+      - latin_capital_i != roman_numeral_one
+      - latin_capital_i == (roman_numeral_one | community.general.unicode_normalize(form='NFKC'))
+
+- name: Register invalid input type
+  debug:
+    msg: "{{ 1 | community.general.unicode_normalize }}"
+  ignore_errors: true
+  register: invalid_input_type
+
+- name: Assert an invalid input type causes failure
+  assert:
+    that:
+      - invalid_input_type is failed
+
+- name: Register invalid form selection
+  debug:
+    msg: "{{ 'arbitrary text' | community.general.unicode_normalize(form='invalid') }}"
+  ignore_errors: true
+  register: invalid_form_selection
+
+- name: Assert invalid form selection causes failure
+  assert:
+    that:
+      - invalid_form_selection is failed
