@@ -72,6 +72,12 @@ options:
     aliases: ["searchtimelimit"]
     type: int
     version_added: '2.5.0'
+  ipaselinuxusermaporder:
+    description: The SELinux user map order (order in increasing priority of SELinux users).
+    aliases: ["selinuxusermaporder"]
+    type: list
+    elements: str
+    version_added: '3.7.0'
   ipauserauthtype:
     description: The authentication type to use by default.
     aliases: ["userauthtype"]
@@ -181,6 +187,18 @@ EXAMPLES = r'''
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
+
+- name: Ensure the SELinux user map order is set
+  community.general.ipa_config:
+    ipaselinuxusermaporder:
+      - "guest_u:s0"
+      - "xguest_u:s0"
+      - "user_u:s0"
+      - "staff_u:s0-s0:c0.c1023"
+      - "unconfined_u:s0-s0:c0.c1023"
+    ipa_host: localhost
+    ipa_user: admin
+    ipa_pass: supersecret
 '''
 
 RETURN = r'''
@@ -213,8 +231,8 @@ def get_config_dict(ipaconfigstring=None, ipadefaultloginshell=None,
                     ipagroupsearchfields=None, ipahomesrootdir=None,
                     ipakrbauthzdata=None, ipamaxusernamelength=None,
                     ipapwdexpadvnotify=None, ipasearchrecordslimit=None,
-                    ipasearchtimelimit=None, ipauserauthtype=None,
-                    ipausersearchfields=None):
+                    ipasearchtimelimit=None, ipaselinuxusermaporder=None,
+                    ipauserauthtype=None, ipausersearchfields=None):
     config = {}
     if ipaconfigstring is not None:
         config['ipaconfigstring'] = ipaconfigstring
@@ -238,6 +256,8 @@ def get_config_dict(ipaconfigstring=None, ipadefaultloginshell=None,
         config['ipasearchrecordslimit'] = str(ipasearchrecordslimit)
     if ipasearchtimelimit is not None:
         config['ipasearchtimelimit'] = str(ipasearchtimelimit)
+    if ipaselinuxusermaporder is not None:
+        config['ipaselinuxusermaporder'] = '$'.join(ipaselinuxusermaporder)
     if ipauserauthtype is not None:
         config['ipauserauthtype'] = ipauserauthtype
     if ipausersearchfields is not None:
@@ -263,6 +283,7 @@ def ensure(module, client):
         ipapwdexpadvnotify=module.params.get('ipapwdexpadvnotify'),
         ipasearchrecordslimit=module.params.get('ipasearchrecordslimit'),
         ipasearchtimelimit=module.params.get('ipasearchtimelimit'),
+        ipaselinuxusermaporder=module.params.get('ipaselinuxusermaporder'),
         ipauserauthtype=module.params.get('ipauserauthtype'),
         ipausersearchfields=module.params.get('ipausersearchfields'),
     )
@@ -304,6 +325,8 @@ def main():
         ipapwdexpadvnotify=dict(type='int', aliases=['pwdexpadvnotify']),
         ipasearchrecordslimit=dict(type='int', aliases=['searchrecordslimit']),
         ipasearchtimelimit=dict(type='int', aliases=['searchtimelimit']),
+        ipaselinuxusermaporder=dict(type='list', elements='str',
+                                    aliases=['selinuxusermaporder']),
         ipauserauthtype=dict(type='list', elements='str',
                              aliases=['userauthtype'],
                              choices=["password", "radius", "otp", "pkinit",
