@@ -1,0 +1,4 @@
+u_umlaut: "{{ '\u00fc' }}"
+u_umlaut_combining: "{{ 'u' + '\u0308' }}"
+roman_numeral_one: "{{ '\u2160' }}"
+latin_capital_i: "{{ '\u0049' }}"
