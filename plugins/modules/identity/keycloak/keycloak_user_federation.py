@@ -104,7 +104,7 @@ options:
                 description:
                     - If C(true), LDAP users will be imported into Keycloak DB and synced by the configured
                       sync policies.
-                default: True
+                default: true
                 type: bool
 
             editMode:
@@ -121,7 +121,7 @@ options:
                 description:
                     - Should newly created users be created within LDAP store? Priority effects which
                       provider is chosen to sync the new user.
-                default: False
+                default: false
                 type: bool
 
             vendor:
@@ -212,7 +212,7 @@ options:
             startTls:
                 description:
                     - Encrypts the connection to LDAP using STARTTLS, which will disable connection pooling.
-                default: False
+                default: false
                 type: bool
 
             usePasswordModifyExtendedOp:
@@ -221,21 +221,21 @@ options:
                       extended operation usually requires that LDAP user already has password in the LDAP
                       server. So when this is used with 'Sync Registrations', it can be good to add also
                       'Hardcoded LDAP attribute mapper' with randomly generated initial password.
-                default: False
+                default: false
                 type: bool
 
             validatePasswordPolicy:
                 description:
                     - Determines if Keycloak should validate the password with the realm password policy
                       before updating it.
-                default: False
+                default: false
                 type: bool
 
             trustEmail:
                 description:
                     - If enabled, email provided by this provider is not verified even if verification is
                       enabled for the realm.
-                default: False
+                default: false
                 type: bool
 
             useTruststoreSpi:
@@ -266,13 +266,13 @@ options:
             pagination:
                 description:
                     - Does the LDAP server support pagination.
-                default: True
+                default: true
                 type: bool
 
             connectionPooling:
                 description:
                     - Determines if Keycloak should use connection pooling for accessing LDAP server.
-                default: True
+                default: true
                 type: bool
 
             connectionPoolingAuthentication:
@@ -324,7 +324,7 @@ options:
                 description:
                     - Enable/disable HTTP authentication of users with SPNEGO/Kerberos tokens. The data
                       about authenticated users will be provisioned from this LDAP server.
-                default: False
+                default: false
                 type: bool
 
             kerberosRealm:
@@ -354,7 +354,7 @@ options:
                 description:
                     - Use Kerberos login module for authenticate username/password against Kerberos server
                       instead of authenticating against LDAP server with Directory Service API.
-                default: False
+                default: false
                 type: bool
 
             allowPasswordAuthentication:
