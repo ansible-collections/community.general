@@ -12,6 +12,8 @@ module: keycloak_user_federation
 
 short_description: Allows administration of Keycloak user federations via Keycloak API
 
+version_added: 3.7.0
+
 description:
     - This module allows you to add, remove or modify Keycloak user federations via the Keycloak REST API.
       It requires access to the REST API via OpenID Connect; the user connecting and the client being
@@ -45,7 +47,7 @@ options:
     id:
         description:
             - The unique ID for this user federation. If left empty, the user federation will be searched
-              by its `name`.
+              by its I(name).
         type: str
 
     name:
@@ -55,7 +57,7 @@ options:
 
     provider_id:
         description:
-            - Provider for this user federation (supported values are C(ldap) or C(kerberos)).
+            - Provider for this user federation.
         aliases:
             - providerId
         type: str
@@ -89,7 +91,7 @@ options:
             enabled:
                 description:
                     - Enable/disable this user federation.
-                default: True
+                default: true
                 type: bool
 
             priority:
@@ -100,7 +102,7 @@ options:
 
             importEnabled:
                 description:
-                    - If C(True), LDAP users will be imported into Keycloak DB and synced by the configured
+                    - If C(true), LDAP users will be imported into Keycloak DB and synced by the configured
                       sync policies.
                 default: True
                 type: bool
