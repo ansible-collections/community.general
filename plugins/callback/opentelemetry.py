@@ -23,13 +23,6 @@ DOCUMENTATION = '''
           - Hide the arguments for a task.
         env:
           - name: ANSIBLE_OPENTELEMETRY_HIDE_TASK_ARGUMENTS
-      console_output:
-        default: false
-        type: bool
-        description:
-          - Print distributed traces in the terminal.
-        env:
-          - name: ANSIBLE_OPENTELEMETRY_CONSOLE_OUTPUT
       otel_service_name:
         default: ansible
         type: str
@@ -151,7 +144,7 @@ class OpenTelemetrySource(object):
 
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def generate_distributed_traces(self, insecure_otel_exporter, otel_service_name, console_output, ansible_playbook, tasks_data, status):
+    def generate_distributed_traces(self, insecure_otel_exporter, otel_service_name, ansible_playbook, tasks_data, status):
         """ generate distributed traces from the collected TaskData and HostData """
 
         tasks = []
@@ -167,10 +160,7 @@ class OpenTelemetrySource(object):
             )
         )
 
-        if console_output:
-            processor = SimpleSpanProcessor(ConsoleSpanExporter())
-        else:
-            processor = BatchSpanProcessor(OTLPSpanExporter(insecure=insecure_otel_exporter))
+        processor = BatchSpanProcessor(OTLPSpanExporter(insecure=insecure_otel_exporter))
 
         trace.get_tracer_provider().add_span_processor(processor)
 
@@ -252,7 +242,6 @@ class CallbackModule(CallbackBase):
         super(CallbackModule, self).__init__(display=display)
         self.hide_task_arguments = None
         self.otel_service_name = None
-        self.console_output = None
         self.insecure_otel_exporter = None
         self.ansible_playbook = None
         self.play_name = None
@@ -285,8 +274,6 @@ class CallbackModule(CallbackBase):
 
         if self.otel_service_name is None:
             self.otel_service_name = 'ansible'
-
-        self.console_output = self.get_option('console_output')
 
         # See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
         self.insecure_otel_exporter = os.getenv('OTEL_EXPORTER_OTLP_INSECURE', 'false').lower() == 'true'
@@ -366,7 +353,6 @@ class CallbackModule(CallbackBase):
         self.opentelemetry.generate_distributed_traces(
             self.insecure_otel_exporter,
             self.otel_service_name,
-            self.console_output,
             self.ansible_playbook,
             self.tasks_data,
             status
