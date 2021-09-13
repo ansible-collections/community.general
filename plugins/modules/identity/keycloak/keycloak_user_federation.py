@@ -186,8 +186,8 @@ options:
                 default: '1'
                 type: str
                 choices:
-                    - 1
-                    - 2
+                    - '1'
+                    - '2'
 
             authType:
                 description:
@@ -245,7 +245,7 @@ options:
                       C(Never) means that it will not use it. C(Only for ldaps) means that it will use if
                       your connection URL use ldaps. Note even if standalone.xml/domain.xml is not
                       configured, the default Java cacerts or certificate specified by
-                      'javax.net.ssl.trustStore' property will be used.
+                      C(javax.net.ssl.trustStore) property will be used.
                 default: ldapsOnly
                 type: str
                 choices:
@@ -545,13 +545,13 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: Message as to what action was taken
+    description: Message as to what action was taken.
     returned: always
     type: str
     sample: "No changes required to user federation 164bb483-c613-482e-80fe-7f1431308799."
 
 proposed:
-    description: Representation of proposed changes to user federation
+    description: Representation of proposed changes to user federation.
     returned: always
     type: dict
     sample: {
@@ -589,7 +589,7 @@ proposed:
     }
 
 existing:
-    description: Representation of existing user federation
+    description: Representation of existing user federation.
     returned: always
     type: dict
     sample: {
@@ -647,7 +647,7 @@ existing:
     }
 
 end_state:
-    description: Representation of user federation after module execution
+    description: Representation of user federation after module execution.
     returned: always
     type: dict
     sample: {
