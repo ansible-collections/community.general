@@ -56,11 +56,11 @@ validate_certs: false
 import json
 
 from ansible.errors import AnsibleParserError
-from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
+from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 from ansible.module_utils.urls import open_url
 
 
-class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
+class InventoryModule(BaseInventoryPlugin, Constructable):
     ''' Host inventory parser for ansible using Icinga2 as source. '''
 
     NAME = 'community.general.icinga2'
@@ -112,7 +112,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         }
         if data is not None:
             request_args['data'] = json.dumps(data)
-            # request_args['data'] = data
         self.display.vvv("Request Args: %s" % request_args)
         response = open_url(request_url, **request_args)
         response_body = response.read()
