@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Copyright: (c) 2021, Raphaël Droz (raphael.droz@gmail.com)
 # Copyright: (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
 # Copyright: (c) 2018, Samy Coenen <samy.coenen@nubera.be>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -38,6 +39,11 @@ options:
     description:
       - Your private token to interact with the GitLab API.
     type: str
+  project:
+    description:
+      - ID or full path of the project in the form of group/name.
+    type: str
+    version_added: '3.7.0'
   description:
     description:
       - The unique name of the runner.
@@ -131,6 +137,15 @@ EXAMPLES = '''
     description: Docker Machine t1
     owned: yes
     state: absent
+
+- name: Register runner for a specific project
+  community.general.gitlab_runner:
+    api_url: https://gitlab.example.com/
+    api_token: "{{ access_token }}"
+    registration_token: 4gfdsg345
+    description: MyProject runner
+    state: present
+    project: mygroup/mysubgroup/myproject
 '''
 
 RETURN = '''
@@ -181,9 +196,13 @@ except NameError:
 
 
 class GitLabRunner(object):
-    def __init__(self, module, gitlab_instance):
+    def __init__(self, module, gitlab_instance, project=None):
         self._module = module
         self._gitlab = gitlab_instance
+        # Whether to operate on GitLab-instance-wide or project-wide runners
+        # See https://gitlab.com/gitlab-org/gitlab-ce/issues/60774
+        # for group runner token access
+        self._runners_endpoint = project.runners if project else gitlab_instance.runners
         self.runnerObject = None
 
     def createOrUpdateRunner(self, description, options):
@@ -230,7 +249,7 @@ class GitLabRunner(object):
             return True
 
         try:
-            runner = self._gitlab.runners.create(arguments)
+            runner = self._runners_endpoint.create(arguments)
         except (gitlab.exceptions.GitlabCreateError) as e:
             self._module.fail_json(msg="Failed to create runner: %s " % to_native(e))
 
@@ -265,19 +284,19 @@ class GitLabRunner(object):
     '''
     def findRunner(self, description, owned=False):
         if owned:
-            runners = self._gitlab.runners.list(as_list=False)
+            runners = self._runners_endpoint.list(as_list=False)
         else:
-            runners = self._gitlab.runners.all(as_list=False)
+            runners = self._runners_endpoint.all(as_list=False)
 
         for runner in runners:
             # python-gitlab 2.2 through at least 2.5 returns a list of dicts for list() instead of a Runner
             # object, so we need to handle both
             if hasattr(runner, "description"):
                 if (runner.description == description):
-                    return self._gitlab.runners.get(runner.id)
+                    return self._runners_endpoint.get(runner.id)
             else:
                 if (runner['description'] == description):
-                    return self._gitlab.runners.get(runner['id'])
+                    return self._runners_endpoint.get(runner['id'])
 
     '''
     @param description Description of the runner
@@ -313,6 +332,7 @@ def main():
         access_level=dict(type='str', default='ref_protected', choices=["not_protected", "ref_protected"]),
         maximum_timeout=dict(type='int', default=3600),
         registration_token=dict(type='str', no_log=True),
+        project=dict(type='str'),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     ))
 
@@ -344,13 +364,20 @@ def main():
     access_level = module.params['access_level']
     maximum_timeout = module.params['maximum_timeout']
     registration_token = module.params['registration_token']
+    project = module.params['project']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
     gitlab_instance = gitlabAuthentication(module)
+    gitlab_project = None
+    if project:
+        try:
+            gitlab_project = gitlab_instance.projects.get(project)
+        except gitlab.exceptions.GitlabGetError as e:
+            module.fail_json(msg='No such a project %s' % project, exception=to_native(e))
 
-    gitlab_runner = GitLabRunner(module, gitlab_instance)
+    gitlab_runner = GitLabRunner(module, gitlab_instance, gitlab_project)
     runner_exists = gitlab_runner.existsRunner(runner_description, owned)
 
     if state == 'absent':

@@ -1,0 +1,2 @@
+minor_changes:
+- gitlab_runner - support project-scoped gitlab.com runners registration (https://github.com/ansible-collections/community.general/pull/634).
