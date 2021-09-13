@@ -2,14 +2,15 @@
 # Copyright (c) 2021 Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-
-from jsonrpc_websocket import Server
-from ansible.errors import AnsibleError
-from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 import asyncio
 import json
 import os
 import re
+
+from ansible.errors import AnsibleError
+from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
+
+from jsonrpc_websocket import Server
 
 
 DOCUMENTATION = '''
@@ -36,27 +37,27 @@ DOCUMENTATION = '''
         api_host:
             description:
                 - API host to XOA API.
-                - If the value is not specified in the inventory configuration, the value of environment variable C(XO_API_HOST) will be used instead.
+                - If the value is not specified in the inventory configuration, the value of environment variable C(ANSIBLE_XO_API_HOST) will be used instead.
             default: '192.168.1.123'
             type: str
             env:
-                - name: XO_API_HOST
+                - name: ANSIBLE_XO_API_HOST
         user:
             description:
                 - Xen Orchestra user.
-                - If the value is not specified in the inventory configuration, the value of environment variable C(XO_USER) will be used instead.
+                - If the value is not specified in the inventory configuration, the value of environment variable C(ANSIBLE_XO_USER) will be used instead.
             required: yes
             type: str
             env:
-                - name: XO_USER
+                - name: ANSIBLE_XO_USER
         password:
             description:
                 - Xen Orchestra password.
-                - If the value is not specified in the inventory configuration, the value of environment variable C(XO_PASSWORD) will be used instead.
+                - If the value is not specified in the inventory configuration, the value of environment variable C(ANSIBLE_XO_PASSWORD) will be used instead.
             required: yes
             type: str
             env:
-                - name: XO_PASSWORD
+                - name: ANSIBLE_XO_PASSWORD
         validate_certs:
             description: Verify SSL certificate if using HTTPS.
             type: boolean
