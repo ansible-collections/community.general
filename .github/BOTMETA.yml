@@ -175,7 +175,7 @@ files:
   $lookups/dnstxt.py:
     maintainers: jpmens
   $lookups/dsv.py:
-    maintainers: amigus
+    maintainers: amigus endlesstrax
   $lookups/etcd3.py:
     maintainers: eric-belhomme
   $lookups/etcd.py:
@@ -211,7 +211,7 @@ files:
     maintainers: $team_ansible_core jpmens
   $lookups/shelvefile.py: {}
   $lookups/tss.py:
-    maintainers: amigus
+    maintainers: amigus endlesstrax
   $module_utils/:
     labels: module_utils
   $module_utils/gitlab.py:
