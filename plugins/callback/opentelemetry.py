@@ -11,7 +11,7 @@ DOCUMENTATION = '''
     short_description: Create distributed traces with OpenTelemetry
     version_added: 3.7.0
     description:
-      - This callback create distributed traces for each Ansible task with OpenTelemetry.
+      - This callback creates distributed traces for each Ansible task with OpenTelemetry.
       - You can configure the OpenTelemetry exporter and SDK with environment variables.
       - See U(https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html).
       - See U(https://opentelemetry-python.readthedocs.io/en/latest/sdk/environment_variables.html#opentelemetry-sdk-environment-variables).
@@ -39,9 +39,9 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 examples: |
-  Whitelist the plugin in ansible.cfg:
+  Enable the plugin in ansible.cfg:
     [defaults]
-    callback_whitelist = community.general.opentelemetry
+    callbacks_enabled = community.general.opentelemetry
 
   Set the environment variable:
     export OTEL_EXPORTER_OTLP_ENDPOINT=<your endpoint (OTLP/HTTP)>
@@ -58,7 +58,6 @@ import uuid
 
 from os.path import basename
 
-from ansible import constants as C
 from ansible.errors import AnsibleError
 from ansible.module_utils.six import raise_from
 from ansible.plugins.callback import CallbackBase
@@ -272,7 +271,7 @@ class CallbackModule(CallbackBase):
 
         self.otel_service_name = self.get_option('otel_service_name')
 
-        if self.otel_service_name is None:
+        if not self.otel_service_name:
             self.otel_service_name = 'ansible'
 
         # See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
