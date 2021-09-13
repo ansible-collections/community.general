@@ -6,12 +6,18 @@
 # Test code for the pids module
 # Copyright: (c) 2019, Saranya Sridharan
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-- name: "Installing the psutil module"
+- name: Attempt installation of latest 'psutil' version
+  pip:
+    name: psutil
+  ignore_errors: true
+  register: psutil_latest_install
+
+- name: Install greatest 'psutil' version which will work with all pip versions
   pip:
     name: psutil < 5.7.0
-    # Version 5.7.0 breaks on older pip versions. See https://github.com/ansible/ansible/pull/70667
+  when: psutil_latest_install is failed
 
-- name: "Checking the empty result" 
+- name: "Checking the empty result"
   pids: 
     name: "blahblah"
   register: emptypids
