@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: redis_set
+module: redis_data
 short_description: Set key value pairs in Redis
 version_added: 3.7.0
 description:
@@ -19,32 +19,32 @@ options:
     key:
         description:
             - Database key.
-        required: True
+        required: true
         type: str
     value:
         description:
             - Value that key should be set to.
-        required: False
+        required: false
         type: str
     expiration:
         description:
             - Expiration time in milliseconds.
-        required: False
+        required: false
         type: int
     non_existing:
         description:
             - Only set key if it does not already exist.
-        required: False
+        required: false
         type: bool
     existing:
         description:
             - Only set key if it already exists.
-        required: False
+        required: false
         type: bool
     keep_ttl:
         description:
             - Retain the time to live associated with the key.
-        required: False
+        required: false
         type: bool
     state:
         description:
@@ -65,7 +65,7 @@ seealso:
 
 EXAMPLES = '''
 - name: Set key foo=bar on localhost with no username
-  community.general.redis_set:
+  community.general.redis_data:
     login_host: localhost
     login_password: supersecret
     key: foo
@@ -73,7 +73,7 @@ EXAMPLES = '''
     state: present
 
 - name: Set key foo=bar if non existing with expiration of 30s
-  community.general.redis_set:
+  community.general.redis_data:
     login_host: localhost
     login_password: supersecret
     key: foo
@@ -83,26 +83,26 @@ EXAMPLES = '''
     state: present
 
 - name: Set key foo=bar if existing and keep current TTL
-  community.general.redis_set:
+  community.general.redis_data:
     login_host: localhost
     login_password: supersecret
     key: foo
     value: bar
-    existing: yes
-    keep_ttl: yes
+    existing: true
+    keep_ttl: true
 
 - name: Set key foo=bar on redishost with custom ca-cert file
-  community.general.redis:
+  community.general.redis_data:
     login_host: redishost
     login_password: supersecret
     login_user: someuser
-    validate_certs: yes
+    validate_certs: true
     ssl_ca_certs: /path/to/ca/certs
     key: foo
     value: bar
 
-- name: Delete key foo=bar on localhost with no username
-  community.general.redis_set:
+- name: Delete key foo on localhost with no username
+  community.general.redis_data:
     login_host: localhost
     login_password: supersecret
     key: foo
@@ -112,12 +112,12 @@ EXAMPLES = '''
 RETURN = '''
 old_value:
   description: Value of key before setting.
-  returned: always
+  returned: on_success if state is C(present) and key exists in database.
   type: str
   sample: 'old_value_of_key'
 value:
-  description: Value key was set to
-  returned: on success
+  description: Value key was set to.
+  returned: on success if state is C(present).
   type: str
   sample: 'new_value_of_key'
 msg:
@@ -196,30 +196,28 @@ def main():
         module.fail_json(**result)
 
     result['old_value'] = old_value
-    result['value'] = value
     if old_value == value:
-        msg = 'Key: {0} had value: {1} now has value {2}'.format(
-            key, old_value, value)
+        msg = 'Key {0} already has desired value'.format(key)
         result['msg'] = msg
+        result['value'] = value
         module.exit_json(**result)
     try:
         ret = redis.connection.set(**set_args)
         if ret is None:
             if nx:
-                msg = 'Could not set key: {0} to {1}. Key already present.'.format(
-                    key, value)
+                msg = 'Could not set key: {0}. Key already present.'.format(
+                    key)
             else:
-                msg = 'Could not set key: {0} to {1}. Key not present.'.format(
-                    key, value)
+                msg = 'Could not set key: {0}. Key not present.'.format(key)
             result['msg'] = msg
             module.fail_json(**result)
-        msg = 'Set key: {0} to {1}'.format(key, value)
+        msg = 'Set key: {0}'.format(key)
         result['msg'] = msg
         result['changed'] = True
+        result['value'] = value
         module.exit_json(**result)
     except Exception as e:
-        msg = 'Failed to set key: {0} to value: {1} with exception: {2}'.format(
-            key, value, str(e))
+        msg = 'Failed to set key: {0} with exception: {2}'.format(key, str(e))
         result['msg'] = msg
         module.fail_json(**result)
 

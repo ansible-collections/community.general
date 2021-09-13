@@ -460,7 +460,7 @@ files:
     maintainers: levonet
   $modules/database/misc/redis_data_info.py:
     maintainers: paginabianca
-  $modules/database/misc/redis_set.py:
+  $modules/database/misc/redis_data.py:
     maintainers: paginabianca
   $modules/database/misc/riak.py:
     maintainers: drewkerrigan jsmartin
