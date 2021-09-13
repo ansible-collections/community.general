@@ -92,6 +92,51 @@ else:
     ORDER_LIBRARY_IMPORT_ERROR = None
 
 
+class TaskData:
+    """
+    Data about an individual task.
+    """
+
+    def __init__(self, uuid, name, path, play, action, args):
+        self.uuid = uuid
+        self.name = name
+        self.path = path
+        self.play = play
+        self.host_data = OrderedDict()
+        if sys.version_info >= (3, 7):
+            self.start = time.time_ns()
+        else:
+            self.start = _time_ns()
+        self.action = action
+        self.args = args
+
+    def add_host(self, host):
+        if host.uuid in self.host_data:
+            if host.status == 'included':
+                # concatenate task include output from multiple items
+                host.result = '%s\n%s' % (self.host_data[host.uuid].result, host.result)
+            else:
+                return
+
+        self.host_data[host.uuid] = host
+
+
+class HostData:
+    """
+    Data about an individual host.
+    """
+
+    def __init__(self, uuid, name, status, result):
+        self.uuid = uuid
+        self.name = name
+        self.status = status
+        self.result = result
+        if sys.version_info >= (3, 7):
+            self.finish = time.time_ns()
+        else:
+            self.finish = _time_ns()
+
+
 class OpenTelemetrySource(object):
     def __init__(self, display):
         self.ansible_playbook = ""
@@ -354,48 +399,3 @@ class CallbackModule(CallbackBase):
 
     def v2_runner_on_async_failed(self, result, **kwargs):
         self.errors += 1
-
-
-class TaskData:
-    """
-    Data about an individual task.
-    """
-
-    def __init__(self, uuid, name, path, play, action, args):
-        self.uuid = uuid
-        self.name = name
-        self.path = path
-        self.play = play
-        self.host_data = OrderedDict()
-        if sys.version_info >= (3, 7):
-            self.start = time.time_ns()
-        else:
-            self.start = _time_ns()
-        self.action = action
-        self.args = args
-
-    def add_host(self, host):
-        if host.uuid in self.host_data:
-            if host.status == 'included':
-                # concatenate task include output from multiple items
-                host.result = '%s\n%s' % (self.host_data[host.uuid].result, host.result)
-            else:
-                return
-
-        self.host_data[host.uuid] = host
-
-
-class HostData:
-    """
-    Data about an individual host.
-    """
-
-    def __init__(self, uuid, name, status, result):
-        self.uuid = uuid
-        self.name = name
-        self.status = status
-        self.result = result
-        if sys.version_info >= (3, 7):
-            self.finish = time.time_ns()
-        else:
-            self.finish = _time_ns()
