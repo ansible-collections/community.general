@@ -679,16 +679,16 @@ from copy import deepcopy
 
 
 def sanitize(comp):
-    result = deepcopy(comp)
-    if 'config' in result:
-        result['config'] = dict((k, v[0]) for k, v in result['config'].items())
-        if 'bindCredential' in result['config']:
-            result['config']['bindCredential'] = '**********'
-    if 'mappers' in result:
-        for mapper in result['mappers']:
+    compcopy = deepcopy(comp)
+    if 'config' in compcopy:
+        compcopy['config'] = dict((k, v[0]) for k, v in compcopy['config'].items())
+        if 'bindCredential' in compcopy['config']:
+            compcopy['config']['bindCredential'] = '**********'
+    if 'mappers' in compcopy:
+        for mapper in compcopy['mappers']:
             if 'config' in mapper:
                 mapper['config'] = dict((k, v[0]) for k, v in mapper['config'].items())
-    return result
+    return compcopy
 
 
 def main():
@@ -893,7 +893,7 @@ def main():
         result['changed'] = True
 
         if module._diff:
-            result['diff'] = dict(before='', after=updated_comp)
+            result['diff'] = dict(before='', after=sanitize(updated_comp))
 
         if module.check_mode:
             module.exit_json(**result)
@@ -922,7 +922,7 @@ def main():
             # no changes
             if updated_comp == before_comp:
                 result['changed'] = False
-                result['end_state'] = updated_comp
+                result['end_state'] = sanitize(updated_comp)
                 result['msg'] = "No changes required to user federation {id}.".format(id=cid)
                 module.exit_json(**result)
 
@@ -930,7 +930,7 @@ def main():
             result['changed'] = True
 
             if module._diff:
-                result['diff'] = dict(before=before_comp, after=updated_comp)
+                result['diff'] = dict(before=sanitize(before_comp), after=sanitize(updated_comp))
 
             if module.check_mode:
                 module.exit_json(**result)
@@ -959,7 +959,7 @@ def main():
             result['changed'] = True
 
             if module._diff:
-                result['diff'] = dict(before=before_comp, after='')
+                result['diff'] = dict(before=sanitize(before_comp), after='')
 
             if module.check_mode:
                 module.exit_json(**result)
