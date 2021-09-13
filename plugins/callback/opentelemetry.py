@@ -143,7 +143,7 @@ class OpenTelemetrySource(object):
 
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def generate_distributed_traces(self, insecure_otel_exporter, otel_service_name, ansible_playbook, tasks_data, status):
+    def generate_distributed_traces(self, otel_service_name, ansible_playbook, tasks_data, status):
         """ generate distributed traces from the collected TaskData and HostData """
 
         tasks = []
@@ -159,7 +159,7 @@ class OpenTelemetrySource(object):
             )
         )
 
-        processor = BatchSpanProcessor(OTLPSpanExporter(insecure=insecure_otel_exporter))
+        processor = BatchSpanProcessor(OTLPSpanExporter())
 
         trace.get_tracer_provider().add_span_processor(processor)
 
@@ -241,7 +241,6 @@ class CallbackModule(CallbackBase):
         super(CallbackModule, self).__init__(display=display)
         self.hide_task_arguments = None
         self.otel_service_name = None
-        self.insecure_otel_exporter = None
         self.ansible_playbook = None
         self.play_name = None
         self.tasks_data = None
@@ -273,9 +272,6 @@ class CallbackModule(CallbackBase):
 
         if not self.otel_service_name:
             self.otel_service_name = 'ansible'
-
-        # See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
-        self.insecure_otel_exporter = os.getenv('OTEL_EXPORTER_OTLP_INSECURE', 'false').lower() == 'true'
 
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
@@ -350,7 +346,6 @@ class CallbackModule(CallbackBase):
         else:
             status = Status(status_code=StatusCode.ERROR)
         self.opentelemetry.generate_distributed_traces(
-            self.insecure_otel_exporter,
             self.otel_service_name,
             self.ansible_playbook,
             self.tasks_data,
