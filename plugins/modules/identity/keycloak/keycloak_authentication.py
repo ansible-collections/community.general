@@ -163,9 +163,14 @@ EXAMPLES = '''
 
 RETURN = '''
 flow:
-  description: JSON representation for the authentication.
+  description: JSON representation for the authentication. [DEPRECATED - Please use end_state instead]
   returned: on success
   type: dict
+
+end_state:
+    description: client representation of the authentication after module execution
+    returned: always
+    type: dict
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak \
@@ -337,6 +342,7 @@ def main():
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
             result['end_state'] = dict()
+            result['flow'] = result['end_state']
             result['msg'] = new_auth_repr["alias"] + ' absent'
             module.exit_json(**result)
 
@@ -368,7 +374,8 @@ def main():
             exec_repr = kc.get_executions_representation(config=new_auth_repr, realm=realm)
             if exec_repr is not None:
                 auth_repr["authenticationExecutions"] = exec_repr
-            result['flow'] = auth_repr
+            result['end_state'] = auth_repr
+            result['flow'] = result['end_state']
 
     else:
         if state == 'present':
@@ -405,7 +412,8 @@ def main():
             exec_repr = kc.get_executions_representation(config=new_auth_repr, realm=realm)
             if exec_repr is not None:
                 auth_repr["authenticationExecutions"] = exec_repr
-            result['flow'] = auth_repr
+            result['end_state'] = auth_repr
+            result['flow'] = result['end_state']
 
         else:
             # Process a deletion (because state was not 'present')
