@@ -32,6 +32,12 @@ options:
     default: "false"
     choices: ["false", "true"]
     type: str
+  allowsyncptr:
+    description: Allow synchronization of forward and reverse records in the zone
+    required: false
+    default: "false"
+    choices: ["false", "true"]
+    type: str
 extends_documentation_fragment:
 - community.general.ipa.documentation
 
@@ -52,6 +58,14 @@ EXAMPLES = r'''
     state: present
     zone_name: example.com
     dynamicupdate: true
+
+- name: Ensure dns zone is present and is allowing sync
+  community.general.ipa_dnszone:
+    ipa_host: spider.example.com
+    ipa_pass: Passw0rd!
+    state: present
+    zone_name: example.com
+    allowsyncptr: true
 
 - name: Ensure that dns zone is removed
   community.general.ipa_dnszone:
@@ -109,6 +123,7 @@ def ensure(module, client):
     zone_name = module.params['zone_name']
     state = module.params['state']
     dynamicupdate = module.params['dynamicupdate']
+    allowsyncptr = module.params['allowsyncptr']
 
     ipa_dnszone = client.dnszone_find(zone_name)
 
@@ -117,7 +132,7 @@ def ensure(module, client):
         if not ipa_dnszone:
             changed = True
             if not module.check_mode:
-                client.dnszone_add(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate})
+                client.dnszone_add(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
         else:
             changed = False
     else:
@@ -134,6 +149,7 @@ def main():
     argument_spec.update(zone_name=dict(type='str', required=True),
                          state=dict(type='str', default='present', choices=['present', 'absent']),
                          dynamicupdate=dict(type='str', required=False, default='false', choices=['true', 'false']),
+                         allowsyncptr=dict(type='str', required=False, default='false', choices=['true', 'false']),
                          )
 
     module = AnsibleModule(argument_spec=argument_spec,
