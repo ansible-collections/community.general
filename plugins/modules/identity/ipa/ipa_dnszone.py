@@ -33,19 +33,11 @@ options:
     choices: ["false", "true"]
     type: str
   allowsyncptr:
-<<<<<<< HEAD
     description: Allow synchronization of forward and reverse records in the zone.
     required: false
     default: false
     choices: [false, true]
     type: bool
-=======
-    description: Allow synchronization of forward and reverse records in the zone
-    required: false
-    default: "false"
-    choices: ["false", "true"]
-    type: str
->>>>>>> Add PTR synchronization support for dnszones
 extends_documentation_fragment:
 - community.general.ipa.documentation
 
@@ -151,17 +143,13 @@ def ensure(module, client):
     state = module.params['state']
     dynamicupdate = module.params['dynamicupdate']
     allowsyncptr = module.params['allowsyncptr']
-<<<<<<< HEAD
     changed = False
-=======
->>>>>>> Add PTR synchronization support for dnszones
 
     # does zone exist with all config params
     ipa_dnszone = client.dnszone_find(zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
 
     if state == 'present':
         if not ipa_dnszone:
-<<<<<<< HEAD
 
             # check for generic zone existence
             if client.dnszone_find(zone_name):
@@ -172,11 +160,6 @@ def ensure(module, client):
                 changed = True
                 if not module.check_mode:
                     client.dnszone_add(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
-=======
-            changed = True
-            if not module.check_mode:
-                client.dnszone_add(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
->>>>>>> Add PTR synchronization support for dnszones
         else:
             changed = False
     # state is absent
@@ -195,11 +178,7 @@ def main():
     argument_spec.update(zone_name=dict(type='str', required=True),
                          state=dict(type='str', default='present', choices=['present', 'absent']),
                          dynamicupdate=dict(type='str', required=False, default='false', choices=['true', 'false']),
-<<<<<<< HEAD
                          allowsyncptr=dict(type='bool', required=False, default=False, choices=[True, False]),
-=======
-                         allowsyncptr=dict(type='str', required=False, default='false', choices=['true', 'false']),
->>>>>>> Add PTR synchronization support for dnszones
                          )
 
     module = AnsibleModule(argument_spec=argument_spec,
