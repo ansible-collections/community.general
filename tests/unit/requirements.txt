@@ -26,3 +26,8 @@ datadog-api-client >= 1.0.0b3 ; python_version >= '3.6'
 # requirement for dnsimple module
 dnsimple >= 2 ; python_version >= '3.6'
 dataclasses ; python_version == '3.6'
+
+# requirement for the opentelemetry callback plugin
+opentelemetry-api ; python_version >= '3.6'
+opentelemetry-exporter-otlp ; python_version >= '3.6'
+opentelemetry-sdk ; python_version >= '3.6'
