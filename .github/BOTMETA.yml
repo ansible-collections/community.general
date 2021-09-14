@@ -218,6 +218,9 @@ files:
   $callbacks/nrdp.py:
     maintainers: rverchere
   $callbacks/null.py: {}
+  $callbacks/opentelemetry.py:
+    maintainers: v1v
+    keywords: opentelemetry observability
   $callbacks/say.py:
     notify: chris-short
     maintainers: $team_macos
