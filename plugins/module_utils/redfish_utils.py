@@ -13,11 +13,10 @@ from ansible.module_utils.six.moves import http_client
 from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
 from ansible.module_utils.six.moves.urllib.parse import urlparse
 
-#To support HPE operations
 import os
-from os.path import expanduser
+from pathlib import Path
 
-HOME = expanduser("~/Documents")
+HOME = str(Path.home())
 
 GET_HEADERS = {'accept': 'application/json', 'OData-Version': '4.0'}
 POST_HEADERS = {'content-type': 'application/json', 'accept': 'application/json',
@@ -71,18 +70,26 @@ class RedfishUtils(object):
         req_headers = dict(GET_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
-            #To support HPE operations
-            session_file = os.path.join(HOME,"sessionfile.txt")
-            if os.path.isfile(session_file):
-            # if "Hpe" in self.creds.keys():
-                with open(session_file) as f:
-                  session_id = f.readline()
-                resp = open_url(uri, method="GET", headers=GET_HEADERS, sessionid= session_id,
+            
+            if os.path.isfile(HOME + "/sessionfile" + self.root_uri[8:] + ".txt"):
+                session_id = ''
+                
+                with open(HOME + "/sessionfile" + self.root_uri[8:] + ".txt", 'r') as json_file:
+                    file_data = json.load(json_file)
+                if "user" in self.creds.keys() and self.creds['user'] is not None and "autologin" not in file_data.keys():
+                    session_id = file_data["login"]
+                elif self.creds["UserName"] is not None:
+                    session_id = file_data["autologin"]
+                else:
+                    session_id = file_data["login"]
+
+                resp = open_url(uri, method="GET", headers=req_headers, sessionid=session_id,
                             url_username=None,
                             url_password=None,
                             force_basic_auth=False, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=False, timeout=self.timeout)
+                            use_proxy=True, timeout=self.timeout)
+
             else:
                 resp = open_url(uri, method="GET", headers=req_headers,
                                 url_username=username, url_password=password,
@@ -110,23 +117,29 @@ class RedfishUtils(object):
         req_headers = dict(POST_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
-            #To support HPE operations
-            session_file = os.path.join(HOME,"sessionfile.txt")
-            if "iLOlogin" in pyld or os.path.isfile(session_file):
-                if "iLOlogin" in pyld:
+            session_id = ''
+            if "iLOlogin" in pyld.keys() or os.path.isfile(HOME + "/sessionfile" + self.root_uri[8:] + ".txt"):
+                if "iLOlogin" in pyld.keys():
                     del pyld["iLOlogin"]
                     session_id = None
-                if os.path.isfile(session_file):
-                    with open(session_file) as f:
-                      session_id = f.readline()
+                elif os.path.isfile(HOME + "/sessionfile" + self.root_uri[8:] + ".txt"):
+                    with open(HOME + "/sessionfile"+self.root_uri[8:] + ".txt", 'r') as json_file:
+                        file_data = json.load(json_file)
+                    if "user" in self.creds.keys() and self.creds['user'] is not None and "autologin" not in file_data.keys():
+                        session_id = file_data["login"]
+                    elif self.creds["UserName"] is not None:
+                        session_id = file_data["autologin"]
+                    else:
+                        session_id = file_data["login"]
                 
-                resp = open_url(uri, data=json.dumps(pyld), sessionid= session_id,
-                            headers=POST_HEADERS, method="POST",
+                resp = open_url(uri, data=json.dumps(pyld), sessionid=session_id,
+                            headers=req_headers, method="POST",
                             url_username=None,
                             url_password=None,
                             force_basic_auth=True, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=False, timeout=self.timeout)
+                            use_proxy=True, timeout=self.timeout)
+
             else:
                 resp = open_url(uri, data=json.dumps(pyld),
                                 headers=req_headers, method="POST",
@@ -164,18 +177,25 @@ class RedfishUtils(object):
                 req_headers['If-Match'] = etag
         username, password, basic_auth = self._auth_params(req_headers)
         try:
-            #To support HPE operations
-            session_file = os.path.join(HOME,"sessionfile.txt")
-            if os.path.isfile(session_file):
-                with open(session_file) as f:
-                  session_id = f.readline()
+            if os.path.isfile(HOME + "/sessionfile" + self.root_uri[8:] + ".txt"):
+                session_id = ''
+                with open(HOME + "/sessionfile"+self.root_uri[8:] + ".txt", 'r') as json_file:
+                    file_data = json.load(json_file)
+                if "user" in self.creds.keys() and self.creds['user'] is not None and "autologin" not in file_data.keys():
+                    session_id = file_data["login"]
+                elif self.creds["UserName"] is not None:
+                    session_id = file_data["autologin"]
+                else:
+                    session_id = file_data["login"]
+
                 resp = open_url(uri, data=json.dumps(pyld),
-                            headers=headers, method="PATCH", sessionid = session_id,
+                            headers=req_headers, method="PATCH", sessionid=session_id,
                             url_username=None,
                             url_password=None,
                             force_basic_auth=True, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=False, timeout=self.timeout)
+                            use_proxy=True, timeout=self.timeout)
+
             else:
                 resp = open_url(uri, data=json.dumps(pyld),
                                 headers=req_headers, method="PATCH",
@@ -203,18 +223,25 @@ class RedfishUtils(object):
         username, password, basic_auth = self._auth_params(req_headers)
         try:
             data = json.dumps(pyld) if pyld else None
-            #To support HPE operations
-            session_file = os.path.join(HOME,"sessionfile.txt")
-            if os.path.isfile(session_file):
-                with open(session_file) as f:
-                  session_id = f.readline()
+            if os.path.isfile(HOME + "/sessionfile" + self.root_uri[8:] + ".txt"):
+                session_id = ''
+                with open(HOME + "/sessionfile" + self.root_uri[8:] + ".txt", 'r') as json_file:
+                    file_data = json.load(json_file)
+                if "user" in self.creds.keys() and self.creds['user'] is not None and "autologin" not in file_data.keys():
+                    session_id = file_data["login"]
+                elif "UserName" in self.creds.keys() and self.creds["UserName"] is not None:
+                    session_id = file_data["autologin"]
+                else:
+                    session_id = file_data["login"]
+
                 resp = open_url(uri, data=json.dumps(pyld),
-                            headers=DELETE_HEADERS, method="DELETE", sessionid=session_id,
+                            headers=req_headers, method="DELETE", sessionid=session_id,
                             url_username=None,
                             url_password=None,
                             force_basic_auth=False, validate_certs=False,
                             follow_redirects='all',
-                            use_proxy=False, timeout=self.timeout)
+                            use_proxy=True, timeout=self.timeout)
+
             else:
                 resp = open_url(uri, data=data,
                                 headers=req_headers, method="DELETE",
@@ -1354,9 +1381,8 @@ class RedfishUtils(object):
                         title = key
                     result['entries'][title] = action.get('TransferProtocol@Redfish.AllowableValues',
                                                           ["Key TransferProtocol@Redfish.AllowableValues not found"])
-                    #To support HPE operations
-                    if "Oem" in data.keys():
-                        result['entries'][title] = action
+                    # if "Oem" in data.keys():
+                    #     result['entries'][title] = action
             else:
                 return {'ret': "False", 'msg': "Actions list is empty."}
         else:
@@ -1892,10 +1918,6 @@ class RedfishUtils(object):
                 return response
             result['ret'] = True
             data = response['data']
-            #To support HPE operations
-            if "Oem" in data.keys():
-                if "Hpe" in data["Oem"].keys():
-                    properties = ['Name', 'Reading', 'ReadingUnits', 'Status']
 
             if key in data:
                 # match: found an entry for "Thermal" information = fans
