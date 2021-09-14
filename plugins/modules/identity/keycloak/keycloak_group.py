@@ -159,6 +159,11 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
+msg:
+  description: Message as to what action was taken
+  returned: always
+  type: str
+
 group:
   description: Group representation of the group after module execution (sample is truncated).
   returned: always
