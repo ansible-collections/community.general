@@ -36,19 +36,20 @@ options:
         ini:
             - section: tss_lookup
               key: username
-        required: true
     password:
-        description: The password associated with the supplied username.
+        description:
+            - The password associated with the supplied username.
+            - Required when I(token) is not provided.
         env:
             - name: TSS_PASSWORD
         ini:
             - section: tss_lookup
               key: password
-        required: true
     domain:
         default: ""
         description:
           - The domain with which to request the OAuth2 Access Grant.
+          - Optional when I(token) is not provided.
           - Requires C(python-tss-sdk) version 1.0.0 or greater.
         env:
             - name: TSS_DOMAIN
@@ -57,6 +58,17 @@ options:
               key: domain
         required: false
         version_added: 3.6.0
+    token:
+        description:
+          - Existing token for Thycotic authorizer.
+          - If provided, I(username) and I(password) are not needed.
+          - Requires C(python-tss-sdk) version 1.0.0 or greater.
+        env:
+            - name: TSS_TOKEN
+        ini:
+            - section: tss_lookup
+              key: token
+        version_added: 3.7.0
     api_path_uri:
         default: /api/v1
         description: The path to append to the base URL to form a valid REST
@@ -85,18 +97,6 @@ _list:
 EXAMPLES = r"""
 - hosts: localhost
   vars:
-      secret: "{{ lookup('community.general.tss', 1) }}"
-  tasks:
-      - ansible.builtin.debug:
-          msg: >
-            the password is {{
-              (secret['items']
-                | items2dict(key_name='slug',
-                             value_name='itemValue'))['password']
-            }}
-
-- hosts: localhost
-  vars:
       secret: >-
         {{
             lookup(
@@ -118,8 +118,37 @@ EXAMPLES = r"""
 
 - hosts: localhost
   vars:
+      secret: >-
+        {{
+            lookup(
+                'community.general.tss',
+                102,
+                base_url='https://secretserver.domain.com/SecretServer/',
+                username='user.name',
+                password='password',
+                domain='domain'
+            )
+        }}
+  tasks:
+      - ansible.builtin.debug:
+          msg: >
+            the password is {{
+              (secret['items']
+                | items2dict(key_name='slug',
+                             value_name='itemValue'))['password']
+            }}
+
+- hosts: localhost
+  vars:
       secret_password: >-
-        {{ ((lookup('community.general.tss', 1) | from_json).get('items') | items2dict(key_name='slug', value_name='itemValue'))['password'] }}"
+        {{
+            ((lookup(
+                'community.general.tss',
+                102,
+                base_url='https://secretserver.domain.com/SecretServer/',
+                token='thycotic_access_token',
+            )  | from_json).get('items') | items2dict(key_name='slug', value_name='itemValue'))['password']
+        }}
   tasks:
       - ansible.builtin.debug:
           msg: the password is {{ secret_password }}
@@ -142,12 +171,13 @@ except ImportError:
     HAS_TSS_SDK = False
 
 try:
-    from thycotic.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer
+    from thycotic.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
 
     HAS_TSS_AUTHORIZER = True
 except ImportError:
     PasswordGrantAuthorizer = None
     DomainPasswordGrantAuthorizer = None
+    AccessTokenAuthorizer = None
     HAS_TSS_AUTHORIZER = False
 
 
@@ -209,6 +239,11 @@ class TSSClientV1(TSSClient):
 
     @staticmethod
     def _get_authorizer(**server_parameters):
+        if server_parameters.get("token"):
+            return AccessTokenAuthorizer(
+                server_parameters["token"],
+            )
+
         if server_parameters.get("domain"):
             return DomainPasswordGrantAuthorizer(
                 server_parameters["base_url"],
@@ -238,6 +273,7 @@ class LookupModule(LookupBase):
             username=self.get_option("username"),
             password=self.get_option("password"),
             domain=self.get_option("domain"),
+            token=self.get_option("token"),
             api_path_uri=self.get_option("api_path_uri"),
             token_path_uri=self.get_option("token_path_uri"),
         )
