@@ -1,0 +1,2 @@
+minor_changes:
+  - Support for Redfish session operations for Ansible playbooks.
