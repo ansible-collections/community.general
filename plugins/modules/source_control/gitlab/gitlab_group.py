@@ -82,7 +82,6 @@ options:
     description:
       - Require all users in this group to setup two-factor authentication.
     type: bool
-    default: false
     version_added: 3.7.0
 '''
 
@@ -307,7 +306,7 @@ def main():
         project_creation_level=dict(type='str', choices=['developer', 'maintainer', 'noone']),
         auto_devops_enabled=dict(type='bool'),
         subgroup_creation_level=dict(type='str', choices=['maintainer', 'owner']),
-        require_two_factor_authentication=dict(type='bool', default=False),
+        require_two_factor_authentication=dict(type='bool'),
     ))
 
     module = AnsibleModule(
