@@ -145,7 +145,11 @@ options:
     type: str
     choices: ["never", "always", "default_off", "default_on"]
     version_added: "3.4.0"
-
+  ci_config_path:
+    description:
+      - The path to CI configuration file.
+    type: str
+    version_added: "3.7.0"
 '''
 
 EXAMPLES = r'''
@@ -252,6 +256,7 @@ class GitLabProject(object):
             'packages_enabled': options['packages_enabled'],
             'remove_source_branch_after_merge': options['remove_source_branch_after_merge'],
             'squash_option': options['squash_option'],
+            'ci_config_path': options['ci_config_path'],
         }
         # Because we have already call userExists in main()
         if self.projectObject is None:
@@ -364,6 +369,7 @@ def main():
         packages_enabled=dict(type='bool'),
         remove_source_branch_after_merge=dict(type='bool'),
         squash_option=dict(type='str', choices=['never', 'always', 'default_off', 'default_on']),
+        ci_config_path=dict(type='str'),
     ))
 
     module = AnsibleModule(
@@ -402,6 +408,7 @@ def main():
     packages_enabled = module.params['packages_enabled']
     remove_source_branch_after_merge = module.params['remove_source_branch_after_merge']
     squash_option = module.params['squash_option']
+    ci_config_path = module.params['ci_config_path']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -466,6 +473,7 @@ def main():
                                                 "packages_enabled": packages_enabled,
                                                 "remove_source_branch_after_merge": remove_source_branch_after_merge,
                                                 "squash_option": squash_option,
+                                                "ci_config_path": ci_config_path,
                                                 }):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.projectObject._attrs)
