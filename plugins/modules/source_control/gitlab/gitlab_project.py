@@ -150,6 +150,11 @@ options:
       - The path to CI configuration file.
     type: str
     version_added: "3.7.0"
+  shared_runners_enabled:
+    description:
+      - Enable shared runners for this project.
+    type: bool
+    version_added: "3.7.0"
 '''
 
 EXAMPLES = r'''
@@ -257,6 +262,7 @@ class GitLabProject(object):
             'remove_source_branch_after_merge': options['remove_source_branch_after_merge'],
             'squash_option': options['squash_option'],
             'ci_config_path': options['ci_config_path'],
+            'shared_runners_enabled': options['shared_runners_enabled'],
         }
         # Because we have already call userExists in main()
         if self.projectObject is None:
@@ -370,6 +376,7 @@ def main():
         remove_source_branch_after_merge=dict(type='bool'),
         squash_option=dict(type='str', choices=['never', 'always', 'default_off', 'default_on']),
         ci_config_path=dict(type='str'),
+        shared_runners_enabled=dict(type='bool'),
     ))
 
     module = AnsibleModule(
@@ -409,6 +416,7 @@ def main():
     remove_source_branch_after_merge = module.params['remove_source_branch_after_merge']
     squash_option = module.params['squash_option']
     ci_config_path = module.params['ci_config_path']
+    shared_runners_enabled = module.params['shared_runners_enabled']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -474,6 +482,7 @@ def main():
                                                 "remove_source_branch_after_merge": remove_source_branch_after_merge,
                                                 "squash_option": squash_option,
                                                 "ci_config_path": ci_config_path,
+                                                "shared_runners_enabled": shared_runners_enabled,
                                                 }):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.projectObject._attrs)
