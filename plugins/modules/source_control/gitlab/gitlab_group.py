@@ -80,9 +80,9 @@ options:
     version_added: 3.7.0
   require_two_factor_authentication:
     description:
-      - Require all users in this group to setup Two-factor authentication.
+      - Require all users in this group to setup two-factor authentication.
     type: bool
-    default: no
+    default: false
     version_added: 3.7.0
 '''
 
