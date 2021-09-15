@@ -76,7 +76,7 @@ examples: |
     callbacks_enabled = community.general.elastic
 
   Set the environment variable:
-    export ELASTIC_APM_SERVER_URL=<your endpoint (OTLP/HTTP)>
+    export ELASTIC_APM_SERVER_URL=<your APM server URL)>
     export ELASTIC_APM_SERVICE_NAME=your_service_name
     export ELASTIC_APM_API_KEY=your_APM_API_KEY
 '''
@@ -94,7 +94,7 @@ from ansible.module_utils.six import raise_from
 from ansible.plugins.callback import CallbackBase
 
 try:
-    from elasticapm import Client, capture_span, trace_parent_from_string, instrument
+    from elasticapm import Client, capture_span, trace_parent_from_string, instrument, label
 except ImportError as imp_exc:
     ELASTIC_LIBRARY_IMPORT_ERROR = imp_exc
 else:
@@ -221,13 +221,20 @@ class ElasticSource(object):
                 apm_cli.begin_transaction("Session", trace_parent=parent, start=parent_start_time)
             else:
                 apm_cli.begin_transaction("Session", start=parent_start_time)
+			# Populate trace metadata attributes
+            if self.ansible_version is not None:
+                label(ansible_version=self.ansible_version)
+            label(ansible_session=self.session, ansible_host_name=self.host, ansible_host_user=self.user)
+            if self.ip_address is not None:
+                label(ansible_host_ip=self.ip_address)
+
             for task_data in tasks:
                 for host_uuid, host_data in task_data.host_data.items():
-                    self.create_span_data(task_data, host_data)
+                    self.create_span_data(apm_cli, task_data, host_data)
 
             apm_cli.end_transaction(name=__name__, result=status, duration=end_time - parent_start_time)
 
-    def create_span_data(self, task_data, host_data):
+    def create_span_data(self, apm_cli, task_data, host_data):
         """ create the span with the given TaskData and HostData """
 
         name = '[%s] %s: %s' % (host_data.name, task_data.play, task_data.name)
@@ -247,7 +254,6 @@ class ElasticSource(object):
                 else:
                     message = 'failed'
                 status = "failure"
-                ## report error
             elif host_data.status == 'skipped':
                 if 'skip_reason' in res:
                     message = res['skip_reason']
@@ -267,6 +273,11 @@ class ElasticSource(object):
                              "ansible.task.host.name": host_data.name,
                              "ansible.task.host.status": host_data.status}) as span:
             span.outcome = status
+            if 'failure' in status:
+                try:
+                    raise Exception("{} failed with the message {}".format(name, message))
+                except Exception as err:
+                    apm_cli.capture_exception(handled=True)
             self._display.debug("{}".format("created span"))
 
     def init_apm_client(self, apm_server_url, apm_service_name, apm_verify_server_cert, apm_secret_token, apm_api_key):
