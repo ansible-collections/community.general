@@ -338,8 +338,6 @@ class CallbackModule(CallbackBase):
 
         # See https://github.com/open-telemetry/opentelemetry-specification/issues/740
         self.traceparent = self.get_option('traceparent')
-        if self.traceparent is None:
-            self.traceparent = os.getenv('TRACEPARENT', None)
 
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
