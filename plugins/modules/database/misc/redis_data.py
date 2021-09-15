@@ -29,6 +29,7 @@ options:
     expiration:
         description:
             - Expiration time in milliseconds.
+              Setting this flag will always result in a change in the database.
         required: false
         type: int
     non_existing:
@@ -148,7 +149,7 @@ def main():
 
     module = AnsibleModule(
         argument_spec=module_args,
-        supports_check_mode=False,
+        supports_check_mode=True,
         required_if=[('state', 'present', ('value',))],
         mutually_exclusive=[['non_existing', 'existing'],
                             ['keep_ttl', 'expiration']],)
@@ -168,7 +169,25 @@ def main():
 
     result = {'changed': False}
 
+    old_value = None
+    try:
+        old_value = redis.connection.get(key)
+    except Exception as e:
+        msg = 'Failed to get value of key: {0} with exception: {1}'.format(
+            key, str(e))
+        result['msg'] = msg
+        module.fail_json(**result)
+
     if state == 'absent':
+        if module.check_mode:
+            if old_value is None:
+                msg = 'Key: {0} not present'.format(key)
+                result['msg'] = msg
+                module.exit_json(**result)
+            else:
+                msg = 'Deleted key: {0}'.format(key)
+                result['msg'] = msg
+                module.exit_json(**result)
         try:
             ret = redis.connection.delete(key)
             if ret == 0:
@@ -196,9 +215,13 @@ def main():
         module.fail_json(**result)
 
     result['old_value'] = old_value
-    if old_value == value:
+    if ((old_value == value) and ((keepttl is not None and keepttl) or px is None)):
         msg = 'Key {0} already has desired value'.format(key)
         result['msg'] = msg
+        result['value'] = value
+        module.exit_json(**result)
+    if module.check_mode:
+        result['msg'] = 'Set key: {0}'.format(key)
         result['value'] = value
         module.exit_json(**result)
     try:
