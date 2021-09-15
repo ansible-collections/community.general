@@ -1,6 +1,2 @@
 minor_changes:
-<<<<<<< HEAD
   - ipa_dnszone - add DNS zone synchronization support (https://github.com/ansible-collections/community.general/pull/3374).
-=======
-  - ipa - dns zone synchronization support (https://github.com/ansible-collections/community.general/pull/3374).
->>>>>>> Add changelog fragment
