@@ -979,6 +979,8 @@ class RedfishUtils(object):
             payload['Password'] = user.get('account_password')
         if user.get('account_roleid'):
             payload['RoleId'] = user.get('account_roleid')
+        if user.get('account_id'):
+            payload['Id'] = user.get('account_id')
 
         response = self.post_request(self.root_uri + self.accounts_uri, payload)
         if not response['ret']:
