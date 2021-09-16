@@ -815,7 +815,7 @@ def main():
 
     # does the user federation already exist?
     if cid is None:
-        found = kc.get_components('type=org.keycloak.storage.UserStorageProvider&parent={id}&name={name}'.format(id=realm, name=name), realm)
+        found = kc.get_components(urlencode(dict(type='org.keycloak.storage.UserStorageProvider', parent=realm, name=name)), realm)
         if len(found) > 1:
             module.fail_json(msg='No ID given and found multiple user federations with name `{name}`. Cannot continue.'.format(name=name))
         before_comp = next(iter(found), None)
