@@ -30,6 +30,13 @@ DOCUMENTATION = '''
           - The service name resource attribute.
         env:
           - name: OTEL_SERVICE_NAME
+      traceparent:
+        default: None
+        type: str
+        description:
+          - The L(W3C Trace Context header traceparent,https://www.w3.org/TR/trace-context-1/#traceparent-header).
+        env:
+          - name: TRACEPARENT
     requirements:
       - opentelemetry-api (python lib)
       - opentelemetry-exporter-otlp (python lib)
@@ -64,9 +71,11 @@ from ansible.plugins.callback import CallbackBase
 
 try:
     from opentelemetry import trace
+    from opentelemetry.trace import SpanKind
     from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
     from opentelemetry.sdk.resources import SERVICE_NAME, Resource
     from opentelemetry.trace.status import Status, StatusCode
+    from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
     from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.sdk.trace.export import (
         ConsoleSpanExporter,
@@ -151,6 +160,11 @@ class OpenTelemetrySource(object):
 
         self._display = display
 
+    def traceparent_context(self, traceparent):
+        carrier = dict()
+        carrier['traceparent'] = traceparent
+        return TraceContextTextMapPropagator().extract(carrier=carrier)
+
     def start_task(self, tasks_data, hide_task_arguments, play_name, task):
         """ record the start of a task for one or more hosts """
 
@@ -188,7 +202,7 @@ class OpenTelemetrySource(object):
 
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def generate_distributed_traces(self, otel_service_name, ansible_playbook, tasks_data, status):
+    def generate_distributed_traces(self, otel_service_name, ansible_playbook, tasks_data, status, traceparent):
         """ generate distributed traces from the collected TaskData and HostData """
 
         tasks = []
@@ -210,7 +224,8 @@ class OpenTelemetrySource(object):
 
         tracer = trace.get_tracer(__name__)
 
-        with tracer.start_as_current_span(ansible_playbook, start_time=parent_start_time) as parent:
+        with tracer.start_as_current_span(ansible_playbook, context=self.traceparent_context(traceparent),
+                                          start_time=parent_start_time, kind=SpanKind.SERVER) as parent:
             parent.set_status(status)
             # Populate trace metadata attributes
             if self.ansible_version is not None:
@@ -244,7 +259,9 @@ class OpenTelemetrySource(object):
                     message = res['msg']
                 else:
                     message = 'failed'
-                status = Status(status_code=StatusCode.ERROR)
+                status = Status(status_code=StatusCode.ERROR, description=message)
+                # Record an exception with the task message
+                span.record_exception(BaseException(message))
             elif host_data.status == 'skipped':
                 if 'skip_reason' in res:
                     message = res['skip_reason']
@@ -291,6 +308,7 @@ class CallbackModule(CallbackBase):
         self.tasks_data = None
         self.errors = 0
         self.disabled = False
+        self.traceparent = False
 
         if OTEL_LIBRARY_IMPORT_ERROR:
             raise_from(
@@ -317,6 +335,9 @@ class CallbackModule(CallbackBase):
 
         if not self.otel_service_name:
             self.otel_service_name = 'ansible'
+
+        # See https://github.com/open-telemetry/opentelemetry-specification/issues/740
+        self.traceparent = self.get_option('traceparent')
 
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
@@ -394,7 +415,8 @@ class CallbackModule(CallbackBase):
             self.otel_service_name,
             self.ansible_playbook,
             self.tasks_data,
-            status
+            status,
+            self.traceparent
         )
 
     def v2_runner_on_async_failed(self, result, **kwargs):
