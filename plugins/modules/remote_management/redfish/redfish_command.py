@@ -56,7 +56,8 @@ options:
     required: false
     aliases: [ account_id ]
     description:
-      - ID of account to delete/modify
+      - ID of account to delete/modify.
+      - Can also be used in account creation to work around vendor issues where the ID of the new user is required in the POST request.
     type: str
   new_username:
     required: false
