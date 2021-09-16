@@ -3,3 +3,11 @@ gitlab_api_access_token: "token"
 gitlab_project: some_project
 username: some_user
 gitlab_access_level: developer
+userlist:
+  - username1
+  - username2
+dedicated_access_users:
+  - name: username1
+    access_level: "developer"
+  - name: username2
+    access_level: "maintainer"
