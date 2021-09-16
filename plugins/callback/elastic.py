@@ -274,7 +274,7 @@ class ElasticSource(object):
                                   "ansible.task.host.status": host_data.status}) as span:
             span.outcome = status
             if 'failure' in status:
-                exception = AnsibleRuntimeError(message="{}: {} failed with error message {}".format(task_data.action, name, message))
+                exception = AnsibleRuntimeError(message="{0}: {1} failed with error message {2}".format(task_data.action, name, message))
                 apm_cli.capture_exception(exc_info=(type(exception), exception, exception.__traceback__), handled=True)
 
     def init_apm_client(self, apm_server_url, apm_service_name, apm_verify_server_cert, apm_secret_token, apm_api_key):
