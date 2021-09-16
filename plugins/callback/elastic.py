@@ -83,13 +83,12 @@ examples: |
 
 import getpass
 import socket
-import sys
 import time
 import uuid
 
 from os.path import basename
 
-from ansible.errors import AnsibleError
+from ansible.errors import AnsibleError, AnsibleRuntimeError
 from ansible.module_utils.six import raise_from
 from ansible.plugins.callback import CallbackBase
 
@@ -274,11 +273,8 @@ class ElasticSource(object):
                              "ansible.task.host.status": host_data.status}) as span:
             span.outcome = status
             if 'failure' in status:
-                try:
-                    raise Exception("{} failed with the message {}".format(name, message))
-                except Exception as err:
-                    apm_cli.capture_exception(handled=True)
-            self._display.debug("{}".format("created span"))
+                exception = AnsibleRuntimeError(message="{}: {} failed with error message {}".format(task_data.action, name, message))
+                apm_cli.capture_exception(exc_info=(type(exception), exception, exception.__traceback__), handled=True)
 
     def init_apm_client(self, apm_server_url, apm_service_name, apm_verify_server_cert, apm_secret_token, apm_api_key):
         if apm_server_url:
