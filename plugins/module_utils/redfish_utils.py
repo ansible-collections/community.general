@@ -60,8 +60,8 @@ class RedfishUtils(object):
             force_basic_auth = False
             headers['X-Auth-Token'] = self.creds['token']
         else:
-            username = self.creds['user']
-            password = self.creds['pswd']
+            username = self.creds.get('user')
+            password = self.creds.get('pswd')
             force_basic_auth = True
         return username, password, force_basic_auth
 
@@ -69,33 +69,23 @@ class RedfishUtils(object):
     def get_request(self, uri):
         req_headers = dict(GET_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
-        try:
-            
+        try: 
             if os.path.isfile(HOME + "/sessionfile" + self.root_uri[8:] + ".txt"):
                 session_id = ''
-                
                 with open(HOME + "/sessionfile" + self.root_uri[8:] + ".txt", 'r') as json_file:
                     file_data = json.load(json_file)
-                if "user" in self.creds.keys() and self.creds['user'] is not None and "autologin" not in file_data.keys():
+                if "user" in self.creds and self.creds['user'] is not None and "autologin" not in file_data:
                     session_id = file_data["login"]
                 elif self.creds["UserName"] is not None:
                     session_id = file_data["autologin"]
                 else:
                     session_id = file_data["login"]
-
-                resp = open_url(uri, method="GET", headers=req_headers, sessionid=session_id,
-                            url_username=None,
-                            url_password=None,
-                            force_basic_auth=False, validate_certs=False,
+                req_headers["X-Auth-Token"] = session_id
+            resp = open_url(uri, method="GET", headers=req_headers,
+                            url_username=username, url_password=password,
+                            force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
-
-            else:
-                resp = open_url(uri, method="GET", headers=req_headers,
-                                url_username=username, url_password=password,
-                                force_basic_auth=basic_auth, validate_certs=False,
-                                follow_redirects='all',
-                                use_proxy=True, timeout=self.timeout)
             data = json.loads(to_native(resp.read()))
             headers = dict((k.lower(), v) for (k, v) in resp.info().items())
         except HTTPError as e:
@@ -118,35 +108,24 @@ class RedfishUtils(object):
         username, password, basic_auth = self._auth_params(req_headers)
         try:
             session_id = ''
-            if "iLOlogin" in pyld.keys() or os.path.isfile(HOME + "/sessionfile" + self.root_uri[8:] + ".txt"):
-                if "iLOlogin" in pyld.keys():
-                    del pyld["iLOlogin"]
-                    session_id = None
-                elif os.path.isfile(HOME + "/sessionfile" + self.root_uri[8:] + ".txt"):
-                    with open(HOME + "/sessionfile"+self.root_uri[8:] + ".txt", 'r') as json_file:
-                        file_data = json.load(json_file)
-                    if "user" in self.creds.keys() and self.creds['user'] is not None and "autologin" not in file_data.keys():
-                        session_id = file_data["login"]
-                    elif self.creds["UserName"] is not None:
-                        session_id = file_data["autologin"]
-                    else:
-                        session_id = file_data["login"]
-                
-                resp = open_url(uri, data=json.dumps(pyld), sessionid=session_id,
+            if "login" in pyld:
+                del pyld["login"]
+            elif os.path.isfile(HOME + "/sessionfile" + self.root_uri[8:] + ".txt"):
+                with open(HOME + "/sessionfile" + self.root_uri[8:] + ".txt", 'r') as json_file:
+                    file_data = json.load(json_file)
+                if "user" in self.creds and self.creds['user'] is not None and "autologin" not in file_data:
+                    session_id = file_data["login"]
+                elif self.creds["UserName"] is not None:
+                    session_id = file_data["autologin"]
+                else:
+                    session_id = file_data["login"]
+                req_headers["X-Auth-Token"] = session_id
+            resp = open_url(uri, data=json.dumps(pyld),
                             headers=req_headers, method="POST",
-                            url_username=None,
-                            url_password=None,
-                            force_basic_auth=True, validate_certs=False,
+                            url_username=username, url_password=password,
+                            force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
-
-            else:
-                resp = open_url(uri, data=json.dumps(pyld),
-                                headers=req_headers, method="POST",
-                                url_username=username, url_password=password,
-                                force_basic_auth=basic_auth, validate_certs=False,
-                                follow_redirects='all',
-                                use_proxy=True, timeout=self.timeout)
             headers = dict((k.lower(), v) for (k, v) in resp.info().items())
         except HTTPError as e:
             msg = self._get_extended_message(e)
@@ -179,30 +158,21 @@ class RedfishUtils(object):
         try:
             if os.path.isfile(HOME + "/sessionfile" + self.root_uri[8:] + ".txt"):
                 session_id = ''
-                with open(HOME + "/sessionfile"+self.root_uri[8:] + ".txt", 'r') as json_file:
+                with open(HOME + "/sessionfile" + self.root_uri[8:] + ".txt", 'r') as json_file:
                     file_data = json.load(json_file)
-                if "user" in self.creds.keys() and self.creds['user'] is not None and "autologin" not in file_data.keys():
+                if "user" in self.creds and self.creds['user'] is not None and "autologin" not in file_data:
                     session_id = file_data["login"]
                 elif self.creds["UserName"] is not None:
                     session_id = file_data["autologin"]
                 else:
                     session_id = file_data["login"]
-
-                resp = open_url(uri, data=json.dumps(pyld),
-                            headers=req_headers, method="PATCH", sessionid=session_id,
-                            url_username=None,
-                            url_password=None,
-                            force_basic_auth=True, validate_certs=False,
+                req_headers["X-Auth-Token"] = session_id
+            resp = open_url(uri, data=json.dumps(pyld),
+                            headers=req_headers, method="PATCH",
+                            url_username=username, url_password=password,
+                            force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
-
-            else:
-                resp = open_url(uri, data=json.dumps(pyld),
-                                headers=req_headers, method="PATCH",
-                                url_username=username, url_password=password,
-                                force_basic_auth=basic_auth, validate_certs=False,
-                                follow_redirects='all',
-                                use_proxy=True, timeout=self.timeout)
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
@@ -227,28 +197,19 @@ class RedfishUtils(object):
                 session_id = ''
                 with open(HOME + "/sessionfile" + self.root_uri[8:] + ".txt", 'r') as json_file:
                     file_data = json.load(json_file)
-                if "user" in self.creds.keys() and self.creds['user'] is not None and "autologin" not in file_data.keys():
+                if "user" in self.creds and self.creds['user'] is not None and "autologin" not in file_data:
                     session_id = file_data["login"]
-                elif "UserName" in self.creds.keys() and self.creds["UserName"] is not None:
+                elif "UserName" in self.creds and self.creds["UserName"] is not None:
                     session_id = file_data["autologin"]
                 else:
                     session_id = file_data["login"]
-
-                resp = open_url(uri, data=json.dumps(pyld),
-                            headers=req_headers, method="DELETE", sessionid=session_id,
-                            url_username=None,
-                            url_password=None,
-                            force_basic_auth=False, validate_certs=False,
+                req_headers["X-Auth-Token"] = session_id
+            resp = open_url(uri, data=data,
+                            headers=req_headers, method="DELETE",
+                            url_username=username, url_password=password,
+                            force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
-
-            else:
-                resp = open_url(uri, data=data,
-                                headers=req_headers, method="DELETE",
-                                url_username=username, url_password=password,
-                                force_basic_auth=basic_auth, validate_certs=False,
-                                follow_redirects='all',
-                                use_proxy=True, timeout=self.timeout)
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
@@ -1381,8 +1342,6 @@ class RedfishUtils(object):
                         title = key
                     result['entries'][title] = action.get('TransferProtocol@Redfish.AllowableValues',
                                                           ["Key TransferProtocol@Redfish.AllowableValues not found"])
-                    # if "Oem" in data.keys():
-                    #     result['entries'][title] = action
             else:
                 return {'ret': "False", 'msg': "Actions list is empty."}
         else:
