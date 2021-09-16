@@ -202,7 +202,8 @@ class ElasticSource(object):
 
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def generate_distributed_traces(self, tasks_data, status, end_time, traceparent, apm_service_name, apm_server_url, apm_verify_server_cert, apm_secret_token, apm_api_key):
+    def generate_distributed_traces(self, tasks_data, status, end_time, traceparent, apm_service_name,
+                                    apm_server_url, apm_verify_server_cert, apm_secret_token, apm_api_key):
         """ generate distributed traces from the collected TaskData and HostData """
 
         tasks = []
@@ -220,7 +221,7 @@ class ElasticSource(object):
                 apm_cli.begin_transaction("Session", trace_parent=parent, start=parent_start_time)
             else:
                 apm_cli.begin_transaction("Session", start=parent_start_time)
-			# Populate trace metadata attributes
+            # Populate trace metadata attributes
             if self.ansible_version is not None:
                 label(ansible_version=self.ansible_version)
             label(ansible_session=self.session, ansible_host_name=self.host, ansible_host_user=self.user)
@@ -261,16 +262,16 @@ class ElasticSource(object):
                 status = "unknown"
 
         with capture_span(task_data.name,
-                     start=task_data.start,
-                     span_type="ansible.task.run",
-                     duration=host_data.finish - task_data.start,
-                     labels={"ansible.task.args": task_data.args,
-                             "ansible.task.message": message,
-                             "ansible.task.module": task_data.action,
-                             "ansible.task.name": name,
-                             "ansible.task.result": rc,
-                             "ansible.task.host.name": host_data.name,
-                             "ansible.task.host.status": host_data.status}) as span:
+                          start=task_data.start,
+                          span_type="ansible.task.run",
+                          duration=host_data.finish - task_data.start,
+                          labels={"ansible.task.args": task_data.args,
+                                  "ansible.task.message": message,
+                                  "ansible.task.module": task_data.action,
+                                  "ansible.task.name": name,
+                                  "ansible.task.result": rc,
+                                  "ansible.task.host.name": host_data.name,
+                                  "ansible.task.host.status": host_data.status}) as span:
             span.outcome = status
             if 'failure' in status:
                 exception = AnsibleRuntimeError(message="{}: {} failed with error message {}".format(task_data.action, name, message))
@@ -279,12 +280,13 @@ class ElasticSource(object):
     def init_apm_client(self, apm_server_url, apm_service_name, apm_verify_server_cert, apm_secret_token, apm_api_key):
         if apm_server_url:
             return Client(service_name=apm_service_name,
-                        server_url=apm_server_url,
-                        verify_server_cert=False,
-                        secret_token=apm_secret_token,
-                        api_key=apm_api_key,
-                        use_elastic_traceparent_header=True,
-                        debug=True)
+                          server_url=apm_server_url,
+                          verify_server_cert=False,
+                          secret_token=apm_secret_token,
+                          api_key=apm_api_key,
+                          use_elastic_traceparent_header=True,
+                          debug=True)
+
 
 class CallbackModule(CallbackBase):
     """
