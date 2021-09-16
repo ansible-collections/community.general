@@ -14,6 +14,7 @@ import sys
 
 ELASTIC_MINIMUM_PYTHON_VERSION = (3, 6)
 
+
 class TestOpentelemetry(unittest.TestCase):
     @patch('ansible_collections.community.general.plugins.callback.elastic.socket')
     def setUp(self, mock_socket):
