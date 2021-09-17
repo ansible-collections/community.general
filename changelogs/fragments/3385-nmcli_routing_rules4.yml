@@ -1,2 +1,2 @@
 minor_changes:
-  - nmcli - routing_rules4 arguement as accept values as list instead of string (https://github.com/ansible-collections/community.general/pull/3385)
+  - nmcli - routing_rules4 argument as accept values as list instead of string (https://github.com/ansible-collections/community.general/pull/3385).
