@@ -34,9 +34,7 @@ options:
           - If the container already exists and its "config" value in metadata
             obtained from GET /1.0/containers/<name>
             U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#10containersname)
-          - The key starts with 'volatile.' are ignored for this comparison when I(ignore_volatile_options=true).
-          - Not all config values are supported to apply the existing container.
-            Maybe you need to delete and recreate a container.
+          - The keys starting with C(volatile.) are ignored for this comparison when I(ignore_volatile_options=true).
         type: dict
         required: false
     ignore_volatile_options:
@@ -627,7 +625,6 @@ class LXDContainerManagement(object):
         try:
             if self.trust_password is not None:
                 self.client.authenticate(self.trust_password)
-            #  self.ignore_volatile_options = self.module.params.get('ignore_volatile_options', default=True)
             self.ignore_volatile_options = self.module.params.get('ignore_volatile_options')
 
             self.old_container_json = self._get_container_json()
