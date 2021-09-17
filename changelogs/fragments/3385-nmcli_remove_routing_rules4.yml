@@ -1,3 +1,0 @@
-minor_changes:
-  - nmcli - routing_rules4 arguement is currenlty accepting only string elements. In the case of adding multiple entries to routing_rules4, we need to accept values as strings.
-  (https://github.com/ansible-collections/community.general/pull/3385)
