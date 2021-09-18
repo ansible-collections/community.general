@@ -169,6 +169,10 @@ def read_interfaces_file(module, filename):
         return read_interfaces_lines(module, f)
 
 
+def _is_line_processing_none(first_word):
+    return first_word in ("source", "source-dir", "source-directory", "auto", "no-auto-down", "no-scripts") or first_word.startswith("auto-")
+
+
 def read_interfaces_lines(module, line_strings):
     lines = []
     ifaces = {}
@@ -184,7 +188,7 @@ def read_interfaces_lines(module, line_strings):
         if words[0] == "mapping":
             lines.append(line_dict(line))
             currently_processing = "MAPPING"
-        elif words[0] in ("source", "source-dir", "source-directory", "auto", "allow-", "no-auto-down", "no-scripts"):
+        elif _is_line_processing_none(words[0]):
             lines.append(line_dict(line))
             currently_processing = "NONE"
         elif words[0] == "iface":
