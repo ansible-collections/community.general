@@ -155,6 +155,8 @@ files:
     maintainers: sieben
   $inventories/proxmox.py:
     maintainers: $team_virt ilijamt
+  $inventories/icinga2.py:
+    maintainers: bongoeadgc6
   $inventories/scaleway.py:
     maintainers: $team_scaleway
     labels: cloud scaleway
