@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     name: icinga2
-    short_description: Icinga2 inventory source.
+    short_description: Icinga2 inventory source
     version_added: 3.7.0
     author:
         - Cliff Hults (@BongoEADGC6) <cliff.hults@gmail.com>
