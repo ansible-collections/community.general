@@ -61,6 +61,7 @@ class Blacklist(StateModuleHelper):
     )
 
     def __init_module__(self):
+        self.pattern = re.compile(r'^blacklist\s+{0}$'.format(re.escape(self.vars.name)))
         self.vars.filename = self.vars.blacklist_file
         self.vars.set('file_exists', os.path.exists(self.vars.filename), output=False, change=True)
         if not self.vars.file_exists:
@@ -72,8 +73,6 @@ class Blacklist(StateModuleHelper):
             with open(self.vars.filename) as fd:
                 self.vars.set('lines', fd.readlines(), change=True, diff=True)
         self.vars.set('is_blacklisted', self._is_module_blocked(), change=True)
-
-        self.pattern = re.compile(r'^blacklist\s+{0}$'.format(re.escape(self.vars.name)))
 
     def _is_module_blocked(self):
         for line in self.vars.lines:
