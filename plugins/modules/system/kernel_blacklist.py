@@ -99,11 +99,15 @@ class Blacklist(StateModuleHelper):
     def __quit_module__(self):
         if self.has_changed() and not self.module.check_module:
             dummy, tmpfile = tempfile.mkstemp()
-            os.remove(tmpfile)
-            self.module.preserved_copy(self.vars.filename, tmpfile)  # ensure right perms/ownership
-            with open(tmpfile, 'w') as fd:
-                fd.writelines(self.vars.lines)
-            self.module.atomic_move(tmpfile, self.vars.filename)
+            try:
+                os.remove(tmpfile)
+                self.module.preserved_copy(self.vars.filename, tmpfile)  # ensure right perms/ownership
+                with open(tmpfile, 'w') as fd:
+                    fd.writelines(self.vars.lines)
+                self.module.atomic_move(tmpfile, self.vars.filename)
+            finally:
+                if os.path.exists(tmpfile):
+                    os.remove(tmpfile)
 
 
 def main():
