@@ -12,7 +12,7 @@ DOCUMENTATION = r'''
 ---
 module: proxmox_tasks_info
 short_description: Retrieve information about one or more Proxmox VE tasks
-version_added: 3.6.0
+version_added: 3.7.0
 description:
   - Retrieve information about one or more Proxmox VE tasks.
 author: 'Andreas Botzner (@paginabianca) <andreas at botzner dot com>'
@@ -44,7 +44,7 @@ EXAMPLES = '''
   register: result
 
 - name: Retrieve information about specific tasks on node01
-  community.general.proxmox_group_info:
+  community.general.proxmox_task_info:
     api_host: proxmoxhost
     api_user: root@pam
     api_password: '{{ password | default(omit) }}'
@@ -57,7 +57,7 @@ EXAMPLES = '''
 
 
 RETURN = '''
-proxmox_groups:
+proxmox_tasks:
     description: List of tasks.
     returned: on success
     type: list
