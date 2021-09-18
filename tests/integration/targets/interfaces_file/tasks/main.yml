@@ -31,4 +31,3 @@
 - assert:
     that:
     - ifile_2 is not changed
-
