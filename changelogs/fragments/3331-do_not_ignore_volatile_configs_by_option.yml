@@ -1,2 +1,2 @@
 minor_changes:
-  - "As noted by oskar456, the module ignores 'volatile' options. This fix allows this behavior to be switched off. The new behavior should be changed to the default in the next releases. Therefore a corresponding deprecate warning was inserted."
+  - "lxd_container - add ``ignore_volatile_options`` option which allows to disable the behavior that the module ignores options starting with ``volatile.`` (https://github.com/ansible-collections/community.general/pull/3331)."
