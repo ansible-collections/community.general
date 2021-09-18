@@ -45,6 +45,7 @@ EXAMPLES = '''
 
 import os
 import re
+import tempfile
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 
@@ -88,18 +89,21 @@ class Blacklist(StateModuleHelper):
             return
         self.vars.is_blacklisted = False
         self.vars.lines = [line for line in self.vars.lines if not self.pattern.match(line.strip())]
-        if self.has_changed() and not self.module.check_module:
-            with open(self.vars.filename, 'w') as fd:
-                fd.writelines(self.vars.lines)
 
     def state_present(self):
         if self.vars.is_blacklisted:
             return
         self.vars.is_blacklisted = True
         self.vars.lines = self.vars.lines + ['blacklist %s\n' % self.vars.name]
+
+    def __quit_module__(self):
         if self.has_changed() and not self.module.check_module:
-            with open(self.vars.filename, 'a') as fd:
-                fd.writelines(self.vars.lines[-1:])
+            dummy, tmpfile = tempfile.mkstemp()
+            os.remove(tmpfile)
+            self.module.preserved_copy(self.vars.filename, tmpfile)  # ensure right perms/ownership
+            with open(tmpfile, 'w') as fd:
+                fd.writelines(self.vars.lines)
+            self.module.atomic_move(tmpfile, self.vars.filename)
 
 
 def main():
