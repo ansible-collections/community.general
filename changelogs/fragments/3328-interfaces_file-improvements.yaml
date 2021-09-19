@@ -1,0 +1,4 @@
+bugfixes:
+  - interfaces_file - no longer reporting change when none happened (https://github.com/ansible-collections/community.general/pull/3328).
+minor_changes:
+  - interfaces_file - minor refactor (https://github.com/ansible-collections/community.general/pull/3328).
