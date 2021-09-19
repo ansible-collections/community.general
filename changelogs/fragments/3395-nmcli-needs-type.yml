@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - "nmcli - modify existing 'routing_rules4' type as 'list' with elements='str' (https://github.com/ansible-collections/community.general/issues/3395)."
