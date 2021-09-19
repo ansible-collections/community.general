@@ -72,7 +72,7 @@ class Blacklist(StateModuleHelper):
             self.vars.set('lines', [], change=True, diff=True)
         else:
             with open(self.vars.filename) as fd:
-                self.vars.set('lines', fd.readlines(), change=True, diff=True)
+                self.vars.set('lines', [x.rstrip() for x in fd.readlines()], change=True, diff=True)
         self.vars.set('is_blacklisted', self._is_module_blocked(), change=True)
 
     def _is_module_blocked(self):
@@ -94,16 +94,16 @@ class Blacklist(StateModuleHelper):
         if self.vars.is_blacklisted:
             return
         self.vars.is_blacklisted = True
-        self.vars.lines = self.vars.lines + ['blacklist %s\n' % self.vars.name]
+        self.vars.lines = self.vars.lines + ['blacklist %s' % self.vars.name]
 
     def __quit_module__(self):
-        if self.has_changed() and not self.module.check_module:
+        if self.has_changed() and not self.module.check_mode:
             dummy, tmpfile = tempfile.mkstemp()
             try:
                 os.remove(tmpfile)
                 self.module.preserved_copy(self.vars.filename, tmpfile)  # ensure right perms/ownership
                 with open(tmpfile, 'w') as fd:
-                    fd.writelines(self.vars.lines)
+                    fd.writelines(["{0}\n".format(x) for x in self.vars.lines])
                 self.module.atomic_move(tmpfile, self.vars.filename)
             finally:
                 if os.path.exists(tmpfile):
