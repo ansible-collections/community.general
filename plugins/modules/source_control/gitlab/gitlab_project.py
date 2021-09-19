@@ -147,7 +147,7 @@ options:
     version_added: "3.4.0"
   ci_config_path:
     description:
-      - The path to CI configuration file.
+      - Custom path to the CI configuration file for this project.
     type: str
     version_added: "3.7.0"
   shared_runners_enabled:
