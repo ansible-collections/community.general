@@ -265,8 +265,8 @@ def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, sta
         if already_installed and state == "present":
             continue
 
-        update_available = query_update(module, pkgng_path, package, dir_arg, old_pkgng, pkgsite)
-        if not update_available and already_installed and state == "latest":
+        def update_available(): return query_update(module, pkgng_path, package, dir_arg, old_pkgng, pkgsite)
+        if already_installed and state == "latest" and not update_available():
             continue
 
         if already_installed:
