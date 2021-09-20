@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab_group - add new property ``require_two_factor_authentication`` (https://github.com/ansible-collections/community.general/pull/3367).
