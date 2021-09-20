@@ -268,6 +268,7 @@ proposed:
     sample: {
       clientId: "test"
     }
+
 existing:
     description: client_scope representation of existing client_scope (sample is truncated)
     returned: always
@@ -278,6 +279,7 @@ existing:
             "request.object.signature.alg": "RS256",
         }
     }
+
 end_state:
     description: client_scope representation of client_scope after module execution (sample is truncated)
     returned: always

@@ -545,6 +545,7 @@ proposed:
     sample: {
       id: "test"
     }
+
 existing:
     description: realm representation of existing realm (sample is truncated)
     returned: always
@@ -555,6 +556,7 @@ existing:
             "request.object.signature.alg": "RS256",
         }
     }
+
 end_state:
     description: realm representation of realm after module execution (sample is truncated)
     returned: always

@@ -657,6 +657,7 @@ proposed:
     sample: {
       clientId: "test"
     }
+
 existing:
     description: client representation of existing client (sample is truncated)
     returned: always
@@ -667,6 +668,7 @@ existing:
             "request.object.signature.alg": "RS256",
         }
     }
+
 end_state:
     description: client representation of client after module execution (sample is truncated)
     returned: always

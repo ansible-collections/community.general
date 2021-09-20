@@ -161,6 +161,7 @@ proposed:
     sample: {
         "description": "My updated test description"
     }
+
 existing:
     description: Role representation of existing role
     returned: always
@@ -174,6 +175,7 @@ existing:
         "id": "561703dd-0f38-45ff-9a5a-0c978f794547",
         "name": "myrole"
     }
+
 end_state:
     description: Role representation of role after module execution (sample is truncated)
     returned: always

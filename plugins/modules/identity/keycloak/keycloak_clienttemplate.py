@@ -243,6 +243,7 @@ proposed:
     sample: {
       name: "test01"
     }
+
 existing:
     description: client template representation of existing client template (sample is truncated)
     returned: always
@@ -254,6 +255,7 @@ existing:
         "name": "test01",
         "protocol": "saml"
     }
+
 end_state:
     description: client template representation of client template after module execution (sample is truncated)
     returned: always

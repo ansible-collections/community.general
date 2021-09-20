@@ -170,6 +170,7 @@ proposed:
     sample: {
       clientId: "test"
     }
+
 existing:
     description:
       - role_representation representation of existing role_representation.
@@ -182,6 +183,7 @@ existing:
             "request.object.signature.alg": "RS256",
         }
     }
+
 end_state:
     description:
       - role_representation representation of role_representation after module execution.
