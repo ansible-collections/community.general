@@ -1,0 +1,2 @@
+minor_changes:
+  - "lxd_container - add ``ignore_volatile_options`` option which allows to disable the behavior that the module ignores options starting with ``volatile.`` (https://github.com/ansible-collections/community.general/pull/3331)."
