@@ -83,6 +83,9 @@ URL_IDENTITY_PROVIDER = "{url}/admin/realms/{realm}/identity-provider/instances/
 URL_IDENTITY_PROVIDER_MAPPERS = "{url}/admin/realms/{realm}/identity-provider/instances/{alias}/mappers"
 URL_IDENTITY_PROVIDER_MAPPER = "{url}/admin/realms/{realm}/identity-provider/instances/{alias}/mappers/{id}"
 
+URL_COMPONENTS = "{url}/admin/realms/{realm}/components"
+URL_COMPONENT = "{url}/admin/realms/{realm}/components/{id}"
+
 
 def keycloak_argument_spec():
     """
@@ -1601,3 +1604,93 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Unable to delete mapper %s for identity provider %s in realm %s: %s'
                                       % (mid, alias, realm, str(e)))
+
+    def get_components(self, filter=None, realm='master'):
+        """ Fetch representations for components in a realm
+        :param realm: realm to be queried
+        :param filter: search filter
+        :return: list of representations for components
+        """
+        comps_url = URL_COMPONENTS.format(url=self.baseurl, realm=realm)
+        if filter is not None:
+            comps_url += '?%s' % filter
+
+        try:
+            return json.loads(to_native(open_url(comps_url, method='GET', headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+        except ValueError as e:
+            self.module.fail_json(msg='API returned incorrect JSON when trying to obtain list of components for realm %s: %s'
+                                      % (realm, str(e)))
+        except Exception as e:
+            self.module.fail_json(msg='Could not obtain list of components for realm %s: %s'
+                                      % (realm, str(e)))
+
+    def get_component(self, cid, realm='master'):
+        """ Fetch component representation from a realm using its cid.
+        If the component does not exist, None is returned.
+        :param cid: Unique ID of the component to fetch.
+        :param realm: Realm in which the component resides; default 'master'.
+        """
+        comp_url = URL_COMPONENT.format(url=self.baseurl, realm=realm, id=cid)
+        try:
+            return json.loads(to_native(open_url(comp_url, method="GET", headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+        except HTTPError as e:
+            if e.code == 404:
+                return None
+            else:
+                self.module.fail_json(msg='Could not fetch component %s in realm %s: %s'
+                                          % (cid, realm, str(e)))
+        except Exception as e:
+            self.module.fail_json(msg='Could not fetch component %s in realm %s: %s'
+                                      % (cid, realm, str(e)))
+
+    def create_component(self, comprep, realm='master'):
+        """ Create an component.
+        :param comprep: Component representation of the component to be created.
+        :param realm: Realm in which this component resides, default "master".
+        :return: Component representation of the created component
+        """
+        comps_url = URL_COMPONENTS.format(url=self.baseurl, realm=realm)
+        try:
+            resp = open_url(comps_url, method='POST', headers=self.restheaders,
+                            data=json.dumps(comprep), validate_certs=self.validate_certs)
+            comp_url = resp.getheader('Location')
+            if comp_url is None:
+                self.module.fail_json(msg='Could not create component in realm %s: %s'
+                                          % (realm, 'unexpected response'))
+            return json.loads(to_native(open_url(comp_url, method="GET", headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.module.fail_json(msg='Could not create component in realm %s: %s'
+                                      % (realm, str(e)))
+
+    def update_component(self, comprep, realm='master'):
+        """ Update an existing component.
+        :param comprep: Component representation of the component to be updated.
+        :param realm: Realm in which this component resides, default "master".
+        :return HTTPResponse object on success
+        """
+        cid = comprep.get('id')
+        if cid is None:
+            self.module.fail_json(msg='Cannot update component without id')
+        comp_url = URL_COMPONENT.format(url=self.baseurl, realm=realm, id=cid)
+        try:
+            return open_url(comp_url, method='PUT', headers=self.restheaders,
+                            data=json.dumps(comprep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not update component %s in realm %s: %s'
+                                      % (cid, realm, str(e)))
+
+    def delete_component(self, cid, realm='master'):
+        """ Delete an component.
+        :param cid: Unique ID of the component.
+        :param realm: Realm in which this component resides, default "master".
+        """
+        comp_url = URL_COMPONENT.format(url=self.baseurl, realm=realm, id=cid)
+        try:
+            return open_url(comp_url, method='DELETE', headers=self.restheaders,
+                            validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Unable to delete component %s in realm %s: %s'
+                                      % (cid, realm, str(e)))
