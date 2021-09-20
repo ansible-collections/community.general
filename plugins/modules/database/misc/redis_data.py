@@ -215,7 +215,7 @@ def main():
         module.fail_json(**result)
 
     result['old_value'] = old_value
-    if ((old_value == value) and ((keepttl is not None and keepttl) or px is None)):
+    if old_value == value and keepttl is not False and px is None:
         msg = 'Key {0} already has desired value'.format(key)
         result['msg'] = msg
         result['value'] = value
