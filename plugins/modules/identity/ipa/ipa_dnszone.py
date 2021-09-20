@@ -34,9 +34,7 @@ options:
     type: str
   allowsyncptr:
     description: Allow synchronization of forward and reverse records in the zone.
-    default: "false"
-    choices: ["false", "true"]
-    type: str
+    type: boolean
 extends_documentation_fragment:
 - community.general.ipa.documentation
 
