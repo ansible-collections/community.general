@@ -1691,13 +1691,13 @@ class Nmcli(object):
                                      route) for route in current_value]
                     current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+)\s*}', r'\1 \2', route) for route in current_value]
                 if key == 'ipv4.routing-rules' and current_value is not None:
-                    # ipv4.routes do not have same options and show_connection() format
+                    # ipv4.routing-rules do not have same options and show_connection() format
                     # options: ['10.11.0.0/24 10.10.0.2', '10.12.0.0/24 10.10.0.2 200']
                     # show_connection(): ['{ ip = 10.11.0.0/24, nh = 10.10.0.2 }', '{ ip = 10.12.0.0/24, nh = 10.10.0.2, mt = 200 }']
                     # Need to convert in order to compare both
                     current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+),\s*mt\s*=\s*([^} ]+)\s*}', r'\1 \2 \3',
-                                     route) for route in current_value]
-                    current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+)\s*}', r'\1 \2', route) for route in current_value]                
+                                     rules) for rules in current_value]
+                    current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+)\s*}', r'\1 \2', rules) for rules in current_value]
                 if key == self.mac_setting:
                     # MAC addresses are case insensitive, nmcli always reports them in uppercase
                     value = value.upper()
