@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - openbsd_pkg - fix crash from ``KeyError`` exception when package installs,
+    but ``pkg_add`` returns with a non-zero exit code
+    (https://github.com/ansible-collections/community.general/pull/3336).
