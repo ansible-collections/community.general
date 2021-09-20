@@ -31,9 +31,10 @@ options:
         description:
           - 'The config for the container (e.g. {"limits.cpu": "2"}).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1)'
-          - If the container already exists and its "config" value in metadata
+          - If the container already exists and its "config" values in metadata
             obtained from GET /1.0/containers/<name>
             U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#10containersname)
+            are different, this module tries to apply the configurations.
           - The keys starting with C(volatile.) are ignored for this comparison when I(ignore_volatile_options=true).
         type: dict
         required: false
