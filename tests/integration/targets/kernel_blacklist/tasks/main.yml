@@ -1,7 +1,7 @@
 ---
 - name: set destination filename
   set_fact:
-    bl_file: '{{ output_dir }}/blacklist-ansible.conf'
+    bl_file: '{{ remote_tmp_dir }}/blacklist-ansible.conf'
 
 - name: copy blacklist file
   copy:
