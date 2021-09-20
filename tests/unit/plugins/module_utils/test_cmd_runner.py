@@ -9,7 +9,7 @@ __metaclass__ = type
 import pytest
 
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import (
-    CmdRunner, fmt_bool, fmt_bool_not, fmt_opt_val, fmt_opt_eq_val, fmt_str
+    CmdRunner, fmt_bool, fmt_bool_not, fmt_opt_val, fmt_opt_eq_val, fmt_str, fmt_mapped
 )
 
 
@@ -28,6 +28,7 @@ ARG_FORMATS = dict(
     simple_opt_val__int=(fmt_opt_val("-t"), 42, ["-t", "42"]),
     simple_opt_eq_val__str=(fmt_opt_eq_val("--food"), "potatoes", ["--food=potatoes"]),
     simple_opt_eq_val__int=(fmt_opt_eq_val("--answer"), 42, ["--answer=42"]),
+    simple_mapped=(fmt_mapped({'a': 1, 'b': 2, 'c': 3}), 'b', ["2"])
 )
 ARG_FORMATS_IDS = sorted(ARG_FORMATS.keys())
 

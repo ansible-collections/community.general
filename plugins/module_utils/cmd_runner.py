@@ -35,6 +35,13 @@ def fmt_str():
     return lambda value: [str(value)]
 
 
+def fmt_mapped(_map, default=None, list_around=True):
+    def fmt(value):
+        res = _map.get(value, default)
+        return [str(res)] if list_around else [str(x) for x in res]
+    return fmt
+
+
 def fmt_default_type(_type, option=""):
     if _type == "dict":
         return lambda value: ["{0}={1}".format(k, v) for k, v in iteritems(value)]
@@ -47,9 +54,10 @@ def fmt_default_type(_type, option=""):
 
 
 class _CmdRunnerContext:
-    def __init__(self, runner, params_order, ignore_value_none=True, **kwargs):
+    def __init__(self, runner, params_order, output_process=None, ignore_value_none=True, **kwargs):
         self.runner = runner
         self.params_order = params_order
+        self.output_process = output_process
         self.ignore_value_none = ignore_value_none
         self.kwargs = dict(kwargs)
 
@@ -69,16 +77,28 @@ class _CmdRunnerContext:
         module = self.runner.module
         cmd = list(runner.command)
         arg_stack = list(reversed(args))
-        params = [kwargs.get(v, arg_stack.pop()) for v in args]
+        named_params = dict(kwargs)
+        named_params.update(module.params)
+        params = [named_params.get(v, arg_stack.pop()) for v in args]
 
         for name, value in zip(self.params_order, params):
             if self.ignore_value_none and value is None:
                 continue
-            cmd.extend(runner.args_formats[name](value))
+            try:
+                cmd.extend(runner.args_formats[name](value))
+            except Exception as e:
+                raise Exception(f"{name=}, {value=}, {runner.args_formats[name]=} {e=}")
 
         environ_update = self.env_update
         check_rc = self.kwargs.get('check_rc', runner.check_rc)
-        module.run_command(cmd, environ_update=environ_update, check_rc=check_rc, **self.kwargs)
+        results = module.run_command(cmd, environ_update=environ_update, check_rc=check_rc, **self.kwargs)
+        return self.output_process(*results)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        return False
 
 
 class CmdRunner:
@@ -93,11 +113,11 @@ class CmdRunner:
 
         self.command[0] = module.get_bin_path(command[0], opt_dirs=path_prefix)
 
-        for mod_param, spec in iteritems(module.arg_spec):
+        for mod_param, spec in iteritems(module.argument_spec):
             if mod_param not in self.args_formats:
                 self.args_formats[mod_param] = fmt_default_type(spec['type'], mod_param)
 
-    def context(self, params_order=None, output_process=None, **kwargs):
+    def context(self, params_order=None, output_process=None, ignore_value_none=True, **kwargs):
         def _process_as_is(rc, out, err):
             return rc, out, err
 
@@ -105,4 +125,4 @@ class CmdRunner:
             output_process = _process_as_is
         if params_order is None:
             params_order = self.default_param_order
-        return output_process(_CmdRunnerContext(runner=self, params_order=params_order, **kwargs))
+        return _CmdRunnerContext(runner=self, params_order=params_order, output_process=output_process, ignore_value_none=ignore_value_none, **kwargs)

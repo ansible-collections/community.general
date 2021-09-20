@@ -1,0 +1,28 @@
+# -*- coding: utf-8 -*-
+# (c) 2021, Alexei Znamensky
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: test msimple 1
+  msimple:
+    command: ["echo", "--"]
+    arg_formats:
+      aa:
+        func: fmt_opt_eq_val
+        args: [--answer]
+      bb:
+        func: fmt_str
+      cc:
+        func: fmt_bool
+        args: [--cc-here]
+      dd:
+        func: fmt_opt_val
+        args: [--dd-there]
+    arg_order: ['aa', 'cc', 'dd']
+    arg_values: [true, "ahoy!"]
+    aa: 42
+  register: simple1
+
+- name: assert msimple 1
+  assert:
+    that:
+    - simple1.result == [0, "-- --answer=True --cc-here\n", ""]
