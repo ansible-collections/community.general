@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab_project - add new properties ``ci_config_path`` and ``shared_runners_enabled`` (https://github.com/ansible-collections/community.general/pull/3379).
