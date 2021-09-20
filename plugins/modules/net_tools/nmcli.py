@@ -100,7 +100,8 @@ options:
     routing_rules4:
         description:
             - Is the same as in an C(ip route add) command, except always requires specifying a priority.
-        type: str
+        type: list
+        element: str
         version_added: 3.3.0
     never_default4:
         description:
@@ -1603,10 +1604,6 @@ class Nmcli(object):
                     conn_info[key] = [s.strip() for s in raw_value.split(';')]
                 elif key_type == list:
                     conn_info[key] = [s.strip() for s in raw_value.split(',')]
-                elif key_type == 'ipv4.routing-rules':
-                    conn_info[key] = [s.strip() for s in raw_value.split(';')]
-                elif key_type == list:
-                    conn_info[key] = [s.strip() for s in raw_value.split(',')]
                 else:
                     m_enum = p_enum_value.match(raw_value)
                     if m_enum is not None:
@@ -1690,14 +1687,6 @@ class Nmcli(object):
                     current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+),\s*mt\s*=\s*([^} ]+)\s*}', r'\1 \2 \3',
                                      route) for route in current_value]
                     current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+)\s*}', r'\1 \2', route) for route in current_value]
-                if key == 'ipv4.routing-rules' and current_value is not None:
-                    # ipv4.routing-rules do not have same options and show_connection() format
-                    # options: ['10.11.0.0/24 10.10.0.2', '10.12.0.0/24 10.10.0.2 200']
-                    # show_connection(): ['{ ip = 10.11.0.0/24, nh = 10.10.0.2 }', '{ ip = 10.12.0.0/24, nh = 10.10.0.2, mt = 200 }']
-                    # Need to convert in order to compare both
-                    current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+),\s*mt\s*=\s*([^} ]+)\s*}', r'\1 \2 \3',
-                                     rules) for rules in current_value]
-                    current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+)\s*}', r'\1 \2', rules) for rules in current_value]
                 if key == self.mac_setting:
                     # MAC addresses are case insensitive, nmcli always reports them in uppercase
                     value = value.upper()
@@ -1771,7 +1760,7 @@ def main():
             gw4_ignore_auto=dict(type='bool', default=False),
             routes4=dict(type='list', elements='str'),
             route_metric4=dict(type='int'),
-            routing_rules4=dict(type='str'),
+            routing_rules4=dict(type='list', elements='str'),
             never_default4=dict(type='bool', default=False),
             dns4=dict(type='list', elements='str'),
             dns4_search=dict(type='list', elements='str'),
