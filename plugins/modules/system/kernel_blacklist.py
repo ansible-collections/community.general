@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Copyright: (c) 2021, Alexei Znamensky (@russoz) <russoz@gmail.com>
 # Copyright: (c) 2013, Matthias Vogelgesang <matthias.vogelgesang@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -32,6 +33,7 @@ options:
         description:
             - If specified, use this blacklist file instead of
               C(/etc/modprobe.d/blacklist-ansible.conf).
+        default: /etc/modprobe.d/blacklist-ansible.conf
 '''
 
 EXAMPLES = '''
@@ -43,110 +45,73 @@ EXAMPLES = '''
 
 import os
 import re
+import tempfile
 
-from ansible.module_utils.basic import AnsibleModule
-
-
-class Blacklist(object):
-    def __init__(self, module, filename, checkmode):
-        self.filename = filename
-        self.module = module
-        self.checkmode = checkmode
-
-    def create_file(self):
-        if not self.checkmode and not os.path.exists(self.filename):
-            open(self.filename, 'a').close()
-            return True
-        elif self.checkmode and not os.path.exists(self.filename):
-            self.filename = os.devnull
-            return True
-        else:
-            return False
-
-    def get_pattern(self):
-        return r'^blacklist\s*' + self.module + '$'
-
-    def readlines(self):
-        f = open(self.filename, 'r')
-        lines = f.readlines()
-        f.close()
-        return lines
-
-    def module_listed(self):
-        lines = self.readlines()
-        pattern = self.get_pattern()
-
-        for line in lines:
-            stripped = line.strip()
-            if stripped.startswith('#'):
-                continue
-
-            if re.match(pattern, stripped):
-                return True
-
-        return False
-
-    def remove_module(self):
-        lines = self.readlines()
-        pattern = self.get_pattern()
-
-        if self.checkmode:
-            f = open(os.devnull, 'w')
-        else:
-            f = open(self.filename, 'w')
-
-        for line in lines:
-            if not re.match(pattern, line.strip()):
-                f.write(line)
-
-        f.close()
-
-    def add_module(self):
-        if self.checkmode:
-            f = open(os.devnull, 'a')
-        else:
-            f = open(self.filename, 'a')
-
-        f.write('blacklist %s\n' % self.module)
-
-        f.close()
+from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 
 
-def main():
-    module = AnsibleModule(
+class Blacklist(StateModuleHelper):
+    output_params = ('name', 'state')
+    module = dict(
         argument_spec=dict(
             name=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
-            blacklist_file=dict(type='str')
+            blacklist_file=dict(type='str', default='/etc/modprobe.d/blacklist-ansible.conf'),
         ),
         supports_check_mode=True,
     )
 
-    args = dict(changed=False, failed=False,
-                name=module.params['name'], state=module.params['state'])
+    def __init_module__(self):
+        self.pattern = re.compile(r'^blacklist\s+{0}$'.format(re.escape(self.vars.name)))
+        self.vars.filename = self.vars.blacklist_file
+        self.vars.set('file_exists', os.path.exists(self.vars.filename), output=False, change=True)
+        if not self.vars.file_exists:
+            with open(self.vars.filename, 'a'):
+                pass
+            self.vars.file_exists = True
+            self.vars.set('lines', [], change=True, diff=True)
+        else:
+            with open(self.vars.filename) as fd:
+                self.vars.set('lines', [x.rstrip() for x in fd.readlines()], change=True, diff=True)
+        self.vars.set('is_blacklisted', self._is_module_blocked(), change=True)
 
-    filename = '/etc/modprobe.d/blacklist-ansible.conf'
+    def _is_module_blocked(self):
+        for line in self.vars.lines:
+            stripped = line.strip()
+            if stripped.startswith('#'):
+                continue
+            if self.pattern.match(stripped):
+                return True
+        return False
 
-    if module.params['blacklist_file']:
-        filename = module.params['blacklist_file']
+    def state_absent(self):
+        if not self.vars.is_blacklisted:
+            return
+        self.vars.is_blacklisted = False
+        self.vars.lines = [line for line in self.vars.lines if not self.pattern.match(line.strip())]
 
-    blacklist = Blacklist(args['name'], filename, module.check_mode)
+    def state_present(self):
+        if self.vars.is_blacklisted:
+            return
+        self.vars.is_blacklisted = True
+        self.vars.lines = self.vars.lines + ['blacklist %s' % self.vars.name]
 
-    if blacklist.create_file():
-        args['changed'] = True
-    else:
-        args['changed'] = False
+    def __quit_module__(self):
+        if self.has_changed() and not self.module.check_mode:
+            dummy, tmpfile = tempfile.mkstemp()
+            try:
+                os.remove(tmpfile)
+                self.module.preserved_copy(self.vars.filename, tmpfile)  # ensure right perms/ownership
+                with open(tmpfile, 'w') as fd:
+                    fd.writelines(["{0}\n".format(x) for x in self.vars.lines])
+                self.module.atomic_move(tmpfile, self.vars.filename)
+            finally:
+                if os.path.exists(tmpfile):
+                    os.remove(tmpfile)
 
-    if blacklist.module_listed():
-        if args['state'] == 'absent':
-            blacklist.remove_module()
-            args['changed'] = True
-    else:
-        if args['state'] == 'present':
-            blacklist.add_module()
-            args['changed'] = True
 
-    module.exit_json(**args)
+def main():
+    Blacklist.execute()
 
 
 if __name__ == '__main__':
