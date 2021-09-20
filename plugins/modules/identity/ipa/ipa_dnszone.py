@@ -34,6 +34,7 @@ options:
     type: str
   allowsyncptr:
     description: Allow synchronization of forward and reverse records in the zone.
+    required: false
     type: boolean
 extends_documentation_fragment:
 - community.general.ipa.documentation
@@ -146,7 +147,7 @@ def main():
     argument_spec.update(zone_name=dict(type='str', required=True),
                          state=dict(type='str', default='present', choices=['present', 'absent']),
                          dynamicupdate=dict(type='str', required=False, default='false', choices=['true', 'false']),
-                         allowsyncptr=dict(type='str', required=False, default='false', choices=['true', 'false']),
+                         allowsyncptr=dict(type='bool', required=False),
                          )
 
     module = AnsibleModule(argument_spec=argument_spec,
