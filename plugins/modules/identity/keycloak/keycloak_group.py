@@ -164,7 +164,7 @@ msg:
   returned: always
   type: str
 
-group:
+end_state:
   description: Group representation of the group after module execution (sample is truncated).
   returned: always
   type: complex
@@ -213,6 +213,12 @@ group:
         manage: true
         manageMembership: true
         view: true
+
+group:
+  description: Group representation of the group after module execution.  [DEPRECATED - Please use end_state instead].
+  returned: always
+  type: complex
+
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
@@ -302,6 +308,7 @@ def main():
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
             result['end_state'] = dict()
+            result['group'] = result['end_state']
             result['msg'] = 'Group does not exist; doing nothing.'
             module.exit_json(**result)
 
@@ -322,6 +329,7 @@ def main():
         after_group = kc.get_group_by_name(name, realm)
 
         result['end_state'] = after_group
+        result['group'] = result['end_state']
 
         result['msg'] = 'Group {name} has been created with ID {id}'.format(name=after_group['name'],
                                                                             id=after_group['id'])
@@ -335,6 +343,7 @@ def main():
             if desired_group == before_group:
                 result['changed'] = False
                 result['end_state'] = desired_group
+                result['group'] = result['end_state']
                 result['msg'] = "No changes required to group {name}.".format(name=before_group['name'])
                 module.exit_json(**result)
 
@@ -353,6 +362,7 @@ def main():
             after_group = kc.get_group_by_groupid(desired_group['id'], realm=realm)
 
             result['end_state'] = after_group
+            result['group'] = result['end_state']
 
             result['msg'] = "Group {id} has been updated".format(id=after_group['id'])
             module.exit_json(**result)
@@ -372,6 +382,7 @@ def main():
             kc.delete_group(groupid=gid, realm=realm)
 
             result['end_state'] = dict()
+            result['group'] = result['end_state']
 
             result['msg'] = "Group {name} has been deleted".format(name=before_group['name'])
             module.exit_json(**result)
