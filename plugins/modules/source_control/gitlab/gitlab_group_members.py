@@ -185,7 +185,7 @@ class GitLabGroup(object):
                 return group.id
         for group in groups:
             if group.path == gitlab_group or group.name == gitlab_group:
-                return group_id
+                return group.id
 
     # get all members in a group
     def get_members_in_a_group(self, gitlab_group_id):
