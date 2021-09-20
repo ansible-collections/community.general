@@ -78,6 +78,11 @@ options:
     choices: ["maintainer", "owner"]
     type: str
     version_added: 3.7.0
+  require_two_factor_authentication:
+    description:
+      - Require all users in this group to setup two-factor authentication.
+    type: bool
+    version_added: 3.7.0
 '''
 
 EXAMPLES = '''
@@ -201,6 +206,7 @@ class GitLabGroup(object):
                 'project_creation_level': options['project_creation_level'],
                 'auto_devops_enabled': options['auto_devops_enabled'],
                 'subgroup_creation_level': options['subgroup_creation_level'],
+                'require_two_factor_authentication': options['require_two_factor_authentication'],
             }
             if options.get('description'):
                 payload['description'] = options['description']
@@ -214,6 +220,7 @@ class GitLabGroup(object):
                 'project_creation_level': options['project_creation_level'],
                 'auto_devops_enabled': options['auto_devops_enabled'],
                 'subgroup_creation_level': options['subgroup_creation_level'],
+                'require_two_factor_authentication': options['require_two_factor_authentication'],
             })
 
         self.groupObject = group
@@ -299,6 +306,7 @@ def main():
         project_creation_level=dict(type='str', choices=['developer', 'maintainer', 'noone']),
         auto_devops_enabled=dict(type='bool'),
         subgroup_creation_level=dict(type='str', choices=['maintainer', 'owner']),
+        require_two_factor_authentication=dict(type='bool'),
     ))
 
     module = AnsibleModule(
@@ -325,6 +333,7 @@ def main():
     project_creation_level = module.params['project_creation_level']
     auto_devops_enabled = module.params['auto_devops_enabled']
     subgroup_creation_level = module.params['subgroup_creation_level']
+    require_two_factor_authentication = module.params['require_two_factor_authentication']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -361,7 +370,9 @@ def main():
                                             "visibility": group_visibility,
                                             "project_creation_level": project_creation_level,
                                             "auto_devops_enabled": auto_devops_enabled,
-                                            "subgroup_creation_level": subgroup_creation_level}):
+                                            "subgroup_creation_level": subgroup_creation_level,
+                                            "require_two_factor_authentication": require_two_factor_authentication,
+                                            }):
             module.exit_json(changed=True, msg="Successfully created or updated the group %s" % group_name, group=gitlab_group.groupObject._attrs)
         else:
             module.exit_json(changed=False, msg="No need to update the group %s" % group_name, group=gitlab_group.groupObject._attrs)
