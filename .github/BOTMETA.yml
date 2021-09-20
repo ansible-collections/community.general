@@ -521,6 +521,8 @@ files:
     maintainers: kris2kris
   $modules/identity/keycloak/keycloak_role.py:
     maintainers: laurpaum
+  $modules/identity/keycloak/keycloak_user_federation.py:
+    maintainers: laurpaum
   $modules/identity/onepassword_info.py:
     maintainers: Rylon
   $modules/identity/opendj/opendj_backendprop.py:
