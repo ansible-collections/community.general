@@ -246,6 +246,7 @@ def package_present(names, pkg_spec, module):
                     if match:
                         # It turns out we were able to install the package.
                         module.debug("package_present(): we were able to install package for name '%s'" % name)
+                        pkg_spec[name]['changed'] = True
                     else:
                         # We really did fail, fake the return code.
                         module.debug("package_present(): we really did fail for name '%s'" % name)
