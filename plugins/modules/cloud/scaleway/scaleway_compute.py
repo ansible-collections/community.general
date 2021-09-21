@@ -256,9 +256,14 @@ def public_ip_payload(compute_api, public_ip):
     except KeyError:
         compute_api.module.fail_json(msg="Error in getting the IP information from: %s" % response.json)
 
-    lookup = [ip["id"] for ip in ip_list]
-    if public_ip in lookup:
-        return {"public_ip": public_ip}
+    lookup = [ ip for ip in ip_list if ip["id"] == public_ip ]
+    if len(lookup) == 1:
+        if public_ip in lookup[0]["id"]:
+            return {"public_ip": public_ip}
+    else:
+        msg = f'Non unique UUID ip address: {public_ip}, {len(lookup)} occurences found'
+        compute_api.module.fail_json(msg=msg)
+
 
 
 def create_server(compute_api, server):
@@ -268,10 +273,12 @@ def create_server(compute_api, server):
             "tags": server["tags"],
             "commercial_type": server["commercial_type"],
             "image": server["image"],
-            "dynamic_ip_required": server["dynamic_ip_required"],
+            "dynamic_ip_required": server.get("dynamic_ip_required", False),
             "name": server["name"],
             "organization": server["organization"]
             }
+    if "dynamic_ip_required" not in server and server["public_ip"]:
+        data["public_ip"] = server["public_ip"]
 
     if server["security_group"]:
         data["security_group"] = server["security_group"]
