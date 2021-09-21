@@ -6,6 +6,46 @@ Community General Release Notes
 
 This changelog describes changes after version 1.0.0.
 
+v2.5.6
+======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Minor Changes
+-------------
+
+- pamd - minor refactorings (https://github.com/ansible-collections/community.general/pull/3285).
+- vdo - minor refactoring of the code (https://github.com/ansible-collections/community.general/pull/3191).
+
+Bugfixes
+--------
+
+- copr - fix chroot naming issues, ``centos-stream`` changed naming to ``centos-stream-<number>`` (for exmaple ``centos-stream-8``) (https://github.com/ansible-collections/community.general/issues/2084, https://github.com/ansible-collections/community.general/pull/3237).
+- launchd - use private attribute to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3194).
+- logdns callback plugin - improve split call to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3194).
+- maven_artifact - improve split call to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3194).
+- memcached cache plugin - change function argument names to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3194).
+- netapp module utils - remove always-true conditional to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3194).
+- nmcli - added ip4/ip6 configuration arguments for ``sit`` and ``ipip`` tunnels (https://github.com/ansible-collections/community.general/issues/3238, https://github.com/ansible-collections/community.general/pull/3239).
+- one_template - change function argument name to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3194).
+- online inventory plugin - improve split call to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3194).
+- online module utils - improve split call to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3194).
+- openbsd_pkg - fix crash from ``KeyError`` exception when package installs, but ``pkg_add`` returns with a non-zero exit code (https://github.com/ansible-collections/community.general/pull/3336).
+- packet_device - use generator to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3194).
+- packet_sshkey - use generator to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3194).
+- pamd - code for ``state=updated`` when dealing with the pam module arguments, made no distinction between ``None`` and an empty list (https://github.com/ansible-collections/community.general/issues/3260).
+- proxmox_kvm - clone operation should return the VMID of the target VM and not that of the source VM. This was failing when the target VM with the chosen name already existed (https://github.com/ansible-collections/community.general/pull/3266).
+- saltstack connection plugin - fix function signature (https://github.com/ansible-collections/community.general/pull/3194).
+- scaleway inventory script - improve split call to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3195).
+- scaleway module utils - improve split call to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3194).
+- udm_dns_record - fixed managing of PTR records, which can never have worked before (https://github.com/ansible-collections/community.general/pull/3256).
+- ufw - use generator to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3194).
+- vbox inventory script - change function argument name to fix sanity errors (https://github.com/ansible-collections/community.general/pull/3195).
+- vdo - boolean arguments now compared with proper ``true`` and ``false`` values instead of string representations like ``"yes"`` or ``"no"`` (https://github.com/ansible-collections/community.general/pull/3191).
+
 v2.5.5
 ======
 
