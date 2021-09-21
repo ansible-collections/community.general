@@ -69,7 +69,7 @@ class RedfishUtils(object):
     def get_request(self, uri):
         req_headers = dict(GET_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
-        try: 
+        try:
             if os.path.isfile(HOME + "/sessionfile" + self.root_uri[8:] + ".txt"):
                 session_id = ''
                 with open(HOME + "/sessionfile" + self.root_uri[8:] + ".txt", 'r') as json_file:
