@@ -81,7 +81,7 @@ See [here](https://docs.ansible.com/ansible/devel/dev_guide/developing_collectio
 To learn how to maintain / become a maintainer of this collection, refer to:
 
 * [Committer guidelines](https://github.com/ansible-collections/community.general/blob/main/commit-rights.md).
-* [Maintainer guidelines](https://github.com/ansible-collections/community.mysql/blob/main/MAINTAINING.md).
+* [Maintainer guidelines](https://github.com/ansible/community-docs/blob/main/maintaining.rst).
 
 It is necessary for maintainers of this collection to be subscribed to:
 
