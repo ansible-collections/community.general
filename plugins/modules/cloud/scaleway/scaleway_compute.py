@@ -256,14 +256,13 @@ def public_ip_payload(compute_api, public_ip):
     except KeyError:
         compute_api.module.fail_json(msg="Error in getting the IP information from: %s" % response.json)
 
-    lookup = [ ip for ip in ip_list if ip["id"] == public_ip ]
+    lookup = [ip for ip in ip_list if ip["id"] == public_ip]
     if len(lookup) == 1:
         if public_ip in lookup[0]["id"]:
             return {"public_ip": public_ip}
     else:
-        msg = f'Non unique UUID ip address: {public_ip}, {len(lookup)} occurences found'
+        msg = "Non unique IP address ID: %s, %d occurences found" % (public_ip, len(lookup))
         compute_api.module.fail_json(msg=msg)
-
 
 
 def create_server(compute_api, server):
