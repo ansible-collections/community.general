@@ -85,7 +85,7 @@ To learn how to maintain / become a maintainer of this collection, refer to:
 
 It is necessary for maintainers of this collection to be subscribed to:
 
-* The collection itself (the `Watch` button -> `All Activity` in the upper right corner of the repository's homepage).
+* The collection itself (the `Watch` button → `All Activity` in the upper right corner of the repository's homepage).
 * The "Changes Impacting Collection Contributors and Maintainers" [issue](https://github.com/ansible-collections/overview/issues/45).
 
 They also should be subscribed to Ansible's [The Bullhorn newsletter](https://docs.ansible.com/ansible/devel/community/communication.html#the-bullhorn).
