@@ -1,3 +1,4 @@
 destructive
 shippable/posix/group3
 skip/python2.6
+context/controller  # While this is not really true, this module mainly is run on the controller, *and* needs access to the ansible-galaxy CLI tool
