@@ -12,11 +12,10 @@ from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.six.moves import http_client
 from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
 from ansible.module_utils.six.moves.urllib.parse import urlparse
-
 import os
-from pathlib import Path
+from os.path import expanduser
 
-HOME = str(Path.home())
+HOME = expanduser("~")
 
 GET_HEADERS = {'accept': 'application/json', 'OData-Version': '4.0'}
 POST_HEADERS = {'content-type': 'application/json', 'accept': 'application/json',
