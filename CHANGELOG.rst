@@ -6,6 +6,81 @@ Community General Release Notes
 
 This changelog describes changes after version 2.0.0.
 
+v3.7.0
+======
+
+Release Summary
+---------------
+
+Regular feature and bugfix release.
+
+Minor Changes
+-------------
+
+- gitlab_group - add new options ``project_creation_level``, ``auto_devops_enabled``, ``subgroup_creation_level`` (https://github.com/ansible-collections/community.general/pull/3248).
+- gitlab_group - add new property ``require_two_factor_authentication`` (https://github.com/ansible-collections/community.general/pull/3367).
+- gitlab_project - add new properties ``ci_config_path`` and ``shared_runners_enabled`` (https://github.com/ansible-collections/community.general/pull/3379).
+- gitlab_project_members - ``gitlab_user`` can now also be a list of users (https://github.com/ansible-collections/community.general/pull/3319).
+- gitlab_project_members - added functionality to set all members exactly as given (https://github.com/ansible-collections/community.general/pull/3319).
+- gitlab_runner - support project-scoped gitlab.com runners registration (https://github.com/ansible-collections/community.general/pull/634).
+- interfaces_file - minor refactor (https://github.com/ansible-collections/community.general/pull/3328).
+- ipa_config - add ``ipaselinuxusermaporder`` option to set the SELinux user map order (https://github.com/ansible-collections/community.general/pull/3178).
+- kernel_blacklist - revamped the module using ``ModuleHelper`` (https://github.com/ansible-collections/community.general/pull/3329).
+- lxd_container - add ``ignore_volatile_options`` option which allows to disable the behavior that the module ignores options starting with ``volatile.`` (https://github.com/ansible-collections/community.general/pull/3331).
+- nmcli - add ``gsm`` support (https://github.com/ansible-collections/community.general/pull/3313).
+- pids - refactor to add support for older ``psutil`` versions to the ``pattern`` option (https://github.com/ansible-collections/community.general/pull/3315).
+- redfish_command and redfish_config and redfish_utils module utils - add parameter to strip etag of quotes before patch, since some vendors do not properly ``If-Match`` etag with quotes (https://github.com/ansible-collections/community.general/pull/3296).
+- tss lookup plugin - added ``token`` parameter for token authorization; ``username`` and ``password`` are optional when ``token`` is provided (https://github.com/ansible-collections/community.general/pull/3327).
+- zpool_facts - minor refactoring (https://github.com/ansible-collections/community.general/pull/3332).
+
+Bugfixes
+--------
+
+- copr - fix chroot naming issues, ``centos-stream`` changed naming to ``centos-stream-<number>`` (for exmaple ``centos-stream-8``) (https://github.com/ansible-collections/community.general/issues/2084, https://github.com/ansible-collections/community.general/pull/3237).
+- django_manage - parameters ``apps`` and ``fixtures`` are now splitted instead of being used as a single argument (https://github.com/ansible-collections/community.general/issues/3333).
+- interfaces_file - no longer reporting change when none happened (https://github.com/ansible-collections/community.general/pull/3328).
+- linode inventory plugin - fix default value of new option ``ip_style`` (https://github.com/ansible-collections/community.general/issues/3337).
+- openbsd_pkg - fix crash from ``KeyError`` exception when package installs, but ``pkg_add`` returns with a non-zero exit code (https://github.com/ansible-collections/community.general/pull/3336).
+- redfish_utils module utils - if given, add account ID of user that should be created to HTTP request (https://github.com/ansible-collections/community.general/pull/3343/).
+
+New Plugins
+-----------
+
+Callback
+~~~~~~~~
+
+- opentelemetry - Create distributed traces with OpenTelemetry
+
+Filter
+~~~~~~
+
+- unicode_normalize - Normalizes unicode strings to facilitate comparison of characters with normalized forms
+
+Inventory
+~~~~~~~~~
+
+- icinga2 - Icinga2 inventory source
+
+New Modules
+-----------
+
+Database
+~~~~~~~~
+
+misc
+^^^^
+
+- redis_data - Set key value pairs in Redis
+- redis_data_info - Get value of key in Redis database
+
+Identity
+~~~~~~~~
+
+keycloak
+^^^^^^^^
+
+- keycloak_user_federation - Allows administration of Keycloak user federations via Keycloak API
+
 v3.6.0
 ======
 

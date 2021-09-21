@@ -1747,3 +1747,91 @@ releases:
       name: keycloak_identity_provider
       namespace: identity.keycloak
     release_date: '2021-08-31'
+  3.7.0:
+    changes:
+      bugfixes:
+      - copr - fix chroot naming issues, ``centos-stream`` changed naming to ``centos-stream-<number>``
+        (for exmaple ``centos-stream-8``) (https://github.com/ansible-collections/community.general/issues/2084,
+        https://github.com/ansible-collections/community.general/pull/3237).
+      - django_manage - parameters ``apps`` and ``fixtures`` are now splitted instead
+        of being used as a single argument (https://github.com/ansible-collections/community.general/issues/3333).
+      - interfaces_file - no longer reporting change when none happened (https://github.com/ansible-collections/community.general/pull/3328).
+      - linode inventory plugin - fix default value of new option ``ip_style`` (https://github.com/ansible-collections/community.general/issues/3337).
+      - openbsd_pkg - fix crash from ``KeyError`` exception when package installs,
+        but ``pkg_add`` returns with a non-zero exit code (https://github.com/ansible-collections/community.general/pull/3336).
+      - redfish_utils module utils - if given, add account ID of user that should
+        be created to HTTP request (https://github.com/ansible-collections/community.general/pull/3343/).
+      minor_changes:
+      - gitlab_group - add new options ``project_creation_level``, ``auto_devops_enabled``,
+        ``subgroup_creation_level`` (https://github.com/ansible-collections/community.general/pull/3248).
+      - gitlab_group - add new property ``require_two_factor_authentication`` (https://github.com/ansible-collections/community.general/pull/3367).
+      - gitlab_project - add new properties ``ci_config_path`` and ``shared_runners_enabled``
+        (https://github.com/ansible-collections/community.general/pull/3379).
+      - gitlab_project_members - ``gitlab_user`` can now also be a list of users (https://github.com/ansible-collections/community.general/pull/3319).
+      - gitlab_project_members - added functionality to set all members exactly as
+        given (https://github.com/ansible-collections/community.general/pull/3319).
+      - gitlab_runner - support project-scoped gitlab.com runners registration (https://github.com/ansible-collections/community.general/pull/634).
+      - interfaces_file - minor refactor (https://github.com/ansible-collections/community.general/pull/3328).
+      - ipa_config - add ``ipaselinuxusermaporder`` option to set the SELinux user
+        map order (https://github.com/ansible-collections/community.general/pull/3178).
+      - kernel_blacklist - revamped the module using ``ModuleHelper`` (https://github.com/ansible-collections/community.general/pull/3329).
+      - lxd_container - add ``ignore_volatile_options`` option which allows to disable
+        the behavior that the module ignores options starting with ``volatile.`` (https://github.com/ansible-collections/community.general/pull/3331).
+      - nmcli - add ``gsm`` support (https://github.com/ansible-collections/community.general/pull/3313).
+      - pids - refactor to add support for older ``psutil`` versions to the ``pattern``
+        option (https://github.com/ansible-collections/community.general/pull/3315).
+      - redfish_command and redfish_config and redfish_utils module utils - add parameter
+        to strip etag of quotes before patch, since some vendors do not properly ``If-Match``
+        etag with quotes (https://github.com/ansible-collections/community.general/pull/3296).
+      - tss lookup plugin - added ``token`` parameter for token authorization; ``username``
+        and ``password`` are optional when ``token`` is provided (https://github.com/ansible-collections/community.general/pull/3327).
+      - zpool_facts - minor refactoring (https://github.com/ansible-collections/community.general/pull/3332).
+      release_summary: Regular feature and bugfix release.
+    fragments:
+    - 3.7.0.yml
+    - 3178-add-ipaselinuxusermaporder-to-ipa-config-module.yml
+    - 3237-copr-fix_chroot_naming.yml
+    - 3248-adds-few-more-gitlab-group-options.yml
+    - 3296-clean-etag.yaml
+    - 3313-nmcli-add_gsm_support.yml
+    - 3315-pids-refactor.yml
+    - 3319-gitlab_project_members_enhancement.yml
+    - 3327-tss-token-authorization.yml
+    - 3328-interfaces_file-improvements.yaml
+    - 3329-kernel_blacklist-improvements.yaml
+    - 3331-do_not_ignore_volatile_configs_by_option.yml
+    - 3332-zpool_facts-pythonify.yaml
+    - 3334-django_manage-split-params.yaml
+    - 3336-openbsd_pkg-fix-KeyError.yml
+    - 3337-linode-fix.yml
+    - 3343-redfish_utils-addUser-userId.yml
+    - 3359-add-unicode_normalize-filter.yml
+    - 3367-add-require_two_factor_authentication-property-to-gitlab-group.yml
+    - 3379-gitlab_project-ci_cd_properties.yml
+    - 634-gitlab_project_runners.yaml
+    modules:
+    - description: Allows administration of Keycloak user federations via Keycloak
+        API
+      name: keycloak_user_federation
+      namespace: identity.keycloak
+    - description: Set key value pairs in Redis
+      name: redis_data
+      namespace: database.misc
+    - description: Get value of key in Redis database
+      name: redis_data_info
+      namespace: database.misc
+    plugins:
+      callback:
+      - description: Create distributed traces with OpenTelemetry
+        name: opentelemetry
+        namespace: null
+      filter:
+      - description: Normalizes unicode strings to facilitate comparison of characters
+          with normalized forms
+        name: unicode_normalize
+        namespace: null
+      inventory:
+      - description: Icinga2 inventory source
+        name: icinga2
+        namespace: null
+    release_date: '2021-09-21'
