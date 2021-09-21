@@ -1,0 +1,5 @@
+---
+- name: Install required library
+  pip:
+    name: pyone
+    extra_args: "-c {{ remote_constraints }}"
