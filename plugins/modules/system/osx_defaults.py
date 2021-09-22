@@ -131,7 +131,7 @@ import plistlib
 import re
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import binary_type, text_type
+from ansible.module_utils.six import binary_type, text_type, PY2
 
 
 # exceptions --------------------------------------------------------------- {{{
@@ -240,21 +240,6 @@ class OSXDefaults(object):
         return [self.executable] + self._host_args()
 
     @staticmethod
-    def _convert_defaults_str_to_list(value):
-        """ Converts array output from defaults to an list """
-        # Split output of defaults. Every line contains a value
-        value = value.splitlines()
-
-        # Remove first and last item, those are not actual values
-        value.pop(0)
-        value.pop(-1)
-
-        # Remove spaces at beginning and comma (,) at the end, unquote and unescape double quotes
-        value = [re.sub('^ *"?|"?,? *$', '', x.replace('\\"', '"')) for x in value]
-
-        return value
-
-    @staticmethod
     def _create_plist_xml_from(value):
         def object_to_element(obj):
             if obj is True:
@@ -305,29 +290,24 @@ class OSXDefaults(object):
         # Ok, lets parse the type from output
         data_type = out.strip().replace('Type is ', '')
 
-        # Now get the current value
-        rc, out, err = self.module.run_command(self._base_command() + ["read", self.domain, self.key])
+        # Export plist in xml
+        rc, out, err = self.module.run_command(self._base_command() + ["export", self.domain, '-'])
 
-        # Strip output
-        out = out.strip()
-
-        # An non zero RC at this point is kinda strange...
         if rc != 0:
-            raise OSXDefaultsException("An error occurred while reading key value from defaults: %s" % out)
+            raise OSXDefaultsException("An error occurred while exporting plist: %s" % out)
 
-        # Convert string to list when type is array
-        if data_type == "array":
-            out = self._convert_defaults_str_to_list(out)
+        # Convert xml to Python objects
+        if PY2:
+            self.current_value = plistlib.readPlistFromString(out)
+        else:
+            self.current_value = plistlib.loads(out.encode('utf-8'))
 
-        # FIXME: cannot parse the current value for dictionary
-        elif data_type == "dictionary":
-            if out.replace('\n', '').replace(' ', '') == '{}':
-                return None
-            else:
-                return 'DICTIONARY'
+        if self.key:
+            self.current_value = self.current_value[self.key]
 
-        # Store the current_value
-        self.current_value = self._convert_type(data_type, out)
+        # if dict_add is given, current_value must be the value under that given key
+        if self.dict_add:
+            self.current_value = self.current_value.get(self.dict_add)
 
     def write(self):
         """ Writes value to this domain & key to defaults """
