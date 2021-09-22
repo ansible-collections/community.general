@@ -266,8 +266,12 @@ class OSXDefaults(object):
                     element.append(key_element)
                     value_element = object_to_element(value)
                     element.append(value_element)
+            elif isinstance(obj, list):
+                element = ElementTree.Element('array')
+                for item in obj:
+                    element.append(object_to_element(item))
             else:
-                raise OSXDefaultsException("Invalid dict value. Value must be one of: bool, datetime, dict, float, int, str")
+                raise OSXDefaultsException("Invalid dict value. Value must be one of: bool, datetime, dict, float, int, list, str")
             return element
         return ElementTree.tostring(object_to_element(value))
 
