@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright: (c) 2014, GeekChimp - Franck Nijhof <franck@geekchimp.com> (DO NOT CONTACT!)
+# Copyright: (c) 2021, aiotter <inquiry@aiotter.com>
 # Copyright: (c) 2019, Ansible project
 # Copyright: (c) 2019, Abhijeet Kasurde <akasurde@redhat.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -15,6 +16,7 @@ module: osx_defaults
 author:
 # DO NOT RE-ADD GITHUB HANDLE!
 - Franck Nijhof (!UNKNOWN)
+- aiotter (@aiotter)
 short_description: Manage macOS user defaults
 description:
   - osx_defaults allows users to read, write, and delete macOS user defaults from Ansible scripts.
@@ -40,13 +42,18 @@ options:
     description:
       - The type of value to write.
     type: str
-    choices: [ array, bool, boolean, date, float, int, integer, string ]
+    choices: [ array, bool, boolean, date, dict, float, int, integer, string ]
     default: string
   array_add:
     description:
       - Add new elements to the array for a key which has an array as its value.
     type: bool
     default: no
+  dict_add:
+    description:
+      - Add new key/value pairs to a dictionary for a key which has a dictionary as its value when specified.
+      - Specify a key name for a dictionary.
+    type: str
   value:
     description:
       - The value to write.
@@ -119,6 +126,8 @@ EXAMPLES = r'''
 '''
 
 from datetime import datetime
+from xml.etree import ElementTree
+import plistlib
 import re
 
 from ansible.module_utils.basic import AnsibleModule
@@ -148,6 +157,7 @@ class OSXDefaults(object):
         self.key = module.params['key']
         self.type = module.params['type']
         self.array_add = module.params['array_add']
+        self.dict_add = module.params['dict_add']
         self.value = module.params['value']
         self.state = module.params['state']
         self.path = module.params['path']
@@ -197,6 +207,8 @@ class OSXDefaults(object):
                 raise OSXDefaultsException(
                     "Invalid date value: {0}. Required format yyy-mm-dd hh:mm:ss.".format(repr(value))
                 )
+        elif data_type in ["dict", "dictionary"]:
+            return dict(value)
         elif data_type in ["int", "integer"]:
             if not OSXDefaults.is_int(value):
                 raise OSXDefaultsException("Invalid integer value: {0}".format(repr(value)))
@@ -242,6 +254,38 @@ class OSXDefaults(object):
 
         return value
 
+    @staticmethod
+    def _create_plist_xml_from(value):
+        def object_to_element(obj):
+            if obj is True:
+                element = ElementTree.Element('true')
+            elif obj is False:
+                element = ElementTree.Element('false')
+            elif isinstance(obj, int):
+                element = ElementTree.Element('integer')
+                element.text = str(obj)
+            elif isinstance(obj, float):
+                element = ElementTree.Element('real')
+                element.text = str(obj)
+            elif isinstance(obj, str):
+                element = ElementTree.Element('string')
+                element.text = obj
+            elif isinstance(obj, datetime):
+                element = ElementTree.Element('date')
+                element.text = obj.strftime('%Y-%m-%d %H:%M:%S')
+            elif isinstance(obj, dict):
+                element = ElementTree.Element('dict')
+                for key, value in obj.items():
+                    key_element = ElementTree.Element('key')
+                    key_element.text = str(key)
+                    element.append(key_element)
+                    value_element = object_to_element(value)
+                    element.append(value_element)
+            else:
+                raise OSXDefaultsException("Invalid dict value. Value must be one of: bool, datetime, dict, float, int, str")
+            return element
+        return ElementTree.tostring(object_to_element(value))
+
     # /tools -------------------------------------------------------------- }}}
 
     # commands ------------------------------------------------------------ {{{
@@ -275,35 +319,28 @@ class OSXDefaults(object):
         if data_type == "array":
             out = self._convert_defaults_str_to_list(out)
 
+        # FIXME: cannot parse the current value for dictionary
+        elif data_type == "dictionary":
+            if out.replace('\n', '').replace(' ', '') == '{}':
+                return None
+            else:
+                return 'DICTIONARY'
+
         # Store the current_value
         self.current_value = self._convert_type(data_type, out)
 
     def write(self):
         """ Writes value to this domain & key to defaults """
-        # We need to convert some values so the defaults commandline understands it
-        if isinstance(self.value, bool):
-            if self.value:
-                value = "TRUE"
-            else:
-                value = "FALSE"
-        elif isinstance(self.value, (int, float)):
-            value = str(self.value)
-        elif self.array_add and self.current_value is not None:
-            value = list(set(self.value) - set(self.current_value))
-        elif isinstance(self.value, datetime):
-            value = self.value.strftime('%Y-%m-%d %H:%M:%S')
+        command_args = self._base_command() + ['write', self.domain, self.key]
+        if self.array_add:
+            command_args.append('-array-add')
+            for v in set(self.value) - set(self.current_value):
+                command_args.append(self._create_plist_xml_from(v))
+        elif self.dict_add:
+            command_args += ['-dict-add', self.dict_add, self._create_plist_xml_from(self.value)]
         else:
-            value = self.value
-
-        # When the type is array and array_add is enabled, morph the type :)
-        if self.type == "array" and self.array_add:
-            self.type = "array-add"
-
-        # All values should be a list, for easy passing it to the command
-        if not isinstance(value, list):
-            value = [value]
-
-        rc, out, err = self.module.run_command(self._base_command() + ['write', self.domain, self.key, '-' + self.type] + value)
+            command_args.append(self._create_plist_xml_from(self.value))
+        rc, out, err = self.module.run_command(command_args)
 
         if rc != 0:
             raise OSXDefaultsException('An error occurred while writing value to defaults: %s' % out)
@@ -370,8 +407,9 @@ def main():
             domain=dict(type='str', default='NSGlobalDomain'),
             host=dict(type='str'),
             key=dict(type='str', no_log=False),
-            type=dict(type='str', default='string', choices=['array', 'bool', 'boolean', 'date', 'float', 'int', 'integer', 'string']),
+            type=dict(type='str', default='string', choices=['array', 'bool', 'boolean', 'date', 'dict', 'float', 'int', 'integer', 'string']),
             array_add=dict(type='bool', default=False),
+            dict_add=dict(type='str'),
             value=dict(type='raw'),
             state=dict(type='str', default='present', choices=['absent', 'list', 'present']),
             path=dict(type='str', default='/usr/bin:/usr/local/bin'),
