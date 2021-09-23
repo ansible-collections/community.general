@@ -41,16 +41,24 @@ options:
         aliases: [ state ]
     node_auth:
         description:
-        - The value for C(discovery.sendtargets.auth.authmethod).
+        - The value for C(node.session.auth.authmethod).
         type: str
         default: CHAP
     node_user:
         description:
-        - The value for C(discovery.sendtargets.auth.username).
+        - The value for C(node.session.auth.username).
         type: str
     node_pass:
         description:
-        - The value for C(discovery.sendtargets.auth.password).
+        - The value for C(node.session.auth.password).
+        type: str
+    node_user_in:
+        description:
+        - The value for C(node.session.auth.username_in).
+        type: str
+    node_pass_in:
+        description:
+        - The value for C(node.session.auth.password_in).
         type: str
     auto_node_startup:
         description:
@@ -191,6 +199,8 @@ def target_login(module, target, portal=None, port=None):
     node_auth = module.params['node_auth']
     node_user = module.params['node_user']
     node_pass = module.params['node_pass']
+    node_user_in = module.params['node_user_in']
+    node_pass_in = module.params['node_pass_in']
 
     if node_user:
         params = [('node.session.auth.authmethod', node_auth),
@@ -199,6 +209,15 @@ def target_login(module, target, portal=None, port=None):
         for (name, value) in params:
             cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--op=update', '--name', name, '--value', value]
             module.run_command(cmd, check_rc=True)
+    
+    if node_user_in:
+        params = [('node.session.auth.username_in', node_user_in),
+                  ('node.session.auth.password_in', node_pass_in)]
+        for (name, value) in params:
+            cmd = '%s --mode node --targetname %s --op=update --name %s --value %s' % (iscsiadm_cmd, target, name, value)
+            (rc, out, err) = module.run_command(cmd)
+            if rc > 0:
+                module.fail_json(cmd=cmd, rc=rc, msg=err)
 
     cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--login']
     if portal is not None and port is not None:
@@ -277,6 +296,8 @@ def main():
             node_auth=dict(type='str', default='CHAP'),
             node_user=dict(type='str'),
             node_pass=dict(type='str', no_log=True),
+            node_user_in=dict(type='str'),
+            node_pass_in=dict(type='str', no_log=True),
 
             # actions
             login=dict(type='bool', aliases=['state']),
@@ -286,7 +307,7 @@ def main():
             show_nodes=dict(type='bool', default=False),
         ),
 
-        required_together=[['node_user', 'node_pass']],
+        required_together=[['node_user', 'node_pass'], ['node_user_in', 'node_pass_in']],
         required_if=[('discover', True, ['portal'])],
         supports_check_mode=True,
     )
