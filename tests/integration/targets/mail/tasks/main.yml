@@ -26,7 +26,7 @@
 #        This would require either dumping the content, or registering async task output
 - name: Start test smtpserver
   shell: '{{ ansible_python.executable }} {{ remote_tmp_dir }}/smtpserver.py 10025:10465'
-  async: 30
+  async: 45
   poll: 0
   register: smtpserver
 
@@ -95,6 +95,6 @@
     ehlohost: some.domain.tld
     from: ansible@localhost
     to: root@localhost
-    subject: Test mail 6 (smtp + body)
+    subject: Test mail 6 (smtp + body + ehlohost)
     body: Test body 6
     secure: never
