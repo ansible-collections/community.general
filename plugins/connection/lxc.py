@@ -35,6 +35,7 @@ import traceback
 import select
 import fcntl
 import errno
+import platform
 
 HAS_LIBLXC = False
 try:
@@ -66,7 +67,7 @@ class Connection(ConnectionBase):
         super(Connection, self)._connect()
 
         if not HAS_LIBLXC:
-            msg = "lxc bindings for python2 are not installed"
+            msg = "lxc bindings for python%s are not installed" % platform.python_version()
             raise errors.AnsibleError(msg)
 
         if self.container:
