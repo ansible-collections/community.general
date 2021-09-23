@@ -127,8 +127,9 @@ options:
     default: 20
   ehlohost:
     description:
-    - allows for manual specification of host for EHLO
+    - Allows for manual specification of host for EHLO.
     type: str
+    version_added: 3.8.0
 '''
 
 EXAMPLES = r'''
