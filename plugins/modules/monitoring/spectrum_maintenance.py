@@ -13,7 +13,7 @@ module: spectrum_maintenance
 short_description: put devices in/out maintenance or hibernating mode.
 description:
    - Tested on CA Spectrum 10.4.3.x
-version_added: 3.4.0
+version_added: 3.6.0
 author: "Uwe Waechter (@UweW)"
 options:
     device:
