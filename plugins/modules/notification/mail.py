@@ -129,7 +129,6 @@ options:
     description:
     - allows for manual specification of host for EHLO
     type: str
-    default: None
 '''
 
 EXAMPLES = r'''
