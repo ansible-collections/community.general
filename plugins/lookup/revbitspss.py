@@ -14,7 +14,7 @@ description:
     - Uses the revbits-ansible Python SDK to get Secrets from RevBits PAM
       Server using API key authentication with the REST API.
 requirements:
-    - revbits-ansible - https://pypi.org/project/revbits-ansible/
+    - revbits-ansible - U(https://pypi.org/project/revbits-ansible/)
 options:
     _terms:
         description:
