@@ -125,6 +125,11 @@ options:
     - Sets the timeout in seconds for connection attempts.
     type: int
     default: 20
+  ehlohost:
+    description:
+    - Allows for manual specification of host for EHLO.
+    type: str
+    version_added: 3.8.0
 '''
 
 EXAMPLES = r'''
@@ -189,6 +194,16 @@ EXAMPLES = r'''
     subject: Ansible-report
     body: System {{ ansible_hostname }} has been successfully provisioned.
     secure: starttls
+
+- name: Sending an e-mail using StartTLS, remote server, custom EHLO
+  community.general.mail:
+    host: some.smtp.host.tld
+    port: 25
+    ehlohost: my-resolvable-hostname.tld
+    to: John Smith <john.smith@example.com>
+    subject: Ansible-report
+    body: System {{ ansible_hostname }} has been successfully provisioned.
+    secure: starttls
 '''
 
 import os
@@ -215,6 +230,7 @@ def main():
             password=dict(type='str', no_log=True),
             host=dict(type='str', default='localhost'),
             port=dict(type='int', default=25),
+            ehlohost=dict(type='str', default=None),
             sender=dict(type='str', default='root', aliases=['from']),
             to=dict(type='list', elements='str', default=['root'], aliases=['recipients']),
             cc=dict(type='list', elements='str', default=[]),
@@ -235,6 +251,7 @@ def main():
     password = module.params.get('password')
     host = module.params.get('host')
     port = module.params.get('port')
+    local_hostname = module.params.get('ehlohost')
     sender = module.params.get('sender')
     recipients = module.params.get('to')
     copies = module.params.get('cc')
@@ -259,9 +276,9 @@ def main():
         if secure != 'never':
             try:
                 if PY3:
-                    smtp = smtplib.SMTP_SSL(host=host, port=port, timeout=timeout)
+                    smtp = smtplib.SMTP_SSL(host=host, port=port, local_hostname=local_hostname, timeout=timeout)
                 else:
-                    smtp = smtplib.SMTP_SSL(timeout=timeout)
+                    smtp = smtplib.SMTP_SSL(local_hostname=local_hostname, timeout=timeout)
                 code, smtpmessage = smtp.connect(host, port)
                 secure_state = True
             except ssl.SSLError as e:
@@ -273,9 +290,9 @@ def main():
 
         if not secure_state:
             if PY3:
-                smtp = smtplib.SMTP(host=host, port=port, timeout=timeout)
+                smtp = smtplib.SMTP(host=host, port=port, local_hostname=local_hostname, timeout=timeout)
             else:
-                smtp = smtplib.SMTP(timeout=timeout)
+                smtp = smtplib.SMTP(local_hostname=local_hostname, timeout=timeout)
             code, smtpmessage = smtp.connect(host, port)
 
     except smtplib.SMTPException as e:
