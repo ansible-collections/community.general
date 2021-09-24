@@ -9,7 +9,7 @@ DOCUMENTATION = r"""
 name: revbitspss
 author: RevBits (@info) <info@revbits.com>
 short_description: Get secrets from RevBits PAM server
-version_added: 1.0.1
+version_added: 3.8.0
 description:
     - Uses the revbits-ansible Python SDK to get Secrets from RevBits PAM
       Server using API key authentication with the REST API.
