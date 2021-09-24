@@ -217,9 +217,7 @@ def target_login(module, target, portal=None, port=None):
                   ('node.session.auth.password_in', node_pass_in)]
         for (name, value) in params:
             cmd = '%s --mode node --targetname %s --op=update --name %s --value %s' % (iscsiadm_cmd, target, name, value)
-            (rc, out, err) = module.run_command(cmd)
-            if rc > 0:
-                module.fail_json(cmd=cmd, rc=rc, msg=err)
+            module.run_command(cmd, check_rc=True)
 
     cmd = [iscsiadm_cmd, '--mode', 'node', '--targetname', target, '--login']
     if portal is not None and port is not None:
