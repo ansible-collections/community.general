@@ -61,6 +61,7 @@ options:
         description:
         - The value for C(node.session.auth.password_in).
         type: str
+        version_added: 3.8.0
     auto_node_startup:
         description:
         - Whether the target node should be automatically connected at startup.
