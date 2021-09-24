@@ -18,7 +18,7 @@ requirements:
 options:
     _terms:
         description:
-            - This will be an array. First index will conatin another array of keys for secrets which you want to fetch from RevBits PAM
+            - This will be an array. First index will conatin another array of keys for secrets which you want to fetch from RevBits PAM.
             - At second index you need to pass the base URL of the server, e.g. C(https://pam.revbits.net).
             - At third index you need to place API key for auth. You can get from RevBits PAM secret manger module
         type: list
