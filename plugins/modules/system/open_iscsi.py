@@ -56,6 +56,7 @@ options:
         description:
         - The value for C(node.session.auth.username_in).
         type: str
+        version_added: 3.8.0
     node_pass_in:
         description:
         - The value for C(node.session.auth.password_in).
