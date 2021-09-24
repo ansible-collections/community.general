@@ -69,17 +69,16 @@ class RedfishUtils(object):
         req_headers = dict(GET_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
-            if os.path.isfile(HOME + "/sessionfile" + self.root_uri[8:] + ".txt"):
-                session_id = ''
-                with open(HOME + "/sessionfile" + self.root_uri[8:] + ".txt", 'r') as json_file:
-                    file_data = json.load(json_file)
-                if "user" in self.creds and self.creds['user'] is not None and "autologin" not in file_data:
-                    session_id = file_data["login"]
-                elif self.creds["UserName"] is not None:
-                    session_id = file_data["autologin"]
-                else:
-                    session_id = file_data["login"]
-                req_headers["X-Auth-Token"] = session_id
+            if "UserName" in self.creds:
+                username = self.creds["UserName"]
+                password = self.creds["Password"]
+            else:
+                username = self.creds["user"]
+                password = self.creds["pswd"]
+            if self.creds.get("Session") is not None:  
+                req_headers["X-Auth-Token"] = self.creds.get("Session")
+                username = None
+                password = None
             resp = open_url(uri, method="GET", headers=req_headers,
                             url_username=username, url_password=password,
                             force_basic_auth=basic_auth, validate_certs=False,
@@ -106,19 +105,16 @@ class RedfishUtils(object):
         req_headers = dict(POST_HEADERS)
         username, password, basic_auth = self._auth_params(req_headers)
         try:
-            session_id = ''
-            if "login" in pyld:
-                del pyld["login"]
-            elif os.path.isfile(HOME + "/sessionfile" + self.root_uri[8:] + ".txt"):
-                with open(HOME + "/sessionfile" + self.root_uri[8:] + ".txt", 'r') as json_file:
-                    file_data = json.load(json_file)
-                if "user" in self.creds and self.creds['user'] is not None and "autologin" not in file_data:
-                    session_id = file_data["login"]
-                elif self.creds["UserName"] is not None:
-                    session_id = file_data["autologin"]
-                else:
-                    session_id = file_data["login"]
-                req_headers["X-Auth-Token"] = session_id
+            if "UserName" in self.creds:
+                username = self.creds["UserName"]
+                password = self.creds["Password"]
+            else:
+                username = self.creds["user"]
+                password = self.creds["pswd"]
+            if self.creds.get("Session") is not None:
+                req_headers["X-Auth-Token"] = self.creds.get("Session")
+                username = None
+                password = None
             resp = open_url(uri, data=json.dumps(pyld),
                             headers=req_headers, method="POST",
                             url_username=username, url_password=password,
@@ -155,17 +151,16 @@ class RedfishUtils(object):
                 req_headers['If-Match'] = etag
         username, password, basic_auth = self._auth_params(req_headers)
         try:
-            if os.path.isfile(HOME + "/sessionfile" + self.root_uri[8:] + ".txt"):
-                session_id = ''
-                with open(HOME + "/sessionfile" + self.root_uri[8:] + ".txt", 'r') as json_file:
-                    file_data = json.load(json_file)
-                if "user" in self.creds and self.creds['user'] is not None and "autologin" not in file_data:
-                    session_id = file_data["login"]
-                elif self.creds["UserName"] is not None:
-                    session_id = file_data["autologin"]
-                else:
-                    session_id = file_data["login"]
-                req_headers["X-Auth-Token"] = session_id
+            if "UserName" in self.creds:
+                username = self.creds["UserName"]
+                password = self.creds["Password"]
+            else:
+                username = self.creds["user"]
+                password = self.creds["pswd"]
+            if self.creds.get("Session") is not None:
+                req_headers["X-Auth-Token"] = self.creds.get("Session")
+                username = None
+                password = None
             resp = open_url(uri, data=json.dumps(pyld),
                             headers=req_headers, method="PATCH",
                             url_username=username, url_password=password,
@@ -192,17 +187,16 @@ class RedfishUtils(object):
         username, password, basic_auth = self._auth_params(req_headers)
         try:
             data = json.dumps(pyld) if pyld else None
-            if os.path.isfile(HOME + "/sessionfile" + self.root_uri[8:] + ".txt"):
-                session_id = ''
-                with open(HOME + "/sessionfile" + self.root_uri[8:] + ".txt", 'r') as json_file:
-                    file_data = json.load(json_file)
-                if "user" in self.creds and self.creds['user'] is not None and "autologin" not in file_data:
-                    session_id = file_data["login"]
-                elif "UserName" in self.creds and self.creds["UserName"] is not None:
-                    session_id = file_data["autologin"]
-                else:
-                    session_id = file_data["login"]
-                req_headers["X-Auth-Token"] = session_id
+            if "UserName" in self.creds:
+                username = self.creds["UserName"]
+                password = self.creds["Password"]
+            else:
+                username = self.creds["user"]
+                password = self.creds["pswd"]
+            if self.creds.get("Session") is not None:
+                req_headers["X-Auth-Token"] = self.creds.get("Session")
+                username = None
+                password = None
             resp = open_url(uri, data=data,
                             headers=req_headers, method="DELETE",
                             url_username=username, url_password=password,
