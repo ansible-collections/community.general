@@ -1,0 +1,53 @@
+plugins/module_utils/compat/ipaddress.py no-assert
+plugins/module_utils/compat/ipaddress.py no-unicode-literals
+plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
+plugins/modules/cloud/lxc/lxc_container.py validate-modules:use-run-command-not-popen
+plugins/modules/cloud/misc/rhevm.py validate-modules:parameter-state-invalid-choice
+plugins/modules/cloud/rackspace/rax.py use-argspec-type-path # fix needed
+plugins/modules/cloud/rackspace/rax_files.py validate-modules:parameter-state-invalid-choice
+plugins/modules/cloud/rackspace/rax_files_objects.py use-argspec-type-path
+plugins/modules/cloud/rackspace/rax_scaling_group.py use-argspec-type-path  # fix needed, expanduser() applied to dict values
+plugins/modules/cloud/scaleway/scaleway_organization_info.py validate-modules:return-syntax-error
+plugins/modules/cloud/smartos/vmadm.py validate-modules:parameter-type-not-in-doc
+plugins/modules/cloud/smartos/vmadm.py validate-modules:undocumented-parameter
+plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-list-no-elements
+plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-type-not-in-doc
+plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:undocumented-parameter
+plugins/modules/cloud/univention/udm_share.py validate-modules:parameter-list-no-elements
+plugins/modules/cloud/univention/udm_user.py validate-modules:parameter-list-no-elements
+plugins/modules/clustering/consul/consul.py validate-modules:doc-missing-type
+plugins/modules/clustering/consul/consul.py validate-modules:undocumented-parameter
+plugins/modules/clustering/consul/consul_session.py validate-modules:parameter-state-invalid-choice
+plugins/modules/notification/grove.py validate-modules:invalid-argument-name   # invalid alias - removed in 4.0.0
+plugins/modules/packaging/language/composer.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
+plugins/modules/packaging/os/apt_rpm.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
+plugins/modules/packaging/os/homebrew.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
+plugins/modules/packaging/os/homebrew_cask.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
+plugins/modules/packaging/os/opkg.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
+plugins/modules/packaging/os/pacman.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
+plugins/modules/packaging/os/redhat_subscription.py validate-modules:return-syntax-error
+plugins/modules/packaging/os/slackpkg.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
+plugins/modules/packaging/os/urpmi.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
+plugins/modules/packaging/os/xbps.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
+plugins/modules/remote_management/hpilo/hpilo_boot.py validate-modules:parameter-type-not-in-doc
+plugins/modules/remote_management/hpilo/hpilo_info.py validate-modules:parameter-type-not-in-doc
+plugins/modules/remote_management/hpilo/hponcfg.py validate-modules:parameter-type-not-in-doc
+plugins/modules/remote_management/manageiq/manageiq_policies.py validate-modules:parameter-state-invalid-choice
+plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-choices-do-not-match-spec   # missing docs on suboptions
+plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-missing-type                # missing docs on suboptions
+plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:parameter-type-not-in-doc       # missing docs on suboptions
+plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:undocumented-parameter          # missing docs on suboptions
+plugins/modules/remote_management/manageiq/manageiq_tags.py validate-modules:parameter-state-invalid-choice
+plugins/modules/source_control/github/github_deploy_key.py validate-modules:parameter-invalid
+plugins/modules/system/gconftool2.py validate-modules:parameter-state-invalid-choice
+plugins/modules/system/iptables_state.py validate-modules:undocumented-parameter
+plugins/modules/system/osx_defaults.py validate-modules:parameter-state-invalid-choice
+plugins/modules/system/parted.py validate-modules:parameter-state-invalid-choice
+plugins/modules/system/puppet.py use-argspec-type-path
+plugins/modules/system/puppet.py validate-modules:doc-default-does-not-match-spec  # show_diff is not documented
+plugins/modules/system/puppet.py validate-modules:parameter-type-not-in-doc
+plugins/modules/system/runit.py validate-modules:parameter-type-not-in-doc  # param removed in 4.0.0
+plugins/modules/system/ssh_config.py use-argspec-type-path # Required since module uses other methods to specify path
+plugins/modules/system/xfconf.py validate-modules:parameter-state-invalid-choice
+plugins/modules/system/xfconf.py validate-modules:return-syntax-error
+plugins/modules/web_infrastructure/jenkins_plugin.py use-argspec-type-path
