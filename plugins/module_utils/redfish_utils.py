@@ -75,7 +75,7 @@ class RedfishUtils(object):
             else:
                 username = self.creds["user"]
                 password = self.creds["pswd"]
-            if self.creds.get("Session") is not None:  
+            if self.creds.get("Session") is not None:
                 req_headers["X-Auth-Token"] = self.creds.get("Session")
                 username = None
                 password = None
