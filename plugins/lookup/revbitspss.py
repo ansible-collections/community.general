@@ -33,7 +33,7 @@ RETURN = r"""
 _list:
     description:
         - The JSON responses which you can access with defined keys.
-        - If you are fetching secrets named as UUID, PASSWORD it will gives you the dict of all secrets
+        - If you are fetching secrets named as UUID, PASSWORD it will gives you the dict of all secrets.
     type: list
     elements: dict
 """
