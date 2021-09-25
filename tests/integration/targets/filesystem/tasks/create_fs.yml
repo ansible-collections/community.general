@@ -72,7 +72,7 @@
 - when:
     - (grow | bool and (fstype != "vfat" or resize_vfat)) or
       (fstype == "xfs" and ansible_system == "Linux" and
-      ansible_distribution not in ["CentOS", "Ubuntu"])
+      ansible_distribution not in ["CentOS", "Ubuntu", "Suse"])
   block:
     - name: Check that resizefs does nothing if device size is not changed
       filesystem:
