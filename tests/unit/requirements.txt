@@ -29,6 +29,7 @@ dnsimple >= 2 ; python_version >= '3.6'
 dataclasses ; python_version == '3.6'
 
 # requirement for the opentelemetry callback plugin
-opentelemetry-api ; python_version >= '3.6'
-opentelemetry-exporter-otlp ; python_version >= '3.6'
-opentelemetry-sdk ; python_version >= '3.6'
+# WARNING: these libraries depend on grpcio, which takes 7 minutes (!) to build in CI on Python 3.10
+opentelemetry-api ; python_version >= '3.6' and python_version < '3.10'
+opentelemetry-exporter-otlp ; python_version >= '3.6' and python_version < '3.10'
+opentelemetry-sdk ; python_version >= '3.6' and python_version < '3.10'
