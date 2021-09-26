@@ -1,0 +1,3 @@
+minor_changes:
+  - opentelemetry callback plugin - validated the task result exception without crashing (https://github.com/ansible/ansible/issues/75726).
+  - opentelemetry callback plugin - OrderedDict is available by default.
