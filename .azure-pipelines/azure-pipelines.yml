@@ -220,7 +220,7 @@ stages:
             - 1
             - 2
             - 3
-  - stage: Remote_2.12
+  - stage: Remote_2_12
     displayName: Remote 2.12
     dependsOn: []
     jobs:
@@ -320,7 +320,7 @@ stages:
             - 1
             - 2
             - 3
-  - stage: Docker_2.12
+  - stage: Docker_2_12
     displayName: Docker 2.12
     dependsOn: []
     jobs:
@@ -406,7 +406,7 @@ stages:
           targets:
             - test: 2.7
             - test: 3.9
-  - stage: Cloud_2.12
+  - stage: Cloud_2_12
     displayName: Cloud 2.12
     dependsOn: []
     jobs:
