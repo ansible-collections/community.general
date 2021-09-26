@@ -38,9 +38,9 @@ DOCUMENTATION = '''
         env:
           - name: TRACEPARENT
     requirements:
-      - opentelemetry-api (python lib)
-      - opentelemetry-exporter-otlp (python lib)
-      - opentelemetry-sdk (python lib)
+      - opentelemetry-api (Python library)
+      - opentelemetry-exporter-otlp (Python library)
+      - opentelemetry-sdk (Python library)
 '''
 
 
