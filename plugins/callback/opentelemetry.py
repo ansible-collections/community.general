@@ -57,12 +57,12 @@ examples: |
 '''
 
 import getpass
-import os
 import socket
 import sys
 import time
 import uuid
 
+from collections import OrderedDict
 from os.path import basename
 
 from ansible.errors import AnsibleError
@@ -87,18 +87,6 @@ except ImportError as imp_exc:
     OTEL_LIBRARY_IMPORT_ERROR = imp_exc
 else:
     OTEL_LIBRARY_IMPORT_ERROR = None
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    try:
-        from ordereddict import OrderedDict
-    except ImportError as imp_exc:
-        ORDER_LIBRARY_IMPORT_ERROR = imp_exc
-    else:
-        ORDER_LIBRARY_IMPORT_ERROR = None
-else:
-    ORDER_LIBRARY_IMPORT_ERROR = None
 
 
 class TaskData:
@@ -315,12 +303,7 @@ class CallbackModule(CallbackBase):
                 AnsibleError('The `opentelemetry-api`, `opentelemetry-exporter-otlp` or `opentelemetry-sdk` must be installed to use this plugin'),
                 OTEL_LIBRARY_IMPORT_ERROR)
 
-        if ORDER_LIBRARY_IMPORT_ERROR:
-            raise_from(
-                AnsibleError('The `ordereddict` must be installed to use this plugin'),
-                ORDER_LIBRARY_IMPORT_ERROR)
-        else:
-            self.tasks_data = OrderedDict()
+        self.tasks_data = OrderedDict()
 
         self.opentelemetry = OpenTelemetrySource(display=self._display)
 
