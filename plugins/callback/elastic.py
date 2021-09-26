@@ -55,7 +55,6 @@ DOCUMENTATION = '''
         env:
           - name: ELASTIC_APM_VERIFY_SERVER_CERT
       traceparent:
-        default: None
         type: str
         description:
           - The L(W3C Trace Context header traceparent,https://www.w3.org/TR/trace-context-1/#traceparent-header).
