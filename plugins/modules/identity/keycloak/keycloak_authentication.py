@@ -195,7 +195,6 @@ def create_or_update_executions(kc, config, realm='master'):
     :param kc: Keycloak API access.
     :param config: Representation of the authentication flow including it's executions.
     :param realm: Realm
-    :return: True if executions have been modified. False otherwise.
     :return: tuple (changed, dict(before, after)
         WHERE
         bool changed indicates if changes have been made
@@ -235,10 +234,14 @@ def create_or_update_executions(kc, config, realm='master'):
                 elif new_exec["providerId"] is not None:
                     kc.create_execution(new_exec, flowAlias=flow_alias_parent, realm=realm)
                     exec_found = True
+                    exec_index = new_exec_index
+                    id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
                     after += str(new_exec) + '\n'
                 elif new_exec["displayName"] is not None:
                     kc.create_subflow(new_exec["displayName"], flow_alias_parent, realm=realm)
                     exec_found = True
+                    exec_index = new_exec_index
+                    id_to_update = kc.get_executions_representation(config, realm=realm)[exec_index]["id"]
                     after += str(new_exec) + '\n'
                 if exec_found:
                     changed = True
