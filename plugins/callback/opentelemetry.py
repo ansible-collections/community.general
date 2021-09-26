@@ -241,7 +241,7 @@ class OpenTelemetrySource(object):
             res = host_data.result._result
             rc = res.get('rc', 0)
             if host_data.status == 'failed':
-                if 'exception' in res:
+                if res.get('exception') is not None:
                     message = res['exception'].strip().split('\n')[-1]
                 elif 'msg' in res:
                     message = res['msg']
