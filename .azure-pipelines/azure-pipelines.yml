@@ -445,7 +445,7 @@ stages:
           nameFormat: Python {0}
           testFormat: 2.9/cloud/{0}/1
           targets:
-            - test: 2.6
+            - test: 2.7
   - stage: Summary
     condition: succeededOrFailed()
     dependsOn:
