@@ -1061,8 +1061,6 @@ def test_generic_connection_modify(mocked_generic_connection_modify, capfd):
     assert not results.get('failed')
     assert results['changed']
 
-
-
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC, indirect=['patch_ansible_module'])
 def test_generic_connection_unchanged(mocked_generic_connection_unchanged, capfd):
     """
@@ -1076,7 +1074,6 @@ def test_generic_connection_unchanged(mocked_generic_connection_unchanged, capfd
     assert not results.get('failed')
     assert not results['changed']
 
-
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_MODIFY_ROUTING_RULES, indirect=['patch_ansible_module'])
 def test_generic_connection_modify_routing_rules4(mocked_generic_connection_create, capfd):
     """
@@ -1089,7 +1086,6 @@ def test_generic_connection_modify_routing_rules4(mocked_generic_connection_crea
     arg_list = nmcli.Nmcli.execute_command.call_args_list
     args, kwargs = arg_list[0]
 
-    
     assert 'ipv4.routing-rules' in args[0]
 
     out, err = capfd.readouterr()
@@ -1116,7 +1112,6 @@ def test_generic_connection_create_dns_search(mocked_generic_connection_create, 
     results = json.loads(out)
     assert not results.get('failed')
     assert results['changed']
-
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_DNS4_SEARCH, indirect=['patch_ansible_module'])
 def test_generic_connection_modify_dns_search(mocked_generic_connection_create, capfd):
