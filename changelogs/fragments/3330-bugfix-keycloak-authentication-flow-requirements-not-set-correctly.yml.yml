@@ -1,0 +1,3 @@
+bugfixes:
+  - keycloak_authentication - fix bug, the requirement was always on ``DISABLED`` when creating a new authentication flow
+    (https://github.com/ansible-collections/community.general/pull/3330).
