@@ -82,6 +82,7 @@ import socket
 import time
 import uuid
 
+from collections import OrderedDict
 from os.path import basename
 
 from ansible.errors import AnsibleError, AnsibleRuntimeError
@@ -94,18 +95,6 @@ except ImportError as imp_exc:
     ELASTIC_LIBRARY_IMPORT_ERROR = imp_exc
 else:
     ELASTIC_LIBRARY_IMPORT_ERROR = None
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    try:
-        from ordereddict import OrderedDict
-    except ImportError as imp_exc:
-        ORDER_LIBRARY_IMPORT_ERROR = imp_exc
-    else:
-        ORDER_LIBRARY_IMPORT_ERROR = None
-else:
-    ORDER_LIBRARY_IMPORT_ERROR = None
 
 
 class TaskData:
@@ -310,12 +299,7 @@ class CallbackModule(CallbackBase):
                 AnsibleError('The `elastic-apm` must be installed to use this plugin'),
                 ELASTIC_LIBRARY_IMPORT_ERROR)
 
-        if ORDER_LIBRARY_IMPORT_ERROR:
-            raise_from(
-                AnsibleError('The `ordereddict` must be installed to use this plugin'),
-                ORDER_LIBRARY_IMPORT_ERROR)
-        else:
-            self.tasks_data = OrderedDict()
+        self.tasks_data = OrderedDict()
 
         self.elastic = ElasticSource(display=self._display)
 
