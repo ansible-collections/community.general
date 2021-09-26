@@ -8,7 +8,7 @@ DOCUMENTATION = '''
     author: Victor Martinez (@v1v)  <VictorMartinezRubio@gmail.com>
     name: elastic
     type: notification
-    short_description: Create distributed traces dfor each ansible task in Elastic APM.
+    short_description: Create distributed traces for each Ansible task in Elastic APM
     version_added: 3.7.0
     description:
       - This callback creates distributed traces for each Ansible task in Elastic APM.
@@ -30,21 +30,18 @@ DOCUMENTATION = '''
         env:
           - name: ELASTIC_APM_SERVICE_NAME
       apm_server_url:
-        default: None
         type: str
         description:
           - Use the APM server and its environment variables.
         env:
           - name: ELASTIC_APM_SERVER_URL
       apm_secret_token:
-        default: None
         type: str
         description:
           - Use the APM server token
         env:
           - name: ELASTIC_APM_SECRET_TOKEN
       apm_api_key:
-        default: None
         type: str
         description:
           - Use the APM API key
@@ -65,7 +62,7 @@ DOCUMENTATION = '''
         env:
           - name: TRACEPARENT
     requirements:
-      - elastic-apm (python lib)
+      - elastic-apm (Python library)
 '''
 
 
@@ -247,7 +244,7 @@ class ElasticSource(object):
             res = host_data.result._result
             rc = res.get('rc', 0)
             if host_data.status == 'failed':
-                if 'exception' in res:
+                if res.get('exception') is not None:
                     message = res['exception'].strip().split('\n')[-1]
                 elif 'msg' in res:
                     message = res['msg']
