@@ -1,0 +1,2 @@
+deprecated_features:
+  - "lxd_container - enable deprecated message if ``ignore_volatile_options`` are True. (https://github.com/ansible-collections/community.general/pull/3429)."
