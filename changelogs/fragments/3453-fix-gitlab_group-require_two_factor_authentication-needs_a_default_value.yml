@@ -1,0 +1,2 @@
+bugfixes:
+  - gitlab_group - Set ``require_two_factor_authentication`` default value to ``false`` (https://github.com/ansible-collections/community.general/pull/3453).
