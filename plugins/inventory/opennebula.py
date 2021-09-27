@@ -190,7 +190,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 labels = labels.replace('-', '_')
                 labels = labels.split(',')
 
-
             # filter by label
             if label_filter is not None:
                 if label_filter not in labels:
