@@ -101,7 +101,7 @@ options:
         description:
             - Is the same as in an C(ip route add) command, except always requires specifying a priority.
         type: list
-        element: str
+        elements: str
         version_added: 3.3.0
     never_default4:
         description:
