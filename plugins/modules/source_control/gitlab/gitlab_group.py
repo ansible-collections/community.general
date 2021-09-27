@@ -82,6 +82,7 @@ options:
     description:
       - Require all users in this group to setup two-factor authentication.
     type: bool
+    default: false
     version_added: 3.7.0
 '''
 
