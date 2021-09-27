@@ -206,10 +206,11 @@ class GitLabGroup(object):
                 'project_creation_level': options['project_creation_level'],
                 'auto_devops_enabled': options['auto_devops_enabled'],
                 'subgroup_creation_level': options['subgroup_creation_level'],
-                'require_two_factor_authentication': options['require_two_factor_authentication'],
             }
             if options.get('description'):
                 payload['description'] = options['description']
+            if options.get('require_two_factor_authentication'):
+                payload['require_two_factor_authentication'] = options['require_two_factor_authentication']
             group = self.createGroup(payload)
             changed = True
         else:
