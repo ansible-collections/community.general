@@ -43,7 +43,7 @@ options:
           - If set to C(true), options starting with C(volatile.) are ignored. As a result,
             they are reapplied for each execution.
           - This default behavior can be changed by setting this option to C(false).
-          - The default value C(true) will be deprecated in community.general 5.0.0,
+          - The current default value C(true) is deprecated since community.general 4.0.0,
             and will change to C(false) in community.general 6.0.0.
         type: bool
         required: false
