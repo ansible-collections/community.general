@@ -82,7 +82,6 @@ options:
     description:
       - Require all users in this group to setup two-factor authentication.
     type: bool
-    default: false
     version_added: 3.7.0
 '''
 
@@ -207,10 +206,11 @@ class GitLabGroup(object):
                 'project_creation_level': options['project_creation_level'],
                 'auto_devops_enabled': options['auto_devops_enabled'],
                 'subgroup_creation_level': options['subgroup_creation_level'],
-                'require_two_factor_authentication': options['require_two_factor_authentication'],
             }
             if options.get('description'):
                 payload['description'] = options['description']
+            if options.get('require_two_factor_authentication'):
+                payload['require_two_factor_authentication'] = options['require_two_factor_authentication']
             group = self.createGroup(payload)
             changed = True
         else:
@@ -307,7 +307,7 @@ def main():
         project_creation_level=dict(type='str', choices=['developer', 'maintainer', 'noone']),
         auto_devops_enabled=dict(type='bool'),
         subgroup_creation_level=dict(type='str', choices=['maintainer', 'owner']),
-        require_two_factor_authentication=dict(type='bool', default=False),
+        require_two_factor_authentication=dict(type='bool'),
     ))
 
     module = AnsibleModule(
