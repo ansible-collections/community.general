@@ -1060,6 +1060,7 @@ def test_generic_connection_modify(mocked_generic_connection_modify, capfd):
     results = json.loads(out)
     assert not results.get('failed')
     assert results['changed']
+    
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC, indirect=['patch_ansible_module'])
 def test_generic_connection_unchanged(mocked_generic_connection_unchanged, capfd):
@@ -1073,6 +1074,7 @@ def test_generic_connection_unchanged(mocked_generic_connection_unchanged, capfd
     results = json.loads(out)
     assert not results.get('failed')
     assert not results['changed']
+    
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_MODIFY_ROUTING_RULES, indirect=['patch_ansible_module'])
 def test_generic_connection_modify_routing_rules4(mocked_generic_connection_create, capfd):
@@ -1092,6 +1094,7 @@ def test_generic_connection_modify_routing_rules4(mocked_generic_connection_crea
     results = json.loads(out)
     assert not results.get('failed')
     assert results['changed']
+    
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_DNS4_SEARCH, indirect=['patch_ansible_module'])
 def test_generic_connection_create_dns_search(mocked_generic_connection_create, capfd):
@@ -1112,6 +1115,7 @@ def test_generic_connection_create_dns_search(mocked_generic_connection_create, 
     results = json.loads(out)
     assert not results.get('failed')
     assert results['changed']
+    
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_DNS4_SEARCH, indirect=['patch_ansible_module'])
 def test_generic_connection_modify_dns_search(mocked_generic_connection_create, capfd):
