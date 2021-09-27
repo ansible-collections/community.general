@@ -27,7 +27,8 @@ options:
         type: str
     gitlab_group:
         description:
-            - The name of the GitLab group the member is added to/removed from.
+            - The C(full_path) of the GitLab group the member is added to/removed from.
+            - Setting this to C(name) or C(path) is deprecated and will be removed in community.general 6.0.0. Use C(full_path) instead.
         required: true
         type: str
     gitlab_user:
