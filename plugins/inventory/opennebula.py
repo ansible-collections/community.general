@@ -100,16 +100,16 @@ import os
 
 def _get_connection_info(url, username, password, authfile):
     if not username and not password:
-            if authfile is None:
-                authfile = os.path.join(os.environ.get("HOME"), ".one", "one_auth")
-            try:
-                with open(authfile, "r") as fp:
-                    authstring = fp.read().rstrip()
-                username, password = authstring.split(":")
-            except (OSError, IOError):
-                raise AnsibleError("Could not find or read ONE_AUTH file at '{e}'".format(e=authfile))
-            except Exception:
-                raise AnsibleError("Error occurs when reading ONE_AUTH file at '{e}'".format(e=authfile))
+        if authfile is None:
+            authfile = os.path.join(os.environ.get("HOME"), ".one", "one_auth")
+        try:
+            with open(authfile, "r") as fp:
+                authstring = fp.read().rstrip()
+            username, password = authstring.split(":")
+        except (OSError, IOError):
+            raise AnsibleError("Could not find or read ONE_AUTH file at '{e}'".format(e=authfile))
+        except Exception:
+            raise AnsibleError("Error occurs when reading ONE_AUTH file at '{e}'".format(e=authfile))
 
     auth_params = namedtuple('auth', ('url', 'username', 'password'))
 
