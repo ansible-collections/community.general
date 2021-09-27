@@ -185,7 +185,7 @@ class GitLabGroup(object):
                 return group.id
         for group in groups:
             if group.path == gitlab_group or group.name == gitlab_group:
-                module.deprecate()
+                self._module.deprecate(msg="Setting 'gitlab_group' to 'name' or 'path' is deprecated. Use 'full_path' instead.", version="6.0.0", collection_name="community.general" )
                 return group.id
 
     # get all members in a group
