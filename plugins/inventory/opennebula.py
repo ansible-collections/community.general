@@ -3,6 +3,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
+from collections import namedtuple
 
 __metaclass__ = type
 
@@ -98,21 +99,17 @@ import os
 
 
 def _get_connection_info(url, username, password, authfile):
-    if not username:
-        if not password:
+    if not username and not password:
             if authfile is None:
                 authfile = os.path.join(os.environ.get("HOME"), ".one", "one_auth")
             try:
                 with open(authfile, "r") as fp:
                     authstring = fp.read().rstrip()
-                username = authstring.split(":")[0]
-                password = authstring.split(":")[1]
+                username, password = authstring.split(":")
             except (OSError, IOError):
                 raise AnsibleError("Could not find or read ONE_AUTH file at '{e}'".format(e=authfile))
             except Exception:
-                raise AnsibleError("Error occurs when read ONE_AUTH file at '{e}'".format(e=authfile))
-
-    from collections import namedtuple
+                raise AnsibleError("Error occurs when reading ONE_AUTH file at '{e}'".format(e=authfile))
 
     auth_params = namedtuple('auth', ('url', 'username', 'password'))
 
@@ -149,7 +146,7 @@ def _retrieve_servers(one_client, label_filter=None):
     try:
         vm_pool = one_client.vmpool.infoextended(-2, -1, -1, 3)
     except Exception as e:
-        raise AnsibleError("Something happened during XML-RPC call, this was original exception: {e}".format(e=to_native(e)))
+        raise AnsibleError("Something happened during XML-RPC call: {e}".format(e=to_native(e)))
 
     result = []
 
