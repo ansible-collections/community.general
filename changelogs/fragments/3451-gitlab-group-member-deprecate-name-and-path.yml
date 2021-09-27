@@ -1,0 +1,2 @@
+deprecated_features:
+  - gitlab_group_members - setting ``gitlab_group`` to ``name`` or ``path`` is deprecated. Use ``full_path`` instead (https://github.com/ansible-collections/community.general/pull/3451).
