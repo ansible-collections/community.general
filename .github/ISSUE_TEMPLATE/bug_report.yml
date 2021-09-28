@@ -50,13 +50,27 @@ body:
 
 - type: textarea
   attributes:
-    label: Ansible Version
+    label: Ansible-core Version
     description: >-
       Paste verbatim output from `ansible --version` between
       tripple backticks.
     value: |
       ```console (paste below)
       $ ansible --version
+
+      ```
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Community.general Version
+    description: >-
+      Paste verbatim output from "ansible-galaxy collection list community.general"
+      between tripple backticks.
+    value: |
+      ```console (paste below)
+      $ ansible-galaxy collection list community.general
 
       ```
   validations:
