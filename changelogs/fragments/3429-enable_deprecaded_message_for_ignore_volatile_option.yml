@@ -1,0 +1,2 @@
+deprecated_features:
+  - "lxd_container - the current default value ``true`` of ``ignore_volatile_options`` is deprecated and will change to ``false`` in community.general 6.0.0 (https://github.com/ansible-collections/community.general/pull/3429)."
