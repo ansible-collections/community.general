@@ -1,3 +1,4 @@
+notifications: true
 automerge: true
 files:
   plugins/:
