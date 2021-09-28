@@ -8,11 +8,10 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
     name: opennebula
-    plugin_type: inventory
     author:
         - Kristian Feldsam (@feldsam)
     short_description: OpenNebula inventory source
-    version_added: "1.3.0"
+    version_added: "3.8.0"
     extends_documentation_fragment:
         - constructed
     description:
