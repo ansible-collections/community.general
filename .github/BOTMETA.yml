@@ -153,6 +153,10 @@ files:
   $inventories/nmap.py: {}
   $inventories/online.py:
     maintainers: sieben
+  $inventories/opennebula.py:
+    maintainers: feldsam
+    labels: cloud opennebula
+    keywords: opennebula dynamic inventory script
   $inventories/proxmox.py:
     maintainers: $team_virt ilijamt
   $inventories/icinga2.py:
