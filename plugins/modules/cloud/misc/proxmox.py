@@ -162,6 +162,7 @@ options:
         which makes sure these options have no defaults.
       - This affects the I(disk), I(cores), I(cpus), I(memory), I(onboot), I(swap), I(cpuunits) options.
     type: str
+    default: no_defaults
     choices:
       - compatibility
       - no_defaults
