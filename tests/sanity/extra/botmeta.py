@@ -154,6 +154,7 @@ def main():
     }, extra=PREVENT_EXTRA)
 
     schema = Schema({
+        ('notifications'): bool,
         ('automerge'): bool,
         ('macros'): MacroSchema,
         ('files'): FilesSchema,
