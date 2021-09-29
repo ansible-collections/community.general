@@ -137,7 +137,8 @@ from distutils.version import LooseVersion
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
-import requests
+from ansible.module_utils.urls import fetch_url
+from ansible.module_utils.common.text.converters import to_text
 from configparser import ConfigParser
 
 REPO_OPTS = ['alias', 'name', 'priority', 'enabled', 'autorefresh', 'gpgcheck']
@@ -363,10 +364,10 @@ def main():
 
     # Download and parse .repo file to ensure idempotency
     if repo and repo.endswith('.repo'):
-        res = requests.get(repo)
-        if res.status_code == requests.codes.ok:
+        response, info = fetch_url(module=module, url=repo, force=True)
+        if response and info['status'] == 200:
             repofile = ConfigParser()
-            repofile.read_string(res.text)
+            repofile.read_string(to_text(response.read(), errors='surrogate_or_strict'))
             # No support for .repo file with zero or more than one repository
             if len(repofile.sections()) == 1:
                 section = repofile.sections()[0]
