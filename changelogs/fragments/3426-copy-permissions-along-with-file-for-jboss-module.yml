@@ -1,0 +1,6 @@
+bugfixes:
+  - jboss - fix the deployment file permission issue when Jboss server is running 
+    under non-root user. The deployment file is copied with file content only. The 
+    file permission is set to ``440`` and belongs to root user. When the
+    JBoss ``WildFly`` server is running under non-root user, it is unable to read
+    the deployment file (https://github.com/ansible-collections/community.general/pull/3426).
