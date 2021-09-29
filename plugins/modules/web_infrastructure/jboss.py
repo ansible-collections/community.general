@@ -142,7 +142,7 @@ def main():
             # Clean up old failed deployment
             os.remove(os.path.join(deploy_path, "%s.failed" % deployment))
 
-        shutil.copyfile(src, os.path.join(deploy_path, deployment))
+        module.preserved_copy(src, os.path.join(deploy_path, deployment))
         while not deployed:
             deployed = is_deployed(deploy_path, deployment)
             if is_failed(deploy_path, deployment):
@@ -153,7 +153,7 @@ def main():
     if state == 'present' and deployed:
         if module.sha1(src) != module.sha1(os.path.join(deploy_path, deployment)):
             os.remove(os.path.join(deploy_path, "%s.deployed" % deployment))
-            shutil.copyfile(src, os.path.join(deploy_path, deployment))
+            module.preserved_copy(src, os.path.join(deploy_path, deployment))
             deployed = False
             while not deployed:
                 deployed = is_deployed(deploy_path, deployment)
