@@ -341,19 +341,6 @@ def main():
     zypper_version = get_zypper_version(module)
     warnings = []  # collect warning messages for final output
 
-    if repo and repo.endswith('.repo'):
-      res = requests.get(repo)
-      if res.status_code == requests.codes.ok:
-        repofile = ConfigParser()
-        repofile.read_string(res.text)
-        if len(repofile.sections()) == 1:
-          pass
-          #todo: check for required values and assign vars
-        else:
-          module.fail_json(msg='Invalid format, .repo file could not be parsed')
-      else:
-        module.fail_json(msg='Error downloading .repo file from provided URL')
-
     repodata = {
         'url': repo,
         'alias': alias,
@@ -373,6 +360,42 @@ def main():
         repodata['autorefresh'] = '1'
     else:
         repodata['autorefresh'] = '0'
+
+    # Download and parse .repo file to ensure idempotency
+    if repo and repo.endswith('.repo'):
+        res = requests.get(repo)
+        if res.status_code == requests.codes.ok:
+            repofile = ConfigParser()
+            repofile.read_string(res.text)
+            # No support for .repo file with zero or more than one repository
+            if len(repofile.sections()) == 1:
+                section = repofile.sections()[0]
+                # Only proceed if at least baseurl is available
+                if repofile[section]['baseurl']:
+                    repodata['alias'] = section
+                    repodata['url'] = repofile[section]['baseurl']
+                    
+                    # Workaround to skip any old .repo related code until re-factoring / cleanup
+                    alias = section
+                    repo = repofile[section]['baseurl']
+
+                    # Map additional values, if available
+                    if repofile[section]['name']:
+                        repodata['name'] = repofile[section]['name']
+                    if repofile[section]['enabled']:
+                        repodata['enabled'] = repofile[section]['enabled']
+                    if repofile[section]['autorefresh']:
+                        repodata['autorefresh'] = repofile[section]['autorefresh']
+                    if repofile[section]['gpgcheck']:
+                        repodata['gpgcheck'] = repofile[section]['gpgcheck']
+                    if repofile[section]['name']:
+                        repodata['name'] = repofile[section]['name']
+                else:
+                    module.fail_json(msg='No baseurl found in .repo file')
+            else:
+                module.fail_json(msg='Invalid format, .repo file could not be parsed')
+        else:
+            module.fail_json(msg='Error downloading .repo file from provided URL')
 
     def exit_unchanged():
         module.exit_json(changed=False, repodata=repodata, state=state)
