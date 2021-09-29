@@ -155,7 +155,7 @@ options:
   proxmox_default_behavior:
     description:
       - As of community.general 4.0.0, various options no longer have default values.
-        These default values caused problems when users expected different behavior from Proxmox 
+        These default values caused problems when users expected different behavior from Proxmox
         by default or filled options which caused problems when set.
       - The value C(compatibility) (default before community.general 4.0.0) will ensure that the default values
         are used when the values are not explicitly specified by the user. The new default is C(no_defaults),
