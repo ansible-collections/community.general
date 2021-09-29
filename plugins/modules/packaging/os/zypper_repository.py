@@ -423,10 +423,10 @@ def main():
 
     exists, mod, old_repos = repo_exists(module, repodata, overwrite_multiple)
 
-    if repo:
-        shortname = repo
-    else:
+    if alias:
         shortname = alias
+    else:
+        shortname = repo
 
     if state == 'present':
         if exists and not mod:
