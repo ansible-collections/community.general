@@ -100,7 +100,8 @@ options:
     routing_rules4:
         description:
             - Is the same as in an C(ip route add) command, except always requires specifying a priority.
-        type: str
+        type: list
+        elements: str
         version_added: 3.3.0
     never_default4:
         description:
@@ -1470,6 +1471,7 @@ class Nmcli(object):
         elif setting in ('ipv4.dns',
                          'ipv4.dns-search',
                          'ipv4.routes',
+                         'ipv4.routing-rules',
                          'ipv4.route-metric'
                          'ipv6.dns',
                          'ipv6.dns-search',
@@ -1758,7 +1760,7 @@ def main():
             gw4_ignore_auto=dict(type='bool', default=False),
             routes4=dict(type='list', elements='str'),
             route_metric4=dict(type='int'),
-            routing_rules4=dict(type='str'),
+            routing_rules4=dict(type='list', elements='str'),
             never_default4=dict(type='bool', default=False),
             dns4=dict(type='list', elements='str'),
             dns4_search=dict(type='list', elements='str'),
