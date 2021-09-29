@@ -4,9 +4,6 @@
 # GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
-from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.basic import AnsibleModule
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -289,6 +286,10 @@ redfish_facts:
     }'
 '''
 
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_native
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
+
 
 class XCCRedfishUtils(RedfishUtils):
     @staticmethod
@@ -429,8 +430,7 @@ class XCCRedfishUtils(RedfishUtils):
             return response
         if 'Members' not in response['data']:
             return {'ret': False, 'msg': "Specified resource_uri doesn't have Members property"}
-        member_list = [i['@odata.id']
-                       for i in response['data'].get('Members', [])]
+        member_list = [i['@odata.id'] for i in response['data'].get('Members', [])]
 
         # get member resource one by one
         data_list = []
@@ -462,8 +462,7 @@ class XCCRedfishUtils(RedfishUtils):
                 return {'ret': False, 'msg': "Key %s not found. Supported key list: %s" % (key, str(data.keys()))}
 
         # perform patch
-        response = self.patch_request(
-            self.root_uri + resource_uri, request_body)
+        response = self.patch_request(self.root_uri + resource_uri, request_body)
         if response['ret'] is False:
             return response
 
@@ -506,8 +505,7 @@ class XCCRedfishUtils(RedfishUtils):
                     if '@Redfish.ActionInfo' in response['data']['Actions'][key]:
                         action_info_uri = response['data']['Actions'][key]['@Redfish.ActionInfo']
                 else:
-                    action_target_uri_list.append(
-                        response['data']['Actions'][key]['target'])
+                    action_target_uri_list.append(response['data']['Actions'][key]['target'])
         if not action_found and 'Oem' in response['data']['Actions']:
             for key in response['data']['Actions']['Oem'].keys():
                 if action_found:
@@ -520,8 +518,7 @@ class XCCRedfishUtils(RedfishUtils):
                         if '@Redfish.ActionInfo' in response['data']['Actions']['Oem'][key]:
                             action_info_uri = response['data']['Actions']['Oem'][key]['@Redfish.ActionInfo']
                     else:
-                        action_target_uri_list.append(
-                            response['data']['Actions']['Oem'][key]['target'])
+                        action_target_uri_list.append(response['data']['Actions']['Oem'][key]['target'])
 
         if not action_found:
             return {'ret': False,
@@ -545,8 +542,7 @@ class XCCRedfishUtils(RedfishUtils):
                             % (key, str(response['data']['Parameters']))}
 
         # perform post
-        response = self.post_request(
-            self.root_uri + resource_uri, request_body)
+        response = self.post_request(self.root_uri + resource_uri, request_body)
         if response['ret'] is False:
             return response
         return {'ret': True, 'changed': True}
@@ -630,20 +626,17 @@ def main():
 
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
-    rf_utils = XCCRedfishUtils(
-        creds, root_uri, timeout, module, resource_id=resource_id, data_modification=True)
+    rf_utils = XCCRedfishUtils(creds, root_uri, timeout, module, resource_id=resource_id, data_modification=True)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (
-            category, CATEGORY_COMMANDS_ALL.keys())))
+        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, CATEGORY_COMMANDS_ALL.keys())))
 
     # Check that all commands are valid
     for cmd in command_list:
         # Fail if even one command given is invalid
         if cmd not in CATEGORY_COMMANDS_ALL[category]:
-            module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (
-                cmd, CATEGORY_COMMANDS_ALL[category])))
+            module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, CATEGORY_COMMANDS_ALL[category])))
 
     # Organize by Categories / Commands
     if category == "Manager":
@@ -664,8 +657,7 @@ def main():
             elif command == 'GetCollectionResource':
                 result = rf_utils.raw_get_collection_resource(resource_uri)
             elif command == 'PatchResource':
-                result = rf_utils.raw_patch_resource(
-                    resource_uri, request_body)
+                result = rf_utils.raw_patch_resource(resource_uri, request_body)
             elif command == 'PostResource':
                 result = rf_utils.raw_post_resource(resource_uri, request_body)
 
