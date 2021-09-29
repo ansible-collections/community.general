@@ -366,6 +366,29 @@ def main():
     else:
         repodata['autorefresh'] = '0'
 
+    def exit_unchanged():
+        module.exit_json(changed=False, repodata=repodata, state=state)
+
+    # Check run-time module parameters
+    if repo == '*' or alias == '*':
+        if runrefresh:
+            runrefreshrepo(module, auto_import_keys)
+            module.exit_json(changed=False, runrefresh=True)
+        else:
+            module.fail_json(msg='repo=* can only be used with the runrefresh option.')
+
+    if state == 'present' and not repo:
+        module.fail_json(msg='Module option state=present requires repo')
+    if state == 'absent' and not repo and not alias:
+        module.fail_json(msg='Alias or repo parameter required when state=absent')
+
+    if repo and repo.endswith('.repo'):
+        if alias:
+            module.fail_json(msg='Incompatible option: \'name\'. Do not use name when adding .repo files')
+    else:
+        if not alias and state == "present":
+            module.fail_json(msg='Name required when adding non-repo files.')
+
     # Download and parse .repo file to ensure idempotency
     if repo and repo.endswith('.repo'):
         response, info = fetch_url(module=module, url=repo, force=True)
@@ -405,29 +428,6 @@ def main():
                 module.fail_json(msg='Invalid format, .repo file could not be parsed')
         else:
             module.fail_json(msg='Error downloading .repo file from provided URL')
-
-    def exit_unchanged():
-        module.exit_json(changed=False, repodata=repodata, state=state)
-
-    # Check run-time module parameters
-    if repo == '*' or alias == '*':
-        if runrefresh:
-            runrefreshrepo(module, auto_import_keys)
-            module.exit_json(changed=False, runrefresh=True)
-        else:
-            module.fail_json(msg='repo=* can only be used with the runrefresh option.')
-
-    if state == 'present' and not repo:
-        module.fail_json(msg='Module option state=present requires repo')
-    if state == 'absent' and not repo and not alias:
-        module.fail_json(msg='Alias or repo parameter required when state=absent')
-
-    if repo and repo.endswith('.repo'):
-        if alias:
-            module.fail_json(msg='Incompatible option: \'name\'. Do not use name when adding .repo files')
-    else:
-        if not alias and state == "present":
-            module.fail_json(msg='Name required when adding non-repo files.')
 
     exists, mod, old_repos = repo_exists(module, repodata, overwrite_multiple)
 
