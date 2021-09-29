@@ -403,9 +403,8 @@ def main():
                     repodata['alias'] = section
                     repodata['url'] = repofile[section]['baseurl']
                     
-                    # Workaround to skip any old .repo related code until re-factoring / cleanup
+                    # Set alias (name) based on value from .repo file
                     alias = section
-                    repo = repofile[section]['baseurl']
 
                     # If gpgkey was part of the .repo file, auto import key
                     if repofile[section]['gpgkey']:
