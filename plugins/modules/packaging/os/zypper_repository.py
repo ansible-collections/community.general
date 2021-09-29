@@ -380,6 +380,10 @@ def main():
                     alias = section
                     repo = repofile[section]['baseurl']
 
+                    # If gpgkey was part of the .repo file, auto import key
+                    if repofile[section]['gpgkey']:
+                        auto_import_keys = True 
+
                     # Map additional values, if available
                     if repofile[section]['name']:
                         repodata['name'] = repofile[section]['name']
