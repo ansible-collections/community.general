@@ -138,6 +138,7 @@ from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 import requests
+from configparser import ConfigParser
 
 REPO_OPTS = ['alias', 'name', 'priority', 'enabled', 'autorefresh', 'gpgcheck']
 
@@ -343,8 +344,13 @@ def main():
     if repo and repo.endswith('.repo'):
       res = requests.get(repo)
       if res.status_code == requests.codes.ok:
-        pass
-        # todo: parse .repo file
+        repofile = ConfigParser()
+        repofile.read_string(res.text)
+        if len(repofile.sections()) == 1:
+          pass
+          #todo: check for required values and assign vars
+        else:
+          module.fail_json(msg='Invalid format, .repo file could not be parsed')
       else:
         module.fail_json(msg='Error downloading .repo file from provided URL')
 
