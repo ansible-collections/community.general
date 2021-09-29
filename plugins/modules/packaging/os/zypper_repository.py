@@ -137,6 +137,7 @@ from distutils.version import LooseVersion
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
+import requests
 
 REPO_OPTS = ['alias', 'name', 'priority', 'enabled', 'autorefresh', 'gpgcheck']
 
@@ -338,6 +339,14 @@ def main():
 
     zypper_version = get_zypper_version(module)
     warnings = []  # collect warning messages for final output
+
+    if repo and repo.endswith('.repo'):
+      res = requests.get(repo)
+      if res.status_code == requests.codes.ok:
+        pass
+        # todo: parse .repo file
+      else:
+        module.fail_json(msg='Error downloading .repo file from provided URL')
 
     repodata = {
         'url': repo,
