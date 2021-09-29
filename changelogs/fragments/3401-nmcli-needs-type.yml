@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - "nmcli - the option ``routing_rules4`` can now be specified as a list of strings, instead of as a single string (https://github.com/ansible-collections/community.general/issues/3401)."

@@ -122,6 +122,37 @@ ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 """
 
+TESTCASE_GENERIC_MODIFY_ROUTING_RULES = [
+    {
+        'type': 'generic',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'generic_non_existant',
+        'ip4': '10.10.10.10/24',
+        'gw4': '10.10.10.1',
+        'routing_rules4': ['priority 5 from 10.0.0.0/24 table 5000', 'priority 10 from 10.0.1.0/24 table 5001'],
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+]
+
+TESTCASE_GENERIC_MODIFY_ROUTING_RULES_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              generic_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            manual
+ipv4.addresses:                         10.10.10.10/24
+ipv4.gateway:                           10.10.10.1
+ipv4.routing-rules:                     priority 5 from 10.0.0.0/24 table 5000, priority 10 from 10.0.1.0/24 table 5001
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+"""
+
+
 TESTCASE_GENERIC_DNS4_SEARCH = [
     {
         'type': 'generic',
@@ -739,6 +770,13 @@ def mocked_generic_connection_unchanged(mocker):
 
 
 @pytest.fixture
+def mocked_generic_connection_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_GENERIC_MODIFY_ROUTING_RULES_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
 def mocked_generic_connection_dns_search_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
@@ -1036,6 +1074,26 @@ def test_generic_connection_unchanged(mocked_generic_connection_unchanged, capfd
     results = json.loads(out)
     assert not results.get('failed')
     assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_MODIFY_ROUTING_RULES, indirect=['patch_ansible_module'])
+def test_generic_connection_modify_routing_rules4(mocked_generic_connection_create, capfd):
+    """
+    Test : Generic connection modified with routing-rules4
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert 'ipv4.routing-rules' in args[0]
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_DNS4_SEARCH, indirect=['patch_ansible_module'])
