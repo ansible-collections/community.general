@@ -42,28 +42,29 @@ def should_use_block(value):
     return False
 
 
-def my_represent_scalar(self, tag, value, style=None):
-    """Uses block style for multi-line strings"""
-    if style is None:
-        if should_use_block(value):
-            style = '|'
-            # we care more about readable than accuracy, so...
-            # ...no trailing space
-            value = value.rstrip()
-            # ...and non-printable characters
-            value = ''.join(x for x in value if x in string.printable or ord(x) >= 0xA0)
-            # ...tabs prevent blocks from expanding
-            value = value.expandtabs()
-            # ...and odd bits of whitespace
-            value = re.sub(r'[\x0b\x0c\r]', '', value)
-            # ...as does trailing space
-            value = re.sub(r' +\n', '\n', value)
-        else:
-            style = self.default_style
-    node = yaml.representer.ScalarNode(tag, value, style=style)
-    if self.alias_key is not None:
-        self.represented_objects[self.alias_key] = node
-    return node
+class MyDumper(AnsibleDumper):
+    def represent_scalar(self, tag, value, style=None):
+        """Uses block style for multi-line strings"""
+        if style is None:
+            if should_use_block(value):
+                style = '|'
+                # we care more about readable than accuracy, so...
+                # ...no trailing space
+                value = value.rstrip()
+                # ...and non-printable characters
+                value = ''.join(x for x in value if x in string.printable or ord(x) >= 0xA0)
+                # ...tabs prevent blocks from expanding
+                value = value.expandtabs()
+                # ...and odd bits of whitespace
+                value = re.sub(r'[\x0b\x0c\r]', '', value)
+                # ...as does trailing space
+                value = re.sub(r' +\n', '\n', value)
+            else:
+                style = self.default_style
+        node = yaml.representer.ScalarNode(tag, value, style=style)
+        if self.alias_key is not None:
+            self.represented_objects[self.alias_key] = node
+        return node
 
 
 class CallbackModule(Default):
@@ -79,7 +80,6 @@ class CallbackModule(Default):
 
     def __init__(self):
         super(CallbackModule, self).__init__()
-        yaml.representer.BaseRepresenter.represent_scalar = my_represent_scalar
 
     def _dump_results(self, result, indent=None, sort_keys=True, keep_invocation=False):
         if result.get('_ansible_no_log', False):
@@ -121,7 +121,7 @@ class CallbackModule(Default):
 
         if abridged_result:
             dumped += '\n'
-            dumped += to_text(yaml.dump(abridged_result, allow_unicode=True, width=1000, Dumper=AnsibleDumper, default_flow_style=False))
+            dumped += to_text(yaml.dump(abridged_result, allow_unicode=True, width=1000, Dumper=MyDumper, default_flow_style=False))
 
         # indent by a couple of spaces
         dumped = '\n  '.join(dumped.split('\n')).rstrip()
