@@ -9,20 +9,18 @@ DOCUMENTATION = r"""
 name: revbitspss
 author: RevBits (@info) <info@revbits.com>
 short_description: Get secrets from RevBits PAM server
-version_added: 3.8.0
+version_added: 1.0.1
 description:
     - Uses the revbits-ansible Python SDK to get Secrets from RevBits PAM
       Server using API key authentication with the REST API.
 requirements:
-    - revbits-ansible - U(https://pypi.org/project/revbits-ansible/)
+    - revbits-ansible - https://pypi.org/project/revbits-ansible/
 options:
     _terms:
         description:
-            - This will be an array. First index will conatin another array of keys for secrets which you want to fetch from RevBits PAM.
-            - At second index you need to pass the base URL of the server, for example C(https://pam.revbits.net).
-            - At third index you need to place API key for auth. You can get from RevBits PAM secret manger module
-        type: list
-        elements: str
+            - This will be an array. First index will contain another array of keys for secrets which you want to fetch from RevBits PAM.
+            - At second index you need to pass the base URL of the server, e.g. C(https://pam.revbits.net).
+            - At third index you need to place API key for authentication. You can get from RevBits PAM secret manager module.
         ini:
             - section: revbitspss_lookup
               key: _terms
@@ -33,7 +31,7 @@ RETURN = r"""
 _list:
     description:
         - The JSON responses which you can access with defined keys.
-        - If you are fetching secrets named as UUID, PASSWORD it will gives you the dict of all secrets.
+        - If you are fetching secrets named as UUID, PASSWORD it will gives you the dict of all secrets
     type: list
     elements: dict
 """
@@ -50,7 +48,7 @@ EXAMPLES = r"""
                  'API_KEY_GOES_HERE'
             )
         }}
-
+​
   tasks:
       - ansible.builtin.debug:
           msg: >
