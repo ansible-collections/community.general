@@ -72,7 +72,8 @@
   command: zypper -x lr testprio
   register: zypper_result
 
-- assert:
+- name: verify priority option set properly
+  assert:
     that:
       - '"priority=\"55\"" in zypper_result.stdout'
 
