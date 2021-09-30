@@ -402,13 +402,13 @@ def main():
                 if repofile[section]['baseurl']:
                     repodata['alias'] = section
                     repodata['url'] = repofile[section]['baseurl']
-                    
+
                     # Set alias (name) based on value from .repo file
                     alias = section
 
                     # If gpgkey was part of the .repo file, auto import key
                     if repofile[section]['gpgkey']:
-                        auto_import_keys = True 
+                        auto_import_keys = True
 
                     # Map additional values, if available
                     if repofile[section]['name']:
