@@ -32,4 +32,3 @@
 
     - name: ensure zypper ref still works
       command: zypper -n ref
-
