@@ -180,7 +180,8 @@
     state: present
   register: add_repo_again
 
-- assert:
+- name: no update in case of $basearch usage in url
+  assert:
     that:
       - add_repo is changed
       - add_repo_again is not changed
