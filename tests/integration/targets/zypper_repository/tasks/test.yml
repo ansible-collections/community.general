@@ -19,6 +19,7 @@
         - testrefresh
         - testprio
         - Apache_PHP_Modules
+        - systemsmanagement_Uyuni_Stable
 
     - name: collect repo configuration after test
       shell: "grep . /etc/zypp/repos.d/*"
@@ -31,3 +32,4 @@
 
     - name: ensure zypper ref still works
       command: zypper -n ref
+
