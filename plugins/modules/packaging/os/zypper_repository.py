@@ -388,44 +388,44 @@ def main():
     # Download and parse .repo file to ensure idempotency
     if repo and repo.endswith('.repo'):
         response, info = fetch_url(module=module, url=repo, force=True)
-        if response and info['status'] == 200:
-            repofile = configparser.ConfigParser()
-            try:
-                repofile.readfp(StringIO(to_text(response.read(), errors='surrogate_or_strict')))
-            except configparser.Error:
-                module.fail_json(msg='Invalid format, .repo file could not be parsed')
-            # No support for .repo file with zero or more than one repository
-            if len(repofile.sections()) == 1:
-                section = repofile.sections()[0]
-                repofile_items = dict(repofile.items(section))
-                # Only proceed if at least baseurl is available
-                if 'baseurl' in repofile_items:
-                    repodata['alias'] = section
-                    repodata['url'] = repofile_items['baseurl']
-
-                    # Set alias (name) based on value from .repo file
-                    alias = section
-
-                    # If gpgkey is part of the .repo file, auto import key
-                    if 'gpgkey' in repofile_items:
-                        auto_import_keys = True
-
-                    # Map additional values, if available
-                    if 'name' in repofile_items:
-                        repodata['name'] = repofile_items['name']
-                    if 'enabled' in repofile_items:
-                        repodata['enabled'] = repofile_items['enabled']
-                    if 'autorefresh' in repofile_items:
-                        repodata['autorefresh'] = repofile_items['autorefresh']
-                    if 'gpgcheck' in repofile_items:
-                        repodata['gpgcheck'] = repofile_items['gpgcheck']
-                else:
-                    module.fail_json(msg='No baseurl found in .repo file')
-            else:
-                err = "Invalid format, .repo file contains %s repositories, expected 1" % len(repofile.sections())
-                module.fail_json(msg=err)
-        else:
+        if not response or info['status'] != 200:
             module.fail_json(msg='Error downloading .repo file from provided URL')
+
+        repofile = configparser.ConfigParser()
+        try:
+            repofile.readfp(StringIO(to_text(response.read(), errors='surrogate_or_strict')))
+        except configparser.Error:
+            module.fail_json(msg='Invalid format, .repo file could not be parsed')
+
+        # No support for .repo file with zero or more than one repository
+        if len(repofile.sections()) != 1:
+            err = "Invalid format, .repo file contains %s repositories, expected 1" % len(repofile.sections())
+            module.fail_json(msg=err)
+
+        section = repofile.sections()[0]
+        repofile_items = dict(repofile.items(section))
+        # Only proceed if at least baseurl is available
+        if 'baseurl' not in repofile_items:
+            module.fail_json(msg='No baseurl found in .repo file')
+
+        # Set alias (name) and url based on values from .repo file
+        alias = section
+        repodata['alias'] = section
+        repodata['url'] = repofile_items['baseurl']
+
+        # If gpgkey is part of the .repo file, auto import key
+        if 'gpgkey' in repofile_items:
+            auto_import_keys = True
+
+        # Map additional values, if available
+        if 'name' in repofile_items:
+            repodata['name'] = repofile_items['name']
+        if 'enabled' in repofile_items:
+            repodata['enabled'] = repofile_items['enabled']
+        if 'autorefresh' in repofile_items:
+            repodata['autorefresh'] = repofile_items['autorefresh']
+        if 'gpgcheck' in repofile_items:
+            repodata['gpgcheck'] = repofile_items['gpgcheck']
 
     exists, mod, old_repos = repo_exists(module, repodata, overwrite_multiple)
 
