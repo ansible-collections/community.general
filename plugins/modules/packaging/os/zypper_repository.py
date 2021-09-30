@@ -386,7 +386,7 @@ def main():
             module.fail_json(msg='Name required when adding non-repo files.')
 
     # Download and parse .repo file to ensure idempotency
-    if repo and repo.endswith('.repo'):
+    if repo and repo.endswith('.repo') and repo.startswith(('http://', 'https://')):
         response, info = fetch_url(module=module, url=repo, force=True)
         if not response or info['status'] != 200:
             module.fail_json(msg='Error downloading .repo file from provided URL')
