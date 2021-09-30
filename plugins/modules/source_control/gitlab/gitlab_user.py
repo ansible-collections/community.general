@@ -442,6 +442,7 @@ class GitLabUser(object):
     @param arguments User attributes
     '''
     def updateUser(self, user, arguments, uncheckable_args):
+        arguments = sanitize_arguments(arguments)
         changed = False
 
         for arg_key, arg_value in arguments.items():
@@ -451,7 +452,7 @@ class GitLabUser(object):
                 if arg_key == "identities":
                     changed = self.addIdentities(user, av, uncheckable_args['overwrite_identities']['value'])
 
-                elif getattr(user, arg_key) != av:
+                elif av and getattr(user, arg_key) != av:
                     setattr(user, arg_value.get('setter', arg_key), av)
                     changed = True
 
@@ -467,6 +468,7 @@ class GitLabUser(object):
     @param arguments User attributes
     '''
     def createUser(self, arguments):
+        arguments = sanitize_arguments(arguments)
         if self._module.check_mode:
             return True
 
@@ -592,8 +594,8 @@ def main():
         group=dict(type='str'),
         access_level=dict(type='str', default="guest", choices=["developer", "guest", "maintainer", "master", "owner", "reporter"]),
         confirm=dict(type='bool', default=True),
-        isadmin=dict(type='bool', default=False),
-        external=dict(type='bool', default=False),
+        isadmin=dict(type='bool', default=None),
+        external=dict(type='bool', default=None),
         identities=dict(type='list', elements='dict'),
         overwrite_identities=dict(type='bool', default=False),
     ))
