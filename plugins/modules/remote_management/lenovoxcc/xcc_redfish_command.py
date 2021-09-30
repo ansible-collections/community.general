@@ -168,7 +168,9 @@ EXAMPLES = '''
       password: "{{ password }}"
       resource_uri: "/redfish/v1/Managers/1/NetworkProtocol/Oem/Lenovo/DNS"
     register: result
-  - ansible.builtin.debug:
+
+  - name: Print fetched information
+    ansible.builtin.debug:
       msg: "{{ result.redfish_facts.data }}"
 
   - name: Get Lenovo FoD key collection resource via GetCollectionResource command
@@ -180,7 +182,9 @@ EXAMPLES = '''
       password: "{{ password }}"
       resource_uri: "/redfish/v1/Managers/1/Oem/Lenovo/FoD/Keys"
     register: result
-  - ansible.builtin.debug:
+
+  - name: Print fetched information
+    ansible.builtin.debug:
       msg: "{{ result.redfish_facts.data_list }}"
 
   - name: Update ComputeSystem property AssetTag via PatchResource command
