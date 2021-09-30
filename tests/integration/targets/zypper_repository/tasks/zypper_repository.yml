@@ -166,6 +166,16 @@
     that:
       - remove_repo is changed
 
+- name: get list of files in /etc/zypp/repos.d/
+  command: ls /etc/zypp/repos.d/
+  changed_when: false
+  register: releaseverrepo_etc_zypp_reposd
+
+- name: verify removal of file releaseverrepo.repo in /etc/zypp/repos.d/
+  assert:
+    that:
+      - "'releaseverrepo' not in releaseverrepo_etc_zypp_reposd.stdout"
+
 - name: add a repo by basearch
   community.general.zypper_repository:
     name: basearchrepo
