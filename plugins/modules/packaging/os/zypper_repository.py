@@ -140,6 +140,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.six.moves import configparser, StringIO
+from io import open
 
 REPO_OPTS = ['alias', 'name', 'priority', 'enabled', 'autorefresh', 'gpgcheck']
 
@@ -385,15 +386,23 @@ def main():
         if not alias and state == "present":
             module.fail_json(msg='Name required when adding non-repo files.')
 
-    # Download and parse .repo file to ensure idempotency
-    if repo and repo.endswith('.repo') and repo.startswith(('http://', 'https://')):
-        response, info = fetch_url(module=module, url=repo, force=True)
-        if not response or info['status'] != 200:
-            module.fail_json(msg='Error downloading .repo file from provided URL')
+    # Download / Open and parse .repo file to ensure idempotency
+    if repo and repo.endswith('.repo'):
+        if repo.startswith(('http://', 'https://')):
+            response, info = fetch_url(module=module, url=repo, force=True)
+            if not response or info['status'] != 200:
+                module.fail_json(msg='Error downloading .repo file from provided URL')
+            repofile_text = to_text(response.read(), errors='surrogate_or_strict')
+        else:
+            try:
+                with open(repo, encoding='utf-8') as file:
+                    repofile_text = file.read()
+            except IOError:
+                module.fail_json(msg='Error opening .repo file from provided path')
 
         repofile = configparser.ConfigParser()
         try:
-            repofile.readfp(StringIO(to_text(response.read(), errors='surrogate_or_strict')))
+            repofile.readfp(StringIO(repofile_text))
         except configparser.Error:
             module.fail_json(msg='Invalid format, .repo file could not be parsed')
 
