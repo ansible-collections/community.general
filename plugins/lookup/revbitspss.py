@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 # Copyright: (c) 2021, RevBits <info@revbits.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see COPYING or
+# https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import absolute_import, division, print_function
+from ansible.plugins.lookup import LookupBase
+from ansible.utils.display import Display
+from ansible.errors import AnsibleError, AnsibleOptionsError
 
 __metaclass__ = type
 
@@ -55,18 +59,15 @@ EXAMPLES = r"""
             UUIDPAM is {{ (secret['UUIDPAM']) }} and DB_PASS is {{ (secret['DB_PASS']) }} and DB_USER is {{ (secret['DB_USER']) }}
 """
 
-from ansible.errors import AnsibleError, AnsibleOptionsError
 
 sdk_is_missing = False
 try:
     from pam.revbits_ansible.server import (
-      SecretServer,
-      SecretServerError,
+        SecretServer,
+        SecretServerError,
     )
 except ImportError:
     sdk_is_missing = True
-from ansible.utils.display import Display
-from ansible.plugins.lookup import LookupBase
 
 
 display = Display()
@@ -89,10 +90,10 @@ class LookupModule(LookupBase):
         )
         result = []
         for term in terms[0]:
-             display.debug("revbitspss_lookup term: %s" % term)
-             try:
-                 display.vvv(u"Secret Server lookup of Secret with ID %s" % term)
-                 result.append({term:secret_server.get_pam_secret(term)})
-             except SecretServerError as error:
-                 raise AnsibleError("Secret Server lookup failure: %s" % error.message)
+            display.debug("revbitspss_lookup term: %s" % term)
+            try:
+                display.vvv(u"Secret Server lookup of Secret with ID %s" % term)
+                result.append({term: secret_server.get_pam_secret(term)})
+            except SecretServerError as error:
+                raise AnsibleError("Secret Server lookup failure: %s" % error.message)
         return result
