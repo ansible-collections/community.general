@@ -1,2 +1,0 @@
-bugfixes:
-  - xcc_redfish_command module plugins - adhere to proper task structure with task names (https://github.com/ansible-collections/community.general/pull/3479).
