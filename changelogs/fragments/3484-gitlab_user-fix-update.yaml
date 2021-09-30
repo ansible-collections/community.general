@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - gitlab_user - Change defaults for isadmin and external to None, so when these arguments are not specified they do not get used when updating a user. When creating a user the API's default are used.
