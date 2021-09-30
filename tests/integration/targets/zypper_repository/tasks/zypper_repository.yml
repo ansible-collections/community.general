@@ -95,7 +95,8 @@
   command: zypper lr chrome2
   register: zypper_result2
 
-- assert:
+- name: ensure same url cause update of existing repo even if name differ
+  assert:
     that:
       - "zypper_result1.rc != 0"
       - "'not found' in zypper_result1.stderr"
