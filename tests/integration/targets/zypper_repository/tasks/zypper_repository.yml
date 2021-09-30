@@ -51,7 +51,8 @@
   command: zypper -x lr testrefresh
   register: zypper_result
 
-- assert:
+- name: verify autorefresh option set properly
+  assert:
     that:
       - '"autorefresh=\"0\"" in zypper_result.stdout'
 
