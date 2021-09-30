@@ -4,6 +4,11 @@
     state: absent
   register: zypper_result
 
+- name: verify no change on test repo deletion
+  assert:
+    that:
+      - "not zypper_result.changed"
+
 - name: Add test repo
   community.general.zypper_repository:
     name: test
