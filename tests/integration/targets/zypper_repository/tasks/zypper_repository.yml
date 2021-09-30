@@ -116,7 +116,8 @@
   command: zypper lr samename
   register: zypper_result
 
-- assert:
+- name: ensure url get updated on repo with same name
+  assert:
     that:
       - "'/science/' not in zypper_result.stdout"
       - "'/devel:/languages:/ruby/' in zypper_result.stdout"
