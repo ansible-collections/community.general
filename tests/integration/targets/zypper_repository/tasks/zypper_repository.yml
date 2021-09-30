@@ -192,6 +192,7 @@
     state: absent
   register: remove_repo
 
-- assert:
+- name: verify repo was removed
+  assert:
     that:
       - remove_repo is changed
