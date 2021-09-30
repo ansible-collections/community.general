@@ -396,8 +396,6 @@ def main():
                 module.fail_json(msg='Invalid format, .repo file could not be parsed')
             # No support for .repo file with zero or more than one repository
             if len(repofile.sections()) == 1:
-                err = "Invalid format, .repo file contains %s repositories, expected 1" % len(repofile.sections())
-                module.fail_json(msg=err)
                 section = repofile.sections()[0]
                 repofile_items = dict(repofile.items(section))
                 # Only proceed if at least baseurl is available
