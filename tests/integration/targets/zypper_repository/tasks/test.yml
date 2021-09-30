@@ -20,6 +20,7 @@
         - testprio
         - Apache_PHP_Modules
         - systemsmanagement_Uyuni_Stable
+        - systemsmanagement_Uyuni_Utils
 
     - name: collect repo configuration after test
       shell: "grep . /etc/zypp/repos.d/*"
