@@ -399,28 +399,26 @@ def main():
             if len(repofile.sections()) == 1:
                 section = repofile.sections()[0]
                 # Only proceed if at least baseurl is available
-                if repofile[section]['baseurl']:
+                if 'baseurl' in repofile[section]:
                     repodata['alias'] = section
                     repodata['url'] = repofile[section]['baseurl']
 
                     # Set alias (name) based on value from .repo file
                     alias = section
 
-                    # If gpgkey was part of the .repo file, auto import key
-                    if repofile[section]['gpgkey']:
+                    # If gpgkey is part of the .repo file, auto import key
+                    if 'gpgkey' in repofile[section]:
                         auto_import_keys = True
 
                     # Map additional values, if available
-                    if repofile[section]['name']:
+                    if 'name' in repofile[section]:
                         repodata['name'] = repofile[section]['name']
-                    if repofile[section]['enabled']:
+                    if 'enabled' in repofile[section]:
                         repodata['enabled'] = repofile[section]['enabled']
-                    if repofile[section]['autorefresh']:
+                    if 'autorefresh' in repofile[section]:
                         repodata['autorefresh'] = repofile[section]['autorefresh']
-                    if repofile[section]['gpgcheck']:
+                    if 'gpgcheck' in repofile[section]:
                         repodata['gpgcheck'] = repofile[section]['gpgcheck']
-                    if repofile[section]['name']:
-                        repodata['name'] = repofile[section]['name']
                 else:
                     module.fail_json(msg='No baseurl found in .repo file')
             else:
