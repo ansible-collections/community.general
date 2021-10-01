@@ -58,3 +58,40 @@
           "PLAY RECAP *********************************************************************",
           "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
+      - name: Test to_yaml
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.yaml
+        playbook: |
+          - hosts: testhost
+            gather_facts: false
+            vars:
+              data: |
+                line 1
+                line 2
+                line 3
+            tasks:
+              - name: Test to_yaml
+                debug:
+                  msg: "{{ '{{' }}'{{ '{{' }}'{{ '}}' }} data | to_yaml {{ '{{' }}'{{ '}}' }}'{{ '}}' }}"
+        # The above should be:   msg: "{{ data | to_yaml }}"
+        # Unfortunately, the way Ansible handles templating, we need to do some funny 'escaping' tricks...
+        expected_output: [
+          "",
+          "PLAY [testhost] ****************************************************************",
+          "",
+          "TASK [Test to_yaml] ************************************************************",
+          "ok: [testhost] => ",
+          "  msg: |-",
+          "    'line 1",
+          "  ",
+          "      line 2",
+          "  ",
+          "      line 3",
+          "  ",
+          "      '",
+          "",
+          "PLAY RECAP *********************************************************************",
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+        ]
