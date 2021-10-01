@@ -67,7 +67,7 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
     register: result
-    
+
   - name: Print fetched information
     ansible.builtin.debug:
       msg: "{{ result.redfish_facts.cpu.entries | to_nice_json }}"
