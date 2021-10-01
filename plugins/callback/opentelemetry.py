@@ -180,7 +180,7 @@ class OpenTelemetrySource(object):
         args = None
 
         if not task.no_log and not hide_task_arguments:
-            args = ', '.join(('%s=%s' % a for a in task.args.items()))
+            args = task.args
 
         tasks_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
 
@@ -266,7 +266,7 @@ class OpenTelemetrySource(object):
                 status = Status(status_code=StatusCode.UNSET)
 
         span.set_status(status)
-        self.set_span_attribute(span, "ansible.task.args", task_data.args)
+        self.set_span_attribute(span, "ansible.task.args", self.flat_args(task_data.args))
         self.set_span_attribute(span, "ansible.task.module", task_data.action)
         self.set_span_attribute(span, "ansible.task.message", message)
         self.set_span_attribute(span, "ansible.task.name", name)
@@ -307,16 +307,26 @@ class OpenTelemetrySource(object):
     def add_network_attributes_if_possible(self, task_data, span):
         """ update the span attributes with the service that the task interacted with, if possible """
 
-        if any(s in task_data.action for s in ('get_url', 'uri', 'win_get_url', 'win_uri')) and "url" in task_data.args:
-            parsed_url = urlparse(task_data.args.url)
+        if any(s in task_data.action for s in ('get_url', 'uri', 'win_get_url', 'win_uri')) and task_data.args.get('url', None):
+            parsed_url = urlparse(task_data.args.get('url'))
+            self._display.warning('matched. ' + parsed_url.hostname)
             self.set_span_attribute(span, "net.peer.name", parsed_url.hostname)
-            self.set_span_attribute(span, "net.peer.port", parsed_url.port)
+            self.set_span_attribute(span, "rpc.service", parsed_url.hostname)
+            if parsed_url.port:
+                self.set_span_attribute(span, "net.peer.port", parsed_url.port)
+            if parsed_url.scheme:
+                self.set_span_attribute(span, "rpc.system", parsed_url.scheme)
 
         # Support  zypper_repository/apt_repository: repo: deb https://artifacts./...packages/6.x/apt stable main
         # Support yum:    name: https://archives.fedoraproject.org/....rpm
         # Support yum_repository baseurl: https://download.docker.com/linux//
         # Support git: repo: '{{ reference_repo_origin }}'
         # Support chocolatey/homebrew
+
+    def flat_args(self, args):
+        if args:
+            return ', '.join(('%s=%s' % a for a in args.items()))
+        return None
 
 
 class CallbackModule(CallbackBase):
