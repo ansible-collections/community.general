@@ -76,10 +76,10 @@ import uuid
 
 from collections import OrderedDict
 from os.path import basename
-from urllib.parse import urlparse
 
 from ansible.errors import AnsibleError
 from ansible.module_utils.six import raise_from
+from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.plugins.callback import CallbackBase
 
 try:
