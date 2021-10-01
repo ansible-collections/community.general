@@ -38,9 +38,9 @@ DOCUMENTATION = '''
         env:
           - name: TRACEPARENT
     requirements:
-      - opentelemetry-api (python lib)
-      - opentelemetry-exporter-otlp (python lib)
-      - opentelemetry-sdk (python lib)
+      - opentelemetry-api (Python library)
+      - opentelemetry-exporter-otlp (Python library)
+      - opentelemetry-sdk (Python library)
 '''
 
 
@@ -57,12 +57,12 @@ examples: |
 '''
 
 import getpass
-import os
 import socket
 import sys
 import time
 import uuid
 
+from collections import OrderedDict
 from os.path import basename
 
 from ansible.errors import AnsibleError
@@ -87,18 +87,6 @@ except ImportError as imp_exc:
     OTEL_LIBRARY_IMPORT_ERROR = imp_exc
 else:
     OTEL_LIBRARY_IMPORT_ERROR = None
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    try:
-        from ordereddict import OrderedDict
-    except ImportError as imp_exc:
-        ORDER_LIBRARY_IMPORT_ERROR = imp_exc
-    else:
-        ORDER_LIBRARY_IMPORT_ERROR = None
-else:
-    ORDER_LIBRARY_IMPORT_ERROR = None
 
 
 class TaskData:
@@ -253,7 +241,7 @@ class OpenTelemetrySource(object):
             res = host_data.result._result
             rc = res.get('rc', 0)
             if host_data.status == 'failed':
-                if 'exception' in res:
+                if res.get('exception') is not None:
                     message = res['exception'].strip().split('\n')[-1]
                 elif 'msg' in res:
                     message = res['msg']
@@ -315,12 +303,7 @@ class CallbackModule(CallbackBase):
                 AnsibleError('The `opentelemetry-api`, `opentelemetry-exporter-otlp` or `opentelemetry-sdk` must be installed to use this plugin'),
                 OTEL_LIBRARY_IMPORT_ERROR)
 
-        if ORDER_LIBRARY_IMPORT_ERROR:
-            raise_from(
-                AnsibleError('The `ordereddict` must be installed to use this plugin'),
-                ORDER_LIBRARY_IMPORT_ERROR)
-        else:
-            self.tasks_data = OrderedDict()
+        self.tasks_data = OrderedDict()
 
         self.opentelemetry = OpenTelemetrySource(display=self._display)
 
