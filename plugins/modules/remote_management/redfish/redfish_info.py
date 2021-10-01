@@ -112,7 +112,7 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
     register: result
-    
+
   - name: Print fetched information
     ansible.builtin.debug:
       msg: "{{ result.redfish_facts.virtual_media.entries | to_nice_json }}"
