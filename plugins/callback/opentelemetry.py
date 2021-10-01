@@ -307,21 +307,51 @@ class OpenTelemetrySource(object):
     def add_network_attributes_if_possible(self, task_data, span):
         """ update the span attributes with the service that the task interacted with, if possible """
 
-        if any(s in task_data.action for s in ('get_url', 'uri', 'win_get_url', 'win_uri')) and task_data.args.get('url', None):
-            parsed_url = urlparse(task_data.args.get('url'))
-            self._display.warning('matched. ' + parsed_url.hostname)
-            self.set_span_attribute(span, "net.peer.name", parsed_url.hostname)
-            self.set_span_attribute(span, "rpc.service", parsed_url.hostname)
-            if parsed_url.port:
-                self.set_span_attribute(span, "net.peer.port", parsed_url.port)
-            if parsed_url.scheme:
-                self.set_span_attribute(span, "rpc.system", parsed_url.scheme)
+        if any(s in task_data.action for s in ('get_url', 'homebrew_tap', 'uri', 'win_get_url', 'win_uri')) and task_data.args.get('url', None):
+            self.add_network_attributes(task_data.args.get('url'), span)
 
-        # Support  zypper_repository/apt_repository: repo: deb https://artifacts./...packages/6.x/apt stable main
-        # Support yum:    name: https://archives.fedoraproject.org/....rpm
-        # Support yum_repository baseurl: https://download.docker.com/linux//
-        # Support git: repo: '{{ reference_repo_origin }}'
-        # Support chocolatey/homebrew
+        # Support apt_repository: repo: deb https://artifacts./...packages/6.x/apt stable main
+
+        if 'win_chocolatey' in task_data.action:
+            if task_data.args.get('source', None):
+                self.add_network_attributes(task_data.args.get('source'), span)
+            elif task_data.args.get('proxy_url', None):
+                self.add_network_attributes(task_data.args.get('proxy_url'), span)
+            else:
+                self.set_span_attribute(span, "net.peer.name", 'chocolatey')
+                self.set_span_attribute(span, "rpc.service", 'chocolatey')
+
+        if 'homebrew' in task_data.action:
+            self.set_span_attribute(span, "net.peer.name", 'homebrew')
+            self.set_span_attribute(span, "rpc.service", 'homebrew')
+
+        if 'git' in task_data.action:
+            self.add_network_attributes(task_data.args.get('repo'), span)
+
+        if 'yum' in task_data.action and task_data.args.get('name', '').startswith('http'):
+            self.add_network_attributes(task_data.args.get('name'), span)
+
+        if 'yum_repository' in task_data.action:
+            if task_data.args.get('baseurl', None):
+                self.add_network_attributes(task_data.args.get('baseurl'), span)
+            elif task_data.args.get('mirrorlist', None):
+                self.add_network_attributes(task_data.args.get('mirrorlist'), span)
+            else:
+                self._display.debug('yum_repository without a baseurl or mirrorlist.')
+
+        if 'zypper_repository' in task_data.action and task_data.args.get('repo', None):
+            self.add_network_attributes(task_data.args.get('repo'), span)
+
+    def add_network_attributes(self, url, span):
+        """ update the span attributes with the service that the task interacted with """
+
+        parsed_url = urlparse(url)
+        self.set_span_attribute(span, "net.peer.name", parsed_url.hostname)
+        self.set_span_attribute(span, "rpc.service", parsed_url.hostname)
+        if parsed_url.port:
+            self.set_span_attribute(span, "net.peer.port", parsed_url.port)
+        if parsed_url.scheme:
+            self.set_span_attribute(span, "rpc.system", parsed_url.scheme)
 
     def flat_args(self, args):
         if args:
