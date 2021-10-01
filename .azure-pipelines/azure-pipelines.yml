@@ -130,7 +130,6 @@ stages:
           nameFormat: Python {0}
           testFormat: devel/units/{0}/1
           targets:
-            - test: 2.6
             - test: 2.7
             - test: 3.5
             - test: 3.6
@@ -296,8 +295,6 @@ stages:
         parameters:
           testFormat: devel/linux/{0}
           targets:
-            - name: CentOS 6
-              test: centos6
             - name: CentOS 7
               test: centos7
             - name: CentOS 8
@@ -326,6 +323,8 @@ stages:
         parameters:
           testFormat: 2.12/linux/{0}
           targets:
+            - name: CentOS 6
+              test: centos6
             - name: CentOS 7
               test: centos7
             - name: Fedora 34
