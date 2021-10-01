@@ -76,6 +76,7 @@ import uuid
 
 from collections import OrderedDict
 from os.path import basename
+from urllib.parse import urlparse
 
 from ansible.errors import AnsibleError
 from ansible.module_utils.six import raise_from
@@ -272,6 +273,8 @@ class OpenTelemetrySource(object):
         self.set_span_attribute(span, "ansible.task.result", rc)
         self.set_span_attribute(span, "ansible.task.host.name", host_data.name)
         self.set_span_attribute(span, "ansible.task.host.status", host_data.status)
+        # This will allow to enrich the service map
+        self.add_network_attributes_if_possible(task_data, span)
         span.end(end_time=host_data.finish)
 
     def set_span_attribute(self, span, attributeName, attributeValue):
@@ -300,6 +303,20 @@ class OpenTelemetrySource(object):
         exception = result.get('exception')
         stderr = result.get('stderr')
         return ('message: "{0}"\nexception: "{1}"\nstderr: "{2}"').format(message, exception, stderr)
+
+    def add_network_attributes_if_possible(self, task_data, span):
+        """ update the span attributes with the service that the task interacted with, if possible """
+
+        if any(s in task_data.action for s in ('get_url', 'uri', 'win_get_url', 'win_uri')) and "url" in task_data.args:
+            parsed_url = urlparse(task_data.args.url)
+            self.set_span_attribute(span, "net.peer.name", parsed_url.hostname)
+            self.set_span_attribute(span, "net.peer.port", parsed_url.port)
+
+        # Support  zypper_repository/apt_repository: repo: deb https://artifacts./...packages/6.x/apt stable main
+        # Support yum:    name: https://archives.fedoraproject.org/....rpm
+        # Support yum_repository baseurl: https://download.docker.com/linux//
+        # Support git: repo: '{{ reference_repo_origin }}'
+        # Support chocolatey/homebrew
 
 
 class CallbackModule(CallbackBase):
