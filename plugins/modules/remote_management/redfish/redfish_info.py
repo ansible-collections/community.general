@@ -67,7 +67,9 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
     register: result
-  - ansible.builtin.debug:
+
+  - name: Print fetched information
+    ansible.builtin.debug:
       msg: "{{ result.redfish_facts.cpu.entries | to_nice_json }}"
 
   - name: Get CPU model
@@ -78,7 +80,9 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
     register: result
-  - ansible.builtin.debug:
+
+  - name: Print fetched information
+    ansible.builtin.debug:
       msg: "{{ result.redfish_facts.cpu.entries.0.Model }}"
 
   - name: Get memory inventory
@@ -108,7 +112,9 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
     register: result
-  - ansible.builtin.debug:
+
+  - name: Print fetched information
+    ansible.builtin.debug:
       msg: "{{ result.redfish_facts.virtual_media.entries | to_nice_json }}"
 
   - name: Get Volume Inventory
@@ -119,7 +125,8 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
     register: result
-  - ansible.builtin.debug:
+  - name: Print fetched information
+    ansible.builtin.debug:
       msg: "{{ result.redfish_facts.volume.entries | to_nice_json }}"
 
   - name: Get Session information
@@ -130,7 +137,9 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
     register: result
-  - ansible.builtin.debug:
+
+  - name: Print fetched information
+    ansible.builtin.debug:
       msg: "{{ result.redfish_facts.session.entries | to_nice_json }}"
 
   - name: Get default inventory information
@@ -139,7 +148,8 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
     register: result
-  - ansible.builtin.debug:
+  - name: Print fetched information
+    ansible.builtin.debug:
       msg: "{{ result.redfish_facts | to_nice_json }}"
 
   - name: Get several inventories
