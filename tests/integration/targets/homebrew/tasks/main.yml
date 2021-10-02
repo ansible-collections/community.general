@@ -36,6 +36,14 @@
     package_name: gnu-tar
 
   block:
+  - name: Make sure {{ package_name }} package is not installed
+    homebrew:
+      name: "{{ package_name }}"
+      state: absent
+      update_homebrew: no
+    become: yes
+    become_user: "{{ brew_stat.stat.pw_name }}"
+
   - name: Install {{ package_name }} package using homebrew
     homebrew:
       name: "{{ package_name }}"
