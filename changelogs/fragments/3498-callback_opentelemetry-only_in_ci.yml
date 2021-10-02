@@ -1,0 +1,2 @@
+minor_changes:
+  - opentelemetry callback plugin - added option `enable_only_in_the_ci` to support enabling the plugin only in the CI. (https://github.com/ansible-collections/community.general/pull/3498).
