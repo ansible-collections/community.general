@@ -41,6 +41,8 @@ def main():
                     continue
                 if line.startswith('cloud/'):
                     continue
+                if line.startswith('context/'):
+                    continue
                 if line in ('unsupported', 'disabled', 'hidden'):
                     skip = True
                 if line in ('destructive', ):

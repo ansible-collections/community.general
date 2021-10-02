@@ -1,0 +1,33 @@
+---
+- name:
+  set_fact:
+    interfaces_testfile: '{{ remote_tmp_dir }}/interfaces'
+
+- name: Copy interfaces file
+  copy:
+    src: 'files/interfaces_ff'
+    dest: '{{ interfaces_testfile }}'
+
+- name: Change IP address to 1.2.3.5
+  community.general.interfaces_file:
+    dest: "{{ interfaces_testfile }}"
+    iface: eno1
+    option: address
+    value: 1.2.3.5
+  register: ifile_1
+
+- assert:
+    that:
+    - ifile_1 is changed
+
+- name: Change IP address to 1.2.3.5 again
+  community.general.interfaces_file:
+    dest: "{{ interfaces_testfile }}"
+    iface: eno1
+    option: address
+    value: 1.2.3.5
+  register: ifile_2
+
+- assert:
+    that:
+    - ifile_2 is not changed

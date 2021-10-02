@@ -150,17 +150,17 @@
 # INSTALL broken local package
 - name: create directory
   file:
-    path: "{{output_dir | expanduser}}/zypper1"
+    path: "{{remote_tmp_dir | expanduser}}/zypper1"
     state: directory
 
 - name: fake rpm package
   file:
-    path: "{{output_dir | expanduser}}/zypper1/broken.rpm"
+    path: "{{remote_tmp_dir | expanduser}}/zypper1/broken.rpm"
     state: touch
 
 - name: install broken rpm
   zypper:
-    name: "{{output_dir | expanduser}}/zypper1/broken.rpm"
+    name: "{{remote_tmp_dir | expanduser}}/zypper1/broken.rpm"
     state: present
   register: zypper_result
   ignore_errors: yes
@@ -191,29 +191,29 @@
 
 - name: create directory
   file:
-    path: "{{output_dir | expanduser}}/zypper2"
+    path: "{{remote_tmp_dir | expanduser}}/zypper2"
     state: directory
 
 - name: copy spec file
   copy:
     src: empty.spec
-    dest: "{{ output_dir | expanduser }}/zypper2/empty.spec"
+    dest: "{{ remote_tmp_dir | expanduser }}/zypper2/empty.spec"
 
 - name: build rpm
   command: |
     rpmbuild -bb \
-    --define "_topdir {{output_dir | expanduser }}/zypper2/rpm-build"
+    --define "_topdir {{remote_tmp_dir | expanduser }}/zypper2/rpm-build"
     --define "_builddir %{_topdir}" \
     --define "_rpmdir %{_topdir}" \
     --define "_srcrpmdir %{_topdir}" \
-    --define "_specdir {{output_dir | expanduser}}/zypper2" \
+    --define "_specdir {{remote_tmp_dir | expanduser}}/zypper2" \
     --define "_sourcedir %{_topdir}" \
-    {{ output_dir }}/zypper2/empty.spec
+    {{ remote_tmp_dir }}/zypper2/empty.spec
   register: rpm_build_result
 
 - name: install empty rpm
   zypper:
-    name: "{{ output_dir | expanduser }}/zypper2/rpm-build/noarch/empty-1-0.noarch.rpm"
+    name: "{{ remote_tmp_dir | expanduser }}/zypper2/rpm-build/noarch/empty-1-0.noarch.rpm"
     disable_gpg_check: yes
   register: zypper_result
 
@@ -236,13 +236,13 @@
 
 - name: extract from rpm
   zypper:
-    name: "{{ output_dir | expanduser }}/zypper2/rpm-build/noarch/empty-1-0.noarch.rpm"
+    name: "{{ remote_tmp_dir | expanduser }}/zypper2/rpm-build/noarch/empty-1-0.noarch.rpm"
     state: installed
     disable_gpg_check: yes
-    extra_args_precommand: --root {{ output_dir | expanduser }}/testdir/
+    extra_args_precommand: --root {{ remote_tmp_dir | expanduser }}/testdir/
 
 - name: check that dir var is exist
-  stat: path={{ output_dir | expanduser }}/testdir/var
+  stat: path={{ remote_tmp_dir | expanduser }}/testdir/var
   register: stat_result
 
 - name: check that we extract rpm package in testdir folder and folder var is exist
@@ -419,35 +419,35 @@
       - zypper_result_update_cache_check is successful
       - zypper_result_update_cache_check is not changed
 
-- name: ensure no previous netcat package still exists
-  zypper:
-    name:
-      - netcat-openbsd
-      - gnu-netcat
-    state: absent
-
-- name: install netcat-openbsd which conflicts with gnu-netcat
-  zypper:
-    name: netcat-openbsd
-    state: present
-
-- name: try installation of gnu-netcat which should fail due to the conflict
-  zypper:
-    name: gnu-netcat
-    state: present
-  ignore_errors: yes
-  register: zypper_pkg_conflict
-
-- assert:
-    that:
-      - zypper_pkg_conflict is failed
-      - "'conflicts with netcat-openbsd provided' in zypper_pkg_conflict.stdout"
-
-- name: retry installation of gnu-netcat with force_resolution set to choose a resolution
-  zypper:
-    name: gnu-netcat
-    state: present
-    force_resolution: True
+# - name: ensure no previous netcat package still exists
+#   zypper:
+#     name:
+#       - netcat-openbsd
+#       - gnu-netcat
+#     state: absent
+#
+# - name: install netcat-openbsd which conflicts with gnu-netcat
+#   zypper:
+#     name: netcat-openbsd
+#     state: present
+#
+# - name: try installation of gnu-netcat which should fail due to the conflict
+#   zypper:
+#     name: gnu-netcat
+#     state: present
+#   ignore_errors: yes
+#   register: zypper_pkg_conflict
+#
+# - assert:
+#     that:
+#       - zypper_pkg_conflict is failed
+#       - "'conflicts with netcat-openbsd provided' in zypper_pkg_conflict.stdout"
+#
+# - name: retry installation of gnu-netcat with force_resolution set to choose a resolution
+#   zypper:
+#     name: gnu-netcat
+#     state: present
+#    force_resolution: True
 
 - name: duplicate rpms block
   vars:
@@ -458,25 +458,25 @@
     - name: Deploy spec files to build 2 packages with duplicate files.
       template:
         src: duplicate.spec.j2
-        dest: "{{ output_dir | expanduser }}/zypper2/duplicate{{ item }}.spec"
+        dest: "{{ remote_tmp_dir | expanduser }}/zypper2/duplicate{{ item }}.spec"
       loop: "{{ looplist }}"
 
     - name: build rpms with duplicate files
       command: |
         rpmbuild -bb \
-        --define "_topdir {{output_dir | expanduser }}/zypper2/rpm-build"
+        --define "_topdir {{remote_tmp_dir | expanduser }}/zypper2/rpm-build"
         --define "_builddir %{_topdir}" \
         --define "_rpmdir %{_topdir}" \
         --define "_srcrpmdir %{_topdir}" \
-        --define "_specdir {{output_dir | expanduser}}/zypper2" \
+        --define "_specdir {{remote_tmp_dir | expanduser}}/zypper2" \
         --define "_sourcedir %{_topdir}" \
-        {{ output_dir | expanduser }}/zypper2/duplicate{{ item }}.spec
+        {{ remote_tmp_dir | expanduser }}/zypper2/duplicate{{ item }}.spec
       loop: "{{ looplist }}"
 
     - name: install duplicate rpms
       zypper:
         name: >-
-          {{ output_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}-1-0.noarch.rpm
+          {{ remote_tmp_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}-1-0.noarch.rpm
         disable_gpg_check: true
       ignore_errors: true
       register: zypper_duplicate_result
@@ -499,7 +499,7 @@
     - name: install duplicate rpms
       zypper:
         name: >-
-          {{ output_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}-1-0.noarch.rpm
+          {{ remote_tmp_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}-1-0.noarch.rpm
         disable_gpg_check: true
         replacefiles: true
       ignore_errors: true

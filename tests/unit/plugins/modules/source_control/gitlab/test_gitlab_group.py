@@ -68,32 +68,49 @@ class TestGitlabGroup(GitlabModuleTestCase):
     def test_create_group(self):
         group = self.moduleUtil.createGroup({'name': "Foobar Group",
                                              'path': "foo-bar",
-                                             'description': "An interesting group"})
+                                             'description': "An interesting group",
+                                             'project_creation_level': "developer",
+                                             'subgroup_creation_level': "maintainer",
+                                             'require_two_factor_authentication': True})
 
         self.assertEqual(type(group), Group)
         self.assertEqual(group.name, "Foobar Group")
         self.assertEqual(group.path, "foo-bar")
         self.assertEqual(group.description, "An interesting group")
+        self.assertEqual(group.project_creation_level, "developer")
+        self.assertEqual(group.subgroup_creation_level, "maintainer")
+        self.assertEqual(group.require_two_factor_authentication, True)
         self.assertEqual(group.id, 1)
 
     @with_httmock(resp_create_subgroup)
     def test_create_subgroup(self):
-        group = self.moduleUtil.createGroup({'name': "BarFoo Group", 'path': "bar-foo", "parent_id": 1})
+        group = self.moduleUtil.createGroup({'name': "BarFoo Group",
+                                             'path': "bar-foo",
+                                             'parent_id': 1,
+                                             'project_creation_level': "noone",
+                                             'require_two_factor_authentication': True})
 
         self.assertEqual(type(group), Group)
         self.assertEqual(group.name, "BarFoo Group")
         self.assertEqual(group.full_path, "foo-bar/bar-foo")
+        self.assertEqual(group.project_creation_level, "noone")
+        self.assertEqual(group.require_two_factor_authentication, True)
         self.assertEqual(group.id, 2)
         self.assertEqual(group.parent_id, 1)
 
     @with_httmock(resp_get_group)
     def test_update_group(self):
         group = self.gitlab_instance.groups.get(1)
-        changed, newGroup = self.moduleUtil.updateGroup(group, {'name': "BarFoo Group", "visibility": "private"})
+        changed, newGroup = self.moduleUtil.updateGroup(group, {'name': "BarFoo Group",
+                                                                'visibility': "private",
+                                                                'project_creation_level': "maintainer",
+                                                                'require_two_factor_authentication': True})
 
         self.assertEqual(changed, True)
         self.assertEqual(newGroup.name, "BarFoo Group")
         self.assertEqual(newGroup.visibility, "private")
+        self.assertEqual(newGroup.project_creation_level, "maintainer")
+        self.assertEqual(newGroup.require_two_factor_authentication, True)
 
         changed, newGroup = self.moduleUtil.updateGroup(group, {'name': "BarFoo Group"})
 

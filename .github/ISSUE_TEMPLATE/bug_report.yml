@@ -64,6 +64,20 @@ body:
 
 - type: textarea
   attributes:
+    label: Community.general Version
+    description: >-
+      Paste verbatim output from "ansible-galaxy collection list community.general"
+      between tripple backticks.
+    value: |
+      ```console (paste below)
+      $ ansible-galaxy collection list community.general
+
+      ```
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
     label: Configuration
     description: >-
       If this issue has an example piece of YAML that can help to reproduce this problem, please provide it.

@@ -1,0 +1,3 @@
+bugfixes:
+  - proxmox_kvm - clone operation should return the VMID of the target VM and not that of the source VM.
+    This was failing when the target VM with the chosen name already existed (https://github.com/ansible-collections/community.general/pull/3266).

@@ -17,7 +17,8 @@ PyGithub
 httmock
 
 # requirement for maven_artifact module
-lxml
+lxml < 4.3.0 ; python_version < '2.7' # lxml 4.3.0 and later require python 2.7 or later
+lxml ; python_version >= '2.7'
 semantic_version
 
 # requirement for datadog_downtime module
@@ -26,3 +27,9 @@ datadog-api-client >= 1.0.0b3 ; python_version >= '3.6'
 # requirement for dnsimple module
 dnsimple >= 2 ; python_version >= '3.6'
 dataclasses ; python_version == '3.6'
+
+# requirement for the opentelemetry callback plugin
+# WARNING: these libraries depend on grpcio, which takes 7 minutes (!) to build in CI on Python 3.10
+opentelemetry-api ; python_version >= '3.6' and python_version < '3.10'
+opentelemetry-exporter-otlp ; python_version >= '3.6' and python_version < '3.10'
+opentelemetry-sdk ; python_version >= '3.6' and python_version < '3.10'

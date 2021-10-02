@@ -1,7 +1,8 @@
+notifications: true
 automerge: true
 files:
   plugins/:
-    supershipit: quidame Ajpantuso
+    supershipit: quidame
   changelogs/: {}
   changelogs/fragments/:
     support: community
@@ -62,6 +63,9 @@ files:
   $callbacks/nrdp.py:
     maintainers: rverchere
   $callbacks/null.py: {}
+  $callbacks/opentelemetry.py:
+    maintainers: v1v
+    keywords: opentelemetry observability
   $callbacks/say.py:
     notify: chris-short
     maintainers: $team_macos
@@ -131,6 +135,8 @@ files:
   $filters/random_mac.py: {}
   $filters/time.py:
     maintainers: resmo
+  $filters/unicode_normalize.py:
+    maintainers: Ajpantuso
   $filters/version_sort.py:
     maintainers: ericzolf
   $inventories/:
@@ -148,8 +154,14 @@ files:
   $inventories/nmap.py: {}
   $inventories/online.py:
     maintainers: sieben
+  $inventories/opennebula.py:
+    maintainers: feldsam
+    labels: cloud opennebula
+    keywords: opennebula dynamic inventory script
   $inventories/proxmox.py:
     maintainers: $team_virt ilijamt
+  $inventories/icinga2.py:
+    maintainers: bongoeadgc6
   $inventories/scaleway.py:
     maintainers: $team_scaleway
     labels: cloud scaleway
@@ -173,7 +185,7 @@ files:
   $lookups/dnstxt.py:
     maintainers: jpmens
   $lookups/dsv.py:
-    maintainers: amigus
+    maintainers: amigus endlesstrax
   $lookups/etcd3.py:
     maintainers: eric-belhomme
   $lookups/etcd.py:
@@ -209,7 +221,7 @@ files:
     maintainers: $team_ansible_core jpmens
   $lookups/shelvefile.py: {}
   $lookups/tss.py:
-    maintainers: amigus
+    maintainers: amigus endlesstrax
   $module_utils/:
     labels: module_utils
   $module_utils/gitlab.py:
@@ -458,6 +470,10 @@ files:
     maintainers: slok
   $modules/database/misc/redis_info.py:
     maintainers: levonet
+  $modules/database/misc/redis_data_info.py:
+    maintainers: paginabianca
+  $modules/database/misc/redis_data.py:
+    maintainers: paginabianca
   $modules/database/misc/riak.py:
     maintainers: drewkerrigan jsmartin
   $modules/database/mssql/mssql_db.py:
@@ -506,9 +522,13 @@ files:
     maintainers: Gaetan2907
   $modules/identity/keycloak/keycloak_group.py:
     maintainers: adamgoossens
+  $modules/identity/keycloak/keycloak_identity_provider.py:
+    maintainers: laurpaum
   $modules/identity/keycloak/keycloak_realm.py:
     maintainers: kris2kris
   $modules/identity/keycloak/keycloak_role.py:
+    maintainers: laurpaum
+  $modules/identity/keycloak/keycloak_user_federation.py:
     maintainers: laurpaum
   $modules/identity/onepassword_info.py:
     maintainers: Rylon
@@ -1101,11 +1121,13 @@ files:
   $modules/web_infrastructure/apache2_mod_proxy.py:
     maintainers: oboukili
   $modules/web_infrastructure/apache2_module.py:
-    maintainers: berendt n0trax robinro
+    maintainers: berendt n0trax
+    ignore: robinro
   $modules/web_infrastructure/deploy_helper.py:
     maintainers: ramondelafuente
   $modules/web_infrastructure/django_manage.py:
-    maintainers: scottanderson42 russoz tastychutney
+    maintainers: russoz
+    ignore: scottanderson42 tastychutney
     labels: django_manage
   $modules/web_infrastructure/ejabberd_user.py:
     maintainers: privateip

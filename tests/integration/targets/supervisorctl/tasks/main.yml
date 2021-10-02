@@ -9,7 +9,7 @@
       suffix: supervisorctl-tests
     register: supervisord_sock_path
 
-  - command: 'echo {{ output_dir }}'
+  - command: 'echo {{ remote_tmp_dir }}'
     register: echo
   - set_fact:
       remote_dir: '{{ echo.stdout }}'

@@ -33,6 +33,27 @@
     extra_args: "-c {{ remote_constraints }}"
   when: ansible_os_family == 'Darwin'
 
+- when: ansible_facts.distribution ~ ansible_facts.distribution_major_version not in  ['CentOS6', 'RedHat6']
+  block:
+  - name: Install cryptography (Python 3)
+    become: true
+    package:
+      name: '{{ cryptography_package_name_python3 }}'
+    when: not ansible_os_family == 'Darwin' and ansible_python_version is version('3.0', '>=')
+
+  - name: Install cryptography (Python 2)
+    become: true
+    package:
+      name: '{{ cryptography_package_name }}'
+    when: not ansible_os_family == 'Darwin' and ansible_python_version is version('3.0', '<')
+
+  - name: Install cryptography (Darwin)
+    become: true
+    pip:
+      name: cryptography>=3.3
+      extra_args: "-c {{ remote_constraints }}"
+    when: ansible_os_family == 'Darwin'
+
 - name: register pyOpenSSL version
   command: "{{ ansible_python.executable }} -c 'import OpenSSL; print(OpenSSL.__version__)'"
   register: pyopenssl_version

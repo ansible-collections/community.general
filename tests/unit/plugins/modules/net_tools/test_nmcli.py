@@ -63,6 +63,12 @@ TESTCASE_CONNECTION = [
         '_ansible_check_mode': True,
     },
     {
+        'type': 'gre',
+        'conn_name': 'non_existent_nw_device',
+        'state': 'absent',
+        '_ansible_check_mode': True,
+    },
+    {
         'type': 'ipip',
         'conn_name': 'non_existent_nw_device',
         'state': 'absent',
@@ -76,6 +82,12 @@ TESTCASE_CONNECTION = [
     },
     {
         'type': 'dummy',
+        'conn_name': 'non_existent_nw_device',
+        'state': 'absent',
+        '_ansible_check_mode': True,
+    },
+    {
+        'type': 'gsm',
         'conn_name': 'non_existent_nw_device',
         'state': 'absent',
         '_ansible_check_mode': True,
@@ -109,6 +121,37 @@ ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 """
+
+TESTCASE_GENERIC_MODIFY_ROUTING_RULES = [
+    {
+        'type': 'generic',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'generic_non_existant',
+        'ip4': '10.10.10.10/24',
+        'gw4': '10.10.10.1',
+        'routing_rules4': ['priority 5 from 10.0.0.0/24 table 5000', 'priority 10 from 10.0.1.0/24 table 5001'],
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+]
+
+TESTCASE_GENERIC_MODIFY_ROUTING_RULES_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              generic_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            manual
+ipv4.addresses:                         10.10.10.10/24
+ipv4.gateway:                           10.10.10.1
+ipv4.routing-rules:                     priority 5 from 10.0.0.0/24 table 5000, priority 10 from 10.0.1.0/24 table 5001
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+"""
+
 
 TESTCASE_GENERIC_DNS4_SEARCH = [
     {
@@ -371,6 +414,39 @@ vxlan.local:                            192.168.225.5
 vxlan.remote:                           192.168.225.6
 """
 
+TESTCASE_GRE = [
+    {
+        'type': 'gre',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'gre-existent_nw_device',
+        'ip_tunnel_dev': 'non_existent_gre_device',
+        'ip_tunnel_local': '192.168.225.5',
+        'ip_tunnel_remote': '192.168.225.6',
+        'ip_tunnel_input_key': '1',
+        'ip_tunnel_output_key': '2',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    }
+]
+
+TESTCASE_GRE_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              gre-existent_nw_device
+connection.autoconnect:                 yes
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+ip-tunnel.mode:                         gre
+ip-tunnel.parent:                       non_existent_gre_device
+ip-tunnel.local:                        192.168.225.5
+ip-tunnel.remote:                       192.168.225.6
+ip-tunnel.input-key:                    1
+ip-tunnel.output-key:                   2
+"""
+
 TESTCASE_IPIP = [
     {
         'type': 'ipip',
@@ -388,6 +464,12 @@ TESTCASE_IPIP_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
 connection.interface-name:              ipip-existent_nw_device
 connection.autoconnect:                 yes
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 ip-tunnel.mode:                         ipip
 ip-tunnel.parent:                       non_existent_ipip_device
 ip-tunnel.local:                        192.168.225.5
@@ -411,6 +493,12 @@ TESTCASE_SIT_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
 connection.interface-name:              sit-existent_nw_device
 connection.autoconnect:                 yes
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 ip-tunnel.mode:                         sit
 ip-tunnel.parent:                       non_existent_sit_device
 ip-tunnel.local:                        192.168.225.5
@@ -507,6 +595,52 @@ TESTCASE_SECURE_WIRELESS = [
     }
 ]
 
+TESTCASE_DEFAULT_WIRELESS_SHOW_OUTPUT = """\
+802-11-wireless.ssid:                   --
+802-11-wireless.mode:                   infrastructure
+802-11-wireless.band:                   --
+802-11-wireless.channel:                0
+802-11-wireless.bssid:                  --
+802-11-wireless.rate:                   0
+802-11-wireless.tx-power:               0
+802-11-wireless.mac-address:            --
+802-11-wireless.cloned-mac-address:     --
+802-11-wireless.generate-mac-address-mask:--
+802-11-wireless.mac-address-blacklist:  --
+802-11-wireless.mac-address-randomization:default
+802-11-wireless.mtu:                    auto
+802-11-wireless.seen-bssids:            --
+802-11-wireless.hidden:                 no
+802-11-wireless.powersave:              0 (default)
+802-11-wireless.wake-on-wlan:           0x1 (default)
+802-11-wireless.ap-isolation:           -1 (default)
+"""
+
+TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT = \
+    TESTCASE_DEFAULT_WIRELESS_SHOW_OUTPUT + """\
+802-11-wireless-security.key-mgmt:      --
+802-11-wireless-security.wep-tx-keyidx: 0
+802-11-wireless-security.auth-alg:      --
+802-11-wireless-security.proto:         --
+802-11-wireless-security.pairwise:      --
+802-11-wireless-security.group:         --
+802-11-wireless-security.pmf:           0 (default)
+802-11-wireless-security.leap-username: --
+802-11-wireless-security.wep-key0:      --
+802-11-wireless-security.wep-key1:      --
+802-11-wireless-security.wep-key2:      --
+802-11-wireless-security.wep-key3:      --
+802-11-wireless-security.wep-key-flags: 0 (none)
+802-11-wireless-security.wep-key-type:  unknown
+802-11-wireless-security.psk:           testingtestingtesting
+802-11-wireless-security.psk-flags:     0 (none)
+802-11-wireless-security.leap-password: --
+802-11-wireless-security.leap-password-flags:0 (none)
+802-11-wireless-security.wps-method:    0x0 (default)
+802-11-wireless-security.fils:          0 (default)
+"""
+
+
 TESTCASE_DUMMY_STATIC = [
     {
         'type': 'dummy',
@@ -539,6 +673,53 @@ ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 ipv6.method:                            manual
 ipv6.addresses:                         2001:db8::1/128
+"""
+
+
+TESTCASE_GSM = [
+    {
+        'type': 'gsm',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'gsm_non_existant',
+        'gsm': {
+            'apn': 'internet.telekom',
+            'username': 't-mobile',
+            'password': 'tm',
+            'pin': '1234',
+        },
+        'method4': 'auto',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    }
+]
+
+TESTCASE_GSM_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.type:                        gsm
+connection.interface-name:              gsm_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            auto
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+gsm.auto-config:                        no
+gsm.number:                             --
+gsm.username:                           t-mobile
+gsm.password:                           tm
+gsm.password-flags:                     0 (none)
+gsm.apn:                                "internet.telekom"
+gsm.network-id:                         --
+gsm.pin:                                1234
+gsm.pin-flags:                          0 (none)
+gsm.home-only:                          no
+gsm.device-id:                          --
+gsm.sim-id:                             --
+gsm.sim-operator-id:                    --
+gsm.mtu:                                auto
 """
 
 
@@ -586,6 +767,13 @@ def mocked_generic_connection_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
                execute_return=(0, TESTCASE_GENERIC_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_generic_connection_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_GENERIC_MODIFY_ROUTING_RULES_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
@@ -652,6 +840,13 @@ def mocked_vxlan_connection_unchanged(mocker):
 
 
 @pytest.fixture
+def mocked_gre_connection_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_GRE_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
 def mocked_ipip_connection_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
@@ -698,9 +893,47 @@ def mocked_ethernet_connection_dhcp_to_static(mocker):
 
 
 @pytest.fixture
+def mocked_wireless_create(mocker):
+    mocker_set(mocker,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_DEFAULT_WIRELESS_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
+
+
+@pytest.fixture
+def mocked_secure_wireless_create(mocker):
+    mocker_set(mocker,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+                   (0, "", ""),
+               ))
+
+
+@pytest.fixture
 def mocked_secure_wireless_create_failure(mocker):
     mocker_set(mocker,
-               execute_return=(1, "", ""))
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT, ""),
+                   (1, "", ""),
+               ))
+
+
+@pytest.fixture
+def mocked_secure_wireless_modify(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+                   (0, "", ""),
+                   (0, "", ""),
+               ))
 
 
 @pytest.fixture
@@ -709,6 +942,7 @@ def mocked_secure_wireless_modify_failure(mocker):
                connection_exists=True,
                execute_return=None,
                execute_side_effect=(
+                   (0, TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT, ""),
                    (0, "", ""),
                    (1, "", ""),
                ))
@@ -719,6 +953,13 @@ def mocked_dummy_connection_static_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
                execute_return=(0, TESTCASE_DUMMY_STATIC_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_gsm_connection_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_GSM_SHOW_OUTPUT, ""))
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_BOND, indirect=['patch_ansible_module'])
@@ -833,6 +1074,26 @@ def test_generic_connection_unchanged(mocked_generic_connection_unchanged, capfd
     results = json.loads(out)
     assert not results.get('failed')
     assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_MODIFY_ROUTING_RULES, indirect=['patch_ansible_module'])
+def test_generic_connection_modify_routing_rules4(mocked_generic_connection_create, capfd):
+    """
+    Test : Generic connection modified with routing-rules4
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert 'ipv4.routing-rules' in args[0]
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_DNS4_SEARCH, indirect=['patch_ansible_module'])
@@ -1534,6 +1795,83 @@ def test_eth_dhcp_client_id_con_create(mocked_generic_connection_create, capfd):
     assert results['changed']
 
 
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GRE, indirect=['patch_ansible_module'])
+def test_create_gre(mocked_generic_connection_create, capfd):
+    """
+    Test if gre created
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert args[0][0] == '/usr/bin/nmcli'
+    assert args[0][1] == 'con'
+    assert args[0][2] == 'add'
+    assert args[0][3] == 'type'
+    assert args[0][4] == 'ip-tunnel'
+    assert args[0][5] == 'con-name'
+    assert args[0][6] == 'non_existent_nw_device'
+
+    args_text = list(map(to_text, args[0]))
+    for param in ['connection.interface-name', 'gre-existent_nw_device',
+                  'ip-tunnel.local', '192.168.225.5',
+                  'ip-tunnel.mode', 'gre',
+                  'ip-tunnel.parent', 'non_existent_gre_device',
+                  'ip-tunnel.remote', '192.168.225.6',
+                  'ip-tunnel.input-key', '1',
+                  'ip-tunnel.output-key', '2']:
+        assert param in args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GRE, indirect=['patch_ansible_module'])
+def test_gre_mod(mocked_generic_connection_modify, capfd):
+    """
+    Test if gre modified
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert args[0][0] == '/usr/bin/nmcli'
+    assert args[0][1] == 'con'
+    assert args[0][2] == 'modify'
+    assert args[0][3] == 'non_existent_nw_device'
+
+    args_text = list(map(to_text, args[0]))
+    for param in ['ip-tunnel.local', '192.168.225.5', 'ip-tunnel.remote', '192.168.225.6']:
+        assert param in args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GRE, indirect=['patch_ansible_module'])
+def test_gre_connection_unchanged(mocked_gre_connection_unchanged, capfd):
+    """
+    Test : GRE connection unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
+
+
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_DHCP, indirect=['patch_ansible_module'])
 def test_ethernet_connection_dhcp_unchanged(mocked_ethernet_connection_dhcp_unchanged, capfd):
     """
@@ -1629,7 +1967,7 @@ def test_ethernet_connection_static_unchanged(mocked_ethernet_connection_static_
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_WIRELESS, indirect=['patch_ansible_module'])
-def test_create_wireless(mocked_generic_connection_create, capfd):
+def test_create_wireless(mocked_wireless_create, capfd):
     """
     Test : Create wireless connection
     """
@@ -1637,10 +1975,22 @@ def test_create_wireless(mocked_generic_connection_create, capfd):
     with pytest.raises(SystemExit):
         nmcli.main()
 
-    assert nmcli.Nmcli.execute_command.call_count == 1
+    assert nmcli.Nmcli.execute_command.call_count == 2
     arg_list = nmcli.Nmcli.execute_command.call_args_list
-    add_args, add_kw = arg_list[0]
 
+    get_available_options_args, get_available_options_kw = arg_list[0]
+    assert get_available_options_args[0][0] == '/usr/bin/nmcli'
+    assert get_available_options_args[0][1] == 'con'
+    assert get_available_options_args[0][2] == 'edit'
+    assert get_available_options_args[0][3] == 'type'
+    assert get_available_options_args[0][4] == 'wifi'
+
+    get_available_options_data = get_available_options_kw['data'].split()
+    for param in ['print', '802-11-wireless',
+                  'quit', 'yes']:
+        assert param in get_available_options_data
+
+    add_args, add_kw = arg_list[1]
     assert add_args[0][0] == '/usr/bin/nmcli'
     assert add_args[0][1] == 'con'
     assert add_args[0][2] == 'add'
@@ -1664,7 +2014,7 @@ def test_create_wireless(mocked_generic_connection_create, capfd):
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_SECURE_WIRELESS, indirect=['patch_ansible_module'])
-def test_create_secure_wireless(mocked_generic_connection_create, capfd):
+def test_create_secure_wireless(mocked_secure_wireless_create, capfd):
     """
     Test : Create secure wireless connection
     """
@@ -1672,10 +2022,22 @@ def test_create_secure_wireless(mocked_generic_connection_create, capfd):
     with pytest.raises(SystemExit):
         nmcli.main()
 
-    assert nmcli.Nmcli.execute_command.call_count == 2
+    assert nmcli.Nmcli.execute_command.call_count == 3
     arg_list = nmcli.Nmcli.execute_command.call_args_list
-    add_args, add_kw = arg_list[0]
 
+    get_available_options_args, get_available_options_kw = arg_list[0]
+    assert get_available_options_args[0][0] == '/usr/bin/nmcli'
+    assert get_available_options_args[0][1] == 'con'
+    assert get_available_options_args[0][2] == 'edit'
+    assert get_available_options_args[0][3] == 'type'
+    assert get_available_options_args[0][4] == 'wifi'
+
+    get_available_options_data = get_available_options_kw['data'].split()
+    for param in ['print', '802-11-wireless-security',
+                  'quit', 'yes']:
+        assert param in get_available_options_data
+
+    add_args, add_kw = arg_list[1]
     assert add_args[0][0] == '/usr/bin/nmcli'
     assert add_args[0][1] == 'con'
     assert add_args[0][2] == 'add'
@@ -1691,7 +2053,7 @@ def test_create_secure_wireless(mocked_generic_connection_create, capfd):
                   '802-11-wireless-security.key-mgmt', 'wpa-psk']:
         assert param in add_args_text
 
-    edit_args, edit_kw = arg_list[1]
+    edit_args, edit_kw = arg_list[2]
     assert edit_args[0][0] == '/usr/bin/nmcli'
     assert edit_args[0][1] == 'con'
     assert edit_args[0][2] == 'edit'
@@ -1718,10 +2080,22 @@ def test_create_secure_wireless_failure(mocked_secure_wireless_create_failure, c
     with pytest.raises(SystemExit):
         nmcli.main()
 
-    assert nmcli.Nmcli.execute_command.call_count == 1
+    assert nmcli.Nmcli.execute_command.call_count == 2
     arg_list = nmcli.Nmcli.execute_command.call_args_list
-    add_args, add_kw = arg_list[0]
 
+    get_available_options_args, get_available_options_kw = arg_list[0]
+    assert get_available_options_args[0][0] == '/usr/bin/nmcli'
+    assert get_available_options_args[0][1] == 'con'
+    assert get_available_options_args[0][2] == 'edit'
+    assert get_available_options_args[0][3] == 'type'
+    assert get_available_options_args[0][4] == 'wifi'
+
+    get_available_options_data = get_available_options_kw['data'].split()
+    for param in ['print', '802-11-wireless-security',
+                  'quit', 'yes']:
+        assert param in get_available_options_data
+
+    add_args, add_kw = arg_list[1]
     assert add_args[0][0] == '/usr/bin/nmcli'
     assert add_args[0][1] == 'con'
     assert add_args[0][2] == 'add'
@@ -1744,17 +2118,36 @@ def test_create_secure_wireless_failure(mocked_secure_wireless_create_failure, c
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_SECURE_WIRELESS, indirect=['patch_ansible_module'])
-def test_modify_secure_wireless(mocked_generic_connection_modify, capfd):
+def test_modify_secure_wireless(mocked_secure_wireless_modify, capfd):
     """
     Test : Modify secure wireless connection
     """
 
     with pytest.raises(SystemExit):
         nmcli.main()
-    assert nmcli.Nmcli.execute_command.call_count == 2
+    assert nmcli.Nmcli.execute_command.call_count == 4
     arg_list = nmcli.Nmcli.execute_command.call_args_list
-    add_args, add_kw = arg_list[0]
 
+    get_available_options_args, get_available_options_kw = arg_list[0]
+    assert get_available_options_args[0][0] == '/usr/bin/nmcli'
+    assert get_available_options_args[0][1] == 'con'
+    assert get_available_options_args[0][2] == 'edit'
+    assert get_available_options_args[0][3] == 'type'
+    assert get_available_options_args[0][4] == 'wifi'
+
+    get_available_options_data = get_available_options_kw['data'].split()
+    for param in ['print', '802-11-wireless-security',
+                  'quit', 'yes']:
+        assert param in get_available_options_data
+
+    show_args, show_kw = arg_list[1]
+    assert show_args[0][0] == '/usr/bin/nmcli'
+    assert show_args[0][1] == '--show-secrets'
+    assert show_args[0][2] == 'con'
+    assert show_args[0][3] == 'show'
+    assert show_args[0][4] == 'non_existent_nw_device'
+
+    add_args, add_kw = arg_list[2]
     assert add_args[0][0] == '/usr/bin/nmcli'
     assert add_args[0][1] == 'con'
     assert add_args[0][2] == 'modify'
@@ -1767,7 +2160,7 @@ def test_modify_secure_wireless(mocked_generic_connection_modify, capfd):
                   '802-11-wireless-security.key-mgmt', 'wpa-psk']:
         assert param in add_args_text
 
-    edit_args, edit_kw = arg_list[1]
+    edit_args, edit_kw = arg_list[3]
     assert edit_args[0][0] == '/usr/bin/nmcli'
     assert edit_args[0][1] == 'con'
     assert edit_args[0][2] == 'edit'
@@ -1794,10 +2187,29 @@ def test_modify_secure_wireless_failure(mocked_secure_wireless_modify_failure, c
     with pytest.raises(SystemExit):
         nmcli.main()
 
-    assert nmcli.Nmcli.execute_command.call_count == 2
+    assert nmcli.Nmcli.execute_command.call_count == 3
     arg_list = nmcli.Nmcli.execute_command.call_args_list
-    add_args, add_kw = arg_list[1]
 
+    get_available_options_args, get_available_options_kw = arg_list[0]
+    assert get_available_options_args[0][0] == '/usr/bin/nmcli'
+    assert get_available_options_args[0][1] == 'con'
+    assert get_available_options_args[0][2] == 'edit'
+    assert get_available_options_args[0][3] == 'type'
+    assert get_available_options_args[0][4] == 'wifi'
+
+    get_available_options_data = get_available_options_kw['data'].split()
+    for param in ['print', '802-11-wireless-security',
+                  'quit', 'yes']:
+        assert param in get_available_options_data
+
+    show_args, show_kw = arg_list[1]
+    assert show_args[0][0] == '/usr/bin/nmcli'
+    assert show_args[0][1] == '--show-secrets'
+    assert show_args[0][2] == 'con'
+    assert show_args[0][3] == 'show'
+    assert show_args[0][4] == 'non_existent_nw_device'
+
+    add_args, add_kw = arg_list[2]
     assert add_args[0][0] == '/usr/bin/nmcli'
     assert add_args[0][1] == 'con'
     assert add_args[0][2] == 'modify'
@@ -1861,6 +2273,82 @@ def test_create_dummy_static(mocked_generic_connection_create, capfd):
 def test_dummy_connection_static_unchanged(mocked_dummy_connection_static_unchanged, capfd):
     """
     Test : Dummy connection with static IP configuration unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GSM, indirect=['patch_ansible_module'])
+def test_create_gsm(mocked_generic_connection_create, capfd):
+    """
+    Test if gsm created
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert args[0][0] == '/usr/bin/nmcli'
+    assert args[0][1] == 'con'
+    assert args[0][2] == 'add'
+    assert args[0][3] == 'type'
+    assert args[0][4] == 'gsm'
+    assert args[0][5] == 'con-name'
+    assert args[0][6] == 'non_existent_nw_device'
+
+    args_text = list(map(to_text, args[0]))
+    for param in ['connection.interface-name', 'gsm_non_existant',
+                  'gsm.apn', 'internet.telekom',
+                  'gsm.username', 't-mobile',
+                  'gsm.password', 'tm',
+                  'gsm.pin', '1234']:
+        assert param in args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GSM, indirect=['patch_ansible_module'])
+def test_gsm_mod(mocked_generic_connection_modify, capfd):
+    """
+    Test if gsm modified
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert args[0][0] == '/usr/bin/nmcli'
+    assert args[0][1] == 'con'
+    assert args[0][2] == 'modify'
+    assert args[0][3] == 'non_existent_nw_device'
+
+    args_text = list(map(to_text, args[0]))
+    for param in ['gsm.username', 't-mobile',
+                  'gsm.password', 'tm']:
+        assert param in args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GSM, indirect=['patch_ansible_module'])
+def test_gsm_connection_unchanged(mocked_gsm_connection_unchanged, capfd):
+    """
+    Test if gsm connection unchanged
     """
     with pytest.raises(SystemExit):
         nmcli.main()

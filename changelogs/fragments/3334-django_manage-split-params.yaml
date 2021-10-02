@@ -1,0 +1,2 @@
+bugfixes:
+  - django_manage - parameters ``apps`` and ``fixtures`` are now splitted instead of being used as a single argument (https://github.com/ansible-collections/community.general/issues/3333).

@@ -56,7 +56,8 @@ options:
     required: false
     aliases: [ account_id ]
     description:
-      - ID of account to delete/modify
+      - ID of account to delete/modify.
+      - Can also be used in account creation to work around vendor issues where the ID of the new user is required in the POST request.
     type: str
   new_username:
     required: false
@@ -207,6 +208,15 @@ options:
         description:
           - The transfer method to use with the image
         type: str
+  strip_etag_quotes:
+    description:
+      - Removes surrounding quotes of etag used in C(If-Match) header
+        of C(PATCH) requests.
+      - Only use this option to resolve bad vendor implementation where
+        C(If-Match) only matches the unquoted etag string.
+    type: bool
+    default: false
+    version_added: 3.7.0
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''
@@ -631,7 +641,8 @@ def main():
                     transfer_protocol_type=dict(),
                     transfer_method=dict(),
                 )
-            )
+            ),
+            strip_etag_quotes=dict(type='bool', default=False),
         ),
         required_together=[
             ('username', 'password'),
@@ -686,10 +697,13 @@ def main():
     # VirtualMedia options
     virtual_media = module.params['virtual_media']
 
+    # Etag options
+    strip_etag_quotes = module.params['strip_etag_quotes']
+
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
     rf_utils = RedfishUtils(creds, root_uri, timeout, module,
-                            resource_id=resource_id, data_modification=True)
+                            resource_id=resource_id, data_modification=True, strip_etag_quotes=strip_etag_quotes)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:

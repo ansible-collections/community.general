@@ -29,7 +29,7 @@ FAIL_MSG = 'Issuing a data modification command without specifying the '\
 class RedfishUtils(object):
 
     def __init__(self, creds, root_uri, timeout, module, resource_id=None,
-                 data_modification=False):
+                 data_modification=False, strip_etag_quotes=False):
         self.root_uri = root_uri
         self.creds = creds
         self.timeout = timeout
@@ -37,6 +37,7 @@ class RedfishUtils(object):
         self.service_root = '/redfish/v1/'
         self.resource_id = resource_id
         self.data_modification = data_modification
+        self.strip_etag_quotes = strip_etag_quotes
         self._init_session()
 
     def _auth_params(self, headers):
@@ -121,6 +122,8 @@ class RedfishUtils(object):
             if not etag:
                 etag = r['data'].get('@odata.etag')
             if etag:
+                if self.strip_etag_quotes:
+                    etag = etag.strip('"')
                 req_headers['If-Match'] = etag
         username, password, basic_auth = self._auth_params(req_headers)
         try:
@@ -976,6 +979,8 @@ class RedfishUtils(object):
             payload['Password'] = user.get('account_password')
         if user.get('account_roleid'):
             payload['RoleId'] = user.get('account_roleid')
+        if user.get('account_id'):
+            payload['Id'] = user.get('account_id')
 
         response = self.post_request(self.root_uri + self.accounts_uri, payload)
         if not response['ret']:
@@ -1887,7 +1892,7 @@ class RedfishUtils(object):
                       'LowerThresholdCritical', 'LowerThresholdFatal',
                       'LowerThresholdNonCritical', 'MaxReadingRangeTemp',
                       'MinReadingRangeTemp', 'ReadingCelsius', 'RelatedItem',
-                      'SensorNumber']
+                      'SensorNumber', 'Status']
 
         # Go through list
         for chassis_uri in self.chassis_uris:

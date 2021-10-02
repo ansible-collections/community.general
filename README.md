@@ -17,7 +17,7 @@ If you encounter abusive behavior violating the [Ansible Code of Conduct](https:
 
 ## Tested with Ansible
 
-Tested with the current Ansible 2.9, ansible-base 2.10 and ansible-core 2.11 releases and the current development version of ansible-core. Ansible versions before 2.9.10 are not supported.
+Tested with the current Ansible 2.9, ansible-base 2.10, ansible-core 2.11, ansible-core 2.12 releases and the current development version of ansible-core. Ansible versions before 2.9.10 are not supported.
 
 ## External requirements
 
@@ -76,7 +76,21 @@ Also for some notes specific to this collection see [our CONTRIBUTING documentat
 
 See [here](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#testing-collections).
 
-### Communication
+## Collection maintenance
+
+To learn how to maintain / become a maintainer of this collection, refer to:
+
+* [Committer guidelines](https://github.com/ansible-collections/community.general/blob/main/commit-rights.md).
+* [Maintainer guidelines](https://github.com/ansible/community-docs/blob/main/maintaining.rst).
+
+It is necessary for maintainers of this collection to be subscribed to:
+
+* The collection itself (the `Watch` button → `All Activity` in the upper right corner of the repository's homepage).
+* The "Changes Impacting Collection Contributors and Maintainers" [issue](https://github.com/ansible-collections/overview/issues/45).
+
+They also should be subscribed to Ansible's [The Bullhorn newsletter](https://docs.ansible.com/ansible/devel/community/communication.html#the-bullhorn).
+
+## Communication
 
 We announce important development changes and releases through Ansible's [The Bullhorn newsletter](https://eepurl.com/gZmiEP). If you are a collection developer, be sure you are subscribed.
 
@@ -86,16 +100,11 @@ We take part in the global quarterly [Ansible Contributor Summit](https://github
 
 For more information about communities, meetings and agendas see [Community Wiki](https://github.com/ansible/community/wiki/Community).
 
-For more information about communication, refer to the [Ansible communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
+For more information about communication, refer to Ansible's the [Communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
 
-### Publishing New Version
+## Publishing New Version
 
-Basic instructions without release branches:
-
-1. Create `changelogs/fragments/<version>.yml` with `release_summary:` section (which must be a string, not a list).
-2. Run `antsibull-changelog release --collection-flatmap yes`
-3. Make sure `CHANGELOG.rst` and `changelogs/changelog.yaml` are added to git, and the deleted fragments have been removed.
-4. Tag the commit with `<version>`. Push changes and tag to the main repository.
+See the [Releasing guidelines](https://github.com/ansible/community-docs/blob/main/releasing_collections.rst) to learn how to release this collection.
 
 ## Release notes
 
@@ -103,9 +112,9 @@ See the [changelog](https://github.com/ansible-collections/community.general/blo
 
 ## Roadmap
 
-See [this issue](https://github.com/ansible-collections/community.general/issues/582) for information on releasing, versioning and deprecation.
-
 In general, we plan to release a major version every six months, and minor versions every two months. Major versions can contain breaking changes, while minor versions only contain new features and bugfixes.
+
+See [this issue](https://github.com/ansible-collections/community.general/issues/582) for information on releasing, versioning, and deprecation.
 
 ## More information
 

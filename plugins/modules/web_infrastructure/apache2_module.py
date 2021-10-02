@@ -202,15 +202,17 @@ def _set_state(module, state):
                              result=success_msg,
                              warnings=module.warnings)
 
-        a2mod_binary = [module.get_bin_path(a2mod_binary)]
-        if a2mod_binary is None:
+        a2mod_binary_path = module.get_bin_path(a2mod_binary)
+        if a2mod_binary_path is None:
             module.fail_json(msg="%s not found. Perhaps this system does not use %s to manage apache" % (a2mod_binary, a2mod_binary))
+
+        a2mod_binary_cmd = [a2mod_binary_path]
 
         if not want_enabled and force:
             # force exists only for a2dismod on debian
-            a2mod_binary.append('-f')
+            a2mod_binary_cmd.append('-f')
 
-        result, stdout, stderr = module.run_command(a2mod_binary + [name])
+        result, stdout, stderr = module.run_command(a2mod_binary_cmd + [name])
 
         if _module_is_enabled(module) == want_enabled:
             module.exit_json(changed=True,

@@ -48,3 +48,9 @@
     pythonpath: "{{ tmp_django_root.path }}/1045-single-app-project/"
     command: check
     virtualenv: "{{ tmp_django_root.path }}/venv"
+
+- name: Run collectstatic --noinput on simple project
+  community.general.django_manage:
+    project_path: "{{ tmp_django_root.path }}/simple_project/p1"
+    command: collectstatic --noinput
+    virtualenv: "{{ tmp_django_root.path }}/venv"

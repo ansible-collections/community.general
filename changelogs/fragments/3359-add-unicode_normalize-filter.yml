@@ -1,0 +1,4 @@
+---
+add plugin.filter:
+  - name: unicode_normalize
+    description: Normalizes unicode strings to facilitate comparison of characters with normalized forms
