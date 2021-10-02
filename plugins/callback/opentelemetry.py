@@ -285,7 +285,7 @@ class OpenTelemetrySource(object):
         message = res.get('msg', 'failed')
         exception = res.get('exception', None)
         stderr = res.get('stderr', None)
-        return ('message: "{}"\nexception: "{}"\nstderr: "{}"').format(message, exception, stderr)
+        return ('message: "{0}"\nexception: "{1}"\nstderr: "{2}"').format(message, exception, stderr)
 
 
 class CallbackModule(CallbackBase):
