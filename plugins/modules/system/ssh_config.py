@@ -76,6 +76,10 @@ options:
     description:
       - Sets the C(ProxyCommand) option.
     type: str
+  forwardagent:
+    description:
+      - Sets the C(ForwardAgent) option.
+    type: str
   ssh_config_file:
     description:
       - SSH config file.
@@ -201,6 +205,7 @@ class SSHConfig():
             strict_host_key_checking=self.params.get('strict_host_key_checking'),
             user_known_hosts_file=self.params.get('user_known_hosts_file'),
             proxycommand=self.params.get('proxycommand'),
+            forwardagent=self.params.get('forwardagent'),
         )
 
         config_changed = False
@@ -288,6 +293,7 @@ def main():
             identity_file=dict(type='path'),
             port=dict(type='str'),
             proxycommand=dict(type='str', default=None),
+            forwardagent=dict(type='str', default=None),
             remote_user=dict(type='str'),
             ssh_config_file=dict(default=None, type='path'),
             state=dict(type='str', default='present', choices=['present', 'absent']),
