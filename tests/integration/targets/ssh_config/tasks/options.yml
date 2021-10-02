@@ -3,7 +3,7 @@
     ssh_config_file: "{{ ssh_config_test }}"
     host: "options.example.com"
     proxycommand: "ssh jumphost.example.com -W %h:%p"
-    forwardagent: yes
+    forwardagent: "yes"
     state: present
   register: options_add
   check_mode: yes
@@ -31,7 +31,7 @@
     ssh_config_file: "{{ ssh_config_test }}"
     host: "options.example.com"
     proxycommand: "ssh jumphost.example.com -W %h:%p"
-    forwardagent: yes
+    forwardagent: "yes"
     state: present
   register: options_add
 
@@ -48,7 +48,7 @@
     ssh_config_file: "{{ ssh_config_test }}"
     host: "options.example.com"
     proxycommand: "ssh jumphost.example.com -W %h:%p"
-    forwardagent: yes
+    forwardagent: "yes"
     state: present
   register: options_add_again
 
@@ -76,7 +76,7 @@
     ssh_config_file: "{{ ssh_config_test }}"
     host: "options.example.com"
     proxycommand: "ssh new-jumphost.example.com -W %h:%p"
-    forwardagent: no
+    forwardagent: "no"
     state: present
   register: options_update
 
@@ -95,7 +95,7 @@
     ssh_config_file: "{{ ssh_config_test }}"
     host: "options.example.com"
     proxycommand: "ssh new-jumphost.example.com -W %h:%p"
-    forwardagent: no
+    forwardagent: "no"
     state: present
   register: options_update
 
