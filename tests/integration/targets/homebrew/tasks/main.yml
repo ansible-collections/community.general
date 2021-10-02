@@ -32,54 +32,66 @@
 #    that:
 #      - upgrade_option_result.changed
 
-- name: Install xz package using homebrew
-  homebrew:
-    name: xz
-    state: present
-    update_homebrew: no
-  become: yes
-  become_user: "{{ brew_stat.stat.pw_name }}"
-  register: xz_result
+- vars:
+    package_name: gnu-tar
 
-- assert:
-    that:
-      - xz_result.changed
+  block:
+  - name: Make sure {{ package_name }} package is not installed
+    homebrew:
+      name: "{{ package_name }}"
+      state: absent
+      update_homebrew: no
+    become: yes
+    become_user: "{{ brew_stat.stat.pw_name }}"
 
-- name: Again install xz package using homebrew
-  homebrew:
-    name: xz
-    state: present
-    update_homebrew: no
-  become: yes
-  become_user: "{{ brew_stat.stat.pw_name }}"
-  register: xz_result
+  - name: Install {{ package_name }} package using homebrew
+    homebrew:
+      name: "{{ package_name }}"
+      state: present
+      update_homebrew: no
+    become: yes
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
 
-- assert:
-    that:
-      - not xz_result.changed
+  - assert:
+      that:
+        - package_result.changed
 
-- name: Uninstall xz package using homebrew
-  homebrew:
-    name: xz
-    state: absent
-    update_homebrew: no
-  become: yes
-  become_user: "{{ brew_stat.stat.pw_name }}"
-  register: xz_result
+  - name: Again install {{ package_name }} package using homebrew
+    homebrew:
+      name: "{{ package_name }}"
+      state: present
+      update_homebrew: no
+    become: yes
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
 
-- assert:
-    that:
-      - xz_result.changed
+  - assert:
+      that:
+        - not package_result.changed
 
-- name: Again uninstall xz package using homebrew
-  homebrew:
-    name: xz
-    state: absent
-    update_homebrew: no
-  become: yes
-  become_user: "{{ brew_stat.stat.pw_name }}"
-  register: xz_result
+  - name: Uninstall {{ package_name }} package using homebrew
+    homebrew:
+      name: "{{ package_name }}"
+      state: absent
+      update_homebrew: no
+    become: yes
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
 
-- assert:
-    that:
-      - not xz_result.changed
+  - assert:
+      that:
+        - package_result.changed
+
+  - name: Again uninstall {{ package_name }} package using homebrew
+    homebrew:
+      name: "{{ package_name }}"
+      state: absent
+      update_homebrew: no
+    become: yes
+    become_user: "{{ brew_stat.stat.pw_name }}"
+    register: package_result
+
+  - assert:
+      that:
+        - not package_result.changed
