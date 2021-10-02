@@ -159,4 +159,3 @@
     that:
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' not in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' not in slurp_ssh_config['content'] | b64decode"
-
