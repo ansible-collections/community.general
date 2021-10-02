@@ -23,6 +23,16 @@ DOCUMENTATION = '''
           - Hide the arguments for a task.
         env:
           - name: ANSIBLE_OPENTELEMETRY_HIDE_TASK_ARGUMENTS
+      enable_only_in_the_ci:
+        default: false
+        type: bool
+        description:
+          - Whether to enable this callback only in the CI.
+          - This is handy when you use Configuration as Code and want to send distributed traces
+          - if running in the CI rather when running Ansible locally.
+          - For such, it evaluates the `CI` environment variable and if set to true this plugin will be enabled.
+        env:
+          - name: ANSIBLE_OPENTELEMETRY_ENABLE_ONLY_IN_THE_CI
       otel_service_name:
         default: ansible
         type: str
@@ -57,6 +67,7 @@ examples: |
 '''
 
 import getpass
+import os
 import socket
 import sys
 import time
@@ -311,6 +322,11 @@ class CallbackModule(CallbackBase):
         super(CallbackModule, self).set_options(task_keys=task_keys,
                                                 var_options=var_options,
                                                 direct=direct)
+
+        if self.get_option('enable_only_in_the_ci') and os.environ.get('CI', 'false').lower() == 'false':
+            self.disabled = True
+            self._display.warning('The `enable_only_in_the_ci` option has been set and `CI` environment is not enabled. '
+                                  'Disabling the `opentelemetry` callback plugin.')
 
         self.hide_task_arguments = self.get_option('hide_task_arguments')
 
