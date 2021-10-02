@@ -91,3 +91,24 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(host_data.uuid, 'include')
         self.assertEqual(host_data.name, 'include')
         self.assertEqual(host_data.status, 'ok')
+
+    def test_get_error_message_with_exception(self):
+        res_data = OrderedDict()
+        res_data['exception'] = 'my-exception'
+        res_data['msg'] = 'my-msg'
+
+        result = self.opentelemetry.get_error_message(res_data)
+        self.assertEqual(result, 'my-exception')
+
+    def test_get_error_message_without_exception(self):
+        res_data = OrderedDict()
+        res_data['msg'] = 'my-msg'
+
+        result = self.opentelemetry.get_error_message(res_data)
+        self.assertEqual(result, 'my-msg')
+
+    def test_get_error_message_without_exception_and_msg(self):
+        res_data = OrderedDict()
+
+        result = self.opentelemetry.get_error_message(res_data)
+        self.assertEqual(result, 'failed')
