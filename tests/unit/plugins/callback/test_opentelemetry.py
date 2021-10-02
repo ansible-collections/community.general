@@ -112,3 +112,45 @@ class TestOpentelemetry(unittest.TestCase):
 
         result = self.opentelemetry.get_error_message(res_data)
         self.assertEqual(result, 'failed')
+
+    def test_enrich_error_message(self):
+        res_data = OrderedDict()
+        res_data['exception'] = 'my-exception'
+        res_data['msg'] = 'my-msg'
+        res_data['stderr'] = 'my-stderr'
+
+        result = self.opentelemetry.enrich_error_message(res_data)
+        self.assertEqual(result, 'message: "my-msg"\nexception: "my-exception"\nstderr: "my-stderr"')
+
+    def test_get_error_message_without_msg(self):
+        res_data = OrderedDict()
+        res_data['exception'] = 'my-exception'
+        res_data['stderr'] = 'my-stderr'
+
+        result = self.opentelemetry.enrich_error_message(res_data)
+        self.assertEqual(result, 'message: "failed"\nexception: "my-exception"\nstderr: "my-stderr"')
+
+    def test_get_error_message_without_msg(self):
+        res_data = OrderedDict()
+        res_data['msg'] = 'my-msg'
+        res_data['stderr'] = 'my-stderr'
+
+        result = self.opentelemetry.enrich_error_message(res_data)
+        self.assertEqual(result, 'message: "my-msg"\nexception: "None"\nstderr: "my-stderr"')
+
+    def test_get_error_message_without_stderr(self):
+        res_data = OrderedDict()
+        res_data['exception'] = 'my-exception'
+        res_data['msg'] = 'my-msg'
+
+        result = self.opentelemetry.enrich_error_message(res_data)
+        self.assertEqual(result, 'message: "my-msg"\nexception: "my-exception"\nstderr: "None"')
+
+    def test_get_error_message_with_multiple_line_stderr(self):
+        res_data = OrderedDict()
+        res_data['exception'] = 'my-exception'
+        res_data['msg'] = 'my-msg'
+        res_data['stderr'] = '\nmake[1]: Entering directory \n.No space left on device'
+
+        result = self.opentelemetry.enrich_error_message(res_data)
+        self.assertEqual(result, 'message: "my-msg"\nexception: "my-exception"\nstderr: "\nmake[1]: Entering directory \n.No space left on device"')
