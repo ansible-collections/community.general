@@ -79,6 +79,7 @@ options:
   forwardagent:
     description:
       - Sets the C(ForwardAgent) option.
+    choices: [ 'yes', 'no' ]
     type: str
   ssh_config_file:
     description:
@@ -293,7 +294,10 @@ def main():
             identity_file=dict(type='path'),
             port=dict(type='str'),
             proxycommand=dict(type='str', default=None),
-            forwardagent=dict(type='str', default=None),
+            forwardagent=dict(
+                default=None,
+                choices=['yes', 'no']
+            ),
             remote_user=dict(type='str'),
             ssh_config_file=dict(default=None, type='path'),
             state=dict(type='str', default='present', choices=['present', 'absent']),
