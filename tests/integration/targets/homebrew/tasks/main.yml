@@ -33,7 +33,7 @@
 #      - upgrade_option_result.changed
 
 - vars:
-    package_name: xz
+    package_name: gnu-tar
 
   block:
   - name: Install {{ package_name }} package using homebrew
