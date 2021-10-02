@@ -1,0 +1,154 @@
+- name: Options - Add in check mode
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    proxycommand: "ssh jumphost.example.com -W %h:%p"
+    state: present
+  register: options_add
+  check_mode: yes
+
+- name: Options - Check if changes are made in check mode
+  assert:
+    that:
+      - options_add.changed
+      - "'options.example.com' in options_add.hosts_added"
+      - options_add.hosts_changed is defined
+      - options_add.hosts_removed is defined
+
+- name: "Options - Get content of {{ ssh_config_test }}"
+  slurp:
+    src: "{{ ssh_config_test }}"
+  register: slurp_ssh_config
+
+- name: "Verify that nothign was added to {{ ssh_config_test }} during change mode"
+  assert:
+    that:
+      - "'options.example.com' not in slurp_ssh_config['content'] | b64decode"
+
+- name: Options - Add a host
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    proxycommand: "ssh jumphost.example.com -W %h:%p"
+    state: present
+  register: options_add
+
+- name: Options - Check if changes are made
+  assert:
+    that:
+      - options_add.changed
+      - "'options.example.com' in options_add.hosts_added"
+      - options_add.hosts_changed is defined
+      - options_add.hosts_removed is defined
+
+- name: Options - Add same host again for idempotency
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    proxycommand: "ssh jumphost.example.com -W %h:%p"
+    state: present
+  register: options_add_again
+
+- name: Options - Check for idempotency
+  assert:
+    that:
+      - not options_add_again.changed
+      - options_add.hosts_changed is defined
+      - options_add.hosts_removed is defined
+      - options_add.hosts_added is defined
+
+- name: "Options - Get content of {{ ssh_config_test }}"
+  slurp:
+    src: "{{ ssh_config_test }}"
+  register: slurp_ssh_config
+
+- name: "Verify that {{ ssh_config_test }} contains added options"
+  assert:
+    that:
+      - "'proxycommand ssh jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
+
+- name: Options - Update host
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    proxycommand: "ssh new-jumphost.example.com -W %h:%p"
+    state: present
+  register: options_update
+
+- name: Options - Check for update operation
+  assert:
+    that:
+      - options_update.changed
+      - options_update.hosts_changed is defined
+      - "'options.example.com' in options_update.hosts_changed"
+      - options_update.hosts_removed is defined
+      - options_update.hosts_added is defined
+      - options_update.hosts_change_diff is defined
+
+- name: Options - Update host again
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    proxycommand: "ssh new-jumphost.example.com -W %h:%p"
+    state: present
+  register: options_update
+
+- name: Options - Check update operation for idempotency
+  assert:
+    that:
+      - not options_update.changed
+      - options_update.hosts_changed is defined
+      - options_update.hosts_removed is defined
+      - options_update.hosts_added is defined
+      - options_update.hosts_change_diff is defined
+
+- name: "Options - Get content of {{ ssh_config_test }}"
+  slurp:
+    src: "{{ ssh_config_test }}"
+  register: slurp_ssh_config
+
+- name: "Verify that {{ ssh_config_test }} contains changed options"
+  assert:
+    that:
+      - "'proxycommand ssh new-jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
+
+- name: Options - Delete a host
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    state: absent
+  register: options_delete
+
+- name: Options - Check if host was removed
+  assert:
+    that:
+      - options_delete.changed
+      - "'options.example.com' in options_delete.hosts_removed"
+      - options_delete.hosts_changed is defined
+      - options_delete.hosts_added is defined
+
+- name: Options - Delete same host again for idempotency
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    state: absent
+  register: options_delete_again
+
+- name: Options - Check delete operation for idempotency
+  assert:
+    that:
+      - not options_delete_again.changed
+      - options_delete_again.hosts_changed is defined
+      - options_delete_again.hosts_removed is defined
+      - options_delete_again.hosts_added is defined
+
+- name: "Options - Get content of {{ ssh_config_test }}"
+  slurp:
+    src: "{{ ssh_config_test }}"
+  register: slurp_ssh_config
+
+- name: "Verify that {{ ssh_config_test }} does not contains deleted options"
+  assert:
+    that:
+      - "'proxycommand ssh new-jumphost.example.com -W %h:%p' not in slurp_ssh_config['content'] | b64decode"
+
