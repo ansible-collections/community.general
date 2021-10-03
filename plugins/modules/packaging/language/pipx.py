@@ -88,6 +88,7 @@ import json
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
     CmdStateModuleHelper, ArgFormat, ModuleHelperException
 )
+from ansible.module_utils.facts.compat import ansible_facts
 
 
 _state_map = dict(
@@ -125,7 +126,6 @@ class PipX(CmdStateModuleHelper):
         ],
         supports_check_mode=True,
     )
-    command = ['python', '-m', 'pipx']
     command_args_formats = dict(
         state=dict(fmt=lambda v: [_state_map.get(v, v)]),
         name_source=dict(fmt=lambda n, s: [s] if s else [n], stars=1),
@@ -166,6 +166,8 @@ class PipX(CmdStateModuleHelper):
         return installed
 
     def __init_module__(self):
+        facts = ansible_facts(self.module, gather_subset=['python'])
+        self.command = [facts['python']['executable'], '-m', 'pipx']
         self.vars.set('will_change', False, output=False, change=True)
         self.vars.set('application', self._retrieve_installed(), change=True, diff=True)
 
