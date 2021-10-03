@@ -125,7 +125,7 @@ class PipX(CmdStateModuleHelper):
         ],
         supports_check_mode=True,
     )
-    command = ['python3', '-m', 'pipx']
+    command = ['python', '-m', 'pipx']
     command_args_formats = dict(
         state=dict(fmt=lambda v: [_state_map.get(v, v)]),
         name_source=dict(fmt=lambda n, s: [s] if s else [n], stars=1),
