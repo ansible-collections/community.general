@@ -143,25 +143,27 @@ class PipX(CmdStateModuleHelper):
         include_injected=dict(fmt="--include-injected", style=ArgFormat.BOOLEAN),
         index_url=dict(fmt=('--index-url', '{0}'),),
         python=dict(fmt=('--python', '{0}'),),
-        _list=dict(fmt=('list', '--include-injected', '--json')),
+        _list=dict(fmt=('list', '--include-injected', '--json'), style=ArgFormat.BOOLEAN),
     )
     check_rc = True
 
     def _retrieve_installed(self):
         def process_list(rc, out, err):
+            if not out:
+                return {}
+
             results = {}
-            if out:
-                raw_data = json.loads(out)
-                for venv_name, venv in raw_data['venvs'].items():
-                    results[venv_name] = {
-                        'version': venv['metadata']['main_package']['package_version'],
-                        'injected': dict(
-                            (k, v['package_version']) for k, v in venv['metadata']['injected_packages']
-                        ),
-                    }
+            raw_data = json.loads(out)
+            for venv_name, venv in raw_data['venvs'].items():
+                results[venv_name] = {
+                    'version': venv['metadata']['main_package']['package_version'],
+                    'injected': dict(
+                        (k, v['package_version']) for k, v in venv['metadata']['injected_packages']
+                    ),
+                }
             return results
 
-        installed = self.run_command(params=[{'_list': "dummy"}], process_output=process_list,
+        installed = self.run_command(params=[{'_list': True}], process_output=process_list,
                                      publish_rc=False, publish_out=False, publish_err=False)
 
         if self.vars.name is not None:
