@@ -87,7 +87,32 @@ author:
     - "Alexei Znamensky (@russoz)"
 '''
 
-EXAMPLES = ''' '''
+EXAMPLES = '''
+- name: Install tox
+  community.general.pipx:
+    name: tox
+
+- name: Install tox from git repository
+  community.general.pipx:
+    name: tox
+    source: git+https://github.com/tox-dev/tox.git
+
+- name: Upgrade tox
+  community.general.pipx:
+    name: tox
+    state: upgrade
+
+- name: Reinstall black with specific python version
+  community.general.pipx:
+    name: black
+    state: reinstall
+    python: 3.7
+
+- name: Uninstall pycowsay
+  community.general.pipx:
+    name: pycowsay
+    state: absent
+'''
 
 
 import json
