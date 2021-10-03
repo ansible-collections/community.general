@@ -12,7 +12,7 @@ DOCUMENTATION = r'''
 ---
 module: proxmox_tasks_info
 short_description: Retrieve information about one or more Proxmox VE tasks
-version_added: 3.7.0
+version_added: 3.8.0
 description:
   - Retrieve information about one or more Proxmox VE tasks.
 author: 'Andreas Botzner (@paginabianca) <andreas at botzner dot com>'
