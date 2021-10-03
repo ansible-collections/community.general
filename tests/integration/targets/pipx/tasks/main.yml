@@ -3,8 +3,6 @@
   pip:
     name: pipx
     extra_args: --user
-- name: pipx ensure path
-  command: python -m pipx ensurepath
 
 ##############################################################################
 - name: install application tox
