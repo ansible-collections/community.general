@@ -69,8 +69,10 @@ options:
     executable:
         description:
             - Path to the `pipx` installed in the system.
+            - >
+              If not specified, the module will use C(python -m pipx) to run the tool,
+              using the same Python interpreter as ansible itself.
         type: path
-        default: ~/.local/bin/pipx
 notes:
     - This module does not install the C(pipx) python package, however that can be easily done with the module C(ansible.builtin.pip).
     - This module does not require C(pipx) to be in the shell C(PATH), but it must be loadable by Python as a module.
@@ -93,6 +95,7 @@ import json
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
     CmdStateModuleHelper, ArgFormat, ModuleHelperException
 )
+from ansible.module_utils.facts.compat import ansible_facts
 
 
 _state_map = dict(
@@ -120,7 +123,7 @@ class PipX(CmdStateModuleHelper):
             include_injected=dict(type='bool', default=False),
             index_url=dict(type='str'),
             python=dict(type='str'),
-            executable=dict(type='path', default='~/.local/bin/pipx')
+            executable=dict(type='path')
         ),
         required_if=[
             ('state', 'present', ['name']),
@@ -171,7 +174,12 @@ class PipX(CmdStateModuleHelper):
         return installed
 
     def __init_module__(self):
-        self.command = [self.vars.executable]
+        if self.vars.executable:
+            self.command = [self.vars.executable]
+        else:
+            facts = ansible_facts(self.module, gather_subset=['python'])
+            self.command = [facts['python']['executable'], '-m', 'pipx']
+
         self.vars.set('will_change', False, output=False, change=True)
         self.vars.set('application', self._retrieve_installed(), change=True, diff=True)
 
