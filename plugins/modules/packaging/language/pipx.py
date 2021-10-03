@@ -88,7 +88,6 @@ import json
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
     CmdStateModuleHelper, ArgFormat, ModuleHelperException
 )
-from ansible.module_utils.facts.compat import ansible_facts
 
 
 _state_map = dict(
@@ -116,6 +115,7 @@ class PipX(CmdStateModuleHelper):
             include_injected=dict(type='bool', default=False),
             index_url=dict(type='str'),
             python=dict(type='str'),
+            pipx_path=dict(type='path', default='~/.local/bin/pipx')
         ),
         required_if=[
             ('state', 'present', ['name']),
@@ -166,8 +166,7 @@ class PipX(CmdStateModuleHelper):
         return installed
 
     def __init_module__(self):
-        facts = ansible_facts(self.module, gather_subset=['python'])
-        self.command = [facts['python']['executable'], '-m', 'pipx']
+        self.command = [self.vars.pipx_path]
         self.vars.set('will_change', False, output=False, change=True)
         self.vars.set('application', self._retrieve_installed(), change=True, diff=True)
 
