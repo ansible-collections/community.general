@@ -66,7 +66,7 @@ options:
         description:
             - Python version to be used when creating the application virtual environment. Must be 3.6+.
         type: str
-    pipx_path:
+    executable:
         description:
             - Path to the `pipx` installed in the system.
         type: path
@@ -120,7 +120,7 @@ class PipX(CmdStateModuleHelper):
             include_injected=dict(type='bool', default=False),
             index_url=dict(type='str'),
             python=dict(type='str'),
-            pipx_path=dict(type='path', default='~/.local/bin/pipx')
+            executable=dict(type='path', default='~/.local/bin/pipx')
         ),
         required_if=[
             ('state', 'present', ['name']),
@@ -171,7 +171,7 @@ class PipX(CmdStateModuleHelper):
         return installed
 
     def __init_module__(self):
-        self.command = [self.vars.pipx_path]
+        self.command = [self.vars.executable]
         self.vars.set('will_change', False, output=False, change=True)
         self.vars.set('application', self._retrieve_installed(), change=True, diff=True)
 
