@@ -295,6 +295,20 @@ EXAMPLES = '''
       clientAuthMethod: client_secret_post
       clientId: my-client
       clientSecret: secret
+      syncMode: FORCE
+    mappers:
+      - name: first_name
+        identityProviderMapper: oidc-user-attribute-idp-mapper
+        config:
+          claim: first_name
+          user.attribute: first_name
+          syncMode: INHERIT
+      - name: last_name
+        identityProviderMapper: oidc-user-attribute-idp-mapper
+        config:
+          claim: last_name
+          user.attribute: last_name
+          syncMode: INHERIT
 
 - name: Create SAML identity provider, authentication with credentials
   community.general.keycloak_identity_provider:
@@ -313,6 +327,14 @@ EXAMPLES = '''
       singleSignOnServiceUrl: https://idp.example.com/login
       wantAuthnRequestsSigned: true
       wantAssertionsSigned: true
+    mappers:
+      - name: roles
+        identityProviderMapper: saml-user-attribute-idp-mapper
+        config:
+          user.attribute: roles
+          attribute.friendly.name: User Roles
+          attribute.name: roles
+          syncMode: INHERIT
 '''
 
 RETURN = '''
@@ -538,6 +560,8 @@ def main():
         mappers = updated_idp.pop('mappers', [])
         kc.create_identity_provider(updated_idp, realm)
         for mapper in mappers:
+            if mapper.get('identityProviderAlias') is None:
+                mapper['identityProviderAlias'] = alias
             kc.create_identity_provider_mapper(mapper, alias, realm)
         after_idp = get_identity_provider_with_mappers(kc, alias, realm)
 
@@ -572,6 +596,8 @@ def main():
                 if mapper.get('id') is not None:
                     kc.update_identity_provider_mapper(mapper, alias, realm)
                 else:
+                    if mapper.get('identityProviderAlias') is None:
+                        mapper['identityProviderAlias'] = alias
                     kc.create_identity_provider_mapper(mapper, alias, realm)
             for mapper in [x for x in before_idp['mappers']
                            if [y for y in updated_mappers if y["name"] == x['name']] == []]:
