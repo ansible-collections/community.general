@@ -69,7 +69,7 @@ options:
         type: str
     executable:
         description:
-            - Path to the `pipx` installed in the system.
+            - Path to the C(pipx) installed in the system.
             - >
               If not specified, the module will use C(python -m pipx) to run the tool,
               using the same Python interpreter as ansible itself.
