@@ -11,7 +11,8 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: pipx
-short_description: manages applications installed with pipx.
+short_description: Manages applications installed with pipx
+version_added: 3.8.0
 description:
     - Manage Python applications installed in isolated virtualenvs using pipx.
 options:
