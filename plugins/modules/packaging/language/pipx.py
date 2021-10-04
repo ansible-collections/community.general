@@ -37,9 +37,10 @@ options:
               If the application source, such as a package with version specifier, or an URL,
               directory or any other accepted specification. See C(pipx) documentation for more details.
             - When specified, the C(pipx) command will use I(source) instead of I(name).
-    installdeps:
+    install_deps:
         description:
-            - Install dependencies for the application.
+            - Include applications of dependent packages.
+            - Only used when I(state=install) or I(state=upgrade).
         type: bool
         default: false
     inject_packages:
@@ -51,6 +52,7 @@ options:
     force:
         description:
             - Force modification of the application's virtual environment. See C(pipx) for details.
+            - Only used when I(state=install), I(state=upgrade), I(state=upgrade_all), or I(state=inject).
         type: bool
         default: false
     include_injected:
@@ -62,10 +64,12 @@ options:
     index_url:
         description:
             - Base URL of Python Package Index.
+            - Only used when I(state=install), I(state=upgrade), or I(state=inject).
         type: str
     python:
         description:
             - Python version to be used when creating the application virtual environment. Must be 3.6+.
+            - Only used when I(state=install), I(state=reinstall), or I(state=reinstall_all).
         type: str
     executable:
         description:
@@ -103,7 +107,7 @@ EXAMPLES = '''
     name: tox
     state: upgrade
 
-- name: Reinstall black with specific python version
+- name: Reinstall black with specific Python version
   community.general.pipx:
     name: black
     state: reinstall
@@ -143,7 +147,7 @@ class PipX(CmdStateModuleHelper):
                            'inject', 'upgrade', 'upgrade_all', 'reinstall', 'reinstall_all']),
             name=dict(type='str'),
             source=dict(type='str'),
-            installdeps=dict(type='bool', default=False),
+            install_deps=dict(type='bool', default=False),
             inject_packages=dict(type='list', elements='str'),
             force=dict(type='bool', default=False),
             include_injected=dict(type='bool', default=False),
@@ -163,7 +167,7 @@ class PipX(CmdStateModuleHelper):
     command_args_formats = dict(
         state=dict(fmt=lambda v: [_state_map.get(v, v)]),
         name_source=dict(fmt=lambda n, s: [s] if s else [n], stars=1),
-        installdeps=dict(fmt="--install-deps", style=ArgFormat.BOOLEAN),
+        install_deps=dict(fmt="--install-deps", style=ArgFormat.BOOLEAN),
         inject_packages=dict(fmt=lambda v: v),
         force=dict(fmt="--force", style=ArgFormat.BOOLEAN),
         include_injected=dict(fmt="--include-injected", style=ArgFormat.BOOLEAN),
@@ -218,7 +222,7 @@ class PipX(CmdStateModuleHelper):
         if not self.vars.application or self.vars.force:
             self.vars.will_change = True
         if not self.module.check_mode:
-            self.run_command(params=['state', 'index_url', 'installdeps', 'force', 'python',
+            self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'python',
                                      {'name_source': [self.vars.name, self.vars.source]}])
 
     state_present = state_install
@@ -229,7 +233,7 @@ class PipX(CmdStateModuleHelper):
                 "Trying to upgrade a non-existent application: {0}".format(self.vars.name))
 
         if not self.module.check_mode:
-            self.run_command(params=['state', 'index_url', 'installdeps', 'force', 'name'])
+            self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'name'])
 
     def state_uninstall(self):
         if not self.vars.application:
