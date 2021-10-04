@@ -40,7 +40,6 @@
         - install_tox is changed
         - "'tox' in install_tox.application"
         - install_tox_again is not changed
-        - install_tox_again is failed
         - install_tox_again_force is changed
         - uninstall_tox is changed
         - "'tox' not in uninstall_tox.application"
