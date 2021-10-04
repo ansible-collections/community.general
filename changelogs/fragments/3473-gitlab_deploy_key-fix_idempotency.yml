@@ -1,0 +1,2 @@
+bugfixes:
+  - gitlab_deploy_key - fix idempotency on projects with multiple deploy keys (https://github.com/ansible-collections/community.general/pull/3473).

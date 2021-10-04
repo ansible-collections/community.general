@@ -211,7 +211,7 @@ class GitLabDeployKey(object):
     @param key_title Title of the key
     '''
     def findDeployKey(self, project, key_title):
-        deployKeys = project.keys.list()
+        deployKeys = project.keys.list(all=True)
         for deployKey in deployKeys:
             if (deployKey.title == key_title):
                 return deployKey
