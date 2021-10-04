@@ -223,7 +223,7 @@ class PipX(CmdStateModuleHelper):
             self.vars.will_change = True
             if not self.module.check_mode:
                 self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'python',
-                                        {'name_source': [self.vars.name, self.vars.source]}])
+                                         {'name_source': [self.vars.name, self.vars.source]}])
 
     state_present = state_install
 
