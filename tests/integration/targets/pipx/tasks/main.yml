@@ -5,6 +5,12 @@
     extra_args: --user
 
 ##############################################################################
+- name: ensure application tox is uninstalled
+  community.general.pipx:
+    state: absent
+    name: tox
+  register: uninstall_tox
+
 - name: install application tox
   community.general.pipx:
     name: tox
