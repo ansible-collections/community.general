@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+
 # Copyright: (c) 2019, Jon Ellis (@JonEllis0) <ellis.jp@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -26,7 +27,8 @@ options:
     group:
         required: false
         description:
-            - Name of the group for the sudoers rule (cannot be used in conjunction with user)
+            - Name of the group for the sudoers rule
+            - (cannot be used in conjunction with user)
         type: str
     name:
         required: true
@@ -49,7 +51,8 @@ options:
     user:
         required: false
         description:
-            - Name of the user for the sudoers rule (cannot be used in conjunction with group)
+            - Name of the user for the sudoers rule
+            - (cannot be used in conjunction with group)
         type: str
 '''
 
@@ -83,17 +86,19 @@ EXAMPLES = '''
 '''
 
 from ansible.module_utils.basic import AnsibleModule
+import os
 
-class Sudoers (object) :
 
-    def __init__ (self, module) :
+class Sudoers (object):
+
+    def __init__(self, module):
         self.module = module
         self.name = module.params['name']
         self.user = module.params.get('user')
         self.group = module.params.get('group')
         self.state = module.params['state']
         self.nopassword = bool(module.params.get('nopassword', True))
-        self.file = '/etc/sudoers.d/{}'.format(self.name)
+        self.file = '/etc/sudoers.d/{filename}'.format(filename=self.name)
 
         command = module.params['command']
         if isinstance(command, list):
@@ -119,11 +124,11 @@ class Sudoers (object) :
         if self.user:
             owner = self.user
         elif self.group:
-            owner = '%{}'.format(self.group)
+            owner = '%{group}'.format(group=self.group)
 
         command_str = ', '.join(self.commands)
         nopasswd_str = 'NOPASSWD' if self.nopassword else ''
-        return "{} ALL={}: {}\n".format(owner, nopasswd_str, command_str)
+        return "{owner} ALL={nopasswd}: {command}\n".format(owner=owner, nopasswd=nopasswd_str, command=command_str)
 
     def check(self):
         try:
@@ -139,9 +144,9 @@ class Sudoers (object) :
             else:
                 changed = False
         except Exception as e:
-            self.module.fail_json (msg = str(e))
+            self.module.fail_json(msg=str(e))
 
-        self.module.exit_json (changed = changed)
+        self.module.exit_json(changed=changed)
 
     def run(self):
         changed = False
@@ -162,13 +167,13 @@ class Sudoers (object) :
             else:
                 changed = False
 
-        except Exception as e :
-            self.module.fail_json (msg = str (e))
+        except Exception as e:
+            self.module.fail_json(msg=str(e))
 
-        self.module.exit_json (changed = changed)
+        self.module.exit_json(changed=changed)
 
 
-def main ():
+def main():
     argument_spec = {
         'command': {
             'type': 'list',
@@ -191,7 +196,7 @@ def main ():
     }
     mutually_exclusive = [['user', 'group']]
 
-    module = AnsibleModule (
+    module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=mutually_exclusive,
         supports_check_mode=True,
