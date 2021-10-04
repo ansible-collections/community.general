@@ -221,9 +221,9 @@ class PipX(CmdStateModuleHelper):
     def state_install(self):
         if not self.vars.application or self.vars.force:
             self.vars.will_change = True
-        if not self.module.check_mode:
-            self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'python',
-                                     {'name_source': [self.vars.name, self.vars.source]}])
+            if not self.module.check_mode:
+                self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'python',
+                                        {'name_source': [self.vars.name, self.vars.source]}])
 
     state_present = state_install
 
@@ -231,16 +231,13 @@ class PipX(CmdStateModuleHelper):
         if not self.vars.application:
             raise ModuleHelperException(
                 "Trying to upgrade a non-existent application: {0}".format(self.vars.name))
-
+        if self.vars.force:
+            self.vars.will_change = True
         if not self.module.check_mode:
             self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'name'])
 
     def state_uninstall(self):
-        if not self.vars.application:
-            raise ModuleHelperException(
-                "Trying to uninstall a non-existent application: {0}".format(self.vars.name))
-
-        if not self.module.check_mode:
+        if self.vars.application and not self.module.check_mode:
             self.run_command(params=['state', 'name'])
 
     state_absent = state_uninstall
@@ -257,7 +254,8 @@ class PipX(CmdStateModuleHelper):
         if not self.vars.application:
             raise ModuleHelperException(
                 "Trying to inject packages into a non-existent application: {0}".format(self.vars.name))
-
+        if self.vars.force:
+            self.vars.will_change = True
         if not self.module.check_mode:
             self.run_command(params=['state', 'index_url', 'force', 'name', 'inject_packages'])
 
@@ -270,6 +268,8 @@ class PipX(CmdStateModuleHelper):
             self.run_command(params=['state', 'python'])
 
     def state_upgrade_all(self):
+        if self.vars.force:
+            self.vars.will_change = True
         if not self.module.check_mode:
             self.run_command(params=['state', 'include_injected', 'force'])
 
