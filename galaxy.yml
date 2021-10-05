@@ -14,3 +14,11 @@ documentation: https://docs.ansible.com/ansible/latest/collections/community/gen
 homepage: https://github.com/ansible-collections/community.general
 issues: https://github.com/ansible-collections/community.general/issues
 #type: flatmap
+build_ignore:
+  - .azure-pipelines
+  - .github
+  - .gitignore
+  - changelogs
+  - CONTRIBUTING.md
+  - commit-rights.md
+  - tests
