@@ -304,7 +304,7 @@ def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, sta
         past_tense = {'install': 'installed', 'upgrade': 'upgraded'}
         messages = []
         for (action, count) in action_count.items():
-            messages.append("%s %s package(s)" % (past_tense.get(action, action), count))
+            messages.append("%s %s package%s" % (past_tense.get(action, action), count, "s" if count != 1 else ""))
 
         return (True, '; '.join(messages), stdout, stderr)
 
