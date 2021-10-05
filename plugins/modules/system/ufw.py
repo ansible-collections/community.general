@@ -54,8 +54,8 @@ options:
     description:
       - Insert the corresponding rule as rule number NUM.
       - Note that ufw numbers rules starting with 1.
-      - The insert option is ignored if the delete option is true allowing
-        the rule to be deleted.
+      - If the delete option is true and the insert option is present,
+        then the task is biased for the rule to be deleted.
     type: int
   insert_relative_to:
     description:
