@@ -511,12 +511,12 @@ def main():
                                  'interface_in and interface_out')
             # Rules are constructed according to the long format
             #
-            # ufw [--dry-run] [route] [delete] [insert NUM] allow|deny|reject|limit [in|out on INTERFACE] [log|log-all] \
+            # ufw [--dry-run] [route] [delete | insert NUM] allow|deny|reject|limit [in|out on INTERFACE] [log|log-all] \
             #     [from ADDRESS [port PORT]] [to ADDRESS [port PORT]] \
             #     [proto protocol] [app application] [comment COMMENT]
             cmd.append([module.boolean(params['route']), 'route'])
             cmd.append([module.boolean(params['delete']), 'delete'])
-            if params['insert'] is not None:
+            if params['insert'] is not None and not module.boolean(params['delete']):
                 relative_to_cmd = params['insert_relative_to']
                 if relative_to_cmd == 'zero':
                     insert_to = params['insert']
