@@ -271,20 +271,22 @@ class OpenTelemetrySource(object):
             if attributeValue is not None:
                 span.set_attribute(attributeName, attributeValue)
 
-    def get_error_message(self, res):
-        message = ''
-        if res.get('exception') is not None:
-            message = res['exception'].strip().split('\n')[-1]
-        elif 'msg' in res:
-            message = res['msg']
-        else:
-            message = 'failed'
-        return message
+    @staticmethod
+    def get_error_message(result):
+        if result.get('exception') is not None:
+            return OpenTelemetrySource._last_line(result['exception'])
+        return result.get('msg', 'failed')
 
-    def enrich_error_message(self, res):
-        message = res.get('msg', 'failed')
-        exception = res.get('exception', None)
-        stderr = res.get('stderr', None)
+    @staticmethod
+    def _last_line(text):  # This doesn't need to be a method of this class
+        lines = text.strip().split('\n')
+        return lines[-1]
+
+    @staticmethod
+    def enrich_error_message(result):
+        message = result.get('msg', 'failed')
+        exception = result.get('exception')
+        stderr = result.get('stderr')
         return ('message: "{0}"\nexception: "{1}"\nstderr: "{2}"').format(message, exception, stderr)
 
 
