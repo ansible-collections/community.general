@@ -119,7 +119,8 @@ options:
     aliases: [ app ]
   delete:
     description:
-      - Delete rule.
+      - Delete rule. If the delete option is true and the insert option
+        is present; then the task is biased for the rule to be deleted.
     type: bool
     default: false
   interface:
