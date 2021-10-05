@@ -33,6 +33,7 @@ DOCUMENTATION = '''
           - For such, it evaluates the `CI` environment variable and if set to true this plugin will be enabled.
         env:
           - name: ANSIBLE_OPENTELEMETRY_ENABLE_ONLY_IN_THE_CI
+        version_added: 3.8.0
       otel_service_name:
         default: ansible
         type: str
