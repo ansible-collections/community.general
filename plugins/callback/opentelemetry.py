@@ -278,7 +278,7 @@ class OpenTelemetrySource(object):
         return result.get('msg', 'failed')
 
     @staticmethod
-    def _last_line(text):  # This doesn't need to be a method of this class
+    def _last_line(text):
         lines = text.strip().split('\n')
         return lines[-1]
 
