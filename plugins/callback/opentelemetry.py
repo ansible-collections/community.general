@@ -23,16 +23,16 @@ DOCUMENTATION = '''
           - Hide the arguments for a task.
         env:
           - name: ANSIBLE_OPENTELEMETRY_HIDE_TASK_ARGUMENTS
-      enable_only_in_the_ci:
-        default: false
-        type: bool
+      enable_from_environment:
+        type: str
         description:
-          - Whether to enable this callback only in the CI.
+          - Whether to enable this callback only if the given environment variable exists and it sets to true.
           - This is handy when you use Configuration as Code and want to send distributed traces
           - if running in the CI rather when running Ansible locally.
-          - For such, it evaluates the `CI` environment variable and if set to true this plugin will be enabled.
+          - For such, it evaluates the given enable_from_environment value as environment variable
+          - and if set to true this plugin will be enabled.
         env:
-          - name: ANSIBLE_OPENTELEMETRY_ENABLE_ONLY_IN_THE_CI
+          - name: ANSIBLE_OPENTELEMETRY_ENABLE_FROM_ENVIRONMENT
         version_added: 3.8.0
       otel_service_name:
         default: ansible
@@ -324,10 +324,11 @@ class CallbackModule(CallbackBase):
                                                 var_options=var_options,
                                                 direct=direct)
 
-        if self.get_option('enable_only_in_the_ci') and os.environ.get('CI', 'false').lower() == 'false':
+        environment_variable = self.get_option('enable_from_environment')
+        if environment_variable is not None and os.environ.get(environment_variable, 'false').lower() == 'false':
             self.disabled = True
-            self._display.warning('The `enable_only_in_the_ci` option has been set and `CI` environment is not enabled. '
-                                  'Disabling the `opentelemetry` callback plugin.')
+            self._display.warning("The `enable_from_environment` option has been set and {0} is not enabled. "
+                                  "Disabling the `opentelemetry` callback plugin.".format(environment_variable))
 
         self.hide_task_arguments = self.get_option('hide_task_arguments')
 
