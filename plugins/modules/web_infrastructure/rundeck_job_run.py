@@ -262,8 +262,7 @@ def main():
     ))
 
     module = AnsibleModule(
-        argument_spec=argument_spec,
-        supports_check_mode=False
+        argument_spec=argument_spec
     )
 
     if module.params["api_version"] < 14:
