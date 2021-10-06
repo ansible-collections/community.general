@@ -758,6 +758,8 @@ files:
     ignore: jle64
   $modules/packaging/language/pip_package_info.py:
     maintainers: bcoca matburt maxamillion
+  $modules/packaging/language/pipx.py:
+    maintainers: russoz
   $modules/packaging/language/yarn.py:
     maintainers: chrishoffman verkaufer
   $modules/packaging/os/apk.py:
