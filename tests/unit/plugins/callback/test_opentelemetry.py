@@ -93,30 +93,28 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(host_data.status, 'ok')
 
     def test_get_error_message(self):
-        result = self.opentelemetry.get_error_message(generate_test_data(exception='my-exception', msg='my-msg'))
-        self.assertEqual(result, 'my-exception')
+        test_cases = (
+            ('my-exception', 'my-msg', None, 'my-exception'),
+            (None, 'my-msg', None, 'my-msg'),
+            (None, None, None, 'failed'),
+        )
 
-        result = self.opentelemetry.get_error_message(generate_test_data(msg='my-msg'))
-        self.assertEqual(result, 'my-msg')
-
-        result = self.opentelemetry.get_error_message(generate_test_data())
-        self.assertEqual(result, 'failed')
+        for tc in test_cases:
+            result = self.opentelemetry.get_error_message(generate_test_data(tc[0], tc[1], tc[2]))
+            self.assertEqual(result, tc[3])
 
     def test_enrich_error_message(self):
-        result = self.opentelemetry.enrich_error_message(generate_test_data(exception='my-exception', msg='my-msg', stderr='my-stderr'))
-        self.assertEqual(result, 'message: "my-msg"\nexception: "my-exception"\nstderr: "my-stderr"')
+        test_cases = (
+            ('my-exception', 'my-msg', 'my-stderr', 'message: "my-msg"\nexception: "my-exception"\nstderr: "my-stderr"'),
+            ('my-exception', None, 'my-stderr', 'message: "failed"\nexception: "my-exception"\nstderr: "my-stderr"'),
+            (None, 'my-msg', 'my-stderr', 'message: "my-msg"\nexception: "None"\nstderr: "my-stderr"'),
+            ('my-exception', 'my-msg', None, 'message: "my-msg"\nexception: "my-exception"\nstderr: "None"'),
+            ('my-exception', 'my-msg', '\nline1\nline2', 'message: "my-msg"\nexception: "my-exception"\nstderr: "\nline1\nline2"')
+        )
 
-        result = self.opentelemetry.enrich_error_message(generate_test_data(exception='my-exception', stderr='my-stderr'))
-        self.assertEqual(result, 'message: "failed"\nexception: "my-exception"\nstderr: "my-stderr"')
-
-        result = self.opentelemetry.enrich_error_message(generate_test_data(msg='my-msg', stderr='my-stderr'))
-        self.assertEqual(result, 'message: "my-msg"\nexception: "None"\nstderr: "my-stderr"')
-
-        result = self.opentelemetry.enrich_error_message(generate_test_data(exception='my-exception', msg='my-msg'))
-        self.assertEqual(result, 'message: "my-msg"\nexception: "my-exception"\nstderr: "None"')
-
-        result = self.opentelemetry.enrich_error_message(generate_test_data(exception='my-exception', msg='my-msg', stderr='\nerror: \n.No space left'))
-        self.assertEqual(result, 'message: "my-msg"\nexception: "my-exception"\nstderr: "\nerror: \n.No space left"')
+        for tc in test_cases:
+            result = self.opentelemetry.enrich_error_message(generate_test_data(tc[0], tc[1], tc[2]))
+            self.assertEqual(result, tc[3])
 
 
 def generate_test_data(exception=None, msg=None, stderr=None):
