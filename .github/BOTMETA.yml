@@ -223,6 +223,7 @@ files:
   $lookups/redis.py:
     maintainers: $team_ansible_core jpmens
   $lookups/shelvefile.py: {}
+  $lookups/revbitspss.py: {}
   $lookups/tss.py:
     maintainers: amigus endlesstrax
   $module_utils/:
