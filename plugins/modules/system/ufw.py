@@ -520,7 +520,7 @@ def main():
             #     [proto protocol] [app application] [comment COMMENT]
             cmd.append([module.boolean(params['route']), 'route'])
             cmd.append([module.boolean(params['delete']), 'delete'])
-            if params['insert'] is not None and not module.boolean(params['delete']):
+            if params['insert'] is not None and not params['delete']:
                 relative_to_cmd = params['insert_relative_to']
                 if relative_to_cmd == 'zero':
                     insert_to = params['insert']
