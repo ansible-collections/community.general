@@ -12,6 +12,7 @@ DOCUMENTATION = '''
 ---
 module: lxd_virtual_machine
 short_description: Manage LXD Virtual machines
+version_added: 3.8.0
 description:
   - Management of LXD virtual machines
 author: "Hiroaki Nakamura (@hnakamur)"
