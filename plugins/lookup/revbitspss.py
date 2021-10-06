@@ -67,16 +67,6 @@ else:
     ANOTHER_LIBRARY_IMPORT_ERROR = None
 
 
-# sdk_is_missing = False
-# try:
-#     from pam.revbits_ansible.server import (
-#         SecretServer,
-#         SecretServerError,
-#     )
-# except ImportError:
-#     sdk_is_missing = True
-
-
 display = Display()
 
 
@@ -92,8 +82,6 @@ class LookupModule(LookupBase):
                 AnsibleError('revbits_ansible must be installed to use this plugin'),
                 ANOTHER_LIBRARY_IMPORT_ERROR
             )
-        # if sdk_is_missing:
-        #     raise AnsibleError("revbits-ansible must be installed to use this plugin")
         self.set_options(var_options=variables, direct=kwargs)
         secret_server = LookupModule.Client(
             {
@@ -103,10 +91,10 @@ class LookupModule(LookupBase):
         )
         result = []
         for term in terms[0]:
-            display.debug(f"revbitspss_lookup term: {term}")
+            display.debug("revbitspss_lookup term: %s" % term)
             try:
-                display.vvv(f"Secret Server lookup of Secret with ID {term}")
+                display.vvv(u"Secret Server lookup of Secret with ID %s" % term)
                 result.append({term: secret_server.get_pam_secret(term)})
             except SecretServerError as error:
-                raise AnsibleError(f"Secret Server lookup failure: {error.message}")
+                raise AnsibleError("Secret Server lookup failure: %s" % error.message)
         return result
