@@ -9,7 +9,7 @@ DOCUMENTATION = '''
     name: elastic
     type: notification
     short_description: Create distributed traces for each Ansible task in Elastic APM
-    version_added: 3.7.0
+    version_added: 3.8.0
     description:
       - This callback creates distributed traces for each Ansible task in Elastic APM.
       - You can configure the plugin with environment variables.
