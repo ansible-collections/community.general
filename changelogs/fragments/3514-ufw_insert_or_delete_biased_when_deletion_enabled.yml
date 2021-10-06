@@ -1,2 +1,2 @@
-bugfixes:
-  - "ufw - If the delete option is true and the insert option is present, then the task is biased for the rule to be deleted - rather than failing with a syntax error. (https://github.com/ansible-collections/community.general/pull/3514)"
+minor_changes:
+  - "ufw - if the delete option is true and the insert option is present, then the task is biased towards deletion of the rule rather than failing with a syntax error (https://github.com/ansible-collections/community.general/pull/3514)."
