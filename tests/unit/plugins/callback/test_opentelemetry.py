@@ -92,65 +92,39 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(host_data.name, 'include')
         self.assertEqual(host_data.status, 'ok')
 
-    def test_get_error_message_with_exception(self):
-        res_data = OrderedDict()
-        res_data['exception'] = 'my-exception'
-        res_data['msg'] = 'my-msg'
-
-        result = self.opentelemetry.get_error_message(res_data)
+    def test_get_error_message(self):
+        result = self.opentelemetry.get_error_message(generate_test_data(exception='my-exception', msg='my-msg'))
         self.assertEqual(result, 'my-exception')
 
-    def test_get_error_message_without_exception(self):
-        res_data = OrderedDict()
-        res_data['msg'] = 'my-msg'
-
-        result = self.opentelemetry.get_error_message(res_data)
+        result = self.opentelemetry.get_error_message(generate_test_data(msg='my-msg'))
         self.assertEqual(result, 'my-msg')
 
-    def test_get_error_message_without_exception_and_msg(self):
-        res_data = OrderedDict()
-
-        result = self.opentelemetry.get_error_message(res_data)
+        result = self.opentelemetry.get_error_message(generate_test_data())
         self.assertEqual(result, 'failed')
 
     def test_enrich_error_message(self):
-        res_data = OrderedDict()
-        res_data['exception'] = 'my-exception'
-        res_data['msg'] = 'my-msg'
-        res_data['stderr'] = 'my-stderr'
-
-        result = self.opentelemetry.enrich_error_message(res_data)
+        result = self.opentelemetry.enrich_error_message(generate_test_data(exception='my-exception', msg='my-msg', stderr='my-stderr'))
         self.assertEqual(result, 'message: "my-msg"\nexception: "my-exception"\nstderr: "my-stderr"')
 
-    def test_get_error_message_without_msg(self):
-        res_data = OrderedDict()
-        res_data['exception'] = 'my-exception'
-        res_data['stderr'] = 'my-stderr'
-
-        result = self.opentelemetry.enrich_error_message(res_data)
+        result = self.opentelemetry.enrich_error_message(generate_test_data(exception='my-exception', stderr='my-stderr'))
         self.assertEqual(result, 'message: "failed"\nexception: "my-exception"\nstderr: "my-stderr"')
 
-    def test_get_error_message_without_msg(self):
-        res_data = OrderedDict()
-        res_data['msg'] = 'my-msg'
-        res_data['stderr'] = 'my-stderr'
-
-        result = self.opentelemetry.enrich_error_message(res_data)
+        result = self.opentelemetry.enrich_error_message(generate_test_data(msg='my-msg', stderr='my-stderr'))
         self.assertEqual(result, 'message: "my-msg"\nexception: "None"\nstderr: "my-stderr"')
 
-    def test_get_error_message_without_stderr(self):
-        res_data = OrderedDict()
-        res_data['exception'] = 'my-exception'
-        res_data['msg'] = 'my-msg'
-
-        result = self.opentelemetry.enrich_error_message(res_data)
+        result = self.opentelemetry.enrich_error_message(generate_test_data(exception='my-exception', msg='my-msg'))
         self.assertEqual(result, 'message: "my-msg"\nexception: "my-exception"\nstderr: "None"')
 
-    def test_get_error_message_with_multiple_line_stderr(self):
-        res_data = OrderedDict()
-        res_data['exception'] = 'my-exception'
-        res_data['msg'] = 'my-msg'
-        res_data['stderr'] = '\nmake[1]: Entering directory \n.No space left on device'
+        result = self.opentelemetry.enrich_error_message(generate_test_data(exception='my-exception', msg='my-msg', stderr='\nerror: \n.No space left'))
+        self.assertEqual(result, 'message: "my-msg"\nexception: "my-exception"\nstderr: "\nerror: \n.No space left"')
 
-        result = self.opentelemetry.enrich_error_message(res_data)
-        self.assertEqual(result, 'message: "my-msg"\nexception: "my-exception"\nstderr: "\nmake[1]: Entering directory \n.No space left on device"')
+
+def generate_test_data(exception=None, msg=None, stderr=None):
+    res_data = OrderedDict()
+    if exception:
+        res_data['exception'] = exception
+    if msg:
+        res_data['msg'] = msg
+    if stderr:
+        res_data['stderr'] = stderr
+    return res_data
