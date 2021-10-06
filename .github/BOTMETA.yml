@@ -1162,6 +1162,8 @@ files:
     maintainers: nerzhul
   $modules/web_infrastructure/rundeck_job_run.py:
     maintainers: phsmith
+  $modules/web_infrastructure/rundeck_job_executions_info.py:
+    maintainers: phsmith
   $modules/web_infrastructure/sophos_utm/:
     maintainers: $team_e_spirit
     keywords: sophos utm
