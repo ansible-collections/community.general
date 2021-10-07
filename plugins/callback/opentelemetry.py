@@ -241,15 +241,10 @@ class OpenTelemetrySource(object):
             res = host_data.result._result
             rc = res.get('rc', 0)
             if host_data.status == 'failed':
-                if res.get('exception') is not None:
-                    message = res['exception'].strip().split('\n')[-1]
-                elif 'msg' in res:
-                    message = res['msg']
-                else:
-                    message = 'failed'
+                message = self.get_error_message(res)
                 status = Status(status_code=StatusCode.ERROR, description=message)
                 # Record an exception with the task message
-                span.record_exception(BaseException(message))
+                span.record_exception(BaseException(self.enrich_error_message(res)))
             elif host_data.status == 'skipped':
                 if 'skip_reason' in res:
                     message = res['skip_reason']
@@ -275,6 +270,24 @@ class OpenTelemetrySource(object):
         else:
             if attributeValue is not None:
                 span.set_attribute(attributeName, attributeValue)
+
+    @staticmethod
+    def get_error_message(result):
+        if result.get('exception') is not None:
+            return OpenTelemetrySource._last_line(result['exception'])
+        return result.get('msg', 'failed')
+
+    @staticmethod
+    def _last_line(text):
+        lines = text.strip().split('\n')
+        return lines[-1]
+
+    @staticmethod
+    def enrich_error_message(result):
+        message = result.get('msg', 'failed')
+        exception = result.get('exception')
+        stderr = result.get('stderr')
+        return ('message: "{0}"\nexception: "{1}"\nstderr: "{2}"').format(message, exception, stderr)
 
 
 class CallbackModule(CallbackBase):
