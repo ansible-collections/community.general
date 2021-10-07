@@ -1,0 +1,2 @@
+minor_changes:
+  - "ufw - if ``delete=true`` and ``insert`` option is present, then ``insert`` is now ignored rather than failing with a syntax error (https://github.com/ansible-collections/community.general/pull/3514)."
