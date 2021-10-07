@@ -307,56 +307,89 @@ class OpenTelemetrySource(object):
     def add_network_attributes_if_possible(self, task_data, span):
         """ update the span attributes with the service that the task interacted with, if possible """
 
-        if any(s in task_data.action for s in ('get_url', 'homebrew_tap', 'uri', 'win_get_url', 'win_uri')) and task_data.args.get('url', None):
-            self.add_network_attributes(task_data.args.get('url'), span)
+        # Data structure to support what ansible tasks provide network attributes
+        # and what tasks arguments contain the data.
+        #
+        # "primary" represents the first task argument to be evaluated.
+        # "secondary" represents the fallback in case the argument in the primary does not exist.
+        # "default" is the very last resort to use the hardcoded value.
+        #
+        # TODO: Support apt_repository: repo:
+        # it requires to parse deb https://artifacts./...packages/6.x/apt stable main
+        #
+        supported_tasks = {
+          "homebrew": {"default": "homebrew"},
+          "homebrew_tap": {"primary": "url"},
+          "get_url": {"primary": "url"},
+          "git": {"primary": "repo"},
+          "uri": {"primary": "url"},
+          "yum": {"primary": "name"},
+          "yum_repository": {"primary": "baseurl", "secondary": "mirrorlist"},
+          "win_chocolatey": {"primary": "source", "secondary": "proxy_url", "default": "chocolatey"},
+          "win_get_url": {"primary": "url"},
+          "zypper_repository": {"primary": "repo"}
+        }
 
-        # Support apt_repository: repo: deb https://artifacts./...packages/6.x/apt stable main
-
-        if 'win_chocolatey' in task_data.action:
-            if task_data.args.get('source', None):
-                self.add_network_attributes(task_data.args.get('source'), span)
-            elif task_data.args.get('proxy_url', None):
-                self.add_network_attributes(task_data.args.get('proxy_url'), span)
+        if task_data.action in supported_tasks.keys():
+            supported_task = supported_tasks.get(task_data.action)
+            primary = self.get_argument_value(task_data, supported_task.get("primary", None))
+            secondary = self.get_argument_value(task_data, supported_task.get("secondary", None))
+            default = supported_task.get("default", None)
+            if primary:
+                self.add_network_attributes_with_url(span, primary)
+            elif secondary:
+                self.add_network_attributes_with_url(span, secondary)
+            elif default:
+                self.add_default_network_attributes(span, default)
             else:
-                self.set_span_attribute(span, "net.peer.name", 'chocolatey')
-                self.set_span_attribute(span, "rpc.service", 'chocolatey')
+                # This should not happen
+                self._display.debug("{0} without any data".format(task_data.action))
 
-        if 'homebrew' in task_data.action:
-            self.set_span_attribute(span, "net.peer.name", 'homebrew')
-            self.set_span_attribute(span, "rpc.service", 'homebrew')
-
-        if 'git' in task_data.action:
-            self.add_network_attributes(task_data.args.get('repo'), span)
-
-        if 'yum' in task_data.action and task_data.args.get('name', '').startswith('http'):
-            self.add_network_attributes(task_data.args.get('name'), span)
-
-        if 'yum_repository' in task_data.action:
-            if task_data.args.get('baseurl', None):
-                self.add_network_attributes(task_data.args.get('baseurl'), span)
-            elif task_data.args.get('mirrorlist', None):
-                self.add_network_attributes(task_data.args.get('mirrorlist'), span)
-            else:
-                self._display.debug('yum_repository without a baseurl or mirrorlist.')
-
-        if 'zypper_repository' in task_data.action and task_data.args.get('repo', None):
-            self.add_network_attributes(task_data.args.get('repo'), span)
-
-    def add_network_attributes(self, url, span):
-        """ update the span attributes with the service that the task interacted with """
+    def add_network_attributes_with_url(self, span, url):
+        """ update the span attributes with the url that the task interacted with """
 
         parsed_url = urlparse(url)
-        self.set_span_attribute(span, "net.peer.name", parsed_url.hostname)
-        self.set_span_attribute(span, "rpc.service", parsed_url.hostname)
+        self.add_default_network_attributes(span, parsed_url.hostname)
         if parsed_url.port:
             self.set_span_attribute(span, "net.peer.port", parsed_url.port)
         if parsed_url.scheme:
             self.set_span_attribute(span, "rpc.system", parsed_url.scheme)
 
+    def add_default_network_attributes(self, span, value):
+        """ update the span attributes with the service that the task interacted with """
+
+        self.set_span_attribute(span, "net.peer.name", value)
+        self.set_span_attribute(span, "rpc.service", value)
+        self.set_span_attribute(span, "rpc.system", "rpc")
+
+    @staticmethod
+    def get_argument_value(task_data, argument):
+        if argument:
+            return task_data.args.get(argument, None)
+        return None
+
     def flat_args(self, args):
         if args:
             return ', '.join(('%s=%s' % a for a in args.items()))
         return None
+
+    @staticmethod
+    def get_error_message(result):
+        if result.get('exception') is not None:
+            return OpenTelemetrySource._last_line(result['exception'])
+        return result.get('msg', 'failed')
+
+    @staticmethod
+    def _last_line(text):
+        lines = text.strip().split('\n')
+        return lines[-1]
+
+    @staticmethod
+    def enrich_error_message(result):
+        message = result.get('msg', 'failed')
+        exception = result.get('exception')
+        stderr = result.get('stderr')
+        return ('message: "{0}"\nexception: "{1}"\nstderr: "{2}"').format(message, exception, stderr)
 
 
 class CallbackModule(CallbackBase):
