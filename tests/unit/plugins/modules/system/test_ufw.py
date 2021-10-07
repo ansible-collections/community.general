@@ -54,6 +54,7 @@ dry_mode_cmd_with_port_700 = {
     "ufw status verbose": ufw_status_verbose_with_port_7000,
     "ufw --version": ufw_version_35,
     "ufw --dry-run allow from any to any port 7000 proto tcp": skippg_adding_existing_rules,
+    "ufw --dry-run insert 1 allow from any to any port 7000 proto tcp": skippg_adding_existing_rules,
     "ufw --dry-run delete allow from any to any port 7000 proto tcp": "",
     "ufw --dry-run delete allow from any to any port 7001 proto tcp": user_rules_with_port_7000,
     "ufw --dry-run route allow in on foo out on bar from 1.1.1.1 port 7000 to 8.8.8.8 port 7001 proto tcp": "",
@@ -170,6 +171,17 @@ class TestUFW(unittest.TestCase):
 
     def test_check_mode_add_rules(self):
         set_module_args({
+            'rule': 'allow',
+            'proto': 'tcp',
+            'port': '7000',
+            '_ansible_check_mode': True
+        })
+        result = self.__getResult(do_nothing_func_port_7000)
+        self.assertFalse(result.exception.args[0]['changed'])
+
+    def test_check_mode_add_insert_rules(self):
+        set_module_args({
+            'insert': '1',
             'rule': 'allow',
             'proto': 'tcp',
             'port': '7000',
@@ -318,9 +330,35 @@ class TestUFW(unittest.TestCase):
 
         self.assertTrue(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
 
+    def test_check_mode_delete_existing_insert_rules(self):
+
+        set_module_args({
+            'insert': '1',
+            'rule': 'allow',
+            'proto': 'tcp',
+            'port': '7000',
+            'delete': 'yes',
+            '_ansible_check_mode': True,
+        })
+
+        self.assertTrue(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
+
     def test_check_mode_delete_not_existing_rules(self):
 
         set_module_args({
+            'rule': 'allow',
+            'proto': 'tcp',
+            'port': '7001',
+            'delete': 'yes',
+            '_ansible_check_mode': True,
+        })
+
+        self.assertFalse(self.__getResult(do_nothing_func_port_7000).exception.args[0]['changed'])
+
+    def test_check_mode_delete_not_existing_insert_rules(self):
+
+        set_module_args({
+            'insert': '1',
             'rule': 'allow',
             'proto': 'tcp',
             'port': '7001',
