@@ -368,7 +368,8 @@ class OpenTelemetrySource(object):
             return task_data.args.get(argument, None)
         return None
 
-    def flat_args(self, args):
+    @staticmethod
+    def flat_args(args):
         if args:
             return ', '.join(('%s=%s' % a for a in args.items()))
         return None
