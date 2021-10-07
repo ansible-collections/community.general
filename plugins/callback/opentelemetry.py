@@ -325,7 +325,7 @@ class CallbackModule(CallbackBase):
                                                 direct=direct)
 
         environment_variable = self.get_option('enable_from_environment')
-        if environment_variable is not None and os.environ.get(environment_variable, 'false').lower() == 'false':
+        if environment_variable is not None and os.environ.get(environment_variable, 'false').lower() != 'true':
             self.disabled = True
             self._display.warning("The `enable_from_environment` option has been set and {0} is not enabled. "
                                   "Disabling the `opentelemetry` callback plugin.".format(environment_variable))
