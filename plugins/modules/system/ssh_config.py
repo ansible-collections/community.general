@@ -81,6 +81,7 @@ options:
       - Sets the C(ForwardAgent) option.
     choices: [ 'yes', 'no' ]
     type: str
+    version_added: 3.8.0
   ssh_config_file:
     description:
       - SSH config file.
