@@ -15,7 +15,7 @@ short_description: Rundeck job executions info.
 description:
     - This module gets the list of executions for a specified Rundeck job.
 author: "Phillipe Smith (@phsmith)"
-version_added: 3.7.0
+version_added: 3.8.0
 options:
     url:
         type: str

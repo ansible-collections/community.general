@@ -15,7 +15,7 @@ short_description: Run a Rundeck job.
 description:
     - This module runs a Rundeck job specified by ID.
 author: "Phillipe Smith (@phsmith)"
-version_added: 3.7.0
+version_added: 3.8.0
 options:
     url:
         type: str
