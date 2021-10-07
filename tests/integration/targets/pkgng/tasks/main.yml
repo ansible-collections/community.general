@@ -1,0 +1,115 @@
+---
+- name: Test on FreeBSD VMs
+  when:
+    - ansible_facts.virtualization_type != 'docker'
+    - ansible_facts.distribution == 'FreeBSD'
+  block:
+    ##
+    ## pkgng - example - install single package
+    ##
+    - name: Verify bash binary is not present
+      stat:
+        path: /usr/local/bin/bash
+        get_attributes: no
+        get_checksum: no
+        get_mime: no
+      register: pkgng_example1_stat_before
+
+    - name: Install bash
+      pkgng:
+        name: bash
+      register: pkgng_example1
+
+    - name: Remove bash (checkmode)
+      pkgng:
+        name: bash
+        state: absent
+      check_mode: yes
+      register: pkgng_example1_checkmode
+
+    - name: Install bash (idempotent)
+      pkgng:
+        name: bash
+      register: pkgng_example1_idempotent
+
+    - name: Verify bash binary is present
+      stat:
+        path: /usr/local/bin/bash
+        get_attributes: no
+        get_checksum: no
+        get_mime: no
+      register: pkgng_example1_stat_after
+
+    - name: Ensure pkgng installs package correctly
+      assert:
+        that:
+          - not pkgng_example1_stat_before.stat.exists
+          - pkgng_example1.changed
+          - pkgng_example1_checkmode.changed
+          - not pkgng_example1_idempotent.changed
+          - pkgng_example1_stat_after.stat.exists
+          - pkgng_example1_stat_after.stat.executable
+
+    ##
+    ## pkgng - example - Install bash in jail
+    ##
+    - name: Test within jail
+      #
+      # NOTE: FreeBSD 12.0 test runner receives a "connection reset by peer" after ~20% downloaded so we are
+      #       only running this on 12.1 or higher
+      #
+      when: ansible_distribution_version is version('12.01', '>=')
+      block:
+        - name: Setup testjail
+          include: setup-testjail.yml
+
+        - name: Verify bash binary is not present
+          stat:
+            path: /usr/jails/testjail/usr/local/bin/bash
+            get_attributes: no
+            get_checksum: no
+            get_mime: no
+          register: pkgng_example2_stat_before
+
+        - name: Install bash
+          pkgng:
+            name: bash
+            jail: testjail
+          register: pkgng_example2
+
+        - name: Remove bash (checkmode)
+          pkgng:
+            name: bash
+            state: absent
+            jail: testjail
+          check_mode: yes
+          register: pkgng_example2_checkmode
+
+        - name: Install bash (idempotent)
+          pkgng:
+            name: bash
+            jail: testjail
+          register: pkgng_example2_idempotent
+
+        - name: Verify bash binary is present
+          stat:
+            path: /usr/jails/testjail/usr/local/bin/bash
+            get_attributes: no
+            get_checksum: no
+            get_mime: no
+          register: pkgng_example2_stat_after
+
+        - name: Ensure pkgng installs package correctly
+          assert:
+            that:
+              - not pkgng_example2_stat_before.stat.exists
+              - pkgng_example2.changed
+              - pkgng_example2_checkmode.changed
+              - not pkgng_example2_idempotent.changed
+              - pkgng_example2_stat_after.stat.exists
+              - pkgng_example2_stat_after.stat.executable
+      always:
+        - name: Stop and remove testjail
+          failed_when: false
+          changed_when: false
+          command: "ezjail-admin delete -wf testjail"
