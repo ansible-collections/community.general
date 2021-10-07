@@ -317,7 +317,7 @@ class OpenTelemetrySource(object):
         # TODO: Support apt_repository: repo:
         # it requires to parse deb https://artifacts./...packages/6.x/apt stable main
         #
-        supported_tasks = {
+        deprecated_tasks = {
           "homebrew": {"default": "homebrew"},
           "homebrew_tap": {"primary": "url"},
           "get_url": {"primary": "url"},
@@ -329,12 +329,42 @@ class OpenTelemetrySource(object):
           "win_get_url": {"primary": "url"},
           "zypper_repository": {"primary": "repo"}
         }
+        # Some tasks are duplicated :/
+        #
+        builtin_tasks = {
+          "ansible.builtin.git": {"primary": "repo"}
+        }
 
-        if task_data.action in supported_tasks.keys():
-            supported_task = supported_tasks.get(task_data.action)
+        # Some tasks are duplicated :/
+        #
+        community_tasks = {
+          "community.zabbix.zabbix_action": {"primary": "server_url"},
+          "community.general.github_repo": {"primary": "api_url", "default": "github.com"},
+          "community.general.gitlab_project": {"primary": "api_url", "default": "gitlab.com"},
+          "community.general.homebrew": {"default": "homebrew"},
+          "community.general.homebrew_tap": {"primary": "url"},
+          "community.general.jenkins_build": {"primary": "url"},
+          "community.general.jenkins_job": {"primary": "url"},
+          "community.general.jenkins_script": {"primary": "url"},
+          "community.general.jira": {"primary": "uri"},
+          "community.general.kibana_plugin": {"primary": "url"},
+          "community.general.maven_artifact": {"primary": "repository_url"},
+          "community.general.zypper_repository": {"primary": "repo"},
+          "community.general.slack": {"default": "slack"},
+          "community.grafana.grafana_dashboard": {"primary": "grafana_url"},
+          "community.grafana.grafana_plugin": {"primary": "grafana_plugin_url"},
+          "community.grafana.grafana_team": {"primary": "url"},
+          "community.grafana.grafana_user": {"primary": "url"},
+          "community.kubernetes.helm_repository": {"primary": "repo_url"},
+          "community.kubernetes.helm": {"primary": "chart_repo_url"}
+        }
+
+        if task_data.action in deprecated_tasks.keys() or task_data.action in builtin_tasks.keys() or task_data.action in community_tasks.keys():
+            supported_task = self.get_task(task_data.action, deprecated_tasks, community_tasks, builtin_tasks)
             primary = self.get_argument_value(task_data, supported_task.get("primary", None))
             secondary = self.get_argument_value(task_data, supported_task.get("secondary", None))
             default = supported_task.get("default", None)
+            # TODO: validate if value is schema valid?
             if primary:
                 self.add_network_attributes_with_url(span, primary)
             elif secondary:
@@ -361,6 +391,15 @@ class OpenTelemetrySource(object):
         self.set_span_attribute(span, "net.peer.name", value)
         self.set_span_attribute(span, "rpc.service", value)
         self.set_span_attribute(span, "rpc.system", "rpc")
+
+    @staticmethod
+    def get_task(task_name, deprecated_tasks, community_tasks, builtin_tasks):
+        supported_task = deprecated_tasks.get(task_name)
+        if supported_task is None:
+            supported_task = community_tasks.get(task_name)
+        if supported_task is None:
+            supported_task = builtin_tasks.get(task_name)
+        return supported_task
 
     @staticmethod
     def get_argument_value(task_data, argument):
