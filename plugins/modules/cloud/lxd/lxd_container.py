@@ -23,14 +23,14 @@ options:
         required: true
     architecture:
         description:
-          - The architecture for the container (e.g. "x86_64" or "i686").
-            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1)
+          - 'The architecture for the container (for example C(x86_64) or C(i686)).
+            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).'
         type: str
         required: false
     config:
         description:
-          - 'The config for the container (e.g. {"limits.cpu": "2"}).
-            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1)'
+          - 'The config for the container (for example C({"limits.cpu": "2"})).
+            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).'
           - If the container already exists and its "config" values in metadata
             obtained from GET /1.0/containers/<name>
             U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#10containersname)
@@ -50,20 +50,20 @@ options:
         version_added: 3.7.0
     profiles:
         description:
-          - Profile to be used by the container
+          - Profile to be used by the container.
         type: list
         elements: str
     devices:
         description:
           - 'The devices for the container
-            (e.g. { "rootfs": { "path": "/dev/kvm", "type": "unix-char" }).
-            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1)'
+            (for example C({ "rootfs": { "path": "/dev/kvm", "type": "unix-char" }})).
+            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).'
         type: dict
         required: false
     ephemeral:
         description:
-          - Whether or not the container is ephemeral (e.g. true or false).
-            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1)
+          - Whether or not the container is ephemeral (for example C(true) or C(false)).
+            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).
         required: false
         type: bool
     source:
@@ -75,7 +75,7 @@ options:
                     "protocol": "lxd",
                     "alias": "ubuntu/xenial/amd64" }).'
           - 'See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1) for complete API documentation.'
-          - 'Note that C(protocol) accepts two choices: C(lxd) or C(simplestreams)'
+          - 'Note that C(protocol) accepts two choices: C(lxd) or C(simplestreams).'
         required: false
         type: dict
     state:
@@ -151,10 +151,10 @@ options:
     trust_password:
         description:
           - The client trusted password.
-          - You need to set this password on the LXD server before
-            running this module using the following command.
-            lxc config set core.trust_password <some random password>
-            See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/)
+          - 'You need to set this password on the LXD server before
+            running this module using the following command:
+            C(lxc config set core.trust_password <some random password>).
+            See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
           - If trust_password is set, this module send a request for
             authentication before sending any requests.
         required: false
