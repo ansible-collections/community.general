@@ -23,6 +23,17 @@ DOCUMENTATION = '''
           - Hide the arguments for a task.
         env:
           - name: ANSIBLE_OPENTELEMETRY_HIDE_TASK_ARGUMENTS
+      enable_from_environment:
+        type: str
+        description:
+          - Whether to enable this callback only if the given environment variable exists and it is set to C(true).
+          - This is handy when you use Configuration as Code and want to send distributed traces
+            if running in the CI rather when running Ansible locally.
+          - For such, it evaluates the given I(enable_from_environment) value as environment variable
+            and if set to true this plugin will be enabled.
+        env:
+          - name: ANSIBLE_OPENTELEMETRY_ENABLE_FROM_ENVIRONMENT
+        version_added: 3.8.0
       otel_service_name:
         default: ansible
         type: str
@@ -57,6 +68,7 @@ examples: |
 '''
 
 import getpass
+import os
 import socket
 import sys
 import time
@@ -324,6 +336,12 @@ class CallbackModule(CallbackBase):
         super(CallbackModule, self).set_options(task_keys=task_keys,
                                                 var_options=var_options,
                                                 direct=direct)
+
+        environment_variable = self.get_option('enable_from_environment')
+        if environment_variable is not None and os.environ.get(environment_variable, 'false').lower() != 'true':
+            self.disabled = True
+            self._display.warning("The `enable_from_environment` option has been set and {0} is not enabled. "
+                                  "Disabling the `opentelemetry` callback plugin.".format(environment_variable))
 
         self.hide_task_arguments = self.get_option('hide_task_arguments')
 
