@@ -137,6 +137,10 @@ from distutils.version import LooseVersion
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
+from ansible.module_utils.urls import fetch_url
+from ansible.module_utils.common.text.converters import to_text
+from ansible.module_utils.six.moves import configparser, StringIO
+from io import open
 
 REPO_OPTS = ['alias', 'name', 'priority', 'enabled', 'autorefresh', 'gpgcheck']
 
@@ -382,12 +386,62 @@ def main():
         if not alias and state == "present":
             module.fail_json(msg='Name required when adding non-repo files.')
 
+    # Download / Open and parse .repo file to ensure idempotency
+    if repo and repo.endswith('.repo'):
+        if repo.startswith(('http://', 'https://')):
+            response, info = fetch_url(module=module, url=repo, force=True)
+            if not response or info['status'] != 200:
+                module.fail_json(msg='Error downloading .repo file from provided URL')
+            repofile_text = to_text(response.read(), errors='surrogate_or_strict')
+        else:
+            try:
+                with open(repo, encoding='utf-8') as file:
+                    repofile_text = file.read()
+            except IOError:
+                module.fail_json(msg='Error opening .repo file from provided path')
+
+        repofile = configparser.ConfigParser()
+        try:
+            repofile.readfp(StringIO(repofile_text))
+        except configparser.Error:
+            module.fail_json(msg='Invalid format, .repo file could not be parsed')
+
+        # No support for .repo file with zero or more than one repository
+        if len(repofile.sections()) != 1:
+            err = "Invalid format, .repo file contains %s repositories, expected 1" % len(repofile.sections())
+            module.fail_json(msg=err)
+
+        section = repofile.sections()[0]
+        repofile_items = dict(repofile.items(section))
+        # Only proceed if at least baseurl is available
+        if 'baseurl' not in repofile_items:
+            module.fail_json(msg='No baseurl found in .repo file')
+
+        # Set alias (name) and url based on values from .repo file
+        alias = section
+        repodata['alias'] = section
+        repodata['url'] = repofile_items['baseurl']
+
+        # If gpgkey is part of the .repo file, auto import key
+        if 'gpgkey' in repofile_items:
+            auto_import_keys = True
+
+        # Map additional values, if available
+        if 'name' in repofile_items:
+            repodata['name'] = repofile_items['name']
+        if 'enabled' in repofile_items:
+            repodata['enabled'] = repofile_items['enabled']
+        if 'autorefresh' in repofile_items:
+            repodata['autorefresh'] = repofile_items['autorefresh']
+        if 'gpgcheck' in repofile_items:
+            repodata['gpgcheck'] = repofile_items['gpgcheck']
+
     exists, mod, old_repos = repo_exists(module, repodata, overwrite_multiple)
 
-    if repo:
-        shortname = repo
-    else:
+    if alias:
         shortname = alias
+    else:
+        shortname = repo
 
     if state == 'present':
         if exists and not mod:

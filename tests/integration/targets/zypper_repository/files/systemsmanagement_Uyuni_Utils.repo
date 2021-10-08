@@ -1,0 +1,7 @@
+[systemsmanagement_Uyuni_Utils]
+name=Several utilities to develop, build or release Uyuni (openSUSE_Leap_15.3)
+type=rpm-md
+baseurl=https://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Utils/openSUSE_Leap_15.3/
+gpgcheck=1
+gpgkey=https://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Utils/openSUSE_Leap_15.3/repodata/repomd.xml.key
+enabled=1

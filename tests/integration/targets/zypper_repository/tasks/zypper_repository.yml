@@ -4,6 +4,11 @@
     state: absent
   register: zypper_result
 
+- name: verify no change on test repo deletion
+  assert:
+    that:
+      - "not zypper_result.changed"
+
 - name: Add test repo
   community.general.zypper_repository:
     name: test
@@ -51,7 +56,8 @@
   command: zypper -x lr testrefresh
   register: zypper_result
 
-- assert:
+- name: verify autorefresh option set properly
+  assert:
     that:
       - '"autorefresh=\"0\"" in zypper_result.stdout'
 
@@ -66,7 +72,8 @@
   command: zypper -x lr testprio
   register: zypper_result
 
-- assert:
+- name: verify priority option set properly
+  assert:
     that:
       - '"priority=\"55\"" in zypper_result.stdout'
 
@@ -88,7 +95,8 @@
   command: zypper lr chrome2
   register: zypper_result2
 
-- assert:
+- name: ensure same url cause update of existing repo even if name differ
+  assert:
     that:
       - "zypper_result1.rc != 0"
       - "'not found' in zypper_result1.stderr"
@@ -108,7 +116,8 @@
   command: zypper lr samename
   register: zypper_result
 
-- assert:
+- name: ensure url get updated on repo with same name
+  assert:
     that:
       - "'/science/' not in zypper_result.stdout"
       - "'/devel:/languages:/ruby/' in zypper_result.stdout"
@@ -140,7 +149,8 @@
     state: present
   register: add_repo_again
 
-- assert:
+- name: no update in case of $releasever usage in url
+  assert:
     that:
       - add_repo is changed
       - add_repo_again is not changed
@@ -151,9 +161,20 @@
     state: absent
   register: remove_repo
 
-- assert:
+- name: verify repo was removed
+  assert:
     that:
       - remove_repo is changed
+
+- name: get list of files in /etc/zypp/repos.d/
+  command: ls /etc/zypp/repos.d/
+  changed_when: false
+  register: releaseverrepo_etc_zypp_reposd
+
+- name: verify removal of file releaseverrepo.repo in /etc/zypp/repos.d/
+  assert:
+    that:
+      - "'releaseverrepo' not in releaseverrepo_etc_zypp_reposd.stdout"
 
 - name: add a repo by basearch
   community.general.zypper_repository:
@@ -169,7 +190,8 @@
     state: present
   register: add_repo_again
 
-- assert:
+- name: no update in case of $basearch usage in url
+  assert:
     that:
       - add_repo is changed
       - add_repo_again is not changed
@@ -180,6 +202,74 @@
     state: absent
   register: remove_repo
 
-- assert:
+- name: verify repo was removed
+  assert:
     that:
       - remove_repo is changed
+
+- name: add new repository via url to .repo file
+  community.general.zypper_repository:
+    repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+    state: present
+  register: added_by_repo_file
+
+- name: get repository details from zypper
+  command: zypper lr systemsmanagement_Uyuni_Stable
+  register: get_repository_details_from_zypper
+
+- name: verify adding via .repo file was successful
+  assert:
+    that:
+      - "added_by_repo_file is changed"
+      - "get_repository_details_from_zypper.rc == 0"
+      - "'/systemsmanagement:/Uyuni:/Stable/' in get_repository_details_from_zypper.stdout"
+
+- name: add same repository via url to .repo file again to verify idempotency
+  community.general.zypper_repository:
+    repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+    state: present
+  register: added_again_by_repo_file
+
+- name: verify nothing was changed adding a repo with the same .repo file
+  assert:
+    that:
+      - added_again_by_repo_file is not changed
+
+- name: remove repository via url to .repo file
+  community.general.zypper_repository:
+    repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+    state: absent
+  register: removed_by_repo_file
+
+- name: get list of files in /etc/zypp/repos.d/
+  command: ls /etc/zypp/repos.d/
+  changed_when: false
+  register: etc_zypp_reposd
+
+- name: verify removal via .repo file was successful, including cleanup of local .repo file in /etc/zypp/repos.d/
+  assert:
+    that:
+      - "removed_by_repo_file"
+      - "'/systemsmanagement:/Uyuni:/Stable/' not in etc_zypp_reposd.stdout"
+
+- name: Copy test .repo file
+  copy:
+    src: 'files/systemsmanagement_Uyuni_Utils.repo'
+    dest: '{{ remote_tmp_dir }}'
+
+- name: add new repository via local path to .repo file
+  community.general.zypper_repository:
+    repo: "{{ remote_tmp_dir }}/systemsmanagement_Uyuni_Utils.repo"
+    state: present
+  register: added_by_repo_local_file
+
+- name: get repository details for systemsmanagement_Uyuni_Utils from zypper
+  command: zypper lr systemsmanagement_Uyuni_Utils
+  register: get_repository_details_from_zypper_for_systemsmanagement_Uyuni_Utils
+
+- name: verify adding repository via local .repo file was successful
+  assert:
+    that:
+      - "added_by_repo_local_file is changed"
+      - "get_repository_details_from_zypper_for_systemsmanagement_Uyuni_Utils.rc == 0"
+      - "'/systemsmanagement:/Uyuni:/Utils/' in get_repository_details_from_zypper_for_systemsmanagement_Uyuni_Utils.stdout"
