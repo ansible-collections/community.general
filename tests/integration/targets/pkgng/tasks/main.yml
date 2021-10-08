@@ -1,7 +1,6 @@
 ---
 - name: Test on FreeBSD VMs
   when:
-    - ansible_facts.virtualization_type != 'docker'
     - ansible_facts.distribution == 'FreeBSD'
   block:
     ##
