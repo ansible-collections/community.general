@@ -6,7 +6,7 @@
 
 - name: Skip unsupported platforms
   meta: end_play
-  when: (ansible_distribution not in ['CentOS', 'Fedora', 'Debian', 'Ubuntu'])
+  when: ansible_distribution not in ['CentOS', 'Fedora', 'Debian', 'Ubuntu']
 
 - name: Include OS-specific variables
   include_vars: '{{ ansible_os_family }}.yml'
@@ -16,7 +16,7 @@
   set_fact:
     rdeck_base: /home/rundeck
 
-- name: Install OpenJDK 11
+- name: Install OpenJDK
   package:
     name: "{{ openjdk_pkg }}"
     state: present

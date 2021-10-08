@@ -20,8 +20,13 @@
     token: "{{ rundeck_api_token.stdout_lines[-1] }}"
     state: present
 
+- name: Copy test_job definition to /tmp
+  copy:
+    src: test_job.yaml
+    dest: /tmp/test_job.yaml
+
 - name: Create Rundeck job Test
-  ansible.builtin.command: java -jar {{ rdeck_base }}/rundeck-cli.jar jobs load -f {{ role_path }}/files/test_job.yaml -F yaml -p test_project
+  ansible.builtin.command: java -jar {{ rdeck_base }}/rundeck-cli.jar jobs load -f /tmp/test_job.yaml -F yaml -p test_project
   environment:
     RD_URL: "{{ rundeck_url }}"
     RD_USER: admin
