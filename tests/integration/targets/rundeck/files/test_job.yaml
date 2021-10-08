@@ -1,0 +1,20 @@
+- defaultTab: nodes
+  description: ''
+  executionEnabled: true
+  id: 3b8a6e54-69fb-42b7-b98f-f82e59238478
+  loglevel: INFO
+  name: test_job
+  nodeFilterEditable: false
+  options:
+  - label: Exit Code
+    name: exit_code
+    value: '0'
+  plugins:
+    ExecutionLifecycle: null
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - exec: echo "Test done!" && exit ${option.exit_code}
+    keepgoing: false
+    strategy: node-first
+  uuid: 3b8a6e54-69fb-42b7-b98f-f82e59238478

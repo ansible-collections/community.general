@@ -1,0 +1,54 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+
+- name: Generate a Rundeck API Token
+  ansible.builtin.command: java -jar {{ rdeck_base }}/rundeck-cli.jar tokens create -u admin -d 24h -r admin
+  environment:
+    RD_URL: "{{ rundeck_url }}"
+    RD_USER: admin
+    RD_PASSWORD: admin
+  register: rundeck_api_token
+
+- name: Create a Rundeck project
+  community.general.rundeck_project:
+    name: "test_project"
+    api_version: "{{ rundeck_api_version }}"
+    url: "{{ rundeck_url }}"
+    token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    state: present
+
+- name: Create Rundeck job Test
+  ansible.builtin.command: java -jar {{ rdeck_base }}/rundeck-cli.jar jobs load -f {{ role_path }}/files/test_job.yaml -F yaml -p test_project
+  environment:
+    RD_URL: "{{ rundeck_url }}"
+    RD_USER: admin
+    RD_PASSWORD: admin
+
+- name: Run Rundeck job test_job
+  community.general.rundeck_job_run:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    job_id: "{{ rundeck_job_id }}"
+  register: rundeck_job_run
+
+- name: Assert that Rundeck job runs successfully
+  assert:
+    that:
+      - rundeck_job_run.execution_info.status == "succeeded"
+
+- name: Get Rundeck job test_job executions info
+  community.general.rundeck_job_executions_info:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    job_id: "{{ rundeck_job_id }}"
+  register: rundeck_job_executions_info
+
+- name: Assert that Rundeck job executions info has a register
+  assert:
+    that:
+      - rundeck_job_executions_info.paging.total | int == 1
