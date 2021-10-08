@@ -143,7 +143,6 @@ class RundeckJobExecutionsInfo(object):
         self.offset = self.module.params["offset"]
         self.max = self.module.params["max"]
         self.status = self.module.params.get("status") or ""
-        self.__api_token = self.module.params["api_token"]
 
     def api_request(self, endpoint, data=None, method="GET"):
         response, info = fetch_url(
@@ -154,7 +153,7 @@ class RundeckJobExecutionsInfo(object):
             headers={
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "X-Rundeck-Auth-Token": self.__api_token
+                "X-Rundeck-Auth-Token": self.module.params["api_token"]
             }
         )
 
