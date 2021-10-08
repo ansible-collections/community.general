@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: rundeck_job_run
-short_description: Run a Rundeck job.
+short_description: Run a Rundeck job
 description:
     - This module runs a Rundeck job specified by ID.
 author: "Phillipe Smith (@phsmith)"
@@ -61,7 +61,21 @@ options:
         description:
             - Log level configuration.
         required: False
-        choices: [debug, verbose, info, warn, error, ""]
+        choices: [debug, verbose, info, warn, error]
+    wait_execution:
+        type: bool
+        description:
+            - Wait until the job finished the execution.
+        required: False
+        default: True
+    wait_execution_timeout:
+        type: int
+        description:
+            - Job execution wait timeout in seconds. 0 = no timeout.
+            - If the timeout is reached, the job will be aborted.
+            - Keep in mind that there is a sleep of 5s after each job status check
+        required: False
+        default: 0
 extends_documentation_fragment: url
 '''
 
@@ -137,6 +151,8 @@ execution_info:
 
 # Modules import
 import json
+from datetime import datetime
+from time import sleep
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
@@ -152,7 +168,9 @@ class RundeckJobRun(object):
         self.job_options = self.module.params["job_options"]
         self.filter_nodes = self.module.params["filter_nodes"]
         self.run_at_time = self.module.params["run_at_time"]
-        self.loglevel = self.module.params["loglevel"]
+        self.loglevel = self.module.params["loglevel"].upper()
+        self.wait_execution = self.module.params['wait_execution']
+        self.wait_execution_timeout = self.module.params['wait_execution_timeout']
         self.__api_token = self.module.params["api_token"]
 
     def api_request(self, endpoint, data=None, method="GET"):
@@ -177,30 +195,31 @@ class RundeckJobRun(object):
         elif info["status"] >= 500:
             self.module.fail_json(msg="Rundeck API error",
                                   execution_info=json.loads(info["body"]))
+        elif info["status"] == -1:
+            self.module.fail_json(msg="Rundeck API request error",
+                                  execution_info=info)
 
-        if response is not None:
-            response = response.read()
-            if response != "":
-                try:
-                    json_response = json.loads(response)
-                    return json_response, info
-                except ValueError as error:
-                    self.module.fail_json(
-                        msg="No valid JSON response",
-                        exception=to_native(error),
-                        execution_info=response
-                    )
+        response = response.read()
 
-        return response, info
-
-    def job_status_check(self, execution_id):
-        while True:
-            endpoint = "execution/%s" % execution_id
-            response = self.api_request(endpoint)[0]
-            output = self.api_request(
-                endpoint="execution/%s/output" % execution_id
+        try:
+            json_response = json.loads(response)
+            return json_response, info
+        except ValueError as error:
+            self.module.fail_json(
+                msg="No valid JSON response",
+                exception=to_native(error),
+                execution_info=response
             )
 
+    def job_status_check(self, execution_id):
+        job_status_wait = True
+        start_datetime = int(datetime.now().strftime("%s"))
+
+        while job_status_wait:
+            endpoint = "execution/%s" % execution_id
+            response = self.api_request(endpoint)[0]
+            datetime_after_start = int(datetime.now().strftime("%s"))
+            output = self.api_request(endpoint="execution/%s/output" % execution_id)
             log_output = "\n".join([x["log"] for x in output[0]["entries"]])
             response.update({"output": log_output})
 
@@ -215,6 +234,22 @@ class RundeckJobRun(object):
                 self.module.exit_json(msg="Job execution succeeded!",
                                       execution_info=response)
 
+            if self.wait_execution_timeout > 0:
+                if (datetime_after_start - start_datetime) >= self.wait_execution_timeout:
+                    job_status_wait = False
+                    continue
+
+            # Wait for 5s before continue
+            sleep(5)
+        else:
+            response = self.api_request(
+                "execution/%s/abort" % response['id'],
+                method="GET"
+            )
+
+            self.module.fail_json(msg="Job execution aborted due the timeout specified",
+                                  execution_info=response[0])
+
     def job_run(self):
         response, info = self.api_request(
             endpoint="job/%s/run" % self.job_id,
@@ -227,20 +262,14 @@ class RundeckJobRun(object):
             }
         )
 
-        if info["status"] == 200:
-            try:
-                self.job_status_check(response["id"])
-            except KeyboardInterrupt:
-                response, info = self.api_request(
-                    "execution/%s/abort" % response['id'],
-                    method="GET"
-                )
-                self.module.fail_json(
-                    msg="Job execution aborted",
-                    execution_info=response
-                )
-        else:
+        if info["status"] != 200:
             self.module.fail_json(msg=info["msg"])
+
+        if not self.wait_execution:
+            self.module.exit_json(msg="Job run send successfully!",
+                                  execution_info=response)
+
+        self.job_status_check(response["id"])
 
 
 def main():
@@ -250,14 +279,15 @@ def main():
         api_version=dict(type="int", default=39),
         api_token=dict(required=True, type="str", no_log=True),
         job_id=dict(required=True, type="str"),
-        job_options=dict(required=False, type="dict", default={}),
-        filter_nodes=dict(required=False, type="str", default=""),
-        run_at_time=dict(required=False, type="str", default=""),
+        job_options=dict(type="dict", default={}),
+        filter_nodes=dict(type="str", default=""),
+        run_at_time=dict(type="str", default=""),
+        wait_execution=dict(type="bool", default=True),
+        wait_execution_timeout=dict(type="int", default=0),
         loglevel=dict(
-            required=False,
             type="str",
-            choices=["debug", "verbose", "info", "warn", "error", ""],
-            default=""
+            choices=["debug", "verbose", "info", "warn", "error"],
+            default="info"
         )
     ))
 

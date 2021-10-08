@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: rundeck_job_executions_info
-short_description: Rundeck job executions info.
+short_description: Rundeck job executions info
 description:
     - This module gets the list of executions for a specified Rundeck job.
 author: "Phillipe Smith (@phsmith)"
@@ -43,8 +43,7 @@ options:
         description:
             - The job status to filter.
         required: False
-        choices: [succeeded, failed, aborted, running, ""]
-        default: ""
+        choices: [succeeded, failed, aborted, running]
     max:
         type: int
         description:
@@ -143,7 +142,7 @@ class RundeckJobExecutionsInfo(object):
         self.job_id = self.module.params["job_id"]
         self.offset = self.module.params["offset"]
         self.max = self.module.params["max"]
-        self.status = self.module.params["status"]
+        self.status = self.module.params.get("status") or ""
         self.__api_token = self.module.params["api_token"]
 
     def api_request(self, endpoint, data=None, method="GET"):
@@ -191,15 +190,13 @@ class RundeckJobExecutionsInfo(object):
             method="GET"
         )
 
-        if info["status"] == 200:
-            self.module.exit_json(
-                msg=response,
-            )
-        else:
+        if info["status"] != 200:
             self.module.fail_json(
                 msg=info["msg"],
                 executions_info=response
             )
+
+        self.module.exit_json(msg=response)
 
 
 def main():
@@ -209,13 +206,11 @@ def main():
         api_version=dict(type="int", default=39),
         api_token=dict(required=True, type="str", no_log=True),
         job_id=dict(required=True, type="str"),
-        offset=dict(required=False, type="int", default=0),
-        max=dict(required=False, type="int", default=20),
+        offset=dict(type="int", default=0),
+        max=dict(type="int", default=20),
         status=dict(
-            required=False,
             type="str",
-            choices=["succeeded", "failed", "aborted", "running", ""],
-            default=""
+            choices=["succeeded", "failed", "aborted", "running"]
         )
     ))
 
