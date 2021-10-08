@@ -86,7 +86,7 @@ paging:
     }
 executions:
     description: Job executions list.
-    returned: success
+    returned: always
     type: list
     elements: dict
     sample: [
@@ -159,27 +159,27 @@ class RundeckJobExecutionsInfo(object):
 
         if info["status"] == 403:
             self.module.fail_json(msg="Token authorization failed",
-                                  execution_info=json.loads(info["body"]))
+                                  executions=json.loads(info["body"]))
         if info["status"] == 409:
             self.module.fail_json(msg="Job executions limit reached",
-                                  execution_info=json.loads(info["body"]))
+                                  executions=json.loads(info["body"]))
         elif info["status"] >= 500:
             self.module.fail_json(msg="Rundeck API error",
-                                  execution_info=json.loads(info["body"]))
-
+                                  executions=json.loads(info["body"]))
         try:
+
             content = response.read()
             json_response = json.loads(content)
             return json_response, info
         except AttributeError as error:
             self.module.fail_json(msg="Rundeck API request error",
                                   exception=to_native(error),
-                                  execution_info=info)
+                                  executions=info)
         except ValueError as error:
             self.module.fail_json(
                 msg="No valid JSON response",
                 exception=to_native(error),
-                execution_info=content
+                executions=content
             )
 
     def job_executions(self):
@@ -192,10 +192,10 @@ class RundeckJobExecutionsInfo(object):
         if info["status"] != 200:
             self.module.fail_json(
                 msg=info["msg"],
-                executions_info=response
+                executions=response
             )
 
-        self.module.exit_json(msg=response)
+        self.module.exit_json(msg="Executions info result", **response)
 
 
 def main():
