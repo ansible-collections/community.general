@@ -134,6 +134,7 @@ EXAMPLES = '''
 '''
 
 
+from collections import defaultdict
 import re
 from ansible.module_utils.basic import AnsibleModule
 
@@ -226,7 +227,8 @@ def remove_packages(module, pkgng_path, packages, dir_arg):
 
 
 def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, state, ignoreosver):
-    install_c = 0
+    action_queue = defaultdict(list)
+    action_count = defaultdict(int)
     stdout = ""
     stderr = ""
 
@@ -263,29 +265,48 @@ def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, sta
         if already_installed and state == "present":
             continue
 
-        update_available = query_update(module, pkgng_path, package, dir_arg, old_pkgng, pkgsite)
-        if not update_available and already_installed and state == "latest":
+        if (
+            already_installed and state == "latest"
+            and not query_update(module, pkgng_path, package, dir_arg, old_pkgng, pkgsite)
+        ):
             continue
 
-        if not module.check_mode:
-            if already_installed:
-                action = "upgrade"
-            else:
-                action = "install"
+        if already_installed:
+            action_queue["upgrade"].append(package)
+        else:
+            action_queue["install"].append(package)
+
+    if not module.check_mode:
+        # install/upgrade all named packages with one pkg command
+        for (action, package_list) in action_queue.items():
+            packages = ' '.join(package_list)
             if old_pkgng:
-                rc, out, err = module.run_command("%s %s %s %s -g -U -y %s" % (batch_var, pkgsite, pkgng_path, action, package))
+                rc, out, err = module.run_command("%s %s %s %s -g -U -y %s" % (batch_var, pkgsite, pkgng_path, action, packages))
             else:
-                rc, out, err = module.run_command("%s %s %s %s %s -g -U -y %s" % (batch_var, pkgng_path, dir_arg, action, pkgsite, package))
+                rc, out, err = module.run_command("%s %s %s %s %s -g -U -y %s" % (batch_var, pkgng_path, dir_arg, action, pkgsite, packages))
             stdout += out
             stderr += err
 
-        if not module.check_mode and not query_package(module, pkgng_path, package, dir_arg):
-            module.fail_json(msg="failed to %s %s: %s" % (action, package, out), stdout=stdout, stderr=stderr)
+            # individually verify packages are in requested state
+            for package in package_list:
+                verified = False
+                if action == 'install':
+                    verified = query_package(module, pkgng_path, package, dir_arg)
+                elif action == 'upgrade':
+                    verified = not query_update(module, pkgng_path, package, dir_arg, old_pkgng, pkgsite)
 
-        install_c += 1
+                if verified:
+                    action_count[action] += 1
+                else:
+                    module.fail_json(msg="failed to %s %s" % (action, package), stdout=stdout, stderr=stderr)
 
-    if install_c > 0:
-        return (True, "added %s package(s)" % (install_c), stdout, stderr)
+    if sum(action_count.values()) > 0:
+        past_tense = {'install': 'installed', 'upgrade': 'upgraded'}
+        messages = []
+        for (action, count) in action_count.items():
+            messages.append("%s %s package%s" % (past_tense.get(action, action), count, "s" if count != 1 else ""))
+
+        return (True, '; '.join(messages), stdout, stderr)
 
     return (False, "package(s) already %s" % (state), stdout, stderr)
 
