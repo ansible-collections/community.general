@@ -1,0 +1,7 @@
+bugfixes:
+  - zypper_repository - when an URL to a .repo file was provided in option 
+    ``repo=`` and ``state=present`` only the first run was successful, 
+    future runs failed due to missing checks prior starting zypper.
+    Usage of ``state=absent`` in combination with a .repo file was not 
+    working either (https://github.com/ansible-collections/community.general/issues/1791,
+    https://github.com/ansible-collections/community.general/issues/3466).
