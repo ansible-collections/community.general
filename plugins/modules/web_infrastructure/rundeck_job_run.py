@@ -62,6 +62,7 @@ options:
             - Log level configuration.
         required: False
         choices: [debug, verbose, info, warn, error]
+        default: info
     wait_execution:
         type: bool
         description:
