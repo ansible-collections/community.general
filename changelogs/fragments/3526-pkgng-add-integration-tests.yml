@@ -1,2 +1,3 @@
 bugfixes:
   - 'pkgng - `name=* state=latest` check for upgrades did not count "Number of packages to be reinstalled" as a `changed` action, giving incorrect results in both regular and check mode'
+  - 'pkgng - PR #3393 (https://github.com/ansible-collections/community.general/pull/3393) broke `check_mode` so that the module always reports `not changed`; fix regression so module reports number of upgrade or install actions that would be performed'

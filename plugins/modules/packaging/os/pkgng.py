@@ -277,29 +277,35 @@ def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, sta
         else:
             action_queue["install"].append(package)
 
-    if not module.check_mode:
-        # install/upgrade all named packages with one pkg command
-        for (action, package_list) in action_queue.items():
-            packages = ' '.join(package_list)
-            if old_pkgng:
-                rc, out, err = module.run_command("%s %s %s %s -g -U -y %s" % (batch_var, pkgsite, pkgng_path, action, packages))
+    # install/upgrade all named packages with one pkg command
+    for (action, package_list) in action_queue.items():
+        if module.check_mode:
+            # Do nothing, but count up how many actions
+            # would be performed so that the changed/msg
+            # is correct.
+            action_count[action] += len(package_list)
+            continue
+
+        packages = ' '.join(package_list)
+        if old_pkgng:
+            rc, out, err = module.run_command("%s %s %s %s -g -U -y %s" % (batch_var, pkgsite, pkgng_path, action, packages))
+        else:
+            rc, out, err = module.run_command("%s %s %s %s %s -g -U -y %s" % (batch_var, pkgng_path, dir_arg, action, pkgsite, packages))
+        stdout += out
+        stderr += err
+
+        # individually verify packages are in requested state
+        for package in package_list:
+            verified = False
+            if action == 'install':
+                verified = query_package(module, pkgng_path, package, dir_arg)
+            elif action == 'upgrade':
+                verified = not query_update(module, pkgng_path, package, dir_arg, old_pkgng, pkgsite)
+
+            if verified:
+                action_count[action] += 1
             else:
-                rc, out, err = module.run_command("%s %s %s %s %s -g -U -y %s" % (batch_var, pkgng_path, dir_arg, action, pkgsite, packages))
-            stdout += out
-            stderr += err
-
-            # individually verify packages are in requested state
-            for package in package_list:
-                verified = False
-                if action == 'install':
-                    verified = query_package(module, pkgng_path, package, dir_arg)
-                elif action == 'upgrade':
-                    verified = not query_update(module, pkgng_path, package, dir_arg, old_pkgng, pkgsite)
-
-                if verified:
-                    action_count[action] += 1
-                else:
-                    module.fail_json(msg="failed to %s %s" % (action, package), stdout=stdout, stderr=stderr)
+                module.fail_json(msg="failed to %s %s" % (action, package), stdout=stdout, stderr=stderr)
 
     if sum(action_count.values()) > 0:
         past_tense = {'install': 'installed', 'upgrade': 'upgraded'}
