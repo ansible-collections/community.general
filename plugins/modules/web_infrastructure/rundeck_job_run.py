@@ -69,14 +69,26 @@ options:
             - Wait until the job finished the execution.
         required: False
         default: True
+    wait_execution_delay:
+        type: int
+        description:
+            - Delay, in seconds, between job execution status check requests.
+        required: False
+        default: 5
     wait_execution_timeout:
         type: int
         description:
             - Job execution wait timeout in seconds. 0 = no timeout.
             - If the timeout is reached, the job will be aborted.
-            - Keep in mind that there is a sleep of 5s after each job status check
+            - Keep in mind that there is a sleep based on wait_execution_delay after each job status check.
         required: False
-        default: 0
+        default: 120
+    abort_on_timeout:
+        type: bool
+        description:
+            - Send a job abort request if exceeded the wait_execution_timeout specified.
+        required: False
+        default: False
 extends_documentation_fragment: url
 '''
 
@@ -152,7 +164,7 @@ execution_info:
 
 # Modules import
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import sleep
 
 from ansible.module_utils.basic import AnsibleModule
@@ -166,13 +178,14 @@ class RundeckJobRun(object):
         self.url = self.module.params["url"]
         self.api_version = self.module.params["api_version"]
         self.job_id = self.module.params["job_id"]
-        self.job_options = self.module.params["job_options"]
-        self.filter_nodes = self.module.params["filter_nodes"]
-        self.run_at_time = self.module.params["run_at_time"]
+        self.job_options = self.module.params.get("job_options") or {}
+        self.filter_nodes = self.module.params.get("filter_nodes") or ""
+        self.run_at_time = self.module.params.get("run_at_time") or ""
         self.loglevel = self.module.params["loglevel"].upper()
         self.wait_execution = self.module.params['wait_execution']
+        self.wait_execution_delay = self.module.params['wait_execution_delay']
         self.wait_execution_timeout = self.module.params['wait_execution_timeout']
-        self.__api_token = self.module.params["api_token"]
+        self.abort_on_timeout = self.module.params['abort_on_timeout']
 
     def api_request(self, endpoint, data=None, method="GET"):
         response, info = fetch_url(
@@ -183,7 +196,7 @@ class RundeckJobRun(object):
             headers={
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "X-Rundeck-Auth-Token": self.__api_token
+                "X-Rundeck-Auth-Token": self.module.params["api_token"]
             }
         )
 
@@ -196,35 +209,37 @@ class RundeckJobRun(object):
         elif info["status"] >= 500:
             self.module.fail_json(msg="Rundeck API error",
                                   execution_info=json.loads(info["body"]))
-        elif info["status"] == -1:
-            self.module.fail_json(msg="Rundeck API request error",
-                                  execution_info=info)
-
-        response = response.read()
 
         try:
-            json_response = json.loads(response)
+            content = response.read()
+            json_response = json.loads(content)
             return json_response, info
+        except AttributeError as error:
+            self.module.fail_json(msg="Rundeck API request error",
+                                  exception=to_native(error),
+                                  execution_info=info)
         except ValueError as error:
             self.module.fail_json(
                 msg="No valid JSON response",
                 exception=to_native(error),
-                execution_info=response
+                execution_info=content
             )
 
     def job_status_check(self, execution_id):
-        job_status_wait = True
-        start_datetime = int(datetime.now().strftime("%s"))
+        response = dict()
+        timeout = False
+        due = datetime.now() + timedelta(seconds=self.wait_execution_timeout)
 
-        while job_status_wait:
+        while not timeout:
             endpoint = "execution/%s" % execution_id
             response = self.api_request(endpoint)[0]
-            datetime_after_start = int(datetime.now().strftime("%s"))
             output = self.api_request(endpoint="execution/%s/output" % execution_id)
             log_output = "\n".join([x["log"] for x in output[0]["entries"]])
             response.update({"output": log_output})
 
-            if response["status"] == "scheduled":
+            if response["status"] == "aborted":
+                break
+            elif response["status"] == "scheduled":
                 self.module.exit_json(msg="Job scheduled to run at %s" % self.run_at_time,
                                       execution_info=response,
                                       changed=True)
@@ -235,22 +250,15 @@ class RundeckJobRun(object):
                 self.module.exit_json(msg="Job execution succeeded!",
                                       execution_info=response)
 
-            if self.wait_execution_timeout > 0:
-                if (datetime_after_start - start_datetime) >= self.wait_execution_timeout:
-                    job_status_wait = False
-                    break
+            if datetime.now() >= due:
+                timeout = True
+                break
 
             # Wait for 5s before continue
-            sleep(5)
+            sleep(self.wait_execution_delay)
 
-        if not job_status_wait:
-            response = self.api_request(
-                "execution/%s/abort" % response['id'],
-                method="GET"
-            )
-
-            self.module.fail_json(msg="Job execution aborted due the timeout specified",
-                                  execution_info=response[0])
+        response.update({"timed_out": timeout})
+        return response
 
     def job_run(self):
         response, info = self.api_request(
@@ -271,7 +279,22 @@ class RundeckJobRun(object):
             self.module.exit_json(msg="Job run send successfully!",
                                   execution_info=response)
 
-        self.job_status_check(response["id"])
+        job_status = self.job_status_check(response["id"])
+
+        if job_status["timed_out"]:
+            if self.abort_on_timeout:
+                self.api_request(
+                    endpoint="execution/%s/abort" % response['id'],
+                    method="GET"
+                )
+
+                abort_status = self.job_status_check(response["id"])
+
+                self.module.fail_json(msg="Job execution aborted due the timeout specified",
+                                      execution_info=abort_status)
+
+            self.module.fail_json(msg="Job execution timed out",
+                                  execution_info=job_status)
 
 
 def main():
@@ -281,11 +304,13 @@ def main():
         api_version=dict(type="int", default=39),
         api_token=dict(required=True, type="str", no_log=True),
         job_id=dict(required=True, type="str"),
-        job_options=dict(type="dict", default={}),
-        filter_nodes=dict(type="str", default=""),
-        run_at_time=dict(type="str", default=""),
+        job_options=dict(type="dict"),
+        filter_nodes=dict(type="str"),
+        run_at_time=dict(type="str"),
         wait_execution=dict(type="bool", default=True),
-        wait_execution_timeout=dict(type="int", default=0),
+        wait_execution_delay=dict(type="int", default=5),
+        wait_execution_timeout=dict(type="int", default=120),
+        abort_on_timeout=dict(type="bool", default=False),
         loglevel=dict(
             type="str",
             choices=["debug", "verbose", "info", "warn", "error"],

@@ -168,20 +168,20 @@ class RundeckJobExecutionsInfo(object):
             self.module.fail_json(msg="Rundeck API error",
                                   execution_info=json.loads(info["body"]))
 
-        if response is not None:
-            response = response.read()
-            if response != "":
-                try:
-                    json_response = json.loads(response)
-                    return json_response, info
-                except ValueError as error:
-                    self.module.fail_json(
-                        msg="No valid JSON response",
-                        exception=to_native(error),
-                        execution_info=response
-                    )
-
-        return response, info
+        try:
+            content = response.read()
+            json_response = json.loads(content)
+            return json_response, info
+        except AttributeError as error:
+            self.module.fail_json(msg="Rundeck API request error",
+                                  exception=to_native(error),
+                                  execution_info=info)
+        except ValueError as error:
+            self.module.fail_json(
+                msg="No valid JSON response",
+                exception=to_native(error),
+                execution_info=content
+            )
 
     def job_executions(self):
         response, info = self.api_request(
