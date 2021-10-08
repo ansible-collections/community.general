@@ -110,6 +110,80 @@
           - not pkgng_example3_stat_after.stat.exists
 
     ##
+    ## pkgng - example - state=latest for out-of-date package
+    ##
+    - name: Install intentionally out-of-date package and upgrade it
+      #
+      # NOTE: The out-of-date package provided is from the FreeBSD 11 package repo.
+      #       FreeBSD 11 was EOL at the time of writing, 2021-10-08, so this test
+      #       will only run on FreeBSD major versions > 11.
+      #
+      #       This test might fail at some point in the
+      #       future if the pkg utility in a FreeBSD version > 14
+      #       makes breaking changes that prevents it from installing
+      #       older package formats.
+      #
+      #       If that occurs, the fix is to replace
+      #       `files/freebsd-release-manifests-20210413__FreeBSD_11.pkg`
+      #       with the version of freebsd-release-manifests from the oldest
+      #       non-breaking release of FreeBSD, update the
+      #       references to it in tasks/main.yml accordingly,
+      #       and update the minimum version number for the test,
+      #       immediately below.
+      #
+      when: ansible_distribution_version is version('12.0', '>=')
+      block:
+        - name: Copy intentionally out-of-date package to testhost
+          copy:
+            src: freebsd-release-manifests-20210413__FreeBSD_11.pkg
+            dest: /tmp/
+            follow: yes
+
+        - name: Force-install out-of-date package
+          command: pkg add -f /tmp/freebsd-release-manifests-20210413__FreeBSD_11.pkg
+          register: pkgng_example4_prepare
+
+        - name: Check for any available package upgrades (checkmode)
+          pkgng:
+            name: '*'
+            state: latest
+          check_mode: yes
+          register: pkgng_example4_wildcard_checkmode
+
+        - name: Check for available package upgrade (checkmode)
+          pkgng:
+            name: freebsd-release-manifests
+            state: latest
+          check_mode: yes
+          register: pkgng_example4_checkmode
+
+        - name: Upgrade out-of-date package
+          pkgng:
+            name: freebsd-release-manifests
+            state: latest
+          register: pkgng_example4
+
+        - name: Upgrade out-of-date package (idempotent)
+          pkgng:
+            name: freebsd-release-manifests
+            state: latest
+          register: pkgng_example4_idempotent
+
+        - name: Remove test out-of-date package
+          pkgng:
+            name: freebsd-release-manifests
+            state: absent
+
+        - name: Ensure pkgng upgrades package correctly
+          assert:
+            that:
+              - not pkgng_example4_prepare.failed
+              - pkgng_example4_wildcard_checkmode.changed
+              - pkgng_example4_checkmode.changed
+              - pkgng_example4.changed
+              - not pkgng_example4_idempotent.changed
+
+    ##
     ## pkgng - example - Install zsh in jail
     ##
     - name: Test within jail
