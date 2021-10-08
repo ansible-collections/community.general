@@ -527,7 +527,7 @@ def main():
                 if old_mapper is None:
                     old_mapper = dict()
             else:
-                found = [ x for x in kc.get_identity_provider_mappers(alias, realm) if x['name'] == change['name'] ]
+                found = [x for x in kc.get_identity_provider_mappers(alias, realm) if x['name'] == change['name']]
                 if len(found) == 1:
                     old_mapper = found[0]
                 else:
