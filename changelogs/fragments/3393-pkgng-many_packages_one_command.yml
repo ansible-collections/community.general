@@ -1,0 +1,5 @@
+minor_changes:
+  - pkgng - packages being installed (or upgraded) are acted on in one command (per action)
+    (https://github.com/ansible-collections/community.general/issues/2265).
+  - pkgng - status message specifies number of packages installed and/or upgraded separately.
+    Previously, all changes were reported as one count of packages "added" (https://github.com/ansible-collections/community.general/pull/3393).
