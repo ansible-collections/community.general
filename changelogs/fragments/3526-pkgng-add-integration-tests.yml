@@ -1,0 +1,2 @@
+bugfixes:
+  - 'pkgng - `name=* state=latest` check for upgrades did not count "Number of packages to be reinstalled" as a `changed` action, giving incorrect results in both regular and check mode'
