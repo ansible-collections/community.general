@@ -238,11 +238,12 @@ class RundeckJobRun(object):
             if self.wait_execution_timeout > 0:
                 if (datetime_after_start - start_datetime) >= self.wait_execution_timeout:
                     job_status_wait = False
-                    continue
+                    break
 
             # Wait for 5s before continue
             sleep(5)
-        else:
+
+        if not job_status_wait:
             response = self.api_request(
                 "execution/%s/abort" % response['id'],
                 method="GET"
