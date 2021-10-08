@@ -4,7 +4,7 @@
     - ansible_facts.distribution == 'FreeBSD'
   block:
     ##
-    ## pkgng - example - install single package
+    ## pkgng - example - state=present for single package
     ##
     - name: Verify zsh binary is not present
       stat:
@@ -50,7 +50,20 @@
           - pkgng_example1_stat_after.stat.executable
 
     ##
-    ## pkgng - example - remove single package
+    ## pkgng - example - state=latest for already up-to-date package
+    ##
+    - name: Upgrade zsh (idempotent)
+      pkgng:
+        name: zsh
+        state: latest
+      register: pkgng_example2
+
+    - name: Ensure pkgng does not upgrade up-to-date package
+      assert:
+        that:
+          - not pkgng_example2.changed
+
+    ## pkgng - example - state=absent for single package
     ##
     - name: Verify zsh binary is present
       stat:
@@ -58,25 +71,25 @@
         get_attributes: no
         get_checksum: no
         get_mime: no
-      register: pkgng_example2_stat_before
+      register: pkgng_example3_stat_before
 
     - name: Install zsh (checkmode)
       pkgng:
         name: zsh
       check_mode: yes
-      register: pkgng_example2_checkmode
+      register: pkgng_example3_checkmode
 
     - name: Remove zsh
       pkgng:
         name: zsh
         state: absent
-      register: pkgng_example2
+      register: pkgng_example3
 
     - name: Remove zsh (idempotent)
       pkgng:
         name: zsh
         state: absent
-      register: pkgng_example2_idempotent
+      register: pkgng_example3_idempotent
 
     - name: Verify zsh binary is not present
       stat:
@@ -84,17 +97,17 @@
         get_attributes: no
         get_checksum: no
         get_mime: no
-      register: pkgng_example2_stat_after
+      register: pkgng_example3_stat_after
 
     - name: Ensure pkgng installs package correctly
       assert:
         that:
-          - pkgng_example2_stat_before.stat.exists
-          - pkgng_example2_stat_before.stat.executable
-          - not pkgng_example2_checkmode.changed
-          - pkgng_example2.changed
-          - not pkgng_example2_idempotent.changed
-          - not pkgng_example2_stat_after.stat.exists
+          - pkgng_example3_stat_before.stat.exists
+          - pkgng_example3_stat_before.stat.executable
+          - not pkgng_example3_checkmode.changed
+          - pkgng_example3.changed
+          - not pkgng_example3_idempotent.changed
+          - not pkgng_example3_stat_after.stat.exists
 
     ##
     ## pkgng - example - Install zsh in jail
