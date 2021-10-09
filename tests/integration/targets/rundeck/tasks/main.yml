@@ -32,6 +32,20 @@
     RD_USER: admin
     RD_PASSWORD: admin
 
+- name: Wrong Rundeck API Token
+  community.general.rundeck_job_run:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: wrong_token
+    job_id: "{{ rundeck_job_id }}"
+  ignore_errors: true
+  register: rundeck_job_run_wrong_token
+
+- name: Assert that Rundeck authorization failed
+  ansible.builtin.assert:
+    that:
+      - rundeck_job_run_wrong_token.msg == "Token authorization failed"
+
 - name: Success run Rundeck job test_job
   community.general.rundeck_job_run:
     url: "{{ rundeck_url }}"
@@ -41,7 +55,7 @@
   register: rundeck_job_run_success
 
 - name: Assert that Rundeck job test_job runs successfully
-  assert:
+  ansible.builtin.assert:
     that:
       - rundeck_job_run_success.execution_info.status == "succeeded"
 
@@ -57,7 +71,7 @@
   register: rundeck_job_run_fail
 
 - name: Assert that Rundeck job test_job failed
-  assert:
+  ansible.builtin.assert:
     that:
       - rundeck_job_run_fail.execution_info.status == "failed"
 
@@ -75,7 +89,7 @@
   register: rundeck_job_run_aborted
 
 - name: Assert that Rundeck job test_job is aborted
-  assert:
+  ansible.builtin.assert:
     that:
       - rundeck_job_run_aborted.execution_info.status == "aborted"
 
@@ -91,7 +105,7 @@
   register: rundeck_job_run_forget
 
 - name: Assert that Rundeck job test_job is running
-  assert:
+  ansible.builtin.assert:
     that:
       - rundeck_job_run_forget.execution_info.status == "running"
 
@@ -104,6 +118,6 @@
   register: rundeck_job_executions_info
 
 - name: Assert that Rundeck job executions info has 4 registers
-  assert:
+  ansible.builtin.assert:
     that:
       - rundeck_job_executions_info.paging.total | int == 4
