@@ -94,6 +94,7 @@ ansible.cfg: |
 
 import os
 import json
+from ansible import context
 import socket
 import uuid
 import logging
