@@ -114,33 +114,28 @@
     ##
     - name: Install intentionally out-of-date package and upgrade it
       #
-      # NOTE: The out-of-date package provided is from the FreeBSD 11 package repo.
-      #       FreeBSD 11 was EOL at the time of writing, 2021-10-08, so this test
-      #       will only run on FreeBSD major versions > 11.
+      # NOTE: The out-of-date package provided is a minimal,
+      #       no-contents test package that declares zsh with
+      #       a version of 0, so it should always be upgraded.
       #
       #       This test might fail at some point in the
-      #       future if the pkg utility in a FreeBSD version > 14
-      #       makes breaking changes that prevents it from installing
+      #       future if the FreeBSD package format receives
+      #       breaking changes that prevent pkg from installing
       #       older package formats.
-      #
-      #       If that occurs, the fix is to replace
-      #       `files/freebsd-release-manifests-20210413__FreeBSD_11.pkg`
-      #       with the version of freebsd-release-manifests from the oldest
-      #       non-breaking release of FreeBSD, update the
-      #       references to it in tasks/main.yml accordingly,
-      #       and update the minimum version number for the test,
-      #       immediately below.
       #
       when: ansible_distribution_version is version('12.0', '>=')
       block:
-        - name: Copy intentionally out-of-date package to testhost
+        - name: Copy intentionally out-of-date package manifest to testhost
           copy:
-            src: freebsd-release-manifests-20210413__FreeBSD_11.pkg
+            src: zsh_test_package_manifests
             dest: /tmp/
             follow: yes
 
-        - name: Force-install out-of-date package
-          command: pkg add -f /tmp/freebsd-release-manifests-20210413__FreeBSD_11.pkg
+        - name: Create out-of-date test package
+          command: tar -C /tmp/zsh_test_package_manifests -cJf /tmp/zsh-0__test.pkg +COMPACT_MANIFEST +MANIFEST
+
+        - name: Install out-of-date test package
+          command: pkg add /tmp/zsh-0__test.pkg
           register: pkgng_example4_prepare
 
         - name: Check for any available package upgrades (checkmode)
