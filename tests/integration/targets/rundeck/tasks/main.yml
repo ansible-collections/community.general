@@ -32,18 +32,68 @@
     RD_USER: admin
     RD_PASSWORD: admin
 
-- name: Run Rundeck job test_job
+- name: Success run Rundeck job test_job
   community.general.rundeck_job_run:
     url: "{{ rundeck_url }}"
     api_version: "{{ rundeck_api_version }}"
     api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
     job_id: "{{ rundeck_job_id }}"
-  register: rundeck_job_run
+  register: rundeck_job_run_success
 
-- name: Assert that Rundeck job runs successfully
+- name: Assert that Rundeck job test_job runs successfully
   assert:
     that:
-      - rundeck_job_run.execution_info.status == "succeeded"
+      - rundeck_job_run_success.execution_info.status == "succeeded"
+
+- name: Fail run Rundeck job test_job
+  community.general.rundeck_job_run:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    job_id: "{{ rundeck_job_id }}"
+    job_options:
+      exit_code: "1"
+  ignore_errors: true
+  register: rundeck_job_run_fail
+
+- name: Assert that Rundeck job test_job failed
+  assert:
+    that:
+      - rundeck_job_run_fail.execution_info.status == "failed"
+
+- name: Abort run Rundeck job test_job due timeout
+  community.general.rundeck_job_run:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    job_id: "{{ rundeck_job_id }}"
+    job_options:
+      sleep: "5"
+    wait_execution_timeout: 2
+    abort_on_timeout: true
+  ignore_errors: true
+  register: rundeck_job_run_aborted
+
+- name: Assert that Rundeck job test_job is aborted
+  assert:
+    that:
+      - rundeck_job_run_aborted.execution_info.status == "aborted"
+
+- name: Fire-and-forget run Rundeck job test_job
+  community.general.rundeck_job_run:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    job_id: "{{ rundeck_job_id }}"
+    job_options:
+      sleep: "5"
+    wait_execution: False
+  register: rundeck_job_run_forget
+
+- name: Assert that Rundeck job test_job is running
+  assert:
+    that:
+      - rundeck_job_run_forget.execution_info.status == "running"
 
 - name: Get Rundeck job test_job executions info
   community.general.rundeck_job_executions_info:
@@ -53,7 +103,7 @@
     job_id: "{{ rundeck_job_id }}"
   register: rundeck_job_executions_info
 
-- name: Assert that Rundeck job executions info has a register
+- name: Assert that Rundeck job executions info has 4 registers
   assert:
     that:
-      - rundeck_job_executions_info.paging.total | int == 1
+      - rundeck_job_executions_info.paging.total | int == 4
