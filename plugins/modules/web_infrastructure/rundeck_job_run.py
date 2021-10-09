@@ -105,6 +105,29 @@ EXAMPLES = '''
   debug:
     var: rundeck_job_run.execution_info
 
+- name: Run a Rundeck job with options
+  community.general.rundeck_job_run:
+    url: "https://rundeck.example.org"
+    api_version: 39
+    api_token: "mytoken"
+    job_id: "xxxxxxxxxxxxxxxxx"
+    job_options:
+        option_1: "value_1"
+        option_2: "value_3"
+        option_3: "value_3"
+  register: rundeck_job_run
+
+- name: Run a Rundeck job with timeout, delay between status check and abort on timeout
+  community.general.rundeck_job_run:
+    url: "https://rundeck.example.org"
+    api_version: 39
+    api_token: "mytoken"
+    job_id: "xxxxxxxxxxxxxxxxx"
+    wait_execution_timeout: 30
+    wait_execution_delay: 10
+    abort_on_timeout: true
+  register: rundeck_job_run
+
 - name: Schedule a Rundeck job
   community.general.rundeck_job_run:
     url: "https://rundeck.example.org"
@@ -113,6 +136,15 @@ EXAMPLES = '''
     job_id: "xxxxxxxxxxxxxxxxx"
     run_at_time: "2021-10-05T15:45:00-03:00"
   register: rundeck_job_schedule
+
+- name: Fire-and-forget a Rundeck job
+  community.general.rundeck_job_run:
+    url: "https://rundeck.example.org"
+    api_version: 39
+    api_token: "mytoken"
+    job_id: "xxxxxxxxxxxxxxxxx"
+    wait_execution: false
+  register: rundeck_job_run
 '''
 
 RETURN = '''
