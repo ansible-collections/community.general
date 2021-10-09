@@ -41,9 +41,9 @@ options:
     job_options:
         type: dict
         description:
-            - The job options.
+            - The job options for the steps.
+            - Options values must be encapsulated by quotes.
         required: False
-        default: {}
     filter_nodes:
         type: str
         description:
