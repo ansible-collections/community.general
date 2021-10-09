@@ -21,7 +21,7 @@ options:
         type: str
         description:
             - Rundeck instance URL.
-        required: True
+        required: true
     api_version:
         type: int
         description:
@@ -32,62 +32,54 @@ options:
         type: str
         description:
             - Rundeck User API Token.
-        required: True
+        required: true
     job_id:
         type: str
         description:
             - The job unique ID.
-        required: True
+        required: true
     job_options:
         type: dict
         description:
             - The job options for the steps.
-            - Options values must be encapsulated by quotes.
-        required: False
+            - Numeric values must be quoted.
     filter_nodes:
         type: str
         description:
             - Filter the nodes where the jobs must run.
-            - See https://docs.rundeck.com/docs/manual/11-node-filters.html#node-filter-syntax.
-        required: False
+            - See U(https://docs.rundeck.com/docs/manual/11-node-filters.html#node-filter-syntax).
     run_at_time:
         type: str
         description:
             - Schedule the job execution to run at specific date and time.
-            - ISO-8601 date and time format like 2021-10-05T15:45:00-03:00.
-        required: False
+            - ISO-8601 date and time format like C(2021-10-05T15:45:00-03:00).
     loglevel:
         type: str
         description:
             - Log level configuration.
-        required: False
         choices: [debug, verbose, info, warn, error]
         default: info
     wait_execution:
         type: bool
         description:
             - Wait until the job finished the execution.
-        required: False
         default: True
     wait_execution_delay:
         type: int
         description:
             - Delay, in seconds, between job execution status check requests.
-        required: False
         default: 5
     wait_execution_timeout:
         type: int
         description:
-            - Job execution wait timeout in seconds. 0 = no timeout.
+            - Job execution wait timeout in seconds.
             - If the timeout is reached, the job will be aborted.
-            - Keep in mind that there is a sleep based on wait_execution_delay after each job status check.
-        required: False
+            - Keep in mind that there is a sleep based on I(wait_execution_delay) after each job status check.
         default: 120
     abort_on_timeout:
         type: bool
         description:
             - Send a job abort request if exceeded the wait_execution_timeout specified.
-        required: False
         default: False
 extends_documentation_fragment: url
 '''
@@ -102,7 +94,7 @@ EXAMPLES = '''
   register: rundeck_job_run
 
 - name: Show execution info
-  debug:
+  ansible.builtin.debug:
     var: rundeck_job_run.execution_info
 
 - name: Run a Rundeck job with options
@@ -201,7 +193,9 @@ from time import sleep
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.urls import fetch_url, url_argument_spec
+from ansible.module_utils.urls import url_argument_spec
+from ansible.module_utils.six.moves.urllib.parse import quote
+from ansible_collections.community.general.plugins.module_utils.rundeck import api_request
 
 
 class RundeckJobRun(object):
@@ -210,52 +204,14 @@ class RundeckJobRun(object):
         self.url = self.module.params["url"]
         self.api_version = self.module.params["api_version"]
         self.job_id = self.module.params["job_id"]
-        self.job_options = self.module.params.get("job_options") or {}
-        self.filter_nodes = self.module.params.get("filter_nodes") or ""
-        self.run_at_time = self.module.params.get("run_at_time") or ""
+        self.job_options = self.module.params["job_options"] or {}
+        self.filter_nodes = self.module.params["filter_nodes"] or ""
+        self.run_at_time = self.module.params["run_at_time"] or ""
         self.loglevel = self.module.params["loglevel"].upper()
         self.wait_execution = self.module.params['wait_execution']
         self.wait_execution_delay = self.module.params['wait_execution_delay']
         self.wait_execution_timeout = self.module.params['wait_execution_timeout']
         self.abort_on_timeout = self.module.params['abort_on_timeout']
-
-    def api_request(self, endpoint, data=None, method="GET"):
-        response, info = fetch_url(
-            module=self.module,
-            url="%s/api/%s/%s" % (self.url, self.api_version, endpoint),
-            data=json.dumps(data),
-            method=method,
-            headers={
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "X-Rundeck-Auth-Token": self.module.params["api_token"]
-            }
-        )
-
-        if info["status"] == 403:
-            self.module.fail_json(msg="Token authorization failed",
-                                  execution_info=json.loads(info["body"]))
-        if info["status"] == 409:
-            self.module.fail_json(msg="Job executions limit reached",
-                                  execution_info=json.loads(info["body"]))
-        elif info["status"] >= 500:
-            self.module.fail_json(msg="Rundeck API error",
-                                  execution_info=json.loads(info["body"]))
-
-        try:
-            content = response.read()
-            json_response = json.loads(content)
-            return json_response, info
-        except AttributeError as error:
-            self.module.fail_json(msg="Rundeck API request error",
-                                  exception=to_native(error),
-                                  execution_info=info)
-        except ValueError as error:
-            self.module.fail_json(
-                msg="No valid JSON response",
-                exception=to_native(error),
-                execution_info=content
-            )
 
     def job_status_check(self, execution_id):
         response = dict()
@@ -263,9 +219,10 @@ class RundeckJobRun(object):
         due = datetime.now() + timedelta(seconds=self.wait_execution_timeout)
 
         while not timeout:
-            endpoint = "execution/%s" % execution_id
-            response = self.api_request(endpoint)[0]
-            output = self.api_request(endpoint="execution/%s/output" % execution_id)
+            endpoint = "execution/%d" % execution_id
+            response = api_request(module=self.module, endpoint=endpoint)[0]
+            output = api_request(module=self.module,
+                                 endpoint="execution/%d/output" % execution_id)
             log_output = "\n".join([x["log"] for x in output[0]["entries"]])
             response.update({"output": log_output})
 
@@ -293,8 +250,9 @@ class RundeckJobRun(object):
         return response
 
     def job_run(self):
-        response, info = self.api_request(
-            endpoint="job/%s/run" % self.job_id,
+        response, info = api_request(
+            module=self.module,
+            endpoint="job/%s/run" % quote(self.job_id),
             method="POST",
             data={
                 "loglevel": self.loglevel,
@@ -315,7 +273,8 @@ class RundeckJobRun(object):
 
         if job_status["timed_out"]:
             if self.abort_on_timeout:
-                self.api_request(
+                api_request(
+                    module=self.module,
                     endpoint="execution/%s/abort" % response['id'],
                     method="GET"
                 )

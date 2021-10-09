@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: rundeck_job_executions_info
-short_description: Rundeck job executions info
+short_description: Query executions for a Rundeck job
 description:
     - This module gets the list of executions for a specified Rundeck job.
 author: "Phillipe Smith (@phsmith)"
@@ -21,7 +21,7 @@ options:
         type: str
         description:
             - Rundeck instance URL.
-        required: True
+        required: true
     api_version:
         type: int
         description:
@@ -31,30 +31,27 @@ options:
     api_token:
         type: str
         description:
-            - Rundeck User API Token.
-        required: True
+            - Rundeck user API token.
+        required: true
     job_id:
         type: str
         description:
             - The job unique ID.
-        required: True
+        required: true
     status:
         type: str
         description:
             - The job status to filter.
-        required: False
         choices: [succeeded, failed, aborted, running]
     max:
         type: int
         description:
             - Max results to return.
-        required: False
         default: 20
     offset:
         type: int
         description:
             - The start point to return the results.
-        required: False
         default: 0
 extends_documentation_fragment: url
 '''
@@ -69,7 +66,7 @@ EXAMPLES = '''
   register: rundeck_job_executions_info
 
 - name: Show Rundeck job executions info
-  debug:
+  ansible.builtin.debug:
     var: rundeck_job_executions_info.executions
 '''
 
@@ -78,6 +75,23 @@ paging:
     description: Results pagination info.
     returned: success
     type: dict
+    contains:
+      count:
+        description: Number of results in the response.
+        type: int
+        returned: success
+      total:
+        description: Total number of results.
+        type: int
+        returned: success
+      offset:
+        description: Offset from first of all results.
+        type: int
+        returned: success
+      max:
+        description: Maximum number of results per page.
+        type: int
+        returned: success
     sample: {
         "count": 20,
         "total": 100,
@@ -132,6 +146,8 @@ import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.urls import fetch_url, url_argument_spec
+from ansible.module_utils.six.moves.urllib.parse import quote
+from ansible_collections.community.general.plugins.module_utils.rundeck import api_request
 
 
 class RundeckJobExecutionsInfo(object):
@@ -142,50 +158,13 @@ class RundeckJobExecutionsInfo(object):
         self.job_id = self.module.params["job_id"]
         self.offset = self.module.params["offset"]
         self.max = self.module.params["max"]
-        self.status = self.module.params.get("status") or ""
-
-    def api_request(self, endpoint, data=None, method="GET"):
-        response, info = fetch_url(
-            module=self.module,
-            url="%s/api/%s/%s" % (self.url, self.api_version, endpoint),
-            data=json.dumps(data),
-            method=method,
-            headers={
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "X-Rundeck-Auth-Token": self.module.params["api_token"]
-            }
-        )
-
-        if info["status"] == 403:
-            self.module.fail_json(msg="Token authorization failed",
-                                  executions=json.loads(info["body"]))
-        if info["status"] == 409:
-            self.module.fail_json(msg="Job executions limit reached",
-                                  executions=json.loads(info["body"]))
-        elif info["status"] >= 500:
-            self.module.fail_json(msg="Rundeck API error",
-                                  executions=json.loads(info["body"]))
-        try:
-
-            content = response.read()
-            json_response = json.loads(content)
-            return json_response, info
-        except AttributeError as error:
-            self.module.fail_json(msg="Rundeck API request error",
-                                  exception=to_native(error),
-                                  executions=info)
-        except ValueError as error:
-            self.module.fail_json(
-                msg="No valid JSON response",
-                exception=to_native(error),
-                executions=content
-            )
+        self.status = self.module.params["status"] or ""
 
     def job_executions(self):
-        response, info = self.api_request(
+        response, info = api_request(
+            module=self.module,
             endpoint="job/%s/executions?offset=%s&max=%s&status=%s"
-                     % (self.job_id, self.offset, self.max, self.status),
+                     % (quote(self.job_id), self.offset, self.max, self.status),
             method="GET"
         )
 
