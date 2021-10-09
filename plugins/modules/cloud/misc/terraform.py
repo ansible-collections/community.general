@@ -141,6 +141,7 @@ options:
     description:
       - Restrict concurrent operations when Terraform applies the plan.
     type: int
+    version_added: '3.8.0'
 notes:
    - To just run a `terraform plan`, use check mode.
 requirements: [ "terraform" ]
