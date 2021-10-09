@@ -131,6 +131,15 @@
             dest: /tmp/
             follow: yes
 
+        - name: Add plus-sign to package manifest filenames on testhost
+          copy:
+            src: "/tmp/zsh_test_package_manifests/{{ item }}"
+            remote_src: yes
+            dest: "/tmp/zsh_test_package_manifests/+{{ item }}"
+          loop:
+            - COMPACT_MANIFEST
+            - MANIFEST
+
         - name: Create out-of-date test package
           command: tar -C /tmp/zsh_test_package_manifests -cJf /tmp/zsh-0__test.pkg +COMPACT_MANIFEST +MANIFEST
 
@@ -147,26 +156,26 @@
 
         - name: Check for available package upgrade (checkmode)
           pkgng:
-            name: freebsd-release-manifests
+            name: zsh
             state: latest
           check_mode: yes
           register: pkgng_example4_checkmode
 
         - name: Upgrade out-of-date package
           pkgng:
-            name: freebsd-release-manifests
+            name: zsh
             state: latest
           register: pkgng_example4
 
         - name: Upgrade out-of-date package (idempotent)
           pkgng:
-            name: freebsd-release-manifests
+            name: zsh
             state: latest
           register: pkgng_example4_idempotent
 
         - name: Remove test out-of-date package
           pkgng:
-            name: freebsd-release-manifests
+            name: zsh
             state: absent
 
         - name: Ensure pkgng upgrades package correctly
