@@ -125,23 +125,23 @@
       #
       when: ansible_distribution_version is version('12.0', '>=')
       block:
-        - name: Copy intentionally out-of-date package manifest to testhost
-          copy:
-            src: zsh_test_package_manifests
-            dest: /tmp/
-            follow: yes
+        - name: Create temporary directory to assemble test package
+          file:
+            state: directory
+            path: /tmp/zsh_test_package
 
-        - name: Add plus-sign to package manifest filenames on testhost
+        - name: Copy intentionally out-of-date package manifests to testhost
           copy:
-            src: "/tmp/zsh_test_package_manifests/{{ item }}"
-            remote_src: yes
-            dest: "/tmp/zsh_test_package_manifests/+{{ item }}"
+            src: zsh_test_package_manifests/{{ item }}
+            # Plus-sign must be added at the destination
+            # CI doesn't like files with '+' in them in the repository
+            dest: /tmp/zsh_test_package/+{{ item }}
           loop:
             - COMPACT_MANIFEST
             - MANIFEST
 
         - name: Create out-of-date test package
-          command: tar -C /tmp/zsh_test_package_manifests -cJf /tmp/zsh-0__test.pkg +COMPACT_MANIFEST +MANIFEST
+          command: tar -C /tmp/zsh_test_package -cJf /tmp/zsh-0__test.pkg +COMPACT_MANIFEST +MANIFEST
 
         - name: Install out-of-date test package
           command: pkg add /tmp/zsh-0__test.pkg
