@@ -191,10 +191,9 @@ def upgrade_packages(module, pkgng_path, dir_arg):
         cmd += " -n"
     rc, out, err = module.run_command(cmd)
 
-    for action in ('upgraded', 'reinstalled',):
-        match = re.search('^Number of packages to be %s: ([0-9]+)' % (action,), out, re.MULTILINE)
-        if match:
-            upgraded_c += int(match.group(1))
+    matches = re.findall('^Number of packages to be (?:upgraded|reinstalled): ([0-9]+)', out, re.MULTILINE)
+    for match in matches:
+        upgraded_c += int(match)
 
     if upgraded_c > 0:
         return (True, "updated %s package(s)" % upgraded_c, out, err)
