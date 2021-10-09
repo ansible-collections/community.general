@@ -318,45 +318,46 @@ class OpenTelemetrySource(object):
         # it requires to parse deb https://artifacts./...packages/6.x/apt stable main
         #
         deprecated_tasks = {
-          "homebrew": {"default": "homebrew"},
-          "homebrew_tap": {"primary": "url"},
-          "get_url": {"primary": "url"},
-          "git": {"primary": "repo"},
-          "uri": {"primary": "url"},
-          "yum": {"primary": "name"},
-          "yum_repository": {"primary": "baseurl", "secondary": "mirrorlist"},
-          "win_chocolatey": {"primary": "source", "secondary": "proxy_url", "default": "chocolatey"},
-          "win_get_url": {"primary": "url"},
-          "zypper_repository": {"primary": "repo"}
-        }
-        # Some tasks are duplicated :/
-        #
-        builtin_tasks = {
-          "ansible.builtin.git": {"primary": "repo"}
+            "homebrew": {"default": "homebrew"},
+            "homebrew_tap": {"primary": "url"},
+            "get_url": {"primary": "url"},
+            "git": {"primary": "repo"},
+            "uri": {"primary": "url"},
+            "yum": {"primary": "name"},
+            "yum_repository": {"primary": "baseurl", "secondary": "mirrorlist"},
+            "win_chocolatey": {"primary": "source", "secondary": "proxy_url", "default": "chocolatey"},
+            "win_get_url": {"primary": "url"},
+            "zypper_repository": {"primary": "repo"}
         }
 
-        # Some tasks are duplicated :/
+        # Some tasks are duplicated since they are also defined in the deprecated_tasks :/
+        #
+        builtin_tasks = {
+            "ansible.builtin.git": {"primary": "repo"}
+        }
+
+        # Some tasks are duplicated since they are also defined in the deprecated_tasks :/
         #
         community_tasks = {
-          "community.zabbix.zabbix_action": {"primary": "server_url"},
-          "community.general.github_repo": {"primary": "api_url", "default": "github.com"},
-          "community.general.gitlab_project": {"primary": "api_url", "default": "gitlab.com"},
-          "community.general.homebrew": {"default": "homebrew"},
-          "community.general.homebrew_tap": {"primary": "url"},
-          "community.general.jenkins_build": {"primary": "url"},
-          "community.general.jenkins_job": {"primary": "url"},
-          "community.general.jenkins_script": {"primary": "url"},
-          "community.general.jira": {"primary": "uri"},
-          "community.general.kibana_plugin": {"primary": "url"},
-          "community.general.maven_artifact": {"primary": "repository_url"},
-          "community.general.zypper_repository": {"primary": "repo"},
-          "community.general.slack": {"default": "slack"},
-          "community.grafana.grafana_dashboard": {"primary": "grafana_url"},
-          "community.grafana.grafana_plugin": {"primary": "grafana_plugin_url"},
-          "community.grafana.grafana_team": {"primary": "url"},
-          "community.grafana.grafana_user": {"primary": "url"},
-          "community.kubernetes.helm_repository": {"primary": "repo_url"},
-          "community.kubernetes.helm": {"primary": "chart_repo_url"}
+            "community.zabbix.zabbix_action": {"primary": "server_url"},
+            "community.general.github_repo": {"primary": "api_url", "default": "github.com"},
+            "community.general.gitlab_project": {"primary": "api_url", "default": "gitlab.com"},
+            "community.general.homebrew": {"default": "homebrew"},
+            "community.general.homebrew_tap": {"primary": "url"},
+            "community.general.jenkins_build": {"primary": "url"},
+            "community.general.jenkins_job": {"primary": "url"},
+            "community.general.jenkins_script": {"primary": "url"},
+            "community.general.jira": {"primary": "uri"},
+            "community.general.kibana_plugin": {"primary": "url"},
+            "community.general.maven_artifact": {"primary": "repository_url"},
+            "community.general.zypper_repository": {"primary": "repo"},
+            "community.general.slack": {"default": "slack"},
+            "community.grafana.grafana_dashboard": {"primary": "grafana_url"},
+            "community.grafana.grafana_plugin": {"primary": "grafana_plugin_url"},
+            "community.grafana.grafana_team": {"primary": "url"},
+            "community.grafana.grafana_user": {"primary": "url"},
+            "community.kubernetes.helm_repository": {"primary": "repo_url"},
+            "community.kubernetes.helm": {"primary": "chart_repo_url"}
         }
 
         if task_data.action in deprecated_tasks.keys() or task_data.action in builtin_tasks.keys() or task_data.action in community_tasks.keys():
