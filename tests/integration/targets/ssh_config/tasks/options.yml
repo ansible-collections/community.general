@@ -1,9 +1,15 @@
+# Reset ssh_config before testing options
+- name: Copy sample config file
+  copy:
+    src: 'files/ssh_config_test'
+    dest: '{{ ssh_config_test }}'
+
 - name: Options - Add in check mode
   community.general.ssh_config:
     ssh_config_file: "{{ ssh_config_test }}"
     host: "options.example.com"
     proxycommand: "ssh jumphost.example.com -W %h:%p"
-    forwardagent: "yes"
+    forward_agent: true
     state: present
   register: options_add
   check_mode: yes
@@ -21,7 +27,7 @@
     src: "{{ ssh_config_test }}"
   register: slurp_ssh_config
 
-- name: "Verify that nothign was added to {{ ssh_config_test }} during change mode"
+- name: "Options - Verify that nothign was added to {{ ssh_config_test }} during change mode"
   assert:
     that:
       - "'options.example.com' not in slurp_ssh_config['content'] | b64decode"
@@ -31,7 +37,7 @@
     ssh_config_file: "{{ ssh_config_test }}"
     host: "options.example.com"
     proxycommand: "ssh jumphost.example.com -W %h:%p"
-    forwardagent: "yes"
+    forward_agent: true
     state: present
   register: options_add
 
@@ -48,7 +54,7 @@
     ssh_config_file: "{{ ssh_config_test }}"
     host: "options.example.com"
     proxycommand: "ssh jumphost.example.com -W %h:%p"
-    forwardagent: "yes"
+    forward_agent: true
     state: present
   register: options_add_again
 
@@ -76,7 +82,7 @@
     ssh_config_file: "{{ ssh_config_test }}"
     host: "options.example.com"
     proxycommand: "ssh new-jumphost.example.com -W %h:%p"
-    forwardagent: "no"
+    forward_agent: no
     state: present
   register: options_update
 
@@ -95,7 +101,7 @@
     ssh_config_file: "{{ ssh_config_test }}"
     host: "options.example.com"
     proxycommand: "ssh new-jumphost.example.com -W %h:%p"
-    forwardagent: "no"
+    forward_agent: no
     state: present
   register: options_update
 
