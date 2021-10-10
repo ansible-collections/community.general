@@ -209,6 +209,12 @@ class SSHConfig():
             forwardagent=self.params.get('forward_agent'),
         )
 
+        # Convert 'true' / 'false' to 'yes' / 'no' for usage in ssh_config
+        if args['forwardagent']:
+            args['forwardagent'] = 'yes'
+        else:
+            args['forwardagent'] = 'no'
+
         config_changed = False
         hosts_changed = []
         hosts_change_diff = []
