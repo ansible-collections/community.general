@@ -249,7 +249,10 @@ class RundeckJobRun(object):
         return response
 
     def job_run(self):
-        job_options = {k: str(v) for k, v in self.job_options.items()}
+        job_options = dict()
+
+        for k, v in self.job_options.items():
+            job_options[k] = str(v)
 
         response, info = api_request(
             module=self.module,
