@@ -42,7 +42,6 @@ options:
         type: dict
         description:
             - The job options for the steps.
-            - Numeric values must be quoted.
     filter_nodes:
         type: str
         description:
@@ -63,7 +62,7 @@ options:
         type: bool
         description:
             - Wait until the job finished the execution.
-        default: True
+        default: true
     wait_execution_delay:
         type: int
         description:
@@ -79,8 +78,8 @@ options:
     abort_on_timeout:
         type: bool
         description:
-            - Send a job abort request if exceeded the wait_execution_timeout specified.
-        default: False
+            - Send a job abort request if exceeded the I(wait_execution_timeout) specified.
+        default: false
 extends_documentation_fragment: url
 '''
 
@@ -250,13 +249,15 @@ class RundeckJobRun(object):
         return response
 
     def job_run(self):
+        job_options = {k: str(v) for k, v in self.job_options.items()}
+
         response, info = api_request(
             module=self.module,
             endpoint="job/%s/run" % quote(self.job_id),
             method="POST",
             data={
                 "loglevel": self.loglevel,
-                "options": self.job_options,
+                "options": job_options,
                 "runAtTime": self.run_at_time,
                 "filter": self.filter_nodes
             }
