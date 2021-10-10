@@ -17,22 +17,6 @@ description:
 author: "Phillipe Smith (@phsmith)"
 version_added: 3.8.0
 options:
-    url:
-        type: str
-        description:
-            - Rundeck instance URL.
-        required: true
-    api_version:
-        type: int
-        description:
-            - Rundeck API version to be used.
-            - API version must be at least 14.
-        default: 39
-    api_token:
-        type: str
-        description:
-            - Rundeck User API Token.
-        required: true
     job_id:
         type: str
         description:
@@ -42,6 +26,7 @@ options:
         type: dict
         description:
             - The job options for the steps.
+            - Numeric values must be quoted.
     filter_nodes:
         type: str
         description:
@@ -80,7 +65,9 @@ options:
         description:
             - Send a job abort request if exceeded the I(wait_execution_timeout) specified.
         default: false
-extends_documentation_fragment: url
+extends_documentation_fragment:
+  - community.general.rundeck
+  - url
 '''
 
 EXAMPLES = '''
@@ -192,9 +179,11 @@ from time import sleep
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.urls import url_argument_spec
 from ansible.module_utils.six.moves.urllib.parse import quote
-from ansible_collections.community.general.plugins.module_utils.rundeck import api_request
+from ansible_collections.community.general.plugins.module_utils.rundeck import (
+    api_argument_spec,
+    api_request
+)
 
 
 class RundeckJobRun(object):
@@ -211,6 +200,13 @@ class RundeckJobRun(object):
         self.wait_execution_delay = self.module.params['wait_execution_delay']
         self.wait_execution_timeout = self.module.params['wait_execution_timeout']
         self.abort_on_timeout = self.module.params['abort_on_timeout']
+
+        for k, v in self.job_options.items():
+            if not isinstance(v, str):
+                self.module.exit_json(
+                    msg="Job option '%s' value must be a string" % k,
+                    execution_info={}
+                )
 
     def job_status_check(self, execution_id):
         response = dict()
@@ -249,18 +245,13 @@ class RundeckJobRun(object):
         return response
 
     def job_run(self):
-        job_options = dict()
-
-        for k, v in self.job_options.items():
-            job_options[k] = str(v)
-
         response, info = api_request(
             module=self.module,
             endpoint="job/%s/run" % quote(self.job_id),
             method="POST",
             data={
                 "loglevel": self.loglevel,
-                "options": job_options,
+                "options": self.job_options,
                 "runAtTime": self.run_at_time,
                 "filter": self.filter_nodes
             }
@@ -293,11 +284,8 @@ class RundeckJobRun(object):
 
 
 def main():
-    argument_spec = url_argument_spec()
+    argument_spec = api_argument_spec()
     argument_spec.update(dict(
-        url=dict(required=True, type="str"),
-        api_version=dict(type="int", default=39),
-        api_token=dict(required=True, type="str", no_log=True),
         job_id=dict(required=True, type="str"),
         job_options=dict(type="dict"),
         filter_nodes=dict(type="str"),

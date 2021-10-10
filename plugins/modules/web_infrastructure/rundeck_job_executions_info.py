@@ -17,22 +17,6 @@ description:
 author: "Phillipe Smith (@phsmith)"
 version_added: 3.8.0
 options:
-    url:
-        type: str
-        description:
-            - Rundeck instance URL.
-        required: true
-    api_version:
-        type: int
-        description:
-            - Rundeck API version to be used.
-            - API version must be at least 14.
-        default: 39
-    api_token:
-        type: str
-        description:
-            - Rundeck user API token.
-        required: true
     job_id:
         type: str
         description:
@@ -53,7 +37,9 @@ options:
         description:
             - The start point to return the results.
         default: 0
-extends_documentation_fragment: url
+extends_documentation_fragment:
+  - community.general.rundeck
+  - url
 '''
 
 EXAMPLES = '''
@@ -145,9 +131,11 @@ import json
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
-from ansible.module_utils.urls import fetch_url, url_argument_spec
 from ansible.module_utils.six.moves.urllib.parse import quote
-from ansible_collections.community.general.plugins.module_utils.rundeck import api_request
+from ansible_collections.community.general.plugins.module_utils.rundeck import (
+    api_argument_spec,
+    api_request
+)
 
 
 class RundeckJobExecutionsInfo(object):
@@ -178,11 +166,8 @@ class RundeckJobExecutionsInfo(object):
 
 
 def main():
-    argument_spec = url_argument_spec()
+    argument_spec = api_argument_spec()
     argument_spec.update(dict(
-        url=dict(required=True, type="str"),
-        api_version=dict(type="int", default=39),
-        api_token=dict(required=True, type="str", no_log=True),
         job_id=dict(required=True, type="str"),
         offset=dict(type="int", default=0),
         max=dict(type="int", default=20),
