@@ -224,7 +224,7 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
 
-    def test_create_when_present(self):
+    def test_update_when_present(self):
         """Update existing identity provider"""
 
         module_args = {
@@ -250,6 +250,15 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 'syncMode': "FORCE"
             },
             'mappers': [{
+                'name': "username",
+                'identityProviderAlias': "oidc-idp",
+                'identityProviderMapper': "oidc-user-attribute-idp-mapper",
+                'config': {
+                    'claim': "username",
+                    'user.attribute': "username",
+                    'syncMode': "INHERIT",
+                }
+            }, {
                 'name': "first_name",
                 'identityProviderAlias': "oidc-idp",
                 'identityProviderMapper': "oidc-user-attribute-idp-mapper",
@@ -319,10 +328,20 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
         ]
         return_value_mappers_get = [
             [{
+                'config': {
+                    'claim': "username",
+                    'syncMode': "INHERIT",
+                    'user.attribute': "username"
+                },
+                "id": "616f11ba-b9ae-42ae-bd1b-bc618741c10b",
+                'identityProviderAlias': "oidc-idp",
+                'identityProviderMapper': "oidc-user-attribute-idp-mapper",
+                'name': "username"
+            }, {
                 "config": {
                     "claim": "first_name_changeme",
                     "syncMode": "INHERIT",
-                    "user.attribute": "first_name_changeme"
+                    "user.attribute": "first_name"
                 },
                 "id": "5fde49bb-93bd-4f5d-97d6-c5d0c1d07aef",
                 "identityProviderAlias": "oidc-idp",
@@ -330,6 +349,79 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                 "name": "first_name"
             }],
             [{
+                'config': {
+                    'claim': "username",
+                    'syncMode': "INHERIT",
+                    'user.attribute': "username"
+                },
+                "id": "616f11ba-b9ae-42ae-bd1b-bc618741c10b",
+                'identityProviderAlias': "oidc-idp",
+                'identityProviderMapper': "oidc-user-attribute-idp-mapper",
+                'name': "username"
+            }, {
+                "config": {
+                    "claim": "first_name_changeme",
+                    "syncMode": "INHERIT",
+                    "user.attribute": "first_name"
+                },
+                "id": "5fde49bb-93bd-4f5d-97d6-c5d0c1d07aef",
+                "identityProviderAlias": "oidc-idp",
+                "identityProviderMapper": "oidc-user-attribute-idp-mapper",
+                "name": "first_name"
+            }],
+            [{
+                'config': {
+                    'claim': "username",
+                    'syncMode': "INHERIT",
+                    'user.attribute': "username"
+                },
+                "id": "616f11ba-b9ae-42ae-bd1b-bc618741c10b",
+                'identityProviderAlias': "oidc-idp",
+                'identityProviderMapper': "oidc-user-attribute-idp-mapper",
+                'name': "username"
+            }, {
+                "config": {
+                    "claim": "first_name_changeme",
+                    "syncMode": "INHERIT",
+                    "user.attribute": "first_name"
+                },
+                "id": "5fde49bb-93bd-4f5d-97d6-c5d0c1d07aef",
+                "identityProviderAlias": "oidc-idp",
+                "identityProviderMapper": "oidc-user-attribute-idp-mapper",
+                "name": "first_name"
+            }],
+            [{
+                'config': {
+                    'claim': "username",
+                    'syncMode': "INHERIT",
+                    'user.attribute': "username"
+                },
+                "id": "616f11ba-b9ae-42ae-bd1b-bc618741c10b",
+                'identityProviderAlias': "oidc-idp",
+                'identityProviderMapper': "oidc-user-attribute-idp-mapper",
+                'name': "username"
+            }, {
+                "config": {
+                    "claim": "first_name_changeme",
+                    "syncMode": "INHERIT",
+                    "user.attribute": "first_name"
+                },
+                "id": "5fde49bb-93bd-4f5d-97d6-c5d0c1d07aef",
+                "identityProviderAlias": "oidc-idp",
+                "identityProviderMapper": "oidc-user-attribute-idp-mapper",
+                "name": "first_name"
+            }],
+            [{
+                'config': {
+                    'claim': "username",
+                    'syncMode': "INHERIT",
+                    'user.attribute': "username"
+                },
+                "id": "616f11ba-b9ae-42ae-bd1b-bc618741c10b",
+                'identityProviderAlias': "oidc-idp",
+                'identityProviderMapper': "oidc-user-attribute-idp-mapper",
+                'name': "username"
+            }, {
                 "config": {
                     "claim": "first_name",
                     "syncMode": "INHERIT",
@@ -371,7 +463,7 @@ class TestKeycloakIdentityProvider(ModuleTestCase):
                     self.module.main()
 
         self.assertEqual(len(mock_get_identity_provider.mock_calls), 2)
-        self.assertEqual(len(mock_get_identity_provider_mappers.mock_calls), 2)
+        self.assertEqual(len(mock_get_identity_provider_mappers.mock_calls), 5)
         self.assertEqual(len(mock_update_identity_provider.mock_calls), 1)
         self.assertEqual(len(mock_update_identity_provider_mapper.mock_calls), 1)
         self.assertEqual(len(mock_create_identity_provider_mapper.mock_calls), 1)
