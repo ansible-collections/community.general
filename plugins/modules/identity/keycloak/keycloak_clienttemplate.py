@@ -100,7 +100,7 @@ options:
 
             protocol:
                 description:
-                    - is either 'openid-connect' or 'saml', this specifies for which protocol this protocol mapper.
+                    - This is either C(openid-connect) or C(saml), this specifies for which protocol this protocol mapper.
                       is active.
                 choices: ['openid-connect', 'saml']
                 type: str
@@ -143,7 +143,7 @@ options:
                       contents differ depending on the value of I(protocolMapper) and are not documented
                       other than by the source of the mappers and its parent class(es). An example is given
                       below. It is easiest to obtain valid config values by dumping an already-existing
-                      protocol mapper configuration through check-mode in the "existing" field.
+                      protocol mapper configuration through check-mode in the I(existing) field.
                 type: dict
 
     attributes:
