@@ -189,7 +189,7 @@ end_state:
     description:
       - role_representation representation of role_representation after module execution.
       - The sample is truncated.
-    returned: always
+    returned: on success
     type: dict
     sample: {
         "adminUrl": "http://www.example.com/admin_url",

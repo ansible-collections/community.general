@@ -181,7 +181,7 @@ flow:
 
 end_state:
     description: client representation of the authentication after module execution
-    returned: always
+    returned: on success
     type: dict
 '''
 

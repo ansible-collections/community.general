@@ -670,7 +670,7 @@ existing:
 
 end_state:
     description: client representation of client after module execution (sample is truncated).
-    returned: always
+    returned: on success
     type: dict
     sample: {
         "adminUrl": "http://www.example.com/admin_url",

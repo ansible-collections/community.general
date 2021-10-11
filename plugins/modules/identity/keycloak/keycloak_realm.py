@@ -560,7 +560,7 @@ existing:
 
 end_state:
     description: realm representation of realm after module execution (sample is truncated)
-    returned: always
+    returned: on success
     type: dict
     sample: {
         "adminUrl": "http://www.example.com/admin_url",

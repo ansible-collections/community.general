@@ -166,7 +166,7 @@ msg:
 
 end_state:
     description: Group representation of the group after module execution (sample is truncated).
-    returned: always
+    returned: on success
     type: complex
     contains:
         id:

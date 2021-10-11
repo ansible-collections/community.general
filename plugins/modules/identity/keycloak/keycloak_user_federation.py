@@ -648,7 +648,7 @@ existing:
 
 end_state:
     description: Representation of user federation after module execution.
-    returned: always
+    returned: on success
     type: dict
     sample: {
         "config": {

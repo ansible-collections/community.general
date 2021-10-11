@@ -178,7 +178,7 @@ existing:
 
 end_state:
     description: Role representation of role after module execution (sample is truncated).
-    returned: always
+    returned: on success
     type: dict
     sample: {
         "attributes": {},

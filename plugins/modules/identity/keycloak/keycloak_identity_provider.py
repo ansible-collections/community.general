@@ -370,7 +370,7 @@ existing:
 
 end_state:
     description: Representation of identity provider after module execution
-    returned: always
+    returned: on success
     type: dict
     sample: {
         "addReadTokenRoleOnCreate": false,

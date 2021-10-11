@@ -257,7 +257,7 @@ existing:
 
 end_state:
     description: client template representation of client template after module execution (sample is truncated).
-    returned: always
+    returned: on success
     type: dict
     sample: {
         "description": "test01",
