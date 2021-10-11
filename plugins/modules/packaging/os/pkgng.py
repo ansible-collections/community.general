@@ -113,12 +113,16 @@ EXAMPLES = '''
 
 - name: Annotate package foo and bar
   community.general.pkgng:
-    name: foo,bar
+    name:
+      - foo
+      - bar
     annotation: '+test1=baz,-test2,:test3=foobar'
 
 - name: Remove packages foo and bar
   community.general.pkgng:
-    name: foo,bar
+    name:
+      - foo
+      - bar
     state: absent
 
 # "latest" support added in 2.7
@@ -476,6 +480,12 @@ def main():
         msgs.append(_msg)
 
     # Operate on named packages
+    if len(pkgs) == 1:
+        # The documentation used to show multiple packages specified in one line
+        # with comma or space delimiters. That doesn't result in a YAML list, and
+        # wrong actions (install vs upgrade) can be reported if those
+        # comma- or space-delimited strings make it to the pkg command line.
+        pkgs = re.split(r'[,\s]', pkgs[0])
     named_packages = [pkg for pkg in pkgs if pkg != '*']
     if p["state"] in ("present", "latest") and named_packages:
         _changed, _msg, _out, _err = install_packages(module, pkgng_path, named_packages,
