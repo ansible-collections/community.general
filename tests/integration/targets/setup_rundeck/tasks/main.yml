@@ -1,0 +1,37 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Skip unsupported platforms
+  meta: end_play
+  when: ansible_distribution not in ['CentOS', 'Fedora', 'Debian', 'Ubuntu']
+
+- name: Include OS-specific variables
+  include_vars: '{{ ansible_os_family }}.yml'
+  when: ansible_os_family in ['Debian', 'RedHat']
+
+- name: Set Rundeck base dir
+  set_fact:
+    rdeck_base: /home/rundeck
+
+- name: Install OpenJDK
+  package:
+    name: "{{ openjdk_pkg }}"
+    state: present
+
+- name: Install Rundeck
+  shell: |
+      mkdir -p $RDECK_BASE;
+      curl -k -o $RDECK_BASE/rundeck.war -L '{{ rundeck_war_url }}';
+      curl -k -o $RDECK_BASE/rundeck-cli.jar -L '{{ rundeck_cli_url }}'
+      cd $RDECK_BASE;
+      java -Xmx4g -jar rundeck.war &
+  environment:
+    RDECK_BASE: "{{ rdeck_base }}"
+
+- name: Wait for Rundeck port 4440
+  wait_for:
+    host: localhost
+    port: 4440
