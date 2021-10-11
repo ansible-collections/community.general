@@ -26,6 +26,7 @@ Also, consider taking up a valuable, reviewed, but abandoned pull request which 
 * Do not squash your commits and force-push to your branch if not needed. Reviews of your pull request are much easier with individual commits to comprehend the pull request history. All commits of your pull request branch will be squashed into one commit by GitHub upon merge.
 * Do not add merge commits to your PR. The bot will complain and you will have to rebase ([instructions for rebasing](https://docs.ansible.com/ansible/latest/dev_guide/developing_rebasing.html)) to remove them before your PR can be merged. To avoid that git automatically does merges during pulls, you can configure it to do rebases instead by running `git config pull.rebase true` inside the respository checkout.
 * Make sure your PR includes a [changelog fragment](https://docs.ansible.com/ansible/devel/community/development_process.html#changelogs-how-to). (You must not include a fragment for new modules or new plugins, except for test and filter plugins. Also you shouldn't include one for docs-only changes. If you're not sure, simply don't include one, we'll tell you whether one is needed or not :) )
+* Avoid reformatting unrelated parts of the codebase in your PR. These types of changes will likely be requested for reversion, create additional work for reviewers, and may cause approval to be delayed.
 
 You can also read [our Quick-start development guide](https://github.com/ansible/community-docs/blob/main/create_pr_quick_start_guide.rst).
 
@@ -42,7 +43,12 @@ Creating new modules and plugins requires a bit more work than other Pull Reques
 1. Please make sure that your new module or plugin is of interest to a larger audience. Very specialized modules or plugins that
    can only be used by very few people should better be added to more specialized collections.
 
-2. When creating a new module or plugin, please make sure that you follow various guidelines:
+2. Please do not add more than one plugin/module in one PR, especially if it is the first plugin/module you are contributing.
+   That makes it easier for reviewers, and increases the chance that your PR will get merged. If you plan to contribute a group
+   of plugins/modules (say, more than a module and a corresponding ``_info`` module), please mention that in the first PR. In
+   such cases, you also have to think whether it is better to publish the group of plugins/modules in a new collection.
+
+3. When creating a new module or plugin, please make sure that you follow various guidelines:
 
    - Follow [development conventions](https://docs.ansible.com/ansible/devel/dev_guide/developing_modules_best_practices.html);
    - Follow [documentation standards](https://docs.ansible.com/ansible/devel/dev_guide/developing_modules_documenting.html) and
@@ -52,7 +58,7 @@ Creating new modules and plugins requires a bit more work than other Pull Reques
    - Make sure that new plugins and modules have tests (unit tests, integration tests, or both); it is preferable to have some tests
      which run in CI.
 
-3. For modules and action plugins, make sure to create your module/plugin in the correct subdirectory, and create a symbolic link
+4. For modules and action plugins, make sure to create your module/plugin in the correct subdirectory, and create a symbolic link
    from `plugins/modules/` respectively `plugins/action/` to the actual module/plugin code. (Other plugin types should not use
    subdirectories.)
 
@@ -60,7 +66,7 @@ Creating new modules and plugins requires a bit more work than other Pull Reques
      (`DOCUMENTATION`, `EXAMPLES` and `RETURN`). The module must have the same name and directory path in `plugins/modules/`
      than the action plugin has in `plugins/action/`.
 
-4. Make sure to add a BOTMETA entry for your new module/plugin in `.github/BOTMETA.yml`. Search for other plugins/modules in the
+5. Make sure to add a BOTMETA entry for your new module/plugin in `.github/BOTMETA.yml`. Search for other plugins/modules in the
    same directory to see how entries could look. You should list all authors either as `maintainers` or under `ignore`. People
    listed as `maintainers` will be pinged for new issues and PRs that modify the module/plugin or its tests.
 
