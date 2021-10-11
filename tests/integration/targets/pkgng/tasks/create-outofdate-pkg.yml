@@ -1,0 +1,34 @@
+---
+- name: Check if out-of-date test package has already been created
+  stat:
+    path: '{{ pkgng_test_outofdate_pkg_path }}'
+  register: pkgng_test_outofdate_pkg_stat
+
+- name: Create out-of-date test package
+  when: not pkgng_test_outofdate_pkg_stat.stat.exists
+  block:
+    - set_fact:
+        pkgng_test_outofdate_pkg_tempdir: '{{ pkgng_test_outofdate_pkg_path }}__tempdir'
+
+    - name: Create temporary directory to assemble test package
+      file:
+        state: directory
+        path: '{{ pkgng_test_outofdate_pkg_tempdir }}'
+
+    - name: Copy intentionally out-of-date package manifests to testhost
+      copy:
+        src: zsh_test_package_manifests/{{ item }}
+        # Plus-sign must be added at the destination
+        # CI doesn't like files with '+' in them in the repository
+        dest: '{{ pkgng_test_outofdate_pkg_tempdir }}/+{{ item }}'
+      loop:
+        - COMPACT_MANIFEST
+        - MANIFEST
+
+    - name: Create out-of-date test package file
+      command: 'tar -C {{ pkgng_test_outofdate_pkg_tempdir }} -cJf {{ pkgng_test_outofdate_pkg_path }} +COMPACT_MANIFEST +MANIFEST'
+
+    - name: Remove temporary directory
+      file:
+        state: absent
+        path: '{{ pkgng_test_outofdate_pkg_tempdir }}'

@@ -1,0 +1,4 @@
+---
+pkgng_test_outofdate_pkg_path: "/tmp/zsh-0__test.pkg"
+pkgng_test_pkg_name: zsh
+pkgng_test_pkg_sentinelfile_path: /usr/local/bin/zsh

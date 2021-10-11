@@ -2,35 +2,35 @@
 ##
 ## pkgng - example - state=present for single package
 ##
-- name: Verify zsh binary is not present
+- name: Verify package sentinel file is not present
   stat:
-    path: /usr/local/bin/zsh
+    path: '{{ pkgng_test_pkg_sentinelfile_path }}'
     get_attributes: no
     get_checksum: no
     get_mime: no
   register: pkgng_example1_stat_before
 
-- name: Install zsh
+- name: Install package
   pkgng:
-    name: zsh
+    name: '{{ pkgng_test_pkg_name }}'
   register: pkgng_example1
 
-- name: Remove zsh (checkmode)
+- name: Remove package (checkmode)
   pkgng:
-    name: zsh
+    name: '{{ pkgng_test_pkg_name }}'
     state: absent
   check_mode: yes
   register: pkgng_example1_checkmode
 
-- name: Install zsh (idempotent, cached)
+- name: Install package (idempotent, cached)
   pkgng:
-    name: zsh
+    name: '{{ pkgng_test_pkg_name }}'
     cached: yes
   register: pkgng_example1_idempotent_cached
 
-- name: Verify zsh binary is present
+- name: Verify package sentinel file is present
   stat:
-    path: /usr/local/bin/zsh
+    path: '{{ pkgng_test_pkg_sentinelfile_path }}'
     get_attributes: no
     get_checksum: no
     get_mime: no
@@ -50,9 +50,9 @@
 ##
 ## pkgng - example - state=latest for already up-to-date package
 ##
-- name: Upgrade zsh (idempotent)
+- name: Upgrade package (idempotent)
   pkgng:
-    name: zsh
+    name: '{{ pkgng_test_pkg_name }}'
     state: latest
   register: pkgng_example2
 
@@ -61,37 +61,38 @@
     that:
       - not pkgng_example2.changed
 
+##
 ## pkgng - example - state=absent for single package
 ##
-- name: Verify zsh binary is present
+- name: Verify package sentinel file is present
   stat:
-    path: /usr/local/bin/zsh
+    path: '{{ pkgng_test_pkg_sentinelfile_path }}'
     get_attributes: no
     get_checksum: no
     get_mime: no
   register: pkgng_example3_stat_before
 
-- name: Install zsh (checkmode)
+- name: Install package (checkmode)
   pkgng:
-    name: zsh
+    name: '{{ pkgng_test_pkg_name }}'
   check_mode: yes
   register: pkgng_example3_checkmode
 
-- name: Remove zsh
+- name: Remove package
   pkgng:
-    name: zsh
+    name: '{{ pkgng_test_pkg_name }}'
     state: absent
   register: pkgng_example3
 
-- name: Remove zsh (idempotent)
+- name: Remove package (idempotent)
   pkgng:
-    name: zsh
+    name: '{{ pkgng_test_pkg_name }}'
     state: absent
   register: pkgng_example3_idempotent
 
-- name: Verify zsh binary is not present
+- name: Verify package sentinel file is not present
   stat:
-    path: /usr/local/bin/zsh
+    path: '{{ pkgng_test_pkg_sentinelfile_path }}'
     get_attributes: no
     get_checksum: no
     get_mime: no
@@ -113,7 +114,7 @@
 - name: Install intentionally out-of-date package and upgrade it
   #
   # NOTE: The out-of-date package provided is a minimal,
-  #       no-contents test package that declares zsh with
+  #       no-contents test package that declares {{ pkgng_test_pkg_name }} with
   #       a version of 0, so it should always be upgraded.
   #
   #       This test might fail at some point in the
@@ -122,26 +123,11 @@
   #       older package formats.
   #
   block:
-    - name: Create temporary directory to assemble test package
-      file:
-        state: directory
-        path: /tmp/zsh_test_package
-
-    - name: Copy intentionally out-of-date package manifests to testhost
-      copy:
-        src: zsh_test_package_manifests/{{ item }}
-        # Plus-sign must be added at the destination
-        # CI doesn't like files with '+' in them in the repository
-        dest: /tmp/zsh_test_package/+{{ item }}
-      loop:
-        - COMPACT_MANIFEST
-        - MANIFEST
-
     - name: Create out-of-date test package
-      command: tar -C /tmp/zsh_test_package -cJf /tmp/zsh-0__test.pkg +COMPACT_MANIFEST +MANIFEST
+      import_tasks: create-outofdate-pkg.yml
 
     - name: Install out-of-date test package
-      command: pkg add /tmp/zsh-0__test.pkg
+      command: 'pkg add {{ pkgng_test_outofdate_pkg_path }}'
       register: pkgng_example4_prepare
 
     - name: Check for any available package upgrades (checkmode)
@@ -153,26 +139,26 @@
 
     - name: Check for available package upgrade (checkmode)
       pkgng:
-        name: zsh
+        name: '{{ pkgng_test_pkg_name }}'
         state: latest
       check_mode: yes
       register: pkgng_example4_checkmode
 
     - name: Upgrade out-of-date package
       pkgng:
-        name: zsh
+        name: '{{ pkgng_test_pkg_name }}'
         state: latest
       register: pkgng_example4
 
     - name: Upgrade out-of-date package (idempotent)
       pkgng:
-        name: zsh
+        name: '{{ pkgng_test_pkg_name }}'
         state: latest
       register: pkgng_example4_idempotent
 
     - name: Remove test out-of-date package
       pkgng:
-        name: zsh
+        name: '{{ pkgng_test_pkg_name }}'
         state: absent
 
     - name: Ensure pkgng upgrades package correctly
@@ -185,7 +171,7 @@
           - not pkgng_example4_idempotent.changed
 
 ##
-## pkgng - example - Install zsh in jail
+## pkgng - example - Install single package in jail
 ##
 - name: Test within jail
   #
@@ -197,37 +183,37 @@
     - name: Setup testjail
       include: setup-testjail.yml
 
-    - name: Verify zsh binary is not present
+    - name: Verify package sentinel file is not present
       stat:
-        path: /usr/jails/testjail/usr/local/bin/zsh
+        path: '/usr/jails/testjail{{ pkgng_test_pkg_sentinelfile_path }}'
         get_attributes: no
         get_checksum: no
         get_mime: no
       register: pkgng_jail_example1_stat_before
 
-    - name: Install zsh
+    - name: Install package in jail
       pkgng:
-        name: zsh
+        name: '{{ pkgng_test_pkg_name }}'
         jail: testjail
       register: pkgng_jail_example1
 
-    - name: Remove zsh (checkmode)
+    - name: Remove package (checkmode)
       pkgng:
-        name: zsh
+        name: '{{ pkgng_test_pkg_name }}'
         state: absent
         jail: testjail
       check_mode: yes
       register: pkgng_jail_example1_checkmode
 
-    - name: Install zsh (idempotent)
+    - name: Install package (idempotent)
       pkgng:
-        name: zsh
+        name: '{{ pkgng_test_pkg_name }}'
         jail: testjail
       register: pkgng_jail_example1_idempotent
 
-    - name: Verify zsh binary is present
+    - name: Verify package sentinel file is present
       stat:
-        path: /usr/jails/testjail/usr/local/bin/zsh
+        path: '/usr/jails/testjail{{ pkgng_test_pkg_sentinelfile_path }}'
         get_attributes: no
         get_checksum: no
         get_mime: no
