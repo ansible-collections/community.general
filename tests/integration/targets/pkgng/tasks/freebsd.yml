@@ -171,6 +171,36 @@
           - not pkgng_example4_idempotent.changed
 
 ##
+## pkgng - example - Install multiple packages in one command
+##
+- name: Remove test package (checkmode)
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    state: absent
+  check_mode: yes
+  register: pkgng_example5_prepare
+
+- name: Install three packages
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }} fish busybox'
+  register: pkgng_example5
+
+- name: Remove three packages
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }} fish busybox'
+    state: absent
+  register: pkgng_example5_cleanup
+
+- name: Ensure pkgng installs multiple packages with one command
+  assert:
+    that:
+      - not pkgng_example5_prepare.changed
+      - pkgng_example5.changed
+      - "'Number of packages to be installed: 3' is in(pkgng_example5.stdout_lines)"
+      - "(pkgng_example5.stdout | regex_findall('^Number of packages to be', multiline=True) | count) == 1"
+      - pkgng_example5_cleanup.changed
+
+##
 ## pkgng - example - Install single package in jail
 ##
 - name: Test within jail
