@@ -215,7 +215,9 @@ end_state:
                 view: true
 
 group:
-  description: Group representation of the group after module execution.  [DEPRECATED - Please use end_state instead].
+  description:
+    - Group representation of the group after module execution.
+    - B(DEPRECATED) - Please use C(end_state) instead.
   returned: always
   type: complex
   contains:

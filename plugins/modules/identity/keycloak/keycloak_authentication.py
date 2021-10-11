@@ -173,7 +173,9 @@ msg:
     type: str
 
 flow:
-    description: JSON representation for the authentication. [DEPRECATED - Please use end_state instead]
+    description:
+      - JSON representation for the authentication.
+      - B(DEPRECATED) - Please use C(end_state) instead.
     returned: on success
     type: dict
 
