@@ -507,8 +507,8 @@ def main():
                                 if [y for y in module.params.get('mappers', []) if y['name'] == x['name']] != []]
 
     # prepare the new representation
-    updated_idp = before_idp.copy()
-    updated_idp.update(changeset)
+    desired_idp = before_idp.copy()
+    desired_idp.update(changeset)
 
     result['proposed'] = sanitize(changeset)
     result['existing'] = sanitize(before_idp)
@@ -528,15 +528,15 @@ def main():
         result['changed'] = True
 
         if module._diff:
-            result['diff'] = dict(before='', after=sanitize(updated_idp))
+            result['diff'] = dict(before='', after=sanitize(desired_idp))
 
         if module.check_mode:
             module.exit_json(**result)
 
         # do it for real!
-        updated_idp = updated_idp.copy()
-        mappers = updated_idp.pop('mappers', [])
-        kc.create_identity_provider(updated_idp, realm)
+        desired_idp = desired_idp.copy()
+        mappers = desired_idp.pop('mappers', [])
+        kc.create_identity_provider(desired_idp, realm)
         for mapper in mappers:
             kc.create_identity_provider_mapper(mapper, alias, realm)
         after_idp = get_identity_provider_with_mappers(kc, alias, realm)
@@ -549,9 +549,9 @@ def main():
     else:
         if state == 'present':
             # no changes
-            if updated_idp == before_idp:
+            if desired_idp == before_idp:
                 result['changed'] = False
-                result['end_state'] = sanitize(updated_idp)
+                result['end_state'] = sanitize(desired_idp)
                 result['msg'] = "No changes required to identity provider {alias}.".format(alias=alias)
                 module.exit_json(**result)
 
@@ -559,15 +559,15 @@ def main():
             result['changed'] = True
 
             if module._diff:
-                result['diff'] = dict(before=sanitize(before_idp), after=sanitize(updated_idp))
+                result['diff'] = dict(before=sanitize(before_idp), after=sanitize(desired_idp))
 
             if module.check_mode:
                 module.exit_json(**result)
 
             # do the update
-            updated_idp = updated_idp.copy()
-            updated_mappers = updated_idp.pop('mappers', [])
-            kc.update_identity_provider(updated_idp, realm)
+            desired_idp = desired_idp.copy()
+            updated_mappers = desired_idp.pop('mappers', [])
+            kc.update_identity_provider(desired_idp, realm)
             for mapper in updated_mappers:
                 if mapper.get('id') is not None:
                     kc.update_identity_provider_mapper(mapper, alias, realm)

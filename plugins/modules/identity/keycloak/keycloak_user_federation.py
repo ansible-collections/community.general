@@ -872,8 +872,8 @@ def main():
                 changeset['mappers'].append(new_mapper)
 
     # prepare the new representation
-    updated_comp = before_comp.copy()
-    updated_comp.update(changeset)
+    desired_comp = before_comp.copy()
+    desired_comp.update(changeset)
 
     result['proposed'] = sanitize(changeset)
     result['existing'] = sanitize(before_comp)
@@ -893,15 +893,15 @@ def main():
         result['changed'] = True
 
         if module._diff:
-            result['diff'] = dict(before='', after=sanitize(updated_comp))
+            result['diff'] = dict(before='', after=sanitize(desired_comp))
 
         if module.check_mode:
             module.exit_json(**result)
 
         # do it for real!
-        updated_comp = updated_comp.copy()
-        updated_mappers = updated_comp.pop('mappers', [])
-        after_comp = kc.create_component(updated_comp, realm)
+        desired_comp = desired_comp.copy()
+        updated_mappers = desired_comp.pop('mappers', [])
+        after_comp = kc.create_component(desired_comp, realm)
 
         for mapper in updated_mappers:
             if mapper.get('id') is not None:
@@ -920,9 +920,9 @@ def main():
     else:
         if state == 'present':
             # no changes
-            if updated_comp == before_comp:
+            if desired_comp == before_comp:
                 result['changed'] = False
-                result['end_state'] = sanitize(updated_comp)
+                result['end_state'] = sanitize(desired_comp)
                 result['msg'] = "No changes required to user federation {id}.".format(id=cid)
                 module.exit_json(**result)
 
@@ -930,15 +930,15 @@ def main():
             result['changed'] = True
 
             if module._diff:
-                result['diff'] = dict(before=sanitize(before_comp), after=sanitize(updated_comp))
+                result['diff'] = dict(before=sanitize(before_comp), after=sanitize(desired_comp))
 
             if module.check_mode:
                 module.exit_json(**result)
 
             # do the update
-            updated_comp = updated_comp.copy()
-            updated_mappers = updated_comp.pop('mappers', [])
-            kc.update_component(updated_comp, realm)
+            desired_comp = desired_comp.copy()
+            updated_mappers = desired_comp.pop('mappers', [])
+            kc.update_component(desired_comp, realm)
             after_comp = kc.get_component(cid, realm)
 
             for mapper in updated_mappers:
@@ -946,7 +946,7 @@ def main():
                     kc.update_component(mapper, realm)
                 else:
                     if mapper.get('parentId') is None:
-                        mapper['parentId'] = updated_comp['id']
+                        mapper['parentId'] = desired_comp['id']
                     mapper = kc.create_component(mapper, realm)
 
             after_comp['mappers'] = updated_mappers
