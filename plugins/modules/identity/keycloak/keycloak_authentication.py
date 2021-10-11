@@ -9,11 +9,15 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: keycloak_authentication
+
 short_description: Configure authentication in Keycloak
+
 description:
     - This module actually can only make a copy of an existing authentication flow, add an execution to it and configure it.
     - It can also delete the flow.
+
 version_added: "3.3.0"
+
 options:
     realm:
         description:
@@ -79,6 +83,7 @@ options:
         default: false
         description:
             - If C(true), allows to remove the authentication flow and recreate it.
+
 extends_documentation_fragment:
 - community.general.keycloak
 

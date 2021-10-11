@@ -13,6 +13,7 @@ DOCUMENTATION = '''
 module: keycloak_realm
 
 short_description: Allows administration of Keycloak realm via Keycloak API
+
 version_added: 3.0.0
 
 
