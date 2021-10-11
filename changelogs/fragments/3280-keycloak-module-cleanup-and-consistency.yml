@@ -1,0 +1,6 @@
+deprecated_features:
+  - keycloak_authentication - The responses  `flow` deprecated, `end_state` to be used instead.
+  - keycloak_group - The responses  `group` is deprecated, `end_state` to be used instead.
+
+minor_changes:
+  - Keycloak modules - Refactor many of the keycloak modules to have similar structures, comments, and documentation.
