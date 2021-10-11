@@ -201,6 +201,49 @@
       - pkgng_example5_cleanup.changed
 
 ##
+## pkgng - example - state=latest multiple packages, some already installed
+##
+- name: Remove test package (checkmode)
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    state: absent
+  check_mode: yes
+  register: pkgng_example6_check
+
+- name: Create out-of-date test package
+  import_tasks: create-outofdate-pkg.yml
+
+- name: Install out-of-date test package
+  command: 'pkg add {{ pkgng_test_outofdate_pkg_path }}'
+  register: pkgng_example6_prepare
+
+- name: Upgrade and/or install two packages
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }} fish'
+    state: latest
+  register: pkgng_example6
+
+- name: Remove two packages
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }} fish'
+    state: absent
+  register: pkgng_example6_cleanup
+
+- name: Ensure pkgng installs multiple packages with one command
+  assert:
+    that:
+      - not pkgng_example6_check.changed
+      - not pkgng_example6_prepare.failed
+      - pkgng_example6.changed
+      - "'Number of packages to be installed: 1' is in(pkgng_example6.stdout_lines)"
+      - "'Number of packages to be upgraded: 1' is in(pkgng_example6.stdout_lines)"
+      # Checking that "will be affected" occurs twice in the output ensures
+      # that the module runs two separate commands for install and upgrade,
+      # as the pkg command only outputs the string once per invocation.
+      - "(pkgng_example6.stdout | regex_findall('will be affected', multiline=True) | count) == 2"
+      - pkgng_example6_cleanup.changed
+
+##
 ## pkgng - example - Install single package in jail
 ##
 - name: Test within jail
