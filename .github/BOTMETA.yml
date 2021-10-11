@@ -49,6 +49,9 @@ files:
     maintainers: dagwieers
   $callbacks/diy.py:
     maintainers: theque5t
+  $callbacks/elastic.py:
+    maintainers: v1v
+    keywords: apm observability
   $callbacks/hipchat.py: {}
   $callbacks/jabber.py: {}
   $callbacks/loganalytics.py:
