@@ -206,14 +206,14 @@ class SSHConfig():
             strict_host_key_checking=self.params.get('strict_host_key_checking'),
             user_known_hosts_file=self.params.get('user_known_hosts_file'),
             proxycommand=self.params.get('proxycommand'),
-            forwardagent=self.params.get('forward_agent'),
+            forward_agent=self.params.get('forward_agent'),
         )
 
         # Convert 'true' / 'false' to 'yes' / 'no' for usage in ssh_config
-        if args['forwardagent']:
-            args['forwardagent'] = 'yes'
+        if args['forward_agent']:
+            args['forward_agent'] = 'yes'
         else:
-            args['forwardagent'] = 'no'
+            args['forward_agent'] = 'no'
 
         config_changed = False
         hosts_changed = []
