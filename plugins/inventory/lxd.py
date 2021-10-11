@@ -15,6 +15,7 @@ DOCUMENTATION = r'''
     author: "Frank Dornheim (@conloos)"
     requirements:
         - ipaddress
+        - lxd >= 4.0
     options:
         plugin:
             description: Token that ensures this is a source file for the 'lxd' plugin.
