@@ -125,7 +125,6 @@
       #       breaking changes that prevent pkg from installing
       #       older package formats.
       #
-      when: ansible_distribution_version is version('12.0', '>=')
       block:
         - name: Create temporary directory to assemble test package
           file:
