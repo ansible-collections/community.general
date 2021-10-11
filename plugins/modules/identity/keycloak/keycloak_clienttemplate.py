@@ -236,7 +236,7 @@ msg:
     sample: "Client template testclient has been updated"
 
 proposed:
-    description: client template representation of proposed changes to client template
+    description: Representation of proposed client template.
     returned: always
     type: dict
     sample: {
@@ -244,7 +244,7 @@ proposed:
     }
 
 existing:
-    description: client template representation of existing client template (sample is truncated).
+    description: Representation of existing client template (sample is truncated).
     returned: always
     type: dict
     sample: {
@@ -256,7 +256,7 @@ existing:
     }
 
 end_state:
-    description: client template representation of client template after module execution (sample is truncated).
+    description: Representation of client template after module execution (sample is truncated).
     returned: on success
     type: dict
     sample: {

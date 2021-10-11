@@ -165,7 +165,7 @@ msg:
     type: str
 
 end_state:
-    description: Group representation of the group after module execution (sample is truncated).
+    description: Representation of the group after module execution (sample is truncated).
     returned: on success
     type: complex
     contains:
@@ -216,7 +216,7 @@ end_state:
 
 group:
   description:
-    - Group representation of the group after module execution.
+    - Representation of the group after module execution.
     - B(DEPRECATED) - Please use C(end_state) instead.
   returned: always
   type: complex

@@ -165,7 +165,7 @@ msg:
     sample: "Role role1 assigned to group group1."
 
 proposed:
-    description: role_representation representation of proposed changes to client_rolemapping.
+    description: Representation of proposed client role mapping.
     returned: always
     type: dict
     sample: {
@@ -174,7 +174,7 @@ proposed:
 
 existing:
     description:
-      - role_representation representation of existing role_representation.
+      - Representation of existing client role mapping.
       - The sample is truncated.
     returned: always
     type: dict
@@ -187,7 +187,7 @@ existing:
 
 end_state:
     description:
-      - role_representation representation of role_representation after module execution.
+      - Representation of client role mapping after module execution.
       - The sample is truncated.
     returned: on success
     type: dict

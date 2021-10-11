@@ -155,7 +155,7 @@ msg:
     sample: "Role myrole has been updated"
 
 proposed:
-    description: Role representation of proposed changes to role.
+    description: Representation of proposed role.
     returned: always
     type: dict
     sample: {
@@ -163,7 +163,7 @@ proposed:
     }
 
 existing:
-    description: Role representation of existing role.
+    description: Representation of existing role.
     returned: always
     type: dict
     sample: {
@@ -177,7 +177,7 @@ existing:
     }
 
 end_state:
-    description: Role representation of role after module execution (sample is truncated).
+    description: Representation of role after module execution (sample is truncated).
     returned: on success
     type: dict
     sample: {

@@ -650,7 +650,7 @@ msg:
     sample: "Client testclient has been updated"
 
 proposed:
-    description: client representation of proposed changes to client.
+    description: Representation of proposed client.
     returned: always
     type: dict
     sample: {
@@ -658,7 +658,7 @@ proposed:
     }
 
 existing:
-    description: client representation of existing client (sample is truncated).
+    description: Representation of existing client (sample is truncated).
     returned: always
     type: dict
     sample: {
@@ -669,7 +669,7 @@ existing:
     }
 
 end_state:
-    description: client representation of client after module execution (sample is truncated).
+    description: Representation of client after module execution (sample is truncated).
     returned: on success
     type: dict
     sample: {

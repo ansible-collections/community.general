@@ -540,7 +540,7 @@ msg:
     sample: "Realm testrealm has been updated"
 
 proposed:
-    description: realm representation of proposed changes to realm
+    description: Representation of proposed realm.
     returned: always
     type: dict
     sample: {
@@ -548,7 +548,7 @@ proposed:
     }
 
 existing:
-    description: realm representation of existing realm (sample is truncated)
+    description: Representation of existing realm (sample is truncated).
     returned: always
     type: dict
     sample: {
@@ -559,7 +559,7 @@ existing:
     }
 
 end_state:
-    description: realm representation of realm after module execution (sample is truncated)
+    description: Representation of realm after module execution (sample is truncated).
     returned: on success
     type: dict
     sample: {

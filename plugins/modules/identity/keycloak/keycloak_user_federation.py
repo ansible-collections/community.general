@@ -551,7 +551,7 @@ msg:
     sample: "No changes required to user federation 164bb483-c613-482e-80fe-7f1431308799."
 
 proposed:
-    description: Representation of proposed changes to user federation.
+    description: Representation of proposed user federation.
     returned: always
     type: dict
     sample: {

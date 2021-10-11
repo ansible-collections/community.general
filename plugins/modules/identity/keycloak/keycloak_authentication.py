@@ -180,7 +180,7 @@ flow:
     type: dict
 
 end_state:
-    description: client representation of the authentication after module execution
+    description: Representation of the authentication after module execution.
     returned: on success
     type: dict
 '''

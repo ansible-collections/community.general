@@ -262,7 +262,7 @@ msg:
     sample: "Client_scope testclientscope has been updated"
 
 proposed:
-    description: client_scope representation of proposed changes to client_scope.
+    description: Representation of proposed client scope.
     returned: always
     type: dict
     sample: {
@@ -270,7 +270,7 @@ proposed:
     }
 
 existing:
-    description: client_scope representation of existing client_scope (sample is truncated).
+    description: Representation of existing client scope (sample is truncated).
     returned: always
     type: dict
     sample: {
@@ -281,7 +281,7 @@ existing:
     }
 
 end_state:
-    description: client_scope representation of client_scope after module execution (sample is truncated).
+    description: Representation of client scope after module execution (sample is truncated).
     returned: on success
     type: dict
     sample: {

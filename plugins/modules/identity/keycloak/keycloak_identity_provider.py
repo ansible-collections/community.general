@@ -323,7 +323,7 @@ msg:
     sample: "Identity provider my-idp has been created"
 
 proposed:
-    description: Representation of proposed changes to identity provider
+    description: Representation of proposed identity provider.
     returned: always
     type: dict
     sample: {
@@ -341,7 +341,7 @@ proposed:
     }
 
 existing:
-    description: Representation of existing identity provider
+    description: Representation of existing identity provider.
     returned: always
     type: dict
     sample: {
@@ -369,7 +369,7 @@ existing:
     }
 
 end_state:
-    description: Representation of identity provider after module execution
+    description: Representation of identity provider after module execution.
     returned: on success
     type: dict
     sample: {
