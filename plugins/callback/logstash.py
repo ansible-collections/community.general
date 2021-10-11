@@ -94,6 +94,7 @@ ansible.cfg: |
 
 import os
 import json
+from ansible import context
 import socket
 import uuid
 import logging
@@ -152,11 +153,11 @@ class CallbackModule(CallbackBase):
                 self.base_data['ansible_pre_command_output'] = os.popen(
                     self.ls_pre_command).read()
 
-            if self._options is not None:
-                self.base_data['ansible_checkmode'] = self._options.check
-                self.base_data['ansible_tags'] = self._options.tags
-                self.base_data['ansible_skip_tags'] = self._options.skip_tags
-                self.base_data['inventory'] = self._options.inventory
+            if context.CLIARGS is not None:
+                self.base_data['ansible_checkmode'] = context.CLIARGS.get('check')
+                self.base_data['ansible_tags'] = context.CLIARGS.get('tags')
+                self.base_data['ansible_skip_tags'] = context.CLIARGS.get('skip_tags')
+                self.base_data['inventory'] = context.CLIARGS.get('inventory')
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
