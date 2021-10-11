@@ -1,0 +1,249 @@
+---
+##
+## pkgng - example - state=present for single package
+##
+- name: Verify zsh binary is not present
+  stat:
+    path: /usr/local/bin/zsh
+    get_attributes: no
+    get_checksum: no
+    get_mime: no
+  register: pkgng_example1_stat_before
+
+- name: Install zsh
+  pkgng:
+    name: zsh
+  register: pkgng_example1
+
+- name: Remove zsh (checkmode)
+  pkgng:
+    name: zsh
+    state: absent
+  check_mode: yes
+  register: pkgng_example1_checkmode
+
+- name: Install zsh (idempotent, cached)
+  pkgng:
+    name: zsh
+    cached: yes
+  register: pkgng_example1_idempotent_cached
+
+- name: Verify zsh binary is present
+  stat:
+    path: /usr/local/bin/zsh
+    get_attributes: no
+    get_checksum: no
+    get_mime: no
+  register: pkgng_example1_stat_after
+
+- name: Ensure pkgng installs package correctly
+  assert:
+    that:
+      - not pkgng_example1_stat_before.stat.exists
+      - pkgng_example1.changed
+      - pkgng_example1_checkmode.changed
+      - not pkgng_example1_idempotent_cached.changed
+      - not pkgng_example1_idempotent_cached.stdout is match("Updating \w+ repository catalogue\.\.\.")
+      - pkgng_example1_stat_after.stat.exists
+      - pkgng_example1_stat_after.stat.executable
+
+##
+## pkgng - example - state=latest for already up-to-date package
+##
+- name: Upgrade zsh (idempotent)
+  pkgng:
+    name: zsh
+    state: latest
+  register: pkgng_example2
+
+- name: Ensure pkgng does not upgrade up-to-date package
+  assert:
+    that:
+      - not pkgng_example2.changed
+
+## pkgng - example - state=absent for single package
+##
+- name: Verify zsh binary is present
+  stat:
+    path: /usr/local/bin/zsh
+    get_attributes: no
+    get_checksum: no
+    get_mime: no
+  register: pkgng_example3_stat_before
+
+- name: Install zsh (checkmode)
+  pkgng:
+    name: zsh
+  check_mode: yes
+  register: pkgng_example3_checkmode
+
+- name: Remove zsh
+  pkgng:
+    name: zsh
+    state: absent
+  register: pkgng_example3
+
+- name: Remove zsh (idempotent)
+  pkgng:
+    name: zsh
+    state: absent
+  register: pkgng_example3_idempotent
+
+- name: Verify zsh binary is not present
+  stat:
+    path: /usr/local/bin/zsh
+    get_attributes: no
+    get_checksum: no
+    get_mime: no
+  register: pkgng_example3_stat_after
+
+- name: Ensure pkgng installs package correctly
+  assert:
+    that:
+      - pkgng_example3_stat_before.stat.exists
+      - pkgng_example3_stat_before.stat.executable
+      - not pkgng_example3_checkmode.changed
+      - pkgng_example3.changed
+      - not pkgng_example3_idempotent.changed
+      - not pkgng_example3_stat_after.stat.exists
+
+##
+## pkgng - example - state=latest for out-of-date package
+##
+- name: Install intentionally out-of-date package and upgrade it
+  #
+  # NOTE: The out-of-date package provided is a minimal,
+  #       no-contents test package that declares zsh with
+  #       a version of 0, so it should always be upgraded.
+  #
+  #       This test might fail at some point in the
+  #       future if the FreeBSD package format receives
+  #       breaking changes that prevent pkg from installing
+  #       older package formats.
+  #
+  block:
+    - name: Create temporary directory to assemble test package
+      file:
+        state: directory
+        path: /tmp/zsh_test_package
+
+    - name: Copy intentionally out-of-date package manifests to testhost
+      copy:
+        src: zsh_test_package_manifests/{{ item }}
+        # Plus-sign must be added at the destination
+        # CI doesn't like files with '+' in them in the repository
+        dest: /tmp/zsh_test_package/+{{ item }}
+      loop:
+        - COMPACT_MANIFEST
+        - MANIFEST
+
+    - name: Create out-of-date test package
+      command: tar -C /tmp/zsh_test_package -cJf /tmp/zsh-0__test.pkg +COMPACT_MANIFEST +MANIFEST
+
+    - name: Install out-of-date test package
+      command: pkg add /tmp/zsh-0__test.pkg
+      register: pkgng_example4_prepare
+
+    - name: Check for any available package upgrades (checkmode)
+      pkgng:
+        name: '*'
+        state: latest
+      check_mode: yes
+      register: pkgng_example4_wildcard_checkmode
+
+    - name: Check for available package upgrade (checkmode)
+      pkgng:
+        name: zsh
+        state: latest
+      check_mode: yes
+      register: pkgng_example4_checkmode
+
+    - name: Upgrade out-of-date package
+      pkgng:
+        name: zsh
+        state: latest
+      register: pkgng_example4
+
+    - name: Upgrade out-of-date package (idempotent)
+      pkgng:
+        name: zsh
+        state: latest
+      register: pkgng_example4_idempotent
+
+    - name: Remove test out-of-date package
+      pkgng:
+        name: zsh
+        state: absent
+
+    - name: Ensure pkgng upgrades package correctly
+      assert:
+        that:
+          - not pkgng_example4_prepare.failed
+          - pkgng_example4_wildcard_checkmode.changed
+          - pkgng_example4_checkmode.changed
+          - pkgng_example4.changed
+          - not pkgng_example4_idempotent.changed
+
+##
+## pkgng - example - Install zsh in jail
+##
+- name: Test within jail
+  #
+  # NOTE: FreeBSD 12.0 test runner receives a "connection reset by peer" after ~20% downloaded so we are
+  #       only running this on 12.1 or higher
+  #
+  when: ansible_distribution_version is version('12.01', '>=')
+  block:
+    - name: Setup testjail
+      include: setup-testjail.yml
+
+    - name: Verify zsh binary is not present
+      stat:
+        path: /usr/jails/testjail/usr/local/bin/zsh
+        get_attributes: no
+        get_checksum: no
+        get_mime: no
+      register: pkgng_jail_example1_stat_before
+
+    - name: Install zsh
+      pkgng:
+        name: zsh
+        jail: testjail
+      register: pkgng_jail_example1
+
+    - name: Remove zsh (checkmode)
+      pkgng:
+        name: zsh
+        state: absent
+        jail: testjail
+      check_mode: yes
+      register: pkgng_jail_example1_checkmode
+
+    - name: Install zsh (idempotent)
+      pkgng:
+        name: zsh
+        jail: testjail
+      register: pkgng_jail_example1_idempotent
+
+    - name: Verify zsh binary is present
+      stat:
+        path: /usr/jails/testjail/usr/local/bin/zsh
+        get_attributes: no
+        get_checksum: no
+        get_mime: no
+      register: pkgng_jail_example1_stat_after
+
+    - name: Ensure pkgng installs package correctly
+      assert:
+        that:
+          - not pkgng_jail_example1_stat_before.stat.exists
+          - pkgng_jail_example1.changed
+          - pkgng_jail_example1_checkmode.changed
+          - not pkgng_jail_example1_idempotent.changed
+          - pkgng_jail_example1_stat_after.stat.exists
+          - pkgng_jail_example1_stat_after.stat.executable
+  always:
+    - name: Stop and remove testjail
+      failed_when: false
+      changed_when: false
+      command: "ezjail-admin delete -wf testjail"
