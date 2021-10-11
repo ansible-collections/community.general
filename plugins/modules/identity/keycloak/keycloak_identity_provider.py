@@ -295,6 +295,20 @@ EXAMPLES = '''
       clientAuthMethod: client_secret_post
       clientId: my-client
       clientSecret: secret
+      syncMode: FORCE
+    mappers:
+      - name: first_name
+        identityProviderMapper: oidc-user-attribute-idp-mapper
+        config:
+          claim: first_name
+          user.attribute: first_name
+          syncMode: INHERIT
+      - name: last_name
+        identityProviderMapper: oidc-user-attribute-idp-mapper
+        config:
+          claim: last_name
+          user.attribute: last_name
+          syncMode: INHERIT
 
 - name: Create SAML identity provider, authentication with credentials
   community.general.keycloak_identity_provider:
@@ -313,6 +327,14 @@ EXAMPLES = '''
       singleSignOnServiceUrl: https://idp.example.com/login
       wantAuthnRequestsSigned: true
       wantAssertionsSigned: true
+    mappers:
+      - name: roles
+        identityProviderMapper: saml-user-attribute-idp-mapper
+        config:
+          user.attribute: roles
+          attribute.friendly.name: User Roles
+          attribute.name: roles
+          syncMode: INHERIT
 '''
 
 RETURN = '''
@@ -400,15 +422,15 @@ end_state:
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
     keycloak_argument_spec, get_token, KeycloakError
 from ansible.module_utils.basic import AnsibleModule
+from copy import deepcopy
 
 
 def sanitize(idp):
-    result = idp.copy()
-    if 'config' in result:
-        result['config'] = sanitize(result['config'])
-    if 'clientSecret' in result:
-        result['clientSecret'] = '**********'
-    return result
+    idpcopy = deepcopy(idp)
+    if 'config' in idpcopy:
+        if 'clientSecret' in idpcopy['config']:
+            idpcopy['clientSecret'] = '**********'
+    return idpcopy
 
 
 def get_identity_provider_with_mappers(kc, alias, realm):
@@ -493,18 +515,29 @@ def main():
             changeset[camel(param)] = new_param_value
 
     # special handling of mappers list to allow change detection
-    changeset['mappers'] = before_idp.get('mappers', list())
     if module.params.get('mappers') is not None:
-        for new_mapper in module.params.get('mappers'):
-            old_mapper = next((x for x in changeset['mappers'] if x['name'] == new_mapper['name']), None)
-            new_mapper = dict((k, v) for k, v in new_mapper.items() if new_mapper[k] is not None)
-            if old_mapper is not None:
-                old_mapper.update(new_mapper)
+        for change in module.params['mappers']:
+            change = dict((k, v) for k, v in change.items() if change[k] is not None)
+            if change.get('id') is None and change.get('name') is None:
+                module.fail_json(msg='Either `name` or `id` has to be specified on each mapper.')
+            if before_idp == dict():
+                old_mapper = dict()
+            elif change.get('id') is not None:
+                old_mapper = kc.get_identity_provider_mapper(change['id'], alias, realm)
+                if old_mapper is None:
+                    old_mapper = dict()
             else:
+                found = [x for x in kc.get_identity_provider_mappers(alias, realm) if x['name'] == change['name']]
+                if len(found) == 1:
+                    old_mapper = found[0]
+                else:
+                    old_mapper = dict()
+            new_mapper = old_mapper.copy()
+            new_mapper.update(change)
+            if new_mapper != old_mapper:
+                if changeset.get('mappers') is None:
+                    changeset['mappers'] = list()
                 changeset['mappers'].append(new_mapper)
-        # remove mappers if not present in module params
-        changeset['mappers'] = [x for x in changeset['mappers']
-                                if [y for y in module.params.get('mappers', []) if y['name'] == x['name']] != []]
 
     # prepare the new representation
     updated_idp = before_idp.copy()
@@ -538,6 +571,8 @@ def main():
         mappers = updated_idp.pop('mappers', [])
         kc.create_identity_provider(updated_idp, realm)
         for mapper in mappers:
+            if mapper.get('identityProviderAlias') is None:
+                mapper['identityProviderAlias'] = alias
             kc.create_identity_provider_mapper(mapper, alias, realm)
         after_idp = get_identity_provider_with_mappers(kc, alias, realm)
 
@@ -572,6 +607,8 @@ def main():
                 if mapper.get('id') is not None:
                     kc.update_identity_provider_mapper(mapper, alias, realm)
                 else:
+                    if mapper.get('identityProviderAlias') is None:
+                        mapper['identityProviderAlias'] = alias
                     kc.create_identity_provider_mapper(mapper, alias, realm)
             for mapper in [x for x in before_idp['mappers']
                            if [y for y in updated_mappers if y["name"] == x['name']] == []]:
