@@ -137,6 +137,11 @@ options:
     type: bool
     default: false
     version_added: '3.3.0'
+  parallelism:
+    description:
+      - Restrict concurrent operations when Terraform applies the plan.
+    type: int
+    version_added: '3.8.0'
 notes:
    - To just run a `terraform plan`, use check mode.
 requirements: [ "terraform" ]
@@ -363,6 +368,7 @@ def main():
             init_reconfigure=dict(type='bool', default=False),
             overwrite_init=dict(type='bool', default=True),
             check_destroy=dict(type='bool', default=False),
+            parallelism=dict(type='int'),
         ),
         required_if=[('state', 'planned', ['plan_file'])],
         supports_check_mode=True,
@@ -414,6 +420,9 @@ def main():
         command.extend(APPLY_ARGS)
     elif state == 'absent':
         command.extend(DESTROY_ARGS)
+
+    if state == 'present' and module.params.get('parallelism') is not None:
+        command.append('-parallelism=%d' % module.params.get('parallelism'))
 
     variables_args = []
     for k, v in variables.items():
