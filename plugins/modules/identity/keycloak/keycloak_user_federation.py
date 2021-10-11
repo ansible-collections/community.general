@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_user_federation
 
-short_description: Allows administration of Keycloak user federations via Keycloak API
+short_description: Allows administration of Keycloak user federations via Keycloak API.
 
 version_added: 3.7.0
 
@@ -182,7 +182,7 @@ options:
                 description:
                     - For one level, the search applies only for users in the DNs specified by User DNs.
                       For subtree, the search applies to the whole subtree. See LDAP documentation for
-                      more details
+                      more details.
                 default: '1'
                 type: str
                 choices:

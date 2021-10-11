@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_client
 
-short_description: Allows administration of Keycloak clients via Keycloak API
+short_description: Allows administration of Keycloak clients via Keycloak API.
 
 
 description:
@@ -62,17 +62,17 @@ options:
 
     name:
         description:
-            - Name of the client (this is not the same as I(client_id))
+            - Name of the client (this is not the same as I(client_id)).
         type: str
 
     description:
         description:
-            - Description of the client in Keycloak
+            - Description of the client in Keycloak.
         type: str
 
     root_url:
         description:
-            - Root URL appended to relative URLs for this client
+            - Root URL appended to relative URLs for this client.
               This is 'rootUrl' in the Keycloak REST API.
         aliases:
             - rootUrl
@@ -80,7 +80,7 @@ options:
 
     admin_url:
         description:
-            - URL to the admin interface of the client
+            - URL to the admin interface of the client.
               This is 'adminUrl' in the Keycloak REST API.
         aliases:
             - adminUrl
@@ -357,7 +357,7 @@ options:
 
             protocol:
                 description:
-                    - This is either C(openid-connect) or C(saml), this specifies for which protocol this protocol mapper
+                    - This is either C(openid-connect) or C(saml), this specifies for which protocol this protocol mapper.
                       is active.
                 choices: ['openid-connect', 'saml']
                 type: str
@@ -513,7 +513,6 @@ options:
 extends_documentation_fragment:
 - community.general.keycloak
 
-
 author:
     - Eike Frost (@eikef)
 '''
@@ -645,13 +644,13 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: Message as to what action was taken
+    description: Message as to what action was taken.
     returned: always
     type: str
     sample: "Client testclient has been updated"
 
 proposed:
-    description: client representation of proposed changes to client
+    description: client representation of proposed changes to client.
     returned: always
     type: dict
     sample: {
@@ -659,7 +658,7 @@ proposed:
     }
 
 existing:
-    description: client representation of existing client (sample is truncated)
+    description: client representation of existing client (sample is truncated).
     returned: always
     type: dict
     sample: {
@@ -670,7 +669,7 @@ existing:
     }
 
 end_state:
-    description: client representation of client after module execution (sample is truncated)
+    description: client representation of client after module execution (sample is truncated).
     returned: always
     type: dict
     sample: {
@@ -687,7 +686,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def sanitize_cr(clientrep):
-    """ Removes probably sensitive details from a client representation
+    """ Removes probably sensitive details from a client representation.
 
     :param clientrep: the clientrep dict to be sanitized
     :return: sanitized clientrep dict

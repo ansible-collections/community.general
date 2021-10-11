@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_clientscope
 
-short_description: Allows administration of Keycloak client_scopes via Keycloak API
+short_description: Allows administration of Keycloak client_scopes via Keycloak API.
 
 version_added: 3.4.0
 
@@ -86,7 +86,7 @@ options:
         suboptions:
             protocol:
                 description:
-                    - This specifies for which protocol this protocol mapper
+                    - This specifies for which protocol this protocol mapper.
                     - is active.
                 choices: ['openid-connect', 'saml', 'wsfed']
                 type: str
@@ -256,13 +256,13 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: Message as to what action was taken
+    description: Message as to what action was taken.
     returned: always
     type: str
     sample: "Client_scope testclientscope has been updated"
 
 proposed:
-    description: client_scope representation of proposed changes to client_scope
+    description: client_scope representation of proposed changes to client_scope.
     returned: always
     type: dict
     sample: {
@@ -270,7 +270,7 @@ proposed:
     }
 
 existing:
-    description: client_scope representation of existing client_scope (sample is truncated)
+    description: client_scope representation of existing client_scope (sample is truncated).
     returned: always
     type: dict
     sample: {
@@ -281,7 +281,7 @@ existing:
     }
 
 end_state:
-    description: client_scope representation of client_scope after module execution (sample is truncated)
+    description: client_scope representation of client_scope after module execution (sample is truncated).
     returned: always
     type: dict
     sample: {
@@ -298,7 +298,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def sanitize_cr(clientscoperep):
-    """ Removes probably sensitive details from a clientscoperep representation
+    """ Removes probably sensitive details from a clientscoperep representation.
 
     :param clientscoperep: the clientscoperep dict to be sanitized
     :return: sanitized clientrep dict

@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_realm
 
-short_description: Allows administration of Keycloak realm via Keycloak API
+short_description: Allows administration of Keycloak realm via Keycloak API.
 
 version_added: 3.0.0
 
@@ -534,7 +534,7 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: Message as to what action was taken
+    description: Message as to what action was taken.
     returned: always
     type: str
     sample: "Realm testrealm has been updated"
@@ -576,7 +576,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def sanitize_cr(realmrep):
-    """ Removes probably sensitive details from a realm representation
+    """ Removes probably sensitive details from a realm representation.
 
     :param realmrep: the realmrep dict to be sanitized
     :return: sanitized realmrep dict

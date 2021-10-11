@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_authentication
 
-short_description: Configure authentication in Keycloak
+short_description: Configure authentication in Keycloak.
 
 description:
     - This module actually can only make a copy of an existing authentication flow, add an execution to it and configure it.
@@ -168,7 +168,7 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: Message as to what action was taken
+    description: Message as to what action was taken.
     returned: always
     type: str
 

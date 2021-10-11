@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_group
 
-short_description: Allows administration of Keycloak groups via Keycloak API
+short_description: Allows administration of Keycloak groups via Keycloak API.
 
 description:
     - This module allows you to add, remove or modify Keycloak groups via the Keycloak REST API.
@@ -160,7 +160,7 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: Message as to what action was taken
+    description: Message as to what action was taken.
     returned: always
     type: str
 
@@ -170,28 +170,28 @@ end_state:
     type: complex
     contains:
         id:
-            description: GUID that identifies the group
+            description: GUID that identifies the group.
             type: str
             returned: always
             sample: 23f38145-3195-462c-97e7-97041ccea73e
         name:
-            description: Name of the group
+            description: Name of the group.
             type: str
             returned: always
             sample: grp-test-123
         attributes:
-            description: Attributes applied to this group
+            description: Attributes applied to this group.
             type: dict
             returned: always
             sample:
                 attr1: ["val1", "val2", "val3"]
         path:
-            description: URI path to the group
+            description: URI path to the group.
             type: str
             returned: always
             sample: /grp-test-123
         realmRoles:
-            description: An array of the realm-level roles granted to this group
+            description: An array of the realm-level roles granted to this group.
             type: list
             returned: always
             sample: []
@@ -201,7 +201,7 @@ end_state:
             type: list
             returned: always
         clientRoles:
-            description: A list of client-level roles granted to this group
+            description: A list of client-level roles granted to this group.
             type: list
             returned: always
             sample: []
@@ -222,28 +222,28 @@ group:
   type: complex
   contains:
     id:
-      description: GUID that identifies the group
+      description: GUID that identifies the group.
       type: str
       returned: always
       sample: 23f38145-3195-462c-97e7-97041ccea73e
     name:
-      description: Name of the group
+      description: Name of the group.
       type: str
       returned: always
       sample: grp-test-123
     attributes:
-      description: Attributes applied to this group
+      description: Attributes applied to this group.
       type: dict
       returned: always
       sample:
         attr1: ["val1", "val2", "val3"]
     path:
-      description: URI path to the group
+      description: URI path to the group.
       type: str
       returned: always
       sample: /grp-test-123
     realmRoles:
-      description: An array of the realm-level roles granted to this group
+      description: An array of the realm-level roles granted to this group.
       type: list
       returned: always
       sample: []
@@ -253,7 +253,7 @@ group:
       type: list
       returned: always
     clientRoles:
-      description: A list of client-level roles granted to this group
+      description: A list of client-level roles granted to this group.
       type: list
       returned: always
       sample: []

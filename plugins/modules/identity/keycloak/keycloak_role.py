@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_role
 
-short_description: Allows administration of Keycloak roles via Keycloak API
+short_description: Allows administration of Keycloak roles via Keycloak API.
 
 version_added: 3.4.0
 
@@ -149,13 +149,13 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: Message as to what action was taken
+    description: Message as to what action was taken.
     returned: always
     type: str
     sample: "Role myrole has been updated"
 
 proposed:
-    description: Role representation of proposed changes to role
+    description: Role representation of proposed changes to role.
     returned: always
     type: dict
     sample: {
@@ -163,7 +163,7 @@ proposed:
     }
 
 existing:
-    description: Role representation of existing role
+    description: Role representation of existing role.
     returned: always
     type: dict
     sample: {
@@ -177,7 +177,7 @@ existing:
     }
 
 end_state:
-    description: Role representation of role after module execution (sample is truncated)
+    description: Role representation of role after module execution (sample is truncated).
     returned: always
     type: dict
     sample: {

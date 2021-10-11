@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_clienttemplate
 
-short_description: Allows administration of Keycloak client templates via Keycloak API
+short_description: Allows administration of Keycloak client templates via Keycloak API.
 
 
 description:
@@ -31,7 +31,7 @@ description:
 options:
     state:
         description:
-            - State of the client template
+            - State of the client template.
             - On C(present), the client template will be created (or updated if it exists already).
             - On C(absent), the client template will be removed if it exists
         choices: ['present', 'absent']
@@ -51,12 +51,12 @@ options:
 
     name:
         description:
-            - Name of the client template
+            - Name of the client template.
         type: str
 
     description:
         description:
-            - Description of the client template in Keycloak
+            - Description of the client template in Keycloak.
         type: str
 
     protocol:
@@ -100,7 +100,7 @@ options:
 
             protocol:
                 description:
-                    - is either 'openid-connect' or 'saml', this specifies for which protocol this protocol mapper
+                    - is either 'openid-connect' or 'saml', this specifies for which protocol this protocol mapper.
                       is active.
                 choices: ['openid-connect', 'saml']
                 type: str
@@ -162,7 +162,6 @@ notes:
 
 extends_documentation_fragment:
 - community.general.keycloak
-
 
 author:
     - Eike Frost (@eikef)
@@ -231,7 +230,7 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: Message as to what action was taken
+    description: Message as to what action was taken.
     returned: always
     type: str
     sample: "Client template testclient has been updated"
@@ -245,7 +244,7 @@ proposed:
     }
 
 existing:
-    description: client template representation of existing client template (sample is truncated)
+    description: client template representation of existing client template (sample is truncated).
     returned: always
     type: dict
     sample: {
@@ -257,7 +256,7 @@ existing:
     }
 
 end_state:
-    description: client template representation of client template after module execution (sample is truncated)
+    description: client template representation of client template after module execution (sample is truncated).
     returned: always
     type: dict
     sample: {

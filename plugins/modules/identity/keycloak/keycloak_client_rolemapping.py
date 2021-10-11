@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_client_rolemapping
 
-short_description: Allows administration of Keycloak client_rolemapping with the Keycloak API
+short_description: Allows administration of Keycloak client_rolemapping with the Keycloak API.
 
 version_added: 3.5.0
 
@@ -159,7 +159,7 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: Message as to what action was taken
+    description: Message as to what action was taken.
     returned: always
     type: str
     sample: "Role role1 assigned to group group1."
