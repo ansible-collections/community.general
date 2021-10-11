@@ -182,12 +182,18 @@
 
 - name: Install three packages
   pkgng:
-    name: '{{ pkgng_test_pkg_name }} fish busybox'
+    name:
+      - '{{ pkgng_test_pkg_name }}'
+      - fish
+      - busybox
   register: pkgng_example5
 
 - name: Remove three packages
   pkgng:
-    name: '{{ pkgng_test_pkg_name }} fish busybox'
+    name:
+      - '{{ pkgng_test_pkg_name }}'
+      - fish
+      - busybox
     state: absent
   register: pkgng_example5_cleanup
 
@@ -219,13 +225,17 @@
 
 - name: Upgrade and/or install two packages
   pkgng:
-    name: '{{ pkgng_test_pkg_name }} fish'
+    name:
+      - '{{ pkgng_test_pkg_name }}'
+      - fish
     state: latest
   register: pkgng_example6
 
 - name: Remove two packages
   pkgng:
-    name: '{{ pkgng_test_pkg_name }} fish'
+    name:
+      - '{{ pkgng_test_pkg_name }}'
+      - fish
     state: absent
   register: pkgng_example6_cleanup
 
