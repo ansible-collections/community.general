@@ -9,13 +9,15 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: redis_incr
+module: redis_data_incr
 short_description: Increment keys in Redis
-version_added: 3.7.0
+version_added: 3.8.0
 description:
    - Increment integers or float keys in Redis database and get new value.
    - Default increment for all keys is 1. For specific increments use the
-     C(increment_int) and C(increment_float) options.
+     I(increment_int) and I(increment_float) options.
+   - When using I(check_mode) the module will try to calculate the value that
+     Redis would return. If the key is not present, 0.0 is used as value.
 author: "Andreas Botzner (@paginabianca)"
 options:
   key:
@@ -33,7 +35,7 @@ options:
       - Float amount to increment the key by.
       - This only works with keys that contain float values
         in their string representation.
-    type: str
+    type: float
     required: false
 
 
@@ -48,7 +50,7 @@ seealso:
 
 EXAMPLES = '''
 - name: Increment integer key foo on localhost with no username and print new value
-  community.general.redis_incr:
+  community.general.redis_data_incr:
     login_host: localhost
     login_password: supersecret
     key: foo
@@ -59,7 +61,7 @@ EXAMPLES = '''
     var: result.value
 
 - name: Increment float key foo by 20.4
-  community.general.redis_incr:
+  community.general.redis_data_incr:
     login_host: redishost
     login_user: redisuser
     login_password: somepass
@@ -71,7 +73,7 @@ RETURN = '''
 value:
   description: Incremented value of key
   returned: on success
-  type: str
+  type: float
   sample: '4039.4'
 msg:
   description: A short message.
@@ -90,13 +92,13 @@ def main():
     module_args = dict(
         key=dict(type='str', required=True, no_log=False),
         increment_int=dict(type='int', required=False),
-        increment_float=dict(type='str', required=False),
+        increment_float=dict(type='float', required=False),
     )
     module_args.update(redis_auth_args)
 
     module = AnsibleModule(
         argument_spec=module_args,
-        supports_check_mode=False,
+        supports_check_mode=True,
         mutually_exclusive=[['increment_int', 'increment_float']],
     )
     fail_imports(module)
@@ -105,23 +107,41 @@ def main():
     key = module.params['key']
     increment_float = module.params['increment_float']
     increment_int = module.params['increment_int']
+    increment = 1
+    if increment_float is not None:
+        increment = increment_float
+    elif increment_int is not None:
+        increment = increment_int
 
     result = {'changed': False}
-    if increment_float is not None:
-        increment = None
+    if module.check_mode:
+        value = 0.0
         try:
-            increment = float(increment_float)
-        except ValueError:
-            msg = "Increment: {0} is not a floating point number".format(
-                increment_float)
+            res = redis.connection.get(key)
+            if res is not None:
+                value = float(res)
+        except ValueError as e:
+            msg = 'Value: {0} of key: {0} is not incrementable(int or float)'
+            result['value'] = res
+            module.fail_json(**result)
+        except Exception as e:
+            msg = 'Failed to get value of key: {0}. Using value 0.0. Exception: {1}'.format(
+                key, str(e))
             result['msg'] = msg
             module.fail_json(**result)
+        msg = 'Incremented key: {0} by {1} to {2}'.format(
+            key, increment, value + increment)
+        result['msg'] = msg
+        result['value'] = value + increment
+        module.exit_json(**result)
+
+    if increment_float is not None:
         try:
             value = redis.connection.incrbyfloat(key, increment)
             msg = 'Incremented key: {0} by {1} to {2}'.format(
                 key, increment, value)
             result['msg'] = msg
-            result['value'] = str(value)
+            result['value'] = float(value)
             result['changed'] = True
             module.exit_json(**result)
         except Exception as e:
@@ -130,14 +150,12 @@ def main():
             result['msg'] = msg
             module.fail_json(**result)
     elif increment_int is not None:
-        increment = increment_int
         try:
-            increment = int(increment)
             value = redis.connection.incrby(key, increment)
             msg = 'Incremented key: {0} by {1} to {2}'.format(
                 key, increment, value)
             result['msg'] = msg
-            result['value'] = str(value)
+            result['value'] = float(value)
             result['changed'] = True
             module.exit_json(**result)
         except Exception as e:
@@ -150,7 +168,7 @@ def main():
             value = redis.connection.incr(key)
             msg = 'Incremented key: {0} to {1}'.format(key, value)
             result['msg'] = msg
-            result['value'] = str(value)
+            result['value'] = float(value)
             result['changed'] = True
             module.exit_json(**result)
         except Exception as e:
