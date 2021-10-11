@@ -26,10 +26,11 @@
       check_mode: yes
       register: pkgng_example1_checkmode
 
-    - name: Install zsh (idempotent)
+    - name: Install zsh (idempotent, cached)
       pkgng:
         name: zsh
-      register: pkgng_example1_idempotent
+        cached: yes
+      register: pkgng_example1_idempotent_cached
 
     - name: Verify zsh binary is present
       stat:
@@ -45,7 +46,8 @@
           - not pkgng_example1_stat_before.stat.exists
           - pkgng_example1.changed
           - pkgng_example1_checkmode.changed
-          - not pkgng_example1_idempotent.changed
+          - not pkgng_example1_idempotent_cached.changed
+          - not pkgng_example1_idempotent_cached.stdout is match("Updating \w+ repository catalogue\.\.\.")
           - pkgng_example1_stat_after.stat.exists
           - pkgng_example1_stat_after.stat.executable
 
