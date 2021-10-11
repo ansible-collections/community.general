@@ -1,0 +1,3 @@
+bugfixes:
+  - macports - add ``stdout`` and ``stderr`` to return values
+    (https://github.com/ansible-collections/community.general/issues/3499).
