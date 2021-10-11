@@ -1,0 +1,123 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+
+- name: Generate a Rundeck API Token
+  ansible.builtin.command: java -jar {{ rdeck_base }}/rundeck-cli.jar tokens create -u admin -d 24h -r admin
+  environment:
+    RD_URL: "{{ rundeck_url }}"
+    RD_USER: admin
+    RD_PASSWORD: admin
+  register: rundeck_api_token
+
+- name: Create a Rundeck project
+  community.general.rundeck_project:
+    name: "test_project"
+    api_version: "{{ rundeck_api_version }}"
+    url: "{{ rundeck_url }}"
+    token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    state: present
+
+- name: Copy test_job definition to /tmp
+  copy:
+    src: test_job.yaml
+    dest: /tmp/test_job.yaml
+
+- name: Create Rundeck job Test
+  ansible.builtin.command: java -jar {{ rdeck_base }}/rundeck-cli.jar jobs load -f /tmp/test_job.yaml -F yaml -p test_project
+  environment:
+    RD_URL: "{{ rundeck_url }}"
+    RD_USER: admin
+    RD_PASSWORD: admin
+
+- name: Wrong Rundeck API Token
+  community.general.rundeck_job_run:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: wrong_token
+    job_id: "{{ rundeck_job_id }}"
+  ignore_errors: true
+  register: rundeck_job_run_wrong_token
+
+- name: Assert that Rundeck authorization failed
+  ansible.builtin.assert:
+    that:
+      - rundeck_job_run_wrong_token.msg == "Token authorization failed"
+
+- name: Success run Rundeck job test_job
+  community.general.rundeck_job_run:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    job_id: "{{ rundeck_job_id }}"
+  register: rundeck_job_run_success
+
+- name: Assert that Rundeck job test_job runs successfully
+  ansible.builtin.assert:
+    that:
+      - rundeck_job_run_success.execution_info.status == "succeeded"
+
+- name: Fail run Rundeck job test_job
+  community.general.rundeck_job_run:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    job_id: "{{ rundeck_job_id }}"
+    job_options:
+      exit_code: "1"
+  ignore_errors: true
+  register: rundeck_job_run_fail
+
+- name: Assert that Rundeck job test_job failed
+  ansible.builtin.assert:
+    that:
+      - rundeck_job_run_fail.execution_info.status == "failed"
+
+- name: Abort run Rundeck job test_job due timeout
+  community.general.rundeck_job_run:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    job_id: "{{ rundeck_job_id }}"
+    job_options:
+      sleep: "5"
+    wait_execution_timeout: 2
+    abort_on_timeout: true
+  ignore_errors: true
+  register: rundeck_job_run_aborted
+
+- name: Assert that Rundeck job test_job is aborted
+  ansible.builtin.assert:
+    that:
+      - rundeck_job_run_aborted.execution_info.status == "aborted"
+
+- name: Fire-and-forget run Rundeck job test_job
+  community.general.rundeck_job_run:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    job_id: "{{ rundeck_job_id }}"
+    job_options:
+      sleep: "5"
+    wait_execution: False
+  register: rundeck_job_run_forget
+
+- name: Assert that Rundeck job test_job is running
+  ansible.builtin.assert:
+    that:
+      - rundeck_job_run_forget.execution_info.status == "running"
+
+- name: Get Rundeck job test_job executions info
+  community.general.rundeck_job_executions_info:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    job_id: "{{ rundeck_job_id }}"
+  register: rundeck_job_executions_info
+
+- name: Assert that Rundeck job executions info has 4 registers
+  ansible.builtin.assert:
+    that:
+      - rundeck_job_executions_info.paging.total | int == 4

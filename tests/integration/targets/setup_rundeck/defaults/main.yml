@@ -1,0 +1,2 @@
+rundeck_war_url: https://packagecloud.io/pagerduty/rundeck/packages/java/org.rundeck/rundeck-3.4.4-20210920.war/artifacts/rundeck-3.4.4-20210920.war/download
+rundeck_cli_url: https://github.com/rundeck/rundeck-cli/releases/download/v1.3.10/rundeck-cli-1.3.10-all.jar
