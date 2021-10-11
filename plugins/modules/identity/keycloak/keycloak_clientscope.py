@@ -256,10 +256,10 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-  description: Message as to what action was taken
-  returned: always
-  type: str
-  sample: "Client_scope testclientscope has been updated"
+    description: Message as to what action was taken
+    returned: always
+    type: str
+    sample: "Client_scope testclientscope has been updated"
 
 proposed:
     description: client_scope representation of proposed changes to client_scope

@@ -160,59 +160,59 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-  description: Message as to what action was taken
-  returned: always
-  type: str
+    description: Message as to what action was taken
+    returned: always
+    type: str
 
 end_state:
-  description: Group representation of the group after module execution (sample is truncated).
-  returned: always
-  type: complex
-  contains:
-    id:
-      description: GUID that identifies the group
-      type: str
-      returned: always
-      sample: 23f38145-3195-462c-97e7-97041ccea73e
-    name:
-      description: Name of the group
-      type: str
-      returned: always
-      sample: grp-test-123
-    attributes:
-      description: Attributes applied to this group
-      type: dict
-      returned: always
-      sample:
-        attr1: ["val1", "val2", "val3"]
-    path:
-      description: URI path to the group
-      type: str
-      returned: always
-      sample: /grp-test-123
-    realmRoles:
-      description: An array of the realm-level roles granted to this group
-      type: list
-      returned: always
-      sample: []
-    subGroups:
-      description: A list of groups that are children of this group. These groups will have the same parameters as
-                   documented here.
-      type: list
-      returned: always
-    clientRoles:
-      description: A list of client-level roles granted to this group
-      type: list
-      returned: always
-      sample: []
-    access:
-      description: A dict describing the accesses you have to this group based on the credentials used.
-      type: dict
-      returned: always
-      sample:
-        manage: true
-        manageMembership: true
-        view: true
+    description: Group representation of the group after module execution (sample is truncated).
+    returned: always
+    type: complex
+    contains:
+        id:
+            description: GUID that identifies the group
+            type: str
+            returned: always
+            sample: 23f38145-3195-462c-97e7-97041ccea73e
+        name:
+            description: Name of the group
+            type: str
+            returned: always
+            sample: grp-test-123
+        attributes:
+            description: Attributes applied to this group
+            type: dict
+            returned: always
+            sample:
+                attr1: ["val1", "val2", "val3"]
+        path:
+            description: URI path to the group
+            type: str
+            returned: always
+            sample: /grp-test-123
+        realmRoles:
+            description: An array of the realm-level roles granted to this group
+            type: list
+            returned: always
+            sample: []
+        subGroups:
+            description: A list of groups that are children of this group. These groups will have the same parameters as
+                         documented here.
+            type: list
+            returned: always
+        clientRoles:
+            description: A list of client-level roles granted to this group
+            type: list
+            returned: always
+            sample: []
+        access:
+            description: A dict describing the accesses you have to this group based on the credentials used.
+            type: dict
+            returned: always
+            sample:
+                manage: true
+                manageMembership: true
+                view: true
 
 group:
   description: Group representation of the group after module execution.  [DEPRECATED - Please use end_state instead].

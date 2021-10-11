@@ -149,10 +149,10 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-  description: Message as to what action was taken
-  returned: always
-  type: str
-  sample: "Role myrole has been updated"
+    description: Message as to what action was taken
+    returned: always
+    type: str
+    sample: "Role myrole has been updated"
 
 proposed:
     description: Role representation of proposed changes to role

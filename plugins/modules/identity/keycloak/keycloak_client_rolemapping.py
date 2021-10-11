@@ -159,10 +159,10 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-  description: Message as to what action was taken
-  returned: always
-  type: str
-  sample: "Role role1 assigned to group group1."
+    description: Message as to what action was taken
+    returned: always
+    type: str
+    sample: "Role role1 assigned to group group1."
 
 proposed:
     description: role_representation representation of proposed changes to client_rolemapping.

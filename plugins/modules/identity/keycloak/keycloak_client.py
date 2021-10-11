@@ -645,10 +645,10 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-  description: Message as to what action was taken
-  returned: always
-  type: str
-  sample: "Client testclient has been updated"
+    description: Message as to what action was taken
+    returned: always
+    type: str
+    sample: "Client testclient has been updated"
 
 proposed:
     description: client representation of proposed changes to client

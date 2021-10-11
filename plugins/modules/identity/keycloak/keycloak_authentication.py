@@ -168,14 +168,14 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-  description: Message as to what action was taken
-  returned: always
-  type: str
+    description: Message as to what action was taken
+    returned: always
+    type: str
 
 flow:
-  description: JSON representation for the authentication. [DEPRECATED - Please use end_state instead]
-  returned: on success
-  type: dict
+    description: JSON representation for the authentication. [DEPRECATED - Please use end_state instead]
+    returned: on success
+    type: dict
 
 end_state:
     description: client representation of the authentication after module execution

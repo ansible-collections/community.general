@@ -231,10 +231,10 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-  description: Message as to what action was taken
-  returned: always
-  type: str
-  sample: "Client template testclient has been updated"
+    description: Message as to what action was taken
+    returned: always
+    type: str
+    sample: "Client template testclient has been updated"
 
 proposed:
     description: client template representation of proposed changes to client template

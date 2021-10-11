@@ -317,10 +317,10 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-  description: Message as to what action was taken
-  returned: always
-  type: str
-  sample: "Identity provider my-idp has been created"
+    description: Message as to what action was taken
+    returned: always
+    type: str
+    sample: "Identity provider my-idp has been created"
 
 proposed:
     description: Representation of proposed changes to identity provider

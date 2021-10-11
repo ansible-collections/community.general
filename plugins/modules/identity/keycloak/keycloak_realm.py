@@ -534,10 +534,10 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-  description: Message as to what action was taken
-  returned: always
-  type: str
-  sample: "Realm testrealm has been updated"
+    description: Message as to what action was taken
+    returned: always
+    type: str
+    sample: "Realm testrealm has been updated"
 
 proposed:
     description: realm representation of proposed changes to realm
