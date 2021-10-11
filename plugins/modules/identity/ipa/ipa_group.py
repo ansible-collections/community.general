@@ -37,7 +37,8 @@ options:
   group:
     description:
     - List of group names assigned to this group.
-    - If an empty list is passed all groups will be removed from this group.
+    - (state: present) If an empty list is passed all groups will be removed from this group.
+    - (state: append) Same to present, except only adds groups
     - If option is omitted assigned groups will not be checked or changed.
     - Groups that are already assigned but not passed will be removed.
     type: list
@@ -49,7 +50,8 @@ options:
   user:
     description:
     - List of user names assigned to this group.
-    - If an empty list is passed all users will be removed from this group.
+    - (state: present) If an empty list is passed all users will be removed from this group.
+    - (state: append) Same to present, except only adds users
     - If option is omitted assigned users will not be checked or changed.
     - Users that are already assigned but not passed will be removed.
     type: list
@@ -58,7 +60,7 @@ options:
     description:
     - State to ensure
     default: "present"
-    choices: ["absent", "present"]
+    choices: ["absent", "append", "present"]
     type: str
 extends_documentation_fragment:
 - community.general.ipa.documentation
@@ -91,6 +93,16 @@ EXAMPLES = r'''
     user:
     - linus
     - larry
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: topsecret
+
+- name: Ensure that new starter named john is member of the group, without removing other members
+  community.general.ipa_group:
+    name: developers
+    user:
+    - john
+    state: append
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
@@ -193,7 +205,9 @@ def ensure(module, client):
     ipa_group = client.group_find(name=name)
 
     changed = False
-    if state == 'present':
+    if state in ('present', 'append'):
+        only_append = state == 'append'
+
         if not ipa_group:
             changed = True
             if not module.check_mode:
@@ -211,12 +225,14 @@ def ensure(module, client):
         if group is not None:
             changed = client.modify_if_diff(name, ipa_group.get('member_group', []), group,
                                             client.group_add_member_group,
-                                            client.group_remove_member_group) or changed
+                                            client.group_remove_member_group,
+                                            append=only_append) or changed
 
         if user is not None:
             changed = client.modify_if_diff(name, ipa_group.get('member_user', []), user,
                                             client.group_add_member_user,
-                                            client.group_remove_member_user) or changed
+                                            client.group_remove_member_user,
+                                            append=only_append) or changed
 
     else:
         if ipa_group:
@@ -235,7 +251,7 @@ def main():
                          gidnumber=dict(type='str', aliases=['gid']),
                          group=dict(type='list', elements='str'),
                          nonposix=dict(type='bool'),
-                         state=dict(type='str', default='present', choices=['present', 'absent']),
+                         state=dict(type='str', default='present', choices=['present', 'append', 'absent']),
                          user=dict(type='list', elements='str'))
 
     module = AnsibleModule(argument_spec=argument_spec,
