@@ -20,20 +20,20 @@ description:
 options:
     name:
         description:
-            - name of package to install/remove
+            - Name of package(s) to install/remove.
         aliases: [pkg]
         required: true
         type: list
         elements: str
     state:
         description:
-            - state of the package
+            - State of the package.
         choices: [ 'present', 'absent', 'installed', 'removed' ]
         default: present
         type: str
     force:
         description:
-            - opkg --force parameter used
+            - The C(opkg --force) parameter used.
         choices:
             - ""
             - "depends"
@@ -49,10 +49,10 @@ options:
         type: str
     update_cache:
         description:
-            - update the package db first
+            - Update the package DB first.
             - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
         aliases: ['update-cache']
-        default: "no"
+        default: false
         type: bool
 requirements:
     - opkg
@@ -77,7 +77,9 @@ EXAMPLES = '''
 
 - name: Remove foo and bar
   community.general.opkg:
-    name: foo,bar
+    name:
+      - foo
+      - bar
     state: absent
 
 - name: Install foo using overwrite option forcibly
