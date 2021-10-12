@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_user_federation
 
-short_description: Allows administration of Keycloak user federations via Keycloak API.
+short_description: Allows administration of Keycloak user federations via Keycloak API
 
 version_added: 3.7.0
 

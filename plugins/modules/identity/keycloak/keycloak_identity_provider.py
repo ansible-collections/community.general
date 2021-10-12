@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_identity_provider
 
-short_description: Allows administration of Keycloak identity providers via Keycloak API.
+short_description: Allows administration of Keycloak identity providers via Keycloak API
 
 version_added: 3.6.0
 

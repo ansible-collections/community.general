@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_clienttemplate
 
-short_description: Allows administration of Keycloak client templates via Keycloak API.
+short_description: Allows administration of Keycloak client templates via Keycloak API
 
 
 description:

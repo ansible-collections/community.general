@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_role
 
-short_description: Allows administration of Keycloak roles via Keycloak API.
+short_description: Allows administration of Keycloak roles via Keycloak API
 
 version_added: 3.4.0
 

@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_client
 
-short_description: Allows administration of Keycloak clients via Keycloak API.
+short_description: Allows administration of Keycloak clients via Keycloak API
 
 
 description:

@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_group
 
-short_description: Allows administration of Keycloak groups via Keycloak API.
+short_description: Allows administration of Keycloak groups via Keycloak API
 
 description:
     - This module allows you to add, remove or modify Keycloak groups via the Keycloak REST API.

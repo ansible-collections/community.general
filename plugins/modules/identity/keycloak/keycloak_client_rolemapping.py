@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_client_rolemapping
 
-short_description: Allows administration of Keycloak client_rolemapping with the Keycloak API.
+short_description: Allows administration of Keycloak client_rolemapping with the Keycloak API
 
 version_added: 3.5.0
 
