@@ -314,6 +314,24 @@
   command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8'
   register: pkgng_example8_add_annotation_verify
 
+- name: Install and annotate single package (checkmode, not changed)
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation: '+ansibletest_example8=added'
+  check_mode: yes
+  register: pkgng_example8_add_annotation_checkmode_nochange
+
+- name: Install and annotate single package (checkmode, changed)
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation: '+ansibletest_example8_checkmode=added'
+  check_mode: yes
+  register: pkgng_example8_add_annotation_checkmode_change
+
+- name: Verify check_mode did not add an annotation
+  command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8_checkmode'
+  register: pkgng_example8_add_annotation_checkmode_change_verify
+
 - name: Modify annotation on single package
   pkgng:
     name: '{{ pkgng_test_pkg_name }}'
@@ -346,6 +364,9 @@
     that:
       - pkgng_example8_add_annotation.changed
       - pkgng_example8_add_annotation_failure.failed
+      - pkgng_example8_add_annotation_checkmode_nochange is not changed
+      - pkgng_example8_add_annotation_checkmode_change is changed
+      - 'pkgng_example8_add_annotation_checkmode_change_verify.stdout_lines | count == 0'
       - 'pkgng_example8_add_annotation_verify.stdout_lines | first == "added"'
       - pkgng_example8_modify_annotation.changed
       - pkgng_example8_modify_annotation_failure.failed

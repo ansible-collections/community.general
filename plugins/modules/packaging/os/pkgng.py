@@ -333,11 +333,12 @@ def annotation_add(module, pkgng_path, package, tag, value, dir_arg):
     _value = annotation_query(module, pkgng_path, package, tag, dir_arg)
     if not _value:
         # Annotation does not exist, add it.
-        rc, out, err = module.run_command('%s %s annotate -y -A %s %s "%s"'
-                                          % (pkgng_path, dir_arg, package, tag, value))
-        if rc != 0:
-            module.fail_json(msg="could not annotate %s: %s"
-                             % (package, out), stderr=err)
+        if not module.check_mode:
+            rc, out, err = module.run_command('%s %s annotate -y -A %s %s "%s"'
+                                              % (pkgng_path, dir_arg, package, tag, value))
+            if rc != 0:
+                module.fail_json(msg="could not annotate %s: %s"
+                                 % (package, out), stderr=err)
         return True
     elif _value != value:
         # Annotation exists, but value differs
@@ -353,11 +354,12 @@ def annotation_add(module, pkgng_path, package, tag, value, dir_arg):
 def annotation_delete(module, pkgng_path, package, tag, value, dir_arg):
     _value = annotation_query(module, pkgng_path, package, tag, dir_arg)
     if _value:
-        rc, out, err = module.run_command('%s %s annotate -y -D %s %s'
-                                          % (pkgng_path, dir_arg, package, tag))
-        if rc != 0:
-            module.fail_json(msg="could not delete annotation to %s: %s"
-                             % (package, out), stderr=err)
+        if not module.check_mode:
+            rc, out, err = module.run_command('%s %s annotate -y -D %s %s'
+                                              % (pkgng_path, dir_arg, package, tag))
+            if rc != 0:
+                module.fail_json(msg="could not delete annotation to %s: %s"
+                                 % (package, out), stderr=err)
         return True
     return False
 
@@ -372,17 +374,18 @@ def annotation_modify(module, pkgng_path, package, tag, value, dir_arg):
         # No change in value
         return False
     else:
-        rc, out, err = module.run_command('%s %s annotate -y -M %s %s "%s"'
-                                          % (pkgng_path, dir_arg, package, tag, value))
+        if not module.check_mode:
+            rc, out, err = module.run_command('%s %s annotate -y -M %s %s "%s"'
+                                              % (pkgng_path, dir_arg, package, tag, value))
 
-        # pkg sometimes exits with rc == 1, even though the modification succeeded
-        # Check the output for a success message
-        if (
-            rc != 0
-            and re.search(r'^%s-[^:]+: Modified annotation tagged: %s' % (package, tag), out, flags=re.MULTILINE) is None
-        ):
-            module.fail_json(msg="failed to annotate %s, could not change annotation %s to %s: %s"
-                             % (package, tag, value, out), stderr=err)
+            # pkg sometimes exits with rc == 1, even though the modification succeeded
+            # Check the output for a success message
+            if (
+                rc != 0
+                and re.search(r'^%s-[^:]+: Modified annotation tagged: %s' % (package, tag), out, flags=re.MULTILINE) is None
+            ):
+                module.fail_json(msg="failed to annotate %s, could not change annotation %s to %s: %s"
+                                 % (package, tag, value, out), stderr=err)
         return True
 
 

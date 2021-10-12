@@ -3,3 +3,4 @@ bugfixes:
   - 'pkgng - PR #3393 (https://github.com/ansible-collections/community.general/pull/3393) broke `check_mode` so that the module always reports `not changed`; fix regression so module reports number of upgrade or install actions that would be performed'
   - 'pkgng - The module will now convert a single space- or comma-separated name parameter to a list. The documentation had given wrong examples in which multiple space- or comma-separated packages were specified in the `name` parameter, rather than using correct YAML list syntax. `pkgng` module documentation has also been updated'
   - 'pkgng - `annotation` functionality was broken; uncovered by new integration tests. Small/typo fixes have restored the functionality.'
+  - 'pkgng - annotation actions performed even if `check_mode=yes`'
