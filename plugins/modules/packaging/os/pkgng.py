@@ -50,13 +50,14 @@ options:
         default: no
     annotation:
         description:
-            - A comma-separated list of keyvalue-pairs of the form
+            - A list of keyvalue-pairs of the form
               C(<+/-/:><key>[=<value>]). A C(+) denotes adding an annotation, a
               C(-) denotes removing an annotation, and C(:) denotes modifying an
               annotation.
               If setting or modifying annotations, a value must be provided.
         required: false
-        type: str
+        type: list
+        elements: str
     pkgsite:
         description:
             - For pkgng versions before 1.1.4, specify packagesite to use
