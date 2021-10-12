@@ -202,8 +202,8 @@
     that:
       - not pkgng_example5_prepare.changed
       - pkgng_example5.changed
-      - "'Number of packages to be installed: 3' is in(pkgng_example5.stdout_lines)"
-      - "(pkgng_example5.stdout | regex_findall('^Number of packages to be', multiline=True) | count) == 1"
+      - '(pkgng_example5.stdout | regex_search("^Number of packages to be installed: (\d+)", "\\1", multiline=True) | first | int) >= 3'
+      - '(pkgng_example5.stdout | regex_findall("^Number of packages to be", multiline=True) | count) == 1'
       - pkgng_example5_cleanup.changed
 
 ##
@@ -245,12 +245,12 @@
       - not pkgng_example6_check.changed
       - not pkgng_example6_prepare.failed
       - pkgng_example6.changed
-      - "'Number of packages to be installed: 1' is in(pkgng_example6.stdout_lines)"
-      - "'Number of packages to be upgraded: 1' is in(pkgng_example6.stdout_lines)"
+      - '(pkgng_example6.stdout | regex_search("^Number of packages to be installed: (\d+)", "\\1", multiline=True) | first | int) >= 1'
+      - '(pkgng_example6.stdout | regex_search("^Number of packages to be upgraded: (\d+)", "\\1", multiline=True) | first | int) >= 1'
       # Checking that "will be affected" occurs twice in the output ensures
       # that the module runs two separate commands for install and upgrade,
       # as the pkg command only outputs the string once per invocation.
-      - "(pkgng_example6.stdout | regex_findall('will be affected', multiline=True) | count) == 2"
+      - '(pkgng_example6.stdout | regex_findall("will be affected", multiline=True) | count) == 2'
       - pkgng_example6_cleanup.changed
 
 ##
