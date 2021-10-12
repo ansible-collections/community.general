@@ -14,6 +14,11 @@ short_description: Manage FreeIPA group
 description:
 - Add, modify and delete group within IPA server
 options:
+  append:
+    description:
+    - If C(yes), add the listed C(user) and C(group) to the group members.
+    - If C(no), only the listed C(user) and C(group) will only be added to the groups, removing any other members.
+    type: bool
   cn:
     description:
     - Canonical name.
@@ -60,7 +65,7 @@ options:
     description:
     - State to ensure
     default: "present"
-    choices: ["absent", "append", "present"]
+    choices: ["absent", "present"]
     type: str
 extends_documentation_fragment:
 - community.general.ipa.documentation
@@ -102,7 +107,8 @@ EXAMPLES = r'''
     name: developers
     user:
     - john
-    state: append
+    append: yes
+    state: present
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
@@ -199,15 +205,14 @@ def ensure(module, client):
     name = module.params['cn']
     group = module.params['group']
     user = module.params['user']
+    append = module.params['append']
 
     module_group = get_group_dict(description=module.params['description'], external=module.params['external'],
                                   gid=module.params['gidnumber'], nonposix=module.params['nonposix'])
     ipa_group = client.group_find(name=name)
 
     changed = False
-    if state in ('present', 'append'):
-        only_append = state == 'append'
-
+    if state == 'present:
         if not ipa_group:
             changed = True
             if not module.check_mode:
@@ -226,13 +231,13 @@ def ensure(module, client):
             changed = client.modify_if_diff(name, ipa_group.get('member_group', []), group,
                                             client.group_add_member_group,
                                             client.group_remove_member_group,
-                                            append=only_append) or changed
+                                            append=append) or changed
 
         if user is not None:
             changed = client.modify_if_diff(name, ipa_group.get('member_user', []), user,
                                             client.group_add_member_user,
                                             client.group_remove_member_user,
-                                            append=only_append) or changed
+                                            append=append) or changed
 
     else:
         if ipa_group:
@@ -251,8 +256,10 @@ def main():
                          gidnumber=dict(type='str', aliases=['gid']),
                          group=dict(type='list', elements='str'),
                          nonposix=dict(type='bool'),
-                         state=dict(type='str', default='present', choices=['present', 'append', 'absent']),
-                         user=dict(type='list', elements='str'))
+                         state=dict(type='str', default='present', choices=['present', 'absent']),
+                         user=dict(type='list', elements='str'),
+                         append=dict(type='bool')
+                         )
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
