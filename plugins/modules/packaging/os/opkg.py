@@ -23,7 +23,8 @@ options:
             - name of package to install/remove
         aliases: [pkg]
         required: true
-        type: str
+        type: list
+        elements: str
     state:
         description:
             - state of the package
@@ -170,7 +171,7 @@ def install_packages(module, opkg_path, packages):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(aliases=["pkg"], required=True),
+            name=dict(aliases=["pkg"], required=True, type="list", elements="str"),
             state=dict(default="present", choices=["present", "installed", "absent", "removed"]),
             force=dict(default="", choices=["", "depends", "maintainer", "reinstall", "overwrite", "downgrade", "space", "postinstall", "remove",
                                             "checksum", "removal-of-dependent-packages"]),
@@ -187,7 +188,7 @@ def main():
     if p["update_cache"]:
         update_package_db(module, opkg_path)
 
-    pkgs = p["name"].split(",")
+    pkgs = p["name"]
 
     if p["state"] in ["present", "installed"]:
         install_packages(module, opkg_path, pkgs)
