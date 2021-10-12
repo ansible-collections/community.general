@@ -60,11 +60,10 @@ options:
     version_added: 1.0.0
   disable_facts:
     description:
-    - For backward compatibility, output results are also returned as C(ansible_facts), but this behaviour is deprecated
-      and will be removed in community.general 4.0.0.
-    - This flag disables the output as facts and also disables the deprecation warning.
+    - The value C(false) is no longer allowed since community.general 4.0.0.
+    - This option will be deprecated in a future version, and eventually be removed.
     type: bool
-    default: no
+    default: true
     version_added: 2.1.0
 '''
 
@@ -129,7 +128,7 @@ RETURN = '''
 '''
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    ModuleHelper, CmdMixin, StateMixin, ArgFormat
+    ModuleHelper, CmdMixin, StateMixin, ArgFormat, ModuleHelperException
 )
 
 
@@ -168,7 +167,7 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
                             elements='str', choices=('int', 'uint', 'bool', 'float', 'double', 'string')),
             value=dict(required=False, type='list', elements='raw'),
             force_array=dict(default=False, type='bool', aliases=['array']),
-            disable_facts=dict(type='bool', default=False),
+            disable_facts=dict(type='bool', default=True),
         ),
         required_if=[('state', 'present', ['value', 'value_type'])],
         required_together=[('value', 'value_type')],
@@ -196,15 +195,8 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
         self.vars.set('type', self.vars.value_type, fact=True)
         self.vars.meta('value').set(initial_value=self.vars.previous_value)
 
-        if not self.module.params['disable_facts']:
-            self.facts_name = "xfconf"
-            self.module.deprecate(
-                msg="Returning results as facts is deprecated. "
-                    "Please register the module output to a variable instead."
-                    " You can use the disable_facts option to switch to the "
-                    "new behavior already now and disable this warning",
-                version="4.0.0", collection_name="community.general"
-            )
+        if self.module.params['disable_facts'] is False:
+            raise ModuleHelperException('Returning results as facts has been removed. Stop using disable_facts=false.')
 
     def process_command_output(self, rc, out, err):
         if err.rstrip() == self.does_not:
