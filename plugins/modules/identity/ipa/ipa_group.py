@@ -257,8 +257,7 @@ def main():
                          nonposix=dict(type='bool'),
                          state=dict(type='str', default='present', choices=['present', 'absent']),
                          user=dict(type='list', elements='str'),
-                         append=dict(type='bool')
-                         )
+                         append=dict(type='bool', default=False))
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
