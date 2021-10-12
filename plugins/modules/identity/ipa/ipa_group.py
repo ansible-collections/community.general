@@ -211,7 +211,7 @@ def ensure(module, client):
     ipa_group = client.group_find(name=name)
 
     changed = False
-    if state == 'present:
+    if state == 'present':
         if not ipa_group:
             changed = True
             if not module.check_mode:
