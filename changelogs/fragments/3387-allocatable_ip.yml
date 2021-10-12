@@ -1,2 +1,2 @@
 minor_changes:
-  - scaleway - allow to create instance with an allocatable ip (https://github.com/ansible-collections/community.general/pull/3418)
+  - scaleway - allow to create instance with an allocatable IP (https://github.com/ansible-collections/community.general/pull/3418).
