@@ -53,16 +53,6 @@ options:
     description:
       - Version specification for the perl module. When I(mode) is C(new), C(cpanm) version operators are accepted.
     type: str
-  system_lib:
-    description:
-      - Use this if you want to install modules to the system perl include path. You must be root or have "passwordless" sudo for this to work.
-      - This uses the cpanm commandline option C(--sudo), which has nothing to do with ansible privilege escalation.
-      - >
-        This option is not recommended for use and it will be deprecated in the future. If you need to escalate privileges
-        please consider using any of the multiple mechanisms available in Ansible.
-    type: bool
-    default: no
-    aliases: ['use_sudo']
   executable:
     description:
       - Override the path to the cpanm executable.
@@ -160,8 +150,6 @@ class CPANMinus(CmdMixin, ModuleHelper):
             mirror=dict(type='str'),
             mirror_only=dict(type='bool', default=False),
             installdeps=dict(type='bool', default=False),
-            system_lib=dict(type='bool', default=False, aliases=['use_sudo'],
-                            removed_in_version="4.0.0", removed_from_collection="community.general"),
             executable=dict(type='path'),
             mode=dict(type='str', choices=['compatibility', 'new'], default='compatibility'),
             name_check=dict(type='str')
@@ -176,7 +164,6 @@ class CPANMinus(CmdMixin, ModuleHelper):
         mirror=dict(fmt=('--mirror', '{0}'),),
         mirror_only=dict(fmt="--mirror-only", style=ArgFormat.BOOLEAN),
         installdeps=dict(fmt="--installdeps", style=ArgFormat.BOOLEAN),
-        system_lib=dict(fmt="--sudo", style=ArgFormat.BOOLEAN),
     )
     check_rc = True
 
@@ -188,8 +175,6 @@ class CPANMinus(CmdMixin, ModuleHelper):
         else:
             if v.name and v.from_path:
                 raise ModuleHelperException("Parameters 'name' and 'from_path' are mutually exclusive when 'mode=new'")
-            if v.system_lib:
-                raise ModuleHelperException("Parameter 'system_lib' is invalid when 'mode=new'")
 
         self.command = self.module.get_bin_path(v.executable if v.executable else self.command)
         self.vars.set("binary", self.command)
@@ -230,7 +215,7 @@ class CPANMinus(CmdMixin, ModuleHelper):
                 return
             pkg_spec = v[pkg_param]
             self.changed = self.run_command(
-                params=['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', 'system_lib', {'name': pkg_spec}],
+                params=['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', {'name': pkg_spec}],
             )
         else:
             installed = self._is_package_installed(v.name_check, v.locallib, v.version) if v.name_check else False
