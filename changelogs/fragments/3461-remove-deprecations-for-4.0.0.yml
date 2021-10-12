@@ -1,0 +1,9 @@
+removed_features:
+  - "ModuleHelper module utils - remove fallback when value could not be determined for a parameter (https://github.com/ansible-collections/community.general/pull/3461)."
+  - "proxmox - default value of ``proxmox_default_behavior`` changed to ``no_defaults`` (https://github.com/ansible-collections/community.general/pull/3461)."
+  - "proxmox_kvm - default value of ``proxmox_default_behavior`` changed to ``no_defaults`` (https://github.com/ansible-collections/community.general/pull/3461)."
+  - "grove - removed the deprecated alias ``message`` of the ``message_content`` option (https://github.com/ansible-collections/community.general/pull/3461)."
+  - "telegram - removed the deprecated ``msg``, ``msg_format`` and ``chat_id`` options (https://github.com/ansible-collections/community.general/pull/3461)."
+  - "cpanm - removed the deprecated ``system_lib`` option. Use Ansible's privilege escalation mechanism instead; the option basically used ``sudo`` (https://github.com/ansible-collections/community.general/pull/3461)."
+  - "runit - removed the deprecated ``dist`` option which was not used by the module (https://github.com/ansible-collections/community.general/pull/3461)."
+  - "xfconf - the default value of ``disable_facts`` changed to ``true``, and the value ``false`` is no longer allowed. Register the module results instead (https://github.com/ansible-collections/community.general/pull/3461)."

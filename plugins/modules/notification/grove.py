@@ -33,8 +33,6 @@ options:
       - Message content.
       - The alias I(message) is deprecated and will be removed in community.general 4.0.0.
     required: true
-    aliases:
-      - message
   url:
     type: str
     description:
@@ -95,9 +93,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             channel_token=dict(type='str', required=True, no_log=True),
-            message_content=dict(type='str', required=True, aliases=['message'],
-                                 deprecated_aliases=[dict(name='message', version='4.0.0',
-                                                          collection_name='community.general')]),
+            message_content=dict(type='str', required=True),
             service=dict(type='str', default='ansible'),
             url=dict(type='str', default=None),
             icon_url=dict(type='str', default=None),
