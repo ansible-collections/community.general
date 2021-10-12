@@ -217,7 +217,6 @@ def main():
             name=dict(type='str', required=True),
             state=dict(type='str', choices=['killed', 'once', 'reloaded', 'restarted', 'started', 'stopped']),
             enabled=dict(type='bool'),
-            dist=dict(type='str', removed_in_version='4.0.0', removed_from_collection='community.general'),
             service_dir=dict(type='str', default='/var/service'),
             service_src=dict(type='str', default='/etc/sv'),
         ),
