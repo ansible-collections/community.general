@@ -212,7 +212,7 @@ class SSHConfig():
         # Convert 'true' / 'false' to 'yes' / 'no' for usage in ssh_config
         if args['forward_agent']:
             args['forward_agent'] = 'yes'
-        else:
+        if not args['forward_agent'] and args['forward_agent'] is not None:
             args['forward_agent'] = 'no'
 
         config_changed = False
