@@ -300,38 +300,45 @@
 - name: Install and annotate single package
   pkgng:
     name: '{{ pkgng_test_pkg_name }}'
-    annotation: '+ansibletest=added'
+    annotation: '+ansibletest_example8=added'
   register: pkgng_example8_add_annotation
 
-- name: Install and annotate single package
+- name: Should fail to add duplicate annotation
   pkgng:
     name: '{{ pkgng_test_pkg_name }}'
-    annotation: '+ansibletest=duplicate'
+    annotation: '+ansibletest_example8=duplicate'
   ignore_errors: yes
   register: pkgng_example8_add_annotation_failure
 
 - name: Verify annotation is actually there
-  command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest'
+  command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8'
   register: pkgng_example8_add_annotation_verify
 
 - name: Modify annotation on single package
   pkgng:
     name: '{{ pkgng_test_pkg_name }}'
-    annotation: ':ansibletest=modified'
+    annotation: ':ansibletest_example8=modified'
   register: pkgng_example8_modify_annotation
 
+- name: Should fail to modify missing annotation
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation: ':ansiblemissing=modified'
+  ignore_errors: yes
+  register: pkgng_example8_modify_annotation_failure
+
 - name: Verify annotation has been modified
-  command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest'
+  command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8'
   register: pkgng_example8_modify_annotation_verify
 
 - name: Remove annotation on single package
   pkgng:
     name: '{{ pkgng_test_pkg_name }}'
-    annotation: '-ansibletest'
+    annotation: '-ansibletest_example8'
   register: pkgng_example8_remove_annotation
 
 - name: Verify annotation has been removed
-  command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest'
+  command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8'
   register: pkgng_example8_remove_annotation_verify
 
 - name: Ensure pkgng annotations on single packages work correctly
@@ -341,9 +348,74 @@
       - pkgng_example8_add_annotation_failure.failed
       - 'pkgng_example8_add_annotation_verify.stdout_lines | first == "added"'
       - pkgng_example8_modify_annotation.changed
+      - pkgng_example8_modify_annotation_failure.failed
       - 'pkgng_example8_modify_annotation_verify.stdout_lines | first == "modified"'
       - pkgng_example8_remove_annotation.changed
       - 'pkgng_example8_remove_annotation_verify.stdout_lines | count == 0'
+
+##
+## pkgng - example - multiple annotations
+##
+- name: Annotate single package with multiple annotations
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation:
+      - '+ansibletest_example9_1=added'
+      - '+ansibletest_example9_2=added'
+  register: pkgng_example9_add_annotation
+
+- name: Verify annotation is actually there
+  command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
+  register: pkgng_example9_add_annotation_verify
+  # Assert, below, tests that stdout includes:
+  # ```
+  # ansibletest_example9_1   : added
+  # ansibletest_example9_2   : added
+  # ```
+
+- name: Multiple annotation operations on single package
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation:
+      - ':ansibletest_example9_1=modified'
+      - '+ansibletest_example9_3=added'
+  register: pkgng_example9_multiple_annotation
+
+- name: Verify multiple operations succeeded
+  command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
+  register: pkgng_example9_multiple_annotation_verify
+  # Assert, below, tests that stdout includes:
+  # ```
+  # ansibletest_example9_1   : modified
+  # ansibletest_example9_2   : added
+  # ansibletest_example9_3   : added
+  # ```
+
+- name: Add multiple annotations with old syntax
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation: '+ansibletest_example9_4=added,+ansibletest_example9_5=added'
+  register: pkgng_example9_add_annotation_old
+
+- name: Verify annotation is actually there
+  command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
+  register: pkgng_example9_add_annotation_old_verify
+  # Assert, below, tests that stdout includes:
+  # ```
+  # ansibletest_example9_4   : added
+  # ansibletest_example9_5   : added
+  # ```
+
+- name: Ensure multiple annotations work correctly
+  assert:
+    that:
+      - pkgng_example9_add_annotation.changed
+      - '(pkgng_example9_add_annotation_verify.stdout_lines | select("match",  "ansibletest_example9_[12]\s*:\s*added") | count) == 2'
+      - pkgng_example9_multiple_annotation.changed
+      - '(pkgng_example9_multiple_annotation_verify.stdout_lines | select("match",  "ansibletest_example9_1\s*:\s*modified") | count) == 1'
+      - '(pkgng_example9_multiple_annotation_verify.stdout_lines | select("match",  "ansibletest_example9_[23]\s*:\s*added") | count) == 2'
+      - pkgng_example9_add_annotation_old.changed
+      - '(pkgng_example9_add_annotation_old_verify.stdout_lines | select("match",  "ansibletest_example9_[45]\s*:\s*added") | count) == 2'
 
 ##
 ## pkgng - example - Install single package in jail
