@@ -418,6 +418,37 @@
       - '(pkgng_example9_add_annotation_old_verify.stdout_lines | select("match",  "ansibletest_example9_[45]\s*:\s*added") | count) == 2'
 
 ##
+## pkgng - example - invalid annotation strings
+##
+- name: Should fail on invalid annotate strings
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation: '{{ item }}'
+  ignore_errors: yes
+  register: pkgng_example8_invalid_annotation_failure
+  loop:
+    - 'naked_string'
+    - '/invalid_operation'
+    - ',empty_first_tag=validsecond'
+    - '=notag'
+
+- name: Verify invalid annotate strings did not add annotations
+  command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
+  register: pkgng_example8_invalid_annotation_verify
+
+- name: Ensure invalid annotate strings fail safely
+  assert:
+    that:
+      # Invalid strings should not change anything
+      - '(pkgng_example8_invalid_annotation_failure.results | selectattr("changed") | count) == 0'
+      # Invalid strings should always fail
+      - '(pkgng_example8_invalid_annotation_failure.results | selectattr("failed", "false") | count) == 0'
+      # Invalid strings should not cause an exception
+      - '(pkgng_example8_invalid_annotation_failure.results | selectattr("exception", "defined") | count) == 0'
+      # Verify annotations are unaffected
+      - '(pkgng_example8_invalid_annotation_verify.stdout_lines | select("search",  "(naked_string|invalid_operation|empty_first_tag|validsecond|notag)") | count) == 0'
+
+##
 ## pkgng - example - Install single package in jail
 ##
 - name: Test within jail
