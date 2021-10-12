@@ -43,8 +43,7 @@ options:
   group:
     description:
     - List of group names assigned to this group.
-    - (state: present) If an empty list is passed all groups will be removed from this group.
-    - (state: append) Same to present, except only adds groups
+    - If an empty list is passed all groups will be removed from this group.
     - If option is omitted assigned groups will not be checked or changed.
     - Groups that are already assigned but not passed will be removed.
     type: list
@@ -56,8 +55,7 @@ options:
   user:
     description:
     - List of user names assigned to this group.
-    - (state: present) If an empty list is passed all users will be removed from this group.
-    - (state: append) Same to present, except only adds users
+    - If an empty list is passed all users will be removed from this group.
     - If option is omitted assigned users will not be checked or changed.
     - Users that are already assigned but not passed will be removed.
     type: list
