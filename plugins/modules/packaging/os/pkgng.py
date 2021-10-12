@@ -342,7 +342,7 @@ def annotation_add(module, pkgng_path, package, tag, value, dir_arg):
     elif _value != value:
         # Annotation exists, but value differs
         module.fail_json(
-            mgs="failed to annotate %s, because %s is already set to %s, but should be set to %s"
+            msg="failed to annotate %s, because %s is already set to %s, but should be set to %s"
             % (package, tag, _value, value))
         return False
     else:
@@ -364,7 +364,7 @@ def annotation_delete(module, pkgng_path, package, tag, value, dir_arg):
 
 def annotation_modify(module, pkgng_path, package, tag, value, dir_arg):
     _value = annotation_query(module, pkgng_path, package, tag, dir_arg)
-    if not value:
+    if not _value:
         # No such tag
         module.fail_json(msg="could not change annotation to %s: tag %s does not exist"
                          % (package, tag))
@@ -374,18 +374,25 @@ def annotation_modify(module, pkgng_path, package, tag, value, dir_arg):
     else:
         rc, out, err = module.run_command('%s %s annotate -y -M %s %s "%s"'
                                           % (pkgng_path, dir_arg, package, tag, value))
-        if rc != 0:
-            module.fail_json(msg="could not change annotation annotation to %s: %s"
-                             % (package, out), stderr=err)
+
+        # pkg sometimes exits with rc == 1, even though the modification succeeded
+        # Check the output for a success message
+        if (
+            rc != 0
+            and re.search(r'^%s-[^:]+: Modified annotation tagged: %s' % (package, tag), out, flags=re.MULTILINE) is None
+        ):
+            module.fail_json(msg="failed to annotate %s, could not change annotation %s to %s: %s"
+                             % (package, tag, value, out), stderr=err)
         return True
 
 
-def annotate_packages(module, pkgng_path, packages, annotation, dir_arg):
+def annotate_packages(module, pkgng_path, packages, annotations, dir_arg):
     annotate_c = 0
-    annotations = map(lambda _annotation:
-                      re.match(r'(?P<operation>[\+-:])(?P<tag>\w+)(=(?P<value>\w+))?',
-                               _annotation).groupdict(),
-                      re.split(r',', annotation))
+    if len(annotations) == 1:
+        # Split on commas with optional trailing whitespace,
+        # to support the old style of multiple annotations
+        # on a single line, rather than YAML list syntax
+        annotations = re.split(r'\s*,\s*', annotations[0])
 
     operation = {
         '+': annotation_add,
@@ -394,8 +401,21 @@ def annotate_packages(module, pkgng_path, packages, annotation, dir_arg):
     }
 
     for package in packages:
-        for _annotation in annotations:
-            if operation[_annotation['operation']](module, pkgng_path, package, _annotation['tag'], _annotation['value']):
+        for annotation_string in annotations:
+            # Note to future maintainers: A dash (-) in a regex character class ([-+:] below)
+            # must appear as the first character in the class, or it will be interpreted
+            # as a range of characters.
+            annotation = \
+                re.match(r'(?P<operation>[-+:])(?P<tag>[^=]+)(=(?P<value>.+))?', annotation_string)
+
+            if annotation is None:
+                module.fail_json(
+                    msg="failed to annotate %s, invalid annotate string: %s"
+                    % (package, annotation_string)
+                )
+
+            annotation = annotation.groupdict()
+            if operation[annotation['operation']](module, pkgng_path, package, annotation['tag'], annotation['value'], dir_arg):
                 annotate_c += 1
 
     if annotate_c > 0:
@@ -432,7 +452,7 @@ def main():
             name=dict(aliases=["pkg"], required=True, type='list', elements='str'),
             cached=dict(default=False, type='bool'),
             ignore_osver=dict(default=False, required=False, type='bool'),
-            annotation=dict(default="", required=False),
+            annotation=dict(required=False, type='list', elements='str'),
             pkgsite=dict(default="", required=False),
             rootdir=dict(default="", required=False, type='path'),
             chroot=dict(default="", required=False, type='path'),
@@ -510,7 +530,7 @@ def main():
         stderr += _stderr
         msgs.append(_msg)
 
-    if p["annotation"]:
+    if p["annotation"] is not None:
         _changed, _msg = annotate_packages(module, pkgng_path, pkgs, p["annotation"], dir_arg)
         changed = changed or _changed
         msgs.append(_msg)
