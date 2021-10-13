@@ -140,6 +140,7 @@ EXAMPLES = '''
 
 
 from collections import defaultdict
+import os.path
 import re
 from ansible.module_utils.basic import AnsibleModule
 
@@ -152,6 +153,23 @@ def query_package(module, run_pkgng, name):
         return True
 
     return False
+
+
+def query_package_name(module, run_pkgng, package):
+
+    # Borrowing this pkg filename detection logic from
+    # https://github.com/freebsd/pkg/blob/06b59b5/libpkg/pkg_jobs.c#L193-L237
+    filename_match = re.search(r'\.(pkg|tzst|t[xbg]z|tar)', package, re.IGNORECASE)
+    if filename_match is not None and os.path.exists(package):
+        rc, out, err = run_pkgng('query', '-F', package, '%n')
+        if rc != 0:
+            module.fail_json(msg="failed to get name from package file %s: %s" % (package, out), stderr=err)
+
+        package_name = out.strip()
+    else:
+        package_name = package
+
+    return package_name
 
 
 def query_update(module, run_pkgng, name):
@@ -273,10 +291,12 @@ def install_packages(module, run_pkgng, packages, cached, state):
         # individually verify packages are in requested state
         for package in package_list:
             verified = False
+            package_name = query_package_name(module, run_pkgng, package)
+
             if action == 'install':
-                verified = query_package(module, run_pkgng, package)
+                verified = query_package(module, run_pkgng, package_name)
             elif action == 'upgrade':
-                verified = not query_update(module, run_pkgng, package)
+                verified = not query_update(module, run_pkgng, package_name)
 
             if verified:
                 action_count[action] += 1
