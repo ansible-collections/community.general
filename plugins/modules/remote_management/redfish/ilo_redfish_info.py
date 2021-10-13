@@ -1,8 +1,10 @@
-from __future__ import absolute_import, division, print_function
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_native
-from ansible.module_utils.ilo_redfish_utils import iLORedfishUtils
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
+# Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -19,6 +21,25 @@ author:
     - "Bhavya B (@Bhavya06)"
 '''
 
+EXAMPLES = '''
+  - name: List iLO Users
+    community.general.ilo_redfish_info:
+      category: Accounts
+      command: ListiLOUsers
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+  - name: Get iLO Sessions
+    community.general.ilo_redfish_info:
+      category: Sessions
+      command: GetiLOSessions
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+'''
+
 ANSIBLE_METADATA = {'status': ['preview'],
                     'supported_by': 'community',
                     'metadata_version': '1.1'}
@@ -32,6 +53,9 @@ CATEGORY_COMMANDS_ALL = {
 
 CATEGORY_COMMANDS_DEFAULT = {}
 
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils._text import to_native
+from ansible.module_utils.ilo_redfish_utils import iLORedfishUtils
 
 def main():
     result = {}

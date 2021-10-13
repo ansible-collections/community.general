@@ -1,10 +1,14 @@
-# from re import S
-from __future__ import (absolute_import, division, print_function)
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
 from ansible.module_utils.redfish_utils import RedfishUtils
 import json
-# import os
-# import os.path
-
 
 class iLORedfishUtils(RedfishUtils):
 

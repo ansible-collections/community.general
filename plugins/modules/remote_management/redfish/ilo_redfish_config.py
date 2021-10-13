@@ -1,7 +1,10 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 from __future__ import absolute_import, division, print_function
-from ansible.module_utils._text import to_native
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.ilo_redfish_utils import iLORedfishUtils
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -17,6 +20,23 @@ author:
     - "Bhavya B (@Bhavya06)"
 '''
 
+EXAMPLES = '''
+  - name: Restart system power gracefully
+    community.general.redfish_command:
+      category: Systems
+      command: PowerGracefulRestart
+      resource_id: 437XR1138R2
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+  - name: Turn system power off
+    community.general.redfish_command:
+      category: Systems
+      command: PowerForceOff
+      resource_id: 437XR1138R2
+'''
+
 ANSIBLE_METADATA = {'status': ['preview'],
                     'supported_by': 'community',
                     'metadata_version': '1.1'}
@@ -28,6 +48,9 @@ CATEGORY_COMMANDS_ALL = {
     "Serverclone": ["LoadEthernetInterface"]
 }
 
+from ansible.module_utils._text import to_native
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.ilo_redfish_utils import iLORedfishUtils
 
 def main():
     result = {}

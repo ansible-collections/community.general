@@ -1,9 +1,10 @@
-from __future__ import absolute_import, division, print_function
-# from nis import cat
-from ansible.module_utils._text import to_native
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.ilo_redfish_utils import iLORedfishUtils
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
+# Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -20,6 +21,21 @@ author:
     - "Bhavya B (@Bhavya06)"
 '''
 
+EXAMPLES = '''
+  - name: Add iLO User
+    community.general.ilo_redfish_command:
+      category: Accounts
+      command: AddiLOuser
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+  - name: Delete iLO User
+    community.general.ilo_redfish_command:
+      category: Accounts
+      command: DeliLOuser
+'''
+
 ANSIBLE_METADATA = {'status': ['preview'],
                     'supported_by': 'community',
                     'metadata_version': '1.1'}
@@ -30,6 +46,9 @@ CATEGORY_COMMANDS_ALL = {
     "Serverclone": ["LoadUsers"]
 }
 
+from ansible.module_utils._text import to_native
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.ilo_redfish_utils import iLORedfishUtils
 
 def main():
     result = {}
