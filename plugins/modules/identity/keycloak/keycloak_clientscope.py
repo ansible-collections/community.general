@@ -375,10 +375,10 @@ def main():
         before_clientscope = kc.get_clientscope_by_clientscopeid(cid, realm=realm)
 
     if before_clientscope is None:
-        before_clientscope = dict()
+        before_clientscope = {}
 
     # Build a proposed changeset from parameters given to this module
-    changeset = dict()
+    changeset = {}
 
     for clientscope_param in clientscope_params:
         new_param_value = module.params.get(clientscope_param)
@@ -407,7 +407,7 @@ def main():
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
-            result['end_state'] = dict()
+            result['end_state'] = {}
             result['msg'] = 'Clientscope does not exist; doing nothing.'
             module.exit_json(**result)
 
@@ -488,7 +488,7 @@ def main():
             cid = before_clientscope['id']
             kc.delete_clientscope(cid=cid, realm=realm)
 
-            result['end_state'] = dict()
+            result['end_state'] = {}
 
             result['msg'] = "Clientscope {name} has been deleted".format(name=before_clientscope['name'])
 

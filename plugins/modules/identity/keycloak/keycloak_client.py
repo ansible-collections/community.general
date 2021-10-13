@@ -797,10 +797,10 @@ def main():
         before_client = kc.get_client_by_id(cid, realm=realm)
 
     if before_client is None:
-        before_client = dict()
+        before_client = {}
 
     # Build a proposed changeset from parameters given to this module
-    changeset = dict()
+    changeset = {}
 
     for client_param in client_params:
         new_param_value = module.params.get(client_param)
@@ -833,7 +833,7 @@ def main():
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
-            result['end_state'] = dict()
+            result['end_state'] = {}
             result['msg'] = 'Client does not exist; doing nothing.'
             module.exit_json(**result)
 
@@ -899,9 +899,9 @@ def main():
 
             # delete it
             kc.delete_client(cid, realm=realm)
-            result['proposed'] = dict()
+            result['proposed'] = {}
 
-            result['end_state'] = dict()
+            result['end_state'] = {}
 
             result['msg'] = 'Client %s has been deleted.' % before_client['clientId']
 

@@ -824,14 +824,14 @@ def main():
         before_comp = kc.get_component(cid, realm)
 
     if before_comp is None:
-        before_comp = dict()
+        before_comp = {}
 
     # if user federation exists, get associated mappers
     if cid is not None:
         before_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name'))
 
     # Build a proposed changeset from parameters given to this module
-    changeset = dict()
+    changeset = {}
 
     for param in comp_params:
         new_param_value = module.params.get(param)
@@ -850,11 +850,11 @@ def main():
             if change.get('id') is None and change.get('name') is None:
                 module.fail_json(msg='Either `name` or `id` has to be specified on each mapper.')
             if cid is None:
-                old_mapper = dict()
+                old_mapper = {}
             elif change.get('id') is not None:
                 old_mapper = kc.get_component(change['id'], realm)
                 if old_mapper is None:
-                    old_mapper = dict()
+                    old_mapper = {}
             else:
                 found = kc.get_components(urlencode(dict(parent=cid, name=change['name'])), realm)
                 if len(found) > 1:
@@ -862,7 +862,7 @@ def main():
                 if len(found) == 1:
                     old_mapper = found[0]
                 else:
-                    old_mapper = dict()
+                    old_mapper = {}
             new_mapper = old_mapper.copy()
             new_mapper.update(change)
             if new_mapper != old_mapper:
@@ -884,7 +884,7 @@ def main():
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
-            result['end_state'] = dict()
+            result['end_state'] = {}
             result['msg'] = 'User federation does not exist; doing nothing.'
             module.exit_json(**result)
 
@@ -969,7 +969,7 @@ def main():
             # delete it
             kc.delete_component(cid, realm)
 
-            result['end_state'] = dict()
+            result['end_state'] = {}
 
             result['msg'] = "User federation {id} has been deleted".format(id=cid)
 

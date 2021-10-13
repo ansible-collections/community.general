@@ -415,7 +415,7 @@ def get_identity_provider_with_mappers(kc, alias, realm):
     if idp is not None:
         idp['mappers'] = sorted(kc.get_identity_provider_mappers(alias, realm), key=lambda x: x.get('name'))
     if idp is None:
-        idp = dict()
+        idp = {}
     return idp
 
 
@@ -483,7 +483,7 @@ def main():
     before_idp = get_identity_provider_with_mappers(kc, alias, realm)
 
     # Build a proposed changeset from parameters given to this module
-    changeset = dict()
+    changeset = {}
 
     for param in idp_params:
         new_param_value = module.params.get(param)
@@ -519,7 +519,7 @@ def main():
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
-            result['end_state'] = dict()
+            result['end_state'] = {}
             result['msg'] = 'Identity provider does not exist; doing nothing.'
             module.exit_json(**result)
 
@@ -598,7 +598,7 @@ def main():
             # delete it
             kc.delete_identity_provider(alias, realm)
 
-            result['end_state'] = dict()
+            result['end_state'] = {}
 
             result['msg'] = "Identity provider {alias} has been deleted".format(alias=alias)
 

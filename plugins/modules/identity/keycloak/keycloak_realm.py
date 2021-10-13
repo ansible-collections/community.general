@@ -713,10 +713,10 @@ def main():
     before_realm = kc.get_realm_by_id(realm=realm)
 
     if before_realm is None:
-        before_realm = dict()
+        before_realm = {}
 
     # Build a proposed changeset from parameters given to this module
-    changeset = dict()
+    changeset = {}
 
     for realm_param in realm_params:
         new_param_value = module.params.get(realm_param)
@@ -737,7 +737,7 @@ def main():
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
-            result['end_state'] = dict()
+            result['end_state'] = {}
             result['msg'] = 'Realm does not exist, doing nothing.'
             module.exit_json(**result)
 
@@ -807,8 +807,8 @@ def main():
             # delete it
             kc.delete_realm(realm=realm)
 
-            result['proposed'] = dict()
-            result['end_state'] = dict()
+            result['proposed'] = {}
+            result['end_state'] = {}
 
             result['msg'] = 'Realm %s has been deleted.' % before_realm['id']
 

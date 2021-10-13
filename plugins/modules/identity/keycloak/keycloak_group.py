@@ -332,10 +332,10 @@ def main():
         before_group = kc.get_group_by_groupid(gid, realm=realm)
 
     if before_group is None:
-        before_group = dict()
+        before_group = {}
 
     # Build a proposed changeset from parameters given to this module
-    changeset = dict()
+    changeset = {}
 
     for param in group_params:
         new_param_value = module.params.get(param)
@@ -354,7 +354,7 @@ def main():
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
-            result['end_state'] = dict()
+            result['end_state'] = {}
             result['group'] = result['end_state']
             result['msg'] = 'Group does not exist; doing nothing.'
             module.exit_json(**result)
@@ -428,7 +428,7 @@ def main():
             gid = before_group['id']
             kc.delete_group(groupid=gid, realm=realm)
 
-            result['end_state'] = dict()
+            result['end_state'] = {}
             result['group'] = result['end_state']
 
             result['msg'] = "Group {name} has been deleted".format(name=before_group['name'])

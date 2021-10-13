@@ -341,12 +341,12 @@ def main():
         before_clientt = kc.get_client_template_by_id(cid, realm=realm)
 
     if before_clientt is None:
-        before_clientt = dict()
+        before_clientt = {}
 
     result['existing'] = before_clientt
 
     # Build a proposed changeset from parameters given to this module
-    changeset = dict()
+    changeset = {}
 
     for clientt_param in clientt_params:
         # lists in the Keycloak API are sorted
@@ -371,7 +371,7 @@ def main():
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
-            result['end_state'] = dict()
+            result['end_state'] = {}
             result['msg'] = 'Client template does not exist, doing nothing.'
             module.exit_json(**result)
 
@@ -436,9 +436,9 @@ def main():
 
             # delete it
             kc.delete_client_template(cid, realm=realm)
-            result['proposed'] = dict()
+            result['proposed'] = {}
 
-            result['end_state'] = dict()
+            result['end_state'] = {}
 
             result['msg'] = 'Client template %s has been deleted.' % before_clientt['name']
 

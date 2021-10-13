@@ -254,10 +254,10 @@ def main():
         before_role = kc.get_client_role(name, clientid, realm)
 
     if before_role is None:
-        before_role = dict()
+        before_role = {}
 
     # Build a proposed changeset from parameters given to this module
-    changeset = dict()
+    changeset = {}
 
     for param in role_params:
         new_param_value = module.params.get(param)
@@ -279,7 +279,7 @@ def main():
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
-            result['end_state'] = dict()
+            result['end_state'] = {}
             result['msg'] = 'Role does not exist, doing nothing.'
             module.exit_json(**result)
 
@@ -357,7 +357,7 @@ def main():
             else:
                 kc.delete_client_role(name, clientid, realm)
 
-            result['end_state'] = dict()
+            result['end_state'] = {}
 
             result['msg'] = "Role {name} has been deleted".format(name=name)
 

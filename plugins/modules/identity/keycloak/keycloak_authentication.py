@@ -405,7 +405,7 @@ def main():
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
-            result['end_state'] = dict()
+            result['end_state'] = {}
             result['flow'] = result['end_state']
             result['msg'] = new_auth_repr["alias"] + ' absent'
             module.exit_json(**result)
