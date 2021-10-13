@@ -1,0 +1,212 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# TODO: Find out how to setup mssql server for tests
+# For the moment you have to run the tests locally
+# docker run --name mssql-test -e "ACCEPT_EULA=Y" -e 'SA_PASSWORD={{ mssql_login_password }}' -p "{ mssql_port }"0:"{ mssql_port }" -d mcr.microsoft.com/mssql/server:2019-latest
+# ansible-test integration mssql_script  -v --allow-disabled
+
+- name: Check default ports
+  wait_for:
+    host: "{{ mssql_host }}"
+    port: "{{ mssql_port }}"
+    state: started         # Port should be open
+    delay: 0               # No wait before first check (sec)
+    timeout: 3             # Stop checking after timeout (sec)
+
+- name: Check DB connection
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    script: "SELECT 1"
+
+- name: two batches with default output
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    script: |
+      SELECT 'Batch 0 - Select 0'
+      SELECT 'Batch 0 - Select 1'
+      GO
+      SELECT 'Batch 1 - Select 0'
+  register: result_batches
+# "result_batches.query_results": 
+# [ # batches
+#     [ # selects
+#         [ # Rows
+#             [ # Columns
+#                 "Batch 1 - Select 1"
+#             ]
+#         ],
+#         [
+#             [
+#                 "Batch 1 - Select 2"
+#             ]
+#         ]
+#     ],
+#     [
+#         [
+#             [
+#                 "Batch 2 - Select 1"
+#             ]
+#         ]
+#     ]
+# ]
+- assert:
+    that:
+      - result_batches.query_results | length == 2 # two batch results
+      - result_batches.query_results[0] | length == 2 # two selects in first batch
+      - result_batches.query_results[0][0] | length == 1 # one row in first select
+      - result_batches.query_results[0][0][0] | length == 1 # one column in first row
+      - result_batches.query_results[0][0][0][0] == 'Batch 0 - Select 0' # first column of first row
+
+
+- name: two batches with dict output
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    output: dict
+    script: |
+      SELECT 'Batch 0 - Select 0' as b0s0
+      SELECT 'Batch 0 - Select 1' as b0s1
+      GO
+      SELECT 'Batch 1 - Select 0' as b1s0
+  register: result_batches_dict
+# "result_batches_dict.query_results":
+# [ # batches
+#     [  # selects
+#         [ # Rows
+#             { # dict columns
+#                 "b0s0": "Batch 0 - Select 0"
+#             }
+#         ],
+#         [
+#             {
+#                 "b0s1": "Batch 0 - Select 1"
+#             }
+#         ]
+#     ],
+#     [
+#         [
+#             {
+#                 "b1s0": "Batch 1 - Select 0"
+#             }
+#         ]
+#     ]
+# ]
+- assert:
+    that:
+      - result_batches_dict.query_results | length == 2 # two batch results
+      - result_batches_dict.query_results[0] | length == 2 # two selects in first batch
+      - result_batches_dict.query_results[0][0] | length == 1 # one row in first select
+      - result_batches_dict.query_results[0][0][0]['b0s0'] == 'Batch 0 - Select 0' # column 'b0s0' of first row
+
+
+
+- name: Stored procedure may return multiple result sets
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    script: sp_spaceused
+    output: dict
+  register: result_spaceused
+- assert:
+    that:
+      - result_spaceused.query_results | length == 1 # one batch
+      - result_spaceused.query_results[0] | length == 2 # stored procedure returns two result sets
+      - result_spaceused.query_results[0][0][0]['database_name'] == 'master' # output dict
+
+- name: Ensure that passed 'db' is used
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    script: exec sp_spaceused
+    output: dict
+    db: msdb
+  register: result_db
+- assert:
+    that:
+      - result_db.query_results[0][0][0]['database_name'] == 'msdb'
+
+- name: pass params to query
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    script: |
+      SELECT name, state_desc FROM sys.databases WHERE name = %(dbname)s
+    params:
+      dbname: msdb
+  register: result_params
+- assert:
+    that:
+      - result_params.query_results[0][0][0][0] == 'msdb'
+      - result_params.query_results[0][0][0][1] == 'ONLINE'
+
+- name: check_mode connects but does not run the query
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    script: SELECT Invalid_Column FROM Does_Not_Exist WITH Invalid Syntax
+  check_mode: yes
+  register: check_mode
+- assert:
+    that: check_mode.query_results is undefined
+
+# # Known issue 1: Value of unknown type: <class 'uuid.UUID'>
+# - name: "TODO: Fix error: TypeError: Value of unknown type: <class 'uuid.UUID'>"
+#   community.general.mssql_script:
+#     login_user: "{{ mssql_login_user }}"
+#     login_password: "{{ mssql_login_password }}"
+#     login_host: "{{ mssql_host }}"
+#     login_port: "{{ mssql_port }}"
+#     script: |
+#       SELECT service_broker_guid FROM sys.databases
+# Guids are returned as type uuid.UUID. Ansible fails during result cleanup:
+#   File "../ansible_collections/community/general/plugins/modules/mssql_script.py", line 202, in <module>
+#   File "../ansible_collections/community/general/plugins/modules/mssql_script.py", line 198, in main
+#   File "../ansible_collections/community/general/plugins/modules/mssql_script.py", line 194, in run_module
+#   File "../ansible/module_utils/basic.py", line 1497, in exit_json
+#   File "../ansible/module_utils/basic.py", line 1490, in _return_formatted
+#   File "../ansible/module_utils/common/parameters.py", line 893, in remove_values
+#   File "../ansible/module_utils/common/parameters.py", line 461, in _remove_values_conditions
+# TypeError: Value of unknown type: <class 'uuid.UUID'>, 00000000-0000-0000-0000-000000000000
+
+# # Known issue 2: empty result set breaks return values
+# - name: empty result set
+#   community.general.mssql_script:
+#     login_user: "{{ mssql_login_user }}"
+#     login_password: "{{ mssql_login_password }}"
+#     login_host: "{{ mssql_host }}"
+#     login_port: "{{ mssql_port }}"
+#     script: |
+#       SELECT name, state_desc FROM sys.databases WHERE name = %(dbname)s
+#       SELECT name, state_desc FROM sys.databases WHERE name = 'DoesNotexist'
+#       SELECT name, state_desc FROM sys.databases WHERE name = %(dbname)s
+#     params:
+#       dbname: msdb
+#   register: empty_result
+# - debug:
+#     var: empty_result
+# - assert:
+#     that:
+#       - empty_result.query_results[0] | length == 3 # == 1 ; issue: only first result is returned
+#       - empty_result.query_results[0][0][0][0] == 'msdb'
+#       - empty_result.query_results[0][1] | length == 0
+#       - empty_result.query_results[0][2][0][0] == 'msdb'
+      
