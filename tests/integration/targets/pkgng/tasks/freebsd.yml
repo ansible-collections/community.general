@@ -471,7 +471,7 @@
       # Invalid strings should not change anything
       - '(pkgng_example8_invalid_annotation_failure.results | selectattr("changed") | list | count) == 0'
       # Invalid strings should always fail
-      - '(pkgng_example8_invalid_annotation_failure.results | selectattr("failed", "false") | list | count) == 0'
+      - '(pkgng_example8_invalid_annotation_failure.results | rejectattr("failed") | list | count) == 0'
       # Invalid strings should not cause an exception
       - '(pkgng_example8_invalid_annotation_failure.results | selectattr("exception", "defined") | list | count) == 0'
       # Verify annotations are unaffected
