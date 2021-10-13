@@ -178,11 +178,63 @@ flow:
       - B(DEPRECATED) - Please use C(end_state) instead.
     returned: on success
     type: dict
+    sample: {
+      "alias": "Copy of first broker login",
+      "authenticationExecutions": [
+        {
+          "alias": "review profile config",
+          "authenticationConfig": {
+            "alias": "review profile config",
+            "config": { "update.profile.on.first.login": "missing" },
+            "id": "6f09e4fb-aad4-496a-b873-7fa9779df6d7"
+          },
+          "configurable": true,
+          "displayName": "Review Profile",
+          "id": "8f77dab8-2008-416f-989e-88b09ccf0b4c",
+          "index": 0,
+          "level": 0,
+          "providerId": "idp-review-profile",
+          "requirement": "REQUIRED",
+          "requirementChoices": [ "REQUIRED", "ALTERNATIVE", "DISABLED" ]
+        }
+      ],
+      "builtIn": false,
+      "description": "Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account",
+      "id": "bc228863-5887-4297-b898-4d988f8eaa5c",
+      "providerId": "basic-flow",
+      "topLevel": true
+    }
 
 end_state:
     description: Representation of the authentication after module execution.
     returned: on success
     type: dict
+    sample: {
+      "alias": "Copy of first broker login",
+      "authenticationExecutions": [
+        {
+          "alias": "review profile config",
+          "authenticationConfig": {
+            "alias": "review profile config",
+            "config": { "update.profile.on.first.login": "missing" },
+            "id": "6f09e4fb-aad4-496a-b873-7fa9779df6d7"
+          },
+          "configurable": true,
+          "displayName": "Review Profile",
+          "id": "8f77dab8-2008-416f-989e-88b09ccf0b4c",
+          "index": 0,
+          "level": 0,
+          "providerId": "idp-review-profile",
+          "requirement": "REQUIRED",
+          "requirementChoices": [ "REQUIRED", "ALTERNATIVE", "DISABLED" ]
+        }
+      ],
+      "builtIn": false,
+      "description": "Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account",
+      "id": "bc228863-5887-4297-b898-4d988f8eaa5c",
+      "providerId": "basic-flow",
+      "topLevel": true
+    }
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak \
