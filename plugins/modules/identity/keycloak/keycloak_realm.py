@@ -811,7 +811,6 @@ def main():
             result['end_state'] = dict()
 
             result['msg'] = 'Realm %s has been deleted.' % before_realm['id']
-            module.exit_json(**result)
 
     module.exit_json(**result)
 

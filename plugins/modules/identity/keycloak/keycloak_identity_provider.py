@@ -601,7 +601,6 @@ def main():
             result['end_state'] = dict()
 
             result['msg'] = "Identity provider {alias} has been deleted".format(alias=alias)
-            module.exit_json(**result)
 
     module.exit_json(**result)
 

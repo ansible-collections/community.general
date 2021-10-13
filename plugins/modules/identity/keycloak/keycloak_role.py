@@ -360,7 +360,6 @@ def main():
             result['end_state'] = dict()
 
             result['msg'] = "Role {name} has been deleted".format(name=name)
-            module.exit_json(**result)
 
     module.exit_json(**result)
 

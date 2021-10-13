@@ -491,7 +491,6 @@ def main():
             result['end_state'] = dict()
 
             result['msg'] = "Clientscope {name} has been deleted".format(name=before_clientscope['name'])
-            module.exit_json(**result)
 
     module.exit_json(**result)
 

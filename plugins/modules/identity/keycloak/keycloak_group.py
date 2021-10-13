@@ -432,7 +432,6 @@ def main():
             result['group'] = result['end_state']
 
             result['msg'] = "Group {name} has been deleted".format(name=before_group['name'])
-            module.exit_json(**result)
 
     module.exit_json(**result)
 

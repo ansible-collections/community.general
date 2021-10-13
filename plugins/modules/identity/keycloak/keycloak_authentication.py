@@ -442,7 +442,6 @@ def main():
 
             result['msg'] = 'Authentication flow: {alias} id: {id} is deleted'.format(alias=new_auth_repr['alias'],
                                                                                       id=auth_repr["id"])
-            module.exit_json(**result)
 
     module.exit_json(**result)
 

@@ -904,7 +904,6 @@ def main():
             result['end_state'] = dict()
 
             result['msg'] = 'Client %s has been deleted.' % before_client['clientId']
-            module.exit_json(**result)
 
     module.exit_json(**result)
 

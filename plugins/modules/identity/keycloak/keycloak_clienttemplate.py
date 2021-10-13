@@ -441,7 +441,6 @@ def main():
             result['end_state'] = dict()
 
             result['msg'] = 'Client template %s has been deleted.' % before_clientt['name']
-            module.exit_json(**result)
 
     module.exit_json(**result)
 

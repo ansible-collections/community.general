@@ -972,7 +972,6 @@ def main():
             result['end_state'] = dict()
 
             result['msg'] = "User federation {id} has been deleted".format(id=cid)
-            module.exit_json(**result)
 
     module.exit_json(**result)
 
