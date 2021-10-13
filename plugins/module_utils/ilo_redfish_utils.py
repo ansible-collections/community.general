@@ -6,8 +6,9 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from ansible.module_utils.redfish_utils import RedfishUtils
+from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
 import json
+
 
 class iLORedfishUtils(RedfishUtils):
 
@@ -236,7 +237,7 @@ class iLORedfishUtils(RedfishUtils):
             response = self.DeleteAllUsers(id)
             if(response['ret'] is False):
                 return response
-            #print("Delete users")
+            # print("Delete users")
 
         fileob = open("/Github/ansible-ilorest-role/ansibleredfish_playbooks/User/acc_details.json", "r")
         response = json.load(fileob)

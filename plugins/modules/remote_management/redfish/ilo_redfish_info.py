@@ -57,6 +57,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
 
+
 def main():
     result = {}
     category_list = []
