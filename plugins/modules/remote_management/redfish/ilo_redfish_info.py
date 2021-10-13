@@ -1,14 +1,15 @@
 from __future__ import absolute_import, division, print_function
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
-from ansible.module_utils.iLO_redfish_utils import iLORedfishUtils
+from ansible.module_utils.ilo_redfish_utils import iLORedfishUtils
 
 __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
 module: iLO Redfish Info
-short_description: Builds Redfish URIs locally and sends them to remote OOB controllers to get information back. For use with HPE iLO operations that require Redfish OEM extensions.
+short_description: Builds Redfish URIs locally and sends them to remote OOB controllers to get information back.
+                For use with HPE iLO operations that require Redfish OEM extensions.
 description:
     - "Provides an interface to get information back"
 requirements:

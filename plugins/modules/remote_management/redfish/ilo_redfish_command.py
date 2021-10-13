@@ -2,14 +2,15 @@ from __future__ import absolute_import, division, print_function
 # from nis import cat
 from ansible.module_utils._text import to_native
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.iLO_redfish_utils import iLORedfishUtils
+from ansible.module_utils.ilo_redfish_utils import iLORedfishUtils
 
 __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
 module: iLO Redfish Command
-short_description: Builds Redfish URIs locally and sends them to remote OOB controllers to perform an action. For use with HPE iLO operations that require Redfish OEM extensions.
+short_description: Builds Redfish URIs locally and sends them to remote OOB controllers to perform an action.
+                    For use with HPE iLO operations that require Redfish OEM extensions.
 description:
     - "Provides an interface to perform an action."
 requirements:
@@ -119,7 +120,7 @@ def main():
         del result['ret']
         changed = result.get('changed', True)
         module.exit_json(
-            changed=changed, msg=command+' was successful', result=to_native(result), session=session_id, payload=result.get("response"))
+            changed=changed, msg=command + ' was successful', result=to_native(result), session=session_id, payload=result.get("response"))
 
     else:
         module.fail_json(msg=to_native(result))
