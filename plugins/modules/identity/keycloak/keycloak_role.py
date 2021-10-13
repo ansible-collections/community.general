@@ -273,7 +273,7 @@ def main():
     result['existing'] = before_role
 
     # Cater for when it doesn't exist (an empty dict)
-    if before_role == dict():
+    if not before_role:
         if state == 'absent':
             # Do nothing and exit
             if module._diff:

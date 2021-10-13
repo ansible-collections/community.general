@@ -365,7 +365,7 @@ def main():
     result['proposed'] = changeset
 
     # Cater for when it doesn't exist (an empty dict)
-    if before_clientt == dict():
+    if not before_clientt:
         if state == 'absent':
             # Do nothing and exit
             if module._diff:

@@ -878,7 +878,7 @@ def main():
     result['existing'] = sanitize(before_comp)
 
     # Cater for when it doesn't exist (an empty dict)
-    if before_comp == dict():
+    if not before_comp:
         if state == 'absent':
             # Do nothing and exit
             if module._diff:

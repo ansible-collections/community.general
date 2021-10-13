@@ -347,7 +347,7 @@ def main():
     auth_repr = kc.get_authentication_flow_by_alias(alias=new_auth_repr["alias"], realm=realm)
 
     # Cater for when it doesn't exist (an empty dict)
-    if auth_repr == dict():
+    if not auth_repr:
         if state == 'absent':
             # Do nothing and exit
             if module._diff:

@@ -348,7 +348,7 @@ def main():
     desired_group.update(changeset)
 
     # Cater for when it doesn't exist (an empty dict)
-    if before_group == dict():
+    if not before_group:
         if state == 'absent':
             # Do nothing and exit
             if module._diff:

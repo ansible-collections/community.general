@@ -827,7 +827,7 @@ def main():
     result['existing'] = sanitize_cr(before_client)
 
     # Cater for when it doesn't exist (an empty dict)
-    if before_client == dict():
+    if not before_client:
         if state == 'absent':
             # Do nothing and exit
             if module._diff:

@@ -513,7 +513,7 @@ def main():
     result['existing'] = sanitize(before_idp)
 
     # Cater for when it doesn't exist (an empty dict)
-    if before_idp == dict():
+    if not before_idp:
         if state == 'absent':
             # Do nothing and exit
             if module._diff:

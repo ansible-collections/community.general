@@ -401,7 +401,7 @@ def main():
     desired_clientscope.update(changeset)
 
     # Cater for when it doesn't exist (an empty dict)
-    if before_clientscope == dict():
+    if not before_clientscope:
         if state == 'absent':
             # Do nothing and exit
             if module._diff:
