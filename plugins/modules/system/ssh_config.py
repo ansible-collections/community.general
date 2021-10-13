@@ -80,7 +80,7 @@ options:
     description:
       - Sets the C(ForwardAgent) option.
     type: bool
-    version_added: 3.8.0
+    version_added: 4.0.0
   ssh_config_file:
     description:
       - SSH config file.
