@@ -468,7 +468,7 @@ def main():
     # in /usr/local/etc/pkg/repos
     repo_flag_not_supported = pkgng_older_than(module, pkgng_path, [1, 1, 4])
 
-    def run_pkgng(action, pkgsite=None, *args, **kwargs):
+    def run_pkgng(action, *args, **kwargs):
         cmd = [pkgng_path, dir_arg, action]
 
         pkgng_env = {'BATCH': 'yes'}
@@ -476,11 +476,11 @@ def main():
         if p["ignore_osver"]:
             pkgng_env['IGNORE_OSVERSION'] = 'yes'
 
-        if pkgsite is not None and action in ('update', 'install', 'upgrade',):
+        if p['pkgsite'] is not None and action in ('update', 'install', 'upgrade',):
             if repo_flag_not_supported:
-                pkgng_env['PACKAGESITE'] = pkgsite
+                pkgng_env['PACKAGESITE'] = p['pkgsite']
             else:
-                cmd.append('--repository=%s' % (pkgsite,))
+                cmd.append('--repository=%s' % (p['pkgsite'],))
 
         # If environ_update is specified to be "passed through"
         # to module.run_command, then merge its values into pkgng_env
