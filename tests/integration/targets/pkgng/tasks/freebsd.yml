@@ -439,12 +439,12 @@
   assert:
     that:
       - pkgng_example9_add_annotation.changed
-      - '(pkgng_example9_add_annotation_verify.stdout_lines | select("match",  "ansibletest_example9_[12]\s*:\s*added") | count) == 2'
+      - '(pkgng_example9_add_annotation_verify.stdout_lines | select("match",  "ansibletest_example9_[12]\s*:\s*added") | list | count) == 2'
       - pkgng_example9_multiple_annotation.changed
-      - '(pkgng_example9_multiple_annotation_verify.stdout_lines | select("match",  "ansibletest_example9_1\s*:\s*modified") | count) == 1'
-      - '(pkgng_example9_multiple_annotation_verify.stdout_lines | select("match",  "ansibletest_example9_[23]\s*:\s*added") | count) == 2'
+      - '(pkgng_example9_multiple_annotation_verify.stdout_lines | select("match",  "ansibletest_example9_1\s*:\s*modified") | list | count) == 1'
+      - '(pkgng_example9_multiple_annotation_verify.stdout_lines | select("match",  "ansibletest_example9_[23]\s*:\s*added") | list | count) == 2'
       - pkgng_example9_add_annotation_old.changed
-      - '(pkgng_example9_add_annotation_old_verify.stdout_lines | select("match",  "ansibletest_example9_[45]\s*:\s*added") | count) == 2'
+      - '(pkgng_example9_add_annotation_old_verify.stdout_lines | select("match",  "ansibletest_example9_[45]\s*:\s*added") | list | count) == 2'
 
 ##
 ## pkgng - example - invalid annotation strings
@@ -469,13 +469,13 @@
   assert:
     that:
       # Invalid strings should not change anything
-      - '(pkgng_example8_invalid_annotation_failure.results | selectattr("changed") | count) == 0'
+      - '(pkgng_example8_invalid_annotation_failure.results | selectattr("changed") | list | count) == 0'
       # Invalid strings should always fail
-      - '(pkgng_example8_invalid_annotation_failure.results | selectattr("failed", "false") | count) == 0'
+      - '(pkgng_example8_invalid_annotation_failure.results | selectattr("failed", "false") | list | count) == 0'
       # Invalid strings should not cause an exception
-      - '(pkgng_example8_invalid_annotation_failure.results | selectattr("exception", "defined") | count) == 0'
+      - '(pkgng_example8_invalid_annotation_failure.results | selectattr("exception", "defined") | list | count) == 0'
       # Verify annotations are unaffected
-      - '(pkgng_example8_invalid_annotation_verify.stdout_lines | select("search",  "(naked_string|invalid_operation|empty_first_tag|validsecond|notag)") | count) == 0'
+      - '(pkgng_example8_invalid_annotation_verify.stdout_lines | select("search",  "(naked_string|invalid_operation|empty_first_tag|validsecond|notag)") | list | count) == 0'
 
 ##
 ## pkgng - example - Install single package in jail
