@@ -21,20 +21,18 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Restart system power gracefully
-    community.general.redfish_command:
+  - name: Load Bios Config
+    community.general.ilo_redfish_config:
       category: Systems
-      command: PowerGracefulRestart
-      resource_id: 437XR1138R2
+      command: LoadBIOSConfig
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
 
-  - name: Turn system power off
-    community.general.redfish_command:
-      category: Systems
-      command: PowerForceOff
-      resource_id: 437XR1138R2
+  - name: Set Time Zone
+    community.general.ilo_redfish_config:
+      category: Manager
+      command: SetTimeZone
 '''
 
 ANSIBLE_METADATA = {'status': ['preview'],
@@ -50,7 +48,7 @@ CATEGORY_COMMANDS_ALL = {
 
 from ansible.module_utils._text import to_native
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.ilo_redfish_utils import iLORedfishUtils
+from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
 
 def main():
     result = {}

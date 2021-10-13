@@ -237,7 +237,7 @@ class iLORedfishUtils(RedfishUtils):
             response = self.DeleteAllUsers(id)
             if(response['ret'] is False):
                 return response
-            print("Delete users")
+            #print("Delete users")
 
         fileob = open("/Github/ansible-ilorest-role/ansibleredfish_playbooks/User/acc_details.json", "r")
         response = json.load(fileob)
