@@ -478,6 +478,24 @@
       - '(pkgng_example8_invalid_annotation_verify.stdout_lines | select("search",  "(naked_string|invalid_operation|empty_first_tag|validsecond|notag)") | list | count) == 0'
 
 ##
+## pkgng - example - pkgsite=...
+##
+# NOTE: testing for failure here to not have to set up our own
+#       or depend on a third-party, alternate package repo
+- name: Should fail with invalid pkgsite
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    pkgsite: DoesNotExist
+  ignore_errors: yes
+  register: pkgng_example10_invalid_pkgsite_failure
+
+- name: Ensure invalid pkgsite fails as expected
+  assert:
+    that:
+      - pkgng_example10_invalid_pkgsite_failure.failed
+      - 'pkgng_example10_invalid_pkgsite_failure.stdout is search("^No repositories are enabled.", multiline=True)'
+
+##
 ## pkgng - example - Install single package in jail
 ##
 - name: Test within jail
