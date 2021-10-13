@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
