@@ -1,5 +1,13 @@
 ---
 ##
+## pkgng - prepare test environment
+##
+- name: Remove test package
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    state: absent
+
+##
 ## pkgng - example - state=present for single package
 ##
 - name: Verify package sentinel file is not present
