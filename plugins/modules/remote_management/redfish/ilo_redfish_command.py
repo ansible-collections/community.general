@@ -42,8 +42,7 @@ ANSIBLE_METADATA = {'status': ['preview'],
 
 CATEGORY_COMMANDS_ALL = {
     "Authorization": ["Login", "Logout"],
-    "Accounts": ["AddiLOuser", "DeliLOuser", "UpdateiLOpassword", "UpdateiLOUserRole"],
-    "Serverclone": ["LoadUsers"]
+    "Accounts": ["AddiLOuser", "DeliLOuser", "UpdateiLOpassword", "UpdateiLOUserRole"]
 }
 
 from ansible.module_utils._text import to_native
@@ -126,15 +125,6 @@ def main():
             elif command == "UpdateiLOUserRole":
                 user['username'] = loginname
                 result = rf_utils.UpdateiLOUserRole(user)
-
-    elif category == "Serverclone":
-        for command in command_list:
-            if command == "LoadUsers":
-                result = rf_utils._find_accountservice_resource(session_id)
-                if result['ret'] is False:
-                    module.fail_json(msg=to_native(result['msg']))
-                result = rf_utils.loadaccounts(
-                    module.params['keepexisting'], module.params['defaultpass'], session_id)
 
     if result['ret'] is True:
         del result['ret']

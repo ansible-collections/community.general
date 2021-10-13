@@ -46,8 +46,6 @@ ANSIBLE_METADATA = {'status': ['preview'],
 
 CATEGORY_COMMANDS_ALL = {
     "Accounts": ["ListiLOUsers"],
-    "Serverclone": ["SaveUsers", "SaveEthernetInterface", "SaveSmartStorage"],
-    "Systems": ["SaveBIOSConfig"],
     "Sessions": ["GetiLOSessions"]
 }
 
@@ -131,35 +129,6 @@ def main():
             if command == "ListiLOUsers":
                 result = rf_utils.list_iLOusers()
                 result['id'] = session_id
-
-    elif category == "Serverclone":
-        for command in command_list:
-            if command == "SaveUsers":
-                resource = rf_utils._find_accountservice_resource(session_id)
-                if resource['ret'] is False:
-                    module.fail_json(msg=resource['msg'])
-                result = rf_utils.accountSave(session_id)
-
-            elif command == "SaveEthernetInterface":
-                resource = rf_utils._find_managers_resource(session_id)
-                if(resource['ret'] is False):
-                    module.fail_json(msg=to_native(resource['msg']))
-                result = rf_utils.ethernetInterfaceSave(session_id)
-
-            elif command == "SaveSmartStorage":
-                resource = rf_utils._find_systems_resource(session_id)
-                if resource['ret'] is False:
-                    module.fail_json(msg=resource['msg'])
-                result = rf_utils.SmartStorageSave(session_id)
-
-    elif category == "Systems":
-        resource = rf_utils._find_systems_resource(session_id)
-        if resource['ret'] is False:
-            module.fail_json(msg=resource['msg'])
-
-        for command in command_list:
-            if command == "SaveBIOSConfig":
-                result = rf_utils.save_biosconfig(session_id)
 
     elif category == "Sessions":
         for command in command_list:

@@ -21,18 +21,24 @@ author:
 '''
 
 EXAMPLES = '''
-  - name: Load Bios Config
+  - name: Disable WINS Registration
     community.general.ilo_redfish_config:
-      category: Systems
-      command: LoadBIOSConfig
+      category: Manager
+      command: SetWINSReg
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+      attribute_name: "{{ attribute_name }}"
 
   - name: Set Time Zone
     community.general.ilo_redfish_config:
       category: Manager
       command: SetTimeZone
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      attribute_name: TimeZone
+      attribute_value: "{{ attribute_value }}"
 '''
 
 ANSIBLE_METADATA = {'status': ['preview'],
@@ -41,9 +47,7 @@ ANSIBLE_METADATA = {'status': ['preview'],
 
 
 CATEGORY_COMMANDS_ALL = {
-    "Systems": ["LoadBIOSConfig"],
-    "Manager": ["SetVLANAttr", "SetTimeZone", "SetDNSserver", "SetDomainName", "SetNTPServers", "SetWINSReg", "ConfigureHostName"],
-    "Serverclone": ["LoadEthernetInterface"]
+    "Manager": ["SetTimeZone", "SetDNSserver", "SetDomainName", "SetNTPServers", "SetWINSReg", "ConfigureHostName"]
 }
 
 from ansible.module_utils._text import to_native
@@ -118,26 +122,6 @@ def main():
                 result = rf_utils.set_WINSRegistration(mgr_attributes)
             elif command == "ConfigureHostName":
                 result = rf_utils.set_HostName(mgr_attributes)
-
-    elif category == "Systems":
-        resource = rf_utils._find_systems_resource(session_id)
-        if resource['ret'] is False:
-            module.fail_json(msg=resource['msg'])
-
-        for command in command_list:
-            if command == "LoadBIOSConfig":
-                result = rf_utils.load_biosconfig(session_id)
-
-    elif category == "Serverclone":
-        for command in command_list:
-            if command == "LoadEthernetInterface":
-                resource = rf_utils._find_managers_resource(session_id)
-                if(resource['ret'] is False):
-                    module.fail_json(msg=to_native(resource['msg']))
-                result = rf_utils.ethernetInterfaceLoad(session_id)
-
-            elif command == "LoadSmartStorage":
-                result = rf_utils.SmartStorageLoad(session_id)
 
     if result['ret'] is True:
         module.exit_json(changed=result['changed'],
