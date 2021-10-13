@@ -468,7 +468,7 @@ def main():
     # in /usr/local/etc/pkg/repos
     repo_flag_not_supported = pkgng_older_than(module, pkgng_path, [1, 1, 4])
 
-    def run_pkgng(action, *args, pkgsite=None, **kwargs):
+    def run_pkgng(action, pkgsite=None, *args, **kwargs):
         cmd = [pkgng_path, dir_arg, action]
 
         pkgng_env = {'BATCH': 'yes'}
