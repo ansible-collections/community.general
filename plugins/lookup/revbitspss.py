@@ -3,32 +3,31 @@
 # GNU General Public License v3.0+ (see COPYING or
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import absolute_import, division, print_function
-from ansible.plugins.lookup import LookupBase
-from ansible.utils.display import Display
-from ansible.errors import AnsibleError, AnsibleOptionsError
-from ansible.module_utils.six import raise_from
 
 __metaclass__ = type
 
 DOCUMENTATION = r"""
 name: revbitspss
-author: RevBits (@info) <info@revbits.com>
+author: RevBits (@RevBits) <info@revbits.com>
 short_description: Get secrets from RevBits PAM server
 version_added: 3.8.0
 description:
-    - Uses the revbits-ansible Python SDK to get Secrets from RevBits PAM
+    - Uses the revbits_ansible Python SDK to get Secrets from RevBits PAM
       Server using API key authentication with the REST API.
 requirements:
-    - revbits-ansible - U(https://pypi.org/project/revbits_ansible/)
+    - revbits_ansible - U(https://pypi.org/project/revbits_ansible/)
 options:
-    _terms:
+    secret_ids:
         description:
-            - This will be an array. First index will contain another array of keys for secrets which you want to fetch from RevBits PAM.
-            - At second index you need to pass the base URL of the server, for example C(https://pam.revbits.net).
-            - At third index you need to place API key for authentication. You can get from RevBits PAM secret manager module.
-        ini:
-            - section: revbitspss_lookup
-              key: _terms
+            - This will be an array of keys for secrets which you want to fetch from RevBits PAM.
+        required: true
+    base_url:
+        description:
+            - This will be the base URL of the server, for example C(https://pam.revbits.net).
+        required: true
+    api_key:
+        description:
+            - This will be the API key for authentication. You can get from RevBits PAM secret manager module.
         required: true
 """
 
@@ -48,16 +47,21 @@ EXAMPLES = r"""
         {{
             lookup(
                 'community.general.revbitspss',
-                 ['UUIDPAM','DB_PASS','DB_USER'],
-                 'https://pam.revbits.net',
-                 'API_KEY_GOES_HERE'
+                 secret_ids=['UUIDPAM', 'DB_PASS', ...],
+                 base_url='https://pam.revbits.net',
+                 api_key='API_KEY_GOES_HERE'
             )
         }}
   tasks:
       - ansible.builtin.debug:
           msg: >
-            UUIDPAM is {{ (secret['UUIDPAM']) }} and DB_PASS is {{ (secret['DB_PASS']) }} and DB_USER is {{ (secret['DB_USER']) }}
+            UUIDPAM is {{ (secret['UUIDPAM']) }} and DB_PASS is {{ (secret['DB_PASS']) }}
 """
+
+from ansible.plugins.lookup import LookupBase
+from ansible.utils.display import Display
+from ansible.errors import AnsibleError, AnsibleOptionsError
+from ansible.module_utils.six import raise_from
 
 try:
     from pam.revbits_ansible.server import SecretServer, SecretServerError
@@ -85,12 +89,12 @@ class LookupModule(LookupBase):
         self.set_options(var_options=variables, direct=kwargs)
         secret_server = LookupModule.Client(
             {
-                "base_url": terms[1],
-                "api_key": terms[2],
+                "base_url": self.get_option('base_url'),
+                "api_key": self.get_option('api_key'),
             }
         )
         result = []
-        for term in terms[0]:
+        for term in self.get_option('secret_ids'):
             display.debug("revbitspss_lookup term: %s" % term)
             try:
                 display.vvv(u"Secret Server lookup of Secret with ID %s" % term)
