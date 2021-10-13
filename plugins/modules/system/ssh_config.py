@@ -209,7 +209,7 @@ class SSHConfig():
             forward_agent=self.params.get('forward_agent'),
         )
 
-        # Convert 'true' / 'false' to 'yes' / 'no' for usage in ssh_config
+        # Convert True / False to 'yes' / 'no' for usage in ssh_config
         if args['forward_agent'] is True:
             args['forward_agent'] = 'yes'
         if args['forward_agent'] is False:
