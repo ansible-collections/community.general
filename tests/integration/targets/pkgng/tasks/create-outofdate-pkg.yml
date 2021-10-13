@@ -23,10 +23,24 @@
       - '{{ pkgng_test_outofdate_pkg_tempdir.path }}/MANIFEST'
     warn: no
 
+# pkg switched from .txz to .pkg in version 1.17.0
+# Might as well look for all valid pkg extensions.
+- name: Find created package file
+  find:
+    path: '{{ pkgng_test_outofdate_pkg_tempdir.path }}'
+    use_regex: yes
+    pattern: '.*\.(pkg|tzst|t[xbg]z|tar)'
+  register: pkgng_test_outofdate_pkg_tempfile
+
+- name: There should be only one package
+  assert:
+    that:
+      - pkgng_test_outofdate_pkg_tempfile.files | count == 1
+
 - name: Copy the created package file to the expected location
   copy:
     remote_src: yes
-    src: '{{ pkgng_test_outofdate_pkg_tempdir.path }}/{{ pkgng_test_pkg_name }}-0.pkg'
+    src: '{{ pkgng_test_outofdate_pkg_tempfile.files[0].path }}'
     dest: '{{ pkgng_test_outofdate_pkg_path }}'
 
 - name: Remove temporary directory
