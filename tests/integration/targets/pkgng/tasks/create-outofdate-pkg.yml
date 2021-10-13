@@ -16,8 +16,8 @@
         path: '{{ pkgng_test_outofdate_pkg_tempdir }}'
 
     - name: Copy intentionally out-of-date package manifests to testhost
-      copy:
-        src: zsh_test_package_manifests/{{ item }}
+      template:
+        src: test_package_manifests/{{ item }}.json.j2
         # Plus-sign must be added at the destination
         # CI doesn't like files with '+' in them in the repository
         dest: '{{ pkgng_test_outofdate_pkg_tempdir }}/+{{ item }}'
