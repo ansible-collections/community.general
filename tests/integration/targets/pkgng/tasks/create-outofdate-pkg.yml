@@ -1,34 +1,35 @@
 ---
-- name: Check if out-of-date test package has already been created
-  stat:
-    path: '{{ pkgng_test_outofdate_pkg_path }}'
-  register: pkgng_test_outofdate_pkg_stat
+- name: Create temporary directory for package creation
+  tempfile:
+    state: directory
+  register: pkgng_test_outofdate_pkg_tempdir
 
-- name: Create out-of-date test package
-  when: not pkgng_test_outofdate_pkg_stat.stat.exists
-  block:
-    - set_fact:
-        pkgng_test_outofdate_pkg_tempdir: '{{ pkgng_test_outofdate_pkg_path }}__tempdir'
+- name: Copy intentionally out-of-date package manifest to testhost
+  template:
+    src: MANIFEST.json.j2
+    # Plus-sign must be added at the destination
+    # CI doesn't like files with '+' in them in the repository
+    dest: '{{ pkgng_test_outofdate_pkg_tempdir.path }}/MANIFEST'
 
-    - name: Create temporary directory to assemble test package
-      file:
-        state: directory
-        path: '{{ pkgng_test_outofdate_pkg_tempdir }}'
+- name: Create out-of-date test package file
+  command:
+    argv:
+      - pkg
+      - create
+      - '--verbose'
+      - '--out-dir'
+      - '{{ pkgng_test_outofdate_pkg_tempdir.path }}'
+      - '--manifest'
+      - '{{ pkgng_test_outofdate_pkg_tempdir.path }}/MANIFEST'
+    warn: no
 
-    - name: Copy intentionally out-of-date package manifests to testhost
-      template:
-        src: test_package_manifests/{{ item }}.json.j2
-        # Plus-sign must be added at the destination
-        # CI doesn't like files with '+' in them in the repository
-        dest: '{{ pkgng_test_outofdate_pkg_tempdir }}/+{{ item }}'
-      loop:
-        - COMPACT_MANIFEST
-        - MANIFEST
+- name: Copy the created package file to the expected location
+  copy:
+    remote_src: yes
+    src: '{{ pkgng_test_outofdate_pkg_tempdir.path }}/{{ pkgng_test_pkg_name }}-0.pkg'
+    dest: '{{ pkgng_test_outofdate_pkg_path }}'
 
-    - name: Create out-of-date test package file
-      command: 'tar -C {{ pkgng_test_outofdate_pkg_tempdir }} -cJf {{ pkgng_test_outofdate_pkg_path }} +COMPACT_MANIFEST +MANIFEST'
-
-    - name: Remove temporary directory
-      file:
-        state: absent
-        path: '{{ pkgng_test_outofdate_pkg_tempdir }}'
+- name: Remove temporary directory
+  file:
+    state: absent
+    path: '{{ pkgng_test_outofdate_pkg_tempdir.path }}'
