@@ -116,6 +116,19 @@ class TestOpentelemetry(unittest.TestCase):
             result = self.opentelemetry.enrich_error_message(generate_test_data(tc[0], tc[1], tc[2]))
             self.assertEqual(result, tc[3])
 
+    def test_get_supported_argument_or_none(self):
+        test_cases = (
+            ({}, None),
+            ({'url': 'my-url'}, 'my-url'),
+            ({'url': 'my-url', 'api_url': 'my-api_url'}, 'my-url'),
+            ({'api_url': 'my-api_url'}, 'my-api_url'),
+            ({'api_url': 'my-api_url', 'chart_repo_url': 'my-chart_repo_url'}, 'my-api_url')
+        )
+
+        for tc in test_cases:
+            result = self.opentelemetry.get_supported_argument_or_none(tc[0])
+            self.assertEqual(result, tc[1])
+
 
 def generate_test_data(exception=None, msg=None, stderr=None):
     res_data = OrderedDict()
