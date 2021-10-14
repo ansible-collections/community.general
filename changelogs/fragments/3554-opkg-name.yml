@@ -1,0 +1,2 @@
+minor_changes:
+  - "opkg - allow ``name`` to be a YAML list of strings (https://github.com/ansible-collections/community.general/issues/572, https://github.com/ansible-collections/community.general/pull/3554)."
