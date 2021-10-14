@@ -305,7 +305,7 @@ class OpenTelemetrySource(object):
                 return True
             else:
                 return False
-        except:
+        except Exception:
             return False
 
     @staticmethod
