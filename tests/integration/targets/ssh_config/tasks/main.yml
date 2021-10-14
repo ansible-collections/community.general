@@ -219,3 +219,6 @@
       - short_name.hosts_added == ["full"]
       - short_name.hosts_changed == []
       - short_name.hosts_removed == []
+
+- name: Include integration tests for additional options (e.g. proxycommand)
+  include: 'options.yml'
