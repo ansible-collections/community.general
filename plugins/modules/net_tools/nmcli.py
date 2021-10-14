@@ -1472,7 +1472,7 @@ class Nmcli(object):
                          'ipv4.dns-search',
                          'ipv4.routes',
                          'ipv4.routing-rules',
-                         'ipv4.route-metric'
+                         'ipv4.route-metric',
                          'ipv6.dns',
                          'ipv6.dns-search',
                          '802-11-wireless-security.group',
