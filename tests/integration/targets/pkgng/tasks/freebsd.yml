@@ -137,28 +137,6 @@
           - not pkgng_example4_idempotent.changed
 
 ##
-## pkgng - example - Install package from local file
-- name: Create test package
-  import_tasks: create-outofdate-pkg.yml
-
-- name: Install test package from local file
-  pkgng:
-    name: '{{ pkgng_test_outofdate_pkg_path }}'
-  register: pkgng_example_localfile
-
-- name: Remove test package
-  pkgng:
-    name: '{{ pkgng_test_pkg_name }}'
-    state: absent
-  register: pkgng_example_localfile_cleanup
-
-- name: Ensure pkgng installs package from local file
-  assert:
-    that:
-      - pkgng_example_localfile.changed
-      - pkgng_example_localfile_cleanup.changed
-
-##
 ## pkgng - example - Install multiple packages in one command
 ##
 - name: Remove test package (checkmode)
