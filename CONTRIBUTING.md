@@ -71,3 +71,11 @@ Creating new modules and plugins requires a bit more work than other Pull Reques
    listed as `maintainers` will be pinged for new issues and PRs that modify the module/plugin or its tests.
 
    When you add a new plugin/module, we expect that you perform maintainer duty for at least some time after contributing it.
+
+## pre-commit
+
+This particular process will help to evaluate some linting before committing any changes. Therefore you need the pre-commit.
+
+### Installation
+
+Follow <https://pre-commit.com/#install> and `pre-commit install`
