@@ -76,6 +76,11 @@ options:
     description:
       - Sets the C(ProxyCommand) option.
     type: str
+  forward_agent:
+    description:
+      - Sets the C(ForwardAgent) option.
+    type: bool
+    version_added: 4.0.0
   ssh_config_file:
     description:
       - SSH config file.
@@ -203,6 +208,12 @@ class SSHConfig():
             proxycommand=self.params.get('proxycommand'),
         )
 
+        # Convert True / False to 'yes' / 'no' for usage in ssh_config
+        if self.params['forward_agent'] is True:
+            args['forward_agent'] = 'yes'
+        if self.params['forward_agent'] is False:
+            args['forward_agent'] = 'no'
+
         config_changed = False
         hosts_changed = []
         hosts_change_diff = []
@@ -288,6 +299,7 @@ def main():
             identity_file=dict(type='path'),
             port=dict(type='str'),
             proxycommand=dict(type='str', default=None),
+            forward_agent=dict(type='bool'),
             remote_user=dict(type='str'),
             ssh_config_file=dict(default=None, type='path'),
             state=dict(type='str', default='present', choices=['present', 'absent']),
