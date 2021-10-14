@@ -1,0 +1,2 @@
+minor_changes:
+  - elastic callback plugin - enriched the stacktrace information with the ``message``, ``exception`` and ``stderr`` fields from the failed task (https://github.com/ansible-collections/community.general/pull/3556).
