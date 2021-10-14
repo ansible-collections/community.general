@@ -57,7 +57,7 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(task_data.path, '/mypath')
         self.assertEqual(task_data.play, 'myplay')
         self.assertEqual(task_data.action, 'myaction')
-        self.assertEqual(task_data.args, '')
+        self.assertEqual(task_data.args, {})
 
     def test_finish_task_with_a_host_match(self):
         tasks_data = OrderedDict()
