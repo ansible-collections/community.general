@@ -1,0 +1,2 @@
+bugfixes:
+  - nmcli - fix setting IPv6 DNS server (https://github.com/ansible-collections/community.general/pull/3563)
