@@ -1,2 +1,2 @@
 bugfixes:
-  - ipa - fix bug with returning results in IPA role
+  - ipa module_util - fix bug with returning results in IPA role (https://github.com/ansible-collections/community.general/pull/3561).
