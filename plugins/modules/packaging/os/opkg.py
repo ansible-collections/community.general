@@ -20,19 +20,20 @@ description:
 options:
     name:
         description:
-            - name of package to install/remove
+            - Name of package(s) to install/remove.
         aliases: [pkg]
         required: true
-        type: str
+        type: list
+        elements: str
     state:
         description:
-            - state of the package
+            - State of the package.
         choices: [ 'present', 'absent', 'installed', 'removed' ]
         default: present
         type: str
     force:
         description:
-            - opkg --force parameter used
+            - The C(opkg --force) parameter used.
         choices:
             - ""
             - "depends"
@@ -48,10 +49,10 @@ options:
         type: str
     update_cache:
         description:
-            - update the package db first
+            - Update the package DB first.
             - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
         aliases: ['update-cache']
-        default: "no"
+        default: false
         type: bool
 requirements:
     - opkg
@@ -76,7 +77,9 @@ EXAMPLES = '''
 
 - name: Remove foo and bar
   community.general.opkg:
-    name: foo,bar
+    name:
+      - foo
+      - bar
     state: absent
 
 - name: Install foo using overwrite option forcibly
@@ -170,7 +173,7 @@ def install_packages(module, opkg_path, packages):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(aliases=["pkg"], required=True),
+            name=dict(aliases=["pkg"], required=True, type="list", elements="str"),
             state=dict(default="present", choices=["present", "installed", "absent", "removed"]),
             force=dict(default="", choices=["", "depends", "maintainer", "reinstall", "overwrite", "downgrade", "space", "postinstall", "remove",
                                             "checksum", "removal-of-dependent-packages"]),
@@ -187,7 +190,7 @@ def main():
     if p["update_cache"]:
         update_package_db(module, opkg_path)
 
-    pkgs = p["name"].split(",")
+    pkgs = p["name"]
 
     if p["state"] in ["present", "installed"]:
         install_packages(module, opkg_path, pkgs)
