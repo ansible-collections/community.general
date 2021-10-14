@@ -89,3 +89,38 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(host_data.uuid, 'include')
         self.assertEqual(host_data.name, 'include')
         self.assertEqual(host_data.status, 'ok')
+
+    def test_get_error_message(self):
+        test_cases = (
+            ('my-exception', 'my-msg', None, 'my-exception'),
+            (None, 'my-msg', None, 'my-msg'),
+            (None, None, None, 'failed'),
+        )
+
+        for tc in test_cases:
+            result = self.elastic.get_error_message(generate_test_data(tc[0], tc[1], tc[2]))
+            self.assertEqual(result, tc[3])
+
+    def test_enrich_error_message(self):
+        test_cases = (
+            ('my-exception', 'my-msg', 'my-stderr', 'message: "my-msg"\nexception: "my-exception"\nstderr: "my-stderr"'),
+            ('my-exception', None, 'my-stderr', 'message: "failed"\nexception: "my-exception"\nstderr: "my-stderr"'),
+            (None, 'my-msg', 'my-stderr', 'message: "my-msg"\nexception: "None"\nstderr: "my-stderr"'),
+            ('my-exception', 'my-msg', None, 'message: "my-msg"\nexception: "my-exception"\nstderr: "None"'),
+            ('my-exception', 'my-msg', '\nline1\nline2', 'message: "my-msg"\nexception: "my-exception"\nstderr: "\nline1\nline2"')
+        )
+
+        for tc in test_cases:
+            result = self.elastic.enrich_error_message(generate_test_data(tc[0], tc[1], tc[2]))
+            self.assertEqual(result, tc[3])
+
+
+def generate_test_data(exception=None, msg=None, stderr=None):
+    res_data = OrderedDict()
+    if exception:
+        res_data['exception'] = exception
+    if msg:
+        res_data['msg'] = msg
+    if stderr:
+        res_data['stderr'] = stderr
+    return res_data
