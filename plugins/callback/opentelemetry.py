@@ -264,7 +264,7 @@ class OpenTelemetrySource(object):
                 status = Status(status_code=StatusCode.UNSET)
 
         span.set_status(status)
-        if isinstance(task_data.args, dict) and not "gather_facts" in task_data.action:
+        if isinstance(task_data.args, dict) and "gather_facts" not in task_data.action:
             names = self.transform_ansible_unicode_to_str(task_data.args.keys())
             values = self.transform_ansible_unicode_to_str(task_data.args.values())
             self.set_span_attribute(span, ("ansible.task.args.name"), names)
