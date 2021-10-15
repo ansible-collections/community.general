@@ -1,5 +1,3 @@
-minor_changes:
-  - mssql_script - new module to run arbitrary sql scripts on ms sql server (https://github.com/ansible-collections/community.general/pull/3557).
 known_issues:
   - "mssql_script - UUIDs are not exported: TypeError: Value of unknown type: <class 'uuid.UUID'>."
   - "mssql_script - empty result set breaks return values."

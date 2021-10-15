@@ -14,35 +14,41 @@ short_description: Execute SQL scripts on a MSSQL database
 
 version_added: "4.0.0"
 
-description: Execute SQL scripts on a MSSQL database
+description:
+  - Execute SQL scripts on a MSSQL database.
 
 options:
     name:
-        description: Database to run script against
-        required: false
+        description: Database to run script against.
         aliases: [ db ]
         default: 'master'
         type: str
     login_user:
-        description: The username used to authenticate with
+        description: The username used to authenticate with.
         type: str
     login_password:
-        description: The password used to authenticate with
+        description: The password used to authenticate with.
         type: str
     login_host:
-        description: Host running the database
+        description: Host running the database.
         type: str
         required: true
     login_port:
-        description: Port of the MSSQL server. Requires login_host be defined as well.
-        default: '1433'
-        type: str
+        description: Port of the MSSQL server. Requires I(login_host) be defined as well.
+        default: 1433
+        type: int
     script:
-        description: The SQL script to be executed.
+        description:
+          - The SQL script to be executed.
+          - Script can contain multiple SQL statements. Multiple Batches can be separated by C(GO) command.
+          - Each batch must return at least one result set.
         required: true
         type: str
     output:
-        description: Output format. 'dict' requires named columns to be returned otherwise an error is thrown.
+        description:
+          - With C(default) each row will be returned as a list a values.
+          - Output format C(dict) will return dictionary with the column names as keys.
+          - C(dict) requires named columns to be returned by each query otherwise an error is thrown.
         choices: [ "dict", "default" ]
         default: 'default'
         type: str
@@ -63,7 +69,6 @@ author:
 '''
 
 EXAMPLES = r'''
-# Pass in a message
 - name: Check DB connection
   community.general.mssql_script:
     login_user: "{{ mssql_login_user }}"
@@ -134,16 +139,19 @@ RETURN = r'''
 query_results:
     description: List of batches ( queries separated by 'GO' keyword)
     type: list
+    elements: list
     returned: success
     sample: [[[["Batch 0 - Select 0"]], [["Batch 0 - Select 1"]]], [[["Batch 1 - Select 0"]]]]
     contains:
         queries:
             description: List of rows for each query
             type: list
+            elements: list
             contains:
                 rows:
                     description: list of rows returned by query
                     type: list
+                    elements: list
                     contains:
                         column_value:
                             description: list of column values
@@ -174,19 +182,13 @@ else:
     mssql_found = True
 
 
-def db_exists(conn, cursor, db):
-    cursor.execute("SELECT name FROM master.sys.databases WHERE name = %s", db)
-    conn.commit()
-    return bool(cursor.rowcount)
-
-
 def run_module():
     module_args = dict(
         name=dict(required=False, aliases=['db'], default='master'),
         login_user=dict(default=''),
         login_password=dict(default='', no_log=True),
         login_host=dict(required=True),
-        login_port=dict(default='1433'),
+        login_port=dict(type='int', default=1433),
         script=dict(required=True),
         output=dict(default='default', choices=['dict', 'default']),
         params=dict(type='dict'),
@@ -214,7 +216,7 @@ def run_module():
     sql_params = module.params['params']
 
     login_querystring = login_host
-    if login_port != "1433":
+    if login_port != 1433:
         login_querystring = "%s:%s" % (login_host, login_port)
 
     if login_user != "" and login_password == "":
@@ -234,9 +236,6 @@ def run_module():
                                  "@sysconfdir@/freetds.conf / ${HOME}/.freetds.conf")
 
     conn.autocommit(True)
-
-    if db and not db_exists(conn, cursor, db):
-        module.exit_json(msg="Database %s does not exist" % db, **result)
 
     if output == 'dict':
         cursor = conn.cursor(as_dict=True)
