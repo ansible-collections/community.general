@@ -10,17 +10,17 @@ DOCUMENTATION = r'''
 ---
 module: dnf_versionlock
 version_added: '4.0.0'
-short_description: Locks package versions in I(dnf) based systems
+short_description: Locks package versions in C(dnf) based systems
 description:
-- Locks package versions using the I(versionlock) plugin in I(dnf) based
+- Locks package versions using the C(versionlock) plugin in C(dnf) based
   systems. This plugin takes a set of name and versions for packages and
-  excludes all other versions of those packages. This allows you to e.g.
+  excludes all other versions of those packages. This allows you to for example
   protect packages from being updated by newer versions. The state of the
-  plugin that reflects locking of packages is the I(locklist).
+  plugin that reflects locking of packages is the C(locklist).
 options:
   name:
     description:
-      - Package name spec to add or exclude to or delete from the I(locklist)
+      - Package name spec to add or exclude to or delete from the C(locklist)
         using the format expected by the C(dnf repoquery) command.
       - This parameter is mutually exclusive with I(state=clean).
     type: list
@@ -37,35 +37,35 @@ options:
   state:
     description:
         - Wheter to add (C(present) or C(excluded)) to or remove (C(absent) or
-          C(clean)) from the I(locklist).
-        - C(add) will add a package name spec to the I(locklist). If there is a
+          C(clean)) from the C(locklist).
+        - C(add) will add a package name spec to the C(locklist). If there is a
           installed package that matches, then only that version will be added.
           Otherwise, all available package versions will be added.
         - C(exclude) will add a package name spec as excluded to the
-          I(locklist). It means that packages represented by the package name
+          C(locklist). It means that packages represented by the package name
           spec will be excluded from transaction operations. All available
           package versions will be added.
-        - C(absent) will delete entries in the I(locklist) that match the
+        - C(absent) will delete entries in the C(locklist) that match the
           package name spec.
-        - C(clean) will delete all entries in the I(locklist). This option is
+        - C(clean) will delete all entries in the C(locklist). This option is
           mutually exclusive with C(name).
     choices: [ 'absent', 'clean', 'excluded', 'present' ]
     type: str
     default: present
 notes:
-  - The logics of the I(versionlock) plugin for corner cases could be
+  - The logics of the C(versionlock) plugin for corner cases could be
     confusing, so please take in account that this module will do its best to
-    give a I(check_mode) prediction on what is going to happen. In case of
+    give a C(check_mode) prediction on what is going to happen. In case of
     doubt, check the documentation of the plugin.
-  - Sometimes the module could predict changes in I(check_mode) that will not
-    be such because I(versionlock) concludes that there is already a entry in
-    I(locklist) that already matches.
-  - In an ideal world, the I(versionlock) plugin would have a dry-run option to
+  - Sometimes the module could predict changes in C(check_mode) that will not
+    be such because C(versionlock) concludes that there is already a entry in
+    C(locklist) that already matches.
+  - In an ideal world, the C(versionlock) plugin would have a dry-run option to
     know for sure what is going to happen. So far we have to work with a best
     guess as close as possible to the behaviour inferred from its code.
   - For most of cases where you want to lock and unlock specific versions of a
     package, this works fairly well.
-  - Supports I(check_mode).
+  - Supports C(check_mode).
 requirements:
   - dnf
   - dnf-plugin-versionlock
@@ -78,25 +78,30 @@ EXAMPLES = r'''
   community.general.dnf_versionlock:
     name: nginx
     state: present
+
 - name: Prevent multiple packages from being updated
   community.general.dnf_versionlock:
     name:
       - nginx
       - haproxy
     state: present
+
 - name: Remove lock from nginx to be updated again
   community.general.dnf_versionlock:
     package: nginx
     state: absent
+
 - name: Exclude bind 32:9.11 from installs or updates
   community.general.dnf_versionlock:
     package: bind-32:9.11*
     state: excluded
+
 - name: Keep bash package in major version 4
   community.general.dnf_versionlock:
     name: bash-0:4.*
     raw: true
     state: present
+
 - name: Delete all entries in the locklist of versionlock
   community.general.dnf_versionlock:
     state: clean
