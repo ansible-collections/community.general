@@ -166,18 +166,13 @@ def do_versionlock(module, command, patterns=None, raw=False):
         outs = []
         for p in patterns:
             rc, out, err = module.run_command(
-                [DNF_BIN, "-q", "versionlock", command] + raw_parameter + [p])
-            if rc != 0:
-                module.fail_json(msg="failed to %s %s" % (command, patterns),
-                                 rc=rc, out=out, err=err)
+                [DNF_BIN, "-q", "versionlock", command] + raw_parameter + [p],
+                check_rc=True)
             outs.append(out)
         out = "\n".join(outs)
     else:
         rc, out, err = module.run_command(
-            [DNF_BIN, "-q", "versionlock", command])
-        if rc != 0:
-            module.fail_json(msg="failed to %s" % command,
-                             rc=rc, out=out, err=err)
+            [DNF_BIN, "-q", "versionlock", command], check_rc=True)
     return out
 
 
@@ -212,11 +207,8 @@ def get_packages(module, patterns, only_installed=False):
     rc, out, err = module.run_command(
         [DNF_BIN, "-q", "repoquery"] +
         (["--installed"] if only_installed else []) +
-        patterns)
-    if rc != 0:
-        module.fail_json(
-            msg="failed to list available %s" % patterns,
-            rc=rc, out=out, err=err)
+        patterns,
+        check_rc=True)
 
     for p in out.split():
         # Extract the NEVRA pattern.
