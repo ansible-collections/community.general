@@ -266,9 +266,9 @@ class OpenTelemetrySource(object):
                 status = Status(status_code=StatusCode.UNSET)
 
         span.set_status(status)
-        if task_data.args and not "gather_facts" in task_data.action:
-            names = self.transform_AnsibleUnicode(task_data.args.keys())
-            values = self.transform_AnsibleUnicode(task_data.args.values())
+        if isinstance(task_data.args, dict) and not "gather_facts" in task_data.action:
+            names = self.transform_ansible_unicode_to_str(task_data.args.keys())
+            values = self.transform_ansible_unicode_to_str(task_data.args.values())
             self.set_span_attribute(span, ("ansible.task.args.name"), names)
             self.set_span_attribute(span, ("ansible.task.args.value"), values)
         self.set_span_attribute(span, "ansible.task.module", task_data.action)
@@ -330,10 +330,33 @@ class OpenTelemetrySource(object):
         return False
 
     @staticmethod
-    def transform_AnsibleUnicode(values):
+    def url_check(parsed_url):
+        # duplicates https://github.com/ansible-collections/community.general/pull/3558
+        try:
+            if all([parsed_url.scheme, parsed_url.netloc, parsed_url.hostname]):
+                return True
+            else:
+                return False
+        except Exception:
+            return False
+
+    @staticmethod
+    def redact_user_password(parsed):
+        # duplicates https://github.com/ansible-collections/community.general/pull/3558
+        if parsed.password:
+            return parsed._replace(netloc="{0}".format(parsed.hostname))
+        return parsed
+
+    @staticmethod
+    def transform_ansible_unicode_to_str(values):
         t = ()
         for value in values:
-            t = t + (str(value),)
+            # Redacted user and password to avoid exposing anything sensible.
+            parsed_url = urlparse(str(value))
+            if OpenTelemetrySource.url_check(parsed_url):
+                t = t + (OpenTelemetrySource.redact_user_password(parsed_url).geturl(),)
+            else:
+                t = t + (str(value),)
         return t
 
     @staticmethod
