@@ -1,2 +1,2 @@
 bugfixes:
-  - ipa module_util - fix bug with returning results in IPA role (https://github.com/ansible-collections/community.general/issues/3560).
+  - ipa_* modules - fix environment fallback for ``ipa_host`` option (https://github.com/ansible-collections/community.general/issues/3560).
