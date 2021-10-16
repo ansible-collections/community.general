@@ -36,12 +36,12 @@ options:
     default: false
   state:
     description:
-        - Wheter to add (C(present) or C(excluded)) to or remove (C(absent) or
+        - Whether to add (C(present) or C(excluded)) to or remove (C(absent) or
           C(clean)) from the C(locklist).
-        - C(add) will add a package name spec to the C(locklist). If there is a
+        - C(present) will add a package name spec to the C(locklist). If there is a
           installed package that matches, then only that version will be added.
           Otherwise, all available package versions will be added.
-        - C(exclude) will add a package name spec as excluded to the
+        - C(excluded) will add a package name spec as excluded to the
           C(locklist). It means that packages represented by the package name
           spec will be excluded from transaction operations. All available
           package versions will be added.
@@ -109,25 +109,25 @@ EXAMPLES = r'''
 
 RETURN = r'''
 locklist_pre:
-    description: Locklist before module execution
+    description: Locklist before module execution.
     returned: success
     type: list
     elements: str
     sample: [ 'bash-0:4.4.20-1.el8_4.*', '!bind-32:9.11.26-4.el8_4.*' ]
 locklist_post:
-    description: Locklist after module execution
+    description: Locklist after module execution.
     returned: success and (not check mode or state is clean)
     type: list
     elements: str
     sample: [ 'bash-0:4.4.20-1.el8_4.*' ]
 specs_toadd:
-    description: Package name specs meant to be added by versionlock
+    description: Package name specs meant to be added by versionlock.
     returned: success
     type: list
     elements: str
     sample: [ 'bash' ]
 specs_todelete:
-    description: Package name specs meant to be deleted by versionlock
+    description: Package name specs meant to be deleted by versionlock.
     returned: success
     type: list
     elements: str
