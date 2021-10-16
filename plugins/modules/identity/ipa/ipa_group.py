@@ -43,9 +43,10 @@ options:
   group:
     description:
     - List of group names assigned to this group.
-    - If an empty list is passed all groups will be removed from this group.
-    - If option is omitted assigned groups will not be checked or changed.
+    - If I(append=no) and an empty list is passed all groups will be removed from this group.
     - Groups that are already assigned but not passed will be removed.
+    - If I(append=yes) the listed groups will be assigned without removing other groups.
+    - If option is omitted assigned groups will not be checked or changed.
     type: list
     elements: str
   nonposix:
@@ -55,9 +56,10 @@ options:
   user:
     description:
     - List of user names assigned to this group.
-    - If an empty list is passed all users will be removed from this group.
-    - If option is omitted assigned users will not be checked or changed.
+    - If I(append=no) and an empty list is passed all users will be removed from this group.
     - Users that are already assigned but not passed will be removed.
+    - If I(append=yes) the listed users will be assigned without removing other users.
+    - If option is omitted assigned users will not be checked or changed.
     type: list
     elements: str
   state:
