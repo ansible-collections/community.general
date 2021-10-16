@@ -16,8 +16,8 @@ description:
 options:
   append:
     description:
-    - If C(yes), add the listed C(user) and C(group) to the group members.
-    - If C(no), only the listed C(user) and C(group) will be group members, removing any other members.
+    - If C(yes), add the listed I(user) and I(group) to the group members.
+    - If C(no), only the listed I(user) and I(group) will be group members, removing any other members.
     default: no
     type: bool
   cn:
