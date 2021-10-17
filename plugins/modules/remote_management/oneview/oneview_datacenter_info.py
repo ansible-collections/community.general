@@ -48,7 +48,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- name: Print fetched information about Data Centers 
+- name: Print fetched information about Data Centers
   ansible.builtin.debug:
     msg: "{{ result.datacenters }}"
 
