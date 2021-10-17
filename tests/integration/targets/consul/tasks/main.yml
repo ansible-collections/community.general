@@ -36,7 +36,7 @@
           commonName: localhost
     - name: Generate selfsigned certificate
       register: selfsigned_certificate
-      community.crypto.openssl_certificate:
+      community.crypto.x509_certificate:
         path: '{{ remote_tmp_dir }}/cert.pem'
         csr_path: '{{ remote_tmp_dir }}/csr.csr'
         privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
