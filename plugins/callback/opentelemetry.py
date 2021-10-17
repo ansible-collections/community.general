@@ -286,12 +286,12 @@ class OpenTelemetrySource(object):
             if attributeValue is not None:
                 span.set_attribute(attributeName, attributeValue)
 
-    def add_attributes_for_service_map_if_possible(self, span, task_data): # Reorder args to show that task_data adds to span
-        """Update the span attributes with the service that the task interacted with, if possible.""" # Full sentences in docstring
+    def add_attributes_for_service_map_if_possible(self, span, task_data):
+        """Update the span attributes with the service that the task interacted with, if possible."""
 
-        try:  # Catch exceptions once at module boundary
-            parsed_url = urlparse(self.url_from_args(task_data.args)) # 'urlparse' handles 'None' gracefully
-        except ValueError: # Be specific when catching exceptions to avoid obfuscation
+        try:
+            parsed_url = urlparse(self.url_from_args(task_data.args))
+        except ValueError:
             return
 
         redacted_url = self.redact_user_password(parsed_url)
@@ -300,20 +300,20 @@ class OpenTelemetrySource(object):
 
     @staticmethod
     def url_from_args(args):
+        # the order matters
         url_args = ("url", "api_url", "baseurl", "repo", "server_url", "chart_repo_url")
-        for arg in url_args: # Loop for clarity and to avoid repetition
+        for arg in url_args:
             if args.get(arg):
                 return arg
         return None
 
     @staticmethod
     def redact_user_password(url):
-        return url._replace(netloc=url.hostname) if url.password else url # No unnecessary formatting makes this a neat one-liner
+        return url._replace(netloc=url.hostname) if url.password else url
 
     @staticmethod
     def is_valid_url(url):
-        return all([url.scheme, url.netloc, url.hostname]) # Use the bool result directly and eliminate exception handling since 'url' is always a 'ParseResult' now
-
+        return all([url.scheme, url.netloc, url.hostname])
 
     @staticmethod
     def get_error_message(result):
