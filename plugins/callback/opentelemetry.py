@@ -274,7 +274,7 @@ class OpenTelemetrySource(object):
         self.set_span_attribute(span, "ansible.task.host.name", host_data.name)
         self.set_span_attribute(span, "ansible.task.host.status", host_data.status)
         # This will allow to enrich the service map
-        self.add_attributes_for_service_map_if_possible(task_data, span)
+        self.add_attributes_for_service_map_if_possible(span, task_data)
         span.end(end_time=host_data.finish)
 
     def set_span_attribute(self, span, attributeName, attributeValue):
