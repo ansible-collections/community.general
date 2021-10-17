@@ -1,3 +1,0 @@
----
-minor_changes:
-- Add names to tasks in oneview module examples and fix task name in github_webhook module example (https://github.com/ansible-collections/community.general/issues/3353).
