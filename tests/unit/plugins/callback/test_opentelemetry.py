@@ -118,11 +118,11 @@ class TestOpentelemetry(unittest.TestCase):
 
     def test_url_from_args(self):
         test_cases = (
-            ({}, None),
-            ({'url': 'my-url'}, 'url'),
-            ({'url': 'my-url', 'api_url': 'my-api_url'}, 'url'),
-            ({'api_url': 'my-api_url'}, 'api_url'),
-            ({'api_url': 'my-api_url', 'chart_repo_url': 'my-chart_repo_url'}, 'api_url')
+            ({}, ""),
+            ({'url': 'my-url'}, 'my-url'),
+            ({'url': 'my-url', 'api_url': 'my-api_url'}, 'my-url'),
+            ({'api_url': 'my-api_url'}, 'my-api_url'),
+            ({'api_url': 'my-api_url', 'chart_repo_url': 'my-chart_repo_url'}, 'my-api_url')
         )
 
         for tc in test_cases:
