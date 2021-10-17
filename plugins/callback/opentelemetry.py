@@ -286,49 +286,34 @@ class OpenTelemetrySource(object):
             if attributeValue is not None:
                 span.set_attribute(attributeName, attributeValue)
 
-    def add_attributes_for_service_map_if_possible(self, task_data, span):
-        """ update the span attributes with the service that the task interacted with, if possible """
+    def add_attributes_for_service_map_if_possible(self, span, task_data): # Reorder args to show that task_data adds to span
+        """Update the span attributes with the service that the task interacted with, if possible.""" # Full sentences in docstring
 
-        url = self.get_supported_argument_or_none(task_data.args)
-        if url:
-            try:
-                parsed_url = self.redact_user_password(urlparse(url))
-                if self.url_check(parsed_url):
-                    self.set_span_attribute(span, "http.url", parsed_url.geturl())
-            except Exception:
-                pass
+        try:  # Catch exceptions once at module boundary
+            parsed_url = urlparse(self.url_from_args(task_data.args)) # 'urlparse' handles 'None' gracefully
+        except ValueError: # Be specific when catching exceptions to avoid obfuscation
+            return
 
-    @staticmethod
-    def url_check(parsed_url):
-        try:
-            if all([parsed_url.scheme, parsed_url.netloc, parsed_url.hostname]):
-                return True
-            else:
-                return False
-        except Exception:
-            return False
+        redacted_url = self.redact_user_password(parsed_url)
+        if self.is_valid_url(redacted_url):
+            self.set_span_attribute(span, "http.url", redacted_url.geturl())
 
     @staticmethod
-    def redact_user_password(parsed):
-        if parsed.password:
-            return parsed._replace(netloc="{0}".format(parsed.hostname))
-        return parsed
-
-    @staticmethod
-    def get_supported_argument_or_none(args):
-        if args.get("url", None):
-            return args.get("url")
-        if args.get("api_url", None):
-            return args.get("api_url")
-        if args.get("baseurl", None):
-            return args.get("baseurl")
-        if args.get("repo", None):
-            return args.get("repo")
-        if args.get("server_url", None):
-            return args.get("server_url")
-        if args.get("chart_repo_url", None):
-            return args.get("chart_repo_url")
+    def url_from_args(args):
+        url_args = ("url", "api_url", "baseurl", "repo", "server_url", "chart_repo_url")
+        for arg in url_args: # Loop for clarity and to avoid repetition
+            if args.get(arg):
+                return arg
         return None
+
+    @staticmethod
+    def redact_user_password(url):
+        return url._replace(netloc=url.hostname) if url.password else url # No unnecessary formatting makes this a neat one-liner
+
+    @staticmethod
+    def is_valid_url(url):
+        return all([url.scheme, url.netloc, url.hostname]) # Use the bool result directly and eliminate exception handling since 'url' is always a 'ParseResult' now
+
 
     @staticmethod
     def get_error_message(result):
