@@ -32,7 +32,7 @@
     - key2
     loop_control:
       loop_var: key
-    community.crypto.openssl_certificate:
+    community.crypto.x509_certificate:
       path: '{{ output_dir }}/ansible_{{ key }}.pem'
       privatekey_path: '{{ output_dir }}/ansible_{{ key }}.key'
       csr_path: '{{ output_dir }}/ansible_{{ key }}.csr'
