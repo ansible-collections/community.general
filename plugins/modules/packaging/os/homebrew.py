@@ -132,10 +132,10 @@ EXAMPLES = '''
     name: homebrew/cask/foo
     state: present
 
-- name: Use ignored-pinned option while upgrading all
+- name: Use ignore-pinned option while upgrading all
   community.general.homebrew:
     upgrade_all: yes
-    upgrade_options: ignored-pinned
+    upgrade_options: ignore-pinned
 '''
 
 RETURN = '''
