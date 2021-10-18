@@ -49,7 +49,9 @@ EXAMPLES = '''
   no_log: true
   delegate_to: localhost
   register: result
-- ansible.builtin.debug:
+
+- name: Print fetched information about Enclosures
+  ansible.builtin.debug:
     msg: "{{ result.enclosures }}"
 
 - name: Gather paginated, filtered and sorted information about Enclosures
@@ -66,7 +68,9 @@ EXAMPLES = '''
   no_log: true
   delegate_to: localhost
   register: result
-- ansible.builtin.debug:
+
+- name: Print fetched information about paginated, filtered ans sorted list of Enclosures
+  ansible.builtin.debug:
     msg: "{{ result.enclosures }}"
 
 - name: Gather information about an Enclosure by name
@@ -79,7 +83,9 @@ EXAMPLES = '''
   no_log: true
   delegate_to: localhost
   register: result
-- ansible.builtin.debug:
+
+- name: Print fetched information about Enclosure found by name
+  ansible.builtin.debug:
     msg: "{{ result.enclosures }}"
 
 - name: Gather information about an Enclosure by name with options
@@ -96,13 +102,21 @@ EXAMPLES = '''
   no_log: true
   delegate_to: localhost
   register: result
-- ansible.builtin.debug:
+
+- name: Print fetched information about Enclosure found by name
+  ansible.builtin.debug:
     msg: "{{ result.enclosures }}"
-- ansible.builtin.debug:
+
+- name: Print fetched information about Enclosure Script
+  ansible.builtin.debug:
     msg: "{{ result.enclosure_script }}"
-- ansible.builtin.debug:
+
+- name: Print fetched information about Enclosure Environmental Configuration
+  ansible.builtin.debug:
     msg: "{{ result.enclosure_environmental_configuration }}"
-- ansible.builtin.debug:
+
+- name: Print fetched information about Enclosure Utilization
+  ansible.builtin.debug:
     msg: "{{ result.enclosure_utilization }}"
 
 - name: "Gather information about an Enclosure with temperature data at a resolution of one sample per day, between two
@@ -124,9 +138,13 @@ EXAMPLES = '''
   no_log: true
   delegate_to: localhost
   register: result
-- ansible.builtin.debug:
+
+- name: Print fetched information about Enclosure found by name
+  ansible.builtin.debug:
     msg: "{{ result.enclosures }}"
-- ansible.builtin.debug:
+
+- name: Print fetched information about Enclosure Utilization
+  ansible.builtin.debug:
     msg: "{{ result.enclosure_utilization }}"
 '''
 
