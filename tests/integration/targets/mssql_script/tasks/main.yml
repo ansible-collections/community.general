@@ -58,13 +58,14 @@
 #         ]
 #     ]
 # ]
+
 - assert:
     that:
-      - result_batches.query_results | length == 2 # two batch results
-      - result_batches.query_results[0] | length == 2 # two selects in first batch
-      - result_batches.query_results[0][0] | length == 1 # one row in first select
-      - result_batches.query_results[0][0][0] | length == 1 # one column in first row
-      - result_batches.query_results[0][0][0][0] == 'Batch 0 - Select 0' # first column of first row
+      - result_batches.query_results | length == 2  # two batch results
+      - result_batches.query_results[0] | length == 2  # two selects in first batch
+      - result_batches.query_results[0][0] | length == 1  # one row in first select
+      - result_batches.query_results[0][0][0] | length == 1  # one column in first row
+      - result_batches.query_results[0][0][0][0] == 'Batch 0 - Select 0'  # first column of first row
 
 
 - name: two batches with dict output
@@ -104,10 +105,10 @@
 # ]
 - assert:
     that:
-      - result_batches_dict.query_results | length == 2 # two batch results
-      - result_batches_dict.query_results[0] | length == 2 # two selects in first batch
-      - result_batches_dict.query_results[0][0] | length == 1 # one row in first select
-      - result_batches_dict.query_results[0][0][0]['b0s0'] == 'Batch 0 - Select 0' # column 'b0s0' of first row
+      - result_batches_dict.query_results_dict | length == 2  # two batch results
+      - result_batches_dict.query_results_dict[0] | length == 2  # two selects in first batch
+      - result_batches_dict.query_results_dict[0][0] | length == 1  # one row in first select
+      - result_batches_dict.query_results_dict[0][0][0]['b0s0'] == 'Batch 0 - Select 0'  # column 'b0s0' of first row
 
 
 
@@ -122,9 +123,9 @@
   register: result_spaceused
 - assert:
     that:
-      - result_spaceused.query_results | length == 1 # one batch
-      - result_spaceused.query_results[0] | length == 2 # stored procedure returns two result sets
-      - result_spaceused.query_results[0][0][0]['database_name'] == 'master' # output dict
+      - result_spaceused.query_results_dict | length == 1  # one batch
+      - result_spaceused.query_results_dict[0] | length == 2  # stored procedure returns two result sets
+      - result_spaceused.query_results_dict[0][0][0]['database_name'] == 'master'  # output dict
 
 - name: Ensure that passed 'db' is used
   community.general.mssql_script:
@@ -138,7 +139,7 @@
   register: result_db
 - assert:
     that:
-      - result_db.query_results[0][0][0]['database_name'] == 'msdb'
+      - result_db.query_results_dict[0][0][0]['database_name'] == 'msdb'
 
 - name: pass params to query
   community.general.mssql_script:

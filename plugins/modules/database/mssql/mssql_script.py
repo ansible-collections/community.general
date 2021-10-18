@@ -21,7 +21,7 @@ options:
     name:
         description: Database to run script against.
         aliases: [ db ]
-        default: 'master'
+        default: ''
         type: str
     login_user:
         description: The username used to authenticate with.
@@ -46,8 +46,8 @@ options:
         type: str
     output:
         description:
-          - With C(default) each row will be returned as a list a values.
-          - Output format C(dict) will return dictionary with the column names as keys.
+          - With C(default) each row will be returned as a list of values. See C(query_results).
+          - Output format C(dict) will return dictionary with the column names as keys. See C(query_results_dict).
           - C(dict) requires named columns to be returned by each query otherwise an error is thrown.
         choices: [ "dict", "default" ]
         default: 'default'
@@ -108,11 +108,11 @@ EXAMPLES = r'''
   register: result_batches
 - assert:
     that:
-      - result_batches.query_results | length == 2 # two batch results
-      - result_batches.query_results[0] | length == 2 # two selects in first batch
-      - result_batches.query_results[0][0] | length == 1 # one row in first select
-      - result_batches.query_results[0][0][0] | length == 1 # one column in first row
-      - result_batches.query_results[0][0][0][0] == 'Batch 0 - Select 0' # each row contains a list of values.
+      - result_batches.query_results | length == 2  # two batch results
+      - result_batches.query_results[0] | length == 2  # two selects in first batch
+      - result_batches.query_results[0][0] | length == 1  # one row in first select
+      - result_batches.query_results[0][0][0] | length == 1  # one column in first row
+      - result_batches.query_results[0][0][0][0] == 'Batch 0 - Select 0'  # each row contains a list of values.
 
 - name: two batches with dict output
   community.general.mssql_script:
@@ -129,10 +129,10 @@ EXAMPLES = r'''
   register: result_batches_dict
 - assert:
     that:
-      - result_batches_dict.query_results | length == 2 # two batch results
-      - result_batches_dict.query_results[0] | length == 2 # two selects in first batch
-      - result_batches_dict.query_results[0][0] | length == 1 # one row in first select
-      - result_batches_dict.query_results[0][0][0]['b0s0'] == 'Batch 0 - Select 0' # column 'b0s0' of first row
+      - result_batches_dict.query_results_dict | length == 2  # two batch results
+      - result_batches_dict.query_results_dict[0] | length == 2  # two selects in first batch
+      - result_batches_dict.query_results_dict[0][0] | length == 1  # one row in first select
+      - result_batches_dict.query_results_dict[0][0][0]['b0s0'] == 'Batch 0 - Select 0'  # column 'b0s0' of first row
 '''
 
 RETURN = r'''
@@ -158,16 +158,28 @@ query_results:
                             type: list
                             example: ["Batch 0 - Select 0"]
                             returned: success, if output is default
-                        column_dict:
+query_results_dict:
+    description: List of batches ( queries separated by 'GO' keyword)
+    type: list
+    elements: list
+    returned: success
+    sample: [[[["Batch 0 - Select 0"]], [["Batch 0 - Select 1"]]], [[["Batch 1 - Select 0"]]]]
+    contains:
+        queries:
+            description: List of rows for each query
+            type: list
+            elements: list
+            contains:
+                rows:
+                    description: list of rows returned by query
+                    type: list
+                    elements: list
+                    contains:
+                         column_dict:
                             description: dict of columns and values
                             type: dict
                             example: {"col_name": "Batch 0 - Select 0"}
                             returned: success, if output is dict
-queries:
-    description: The output message that the test module generates.
-    type: list
-    returned: success
-    sample: 'goodbye'
 '''
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -177,16 +189,16 @@ try:
     import pymssql
 except ImportError:
     PYMSSQL_IMP_ERR = traceback.format_exc()
-    mssql_found = False
+    MSSQL_FOUND = False
 else:
-    mssql_found = True
+    MSSQL_FOUND = True
 
 
 def run_module():
     module_args = dict(
-        name=dict(required=False, aliases=['db'], default='master'),
-        login_user=dict(default=''),
-        login_password=dict(default='', no_log=True),
+        name=dict(required=False, aliases=['db'], default=''),
+        login_user=dict(),
+        login_password=dict(no_log=True),
         login_host=dict(required=True),
         login_port=dict(type='int', default=1433),
         script=dict(required=True),
@@ -202,7 +214,7 @@ def run_module():
         argument_spec=module_args,
         supports_check_mode=True
     )
-    if not mssql_found:
+    if not MSSQL_FOUND:
         module.fail_json(msg=missing_required_lib(
             'pymssql'), exception=PYMSSQL_IMP_ERR)
 
@@ -219,9 +231,9 @@ def run_module():
     if login_port != 1433:
         login_querystring = "%s:%s" % (login_host, login_port)
 
-    if login_user != "" and login_password == "":
+    if login_user is not None and login_password is None:
         module.fail_json(
-            msg="when supplying login_user arguments login_password must be provided")
+            msg="when supplying login_user argument, login_password must also be provided")
 
     try:
         conn = pymssql.connect(
@@ -237,12 +249,12 @@ def run_module():
 
     conn.autocommit(True)
 
+    query_results_key = 'query_results'
     if output == 'dict':
         cursor = conn.cursor(as_dict=True)
+        query_results_key = 'query_results_dict'
 
     queries = script.split('\nGO\n')
-    result['queries'] = queries
-    # result['sql_params'] = sql_params # may contain sensitive data
     result['changed'] = True
     if module.check_mode:
         module.exit_json(**result)
@@ -260,7 +272,7 @@ def run_module():
     except Exception as e:
         return module.fail_json(msg="query failed", query=query, error=str(e), **result)
 
-    result['query_results'] = query_results
+    result[query_results_key] = query_results
     module.exit_json(**result)
 
 
