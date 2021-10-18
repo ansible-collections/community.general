@@ -94,13 +94,6 @@ EXAMPLES = '''
     account_api_token: dummyapitoken
   delegate_to: localhost
 
-- name: Fetch my.com domain records
-  community.general.dnsimple:
-    domain: my.com
-    state: present
-  delegate_to: localhost
-  register: records
-
 - name: Delete a domain
   community.general.dnsimple:
     domain: my.com
