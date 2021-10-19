@@ -4,9 +4,6 @@
 """The community.general.random_words Ansible lookup plugin."""
 
 from __future__ import absolute_import, division, print_function
-from ansible.errors import AnsibleError
-from ansible.plugins.lookup import LookupBase
-
 
 __metaclass__ = type
 
@@ -80,6 +77,9 @@ RETURN = r"""
     type: list
     elements: str
 """
+
+from ansible.errors import AnsibleLookupError
+from ansible.plugins.lookup import LookupBase
 
 try:
     from xkcdpass import xkcd_password as xp
