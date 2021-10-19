@@ -179,10 +179,10 @@ class IPAClient(object):
                 result.append(key)
         return result
 
-    def modify_if_diff(self, name, ipa_list, module_list, add_method, remove_method, item=None):
+    def modify_if_diff(self, name, ipa_list, module_list, add_method, remove_method, item=None, append=None):
         changed = False
         diff = list(set(ipa_list) - set(module_list))
-        if len(diff) > 0:
+        if append is not True and len(diff) > 0:
             changed = True
             if not self.module.check_mode:
                 if item:
