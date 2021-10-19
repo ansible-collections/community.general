@@ -1,0 +1,2 @@
+minor_changes:
+  - "ipa_group - add ``append`` option for adding group and users members, instead of replacing the respective lists (https://github.com/ansible-collections/community.general/pull/3545)."
