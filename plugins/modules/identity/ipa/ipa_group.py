@@ -20,6 +20,7 @@ options:
     - If C(no), only the listed I(user) and I(group) will be group members, removing any other members.
     default: no
     type: bool
+    version_added: 4.0.0
   cn:
     description:
     - Canonical name.
