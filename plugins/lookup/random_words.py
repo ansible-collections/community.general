@@ -95,7 +95,7 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
 
         if not HAS_XKCDPASS:
-            raise AnsibleError(
+            raise AnsibleLookupError(
                 "Python xkcdpass library is required. "
                 'Please install using "pip install xkcdpass"'
             )
