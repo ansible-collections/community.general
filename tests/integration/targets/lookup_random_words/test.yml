@@ -23,6 +23,6 @@
         - result4[0] | length >= 17
         - result4[0] | length <= 29
         - result4[0] | regex_findall("[A-Z]") | length == 3
-        - result4[0] | select("equalto", "-") | length == 2
+        - result4[0].count("-") == 2
         - result5 | length == 1
         - result5[0] | length >= 18
