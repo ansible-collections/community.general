@@ -19,7 +19,7 @@ DOCUMENTATION = r"""
     requirements:
       - xkcdpass U(https://github.com/redacted/XKCD-password-generator)
     description:
-      - Returns a number of random words, and output can for example be used for
+      - Returns a number of random words. The output can for example be used for
         passwords.
       - See U(https://xkcd.com/936/) for background.
     options:
