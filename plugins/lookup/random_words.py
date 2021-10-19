@@ -76,7 +76,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
   _raw:
-    description: A single-element list containing random words
+    description: A single-element list containing random words.
     type: list
     elements: str
 """
