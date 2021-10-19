@@ -154,7 +154,9 @@ query_results:
                     elements: list
                     contains:
                         column_value:
-                            description: list of column values
+                            description:
+                              - list of column values
+                              - c(bytes) are converted to hex strings. An other non-standard type is converted to string.
                             type: list
                             example: ["Batch 0 - Select 0"]
                             returned: success, if output is default
@@ -176,7 +178,9 @@ query_results_dict:
                     elements: list
                     contains:
                          column_dict:
-                            description: dict of columns and values
+                            description:
+                              - dict of column names and values
+                              - c(bytes) are converted to hex strings. An other non-standard type is converted to string.
                             type: dict
                             example: {"col_name": "Batch 0 - Select 0"}
                             returned: success, if output is dict
@@ -184,6 +188,7 @@ query_results_dict:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 import traceback
+import json
 PYMSSQL_IMP_ERR = None
 try:
     import pymssql
@@ -192,6 +197,12 @@ except ImportError:
     MSSQL_FOUND = False
 else:
     MSSQL_FOUND = True
+
+
+def clean_output(o):
+    if isinstance(o, bytes):
+        return o.hex()
+    return str(o)
 
 
 def run_module():
@@ -272,7 +283,10 @@ def run_module():
     except Exception as e:
         return module.fail_json(msg="query failed", query=query, error=str(e), **result)
 
-    result[query_results_key] = query_results
+    # ensure that the result is json serializable
+    qry_results = json.loads(json.dumps(query_results, default=clean_output))
+
+    result[query_results_key] = qry_results
     module.exit_json(**result)
 
 

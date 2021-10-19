@@ -1,3 +1,2 @@
 known_issues:
-  - "mssql_script - UUIDs are not exported: TypeError: Value of unknown type: <class 'uuid.UUID'>."
   - "mssql_script - empty result set breaks return values."

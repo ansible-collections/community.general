@@ -169,26 +169,26 @@
 - assert:
     that: check_mode.query_results is undefined
 
-# # Known issue 1: Value of unknown type: <class 'uuid.UUID'>
-# - name: "TODO: Fix error: TypeError: Value of unknown type: <class 'uuid.UUID'>"
-#   community.general.mssql_script:
-#     login_user: "{{ mssql_login_user }}"
-#     login_password: "{{ mssql_login_password }}"
-#     login_host: "{{ mssql_host }}"
-#     login_port: "{{ mssql_port }}"
-#     script: |
-#       SELECT service_broker_guid FROM sys.databases
-# Guids are returned as type uuid.UUID. Ansible fails during result cleanup:
-#   File "../ansible_collections/community/general/plugins/modules/mssql_script.py", line 202, in <module>
-#   File "../ansible_collections/community/general/plugins/modules/mssql_script.py", line 198, in main
-#   File "../ansible_collections/community/general/plugins/modules/mssql_script.py", line 194, in run_module
-#   File "../ansible/module_utils/basic.py", line 1497, in exit_json
-#   File "../ansible/module_utils/basic.py", line 1490, in _return_formatted
-#   File "../ansible/module_utils/common/parameters.py", line 893, in remove_values
-#   File "../ansible/module_utils/common/parameters.py", line 461, in _remove_values_conditions
-# TypeError: Value of unknown type: <class 'uuid.UUID'>, 00000000-0000-0000-0000-000000000000
+- name: "Test: Value of unknown type: <class 'uuid.UUID'>"
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    script: |
+      SELECT service_broker_guid, * FROM sys.databases
 
-# # Known issue 2: empty result set breaks return values
+- name: "Test: Value of unknown type: <class 'uuid.UUID'>-dict"
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    output: dict
+    script: |
+      SELECT service_broker_guid, * FROM sys.databases
+
+# # Known issue: empty result set breaks return values
 # - name: empty result set
 #   community.general.mssql_script:
 #     login_user: "{{ mssql_login_user }}"
