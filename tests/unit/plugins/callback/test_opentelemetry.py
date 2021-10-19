@@ -132,7 +132,7 @@ class TestOpentelemetry(unittest.TestCase):
     def test_parse_and_redact_url_if_possible(self):
         test_cases = (
             ({}, None),
-            ({'url': 'wrong' }, None),
+            ({'url': 'wrong'}, None),
             ({'url': 'https://my-url'}, 'https://my-url'),
             ({'url': 'https://user:pass@my-url'}, 'https://my-url'),
             ({'url': 'https://my-url:{{ my_port }}'}, 'https://my-url:{{ my_port }}'),

@@ -322,7 +322,7 @@ class OpenTelemetrySource(object):
     @staticmethod
     def is_valid_url(url):
         if all([url.scheme, url.netloc, url.hostname]):
-            return  "{{" not in url.hostname
+            return "{{" not in url.hostname
         return False
 
     @staticmethod
