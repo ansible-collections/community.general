@@ -14,6 +14,13 @@ short_description: Manage FreeIPA group
 description:
 - Add, modify and delete group within IPA server
 options:
+  append:
+    description:
+    - If C(yes), add the listed I(user) and I(group) to the group members.
+    - If C(no), only the listed I(user) and I(group) will be group members, removing any other members.
+    default: no
+    type: bool
+    version_added: 4.0.0
   cn:
     description:
     - Canonical name.
@@ -37,9 +44,10 @@ options:
   group:
     description:
     - List of group names assigned to this group.
-    - If an empty list is passed all groups will be removed from this group.
-    - If option is omitted assigned groups will not be checked or changed.
+    - If I(append=no) and an empty list is passed all groups will be removed from this group.
     - Groups that are already assigned but not passed will be removed.
+    - If I(append=yes) the listed groups will be assigned without removing other groups.
+    - If option is omitted assigned groups will not be checked or changed.
     type: list
     elements: str
   nonposix:
@@ -49,9 +57,10 @@ options:
   user:
     description:
     - List of user names assigned to this group.
-    - If an empty list is passed all users will be removed from this group.
-    - If option is omitted assigned users will not be checked or changed.
+    - If I(append=no) and an empty list is passed all users will be removed from this group.
     - Users that are already assigned but not passed will be removed.
+    - If I(append=yes) the listed users will be assigned without removing other users.
+    - If option is omitted assigned users will not be checked or changed.
     type: list
     elements: str
   state:
@@ -91,6 +100,17 @@ EXAMPLES = r'''
     user:
     - linus
     - larry
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: topsecret
+
+- name: Ensure that new starter named john is member of the group, without removing other members
+  community.general.ipa_group:
+    name: developers
+    user:
+    - john
+    append: yes
+    state: present
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
@@ -187,6 +207,7 @@ def ensure(module, client):
     name = module.params['cn']
     group = module.params['group']
     user = module.params['user']
+    append = module.params['append']
 
     module_group = get_group_dict(description=module.params['description'], external=module.params['external'],
                                   gid=module.params['gidnumber'], nonposix=module.params['nonposix'])
@@ -211,12 +232,14 @@ def ensure(module, client):
         if group is not None:
             changed = client.modify_if_diff(name, ipa_group.get('member_group', []), group,
                                             client.group_add_member_group,
-                                            client.group_remove_member_group) or changed
+                                            client.group_remove_member_group,
+                                            append=append) or changed
 
         if user is not None:
             changed = client.modify_if_diff(name, ipa_group.get('member_user', []), user,
                                             client.group_add_member_user,
-                                            client.group_remove_member_user) or changed
+                                            client.group_remove_member_user,
+                                            append=append) or changed
 
     else:
         if ipa_group:
@@ -236,7 +259,8 @@ def main():
                          group=dict(type='list', elements='str'),
                          nonposix=dict(type='bool'),
                          state=dict(type='str', default='present', choices=['present', 'absent']),
-                         user=dict(type='list', elements='str'))
+                         user=dict(type='list', elements='str'),
+                         append=dict(type='bool', default=False))
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
