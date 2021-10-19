@@ -321,7 +321,9 @@ class OpenTelemetrySource(object):
 
     @staticmethod
     def is_valid_url(url):
-        return all([url.scheme, url.netloc, url.hostname])
+        if all([url.scheme, url.netloc, url.hostname]):
+            return  "{{" not in url.hostname
+        return False
 
     @staticmethod
     def get_error_message(result):

@@ -136,7 +136,7 @@ class TestOpentelemetry(unittest.TestCase):
             ({'url': 'https://my-url'}, 'https://my-url'),
             ({'url': 'https://user:pass@my-url'}, 'https://my-url'),
             ({'url': 'https://my-url:{{ my_port }}'}, 'https://my-url:{{ my_port }}'),
-            ({'url': 'https://{{ my_hostname }}:{{ my_port }}'}, 'https://{{ my_hostname }}:{{ my_port }}'),
+            ({'url': 'https://{{ my_hostname }}:{{ my_port }}'}, None),
             ({'url': '{{my_schema}}{{ my_hostname }}:{{ my_port }}'}, None)
         )
 
