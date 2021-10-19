@@ -15,7 +15,7 @@ DOCUMENTATION = r"""
     author:
       - Thomas Sjögren (@konstruktoid)
     short_description: Return a number of random words
-    version_added: "3.1.0"
+    version_added: "4.0.0"
     requirements:
       - xkcdpass U(https://github.com/redacted/XKCD-password-generator)
     description:
