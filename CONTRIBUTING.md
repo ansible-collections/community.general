@@ -74,8 +74,8 @@ Creating new modules and plugins requires a bit more work than other Pull Reques
 
 ## pre-commit
 
-This particular process will help to evaluate some linting before committing any changes. Therefore you need the pre-commit.
+To help ensure high-quality contributions this repository includes a [pre-commit](https://pre-commit.com) configuration which corrects and tests against common issues that would otherwise cause CI to fail. To begin using these pre-commit hooks see the [Installation](#installation) section below.
 
 ### Installation
 
-Follow <https://pre-commit.com/#install> and `pre-commit install`
+Follow the [instructions](https://pre-commit.com/#install) provided with pre-commit and run `pre-commit install` under the repository base. If for any reason you would like to disable the pre-commit hooks run `pre-commit uninstall`.

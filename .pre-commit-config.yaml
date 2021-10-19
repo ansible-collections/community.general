@@ -1,15 +1,19 @@
+---
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.0.1
     hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: fix-encoding-pragma
       - id: check-ast
       - id: check-merge-conflict
-      - id: trailing-whitespace
-  - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.2
+      - id: check-symlinks
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.9.0
     hooks:
-      - id: flake8
-        additional_dependencies: [flake8-bugbear]
-        args:
-          - --max-line-length=160
-          - --ignore=E402,B007
+      - id: rst-backticks
+        types: [file]
+        files: changelogs/fragments/.*\.(yml|yaml)$
