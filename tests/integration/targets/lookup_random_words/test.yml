@@ -18,7 +18,7 @@
         - result2 | length == 1
         - result2[0] | length == 35
         - result3 | length == 1
-        - result3[0] | select("equalto", "!") | length == 5
+        - result3[0].count("!") == 5
         - result4 | length == 1
         - result4[0] | length >= 17
         - result4[0] | length <= 29
