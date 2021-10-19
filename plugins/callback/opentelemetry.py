@@ -289,14 +289,22 @@ class OpenTelemetrySource(object):
     def add_attributes_for_service_map_if_possible(self, span, task_data):
         """Update the span attributes with the service that the task interacted with, if possible."""
 
-        try:
-            parsed_url = urlparse(self.url_from_args(task_data.args))
-        except ValueError:
-            return
-
-        redacted_url = self.redact_user_password(parsed_url)
-        if self.is_valid_url(redacted_url):
+        redacted_url = self.parse_and_redact_url_if_possible(task_data.args)
+        if redacted_url:
             self.set_span_attribute(span, "http.url", redacted_url.geturl())
+
+    @staticmethod
+    def parse_and_redact_url_if_possible(args):
+        """Parse and redact the url, if possible."""
+
+        try:
+            parsed_url = urlparse(OpenTelemetrySource.url_from_args(args))
+        except ValueError:
+            return None
+
+        if OpenTelemetrySource.is_valid_url(parsed_url):
+            return OpenTelemetrySource.redact_user_password(parsed_url)
+        return None
 
     @staticmethod
     def url_from_args(args):

@@ -129,6 +129,24 @@ class TestOpentelemetry(unittest.TestCase):
             result = self.opentelemetry.url_from_args(tc[0])
             self.assertEqual(result, tc[1])
 
+    def test_parse_and_redact_url_if_possible(self):
+        test_cases = (
+            ({}, None),
+            ({'url': 'wrong' }, None),
+            ({'url': 'https://my-url'}, 'https://my-url'),
+            ({'url': 'https://user:pass@my-url'}, 'https://my-url'),
+            ({'url': 'https://my-url:{{ my_port }}'}, 'https://my-url:{{ my_port }}'),
+            ({'url': 'https://{{ my_hostname }}:{{ my_port }}'}, 'https://{{ my_hostname }}:{{ my_port }}'),
+            ({'url': '{{my_schema}}{{ my_hostname }}:{{ my_port }}'}, None)
+        )
+
+        for tc in test_cases:
+            result = self.opentelemetry.parse_and_redact_url_if_possible(tc[0])
+            if tc[1]:
+                self.assertEqual(result.geturl(), tc[1])
+            else:
+                self.assertEqual(result, tc[1])
+
 
 def generate_test_data(exception=None, msg=None, stderr=None):
     res_data = OrderedDict()
