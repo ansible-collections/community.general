@@ -144,7 +144,10 @@ query_results:
     sample: [[[["Batch 0 - Select 0"]], [["Batch 0 - Select 1"]]], [[["Batch 1 - Select 0"]]]]
     contains:
         queries:
-            description: List of rows for each query
+            description:
+              - List of result sets of each query.
+              - If a query returns no results, the results of this and all the following queries will not be included in the output.
+                Use 'GO' keyword to separate queries.
             type: list
             elements: list
             contains:
@@ -168,7 +171,10 @@ query_results_dict:
     sample: [[[["Batch 0 - Select 0"]], [["Batch 0 - Select 1"]]], [[["Batch 1 - Select 0"]]]]
     contains:
         queries:
-            description: List of rows for each query
+            description:
+              - List of result sets of each query.
+              - If a query returns no results, the results of this and all the following queries will not be included in the output.
+                Use 'GO' keyword to separate queries.
             type: list
             elements: list
             contains:
@@ -200,8 +206,6 @@ else:
 
 
 def clean_output(o):
-    if isinstance(o, bytes):
-        return o.hex()
     return str(o)
 
 

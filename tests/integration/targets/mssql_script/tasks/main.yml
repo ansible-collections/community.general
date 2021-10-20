@@ -176,7 +176,19 @@
     login_host: "{{ mssql_host }}"
     login_port: "{{ mssql_port }}"
     script: |
-      SELECT service_broker_guid, * FROM sys.databases
+      SELECT service_broker_guid, * FROM sys.databases WHERE name = 'master'
+  register: result_databases
+- debug:
+    var: result_databases
+- name: check types
+  assert:
+    that:
+      - result_databases.query_results[0][0][0][0] == '00000000-0000-0000-0000-000000000000'  # guid
+      - result_databases.query_results[0][0][0][1] == 'master'  # string
+      - result_databases.query_results[0][0][0][3] == None  # byte string representation
+      - result_databases.query_results[0][0][0][4] == "b'\\x01'"  # byte string representation
+      - result_databases.query_results[0][0][0][6] == 150  # int
+      - result_databases.query_results[0][0][0][10] == false  # bool
 
 - name: "Test: Value of unknown type: <class 'uuid.UUID'>-dict"
   community.general.mssql_script:
@@ -188,26 +200,25 @@
     script: |
       SELECT service_broker_guid, * FROM sys.databases
 
-# # Known issue: empty result set breaks return values
-# - name: empty result set
-#   community.general.mssql_script:
-#     login_user: "{{ mssql_login_user }}"
-#     login_password: "{{ mssql_login_password }}"
-#     login_host: "{{ mssql_host }}"
-#     login_port: "{{ mssql_port }}"
-#     script: |
-#       SELECT name, state_desc FROM sys.databases WHERE name = %(dbname)s
-#       SELECT name, state_desc FROM sys.databases WHERE name = 'DoesNotexist'
-#       SELECT name, state_desc FROM sys.databases WHERE name = %(dbname)s
-#     params:
-#       dbname: msdb
-#   register: empty_result
-# - debug:
-#     var: empty_result
-# - assert:
-#     that:
-#       - empty_result.query_results[0] | length == 3 # == 1 ; issue: only first result is returned
-#       - empty_result.query_results[0][0][0][0] == 'msdb'
-#       - empty_result.query_results[0][1] | length == 0
-#       - empty_result.query_results[0][2][0][0] == 'msdb'
+# Known issue: empty result set breaks return values
+- name: empty result set
+  community.general.mssql_script:
+    login_user: "{{ mssql_login_user }}"
+    login_password: "{{ mssql_login_password }}"
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    script: |
+      SELECT name, state_desc FROM sys.databases WHERE name = %(dbname)s
+      SELECT name, state_desc FROM sys.databases WHERE name = 'DoesNotexist'
+      SELECT name, state_desc FROM sys.databases WHERE name = %(dbname)s
+    params:
+      dbname: msdb
+  register: empty_result
+- assert:
+    that:
+      - empty_result.query_results[0] | length == 3  # == 1 ; issue: only first result is returned
+      - empty_result.query_results[0][0][0][0] == 'msdb'
+      - empty_result.query_results[0][1] | length == 0
+      - empty_result.query_results[0][2][0][0] == 'msdb'
+  failed_when: false  # known issue
       

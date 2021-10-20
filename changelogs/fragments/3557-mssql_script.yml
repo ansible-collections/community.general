@@ -1,2 +1,0 @@
-known_issues:
-  - "mssql_script - empty result set breaks return values."
