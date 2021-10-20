@@ -2762,7 +2762,9 @@ class RedfishUtils(object):
             if isinstance(set_value, dict):
                 for subprop in payload[property].keys():
                     if subprop not in target_ethernet_current_setting[property]:
-                        return {'ret': False, 'msg': "Sub-property %s in nic_config is invalid" % subprop}
+                        # Not configured already; need to apply the request
+                        need_change = True
+                        break
                     sub_set_value = payload[property][subprop]
                     sub_cur_value = target_ethernet_current_setting[property][subprop]
                     if sub_set_value != sub_cur_value:
@@ -2776,7 +2778,9 @@ class RedfishUtils(object):
                 for i in range(len(set_value)):
                     for subprop in payload[property][i].keys():
                         if subprop not in target_ethernet_current_setting[property][i]:
-                            return {'ret': False, 'msg': "Sub-property %s in nic_config is invalid" % subprop}
+                            # Not configured already; need to apply the request
+                            need_change = True
+                            break
                         sub_set_value = payload[property][i][subprop]
                         sub_cur_value = target_ethernet_current_setting[property][i][subprop]
                         if sub_set_value != sub_cur_value:
