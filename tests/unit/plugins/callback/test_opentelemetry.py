@@ -57,7 +57,7 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(task_data.path, '/mypath')
         self.assertEqual(task_data.play, 'myplay')
         self.assertEqual(task_data.action, 'myaction')
-        self.assertEqual(task_data.args, '')
+        self.assertEqual(task_data.args, {})
 
     def test_finish_task_with_a_host_match(self):
         tasks_data = OrderedDict()
@@ -115,6 +115,37 @@ class TestOpentelemetry(unittest.TestCase):
         for tc in test_cases:
             result = self.opentelemetry.enrich_error_message(generate_test_data(tc[0], tc[1], tc[2]))
             self.assertEqual(result, tc[3])
+
+    def test_url_from_args(self):
+        test_cases = (
+            ({}, ""),
+            ({'url': 'my-url'}, 'my-url'),
+            ({'url': 'my-url', 'api_url': 'my-api_url'}, 'my-url'),
+            ({'api_url': 'my-api_url'}, 'my-api_url'),
+            ({'api_url': 'my-api_url', 'chart_repo_url': 'my-chart_repo_url'}, 'my-api_url')
+        )
+
+        for tc in test_cases:
+            result = self.opentelemetry.url_from_args(tc[0])
+            self.assertEqual(result, tc[1])
+
+    def test_parse_and_redact_url_if_possible(self):
+        test_cases = (
+            ({}, None),
+            ({'url': 'wrong'}, None),
+            ({'url': 'https://my-url'}, 'https://my-url'),
+            ({'url': 'https://user:pass@my-url'}, 'https://my-url'),
+            ({'url': 'https://my-url:{{ my_port }}'}, 'https://my-url:{{ my_port }}'),
+            ({'url': 'https://{{ my_hostname }}:{{ my_port }}'}, None),
+            ({'url': '{{my_schema}}{{ my_hostname }}:{{ my_port }}'}, None)
+        )
+
+        for tc in test_cases:
+            result = self.opentelemetry.parse_and_redact_url_if_possible(tc[0])
+            if tc[1]:
+                self.assertEqual(result.geturl(), tc[1])
+            else:
+                self.assertEqual(result, tc[1])
 
 
 def generate_test_data(exception=None, msg=None, stderr=None):
