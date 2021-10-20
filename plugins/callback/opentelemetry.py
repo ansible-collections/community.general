@@ -79,6 +79,7 @@ from os.path import basename
 
 from ansible.errors import AnsibleError
 from ansible.module_utils.six import raise_from
+from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.plugins.callback import CallbackBase
 
 try:
@@ -179,7 +180,7 @@ class OpenTelemetrySource(object):
         args = None
 
         if not task.no_log and not hide_task_arguments:
-            args = ', '.join(('%s=%s' % a for a in task.args.items()))
+            args = task.args
 
         tasks_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
 
@@ -265,13 +266,15 @@ class OpenTelemetrySource(object):
                 status = Status(status_code=StatusCode.UNSET)
 
         span.set_status(status)
-        self.set_span_attribute(span, "ansible.task.args", task_data.args)
+        self.set_span_attribute(span, "ansible.task.args", self.flat_args(task_data.args))
         self.set_span_attribute(span, "ansible.task.module", task_data.action)
         self.set_span_attribute(span, "ansible.task.message", message)
         self.set_span_attribute(span, "ansible.task.name", name)
         self.set_span_attribute(span, "ansible.task.result", rc)
         self.set_span_attribute(span, "ansible.task.host.name", host_data.name)
         self.set_span_attribute(span, "ansible.task.host.status", host_data.status)
+        # This will allow to enrich the service map
+        self.add_attributes_for_service_map_if_possible(span, task_data)
         span.end(end_time=host_data.finish)
 
     def set_span_attribute(self, span, attributeName, attributeValue):
@@ -282,6 +285,45 @@ class OpenTelemetrySource(object):
         else:
             if attributeValue is not None:
                 span.set_attribute(attributeName, attributeValue)
+
+    def add_attributes_for_service_map_if_possible(self, span, task_data):
+        """Update the span attributes with the service that the task interacted with, if possible."""
+
+        redacted_url = self.parse_and_redact_url_if_possible(task_data.args)
+        if redacted_url:
+            self.set_span_attribute(span, "http.url", redacted_url.geturl())
+
+    @staticmethod
+    def parse_and_redact_url_if_possible(args):
+        """Parse and redact the url, if possible."""
+
+        try:
+            parsed_url = urlparse(OpenTelemetrySource.url_from_args(args))
+        except ValueError:
+            return None
+
+        if OpenTelemetrySource.is_valid_url(parsed_url):
+            return OpenTelemetrySource.redact_user_password(parsed_url)
+        return None
+
+    @staticmethod
+    def url_from_args(args):
+        # the order matters
+        url_args = ("url", "api_url", "baseurl", "repo", "server_url", "chart_repo_url")
+        for arg in url_args:
+            if args.get(arg):
+                return args.get(arg)
+        return ""
+
+    @staticmethod
+    def redact_user_password(url):
+        return url._replace(netloc=url.hostname) if url.password else url
+
+    @staticmethod
+    def is_valid_url(url):
+        if all([url.scheme, url.netloc, url.hostname]):
+            return "{{" not in url.hostname
+        return False
 
     @staticmethod
     def get_error_message(result):
@@ -300,6 +342,12 @@ class OpenTelemetrySource(object):
         exception = result.get('exception')
         stderr = result.get('stderr')
         return ('message: "{0}"\nexception: "{1}"\nstderr: "{2}"').format(message, exception, stderr)
+
+    @staticmethod
+    def flat_args(args):
+        if args:
+            return ', '.join(('%s=%s' % a for a in args.items()))
+        return None
 
 
 class CallbackModule(CallbackBase):
