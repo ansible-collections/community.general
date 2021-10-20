@@ -1,0 +1,2 @@
+bugfixes:
+  - redfish_utils module utils - if a manager network property is not specified in the service, attempt to change the requested settings (https://github.com/ansible-collections/community.general/issues/3404/).
