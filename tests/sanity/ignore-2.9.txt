@@ -28,38 +28,6 @@ plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-missing-type                # missing docs on suboptions
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:parameter-type-not-in-doc       # missing docs on suboptions
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:undocumented-parameter          # missing docs on suboptions
-plugins/modules/net_tools/nios/nios_a_record.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_a_record.py validate-modules:invalid-documentation
-plugins/modules/net_tools/nios/nios_aaaa_record.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_aaaa_record.py validate-modules:invalid-documentation
-plugins/modules/net_tools/nios/nios_cname_record.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_cname_record.py validate-modules:invalid-documentation
-plugins/modules/net_tools/nios/nios_dns_view.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_dns_view.py validate-modules:invalid-documentation
-plugins/modules/net_tools/nios/nios_fixed_address.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_fixed_address.py validate-modules:invalid-documentation
-plugins/modules/net_tools/nios/nios_host_record.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_host_record.py validate-modules:invalid-documentation
-plugins/modules/net_tools/nios/nios_member.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_member.py validate-modules:invalid-documentation
-plugins/modules/net_tools/nios/nios_mx_record.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_mx_record.py validate-modules:invalid-documentation
-plugins/modules/net_tools/nios/nios_naptr_record.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_naptr_record.py validate-modules:invalid-documentation
-plugins/modules/net_tools/nios/nios_network.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_network.py validate-modules:invalid-documentation
-plugins/modules/net_tools/nios/nios_network_view.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_network_view.py validate-modules:invalid-documentation
-plugins/modules/net_tools/nios/nios_nsgroup.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_nsgroup.py validate-modules:invalid-documentation
-plugins/modules/net_tools/nios/nios_ptr_record.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_ptr_record.py validate-modules:invalid-documentation
-plugins/modules/net_tools/nios/nios_srv_record.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_srv_record.py validate-modules:invalid-documentation
-plugins/modules/net_tools/nios/nios_txt_record.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_txt_record.py validate-modules:invalid-documentation
-plugins/modules/net_tools/nios/nios_zone.py validate-modules:deprecation-mismatch
-plugins/modules/net_tools/nios/nios_zone.py validate-modules:invalid-documentation
 plugins/modules/source_control/github/github_deploy_key.py validate-modules:parameter-invalid
 plugins/modules/system/iptables_state.py validate-modules:undocumented-parameter
 plugins/modules/system/puppet.py use-argspec-type-path

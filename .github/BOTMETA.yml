@@ -205,9 +205,6 @@ files:
   $lookups/manifold.py:
     maintainers: galanoff
     labels: manifold
-  $lookups/nios:
-    maintainers: $team_networking sganesh-infoblox
-    labels: infoblox networking
   $lookups/onepass:
     maintainers: samdoran
     labels: onepassword
@@ -253,9 +250,6 @@ files:
   $module_utils/module_helper.py:
     maintainers: russoz
     labels: module_helper
-  $module_utils/net_tools/nios/api.py:
-    maintainers: $team_networking sganesh-infoblox
-    labels: infoblox networking
   $module_utils/oracle/oci_utils.py:
     maintainers: $team_oracle
     labels: cloud
@@ -647,31 +641,6 @@ files:
     maintainers: amasolov nerzhul
   $modules/net_tools/pritunl/:
     maintainers: Lowess
-  $modules/net_tools/nios/:
-    maintainers: $team_networking
-    labels: infoblox networking
-  $modules/net_tools/nios/nios_a_record.py:
-    maintainers: brampling
-  $modules/net_tools/nios/nios_aaaa_record.py:
-    maintainers: brampling
-  $modules/net_tools/nios/nios_cname_record.py:
-    maintainers: brampling
-  $modules/net_tools/nios/nios_fixed_address.py:
-    maintainers: sjaiswal
-  $modules/net_tools/nios/nios_member.py:
-    maintainers: krisvasudevan
-  $modules/net_tools/nios/nios_mx_record.py:
-    maintainers: brampling
-  $modules/net_tools/nios/nios_naptr_record.py:
-    maintainers: brampling
-  $modules/net_tools/nios/nios_nsgroup.py:
-    maintainers: ebirn sjaiswal
-  $modules/net_tools/nios/nios_ptr_record.py:
-    maintainers: clementtrebuchet
-  $modules/net_tools/nios/nios_srv_record.py:
-    maintainers: brampling
-  $modules/net_tools/nios/nios_txt_record.py:
-    maintainers: coreywan
   $modules/net_tools/nmcli.py:
     maintainers: alcamie101
   $modules/net_tools/snmp_facts.py:
