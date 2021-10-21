@@ -1,1 +1,0 @@
-./net_tools/nios/nios_network_view.py
