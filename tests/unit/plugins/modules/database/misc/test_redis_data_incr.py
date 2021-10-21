@@ -9,9 +9,10 @@ __metaclass__ = type
 
 import pytest
 import json
+import redis
 from redis import __version__
 
-from redis.exceptions import RedisError, ResponseError
+from redis.exceptions import NoPermissionError, RedisError, ResponseError
 from ansible_collections.community.general.plugins.modules.database.misc import redis_data_incr
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 
@@ -164,4 +165,42 @@ def test_redis_data_incr_check_mode(capfd, mocker):
     assert not err
     assert json.loads(out)['value'] == 11.0
     assert json.loads(out)['msg'] == 'Incremented key: foo by 1 to 11.0'
+    assert not json.loads(out)['changed']
+
+
+def test_redis_data_incr_check_mode_not_incrementable(capfd, mocker):
+    set_module_args({'login_host': 'localhost',
+                     'login_password': 'secret',
+                     'key': 'foo',
+                     '_ansible_check_mode': True})
+    mocker.patch('redis.Redis.get', return_value='bar')
+    with pytest.raises(SystemExit):
+        redis_data_incr.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert json.loads(out)['failed']
+    assert json.loads(out)[
+        'msg'] == "Value: bar of key: foo is not incrementable(int or float)"
+    assert 'value' not in json.loads(out)
+    assert not json.loads(out)['changed']
+
+
+@pytest.mark.skipif(not HAS_REDIS_USERNAME_OPTION, reason="Redis version < 3.4.0")
+def test_redis_data_incr_check_mode_permissions(capfd, mocker):
+    set_module_args({'login_host': 'localhost',
+                     'login_password': 'secret',
+                     'key': 'foo',
+                     '_ansible_check_mode': True})
+    redis.Redis.get = mocker.Mock(side_effect=NoPermissionError(
+        "this user has no permissions to run the 'get' command or its subcommand"))
+    with pytest.raises(SystemExit):
+        redis_data_incr.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert json.loads(out)['failed']
+    assert json.loads(out)['msg'].startswith(
+        'Failed to get value of key: foo with exception:')
+    assert 'value' not in json.loads(out)
     assert not json.loads(out)['changed']

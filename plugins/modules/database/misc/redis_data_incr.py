@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: redis_data_incr
 short_description: Increment keys in Redis
-version_added: 3.8.0
+version_added: 4.0.0
 description:
    - Increment integers or float keys in Redis database and get new value.
    - Default increment for all keys is 1. For specific increments use the
@@ -41,6 +41,10 @@ options:
 
 extends_documentation_fragment:
   - community.general.redis.documentation
+
+notes:
+   - For I(check_mode) to work, the specified I(redis_user) needs permission to
+     run the (GET) command on the key, otherwise the module will fail.
 
 seealso:
     - module: community.general.redis_set
@@ -121,18 +125,19 @@ def main():
             if res is not None:
                 value = float(res)
         except ValueError as e:
-            msg = 'Value: {0} of key: {0} is not incrementable(int or float)'
-            result['value'] = res
+            msg = 'Value: {0} of key: {1} is not incrementable(int or float)'.format(
+                res, key)
+            result['msg'] = msg
             module.fail_json(**result)
         except Exception as e:
-            msg = 'Failed to get value of key: {0}. Using value 0.0. Exception: {1}'.format(
+            msg = 'Failed to get value of key: {0} with exception: {1}'.format(
                 key, str(e))
             result['msg'] = msg
             module.fail_json(**result)
         msg = 'Incremented key: {0} by {1} to {2}'.format(
             key, increment, value + increment)
         result['msg'] = msg
-        result['value'] = value + increment
+        result['value'] = float(value + increment)
         module.exit_json(**result)
 
     if increment_float is not None:
