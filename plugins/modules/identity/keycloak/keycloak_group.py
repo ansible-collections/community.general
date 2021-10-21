@@ -217,7 +217,7 @@ end_state:
 group:
   description:
     - Representation of the group after module execution.
-    - B(DEPRECATED) - Please use C(end_state) instead.
+    - Deprecated return value, it will be removed in community.general 6.0.0. Please use the return value I(end_state) instead.
   returned: always
   type: complex
   contains:

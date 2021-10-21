@@ -175,7 +175,7 @@ msg:
 flow:
     description:
       - JSON representation for the authentication.
-      - B(DEPRECATED) - Please use C(end_state) instead.
+      - Deprecated return value, it will be removed in community.general 6.0.0. Please use the return value I(end_state) instead.
     returned: on success
     type: dict
     sample: {
