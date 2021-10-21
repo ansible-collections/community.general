@@ -375,12 +375,6 @@ class OpenTelemetrySource(object):
         stderr = result.get('stderr')
         return ('message: "{0}"\nexception: "{1}"\nstderr: "{2}"').format(message, exception, stderr)
 
-    @staticmethod
-    def flat_args(args):
-        if args:
-            return ', '.join(('%s=%s' % a for a in args.items()))
-        return None
-
 
 class CallbackModule(CallbackBase):
     """
