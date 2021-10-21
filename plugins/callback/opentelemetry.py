@@ -266,7 +266,11 @@ class OpenTelemetrySource(object):
                 status = Status(status_code=StatusCode.UNSET)
 
         span.set_status(status)
-        self.set_span_attribute(span, "ansible.task.args", self.flat_args(task_data.args))
+        if task_data.args and not "gather_facts" in task_data.action:
+            names = self.transform_AnsibleUnicode(task_data.args.keys())
+            values = self.transform_AnsibleUnicode(task_data.args.values())
+            self.set_span_attribute(span, ("ansible.task.args.name"), names)
+            self.set_span_attribute(span, ("ansible.task.args.value"), values)
         self.set_span_attribute(span, "ansible.task.module", task_data.action)
         self.set_span_attribute(span, "ansible.task.message", message)
         self.set_span_attribute(span, "ansible.task.name", name)
@@ -324,6 +328,13 @@ class OpenTelemetrySource(object):
         if all([url.scheme, url.netloc, url.hostname]):
             return "{{" not in url.hostname
         return False
+
+    @staticmethod
+    def transform_AnsibleUnicode(values):
+        t = ()
+        for value in values:
+            t = t + (str(value),)
+        return t
 
     @staticmethod
     def get_error_message(result):
