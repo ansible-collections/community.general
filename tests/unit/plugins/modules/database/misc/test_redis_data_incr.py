@@ -12,7 +12,6 @@ import json
 import redis
 from redis import __version__
 
-from redis.exceptions import NoPermissionError, RedisError, ResponseError
 from ansible_collections.community.general.plugins.modules.database.misc import redis_data_incr
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 
@@ -20,6 +19,8 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
 HAS_REDIS_USERNAME_OPTION = True
 if tuple(map(int, __version__.split('.'))) < (3, 4, 0):
     HAS_REDIS_USERNAME_OPTION = False
+if HAS_REDIS_USERNAME_OPTION:
+    from redis.exceptions import NoPermissionError, RedisError, ResponseError
 
 
 def test_redis_data_incr_without_arguments(capfd):
