@@ -1,6 +1,0 @@
-####################################################################
-# WARNING: These are designed specifically for Ansible tests       #
-# and should not be used as examples of how to write Ansible roles #
-####################################################################
-
-- include: nios_network_view_idempotence.yml
