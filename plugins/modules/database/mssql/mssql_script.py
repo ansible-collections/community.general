@@ -137,37 +137,37 @@ EXAMPLES = r'''
 
 RETURN = r'''
 query_results:
-    description: List of batches ( queries separated by 'GO' keyword)
+    description: List of batches (queries separated by C(GO) keyword).
     type: list
     elements: list
-    returned: success
+    returned: success and I(output=default)
     sample: [[[["Batch 0 - Select 0"]], [["Batch 0 - Select 1"]]], [[["Batch 1 - Select 0"]]]]
     contains:
         queries:
             description:
               - List of result sets of each query.
               - If a query returns no results, the results of this and all the following queries will not be included in the output.
-                Use 'GO' keyword to separate queries.
+              - Use the C(GO) keyword in I(script) to separate queries.
             type: list
             elements: list
             contains:
                 rows:
-                    description: list of rows returned by query
+                    description: List of rows returned by query.
                     type: list
                     elements: list
                     contains:
                         column_value:
                             description:
-                              - list of column values
-                              - c(bytes) are converted to hex strings. An other non-standard type is converted to string.
+                              - List of column values.
+                              - Any non-standard JSON type is converted to string.
                             type: list
                             example: ["Batch 0 - Select 0"]
                             returned: success, if output is default
 query_results_dict:
-    description: List of batches ( queries separated by 'GO' keyword)
+    description: List of batches (queries separated by C(GO) keyword).
     type: list
     elements: list
-    returned: success
+    returned: success and I(output=dict)
     sample: [[[["Batch 0 - Select 0"]], [["Batch 0 - Select 1"]]], [[["Batch 1 - Select 0"]]]]
     contains:
         queries:
@@ -179,14 +179,14 @@ query_results_dict:
             elements: list
             contains:
                 rows:
-                    description: list of rows returned by query
+                    description: List of rows returned by query.
                     type: list
                     elements: list
                     contains:
                          column_dict:
                             description:
-                              - dict of column names and values
-                              - c(bytes) are converted to hex strings. An other non-standard type is converted to string.
+                              - Dictionary of column names and values.
+                              - Any non-standard JSON type is converted to string.
                             type: dict
                             example: {"col_name": "Batch 0 - Select 0"}
                             returned: success, if output is dict
