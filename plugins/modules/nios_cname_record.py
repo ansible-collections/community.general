@@ -1,1 +1,0 @@
-./net_tools/nios/nios_cname_record.py
