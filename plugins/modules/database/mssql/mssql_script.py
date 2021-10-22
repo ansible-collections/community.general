@@ -54,12 +54,11 @@ options:
         type: str
     params:
         description: |
-            Parameters passed to the script as sql parameters. ('SELECT %(name)s"')
-            example: '{"name": "John Doe"}'
+            Parameters passed to the script as SQL parameters. ('SELECT %(name)s"' with C(example: '{"name": "John Doe"}).)'
         type: dict
 notes:
    - Requires the pymssql Python package on the remote host. For Ubuntu, this
-     is as easy as pip install pymssql (See M(ansible.builtin.pip).)
+     is as easy as C(pip install pymssql) (See M(ansible.builtin.pip).)
 requirements:
    - python >= 2.7
    - pymssql
