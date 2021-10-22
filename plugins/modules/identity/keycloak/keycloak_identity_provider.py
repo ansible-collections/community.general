@@ -339,13 +339,13 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-  description: Message as to what action was taken
-  returned: always
-  type: str
-  sample: "Identity provider my-idp has been created"
+    description: Message as to what action was taken.
+    returned: always
+    type: str
+    sample: "Identity provider my-idp has been created"
 
 proposed:
-    description: Representation of proposed changes to identity provider
+    description: Representation of proposed identity provider.
     returned: always
     type: dict
     sample: {
@@ -363,7 +363,7 @@ proposed:
     }
 
 existing:
-    description: Representation of existing identity provider
+    description: Representation of existing identity provider.
     returned: always
     type: dict
     sample: {
@@ -391,8 +391,8 @@ existing:
     }
 
 end_state:
-    description: Representation of identity provider after module execution
-    returned: always
+    description: Representation of identity provider after module execution.
+    returned: on success
     type: dict
     sample: {
         "addReadTokenRoleOnCreate": false,
@@ -416,7 +416,6 @@ end_state:
         "storeToken": false,
         "trustEmail": false,
     }
-
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
@@ -438,7 +437,7 @@ def get_identity_provider_with_mappers(kc, alias, realm):
     if idp is not None:
         idp['mappers'] = sorted(kc.get_identity_provider_mappers(alias, realm), key=lambda x: x.get('name'))
     if idp is None:
-        idp = dict()
+        idp = {}
     return idp
 
 
@@ -497,16 +496,16 @@ def main():
     alias = module.params.get('alias')
     state = module.params.get('state')
 
-    # convert module parameters to client representation parameters (if they belong in there)
+    # Filter and map the parameters names that apply to the identity provider.
     idp_params = [x for x in module.params
                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'mappers'] and
                   module.params.get(x) is not None]
 
-    # does the identity provider already exist?
+    # See if it already exists in Keycloak
     before_idp = get_identity_provider_with_mappers(kc, alias, realm)
 
-    # build a changeset
-    changeset = dict()
+    # Build a proposed changeset from parameters given to this module
+    changeset = {}
 
     for param in idp_params:
         new_param_value = module.params.get(param)
@@ -539,37 +538,37 @@ def main():
                     changeset['mappers'] = list()
                 changeset['mappers'].append(new_mapper)
 
-    # prepare the new representation
-    updated_idp = before_idp.copy()
-    updated_idp.update(changeset)
+    # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
+    desired_idp = before_idp.copy()
+    desired_idp.update(changeset)
 
     result['proposed'] = sanitize(changeset)
     result['existing'] = sanitize(before_idp)
 
-    # if before_idp is none, the identity provider doesn't exist.
-    if before_idp == dict():
+    # Cater for when it doesn't exist (an empty dict)
+    if not before_idp:
         if state == 'absent':
-            # nothing to do.
+            # Do nothing and exit
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
-            result['end_state'] = dict()
+            result['end_state'] = {}
             result['msg'] = 'Identity provider does not exist; doing nothing.'
             module.exit_json(**result)
 
-        # for 'present', create a new identity provider.
+        # Process a creation
         result['changed'] = True
 
         if module._diff:
-            result['diff'] = dict(before='', after=sanitize(updated_idp))
+            result['diff'] = dict(before='', after=sanitize(desired_idp))
 
         if module.check_mode:
             module.exit_json(**result)
 
-        # do it for real!
-        updated_idp = updated_idp.copy()
-        mappers = updated_idp.pop('mappers', [])
-        kc.create_identity_provider(updated_idp, realm)
+        # create it
+        desired_idp = desired_idp.copy()
+        mappers = desired_idp.pop('mappers', [])
+        kc.create_identity_provider(desired_idp, realm)
         for mapper in mappers:
             if mapper.get('identityProviderAlias') is None:
                 mapper['identityProviderAlias'] = alias
@@ -583,26 +582,28 @@ def main():
 
     else:
         if state == 'present':
+            # Process an update
+
             # no changes
-            if updated_idp == before_idp:
+            if desired_idp == before_idp:
                 result['changed'] = False
-                result['end_state'] = sanitize(updated_idp)
+                result['end_state'] = sanitize(desired_idp)
                 result['msg'] = "No changes required to identity provider {alias}.".format(alias=alias)
                 module.exit_json(**result)
 
-            # update the existing role
+            # doing an update
             result['changed'] = True
 
             if module._diff:
-                result['diff'] = dict(before=sanitize(before_idp), after=sanitize(updated_idp))
+                result['diff'] = dict(before=sanitize(before_idp), after=sanitize(desired_idp))
 
             if module.check_mode:
                 module.exit_json(**result)
 
             # do the update
-            updated_idp = updated_idp.copy()
-            updated_mappers = updated_idp.pop('mappers', [])
-            kc.update_identity_provider(updated_idp, realm)
+            desired_idp = desired_idp.copy()
+            updated_mappers = desired_idp.pop('mappers', [])
+            kc.update_identity_provider(desired_idp, realm)
             for mapper in updated_mappers:
                 if mapper.get('id') is not None:
                     kc.update_identity_provider_mapper(mapper, alias, realm)
@@ -622,6 +623,7 @@ def main():
             module.exit_json(**result)
 
         elif state == 'absent':
+            # Process a deletion
             result['changed'] = True
 
             if module._diff:
@@ -630,13 +632,12 @@ def main():
             if module.check_mode:
                 module.exit_json(**result)
 
-            # delete for real
+            # delete it
             kc.delete_identity_provider(alias, realm)
 
-            result['end_state'] = dict()
+            result['end_state'] = {}
 
             result['msg'] = "Identity provider {alias} has been deleted".format(alias=alias)
-            module.exit_json(**result)
 
     module.exit_json(**result)
 
