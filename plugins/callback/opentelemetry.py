@@ -252,8 +252,8 @@ class OpenTelemetrySource(object):
             # Support loops
             if 'results' in host_data.result._result:
                 if host_data.status == 'failed':
-                    message = self.get_error_message_from_results(host_data.result._result['results'])
-                    enriched_error_message = self.enrich_error_message_from_results(host_data.result._result['results'])
+                    message = self.get_error_message_from_results(host_data.result._result['results'], task_data.action)
+                    enriched_error_message = self.enrich_error_message_from_results(host_data.result._result['results'], task_data.action)
             else:
                 res = host_data.result._result
                 rc = res.get('rc', 0)
@@ -346,10 +346,10 @@ class OpenTelemetrySource(object):
         return result.get('msg', 'failed')
 
     @staticmethod
-    def get_error_message_from_results(results):
+    def get_error_message_from_results(results, action):
         for result in results:
             if result.get('failed', False):
-                return OpenTelemetrySource.get_error_message(result)
+                return ('{0}({1}) - {2}').format(action, result.get('item', 'none'), OpenTelemetrySource.get_error_message(result))
 
     @staticmethod
     def _last_line(text):
@@ -364,11 +364,11 @@ class OpenTelemetrySource(object):
         return ('message: "{0}"\nexception: "{1}"\nstderr: "{2}"').format(message, exception, stderr)
 
     @staticmethod
-    def enrich_error_message_from_results(results):
+    def enrich_error_message_from_results(results, action):
         message = ""
         for result in results:
             if result.get('failed', False):
-                message = ('{0}\n{1}').format(message, OpenTelemetrySource.enrich_error_message(result))
+                message = ('{0}\n{1}({2}) {3}').format(message, action, result.get('item', 'none'), OpenTelemetrySource.enrich_error_message(result))
         return message
 
 
