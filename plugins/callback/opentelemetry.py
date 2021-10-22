@@ -248,19 +248,25 @@ class OpenTelemetrySource(object):
         rc = 0
         status = Status(status_code=StatusCode.OK)
         if host_data.status != 'included':
-            res = host_data.result._result
-            rc = res.get('rc', 0)
-            if host_data.status == 'failed':
-                message = self.get_error_message(res)
-                status = Status(status_code=StatusCode.ERROR, description=message)
-                # Record an exception with the task message
-                span.record_exception(BaseException(self.enrich_error_message(res)))
-            elif host_data.status == 'skipped':
-                if 'skip_reason' in res:
-                    message = res['skip_reason']
-                else:
-                    message = 'skipped'
-                status = Status(status_code=StatusCode.UNSET)
+            # Support loops
+            if 'results' in host_data.result._result:
+                for x in host_data.result._result['results']:
+                    if x.get('failed', False):
+                        pass
+            else:
+                res = host_data.result._result
+                rc = res.get('rc', 0)
+                if host_data.status == 'failed':
+                    message = self.get_error_message(res)
+                    status = Status(status_code=StatusCode.ERROR, description=message)
+                    # Record an exception with the task message
+                    span.record_exception(BaseException(self.enrich_error_message(res)))
+                elif host_data.status == 'skipped':
+                    if 'skip_reason' in res:
+                        message = res['skip_reason']
+                    else:
+                        message = 'skipped'
+                    status = Status(status_code=StatusCode.UNSET)
 
         span.set_status(status)
         if isinstance(task_data.args, dict) and "gather_facts" not in task_data.action:
