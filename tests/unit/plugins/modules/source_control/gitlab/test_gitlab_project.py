@@ -71,16 +71,10 @@ class TestGitlabProject(GitlabModuleTestCase):
     @with_httmock(resp_create_project)
     def test_create_project(self):
         group = self.gitlab_instance.groups.get(1)
-        project = self.moduleUtil.createProject(
-            group,
-            {"name": "Diaspora Client", "path": "diaspora-client", "namespace_id": group.id, "initialize_with_readme": True}
-        )
+        project = self.moduleUtil.createProject(group, {"name": "Diaspora Client", "path": "diaspora-client", "namespace_id": group.id})
 
         self.assertEqual(type(project), Project)
         self.assertEqual(project.name, "Diaspora Client")
-        self.assertEqual(project.path, "diaspora-client")
-        self.assertEqual(project.namespace_id, group.id)
-        self.assertTrue(project.initialize_with_readme)
 
     @with_httmock(resp_get_project)
     def test_update_project(self):
