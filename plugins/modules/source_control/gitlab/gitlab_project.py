@@ -48,6 +48,12 @@ options:
     description:
       - An description for the project.
     type: str
+  initialize_with_readme:
+    description:
+      - Will initialize the project with a default README.md.
+    type: bool
+    default: no
+    version_added: "4.0.0"
   issues_enabled:
     description:
       - Whether you want to create issues or not.
@@ -187,6 +193,7 @@ EXAMPLES = r'''
     wiki_enabled: True
     snippets_enabled: True
     import_url: http://git.example.com/example/lab.git
+    initialize_with_readme: True
     state: present
   delegate_to: localhost
 '''
@@ -248,6 +255,7 @@ class GitLabProject(object):
         project_options = {
             'name': project_name,
             'description': options['description'],
+            'initialize_with_readme': options['initialize_with_readme'],
             'issues_enabled': options['issues_enabled'],
             'merge_requests_enabled': options['merge_requests_enabled'],
             'merge_method': options['merge_method'],
@@ -359,6 +367,7 @@ def main():
         name=dict(type='str', required=True),
         path=dict(type='str'),
         description=dict(type='str'),
+        initialize_with_readme=dict(type='bool', default=False),
         issues_enabled=dict(type='bool', default=True),
         merge_requests_enabled=dict(type='bool', default=True),
         merge_method=dict(type='str', default='merge', choices=["merge", "rebase_merge", "ff"]),
@@ -399,6 +408,7 @@ def main():
     project_name = module.params['name']
     project_path = module.params['path']
     project_description = module.params['description']
+    initialize_with_readme = module.params['initialize_with_readme']
     issues_enabled = module.params['issues_enabled']
     merge_requests_enabled = module.params['merge_requests_enabled']
     merge_method = module.params['merge_method']
@@ -467,6 +477,7 @@ def main():
         if gitlab_project.createOrUpdateProject(project_name, namespace, {
                                                 "path": project_path,
                                                 "description": project_description,
+                                                "initialize_with_readme": initialize_with_readme,
                                                 "issues_enabled": issues_enabled,
                                                 "merge_requests_enabled": merge_requests_enabled,
                                                 "merge_method": merge_method,
