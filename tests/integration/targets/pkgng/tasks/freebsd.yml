@@ -1,0 +1,493 @@
+---
+##
+## pkgng - prepare test environment
+##
+- name: Remove test package
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    state: absent
+
+##
+## pkgng - example - state=present for single package
+##
+- name: 'state=present for single package'
+  include_tasks: install_single_package.yml
+
+##
+## pkgng - example - state=latest for already up-to-date package
+##
+- name: Upgrade package (idempotent)
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    state: latest
+  register: pkgng_example2
+
+- name: Ensure pkgng does not upgrade up-to-date package
+  assert:
+    that:
+      - not pkgng_example2.changed
+
+##
+## pkgng - example - state=absent for single package
+##
+- name: Verify package sentinel file is present
+  stat:
+    path: '{{ pkgng_test_pkg_sentinelfile_path }}'
+    get_attributes: no
+    get_checksum: no
+    get_mime: no
+  register: pkgng_example3_stat_before
+
+- name: Install package (checkmode)
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+  check_mode: yes
+  register: pkgng_example3_checkmode
+
+- name: Remove package
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    state: absent
+  register: pkgng_example3
+
+- name: Remove package (idempotent)
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    state: absent
+  register: pkgng_example3_idempotent
+
+- name: Verify package sentinel file is not present
+  stat:
+    path: '{{ pkgng_test_pkg_sentinelfile_path }}'
+    get_attributes: no
+    get_checksum: no
+    get_mime: no
+  register: pkgng_example3_stat_after
+
+- name: Ensure pkgng installs package correctly
+  assert:
+    that:
+      - pkgng_example3_stat_before.stat.exists
+      - pkgng_example3_stat_before.stat.executable
+      - not pkgng_example3_checkmode.changed
+      - pkgng_example3.changed
+      - not pkgng_example3_idempotent.changed
+      - not pkgng_example3_stat_after.stat.exists
+
+##
+## pkgng - example - state=latest for out-of-date package
+##
+- name: Install intentionally out-of-date package and upgrade it
+  #
+  # NOTE: The out-of-date package provided is a minimal,
+  #       no-contents test package that declares {{ pkgng_test_pkg_name }} with
+  #       a version of 0, so it should always be upgraded.
+  #
+  #       This test might fail at some point in the
+  #       future if the FreeBSD package format receives
+  #       breaking changes that prevent pkg from installing
+  #       older package formats.
+  #
+  block:
+    - name: Create out-of-date test package
+      import_tasks: create-outofdate-pkg.yml
+
+    - name: Install out-of-date test package
+      command: 'pkg add {{ pkgng_test_outofdate_pkg_path }}'
+      register: pkgng_example4_prepare
+
+    - name: Check for any available package upgrades (checkmode)
+      pkgng:
+        name: '*'
+        state: latest
+      check_mode: yes
+      register: pkgng_example4_wildcard_checkmode
+
+    - name: Check for available package upgrade (checkmode)
+      pkgng:
+        name: '{{ pkgng_test_pkg_name }}'
+        state: latest
+      check_mode: yes
+      register: pkgng_example4_checkmode
+
+    - name: Upgrade out-of-date package
+      pkgng:
+        name: '{{ pkgng_test_pkg_name }}'
+        state: latest
+      register: pkgng_example4
+
+    - name: Upgrade out-of-date package (idempotent)
+      pkgng:
+        name: '{{ pkgng_test_pkg_name }}'
+        state: latest
+      register: pkgng_example4_idempotent
+
+    - name: Remove test out-of-date package
+      pkgng:
+        name: '{{ pkgng_test_pkg_name }}'
+        state: absent
+
+    - name: Ensure pkgng upgrades package correctly
+      assert:
+        that:
+          - not pkgng_example4_prepare.failed
+          - pkgng_example4_wildcard_checkmode.changed
+          - pkgng_example4_checkmode.changed
+          - pkgng_example4.changed
+          - not pkgng_example4_idempotent.changed
+
+##
+## pkgng - example - Install multiple packages in one command
+##
+- name: Remove test package (checkmode)
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    state: absent
+  check_mode: yes
+  register: pkgng_example5_prepare
+
+- name: Install three packages
+  pkgng:
+    name:
+      - '{{ pkgng_test_pkg_name }}'
+      - fish
+      - busybox
+  register: pkgng_example5
+
+- name: Remove three packages
+  pkgng:
+    name:
+      - '{{ pkgng_test_pkg_name }}'
+      - fish
+      - busybox
+    state: absent
+  register: pkgng_example5_cleanup
+
+- name: Ensure pkgng installs multiple packages with one command
+  assert:
+    that:
+      - not pkgng_example5_prepare.changed
+      - pkgng_example5.changed
+      - '(pkgng_example5.stdout | regex_search("^Number of packages to be installed: (\d+)", "\\1", multiline=True) | first | int) >= 3'
+      - '(pkgng_example5.stdout | regex_findall("^Number of packages to be", multiline=True) | count) == 1'
+      - pkgng_example5_cleanup.changed
+
+##
+## pkgng - example - state=latest multiple packages, some already installed
+##
+- name: Remove test package (checkmode)
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    state: absent
+  check_mode: yes
+  register: pkgng_example6_check
+
+- name: Create out-of-date test package
+  import_tasks: create-outofdate-pkg.yml
+
+- name: Install out-of-date test package
+  command: 'pkg add {{ pkgng_test_outofdate_pkg_path }}'
+  register: pkgng_example6_prepare
+
+- name: Upgrade and/or install two packages
+  pkgng:
+    name:
+      - '{{ pkgng_test_pkg_name }}'
+      - fish
+    state: latest
+  register: pkgng_example6
+
+- name: Remove two packages
+  pkgng:
+    name:
+      - '{{ pkgng_test_pkg_name }}'
+      - fish
+    state: absent
+  register: pkgng_example6_cleanup
+
+- name: Ensure pkgng installs multiple packages with one command
+  assert:
+    that:
+      - not pkgng_example6_check.changed
+      - not pkgng_example6_prepare.failed
+      - pkgng_example6.changed
+      - '(pkgng_example6.stdout | regex_search("^Number of packages to be installed: (\d+)", "\\1", multiline=True) | first | int) >= 1'
+      - '(pkgng_example6.stdout | regex_search("^Number of packages to be upgraded: (\d+)", "\\1", multiline=True) | first | int) >= 1'
+      # Checking that "will be affected" occurs twice in the output ensures
+      # that the module runs two separate commands for install and upgrade,
+      # as the pkg command only outputs the string once per invocation.
+      - '(pkgng_example6.stdout | regex_findall("will be affected", multiline=True) | count) == 2'
+      - pkgng_example6_cleanup.changed
+
+##
+## pkgng - example - autoremove=yes
+##
+- name: "Test autoremove=yes"
+  #
+  # NOTE: FreeBSD 12.0 test runner receives a "connection reset by peer" after ~20% downloaded so we are
+  #       only running this on 12.1 or higher
+  #
+  when: ansible_distribution_version is version('12.01', '>=')
+  block:
+    - name: Install GNU autotools
+      pkgng:
+        name: autotools
+        state: latest
+      register: pkgng_example7_prepare_install
+
+    - name: Remove GNU autotools and run pkg autoremove
+      pkgng:
+        name: autotools
+        state: absent
+        autoremove: yes
+      register: pkgng_example7
+
+    - name: Check if autoremove uninstalled known autotools dependencies
+      pkgng:
+        name:
+          - autoconf
+          - automake
+          - libtool
+          - m4
+        state: absent
+      check_mode: yes
+      register: pkgng_example7_cleanup
+
+    - name: Ensure pkgng autoremove works correctly
+      assert:
+        that:
+          - pkgng_example7_prepare_install.changed
+          - "'autoremoved' is in(pkgng_example7.msg)"
+          - not pkgng_example7_cleanup.changed
+
+##
+## pkgng - example - single annotations
+##
+- name: Install and annotate single package
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation: '+ansibletest_example8=added'
+  register: pkgng_example8_add_annotation
+
+- name: Should fail to add duplicate annotation
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation: '+ansibletest_example8=duplicate'
+  ignore_errors: yes
+  register: pkgng_example8_add_annotation_failure
+
+- name: Verify annotation is actually there
+  command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8'
+  register: pkgng_example8_add_annotation_verify
+
+- name: Install and annotate single package (checkmode, not changed)
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation: '+ansibletest_example8=added'
+  check_mode: yes
+  register: pkgng_example8_add_annotation_checkmode_nochange
+
+- name: Install and annotate single package (checkmode, changed)
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation: '+ansibletest_example8_checkmode=added'
+  check_mode: yes
+  register: pkgng_example8_add_annotation_checkmode_change
+
+- name: Verify check_mode did not add an annotation
+  command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8_checkmode'
+  register: pkgng_example8_add_annotation_checkmode_change_verify
+
+- name: Modify annotation on single package
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation: ':ansibletest_example8=modified'
+  register: pkgng_example8_modify_annotation
+
+- name: Should fail to modify missing annotation
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation: ':ansiblemissing=modified'
+  ignore_errors: yes
+  register: pkgng_example8_modify_annotation_failure
+
+- name: Verify annotation has been modified
+  command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8'
+  register: pkgng_example8_modify_annotation_verify
+
+- name: Remove annotation on single package
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation: '-ansibletest_example8'
+  register: pkgng_example8_remove_annotation
+
+- name: Verify annotation has been removed
+  command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8'
+  register: pkgng_example8_remove_annotation_verify
+
+- name: Ensure pkgng annotations on single packages work correctly
+  assert:
+    that:
+      - pkgng_example8_add_annotation.changed
+      - pkgng_example8_add_annotation_failure.failed
+      - pkgng_example8_add_annotation_checkmode_nochange is not changed
+      - pkgng_example8_add_annotation_checkmode_change is changed
+      - 'pkgng_example8_add_annotation_checkmode_change_verify.stdout_lines | count == 0'
+      - 'pkgng_example8_add_annotation_verify.stdout_lines | first == "added"'
+      - pkgng_example8_modify_annotation.changed
+      - pkgng_example8_modify_annotation_failure.failed
+      - 'pkgng_example8_modify_annotation_verify.stdout_lines | first == "modified"'
+      - pkgng_example8_remove_annotation.changed
+      - 'pkgng_example8_remove_annotation_verify.stdout_lines | count == 0'
+
+##
+## pkgng - example - multiple annotations
+##
+- name: Annotate single package with multiple annotations
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation:
+      - '+ansibletest_example9_1=added'
+      - '+ansibletest_example9_2=added'
+  register: pkgng_example9_add_annotation
+
+- name: Verify annotation is actually there
+  command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
+  register: pkgng_example9_add_annotation_verify
+  # Assert, below, tests that stdout includes:
+  # ```
+  # ansibletest_example9_1   : added
+  # ansibletest_example9_2   : added
+  # ```
+
+- name: Multiple annotation operations on single package
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation:
+      - ':ansibletest_example9_1=modified'
+      - '+ansibletest_example9_3=added'
+  register: pkgng_example9_multiple_annotation
+
+- name: Verify multiple operations succeeded
+  command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
+  register: pkgng_example9_multiple_annotation_verify
+  # Assert, below, tests that stdout includes:
+  # ```
+  # ansibletest_example9_1   : modified
+  # ansibletest_example9_2   : added
+  # ansibletest_example9_3   : added
+  # ```
+
+- name: Add multiple annotations with old syntax
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation: '+ansibletest_example9_4=added,+ansibletest_example9_5=added'
+  register: pkgng_example9_add_annotation_old
+
+- name: Verify annotation is actually there
+  command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
+  register: pkgng_example9_add_annotation_old_verify
+  # Assert, below, tests that stdout includes:
+  # ```
+  # ansibletest_example9_4   : added
+  # ansibletest_example9_5   : added
+  # ```
+
+- name: Ensure multiple annotations work correctly
+  assert:
+    that:
+      - pkgng_example9_add_annotation.changed
+      - '(pkgng_example9_add_annotation_verify.stdout_lines | select("match",  "ansibletest_example9_[12]\s*:\s*added") | list | count) == 2'
+      - pkgng_example9_multiple_annotation.changed
+      - '(pkgng_example9_multiple_annotation_verify.stdout_lines | select("match",  "ansibletest_example9_1\s*:\s*modified") | list | count) == 1'
+      - '(pkgng_example9_multiple_annotation_verify.stdout_lines | select("match",  "ansibletest_example9_[23]\s*:\s*added") | list | count) == 2'
+      - pkgng_example9_add_annotation_old.changed
+      - '(pkgng_example9_add_annotation_old_verify.stdout_lines | select("match",  "ansibletest_example9_[45]\s*:\s*added") | list | count) == 2'
+
+##
+## pkgng - example - invalid annotation strings
+##
+- name: Should fail on invalid annotate strings
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    annotation: '{{ item }}'
+  ignore_errors: yes
+  register: pkgng_example8_invalid_annotation_failure
+  loop:
+    - 'naked_string'
+    - '/invalid_operation'
+    - ',empty_first_tag=validsecond'
+    - '=notag'
+
+- name: Verify invalid annotate strings did not add annotations
+  command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
+  register: pkgng_example8_invalid_annotation_verify
+
+- name: Ensure invalid annotate strings fail safely
+  assert:
+    that:
+      # Invalid strings should not change anything
+      - '(pkgng_example8_invalid_annotation_failure.results | selectattr("changed") | list | count) == 0'
+      # Invalid strings should always fail
+      - '(pkgng_example8_invalid_annotation_failure.results | rejectattr("failed") | list | count) == 0'
+      # Invalid strings should not cause an exception
+      - '(pkgng_example8_invalid_annotation_failure.results | selectattr("exception", "defined") | list | count) == 0'
+      # Verify annotations are unaffected
+      - '(pkgng_example8_invalid_annotation_verify.stdout_lines | select("search",  "(naked_string|invalid_operation|empty_first_tag|validsecond|notag)") | list | count) == 0'
+
+##
+## pkgng - example - pkgsite=...
+##
+# NOTE: testing for failure here to not have to set up our own
+#       or depend on a third-party, alternate package repo
+- name: Should fail with invalid pkgsite
+  pkgng:
+    name: '{{ pkgng_test_pkg_name }}'
+    pkgsite: DoesNotExist
+  ignore_errors: yes
+  register: pkgng_example10_invalid_pkgsite_failure
+
+- name: Ensure invalid pkgsite fails as expected
+  assert:
+    that:
+      - pkgng_example10_invalid_pkgsite_failure.failed
+      - 'pkgng_example10_invalid_pkgsite_failure.stdout is search("^No repositories are enabled.", multiline=True)'
+
+##
+## pkgng - example - Install single package in jail
+##
+- name: Test within jail
+  #
+  # NOTE: FreeBSD 12.0 test runner receives a "connection reset by peer" after ~20% downloaded so we are
+  #       only running this on 12.1 or higher
+  #
+  when: ansible_distribution_version is version('12.01', '>=')
+  block:
+    - name: Setup testjail
+      include: setup-testjail.yml
+
+    - name: Install package in jail as rootdir
+      include_tasks: install_single_package.yml
+      vars:
+        pkgng_test_rootdir: /usr/jails/testjail
+        pkgng_test_install_prefix: /usr/jails/testjail
+        pkgng_test_install_cleanup: yes
+
+    - name: Install package in jail
+      include_tasks: install_single_package.yml
+      vars:
+        pkgng_test_jail: testjail
+        pkgng_test_install_prefix: /usr/jails/testjail
+        pkgng_test_install_cleanup: yes
+
+    - name: Install package in jail as chroot
+      include_tasks: install_single_package.yml
+      vars:
+        pkgng_test_chroot: /usr/jails/testjail
+        pkgng_test_install_prefix: /usr/jails/testjail
+        pkgng_test_install_cleanup: yes
+  always:
+    - name: Stop and remove testjail
+      failed_when: false
+      changed_when: false
+      command: "ezjail-admin delete -wf testjail"

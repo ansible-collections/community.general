@@ -50,13 +50,14 @@ options:
         default: no
     annotation:
         description:
-            - A comma-separated list of keyvalue-pairs of the form
+            - A list of keyvalue-pairs of the form
               C(<+/-/:><key>[=<value>]). A C(+) denotes adding an annotation, a
               C(-) denotes removing an annotation, and C(:) denotes modifying an
               annotation.
               If setting or modifying annotations, a value must be provided.
         required: false
-        type: str
+        type: list
+        elements: str
     pkgsite:
         description:
             - For pkgng versions before 1.1.4, specify packagesite to use
@@ -113,12 +114,16 @@ EXAMPLES = '''
 
 - name: Annotate package foo and bar
   community.general.pkgng:
-    name: foo,bar
+    name:
+      - foo
+      - bar
     annotation: '+test1=baz,-test2,:test3=foobar'
 
 - name: Remove packages foo and bar
   community.general.pkgng:
-    name: foo,bar
+    name:
+      - foo
+      - bar
     state: absent
 
 # "latest" support added in 2.7
@@ -139,9 +144,9 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 
 
-def query_package(module, pkgng_path, name, dir_arg):
+def query_package(module, run_pkgng, name):
 
-    rc, out, err = module.run_command("%s %s info -g -e %s" % (pkgng_path, dir_arg, name))
+    rc, out, err = run_pkgng('info', '-g', '-e', name)
 
     if rc == 0:
         return True
@@ -149,15 +154,12 @@ def query_package(module, pkgng_path, name, dir_arg):
     return False
 
 
-def query_update(module, pkgng_path, name, dir_arg, old_pkgng, pkgsite):
+def query_update(module, run_pkgng, name):
 
     # Check to see if a package upgrade is available.
     # rc = 0, no updates available or package not installed
     # rc = 1, updates available
-    if old_pkgng:
-        rc, out, err = module.run_command("%s %s upgrade -g -n %s" % (pkgsite, pkgng_path, name))
-    else:
-        rc, out, err = module.run_command("%s %s upgrade %s -g -n %s" % (pkgng_path, dir_arg, pkgsite, name))
+    rc, out, err = run_pkgng('upgrade', '-g', '-n', name)
 
     if rc == 1:
         return True
@@ -167,7 +169,7 @@ def query_update(module, pkgng_path, name, dir_arg, old_pkgng, pkgsite):
 
 def pkgng_older_than(module, pkgng_path, compare_version):
 
-    rc, out, err = module.run_command("%s -v" % pkgng_path)
+    rc, out, err = module.run_command([pkgng_path, '-v'])
     version = [int(x) for x in re.split(r'[\._]', out)]
 
     i = 0
@@ -182,40 +184,39 @@ def pkgng_older_than(module, pkgng_path, compare_version):
     return not new_pkgng
 
 
-def upgrade_packages(module, pkgng_path, dir_arg):
+def upgrade_packages(module, run_pkgng):
     # Run a 'pkg upgrade', updating all packages.
     upgraded_c = 0
 
-    cmd = "%s %s upgrade -y" % (pkgng_path, dir_arg)
-    if module.check_mode:
-        cmd += " -n"
-    rc, out, err = module.run_command(cmd)
+    pkgng_args = ['upgrade']
+    pkgng_args.append('-n' if module.check_mode else '-y')
+    rc, out, err = run_pkgng(*pkgng_args)
 
-    match = re.search('^Number of packages to be upgraded: ([0-9]+)', out, re.MULTILINE)
-    if match:
-        upgraded_c = int(match.group(1))
+    matches = re.findall('^Number of packages to be (?:upgraded|reinstalled): ([0-9]+)', out, re.MULTILINE)
+    for match in matches:
+        upgraded_c += int(match)
 
     if upgraded_c > 0:
         return (True, "updated %s package(s)" % upgraded_c, out, err)
     return (False, "no packages need upgrades", out, err)
 
 
-def remove_packages(module, pkgng_path, packages, dir_arg):
+def remove_packages(module, run_pkgng, packages):
     remove_c = 0
     stdout = ""
     stderr = ""
     # Using a for loop in case of error, we can report the package that failed
     for package in packages:
         # Query the package first, to see if we even need to remove
-        if not query_package(module, pkgng_path, package, dir_arg):
+        if not query_package(module, run_pkgng, package):
             continue
 
         if not module.check_mode:
-            rc, out, err = module.run_command("%s %s delete -y %s" % (pkgng_path, dir_arg, package))
+            rc, out, err = run_pkgng('delete', '-y', package)
             stdout += out
             stderr += err
 
-        if not module.check_mode and query_package(module, pkgng_path, package, dir_arg):
+        if not module.check_mode and query_package(module, run_pkgng, package):
             module.fail_json(msg="failed to remove %s: %s" % (package, out), stdout=stdout, stderr=stderr)
 
         remove_c += 1
@@ -226,48 +227,27 @@ def remove_packages(module, pkgng_path, packages, dir_arg):
     return (False, "package(s) already absent", stdout, stderr)
 
 
-def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, state, ignoreosver):
+def install_packages(module, run_pkgng, packages, cached, state):
     action_queue = defaultdict(list)
     action_count = defaultdict(int)
     stdout = ""
     stderr = ""
 
-    # as of pkg-1.1.4, PACKAGESITE is deprecated in favor of repository definitions
-    # in /usr/local/etc/pkg/repos
-    old_pkgng = pkgng_older_than(module, pkgng_path, [1, 1, 4])
-    if pkgsite != "":
-        if old_pkgng:
-            pkgsite = "PACKAGESITE=%s" % (pkgsite)
-        else:
-            pkgsite = "-r %s" % (pkgsite)
-
-    # This environment variable skips mid-install prompts,
-    # setting them to their default values.
-    batch_var = 'env BATCH=yes'
-
-    if ignoreosver:
-        # Ignore FreeBSD OS version check,
-        #   useful on -STABLE and -CURRENT branches.
-        batch_var = batch_var + ' IGNORE_OSVERSION=yes'
-
     if not module.check_mode and not cached:
-        if old_pkgng:
-            rc, out, err = module.run_command("%s %s update" % (pkgsite, pkgng_path))
-        else:
-            rc, out, err = module.run_command("%s %s %s update" % (batch_var, pkgng_path, dir_arg))
+        rc, out, err = run_pkgng('update')
         stdout += out
         stderr += err
         if rc != 0:
             module.fail_json(msg="Could not update catalogue [%d]: %s %s" % (rc, out, err), stdout=stdout, stderr=stderr)
 
     for package in packages:
-        already_installed = query_package(module, pkgng_path, package, dir_arg)
+        already_installed = query_package(module, run_pkgng, package)
         if already_installed and state == "present":
             continue
 
         if (
             already_installed and state == "latest"
-            and not query_update(module, pkgng_path, package, dir_arg, old_pkgng, pkgsite)
+            and not query_update(module, run_pkgng, package)
         ):
             continue
 
@@ -276,29 +256,32 @@ def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, sta
         else:
             action_queue["install"].append(package)
 
-    if not module.check_mode:
-        # install/upgrade all named packages with one pkg command
-        for (action, package_list) in action_queue.items():
-            packages = ' '.join(package_list)
-            if old_pkgng:
-                rc, out, err = module.run_command("%s %s %s %s -g -U -y %s" % (batch_var, pkgsite, pkgng_path, action, packages))
+    # install/upgrade all named packages with one pkg command
+    for (action, package_list) in action_queue.items():
+        if module.check_mode:
+            # Do nothing, but count up how many actions
+            # would be performed so that the changed/msg
+            # is correct.
+            action_count[action] += len(package_list)
+            continue
+
+        pkgng_args = [action, '-g', '-U', '-y'] + package_list
+        rc, out, err = run_pkgng(*pkgng_args)
+        stdout += out
+        stderr += err
+
+        # individually verify packages are in requested state
+        for package in package_list:
+            verified = False
+            if action == 'install':
+                verified = query_package(module, run_pkgng, package)
+            elif action == 'upgrade':
+                verified = not query_update(module, run_pkgng, package)
+
+            if verified:
+                action_count[action] += 1
             else:
-                rc, out, err = module.run_command("%s %s %s %s %s -g -U -y %s" % (batch_var, pkgng_path, dir_arg, action, pkgsite, packages))
-            stdout += out
-            stderr += err
-
-            # individually verify packages are in requested state
-            for package in package_list:
-                verified = False
-                if action == 'install':
-                    verified = query_package(module, pkgng_path, package, dir_arg)
-                elif action == 'upgrade':
-                    verified = not query_update(module, pkgng_path, package, dir_arg, old_pkgng, pkgsite)
-
-                if verified:
-                    action_count[action] += 1
-                else:
-                    module.fail_json(msg="failed to %s %s" % (action, package), stdout=stdout, stderr=stderr)
+                module.fail_json(msg="failed to %s %s" % (action, package), stdout=stdout, stderr=stderr)
 
     if sum(action_count.values()) > 0:
         past_tense = {'install': 'installed', 'upgrade': 'upgraded'}
@@ -311,28 +294,28 @@ def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, sta
     return (False, "package(s) already %s" % (state), stdout, stderr)
 
 
-def annotation_query(module, pkgng_path, package, tag, dir_arg):
-    rc, out, err = module.run_command("%s %s info -g -A %s" % (pkgng_path, dir_arg, package))
+def annotation_query(module, run_pkgng, package, tag):
+    rc, out, err = run_pkgng('info', '-g', '-A', package)
     match = re.search(r'^\s*(?P<tag>%s)\s*:\s*(?P<value>\w+)' % tag, out, flags=re.MULTILINE)
     if match:
         return match.group('value')
     return False
 
 
-def annotation_add(module, pkgng_path, package, tag, value, dir_arg):
-    _value = annotation_query(module, pkgng_path, package, tag, dir_arg)
+def annotation_add(module, run_pkgng, package, tag, value):
+    _value = annotation_query(module, run_pkgng, package, tag)
     if not _value:
         # Annotation does not exist, add it.
-        rc, out, err = module.run_command('%s %s annotate -y -A %s %s "%s"'
-                                          % (pkgng_path, dir_arg, package, tag, value))
-        if rc != 0:
-            module.fail_json(msg="could not annotate %s: %s"
-                             % (package, out), stderr=err)
+        if not module.check_mode:
+            rc, out, err = run_pkgng('annotate', '-y', '-A', package, tag, data=value, binary_data=True)
+            if rc != 0:
+                module.fail_json(msg="could not annotate %s: %s"
+                                 % (package, out), stderr=err)
         return True
     elif _value != value:
         # Annotation exists, but value differs
         module.fail_json(
-            mgs="failed to annotate %s, because %s is already set to %s, but should be set to %s"
+            msg="failed to annotate %s, because %s is already set to %s, but should be set to %s"
             % (package, tag, _value, value))
         return False
     else:
@@ -340,21 +323,21 @@ def annotation_add(module, pkgng_path, package, tag, value, dir_arg):
         return False
 
 
-def annotation_delete(module, pkgng_path, package, tag, value, dir_arg):
-    _value = annotation_query(module, pkgng_path, package, tag, dir_arg)
+def annotation_delete(module, run_pkgng, package, tag, value):
+    _value = annotation_query(module, run_pkgng, package, tag)
     if _value:
-        rc, out, err = module.run_command('%s %s annotate -y -D %s %s'
-                                          % (pkgng_path, dir_arg, package, tag))
-        if rc != 0:
-            module.fail_json(msg="could not delete annotation to %s: %s"
-                             % (package, out), stderr=err)
+        if not module.check_mode:
+            rc, out, err = run_pkgng('annotate', '-y', '-D', package, tag)
+            if rc != 0:
+                module.fail_json(msg="could not delete annotation to %s: %s"
+                                 % (package, out), stderr=err)
         return True
     return False
 
 
-def annotation_modify(module, pkgng_path, package, tag, value, dir_arg):
-    _value = annotation_query(module, pkgng_path, package, tag, dir_arg)
-    if not value:
+def annotation_modify(module, run_pkgng, package, tag, value):
+    _value = annotation_query(module, run_pkgng, package, tag)
+    if not _value:
         # No such tag
         module.fail_json(msg="could not change annotation to %s: tag %s does not exist"
                          % (package, tag))
@@ -362,20 +345,27 @@ def annotation_modify(module, pkgng_path, package, tag, value, dir_arg):
         # No change in value
         return False
     else:
-        rc, out, err = module.run_command('%s %s annotate -y -M %s %s "%s"'
-                                          % (pkgng_path, dir_arg, package, tag, value))
-        if rc != 0:
-            module.fail_json(msg="could not change annotation annotation to %s: %s"
-                             % (package, out), stderr=err)
+        if not module.check_mode:
+            rc, out, err = run_pkgng('annotate', '-y', '-M', package, tag, data=value, binary_data=True)
+
+            # pkg sometimes exits with rc == 1, even though the modification succeeded
+            # Check the output for a success message
+            if (
+                rc != 0
+                and re.search(r'^%s-[^:]+: Modified annotation tagged: %s' % (package, tag), out, flags=re.MULTILINE) is None
+            ):
+                module.fail_json(msg="failed to annotate %s, could not change annotation %s to %s: %s"
+                                 % (package, tag, value, out), stderr=err)
         return True
 
 
-def annotate_packages(module, pkgng_path, packages, annotation, dir_arg):
+def annotate_packages(module, run_pkgng, packages, annotations):
     annotate_c = 0
-    annotations = map(lambda _annotation:
-                      re.match(r'(?P<operation>[\+-:])(?P<tag>\w+)(=(?P<value>\w+))?',
-                               _annotation).groupdict(),
-                      re.split(r',', annotation))
+    if len(annotations) == 1:
+        # Split on commas with optional trailing whitespace,
+        # to support the old style of multiple annotations
+        # on a single line, rather than YAML list syntax
+        annotations = re.split(r'\s*,\s*', annotations[0])
 
     operation = {
         '+': annotation_add,
@@ -384,8 +374,21 @@ def annotate_packages(module, pkgng_path, packages, annotation, dir_arg):
     }
 
     for package in packages:
-        for _annotation in annotations:
-            if operation[_annotation['operation']](module, pkgng_path, package, _annotation['tag'], _annotation['value']):
+        for annotation_string in annotations:
+            # Note to future maintainers: A dash (-) in a regex character class ([-+:] below)
+            # must appear as the first character in the class, or it will be interpreted
+            # as a range of characters.
+            annotation = \
+                re.match(r'(?P<operation>[-+:])(?P<tag>[^=]+)(=(?P<value>.+))?', annotation_string)
+
+            if annotation is None:
+                module.fail_json(
+                    msg="failed to annotate %s, invalid annotate string: %s"
+                    % (package, annotation_string)
+                )
+
+            annotation = annotation.groupdict()
+            if operation[annotation['operation']](module, run_pkgng, package, annotation['tag'], annotation['value']):
                 annotate_c += 1
 
     if annotate_c > 0:
@@ -393,10 +396,10 @@ def annotate_packages(module, pkgng_path, packages, annotation, dir_arg):
     return (False, "changed no annotations")
 
 
-def autoremove_packages(module, pkgng_path, dir_arg):
+def autoremove_packages(module, run_pkgng):
     stdout = ""
     stderr = ""
-    rc, out, err = module.run_command("%s %s autoremove -n" % (pkgng_path, dir_arg))
+    rc, out, err = run_pkgng('autoremove', '-n')
 
     autoremove_c = 0
 
@@ -408,7 +411,7 @@ def autoremove_packages(module, pkgng_path, dir_arg):
         return (False, "no package(s) to autoremove", stdout, stderr)
 
     if not module.check_mode:
-        rc, out, err = module.run_command("%s %s autoremove -y" % (pkgng_path, dir_arg))
+        rc, out, err = run_pkgng('autoremove', '-y')
         stdout += out
         stderr += err
 
@@ -422,11 +425,11 @@ def main():
             name=dict(aliases=["pkg"], required=True, type='list', elements='str'),
             cached=dict(default=False, type='bool'),
             ignore_osver=dict(default=False, required=False, type='bool'),
-            annotation=dict(default="", required=False),
-            pkgsite=dict(default="", required=False),
-            rootdir=dict(default="", required=False, type='path'),
-            chroot=dict(default="", required=False, type='path'),
-            jail=dict(default="", required=False, type='str'),
+            annotation=dict(required=False, type='list', elements='str'),
+            pkgsite=dict(required=False),
+            rootdir=dict(required=False, type='path'),
+            chroot=dict(required=False, type='path'),
+            jail=dict(required=False, type='str'),
             autoremove=dict(default=False, type='bool')),
         supports_check_mode=True,
         mutually_exclusive=[["rootdir", "chroot", "jail"]])
@@ -441,61 +444,90 @@ def main():
     msgs = []
     stdout = ""
     stderr = ""
-    dir_arg = ""
+    dir_arg = None
 
-    if p["rootdir"] != "":
-        old_pkgng = pkgng_older_than(module, pkgng_path, [1, 5, 0])
-        if old_pkgng:
+    if p["rootdir"] is not None:
+        rootdir_not_supported = pkgng_older_than(module, pkgng_path, [1, 5, 0])
+        if rootdir_not_supported:
             module.fail_json(msg="To use option 'rootdir' pkg version must be 1.5 or greater")
         else:
-            dir_arg = "--rootdir %s" % (p["rootdir"])
+            dir_arg = "--rootdir=%s" % (p["rootdir"])
 
     if p["ignore_osver"]:
-        old_pkgng = pkgng_older_than(module, pkgng_path, [1, 11, 0])
-        if old_pkgng:
+        ignore_osver_not_supported = pkgng_older_than(module, pkgng_path, [1, 11, 0])
+        if ignore_osver_not_supported:
             module.fail_json(msg="To use option 'ignore_osver' pkg version must be 1.11 or greater")
 
-    if p["chroot"] != "":
-        dir_arg = '--chroot %s' % (p["chroot"])
+    if p["chroot"] is not None:
+        dir_arg = '--chroot=%s' % (p["chroot"])
 
-    if p["jail"] != "":
-        dir_arg = '--jail %s' % (p["jail"])
+    if p["jail"] is not None:
+        dir_arg = '--jail=%s' % (p["jail"])
+
+    # as of pkg-1.1.4, PACKAGESITE is deprecated in favor of repository definitions
+    # in /usr/local/etc/pkg/repos
+    repo_flag_not_supported = pkgng_older_than(module, pkgng_path, [1, 1, 4])
+
+    def run_pkgng(action, *args, **kwargs):
+        cmd = [pkgng_path, dir_arg, action]
+
+        pkgng_env = {'BATCH': 'yes'}
+
+        if p["ignore_osver"]:
+            pkgng_env['IGNORE_OSVERSION'] = 'yes'
+
+        if p['pkgsite'] is not None and action in ('update', 'install', 'upgrade',):
+            if repo_flag_not_supported:
+                pkgng_env['PACKAGESITE'] = p['pkgsite']
+            else:
+                cmd.append('--repository=%s' % (p['pkgsite'],))
+
+        # If environ_update is specified to be "passed through"
+        # to module.run_command, then merge its values into pkgng_env
+        pkgng_env.update(kwargs.pop('environ_update', dict()))
+
+        return module.run_command(cmd + list(args), environ_update=pkgng_env, **kwargs)
 
     if pkgs == ['*'] and p["state"] == 'latest':
         # Operate on all installed packages. Only state: latest makes sense here.
-        _changed, _msg, _stdout, _stderr = upgrade_packages(module, pkgng_path, dir_arg)
+        _changed, _msg, _stdout, _stderr = upgrade_packages(module, run_pkgng)
         changed = changed or _changed
         stdout += _stdout
         stderr += _stderr
         msgs.append(_msg)
 
     # Operate on named packages
+    if len(pkgs) == 1:
+        # The documentation used to show multiple packages specified in one line
+        # with comma or space delimiters. That doesn't result in a YAML list, and
+        # wrong actions (install vs upgrade) can be reported if those
+        # comma- or space-delimited strings make it to the pkg command line.
+        pkgs = re.split(r'[,\s]', pkgs[0])
     named_packages = [pkg for pkg in pkgs if pkg != '*']
     if p["state"] in ("present", "latest") and named_packages:
-        _changed, _msg, _out, _err = install_packages(module, pkgng_path, named_packages,
-                                                      p["cached"], p["pkgsite"], dir_arg,
-                                                      p["state"], p["ignore_osver"])
+        _changed, _msg, _out, _err = install_packages(module, run_pkgng, named_packages,
+                                                      p["cached"], p["state"])
         stdout += _out
         stderr += _err
         changed = changed or _changed
         msgs.append(_msg)
 
     elif p["state"] == "absent" and named_packages:
-        _changed, _msg, _out, _err = remove_packages(module, pkgng_path, named_packages, dir_arg)
+        _changed, _msg, _out, _err = remove_packages(module, run_pkgng, named_packages)
         stdout += _out
         stderr += _err
         changed = changed or _changed
         msgs.append(_msg)
 
     if p["autoremove"]:
-        _changed, _msg, _stdout, _stderr = autoremove_packages(module, pkgng_path, dir_arg)
+        _changed, _msg, _stdout, _stderr = autoremove_packages(module, run_pkgng)
         changed = changed or _changed
         stdout += _stdout
         stderr += _stderr
         msgs.append(_msg)
 
-    if p["annotation"]:
-        _changed, _msg = annotate_packages(module, pkgng_path, pkgs, p["annotation"], dir_arg)
+    if p["annotation"] is not None:
+        _changed, _msg = annotate_packages(module, run_pkgng, pkgs, p["annotation"])
         changed = changed or _changed
         msgs.append(_msg)
 
