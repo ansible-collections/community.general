@@ -1,0 +1,6 @@
+bugfixes:
+  - 'pkgng - ``name=* state=latest`` check for upgrades did not count "Number of packages to be reinstalled" as a `changed` action, giving incorrect results in both regular and check mode (https://github.com/ansible-collections/community.general/pull/3526).'
+  - 'pkgng - an `earlier PR <https://github.com/ansible-collections/community.general/pull/3393>`_ broke check mode so that the module always reports `not changed`. This is now fixed so that the module reports number of upgrade or install actions that would be performed (https://github.com/ansible-collections/community.general/pull/3526).'
+  - 'pkgng - the ``annotation`` functionality was broken and is now fixed, and now also works with check mode (https://github.com/ansible-collections/community.general/pull/3526).'
+minor_changes:
+  - 'pkgng - ``annotation`` can now also be a YAML list (https://github.com/ansible-collections/community.general/pull/3526).'
