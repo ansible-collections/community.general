@@ -368,7 +368,7 @@ class OpenTelemetrySource(object):
         message = ""
         for result in results:
             if result.get('failed', False):
-                message = ('{0}\n{1}({2}) {3}').format(message, action, result.get('item', 'none'), OpenTelemetrySource.enrich_error_message(result))
+                message = ('{0}({1}) - {2}\n{3}').format(action, result.get('item', 'none'), OpenTelemetrySource.enrich_error_message(result), message)
         return message
 
 
