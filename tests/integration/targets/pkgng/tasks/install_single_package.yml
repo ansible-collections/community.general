@@ -1,0 +1,54 @@
+---
+- name: Verify package sentinel file is not present
+  stat:
+    path: '{{ pkgng_test_install_prefix | default("") }}{{ pkgng_test_pkg_sentinelfile_path }}'
+    get_attributes: no
+    get_checksum: no
+    get_mime: no
+  register: pkgng_install_stat_before
+
+- name: Install package
+  pkgng: &pkgng_install_params
+    name: '{{ pkgng_test_pkg_name }}'
+    jail: '{{ pkgng_test_jail | default(omit) }}'
+    chroot: '{{ pkgng_test_chroot | default(omit) }}'
+    rootdir: '{{ pkgng_test_rootdir | default(omit) }}'
+  register: pkgng_install
+
+- name: Remove package (checkmode)
+  pkgng:
+    <<: *pkgng_install_params
+    state: absent
+  check_mode: yes
+  register: pkgng_install_checkmode
+
+- name: Install package (idempotent, cached)
+  pkgng:
+    <<: *pkgng_install_params
+    cached: yes
+  register: pkgng_install_idempotent_cached
+
+- name: Verify package sentinel file is present
+  stat:
+    path: '{{ pkgng_test_install_prefix | default("") }}{{ pkgng_test_pkg_sentinelfile_path }}'
+    get_attributes: no
+    get_checksum: no
+    get_mime: no
+  register: pkgng_install_stat_after
+
+- name: Remove test package (if requested)
+  pkgng:
+    <<: *pkgng_install_params
+    state: absent
+  when: 'pkgng_test_install_cleanup | default(False)'
+
+- name: Ensure pkgng installs package correctly
+  assert:
+    that:
+      - not pkgng_install_stat_before.stat.exists
+      - pkgng_install.changed
+      - pkgng_install_checkmode.changed
+      - not pkgng_install_idempotent_cached.changed
+      - not pkgng_install_idempotent_cached.stdout is match("Updating \w+ repository catalogue\.\.\.")
+      - pkgng_install_stat_after.stat.exists
+      - pkgng_install_stat_after.stat.executable

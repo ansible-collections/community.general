@@ -1,0 +1,4 @@
+---
+- import_tasks: freebsd.yml
+  when:
+    - ansible_facts.distribution == 'FreeBSD'
