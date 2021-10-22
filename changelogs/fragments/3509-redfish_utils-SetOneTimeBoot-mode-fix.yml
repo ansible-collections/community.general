@@ -1,0 +1,2 @@
+bugfixes:
+  - redfish_utils module utils - do not attempt to change the boot source override mode if not specified by the user (https://github.com/ansible-collections/community.general/issues/3509/).

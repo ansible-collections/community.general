@@ -1605,9 +1605,6 @@ class RedfishUtils(object):
         cur_boot_next = boot.get('BootNext')
         cur_override_mode = boot.get('BootSourceOverrideMode')
 
-        if not boot_override_mode:
-            boot_override_mode = cur_override_mode
-
         if override_enabled == 'Disabled':
             payload = {
                 'Boot': {
@@ -1643,16 +1640,18 @@ class RedfishUtils(object):
                 }
             }
         else:
-            if cur_enabled == override_enabled and target == bootdevice and cur_override_mode == boot_override_mode:
+            if (cur_enabled == override_enabled and target == bootdevice and
+                    (cur_override_mode == boot_override_mode or not boot_override_mode)):
                 # If properties are already set, no changes needed
                 return {'ret': True, 'changed': False}
             payload = {
                 'Boot': {
                     'BootSourceOverrideEnabled': override_enabled,
-                    'BootSourceOverrideMode': boot_override_mode,
                     'BootSourceOverrideTarget': bootdevice
                 }
             }
+            if boot_override_mode:
+                payload['Boot']['BootSourceOverrideMode'] = boot_override_mode
 
         response = self.patch_request(self.root_uri + self.systems_uri, payload)
         if response['ret'] is False:
