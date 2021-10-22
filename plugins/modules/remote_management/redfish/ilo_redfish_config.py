@@ -47,7 +47,7 @@ ANSIBLE_METADATA = {'status': ['preview'],
 
 
 CATEGORY_COMMANDS_ALL = {
-    "Manager": ["SetTimeZone", "SetDNSserver", "SetDomainName", "SetNTPServers", "SetWINSReg", "ConfigureHostName"]
+    "Manager": ["SetTimeZone", "SetDNSserver", "SetDomainName", "SetNTPServers", "SetWINSReg"]
 }
 
 from ansible.module_utils._text import to_native
@@ -120,9 +120,7 @@ def main():
                 result = rf_utils.set_NTPServer(mgr_attributes)
             elif command == "SetWINSReg":
                 result = rf_utils.set_WINSRegistration(mgr_attributes)
-            elif command == "ConfigureHostName":
-                result = rf_utils.set_HostName(mgr_attributes)
-
+        
     if result['ret'] is True:
         module.exit_json(changed=result['changed'],
                          msg=to_native(result.get('msg')), sessionid=session_id)
