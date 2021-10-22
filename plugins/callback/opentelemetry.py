@@ -245,28 +245,28 @@ class OpenTelemetrySource(object):
         name = '[%s] %s: %s' % (host_data.name, task_data.play, task_data.name)
 
         message = 'success'
+        res = []
         rc = 0
         status = Status(status_code=StatusCode.OK)
         if host_data.status != 'included':
             # Support loops
             if 'results' in host_data.result._result:
-                for x in host_data.result._result['results']:
-                    if x.get('failed', False):
-                        pass
+                if host_data.status == 'failed':
+                    message = self.get_error_message_from_results(host_data.result._result['results'])
+                    enriched_error_message = self.enrich_error_message_from_results(host_data.result._result['results'])
             else:
                 res = host_data.result._result
                 rc = res.get('rc', 0)
-                if host_data.status == 'failed':
-                    message = self.get_error_message(res)
-                    status = Status(status_code=StatusCode.ERROR, description=message)
-                    # Record an exception with the task message
-                    span.record_exception(BaseException(self.enrich_error_message(res)))
-                elif host_data.status == 'skipped':
-                    if 'skip_reason' in res:
-                        message = res['skip_reason']
-                    else:
-                        message = 'skipped'
-                    status = Status(status_code=StatusCode.UNSET)
+                message = self.get_error_message(res)
+                enriched_error_message = self.enrich_error_message(res)
+
+            if host_data.status == 'failed':
+                status = Status(status_code=StatusCode.ERROR, description=message)
+                # Record an exception with the task message
+                span.record_exception(BaseException(enriched_error_message))
+            elif host_data.status == 'skipped':
+                message = res['skip_reason'] if 'skip_reason' in res else 'skipped'
+                status = Status(status_code=StatusCode.UNSET)
 
         span.set_status(status)
         if isinstance(task_data.args, dict) and "gather_facts" not in task_data.action:
@@ -346,6 +346,12 @@ class OpenTelemetrySource(object):
         return result.get('msg', 'failed')
 
     @staticmethod
+    def get_error_message_from_results(results):
+        for result in results:
+            if result.get('failed', False):
+                return OpenTelemetrySource.get_error_message(result)
+
+    @staticmethod
     def _last_line(text):
         lines = text.strip().split('\n')
         return lines[-1]
@@ -356,6 +362,14 @@ class OpenTelemetrySource(object):
         exception = result.get('exception')
         stderr = result.get('stderr')
         return ('message: "{0}"\nexception: "{1}"\nstderr: "{2}"').format(message, exception, stderr)
+
+    @staticmethod
+    def enrich_error_message_from_results(results):
+        message = ""
+        for result in results:
+            if result.get('failed', False):
+                message = ('{0}\n{1}').format(message, OpenTelemetrySource.enrich_error_message(result))
+        return message
 
 
 class CallbackModule(CallbackBase):
