@@ -265,8 +265,8 @@ class OpenTelemetrySource(object):
 
         span.set_status(status)
         if isinstance(task_data.args, dict) and "gather_facts" not in task_data.action:
-            names = self.transform_ansible_unicode_to_str(task_data.args.keys())
-            values = self.transform_ansible_unicode_to_str(task_data.args.values())
+            names = tuple(self.transform_ansible_unicode_to_str(k) for k in task_data.args.keys())
+            values = tuple(self.transform_ansible_unicode_to_str(k) for k in task_data.args.values())
             self.set_span_attribute(span, ("ansible.task.args.name"), names)
             self.set_span_attribute(span, ("ansible.task.args.value"), values)
         self.set_span_attribute(span, "ansible.task.module", task_data.action)
@@ -328,16 +328,11 @@ class OpenTelemetrySource(object):
         return False
 
     @staticmethod
-    def transform_ansible_unicode_to_str(values):
-        t = ()
-        for value in values:
-            # Redacted user and password to avoid exposing anything sensible.
-            parsed_url = urlparse(str(value))
-            if OpenTelemetrySource.is_valid_url(parsed_url):
-                t = t + (OpenTelemetrySource.redact_user_password(parsed_url).geturl(),)
-            else:
-                t = t + (str(value),)
-        return t
+    def transform_ansible_unicode_to_str(value):
+        parsed_url = urlparse(str(value))
+        if OpenTelemetrySource.is_valid_url(parsed_url):
+                return OpenTelemetrySource.redact_user_password(parsed_url).geturl()
+        return str(value)
 
     @staticmethod
     def get_error_message(result):
