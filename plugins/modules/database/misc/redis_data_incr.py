@@ -43,8 +43,8 @@ extends_documentation_fragment:
   - community.general.redis.documentation
 
 notes:
-   - For I(check_mode) to work, the specified I(redis_user) needs permission to
-     run the (GET) command on the key, otherwise the module will fail.
+   - For C(check_mode) to work, the specified I(redis_user) needs permission to
+     run the C(GET) command on the key, otherwise the module will fail.
 
 seealso:
     - module: community.general.redis_set
