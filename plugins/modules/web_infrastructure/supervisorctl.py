@@ -92,6 +92,11 @@ EXAMPLES = '''
     name: my_app
     state: signalled
     signal: USR1
+
+- name: Restart all programs and program groups
+  community.general.supervisorctl:
+    name: all
+    state: restarted
 '''
 
 import os
@@ -179,7 +184,7 @@ def main():
                 else:
                     continue
             else:
-                if process_name != name:
+                if process_name != name and name != "all":
                     continue
 
             matched.append((process_name, status))
