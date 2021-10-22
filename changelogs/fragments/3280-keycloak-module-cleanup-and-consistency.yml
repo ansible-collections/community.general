@@ -1,0 +1,6 @@
+deprecated_features:
+  - keycloak_authentication - the return value ``flow`` is now deprecated and will be removed in community.general 6.0.0; use ``end_state`` instead (https://github.com/ansible-collections/community.general/pull/3280).
+  - keycloak_group - the return value ``group`` is now deprecated and will be removed in community.general 6.0.0; use ``end_state`` instead (https://github.com/ansible-collections/community.general/pull/3280).
+
+minor_changes:
+  - keycloak_* modules - refactor many of the ``keycloak_*`` modules to have similar structures, comments, and documentation (https://github.com/ansible-collections/community.general/pull/3280).
