@@ -331,7 +331,7 @@ class OpenTelemetrySource(object):
     def transform_ansible_unicode_to_str(value):
         parsed_url = urlparse(str(value))
         if OpenTelemetrySource.is_valid_url(parsed_url):
-                return OpenTelemetrySource.redact_user_password(parsed_url).geturl()
+            return OpenTelemetrySource.redact_user_password(parsed_url).geturl()
         return str(value)
 
     @staticmethod
