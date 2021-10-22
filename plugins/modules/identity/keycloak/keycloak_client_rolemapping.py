@@ -11,6 +11,7 @@ DOCUMENTATION = '''
 module: keycloak_client_rolemapping
 
 short_description: Allows administration of Keycloak client_rolemapping with the Keycloak API
+
 version_added: 3.5.0
 
 description:
@@ -158,21 +159,22 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-  description: Message as to what action was taken
-  returned: always
-  type: str
-  sample: "Role role1 assigned to group group1."
+    description: Message as to what action was taken.
+    returned: always
+    type: str
+    sample: "Role role1 assigned to group group1."
 
 proposed:
-    description: role_representation representation of proposed changes to client_rolemapping.
+    description: Representation of proposed client role mapping.
     returned: always
     type: dict
     sample: {
       clientId: "test"
     }
+
 existing:
     description:
-      - role_representation representation of existing role_representation.
+      - Representation of existing client role mapping.
       - The sample is truncated.
     returned: always
     type: dict
@@ -182,11 +184,12 @@ existing:
             "request.object.signature.alg": "RS256",
         }
     }
+
 end_state:
     description:
-      - role_representation representation of role_representation after module execution.
+      - Representation of client role mapping after module execution.
       - The sample is truncated.
-    returned: always
+    returned: on success
     type: dict
     sample: {
         "adminUrl": "http://www.example.com/admin_url",
