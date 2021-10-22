@@ -1,0 +1,2 @@
+bugfixes:
+  - pkgin - Fix exception encountered when all packages are already installed (https://github.com/ansible-collections/community.general/pull/3583).
