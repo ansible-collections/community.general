@@ -134,7 +134,7 @@ EXAMPLES = '''
   community.general.homebrew_cask:
     name: wireshark
     state: present
-    sudo_password: "{{ ansible_become_pass }}"
+    sudo_password: "{{ ansible_become_password }}"
 '''
 
 import os
