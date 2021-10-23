@@ -506,7 +506,7 @@ def transactional_updates():
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(required=True, aliases=['pkg'], type='list', elements='str'),
+            name=dict(default=[], aliases=['pkg'], type='list', elements='str'),
             state=dict(required=False, default='present', choices=['absent', 'installed', 'latest', 'present', 'removed', 'dist-upgrade']),
             type=dict(required=False, default='package', choices=['package', 'patch', 'pattern', 'product', 'srcpackage', 'application']),
             extra_args_precommand=dict(required=False, default=None),
@@ -520,6 +520,7 @@ def main():
             allow_vendor_change=dict(required=False, default=False, type='bool'),
             replacefiles=dict(required=False, default=False, type='bool')
         ),
+        required_one_of=[['pkg', 'update_cache']],
         supports_check_mode=True
     )
 
@@ -538,6 +539,14 @@ def main():
 
         if retvals['rc'] != 0:
             module.fail_json(msg="Zypper refresh run failed.", **retvals)
+
+        # If there is nothing else to do, set changed=True
+        #  to show the cache was updated and exit
+        if not module.params['name']:
+            module.exit_json(
+                changed=True,
+                **retvals
+            )
 
     # Perform requested action
     if name == ['*'] and state in ['latest', 'dist-upgrade']:
