@@ -194,9 +194,13 @@ class GitLabProjectMembers(object):
         self._gitlab = gl
 
     def get_project(self, project_name):
-        project_exists = self._gitlab.projects.list(search=project_name)
-        if project_exists:
-            return project_exists[0].id
+        project_exists = self._gitlab.projects.get(project_name)
+        if not project_exists:
+            project_exists = self._gitlab.projects.list(search=project_name)
+            if project_exists:
+                return project_exists[0].id
+        else:
+            return project_exists.id
 
     def get_user_id(self, gitlab_user):
         user_exists = self._gitlab.users.list(username=gitlab_user)
