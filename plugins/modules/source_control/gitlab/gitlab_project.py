@@ -155,6 +155,12 @@ options:
       - Enable shared runners for this project.
     type: bool
     version_added: "3.7.0"
+  initialize_with_readme:
+    description:
+      - Enable initiliazze with readme for this project.
+    type: bool
+    default: false
+    version_added: "3.9.0"  
 '''
 
 EXAMPLES = r'''
@@ -269,6 +275,7 @@ class GitLabProject(object):
             project_options.update({
                 'path': options['path'],
                 'import_url': options['import_url'],
+                'initialize_with_readme': options['initialize_with_readme'],
             })
             project_options = self.getOptionsWithValue(project_options)
             project = self.createProject(namespace, project_options)
@@ -377,6 +384,7 @@ def main():
         squash_option=dict(type='str', choices=['never', 'always', 'default_off', 'default_on']),
         ci_config_path=dict(type='str'),
         shared_runners_enabled=dict(type='bool'),
+        initialize_with_readme=dict(type='bool'),
     ))
 
     module = AnsibleModule(
@@ -417,6 +425,7 @@ def main():
     squash_option = module.params['squash_option']
     ci_config_path = module.params['ci_config_path']
     shared_runners_enabled = module.params['shared_runners_enabled']
+    initialize_with_readme = module.params['initialize_with_readme']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -483,6 +492,7 @@ def main():
                                                 "squash_option": squash_option,
                                                 "ci_config_path": ci_config_path,
                                                 "shared_runners_enabled": shared_runners_enabled,
+                                                "initialize_with_readme": initialize_with_readme,
                                                 }):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.projectObject._attrs)
