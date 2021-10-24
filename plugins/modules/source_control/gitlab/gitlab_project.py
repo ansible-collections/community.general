@@ -256,7 +256,6 @@ class GitLabProject(object):
         project_options = {
             'name': project_name,
             'description': options['description'],
-            'initialize_with_readme': options['initialize_with_readme'],
             'issues_enabled': options['issues_enabled'],
             'merge_requests_enabled': options['merge_requests_enabled'],
             'merge_method': options['merge_method'],
@@ -278,6 +277,7 @@ class GitLabProject(object):
             project_options.update({
                 'path': options['path'],
                 'import_url': options['import_url'],
+                'initialize_with_readme': options['initialize_with_readme'],
             })
             project_options = self.getOptionsWithValue(project_options)
             project = self.createProject(namespace, project_options)
