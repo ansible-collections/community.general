@@ -15,17 +15,9 @@ description:
   - Manages Bitbucket pipeline SSH key pair.
 author:
   - Evgeniy Krysanov (@catcombo)
+extends_documentation_fragment:
+  - community.general.bitbucket
 options:
-  client_id:
-    description:
-      - OAuth consumer key.
-      - If not set the environment variable C(BITBUCKET_CLIENT_ID) will be used.
-    type: str
-  client_secret:
-    description:
-      - OAuth consumer secret.
-      - If not set the environment variable C(BITBUCKET_CLIENT_SECRET) will be used.
-    type: str
   repository:
     description:
       - The repository name.
@@ -51,7 +43,6 @@ options:
     required: true
     choices: [ absent, present ]
 notes:
-  - Bitbucket OAuth consumer key and secret can be obtained from Bitbucket profile -> Settings -> Access Management -> OAuth.
   - Check mode is supported.
 '''
 
