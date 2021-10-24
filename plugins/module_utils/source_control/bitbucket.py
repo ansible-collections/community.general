@@ -16,13 +16,13 @@ class BitbucketHelper:
     BITBUCKET_API_URL = 'https://api.bitbucket.org'
 
     error_messages = {
-        'credentials_required': '`client_id`/`client_secret` or `username`/`password` must be specified as a parameter',
+        'credentials_required': '`client_id`/`client_secret` or `user`/`password` must be specified as a parameter',
     }
 
     def __init__(self, module):
         self.module = module
         self.access_token = None
-        self.username = None
+        self.user = None
         self.password = None
 
     @staticmethod
@@ -30,13 +30,13 @@ class BitbucketHelper:
         return dict(
             client_id=dict(type='str', no_log=False, fallback=(env_fallback, ['BITBUCKET_CLIENT_ID'])),
             client_secret=dict(type='str', no_log=True, fallback=(env_fallback, ['BITBUCKET_CLIENT_SECRET'])),
-            username=dict(type='str', no_log=False, fallback=(env_fallback, ['BITBUCKET_USERNAME'])),
+            user=dict(type='str', no_log=False, fallback=(env_fallback, ['BITBUCKET_USERNAME'])),
             password=dict(type='str', no_log=True, fallback=(env_fallback, ['BITBUCKET_PASSWORD'])),
         )
 
     def check_arguments(self):
         if self.module.params['client_id'] is None and self.module.params['client_secret'] is None or \
-           self.module.params['username'] is None and self.module.params['password'] is None:
+           self.module.params['user'] is None and self.module.params['password'] is None:
             self.module.fail_json(msg=self.error_messages['required_client_id'])
 
     def fetch_access_token(self):
@@ -66,9 +66,9 @@ class BitbucketHelper:
             headers.update({
                 'Authorization': 'Bearer {0}'.format(self.access_token),
             })
-        elif self.username and self.password:
+        elif self.user and self.password:
             headers.update({
-                'Authorization': basic_auth_header(self.username, self.password)
+                'Authorization': basic_auth_header(self.user, self.password)
             })
 
         if isinstance(data, dict):
