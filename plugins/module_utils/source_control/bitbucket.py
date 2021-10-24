@@ -40,7 +40,7 @@ class BitbucketHelper:
     def check_arguments(self):
         if self.module.params['client_id'] is None and self.module.params['client_secret'] is None or \
            self.module.params['user'] is None and self.module.params['password'] is None:
-            self.module.fail_json(msg=self.error_messages['required_client_id'])
+            self.module.fail_json(msg=self.error_messages['credentials_required'])
 
     def fetch_access_token(self):
         self.check_arguments()
