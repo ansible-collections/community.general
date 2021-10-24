@@ -397,14 +397,22 @@
       - zypperin2 is not changed
 
 # check for https://github.com/ansible-collections/community.general/issues/3570
-- name: run updatecache without any packages
+- name: update_cache=yes without any packages
   zypper:
     update_cache: True
-  register: zypper_result_update_cache_only
+  register: zypper_result_update_cache_yes
+
+- name: update_cache=no without any packages
+  zypper:
+    update_cache: False
+  register: zypper_result_update_cache_no
 
 - assert:
     that:
-      - zypper_result_update_cache_only is successful
+      - zypper_result_update_cache_yes is successful
+
+      - zypper_result_update_cache_no is successful
+      - zypper_result_update_cache_no is not changed
 
 # check for https://github.com/ansible/ansible/issues/20139
 - name: run updatecache

@@ -38,7 +38,6 @@ options:
           update the package within the version range given.
         - You can also pass a url or a local path to a rpm file.
         - When using state=latest, this can be '*', which updates all installed packages.
-        required: false
         aliases: [ 'pkg' ]
         type: list
         default: []
@@ -539,11 +538,12 @@ def main():
     name = list(filter(None, name))
 
     # Refresh repositories
-    if update_cache and not module.check_mode:
-        retvals = repo_refresh(module)
+    if update_cache:
+        if not module.check_mode:
+            retvals = repo_refresh(module)
 
-        if retvals['rc'] != 0:
-            module.fail_json(msg="Zypper refresh run failed.", **retvals)
+            if retvals['rc'] != 0:
+                module.fail_json(msg="Zypper refresh run failed.", **retvals)
 
         # If there is nothing else to do, set changed=True
         #  to show the cache was updated and exit
