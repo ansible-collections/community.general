@@ -1,0 +1,2 @@
+minor_changes:
+  - opentelemetry callback plugin - transformed args in a list of span attributes in addition it redacted username and password from any URLs (https://github.com/ansible-collections/community.general/pull/3564).
