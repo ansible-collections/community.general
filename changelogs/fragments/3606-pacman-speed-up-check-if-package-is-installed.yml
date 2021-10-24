@@ -1,2 +1,2 @@
 minor_changes:
-- "pacman - Speed up checking if the package is installed, when the latest version check isn't needed."
+- "pacman - speed up checking if the package is installed, when the latest version check is not needed (https://github.com/ansible-collections/community.general/pull/3606)."
