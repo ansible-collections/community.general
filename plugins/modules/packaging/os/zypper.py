@@ -38,9 +38,10 @@ options:
           update the package within the version range given.
         - You can also pass a url or a local path to a rpm file.
         - When using state=latest, this can be '*', which updates all installed packages.
-        required: true
+        required: false
         aliases: [ 'pkg' ]
         type: list
+        default: []
         elements: str
     state:
         description:
@@ -194,6 +195,10 @@ EXAMPLES = '''
     name: 'nmap'
     state: latest
     replacefiles: true
+
+- name: Refresh repositories without installing/updating any packages
+  community.general.zypper:
+    update_cache: yes
 
 - name: Refresh repositories and update package openssl
   community.general.zypper:
