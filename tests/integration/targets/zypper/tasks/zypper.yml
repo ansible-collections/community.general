@@ -396,6 +396,16 @@
       - zypperin1 is changed
       - zypperin2 is not changed
 
+# check for https://github.com/ansible-collections/community.general/issues/3570
+- name: run updatecache without any packages
+  zypper:
+    update_cache: True
+  register: zypper_result_update_cache_only
+
+- assert:
+    that:
+      - zypper_result_update_cache_only is successful
+
 # check for https://github.com/ansible/ansible/issues/20139
 - name: run updatecache
   zypper:
