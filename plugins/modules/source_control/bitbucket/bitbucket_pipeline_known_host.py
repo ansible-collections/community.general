@@ -26,11 +26,12 @@ options:
       - The repository name.
     type: str
     required: true
-  username:
+  workspace:
     description:
       - The repository owner.
     type: str
     required: true
+    aliases: [ username ]
   name:
     description:
       - The FQDN of the known host.
@@ -54,7 +55,7 @@ EXAMPLES = r'''
 - name: Create known hosts from the list
   community.general.bitbucket_pipeline_known_host:
     repository: 'bitbucket-repo'
-    username: bitbucket_username
+    workspace: bitbucket_workspace
     name: '{{ item }}'
     state: present
   with_items:
@@ -64,14 +65,14 @@ EXAMPLES = r'''
 - name: Remove known host
   community.general.bitbucket_pipeline_known_host:
     repository: bitbucket-repo
-    username: bitbucket_username
+    workspace: bitbucket_workspace
     name: bitbucket.org
     state: absent
 
 - name: Specify public key file
   community.general.bitbucket_pipeline_known_host:
     repository: bitbucket-repo
-    username: bitbucket_username
+    workspace: bitbucket_workspace
     name: bitbucket.org
     key: '{{lookup("file", "bitbucket.pub") }}'
     state: absent
@@ -96,8 +97,8 @@ error_messages = {
 }
 
 BITBUCKET_API_ENDPOINTS = {
-    'known-host-list': '%s/2.0/repositories/{username}/{repo_slug}/pipelines_config/ssh/known_hosts/' % BitbucketHelper.BITBUCKET_API_URL,
-    'known-host-detail': '%s/2.0/repositories/{username}/{repo_slug}/pipelines_config/ssh/known_hosts/{known_host_uuid}' % BitbucketHelper.BITBUCKET_API_URL,
+    'known-host-list': '%s/2.0/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/known_hosts/' % BitbucketHelper.BITBUCKET_API_URL,
+    'known-host-detail': '%s/2.0/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/known_hosts/{known_host_uuid}' % BitbucketHelper.BITBUCKET_API_URL,
 }
 
 
@@ -128,7 +129,7 @@ def get_existing_known_host(module, bitbucket):
     """
     content = {
         'next': BITBUCKET_API_ENDPOINTS['known-host-list'].format(
-            username=module.params['username'],
+            workspace=module.params['workspace'],
             repo_slug=module.params['repository'],
         )
     }
@@ -141,7 +142,7 @@ def get_existing_known_host(module, bitbucket):
         )
 
         if info['status'] == 404:
-            module.fail_json(msg='Invalid `repository` or `username`.')
+            module.fail_json(msg='Invalid `repository` or `workspace`.')
 
         if info['status'] != 200:
             module.fail_json(msg='Failed to retrieve list of known hosts: {0}'.format(info))
@@ -205,7 +206,7 @@ def create_known_host(module, bitbucket):
 
     info, content = bitbucket.request(
         api_url=BITBUCKET_API_ENDPOINTS['known-host-list'].format(
-            username=module.params['username'],
+            workspace=module.params['workspace'],
             repo_slug=module.params['repository'],
         ),
         method='POST',
@@ -231,7 +232,7 @@ def create_known_host(module, bitbucket):
 def delete_known_host(module, bitbucket, known_host_uuid):
     info, content = bitbucket.request(
         api_url=BITBUCKET_API_ENDPOINTS['known-host-detail'].format(
-            username=module.params['username'],
+            workspace=module.params['workspace'],
             repo_slug=module.params['repository'],
             known_host_uuid=known_host_uuid,
         ),
@@ -252,7 +253,7 @@ def main():
     argument_spec = BitbucketHelper.bitbucket_argument_spec()
     argument_spec.update(
         repository=dict(type='str', required=True),
-        username=dict(type='str', required=True),
+        workspace=dict(type='str', aliases=['username'], required=True),
         name=dict(type='str', required=True),
         key=dict(type='str', no_log=False),
         state=dict(type='str', choices=['present', 'absent'], required=True),
