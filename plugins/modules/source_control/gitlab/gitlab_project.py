@@ -194,7 +194,7 @@ EXAMPLES = r'''
     wiki_enabled: True
     snippets_enabled: True
     import_url: http://git.example.com/example/lab.git
-    initialize_with_readme: True
+    initialize_with_readme: true
     state: present
   delegate_to: localhost
 '''
