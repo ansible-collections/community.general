@@ -91,8 +91,6 @@ try:
     from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
     from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.sdk.trace.export import (
-        ConsoleSpanExporter,
-        SimpleSpanProcessor,
         BatchSpanProcessor
     )
     from opentelemetry.util._time import _time_ns
@@ -266,7 +264,11 @@ class OpenTelemetrySource(object):
                 status = Status(status_code=StatusCode.UNSET)
 
         span.set_status(status)
-        self.set_span_attribute(span, "ansible.task.args", self.flat_args(task_data.args))
+        if isinstance(task_data.args, dict) and "gather_facts" not in task_data.action:
+            names = tuple(self.transform_ansible_unicode_to_str(k) for k in task_data.args.keys())
+            values = tuple(self.transform_ansible_unicode_to_str(k) for k in task_data.args.values())
+            self.set_span_attribute(span, ("ansible.task.args.name"), names)
+            self.set_span_attribute(span, ("ansible.task.args.value"), values)
         self.set_span_attribute(span, "ansible.task.module", task_data.action)
         self.set_span_attribute(span, "ansible.task.message", message)
         self.set_span_attribute(span, "ansible.task.name", name)
@@ -326,6 +328,13 @@ class OpenTelemetrySource(object):
         return False
 
     @staticmethod
+    def transform_ansible_unicode_to_str(value):
+        parsed_url = urlparse(str(value))
+        if OpenTelemetrySource.is_valid_url(parsed_url):
+            return OpenTelemetrySource.redact_user_password(parsed_url).geturl()
+        return str(value)
+
+    @staticmethod
     def get_error_message(result):
         if result.get('exception') is not None:
             return OpenTelemetrySource._last_line(result['exception'])
@@ -342,12 +351,6 @@ class OpenTelemetrySource(object):
         exception = result.get('exception')
         stderr = result.get('stderr')
         return ('message: "{0}"\nexception: "{1}"\nstderr: "{2}"').format(message, exception, stderr)
-
-    @staticmethod
-    def flat_args(args):
-        if args:
-            return ', '.join(('%s=%s' % a for a in args.items()))
-        return None
 
 
 class CallbackModule(CallbackBase):
