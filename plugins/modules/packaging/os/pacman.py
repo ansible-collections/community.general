@@ -296,7 +296,7 @@ def remove_packages(module, pacman_path, packages):
     # Using a for loop in case of error, we can report the package that failed
     for package in packages:
         # Query the package first, to see if we even need to remove
-        installed, _, unknown = query_package(module, pacman_path, package, 'absent')
+        installed, updated, unknown = query_package(module, pacman_path, package, 'absent')
         if not installed:
             continue
 
