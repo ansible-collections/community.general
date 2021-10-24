@@ -520,7 +520,7 @@ def main():
             allow_vendor_change=dict(required=False, default=False, type='bool'),
             replacefiles=dict(required=False, default=False, type='bool')
         ),
-        required_one_of=[['pkg', 'update_cache']],
+        required_one_of=[['name', 'update_cache']],
         supports_check_mode=True
     )
 
