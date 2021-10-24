@@ -277,8 +277,9 @@ class GitLabProject(object):
             project_options.update({
                 'path': options['path'],
                 'import_url': options['import_url'],
-                'initialize_with_readme': options['initialize_with_readme'],
             })
+            if options['initialize_with_readme']:
+                project_options['initialize_with_readme'] = options['initialize_with_readme']
             project_options = self.getOptionsWithValue(project_options)
             project = self.createProject(namespace, project_options)
             changed = True
