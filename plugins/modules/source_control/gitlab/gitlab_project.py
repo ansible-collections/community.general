@@ -50,7 +50,8 @@ options:
     type: str
   initialize_with_readme:
     description:
-      - Will initialize the project with a default README.md.
+      - Will initialize the project with a default C(README.md).
+      - Is only used when the project is created, and ignored otherwise.
     type: bool
     default: no
     version_added: "4.0.0"
