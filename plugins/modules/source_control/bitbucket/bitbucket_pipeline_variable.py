@@ -26,6 +26,7 @@ options:
   workspace:
     description:
       - The repository owner.
+      - Alias C(username) has been deprecated and will become an alias of C(user) in community.general 5.0.0.
     type: str
     required: true
     aliases: [ username ]
@@ -213,7 +214,10 @@ def main():
     argument_spec = BitbucketHelper.bitbucket_argument_spec()
     argument_spec.update(
         repository=dict(type='str', required=True),
-        workspace=dict(type='str', aliases=['username'], required=True),
+        workspace=dict(
+            type='str', aliases=['username'], required=True,
+            deprecated_aliases=[dict(name='username', version='5.0.0', collection_name='community.general')],
+        ),
         name=dict(type='str', required=True),
         value=dict(type='str'),
         secured=dict(type='bool', default=False),

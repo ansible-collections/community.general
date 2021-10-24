@@ -30,6 +30,9 @@ class BitbucketHelper:
         return dict(
             client_id=dict(type='str', no_log=False, fallback=(env_fallback, ['BITBUCKET_CLIENT_ID'])),
             client_secret=dict(type='str', no_log=True, fallback=(env_fallback, ['BITBUCKET_CLIENT_SECRET'])),
+            # TODO:
+            # - Rename user to username once current usage of username is removed
+            # - Alias user to username and deprecate it
             user=dict(type='str', no_log=False, fallback=(env_fallback, ['BITBUCKET_USERNAME'])),
             password=dict(type='str', no_log=True, fallback=(env_fallback, ['BITBUCKET_PASSWORD'])),
         )
