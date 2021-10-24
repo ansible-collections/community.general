@@ -53,7 +53,7 @@ options:
       - Will initialize the project with a default C(README.md).
       - Is only used when the project is created, and ignored otherwise.
     type: bool
-    default: no
+    default: false
     version_added: "4.0.0"
   issues_enabled:
     description:
