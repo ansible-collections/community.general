@@ -1,0 +1,2 @@
+minor_changes:
+- "pacman - Speed up checking if the package is installed, when the latest version check isn't needed."
