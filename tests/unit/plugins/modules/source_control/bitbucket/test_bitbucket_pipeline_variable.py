@@ -30,9 +30,9 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     def test_missing_value_with_present_state(self):
         with self.assertRaises(AnsibleFailJson) as exec_info:
             set_module_args({
-                'client_id': 'ABC',
-                'client_secret': 'XXX',
-                'username': 'name',
+                'user': 'ABC',
+                'password': 'XXX',
+                'workspace': 'name',
                 'repository': 'repo',
                 'name': 'PIPELINE_VAR_NAME',
                 'state': 'present',
@@ -47,10 +47,25 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     })
     @patch.object(BitbucketHelper, 'fetch_access_token', return_value='token')
     @patch.object(bitbucket_pipeline_variable, 'get_existing_pipeline_variable', return_value=None)
-    def test_env_vars_params(self, *args):
+    def test_oauth_env_vars_params(self, *args):
         with self.assertRaises(AnsibleExitJson):
             set_module_args({
                 'username': 'name',
+                'repository': 'repo',
+                'name': 'PIPELINE_VAR_NAME',
+                'state': 'absent',
+            })
+            self.module.main()
+
+    @patch.dict('os.environ', {
+        'BITBUCKET_USERNAME': 'ABC',
+        'BITBUCKET_PASSWORD': 'XXX',
+    })
+    @patch.object(bitbucket_pipeline_variable, 'get_existing_pipeline_variable', return_value=None)
+    def test_basic_auth_env_vars_params(self, *args):
+        with self.assertRaises(AnsibleExitJson):
+            set_module_args({
+                'workspace': 'name',
                 'repository': 'repo',
                 'name': 'PIPELINE_VAR_NAME',
                 'state': 'absent',
