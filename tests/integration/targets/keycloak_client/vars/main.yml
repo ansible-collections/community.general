@@ -14,3 +14,8 @@ auth_args:
   auth_realm: "{{ admin_realm }}"
   auth_username: "{{ admin_user }}"
   auth_password: "{{ admin_password }}"
+
+redirect_uris1:
+  - "http://example.c.com/"
+  - "http://example.b.com/"
+  - "http://example.a.com/"
