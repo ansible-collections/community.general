@@ -176,6 +176,7 @@ class PipX(CmdStateModuleHelper):
         _list=dict(fmt=('list', '--include-injected', '--json'), style=ArgFormat.BOOLEAN),
     )
     check_rc = True
+    force_lang = "en_US.UTF-8"
 
     def _retrieve_installed(self):
         def process_list(rc, out, err):
@@ -188,7 +189,7 @@ class PipX(CmdStateModuleHelper):
                 results[venv_name] = {
                     'version': venv['metadata']['main_package']['package_version'],
                     'injected': dict(
-                        (k, v['package_version']) for k, v in venv['metadata']['injected_packages']
+                        (k, v['package_version']) for k, v in venv['metadata']['injected_packages'].items()
                     ),
                 }
             return results
