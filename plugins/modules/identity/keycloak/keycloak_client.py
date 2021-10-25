@@ -685,6 +685,19 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 from ansible.module_utils.basic import AnsibleModule
 
 
+def normalise_cr(clientrep):
+    """ Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
+    the change detection is more effective.
+
+    :param clientrep: the clientrep dict to be sanitized
+    :return: normalised clientrep dict
+    """
+    if 'redirectUris' in clientrep:
+        clientrep['redirectUris'] = list(sorted(clientrep['redirectUris']))
+
+    return clientrep
+
+
 def sanitize_cr(clientrep):
     """ Removes probably sensitive details from a client representation.
 
@@ -697,7 +710,7 @@ def sanitize_cr(clientrep):
     if 'attributes' in result:
         if 'saml.signing.private.key' in result['attributes']:
             result['attributes']['saml.signing.private.key'] = 'no_log'
-    return result
+    return normalise_cr(result)
 
 
 def main():
@@ -865,10 +878,12 @@ def main():
 
             if module.check_mode:
                 # We can only compare the current client with the proposed updates we have
+                before_norm = normalise_cr(before_client.copy())
+                desired_norm =  normalise_cr(desired_client.copy())
                 if module._diff:
-                    result['diff'] = dict(before=sanitize_cr(before_client),
-                                          after=sanitize_cr(desired_client))
-                result['changed'] = (before_client != desired_client)
+                    result['diff'] = dict(before=sanitize_cr(before_norm),
+                                          after=sanitize_cr(desired_norm))
+                result['changed'] = (before_norm != desired_norm)
 
                 module.exit_json(**result)
 
