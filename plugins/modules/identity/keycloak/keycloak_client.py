@@ -692,6 +692,9 @@ def normalise_cr(clientrep):
     :param clientrep: the clientrep dict to be sanitized
     :return: normalised clientrep dict
     """
+    if 'attributes' in clientrep:
+        clientrep['attributes'] = list(sorted(clientrep['attributes']))
+
     if 'redirectUris' in clientrep:
         clientrep['redirectUris'] = list(sorted(clientrep['redirectUris']))
 
