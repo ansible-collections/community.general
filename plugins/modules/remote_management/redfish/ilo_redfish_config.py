@@ -23,9 +23,6 @@ options:
     required: true
     description:
       - List of commands to execute on iLO
-      - I(SetManagerAttributes), I(SetLifecycleControllerAttributes) and
-        I(SetSystemAttributes) are mutually exclusive commands when C(category)
-        is I(Manager)
     type: list
     elements: str
   baseuri:
@@ -46,24 +43,11 @@ options:
       - Security token for authentication with OOB controller
     type: str
     version_added: 2.3.0
-  manager_attributes:
-    required: false
-    description:
-      - dictionary of iLO attribute name and value pairs to update
-    default: {}
-    type: 'dict'
-    version_added: '0.2.0'
   timeout:
     description:
       - Timeout in seconds for URL requests to iLO controller
     default: 10
     type: int
-  resource_id:
-    required: false
-    description:
-      - The ID of the System, Manager or Chassis to modify
-    type: str
-    version_added: '0.2.0'
   attribute_name:
     required: false
     description:
@@ -123,13 +107,13 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             category=dict(required=True),
-            command=dict(required=True, type='list'),
+            command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
             username=dict(),
             password=dict(no_log=True),
-            attribute_name=dict(default='null'),
-            attribute_value=dict(default='null'),
-            auth_token=dict(),
+            attribute_name=dict(default=None),
+            attribute_value=dict(default=None),
+            auth_token=dict(no_log=True),
             timeout=dict(type='int', default=10)
         ),
         supports_check_mode=False
