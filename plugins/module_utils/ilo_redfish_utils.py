@@ -51,23 +51,6 @@ class iLORedfishUtils(RedfishUtils):
         result["ret"] = True
         return result
 
-    def DeleteAllUsers(self, id):
-        account_collection_uri = self.root_uri + self.accounts_uri
-        account_response = self.get_request(account_collection_uri, id)
-        if account_response['ret'] is False:
-            return account_response
-
-        data = account_response["data"]
-
-        for account in data["Members"]:
-            payload = {}
-            response = self.delete_request(
-                self.root_uri + account["@odata.id"], payload, id)
-            if(response['ret'] is False):
-                return response
-
-        return {'ret': True}
-
     def get_Etherneturi(self):
         key = "EthernetInterfaces"
 
