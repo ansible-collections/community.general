@@ -107,7 +107,7 @@
     state: inject
     name: ansible-lint
     inject_packages:
-      - ansible-core
+      - licenses
   register: inject_pkgs_ansible_lint
 
 - name: cleanup ansible-lint
@@ -122,5 +122,5 @@
         - install_ansible_lint is changed
         - inject_pkgs_ansible_lint is changed
         - '"ansible-lint" in inject_pkgs_ansible_lint.application'
-        - '"ansible-core" in inject_pkgs_ansible_lint.application["ansible-lint"]["injected"]'
+        - '"licenses" in inject_pkgs_ansible_lint.application["ansible-lint"]["injected"]'
         - uninstall_ansible_lint is changed
