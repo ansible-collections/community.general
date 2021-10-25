@@ -30,9 +30,9 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     def test_missing_value_with_present_state(self):
         with self.assertRaises(AnsibleFailJson) as exec_info:
             set_module_args({
-                'user': 'ABC',
-                'password': 'XXX',
-                'workspace': 'name',
+                'client_id': 'ABC',
+                'client_secret': 'XXX',
+                'username': 'name',
                 'repository': 'repo',
                 'name': 'PIPELINE_VAR_NAME',
                 'state': 'present',
@@ -72,15 +72,14 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
             })
             self.module.main()
 
-    @patch.object(BitbucketHelper, 'fetch_access_token', return_value='token')
     @patch.object(bitbucket_pipeline_variable, 'get_existing_pipeline_variable', return_value=None)
     def test_create_variable(self, *args):
         with patch.object(self.module, 'create_pipeline_variable') as create_pipeline_variable_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
                 set_module_args({
-                    'client_id': 'ABC',
-                    'client_secret': 'XXX',
-                    'username': 'name',
+                    'user': 'ABC',
+                    'password': 'XXX',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'PIPELINE_VAR_NAME',
                     'value': '42',
