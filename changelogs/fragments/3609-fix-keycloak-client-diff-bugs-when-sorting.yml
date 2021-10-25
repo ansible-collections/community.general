@@ -1,4 +1,0 @@
-bugfixes:
-  - keycloak_client - Update the check mode to not show differences resulting from sorting and default values relating to the properties, ``redirectUris``, ``attributes``, and ``protocol_mappers``.
-minor_changes:
-  - keycloak_client - Introduce tests and and README to test the module via docker.
