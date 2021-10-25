@@ -701,7 +701,7 @@ def normalise_cr(clientrep, remove_ids=False):
         clientrep['redirectUris'] = list(sorted(clientrep['redirectUris']))
 
     if 'protocolMappers' in clientrep:
-        clientrep['protocolMappers'] = sorted(clientrep['protocolMappers'], key=lambda x: (x.get('name'),  x.get('protocol'), x.get('protocolMapper')))
+        clientrep['protocolMappers'] = sorted(clientrep['protocolMappers'], key=lambda x: (x.get('name'), x.get('protocol'), x.get('protocolMapper')))
         for mapper in clientrep['protocolMappers']:
             if remove_ids:
                 mapper.pop('id', None)
@@ -893,7 +893,7 @@ def main():
             if module.check_mode:
                 # We can only compare the current client with the proposed updates we have
                 before_norm = normalise_cr(before_client.copy(), remove_ids=True)
-                desired_norm =  normalise_cr(desired_client.copy(), remove_ids=True)
+                desired_norm = normalise_cr(desired_client.copy(), remove_ids=True)
                 if module._diff:
                     result['diff'] = dict(before=sanitize_cr(before_norm),
                                           after=sanitize_cr(desired_norm))
