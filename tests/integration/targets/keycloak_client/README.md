@@ -7,5 +7,5 @@ docker-compose -f tests/integration/targets/keycloak_client/docker-compose.yml r
 docker-compose -f tests/integration/targets/keycloak_client/docker-compose.yml up -d
 
 # 2. Run the integration tests:
-ansible-test integration keycloak_role --allow-unsupported -v
+ansible-test integration keycloak_client --allow-unsupported -v
 ```
