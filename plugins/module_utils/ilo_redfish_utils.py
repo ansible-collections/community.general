@@ -267,4 +267,3 @@ class iLORedfishUtils(RedfishUtils):
         if response['ret'] is False:
             return response
         return {'ret': True, 'changed': True, 'msg': "Modified %s" % mgrattr['mgr_attr_name']}
-

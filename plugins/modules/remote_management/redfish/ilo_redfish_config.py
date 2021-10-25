@@ -17,7 +17,7 @@ requirements:
     - "python >= 3.8"
     - "ansible >= 3.2"
 author:
-    - "Bhavya B (@Bhavya06)"
+    - "Bhavya B (@bhavya06)"
 '''
 
 EXAMPLES = '''
@@ -120,7 +120,6 @@ def main():
                 result = rf_utils.set_NTPServer(mgr_attributes)
             elif command == "SetWINSReg":
                 result = rf_utils.set_WINSRegistration(mgr_attributes)
-        
     if result['ret'] is True:
         module.exit_json(changed=result['changed'],
                          msg=to_native(result.get('msg')), sessionid=session_id)
