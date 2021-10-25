@@ -245,7 +245,7 @@ class OpenTelemetrySource(object):
         name = '[%s] %s: %s' % (host_data.name, task_data.play, task_data.name)
 
         message = 'success'
-        res = []
+        res = {}
         rc = 0
         status = Status(status_code=StatusCode.OK)
         if host_data.status != 'included':
