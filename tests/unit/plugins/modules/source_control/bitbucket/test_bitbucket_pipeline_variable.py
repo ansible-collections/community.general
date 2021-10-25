@@ -16,7 +16,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
         self.module = bitbucket_pipeline_variable
 
     def test_without_required_parameters(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(AnsibleFailJson) as exec_info:
             set_module_args({
                 'username': 'name',
                 'repository': 'repo',
@@ -24,6 +24,8 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                 'state': 'absent',
             })
             self.module.main()
+
+        self.assertEqual(exec_info.exception.args[0]['Failed'], True)
 
     def test_missing_value_with_present_state(self):
         with self.assertRaises(AnsibleFailJson) as exec_info:
