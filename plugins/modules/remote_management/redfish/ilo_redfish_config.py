@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: iLO Redfish Config
+module: ilo_redfish_config
 short_description: Sets or updates a configuration attribute. For use with HPE iLO operations that require Redfish OEM extensions.
 description:
     - "Provides an interface to manage configuration attributes."
