@@ -1373,6 +1373,7 @@ class Nmcli(object):
                     convert_func = to_text
                 elif setting == self.mtu_setting:
                     # MTU is 'auto' by default when detecting changes.
+                    # The above does not hold for 'dummy' connections when MTU is undefined.
                     convert_func = self.mtu_to_string
             elif setting_type is list:
                 # Convert lists to strings for nmcli create/modify commands.
@@ -1420,12 +1421,12 @@ class Nmcli(object):
     def mtu_setting(self):
         return '802-3-ethernet.mtu'
 
-    @staticmethod
-    def mtu_to_string(mtu):
+    def mtu_to_string(self, mtu):
+        if self.type == 'dummy' and mtu is None:
+            return ''
         if not mtu:
             return 'auto'
-        else:
-            return to_text(mtu)
+        return to_text(mtu)
 
     @property
     def slave_conn_type(self):
