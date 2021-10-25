@@ -25,7 +25,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
             })
             self.module.main()
 
-        self.assertEqual(exec_info.exception.args[0]['Failed'], True)
+        self.assertEqual(exec_info.exception.args[0]['failed'], True)
 
     def test_missing_value_with_present_state(self):
         with self.assertRaises(AnsibleFailJson) as exec_info:
