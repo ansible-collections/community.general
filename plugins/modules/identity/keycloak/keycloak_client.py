@@ -685,11 +685,13 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 from ansible.module_utils.basic import AnsibleModule
 
 
-def normalise_cr(clientrep):
+def normalise_cr(clientrep, remove_ids=False):
     """ Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
     the change detection is more effective.
 
     :param clientrep: the clientrep dict to be sanitized
+    :param remove_ids: If set to true, then the unique ID's of objects is removed to make the diff and checks for changed
+                       not alert when the ID's of objects are not usually known, (e.g. for protocol_mappers)
     :return: normalised clientrep dict
     """
     if 'attributes' in clientrep:
@@ -697,6 +699,15 @@ def normalise_cr(clientrep):
 
     if 'redirectUris' in clientrep:
         clientrep['redirectUris'] = list(sorted(clientrep['redirectUris']))
+
+    if 'protocolMappers' in clientrep:
+        clientrep['protocolMappers'] = sorted(clientrep['protocolMappers'], key=lambda x: (x.get('name'),  x.get('protocol'), x.get('protocolMapper')))
+        for mapper in clientrep['protocolMappers']:
+            if remove_ids:
+                mapper.pop('id', None)
+
+            # Set to a default value.
+            mapper['consentRequired'] = mapper.get('consentRequired', False)
 
     return clientrep
 
@@ -881,8 +892,8 @@ def main():
 
             if module.check_mode:
                 # We can only compare the current client with the proposed updates we have
-                before_norm = normalise_cr(before_client.copy())
-                desired_norm =  normalise_cr(desired_client.copy())
+                before_norm = normalise_cr(before_client.copy(), remove_ids=True)
+                desired_norm =  normalise_cr(desired_client.copy(), remove_ids=True)
                 if module._diff:
                     result['diff'] = dict(before=sanitize_cr(before_norm),
                                           after=sanitize_cr(desired_norm))
