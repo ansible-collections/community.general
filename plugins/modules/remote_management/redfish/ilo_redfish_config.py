@@ -13,6 +13,69 @@ module: iLO Redfish Config
 short_description: Sets or updates a configuration attribute. For use with HPE iLO operations that require Redfish OEM extensions.
 description:
     - "Provides an interface to manage configuration attributes."
+options:
+  category:
+    required: true
+    type: str
+    description:
+      - Category to execute on iLO
+  command:
+    required: true
+    description:
+      - List of commands to execute on iLO
+      - I(SetManagerAttributes), I(SetLifecycleControllerAttributes) and
+        I(SetSystemAttributes) are mutually exclusive commands when C(category)
+        is I(Manager)
+    type: list
+    elements: str
+  baseuri:
+    required: true
+    description:
+      - Base URI of iLO
+    type: str
+  username:
+    description:
+      - User for authentication with iLO
+    type: str
+  password:
+    description:
+      - Password for authentication with iLO
+    type: str
+  auth_token:
+    description:
+      - Security token for authentication with OOB controller
+    type: str
+    version_added: 2.3.0
+  manager_attributes:
+    required: false
+    description:
+      - dictionary of iLO attribute name and value pairs to update
+    default: {}
+    type: 'dict'
+    version_added: '0.2.0'
+  timeout:
+    description:
+      - Timeout in seconds for URL requests to iLO controller
+    default: 10
+    type: int
+  resource_id:
+    required: false
+    description:
+      - The ID of the System, Manager or Chassis to modify
+    type: str
+    version_added: '0.2.0'
+  attribute_name:
+    required: false
+    description:
+      - Name of the attribute
+    type: str
+    version_added: '0.2.0'
+  attribute_value:
+    required: false
+    description:
+      - Value of the attribute
+    type: str
+    version_added: '0.2.0'
 requirements:
     - "python >= 3.8"
     - "ansible >= 3.2"
