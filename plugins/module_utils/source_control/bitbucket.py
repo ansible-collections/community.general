@@ -18,8 +18,8 @@ class BitbucketHelper:
     def __init__(self, module):
         self.module = module
         self.access_token = None
-        self.user = None
-        self.password = None
+        self.username = self.module.params['user']
+        self.password = self.module.params['password']
 
     @staticmethod
     def bitbucket_argument_spec():
@@ -66,9 +66,9 @@ class BitbucketHelper:
             headers.update({
                 'Authorization': 'Bearer {0}'.format(self.access_token),
             })
-        elif self.user and self.password:
+        elif self.username and self.password:
             headers.update({
-                'Authorization': basic_auth_header(self.user, self.password)
+                'Authorization': basic_auth_header(self.username, self.password)
             })
 
         if isinstance(data, dict):
