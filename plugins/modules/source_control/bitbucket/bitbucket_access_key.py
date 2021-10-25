@@ -227,6 +227,8 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
+        required_one_of=BitbucketHelper.bitbucket_require_one_of(),
+        required_together=BitbucketHelper.bitbucket_require_together(),
     )
 
     bitbucket = BitbucketHelper(module)

@@ -15,10 +15,6 @@ from ansible.module_utils.urls import fetch_url, basic_auth_header
 class BitbucketHelper:
     BITBUCKET_API_URL = 'https://api.bitbucket.org'
 
-    error_messages = {
-        'credentials_required': '`client_id`/`client_secret` or `user`/`password` must be specified as a parameter',
-    }
-
     def __init__(self, module):
         self.module = module
         self.access_token = None
@@ -37,14 +33,15 @@ class BitbucketHelper:
             password=dict(type='str', no_log=True, fallback=(env_fallback, ['BITBUCKET_PASSWORD'])),
         )
 
-    def check_arguments(self):
-        if self.module.params['client_id'] is None and self.module.params['client_secret'] is None and \
-           self.module.params['user'] is None and self.module.params['password'] is None:
-            self.module.fail_json(msg=self.error_messages['credentials_required'])
+    @staticmethod
+    def bitbucket_required_one_of():
+        return [['client_id', 'client_secret', 'user', 'password']]
+
+    @staticmethod
+    def bitbucket_required_together():
+        return [['client_id', 'client_secret'], ['user', 'password']]
 
     def fetch_access_token(self):
-        self.check_arguments()
-
         if 'client_id' in self.module.params and 'client_secret' in self.module.params:
             headers = {
                 'Authorization': basic_auth_header(self.module.params['client_id'], self.module.params['client_secret'])
