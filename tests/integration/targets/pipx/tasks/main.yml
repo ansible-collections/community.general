@@ -121,6 +121,6 @@
     that:
         - install_ansible_lint is changed
         - inject_pkgs_ansible_lint is changed
-        - '"ansible-lint" is in inject_pkgs_ansible_lint.application'
+        - '"ansible-lint" in inject_pkgs_ansible_lint.application'
         - '"ansible-core" in inject_pkgs_ansible_lint.application["ansible-lint"]["injected"]'
         - uninstall_ansible_lint is changed
