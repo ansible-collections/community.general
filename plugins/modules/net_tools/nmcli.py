@@ -1367,16 +1367,15 @@ class Nmcli(object):
             if setting_type is bool:
                 # Convert all bool options to yes/no.
                 convert_func = self.bool_to_string
-            if detect_change:
-                if setting in ('vlan.id', 'vxlan.id'):
-                    # Convert VLAN/VXLAN IDs to text when detecting changes.
-                    convert_func = to_text
-                elif setting == self.mtu_setting:
-                    # MTU is 'auto' by default when detecting changes.
-                    convert_func = self.mtu_to_string
+            if detect_change and setting in ('vlan.id', 'vxlan.id'):
+                # Convert VLAN/VXLAN IDs to text when detecting changes.
+                convert_func = to_text
             elif setting_type is list:
                 # Convert lists to strings for nmcli create/modify commands.
                 convert_func = self.list_to_string
+            if setting == self.mtu_setting:
+                # MTU is 'auto' by default
+                convert_func = self.mtu_to_string
 
             if callable(convert_func):
                 options[setting] = convert_func(options[setting])
