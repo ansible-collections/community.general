@@ -51,32 +51,6 @@ class iLORedfishUtils(RedfishUtils):
         result["ret"] = True
         return result
 
-    def get_Etherneturi(self):
-        key = "EthernetInterfaces"
-
-        response = self.get_request(self.root_uri + self.manager_uri)
-        if(response['ret'] is False):
-            return response
-
-        data = response['data']
-
-        if key not in data:
-            return {'ret': False, 'msg': "Key %s not found" % key}
-
-        EthernetInterface_uri = data[key]["@odata.id"]
-
-        response = self.get_request(self.root_uri + EthernetInterface_uri)
-        if response['ret'] is False:
-            return response
-
-        data = response['data']
-        ethernetlist = []
-
-        for ethernet in data[u'Members']:
-            ethernetlist.append(ethernet[u'@odata.id'])
-
-        return ethernetlist[0]
-
     def set_NTPServer(self, mgr_attributes):
         result = {}
         setkey = mgr_attributes['mgr_attr_name']
