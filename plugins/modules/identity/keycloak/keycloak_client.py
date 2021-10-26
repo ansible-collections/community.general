@@ -694,6 +694,9 @@ def normalise_cr(clientrep, remove_ids=False):
                        not alert when the ID's of objects are not usually known, (e.g. for protocol_mappers)
     :return: normalised clientrep dict
     """
+    # Avoid the dict passed in to be modified
+    clientrep = clientrep.copy()
+
     if 'attributes' in clientrep:
         clientrep['attributes'] = list(sorted(clientrep['attributes']))
 
