@@ -895,8 +895,8 @@ def main():
 
             if module.check_mode:
                 # We can only compare the current client with the proposed updates we have
-                before_norm = normalise_cr(before_client.copy(), remove_ids=True)
-                desired_norm = normalise_cr(desired_client.copy(), remove_ids=True)
+                before_norm = normalise_cr(before_client, remove_ids=True)
+                desired_norm = normalise_cr(desired_client, remove_ids=True)
                 if module._diff:
                     result['diff'] = dict(before=sanitize_cr(before_norm),
                                           after=sanitize_cr(desired_norm))
