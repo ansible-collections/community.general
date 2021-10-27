@@ -1,0 +1,2 @@
+minor_changes:
+  - opentelemetry callback plugin - enriched the stacktrace information for loops with the ``message``, ``exception`` and ``stderr`` fields from the failed item in the tasks in addition to the name of the task and failed item (https://github.com/ansible-collections/community.general/pull/3599).
