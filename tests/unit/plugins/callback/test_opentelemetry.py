@@ -103,6 +103,20 @@ class TestOpentelemetry(unittest.TestCase):
             result = self.opentelemetry.get_error_message(generate_test_data(tc[0], tc[1], tc[2]))
             self.assertEqual(result, tc[3])
 
+    def test_get_error_message_from_results(self):
+        test_cases = (
+            ('my-exception', 'my-msg', None, False, None),
+            (None, 'my-msg', None, False, None),
+            (None, None, None, False, None),
+            ('my-exception', 'my-msg', None, True, 'shell(none) - my-exception'),
+            (None, 'my-msg', None, True, 'shell(none) - my-msg'),
+            (None, None, None, True, 'shell(none) - failed'),
+        )
+
+        for tc in test_cases:
+            result = self.opentelemetry.get_error_message_from_results([generate_test_data(tc[0], tc[1], tc[2], tc[3])], 'shell')
+            self.assertEqual(result, tc[4])
+
     def test_enrich_error_message(self):
         test_cases = (
             ('my-exception', 'my-msg', 'my-stderr', 'message: "my-msg"\nexception: "my-exception"\nstderr: "my-stderr"'),
@@ -115,6 +129,24 @@ class TestOpentelemetry(unittest.TestCase):
         for tc in test_cases:
             result = self.opentelemetry.enrich_error_message(generate_test_data(tc[0], tc[1], tc[2]))
             self.assertEqual(result, tc[3])
+
+    def test_enrich_error_message_from_results(self):
+        test_cases = (
+            ('my-exception', 'my-msg', 'my-stderr', False, ''),
+            ('my-exception', None, 'my-stderr', False, ''),
+            (None, 'my-msg', 'my-stderr', False, ''),
+            ('my-exception', 'my-msg', None, False, ''),
+            ('my-exception', 'my-msg', '\nline1\nline2', False, ''),
+            ('my-exception', 'my-msg', 'my-stderr', True, 'shell(none) - message: "my-msg"\nexception: "my-exception"\nstderr: "my-stderr"\n'),
+            ('my-exception', None, 'my-stderr', True, 'shell(none) - message: "failed"\nexception: "my-exception"\nstderr: "my-stderr"\n'),
+            (None, 'my-msg', 'my-stderr', True, 'shell(none) - message: "my-msg"\nexception: "None"\nstderr: "my-stderr"\n'),
+            ('my-exception', 'my-msg', None, True, 'shell(none) - message: "my-msg"\nexception: "my-exception"\nstderr: "None"\n'),
+            ('my-exception', 'my-msg', '\nline1\nline2', True, 'shell(none) - message: "my-msg"\nexception: "my-exception"\nstderr: "\nline1\nline2"\n')
+        )
+
+        for tc in test_cases:
+            result = self.opentelemetry.enrich_error_message_from_results([generate_test_data(tc[0], tc[1], tc[2], tc[3])], 'shell')
+            self.assertEqual(result, tc[4])
 
     def test_url_from_args(self):
         test_cases = (
@@ -148,7 +180,7 @@ class TestOpentelemetry(unittest.TestCase):
                 self.assertEqual(result, tc[1])
 
 
-def generate_test_data(exception=None, msg=None, stderr=None):
+def generate_test_data(exception=None, msg=None, stderr=None, failed=False):
     res_data = OrderedDict()
     if exception:
         res_data['exception'] = exception
@@ -156,4 +188,5 @@ def generate_test_data(exception=None, msg=None, stderr=None):
         res_data['msg'] = msg
     if stderr:
         res_data['stderr'] = stderr
+    res_data['failed'] = failed
     return res_data
