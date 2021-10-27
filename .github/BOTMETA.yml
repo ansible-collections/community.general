@@ -217,6 +217,8 @@ files:
     maintainers: Akasurde
   $lookups/random_string.py:
     maintainers: Akasurde
+  $lookups/random_words.py:
+    maintainers: konstruktoid
   $lookups/redis.py:
     maintainers: $team_ansible_core jpmens
   $lookups/shelvefile.py: {}
