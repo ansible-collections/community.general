@@ -1,0 +1,4 @@
+mssql_host: localhost
+mssql_port: 14330
+mssql_login_user: sa
+mssql_login_password: "yourStrong(!)Password"
