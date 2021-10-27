@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Install xkcdpass Python package
+      pip:
+        name: xkcdpass
