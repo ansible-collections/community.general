@@ -1367,15 +1367,16 @@ class Nmcli(object):
             if setting_type is bool:
                 # Convert all bool options to yes/no.
                 convert_func = self.bool_to_string
-            if detect_change and setting in ('vlan.id', 'vxlan.id'):
-                # Convert VLAN/VXLAN IDs to text when detecting changes.
-                convert_func = to_text
+            if detect_change:
+                if setting in ('vlan.id', 'vxlan.id'):
+                    # Convert VLAN/VXLAN IDs to text when detecting changes.
+                    convert_func = to_text
+                elif setting == self.mtu_setting:
+                    # MTU is 'auto' by default when detecting changes.
+                    convert_func = self.mtu_to_string
             elif setting_type is list:
                 # Convert lists to strings for nmcli create/modify commands.
                 convert_func = self.list_to_string
-            if setting == self.mtu_setting:
-                # MTU is 'auto' by default
-                convert_func = self.mtu_to_string
 
             if callable(convert_func):
                 options[setting] = convert_func(options[setting])
@@ -1694,6 +1695,9 @@ class Nmcli(object):
                     # Depending on version nmcli adds double-qoutes to gsm.apn
                     # Need to strip them in order to compare both
                     current_value = current_value.strip('"')
+            elif key == self.mtu_setting and value == 'auto':
+                # if self.mtu_setting parameter doesn't exist, NetworkManager behave like it's set to 'auto'
+                continue
             else:
                 # parameter does not exist
                 current_value = None
