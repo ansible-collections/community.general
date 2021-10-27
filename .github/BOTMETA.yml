@@ -746,6 +746,8 @@ files:
     maintainers: evgkrsk
   $modules/packaging/os/copr.py:
     maintainers: schlupov
+  $modules/packaging/os/dnf_versionlock.py:
+    maintainers: moreda
   $modules/packaging/os/flatpak.py:
     maintainers: $team_flatpak
   $modules/packaging/os/flatpak_remote.py:
