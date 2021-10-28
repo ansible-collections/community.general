@@ -1,0 +1,25 @@
+- hosts: localhost
+  tasks:
+    - name: Test check_action
+      assert:
+        that:
+          # Modules/actions that do not exist
+          - query('community.general.check_action', 'foo_bar') == [false]
+          - query('community.general.check_action', 'foo.bar.baz') == [false]
+          # Short name and FQCN for builtin and other collections
+          - query('community.general.check_action', 'file') == [true]
+          - query('community.general.check_action', 'set_fact') == [true]
+          - query('community.general.check_action', 'ansible.builtin.file') == [true]
+          - query('community.general.check_action', 'ansible.builtin.set_fact') == [true]
+          - query('community.general.check_action', 'ansible.builtin.foo_bar') == [false]
+          - query('community.general.check_action', 'community.crypto.acme_certificate') == [true]
+          - query('community.general.check_action', 'community.crypto.openssl_privatekey_pipe') == [true]
+          - query('community.general.check_action', 'community.crypto.foo_bar') == [false]
+          # Modules from this collection (that exist or not)
+          - query('community.general.check_action', 'community.general.ufw') == [true]
+          - query('community.general.check_action', 'community.general.foooo_really_does_not_exist') == [false]
+          # Local module
+          - query('community.general.check_action', 'local_module') == [true]
+          # Local collection module (that exist or not)
+          - query('community.general.check_action', 'testns.testcoll.collection_module') == [true]
+          - query('community.general.check_action', 'testns.testcoll.foobar') == [false]

@@ -174,6 +174,8 @@ files:
   $lookups/:
     labels: lookups
   $lookups/cartesian.py: {}
+  $lookups/check_target:
+    maintainers: felixfontein
   $lookups/chef_databag.py: {}
   $lookups/consul_kv.py: {}
   $lookups/credstash.py: {}
