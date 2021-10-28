@@ -1,0 +1,25 @@
+- hosts: localhost
+  tasks:
+    - name: Test an_action
+      assert:
+        that:
+          # Modules/actions that do not exist
+          - "'foo_bar' is not community.general.an_action"
+          - "'foo.bar.baz' is not community.general.an_action"
+          # Short name and FQCN for builtin and other collections
+          - "'file' is community.general.an_action"
+          - "'set_fact' is community.general.an_action"
+          - "'ansible.builtin.file' is community.general.an_action"
+          - "'ansible.builtin.set_fact' is community.general.an_action"
+          - "'ansible.builtin.foo_bar' is not community.general.an_action"
+          - "'community.crypto.acme_certificate' is community.general.an_action"
+          - "'community.crypto.openssl_privatekey_pipe' is community.general.an_action"
+          - "'community.crypto.foo_bar' is not community.general.an_action"
+          # Modules from this collection (that exist or not)
+          - "'community.general.ufw' is community.general.an_action"
+          - "'community.general.foooo_really_does_not_exist' is not community.general.an_action"
+          # Local module
+          - "'local_module' is community.general.an_action"
+          # Local collection module (that exist or not)
+          - "'testns.testcoll.collection_module' is community.general.an_action"
+          - "'testns.testcoll.foobar' is not community.general.an_action"
