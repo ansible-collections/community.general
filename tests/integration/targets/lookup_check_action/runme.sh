@@ -10,7 +10,7 @@ source virtualenv.sh
 
 # Create temporary folder
 TEMPDIR=$(mktemp --directory)
-trap "{ rm -rf ${TEMPDIR}; }" EXIT
+trap '{ rm -rf ${TEMPDIR}; }' EXIT
 
 cp -r . "${TEMPDIR}"
 cd "${TEMPDIR}"
