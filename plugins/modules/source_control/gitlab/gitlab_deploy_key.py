@@ -149,7 +149,8 @@ class GitLabDeployKey(object):
         #   GitLab REST API, so for that case we need to delete and
         #   than recreate the key
         if self.deployKeyObject and self.deployKeyObject.key != key_key:
-            self.deployKeyObject.delete()
+            if not self._module.check_mode:
+                self.deployKeyObject.delete()
             self.deployKeyObject = None
 
         # Because we have already call existsDeployKey in main()
