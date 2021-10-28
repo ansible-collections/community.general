@@ -11,7 +11,12 @@ version_added: "4.0.0"
 short_description: Check whether a module or action plugin is available
 description:
   - This lookup allows to query whether a module or action plugin is available under a given name.
-  - Please note that this lookup does B(not) consider the C(collections) keyword.
+  - Please note that this lookup does B(not) consider the C(collections) keyword. It looks up
+    module or action plugin names the same way as ansible does when the C(collections) keyword is
+    not present. So for modules or action plugins in collections, it is best to use their FQCN.
+    Short names should only be used for local modules or action plugins, for modules and action
+    plugins included with ansible-core, or for modules and action plugins that have a short name
+    redirect included for backwards compatibility in ansible-core.
 options:
   _terms:
     description:
@@ -25,7 +30,7 @@ options:
 EXAMPLES = """
 - name: Check whether community.general.ufw is available.
   ansible.builtin.debug:
-    msg: "We can use ufw: {{ lookup('felixfontein.acme.check_action', 'community.general.ufw) }}"
+    msg: "We can use ufw: {{ lookup('community.general.check_action', 'community.general.ufw') }}"
 """
 
 RETURN = """
