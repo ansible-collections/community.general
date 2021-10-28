@@ -1695,7 +1695,7 @@ class Nmcli(object):
                     # Depending on version nmcli adds double-qoutes to gsm.apn
                     # Need to strip them in order to compare both
                     current_value = current_value.strip('"')
-            elif key == self.mtu_setting and self.mtu == None:
+            elif key == self.mtu_setting and self.mtu is None:
                 # if self.mtu_setting parameter doesn't exist, NetworkManager behave like it's set to 'auto'
                 continue
             else:
