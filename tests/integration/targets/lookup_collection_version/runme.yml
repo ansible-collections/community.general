@@ -1,0 +1,20 @@
+- hosts: localhost
+  tasks:
+    - name: Test collection_version
+      assert:
+        that:
+          # Collection that does not exist
+          - query('community.general.collection_version', 'foo.bar') == [none]
+          - lookup('community.general.collection_version', 'foo.bar', result_not_found='foo') == 'foo'
+          # Collection that exists
+          - lookup('community.general.collection_version', 'community.general') is string
+          # Local collection
+          - lookup('community.general.collection_version', 'testns.testcoll') == '0.0.1'
+          # Local collection with no version
+          - lookup('community.general.collection_version', 'testns.testcoll_nv') == '*'
+          - lookup('community.general.collection_version', 'testns.testcoll_nv', result_no_version='') == ''
+          # Local collection with MANIFEST.json
+          - lookup('community.general.collection_version', 'testns.testcoll_mf') == '0.0.1'
+          # Local collection with no galaxy.yml and no MANIFEST.json
+          - lookup('community.general.collection_version', 'testns.testcoll_nothing') == '*'
+          - lookup('community.general.collection_version', 'testns.testcoll_nothing', result_no_version='0.0.0') == '0.0.0'
