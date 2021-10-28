@@ -9,7 +9,7 @@ source virtualenv.sh
 # That's why we have to copy this directory to a temporary place and run the test there.
 
 # Create temporary folder
-TEMPDIR=$(mktemp --directory)
+TEMPDIR=$(mktemp -d)
 trap '{ rm -rf ${TEMPDIR}; }' EXIT
 
 cp -r . "${TEMPDIR}"
