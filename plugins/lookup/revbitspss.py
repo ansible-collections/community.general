@@ -21,14 +21,18 @@ options:
         description:
             - This will be an array of keys for secrets which you want to fetch from RevBits PAM.
         required: true
+        type: list
+        elements: string
     base_url:
         description:
-            - This will be the base URL of the server, for example C(https://pam.revbits.net).
+            - This will be the base URL of the server, for example C(https://server-url-here).
         required: true
+        type:string
     api_key:
         description:
-            - This will be the API key for authentication. You can get from RevBits PAM secret manager module.
+            - This will be the API key for authentication. You can get it from the RevBits PAM secret manager module.
         required: true
+        type: string
 """
 
 RETURN = r"""
@@ -48,7 +52,7 @@ EXAMPLES = r"""
             lookup(
                 'community.general.revbitspss',
                  secret_ids=['UUIDPAM', 'DB_PASS', ...],
-                 base_url='https://pam.revbits.net',
+                 base_url='https://server-url-here',
                  api_key='API_KEY_GOES_HERE'
             )
         }}
