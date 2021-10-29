@@ -36,8 +36,8 @@ class TestLookupModule(TestCase):
         self.assertListEqual(
             [MockSecretsVault.RESPONSE],
             self.lookup.run(
-                secret_ids=['dummy'],
-                base_url='https://server-url-here',
-                api_key='api-key-here'
+                secret_ids=['dockerhub'],
+                base_url='https://pam.revbits.net',
+                api_key='a0fbb87ea84c07278dfa9d3e25d3af414a7eb61ebdfc4301cf030851481d60291bf81daf604e5652b3111300ab0d8812887736366e109291e4e806892f36e378'
             ),
         )
