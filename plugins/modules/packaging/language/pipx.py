@@ -176,8 +176,6 @@ class PipX(CmdStateModuleHelper):
         _list=dict(fmt=('list', '--include-injected', '--json'), style=ArgFormat.BOOLEAN),
     )
     check_rc = True
-    # force_lang = "en_US.UTF-8"
-    force_lang = None
 
     def _retrieve_installed(self):
         def process_list(rc, out, err):
@@ -195,7 +193,7 @@ class PipX(CmdStateModuleHelper):
                 }
             return results
 
-        installed = self.run_command(params=[{'_list': True}], process_output=process_list,
+        installed = self.run_command(params=[{'_list': True}], process_output=process_list, environ_update={'USE_EMOJI': '0'},
                                      publish_rc=False, publish_out=False, publish_err=False)
 
         if self.vars.name is not None:
@@ -225,7 +223,8 @@ class PipX(CmdStateModuleHelper):
             self.vars.will_change = True
             if not self.module.check_mode:
                 self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'python',
-                                         {'name_source': [self.vars.name, self.vars.source]}])
+                                         {'name_source': [self.vars.name, self.vars.source]}],
+                                 environ_update={'USE_EMOJI': '0'})
 
     state_present = state_install
 
@@ -236,11 +235,11 @@ class PipX(CmdStateModuleHelper):
         if self.vars.force:
             self.vars.will_change = True
         if not self.module.check_mode:
-            self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'name'])
+            self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'name'], environ_update={'USE_EMOJI': '0'})
 
     def state_uninstall(self):
         if self.vars.application and not self.module.check_mode:
-            self.run_command(params=['state', 'name'])
+            self.run_command(params=['state', 'name'], environ_update={'USE_EMOJI': '0'})
 
     state_absent = state_uninstall
 
@@ -250,7 +249,7 @@ class PipX(CmdStateModuleHelper):
                 "Trying to reinstall a non-existent application: {0}".format(self.vars.name))
         self.vars.will_change = True
         if not self.module.check_mode:
-            self.run_command(params=['state', 'name', 'python'])
+            self.run_command(params=['state', 'name', 'python'], environ_update={'USE_EMOJI': '0'})
 
     def state_inject(self):
         if not self.vars.application:
@@ -259,21 +258,21 @@ class PipX(CmdStateModuleHelper):
         if self.vars.force:
             self.vars.will_change = True
         if not self.module.check_mode:
-            self.run_command(params=['state', 'index_url', 'force', 'name', 'inject_packages'])
+            self.run_command(params=['state', 'index_url', 'force', 'name', 'inject_packages'], environ_update={'USE_EMOJI': '0'})
 
     def state_uninstall_all(self):
         if not self.module.check_mode:
-            self.run_command(params=['state'])
+            self.run_command(params=['state'], environ_update={'USE_EMOJI': '0'})
 
     def state_reinstall_all(self):
         if not self.module.check_mode:
-            self.run_command(params=['state', 'python'])
+            self.run_command(params=['state', 'python'], environ_update={'USE_EMOJI': '0'})
 
     def state_upgrade_all(self):
         if self.vars.force:
             self.vars.will_change = True
         if not self.module.check_mode:
-            self.run_command(params=['state', 'include_injected', 'force'])
+            self.run_command(params=['state', 'include_injected', 'force'], environ_update={'USE_EMOJI': '0'})
 
 
 def main():
