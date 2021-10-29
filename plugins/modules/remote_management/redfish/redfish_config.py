@@ -105,7 +105,7 @@ options:
     description:
       - setting dict of HostInterface on OOB controller
     type: dict
-    version_added: '3.9.0'
+    version_added: '4.0.0'
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''
