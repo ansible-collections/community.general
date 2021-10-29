@@ -176,7 +176,8 @@ class PipX(CmdStateModuleHelper):
         _list=dict(fmt=('list', '--include-injected', '--json'), style=ArgFormat.BOOLEAN),
     )
     check_rc = True
-    force_lang = "en_US.UTF-8"
+    # force_lang = "en_US.UTF-8"
+    force_lang = None
 
     def _retrieve_installed(self):
         def process_list(rc, out, err):
