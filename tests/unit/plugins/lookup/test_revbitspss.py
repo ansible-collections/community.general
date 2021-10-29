@@ -17,7 +17,7 @@ from ansible.plugins.loader import lookup_loader
 
 
 class MockSecretsVault(MagicMock):
-    RESPONSE = '{"foo": "bar"}'
+    RESPONSE = '{"dockerhub": "mP1fD4kY9oG3jI2d"}'
 
     def get_secret_json(self, path):
         return self.RESPONSE
