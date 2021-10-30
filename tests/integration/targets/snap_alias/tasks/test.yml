@@ -26,8 +26,6 @@
     state: absent
   register: alias_remove
 
-- command: snap aliases
-
 - name: Remove all aliases for snap
   community.general.snap_alias:
     name: hello-world
