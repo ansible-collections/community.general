@@ -25,13 +25,12 @@ options:
         description:
             - Name of the snap.
         type: str
-        required: true
     alias:
         description:
             - Aliases to be created or removed.
         type: list
         elements: str
-        aliases: aliases
+        aliases: [aliases]
 
 author:
     - Alexei Znamensky (@russoz) <russoz@gmail.com>
@@ -125,8 +124,8 @@ class SnapAlias(CmdStateModuleHelper):
             return results
 
         return self.run_command(params=[{'state': 'info'}, 'name'], check_rc=True,
-                                        publish_rc=False, publish_out=False, publish_err=False,
-                                        process_output=process_get_aliases)
+                                publish_rc=False, publish_out=False, publish_err=False,
+                                process_output=process_get_aliases)
 
     def _get_aliases_for(self, name):
         return self._get_aliases().get(name, [])
