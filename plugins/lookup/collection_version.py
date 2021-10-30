@@ -102,9 +102,7 @@ class LookupModule(LookupBase):
 
             try:
                 collection_pkg = import_module('ansible_collections.{fqcn}'.format(fqcn=term))
-                if not collection_pkg:
-                    raise Exception('collection not found')
-            except Exception:
+            except ImportError:
                 # Collection not found
                 result.append(not_found)
                 continue
