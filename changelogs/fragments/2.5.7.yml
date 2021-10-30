@@ -1,1 +1,1 @@
-release_summary: Regular bugfix release.
+release_summary: Regular bugfix release. Please note that this is the last regular bugfix release, from now on only security fixes and major bugfixes will be accepted for the ``stable-2`` branch.
