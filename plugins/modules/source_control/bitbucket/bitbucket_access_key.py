@@ -218,7 +218,7 @@ def main():
         repository=dict(type='str', required=True),
         workspace=dict(
             type='str', aliases=['username'], required=True,
-            deprecated_aliases=[dict(name='username', version='5.0.0', collection_name='community.general')],
+            deprecated_aliases=[dict(name='username', version='6.0.0', collection_name='community.general')],
         ),
         key=dict(type='str', no_log=False),
         label=dict(type='str', required=True),
