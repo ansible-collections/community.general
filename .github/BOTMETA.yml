@@ -1159,7 +1159,7 @@ files:
     maintainers: inetfuture mattupstate
   $modules/web_infrastructure/taiga_issue.py:
     maintainers: lekum
-  $tests/an_action.py:
+  $tests/a_module.py:
     maintainers: felixfontein
 #########################
   tests/:
