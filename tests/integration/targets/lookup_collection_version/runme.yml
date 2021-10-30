@@ -31,4 +31,5 @@
     - name: Validate error message
       assert:
         that:
-          - invalid_fqcn.msg == '"foo.bar.baz" is not a FQCN'
+          - >
+            '"foo.bar.baz" is not a FQCN' in invalid_fqcn.msg
