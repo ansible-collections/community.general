@@ -8,11 +8,11 @@ __metaclass__ = type
 from ansible.plugins.loader import action_loader, module_loader
 
 
-def an_action(term):
+def a_module(term):
     """
     Example:
-      - 'community.general.ufw' is community.general.an_action
-      - 'community.general.does_not_exist' is not community.general.an_action
+      - 'community.general.ufw' is community.general.a_module
+      - 'community.general.does_not_exist' is not community.general.a_module
     """
     for loader in (action_loader, module_loader):
         data = loader.find_plugin(term)
@@ -29,5 +29,5 @@ class TestModule(object):
 
     def tests(self):
         return {
-            'an_action': an_action,
+            'a_module': a_module,
         }
