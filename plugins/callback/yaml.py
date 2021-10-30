@@ -32,7 +32,12 @@ from ansible.module_utils.six import string_types
 from ansible.parsing.yaml.dumper import AnsibleDumper
 from ansible.plugins.callback import CallbackBase, strip_internal_keys, module_response_deepcopy
 from ansible.plugins.callback.default import CallbackModule as Default
-from ansible.utils.unsafe_proxy import NativeJinjaUnsafeText
+
+try:
+    from ansible.utils.unsafe_proxy import NativeJinjaUnsafeText
+except ImportError:
+    # Ansible 2.9 and ansible-base 2.10 do not have this yet
+    NativeJinjaUnsafeText = None
 
 
 # from http://stackoverflow.com/a/15423007/115478
@@ -72,7 +77,7 @@ class MyDumper(AnsibleDumper):
 def sanitize(value):
     if isinstance(value, Mapping):
         return dict((sanitize(k), sanitize(v)) for k, v in value.items())
-    if isinstance(value, NativeJinjaUnsafeText):
+    if NativeJinjaUnsafeText is not None and isinstance(value, NativeJinjaUnsafeText):
         return str(value)
     if isinstance(value, string_types):
         return value
