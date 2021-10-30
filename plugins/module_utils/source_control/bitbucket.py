@@ -22,7 +22,7 @@ class BitbucketHelper:
     @staticmethod
     def bitbucket_argument_spec():
         return dict(
-            client_id=dict(type='str', no_log=False, fallback=(env_fallback, ['BITBUCKET_CLIENT_ID'])),
+            client_id=dict(type='str', fallback=(env_fallback, ['BITBUCKET_CLIENT_ID'])),
             client_secret=dict(type='str', no_log=True, fallback=(env_fallback, ['BITBUCKET_CLIENT_SECRET'])),
             # TODO:
             # - Rename user to username once current usage of username is removed
