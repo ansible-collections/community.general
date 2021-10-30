@@ -132,7 +132,7 @@ class EthernetNetworkModuleSpec(unittest.TestCase,
         self.resource.update.return_value = data_merged
         self.mock_ov_client.connection_templates.get.return_value = {"uri": "uri"}
 
-        self.mock_ansible_module.params = yaml.load(YAML_PARAMS_WITH_CHANGES)
+        self.mock_ansible_module.params = yaml.safe_load(YAML_PARAMS_WITH_CHANGES)
 
         EthernetNetworkModule().run()
 
@@ -146,7 +146,7 @@ class EthernetNetworkModuleSpec(unittest.TestCase,
         self.resource.get_by.return_value = [DICT_PARAMS_WITH_CHANGES]
         self.mock_ov_client.connection_templates.get.return_value = {"uri": "uri"}
 
-        self.mock_ansible_module.params = yaml.load(YAML_PARAMS_WITH_CHANGES)
+        self.mock_ansible_module.params = yaml.safe_load(YAML_PARAMS_WITH_CHANGES)
 
         EthernetNetworkModule().run()
 
@@ -165,7 +165,7 @@ class EthernetNetworkModuleSpec(unittest.TestCase,
         self.mock_ov_client.connection_templates.get.return_value = {
             "bandwidth": DICT_PARAMS_WITH_CHANGES['bandwidth']}
 
-        self.mock_ansible_module.params = yaml.load(YAML_PARAMS_WITH_CHANGES)
+        self.mock_ansible_module.params = yaml.safe_load(YAML_PARAMS_WITH_CHANGES)
 
         EthernetNetworkModule().run()
 
@@ -182,7 +182,7 @@ class EthernetNetworkModuleSpec(unittest.TestCase,
         self.resource.get_by.return_value = [DEFAULT_ENET_TEMPLATE]
         self.resource.update.return_value = data_merged
 
-        self.mock_ansible_module.params = yaml.load(YAML_PARAMS_WITH_CHANGES)
+        self.mock_ansible_module.params = yaml.safe_load(YAML_PARAMS_WITH_CHANGES)
 
         EthernetNetworkModule().run()
 
@@ -320,7 +320,7 @@ class EthernetNetworkModuleSpec(unittest.TestCase,
             "max": 1
         }}
 
-        self.mock_ansible_module.params = yaml.load(YAML_RESET_CONNECTION_TEMPLATE)
+        self.mock_ansible_module.params = yaml.safe_load(YAML_RESET_CONNECTION_TEMPLATE)
 
         EthernetNetworkModule().run()
 
@@ -331,7 +331,7 @@ class EthernetNetworkModuleSpec(unittest.TestCase,
     def test_should_fail_when_reset_not_existing_ethernet_network(self):
         self.resource.get_by.return_value = [None]
 
-        self.mock_ansible_module.params = yaml.load(YAML_RESET_CONNECTION_TEMPLATE)
+        self.mock_ansible_module.params = yaml.safe_load(YAML_RESET_CONNECTION_TEMPLATE)
 
         EthernetNetworkModule().run()
 
