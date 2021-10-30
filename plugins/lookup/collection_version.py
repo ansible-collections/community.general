@@ -52,7 +52,7 @@ RETURN = """
       - The version number of the collections listed as input.
       - If a collection can not be found, it will return the value provided in I(result_not_found).
         By default, this is C(none).
-      - If a collection can be found, but the version not identified, it will value provided in
+      - If a collection can be found, but the version not identified, it will return the value provided in
         I(result_no_version). By default, this is C(*). This can happen for collections installed
         from git which do not have a version number in C(galaxy.yml).
     type: list
