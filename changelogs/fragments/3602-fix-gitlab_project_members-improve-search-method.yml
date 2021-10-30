@@ -1,0 +1,2 @@
+bugfixes:
+  - gitlab_project_members - ``get_project_id`` return the project id by matching ``full_path`` or ``name`` (https://github.com/ansible-collections/community.general/pull/3602).
