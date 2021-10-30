@@ -35,4 +35,5 @@ options:
 notes:
   - Bitbucket OAuth consumer key and secret can be obtained from Bitbucket profile -> Settings -> Access Management -> OAuth.
   - Bitbucket App password can be created from Bitbucket profile -> Personal Settings -> App passwords.
+  - If both OAuth and Basic Auth credentials are passed, OAuth credentials take precedence.
 '''
