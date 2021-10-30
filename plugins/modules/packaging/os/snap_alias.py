@@ -35,6 +35,9 @@ options:
 
 author:
     - Alexei Znamensky (@russoz) <russoz@gmail.com>
+
+seealso:
+    - module: community.general.snap
 '''
 
 EXAMPLES = '''
@@ -76,7 +79,7 @@ snap_aliases:
 import re
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    CmdStateModuleHelper, ModuleHelperException
+    CmdStateModuleHelper
 )
 
 
