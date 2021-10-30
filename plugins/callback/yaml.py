@@ -27,10 +27,12 @@ import string
 import sys
 
 from ansible.module_utils.common.text.converters import to_bytes, to_text
+from ansible.module_utils.common._collections_compat import Mapping, Sequence
 from ansible.module_utils.six import string_types
 from ansible.parsing.yaml.dumper import AnsibleDumper
 from ansible.plugins.callback import CallbackBase, strip_internal_keys, module_response_deepcopy
 from ansible.plugins.callback.default import CallbackModule as Default
+from ansible.utils.unsafe_proxy import NativeJinjaUnsafeText
 
 
 # from http://stackoverflow.com/a/15423007/115478
@@ -65,6 +67,18 @@ class MyDumper(AnsibleDumper):
         if self.alias_key is not None:
             self.represented_objects[self.alias_key] = node
         return node
+
+
+def sanitize(value):
+    if isinstance(value, Mapping):
+        return dict((sanitize(k), sanitize(v)) for k, v in value.items())
+    if isinstance(value, NativeJinjaUnsafeText):
+        return str(value)
+    if isinstance(value, string_types):
+        return value
+    if isinstance(value, Sequence):
+        return [sanitize(v) for v in value]
+    return value
 
 
 class CallbackModule(Default):
@@ -121,7 +135,7 @@ class CallbackModule(Default):
 
         if abridged_result:
             dumped += '\n'
-            dumped += to_text(yaml.dump(abridged_result, allow_unicode=True, width=1000, Dumper=MyDumper, default_flow_style=False))
+            dumped += to_text(yaml.dump(sanitize(abridged_result), allow_unicode=True, width=1000, Dumper=MyDumper, default_flow_style=False))
 
         # indent by a couple of spaces
         dumped = '\n  '.join(dumped.split('\n')).rstrip()
