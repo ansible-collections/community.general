@@ -1,0 +1,26 @@
+version: '3.4'
+
+services:
+  postgres:
+    image: postgres:9.6
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+
+  keycloak:
+    image: jboss/keycloak:12.0.4
+    ports:
+      - 8080:8080
+
+    environment:
+      DB_VENDOR: postgres
+      DB_ADDR: postgres
+      DB_DATABASE: postgres
+      DB_USER: postgres
+      DB_SCHEMA: public
+      DB_PASSWORD: postgres
+
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password

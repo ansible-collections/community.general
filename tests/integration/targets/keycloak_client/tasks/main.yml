@@ -1,0 +1,59 @@
+---
+- name: Delete realm
+  community.general.keycloak_realm: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      id: "{{ realm }}"
+      realm: "{{ realm }}"
+      state: absent
+
+- name: Create realm
+  community.general.keycloak_realm: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      id: "{{ realm }}"
+      realm: "{{ realm }}"
+      state: present
+
+- name: Desire client
+  community.general.keycloak_client: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      realm: "{{ realm }}"
+      client_id: "{{ client_id }}"
+      state: present
+      redirect_uris: '{{redirect_uris1}}'
+      attributes: '{{client_attributes1}}'
+      protocol_mappers: '{{protocol_mappers1}}'
+  register: desire_client_not_present
+
+- name: Desire client again with same props
+  community.general.keycloak_client: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      realm: "{{ realm }}"
+      client_id: "{{ client_id }}"
+      state: present
+      redirect_uris: '{{redirect_uris1}}'
+      attributes: '{{client_attributes1}}'
+      protocol_mappers: '{{protocol_mappers1}}'
+  register: desire_client_when_present_and_same
+
+- name: Check client again with same props
+  community.general.keycloak_client: "{{ auth_args | combine(call_args) }}"
+  check_mode: yes
+  vars:
+    call_args:
+      realm: "{{ realm }}"
+      client_id: "{{ client_id }}"
+      state: present
+      redirect_uris: '{{redirect_uris1}}'
+      attributes: '{{client_attributes1}}'
+      protocol_mappers: '{{protocol_mappers1}}'
+  register: check_client_when_present_and_same
+
+- name: Assert changes not detected in last two tasks (desire when same, and check)
+  assert:
+    that:
+      - desire_client_when_present_and_same is not changed
+      - check_client_when_present_and_same is not changed
