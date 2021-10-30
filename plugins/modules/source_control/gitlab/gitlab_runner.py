@@ -92,7 +92,7 @@ options:
     type: str
   maximum_timeout:
     description:
-      - The maximum timeout that a runner has to pick up a specific job.
+      - The maximum time that a runner has to complete a specific job.
     required: False
     default: 3600
     type: int
