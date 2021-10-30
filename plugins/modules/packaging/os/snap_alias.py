@@ -68,6 +68,7 @@ RETURN = '''
 snap_aliases:
     description: The snap aliases after execution
     type: list
+    elements: str
     returned: always
 '''
 
