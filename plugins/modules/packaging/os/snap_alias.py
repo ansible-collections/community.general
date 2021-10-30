@@ -12,6 +12,7 @@ DOCUMENTATION = '''
 ---
 module: snap_alias
 short_description: Manages snap aliases
+version_added: 4.0.0
 description:
     - "Manages snaps aliases."
 options:
