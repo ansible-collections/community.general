@@ -47,7 +47,10 @@ EXAMPLES = '''
 - name: Create multiple aliases
   community.general.snap_alias:
     name: hello-world
-    aliases: [hw, hw2, hw3]
+    aliases:
+      - hw
+      - hw2
+      - hw3
     state: present   # optional
 
 - name: Remove one specific aliases
