@@ -42,7 +42,7 @@ class BitbucketHelper:
     def fetch_access_token(self):
         if self.module.params['client_id'] and self.module.params['client_secret']:
             headers = {
-                'Authorization': basic_auth_header(self.module.params['client_id'], self.module.params['client_secret'])
+                'Authorization': basic_auth_header(self.module.params['client_id'], self.module.params['client_secret']),
             }
 
             info, content = self.request(
