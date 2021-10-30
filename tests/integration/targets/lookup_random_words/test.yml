@@ -8,7 +8,7 @@
       result2: "{{ query('community.general.random_words', min_length=5, max_length=5) }}"
       result3: "{{ query('community.general.random_words', delimiter='!') }}"
       result4: "{{ query('community.general.random_words', numwords=3, delimiter='-', case='capitalize') }}"
-      result5: "{{ query('community.general.random_words', numwords=3, delimiter='') }}"
+      result5: "{{ query('community.general.random_words', min_length=5, max_length=5, numwords=3, delimiter='') }}"
 
   - name: Check results
     assert:
@@ -25,4 +25,4 @@
         - result4[0] | regex_findall("[A-Z]") | length == 3
         - result4[0].count("-") == 2
         - result5 | length == 1
-        - result5[0] | length >= 18
+        - result5[0] | length == 15
