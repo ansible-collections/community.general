@@ -1,0 +1,47 @@
+---
+- name: Ensure snap 'hello-world' is not installed
+  community.general.snap:
+    name: hello-world
+    state: absent
+
+- name: Ensure snap 'hello-world' is installed now
+  community.general.snap:
+    name: hello-world
+
+- name: Create snap alias
+  community.general.snap_alias:
+    name: hello-world
+    alias: hw
+  register: alias_single
+
+- name: Create multiple aliases
+  community.general.snap_alias:
+    name: hello-world
+    aliases: [hw, hw2, hw3]
+  register: alias_multi
+
+- name: Remove one specific alias
+  community.general.snap_alias:
+    alias: hw
+    state: absent
+  register: alias_remove
+
+- command: snap aliases
+
+- name: Remove all aliases for snap
+  community.general.snap_alias:
+    name: hello-world
+    state: absent
+  register: alias_remove_all
+
+- name: Assertions
+  assert:
+    that:
+        - alias_single is changed
+        - 'alias_single.snap_aliases["hello-world"] == ["hw"]'
+        - alias_multi is changed
+        - 'alias_multi.snap_aliases["hello-world"] == ["hw", "hw2", "hw3"]'
+        - alias_remove is changed
+        - 'alias_remove.snap_aliases["hello-world"] == ["hw2", "hw3"]'
+        - alias_remove_all is changed
+        - 'alias_remove_all.snap_aliases["hello-world"] == []'

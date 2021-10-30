@@ -59,52 +59,33 @@ EXAMPLES = '''
   community.general.snap_alias:
     name: hello-world
     state: absent
-
-# Install a snap with classic confinement
-- name: Install "foo" with option --classic
-  community.general.snap:
-    name: foo
-    classic: yes
-
-# Install a snap with from a specific channel
-- name: Install "foo" with option --channel=latest/edge
-  community.general.snap:
-    name: foo
-    channel: latest/edge
 '''
 
 RETURN = '''
-cmd:
-    description: The command that was executed on the host
-    type: str
-    returned: When changed is true
-snaps_installed:
-    description: The list of actually installed snaps
+snap_aliases:
+    description: The snap aliases after execution
     type: list
-    returned: When any snaps have been installed
-snaps_removed:
-    description: The list of actually removed snaps
-    type: list
-    returned: When any snaps have been removed
+    returned: always
 '''
+
+
+import re
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
     CmdStateModuleHelper, ModuleHelperException
 )
 
 
-__state_map = dict(
+_state_map = dict(
     present='alias',
     absent='unalias',
     info='aliases',
 )
 
 
-def _state_map(value):
-    return [__state_map[value]]
-
-
 class SnapAlias(CmdStateModuleHelper):
+    _RE_ALIAS_LIST = re.compile(r"^(?P<snap>[\w-]+)\s+(?P<alias>[\w-]+)\s+.*$")
+
     module = dict(
         argument_spec={
             'state': dict(type='str', choices=['absent', 'present'], default='present'),
@@ -118,36 +99,48 @@ class SnapAlias(CmdStateModuleHelper):
     )
     command = "snap"
     command_args_formats = dict(
-        snap_name={},
-        snap_alias={},
-        state=dict(fmt=_state_map),
+        _alias=dict(fmt=lambda v: [v]),
+        state=dict(fmt=lambda v: [_state_map[v]]),
     )
+    check_rc = False
 
-    def _get_aliases(self, name):
-        rc, out, err = self.run_command(params=[{'state': 'info'}, {'snap_name': name}])
-        if err:
-            return []
-        aliases = [a.split() for a in out.splitlines()[1:]]
-        aliases = [a[1] for a in aliases if a[0] == name]
-        return aliases
+    def _aliases(self):
+        return {self.vars.name: self._get_aliases_for(self.vars.name)} if self.vars.name else self._get_aliases()
+
+    def __init_module__(self):
+        self.vars.set("snap_aliases", self._aliases(), change=True, diff=True)
+
+    def __quit_module__(self):
+        self.vars.snap_aliases = self._aliases()
+
+    def _get_aliases(self):
+        def process_get_aliases(rc, out, err):
+            if err:
+                return {}
+            aliases = [self._RE_ALIAS_LIST.match(a.strip()) for a in out.splitlines()[1:]]
+            snap_alias_list = [(entry.group("snap"), entry.group("alias")) for entry in aliases]
+            results = {}
+            for snap, alias in snap_alias_list:
+                results[snap] = results.get(snap, []) + [alias]
+            return results
+
+        return self.run_command(params=[{'state': 'info'}, 'name'], check_rc=True,
+                                        publish_rc=False, publish_out=False, publish_err=False,
+                                        process_output=process_get_aliases)
+
+    def _get_aliases_for(self, name):
+        return self._get_aliases().get(name, [])
 
     def state_present(self):
         for alias in self.vars.alias:
-            self.run_command(params=['state', {'snap_name': self.vars.name}, {'snap_alias': alias}])
+            self.run_command(params=['state', 'name', {'_alias': alias}])
 
     def state_absent(self):
         if self.vars.alias is None:
-            self.run_command(params=['state', {'snap_name': self.vars.name}])
-        elif self.vars.name is None:
-            for alias in self.vars.alias:
-                self.run_command(params=['state', {'snap_alias': alias}])
+            self.run_command(params=['state', 'name'])
         else:
-            existing = self._get_aliases(self.vars.name)
-            non_existing = set(self.vars.alias) - set(existing)
-            if non_existing:
-                raise ModuleHelperException(msg="Snap {0} has not the aliases: {1}".format(self.vars.name, ", ".join(non_existing)))
             for alias in self.vars.alias:
-                self.run_command(params=['state', {'snap_alias': alias}])
+                self.run_command(params=['state', {'_alias': alias}])
 
 
 def main():
