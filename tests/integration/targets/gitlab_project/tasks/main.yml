@@ -22,9 +22,9 @@
     validate_certs: False
     login_token: "{{ gitlab_login_token }}"
     name: "{{ gitlab_project_name }}"
+    initialize_with_readme: True
     state: present
   register: gitlab_project_state
-
 
 - assert:
     that:
@@ -38,7 +38,6 @@
     name: "{{ gitlab_project_name }}"
     state: present
   register: gitlab_project_state_again
-
 
 - assert:
     that:
