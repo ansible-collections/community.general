@@ -27,11 +27,13 @@ options:
       - The username.
       - If not set the environment variable C(BITBUCKET_USERNAME) will be used.
     type: str
+    version_added: 4.0.0
   password:
     description:
       - The App password.
       - If not set the environment variable C(BITBUCKET_PASSWORD) will be used.
     type: str
+    version_added: 4.0.0
 notes:
   - Bitbucket OAuth consumer key and secret can be obtained from Bitbucket profile -> Settings -> Access Management -> OAuth.
   - Bitbucket App password can be created from Bitbucket profile -> Personal Settings -> App passwords.
