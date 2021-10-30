@@ -29,7 +29,7 @@ options:
   workspace:
     description:
       - The repository owner.
-      - Alias C(username) has been deprecated and will become an alias of C(user) in community.general 5.0.0.
+      - Alias I(username) has been deprecated and will become an alias of I(user) in community.general 6.0.0.
     type: str
     required: true
     aliases: [ username ]
