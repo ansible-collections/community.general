@@ -34,5 +34,5 @@ options:
     type: str
 notes:
   - Bitbucket OAuth consumer key and secret can be obtained from Bitbucket profile -> Settings -> Access Management -> OAuth.
-  - Bitbucket App password can be created from Bitbucket profile -> Personal Settings -> App passwords
+  - Bitbucket App password can be created from Bitbucket profile -> Personal Settings -> App passwords.
 '''
