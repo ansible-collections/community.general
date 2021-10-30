@@ -66,7 +66,7 @@ class BitbucketHelper:
             })
         elif self.module.params['user'] and self.module.params['password']:
             headers.update({
-                'Authorization': basic_auth_header(self.module.params['user'], self.module.params['password'])
+                'Authorization': basic_auth_header(self.module.params['user'], self.module.params['password']),
             })
 
         if isinstance(data, dict):
