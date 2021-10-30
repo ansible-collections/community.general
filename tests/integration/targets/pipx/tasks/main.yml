@@ -90,3 +90,37 @@
         - downgrade_tox_324.application.tox.version == '3.24.0'
         - uninstall_tox_324 is changed
         - "'tox' not in uninstall_tox_324.application"
+
+##############################################################################
+- name: ensure application ansible-lint is uninstalled
+  community.general.pipx:
+    name: ansible-lint
+    state: absent
+
+- name: install application ansible-lint
+  community.general.pipx:
+    name: ansible-lint
+  register: install_ansible_lint
+
+- name: inject packages
+  community.general.pipx:
+    state: inject
+    name: ansible-lint
+    inject_packages:
+      - licenses
+  register: inject_pkgs_ansible_lint
+
+- name: cleanup ansible-lint
+  community.general.pipx:
+    state: absent
+    name: ansible-lint
+  register: uninstall_ansible_lint
+
+- name: check assertions inject_packages
+  assert:
+    that:
+        - install_ansible_lint is changed
+        - inject_pkgs_ansible_lint is changed
+        - '"ansible-lint" in inject_pkgs_ansible_lint.application'
+        - '"licenses" in inject_pkgs_ansible_lint.application["ansible-lint"]["injected"]'
+        - uninstall_ansible_lint is changed
