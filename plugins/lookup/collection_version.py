@@ -117,6 +117,9 @@ class LookupModule(LookupBase):
                     data = {}
                     galaxy_path = os.path.join(path, 'galaxy.yml')
                     galaxy_alt_path = os.path.join(path, 'galaxy.yaml')
+                    # galaxy.yaml was only supported in ansible-base 2.10 and ansible-core 2.11. Support was removed
+                    # in https://github.com/ansible/ansible/commit/595413d11346b6f26bb3d9df2d8e05f2747508a3 for
+                    # ansible-core 2.12.
                     for path in (galaxy_path, galaxy_alt_path):
                         if os.path.exists(path):
                             data = load_collection_meta_galaxy(path, no_version=no_version)
