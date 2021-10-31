@@ -15,27 +15,21 @@ description:
   - Manages Bitbucket pipeline SSH key pair.
 author:
   - Evgeniy Krysanov (@catcombo)
+extends_documentation_fragment:
+  - community.general.bitbucket
 options:
-  client_id:
-    description:
-      - OAuth consumer key.
-      - If not set the environment variable C(BITBUCKET_CLIENT_ID) will be used.
-    type: str
-  client_secret:
-    description:
-      - OAuth consumer secret.
-      - If not set the environment variable C(BITBUCKET_CLIENT_SECRET) will be used.
-    type: str
   repository:
     description:
       - The repository name.
     type: str
     required: true
-  username:
+  workspace:
     description:
       - The repository owner.
+      - Alias I(username) has been deprecated and will become an alias of I(user) in community.general 6.0.0.
     type: str
     required: true
+    aliases: [ username ]
   public_key:
     description:
       - The public key.
@@ -51,7 +45,6 @@ options:
     required: true
     choices: [ absent, present ]
 notes:
-  - Bitbucket OAuth consumer key and secret can be obtained from Bitbucket profile -> Settings -> Access Management -> OAuth.
   - Check mode is supported.
 '''
 
@@ -59,7 +52,7 @@ EXAMPLES = r'''
 - name: Create or update SSH key pair
   community.general.bitbucket_pipeline_key_pair:
     repository: 'bitbucket-repo'
-    username: bitbucket_username
+    workspace: bitbucket_workspace
     public_key: '{{lookup("file", "bitbucket.pub") }}'
     private_key: '{{lookup("file", "bitbucket") }}'
     state: present
@@ -67,7 +60,7 @@ EXAMPLES = r'''
 - name: Remove SSH key pair
   community.general.bitbucket_pipeline_key_pair:
     repository: bitbucket-repo
-    username: bitbucket_username
+    workspace: bitbucket_workspace
     state: absent
 '''
 
@@ -82,7 +75,7 @@ error_messages = {
 }
 
 BITBUCKET_API_ENDPOINTS = {
-    'ssh-key-pair': '%s/2.0/repositories/{username}/{repo_slug}/pipelines_config/ssh/key_pair' % BitbucketHelper.BITBUCKET_API_URL,
+    'ssh-key-pair': '%s/2.0/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair' % BitbucketHelper.BITBUCKET_API_URL,
 }
 
 
@@ -104,7 +97,7 @@ def get_existing_ssh_key_pair(module, bitbucket):
         }
     """
     api_url = BITBUCKET_API_ENDPOINTS['ssh-key-pair'].format(
-        username=module.params['username'],
+        workspace=module.params['workspace'],
         repo_slug=module.params['repository'],
     )
 
@@ -123,7 +116,7 @@ def get_existing_ssh_key_pair(module, bitbucket):
 def update_ssh_key_pair(module, bitbucket):
     info, content = bitbucket.request(
         api_url=BITBUCKET_API_ENDPOINTS['ssh-key-pair'].format(
-            username=module.params['username'],
+            workspace=module.params['workspace'],
             repo_slug=module.params['repository'],
         ),
         method='PUT',
@@ -143,7 +136,7 @@ def update_ssh_key_pair(module, bitbucket):
 def delete_ssh_key_pair(module, bitbucket):
     info, content = bitbucket.request(
         api_url=BITBUCKET_API_ENDPOINTS['ssh-key-pair'].format(
-            username=module.params['username'],
+            workspace=module.params['workspace'],
             repo_slug=module.params['repository'],
         ),
         method='DELETE',
@@ -160,7 +153,10 @@ def main():
     argument_spec = BitbucketHelper.bitbucket_argument_spec()
     argument_spec.update(
         repository=dict(type='str', required=True),
-        username=dict(type='str', required=True),
+        workspace=dict(
+            type='str', aliases=['username'], required=True,
+            deprecated_aliases=[dict(name='username', version='6.0.0', collection_name='community.general')],
+        ),
         public_key=dict(type='str'),
         private_key=dict(type='str', no_log=True),
         state=dict(type='str', choices=['present', 'absent'], required=True),
@@ -168,6 +164,8 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
+        required_one_of=BitbucketHelper.bitbucket_required_one_of(),
+        required_together=BitbucketHelper.bitbucket_required_together(),
     )
 
     bitbucket = BitbucketHelper(module)

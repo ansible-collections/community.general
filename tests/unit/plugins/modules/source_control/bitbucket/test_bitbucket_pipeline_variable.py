@@ -25,7 +25,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
             })
             self.module.main()
 
-        self.assertEqual(exec_info.exception.args[0]['msg'], BitbucketHelper.error_messages['required_client_id'])
+        self.assertEqual(exec_info.exception.args[0]['failed'], True)
 
     def test_missing_value_with_present_state(self):
         with self.assertRaises(AnsibleFailJson) as exec_info:
@@ -47,7 +47,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     })
     @patch.object(BitbucketHelper, 'fetch_access_token', return_value='token')
     @patch.object(bitbucket_pipeline_variable, 'get_existing_pipeline_variable', return_value=None)
-    def test_env_vars_params(self, *args):
+    def test_oauth_env_vars_params(self, *args):
         with self.assertRaises(AnsibleExitJson):
             set_module_args({
                 'username': 'name',
@@ -57,15 +57,29 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
             })
             self.module.main()
 
-    @patch.object(BitbucketHelper, 'fetch_access_token', return_value='token')
+    @patch.dict('os.environ', {
+        'BITBUCKET_USERNAME': 'ABC',
+        'BITBUCKET_PASSWORD': 'XXX',
+    })
+    @patch.object(bitbucket_pipeline_variable, 'get_existing_pipeline_variable', return_value=None)
+    def test_basic_auth_env_vars_params(self, *args):
+        with self.assertRaises(AnsibleExitJson):
+            set_module_args({
+                'workspace': 'name',
+                'repository': 'repo',
+                'name': 'PIPELINE_VAR_NAME',
+                'state': 'absent',
+            })
+            self.module.main()
+
     @patch.object(bitbucket_pipeline_variable, 'get_existing_pipeline_variable', return_value=None)
     def test_create_variable(self, *args):
         with patch.object(self.module, 'create_pipeline_variable') as create_pipeline_variable_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
                 set_module_args({
-                    'client_id': 'ABC',
-                    'client_secret': 'XXX',
-                    'username': 'name',
+                    'user': 'ABC',
+                    'password': 'XXX',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'PIPELINE_VAR_NAME',
                     'value': '42',
