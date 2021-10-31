@@ -1,0 +1,7 @@
+---
+minor_changes:
+  - bitbucket_* modules - add ``user`` and ``password`` options for Basic authentication (https://github.com/ansible-collections/community.general/pull/2045).
+deprecated_features:
+  - bitbucket_* modules - ``username`` options have been deprecated in favor of ``workspace`` and will be removed in community.general 6.0.0 (https://github.com/ansible-collections/community.general/pull/2045).
+major_changes:
+  - "bitbucket_* modules - ``client_id`` is no longer marked as ``no_log=true``. If you relied on its value not showing up in logs and output, please mark the whole tasks with ``no_log: true`` (https://github.com/ansible-collections/community.general/pull/2045)."

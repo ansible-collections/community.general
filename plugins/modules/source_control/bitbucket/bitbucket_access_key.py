@@ -15,27 +15,21 @@ description:
   - Manages Bitbucket repository access keys (also called deploy keys).
 author:
   - Evgeniy Krysanov (@catcombo)
+extends_documentation_fragment:
+  - community.general.bitbucket
 options:
-  client_id:
-    description:
-      - The OAuth consumer key.
-      - If not set the environment variable C(BITBUCKET_CLIENT_ID) will be used.
-    type: str
-  client_secret:
-    description:
-      - The OAuth consumer secret.
-      - If not set the environment variable C(BITBUCKET_CLIENT_SECRET) will be used.
-    type: str
   repository:
     description:
       - The repository name.
     type: str
     required: true
-  username:
+  workspace:
     description:
       - The repository owner.
+      - Alias I(username) has been deprecated and will become an alias of I(user) in community.general 6.0.0.
     type: str
     required: true
+    aliases: [ username ]
   key:
     description:
       - The SSH public key.
@@ -52,8 +46,7 @@ options:
     required: true
     choices: [ absent, present ]
 notes:
-  - Bitbucket OAuth consumer key and secret can be obtained from Bitbucket profile -> Settings -> Access Management -> OAuth.
-  - Bitbucket OAuth consumer should have permissions to read and administrate account repositories.
+  - Bitbucket OAuth consumer or App password should have permissions to read and administrate account repositories.
   - Check mode is supported.
 '''
 
@@ -61,7 +54,7 @@ EXAMPLES = r'''
 - name: Create access key
   community.general.bitbucket_access_key:
     repository: 'bitbucket-repo'
-    username: bitbucket_username
+    workspace: bitbucket_workspace
     key: '{{lookup("file", "bitbucket.pub") }}'
     label: 'Bitbucket'
     state: present
@@ -69,7 +62,7 @@ EXAMPLES = r'''
 - name: Delete access key
   community.general.bitbucket_access_key:
     repository: bitbucket-repo
-    username: bitbucket_username
+    workspace: bitbucket_workspace
     label: Bitbucket
     state: absent
 '''
@@ -82,13 +75,13 @@ from ansible_collections.community.general.plugins.module_utils.source_control.b
 error_messages = {
     'required_key': '`key` is required when the `state` is `present`',
     'required_permission': 'OAuth consumer `client_id` should have permissions to read and administrate the repository',
-    'invalid_username_or_repo': 'Invalid `repository` or `username`',
+    'invalid_workspace_or_repo': 'Invalid `repository` or `workspace`',
     'invalid_key': 'Invalid SSH key or key is already in use',
 }
 
 BITBUCKET_API_ENDPOINTS = {
-    'deploy-key-list': '%s/2.0/repositories/{username}/{repo_slug}/deploy-keys/' % BitbucketHelper.BITBUCKET_API_URL,
-    'deploy-key-detail': '%s/2.0/repositories/{username}/{repo_slug}/deploy-keys/{key_id}' % BitbucketHelper.BITBUCKET_API_URL,
+    'deploy-key-list': '%s/2.0/repositories/{workspace}/{repo_slug}/deploy-keys/' % BitbucketHelper.BITBUCKET_API_URL,
+    'deploy-key-detail': '%s/2.0/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}' % BitbucketHelper.BITBUCKET_API_URL,
 }
 
 
@@ -138,7 +131,7 @@ def get_existing_deploy_key(module, bitbucket):
     """
     content = {
         'next': BITBUCKET_API_ENDPOINTS['deploy-key-list'].format(
-            username=module.params['username'],
+            workspace=module.params['workspace'],
             repo_slug=module.params['repository'],
         )
     }
@@ -151,7 +144,7 @@ def get_existing_deploy_key(module, bitbucket):
         )
 
         if info['status'] == 404:
-            module.fail_json(msg=error_messages['invalid_username_or_repo'])
+            module.fail_json(msg=error_messages['invalid_workspace_or_repo'])
 
         if info['status'] == 403:
             module.fail_json(msg=error_messages['required_permission'])
@@ -170,7 +163,7 @@ def get_existing_deploy_key(module, bitbucket):
 def create_deploy_key(module, bitbucket):
     info, content = bitbucket.request(
         api_url=BITBUCKET_API_ENDPOINTS['deploy-key-list'].format(
-            username=module.params['username'],
+            workspace=module.params['workspace'],
             repo_slug=module.params['repository'],
         ),
         method='POST',
@@ -181,7 +174,7 @@ def create_deploy_key(module, bitbucket):
     )
 
     if info['status'] == 404:
-        module.fail_json(msg=error_messages['invalid_username_or_repo'])
+        module.fail_json(msg=error_messages['invalid_workspace_or_repo'])
 
     if info['status'] == 403:
         module.fail_json(msg=error_messages['required_permission'])
@@ -199,7 +192,7 @@ def create_deploy_key(module, bitbucket):
 def delete_deploy_key(module, bitbucket, key_id):
     info, content = bitbucket.request(
         api_url=BITBUCKET_API_ENDPOINTS['deploy-key-detail'].format(
-            username=module.params['username'],
+            workspace=module.params['workspace'],
             repo_slug=module.params['repository'],
             key_id=key_id,
         ),
@@ -207,7 +200,7 @@ def delete_deploy_key(module, bitbucket, key_id):
     )
 
     if info['status'] == 404:
-        module.fail_json(msg=error_messages['invalid_username_or_repo'])
+        module.fail_json(msg=error_messages['invalid_workspace_or_repo'])
 
     if info['status'] == 403:
         module.fail_json(msg=error_messages['required_permission'])
@@ -223,7 +216,10 @@ def main():
     argument_spec = BitbucketHelper.bitbucket_argument_spec()
     argument_spec.update(
         repository=dict(type='str', required=True),
-        username=dict(type='str', required=True),
+        workspace=dict(
+            type='str', aliases=['username'], required=True,
+            deprecated_aliases=[dict(name='username', version='6.0.0', collection_name='community.general')],
+        ),
         key=dict(type='str', no_log=False),
         label=dict(type='str', required=True),
         state=dict(type='str', choices=['present', 'absent'], required=True),
@@ -231,6 +227,8 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
+        required_one_of=BitbucketHelper.bitbucket_required_one_of(),
+        required_together=BitbucketHelper.bitbucket_required_together(),
     )
 
     bitbucket = BitbucketHelper(module)
