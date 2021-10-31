@@ -306,7 +306,7 @@ def rename_image(module, client, image, new_name):
 
     tmp_image = get_image_by_name(module, client, new_name)
     if tmp_image:
-        module.fail_json(msg="Name '" + new_name + "' is already taken by IMAGE with id=" + str(tmp_image.id))
+        module.fail_json(msg="Name '" + new_name + "' is already taken by IMAGE with id=" + str(tmp_image.ID))
 
     if not module.check_mode:
         client.image.rename(image.ID, new_name)
