@@ -1,0 +1,2 @@
+bugfixes:
+  - one_image - fix error message when renaming an image (https://github.com/ansible-collections/community.general/pull/3626).
