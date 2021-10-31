@@ -37,16 +37,15 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
             self.assertEqual(create_known_host_mock.call_count, 1)
             self.assertEqual(exec_info.exception.args[0]['changed'], True)
 
-    @patch.object(BitbucketHelper, 'fetch_access_token', return_value='token')
     @patch.object(BitbucketHelper, 'request', return_value=(dict(status=201), dict()))
     @patch.object(bitbucket_pipeline_known_host, 'get_existing_known_host', return_value=None)
     def test_create_known_host_with_key(self, *args):
         with patch.object(self.module, 'get_host_key') as get_host_key_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
                 set_module_args({
-                    'client_id': 'ABC',
-                    'client_secret': 'XXX',
-                    'username': 'name',
+                    'user': 'ABC',
+                    'password': 'XXX',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'bitbucket.org',
                     'key': 'ssh-rsa public',
