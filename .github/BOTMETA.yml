@@ -849,6 +849,9 @@ files:
   $modules/packaging/os/snap.py:
     maintainers: angristan vcarceler
     labels: snap
+  $modules/packaging/os/snap_alias.py:
+    maintainers: russoz
+    labels: snap
   $modules/packaging/os/sorcery.py:
     maintainers: vaygr
   $modules/packaging/os/svr4pkg.py:
