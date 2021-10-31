@@ -14,6 +14,7 @@ linode_api4 ; python_version > '2.6'  # APIv4
 # requirement for the gitlab and github modules
 python-gitlab
 PyGithub
+github3.py
 httmock
 
 # requirement for maven_artifact module
