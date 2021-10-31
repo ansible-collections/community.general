@@ -28,15 +28,14 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
 
         self.assertEqual(exec_info.exception.args[0]['msg'], self.module.error_messages['required_keys'])
 
-    @patch.object(BitbucketHelper, 'fetch_access_token', return_value='token')
     @patch.object(bitbucket_pipeline_key_pair, 'get_existing_ssh_key_pair', return_value=None)
     def test_create_keys(self, *args):
         with patch.object(self.module, 'update_ssh_key_pair') as update_ssh_key_pair_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
                 set_module_args({
-                    'client_id': 'ABC',
-                    'client_secret': 'XXX',
-                    'username': 'name',
+                    'user': 'ABC',
+                    'password': 'XXX',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'public_key': 'public',
                     'private_key': 'PRIVATE',

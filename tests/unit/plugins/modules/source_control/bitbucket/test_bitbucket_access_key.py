@@ -29,15 +29,14 @@ class TestBucketAccessKeyModule(ModuleTestCase):
 
         self.assertEqual(exec_info.exception.args[0]['msg'], self.module.error_messages['required_key'])
 
-    @patch.object(BitbucketHelper, 'fetch_access_token', return_value='token')
     @patch.object(bitbucket_access_key, 'get_existing_deploy_key', return_value=None)
     def test_create_deploy_key(self, *args):
         with patch.object(self.module, 'create_deploy_key') as create_deploy_key_mock:
             with self.assertRaises(AnsibleExitJson) as exec_info:
                 set_module_args({
-                    'client_id': 'ABC',
-                    'client_secret': 'XXX',
-                    'username': 'name',
+                    'user': 'ABC',
+                    'password': 'XXX',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'key': 'public_key',
                     'label': 'key name',
