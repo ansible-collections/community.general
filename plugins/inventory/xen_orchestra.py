@@ -115,7 +115,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _get_objects(self):
         async def req():
             server = Server(
-                f'{self.protocol}://{self.xoa_api_host}/api/', ssl=self.validate_certs)
+                '{0}://{1}/api/'.format(self.protocol, self.xoa_api_host), ssl=self.validate_certs)
 
             await server.ws_connect()
             await server.session.signIn(username=self.xoa_user, password=self.xoa_password)
