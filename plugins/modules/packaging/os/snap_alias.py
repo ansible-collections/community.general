@@ -103,6 +103,7 @@ class SnapAlias(CmdStateModuleHelper):
             ('state', 'present', ['name', 'alias']),
             ('state', 'absent', ['name', 'alias'], True),
         ],
+        supports_check_mode=True,
     )
     command = "snap"
     command_args_formats = dict(
@@ -112,7 +113,8 @@ class SnapAlias(CmdStateModuleHelper):
     check_rc = False
 
     def _aliases(self):
-        return {self.vars.name: self._get_aliases_for(self.vars.name)} if self.vars.name else self._get_aliases()
+        n = self.vars.name
+        return {n: self._get_aliases_for(n)} if n else self._get_aliases()
 
     def __init_module__(self):
         self.vars.set("snap_aliases", self._aliases(), change=True, diff=True)
@@ -138,16 +140,35 @@ class SnapAlias(CmdStateModuleHelper):
     def _get_aliases_for(self, name):
         return self._get_aliases().get(name, [])
 
+    def _has_alias(self, name=None, alias=None):
+        if name:
+            if name not in self.vars.snap_aliases:
+                return False
+            if alias is None:
+                return bool(self.vars.snap_aliases[name])
+            return alias in self.vars.snap_aliases[name]
+
+        return any(alias in aliases for aliases in self.vars.snap_aliases.values())
+
     def state_present(self):
         for alias in self.vars.alias:
-            self.run_command(params=['state', 'name', {'_alias': alias}])
+            if not self._has_alias(self.vars.name, alias):
+                self.changed = True
+                if not self.module.check_mode:
+                    self.run_command(params=['state', 'name', {'_alias': alias}])
 
     def state_absent(self):
-        if self.vars.alias is None:
-            self.run_command(params=['state', 'name'])
+        if not self.vars.alias:
+            if self._has_alias(self.vars.name):
+                self.changed = True
+                if not self.module.check_mode:
+                    self.run_command(params=['state', 'name'])
         else:
             for alias in self.vars.alias:
-                self.run_command(params=['state', {'_alias': alias}])
+                if self._has_alias(self.vars.name, alias):
+                    self.changed = True
+                    if not self.module.check_mode:
+                        self.run_command(params=['state', {'_alias': alias}])
 
 
 def main():
