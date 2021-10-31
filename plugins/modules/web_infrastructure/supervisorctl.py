@@ -21,6 +21,7 @@ options:
       - The name of the supervisord program or group to manage.
       - The name will be taken as group name when it ends with a colon I(:)
       - Group support is only available in Ansible version 1.6 or later.
+      - If I(name=all), all programs and program groups will be managed.
     required: true
   config:
     type: path
@@ -92,6 +93,11 @@ EXAMPLES = '''
     name: my_app
     state: signalled
     signal: USR1
+
+- name: Restart all programs and program groups
+  community.general.supervisorctl:
+    name: all
+    state: restarted
 '''
 
 import os
@@ -179,7 +185,7 @@ def main():
                 else:
                     continue
             else:
-                if process_name != name:
+                if process_name != name and name != "all":
                     continue
 
             matched.append((process_name, status))
