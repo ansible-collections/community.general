@@ -1,3 +1,3 @@
 ---
 bugfixes:
-  - fix  - proxmox_group_info.py - error "TypeError: get_group() got an unexpected keyword argument 'group'\r\n'" if a group parameter is used. Issue is an argument naming conflict. After changing the argument name to 'groupid', as used in method ProxmoxGroupInfoAnsible::get_group, testing a Proxmox group name is working now. (https://github.com/ansible-collections/community.general/pull/3649)
+  - proxmox_group_info - fix module crash if a ``group`` parameter is used (https://github.com/ansible-collections/community.general/pull/3649).
