@@ -179,7 +179,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _add_hosts(self, hosts, pools):
         for host in hosts.values():
             address = host['address']
-            group_name = self.to_safe("xo_host_{}".format(host['name_label']))
+            group_name = self.to_safe("xo_host_{0}".format(host['name_label']))
             pool_name = self._pool_group_name_for_uuid(pools, host['$poolId'])
 
             self.inventory.add_group(group_name)
@@ -201,7 +201,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _add_pools(self, pools):
         for pool in pools.values():
-            group_name = self.to_safe("xo_pool_{}".format(pool['name_label']))
+            group_name = self.to_safe("xo_pool_{0}".format(pool['name_label']))
 
             self.inventory.add_group(group_name)
 
@@ -209,13 +209,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _pool_group_name_for_uuid(self, pools, pool_uuid) -> str:
         for pool in pools:
             if pool == pool_uuid:
-                return self.to_safe("xo_pool_{}".format(pools[pool_uuid]['name_label']))
+                return self.to_safe("xo_pool_{0}".format(pools[pool_uuid]['name_label']))
 
     # TODO: Refactor
     def _host_group_name_for_uuid(self, hosts, host_uuid) -> str:
         for host in hosts:
             if host == host_uuid:
-                return self.to_safe("xo_host_{}".format(hosts[host_uuid]['name_label']))
+                return self.to_safe("xo_host_{0}".format(hosts[host_uuid]['name_label']))
 
     def _populate(self, objects):
         # Prepare general groups
