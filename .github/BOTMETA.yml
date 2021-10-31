@@ -163,6 +163,8 @@ files:
     keywords: opennebula dynamic inventory script
   $inventories/proxmox.py:
     maintainers: $team_virt ilijamt
+  $inventories/xen_orchestra.py:
+    maintainers: shinuza
   $inventories/icinga2.py:
     maintainers: bongoeadgc6
   $inventories/scaleway.py:
