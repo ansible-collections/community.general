@@ -180,7 +180,7 @@ class CmdMixin(object):
         if publish_err:
             self.update_output(stderr=err)
         if publish_cmd:
-            self.update_output(cmd_args=cmd)
+            self.update_output(cmd_args=cmd_args)
         if process_output is None:
             _process = self.process_command_output
         else:
