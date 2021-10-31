@@ -69,7 +69,7 @@ EXAMPLES = '''
 
 RETURN = '''
 snap_aliases:
-    description: The snap aliases after execution.
+    description: The snap aliases after execution. If called in check mode, then the list represents the state before execution.
     type: list
     elements: str
     returned: always
