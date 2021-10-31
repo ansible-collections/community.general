@@ -2,16 +2,8 @@
 # Copyright (c) 2021 Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-import asyncio
-import json
-import os
-import re
-
-from ansible.errors import AnsibleError
-from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
-
-from jsonrpc_websocket import Server
-
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 DOCUMENTATION = '''
     name: xen_orchestra
@@ -79,6 +71,22 @@ simple_config_file:
     validate_certs: true
     use_ssl: true
 '''
+
+import asyncio
+import json
+import os
+import re
+
+from ansible.errors import AnsibleError
+from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
+from distutils.version import LooseVersion
+
+# 3rd party imports
+try:
+    from jsonrpc_websocket import Server
+    JSONRPC_WEBSOCKET = True
+except ImportError:
+    JSONRPC_WEBSOCKET = False
 
 
 HALTED = 'Halted'
@@ -240,6 +248,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return valid
 
     def parse(self, inventory, loader, path, cache=True):
+        if not JSONRPC_WEBSOCKET:
+            raise AnsibleError('This module requires jsonrpc-websocket 3.0.0 or higher: '
+                               'https://pypi.org/project/jsonrpc-websocket/.')
+
         super(InventoryModule, self).parse(inventory, loader, path)
 
         # read config from file, this sets 'options'
