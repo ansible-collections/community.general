@@ -238,7 +238,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
     def _list_element(self, _type, path_re, elem_re):
         params = ({'type': _type}, {'galaxy_cmd': 'list'}, 'dest')
         elems = self.run_command(params=params,
-                                 publish_rc=False, publish_out=False, publish_err=False,
+                                 publish_rc=False, publish_out=False, publish_err=False, publish_cmd=False,
                                  process_output=self._process_output_list,
                                  check_rc=False)
         elems_dict = {}
