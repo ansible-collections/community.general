@@ -197,7 +197,7 @@ class PipX(CmdStateModuleHelper):
             return results
 
         installed = self.run_command(params=[{'_list': True}], process_output=process_list,
-                                     publish_rc=False, publish_out=False, publish_err=False)
+                                     publish_rc=False, publish_out=False, publish_err=False, publish_cmd=False)
 
         if self.vars.name is not None:
             app_list = installed.get(self.vars.name)
