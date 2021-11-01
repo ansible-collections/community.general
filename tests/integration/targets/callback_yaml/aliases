@@ -1,3 +1,2 @@
 shippable/posix/group1
 needs/target/callback
-disabled  # FIXME (https://github.com/ansible-collections/community.general/pull/3643)
