@@ -215,7 +215,6 @@ class PipX(CmdStateModuleHelper):
             facts = ansible_facts(self.module, gather_subset=['python'])
             self.command = [facts['python']['executable'], '-m', 'pipx']
 
-        self.vars.set('will_change', False, output=False, change=True)
         self.vars.set('application', self._retrieve_installed(), change=True, diff=True)
 
     def __quit_module__(self):
@@ -223,7 +222,7 @@ class PipX(CmdStateModuleHelper):
 
     def state_install(self):
         if not self.vars.application or self.vars.force:
-            self.vars.will_change = True
+            self.changed = True
             if not self.module.check_mode:
                 self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'python',
                                          {'name_source': [self.vars.name, self.vars.source]}])
@@ -235,7 +234,7 @@ class PipX(CmdStateModuleHelper):
             raise ModuleHelperException(
                 "Trying to upgrade a non-existent application: {0}".format(self.vars.name))
         if self.vars.force:
-            self.vars.will_change = True
+            self.changed = True
         if not self.module.check_mode:
             self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'name'])
 
@@ -249,7 +248,7 @@ class PipX(CmdStateModuleHelper):
         if not self.vars.application:
             raise ModuleHelperException(
                 "Trying to reinstall a non-existent application: {0}".format(self.vars.name))
-        self.vars.will_change = True
+        self.changed = True
         if not self.module.check_mode:
             self.run_command(params=['state', 'name', 'python'])
 
@@ -258,7 +257,7 @@ class PipX(CmdStateModuleHelper):
             raise ModuleHelperException(
                 "Trying to inject packages into a non-existent application: {0}".format(self.vars.name))
         if self.vars.force:
-            self.vars.will_change = True
+            self.changed = True
         if not self.module.check_mode:
             self.run_command(params=['state', 'index_url', 'force', 'name', 'inject_packages'])
 
@@ -272,7 +271,7 @@ class PipX(CmdStateModuleHelper):
 
     def state_upgrade_all(self):
         if self.vars.force:
-            self.vars.will_change = True
+            self.changed = True
         if not self.module.check_mode:
             self.run_command(params=['state', 'include_injected', 'force'])
 
