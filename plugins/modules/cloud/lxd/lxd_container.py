@@ -11,16 +11,23 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: lxd_container
-short_description: Manage LXD Containers
+short_description: Manage LXD instances
 description:
-  - Management of LXD containers
+  - Management of LXD containers and virtual machines.
 author: "Hiroaki Nakamura (@hnakamur)"
 options:
     name:
         description:
-          - Name of a container.
+          - Name of an instance.
         type: str
         required: true
+    api_endpoint:
+        description:
+          - The LXD Rest API endpoint to create containers oder virtual-machines.
+            It can be set to "/1.0/instances" for creating instances of type container or virtual-machine.
+          - If the LXD server version is older than 3.19, then this should be set to "/1.0/containers".
+        type: str
+        required: false
     architecture:
         description:
           - 'The architecture for the container (for example C(x86_64) or C(i686)).
@@ -32,7 +39,7 @@ options:
           - 'The config for the container (for example C({"limits.cpu": "2"})).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).'
           - If the container already exists and its "config" values in metadata
-            obtained from GET /1.0/containers/<name>
+            obtained from GET <api_endpoint>/<name>
             U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#10containersname)
             are different, this module tries to apply the configurations.
           - The keys starting with C(volatile.) are ignored for this comparison when I(ignore_volatile_options=true).
@@ -107,6 +114,12 @@ options:
         required: false
         default: 30
         type: int
+    type:
+        description:
+          - Instance type can be either "container" or "virtual-machine".
+        required: false
+        default: container
+        type: str
     wait_for_ipv4_addresses:
         description:
           - If this is true, the C(lxd_container) waits until IPv4 addresses
@@ -361,7 +374,7 @@ ANSIBLE_LXD_DEFAULT_URL = 'unix:/var/lib/lxd/unix.socket'
 
 # CONFIG_PARAMS is a list of config attribute names.
 CONFIG_PARAMS = [
-    'architecture', 'config', 'devices', 'ephemeral', 'profiles', 'source'
+    'api_endpoint', 'architecture', 'config', 'devices', 'ephemeral', 'profiles', 'source', 'type'
 ]
 
 
@@ -383,6 +396,9 @@ class LXDContainerManagement(object):
         self.force_stop = self.module.params['force_stop']
         self.addresses = None
         self.target = self.module.params['target']
+
+        self.api_endpoint = self.module.params['api_endpoint']
+        self.type = self.module.params['type']
 
         self.key_file = self.module.params.get('client_key')
         if self.key_file is None:
@@ -421,13 +437,13 @@ class LXDContainerManagement(object):
 
     def _get_container_json(self):
         return self.client.do(
-            'GET', '/1.0/containers/{0}'.format(self.name),
+            'GET', '{0}/{1}'.format(self.api_endpoint, self.name),
             ok_error_codes=[404]
         )
 
     def _get_container_state_json(self):
         return self.client.do(
-            'GET', '/1.0/containers/{0}/state'.format(self.name),
+            'GET', '{0}/{1}/state'.format(self.api_endpoint, self.name),
             ok_error_codes=[404]
         )
 
@@ -441,15 +457,15 @@ class LXDContainerManagement(object):
         body_json = {'action': action, 'timeout': self.timeout}
         if force_stop:
             body_json['force'] = True
-        return self.client.do('PUT', '/1.0/containers/{0}/state'.format(self.name), body_json=body_json)
+        return self.client.do('PUT', '{0}/{1}/state'.format(self.api_endpoint, self.name), body_json=body_json)
 
     def _create_container(self):
         config = self.config.copy()
         config['name'] = self.name
         if self.target:
-            self.client.do('POST', '/1.0/containers?' + urlencode(dict(target=self.target)), config)
+            self.client.do('POST', '{0}?{1}'.format(self.api_endpoint, urlencode(dict(target=self.target))), config)
         else:
-            self.client.do('POST', '/1.0/containers', config)
+            self.client.do('POST', self.api_endpoint, config)
         self.actions.append('create')
 
     def _start_container(self):
@@ -465,7 +481,7 @@ class LXDContainerManagement(object):
         self.actions.append('restart')
 
     def _delete_container(self):
-        self.client.do('DELETE', '/1.0/containers/{0}'.format(self.name))
+        self.client.do('DELETE', '{0}/{1}'.format(self.api_endpoint, self.name))
         self.actions.append('delete')
 
     def _freeze_container(self):
@@ -594,7 +610,8 @@ class LXDContainerManagement(object):
             self._needs_to_change_container_config('config') or
             self._needs_to_change_container_config('ephemeral') or
             self._needs_to_change_container_config('devices') or
-            self._needs_to_change_container_config('profiles')
+            self._needs_to_change_container_config('profiles') or
+            self._needs_to_change_container_config('type')
         )
 
     def _apply_container_configs(self):
@@ -603,8 +620,10 @@ class LXDContainerManagement(object):
             'architecture': old_metadata['architecture'],
             'config': old_metadata['config'],
             'devices': old_metadata['devices'],
-            'profiles': old_metadata['profiles']
+            'profiles': old_metadata['profiles'],
+            'type': old_metadata['type'],
         }
+
         if self._needs_to_change_container_config('architecture'):
             body_json['architecture'] = self.config['architecture']
         if self._needs_to_change_container_config('config'):
@@ -616,7 +635,13 @@ class LXDContainerManagement(object):
             body_json['devices'] = self.config['devices']
         if self._needs_to_change_container_config('profiles'):
             body_json['profiles'] = self.config['profiles']
-        self.client.do('PUT', '/1.0/containers/{0}'.format(self.name), body_json=body_json)
+        if self._needs_to_change_container_config('type') and self.type != self.old_container_json['metadata']['type']:
+            self.module.fail_json(rc=1,
+                                  msg="Failed to update the instance name '{0}'. The parameter 'type' is immutable and cannot be changed."
+                                      " The last provided value '{1}' mismatch the current one '{2}'".
+                                      format(self.name, self.type, self.old_container_json['metadata']['type']))
+
+        self.client.do('PUT', '{0}/{1}'.format(self.api_endpoint, self.name), body_json=body_json)
         self.actions.append('apply_container_configs')
 
     def run(self):
@@ -698,6 +723,13 @@ def main():
                 type='int',
                 default=30
             ),
+            api_endpoint=dict(
+                type='str',
+            ),
+            type=dict(
+                type='str',
+                default='container'
+            ),
             wait_for_ipv4_addresses=dict(
                 type='bool',
                 default=False
@@ -736,6 +768,18 @@ def main():
             'This will change in the future. Please test your scripts'
             'by "ignore_volatile_options: false". To keep the old behavior, set that option explicitly to "true"',
             version='6.0.0', collection_name='community.general')
+
+    if module.params['api_endpoint'] is None:
+        if module.params['type'] == 'virtual-machine':
+            module.params['api_endpoint'] = '/1.0/virtual-machines'
+        else:
+            module.params['api_endpoint'] = '/1.0/containers'
+        module.deprecate(
+            'The LXD Rest API has implemented a new endpoint, which supports containers and virtual-machines.'
+            ' If the LXD server version is greater than or equal to 3.19, make sure to change the API endpoint by setting "api_endpoint: /1.0/instances".'
+            ' To keep the old behavior, set that option explicitly to "/1.0/containers"',
+            version='6.0.0', collection_name='community.general')
+
     lxd_manage = LXDContainerManagement(module=module)
     lxd_manage.run()
 

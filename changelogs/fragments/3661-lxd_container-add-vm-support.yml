@@ -1,0 +1,2 @@
+minor_changes:
+  - lxd_container - manipulate the API endpoint to create instances of type container or virtual-machine.
