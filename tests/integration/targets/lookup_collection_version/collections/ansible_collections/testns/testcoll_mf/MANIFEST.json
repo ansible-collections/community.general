@@ -1,0 +1,30 @@
+{
+ "collection_info": {
+  "namespace": "testns",
+  "name": "testcoll_mf",
+  "version": "0.0.1",
+  "authors": [
+   "Ansible (https://github.com/ansible)"
+  ],
+  "readme": "README.md",
+  "tags": [
+   "community"
+  ],
+  "description": null,
+  "license": [],
+  "license_file": null,
+  "dependencies": {},
+  "repository": null,
+  "documentation": null,
+  "homepage": null,
+  "issues": null
+ },
+ "file_manifest_file": {
+  "name": "FILES.json",
+  "ftype": "file",
+  "chksum_type": "sha256",
+  "chksum_sha256": "025818f18fcae5c9f78d778ae6e246ecffed6d56a886ffbc145cb66d54e9951e",
+  "format": 1
+ },
+ "format": 1
+}
