@@ -8,12 +8,12 @@ __metaclass__ = type
 DOCUMENTATION = '''
     name: xen_orchestra
     short_description: Xen Orchestra inventory source
-    version_added: 3.7.0
+    version_added: 4.0.0
     author:
         - Dom Del Nano (@ddelnano) <ddelnano@gmail.com>
         - Samori Gorse (@shinuza) <samorigorse@gmail.com>
     requirements:
-        - jsonrpc_websocket >= 3.0
+        - websocket-client >= 1.0.0
     description:
         - Get inventory hosts from a Xen Orchestra deployment.
         - 'Uses a configuration file as an inventory source, it must end in C(.xen_orchestra.yml) or C(.xen_orchestra.yaml).'
@@ -29,11 +29,10 @@ DOCUMENTATION = '''
         api_host:
             description:
                 - API host to XOA API.
-                - If the value is not specified in the inventory configuration, the value of environment variable C(ANSIBLE_XO_API_HOST) will be used instead.
-            default: '192.168.1.123'
+                - If the value is not specified in the inventory configuration, the value of environment variable C(ANSIBLE_XO_HOST) will be used instead.
             type: str
             env:
-                - name: ANSIBLE_XO_API_HOST
+                - name: ANSIBLE_XO_HOST
         user:
             description:
                 - Xen Orchestra user.
@@ -64,7 +63,7 @@ DOCUMENTATION = '''
 EXAMPLES = '''
 # file must be named xen_orchestra.yaml or xen_orchestra.yml
 simple_config_file:
-    plugin: xen_orchestra
+    plugin: community.general.xen_orchestra
     api_host: 192.168.1.255
     user: xo
     password: xo_pwd
@@ -72,21 +71,25 @@ simple_config_file:
     use_ssl: true
 '''
 
-import asyncio
 import json
-import os
 import re
+import ssl
+
+from packaging import version
 
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
-from distutils.version import LooseVersion
 
 # 3rd party imports
 try:
-    from jsonrpc_websocket import Server
-    JSONRPC_WEBSOCKET = True
-except ImportError:
-    JSONRPC_WEBSOCKET = False
+    HAS_WEBSOCKET = True
+    import websocket
+    from websocket import create_connection
+
+    if version.parse(websocket.__version__) <= version.parse('1.0.0'):
+        raise ImportError
+except ImportError as e:
+    HAS_WEBSOCKET = False
 
 
 HALTED = 'Halted'
@@ -101,36 +104,58 @@ POOL_GROUP = 'xo_pools'
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     ''' Host inventory parser for ansible using XenOrchestra as source. '''
 
-    NAME = 'community.general.xen_orchestra'
+    NAME = 'xen_orchestra'
 
     def __init__(self):
 
         super(InventoryModule, self).__init__()
 
         # from config
+        self.counter = -1
         self.session = None
         self.cache_key = None
         self.use_cache = None
 
+    @property
+    def pointer(self):
+        self.counter += 1
+        return self.counter
+
+    def create_connection(self, xoa_api_host):
+        validate_certs = self.get_option("validate_certs")
+        use_ssl = self.get_option("use_ssl")
+        proto = "wss" if use_ssl else "ws"
+
+        sslopt = None if validate_certs else {"cert_reqs": ssl.CERT_NONE}
+        self.conn = create_connection("{0}://{1}/api/".format(proto, xoa_api_host), sslopt=sslopt)
+
+    def login(self, user, password):
+        payload = {"id": self.pointer, "jsonrpc": "2.0", "method": "session.signIn", "params": {"username": user, "password": password}}
+        self.conn.send(json.dumps(payload))
+        result = self.conn.recv()
+
+        if 'error' in result:
+            raise AnsibleError('Could not connect: {0}'.format(result['error']))
+
+    def get_object(self, name):
+        payload = {"id": self.pointer, "jsonrpc": "2.0", "method": "xo.getAllObjects", "params": {"filter": {'type': name}}}
+        self.conn.send(json.dumps(payload))
+        answer = json.loads(self.conn.recv())
+
+        if 'error' in answer:
+            raise AnsibleError('Could not request: {0}'.format(answer['error']))
+
+        return answer['result']
+
     def _get_objects(self):
-        async def req():
-            server = Server(
-                '{0}://{1}/api/'.format(self.protocol, self.xoa_api_host), ssl=self.validate_certs)
+        self.create_connection(self.xoa_api_host)
+        self.login(self.xoa_user, self.xoa_password)
 
-            await server.ws_connect()
-            await server.session.signIn(username=self.xoa_user, password=self.xoa_password)
-
-            vms = await server.xo.getAllObjects(filter={'type': 'VM'})
-            pools = await server.xo.getAllObjects(filter={'type': 'pool'})
-            hosts = await server.xo.getAllObjects(filter={'type': 'host'})
-
-            return {
-                'vms': vms,
-                'pools': pools,
-                'hosts': hosts,
-            }
-
-        return asyncio.get_event_loop().run_until_complete(req())
+        return {
+            'vms': self.get_object('VM'),
+            'pools': self.get_object('pool'),
+            'hosts': self.get_object('host'),
+        }
 
     def _add_vms(self, vms, hosts, pools):
         for uuid, vm in vms.items():
@@ -199,6 +224,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self.inventory.set_variable(
                 address, 'product_brand', host['productBrand'])
 
+        for pool in pools.values():
+            group_name = self.to_safe("xo_pool_{0}".format(pool['name_label']))
+
+            self.inventory.add_group(group_name)
+
     def _add_pools(self, pools):
         for pool in pools.values():
             group_name = self.to_safe("xo_pool_{0}".format(pool['name_label']))
@@ -206,13 +236,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self.inventory.add_group(group_name)
 
     # TODO: Refactor
-    def _pool_group_name_for_uuid(self, pools, pool_uuid) -> str:
+    def _pool_group_name_for_uuid(self, pools, pool_uuid):
         for pool in pools:
             if pool == pool_uuid:
                 return self.to_safe("xo_pool_{0}".format(pools[pool_uuid]['name_label']))
 
     # TODO: Refactor
-    def _host_group_name_for_uuid(self, hosts, host_uuid) -> str:
+    def _host_group_name_for_uuid(self, hosts, host_uuid):
         for host in hosts:
             if host == host_uuid:
                 return self.to_safe("xo_host_{0}".format(hosts[host_uuid]['name_label']))
@@ -228,7 +258,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self._add_hosts(objects['hosts'], objects['pools'])
         self._add_vms(objects['vms'], objects['hosts'], objects['pools'])
 
-    def to_safe(self, word) -> str:
+    def to_safe(self, word):
         '''Converts 'bad' characters in a string to underscores so they can be used as Ansible groups
         #> InventoryModule.to_safe("foo-bar baz")
         'foo_barbaz'
@@ -248,9 +278,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return valid
 
     def parse(self, inventory, loader, path, cache=True):
-        if not JSONRPC_WEBSOCKET:
-            raise AnsibleError('This module requires jsonrpc-websocket 3.0.0 or higher: '
-                               'https://pypi.org/project/jsonrpc-websocket/.')
+        if not HAS_WEBSOCKET:
+            raise AnsibleError('This module requires websocket-client 1.0.0 or higher: '
+                               'https://github.com/websocket-client/websocket-client.')
 
         super(InventoryModule, self).parse(inventory, loader, path)
 
