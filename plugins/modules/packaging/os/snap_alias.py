@@ -134,7 +134,7 @@ class SnapAlias(CmdStateModuleHelper):
             return results
 
         return self.run_command(params=[{'state': 'info'}, 'name'], check_rc=True,
-                                publish_rc=False, publish_out=False, publish_err=False,
+                                publish_rc=False, publish_out=False, publish_err=False, publish_cmd=False,
                                 process_output=process_get_aliases)
 
     def _get_aliases_for(self, name):
