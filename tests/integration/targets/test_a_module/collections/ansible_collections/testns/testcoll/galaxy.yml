@@ -1,0 +1,7 @@
+namespace: testns
+name: testcoll
+version: 0.0.1
+authors:
+  - Ansible (https://github.com/ansible)
+description: null
+tags: [community]

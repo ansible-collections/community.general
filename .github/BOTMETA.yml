@@ -1169,6 +1169,8 @@ files:
     maintainers: inetfuture mattupstate
   $modules/web_infrastructure/taiga_issue.py:
     maintainers: lekum
+  $tests/a_module.py:
+    maintainers: felixfontein
 #########################
   tests/:
     labels: tests
@@ -1195,6 +1197,7 @@ macros:
   module_utils: plugins/module_utils
   modules: plugins/modules
   terminals: plugins/terminal
+  tests: plugins/test
   team_ansible_core:
   team_aix: MorrisA bcoca d-little flynn1973 gforster kairoaraujo marvin-sinister mator molekuul ramooncamacho wtcross
   team_bsd: JoergFiedler MacLemon bcoca dch jasperla mekanix opoplawski overhacked tuxillo
