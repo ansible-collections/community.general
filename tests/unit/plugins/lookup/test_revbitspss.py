@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# (c) 2020, RevBits <info@revbits.com>
+# (c) 2021, RevBits <info@revbits.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 # Make coding more python3-ish
@@ -37,6 +37,7 @@ class TestLookupModule(TestCase):
             [MockSecretsVault.RESPONSE],
             self.lookup.run(
                 'community.general.revbitspss',
+                {},
                 secret_ids=['dockerhub'],
                 base_url='https://pam.revbits.net',
                 api_key='a0fbb87ea84c07278dfa9d3e25d3af414a7eb61ebdfc4301cf030851481d60291bf81daf604e5652b3111300ab0d8812887736366e109291e4e806892f36e378'
