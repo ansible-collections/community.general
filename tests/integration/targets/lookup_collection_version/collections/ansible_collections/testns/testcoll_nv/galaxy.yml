@@ -1,0 +1,6 @@
+namespace: testns
+name: testcoll_nv
+authors:
+  - Ansible (https://github.com/ansible)
+description: null
+tags: [community]

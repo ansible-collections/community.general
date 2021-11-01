@@ -175,6 +175,8 @@ files:
     labels: lookups
   $lookups/cartesian.py: {}
   $lookups/chef_databag.py: {}
+  $lookups/collection_version.py:
+    maintainers: felixfontein
   $lookups/consul_kv.py: {}
   $lookups/credstash.py: {}
   $lookups/cyberarkpassword.py:
