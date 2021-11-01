@@ -3,3 +3,4 @@ sections:
   - title: Guides
     toctree:
       - filter_guide
+      - test_guide

@@ -1,0 +1,3 @@
+add plugin.test:
+  - name: a_module
+    description: Check whether the given string refers to an available module or action plugin
