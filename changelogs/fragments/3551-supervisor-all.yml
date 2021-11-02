@@ -1,3 +1,0 @@
----
-minor_changes:
-- supervisorctl - add the possibility to restart all programs and program groups (https://github.com/ansible-collections/community.general/issues/3551).

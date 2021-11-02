@@ -1,2 +1,0 @@
-minor_changes:
-  - nmcli - add ``runner`` and ``runner_hwaddr_policy`` options (https://github.com/ansible-collections/community.general/issues/2901).

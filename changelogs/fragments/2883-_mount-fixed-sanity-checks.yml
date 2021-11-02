@@ -1,2 +1,0 @@
-bugfixes:
-  - _mount module utils - fixed the sanity checks (https://github.com/ansible-collections/community.general/pull/2883).

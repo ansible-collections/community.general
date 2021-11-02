@@ -1,2 +1,0 @@
-minor_changes:
-  - jira - add comment visibility parameter for comment operation (https://github.com/ansible-collections/community.general/pull/2556).

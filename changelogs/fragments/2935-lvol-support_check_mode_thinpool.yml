@@ -1,3 +1,0 @@
----
-bugfixes:
-  - lvol - honor ``check_mode`` on thinpool (https://github.com/ansible-collections/community.general/issues/2934).
