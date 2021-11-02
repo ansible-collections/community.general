@@ -1,2 +1,0 @@
-minor_changes:
-  - module_helper module utils - added feature flag parameter to ``CmdMixin`` to control whether ``cmd_args`` is automatically added to the module output (https://github.com/ansible-collections/community.general/pull/3648).
