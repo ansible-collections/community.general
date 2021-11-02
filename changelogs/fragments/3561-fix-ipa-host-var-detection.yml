@@ -1,2 +1,0 @@
-bugfixes:
-  - ipa_* modules - fix environment fallback for ``ipa_host`` option (https://github.com/ansible-collections/community.general/issues/3560).

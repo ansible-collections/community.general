@@ -1,3 +1,0 @@
----
-minor_changes:
-  - composer - add ``composer_executable`` option (https://github.com/ansible-collections/community.general/issues/2649).
