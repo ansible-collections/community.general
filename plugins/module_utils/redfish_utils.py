@@ -2793,7 +2793,7 @@ class RedfishUtils(object):
             return response
         return {'ret': True, 'changed': True, 'msg': "Modified Manager NIC"}
 
-    def set_hostinterface_attributes(self, hostinterface_config):
+    def set_hostinterface_attributes(self, hostinterface_config, hostinterface_id=None):
         response = self.get_request(self.root_uri + self.manager_uri)
         if response['ret'] is False:
             return response
@@ -2806,13 +2806,19 @@ class RedfishUtils(object):
         if response['ret'] is False:
             return response
         data = response['data']
-        uris = [a.get('@odata.id') for a in data.get('Members', []) if
-                a.get('@odata.id')]
+        uris = [a.get('@odata.id') for a in data.get('Members', []) if a.get('@odata.id')]
+        # Capture list of URIs that match a specified HostInterface resource ID
+        if hostinterface_id:
+            matching_hostinterface_uris = [uri for uri in uris if hostinterface_id in uri.split('/')[-1]]
 
-        # Fail if multiple Redfish Host Interfaces are detected
-        if len(uris) != 1:
-            return {'ret': False, 'msg': "Multiple Redfish Host Interfaces detected, expected one"}
-        hostinterface_uri = list.pop(uris)
+        if hostinterface_id and matching_hostinterface_uris:
+            hostinterface_uri = list.pop(matching_hostinterface_uris)
+        elif hostinterface_id and not matching_hostinterface_uris:
+            return {'ret': False, 'msg': "HostInterface ID %s not present." % hostinterface_id}
+        elif len(uris) == 1:
+            hostinterface_uri = list.pop(uris)
+        else:
+            return {'ret': False, 'msg': "HostInterface ID not defined and multiple interfaces detected."}
 
         response = self.get_request(self.root_uri + hostinterface_uri)
         if response['ret'] is False:

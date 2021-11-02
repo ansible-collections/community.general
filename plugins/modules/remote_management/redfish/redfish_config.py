@@ -105,7 +105,13 @@ options:
     description:
       - setting dict of HostInterface on OOB controller
     type: dict
-    version_added: '4.0.0'
+    version_added: '3.9.0'
+  hostinterface_id:
+    required: false
+    description:
+      - redfish HostInterface instance ID if multiple HostInterfaces are present
+    type: str
+    version_added: '3.9.0'
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''
@@ -208,12 +214,23 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
 
-  - name: Set Host Interface
+  - name: Disable Host Interface
+    community.general.redfish_config:
+      category: Manager
+      command: SetHostInterface
+      hostinterface_config:
+        InterfaceEnabled: false
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+  - name: Enable Host Interface for HostInterface resource ID '2'
     community.general.redfish_config:
       category: Manager
       command: SetHostInterface
       hostinterface_config:
         InterfaceEnabled: true
+      hostinterface_id: "2"
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
@@ -265,6 +282,7 @@ def main():
             ),
             strip_etag_quotes=dict(type='bool', default=False),
             hostinterface_config=dict(type='dict', default={}),
+            hostinterface_id=dict(),
         ),
         required_together=[
             ('username', 'password'),
@@ -307,6 +325,9 @@ def main():
 
     # HostInterface config options
     hostinterface_config = module.params['hostinterface_config']
+
+    # HostInterface instance ID
+    hostinterface_id = module.params['hostinterface_id']
 
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
@@ -352,7 +373,7 @@ def main():
             elif command == "SetManagerNic":
                 result = rf_utils.set_manager_nic(nic_addr, nic_config)
             elif command == "SetHostInterface":
-                result = rf_utils.set_hostinterface_attributes(hostinterface_config)
+                result = rf_utils.set_hostinterface_attributes(hostinterface_config, hostinterface_id)
 
     # Return data back or fail with proper message
     if result['ret'] is True:
