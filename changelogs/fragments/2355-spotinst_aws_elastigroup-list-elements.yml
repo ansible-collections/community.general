@@ -1,2 +1,0 @@
-minor_changes:
-  - spotinst_aws_elastigroup - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/2355).

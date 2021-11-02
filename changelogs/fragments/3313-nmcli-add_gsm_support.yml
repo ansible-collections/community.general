@@ -1,2 +1,0 @@
-minor_changes:
-  - "nmcli - add ``gsm`` support (https://github.com/ansible-collections/community.general/pull/3313)."
