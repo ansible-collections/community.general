@@ -1,4 +1,0 @@
----
-minor_changes:
-  - pids - refactor to add support for older ``psutil`` versions to the ``pattern`` option
-    (https://github.com/ansible-collections/community.general/pull/3315).
