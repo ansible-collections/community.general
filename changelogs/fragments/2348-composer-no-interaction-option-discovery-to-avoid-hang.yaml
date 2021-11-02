@@ -1,2 +1,0 @@
-bugfixes:
-  - composer - use ``no-interaction`` option when discovering available options to avoid an issue where composer hangs (https://github.com/ansible-collections/community.general/pull/2348).
