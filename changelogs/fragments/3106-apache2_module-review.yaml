@@ -1,2 +1,0 @@
-minor_changes:
-  - apache2_module - minor refactoring improving code quality, readability and speed (https://github.com/ansible-collections/community.general/pull/3106).

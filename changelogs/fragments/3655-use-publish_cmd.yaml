@@ -1,4 +1,0 @@
-bugfixes:
-    - ansible_galaxy_install - the output value ``cmd_args`` was bringing the intermediate command used to gather the state, instead of the command that actually performed the state change (https://github.com/ansible-collections/community.general/pull/3655).
-    - pipx - the output value ``cmd_args`` was bringing the intermediate command used to gather the state, instead of the command that actually performed the state change (https://github.com/ansible-collections/community.general/pull/3655).
-    - snap_alias - the output value ``cmd_args`` was bringing the intermediate command used to gather the state, instead of the command that actually performed the state change (https://github.com/ansible-collections/community.general/pull/3655).
