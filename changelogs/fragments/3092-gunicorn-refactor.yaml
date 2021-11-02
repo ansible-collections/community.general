@@ -1,2 +1,0 @@
-minor_changes:
-  - gunicorn - search for ``gunicorn`` binary in more paths (https://github.com/ansible-collections/community.general/pull/3092).
