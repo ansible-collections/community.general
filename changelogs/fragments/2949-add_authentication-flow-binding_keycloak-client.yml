@@ -1,3 +1,0 @@
----
-minor_changes:
-  - keycloak_client - add ``authentication_flow_binding_overrides`` option (https://github.com/ansible-collections/community.general/pull/2949).

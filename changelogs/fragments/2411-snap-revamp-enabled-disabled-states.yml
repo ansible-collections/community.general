@@ -1,2 +1,0 @@
-minor_changes:
-  - snap - added ``enabled`` and ``disabled`` states (https://github.com/ansible-collections/community.general/issues/1990).

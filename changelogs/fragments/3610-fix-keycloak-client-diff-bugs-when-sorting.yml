@@ -1,2 +1,0 @@
-bugfixes:
-  - keycloak_client - update the check mode to not show differences resulting from sorting and default values relating to the properties, ``redirectUris``, ``attributes``, and ``protocol_mappers`` (https://github.com/ansible-collections/community.general/pull/3610).

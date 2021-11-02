@@ -1,3 +1,0 @@
----
-minor_changes:
-- timezone - print error message to debug instead of warning when timedatectl fails (https://github.com/ansible-collections/community.general/issues/1942).

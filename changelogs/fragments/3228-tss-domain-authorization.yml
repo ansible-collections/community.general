@@ -1,3 +1,0 @@
-minor_changes:
-  - tss lookup plugin - added new parameter for domain authorization
-    (https://github.com/ansible-collections/community.general/pull/3228).

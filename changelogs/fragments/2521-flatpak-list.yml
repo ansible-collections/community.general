@@ -1,2 +1,0 @@
-minor_changes:
-- flatpak - allows installing or uninstalling a list of packages (https://github.com/ansible-collections/community.general/pull/2521).
