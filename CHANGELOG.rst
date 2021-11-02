@@ -6,6 +6,30 @@ Community General Release Notes
 
 This changelog describes changes after version 2.0.0.
 
+v3.8.1
+======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Bugfixes
+--------
+
+- gitlab_deploy_key - fix the SSH Deploy Key being deleted accidentally while running task in check mode (https://github.com/ansible-collections/community.general/issues/3621, https://github.com/ansible-collections/community.general/pull/3622).
+- gitlab_project_members - ``get_project_id`` return the project id by matching ``full_path`` or ``name`` (https://github.com/ansible-collections/community.general/pull/3602).
+- ipa_* modules - fix environment fallback for ``ipa_host`` option (https://github.com/ansible-collections/community.general/issues/3560).
+- nmcli - fixed ``dns6`` option handling so that it is treated as a list internally (https://github.com/ansible-collections/community.general/pull/3563).
+- nmcli - fixed ``ipv4.route-metric`` being in properties of type list (https://github.com/ansible-collections/community.general/pull/3563).
+- one_image - fix error message when renaming an image (https://github.com/ansible-collections/community.general/pull/3626).
+- pipx - ``state=inject`` was failing to parse the list of injected packages (https://github.com/ansible-collections/community.general/pull/3611).
+- pipx - set environment variable ``USE_EMOJI=0`` to prevent errors in platforms that do not support ``UTF-8`` (https://github.com/ansible-collections/community.general/pull/3611).
+- pkgin - Fix exception encountered when all packages are already installed (https://github.com/ansible-collections/community.general/pull/3583).
+- proxmox_group_info - fix module crash if a ``group`` parameter is used (https://github.com/ansible-collections/community.general/pull/3649).
+- redfish_utils module utils - do not attempt to change the boot source override mode if not specified by the user (https://github.com/ansible-collections/community.general/issues/3509/).
+- redfish_utils module utils - if a manager network property is not specified in the service, attempt to change the requested settings (https://github.com/ansible-collections/community.general/issues/3404/).
+
 v3.8.0
 ======
 
