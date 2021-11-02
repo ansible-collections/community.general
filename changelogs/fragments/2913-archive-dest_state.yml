@@ -1,4 +1,0 @@
----
-minor_changes:
-  - archive - added ``dest_state`` return value to describe final state of ``dest`` after successful task execution
-    (https://github.com/ansible-collections/community.general/pull/2913).

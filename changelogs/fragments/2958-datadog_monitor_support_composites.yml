@@ -1,3 +1,0 @@
-minor_changes:
-  - datadog_monitor - allow creation of composite datadog monitors
-    (https://github.com/ansible-collections/community.general/issues/2956).

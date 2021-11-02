@@ -1,3 +1,0 @@
----
-bugfixes:
-  - 'logstash callback plugin - replace ``_option`` with ``context.CLIARGS`` to fix the plugin on ansible-base and ansible-core (https://github.com/ansible-collections/community.general/issues/2692).'
