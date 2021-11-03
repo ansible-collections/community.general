@@ -73,7 +73,7 @@ DOCUMENTATION = r'''
             choices: [ 'inet', 'inet6' ]
         groupby:
             description:
-            - Create groups by the following keywords C(location), C(pattern), C(network_range), C(os), C(release), C(profile), C(vlanid).
+            - Create groups by the following keywords C(location), C(network_range), C(os), C(pattern), C(profile), C(release), C(nature), C(vlanid).
             - See example for syntax.
             type: dict
 '''
@@ -90,36 +90,42 @@ state: RUNNING
 
 # grouping lxd.yml
 groupby:
-  testpattern:
-    type: pattern
-    attribute: test
-  vlan666:
-    type: vlanid
-    attribute: 666
   locationBerlin:
     type: location
     attribute: Berlin
-  osUbuntu:
-    type: os
-    attribute: ubuntu
-  releaseFocal:
-    type: release
-    attribute: focal
-  releaseBionic:
-    type: release
-    attribute: bionic
-  profileDefault:
-    type: profile
-    attribute: default
-  profileX11:
-    type: profile
-    attribute: x11
   netRangeIPv4:
     type: network_range
     attribute: 10.98.143.0/24
   netRangeIPv6:
     type: network_range
     attribute: fd42:bd00:7b11:2167:216:3eff::/24
+  osUbuntu:
+    type: os
+    attribute: ubuntu
+  testpattern:
+    type: pattern
+    attribute: test
+  profileDefault:
+    type: profile
+    attribute: default
+  profileX11:
+    type: profile
+    attribute: x11
+  releaseFocal:
+    type: release
+    attribute: focal
+  releaseBionic:
+    type: release
+    attribute: bionic
+  natureVM:
+    type: nature
+    attribute: virtual-machine
+  natureContainer:
+    type: nature
+    attribute: container
+  vlan666:
+    type: vlanid
+    attribute: 666
 '''
 
 import binascii
@@ -558,6 +564,8 @@ class InventoryModule(BaseInventoryPlugin):
                 'instances/{0}/instances/metadata/location'.format(instance_name)))
             self._set_data_entry(instance_name, 'state', self._get_data_entry(
                 'instances/{0}/instances/metadata/config/volatile.last_state.power'.format(instance_name)))
+            self._set_data_entry(instance_name, 'type', self._get_data_entry(
+                'instances/{0}/instances/metadata/type'.format(instance_name)))
             self._set_data_entry(instance_name, 'network_interfaces', self.extract_network_information_from_instance_config(instance_name))
             self._set_data_entry(instance_name, 'preferred_interface', self.get_prefered_instance_network_interface(instance_name))
             self._set_data_entry(instance_name, 'vlan_ids', self.get_instance_vlans(instance_name))
@@ -652,6 +660,8 @@ class InventoryModule(BaseInventoryPlugin):
             self.inventory.set_variable(instance_name, 'ansible_lxd_profile', self._get_data_entry('inventory/{0}/profile'.format(instance_name)))
             # add state
             self.inventory.set_variable(instance_name, 'ansible_lxd_state', instance_state)
+            # add type
+            self.inventory.set_variable(instance_name, 'ansible_lxd_type', self._get_data_entry('inventory/{0}/type'.format(instance_name)))
             # add location information
             if self._get_data_entry('inventory/{0}/location'.format(instance_name)) != "none":  # wrong type by lxd 'none' != 'None'
                 self.inventory.set_variable(instance_name, 'ansible_lxd_location', self._get_data_entry('inventory/{0}/location'.format(instance_name)))
@@ -739,7 +749,7 @@ class InventoryModule(BaseInventoryPlugin):
         Args:
             str(group_name): Group name
         Kwargs:
-            Noneself.data['inventory'][instance_name][interface]
+            None
         Raises:
             None
         Returns:
@@ -821,6 +831,28 @@ class InventoryModule(BaseInventoryPlugin):
             if self.groupby[group_name].get('attribute') in self.inventory.get_host(instance_name).get_vars().get('ansible_lxd_vlan_ids').values():
                 self.inventory.add_child(group_name, instance_name)
 
+    def build_inventory_groups_type(self, group_name):
+        """create group by attribute: type
+
+        Args:
+            str(group_name): Group name
+        Kwargs:
+            None
+        Raises:
+            None
+        Returns:
+            None"""
+        # maybe we just want to expand one group
+        if group_name not in self.inventory.groups:
+            self.inventory.add_group(group_name)
+
+        gen_instances = [
+            instance_name for instance_name in self.inventory.hosts
+            if 'ansible_lxd_type' in self.inventory.get_host(instance_name).get_vars()]
+        for instance_name in gen_instances:
+            if self.groupby[group_name].get('attribute').lower() == self.inventory.get_host(instance_name).get_vars().get('ansible_lxd_type'):
+                self.inventory.add_child(group_name, instance_name)
+
     def build_inventory_groups(self):
         """Build group-part dynamic inventory
 
@@ -848,6 +880,7 @@ class InventoryModule(BaseInventoryPlugin):
                 * 'release'
                 * 'profile'
                 * 'vlanid'
+                * 'nature'
 
             Args:
                 str(group_name): Group name
@@ -873,6 +906,8 @@ class InventoryModule(BaseInventoryPlugin):
                 self.build_inventory_groups_profile(group_name)
             elif self.groupby[group_name].get('type') == 'vlanid':
                 self.build_inventory_groups_vlanid(group_name)
+            elif self.groupby[group_name].get('type') == 'nature':
+                self.build_inventory_groups_type(group_name)
             else:
                 raise AnsibleParserError('Unknown group type: {0}'.format(to_native(group_name)))
 
