@@ -2697,7 +2697,7 @@ class RedfishUtils(object):
         return self.aggregate_managers(self.get_manager_health_report)
 
     def set_manager_nic(self, nic_addr, nic_config):
-
+        # Get the manager ethernet interface uri
         nic_info = self.get_manager_ethernet_uri(nic_addr)
 
         if nic_info['nic_addr'] is None:
