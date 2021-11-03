@@ -923,6 +923,8 @@ files:
     maintainers: djmattyg007 mgedmin
   $modules/source_control/github/github_deploy_key.py:
     maintainers: bincyber
+  $modules/source_control/github/github_tag.py:
+    maintainers: marknet15
   $modules/source_control/github/github_issue.py:
     maintainers: Akasurde
   $modules/source_control/github/github_key.py:

@@ -23,7 +23,7 @@ class TestGithubTag(ModuleTestCase):
                     "name": "Test User",
                     "email": "test.user@test.com"
                 },
-                "message": "Test tag",
+                "description": "Test tag",
             })
             github_tag.main()
 
@@ -45,7 +45,7 @@ class TestGithubTag(ModuleTestCase):
                     "name": "Test User",
                     "email": "test.user@test.com"
                 },
-                "message": "Test tag",
+                "description": "Test tag",
                 "url": "https://api.github.com"
             })
             github_tag.main()
@@ -69,7 +69,7 @@ class TestGithubTag(ModuleTestCase):
                     "name": "Test User",
                     "email": "test.user@test.com"
                 },
-                "message": "Test tag",
+                "description": "Test tag",
                 "url": "https://api.github.com"
             })
             github_tag.main()
@@ -95,7 +95,7 @@ class TestGithubTag(ModuleTestCase):
                     "name": "Test User",
                     "email": "test.user@test.com"
                 },
-                "message": "Test tag",
+                "description": "Test tag",
                 "url": "https://api.github.com"
             })
             github_tag.main()

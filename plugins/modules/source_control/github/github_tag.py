@@ -70,9 +70,9 @@ options:
                 type: str
                 required: true
         required: true
-    message:
+    description:
         description:
-            - Message for the tag to be created with.
+            - description message for the tag to be created with.
         type: str
         required: true
 
@@ -94,7 +94,7 @@ EXAMPLES = r'''
     tagger:
       name: Some User
       email: some.user@example.com
-    message: Some tag message
+    description: Some tag description message
 
 '''
 
@@ -170,6 +170,7 @@ def authenticate(module):
 
     return client
 
+
 def get_repo(module, client):
     '''
     Check if tag already exists and return repository object
@@ -195,6 +196,7 @@ def get_repo(module, client):
 
     return repository
 
+
 def create_tag(module, repository):
     '''
     Create annotated git tag
@@ -203,7 +205,7 @@ def create_tag(module, repository):
     branch = module.params.get('branch')
     tag = module.params.get('tag')
     tagger = module.params.get('tagger')
-    message = module.params.get('message')
+    description = module.params.get('description')
 
     latest_commit = repository.commit(sha=branch)
 
@@ -216,7 +218,7 @@ def create_tag(module, repository):
         tag=tag,
         tagger=tagger,
         sha=latest_commit.sha,
-        message=message,
+        message=description,
         obj_type="commit"
     )
 
@@ -232,16 +234,16 @@ def create_tag(module, repository):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            url=dict(type=str),
+            url=dict(type='str'),
             username=dict(type='str'),
             password=dict(no_log=True),
             token=dict(no_log=True),
             organization=dict(required=True, type='str'),
             repo=dict(required=True),
-            branch=dict(type='str'),
-            tag=dict(type='str'),
+            branch=dict(required=True, type='str'),
+            tag=dict(required=True, type='str'),
             tagger=dict(required=True, type='dict'),
-            message=dict(required=True, type='str')
+            description=dict(required=True, type='str')
         ),
         required_together=[('username', 'password')],
         required_one_of=[('password', 'token')],
