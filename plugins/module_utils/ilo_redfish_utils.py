@@ -55,7 +55,8 @@ class iLORedfishUtils(RedfishUtils):
         result = {}
         setkey = mgr_attributes['mgr_attr_name']
 
-        ethuri = self.get_Etherneturi()
+        nic_info = self.get_manager_ethernet_uri()
+        ethuri = nic_info["nic_addr"]
 
         response = self.get_request(self.root_uri + ethuri)
         if(response['ret'] is False):
@@ -146,7 +147,8 @@ class iLORedfishUtils(RedfishUtils):
         key = attr['mgr_attr_name']
         # setkey = "Oem"
 
-        uri = self.get_Etherneturi()
+        nic_info = self.get_manager_ethernet_uri()
+        uri = nic_info["nic_addr"]
 
         response = self.get_request(self.root_uri + uri)
         if(response['ret'] is False):
@@ -180,7 +182,8 @@ class iLORedfishUtils(RedfishUtils):
     def set_DomainName(self, attr):
         key = attr['mgr_attr_name']
 
-        Ethuri = self.get_Etherneturi()
+        nic_info = self.get_manager_ethernet_uri()
+        Ethuri = nic_info["nic_addr"]
 
         response = self.get_request(self.root_uri + Ethuri)
         if(response['ret'] is False):
@@ -225,7 +228,8 @@ class iLORedfishUtils(RedfishUtils):
     def set_WINSRegistration(self, mgrattr):
         Key = mgrattr['mgr_attr_name']
 
-        Ethuri = self.get_Etherneturi()
+        nic_info = self.get_manager_ethernet_uri()
+        Ethuri = nic_info["nic_addr"]
 
         payload = {
             "Oem": {
