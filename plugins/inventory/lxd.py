@@ -54,6 +54,14 @@ DOCUMENTATION = r'''
             type: str
             default: none
             choices: [ 'STOPPED', 'STARTING', 'RUNNING', 'none' ]
+        typefilter:
+            description:
+            - Filter the instances by type 'virtual-machine', 'container' or 'both'.
+            - The first version of the inventory only supported container.
+            - This will change in the future.
+            type: str
+            default: container
+            choices: [ 'virtual-machine', 'container', 'both' ]
         prefered_instance_network_interface:
             description:
             - If an instance has multiple network interfaces, select which one is the prefered as pattern.
@@ -87,6 +95,11 @@ url: unix:/var/snap/lxd/common/lxd/unix.socket
 plugin: community.general.lxd
 url: unix:/var/snap/lxd/common/lxd/unix.socket
 state: RUNNING
+
+# simple lxd.yml including Virtual-machines and container
+plugin: community.general.lxd
+url: unix:/var/snap/lxd/common/lxd/unix.socket
+typefilter: both
 
 # grouping lxd.yml
 groupby:
@@ -934,6 +947,26 @@ class InventoryModule(BaseInventoryPlugin):
         self.build_inventory_hosts()
         self.build_inventory_groups()
 
+    def cleandata(self):
+        """Clean the dynamic inventory
+
+        The first version of the inventory only supported container.
+        This will change in the future.
+        The following function cleans up the data and remove the all items with the wrong type.
+
+        Args:
+            None
+        Kwargs:
+            None
+        Raises:
+            None
+        Returns:
+            None"""
+        iter_keys = list(self.data['instances'].keys())
+        for instance_name in iter_keys:
+            if self._get_data_entry('instances/{0}/instances/metadata/type'.format(instance_name)) != self.typefilter:
+                del self.data['instances'][instance_name]
+
     def _populate(self):
         """Return the hosts and groups
 
@@ -952,6 +985,12 @@ class InventoryModule(BaseInventoryPlugin):
             self.socket = self._connect_to_socket()
             self.get_instance_data(self._get_instances())
             self.get_network_data(self._get_networks())
+
+        # The first version of the inventory only supported container.
+        # This will change in the future.
+        # The following function cleans up the data.
+        if self.typefilter != 'both':
+            self.cleandata()
 
         self.extract_information_from_instance_configs()
 
@@ -994,6 +1033,7 @@ class InventoryModule(BaseInventoryPlugin):
             self.plugin = self.get_option('plugin')
             self.prefered_instance_network_family = self.get_option('prefered_instance_network_family')
             self.prefered_instance_network_interface = self.get_option('prefered_instance_network_interface')
+            self.typefilter = self.get_option('typefilter')
             if self.get_option('state').lower() == 'none':  # none in config is str()
                 self.filter = None
             else:
