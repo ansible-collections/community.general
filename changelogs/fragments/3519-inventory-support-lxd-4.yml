@@ -1,2 +1,2 @@
 minor_changes:
-  - lxd inventory plugin - add support for LXD 4.x (https://github.com/ansible-collections/community.general/pull/3519).
+  - lxd inventory plugin - support virtual machines (https://github.com/ansible-collections/community.general/pull/3519).
