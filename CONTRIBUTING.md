@@ -74,7 +74,9 @@ Creating new modules and plugins requires a bit more work than other Pull Reques
 
 ## pre-commit
 
-To help ensure high-quality contributions this repository includes a [pre-commit](https://pre-commit.com) configuration which corrects and tests against common issues that would otherwise cause CI to fail. To begin using these pre-commit hooks see the [Installation](#installation) section below.
+To help ensure high-quality contributions this repository includes a [pre-commit](https://pre-commit.com) configuration which
+corrects and tests against common issues that would otherwise cause CI to fail. To begin using these pre-commit hooks see
+the [Installation](#installation) section below.
 
 ### Installation
 

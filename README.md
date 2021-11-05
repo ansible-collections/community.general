@@ -2,7 +2,7 @@
 
 [![Build Status](https://dev.azure.com/ansible/community.general/_apis/build/status/CI?branchName=main)](https://dev.azure.com/ansible/community.general/_build?definitionId=31)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/ansible-collections/community.general/main.svg)](https://results.pre-commit.ci/latest/github/ansible-collections/community.general/main)
 
 This repository contains the `community.general` Ansible Collection. The collection is a part of the Ansible package and includes many modules and plugins supported by Ansible community which are not part of more specialized community collections.
 
