@@ -115,9 +115,9 @@ def main():
 
     # Run even in check mode #3619
     try:
-      LdapSearch(module).main()
+        LdapSearch(module).main()
     except Exception as exception:
-      module.fail_json(msg="Attribute action failed.", details=to_native(exception))
+        module.fail_json(msg="Attribute action failed.", details=to_native(exception))
 
     module.exit_json(changed=False)
 
