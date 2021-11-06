@@ -32,8 +32,7 @@ options:
           - 'The config for the instance (for example C({"limits.cpu": "2"})).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).'
           - If the instance already exists and its "config" values in metadata
-            obtained from GET <api_endpoint>/<name>
-            U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#10containersname)
+            obtained from the LXD API U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#instances-containers-and-virtual-machines)
             are different, this module tries to apply the configurations.
           - The keys starting with C(volatile.) are ignored for this comparison when I(ignore_volatile_options=true).
         type: dict
