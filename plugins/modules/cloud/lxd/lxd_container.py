@@ -246,6 +246,7 @@ EXAMPLES = '''
       community.general.lxd_container:
         name: mycontainer
         state: absent
+        type: container
 
 # An example for restarting a container
 - hosts: localhost
@@ -255,6 +256,7 @@ EXAMPLES = '''
       community.general.lxd_container:
         name: mycontainer
         state: restarted
+        type: container
 
 # An example for restarting a container using https to connect to the LXD server
 - hosts: localhost
@@ -312,6 +314,26 @@ EXAMPLES = '''
           mode: pull
           alias: ubuntu/xenial/amd64
         target: node02
+
+# An example for creating a virtual machine
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Create container on another node
+      community.general.lxd_container:
+        name: new-vm-1
+        type: virtual-machine
+        state: started
+        ignore_volatile_options: true
+        wait_for_ipv4_addresses: true
+        profiles: ["default"]
+        source:
+          protocol: simplestreams
+          type: image
+          mode: pull
+          server: https://images.linuxcontainers.org
+          alias: debian/11
+        timeout: 600
 '''
 
 RETURN = '''
