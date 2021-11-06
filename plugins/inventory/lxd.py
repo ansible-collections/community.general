@@ -81,7 +81,7 @@ DOCUMENTATION = r'''
             choices: [ 'inet', 'inet6' ]
         groupby:
             description:
-            - Create groups by the following keywords C(location), C(network_range), C(os), C(pattern), C(profile), C(release), C(nature), C(vlanid).
+            - Create groups by the following keywords C(location), C(network_range), C(os), C(pattern), C(profile), C(release), C(type), C(vlanid).
             - See example for syntax.
             type: dict
 '''
@@ -130,11 +130,11 @@ groupby:
   releaseBionic:
     type: release
     attribute: bionic
-  natureVM:
-    type: nature
+  typeVM:
+    type: type
     attribute: virtual-machine
-  natureContainer:
-    type: nature
+  typeContainer:
+    type: type
     attribute: container
   vlan666:
     type: vlanid
@@ -893,7 +893,7 @@ class InventoryModule(BaseInventoryPlugin):
                 * 'release'
                 * 'profile'
                 * 'vlanid'
-                * 'nature'
+                * 'type'
 
             Args:
                 str(group_name): Group name
@@ -919,7 +919,7 @@ class InventoryModule(BaseInventoryPlugin):
                 self.build_inventory_groups_profile(group_name)
             elif self.groupby[group_name].get('type') == 'vlanid':
                 self.build_inventory_groups_vlanid(group_name)
-            elif self.groupby[group_name].get('type') == 'nature':
+            elif self.groupby[group_name].get('type') == 'type':
                 self.build_inventory_groups_type(group_name)
             else:
                 raise AnsibleParserError('Unknown group type: {0}'.format(to_native(group_name)))
