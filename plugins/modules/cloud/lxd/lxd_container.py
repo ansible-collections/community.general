@@ -422,7 +422,7 @@ class LXDContainerManagement(object):
         else:
             self.module.fail_json(msg="Validation error: "
                                       "'type' parameter must be 'container' or 'virtual-machine'. "
-                                      "The current value is '{}'".format(self.type))
+                                      "The current value is '{0}'".format(self.type))
 
         self.key_file = self.module.params.get('client_key')
         if self.key_file is None:
