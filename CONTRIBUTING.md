@@ -58,7 +58,7 @@ Creating new modules and plugins requires a bit more work than other Pull Reques
    - Make sure that new plugins and modules have tests (unit tests, integration tests, or both); it is preferable to have some tests
      which run in CI.
 
-4. For modules and action plugins, make sure to create your module/plugin in the correct subdirectory, and create a symbolic link
+4. For modules and action plugins, make sure to create your module/plugin in the correct subdirectory, and create a relative symbolic link
    from `plugins/modules/` respectively `plugins/action/` to the actual module/plugin code. (Other plugin types should not use
    subdirectories.)
 

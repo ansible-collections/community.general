@@ -10,10 +10,12 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: github_tag
-short_description: Create annotated GitHub tags for use with releases
+short_description: Create annotated GitHub tags for use with releases.
+version_added: 4.1.0
 description:
     - Allows for creation of annotated tags, by default a GitHub release only create lightweight tags.
-    - Use this module with the `github_release` module to created a release linked to a annotated tag.
+    - Use this module with the the M(community.general.github_release) module to created a release linked to a annotated tag.
+    - Note this module will only mark a task as changed if the requested tag doesn't already exist.
 options:
     url:
         description:
@@ -22,7 +24,7 @@ options:
     token:
         description:
             - GitHub access Token for authenticating.
-            - Mutually exclusive with C(password).
+            - Mutually exclusive with I(password).
         type: str
     username:
         description:
@@ -56,29 +58,28 @@ options:
         required: true
     tagger:
         description:
-            - Name of the tag to create.
+            - Tagger details to apply to the tag.
         type: dict
         suboptions:
             name:
                 description:
-                    - Name of the tagger
+                    - Name of the tagger.
                 type: str
                 required: true
             email:
                 description:
-                    - Email of the tagger
+                    - Email of the tagger.
                 type: str
                 required: true
         required: true
     description:
         description:
-            - description message for the tag to be created with.
+            - Description message for the tag to be created with.
         type: str
         required: true
 
 author:
     - "Mark Woolley (@marknet15)"
-version_added: 3.9.0
 requirements:
     - "github3.py >= 1.0.0"
 '''
@@ -101,16 +102,16 @@ EXAMPLES = r'''
 RETURN = r'''
 tag:
     description:
-    - The tag name created
-    - If specified tag already exists, then State is unchanged
+    - The tag name created.
+    - If the specified tag already exists, then State is unchanged
     type: str
-    returned: success
+    returned: when tag does not already exist and is successfully created.
     sample: 1.1.0
 branch:
     description:
     - The branch used for the tag creation
     type: str
-    returned: success
+    returned: when tag does not already exist and is successfully created.
     sample: main
 '''
 
@@ -166,7 +167,7 @@ def authenticate(module):
     except github3.exceptions.AuthenticationFailed as e:
         module.fail_json(msg='Failed to connect to GitHub: %s' % to_native(e),
                          details="Please check username and password or token "
-                                 "for repository %s" % module.params.get('repo'))
+                                 "for repository %s" % module.params['repo'])
 
     return client
 
@@ -176,9 +177,9 @@ def get_repo(module, client):
     Check if tag already exists and return repository object
     '''
 
-    org = module.params.get('organization')
-    repo = module.params.get('repo')
-    tag = module.params.get('tag')
+    org = module.params['organization']
+    repo = module.params['repo']
+    tag = module.params['tag']
 
     try:
         repository = client.repository(org, repo)
@@ -202,10 +203,10 @@ def create_tag(module, repository):
     Create annotated git tag
     '''
 
-    branch = module.params.get('branch')
-    tag = module.params.get('tag')
-    tagger = module.params.get('tagger')
-    description = module.params.get('description')
+    branch = module.params['branch']
+    tag = module.params['tag']
+    tagger = module.params['tagger']
+    description = module.params['description']
 
     latest_commit = repository.commit(sha=branch)
 
@@ -258,14 +259,11 @@ def main():
     repository = get_repo(module, client)
 
     if not repository:
-        module.exit_json(changed=False, msg="Tag %s already exists." % module.params.get('tag'))
+        module.exit_json(changed=False, msg="Tag %s already exists." % module.params['tag'])
 
     new_tag = create_tag(module, repository)
 
-    if new_tag:
-        module.exit_json(changed=True, tag=new_tag.tag, branch=module.params.get('branch'))
-    else:
-        module.exit_json(changed=False, tag=None)
+    module.exit_json(changed=True, tag=new_tag.tag, branch=module['branch'])
 
 
 if __name__ == '__main__':
