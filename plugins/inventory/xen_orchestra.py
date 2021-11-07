@@ -6,9 +6,9 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    name: xen_orchestra
+    name: community.general.xen_orchestra
     short_description: Xen Orchestra inventory source
-    version_added: 4.0.0
+    version_added: 4.1.0
     author:
         - Dom Del Nano (@ddelnano) <ddelnano@gmail.com>
         - Samori Gorse (@shinuza) <samorigorse@gmail.com>
@@ -22,7 +22,7 @@ DOCUMENTATION = '''
         - inventory_cache
     options:
         plugin:
-            description: The name of this plugin, it should always be set to C(community.general.xen_orchestra) for this plugin to recognize it as it's own.
+            description: The name of this plugin, it should always be set to C(community.general.xen_orchestra) for this plugin to recognize it as its own.
             required: yes
             choices: ['community.general.xen_orchestra']
             type: str
@@ -50,7 +50,7 @@ DOCUMENTATION = '''
             env:
                 - name: ANSIBLE_XO_PASSWORD
         validate_certs:
-            description: Verify SSL certificate if using HTTPS.
+            description: Verify TLS certificate if using HTTPS.
             type: boolean
             default: true
         use_ssl:
@@ -72,7 +72,6 @@ simple_config_file:
 '''
 
 import json
-import re
 import ssl
 
 from packaging import version
@@ -101,10 +100,14 @@ HOST_GROUP = 'xo_hosts'
 POOL_GROUP = 'xo_pools'
 
 
+def clean_group_name(label):
+    return label.lower().replace(' ', '-').replace('-', '_')
+
+
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     ''' Host inventory parser for ansible using XenOrchestra as source. '''
 
-    NAME = 'xen_orchestra'
+    NAME = 'community.general.xen_orchestra'
 
     def __init__(self):
 
@@ -122,28 +125,33 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return self.counter
 
     def create_connection(self, xoa_api_host):
-        validate_certs = self.get_option("validate_certs")
-        use_ssl = self.get_option("use_ssl")
-        proto = "wss" if use_ssl else "ws"
+        validate_certs = self.get_option('validate_certs')
+        use_ssl = self.get_option('use_ssl')
+        proto = 'wss' if use_ssl else 'ws'
 
-        sslopt = None if validate_certs else {"cert_reqs": ssl.CERT_NONE}
-        self.conn = create_connection("{0}://{1}/api/".format(proto, xoa_api_host), sslopt=sslopt)
+        sslopt = None if validate_certs else {'cert_reqs': ssl.CERT_NONE}
+        self.conn = create_connection(
+            '{0}://{1}/api/'.format(proto, xoa_api_host), sslopt=sslopt)
 
     def login(self, user, password):
-        payload = {"id": self.pointer, "jsonrpc": "2.0", "method": "session.signIn", "params": {"username": user, "password": password}}
+        payload = {'id': self.pointer, 'jsonrpc': '2.0', 'method': 'session.signIn', 'params': {
+            'username': user, 'password': password}}
         self.conn.send(json.dumps(payload))
         result = self.conn.recv()
 
         if 'error' in result:
-            raise AnsibleError('Could not connect: {0}'.format(result['error']))
+            raise AnsibleError(
+                'Could not connect: {0}'.format(result['error']))
 
     def get_object(self, name):
-        payload = {"id": self.pointer, "jsonrpc": "2.0", "method": "xo.getAllObjects", "params": {"filter": {'type': name}}}
+        payload = {'id': self.pointer, 'jsonrpc': '2.0',
+                   'method': 'xo.getAllObjects', 'params': {'filter': {'type': name}}}
         self.conn.send(json.dumps(payload))
         answer = json.loads(self.conn.recv())
 
         if 'error' in answer:
-            raise AnsibleError('Could not request: {0}'.format(answer['error']))
+            raise AnsibleError(
+                'Could not request: {0}'.format(answer['error']))
 
         return answer['result']
 
@@ -161,77 +169,86 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         for uuid, vm in vms.items():
             group = 'with_ip'
             ip = vm.get('mainIpAddress')
-            host = uuid
+            entry_name = uuid
             power_state = vm['power_state'].lower()
             pool_name = self._pool_group_name_for_uuid(pools, vm['$poolId'])
             host_name = self._host_group_name_for_uuid(hosts, vm['$container'])
 
-            self.inventory.add_host(host)
+            self.inventory.add_host(entry_name)
 
             # Grouping by power state
-            self.inventory.add_child(power_state, host)
+            self.inventory.add_child(power_state, entry_name)
 
             # Grouping by host
             if host_name:
-                self.inventory.add_child(host_name, host)
+                self.inventory.add_child(host_name, entry_name)
 
             # Grouping by pool
             if pool_name:
-                self.inventory.add_child(pool_name, host)
+                self.inventory.add_child(pool_name, entry_name)
 
             # Grouping VMs with an IP together
             if ip is None:
                 group = 'without_ip'
             self.inventory.add_group(group)
-            self.inventory.add_child(group, host)
+            self.inventory.add_child(group, entry_name)
 
             # Adding meta
-            self.inventory.set_variable(host, 'uuid', uuid)
-            self.inventory.set_variable(host, 'ip', ip)
-            self.inventory.set_variable(host, 'ansible_host', ip)
-            self.inventory.set_variable(host, 'name_label', vm['name_label'])
-            self.inventory.set_variable(host, 'type', vm['type'])
-            self.inventory.set_variable(host, 'power_state', power_state)
-            self.inventory.set_variable(host, 'cpus', vm["CPUs"]["number"])
-            self.inventory.set_variable(host, 'tags', vm["tags"])
-            self.inventory.set_variable(host, 'memory', vm["memory"]["size"])
-            self.inventory.set_variable(host, 'has_ip', group == 'with_ip')
+            self.inventory.set_variable(entry_name, 'uuid', uuid)
+            self.inventory.set_variable(entry_name, 'ip', ip)
+            self.inventory.set_variable(entry_name, 'ansible_host', ip)
+            self.inventory.set_variable(entry_name, 'power_state', power_state)
             self.inventory.set_variable(
-                host, 'is_managed', vm.get('managementAgentDetected', False))
+                entry_name, 'name_label', vm['name_label'])
+            self.inventory.set_variable(entry_name, 'type', vm['type'])
             self.inventory.set_variable(
-                host, 'os_version', vm["os_version"])
+                entry_name, 'cpus', vm['CPUs']['number'])
+            self.inventory.set_variable(entry_name, 'tags', vm['tags'])
+            self.inventory.set_variable(
+                entry_name, 'memory', vm['memory']['size'])
+            self.inventory.set_variable(
+                entry_name, 'has_ip', group == 'with_ip')
+            self.inventory.set_variable(
+                entry_name, 'is_managed', vm.get('managementAgentDetected', False))
+            self.inventory.set_variable(
+                entry_name, 'os_version', vm['os_version'])
 
     def _add_hosts(self, hosts, pools):
         for host in hosts.values():
-            address = host['address']
-            group_name = self.to_safe("xo_host_{0}".format(host['name_label']))
+            entry_name = host['uuid']
+            group_name = 'xo_host_{0}'.format(
+                clean_group_name(host['name_label']))
             pool_name = self._pool_group_name_for_uuid(pools, host['$poolId'])
 
             self.inventory.add_group(group_name)
-            self.inventory.add_host(address)
-            self.inventory.add_child(HOST_GROUP, address)
-            self.inventory.add_child(pool_name, address)
+            self.inventory.add_host(entry_name)
+            self.inventory.add_child(HOST_GROUP, entry_name)
+            self.inventory.add_child(pool_name, entry_name)
 
-            self.inventory.set_variable(address, 'enabled', host['enabled'])
-            self.inventory.set_variable(address, 'hostname', host['hostname'])
-            self.inventory.set_variable(address, 'memory', host['memory'])
-            self.inventory.set_variable(address, 'cpus', host['cpus'])
-            self.inventory.set_variable(address, 'type', 'host')
-            self.inventory.set_variable(address, 'tags', host['tags'])
-            self.inventory.set_variable(address, 'version', host['version'])
+            self.inventory.set_variable(entry_name, 'enabled', host['enabled'])
             self.inventory.set_variable(
-                address, 'power_state', host['power_state'].lower())
+                entry_name, 'hostname', host['hostname'])
+            self.inventory.set_variable(entry_name, 'memory', host['memory'])
+            self.inventory.set_variable(entry_name, 'address', host['address'])
+            self.inventory.set_variable(entry_name, 'cpus', host['cpus'])
+            self.inventory.set_variable(entry_name, 'type', 'host')
+            self.inventory.set_variable(entry_name, 'tags', host['tags'])
+            self.inventory.set_variable(entry_name, 'version', host['version'])
             self.inventory.set_variable(
-                address, 'product_brand', host['productBrand'])
+                entry_name, 'power_state', host['power_state'].lower())
+            self.inventory.set_variable(
+                entry_name, 'product_brand', host['productBrand'])
 
         for pool in pools.values():
-            group_name = self.to_safe("xo_pool_{0}".format(pool['name_label']))
+            group_name = 'xo_pool_{0}'.format(
+                clean_group_name(pool['name_label']))
 
             self.inventory.add_group(group_name)
 
     def _add_pools(self, pools):
         for pool in pools.values():
-            group_name = self.to_safe("xo_pool_{0}".format(pool['name_label']))
+            group_name = 'xo_pool_{0}'.format(
+                clean_group_name(pool['name_label']))
 
             self.inventory.add_group(group_name)
 
@@ -239,13 +256,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _pool_group_name_for_uuid(self, pools, pool_uuid):
         for pool in pools:
             if pool == pool_uuid:
-                return self.to_safe("xo_pool_{0}".format(pools[pool_uuid]['name_label']))
+                return 'xo_pool_{0}'.format(
+                    clean_group_name(pools[pool_uuid]['name_label']))
 
     # TODO: Refactor
     def _host_group_name_for_uuid(self, hosts, host_uuid):
         for host in hosts:
             if host == host_uuid:
-                return self.to_safe("xo_host_{0}".format(hosts[host_uuid]['name_label']))
+                return 'xo_host_{0}'.format(
+                    clean_group_name(hosts[host_uuid]['name_label']
+                                     ))
 
     def _populate(self, objects):
         # Prepare general groups
@@ -257,14 +277,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self._add_pools(objects['pools'])
         self._add_hosts(objects['hosts'], objects['pools'])
         self._add_vms(objects['vms'], objects['hosts'], objects['pools'])
-
-    def to_safe(self, word):
-        '''Converts 'bad' characters in a string to underscores so they can be used as Ansible groups
-        #> InventoryModule.to_safe("foo-bar baz")
-        'foo_barbaz'
-        '''
-        regex = r"[^A-Za-z0-9\_]"
-        return re.sub(regex, "_", word.replace(" ", "")).lower()
 
     def verify_file(self, path):
 
@@ -279,7 +291,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def parse(self, inventory, loader, path, cache=True):
         if not HAS_WEBSOCKET:
-            raise AnsibleError('This module requires websocket-client 1.0.0 or higher: '
+            raise AnsibleError('This plugin requires websocket-client 1.0.0 or higher: '
                                'https://github.com/websocket-client/websocket-client.')
 
         super(InventoryModule, self).parse(inventory, loader, path)
