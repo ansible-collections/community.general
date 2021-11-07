@@ -59,7 +59,7 @@ Creating new modules and plugins requires a bit more work than other Pull Reques
      which run in CI.
 
 4. For modules and action plugins, make sure to create your module/plugin in the correct subdirectory, and create a relative symbolic link
-   from `plugins/modules/` respectively `plugins/action/` to the actual module/plugin code. (Other plugin types should not use
+   from `plugins/modules/` respectively `plugins/action/` to the actual module/plugin code for example `ln -s ./sub_dir/module.py ./module.py`. (Other plugin types should not use
    subdirectories.)
 
    - Action plugins need to be accompanied by a module, even if the module file only contains documentation
