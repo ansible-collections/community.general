@@ -78,6 +78,8 @@ To help ensure high-quality contributions this repository includes a [pre-commit
 corrects and tests against common issues that would otherwise cause CI to fail. To begin using these pre-commit hooks see
 the [Installation](#installation) section below.
 
+This is optional and not required to contribute to this repository.
+
 ### Installation
 
 Follow the [instructions](https://pre-commit.com/#install) provided with pre-commit and run `pre-commit install` under the repository base. If for any reason you would like to disable the pre-commit hooks run `pre-commit uninstall`.
