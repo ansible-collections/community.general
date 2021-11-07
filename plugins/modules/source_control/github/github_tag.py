@@ -263,7 +263,7 @@ def main():
 
     new_tag = create_tag(module, repository)
 
-    module.exit_json(changed=True, tag=new_tag.tag, branch=module['branch'])
+    module.exit_json(changed=True, tag=new_tag.tag, branch=module.params['branch'])
 
 
 if __name__ == '__main__':
