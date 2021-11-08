@@ -1697,9 +1697,6 @@ class Nmcli(object):
                     current_value = current_value.strip('"')
                 if key == self.mtu_setting and self.mtu is None:
                     self.mtu = 0
-            elif key == self.mtu_setting:
-                # if self.mtu_setting parameter doesn't exist, NetworkManager behave like it's set to 'auto'
-                current_value = 'auto'
             else:
                 # parameter does not exist
                 current_value = None
@@ -1709,7 +1706,7 @@ class Nmcli(object):
                 if sorted(current_value) != sorted(value):
                     changed = True
             elif all([key == self.mtu_setting, self.type == 'dummy', current_value is None, value =='auto', self.mtu is None]):
-                 value = None
+                value = None
             else:
                 if current_value != to_text(value):
                     changed = True

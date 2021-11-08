@@ -993,11 +993,13 @@ def mocked_dummy_connection_static_unchanged(mocker):
                connection_exists=True,
                execute_return=(0, TESTCASE_DUMMY_STATIC_SHOW_OUTPUT, ""))
 
+
 @pytest.fixture
 def mocked_dummy_connection_static_without_mtu_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
                execute_return=(0, TESTCASE_DUMMY_STATIC_WITHOUT_MTU_SHOW_OUTPUT, ""))
+
 
 @pytest.fixture
 def mocked_dummy_connection_static_with_custom_mtu_modify(mocker):
@@ -1008,6 +1010,7 @@ def mocked_dummy_connection_static_with_custom_mtu_modify(mocker):
                    (0, TESTCASE_DUMMY_STATIC_WITH_CUSTOM_MTU_SHOW_OUTPUT, ""),
                    (0, "", ""),
                ))
+
 
 @pytest.fixture
 def mocked_gsm_connection_unchanged(mocker):
@@ -2358,9 +2361,9 @@ def test_dummy_connection_static_with_custom_mtu_modify(mocked_dummy_connection_
     """
     with pytest.raises(SystemExit):
         nmcli.main()
-    
+
     assert nmcli.Nmcli.execute_command.call_count == 2
-    
+
     arg_list = nmcli.Nmcli.execute_command.call_args_list
     args, kwargs = arg_list[1]
 
@@ -2377,7 +2380,6 @@ def test_dummy_connection_static_with_custom_mtu_modify(mocked_dummy_connection_
     results = json.loads(out)
     assert not results.get('failed')
     assert results['changed']
-
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_GSM, indirect=['patch_ansible_module'])
