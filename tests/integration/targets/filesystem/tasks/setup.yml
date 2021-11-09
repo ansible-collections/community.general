@@ -44,7 +44,7 @@
     name: reiserfs-utils
     state: present
   when:
-    - ansible_distribution == 'Fedora'
+    - ansible_distribution == 'Fedora' and (ansible_facts.distribution_major_version | int < 35)
 
 - name: "Install reiserfs (OpenSuse)"
   ansible.builtin.package:
