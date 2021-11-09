@@ -157,7 +157,7 @@ def _run_xattr(module, cmd, check_rc=True):
         if line.startswith('#') or line == '':
             pass
         elif '=' in line:
-            (key, val) = line.split('=')
+            (key, val) = line.split('=', 1)
             result[key] = val.strip('"')
         else:
             result[line] = ''
