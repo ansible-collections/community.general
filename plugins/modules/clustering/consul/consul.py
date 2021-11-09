@@ -84,7 +84,7 @@ options:
         description:
           - the address to advertise that the service will be listening on.
             This value will be passed as the I(address) parameter to Consul's
-            U(/v1/agent/service/register) API method, so refer to the Consul API
+            C(/v1/agent/service/register) API method, so refer to the Consul API
             documentation for further details.
     tags:
         type: list
