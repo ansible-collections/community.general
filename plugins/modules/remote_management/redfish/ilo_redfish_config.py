@@ -11,6 +11,7 @@ DOCUMENTATION = '''
 ---
 module: ilo_redfish_config
 short_description: Sets or updates a configuration attribute. For use with HPE iLO operations that require Redfish OEM extensions.
+version_added: 4.1.0
 description:
     - "Provides an interface to manage configuration attributes."
 options:
@@ -18,7 +19,7 @@ options:
     required: true
     type: str
     description:
-      - Category to execute on iLO
+      - Command category to execute on iLO
   command:
     required: true
     description:
@@ -42,7 +43,6 @@ options:
     description:
       - Security token for authentication with OOB controller
     type: str
-    version_added: 2.3.0
   timeout:
     description:
       - Timeout in seconds for URL requests to iLO controller
@@ -53,13 +53,11 @@ options:
     description:
       - Name of the attribute
     type: str
-    version_added: '0.2.0'
   attribute_value:
     required: false
     description:
       - Value of the attribute
     type: str
-    version_added: '0.2.0'
 requirements:
     - "python >= 3.8"
     - "ansible >= 3.2"
@@ -72,29 +70,25 @@ EXAMPLES = '''
     community.general.ilo_redfish_config:
       category: Manager
       command: SetWINSReg
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      attribute_name: "{{ attribute_name }}"
+      baseuri: 15.X.X.X
+      username: Admin
+      password: Testpass123
+      attribute_name: WINSRegistration
 
   - name: Set Time Zone
     community.general.ilo_redfish_config:
       category: Manager
       command: SetTimeZone
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
+      baseuri: 15.X.X.X
+      username: Admin
+      password: Testpass123
       attribute_name: TimeZone
-      attribute_value: "{{ attribute_value }}"
+      attribute_value: Chennai
 '''
 
-ANSIBLE_METADATA = {'status': ['preview'],
-                    'supported_by': 'community',
-                    'metadata_version': '1.1'}
-
-
 CATEGORY_COMMANDS_ALL = {
-    "Manager": ["SetTimeZone", "SetDNSserver", "SetDomainName", "SetNTPServers", "SetWINSReg"]
+    "Manager": ["SetTimeZone", "SetDNSserver", "SetDomainName", "SetNTPServers", "SetWINSReg"],
+    "Sessions": ["GetiLOSessions"]
 }
 
 from ansible.module_utils._text import to_native
@@ -106,13 +100,13 @@ def main():
     result = {}
     module = AnsibleModule(
         argument_spec=dict(
-            category=dict(required=True),
+            category=dict(required=True, choices=list(CATEGORY_COMMANDS_ALL.keys())),
             command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
             username=dict(),
             password=dict(no_log=True),
-            attribute_name=dict(default=None),
-            attribute_value=dict(default=None),
+            attribute_name=dict(),
+            attribute_value=dict(),
             auth_token=dict(no_log=True),
             timeout=dict(type='int', default=10)
         ),
@@ -122,54 +116,47 @@ def main():
     category = module.params['category']
     command_list = module.params['command']
 
-    # creds = None
     session_id = None
     creds = {"user": module.params['username'],
              "pswd": module.params['password'],
              "token": module.params['auth_token']}
-    # creds["Hpe"] = True
 
     timeout = module.params['timeout']
 
-    if module.params['baseuri'] is None:
-        module.fail_json(msg=to_native("Baseuri is empty."))
-
     root_uri = "https://" + module.params['baseuri']
-    # Auto_login = False
     rf_utils = iLORedfishUtils(creds, root_uri, timeout, module)
     mgr_attributes = {'mgr_attr_name': module.params['attribute_name'],
                       'mgr_attr_value': module.params['attribute_value']}
 
-    if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (
-            category, CATEGORY_COMMANDS_ALL.keys())))
+    offending = [cmd for cmd in command_list if cmd not in CATEGORY_COMMANDS_ALL[category]]
 
-    for cmd in command_list:
-        if cmd not in CATEGORY_COMMANDS_ALL[category]:
-            module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (
-                cmd, CATEGORY_COMMANDS_ALL[category])))
+    if offending:
+      module.fail_json(msg=to_native("Invalid Command(s): '%s'. Allowed Commands = %s" % (offending, CATEGORY_COMMANDS_ALL[category])))
 
     if category == "Manager":
         result = rf_utils._find_managers_resource()
-        if(result['ret'] is False):
+        if not result['ret']:
             module.fail_json(msg=to_native(result['msg']))
 
+        dispatch = dict(
+          SetTimeZone = rf_utils.set_time_zone,
+          SetDNSserver = rf_utils.set_dns_server,
+          SetDomainName = rf_utils.set_domain_name,
+          SetNTPServers = rf_utils.set_ntp_server,
+          SetWINSReg = rf_utils.set_wins_registration
+        )
+
         for command in command_list:
-            if command == "SetVLANAttr":
-                result = rf_utils.set_VLANId(mgr_attributes)
-            elif command == "SetTimeZone":
-                result = rf_utils.setTimeZone(mgr_attributes)
-            elif command == "SetDNSserver":
-                result = rf_utils.set_DNSserver(mgr_attributes)
-            elif command == "SetDomainName":
-                result = rf_utils.set_DomainName(mgr_attributes)
-            elif command == "SetNTPServers":
-                result = rf_utils.set_NTPServer(mgr_attributes)
-            elif command == "SetWINSReg":
-                result = rf_utils.set_WINSRegistration(mgr_attributes)
-    if result['ret'] is True:
-        module.exit_json(changed=result['changed'],
-                         msg=to_native(result.get('msg')), sessionid=session_id)
+          result = dispatch[command](mgr_attributes)
+
+    elif category == "Sessions":
+      for command in command_list:
+          if command == "GetiLOSessions":
+              result = rf_utils.get_ilo_sessions()
+
+    if result['ret']:
+        module.exit_json(changed=result.get('changed'),
+                         msg=to_native(result.get('msg')))
     else:
         module.fail_json(msg=to_native(result['msg']))
 

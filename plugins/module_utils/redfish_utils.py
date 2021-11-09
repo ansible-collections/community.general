@@ -2852,20 +2852,17 @@ class RedfishUtils(object):
             return response
         return {'ret': True, 'changed': True, 'msg': "Modified Host Interface"}
 
-    def get_Etherneturi(self):
-        key = "EthernetInterfaces"
-
-    def get_manager_ethernet_uri(self, nic_addr):
+    def get_manager_ethernet_uri(self, nic_addr = 'null'):
         # Get EthernetInterface collection
         response = self.get_request(self.root_uri + self.manager_uri)
-        if response['ret'] is False:
+        if not response['ret']:
             return response
         data = response['data']
         if 'EthernetInterfaces' not in data:
             return {'ret': False, 'msg': "EthernetInterfaces resource not found"}
         ethernetinterfaces_uri = data["EthernetInterfaces"]["@odata.id"]
         response = self.get_request(self.root_uri + ethernetinterfaces_uri)
-        if response['ret'] is False:
+        if not response['ret']:
             return response
         data = response['data']
         uris = [a.get('@odata.id') for a in data.get('Members', []) if
@@ -2880,10 +2877,11 @@ class RedfishUtils(object):
             nic_addr = nic_addr.split(':')[0]  # split port if existing
         for uri in uris:
             response = self.get_request(self.root_uri + uri)
-            if response['ret'] is False:
+            if not response['ret']:
                 return response
             data = response['data']
-            if '"' + nic_addr.lower() + '"' in str(data).lower() or "'" + nic_addr.lower() + "'" in str(data).lower():
+            data_string = json.dumps(data)
+            if str(nic_addr.lower()) in data_string.lower():
                 target_ethernet_uri = uri
                 target_ethernet_current_setting = data
                 break
