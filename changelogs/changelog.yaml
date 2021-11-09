@@ -2157,3 +2157,45 @@ releases:
     - 3285-pamd-updated-with-empty-args.yaml
     - 3336-openbsd_pkg-fix-KeyError.yml
     release_date: '2021-09-21'
+  2.5.7:
+    changes:
+      bugfixes:
+      - gitlab_deploy_key - fix idempotency on projects with multiple deploy keys
+        (https://github.com/ansible-collections/community.general/pull/3473).
+      - gitlab_group_members - ``get_group_id`` return the group ID by matching ``full_path``,
+        ``path`` or ``name`` (https://github.com/ansible-collections/community.general/pull/3400).
+      - gitlab_project_members - ``get_project_id`` return the project id by matching
+        ``full_path`` or ``name`` (https://github.com/ansible-collections/community.general/pull/3602).
+      - ipa_* modules - fix environment fallback for ``ipa_host`` option (https://github.com/ansible-collections/community.general/issues/3560).
+      - jboss - fix the deployment file permission issue when Jboss server is running
+        under non-root user. The deployment file is copied with file content only.
+        The file permission is set to ``440`` and belongs to root user. When the JBoss
+        ``WildFly`` server is running under non-root user, it is unable to read the
+        deployment file (https://github.com/ansible-collections/community.general/pull/3426).
+      - logstash callback plugin - replace ``_option`` with ``context.CLIARGS`` to
+        fix the plugin on ansible-base and ansible-core (https://github.com/ansible-collections/community.general/issues/2692).
+      - proxmox_group_info - fix module crash if a ``group`` parameter is used (https://github.com/ansible-collections/community.general/pull/3649).
+      - redfish_utils module utils - if a manager network property is not specified
+        in the service, attempt to change the requested settings (https://github.com/ansible-collections/community.general/issues/3404/).
+      - xattr - fix exception caused by ``_run_xattr()`` raising a ``ValueError``
+        due to a mishandling of base64-encoded value (https://github.com/ansible-collections/community.general/issues/3673).
+      - yaml callback plugin - avoid modifying PyYAML so that other plugins using
+        it on the controller, like the ``to_yaml`` filter, do not produce different
+        output (https://github.com/ansible-collections/community.general/issues/3471,
+        https://github.com/ansible-collections/community.general/pull/3478).
+      release_summary: Regular bugfix release. Please note that this is the last regular
+        bugfix release, from now on only security fixes and major bugfixes will be
+        accepted for the ``stable-2`` branch.
+    fragments:
+    - 2.5.7.yml
+    - 2692-logstash-callback-plugin-replacing_options.yml
+    - 3400-fix-gitLab-api-searches-always-return-first-found-match-3386.yml
+    - 3404-redfish_utils-skip-manager-network-check.yml
+    - 3426-copy-permissions-along-with-file-for-jboss-module.yml
+    - 3473-gitlab_deploy_key-fix_idempotency.yml
+    - 3478-yaml-callback.yml
+    - 3561-fix-ipa-host-var-detection.yml
+    - 3602-fix-gitlab_project_members-improve-search-method.yml
+    - 3649-proxmox_group_info_TypeError.yml
+    - 3675-xattr-handle-base64-values.yml
+    release_date: '2021-11-09'

@@ -6,6 +6,28 @@ Community General Release Notes
 
 This changelog describes changes after version 1.0.0.
 
+v2.5.7
+======
+
+Release Summary
+---------------
+
+Regular bugfix release. Please note that this is the last regular bugfix release, from now on only security fixes and major bugfixes will be accepted for the ``stable-2`` branch.
+
+Bugfixes
+--------
+
+- gitlab_deploy_key - fix idempotency on projects with multiple deploy keys (https://github.com/ansible-collections/community.general/pull/3473).
+- gitlab_group_members - ``get_group_id`` return the group ID by matching ``full_path``, ``path`` or ``name`` (https://github.com/ansible-collections/community.general/pull/3400).
+- gitlab_project_members - ``get_project_id`` return the project id by matching ``full_path`` or ``name`` (https://github.com/ansible-collections/community.general/pull/3602).
+- ipa_* modules - fix environment fallback for ``ipa_host`` option (https://github.com/ansible-collections/community.general/issues/3560).
+- jboss - fix the deployment file permission issue when Jboss server is running under non-root user. The deployment file is copied with file content only. The file permission is set to ``440`` and belongs to root user. When the JBoss ``WildFly`` server is running under non-root user, it is unable to read the deployment file (https://github.com/ansible-collections/community.general/pull/3426).
+- logstash callback plugin - replace ``_option`` with ``context.CLIARGS`` to fix the plugin on ansible-base and ansible-core (https://github.com/ansible-collections/community.general/issues/2692).
+- proxmox_group_info - fix module crash if a ``group`` parameter is used (https://github.com/ansible-collections/community.general/pull/3649).
+- redfish_utils module utils - if a manager network property is not specified in the service, attempt to change the requested settings (https://github.com/ansible-collections/community.general/issues/3404/).
+- xattr - fix exception caused by ``_run_xattr()`` raising a ``ValueError`` due to a mishandling of base64-encoded value (https://github.com/ansible-collections/community.general/issues/3673).
+- yaml callback plugin - avoid modifying PyYAML so that other plugins using it on the controller, like the ``to_yaml`` filter, do not produce different output (https://github.com/ansible-collections/community.general/issues/3471, https://github.com/ansible-collections/community.general/pull/3478).
+
 v2.5.6
 ======
 
