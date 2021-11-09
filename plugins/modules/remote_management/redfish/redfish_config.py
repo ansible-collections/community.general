@@ -111,7 +111,7 @@ options:
     description:
       - Redfish HostInterface instance ID if multiple HostInterfaces are present.
     type: str
-    version_added: '3.9.0'
+    version_added: '4.1.0'
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''
