@@ -6,6 +6,20 @@ Community General Release Notes
 
 This changelog describes changes after version 3.0.0.
 
+v4.0.1
+======
+
+Release Summary
+---------------
+
+Bugfix release for today's Ansible 5.0.0 beta 1.
+
+Bugfixes
+--------
+
+- a_module test plugin - fix crash when testing a module name that was tombstoned (https://github.com/ansible-collections/community.general/pull/3660).
+- xattr - fix exception caused by ``_run_xattr()`` raising a ``ValueError`` due to a mishandling of base64-encoded value (https://github.com/ansible-collections/community.general/issues/3673).
+
 v4.0.0
 ======
 
