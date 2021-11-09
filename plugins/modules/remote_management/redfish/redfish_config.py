@@ -103,13 +103,13 @@ options:
   hostinterface_config:
     required: false
     description:
-      - setting dict of HostInterface on OOB controller
+      - Setting dict of HostInterface on OOB controller.
     type: dict
-    version_added: '3.9.0'
+    version_added: '4.1.0'
   hostinterface_id:
     required: false
     description:
-      - redfish HostInterface instance ID if multiple HostInterfaces are present
+      - Redfish HostInterface instance ID if multiple HostInterfaces are present.
     type: str
     version_added: '3.9.0'
 
