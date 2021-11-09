@@ -5,6 +5,9 @@
 # GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils._text import to_native
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -91,16 +94,13 @@ CATEGORY_COMMANDS_ALL = {
     "Sessions": ["GetiLOSessions"]
 }
 
-from ansible.module_utils._text import to_native
-from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
-
 
 def main():
     result = {}
     module = AnsibleModule(
         argument_spec=dict(
-            category=dict(required=True, choices=list(CATEGORY_COMMANDS_ALL.keys())),
+            category=dict(required=True, choices=list(
+                CATEGORY_COMMANDS_ALL.keys())),
             command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
             username=dict(),
@@ -127,32 +127,34 @@ def main():
     rf_utils = iLORedfishUtils(creds, root_uri, timeout, module)
     mgr_attributes = {'mgr_attr_name': module.params['attribute_name'],
                       'mgr_attr_value': module.params['attribute_value']}
-                      
-    offending = [cmd for cmd in command_list if cmd not in CATEGORY_COMMANDS_ALL[category]]
-    
+
+    offending = [
+        cmd for cmd in command_list if cmd not in CATEGORY_COMMANDS_ALL[category]]
+
     if offending:
-      module.fail_json(msg=to_native("Invalid Command(s): '%s'. Allowed Commands = %s" % (offending, CATEGORY_COMMANDS_ALL[category])))
+        module.fail_json(msg=to_native("Invalid Command(s): '%s'. Allowed Commands = %s" % (
+            offending, CATEGORY_COMMANDS_ALL[category])))
 
     if category == "Manager":
         result = rf_utils._find_managers_resource()
         if not result['ret']:
             module.fail_json(msg=to_native(result['msg']))
-            
+
         dispatch = dict(
-          SetTimeZone=rf_utils.set_time_zone,
-          SetDNSserver=rf_utils.set_dns_server,
-          SetDomainName=rf_utils.set_domain_name,
-          SetNTPServers=rf_utils.set_ntp_server,
-          SetWINSReg=rf_utils.set_wins_registration
+            SetTimeZone=rf_utils.set_time_zone,
+            SetDNSserver=rf_utils.set_dns_server,
+            SetDomainName=rf_utils.set_domain_name,
+            SetNTPServers=rf_utils.set_ntp_server,
+            SetWINSReg=rf_utils.set_wins_registration
         )
-        
+
         for command in command_list:
-          result = dispatch[command](mgr_attributes)
-          
+            result = dispatch[command](mgr_attributes)
+
     elif category == "Sessions":
-      for command in command_list:
-        if command == "GetiLOSessions":
-          result = rf_utils.get_ilo_sessions()
+        for command in command_list:
+            if command == "GetiLOSessions":
+                result = rf_utils.get_ilo_sessions()
 
     if result['ret']:
         module.exit_json(changed=result.get('changed'),
