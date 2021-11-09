@@ -2852,7 +2852,7 @@ class RedfishUtils(object):
             return response
         return {'ret': True, 'changed': True, 'msg': "Modified Host Interface"}
 
-    def get_manager_ethernet_uri(self, nic_addr = 'null'):
+    def get_manager_ethernet_uri(self, nic_addr='null'):
         # Get EthernetInterface collection
         response = self.get_request(self.root_uri + self.manager_uri)
         if not response['ret']:

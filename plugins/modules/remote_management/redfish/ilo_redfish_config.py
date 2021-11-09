@@ -139,11 +139,11 @@ def main():
             module.fail_json(msg=to_native(result['msg']))
 
         dispatch = dict(
-          SetTimeZone = rf_utils.set_time_zone,
-          SetDNSserver = rf_utils.set_dns_server,
-          SetDomainName = rf_utils.set_domain_name,
-          SetNTPServers = rf_utils.set_ntp_server,
-          SetWINSReg = rf_utils.set_wins_registration
+          SetTimeZone=rf_utils.set_time_zone,
+          SetDNSserver=rf_utils.set_dns_server,
+          SetDomainName=rf_utils.set_domain_name,
+          SetNTPServers=rf_utils.set_ntp_server,
+          SetWINSReg=rf_utils.set_wins_registration
         )
 
         for command in command_list:
@@ -151,8 +151,8 @@ def main():
 
     elif category == "Sessions":
       for command in command_list:
-          if command == "GetiLOSessions":
-              result = rf_utils.get_ilo_sessions()
+        if command == "GetiLOSessions":
+          result = rf_utils.get_ilo_sessions()
 
     if result['ret']:
         module.exit_json(changed=result.get('changed'),

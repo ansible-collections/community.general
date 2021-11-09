@@ -120,9 +120,9 @@ class iLORedfishUtils(RedfishUtils):
         timezones = data["TimeZoneList"]
         index = ""
         for tz in timezones:
-           if attr['mgr_attr_value'] in tz["Name"]:
-               index = tz["Index"]
-               break
+            if attr['mgr_attr_value'] in tz["Name"]:
+                index = tz["Index"]
+                break
 
         payload = {key: {"Index": index}}
         response = self.patch_request(self.root_uri + uri, payload)
