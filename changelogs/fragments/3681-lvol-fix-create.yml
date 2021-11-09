@@ -1,0 +1,2 @@
+bugfixes:
+  - Fixes #3665 - allows lvols to be created with arguments prefixed with "+" to preserve old lvol.py behaviour
