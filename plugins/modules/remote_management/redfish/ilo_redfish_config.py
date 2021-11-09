@@ -5,9 +5,6 @@
 # GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_native
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -23,6 +20,7 @@ options:
     type: str
     description:
       - Command category to execute on iLO
+    choices: ['Manager', 'Sessions']
   command:
     required: true
     description:
@@ -94,6 +92,9 @@ CATEGORY_COMMANDS_ALL = {
     "Sessions": ["GetiLOSessions"]
 }
 
+from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils._text import to_native
 
 def main():
     result = {}
