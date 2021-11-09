@@ -127,9 +127,9 @@ def main():
     rf_utils = iLORedfishUtils(creds, root_uri, timeout, module)
     mgr_attributes = {'mgr_attr_name': module.params['attribute_name'],
                       'mgr_attr_value': module.params['attribute_value']}
-
+                      
     offending = [cmd for cmd in command_list if cmd not in CATEGORY_COMMANDS_ALL[category]]
-
+    
     if offending:
       module.fail_json(msg=to_native("Invalid Command(s): '%s'. Allowed Commands = %s" % (offending, CATEGORY_COMMANDS_ALL[category])))
 
@@ -137,7 +137,7 @@ def main():
         result = rf_utils._find_managers_resource()
         if not result['ret']:
             module.fail_json(msg=to_native(result['msg']))
-
+            
         dispatch = dict(
           SetTimeZone=rf_utils.set_time_zone,
           SetDNSserver=rf_utils.set_dns_server,
@@ -145,10 +145,10 @@ def main():
           SetNTPServers=rf_utils.set_ntp_server,
           SetWINSReg=rf_utils.set_wins_registration
         )
-
+        
         for command in command_list:
           result = dispatch[command](mgr_attributes)
-
+          
     elif category == "Sessions":
       for command in command_list:
         if command == "GetiLOSessions":
