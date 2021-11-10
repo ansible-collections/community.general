@@ -675,6 +675,45 @@ ipv6.method:                            manual
 ipv6.addresses:                         2001:db8::1/128
 """
 
+TESTCASE_DUMMY_STATIC_WITHOUT_MTU_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              dummy_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            manual
+ipv4.addresses:                         10.10.10.10/24
+ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv4.dns:                               1.1.1.1,8.8.8.8
+ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+ipv6.method:                            manual
+ipv6.addresses:                         2001:db8::1/128
+"""
+
+TESTCASE_DUMMY_STATIC_WITH_CUSTOM_MTU_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              dummy_non_existant
+connection.autoconnect:                 yes
+802-3-ethernet.mtu:                     1500
+ipv4.method:                            manual
+ipv4.addresses:                         10.10.10.10/24
+ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv4.dns:                               1.1.1.1,8.8.8.8
+ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+ipv6.method:                            manual
+ipv6.addresses:                         2001:db8::1/128
+"""
+
 
 TESTCASE_GSM = [
     {
@@ -953,6 +992,24 @@ def mocked_dummy_connection_static_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
                execute_return=(0, TESTCASE_DUMMY_STATIC_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_dummy_connection_static_without_mtu_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_DUMMY_STATIC_WITHOUT_MTU_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_dummy_connection_static_with_custom_mtu_modify(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_DUMMY_STATIC_WITH_CUSTOM_MTU_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
 
 
 @pytest.fixture
@@ -2281,6 +2338,48 @@ def test_dummy_connection_static_unchanged(mocked_dummy_connection_static_unchan
     results = json.loads(out)
     assert not results.get('failed')
     assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_DUMMY_STATIC, indirect=['patch_ansible_module'])
+def test_dummy_connection_static_without_mtu_unchanged(mocked_dummy_connection_static_without_mtu_unchanged, capfd):
+    """
+    Test : Dummy connection with static IP configuration and no mtu set unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_DUMMY_STATIC, indirect=['patch_ansible_module'])
+def test_dummy_connection_static_with_custom_mtu_modify(mocked_dummy_connection_static_with_custom_mtu_modify, capfd):
+    """
+    Test : Dummy connection with static IP configuration and no mtu set modify
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 2
+
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[1]
+
+    assert args[0][0] == '/usr/bin/nmcli'
+    assert args[0][1] == 'con'
+    assert args[0][2] == 'modify'
+    assert args[0][3] == 'non_existent_nw_device'
+
+    args_text = list(map(to_text, args[0]))
+    for param in ['802-3-ethernet.mtu', '0']:
+        assert param in args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_GSM, indirect=['patch_ansible_module'])
