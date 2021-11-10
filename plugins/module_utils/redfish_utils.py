@@ -2925,12 +2925,11 @@ class RedfishUtils(object):
                     # object, a link to a _single_ EthernetInterface that the
                     # BMC uses to communicate with the host.
                     if 'ManagerEthernetInterface' in hostinterface_data:
-                       interface_uri = hostinterface_data['ManagerEthernetInterface']['@odata.id']
-                       interface_response = self.get_nic(interface_uri)
-                       if interface_response['ret'] is False:
-                           return interface_response
-                       hostinterface_data_temp['ManagerEthernetInterface'] = interface_response['entries']
-
+                        interface_uri = hostinterface_data['ManagerEthernetInterface']['@odata.id']
+                        interface_response = self.get_nic(interface_uri)
+                        if interface_response['ret'] is False:
+                            return interface_response
+                        hostinterface_data_temp['ManagerEthernetInterface'] = interface_response['entries']
 
                     # Check for the presence of a HostEthernetInterfaces
                     # object, a link to a _collection_ of EthernetInterfaces
