@@ -643,7 +643,7 @@ class LXDContainerManagement(object):
             'architecture': old_metadata['architecture'],
             'config': old_metadata['config'],
             'devices': old_metadata['devices'],
-            'profiles': old_metadata['profiles'],
+            'profiles': old_metadata['profiles']
         }
 
         if self._needs_to_change_instance_config('architecture'):
