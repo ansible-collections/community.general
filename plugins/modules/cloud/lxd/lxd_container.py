@@ -392,7 +392,7 @@ ANSIBLE_LXD_DEFAULT_URL = 'unix:/var/lib/lxd/unix.socket'
 
 # CONFIG_PARAMS is a list of config attribute names.
 CONFIG_PARAMS = [
-    'architecture', 'config', 'devices', 'ephemeral', 'profiles', 'source', 'type'
+    'architecture', 'config', 'devices', 'ephemeral', 'profiles', 'source'
 ]
 
 
