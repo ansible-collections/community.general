@@ -111,7 +111,11 @@ options:
           - Instance type can be either C(virtual-machine) or C(container).
         required: false
         default: container
+        choices:
+          - container
+          - virtual-machine
         type: str
+        version_added: 4.1.0
     wait_for_ipv4_addresses:
         description:
           - If this is true, the C(lxd_container) waits until IPv4 addresses
@@ -419,10 +423,6 @@ class LXDContainerManagement(object):
             self.api_endpoint = '/1.0/containers'
         elif self.type == 'virtual-machine':
             self.api_endpoint = '/1.0/virtual-machines'
-        else:
-            self.module.fail_json(msg="Validation error: "
-                                      "'type' parameter must be 'container' or 'virtual-machine'. "
-                                      "The current value is '{0}'".format(self.type))
 
         self.key_file = self.module.params.get('client_key')
         if self.key_file is None:
@@ -749,7 +749,8 @@ def main():
             ),
             type=dict(
                 type='str',
-                default='container'
+                default='container',
+                choices=['container', 'virtual-machine'],
             ),
             wait_for_ipv4_addresses=dict(
                 type='bool',
