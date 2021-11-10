@@ -186,7 +186,7 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import gitlabAuthentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import gitlab_authentication
 
 try:
     cmp
@@ -205,12 +205,12 @@ class GitLabRunner(object):
         self._runners_endpoint = project.runners if project else gitlab_instance.runners
         self.runnerObject = None
 
-    def createOrUpdateRunner(self, description, options):
+    def create_or_update_runner(self, description, options):
         changed = False
 
         # Because we have already call userExists in main()
         if self.runnerObject is None:
-            runner = self.createRunner({
+            runner = self.create_runner({
                 'description': description,
                 'active': options['active'],
                 'token': options['registration_token'],
@@ -220,7 +220,7 @@ class GitLabRunner(object):
                 'tag_list': options['tag_list']})
             changed = True
         else:
-            changed, runner = self.updateRunner(self.runnerObject, {
+            changed, runner = self.update_runner(self.runnerObject, {
                 'active': options['active'],
                 'locked': options['locked'],
                 'run_untagged': options['run_untagged'],
@@ -244,7 +244,7 @@ class GitLabRunner(object):
     '''
     @param arguments Attributes of the runner
     '''
-    def createRunner(self, arguments):
+    def create_runner(self, arguments):
         if self._module.check_mode:
             return True
 
@@ -259,7 +259,7 @@ class GitLabRunner(object):
     @param runner Runner object
     @param arguments Attributes of the runner
     '''
-    def updateRunner(self, runner, arguments):
+    def update_runner(self, runner, arguments):
         changed = False
 
         for arg_key, arg_value in arguments.items():
@@ -282,7 +282,7 @@ class GitLabRunner(object):
     '''
     @param description Description of the runner
     '''
-    def findRunner(self, description, owned=False):
+    def find_runner(self, description, owned=False):
         if owned:
             runners = self._runners_endpoint.list(as_list=False)
         else:
@@ -301,16 +301,16 @@ class GitLabRunner(object):
     '''
     @param description Description of the runner
     '''
-    def existsRunner(self, description, owned=False):
+    def exists_runner(self, description, owned=False):
         # When runner exists, object will be stored in self.runnerObject.
-        runner = self.findRunner(description, owned)
+        runner = self.find_runner(description, owned)
 
         if runner:
             self.runnerObject = runner
             return True
         return False
 
-    def deleteRunner(self):
+    def delete_runner(self):
         if self._module.check_mode:
             return True
 
@@ -369,7 +369,7 @@ def main():
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
-    gitlab_instance = gitlabAuthentication(module)
+    gitlab_instance = gitlab_authentication(module)
     gitlab_project = None
     if project:
         try:
@@ -378,17 +378,17 @@ def main():
             module.fail_json(msg='No such a project %s' % project, exception=to_native(e))
 
     gitlab_runner = GitLabRunner(module, gitlab_instance, gitlab_project)
-    runner_exists = gitlab_runner.existsRunner(runner_description, owned)
+    runner_exists = gitlab_runner.exists_runner(runner_description, owned)
 
     if state == 'absent':
         if runner_exists:
-            gitlab_runner.deleteRunner()
+            gitlab_runner.delete_runner()
             module.exit_json(changed=True, msg="Successfully deleted runner %s" % runner_description)
         else:
             module.exit_json(changed=False, msg="Runner deleted or does not exists")
 
     if state == 'present':
-        if gitlab_runner.createOrUpdateRunner(runner_description, {
+        if gitlab_runner.create_or_update_runner(runner_description, {
                                               "active": runner_active,
                                               "tag_list": tag_list,
                                               "run_untagged": run_untagged,
