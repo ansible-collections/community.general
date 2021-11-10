@@ -96,6 +96,7 @@ from ansible_collections.community.general.plugins.module_utils.ilo_redfish_util
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
+
 def main():
     result = {}
     module = AnsibleModule(
