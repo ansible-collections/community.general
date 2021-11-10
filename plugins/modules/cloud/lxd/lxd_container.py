@@ -634,8 +634,7 @@ class LXDContainerManagement(object):
             self._needs_to_change_instance_config('config') or
             self._needs_to_change_instance_config('ephemeral') or
             self._needs_to_change_instance_config('devices') or
-            self._needs_to_change_instance_config('profiles') or
-            self._needs_to_change_instance_config('type')
+            self._needs_to_change_instance_config('profiles')
         )
 
     def _apply_instance_configs(self):
@@ -645,7 +644,6 @@ class LXDContainerManagement(object):
             'config': old_metadata['config'],
             'devices': old_metadata['devices'],
             'profiles': old_metadata['profiles'],
-            'type': old_metadata['type'],
         }
 
         if self._needs_to_change_instance_config('architecture'):
@@ -659,11 +657,6 @@ class LXDContainerManagement(object):
             body_json['devices'] = self.config['devices']
         if self._needs_to_change_instance_config('profiles'):
             body_json['profiles'] = self.config['profiles']
-        if self._needs_to_change_instance_config('type') and self.type != self.old_instance_json['metadata']['type']:
-            self.module.fail_json(rc=1,
-                                  msg="Failed to update the instance name '{0}'. The parameter 'type' is immutable and cannot be changed."
-                                      " The last provided value '{1}' mismatch the current one '{2}'".
-                                      format(self.name, self.type, self.old_instance_json['metadata']['type']))
 
         self.client.do('PUT', '{0}/{1}'.format(self.api_endpoint, self.name), body_json=body_json)
         self.actions.append('apply_instance_configs')
