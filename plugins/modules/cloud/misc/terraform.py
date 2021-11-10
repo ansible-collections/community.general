@@ -323,14 +323,19 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
     if plan_path is None:
         f, plan_path = tempfile.mkstemp(suffix='.tfplan')
 
-    plan_command = [command[0], 'plan', '-input=false', '-no-color', '-detailed-exitcode', '-out', plan_path]
+    plan_command = [command.pop(0), 'plan', '-input=false', '-no-color', '-detailed-exitcode', '-out', plan_path]
+
+    for c in command:
+        plan_command.insert(2,c)
 
     for t in targets:
         plan_command.extend(['-target', t])
 
+    plan_command.extend(variables_args)
+
     plan_command.extend(_state_args(state_file))
 
-    rc, out, err = module.run_command(plan_command + variables_args, cwd=project_path)
+    rc, out, err = module.run_command(plan_command, cwd=project_path)
 
     if rc == 0:
         # no changes
