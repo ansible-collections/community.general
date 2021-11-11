@@ -137,7 +137,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         payload = {'id': self.pointer, 'jsonrpc': '2.0', 'method': 'session.signIn', 'params': {
             'username': user, 'password': password}}
         self.conn.send(json.dumps(payload))
-        result = self.conn.recv()
+        result = json.loads(self.conn.recv())
 
         if 'error' in result:
             raise AnsibleError(
