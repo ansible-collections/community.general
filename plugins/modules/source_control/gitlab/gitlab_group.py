@@ -176,7 +176,7 @@ class GitLabGroup(object):
     def __init__(self, module, gitlab_instance):
         self._module = module
         self._gitlab = gitlab_instance
-        self.groupObject = None
+        self.group_object = None
 
     '''
     @param group Group object
@@ -195,7 +195,7 @@ class GitLabGroup(object):
         changed = False
 
         # Because we have already call userExists in main()
-        if self.groupObject is None:
+        if self.group_object is None:
             parent_id = self.get_group_id(parent)
 
             payload = {
@@ -214,7 +214,7 @@ class GitLabGroup(object):
             group = self.create_group(payload)
             changed = True
         else:
-            changed, group = self.update_group(self.groupObject, {
+            changed, group = self.update_group(self.group_object, {
                 'name': name,
                 'description': options['description'],
                 'visibility': options['visibility'],
@@ -224,7 +224,7 @@ class GitLabGroup(object):
                 'require_two_factor_authentication': options['require_two_factor_authentication'],
             })
 
-        self.groupObject = group
+        self.group_object = group
         if changed:
             if self._module.check_mode:
                 self._module.exit_json(changed=True, msg="Successfully created or updated the group %s" % name)
@@ -267,7 +267,7 @@ class GitLabGroup(object):
         return (changed, group)
 
     def delete_group(self):
-        group = self.groupObject
+        group = self.group_object
 
         if len(group.projects.list()) >= 1:
             self._module.fail_json(
@@ -286,10 +286,10 @@ class GitLabGroup(object):
     @param full_path Complete path of the Group including parent group path. <parent_path>/<group_path>
     '''
     def exists_group(self, project_identifier):
-        # When group/user exists, object will be stored in self.groupObject.
+        # When group/user exists, object will be stored in self.group_object.
         group = find_group(self._gitlab, project_identifier)
         if group:
-            self.groupObject = group
+            self.group_object = group
             return True
         return False
 
@@ -374,9 +374,9 @@ def main():
                                             "subgroup_creation_level": subgroup_creation_level,
                                             "require_two_factor_authentication": require_two_factor_authentication,
                                             }):
-            module.exit_json(changed=True, msg="Successfully created or updated the group %s" % group_name, group=gitlab_group.groupObject._attrs)
+            module.exit_json(changed=True, msg="Successfully created or updated the group %s" % group_name, group=gitlab_group.group_object._attrs)
         else:
-            module.exit_json(changed=False, msg="No need to update the group %s" % group_name, group=gitlab_group.groupObject._attrs)
+            module.exit_json(changed=False, msg="No need to update the group %s" % group_name, group=gitlab_group.group_object._attrs)
 
 
 if __name__ == '__main__':

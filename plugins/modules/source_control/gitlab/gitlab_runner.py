@@ -203,13 +203,13 @@ class GitLabRunner(object):
         # See https://gitlab.com/gitlab-org/gitlab-ce/issues/60774
         # for group runner token access
         self._runners_endpoint = project.runners if project else gitlab_instance.runners
-        self.runnerObject = None
+        self.runner_object = None
 
     def create_or_update_runner(self, description, options):
         changed = False
 
         # Because we have already call userExists in main()
-        if self.runnerObject is None:
+        if self.runner_object is None:
             runner = self.create_runner({
                 'description': description,
                 'active': options['active'],
@@ -220,7 +220,7 @@ class GitLabRunner(object):
                 'tag_list': options['tag_list']})
             changed = True
         else:
-            changed, runner = self.update_runner(self.runnerObject, {
+            changed, runner = self.update_runner(self.runner_object, {
                 'active': options['active'],
                 'locked': options['locked'],
                 'run_untagged': options['run_untagged'],
@@ -228,7 +228,7 @@ class GitLabRunner(object):
                 'access_level': options['access_level'],
                 'tag_list': options['tag_list']})
 
-        self.runnerObject = runner
+        self.runner_object = runner
         if changed:
             if self._module.check_mode:
                 self._module.exit_json(changed=True, msg="Successfully created or updated the runner %s" % description)
@@ -302,11 +302,11 @@ class GitLabRunner(object):
     @param description Description of the runner
     '''
     def exists_runner(self, description, owned=False):
-        # When runner exists, object will be stored in self.runnerObject.
+        # When runner exists, object will be stored in self.runner_object.
         runner = self.find_runner(description, owned)
 
         if runner:
-            self.runnerObject = runner
+            self.runner_object = runner
             return True
         return False
 
@@ -314,7 +314,7 @@ class GitLabRunner(object):
         if self._module.check_mode:
             return True
 
-        runner = self.runnerObject
+        runner = self.runner_object
 
         return runner.delete()
 
@@ -396,10 +396,10 @@ def main():
                                               "access_level": access_level,
                                               "maximum_timeout": maximum_timeout,
                                               "registration_token": registration_token}):
-            module.exit_json(changed=True, runner=gitlab_runner.runnerObject._attrs,
+            module.exit_json(changed=True, runner=gitlab_runner.runner_object._attrs,
                              msg="Successfully created or updated the runner %s" % runner_description)
         else:
-            module.exit_json(changed=False, runner=gitlab_runner.runnerObject._attrs,
+            module.exit_json(changed=False, runner=gitlab_runner.runner_object._attrs,
                              msg="No need to update the runner %s" % runner_description)
 
 

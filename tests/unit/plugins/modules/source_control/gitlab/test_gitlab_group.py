@@ -122,7 +122,7 @@ class TestGitlabGroup(GitlabModuleTestCase):
     def test_delete_group(self):
         self.moduleUtil.exists_group(1)
 
-        print(self.moduleUtil.groupObject.projects)
+        print(self.moduleUtil.group_object.projects)
 
         rvalue = self.moduleUtil.delete_group()
 

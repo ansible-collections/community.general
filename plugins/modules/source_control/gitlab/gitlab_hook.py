@@ -183,7 +183,7 @@ class GitLabHook(object):
     def __init__(self, module, gitlab_instance):
         self._module = module
         self._gitlab = gitlab_instance
-        self.hookObject = None
+        self.hook_object = None
 
     '''
     @param project Project Object
@@ -195,7 +195,7 @@ class GitLabHook(object):
         changed = False
 
         # Because we have already call userExists in main()
-        if self.hookObject is None:
+        if self.hook_object is None:
             hook = self.create_hook(project, {
                 'url': hook_url,
                 'push_events': options['push_events'],
@@ -211,7 +211,7 @@ class GitLabHook(object):
                 'token': options['token']})
             changed = True
         else:
-            changed, hook = self.update_hook(self.hookObject, {
+            changed, hook = self.update_hook(self.hook_object, {
                 'push_events': options['push_events'],
                 'push_events_branch_filter': options['push_events_branch_filter'],
                 'issues_events': options['issues_events'],
@@ -224,7 +224,7 @@ class GitLabHook(object):
                 'enable_ssl_verification': options['enable_ssl_verification'],
                 'token': options['token']})
 
-        self.hookObject = hook
+        self.hook_object = hook
         if changed:
             if self._module.check_mode:
                 self._module.exit_json(changed=True, msg="Successfully created or updated the hook %s" % hook_url)
@@ -279,10 +279,10 @@ class GitLabHook(object):
     @param hook_url Url to call on event
     '''
     def exists_hook(self, project, hook_url):
-        # When project exists, object will be stored in self.projectObject.
+        # When project exists, object will be stored in self.project_object.
         hook = self.find_hook(project, hook_url)
         if hook:
-            self.hookObject = hook
+            self.hook_object = hook
             return True
         return False
 
@@ -290,7 +290,7 @@ class GitLabHook(object):
         if self._module.check_mode:
             return True
 
-        return self.hookObject.delete()
+        return self.hook_object.delete()
 
 
 def main():
@@ -378,9 +378,9 @@ def main():
                                           "enable_ssl_verification": enable_ssl_verification,
                                           "token": hook_token}):
 
-            module.exit_json(changed=True, msg="Successfully created or updated the hook %s" % hook_url, hook=gitlab_hook.hookObject._attrs)
+            module.exit_json(changed=True, msg="Successfully created or updated the hook %s" % hook_url, hook=gitlab_hook.hook_object._attrs)
         else:
-            module.exit_json(changed=False, msg="No need to update the hook %s" % hook_url, hook=gitlab_hook.hookObject._attrs)
+            module.exit_json(changed=False, msg="No need to update the hook %s" % hook_url, hook=gitlab_hook.hook_object._attrs)
 
 
 if __name__ == '__main__':

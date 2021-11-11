@@ -245,7 +245,7 @@ class GitLabUser(object):
     def __init__(self, module, gitlab_instance):
         self._module = module
         self._gitlab = gitlab_instance
-        self.userObject = None
+        self.user_object = None
         self.ACCESS_LEVEL = {
             'guest': gitlab.GUEST_ACCESS,
             'reporter': gitlab.REPORTER_ACCESS,
@@ -263,7 +263,7 @@ class GitLabUser(object):
         potentionally_changed = False
 
         # Because we have already call userExists in main()
-        if self.userObject is None:
+        if self.user_object is None:
             user = self.create_user({
                 'name': options['name'],
                 'username': username,
@@ -278,7 +278,7 @@ class GitLabUser(object):
             changed = True
         else:
             changed, user = self.update_user(
-                self.userObject, {
+                self.user_object, {
                     # add "normal" parameters here, put uncheckable
                     # params in the dict below
                     'name': {'value': options['name']},
@@ -324,7 +324,7 @@ class GitLabUser(object):
             group_changed = self.assign_user_to_group(user, options['group_path'], options['access_level'])
             changed = changed or group_changed
 
-        self.userObject = user
+        self.user_object = user
         if (changed or potentionally_changed) and not self._module.check_mode:
             try:
                 user.save()
@@ -530,10 +530,10 @@ class GitLabUser(object):
     @param username Username of the user
     '''
     def exists_user(self, username):
-        # When user exists, object will be stored in self.userObject.
+        # When user exists, object will be stored in self.user_object.
         user = self.find_user(username)
         if user:
-            self.userObject = user
+            self.user_object = user
             return True
         return False
 
@@ -548,7 +548,7 @@ class GitLabUser(object):
         if self._module.check_mode:
             return True
 
-        user = self.userObject
+        user = self.user_object
 
         return user.delete()
 
@@ -556,7 +556,7 @@ class GitLabUser(object):
         if self._module.check_mode:
             return True
 
-        user = self.userObject
+        user = self.user_object
 
         return user.block()
 
@@ -564,7 +564,7 @@ class GitLabUser(object):
         if self._module.check_mode:
             return True
 
-        user = self.userObject
+        user = self.user_object
 
         return user.unblock()
 
@@ -682,9 +682,9 @@ def main():
                                           "external": user_external,
                                           "identities": user_identities,
                                           "overwrite_identities": overwrite_identities}):
-            module.exit_json(changed=True, msg="Successfully created or updated the user %s" % user_username, user=gitlab_user.userObject._attrs)
+            module.exit_json(changed=True, msg="Successfully created or updated the user %s" % user_username, user=gitlab_user.user_object._attrs)
         else:
-            module.exit_json(changed=False, msg="No need to update the user %s" % user_username, user=gitlab_user.userObject._attrs)
+            module.exit_json(changed=False, msg="No need to update the user %s" % user_username, user=gitlab_user.user_object._attrs)
 
 
 if __name__ == '__main__':

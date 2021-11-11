@@ -82,15 +82,15 @@ class TestGitlabDeployKey(GitlabModuleTestCase):
     @with_httmock(resp_create_project_deploy_key)
     def test_update_deploy_key(self):
         project = self.gitlab_instance.projects.get(1)
-        deployKey = self.moduleUtil.find_deploy_key(project, "Public key")
+        deploy_key = self.moduleUtil.find_deploy_key(project, "Public key")
 
-        changed, newDeploy_key = self.moduleUtil.update_deploy_key(deployKey, {"title": "Private key"})
+        changed, newDeploy_key = self.moduleUtil.update_deploy_key(deploy_key, {"title": "Private key"})
 
         self.assertEqual(changed, True)
         self.assertEqual(type(newDeploy_key), ProjectKey)
         self.assertEqual(newDeploy_key.title, "Private key")
 
-        changed, newDeploy_key = self.moduleUtil.update_deploy_key(deployKey, {"title": "Private key"})
+        changed, newDeploy_key = self.moduleUtil.update_deploy_key(deploy_key, {"title": "Private key"})
 
         self.assertEqual(changed, False)
         self.assertEqual(newDeploy_key.title, "Private key")

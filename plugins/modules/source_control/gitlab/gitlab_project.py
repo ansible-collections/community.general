@@ -244,7 +244,7 @@ class GitLabProject(object):
     def __init__(self, module, gitlab_instance):
         self._module = module
         self._gitlab = gitlab_instance
-        self.projectObject = None
+        self.project_object = None
 
     '''
     @param project_name Name of the project
@@ -273,7 +273,7 @@ class GitLabProject(object):
             'shared_runners_enabled': options['shared_runners_enabled'],
         }
         # Because we have already call userExists in main()
-        if self.projectObject is None:
+        if self.project_object is None:
             project_options.update({
                 'path': options['path'],
                 'import_url': options['import_url'],
@@ -284,9 +284,9 @@ class GitLabProject(object):
             project = self.create_project(namespace, project_options)
             changed = True
         else:
-            changed, project = self.update_project(self.projectObject, project_options)
+            changed, project = self.update_project(self.project_object, project_options)
 
-        self.projectObject = project
+        self.project_object = project
         if changed:
             if self._module.check_mode:
                 self._module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name)
@@ -344,7 +344,7 @@ class GitLabProject(object):
         if self._module.check_mode:
             return True
 
-        project = self.projectObject
+        project = self.project_object
 
         return project.delete()
 
@@ -353,10 +353,10 @@ class GitLabProject(object):
     @param name Name of the project
     '''
     def exists_project(self, namespace, path):
-        # When project exists, object will be stored in self.projectObject.
+        # When project exists, object will be stored in self.project_object.
         project = find_project(self._gitlab, namespace.full_path + '/' + path)
         if project:
-            self.projectObject = project
+            self.project_object = project
             return True
         return False
 
@@ -498,8 +498,8 @@ def main():
                                                 "shared_runners_enabled": shared_runners_enabled,
                                                 }):
 
-            module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.projectObject._attrs)
-        module.exit_json(changed=False, msg="No need to update the project %s" % project_name, project=gitlab_project.projectObject._attrs)
+            module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.project_object._attrs)
+        module.exit_json(changed=False, msg="No need to update the project %s" % project_name, project=gitlab_project.project_object._attrs)
 
 
 if __name__ == '__main__':
