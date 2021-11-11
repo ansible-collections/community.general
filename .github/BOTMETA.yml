@@ -651,7 +651,7 @@ files:
   $modules/net_tools/pritunl/:
     maintainers: Lowess
   $modules/net_tools/nmcli.py:
-    maintainers: alcamie101
+    maintainers: alcamie101 hummeltech
   $modules/net_tools/snmp_facts.py:
     maintainers: ogenstad ujwalkomarla
   $modules/notification/bearychat.py:
