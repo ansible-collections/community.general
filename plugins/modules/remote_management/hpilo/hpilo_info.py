@@ -256,6 +256,58 @@ def main():
     # Report host state
     info['host_power_status'] = power_state or 'UNKNOWN'
 
+    # Rerieve server name
+    server_name = ilo.get_server_name()
+    info['server_name'] = server_name
+
+    # Rerieve snmp setting
+    snmp_im_settings = ilo.get_snmp_im_settings()
+    info['snmp_im_settings'] = snmp_im_settings
+
+    # Rerieve network setting
+    network_settings = ilo.get_network_settings()
+    info['network_settings'] = network_settings
+
+    # Rerieve global settings
+    global_settings = ilo.get_global_settings()
+    info['global_settings'] = global_settings
+
+    # Rerieve Supported boot mode
+    supported_boot_mode = ilo.get_supported_boot_mode()
+    info['supported_boot_mode'] = supported_boot_mode
+
+    # Rerieve one time boot
+    one_time_boot = ilo.get_one_time_boot()
+    info['one_time_boot'] = one_time_boot
+        
+    # Rerieve if is pending boot
+    pending_boot_mode = ilo.get_pending_boot_mode()
+    info['pending_boot_mode'] = pending_boot_mode
+
+    # Rerieve if is persistent boot
+    persistent_boot = ilo.get_persistent_boot()
+    info['persistent_boot'] = persistent_boot
+
+    # Rerieve current boot mode
+    current_boot_mode = ilo.get_current_boot_mode()
+    info['current_boot_mode'] = current_boot_mode
+        
+    #Retrieve Security msg
+    security_msg = ilo.get_security_msg()
+    info['security_msg'] = security_msg
+        
+    #Retrieve list of licenses
+    all_licenses = ilo.get_all_licenses()
+    info['all_licenses'] = all_licenses
+
+    #retrieve user data
+    all_user_info = ilo.get_all_user_info()
+    info['all_user_info'] = all_user_info
+        
+    # Rerieve list of users
+    all_users = ilo.get_all_users()
+    info['all_users'] = all_users
+    
     module.exit_json(**info)
 
 
