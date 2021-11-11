@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    name: community.general.xen_orchestra
+    name: xen_orchestra
     short_description: Xen Orchestra inventory source
     version_added: 4.1.0
     author:
