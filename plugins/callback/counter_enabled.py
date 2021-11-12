@@ -82,6 +82,7 @@ class CallbackModule(CallbackBase):
         self._current_batch_total = self._previous_batch_total + len(self._all_vars()['vars']['ansible_play_batch'])
         self._host_total = len(self._all_vars()['vars']['ansible_play_hosts_all'])
         self._task_total = len(self._play.get_tasks()[0])
+        self._task_counter = 1
 
     def v2_playbook_on_stats(self, stats):
         self._display.banner("PLAY RECAP")
