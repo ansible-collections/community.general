@@ -106,14 +106,6 @@ def main():
         module.fail_json(msg=missing_required_lib('python-ldap'),
                          exception=LDAP_IMP_ERR)
 
-    # remove the following and allow to run even in check mode #3619
-    # if not module.check_mode:
-    #     try:
-    #         LdapSearch(module).main()
-    #     except Exception as exception:
-    #         module.fail_json(msg="Attribute action failed.", details=to_native(exception))
-
-    # Run even in check mode #3619
     try:
         LdapSearch(module).main()
     except Exception as exception:
