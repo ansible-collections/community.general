@@ -69,10 +69,10 @@ class TestGitlabDeployKey(GitlabModuleTestCase):
         project = self.gitlab_instance.projects.get(1)
 
         deploy_key = self.moduleUtil.create_deploy_key(project, {"title": "Public key",
-                                                               "key": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM"
-                                                               "4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4596k6YjzGGphH2TUxwKzxc"
-                                                               "KDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4soW6NUlfD"
-                                                               "zpvZK2H5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0="})
+                                                                 "key": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM"
+                                                                 "4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4596k6YjzGGphH2TUxwKzxc"
+                                                                 "KDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4soW6NUlfD"
+                                                                 "zpvZK2H5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0="})
 
         self.assertEqual(type(deploy_key), ProjectKey)
         self.assertEqual(deploy_key.title, "Public key")

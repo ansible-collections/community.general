@@ -67,11 +67,11 @@ class TestGitlabGroup(GitlabModuleTestCase):
     @with_httmock(resp_create_group)
     def test_create_group(self):
         group = self.moduleUtil.create_group({'name': "Foobar Group",
-                                             'path': "foo-bar",
-                                             'description': "An interesting group",
-                                             'project_creation_level': "developer",
-                                             'subgroup_creation_level': "maintainer",
-                                             'require_two_factor_authentication': True})
+                                              'path': "foo-bar",
+                                              'description': "An interesting group",
+                                              'project_creation_level': "developer",
+                                              'subgroup_creation_level': "maintainer",
+                                              'require_two_factor_authentication': True})
 
         self.assertEqual(type(group), Group)
         self.assertEqual(group.name, "Foobar Group")
@@ -85,10 +85,10 @@ class TestGitlabGroup(GitlabModuleTestCase):
     @with_httmock(resp_create_subgroup)
     def test_create_subgroup(self):
         group = self.moduleUtil.create_group({'name': "BarFoo Group",
-                                             'path': "bar-foo",
-                                             'parent_id': 1,
-                                             'project_creation_level': "noone",
-                                             'require_two_factor_authentication': True})
+                                              'path': "bar-foo",
+                                              'parent_id': 1,
+                                              'project_creation_level': "noone",
+                                              'require_two_factor_authentication': True})
 
         self.assertEqual(type(group), Group)
         self.assertEqual(group.name, "BarFoo Group")
@@ -102,9 +102,9 @@ class TestGitlabGroup(GitlabModuleTestCase):
     def test_update_group(self):
         group = self.gitlab_instance.groups.get(1)
         changed, newGroup = self.moduleUtil.update_group(group, {'name': "BarFoo Group",
-                                                                'visibility': "private",
-                                                                'project_creation_level': "maintainer",
-                                                                'require_two_factor_authentication': True})
+                                                                 'visibility': "private",
+                                                                 'project_creation_level': "maintainer",
+                                                                 'require_two_factor_authentication': True})
 
         self.assertEqual(changed, True)
         self.assertEqual(newGroup.name, "BarFoo Group")

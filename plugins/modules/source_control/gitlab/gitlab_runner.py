@@ -389,13 +389,13 @@ def main():
 
     if state == 'present':
         if gitlab_runner.create_or_update_runner(runner_description, {
-                                              "active": runner_active,
-                                              "tag_list": tag_list,
-                                              "run_untagged": run_untagged,
-                                              "locked": runner_locked,
-                                              "access_level": access_level,
-                                              "maximum_timeout": maximum_timeout,
-                                              "registration_token": registration_token}):
+                                                 "active": runner_active,
+                                                 "tag_list": tag_list,
+                                                 "run_untagged": run_untagged,
+                                                 "locked": runner_locked,
+                                                 "access_level": access_level,
+                                                 "maximum_timeout": maximum_timeout,
+                                                 "registration_token": registration_token}):
             module.exit_json(changed=True, runner=gitlab_runner.runner_object._attrs,
                              msg="Successfully created or updated the runner %s" % runner_description)
         else:

@@ -668,20 +668,20 @@ def main():
 
     if state == 'present':
         if gitlab_user.create_or_update_user(user_username, {
-                                          "name": user_name,
-                                          "password": user_password,
-                                          "reset_password": user_reset_password,
-                                          "email": user_email,
-                                          "sshkey_name": user_sshkey_name,
-                                          "sshkey_file": user_sshkey_file,
-                                          "sshkey_expires_at": user_sshkey_expires_at,
-                                          "group_path": group_path,
-                                          "access_level": access_level,
-                                          "confirm": confirm,
-                                          "isadmin": user_isadmin,
-                                          "external": user_external,
-                                          "identities": user_identities,
-                                          "overwrite_identities": overwrite_identities}):
+                                             "name": user_name,
+                                             "password": user_password,
+                                             "reset_password": user_reset_password,
+                                             "email": user_email,
+                                             "sshkey_name": user_sshkey_name,
+                                             "sshkey_file": user_sshkey_file,
+                                             "sshkey_expires_at": user_sshkey_expires_at,
+                                             "group_path": group_path,
+                                             "access_level": access_level,
+                                             "confirm": confirm,
+                                             "isadmin": user_isadmin,
+                                             "external": user_external,
+                                             "identities": user_identities,
+                                             "overwrite_identities": overwrite_identities}):
             module.exit_json(changed=True, msg="Successfully created or updated the user %s" % user_username, user=gitlab_user.user_object._attrs)
         else:
             module.exit_json(changed=False, msg="No need to update the user %s" % user_username, user=gitlab_user.user_object._attrs)

@@ -477,26 +477,26 @@ def main():
     if state == 'present':
 
         if gitlab_project.create_or_update_project(project_name, namespace, {
-                                                "path": project_path,
-                                                "description": project_description,
-                                                "initialize_with_readme": initialize_with_readme,
-                                                "issues_enabled": issues_enabled,
-                                                "merge_requests_enabled": merge_requests_enabled,
-                                                "merge_method": merge_method,
-                                                "wiki_enabled": wiki_enabled,
-                                                "snippets_enabled": snippets_enabled,
-                                                "visibility": visibility,
-                                                "import_url": import_url,
-                                                "lfs_enabled": lfs_enabled,
-                                                "allow_merge_on_skipped_pipeline": allow_merge_on_skipped_pipeline,
-                                                "only_allow_merge_if_all_discussions_are_resolved": only_allow_merge_if_all_discussions_are_resolved,
-                                                "only_allow_merge_if_pipeline_succeeds": only_allow_merge_if_pipeline_succeeds,
-                                                "packages_enabled": packages_enabled,
-                                                "remove_source_branch_after_merge": remove_source_branch_after_merge,
-                                                "squash_option": squash_option,
-                                                "ci_config_path": ci_config_path,
-                                                "shared_runners_enabled": shared_runners_enabled,
-                                                }):
+                                                   "path": project_path,
+                                                   "description": project_description,
+                                                   "initialize_with_readme": initialize_with_readme,
+                                                   "issues_enabled": issues_enabled,
+                                                   "merge_requests_enabled": merge_requests_enabled,
+                                                   "merge_method": merge_method,
+                                                   "wiki_enabled": wiki_enabled,
+                                                   "snippets_enabled": snippets_enabled,
+                                                   "visibility": visibility,
+                                                   "import_url": import_url,
+                                                   "lfs_enabled": lfs_enabled,
+                                                   "allow_merge_on_skipped_pipeline": allow_merge_on_skipped_pipeline,
+                                                   "only_allow_merge_if_all_discussions_are_resolved": only_allow_merge_if_all_discussions_are_resolved,
+                                                   "only_allow_merge_if_pipeline_succeeds": only_allow_merge_if_pipeline_succeeds,
+                                                   "packages_enabled": packages_enabled,
+                                                   "remove_source_branch_after_merge": remove_source_branch_after_merge,
+                                                   "squash_option": squash_option,
+                                                   "ci_config_path": ci_config_path,
+                                                   "shared_runners_enabled": shared_runners_enabled,
+                                                   }):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.project_object._attrs)
         module.exit_json(changed=False, msg="No need to update the project %s" % project_name, project=gitlab_project.project_object._attrs)
