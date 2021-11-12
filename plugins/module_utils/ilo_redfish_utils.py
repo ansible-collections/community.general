@@ -68,9 +68,9 @@ class iLORedfishUtils(RedfishUtils):
 
         if data["DHCPv4"]["UseNTPServers"]:
             payload["DHCPv4"]["UseNTPServers"] = False
-            resDHV4 = self.patch_request(self.root_uri + ethuri, payload)
-            if not resDHV4['ret']:
-                return resDHV4
+            res_dhv4 = self.patch_request(self.root_uri + ethuri, payload)
+            if not res_dhv4['ret']:
+                return res_dhv4
 
         payload = {"DHCPv6": {
             "UseNTPServers": ""
@@ -78,27 +78,27 @@ class iLORedfishUtils(RedfishUtils):
 
         if data["DHCPv6"]["UseNTPServers"]:
             payload["DHCPv6"]["UseNTPServers"] = False
-            resDHV6 = self.patch_request(self.root_uri + ethuri, payload)
-            if not resDHV6['ret']:
-                return resDHV6
+            res_dhv6 = self.patch_request(self.root_uri + ethuri, payload)
+            if not res_dhv6['ret']:
+                return res_dhv6
 
-        DTuri = self.manager_uri + "DateTime"
+        datetime_uri = self.manager_uri + "DateTime"
 
-        response = self.get_request(self.root_uri + DTuri)
+        response = self.get_request(self.root_uri + datetime_uri)
         if not response['ret']:
             return response
 
         data = response['data']
 
-        NTPlist = data[setkey]
-        if(len(NTPlist) == 2):
-            NTPlist.pop(0)
+        ntp_list = data[setkey]
+        if(len(ntp_list) == 2):
+            ntp_list.pop(0)
 
-        NTPlist.append(mgr_attributes['mgr_attr_value'])
+        ntp_list.append(mgr_attributes['mgr_attr_value'])
 
-        payload = {setkey: NTPlist}
+        payload = {setkey: ntp_list}
 
-        response1 = self.patch_request(self.root_uri + DTuri, payload)
+        response1 = self.patch_request(self.root_uri + datetime_uri, payload)
         if not response1['ret']:
             return response1
 
@@ -142,18 +142,18 @@ class iLORedfishUtils(RedfishUtils):
 
         data = response['data']
 
-        DNSlist = data["Oem"]["Hpe"]["IPv4"][key]
+        dns_list = data["Oem"]["Hpe"]["IPv4"][key]
 
-        if len(DNSlist) == 3:
-            DNSlist.pop(0)
+        if len(dns_list) == 3:
+            dns_list.pop(0)
 
-        DNSlist.append(attr['mgr_attr_value'])
+        dns_list.append(attr['mgr_attr_value'])
 
         payload = {
             "Oem": {
                 "Hpe": {
                     "IPv4": {
-                        key: DNSlist
+                        key: dns_list
                     }
                 }
             }
@@ -183,9 +183,9 @@ class iLORedfishUtils(RedfishUtils):
 
         if data["DHCPv4"]["UseDomainName"]:
             payload["DHCPv4"]["UseDomainName"] = False
-            resDHV4 = self.patch_request(self.root_uri + ethuri, payload)
-            if not resDHV4['ret']:
-                return resDHV4
+            res_dhv4 = self.patch_request(self.root_uri + ethuri, payload)
+            if not res_dhv4['ret']:
+                return res_dhv4
 
         payload = {"DHCPv6": {
             "UseDomainName": ""
@@ -193,9 +193,9 @@ class iLORedfishUtils(RedfishUtils):
 
         if data["DHCPv6"]["UseDomainName"]:
             payload["DHCPv6"]["UseDomainName"] = False
-            resDHV6 = self.patch_request(self.root_uri + ethuri, payload)
-            if not resDHV6['ret']:
-                return resDHV6
+            res_dhv6 = self.patch_request(self.root_uri + ethuri, payload)
+            if not res_dhv6['ret']:
+                return res_dhv6
 
         domain_name = attr['mgr_attr_value']
 
