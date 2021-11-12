@@ -2051,10 +2051,6 @@ class RedfishUtils(object):
         nic_list = []
         nic_results = []
         key = "EthernetInterfaces"
-        # Get these entries, but does not fail if not found
-        properties = ['Name', 'Id', 'Description', 'FQDN', 'IPv4Addresses', 'IPv6Addresses',
-                      'NameServers', 'MACAddress', 'PermanentMACAddress',
-                      'SpeedMbps', 'MTUSize', 'AutoNeg', 'Status']
 
         response = self.get_request(self.root_uri + resource_uri)
         if response['ret'] is False:
@@ -2888,9 +2884,9 @@ class RedfishUtils(object):
     def get_hostinterfaces(self):
         result = {}
         hostinterface_results = []
-        key = "PowerSupplies"
         properties = ['Id', 'Name', 'Description', 'HostInterfaceType', 'Status',
-                      'InterfaceEnabled', 'ExternallyAccessible', 'AuthenticationModes']
+                      'InterfaceEnabled', 'ExternallyAccessible', 'AuthenticationModes',
+                      'AuthNoneRoleId', 'CredentialBootstrapping']
         manager_uri_list = self.manager_uris
         for manager_uri in manager_uri_list:
             response = self.get_request(self.root_uri + manager_uri)
