@@ -279,7 +279,7 @@ def main():
     # Rerieve one time boot
     one_time_boot = ilo.get_one_time_boot()
     info['one_time_boot'] = one_time_boot
-        
+
     # Rerieve if is pending boot
     pending_boot_mode = ilo.get_pending_boot_mode()
     info['pending_boot_mode'] = pending_boot_mode
@@ -291,23 +291,23 @@ def main():
     # Rerieve current boot mode
     current_boot_mode = ilo.get_current_boot_mode()
     info['current_boot_mode'] = current_boot_mode
-        
-    #Retrieve Security msg
+
+    # Retrieve Security msg
     security_msg = ilo.get_security_msg()
     info['security_msg'] = security_msg
-        
-    #Retrieve list of licenses
+
+    # Retrieve list of licenses
     all_licenses = ilo.get_all_licenses()
     info['all_licenses'] = all_licenses
 
-    #retrieve user data
+    # Retrieve user data
     all_user_info = ilo.get_all_user_info()
     info['all_user_info'] = all_user_info
-        
+
     # Rerieve list of users
     all_users = ilo.get_all_users()
     info['all_users'] = all_users
-    
+
     module.exit_json(**info)
 
 
