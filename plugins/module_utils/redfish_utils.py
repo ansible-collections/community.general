@@ -2881,7 +2881,7 @@ class RedfishUtils(object):
                 return response
             data = response['data']
             data_string = json.dumps(data)
-            if str(nic_addr.lower()) in data_string.lower():
+            if nic_addr.lower() in data_string.lower():
                 target_ethernet_uri = uri
                 target_ethernet_current_setting = data
                 break
