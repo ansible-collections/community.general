@@ -963,6 +963,8 @@ files:
     notify: jlozadad
     maintainers: $team_gitlab
     keywords: gitlab source_control
+  $modules/source_control/gitlab/gitlab_integration.py:
+    maintainers: drzraf
   $modules/source_control/gitlab/gitlab_project_variable.py:
     maintainers: markuman
   $modules/source_control/gitlab/gitlab_runner.py:
