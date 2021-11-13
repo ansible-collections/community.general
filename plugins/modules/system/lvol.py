@@ -451,7 +451,8 @@ def main():
     if this_lv is None:
         if state == 'present':
             if size_operator is not None:
-                module.fail_json(msg="Bad size specification of '%s%s' for creating LV" % (size_operator, size))
+                if size_operator == "-" or (size_whole not in ["VG", "PVS", "FREE", "ORIGIN", None]):
+                    module.fail_json(msg="Bad size specification of '%s%s' for creating LV" % (size_operator, size))
             # Require size argument except for snapshot of thin volumes
             if (lv or thinpool) and not size:
                 for test_lv in lvs:
