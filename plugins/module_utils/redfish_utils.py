@@ -2792,3 +2792,87 @@ class RedfishUtils(object):
         if response['ret'] is False:
             return response
         return {'ret': True, 'changed': True, 'msg': "Modified Manager NIC"}
+
+    def set_hostinterface_attributes(self, hostinterface_config, hostinterface_id=None):
+        response = self.get_request(self.root_uri + self.manager_uri)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+        if 'HostInterfaces' not in data:
+            return {'ret': False, 'msg': "HostInterfaces resource not found"}
+
+        hostinterfaces_uri = data["HostInterfaces"]["@odata.id"]
+        response = self.get_request(self.root_uri + hostinterfaces_uri)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+        uris = [a.get('@odata.id') for a in data.get('Members', []) if a.get('@odata.id')]
+        # Capture list of URIs that match a specified HostInterface resource ID
+        if hostinterface_id:
+            matching_hostinterface_uris = [uri for uri in uris if hostinterface_id in uri.split('/')[-1]]
+
+        if hostinterface_id and matching_hostinterface_uris:
+            hostinterface_uri = list.pop(matching_hostinterface_uris)
+        elif hostinterface_id and not matching_hostinterface_uris:
+            return {'ret': False, 'msg': "HostInterface ID %s not present." % hostinterface_id}
+        elif len(uris) == 1:
+            hostinterface_uri = list.pop(uris)
+        else:
+            return {'ret': False, 'msg': "HostInterface ID not defined and multiple interfaces detected."}
+
+        response = self.get_request(self.root_uri + hostinterface_uri)
+        if response['ret'] is False:
+            return response
+        current_hostinterface_config = response['data']
+        payload = {}
+        for property in hostinterface_config.keys():
+            value = hostinterface_config[property]
+            if property not in current_hostinterface_config:
+                return {'ret': False, 'msg': "Property %s in hostinterface_config is invalid" % property}
+            if isinstance(value, dict):
+                if isinstance(current_hostinterface_config[property], dict):
+                    payload[property] = value
+                elif isinstance(current_hostinterface_config[property], list):
+                    payload[property] = list()
+                    payload[property].append(value)
+                else:
+                    return {'ret': False, 'msg': "Value of property %s in hostinterface_config is invalid" % property}
+            else:
+                payload[property] = value
+
+        need_change = False
+        for property in payload.keys():
+            set_value = payload[property]
+            cur_value = current_hostinterface_config[property]
+            if not isinstance(set_value, dict) and not isinstance(set_value, list):
+                if set_value != cur_value:
+                    need_change = True
+            if isinstance(set_value, dict):
+                for subprop in payload[property].keys():
+                    if subprop not in current_hostinterface_config[property]:
+                        need_change = True
+                        break
+                    sub_set_value = payload[property][subprop]
+                    sub_cur_value = current_hostinterface_config[property][subprop]
+                    if sub_set_value != sub_cur_value:
+                        need_change = True
+            if isinstance(set_value, list):
+                if len(set_value) != len(cur_value):
+                    need_change = True
+                    continue
+                for i in range(len(set_value)):
+                    for subprop in payload[property][i].keys():
+                        if subprop not in current_hostinterface_config[property][i]:
+                            need_change = True
+                            break
+                        sub_set_value = payload[property][i][subprop]
+                        sub_cur_value = current_hostinterface_config[property][i][subprop]
+                        if sub_set_value != sub_cur_value:
+                            need_change = True
+        if not need_change:
+            return {'ret': True, 'changed': False, 'msg': "Host Interface already configured"}
+
+        response = self.patch_request(self.root_uri + hostinterface_uri, payload)
+        if response['ret'] is False:
+            return response
+        return {'ret': True, 'changed': True, 'msg': "Modified Host Interface"}
