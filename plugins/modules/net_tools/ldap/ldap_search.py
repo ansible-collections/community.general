@@ -106,11 +106,10 @@ def main():
         module.fail_json(msg=missing_required_lib('python-ldap'),
                          exception=LDAP_IMP_ERR)
 
-    if not module.check_mode:
-        try:
-            LdapSearch(module).main()
-        except Exception as exception:
-            module.fail_json(msg="Attribute action failed.", details=to_native(exception))
+    try:
+        LdapSearch(module).main()
+    except Exception as exception:
+        module.fail_json(msg="Attribute action failed.", details=to_native(exception))
 
     module.exit_json(changed=False)
 
