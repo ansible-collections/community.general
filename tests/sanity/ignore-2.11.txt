@@ -1,3 +1,9 @@
+.azure-pipelines/scripts/publish-codecov.py replace-urlopen
+.azure-pipelines/scripts/publish-codecov.py compile-2.6!skip # Uses Python 3.6+ syntax
+.azure-pipelines/scripts/publish-codecov.py compile-2.7!skip # Uses Python 3.6+ syntax
+.azure-pipelines/scripts/publish-codecov.py compile-3.5!skip # Uses Python 3.6+ syntax
+.azure-pipelines/scripts/publish-codecov.py future-import-boilerplate
+.azure-pipelines/scripts/publish-codecov.py metaclass-boilerplate
 plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
 plugins/modules/cloud/lxc/lxc_container.py validate-modules:use-run-command-not-popen
 plugins/modules/cloud/misc/rhevm.py validate-modules:parameter-state-invalid-choice
