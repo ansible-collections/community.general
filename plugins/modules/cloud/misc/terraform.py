@@ -319,11 +319,23 @@ def remove_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'delete', workspace)
 
 
-def build_plan(command, project_path, variables_args, state_file, targets, state, plan_path=None):
+def build_plan(command, project_path, variables_args, state_file, targets, state, APPLY_ARGS, plan_path=None):
     if plan_path is None:
         f, plan_path = tempfile.mkstemp(suffix='.tfplan')
 
+    local_command = command.copy()
+
     plan_command = [command[0], 'plan', '-input=false', '-no-color', '-detailed-exitcode', '-out', plan_path]
+
+    if state == "planned":
+        for c in local_command[1:]:
+            plan_command.insert(2, c)
+
+    if state == "present":
+        for a in APPLY_ARGS:
+            local_command.remove(a)
+        for c in local_command[1:]:
+            plan_command.insert(2, c)
 
     for t in targets:
         plan_command.extend(['-target', t])
@@ -461,7 +473,7 @@ def main():
             module.fail_json(msg='Could not find plan_file "{0}", check the path and try again.'.format(plan_file))
     else:
         plan_file, needs_application, out, err, command = build_plan(command, project_path, variables_args, state_file,
-                                                                     module.params.get('targets'), state, plan_file)
+                                                                     module.params.get('targets'), state, APPLY_ARGS, plan_file)
         if state == 'present' and check_destroy and '- destroy' in out:
             module.fail_json(msg="Aborting command because it would destroy some resources. "
                                  "Consider switching the 'check_destroy' to false to suppress this error")
