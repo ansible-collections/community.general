@@ -100,6 +100,18 @@ options:
     type: bool
     default: false
     version_added: 3.7.0
+  hostinterface_config:
+    required: false
+    description:
+      - Setting dict of HostInterface on OOB controller.
+    type: dict
+    version_added: '4.1.0'
+  hostinterface_id:
+    required: false
+    description:
+      - Redfish HostInterface instance ID if multiple HostInterfaces are present.
+    type: str
+    version_added: '4.1.0'
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''
@@ -201,6 +213,27 @@ EXAMPLES = '''
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+
+  - name: Disable Host Interface
+    community.general.redfish_config:
+      category: Manager
+      command: SetHostInterface
+      hostinterface_config:
+        InterfaceEnabled: false
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+  - name: Enable Host Interface for HostInterface resource ID '2'
+    community.general.redfish_config:
+      category: Manager
+      command: SetHostInterface
+      hostinterface_config:
+        InterfaceEnabled: true
+      hostinterface_id: "2"
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
 '''
 
 RETURN = '''
@@ -220,7 +253,7 @@ from ansible.module_utils.common.text.converters import to_native
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["SetBiosDefaultSettings", "SetBiosAttributes", "SetBootOrder",
                 "SetDefaultBootOrder"],
-    "Manager": ["SetNetworkProtocols", "SetManagerNic"]
+    "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface"]
 }
 
 
@@ -248,6 +281,8 @@ def main():
                 default={}
             ),
             strip_etag_quotes=dict(type='bool', default=False),
+            hostinterface_config=dict(type='dict', default={}),
+            hostinterface_id=dict(),
         ),
         required_together=[
             ('username', 'password'),
@@ -287,6 +322,12 @@ def main():
 
     # Etag options
     strip_etag_quotes = module.params['strip_etag_quotes']
+
+    # HostInterface config options
+    hostinterface_config = module.params['hostinterface_config']
+
+    # HostInterface instance ID
+    hostinterface_id = module.params['hostinterface_id']
 
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
@@ -331,6 +372,8 @@ def main():
                 result = rf_utils.set_network_protocols(module.params['network_protocols'])
             elif command == "SetManagerNic":
                 result = rf_utils.set_manager_nic(nic_addr, nic_config)
+            elif command == "SetHostInterface":
+                result = rf_utils.set_hostinterface_attributes(hostinterface_config, hostinterface_id)
 
     # Return data back or fail with proper message
     if result['ret'] is True:
