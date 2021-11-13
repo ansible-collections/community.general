@@ -1,3 +1,4 @@
+.azure-pipelines/scripts/publish-codecov.py replace-urlopen
 plugins/module_utils/compat/ipaddress.py no-assert
 plugins/module_utils/compat/ipaddress.py no-unicode-literals
 plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
