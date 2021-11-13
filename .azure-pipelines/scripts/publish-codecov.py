@@ -4,7 +4,6 @@ Upload code coverage reports to codecov.io.
 Multiple coverage files from multiple languages are accepted and aggregated after upload.
 Python coverage, as well as PowerShell and Python stubs can all be uploaded.
 """
-from __future__ import annotations
 
 import argparse
 import dataclasses
@@ -61,12 +60,9 @@ def upload_files(codecov_bin: pathlib.Path, files: t.Tuple[CoverageFile, ...], d
     for file in files:
         cmd = [
             str(codecov_bin),
-            '--name',
-            file.name,
-            '--file',
-            str(file.path),
+            '--name', file.name,
+            '--file', str(file.path),
         ]
-
         for flag in file.flags:
             cmd.extend(['--flags', flag])
 
@@ -92,7 +88,7 @@ def download_file(url: str, dest: pathlib.Path, flags: int, dry_run: bool = Fals
 
 def main():
     args = parse_args()
-    url = 'https://ci-files.testing.ansible.com/codecov/linux/codecov'
+    url = 'https://ansible-ci-files.s3.amazonaws.com/codecov/linux/codecov'
     with tempfile.TemporaryDirectory(prefix='codecov-') as tmpdir:
         codecov_bin = pathlib.Path(tmpdir) / 'codecov'
         download_file(url, codecov_bin, 0o755, args.dry_run)
