@@ -80,7 +80,7 @@ options:
       - youtrack
   params:
     description:
-      - The description of the integration, see documentation at U(https://docs.gitlab.com/ee/api/services.html).
+      - The description of the integration, see documentation at U(https://docs.gitlab.com/ee/api/integrations.html).
     type: dict
   events:
     description:
