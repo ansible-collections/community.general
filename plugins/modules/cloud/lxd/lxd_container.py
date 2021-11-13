@@ -346,7 +346,7 @@ addresses:
   type: dict
   sample: {"eth0": ["10.155.92.191"]}
 old_state:
-  description: The old state of the instance
+  description: The old state of the instance.
   returned: when state is started or restarted
   type: str
   sample: "stopped"
