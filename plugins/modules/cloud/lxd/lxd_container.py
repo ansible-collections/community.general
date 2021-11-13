@@ -341,7 +341,7 @@ EXAMPLES = '''
 
 RETURN = '''
 addresses:
-  description: Mapping from the network device name to a list of IPv4 addresses in the instance
+  description: Mapping from the network device name to a list of IPv4 addresses in the instance.
   returned: when state is started or restarted
   type: dict
   sample: {"eth0": ["10.155.92.191"]}
@@ -419,7 +419,7 @@ class LXDContainerManagement(object):
 
         # LXD Rest API provides additional endpoints for creating containers and virtual-machines.
         self.api_endpoint = None
-        if self.type == 'container' or self.type is None:
+        if self.type == 'container':
             self.api_endpoint = '/1.0/containers'
         elif self.type == 'virtual-machine':
             self.api_endpoint = '/1.0/virtual-machines'
