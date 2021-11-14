@@ -71,7 +71,8 @@ class TestGitlabGroup(GitlabModuleTestCase):
                                               'description': "An interesting group",
                                               'project_creation_level': "developer",
                                               'subgroup_creation_level': "maintainer",
-                                              'require_two_factor_authentication': True})
+                                              'require_two_factor_authentication': True,
+                                              })
 
         self.assertEqual(type(group), Group)
         self.assertEqual(group.name, "Foobar Group")
@@ -88,7 +89,8 @@ class TestGitlabGroup(GitlabModuleTestCase):
                                               'path': "bar-foo",
                                               'parent_id': 1,
                                               'project_creation_level': "noone",
-                                              'require_two_factor_authentication': True})
+                                              'require_two_factor_authentication': True,
+                                              })
 
         self.assertEqual(type(group), Group)
         self.assertEqual(group.name, "BarFoo Group")
@@ -104,7 +106,8 @@ class TestGitlabGroup(GitlabModuleTestCase):
         changed, newGroup = self.moduleUtil.update_group(group, {'name': "BarFoo Group",
                                                                  'visibility': "private",
                                                                  'project_creation_level': "maintainer",
-                                                                 'require_two_factor_authentication': True})
+                                                                 'require_two_factor_authentication': True,
+                                                                 })
 
         self.assertEqual(changed, True)
         self.assertEqual(newGroup.name, "BarFoo Group")

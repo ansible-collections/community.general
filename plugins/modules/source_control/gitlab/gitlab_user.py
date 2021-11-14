@@ -681,7 +681,8 @@ def main():
                                              "isadmin": user_isadmin,
                                              "external": user_external,
                                              "identities": user_identities,
-                                             "overwrite_identities": overwrite_identities}):
+                                             "overwrite_identities": overwrite_identities,
+                                             }):
             module.exit_json(changed=True, msg="Successfully created or updated the user %s" % user_username, user=gitlab_user.user_object._attrs)
         else:
             module.exit_json(changed=False, msg="No need to update the user %s" % user_username, user=gitlab_user.user_object._attrs)

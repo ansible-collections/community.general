@@ -208,7 +208,8 @@ class GitLabHook(object):
                 'pipeline_events': options['pipeline_events'],
                 'wiki_page_events': options['wiki_page_events'],
                 'enable_ssl_verification': options['enable_ssl_verification'],
-                'token': options['token']})
+                'token': options['token'],
+                })
             changed = True
         else:
             changed, hook = self.update_hook(self.hook_object, {
@@ -222,7 +223,8 @@ class GitLabHook(object):
                 'pipeline_events': options['pipeline_events'],
                 'wiki_page_events': options['wiki_page_events'],
                 'enable_ssl_verification': options['enable_ssl_verification'],
-                'token': options['token']})
+                'token': options['token'],
+                })
 
         self.hook_object = hook
         if changed:
@@ -376,7 +378,8 @@ def main():
                                              "pipeline_events": pipeline_events,
                                              "wiki_page_events": wiki_page_events,
                                              "enable_ssl_verification": enable_ssl_verification,
-                                             "token": hook_token}):
+                                             "token": hook_token,
+                                             }):
 
             module.exit_json(changed=True, msg="Successfully created or updated the hook %s" % hook_url, hook=gitlab_hook.hook_object._attrs)
         else:
