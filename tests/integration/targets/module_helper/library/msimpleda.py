@@ -45,7 +45,8 @@ class MSimpleDA(DeprecateAttrsMixin, ModuleHelper):
             msg="Attribute attr2 is deprecated",
             version="9.9.9",
             collection_name="community.general",
-            target=self.__class__
+            target=self.__class__,
+            module=self.module,
         )
 
     def __run__(self):

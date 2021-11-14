@@ -6,13 +6,11 @@
     a: 1
   register: simple1
 
-# - name: assert simple1
-#   assert:
-#     that:
-#       - simple1.a == 80
-#       - simple1.abc == "abc"
-#       - simple1 is not changed
-#       - simple1.value is none
+- name: assert simple1
+  assert:
+    that:
+      - simple1.a == 1
+      - simple1.attr1 == "abc"
 
 - name: test msimpleda 2
   msimpleda:
@@ -21,12 +19,11 @@
   vars:
     ansible_deprecation_warnings: yes
 
-# - name: assert simple2
-#   assert:
-#     that:
-#       - simple2.a == 101
-#       - 'simple2.msg == "Module failed with exception: a >= 100"'
-#       - simple2.abc == "abc"
-#       - simple2 is failed
-#       - simple2 is not changed
-#       - simple2.value is none
+- name: assert simple2
+  assert:
+    that:
+      - simple2.a == 2
+      - simple2.attr2 == "def"
+      - '"deprecations" in simple2'
+      - (simple2.deprecations|first).msg == "Attribute attr2 is deprecated"
+      - (simple2.deprecations|first).version == "9.9.9"
