@@ -170,9 +170,13 @@ class GitlabGroupVariables(object):
     def create_variable(self, key, value, masked, protected, variable_type):
         if self._module.check_mode:
             return
-        return self.group.variables.create({"key": key, "value": value,
-                                            "masked": masked, "protected": protected,
-                                            "variable_type": variable_type})
+        return self.group.variables.create({
+            "key": key,
+            "value": value,
+            "masked": masked,
+            "protected": protected,
+            "variable_type": variable_type,
+        })
 
     def update_variable(self, key, var, value, masked, protected, variable_type):
         if var.value == value and var.protected == protected and var.masked == masked and var.variable_type == variable_type:
@@ -226,11 +230,14 @@ def native_python_main(this_gitlab, purge, var_list, state, module):
             existing_variables[index] = None
 
             if state == 'present':
-                single_change = this_gitlab.update_variable(key,
-                                                            gitlab_keys[index],
-                                                            value, masked,
-                                                            protected,
-                                                            variable_type)
+                single_change = this_gitlab.update_variable(
+                    key,
+                    gitlab_keys[index],
+                    value,
+                    masked,
+                    protected,
+                    variable_type,
+                )
                 change = single_change or change
                 if single_change:
                     return_value['updated'].append(key)

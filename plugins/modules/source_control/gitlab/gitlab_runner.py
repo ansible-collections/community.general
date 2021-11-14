@@ -218,7 +218,7 @@ class GitLabRunner(object):
                 'run_untagged': options['run_untagged'],
                 'maximum_timeout': options['maximum_timeout'],
                 'tag_list': options['tag_list'],
-                })
+            })
             changed = True
         else:
             changed, runner = self.update_runner(self.runner_object, {
@@ -228,7 +228,7 @@ class GitLabRunner(object):
                 'maximum_timeout': options['maximum_timeout'],
                 'access_level': options['access_level'],
                 'tag_list': options['tag_list'],
-                })
+            })
 
         self.runner_object = runner
         if changed:
@@ -391,14 +391,14 @@ def main():
 
     if state == 'present':
         if gitlab_runner.create_or_update_runner(runner_description, {
-                                                 "active": runner_active,
-                                                 "tag_list": tag_list,
-                                                 "run_untagged": run_untagged,
-                                                 "locked": runner_locked,
-                                                 "access_level": access_level,
-                                                 "maximum_timeout": maximum_timeout,
-                                                 "registration_token": registration_token,
-                                                 }):
+            "active": runner_active,
+            "tag_list": tag_list,
+            "run_untagged": run_untagged,
+            "locked": runner_locked,
+            "access_level": access_level,
+            "maximum_timeout": maximum_timeout,
+            "registration_token": registration_token,
+        }):
             module.exit_json(changed=True, runner=gitlab_runner.runner_object._attrs,
                              msg="Successfully created or updated the runner %s" % runner_description)
         else:

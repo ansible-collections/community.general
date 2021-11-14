@@ -172,7 +172,7 @@ class GitlabProjectVariables(object):
         var = {
             "key": key, "value": value,
             "masked": masked, "protected": protected,
-            "variable_type": variable_type
+            "variable_type": variable_type,
         }
         if environment_scope is not None:
             var["environment_scope"] = environment_scope

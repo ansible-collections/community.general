@@ -366,14 +366,14 @@ def main():
 
     if state == 'present':
         if gitlab_group.create_or_update_group(group_name, parent_group, {
-                                               "path": group_path,
-                                               "description": description,
-                                               "visibility": group_visibility,
-                                               "project_creation_level": project_creation_level,
-                                               "auto_devops_enabled": auto_devops_enabled,
-                                               "subgroup_creation_level": subgroup_creation_level,
-                                               "require_two_factor_authentication": require_two_factor_authentication,
-                                               }):
+            "path": group_path,
+            "description": description,
+            "visibility": group_visibility,
+            "project_creation_level": project_creation_level,
+            "auto_devops_enabled": auto_devops_enabled,
+            "subgroup_creation_level": subgroup_creation_level,
+            "require_two_factor_authentication": require_two_factor_authentication,
+        }):
             module.exit_json(changed=True, msg="Successfully created or updated the group %s" % group_name, group=gitlab_group.group_object._attrs)
         else:
             module.exit_json(changed=False, msg="No need to update the group %s" % group_name, group=gitlab_group.group_object._attrs)

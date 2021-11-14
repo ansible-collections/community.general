@@ -288,7 +288,7 @@ def main():
         'reporter': gitlab.REPORTER_ACCESS,
         'developer': gitlab.DEVELOPER_ACCESS,
         'maintainer': gitlab.MAINTAINER_ACCESS,
-        'owner': gitlab.OWNER_ACCESS
+        'owner': gitlab.OWNER_ACCESS,
     }
 
     gitlab_group = module.params['gitlab_group']
