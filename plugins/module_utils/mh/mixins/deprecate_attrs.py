@@ -34,7 +34,7 @@ class DeprecateAttrsMixin(object):
             setattr(target, trigger_attr, {})
         value_dict = getattr(target, value_attr)
         trigger_dict = getattr(target, trigger_attr)
-        return target,module,value_dict,trigger_dict
+        return target, module, value_dict, trigger_dict
 
     def _deprecate_attr(self, attr, msg, version=None, date=None, collection_name=None, target=None, value=None, module=None):
         target, module, value_dict, trigger_dict = self._deprecate_setup(attr, target, module)
