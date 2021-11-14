@@ -72,6 +72,12 @@ options:
     type: str
     default: 'https://api.github.com'
     version_added: "3.5.0"
+  force_defaults:
+    description:
+    - Overwrite current repository attributes with defaults if not set.
+    type: bool
+    default: true
+    required: false
 requirements:
 - PyGithub>=1.54
 notes:
@@ -92,6 +98,7 @@ EXAMPLES = '''
     description: "Just for fun"
     private: yes
     state: present
+    force_defaults: no
   register: result
 
 - name: Delete the repository
@@ -198,6 +205,10 @@ def delete_repo(gh, name, organization=None, check_mode=False):
 
 
 def run_module(params, check_mode=False):
+    if params['force_defaults']:
+        params['description'] = params.get('description') or ''
+        params['private'] = params.get('private') or False
+
     gh = authenticate(
         username=params['username'], password=params['password'], access_token=params['access_token'],
         api_url=params['api_url'])
@@ -231,6 +242,7 @@ def main():
         private=dict(type='bool'),
         description=dict(type='str'),
         api_url=dict(type='str', required=False, default='https://api.github.com'),
+        force_defaults=dict(type='bool', default=True),
     )
     module = AnsibleModule(
         argument_spec=module_args,

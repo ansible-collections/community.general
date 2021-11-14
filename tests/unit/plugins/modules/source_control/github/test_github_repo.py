@@ -182,7 +182,8 @@ class TestGithubRepo(unittest.TestCase):
             "description": "Just for fun",
             "private": False,
             "state": "present",
-            "api_url": "https://api.github.com"
+            "api_url": "https://api.github.com",
+            "force_defaults": False,
         })
 
         self.assertEqual(result['changed'], True)
@@ -202,7 +203,8 @@ class TestGithubRepo(unittest.TestCase):
             "description": None,
             "private": None,
             "state": "present",
-            "api_url": "https://api.github.com"
+            "api_url": "https://api.github.com",
+            "force_defaults": False,
         })
 
         self.assertEqual(result['changed'], True)
@@ -222,7 +224,8 @@ class TestGithubRepo(unittest.TestCase):
             "description": "Just for fun",
             "private": True,
             "state": "present",
-            "api_url": "https://api.github.com"
+            "api_url": "https://api.github.com",
+            "force_defaults": False,
         })
         self.assertEqual(result['changed'], True)
         self.assertEqual(result['repo']['private'], True)
@@ -240,7 +243,8 @@ class TestGithubRepo(unittest.TestCase):
             "description": "Just for fun",
             "private": True,
             "state": "present",
-            "api_url": "https://api.github.com"
+            "api_url": "https://api.github.com",
+            "force_defaults": False,
         })
         self.assertEqual(result['changed'], True)
         self.assertEqual(result['repo']['private'], True)
@@ -257,7 +261,8 @@ class TestGithubRepo(unittest.TestCase):
             "description": None,
             "private": None,
             "state": "present",
-            "api_url": "https://api.github.com"
+            "api_url": "https://api.github.com",
+            "force_defaults": False,
         })
         self.assertEqual(result['changed'], False)
         self.assertEqual(result['repo']['private'], True)
@@ -276,7 +281,8 @@ class TestGithubRepo(unittest.TestCase):
             "description": "Just for fun",
             "private": False,
             "state": "absent",
-            "api_url": "https://api.github.com"
+            "api_url": "https://api.github.com",
+            "force_defaults": False,
         })
         self.assertEqual(result['changed'], True)
 
@@ -293,7 +299,8 @@ class TestGithubRepo(unittest.TestCase):
             "description": "Just for fun",
             "private": False,
             "state": "absent",
-            "api_url": "https://api.github.com"
+            "api_url": "https://api.github.com",
+            "force_defaults": False,
         })
         self.assertEqual(result['changed'], True)
 
@@ -310,7 +317,8 @@ class TestGithubRepo(unittest.TestCase):
             "description": "Just for fun",
             "private": True,
             "state": "absent",
-            "api_url": "https://api.github.com"
+            "api_url": "https://api.github.com",
+            "force_defaults": False,
         })
         self.assertEqual(result['changed'], False)
 
