@@ -72,7 +72,8 @@ options:
             - The IPv4 address to this interface.
             - Use the format C(192.0.2.24/24).
             - If defined and I(method4) is not specified, automatically set C(ipv4.method) to C(manual).
-        type: str
+        type: list
+        elements: str
     gw4:
         description:
             - The IPv4 gateway for this interface.
@@ -1468,7 +1469,8 @@ class Nmcli(object):
                        'ipv6.ignore-auto-routes',
                        '802-11-wireless.hidden'):
             return bool
-        elif setting in ('ipv4.dns',
+        elif setting in ('ipv4.addresses',
+                         'ipv4.dns',
                          'ipv4.dns-search',
                          'ipv4.routes',
                          'ipv4.routing-rules',
@@ -1758,7 +1760,7 @@ def main():
                           'wifi',
                           'gsm',
                       ]),
-            ip4=dict(type='str'),
+            ip4=dict(type='list', elements='str'),
             gw4=dict(type='str'),
             gw4_ignore_auto=dict(type='bool', default=False),
             routes4=dict(type='list', elements='str'),
