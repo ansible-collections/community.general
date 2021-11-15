@@ -18,7 +18,7 @@ redis_bin:
   CentOS: /usr/bin/redis-server
   FreeBSD: /usr/local/bin/redis-server
 
-redis_module: "{{ (ansible_python_version is version('2.7', '>=')) | ternary('redis', 'redis==2.10.6') }}"
+redis_module: redis
 
 redis_password: PASS
 
