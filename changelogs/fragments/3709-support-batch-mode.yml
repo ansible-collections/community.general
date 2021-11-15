@@ -1,0 +1,2 @@
+bugfixes:
+  - counter_enabled - fix output to correctly display host and task counters (https://github.com/ansible-collections/community.general/pull/3709).
