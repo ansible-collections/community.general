@@ -481,6 +481,8 @@ def main():
                     result["log"] = rf_utils.get_logs()
                 elif command == "GetNetworkProtocols":
                     result["network_protocols"] = rf_utils.get_network_protocols()
+                elif command == "GetHealthReport":
+                    result["health_report"] = rf_utils.get_multi_manager_health_report()
                 elif command == "GetHostInterfaces":
                     result["host_interfaces"] = rf_utils.get_hostinterfaces()
 
