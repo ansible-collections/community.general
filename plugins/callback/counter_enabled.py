@@ -45,6 +45,8 @@ class CallbackModule(CallbackBase):
     _task_total = 0
     _host_counter = 1
     _host_total = 0
+    _current_batch_total = 0
+    _previous_batch_total = 0
 
     def __init__(self):
         super(CallbackModule, self).__init__()
@@ -76,8 +78,11 @@ class CallbackModule(CallbackBase):
         self._display.banner(msg)
         self._play = play
 
+        self._previous_batch_total = self._current_batch_total
+        self._current_batch_total = self._previous_batch_total + len(self._all_vars()['vars']['ansible_play_batch'])
         self._host_total = len(self._all_vars()['vars']['ansible_play_hosts_all'])
         self._task_total = len(self._play.get_tasks()[0])
+        self._task_counter = 1
 
     def v2_playbook_on_stats(self, stats):
         self._display.banner("PLAY RECAP")
@@ -145,7 +150,7 @@ class CallbackModule(CallbackBase):
             path = task.get_path()
             if path:
                 self._display.display("task path: %s" % path, color=C.COLOR_DEBUG)
-        self._host_counter = 0
+        self._host_counter = self._previous_batch_total
         self._task_counter += 1
 
     def v2_runner_on_ok(self, result):
