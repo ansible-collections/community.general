@@ -149,21 +149,20 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
-    sample: "Role myrole has been updated"
+  description: Message as to what action was taken
+  returned: always
+  type: str
+  sample: "Role myrole has been updated"
 
 proposed:
-    description: Representation of proposed role.
+    description: Role representation of proposed changes to role
     returned: always
     type: dict
     sample: {
         "description": "My updated test description"
     }
-
 existing:
-    description: Representation of existing role.
+    description: Role representation of existing role
     returned: always
     type: dict
     sample: {
@@ -175,10 +174,9 @@ existing:
         "id": "561703dd-0f38-45ff-9a5a-0c978f794547",
         "name": "myrole"
     }
-
 end_state:
-    description: Representation of role after module execution (sample is truncated).
-    returned: on success
+    description: Role representation of role after module execution (sample is truncated)
+    returned: always
     type: dict
     sample: {
         "attributes": {},
@@ -203,7 +201,6 @@ def main():
     :return:
     """
     argument_spec = keycloak_argument_spec()
-
     meta_args = dict(
         state=dict(type='str', default='present', choices=['present', 'absent']),
         name=dict(type='str', required=True),
@@ -242,22 +239,22 @@ def main():
         for key, val in module.params['attributes'].items():
             module.params['attributes'][key] = [val] if not isinstance(val, list) else val
 
-    # Filter and map the parameters names that apply to the role
+    # convert module parameters to client representation parameters (if they belong in there)
     role_params = [x for x in module.params
                    if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'client_id', 'composites'] and
                    module.params.get(x) is not None]
 
-    # See if it already exists in Keycloak
+    # does the role already exist?
     if clientid is None:
         before_role = kc.get_realm_role(name, realm)
     else:
         before_role = kc.get_client_role(name, clientid, realm)
 
     if before_role is None:
-        before_role = {}
+        before_role = dict()
 
-    # Build a proposed changeset from parameters given to this module
-    changeset = {}
+    # build a changeset
+    changeset = dict()
 
     for param in role_params:
         new_param_value = module.params.get(param)
@@ -265,42 +262,42 @@ def main():
         if new_param_value != old_value:
             changeset[camel(param)] = new_param_value
 
-    # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
-    desired_role = before_role.copy()
-    desired_role.update(changeset)
+    # prepare the new role
+    updated_role = before_role.copy()
+    updated_role.update(changeset)
 
     result['proposed'] = changeset
     result['existing'] = before_role
 
-    # Cater for when it doesn't exist (an empty dict)
-    if not before_role:
+    # if before_role is none, the role doesn't exist.
+    if before_role == dict():
         if state == 'absent':
-            # Do nothing and exit
+            # nothing to do.
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
-            result['end_state'] = {}
-            result['msg'] = 'Role does not exist, doing nothing.'
+            result['end_state'] = dict()
+            result['msg'] = 'Role does not exist; doing nothing.'
             module.exit_json(**result)
 
-        # Process a creation
+        # for 'present', create a new role.
         result['changed'] = True
 
         if name is None:
             module.fail_json(msg='name must be specified when creating a new role')
 
         if module._diff:
-            result['diff'] = dict(before='', after=desired_role)
+            result['diff'] = dict(before='', after=updated_role)
 
         if module.check_mode:
             module.exit_json(**result)
 
-        # create it
+        # do it for real!
         if clientid is None:
-            kc.create_realm_role(desired_role, realm)
+            kc.create_realm_role(updated_role, realm)
             after_role = kc.get_realm_role(name, realm)
         else:
-            kc.create_client_role(desired_role, clientid, realm)
+            kc.create_client_role(updated_role, clientid, realm)
             after_role = kc.get_client_role(name, clientid, realm)
 
         result['end_state'] = after_role
@@ -310,30 +307,28 @@ def main():
 
     else:
         if state == 'present':
-            # Process an update
-
             # no changes
-            if desired_role == before_role:
+            if updated_role == before_role:
                 result['changed'] = False
-                result['end_state'] = desired_role
+                result['end_state'] = updated_role
                 result['msg'] = "No changes required to role {name}.".format(name=name)
                 module.exit_json(**result)
 
-            # doing an update
+            # update the existing role
             result['changed'] = True
 
             if module._diff:
-                result['diff'] = dict(before=before_role, after=desired_role)
+                result['diff'] = dict(before=before_role, after=updated_role)
 
             if module.check_mode:
                 module.exit_json(**result)
 
             # do the update
             if clientid is None:
-                kc.update_realm_role(desired_role, realm)
+                kc.update_realm_role(updated_role, realm)
                 after_role = kc.get_realm_role(name, realm)
             else:
-                kc.update_client_role(desired_role, clientid, realm)
+                kc.update_client_role(updated_role, clientid, realm)
                 after_role = kc.get_client_role(name, clientid, realm)
 
             result['end_state'] = after_role
@@ -341,8 +336,7 @@ def main():
             result['msg'] = "Role {name} has been updated".format(name=name)
             module.exit_json(**result)
 
-        else:
-            # Process a deletion (because state was not 'present')
+        elif state == 'absent':
             result['changed'] = True
 
             if module._diff:
@@ -351,15 +345,16 @@ def main():
             if module.check_mode:
                 module.exit_json(**result)
 
-            # delete it
+            # delete for real
             if clientid is None:
                 kc.delete_realm_role(name, realm)
             else:
                 kc.delete_client_role(name, clientid, realm)
 
-            result['end_state'] = {}
+            result['end_state'] = dict()
 
             result['msg'] = "Role {name} has been deleted".format(name=name)
+            module.exit_json(**result)
 
     module.exit_json(**result)
 

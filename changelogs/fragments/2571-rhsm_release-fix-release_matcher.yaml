@@ -1,0 +1,2 @@
+bugfixes:
+  - rhsm_release - fix the issue that module considers 8, 7Client and 7Workstation as invalid releases (https://github.com/ansible-collections/community.general/pull/2571).

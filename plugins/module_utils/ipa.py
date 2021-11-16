@@ -31,7 +31,6 @@ def _env_then_dns_fallback(*args, **kwargs):
         result = env_fallback(*args, **kwargs)
         if result == '':
             raise AnsibleFallbackNotFound
-        return result
     except AnsibleFallbackNotFound:
         # If no host was given, we try to guess it from IPA.
         # The ipa-ca entry is a standard entry that IPA will have set for
@@ -179,10 +178,10 @@ class IPAClient(object):
                 result.append(key)
         return result
 
-    def modify_if_diff(self, name, ipa_list, module_list, add_method, remove_method, item=None, append=None):
+    def modify_if_diff(self, name, ipa_list, module_list, add_method, remove_method, item=None):
         changed = False
         diff = list(set(ipa_list) - set(module_list))
-        if append is not True and len(diff) > 0:
+        if len(diff) > 0:
             changed = True
             if not self.module.check_mode:
                 if item:

@@ -1,0 +1,4 @@
+---
+- name: Install
+  pip:
+    name: infoblox-client

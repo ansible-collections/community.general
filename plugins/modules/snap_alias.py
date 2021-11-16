@@ -1,1 +1,0 @@
-packaging/os/snap_alias.py

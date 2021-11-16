@@ -1,0 +1,4 @@
+minor_changes:
+  - redfish_utils module utils - modified set_bios_attributes function to skip invalid attribute instead of returning. Added skipped attributes to output (https://github.com/ansible-collections/community.general/issues/1995).
+  - idrac_redfish_config - modified set_manager_attributes function to skip invalid attribute instead of returning. Added skipped attributes to output. Modified module exit to add warning variable (https://github.com/ansible-collections/community.general/issues/1995).
+  - redfish_config - modified module exit to add warning variable (https://github.com/ansible-collections/community.general/issues/1995).

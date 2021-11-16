@@ -43,8 +43,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- name: Print fetched information about Logical Interconnect Groups
-  ansible.builtin.debug:
+- ansible.builtin.debug:
     msg: "{{ result.logical_interconnect_groups }}"
 
 - name: Gather paginated, filtered and sorted information about Logical Interconnect Groups
@@ -62,8 +61,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- name: Print fetched information about paginated, filtered and sorted list of Logical Interconnect Groups
-  ansible.builtin.debug:
+- ansible.builtin.debug:
     msg: "{{ result.logical_interconnect_groups }}"
 
 - name: Gather information about a Logical Interconnect Group by name
@@ -77,8 +75,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- name: Print fetched information about Logical Interconnect Group found by name
-  ansible.builtin.debug:
+- ansible.builtin.debug:
     msg: "{{ result.logical_interconnect_groups }}"
 '''
 

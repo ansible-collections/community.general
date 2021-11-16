@@ -47,9 +47,7 @@ EXAMPLES = '''
     api_version: 500
   delegate_to: localhost
   register: result
-
-- name: Print fetched information about Data Centers
-  ansible.builtin.debug:
+- ansible.builtin.debug:
     msg: "{{ result.datacenters }}"
 
 - name: Gather paginated, filtered and sorted information about Data Centers
@@ -64,9 +62,7 @@ EXAMPLES = '''
       sort: 'name:descending'
       filter: 'state=Unmanaged'
   register: result
-
-- name: Print fetched information about paginated, filtered and sorted list of Data Centers
-  ansible.builtin.debug:
+- ansible.builtin.debug:
     msg: "{{ result.datacenters }}"
 
 - name: Gather information about a Data Center by name
@@ -78,9 +74,7 @@ EXAMPLES = '''
     name: "My Data Center"
   delegate_to: localhost
   register: result
-
-- name: Print fetched information about Data Center found by name
-  ansible.builtin.debug:
+- ansible.builtin.debug:
     msg: "{{ result.datacenters }}"
 
 - name: Gather information about the Data Center Visual Content
@@ -94,13 +88,9 @@ EXAMPLES = '''
       - visualContent
   delegate_to: localhost
   register: result
-
-- name: Print fetched information about Data Center found by name
-  ansible.builtin.debug:
+- ansible.builtin.debug:
     msg: "{{ result.datacenters }}"
-
-- name: Print fetched information about Data Center Visual Content
-  ansible.builtin.debug:
+- ansible.builtin.debug:
     msg: "{{ result.datacenter_visual_content }}"
 '''
 

@@ -48,7 +48,7 @@ options:
         type: str
     project:
         description:
-            - The name (or full path) of the GitLab project the member is added to/removed from.
+            - The name of the GitLab project the member is added to/removed from.
         required: true
         type: str
     gitlab_user:
@@ -194,13 +194,9 @@ class GitLabProjectMembers(object):
         self._gitlab = gl
 
     def get_project(self, project_name):
-        try:
-            project_exists = self._gitlab.projects.get(project_name)
-            return project_exists.id
-        except gitlab.exceptions.GitlabGetError as e:
-            project_exists = self._gitlab.projects.list(search=project_name)
-            if project_exists:
-                return project_exists[0].id
+        project_exists = self._gitlab.projects.list(search=project_name)
+        if project_exists:
+            return project_exists[0].id
 
     def get_user_id(self, gitlab_user):
         user_exists = self._gitlab.users.list(username=gitlab_user)

@@ -1,0 +1,2 @@
+minor_changes:
+  - pacman - add ``executable`` option to use an alternative pacman binary (https://github.com/ansible-collections/community.general/issues/2524).

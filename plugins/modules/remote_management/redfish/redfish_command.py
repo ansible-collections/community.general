@@ -307,7 +307,7 @@ EXAMPLES = '''
     community.general.redfish_command:
       category: Systems
       command: SetOneTimeBoot
-      boot_next: BiosSetup
+      bootnext: BiosSetup
       boot_override_mode: Legacy
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"

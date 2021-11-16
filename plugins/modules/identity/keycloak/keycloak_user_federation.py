@@ -182,7 +182,7 @@ options:
                 description:
                     - For one level, the search applies only for users in the DNs specified by User DNs.
                       For subtree, the search applies to the whole subtree. See LDAP documentation for
-                      more details.
+                      more details
                 default: '1'
                 type: str
                 choices:
@@ -551,7 +551,7 @@ msg:
     sample: "No changes required to user federation 164bb483-c613-482e-80fe-7f1431308799."
 
 proposed:
-    description: Representation of proposed user federation.
+    description: Representation of proposed changes to user federation.
     returned: always
     type: dict
     sample: {
@@ -648,7 +648,7 @@ existing:
 
 end_state:
     description: Representation of user federation after module execution.
-    returned: on success
+    returned: always
     type: dict
     sample: {
         "config": {
@@ -668,6 +668,7 @@ end_state:
         "providerId": "kerberos",
         "providerType": "org.keycloak.storage.UserStorageProvider"
     }
+
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
@@ -807,12 +808,12 @@ def main():
                 mapper['config'] = dict((k, [str(v).lower() if not isinstance(v, str) else v])
                                         for k, v in mapper['config'].items() if mapper['config'][k] is not None)
 
-    # Filter and map the parameters names that apply
+    # convert module parameters to client representation parameters (if they belong in there)
     comp_params = [x for x in module.params
                    if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm', 'mappers'] and
                    module.params.get(x) is not None]
 
-    # See if it already exists in Keycloak
+    # does the user federation already exist?
     if cid is None:
         found = kc.get_components(urlencode(dict(type='org.keycloak.storage.UserStorageProvider', parent=realm, name=name)), realm)
         if len(found) > 1:
@@ -824,14 +825,14 @@ def main():
         before_comp = kc.get_component(cid, realm)
 
     if before_comp is None:
-        before_comp = {}
+        before_comp = dict()
 
     # if user federation exists, get associated mappers
     if cid is not None:
         before_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name'))
 
-    # Build a proposed changeset from parameters given to this module
-    changeset = {}
+    # build a changeset
+    changeset = dict()
 
     for param in comp_params:
         new_param_value = module.params.get(param)
@@ -850,11 +851,11 @@ def main():
             if change.get('id') is None and change.get('name') is None:
                 module.fail_json(msg='Either `name` or `id` has to be specified on each mapper.')
             if cid is None:
-                old_mapper = {}
+                old_mapper = dict()
             elif change.get('id') is not None:
                 old_mapper = kc.get_component(change['id'], realm)
                 if old_mapper is None:
-                    old_mapper = {}
+                    old_mapper = dict()
             else:
                 found = kc.get_components(urlencode(dict(parent=cid, name=change['name'])), realm)
                 if len(found) > 1:
@@ -862,7 +863,7 @@ def main():
                 if len(found) == 1:
                     old_mapper = found[0]
                 else:
-                    old_mapper = {}
+                    old_mapper = dict()
             new_mapper = old_mapper.copy()
             new_mapper.update(change)
             if new_mapper != old_mapper:
@@ -870,37 +871,37 @@ def main():
                     changeset['mappers'] = list()
                 changeset['mappers'].append(new_mapper)
 
-    # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
-    desired_comp = before_comp.copy()
-    desired_comp.update(changeset)
+    # prepare the new representation
+    updated_comp = before_comp.copy()
+    updated_comp.update(changeset)
 
     result['proposed'] = sanitize(changeset)
     result['existing'] = sanitize(before_comp)
 
-    # Cater for when it doesn't exist (an empty dict)
-    if not before_comp:
+    # if before_comp is none, the user federation doesn't exist.
+    if before_comp == dict():
         if state == 'absent':
-            # Do nothing and exit
+            # nothing to do.
             if module._diff:
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
-            result['end_state'] = {}
+            result['end_state'] = dict()
             result['msg'] = 'User federation does not exist; doing nothing.'
             module.exit_json(**result)
 
-        # Process a creation
+        # for 'present', create a new user federation.
         result['changed'] = True
 
         if module._diff:
-            result['diff'] = dict(before='', after=sanitize(desired_comp))
+            result['diff'] = dict(before='', after=sanitize(updated_comp))
 
         if module.check_mode:
             module.exit_json(**result)
 
-        # create it
-        desired_comp = desired_comp.copy()
-        updated_mappers = desired_comp.pop('mappers', [])
-        after_comp = kc.create_component(desired_comp, realm)
+        # do it for real!
+        updated_comp = updated_comp.copy()
+        updated_mappers = updated_comp.pop('mappers', [])
+        after_comp = kc.create_component(updated_comp, realm)
 
         for mapper in updated_mappers:
             if mapper.get('id') is not None:
@@ -918,28 +919,26 @@ def main():
 
     else:
         if state == 'present':
-            # Process an update
-
             # no changes
-            if desired_comp == before_comp:
+            if updated_comp == before_comp:
                 result['changed'] = False
-                result['end_state'] = sanitize(desired_comp)
+                result['end_state'] = sanitize(updated_comp)
                 result['msg'] = "No changes required to user federation {id}.".format(id=cid)
                 module.exit_json(**result)
 
-            # doing an update
+            # update the existing role
             result['changed'] = True
 
             if module._diff:
-                result['diff'] = dict(before=sanitize(before_comp), after=sanitize(desired_comp))
+                result['diff'] = dict(before=sanitize(before_comp), after=sanitize(updated_comp))
 
             if module.check_mode:
                 module.exit_json(**result)
 
             # do the update
-            desired_comp = desired_comp.copy()
-            updated_mappers = desired_comp.pop('mappers', [])
-            kc.update_component(desired_comp, realm)
+            updated_comp = updated_comp.copy()
+            updated_mappers = updated_comp.pop('mappers', [])
+            kc.update_component(updated_comp, realm)
             after_comp = kc.get_component(cid, realm)
 
             for mapper in updated_mappers:
@@ -947,7 +946,7 @@ def main():
                     kc.update_component(mapper, realm)
                 else:
                     if mapper.get('parentId') is None:
-                        mapper['parentId'] = desired_comp['id']
+                        mapper['parentId'] = updated_comp['id']
                     mapper = kc.create_component(mapper, realm)
 
             after_comp['mappers'] = updated_mappers
@@ -957,7 +956,6 @@ def main():
             module.exit_json(**result)
 
         elif state == 'absent':
-            # Process a deletion
             result['changed'] = True
 
             if module._diff:
@@ -966,12 +964,13 @@ def main():
             if module.check_mode:
                 module.exit_json(**result)
 
-            # delete it
+            # delete for real
             kc.delete_component(cid, realm)
 
-            result['end_state'] = {}
+            result['end_state'] = dict()
 
             result['msg'] = "User federation {id} has been deleted".format(id=cid)
+            module.exit_json(**result)
 
     module.exit_json(**result)
 

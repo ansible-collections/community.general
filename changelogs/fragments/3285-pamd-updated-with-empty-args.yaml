@@ -1,0 +1,4 @@
+bugfixes:
+  - pamd - code for ``state=updated`` when dealing with the pam module arguments, made no distinction between ``None`` and an empty list (https://github.com/ansible-collections/community.general/issues/3260).
+minor_changes:
+  - pamd - minor refactorings (https://github.com/ansible-collections/community.general/pull/3285).

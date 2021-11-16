@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - dig lookup plugin - add ``retry_servfail`` option (https://github.com/ansible-collections/community.general/pull/3247).

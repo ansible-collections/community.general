@@ -1605,6 +1605,9 @@ class RedfishUtils(object):
         cur_boot_next = boot.get('BootNext')
         cur_override_mode = boot.get('BootSourceOverrideMode')
 
+        if not boot_override_mode:
+            boot_override_mode = cur_override_mode
+
         if override_enabled == 'Disabled':
             payload = {
                 'Boot': {
@@ -1640,18 +1643,16 @@ class RedfishUtils(object):
                 }
             }
         else:
-            if (cur_enabled == override_enabled and target == bootdevice and
-                    (cur_override_mode == boot_override_mode or not boot_override_mode)):
+            if cur_enabled == override_enabled and target == bootdevice and cur_override_mode == boot_override_mode:
                 # If properties are already set, no changes needed
                 return {'ret': True, 'changed': False}
             payload = {
                 'Boot': {
                     'BootSourceOverrideEnabled': override_enabled,
+                    'BootSourceOverrideMode': boot_override_mode,
                     'BootSourceOverrideTarget': bootdevice
                 }
             }
-            if boot_override_mode:
-                payload['Boot']['BootSourceOverrideMode'] = boot_override_mode
 
         response = self.patch_request(self.root_uri + self.systems_uri, payload)
         if response['ret'] is False:
@@ -2736,9 +2737,7 @@ class RedfishUtils(object):
             if isinstance(set_value, dict):
                 for subprop in payload[property].keys():
                     if subprop not in target_ethernet_current_setting[property]:
-                        # Not configured already; need to apply the request
-                        need_change = True
-                        break
+                        return {'ret': False, 'msg': "Sub-property %s in nic_config is invalid" % subprop}
                     sub_set_value = payload[property][subprop]
                     sub_cur_value = target_ethernet_current_setting[property][subprop]
                     if sub_set_value != sub_cur_value:
@@ -2752,9 +2751,7 @@ class RedfishUtils(object):
                 for i in range(len(set_value)):
                     for subprop in payload[property][i].keys():
                         if subprop not in target_ethernet_current_setting[property][i]:
-                            # Not configured already; need to apply the request
-                            need_change = True
-                            break
+                            return {'ret': False, 'msg': "Sub-property %s in nic_config is invalid" % subprop}
                         sub_set_value = payload[property][i][subprop]
                         sub_cur_value = target_ethernet_current_setting[property][i][subprop]
                         if sub_set_value != sub_cur_value:
@@ -2768,6 +2765,7 @@ class RedfishUtils(object):
             return response
         return {'ret': True, 'changed': True, 'msg': "Modified Manager NIC"}
 
+    # A helper function to get the EthernetInterface URI
     def get_manager_ethernet_uri(self, nic_addr='null'):
         # Get EthernetInterface collection
         response = self.get_request(self.root_uri + self.manager_uri)

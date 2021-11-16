@@ -1,0 +1,6 @@
+---
+bugfixes:
+  - "iptables_state - fix initialization of iptables from null state when adressing
+    more than one table (https://github.com/ansible-collections/community.general/issues/2523)."
+  - "iptables_state - fix a 'FutureWarning' in a regex and do some basic code clean up
+    (https://github.com/ansible-collections/community.general/pull/2525)."

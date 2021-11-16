@@ -131,7 +131,7 @@ def main():
     group = module.params['group']
 
     if group:
-        groups = [proxmox.get_group(groupid=group)]
+        groups = [proxmox.get_group(group=group)]
     else:
         groups = proxmox.get_groups()
     result['proxmox_groups'] = [group.group for group in groups]

@@ -44,7 +44,6 @@
 - name: Install redis module
   pip:
     name: "{{ redis_module }}"
-    extra_args: "-c {{ remote_constraints }}"
     state: present
   notify: cleanup redis
 

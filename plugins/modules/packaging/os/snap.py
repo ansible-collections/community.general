@@ -50,9 +50,6 @@ options:
 author:
     - Victor Carceler (@vcarceler) <vcarceler@iespuigcastellar.xeill.net>
     - Stanislas Lange (@angristan) <angristan@pm.me>
-
-seealso:
-    - module: community.general.snap_alias
 '''
 
 EXAMPLES = '''

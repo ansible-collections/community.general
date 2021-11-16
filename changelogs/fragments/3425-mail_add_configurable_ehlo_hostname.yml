@@ -1,0 +1,2 @@
+minor_changes:
+  - mail - added the ``ehlohost`` parameter which allows for manual override of the host used in SMTP EHLO (https://github.com/ansible-collections/community.general/pull/3425).

@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - archive - fixed incorrect ``state`` result value documentation (https://github.com/ansible-collections/community.general/pull/2816).
+  - archive - fixed ``exclude_path`` values causing incorrect archive root (https://github.com/ansible-collections/community.general/pull/2816).
+  - archive - fixed improper file names for single file zip archives (https://github.com/ansible-collections/community.general/issues/2818).

@@ -1,0 +1,2 @@
+bugfixes:
+  - ssh_config - reduce stormssh searches based on host (https://github.com/ansible-collections/community.general/pull/2568/).

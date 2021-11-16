@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - inventory and vault scripts - change file permissions to make vendored inventory and vault scripts exectuable (https://github.com/ansible-collections/community.general/pull/2337).

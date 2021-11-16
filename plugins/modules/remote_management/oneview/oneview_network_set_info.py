@@ -51,11 +51,10 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- name: Print fetched information about Network Sets
-  ansible.builtin.debug:
+- ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
 
-- name: Gather paginated, filtered and sorted information about Network Sets
+- name: Gather paginated, filtered, and sorted information about Network Sets
   community.general.oneview_network_set_info:
     hostname: 172.16.101.48
     username: administrator
@@ -70,8 +69,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- name: Print fetched information about paginated, filtered and sorted list of Network Sets
-  ansible.builtin.debug:
+- ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
 
 - name: Gather information about all Network Sets, excluding Ethernet networks
@@ -86,8 +84,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- name: Print fetched information about Network Sets, excluding Ethernet networks
-  ansible.builtin.debug:
+- ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
 
 - name: Gather information about a Network Set by name
@@ -101,8 +98,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- name: Print fetched information about Network Set found by name
-  ansible.builtin.debug:
+- ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
 
 - name: Gather information about a Network Set by name, excluding Ethernet networks
@@ -118,8 +114,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- name: Print fetched information about Network Set found by name, excluding Ethernet networks
-  ansible.builtin.debug:
+- ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
 '''
 

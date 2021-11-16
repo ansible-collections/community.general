@@ -79,7 +79,6 @@ from os.path import basename
 
 from ansible.errors import AnsibleError
 from ansible.module_utils.six import raise_from
-from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.plugins.callback import CallbackBase
 
 try:
@@ -91,6 +90,8 @@ try:
     from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
     from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.sdk.trace.export import (
+        ConsoleSpanExporter,
+        SimpleSpanProcessor,
         BatchSpanProcessor
     )
     from opentelemetry.util._time import _time_ns
@@ -178,7 +179,7 @@ class OpenTelemetrySource(object):
         args = None
 
         if not task.no_log and not hide_task_arguments:
-            args = task.args
+            args = ', '.join(('%s=%s' % a for a in task.args.items()))
 
         tasks_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
 
@@ -245,43 +246,32 @@ class OpenTelemetrySource(object):
         name = '[%s] %s: %s' % (host_data.name, task_data.play, task_data.name)
 
         message = 'success'
-        res = {}
-        rc = 0
         status = Status(status_code=StatusCode.OK)
-        if host_data.status != 'included':
-            # Support loops
-            if 'results' in host_data.result._result:
-                if host_data.status == 'failed':
-                    message = self.get_error_message_from_results(host_data.result._result['results'], task_data.action)
-                    enriched_error_message = self.enrich_error_message_from_results(host_data.result._result['results'], task_data.action)
-            else:
-                res = host_data.result._result
-                rc = res.get('rc', 0)
-                message = self.get_error_message(res)
-                enriched_error_message = self.enrich_error_message(res)
-
+        if host_data.status == 'included':
+            rc = 0
+        else:
+            res = host_data.result._result
+            rc = res.get('rc', 0)
             if host_data.status == 'failed':
+                message = self.get_error_message(res)
                 status = Status(status_code=StatusCode.ERROR, description=message)
                 # Record an exception with the task message
-                span.record_exception(BaseException(enriched_error_message))
+                span.record_exception(BaseException(self.enrich_error_message(res)))
             elif host_data.status == 'skipped':
-                message = res['skip_reason'] if 'skip_reason' in res else 'skipped'
+                if 'skip_reason' in res:
+                    message = res['skip_reason']
+                else:
+                    message = 'skipped'
                 status = Status(status_code=StatusCode.UNSET)
 
         span.set_status(status)
-        if isinstance(task_data.args, dict) and "gather_facts" not in task_data.action:
-            names = tuple(self.transform_ansible_unicode_to_str(k) for k in task_data.args.keys())
-            values = tuple(self.transform_ansible_unicode_to_str(k) for k in task_data.args.values())
-            self.set_span_attribute(span, ("ansible.task.args.name"), names)
-            self.set_span_attribute(span, ("ansible.task.args.value"), values)
+        self.set_span_attribute(span, "ansible.task.args", task_data.args)
         self.set_span_attribute(span, "ansible.task.module", task_data.action)
         self.set_span_attribute(span, "ansible.task.message", message)
         self.set_span_attribute(span, "ansible.task.name", name)
         self.set_span_attribute(span, "ansible.task.result", rc)
         self.set_span_attribute(span, "ansible.task.host.name", host_data.name)
         self.set_span_attribute(span, "ansible.task.host.status", host_data.status)
-        # This will allow to enrich the service map
-        self.add_attributes_for_service_map_if_possible(span, task_data)
         span.end(end_time=host_data.finish)
 
     def set_span_attribute(self, span, attributeName, attributeValue):
@@ -293,63 +283,11 @@ class OpenTelemetrySource(object):
             if attributeValue is not None:
                 span.set_attribute(attributeName, attributeValue)
 
-    def add_attributes_for_service_map_if_possible(self, span, task_data):
-        """Update the span attributes with the service that the task interacted with, if possible."""
-
-        redacted_url = self.parse_and_redact_url_if_possible(task_data.args)
-        if redacted_url:
-            self.set_span_attribute(span, "http.url", redacted_url.geturl())
-
-    @staticmethod
-    def parse_and_redact_url_if_possible(args):
-        """Parse and redact the url, if possible."""
-
-        try:
-            parsed_url = urlparse(OpenTelemetrySource.url_from_args(args))
-        except ValueError:
-            return None
-
-        if OpenTelemetrySource.is_valid_url(parsed_url):
-            return OpenTelemetrySource.redact_user_password(parsed_url)
-        return None
-
-    @staticmethod
-    def url_from_args(args):
-        # the order matters
-        url_args = ("url", "api_url", "baseurl", "repo", "server_url", "chart_repo_url")
-        for arg in url_args:
-            if args.get(arg):
-                return args.get(arg)
-        return ""
-
-    @staticmethod
-    def redact_user_password(url):
-        return url._replace(netloc=url.hostname) if url.password else url
-
-    @staticmethod
-    def is_valid_url(url):
-        if all([url.scheme, url.netloc, url.hostname]):
-            return "{{" not in url.hostname
-        return False
-
-    @staticmethod
-    def transform_ansible_unicode_to_str(value):
-        parsed_url = urlparse(str(value))
-        if OpenTelemetrySource.is_valid_url(parsed_url):
-            return OpenTelemetrySource.redact_user_password(parsed_url).geturl()
-        return str(value)
-
     @staticmethod
     def get_error_message(result):
         if result.get('exception') is not None:
             return OpenTelemetrySource._last_line(result['exception'])
         return result.get('msg', 'failed')
-
-    @staticmethod
-    def get_error_message_from_results(results, action):
-        for result in results:
-            if result.get('failed', False):
-                return ('{0}({1}) - {2}').format(action, result.get('item', 'none'), OpenTelemetrySource.get_error_message(result))
 
     @staticmethod
     def _last_line(text):
@@ -362,14 +300,6 @@ class OpenTelemetrySource(object):
         exception = result.get('exception')
         stderr = result.get('stderr')
         return ('message: "{0}"\nexception: "{1}"\nstderr: "{2}"').format(message, exception, stderr)
-
-    @staticmethod
-    def enrich_error_message_from_results(results, action):
-        message = ""
-        for result in results:
-            if result.get('failed', False):
-                message = ('{0}({1}) - {2}\n{3}').format(action, result.get('item', 'none'), OpenTelemetrySource.enrich_error_message(result), message)
-        return message
 
 
 class CallbackModule(CallbackBase):

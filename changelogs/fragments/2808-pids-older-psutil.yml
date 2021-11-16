@@ -1,0 +1,2 @@
+bugfixes:
+- "pids - avoid crashes for older ``psutil`` versions, like on RHEL6 and RHEL7 (https://github.com/ansible-collections/community.general/pull/2808)."

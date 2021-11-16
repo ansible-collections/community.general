@@ -1,0 +1,4 @@
+bugfixes:
+  - supervisorctl - state ``signalled`` was not working (https://github.com/ansible-collections/community.general/pull/3068).
+minor_changes:
+  - supervisorctl - using standard Ansible mechanism to validate ``signalled`` state required parameter (https://github.com/ansible-collections/community.general/pull/3068).

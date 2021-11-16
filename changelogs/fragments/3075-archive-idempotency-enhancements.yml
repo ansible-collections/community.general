@@ -1,0 +1,4 @@
+---
+breaking_changes:
+  - archive - adding idempotency checks for changes to file names and content within the ``destination`` file
+    (https://github.com/ansible-collections/community.general/pull/3075).

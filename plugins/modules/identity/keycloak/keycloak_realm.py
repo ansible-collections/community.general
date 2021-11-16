@@ -13,7 +13,6 @@ DOCUMENTATION = '''
 module: keycloak_realm
 
 short_description: Allows administration of Keycloak realm via Keycloak API
-
 version_added: 3.0.0
 
 
@@ -534,21 +533,20 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
-    sample: "Realm testrealm has been updated"
+  description: Message as to what action was taken
+  returned: always
+  type: str
+  sample: "Realm testrealm has been updated"
 
 proposed:
-    description: Representation of proposed realm.
+    description: realm representation of proposed changes to realm
     returned: always
     type: dict
     sample: {
       id: "test"
     }
-
 existing:
-    description: Representation of existing realm (sample is truncated).
+    description: realm representation of existing realm (sample is truncated)
     returned: always
     type: dict
     sample: {
@@ -557,10 +555,9 @@ existing:
             "request.object.signature.alg": "RS256",
         }
     }
-
 end_state:
-    description: Representation of realm after module execution (sample is truncated).
-    returned: on success
+    description: realm representation of realm after module execution (sample is truncated)
+    returned: always
     type: dict
     sample: {
         "adminUrl": "http://www.example.com/admin_url",
@@ -576,7 +573,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def sanitize_cr(realmrep):
-    """ Removes probably sensitive details from a realm representation.
+    """ Removes probably sensitive details from a realm representation
 
     :param realmrep: the realmrep dict to be sanitized
     :return: sanitized realmrep dict
@@ -679,7 +676,6 @@ def main():
         verify_email=dict(type='bool', aliases=['verifyEmail']),
         wait_increment_seconds=dict(type='int', aliases=['waitIncrementSeconds']),
     )
-
     argument_spec.update(meta_args)
 
     module = AnsibleModule(argument_spec=argument_spec,
@@ -703,114 +699,95 @@ def main():
 
     # convert module parameters to realm representation parameters (if they belong in there)
     params_to_ignore = list(keycloak_argument_spec().keys()) + ['state']
-
-    # Filter and map the parameters names that apply to the role
     realm_params = [x for x in module.params
                     if x not in params_to_ignore and
                     module.params.get(x) is not None]
 
     # See whether the realm already exists in Keycloak
-    before_realm = kc.get_realm_by_id(realm=realm)
-
-    if before_realm is None:
-        before_realm = {}
+    before_realm = kc.get_realm_by_id(realm=realm) or {}
 
     # Build a proposed changeset from parameters given to this module
-    changeset = {}
+    changeset = dict()
 
     for realm_param in realm_params:
         new_param_value = module.params.get(realm_param)
         changeset[camel(realm_param)] = new_param_value
 
-    # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
-    desired_realm = before_realm.copy()
-    desired_realm.update(changeset)
+    # Whether creating or updating a realm, take the before-state and merge the changeset into it
+    updated_realm = before_realm.copy()
+    updated_realm.update(changeset)
 
     result['proposed'] = sanitize_cr(changeset)
     before_realm_sanitized = sanitize_cr(before_realm)
     result['existing'] = before_realm_sanitized
 
-    # Cater for when it doesn't exist (an empty dict)
+    # If the realm does not exist yet, before_realm is still empty
     if not before_realm:
         if state == 'absent':
-            # Do nothing and exit
+            # do nothing and exit
             if module._diff:
                 result['diff'] = dict(before='', after='')
-            result['changed'] = False
-            result['end_state'] = {}
             result['msg'] = 'Realm does not exist, doing nothing.'
             module.exit_json(**result)
 
-        # Process a creation
+        # create new realm
         result['changed'] = True
-
-        if 'id' not in desired_realm:
+        if 'id' not in updated_realm:
             module.fail_json(msg='id needs to be specified when creating a new realm')
 
         if module._diff:
-            result['diff'] = dict(before='', after=sanitize_cr(desired_realm))
+            result['diff'] = dict(before='', after=sanitize_cr(updated_realm))
 
         if module.check_mode:
             module.exit_json(**result)
 
-        # create it
-        kc.create_realm(desired_realm)
-        after_realm = kc.get_realm_by_id(desired_realm['id'])
+        kc.create_realm(updated_realm)
+        after_realm = kc.get_realm_by_id(updated_realm['id'])
 
         result['end_state'] = sanitize_cr(after_realm)
 
-        result['msg'] = 'Realm %s has been created.' % desired_realm['id']
+        result['msg'] = 'Realm %s has been created.' % updated_realm['id']
         module.exit_json(**result)
-
     else:
         if state == 'present':
-            # Process an update
-
-            # doing an update
+            # update existing realm
             result['changed'] = True
             if module.check_mode:
                 # We can only compare the current realm with the proposed updates we have
                 if module._diff:
                     result['diff'] = dict(before=before_realm_sanitized,
-                                          after=sanitize_cr(desired_realm))
-                result['changed'] = (before_realm != desired_realm)
+                                          after=sanitize_cr(updated_realm))
+                result['changed'] = (before_realm != updated_realm)
 
                 module.exit_json(**result)
 
-            # do the update
-            kc.update_realm(desired_realm, realm=realm)
+            kc.update_realm(updated_realm, realm=realm)
 
             after_realm = kc.get_realm_by_id(realm=realm)
-
             if before_realm == after_realm:
                 result['changed'] = False
-
-            result['end_state'] = sanitize_cr(after_realm)
-
             if module._diff:
                 result['diff'] = dict(before=before_realm_sanitized,
                                       after=sanitize_cr(after_realm))
+            result['end_state'] = sanitize_cr(after_realm)
 
-            result['msg'] = 'Realm %s has been updated.' % desired_realm['id']
+            result['msg'] = 'Realm %s has been updated.' % updated_realm['id']
             module.exit_json(**result)
-
         else:
-            # Process a deletion (because state was not 'present')
+            # Delete existing realm
             result['changed'] = True
-
             if module._diff:
-                result['diff'] = dict(before=before_realm_sanitized, after='')
+                result['diff']['before'] = before_realm_sanitized
+                result['diff']['after'] = ''
 
             if module.check_mode:
                 module.exit_json(**result)
 
-            # delete it
             kc.delete_realm(realm=realm)
-
-            result['proposed'] = {}
-            result['end_state'] = {}
-
+            result['proposed'] = dict()
+            result['end_state'] = dict()
             result['msg'] = 'Realm %s has been deleted.' % before_realm['id']
+            module.exit_json(**result)
 
     module.exit_json(**result)
 

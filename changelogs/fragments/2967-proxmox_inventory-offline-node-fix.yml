@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - proxmox inventory plugin - fixed parsing failures when some cluster nodes are offline (https://github.com/ansible-collections/community.general/issues/2931).

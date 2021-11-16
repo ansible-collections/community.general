@@ -1,0 +1,3 @@
+bugfixes:
+  - tss lookup plugin - fixed incompatibility with ``python-tss-sdk`` version 1.0.0
+    (https://github.com/ansible-collections/community.general/issues/3057, https://github.com/ansible-collections/community.general/pull/3139).

@@ -176,9 +176,6 @@ class PipX(CmdStateModuleHelper):
         _list=dict(fmt=('list', '--include-injected', '--json'), style=ArgFormat.BOOLEAN),
     )
     check_rc = True
-    run_command_fixed_options = dict(
-        environ_update={'USE_EMOJI': '0'}
-    )
 
     def _retrieve_installed(self):
         def process_list(rc, out, err):
@@ -191,13 +188,13 @@ class PipX(CmdStateModuleHelper):
                 results[venv_name] = {
                     'version': venv['metadata']['main_package']['package_version'],
                     'injected': dict(
-                        (k, v['package_version']) for k, v in venv['metadata']['injected_packages'].items()
+                        (k, v['package_version']) for k, v in venv['metadata']['injected_packages']
                     ),
                 }
             return results
 
         installed = self.run_command(params=[{'_list': True}], process_output=process_list,
-                                     publish_rc=False, publish_out=False, publish_err=False, publish_cmd=False)
+                                     publish_rc=False, publish_out=False, publish_err=False)
 
         if self.vars.name is not None:
             app_list = installed.get(self.vars.name)
@@ -215,6 +212,7 @@ class PipX(CmdStateModuleHelper):
             facts = ansible_facts(self.module, gather_subset=['python'])
             self.command = [facts['python']['executable'], '-m', 'pipx']
 
+        self.vars.set('will_change', False, output=False, change=True)
         self.vars.set('application', self._retrieve_installed(), change=True, diff=True)
 
     def __quit_module__(self):
@@ -222,7 +220,7 @@ class PipX(CmdStateModuleHelper):
 
     def state_install(self):
         if not self.vars.application or self.vars.force:
-            self.changed = True
+            self.vars.will_change = True
             if not self.module.check_mode:
                 self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'python',
                                          {'name_source': [self.vars.name, self.vars.source]}])
@@ -234,7 +232,7 @@ class PipX(CmdStateModuleHelper):
             raise ModuleHelperException(
                 "Trying to upgrade a non-existent application: {0}".format(self.vars.name))
         if self.vars.force:
-            self.changed = True
+            self.vars.will_change = True
         if not self.module.check_mode:
             self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'name'])
 
@@ -248,7 +246,7 @@ class PipX(CmdStateModuleHelper):
         if not self.vars.application:
             raise ModuleHelperException(
                 "Trying to reinstall a non-existent application: {0}".format(self.vars.name))
-        self.changed = True
+        self.vars.will_change = True
         if not self.module.check_mode:
             self.run_command(params=['state', 'name', 'python'])
 
@@ -257,7 +255,7 @@ class PipX(CmdStateModuleHelper):
             raise ModuleHelperException(
                 "Trying to inject packages into a non-existent application: {0}".format(self.vars.name))
         if self.vars.force:
-            self.changed = True
+            self.vars.will_change = True
         if not self.module.check_mode:
             self.run_command(params=['state', 'index_url', 'force', 'name', 'inject_packages'])
 
@@ -271,7 +269,7 @@ class PipX(CmdStateModuleHelper):
 
     def state_upgrade_all(self):
         if self.vars.force:
-            self.changed = True
+            self.vars.will_change = True
         if not self.module.check_mode:
             self.run_command(params=['state', 'include_injected', 'force'])
 

@@ -62,17 +62,17 @@ options:
 
     name:
         description:
-            - Name of the client (this is not the same as I(client_id)).
+            - Name of the client (this is not the same as I(client_id))
         type: str
 
     description:
         description:
-            - Description of the client in Keycloak.
+            - Description of the client in Keycloak
         type: str
 
     root_url:
         description:
-            - Root URL appended to relative URLs for this client.
+            - Root URL appended to relative URLs for this client
               This is 'rootUrl' in the Keycloak REST API.
         aliases:
             - rootUrl
@@ -80,7 +80,7 @@ options:
 
     admin_url:
         description:
-            - URL to the admin interface of the client.
+            - URL to the admin interface of the client
               This is 'adminUrl' in the Keycloak REST API.
         aliases:
             - adminUrl
@@ -357,7 +357,7 @@ options:
 
             protocol:
                 description:
-                    - This is either C(openid-connect) or C(saml), this specifies for which protocol this protocol mapper.
+                    - This is either C(openid-connect) or C(saml), this specifies for which protocol this protocol mapper
                       is active.
                 choices: ['openid-connect', 'saml']
                 type: str
@@ -513,6 +513,7 @@ options:
 extends_documentation_fragment:
 - community.general.keycloak
 
+
 author:
     - Eike Frost (@eikef)
 '''
@@ -644,21 +645,20 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: Message as to what action was taken.
-    returned: always
-    type: str
-    sample: "Client testclient has been updated"
+  description: Message as to what action was taken
+  returned: always
+  type: str
+  sample: "Client testclient has been updated"
 
 proposed:
-    description: Representation of proposed client.
+    description: client representation of proposed changes to client
     returned: always
     type: dict
     sample: {
       clientId: "test"
     }
-
 existing:
-    description: Representation of existing client (sample is truncated).
+    description: client representation of existing client (sample is truncated)
     returned: always
     type: dict
     sample: {
@@ -667,10 +667,9 @@ existing:
             "request.object.signature.alg": "RS256",
         }
     }
-
 end_state:
-    description: Representation of client after module execution (sample is truncated).
-    returned: on success
+    description: client representation of client after module execution (sample is truncated)
+    returned: always
     type: dict
     sample: {
         "adminUrl": "http://www.example.com/admin_url",
@@ -685,38 +684,8 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 from ansible.module_utils.basic import AnsibleModule
 
 
-def normalise_cr(clientrep, remove_ids=False):
-    """ Re-sorts any properties where the order so that diff's is minimised, and adds default values where appropriate so that the
-    the change detection is more effective.
-
-    :param clientrep: the clientrep dict to be sanitized
-    :param remove_ids: If set to true, then the unique ID's of objects is removed to make the diff and checks for changed
-                       not alert when the ID's of objects are not usually known, (e.g. for protocol_mappers)
-    :return: normalised clientrep dict
-    """
-    # Avoid the dict passed in to be modified
-    clientrep = clientrep.copy()
-
-    if 'attributes' in clientrep:
-        clientrep['attributes'] = list(sorted(clientrep['attributes']))
-
-    if 'redirectUris' in clientrep:
-        clientrep['redirectUris'] = list(sorted(clientrep['redirectUris']))
-
-    if 'protocolMappers' in clientrep:
-        clientrep['protocolMappers'] = sorted(clientrep['protocolMappers'], key=lambda x: (x.get('name'), x.get('protocol'), x.get('protocolMapper')))
-        for mapper in clientrep['protocolMappers']:
-            if remove_ids:
-                mapper.pop('id', None)
-
-            # Set to a default value.
-            mapper['consentRequired'] = mapper.get('consentRequired', False)
-
-    return clientrep
-
-
 def sanitize_cr(clientrep):
-    """ Removes probably sensitive details from a client representation.
+    """ Removes probably sensitive details from a client representation
 
     :param clientrep: the clientrep dict to be sanitized
     :return: sanitized clientrep dict
@@ -727,7 +696,7 @@ def sanitize_cr(clientrep):
     if 'attributes' in result:
         if 'saml.signing.private.key' in result['attributes']:
             result['attributes']['saml.signing.private.key'] = 'no_log'
-    return normalise_cr(result)
+    return result
 
 
 def main():
@@ -790,7 +759,6 @@ def main():
         protocol_mappers=dict(type='list', elements='dict', options=protmapper_spec, aliases=['protocolMappers']),
         authorization_settings=dict(type='dict', aliases=['authorizationSettings']),
     )
-
     argument_spec.update(meta_args)
 
     module = AnsibleModule(argument_spec=argument_spec,
@@ -813,12 +781,12 @@ def main():
     cid = module.params.get('id')
     state = module.params.get('state')
 
-    # Filter and map the parameters names that apply to the client
+    # convert module parameters to client representation parameters (if they belong in there)
     client_params = [x for x in module.params
                      if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
                      module.params.get(x) is not None]
-
-    # See if it already exists in Keycloak
+    keycloak_argument_spec().keys()
+    # See whether the client already exists in Keycloak
     if cid is None:
         before_client = kc.get_client_by_clientid(module.params.get('client_id'), realm=realm)
         if before_client is not None:
@@ -827,10 +795,10 @@ def main():
         before_client = kc.get_client_by_id(cid, realm=realm)
 
     if before_client is None:
-        before_client = {}
+        before_client = dict()
 
     # Build a proposed changeset from parameters given to this module
-    changeset = {}
+    changeset = dict()
 
     for client_param in client_params:
         new_param_value = module.params.get(client_param)
@@ -849,63 +817,54 @@ def main():
 
         changeset[camel(client_param)] = new_param_value
 
-    # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
-    desired_client = before_client.copy()
-    desired_client.update(changeset)
+    # Whether creating or updating a client, take the before-state and merge the changeset into it
+    updated_client = before_client.copy()
+    updated_client.update(changeset)
 
     result['proposed'] = sanitize_cr(changeset)
     result['existing'] = sanitize_cr(before_client)
 
-    # Cater for when it doesn't exist (an empty dict)
-    if not before_client:
+    # If the client does not exist yet, before_client is still empty
+    if before_client == dict():
         if state == 'absent':
-            # Do nothing and exit
+            # do nothing and exit
             if module._diff:
                 result['diff'] = dict(before='', after='')
-            result['changed'] = False
-            result['end_state'] = {}
-            result['msg'] = 'Client does not exist; doing nothing.'
+            result['msg'] = 'Client does not exist, doing nothing.'
             module.exit_json(**result)
 
-        # Process a creation
+        # create new client
         result['changed'] = True
-
-        if 'clientId' not in desired_client:
+        if 'clientId' not in updated_client:
             module.fail_json(msg='client_id needs to be specified when creating a new client')
 
         if module._diff:
-            result['diff'] = dict(before='', after=sanitize_cr(desired_client))
+            result['diff'] = dict(before='', after=sanitize_cr(updated_client))
 
         if module.check_mode:
             module.exit_json(**result)
 
-        # create it
-        kc.create_client(desired_client, realm=realm)
-        after_client = kc.get_client_by_clientid(desired_client['clientId'], realm=realm)
+        kc.create_client(updated_client, realm=realm)
+        after_client = kc.get_client_by_clientid(updated_client['clientId'], realm=realm)
 
         result['end_state'] = sanitize_cr(after_client)
 
-        result['msg'] = 'Client %s has been created.' % desired_client['clientId']
+        result['msg'] = 'Client %s has been created.' % updated_client['clientId']
         module.exit_json(**result)
-
     else:
         if state == 'present':
-            # Process an update
+            # update existing client
             result['changed'] = True
-
             if module.check_mode:
                 # We can only compare the current client with the proposed updates we have
-                before_norm = normalise_cr(before_client, remove_ids=True)
-                desired_norm = normalise_cr(desired_client, remove_ids=True)
                 if module._diff:
-                    result['diff'] = dict(before=sanitize_cr(before_norm),
-                                          after=sanitize_cr(desired_norm))
-                result['changed'] = (before_norm != desired_norm)
+                    result['diff'] = dict(before=sanitize_cr(before_client),
+                                          after=sanitize_cr(updated_client))
+                result['changed'] = (before_client != updated_client)
 
                 module.exit_json(**result)
 
-            # do the update
-            kc.update_client(cid, desired_client, realm=realm)
+            kc.update_client(cid, updated_client, realm=realm)
 
             after_client = kc.get_client_by_id(cid, realm=realm)
             if before_client == after_client:
@@ -913,29 +872,25 @@ def main():
             if module._diff:
                 result['diff'] = dict(before=sanitize_cr(before_client),
                                       after=sanitize_cr(after_client))
-
             result['end_state'] = sanitize_cr(after_client)
 
-            result['msg'] = 'Client %s has been updated.' % desired_client['clientId']
+            result['msg'] = 'Client %s has been updated.' % updated_client['clientId']
             module.exit_json(**result)
-
         else:
-            # Process a deletion (because state was not 'present')
+            # Delete existing client
             result['changed'] = True
-
             if module._diff:
-                result['diff'] = dict(before=sanitize_cr(before_client), after='')
+                result['diff']['before'] = sanitize_cr(before_client)
+                result['diff']['after'] = ''
 
             if module.check_mode:
                 module.exit_json(**result)
 
-            # delete it
             kc.delete_client(cid, realm=realm)
-            result['proposed'] = {}
-
-            result['end_state'] = {}
-
+            result['proposed'] = dict()
+            result['end_state'] = dict()
             result['msg'] = 'Client %s has been deleted.' % before_client['clientId']
+            module.exit_json(**result)
 
     module.exit_json(**result)
 

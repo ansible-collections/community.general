@@ -1,0 +1,5 @@
+deprecated_features:
+  - linode - parameter ``backupsenabled`` is deprecated and will be removed in community.general 5.0.0 (https://github.com/ansible-collections/community.general/pull/2410).
+minor_changes:
+  - linode - added proper traceback when failing due to exceptions (https://github.com/ansible-collections/community.general/pull/2410).
+  - linode - parameter ``additional_disks`` is now validated as a list of dictionaries (https://github.com/ansible-collections/community.general/pull/2410).
