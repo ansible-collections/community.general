@@ -176,7 +176,7 @@ RETURN = r''' # '''
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import gitlabAuthentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import gitlab_authentication
 
 import traceback
 
@@ -317,7 +317,7 @@ def main():
         purge_users = [access_level_int[level] for level in purge_users]
 
     # connect to gitlab server
-    gl = gitlabAuthentication(module)
+    gl = gitlab_authentication(module)
 
     project = GitLabProjectMembers(module, gl)
 
