@@ -19,11 +19,14 @@
   vars:
     ansible_deprecation_warnings: yes
 
+- debug:
+    msg: simple2={{ simple2.deprecations|selectattr("msg") }}
+
 - name: assert simple2
   assert:
     that:
       - simple2.a == 2
       - simple2.attr2 == "def"
       - '"deprecations" in simple2'
-      - (simple2.deprecations|first).msg == "Attribute attr2 is deprecated"
-      - (simple2.deprecations|first).version == "9.9.9"
+      - simple2.deprecations|selectattr("msg", "eq", "Attribute attr2 is deprecated")|length == 1
+      - simple2.deprecations|selectattr("version", "eq", "9.9.9")|length == 1
