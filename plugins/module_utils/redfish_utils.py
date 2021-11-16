@@ -2768,6 +2768,49 @@ class RedfishUtils(object):
             return response
         return {'ret': True, 'changed': True, 'msg': "Modified Manager NIC"}
 
+    def get_manager_ethernet_uri(self, nic_addr='null'):
+        # Get EthernetInterface collection
+        response = self.get_request(self.root_uri + self.manager_uri)
+        if not response['ret']:
+            return response
+        data = response['data']
+        if 'EthernetInterfaces' not in data:
+            return {'ret': False, 'msg': "EthernetInterfaces resource not found"}
+        ethernetinterfaces_uri = data["EthernetInterfaces"]["@odata.id"]
+        response = self.get_request(self.root_uri + ethernetinterfaces_uri)
+        if not response['ret']:
+            return response
+        data = response['data']
+        uris = [a.get('@odata.id') for a in data.get('Members', []) if
+                a.get('@odata.id')]
+
+        # Find target EthernetInterface
+        target_ethernet_uri = None
+        target_ethernet_current_setting = None
+        if nic_addr == 'null':
+            # Find root_uri matched EthernetInterface when nic_addr is not specified
+            nic_addr = (self.root_uri).split('/')[-1]
+            nic_addr = nic_addr.split(':')[0]  # split port if existing
+        for uri in uris:
+            response = self.get_request(self.root_uri + uri)
+            if not response['ret']:
+                return response
+            data = response['data']
+            data_string = json.dumps(data)
+            if nic_addr.lower() in data_string.lower():
+                target_ethernet_uri = uri
+                target_ethernet_current_setting = data
+                break
+
+        nic_info = {}
+        nic_info['nic_addr'] = target_ethernet_uri
+        nic_info['ethernet_setting'] = target_ethernet_current_setting
+
+        if target_ethernet_uri is None:
+            return {'ret': False, 'msg': "No matched EthernetInterface found under Manager"}
+        else:
+            return nic_info
+
     def set_hostinterface_attributes(self, hostinterface_config, hostinterface_id=None):
         response = self.get_request(self.root_uri + self.manager_uri)
         if response['ret'] is False:
