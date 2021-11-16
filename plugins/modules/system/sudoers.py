@@ -89,7 +89,7 @@ from ansible.module_utils.basic import AnsibleModule
 import os
 
 
-class Sudoers (object):
+class Sudoers(object):
 
     def __init__(self, module):
         self.module = module
