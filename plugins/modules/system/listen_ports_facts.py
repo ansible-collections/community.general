@@ -13,11 +13,25 @@ module: listen_ports_facts
 author:
     - Nathan Davison (@ndavison)
 description:
-    - Gather facts on processes listening on TCP and UDP ports using netstat command.
+    - Gather facts on processes listening on TCP and UDP ports using the C(netstat) or C(ss) commands.
     - This module currently supports Linux only.
 requirements:
-  - netstat
+  - netstat or ss
 short_description: Gather facts on processes listening on TCP and UDP ports.
+notes:
+  - |
+    C(ss) returns all processes for each listen address and port.
+    This plugin will return each of them, so multiple entries for the same listen address and port are likely in results.
+options:
+  command:
+    description:
+      - Override which command to use for fetching listen ports.
+      - 'By default module will use first found supported command on the system (in alphanumerical order).'
+    type: str
+    choices:
+      - netstat
+      - ss
+    version_added: 4.1.0
 '''
 
 EXAMPLES = r'''
@@ -181,10 +195,87 @@ def netStatParse(raw):
     return results
 
 
-def main():
+def ss_parse(raw):
+    results = list()
+    regex_conns = re.compile(pattern=r'\[?(.+?)\]?:([0-9]+)')
+    regex_pid = re.compile(pattern=r'"(.*?)",pid=(\d+)')
 
+    lines = raw.splitlines()
+
+    if len(lines) == 0 or not lines[0].startswith('Netid '):
+        # unexpected stdout from ss
+        raise EnvironmentError('Unknown stdout format of `ss`: {0}'.format(raw))
+
+    # skip headers (-H arg is not present on e.g. Ubuntu 16)
+    lines = lines[1:]
+
+    for line in lines:
+        cells = line.split(None, 6)
+        try:
+            if len(cells) == 6:
+                # no process column, e.g. due to unprivileged user
+                process = str()
+                protocol, state, recv_q, send_q, local_addr_port, peer_addr_port = cells
+            else:
+                protocol, state, recv_q, send_q, local_addr_port, peer_addr_port, process = cells
+        except ValueError:
+            # unexpected stdout from ss
+            raise EnvironmentError(
+                'Expected `ss` table layout "Netid, State, Recv-Q, Send-Q, Local Address:Port, Peer Address:Port" and optionally "Process", \
+                    but got something else: {0}'.format(line)
+            )
+
+        conns = regex_conns.search(local_addr_port)
+        pids = regex_pid.findall(process)
+        if conns is None and pids is None:
+            continue
+
+        if pids is None:
+            # likely unprivileged user, so add empty name & pid
+            # as we do in netstat logic to be consistent with output
+            pids = [(str(), 0)]
+
+        address = conns.group(1)
+        port = conns.group(2)
+        for name, pid in pids:
+            result = {
+                'pid': int(pid),
+                'address': address,
+                'port': int(port),
+                'protocol': protocol,
+                'name': name
+            }
+            results.append(result)
+    return results
+
+
+def main():
+    commands_map = {
+        'netstat': {
+            'args': [
+                '-p',
+                '-l',
+                '-u',
+                '-n',
+                '-t',
+            ],
+            'parse_func': netStatParse
+        },
+        'ss': {
+            'args': [
+                '-p',
+                '-l',
+                '-u',
+                '-n',
+                '-t',
+            ],
+            'parse_func': ss_parse
+        },
+    }
     module = AnsibleModule(
-        argument_spec={},
+        argument_spec=dict(
+            command=dict(type='str', choices=list(sorted(commands_map)))
+        ),
         supports_check_mode=True,
     )
 
@@ -220,18 +311,34 @@ def main():
     }
 
     try:
-        netstat_cmd = module.get_bin_path('netstat', True)
+        command = None
+        bin_path = None
+        if module.params['command'] is not None:
+            command = module.params['command']
+            bin_path = module.get_bin_path(command, required=True)
+        else:
+            for c in sorted(commands_map):
+                bin_path = module.get_bin_path(c, required=False)
+                if bin_path is not None:
+                    command = c
+                    break
+
+        if bin_path is None:
+            raise EnvironmentError(msg='Unable to find any of the supported commands in PATH: {0}'.format(", ".join(sorted(commands_map))))
 
         # which ports are listening for connections?
-        rc, stdout, stderr = module.run_command([netstat_cmd, '-plunt'])
+        args = commands_map[command]['args']
+        rc, stdout, stderr = module.run_command([bin_path] + args)
         if rc == 0:
-            netstatOut = netStatParse(stdout)
-            for p in netstatOut:
+            parse_func = commands_map[command]['parse_func']
+            results = parse_func(stdout)
+
+            for p in results:
                 p['stime'] = getPidSTime(p['pid'])
                 p['user'] = getPidUser(p['pid'])
-                if p['protocol'] == 'tcp':
+                if p['protocol'].startswith('tcp'):
                     result['ansible_facts']['tcp_listen'].append(p)
-                elif p['protocol'] == 'udp':
+                elif p['protocol'].startswith('udp'):
                     result['ansible_facts']['udp_listen'].append(p)
     except (KeyError, EnvironmentError) as e:
         module.fail_json(msg=to_native(e))
