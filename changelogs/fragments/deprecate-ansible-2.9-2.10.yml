@@ -1,6 +1,0 @@
-deprecated_features:
-  - "Support for Ansible 2.9 and ansible-base 2.10 is deprecated, and will be removed in the next major release (community.general 5.0.0) next spring.
-     While most content will probably still work with ansible-base 2.10, we will remove symbolic links for modules and action plugins, which will make
-     it impossible to use them with Ansible 2.9 anymore. Please use community.general 4.x.y with Ansible 2.9 and ansible-base 2.10, as these releases
-     will continue to support Ansible 2.9 and ansible-base 2.10 even after they are End of Life
-     (https://github.com/ansible-community/community-topics/issues/50, https://github.com/ansible-collections/community.general/pull/3723)."

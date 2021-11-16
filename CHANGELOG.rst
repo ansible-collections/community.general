@@ -6,6 +6,27 @@ Community General Release Notes
 
 This changelog describes changes after version 3.0.0.
 
+v4.0.2
+======
+
+Release Summary
+---------------
+
+Bugfix release for today's Ansible 5.0.0 beta 2.
+
+Deprecated Features
+-------------------
+
+- Support for Ansible 2.9 and ansible-base 2.10 is deprecated, and will be removed in the next major release (community.general 5.0.0) next spring. While most content will probably still work with ansible-base 2.10, we will remove symbolic links for modules and action plugins, which will make it impossible to use them with Ansible 2.9 anymore. Please use community.general 4.x.y with Ansible 2.9 and ansible-base 2.10, as these releases will continue to support Ansible 2.9 and ansible-base 2.10 even after they are End of Life (https://github.com/ansible-community/community-topics/issues/50, https://github.com/ansible-collections/community.general/pull/3723).
+
+Bugfixes
+--------
+
+- counter_enabled callback plugin - fix output to correctly display host and task counters in serial mode (https://github.com/ansible-collections/community.general/pull/3709).
+- ldap_search - allow it to be used even in check mode (https://github.com/ansible-collections/community.general/issues/3619).
+- lvol - allows logical volumes to be created with certain size arguments prefixed with ``+`` to preserve behavior of older versions of this module (https://github.com/ansible-collections/community.general/issues/3665).
+- nmcli - fixed falsely reported changed status when ``mtu`` is omitted with ``dummy`` connections (https://github.com/ansible-collections/community.general/issues/3612, https://github.com/ansible-collections/community.general/pull/3625).
+
 v4.0.1
 ======
 
