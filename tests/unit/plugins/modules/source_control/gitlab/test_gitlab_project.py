@@ -59,11 +59,11 @@ class TestGitlabProject(GitlabModuleTestCase):
     def test_project_exist(self):
         group = self.gitlab_instance.groups.get(1)
 
-        rvalue = self.moduleUtil.existsProject(group, "diaspora-client")
+        rvalue = self.moduleUtil.exists_project(group, "diaspora-client")
 
         self.assertEqual(rvalue, True)
 
-        rvalue = self.moduleUtil.existsProject(group, "missing-project")
+        rvalue = self.moduleUtil.exists_project(group, "missing-project")
 
         self.assertEqual(rvalue, False)
 
@@ -71,7 +71,7 @@ class TestGitlabProject(GitlabModuleTestCase):
     @with_httmock(resp_create_project)
     def test_create_project(self):
         group = self.gitlab_instance.groups.get(1)
-        project = self.moduleUtil.createProject(group, {"name": "Diaspora Client", "path": "diaspora-client", "namespace_id": group.id})
+        project = self.moduleUtil.create_project(group, {"name": "Diaspora Client", "path": "diaspora-client", "namespace_id": group.id})
 
         self.assertEqual(type(project), Project)
         self.assertEqual(project.name, "Diaspora Client")
@@ -80,13 +80,13 @@ class TestGitlabProject(GitlabModuleTestCase):
     def test_update_project(self):
         project = self.gitlab_instance.projects.get(1)
 
-        changed, newProject = self.moduleUtil.updateProject(project, {"name": "New Name"})
+        changed, newProject = self.moduleUtil.update_project(project, {"name": "New Name"})
 
         self.assertEqual(changed, True)
         self.assertEqual(type(newProject), Project)
         self.assertEqual(newProject.name, "New Name")
 
-        changed, newProject = self.moduleUtil.updateProject(project, {"name": "New Name"})
+        changed, newProject = self.moduleUtil.update_project(project, {"name": "New Name"})
 
         self.assertEqual(changed, False)
         self.assertEqual(newProject.name, "New Name")
@@ -98,14 +98,14 @@ class TestGitlabProject(GitlabModuleTestCase):
         # merge_method should be 'merge' by default
         self.assertEqual(project.merge_method, "merge")
 
-        changed, newProject = self.moduleUtil.updateProject(project, {"name": "New Name", "merge_method": "rebase_merge"})
+        changed, newProject = self.moduleUtil.update_project(project, {"name": "New Name", "merge_method": "rebase_merge"})
 
         self.assertEqual(changed, True)
         self.assertEqual(type(newProject), Project)
         self.assertEqual(newProject.name, "New Name")
         self.assertEqual(newProject.merge_method, "rebase_merge")
 
-        changed, newProject = self.moduleUtil.updateProject(project, {"name": "New Name", "merge_method": "rebase_merge"})
+        changed, newProject = self.moduleUtil.update_project(project, {"name": "New Name", "merge_method": "rebase_merge"})
 
         self.assertEqual(changed, False)
         self.assertEqual(newProject.name, "New Name")
@@ -117,8 +117,8 @@ class TestGitlabProject(GitlabModuleTestCase):
     def test_delete_project(self):
         group = self.gitlab_instance.groups.get(1)
 
-        self.moduleUtil.existsProject(group, "diaspora-client")
+        self.moduleUtil.exists_project(group, "diaspora-client")
 
-        rvalue = self.moduleUtil.deleteProject()
+        rvalue = self.moduleUtil.delete_project()
 
         self.assertEqual(rvalue, None)
