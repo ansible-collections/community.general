@@ -269,6 +269,14 @@ EXAMPLES = '''
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+
+  - name: Get manager Redfish Host Interface inventory
+    community.general.redfish_info:
+      category: Manager
+      command: GetHostInterfaces
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
 '''
 
 RETURN = '''
@@ -293,7 +301,7 @@ CATEGORY_COMMANDS_ALL = {
     "Sessions": ["GetSessions"],
     "Update": ["GetFirmwareInventory", "GetFirmwareUpdateCapabilities", "GetSoftwareInventory"],
     "Manager": ["GetManagerNicInventory", "GetVirtualMedia", "GetLogs", "GetNetworkProtocols",
-                "GetHealthReport"],
+                "GetHealthReport", "GetHostInterfaces"],
 }
 
 CATEGORY_COMMANDS_DEFAULT = {
@@ -475,6 +483,8 @@ def main():
                     result["network_protocols"] = rf_utils.get_network_protocols()
                 elif command == "GetHealthReport":
                     result["health_report"] = rf_utils.get_multi_manager_health_report()
+                elif command == "GetHostInterfaces":
+                    result["host_interfaces"] = rf_utils.get_hostinterfaces()
 
     # Return data back
     module.exit_json(redfish_facts=result)
