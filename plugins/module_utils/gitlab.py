@@ -30,31 +30,7 @@ except Exception:
     HAS_GITLAB_PACKAGE = False
 
 
-def request(module, api_url, project, path, access_token, private_token, rawdata='', method='GET'):
-    url = "%s/v4/projects/%s%s" % (api_url, quote_plus(project), path)
-    headers = {}
-    if access_token:
-        headers['Authorization'] = "Bearer %s" % access_token
-    else:
-        headers['Private-Token'] = private_token
-
-    headers['Accept'] = "application/json"
-    headers['Content-Type'] = "application/json"
-
-    response, info = fetch_url(module=module, url=url, headers=headers, data=rawdata, method=method)
-    status = info['status']
-    content = ""
-    if response:
-        content = response.read()
-    if status == 204:
-        return True, content
-    elif status == 200 or status == 201:
-        return True, json.loads(content)
-    else:
-        return False, str(status) + ": " + content
-
-
-def findProject(gitlab_instance, identifier):
+def find_project(gitlab_instance, identifier):
     try:
         project = gitlab_instance.projects.get(identifier)
     except Exception as e:
@@ -67,7 +43,7 @@ def findProject(gitlab_instance, identifier):
     return project
 
 
-def findGroup(gitlab_instance, identifier):
+def find_group(gitlab_instance, identifier):
     try:
         project = gitlab_instance.groups.get(identifier)
     except Exception as e:
@@ -76,7 +52,7 @@ def findGroup(gitlab_instance, identifier):
     return project
 
 
-def gitlabAuthentication(module):
+def gitlab_authentication(module):
     gitlab_url = module.params['api_url']
     validate_certs = module.params['validate_certs']
     gitlab_user = module.params['api_username']

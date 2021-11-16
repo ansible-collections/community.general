@@ -55,11 +55,11 @@ class TestGitlabDeployKey(GitlabModuleTestCase):
     def test_deploy_key_exist(self):
         project = self.gitlab_instance.projects.get(1)
 
-        rvalue = self.moduleUtil.existsDeployKey(project, "Public key")
+        rvalue = self.moduleUtil.exists_deploy_key(project, "Public key")
 
         self.assertEqual(rvalue, True)
 
-        rvalue = self.moduleUtil.existsDeployKey(project, "Private key")
+        rvalue = self.moduleUtil.exists_deploy_key(project, "Private key")
 
         self.assertEqual(rvalue, False)
 
@@ -68,11 +68,11 @@ class TestGitlabDeployKey(GitlabModuleTestCase):
     def test_create_deploy_key(self):
         project = self.gitlab_instance.projects.get(1)
 
-        deploy_key = self.moduleUtil.createDeployKey(project, {"title": "Public key",
-                                                               "key": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM"
-                                                               "4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4596k6YjzGGphH2TUxwKzxc"
-                                                               "KDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4soW6NUlfD"
-                                                               "zpvZK2H5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0="})
+        deploy_key = self.moduleUtil.create_deploy_key(project, {"title": "Public key",
+                                                                 "key": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM"
+                                                                 "4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4596k6YjzGGphH2TUxwKzxc"
+                                                                 "KDKKezwkpfnxPkSMkuEspGRt/aZZ9wa++Oi7Qkr8prgHc4soW6NUlfD"
+                                                                 "zpvZK2H5E7eQaSeP3SAwGmQKUFHCddNaP0L+hM7zhFNzjFvpaMgJw0="})
 
         self.assertEqual(type(deploy_key), ProjectKey)
         self.assertEqual(deploy_key.title, "Public key")
@@ -82,15 +82,15 @@ class TestGitlabDeployKey(GitlabModuleTestCase):
     @with_httmock(resp_create_project_deploy_key)
     def test_update_deploy_key(self):
         project = self.gitlab_instance.projects.get(1)
-        deployKey = self.moduleUtil.findDeployKey(project, "Public key")
+        deploy_key = self.moduleUtil.find_deploy_key(project, "Public key")
 
-        changed, newDeploy_key = self.moduleUtil.updateDeployKey(deployKey, {"title": "Private key"})
+        changed, newDeploy_key = self.moduleUtil.update_deploy_key(deploy_key, {"title": "Private key"})
 
         self.assertEqual(changed, True)
         self.assertEqual(type(newDeploy_key), ProjectKey)
         self.assertEqual(newDeploy_key.title, "Private key")
 
-        changed, newDeploy_key = self.moduleUtil.updateDeployKey(deployKey, {"title": "Private key"})
+        changed, newDeploy_key = self.moduleUtil.update_deploy_key(deploy_key, {"title": "Private key"})
 
         self.assertEqual(changed, False)
         self.assertEqual(newDeploy_key.title, "Private key")
@@ -101,8 +101,8 @@ class TestGitlabDeployKey(GitlabModuleTestCase):
     def test_delete_deploy_key(self):
         project = self.gitlab_instance.projects.get(1)
 
-        self.moduleUtil.existsDeployKey(project, "Public key")
+        self.moduleUtil.exists_deploy_key(project, "Public key")
 
-        rvalue = self.moduleUtil.deleteDeployKey()
+        rvalue = self.moduleUtil.delete_deploy_key()
 
         self.assertEqual(rvalue, None)
