@@ -2029,15 +2029,28 @@ class RedfishUtils(object):
     def get_multi_memory_inventory(self):
         return self.aggregate_systems(self.get_memory_inventory)
 
+    def get_nic(self, resource_uri):
+        result = {}
+        properties = ['Name', 'Id', 'Description', 'FQDN', 'IPv4Addresses', 'IPv6Addresses',
+                      'NameServers', 'MACAddress', 'PermanentMACAddress',
+                      'SpeedMbps', 'MTUSize', 'AutoNeg', 'Status']
+        response = self.get_request(self.root_uri + resource_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+        nic = {}
+        for property in properties:
+            if property in data:
+                nic[property] = data[property]
+        result['entries'] = nic
+        return(result)
+
     def get_nic_inventory(self, resource_uri):
         result = {}
         nic_list = []
         nic_results = []
         key = "EthernetInterfaces"
-        # Get these entries, but does not fail if not found
-        properties = ['Name', 'Id', 'Description', 'FQDN', 'IPv4Addresses', 'IPv6Addresses',
-                      'NameServers', 'MACAddress', 'PermanentMACAddress',
-                      'SpeedMbps', 'MTUSize', 'AutoNeg', 'Status']
 
         response = self.get_request(self.root_uri + resource_uri)
         if response['ret'] is False:
@@ -2061,18 +2074,9 @@ class RedfishUtils(object):
             nic_list.append(nic[u'@odata.id'])
 
         for n in nic_list:
-            nic = {}
-            uri = self.root_uri + n
-            response = self.get_request(uri)
-            if response['ret'] is False:
-                return response
-            data = response['data']
-
-            for property in properties:
-                if property in data:
-                    nic[property] = data[property]
-
-            nic_results.append(nic)
+            nic = self.get_nic(n)
+            if nic['ret']:
+                nic_results.append(nic['entries'])
         result["entries"] = nic_results
         return result
 
@@ -2876,3 +2880,80 @@ class RedfishUtils(object):
         if response['ret'] is False:
             return response
         return {'ret': True, 'changed': True, 'msg': "Modified Host Interface"}
+
+    def get_hostinterfaces(self):
+        result = {}
+        hostinterface_results = []
+        properties = ['Id', 'Name', 'Description', 'HostInterfaceType', 'Status',
+                      'InterfaceEnabled', 'ExternallyAccessible', 'AuthenticationModes',
+                      'AuthNoneRoleId', 'CredentialBootstrapping']
+        manager_uri_list = self.manager_uris
+        for manager_uri in manager_uri_list:
+            response = self.get_request(self.root_uri + manager_uri)
+            if response['ret'] is False:
+                return response
+
+            result['ret'] = True
+            data = response['data']
+
+            if 'HostInterfaces' in data:
+                hostinterfaces_uri = data[u'HostInterfaces'][u'@odata.id']
+            else:
+                continue
+
+            response = self.get_request(self.root_uri + hostinterfaces_uri)
+            data = response['data']
+
+            if 'Members' in data:
+                for hostinterface in data['Members']:
+                    hostinterface_uri = hostinterface['@odata.id']
+                    hostinterface_response = self.get_request(self.root_uri + hostinterface_uri)
+                    # dictionary for capturing individual HostInterface properties
+                    hostinterface_data_temp = {}
+                    if hostinterface_response['ret'] is False:
+                        return hostinterface_response
+                    hostinterface_data = hostinterface_response['data']
+                    for property in properties:
+                        if property in hostinterface_data:
+                            if hostinterface_data[property] is not None:
+                                hostinterface_data_temp[property] = hostinterface_data[property]
+                    # Check for the presence of a ManagerEthernetInterface
+                    # object, a link to a _single_ EthernetInterface that the
+                    # BMC uses to communicate with the host.
+                    if 'ManagerEthernetInterface' in hostinterface_data:
+                        interface_uri = hostinterface_data['ManagerEthernetInterface']['@odata.id']
+                        interface_response = self.get_nic(interface_uri)
+                        if interface_response['ret'] is False:
+                            return interface_response
+                        hostinterface_data_temp['ManagerEthernetInterface'] = interface_response['entries']
+
+                    # Check for the presence of a HostEthernetInterfaces
+                    # object, a link to a _collection_ of EthernetInterfaces
+                    # that the host uses to communicate with the BMC.
+                    if 'HostEthernetInterfaces' in hostinterface_data:
+                        interfaces_uri = hostinterface_data['HostEthernetInterfaces']['@odata.id']
+                        interfaces_response = self.get_request(self.root_uri + interfaces_uri)
+                        if interfaces_response['ret'] is False:
+                            return interfaces_response
+                        interfaces_data = interfaces_response['data']
+                        if 'Members' in interfaces_data:
+                            for interface in interfaces_data['Members']:
+                                interface_uri = interface['@odata.id']
+                                interface_response = self.get_nic(interface_uri)
+                                if interface_response['ret'] is False:
+                                    return interface_response
+                                # Check if this is the first
+                                # HostEthernetInterfaces item and create empty
+                                # list if so.
+                                if 'HostEthernetInterfaces' not in hostinterface_data_temp:
+                                    hostinterface_data_temp['HostEthernetInterfaces'] = []
+
+                                hostinterface_data_temp['HostEthernetInterfaces'].append(interface_response['entries'])
+
+                    hostinterface_results.append(hostinterface_data_temp)
+            else:
+                continue
+        result["entries"] = hostinterface_results
+        if not result["entries"]:
+            return {'ret': False, 'msg': "No HostInterface objects found"}
+        return result
