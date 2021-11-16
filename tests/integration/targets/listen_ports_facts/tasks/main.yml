@@ -9,30 +9,25 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 - name: install netstat and netcat on deb
-  apt:
-    name: "{{ item }}"
+  ansible.builtin.package:
+    name:
+      - net-tools
+      - netcat
     state: latest
-  with_items:
-    - net-tools
-    - netcat
   when: ansible_os_family == "Debian"
 
 - name: install netstat and netcat on rh < 7
-  yum:
-    name: "{{ item }}"
+  ansible.builtin.package:
+    name:
+      - net-tools
+      - nc.x86_64
     state: latest
-  with_items:
-    - net-tools
-    - nc.x86_64
   when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 7
 
-- name: install netstat and netcat on rh >= 7
-  yum:
-    name: "{{ item }}"
+- name: install netcat on rh >= 7
+  ansible.builtin.package:
+    name: 'nmap-ncat'
     state: latest
-  with_items:
-    - net-tools
-    - nmap-ncat
   when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7
 
 - name: start UDP server on port 5555
@@ -62,6 +57,16 @@
 - name: Gather listening ports facts
   listen_ports_facts:
   when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+
+- name: Gather listening ports facts explicitly via netstat
+  listen_ports_facts:
+    command: 'netstat'
+  when: (ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 7) or ansible_os_family == "Debian"
+
+- name: Gather listening ports facts explicitly via ss
+  listen_ports_facts:
+    command: 'ss'
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7
 
 - name: check for ansible_facts.udp_listen exists
   assert:
