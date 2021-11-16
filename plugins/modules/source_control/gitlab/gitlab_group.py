@@ -169,19 +169,19 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import findGroup, gitlabAuthentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import find_group, gitlab_authentication
 
 
 class GitLabGroup(object):
     def __init__(self, module, gitlab_instance):
         self._module = module
         self._gitlab = gitlab_instance
-        self.groupObject = None
+        self.group_object = None
 
     '''
     @param group Group object
     '''
-    def getGroupId(self, group):
+    def get_group_id(self, group):
         if group is not None:
             return group.id
         return None
@@ -191,12 +191,12 @@ class GitLabGroup(object):
     @param parent Parent group full path
     @param options Group options
     '''
-    def createOrUpdateGroup(self, name, parent, options):
+    def create_or_update_group(self, name, parent, options):
         changed = False
 
         # Because we have already call userExists in main()
-        if self.groupObject is None:
-            parent_id = self.getGroupId(parent)
+        if self.group_object is None:
+            parent_id = self.get_group_id(parent)
 
             payload = {
                 'name': name,
@@ -211,10 +211,10 @@ class GitLabGroup(object):
                 payload['description'] = options['description']
             if options.get('require_two_factor_authentication'):
                 payload['require_two_factor_authentication'] = options['require_two_factor_authentication']
-            group = self.createGroup(payload)
+            group = self.create_group(payload)
             changed = True
         else:
-            changed, group = self.updateGroup(self.groupObject, {
+            changed, group = self.update_group(self.group_object, {
                 'name': name,
                 'description': options['description'],
                 'visibility': options['visibility'],
@@ -224,7 +224,7 @@ class GitLabGroup(object):
                 'require_two_factor_authentication': options['require_two_factor_authentication'],
             })
 
-        self.groupObject = group
+        self.group_object = group
         if changed:
             if self._module.check_mode:
                 self._module.exit_json(changed=True, msg="Successfully created or updated the group %s" % name)
@@ -240,7 +240,7 @@ class GitLabGroup(object):
     '''
     @param arguments Attributes of the group
     '''
-    def createGroup(self, arguments):
+    def create_group(self, arguments):
         if self._module.check_mode:
             return True
 
@@ -255,7 +255,7 @@ class GitLabGroup(object):
     @param group Group Object
     @param arguments Attributes of the group
     '''
-    def updateGroup(self, group, arguments):
+    def update_group(self, group, arguments):
         changed = False
 
         for arg_key, arg_value in arguments.items():
@@ -266,8 +266,8 @@ class GitLabGroup(object):
 
         return (changed, group)
 
-    def deleteGroup(self):
-        group = self.groupObject
+    def delete_group(self):
+        group = self.group_object
 
         if len(group.projects.list()) >= 1:
             self._module.fail_json(
@@ -285,11 +285,11 @@ class GitLabGroup(object):
     @param name Name of the groupe
     @param full_path Complete path of the Group including parent group path. <parent_path>/<group_path>
     '''
-    def existsGroup(self, project_identifier):
-        # When group/user exists, object will be stored in self.groupObject.
-        group = findGroup(self._gitlab, project_identifier)
+    def exists_group(self, project_identifier):
+        # When group/user exists, object will be stored in self.group_object.
+        group = find_group(self._gitlab, project_identifier)
         if group:
-            self.groupObject = group
+            self.group_object = group
             return True
         return False
 
@@ -339,7 +339,7 @@ def main():
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
-    gitlab_instance = gitlabAuthentication(module)
+    gitlab_instance = gitlab_authentication(module)
 
     # Define default group_path based on group_name
     if group_path is None:
@@ -349,34 +349,34 @@ def main():
 
     parent_group = None
     if parent_identifier:
-        parent_group = findGroup(gitlab_instance, parent_identifier)
+        parent_group = find_group(gitlab_instance, parent_identifier)
         if not parent_group:
             module.fail_json(msg="Failed create GitLab group: Parent group doesn't exists")
 
-        group_exists = gitlab_group.existsGroup(parent_group.full_path + '/' + group_path)
+        group_exists = gitlab_group.exists_group(parent_group.full_path + '/' + group_path)
     else:
-        group_exists = gitlab_group.existsGroup(group_path)
+        group_exists = gitlab_group.exists_group(group_path)
 
     if state == 'absent':
         if group_exists:
-            gitlab_group.deleteGroup()
+            gitlab_group.delete_group()
             module.exit_json(changed=True, msg="Successfully deleted group %s" % group_name)
         else:
             module.exit_json(changed=False, msg="Group deleted or does not exists")
 
     if state == 'present':
-        if gitlab_group.createOrUpdateGroup(group_name, parent_group, {
-                                            "path": group_path,
-                                            "description": description,
-                                            "visibility": group_visibility,
-                                            "project_creation_level": project_creation_level,
-                                            "auto_devops_enabled": auto_devops_enabled,
-                                            "subgroup_creation_level": subgroup_creation_level,
-                                            "require_two_factor_authentication": require_two_factor_authentication,
-                                            }):
-            module.exit_json(changed=True, msg="Successfully created or updated the group %s" % group_name, group=gitlab_group.groupObject._attrs)
+        if gitlab_group.create_or_update_group(group_name, parent_group, {
+            "path": group_path,
+            "description": description,
+            "visibility": group_visibility,
+            "project_creation_level": project_creation_level,
+            "auto_devops_enabled": auto_devops_enabled,
+            "subgroup_creation_level": subgroup_creation_level,
+            "require_two_factor_authentication": require_two_factor_authentication,
+        }):
+            module.exit_json(changed=True, msg="Successfully created or updated the group %s" % group_name, group=gitlab_group.group_object._attrs)
         else:
-            module.exit_json(changed=False, msg="No need to update the group %s" % group_name, group=gitlab_group.groupObject._attrs)
+            module.exit_json(changed=False, msg="No need to update the group %s" % group_name, group=gitlab_group.group_object._attrs)
 
 
 if __name__ == '__main__':

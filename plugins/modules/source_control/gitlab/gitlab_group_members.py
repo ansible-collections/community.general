@@ -155,7 +155,7 @@ RETURN = r''' # '''
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import gitlabAuthentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import gitlab_authentication
 
 import traceback
 
@@ -288,7 +288,7 @@ def main():
         'reporter': gitlab.REPORTER_ACCESS,
         'developer': gitlab.DEVELOPER_ACCESS,
         'maintainer': gitlab.MAINTAINER_ACCESS,
-        'owner': gitlab.OWNER_ACCESS
+        'owner': gitlab.OWNER_ACCESS,
     }
 
     gitlab_group = module.params['gitlab_group']
@@ -300,7 +300,7 @@ def main():
         purge_users = [access_level_int[level] for level in purge_users]
 
     # connect to gitlab server
-    gl = gitlabAuthentication(module)
+    gl = gitlab_authentication(module)
 
     group = GitLabGroup(module, gl)
 

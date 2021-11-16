@@ -55,11 +55,11 @@ class TestGitlabHook(GitlabModuleTestCase):
     def test_hook_exist(self):
         project = self.gitlab_instance.projects.get(1)
 
-        rvalue = self.moduleUtil.existsHook(project, "http://example.com/hook")
+        rvalue = self.moduleUtil.exists_hook(project, "http://example.com/hook")
 
         self.assertEqual(rvalue, True)
 
-        rvalue = self.moduleUtil.existsHook(project, "http://gitlab.com/hook")
+        rvalue = self.moduleUtil.exists_hook(project, "http://gitlab.com/hook")
 
         self.assertEqual(rvalue, False)
 
@@ -68,7 +68,7 @@ class TestGitlabHook(GitlabModuleTestCase):
     def test_create_hook(self):
         project = self.gitlab_instance.projects.get(1)
 
-        hook = self.moduleUtil.createHook(project, {"url": "http://example.com/hook"})
+        hook = self.moduleUtil.create_hook(project, {"url": "http://example.com/hook"})
 
         self.assertEqual(type(hook), ProjectHook)
         self.assertEqual(hook.url, "http://example.com/hook")
@@ -77,15 +77,15 @@ class TestGitlabHook(GitlabModuleTestCase):
     @with_httmock(resp_find_project_hook)
     def test_update_hook(self):
         project = self.gitlab_instance.projects.get(1)
-        hook = self.moduleUtil.findHook(project, "http://example.com/hook")
+        hook = self.moduleUtil.find_hook(project, "http://example.com/hook")
 
-        changed, newHook = self.moduleUtil.updateHook(hook, {"url": "http://gitlab.com/hook"})
+        changed, newHook = self.moduleUtil.update_hook(hook, {"url": "http://gitlab.com/hook"})
 
         self.assertEqual(changed, True)
         self.assertEqual(type(newHook), ProjectHook)
         self.assertEqual(newHook.url, "http://gitlab.com/hook")
 
-        changed, newHook = self.moduleUtil.updateHook(hook, {"url": "http://gitlab.com/hook"})
+        changed, newHook = self.moduleUtil.update_hook(hook, {"url": "http://gitlab.com/hook"})
 
         self.assertEqual(changed, False)
         self.assertEqual(newHook.url, "http://gitlab.com/hook")
@@ -96,8 +96,8 @@ class TestGitlabHook(GitlabModuleTestCase):
     def test_delete_hook(self):
         project = self.gitlab_instance.projects.get(1)
 
-        self.moduleUtil.existsHook(project, "http://example.com/hook")
+        self.moduleUtil.exists_hook(project, "http://example.com/hook")
 
-        rvalue = self.moduleUtil.deleteHook()
+        rvalue = self.moduleUtil.delete_hook()
 
         self.assertEqual(rvalue, None)

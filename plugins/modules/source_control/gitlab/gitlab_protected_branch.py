@@ -87,7 +87,7 @@ except Exception:
     GITLAB_IMP_ERR = traceback.format_exc()
     HAS_GITLAB_PACKAGE = False
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import gitlabAuthentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import gitlab_authentication
 
 
 class GitlabProtectedBranch(object):
@@ -179,7 +179,7 @@ def main():
         module.fail_json(msg="community.general.gitlab_proteched_branch requires python-gitlab Python module >= 2.3.0 (installed version: [%s])."
                              " Please upgrade python-gitlab to version 2.3.0 or above." % gitlab_version)
 
-    gitlab_instance = gitlabAuthentication(module)
+    gitlab_instance = gitlab_authentication(module)
     this_gitlab = GitlabProtectedBranch(module=module, project=project, gitlab_instance=gitlab_instance)
 
     p_branch = this_gitlab.protected_branch_exist(name=name)
