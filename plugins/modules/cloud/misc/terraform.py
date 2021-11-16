@@ -339,7 +339,6 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
 
     plan_command.extend('-input=false', '-no-color', '-detailed-exitcode', '-out', plan_path)
 
-
     for t in targets:
         plan_command.extend(['-target', t])
 
