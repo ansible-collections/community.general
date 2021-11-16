@@ -143,7 +143,7 @@ except Exception:
     GITLAB_IMP_ERR = traceback.format_exc()
     HAS_GITLAB_PACKAGE = False
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import gitlabAuthentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import gitlab_authentication
 
 
 class GitlabProjectVariables(object):
@@ -172,7 +172,7 @@ class GitlabProjectVariables(object):
         var = {
             "key": key, "value": value,
             "masked": masked, "protected": protected,
-            "variable_type": variable_type
+            "variable_type": variable_type,
         }
         if environment_scope is not None:
             var["environment_scope"] = environment_scope
@@ -300,7 +300,7 @@ def main():
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
-    gitlab_instance = gitlabAuthentication(module)
+    gitlab_instance = gitlab_authentication(module)
 
     this_gitlab = GitlabProjectVariables(module=module, gitlab_instance=gitlab_instance)
 
