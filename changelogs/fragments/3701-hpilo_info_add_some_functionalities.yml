@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - hpilo_info - add other return values from HP ILO
+    (https://github.com/ansible-collections/community.general/pull/3701).
