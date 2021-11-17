@@ -118,7 +118,6 @@ def main():
     category = module.params['category']
     command_list = module.params['command']
 
-    session_id = None
     creds = {"user": module.params['username'],
              "pswd": module.params['password'],
              "token": module.params['auth_token']}
