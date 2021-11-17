@@ -1834,12 +1834,16 @@ class RedfishUtils(object):
                 result['ret'] = True
                 data = response['data']
 
-                for device in data[u'Fans']:
-                    fan = {}
-                    for property in properties:
-                        if property in device:
-                            fan[property] = device[property]
-                    fan_results.append(fan)
+                # Checking if fans are present
+                if 'Fans' in data:
+                    for device in data[u'Fans']:
+                        fan = {}
+                        for property in properties:
+                            if property in device:
+                                fan[property] = device[property]
+                        fan_results.append(fan)
+                else:
+                    fan_results = "No fans present"
         result["entries"] = fan_results
         return result
 
