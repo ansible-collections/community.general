@@ -107,11 +107,20 @@ def main():
             baseuri=dict(required=True),
             username=dict(),
             password=dict(no_log=True),
+            auth_token=dict(no_log=True),
             attribute_name=dict(),
             attribute_value=dict(),
-            auth_token=dict(no_log=True),
             timeout=dict(type='int', default=10)
         ),
+        required_together=[
+            ('username', 'password'),
+        ],
+        required_one_of=[
+            ('username', 'auth_token'),
+        ],
+        mutually_exclusive=[
+            ('username', 'auth_token'),
+        ],
         supports_check_mode=False
     )
 
