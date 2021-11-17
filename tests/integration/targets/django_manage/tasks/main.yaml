@@ -8,6 +8,11 @@
     suffix: .django_manage
   register: tmp_django_root
 
+- name: Make sure virtualenv is installed
+  pip:
+    name: virtualenv
+    state: present
+
 - name: Install required library
   pip:
     name: django
