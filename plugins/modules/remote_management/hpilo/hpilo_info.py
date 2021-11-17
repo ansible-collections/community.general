@@ -88,7 +88,7 @@ hw_eth_ilo:
     type: dict
     sample:
       - macaddress: 00:11:22:33:44:BA
-      - macaddress_dash: 00-11-22-33-44-BA
+        macaddress_dash: 00-11-22-33-44-BA
 
 hw_product_name:
     description: Product name
@@ -122,6 +122,226 @@ host_power_status:
     type: str
     sample: ON
     version_added: 3.5.0
+
+server_name:
+    description: Server name
+    returned: always
+    type: str
+    sample: milo.company.com
+
+snmp_im_settings:
+    description: System serial number
+    returned: always
+    type: dict
+    sample: 
+      snmp_im_settings:
+        agentless_management_enable: true
+        cim_security_mask: 3
+        cold_start_trap_broadcast: true
+        os_traps: true
+        rib_traps: true
+        snmp_access: Enable
+        snmp_address_1: ''
+        snmp_address_1_rocommunity: ''
+        snmp_address_1_trapcommunity: ''
+        snmp_address_2: ''
+        snmp_address_2_rocommunity: ''
+        snmp_address_2_trapcommunity: ''
+        snmp_address_3: ''
+        snmp_address_3_rocommunity: ''
+        snmp_address_3_trapcommunity: ''
+        snmp_passthrough_status: false
+        snmp_port: 161
+        snmp_sys_contact: ''
+        snmp_sys_location: ''
+        snmp_system_role: ''
+        snmp_system_role_detail: ''
+        snmp_trap_port: 162
+        snmp_v1_traps: true
+        snmp_v3_engine_id: '0x800000E804435A3137323030314139'
+        trap_source_identifier: iLO Hostname
+        web_agent_ip_address: milo.company.com
+
+network_settings:
+    description: Retrieve information about ilo network
+    returned: always
+    type: dict
+    sample: 
+      network_settings:
+        dhcp_dns_server: false
+        dhcp_domain_name: false
+        dhcp_enable: false
+        dhcp_gateway: false
+        dhcp_sntp_settings: false
+        dhcp_static_route: false
+        dhcp_wins_server: false
+        dns_name: ilo
+        domain_name: ''
+        enable_nic: true
+        full_duplex: Automatic
+        gateway_ip_address: 10.1.2.254
+        ilo_nic_auto_delay: 90
+        ilo_nic_auto_select: DISABLED
+        ilo_nic_auto_snp_scan: 0
+        ilo_nic_fail_over: DISABLED
+        ilo_nic_fail_over_delay: 300
+        ip_address: 10.1.2.3
+        mac_address: f4:03:43:ff:1d:63
+        nic_speed: Automatic
+        ping_gateway: true
+        prim_dns_server: 8.8.8.8
+        prim_wins_server: 0.0.0.0
+        reg_ddns_server: true
+        reg_wins_server: true
+        sec_dns_server: 9.9.9.9
+        sec_wins_server: 0.0.0.0
+        shared_network_port: LOM
+        snp_port: 1
+        sntp_server1: fr.pool.ntp.org
+        sntp_server2: ''
+        speed_autoselect: true
+        static_route_1:
+            dest: 0.0.0.0
+            gateway: 0.0.0.0
+            mask: 0.0.0.0
+        static_route_2:
+            dest: 0.0.0.0
+            gateway: 0.0.0.0
+            mask: 0.0.0.0
+        static_route_3:
+            dest: 0.0.0.0
+            gateway: 0.0.0.0
+            mask: 0.0.0.0
+        subnet_mask: 255.255.255.0
+        ter_dns_server: 0.0.0.0
+        timezone: Europe/Madrid
+        vlan_enabled: false
+        vlan_id: 0
+
+
+global_settings:
+    description: Global settings about ilo
+    returned: always
+    type: dict
+    sample: 
+      global_settings:
+        alertmail_email_address: ''
+        alertmail_enable: false
+        alertmail_sender_domain: ''
+        alertmail_smtp_port: 25
+        alertmail_smtp_server: ''
+        authentication_failure_delay_secs: 10
+        authentication_failure_logging: Enabled-every 3rd failure
+        authentication_failures_before_delay: 1
+        enforce_aes: false
+        f8_login_required: false
+        f8_prompt_enabled: true
+        http_port: 80
+        https_port: 443
+        ilo_funct_enabled: true
+        ipmi_dcmi_over_lan_enabled: true
+        ipmi_dcmi_over_lan_port: 623
+        lock_configuration: false
+        min_password: 8
+        propagate_time_to_host: true
+        rbsu_post_ip: true
+        remote_console_port: 17990
+        remote_syslog_enable: false
+        remote_syslog_port: 514
+        remote_syslog_server_address: ''
+        session_timeout: 120
+        snmp_access_enabled: true
+        snmp_port: 161
+        snmp_trap_port: 162
+        ssh_port: 22
+        ssh_status: true
+        virtual_media_port: 17988
+        vsp_log_enable: false
+
+
+supported_boot_mode:
+    description: Boot mode supported
+    returned: always
+    type: str
+    sample: LEGACY_UEFI
+    
+one_time_boot:
+    description: One time boot
+    returned: always
+    type: str
+    sample: normal
+
+pending_boot_mode:
+    description: Pending boot mode
+    returned: always
+    type: str
+    sample: UEFI
+
+persistent_boot:
+    description: System serial number
+    returned: always
+    type: list
+    sample: 
+      persistent_boot:
+        -   - Boot0013
+            - VMware ESXi
+        -   - Boot000E
+            - Windows Boot Manager
+        -   - Boot000D
+            - Assisted_Installation
+        -   - Boot0008
+            - Generic USB Boot
+        -   - Boot0009
+            - 'Internal SD Card 1 : Generic Ultra Fast Media Reader'
+        -   - Boot000B
+            - 'Rear USB 1 : Kingston DataTraveler 3.0'
+
+current_boot_mode:
+    description: Current boot mode
+    returned: always
+    type: str
+    sample: UEFI
+
+security_msg:
+    description: Security msg if enabled
+    returned: always
+    type: dict
+    sample: 
+      security_msg:
+        security_msg: Disabled
+        security_msg_text: ''
+
+all_licenses:
+    description: Display list of dict about the licences (expired or not)
+    returned: always
+    type: list of dict
+    sample: 
+    -   license_class: FQL
+        license_install_date: Sun Mar 12 16:44:03 1988
+        license_key: XXXX-XXXX-XXXX-XXXX-XXXX
+        license_type: iLO Advanced
+
+all_user_info:
+    description: Return detail actual connected user
+    returned: always
+    type: dict
+    sample: 
+      Administrator:
+        admin_priv: true
+        config_ilo_priv: true
+        remote_cons_priv: true
+        reset_server_priv: true
+        user_login: Administrator
+        user_name: Administrator
+        virtual_media_priv: true
+
+all_users:
+    description: display all user in ILO
+    returned: always
+    type: list
+    sample: 
+    - Administrator
+    
 '''
 
 import re
