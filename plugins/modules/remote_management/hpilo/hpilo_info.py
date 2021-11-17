@@ -124,13 +124,14 @@ host_power_status:
     version_added: 3.5.0
 
 server_name:
-    description: Server name
+    description: The server name
     returned: always
     type: str
     sample: milo.company.com
+    version_added: 4.1.0
 
 snmp_im_settings:
-    description: System serial number
+    description: The system serial number
     returned: always
     type: dict
     sample: 
@@ -161,6 +162,7 @@ snmp_im_settings:
         snmp_v3_engine_id: '0x800000E804435A3137323030314139'
         trap_source_identifier: iLO Hostname
         web_agent_ip_address: milo.company.com
+    version_added: 4.1.0
 
 network_settings:
     description: Retrieve information about ilo network
@@ -217,6 +219,7 @@ network_settings:
         timezone: Europe/Madrid
         vlan_enabled: false
         vlan_id: 0
+    version_added: 4.1.0
 
 
 global_settings:
@@ -257,6 +260,7 @@ global_settings:
         ssh_status: true
         virtual_media_port: 17988
         vsp_log_enable: false
+    version_added: 4.1.0
 
 
 supported_boot_mode:
@@ -264,21 +268,24 @@ supported_boot_mode:
     returned: always
     type: str
     sample: LEGACY_UEFI
+    version_added: 4.1.0
     
 one_time_boot:
-    description: One time boot
+    description: The one time boot
     returned: always
     type: str
     sample: normal
+    version_added: 4.1.0
 
 pending_boot_mode:
-    description: Pending boot mode
+    description: The pending boot mode
     returned: always
     type: str
     sample: UEFI
+    version_added: 4.1.0
 
 persistent_boot:
-    description: System serial number
+    description: The persistant boot
     returned: always
     type: list
     sample: 
@@ -295,12 +302,14 @@ persistent_boot:
             - 'Internal SD Card 1 : Generic Ultra Fast Media Reader'
         -   - Boot000B
             - 'Rear USB 1 : Kingston DataTraveler 3.0'
+    version_added: 4.1.0
 
 current_boot_mode:
-    description: Current boot mode
+    description: The current boot mode
     returned: always
     type: str
     sample: UEFI
+    version_added: 4.1.0
 
 security_msg:
     description: Security msg if enabled
@@ -310,6 +319,7 @@ security_msg:
       security_msg:
         security_msg: Disabled
         security_msg_text: ''
+    version_added: 4.1.0
 
 all_licenses:
     description: Display list of dict about the licences (expired or not)
@@ -320,6 +330,7 @@ all_licenses:
         license_install_date: Sun Mar 12 16:44:03 1988
         license_key: XXXX-XXXX-XXXX-XXXX-XXXX
         license_type: iLO Advanced
+    version_added: 4.1.0
 
 all_user_info:
     description: Return detail actual connected user
@@ -334,13 +345,15 @@ all_user_info:
         user_login: Administrator
         user_name: Administrator
         virtual_media_priv: true
+    version_added: 4.1.0
 
 all_users:
-    description: display all user in ILO
+    description: Display all user in ILO
     returned: always
     type: list
     sample: 
     - Administrator
+    version_added: 4.1.0
     
 '''
 
