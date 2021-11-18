@@ -57,7 +57,7 @@ requirements:
     - "python >= 3.8"
     - "ansible >= 3.2"
 author:
-    - "Bhavya B (@Bhavya06)"
+    - "Bhavya B (@bhavya06)"
 '''
 
 EXAMPLES = '''
