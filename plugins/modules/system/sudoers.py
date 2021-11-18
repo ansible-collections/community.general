@@ -26,7 +26,6 @@ options:
         type: list
         elements: str
     group:
-        required: false
         description:
             - The name of the group for the sudoers rule.
             - This option cannot be used in conjunction with I(user).
@@ -43,20 +42,17 @@ options:
         default: true
         type: bool
     sudoers_path:
-        required: false
         description:
             - The path which sudoers config files will be managed in.
         default: /etc/sudoers.d
         type: str
     state:
-        required: false
         default: "present"
         choices: [ present, absent ]
         description:
             - Whether the rule should exist or not.
         type: str
     user:
-        required: false
         description:
             - The name of the user for the sudoers rule.
             - This option cannot be used in conjunction with I(group).
