@@ -42,16 +42,16 @@ options:
   description:
     description:
     - Description for the repository.
-    - Defaults to empty if force_defaults=true, which is the default in this module.
-    - Defaults to empty if force_defaults=false when creating a new repository.
+    - Defaults to empty if I(force_defaults=true), which is the default in this module.
+    - Defaults to empty if I(force_defaults=false) when creating a new repository.
     - This is only used when I(state) is C(present).
     type: str
     required: false
   private:
     description:
     - Whether the repository should be private or not.
-    - Defaults to C(false) if force_defaults=true, which is the default in this module.
-    - Defaults to C(false) if force_defaults=false when creating a new repository.
+    - Defaults to C(false) if I(force_defaults=true), which is the default in this module.
+    - Defaults to C(false) if I(force_defaults=false) when creating a new repository.
     - This is only used when I(state) is C(present).
     type: bool
     required: false
