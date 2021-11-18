@@ -42,14 +42,16 @@ options:
   description:
     description:
     - Description for the repository.
-    - Defaults to empty when creating a new repository.
+    - Defaults to empty if force_defaults=true, which is the default in this module.
+    - Defaults to empty if force_defaults=false when creating a new repository.
     - This is only used when I(state) is C(present).
     type: str
     required: false
   private:
     description:
     - Whether the repository should be private or not.
-    - Defaults to C(false) when creating a new repository.
+    - Defaults to C(false) if force_defaults=true, which is the default in this module.
+    - Defaults to C(false) if force_defaults=false when creating a new repository.
     - This is only used when I(state) is C(present).
     type: bool
     required: false
@@ -74,10 +76,11 @@ options:
     version_added: "3.5.0"
   force_defaults:
     description:
-    - Overwrite current repository attributes with defaults if not set.
+    - Overwrite current description and private attributes with defaults if not set.
     type: bool
     default: true
     required: false
+    version_added: 4.1.0
 requirements:
 - PyGithub>=1.54
 notes:
@@ -206,8 +209,8 @@ def delete_repo(gh, name, organization=None, check_mode=False):
 
 def run_module(params, check_mode=False):
     if params['force_defaults']:
-        params['description'] = params.get('description') or ''
-        params['private'] = params.get('private') or False
+        params['description'] = params['description'] or ''
+        params['private'] = params['private'] or False
 
     gh = authenticate(
         username=params['username'], password=params['password'], access_token=params['access_token'],
