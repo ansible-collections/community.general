@@ -12,48 +12,54 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: sudoers
-short_description: Manage Linux sudoers files
+short_description: manage sudoers files
 version_added: "4.1.0"
 description:
-    - This module allows for the manipulation of Linux sudoers files
+    - This module allows for the manipulation of sudoers files.
 author:
     - "Jon Ellis (@JonEllis0) <ellis.jp@gmail.com>"
 options:
-    command:
+    commands:
         description:
-            - The command allowed by the sudoers rule
-            - Multiple can be added by passing a list of commands
+            - The commands allowed by the sudoers rule.
+            - Multiple can be added by passing a list of commands.
         type: list
         elements: str
     group:
         required: false
         description:
-            - Name of the group for the sudoers rule
-            - (cannot be used in conjunction with user)
+            - The name of the group for the sudoers rule.
+            - This option cannot be used in conjunction with I(user).
         type: str
     name:
         required: true
         description:
-            - Name of the sudoers rule
+            - The name of the sudoers rule.
+            - This will be used for the filename for the sudoers file managed by this rule.
         type: str
     nopassword:
-        required: false
         description:
-            - Whether a password will be required to run the sudo'd command
+            - Whether a password will be required to run the sudo'd command.
         default: true
         type: bool
+    sudoers_path:
+        required: false
+        description:
+            - The path which sudoers config files will be managed in.
+        default: /etc/sudoers.d
+        type: str
     state:
         required: false
         default: "present"
         choices: [ present, absent ]
         description:
-            - Whether the rule should exist or not
+            - Whether the rule should exist or not.
         type: str
     user:
         required: false
         description:
-            - Name of the user for the sudoers rule
-            - (cannot be used in conjunction with group)
+            - The name of the user for the sudoers rule.
+            - This option cannot be used in conjunction with I(group).
         type: str
 '''
 
@@ -63,19 +69,19 @@ EXAMPLES = '''
     name: allow-backup
     state: present
     user: backup
-    command: /usr/local/bin/backup
+    commands: /usr/local/bin/backup
 
 - name: Allow the monitoring group to run sudo /usr/local/bin/gather-app-metrics without requiring a password
   sudoers:
     name: monitor-app
     group: monitoring
-    command: /usr/local/bin/gather-app-metrics
+    commands: /usr/local/bin/gather-app-metrics
 
 - name: Allow the alice user to run sudo /bin/systemctl restart my-service or sudo /bin/systemctl reload my-service, but a password is required
   sudoers:
     name: alice-service
     user: alice
-    command:
+    commands:
       - /bin/systemctl restart my-service
       - /bin/systemctl reload my-service
     nopassword: false
@@ -86,26 +92,22 @@ EXAMPLES = '''
       state: absent
 '''
 
-from ansible.module_utils.basic import AnsibleModule
 import os
+from ansible.module_utils.basic import AnsibleModule
 
 
 class Sudoers(object):
 
     def __init__(self, module):
-        self.module = module
+        self.check_mode = module.check_mode
         self.name = module.params['name']
-        self.user = module.params.get('user')
-        self.group = module.params.get('group')
+        self.user = module.params['user']
+        self.group = module.params['group']
         self.state = module.params['state']
-        self.nopassword = bool(module.params.get('nopassword', True))
-        self.file = '/etc/sudoers.d/{filename}'.format(filename=self.name)
-
-        command = module.params['command']
-        if isinstance(command, list):
-            self.commands = command
-        else:
-            self.commands = [command]
+        self.nopassword = module.params['nopassword']
+        self.sudoers_path = module.params['sudoers_path']
+        self.file = os.path.join(self.sudoers_path, self.name)
+        self.commands = module.params['commands']
 
     def write(self):
         with open(self.file, 'w') as f:
@@ -127,56 +129,28 @@ class Sudoers(object):
         elif self.group:
             owner = '%{group}'.format(group=self.group)
 
-        command_str = ', '.join(self.commands)
-        nopasswd_str = 'NOPASSWD' if self.nopassword else ''
-        return "{owner} ALL={nopasswd}: {command}\n".format(owner=owner, nopasswd=nopasswd_str, command=command_str)
-
-    def check(self):
-        try:
-            if self.state == 'absent' and self.exists():
-                changed = True
-            elif self.state == 'present':
-                if not self.exists():
-                    changed = True
-                elif not self.matches():
-                    changed = True
-                else:
-                    changed = False
-            else:
-                changed = False
-        except Exception as e:
-            self.module.fail_json(msg=str(e))
-
-        self.module.exit_json(changed=changed)
+        commands_str = ', '.join(self.commands)
+        nopasswd_str = 'NOPASSWD:' if self.nopassword else ''
+        return "{owner} ALL={nopasswd} {commands}\n".format(owner=owner, nopasswd=nopasswd_str, commands=commands_str)
 
     def run(self):
-        changed = False
-
-        try:
-            if self.state == 'absent' and self.exists():
+        if self.state == 'absent' and self.exists():
+            if not self.check_mode:
                 self.delete()
-                changed = True
-            elif self.state == 'present':
-                if not self.exists():
-                    self.write()
-                    changed = True
-                elif not self.matches():
-                    self.write()
-                    changed = True
-                else:
-                    changed = False
-            else:
-                changed = False
+            return True
 
-        except Exception as e:
-            self.module.fail_json(msg=str(e))
+        if self.exists() and self.matches():
+            return False
 
-        self.module.exit_json(changed=changed)
+        if not self.check_mode:
+            self.write()
+
+        return True
 
 
 def main():
     argument_spec = {
-        'command': {
+        'commands': {
             'type': 'list',
             'elements': 'str',
             'default': [],
@@ -189,26 +163,31 @@ def main():
             'type': 'bool',
             'default': True,
         },
+        'sudoers_path': {
+            'type': 'str',
+            'default': '/etc/sudoers.d',
+        },
         'state': {
             'default': 'present',
             'choices': ['present', 'absent'],
         },
         'user': {},
     }
-    mutually_exclusive = [['user', 'group']]
 
     module = AnsibleModule(
         argument_spec=argument_spec,
-        mutually_exclusive=mutually_exclusive,
+        mutually_exclusive=[['user', 'group']],
         supports_check_mode=True,
+        required_if=[('state', 'present', ['commands'])],
     )
 
     sudoers = Sudoers(module)
 
-    if module.check_mode:
-        sudoers.check()
-    else:
-        sudoers.run()
+    try:
+        changed = sudoers.run()
+        module.exit_json(changed=changed)
+    except Exception as e:
+        module.fail_json(msg=str(e))
 
 
 if __name__ == '__main__':
