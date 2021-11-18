@@ -2708,7 +2708,7 @@ class RedfishUtils(object):
         # Get the manager ethernet interface uri
         nic_info = self.get_manager_ethernet_uri(nic_addr)
 
-        if nic_info['nic_addr'] is None:
+        if nic_info.get('nic_addr') is None:
             return nic_info
         else:
             target_ethernet_uri = nic_info['nic_addr']
