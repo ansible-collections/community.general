@@ -86,7 +86,7 @@ if [ "${script}" != "sanity" ] || [ "${test}" == "sanity/extra" ]; then
     # retry ansible-galaxy -vvv collection install community.internal_test_tools
 fi
 
-if [ "${script}" != "sanity" ] && [ "${script}" != "units" ]; then
+if [ "${script}" != "sanity" ] && [ "${script}" != "units" ] && [ "${test}" != "sanity/extra" ]; then
     CRYPTO_BRANCH=main
     if [ "${script}" == "linux" ] && [[ "${test}" =~ "ubuntu1604/" ]]; then
         CRYPTO_BRANCH=stable-1
