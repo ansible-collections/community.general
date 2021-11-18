@@ -20,13 +20,14 @@ options:
     required: true
     description:
       - List of categories to execute on iLO.
-    choices: 'Sessions'
     type: list
+    elements: str
   command:
     required: true
     description:
       - List of commands to execute on iLO.
     type: list
+    elements: str
   baseuri:
     required: true
     description:
@@ -84,8 +85,8 @@ def main():
     category_list = []
     module = AnsibleModule(
         argument_spec=dict(
-            category=dict(required=True, type='list'),
-            command=dict(required=True, type='list'),
+            category=dict(required=True, type='list', elements='str'),
+            command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
             username=dict(),
             password=dict(no_log=True),
