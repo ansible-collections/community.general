@@ -13,51 +13,53 @@ module: ilo_redfish_config
 short_description: Sets or updates configuration attributes on HPE iLO with Redfish OEM extensions
 version_added: 4.1.0
 description:
-    - "Provides an interface to manage configuration attributes."
+    - Builds Redfish URIs locally and sends them to iLO to
+    set or update a configuration attribute.
+    - For use with HPE iLO operations that require Redfish OEM extensions
 options:
   category:
     required: true
     type: str
     description:
-      - Command category to execute on iLO
-    choices: ['Manager', 'Sessions']
+      - Command category to execute on iLO.
+    choices: ['Manager']
   command:
     required: true
     description:
-      - List of commands to execute on iLO
+      - List of commands to execute on iLO.
     type: list
     elements: str
   baseuri:
     required: true
     description:
-      - Base URI of iLO
+      - Base URI of iLO.
     type: str
   username:
     description:
-      - User for authentication with iLO
+      - User for authentication with iLO.
     type: str
   password:
     description:
-      - Password for authentication with iLO
+      - Password for authentication with iLO.
     type: str
   auth_token:
     description:
-      - Security token for authentication with OOB controller
+      - Security token for authentication with OOB controller.
     type: str
   timeout:
     description:
-      - Timeout in seconds for URL requests to iLO controller
+      - Timeout in seconds for URL requests to iLO controller.
     default: 10
     type: int
   attribute_name:
-    required: false
+    required: true
     description:
-      - Name of the attribute
+      - Name of the attribute.
     type: str
   attribute_value:
     required: false
     description:
-      - Value of the attribute
+      - Value of the attribute.
     type: str
 requirements:
     - "python >= 3.8"
@@ -88,8 +90,7 @@ EXAMPLES = '''
 '''
 
 CATEGORY_COMMANDS_ALL = {
-    "Manager": ["SetTimeZone", "SetDNSserver", "SetDomainName", "SetNTPServers", "SetWINSReg"],
-    "Sessions": ["GetiLOSessions"]
+    "Manager": ["SetTimeZone", "SetDNSserver", "SetDomainName", "SetNTPServers", "SetWINSReg"]
 }
 
 from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
@@ -108,7 +109,7 @@ def main():
             username=dict(),
             password=dict(no_log=True),
             auth_token=dict(no_log=True),
-            attribute_name=dict(),
+            attribute_name=dict(required=True),
             attribute_value=dict(),
             timeout=dict(type='int', default=10)
         ),
@@ -146,9 +147,9 @@ def main():
             offending, CATEGORY_COMMANDS_ALL[category])))
 
     if category == "Manager":
-        result = rf_utils._find_managers_resource()
-        if not result['ret']:
-            module.fail_json(msg=to_native(result['msg']))
+        resource = rf_utils._find_managers_resource()
+        if not resource['ret']:
+            module.fail_json(msg=to_native(resource['msg']))
 
         dispatch = dict(
             SetTimeZone=rf_utils.set_time_zone,
@@ -160,11 +161,6 @@ def main():
 
         for command in command_list:
             result = dispatch[command](mgr_attributes)
-
-    elif category == "Sessions":
-        for command in command_list:
-            if command == "GetiLOSessions":
-                result = rf_utils.get_ilo_sessions()
 
     if result['ret']:
         module.exit_json(changed=result.get('changed'),

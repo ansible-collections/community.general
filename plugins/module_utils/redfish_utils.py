@@ -1835,7 +1835,7 @@ class RedfishUtils(object):
                 data = response['data']
 
                 # Checking if fans are present
-                if 'uFans' in data:
+                if u'Fans' in data:
                     for device in data[u'Fans']:
                         fan = {}
                         for property in properties:
@@ -1843,7 +1843,7 @@ class RedfishUtils(object):
                                 fan[property] = device[property]
                         fan_results.append(fan)
                 else:
-                    fan_results = "No fans present"
+                    return {'ret': False, 'msg': "No Fans present"}
         result["entries"] = fan_results
         return result
 
@@ -2816,7 +2816,7 @@ class RedfishUtils(object):
         nic_info['ethernet_setting'] = target_ethernet_current_setting
 
         if target_ethernet_uri is None:
-            return {'ret': False, 'msg': "No matched EthernetInterface found under Manager"}
+            return {}
         else:
             return nic_info
 
