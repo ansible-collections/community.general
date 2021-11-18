@@ -22,7 +22,7 @@ options:
     required: true
   path:
     description:
-      - >
+      ->
       The base path where to install the Rust packages. Cargo automatically appends
       /bin. In other words, /usr/local will become /usr/local/bin.
     type: path
@@ -150,7 +150,7 @@ class Cargo(object):
 
 def main():
     arg_spec = dict(
-        name=dict(default=None, type='str'),
+        name=dict(required=True, type='str'),
         path=dict(default=None, type='path'),
         state=dict(default='present', choices=['present', 'absent', 'latest']),
         version=dict(default=None, type='str'),
