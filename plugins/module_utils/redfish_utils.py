@@ -1835,7 +1835,7 @@ class RedfishUtils(object):
                 data = response['data']
 
                 # Checking if fans are present
-                if 'Fans' in data:
+                if 'uFans' in data:
                     for device in data[u'Fans']:
                         fan = {}
                         for property in properties:
