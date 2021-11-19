@@ -27,7 +27,6 @@ options:
       The base path where to install the Rust packages. Cargo automatically appends
       C(/bin). In other words, C(/usr/local) will become C(/usr/local/bin).
     type: path
-    required: false
   version:
     description:
       - The version to be installed.
