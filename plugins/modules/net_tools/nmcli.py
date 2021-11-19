@@ -69,10 +69,11 @@ options:
         type: str
     ip4:
         description:
-            - The IPv4 address to this interface.
+            - List of IPv4 addresses to this interface.
             - Use the format C(192.0.2.24/24).
             - If defined and I(method4) is not specified, automatically set C(ipv4.method) to C(manual).
-        type: str
+        type: list
+        elements: str
     gw4:
         description:
             - The IPv4 gateway for this interface.
@@ -822,7 +823,9 @@ EXAMPLES = r'''
 # nmcli_ethernet:
 #   - conn_name: em1
 #     ifname: em1
-#     ip4: '{{ tenant_ip }}'
+#     ip4:
+#       - '{{ tenant_ip }}'
+#       - '{{ second_tenant_ip }}'
 #     gw4: '{{ tenant_gw }}'
 #   - conn_name: em2
 #     ifname: em2
@@ -844,6 +847,7 @@ EXAMPLES = r'''
 # storage_ip: "192.0.2.91/23"
 # external_ip: "198.51.100.23/21"
 # tenant_ip: "203.0.113.77/23"
+# second_tenant_ip: "204.0.113.77/23"
 # ```
 
 
@@ -995,6 +999,16 @@ EXAMPLES = r'''
       conn_name: my-eth1
       mtu: 9000
       type: ethernet
+      state: present
+
+  - name: Add second ip4 address
+    community.general.nmcli:
+      conn_name: my-eth1
+      ifname: eth1
+      type: ethernet
+      ip4:
+        - 192.0.2.100/24
+        - 192.0.3.100/24
       state: present
 
   - name: Add VxLan
@@ -1468,7 +1482,8 @@ class Nmcli(object):
                        'ipv6.ignore-auto-routes',
                        '802-11-wireless.hidden'):
             return bool
-        elif setting in ('ipv4.dns',
+        elif setting in ('ipv4.addresses',
+                         'ipv4.dns',
                          'ipv4.dns-search',
                          'ipv4.routes',
                          'ipv4.routing-rules',
@@ -1758,7 +1773,7 @@ def main():
                           'wifi',
                           'gsm',
                       ]),
-            ip4=dict(type='str'),
+            ip4=dict(type='list', elements='str'),
             gw4=dict(type='str'),
             gw4_ignore_auto=dict(type='bool', default=False),
             routes4=dict(type='list', elements='str'),
