@@ -76,7 +76,8 @@ options:
     version_added: "3.5.0"
   force_defaults:
     description:
-    - Overwrite current description and private attributes with defaults if not set.
+    - Overwrite current I(description) and I(private) attributes with defaults if set to C(true), which currently is the default.
+    - The default for this option will be deprecated in a future version of this collection, and eventually change to C(false).
     type: bool
     default: true
     required: false
