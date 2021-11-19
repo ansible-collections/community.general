@@ -11,6 +11,7 @@ DOCUMENTATION = r'''
 ---
 module: cargo
 short_description: Manage Rust packages with cargo
+version_added: 4.1.0
 description:
   - Manage Rust packages with cargo.
 author: "Radek Sprta (@radek-sprta)"
