@@ -17,7 +17,7 @@ description:
 requirements:
     - revbits_ansible - U(https://pypi.org/project/revbits_ansible/)
 options:
-    secret_ids:
+    _terms:
         description:
             - This will be an array of keys for secrets which you want to fetch from RevBits PAM.
         required: true
@@ -51,9 +51,9 @@ EXAMPLES = r"""
         {{
             lookup(
                 'community.general.revbitspss',
-                 secret_ids=['UUIDPAM', 'DB_PASS', ...],
-                 base_url='https://server-url-here',
-                 api_key='API_KEY_GOES_HERE'
+                'UUIDPAM', 'DB_PASS',
+                base_url='https://server-url-here',
+                api_key='API_KEY_GOES_HERE'
             )
         }}
   tasks:
@@ -64,11 +64,11 @@ EXAMPLES = r"""
 
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
-from ansible.errors import AnsibleError, AnsibleOptionsError
+from ansible.errors import AnsibleError
 from ansible.module_utils.six import raise_from
 
 try:
-    from pam.revbits_ansible.server import SecretServer, SecretServerError
+    from pam.revbits_ansible.server import SecretServer
 except ImportError as imp_exc:
     ANOTHER_LIBRARY_IMPORT_ERROR = imp_exc
 else:
@@ -98,11 +98,10 @@ class LookupModule(LookupBase):
             }
         )
         result = []
-        for term in self.get_option('secret_ids'):
-            display.debug("revbitspss_lookup term: %s" % term)
+        for term in terms:
             try:
                 display.vvv(u"Secret Server lookup of Secret with ID %s" % term)
                 result.append({term: secret_server.get_pam_secret(term)})
-            except SecretServerError as error:
+            except Exception as error:
                 raise AnsibleError("Secret Server lookup failure: %s" % error.message)
         return result
