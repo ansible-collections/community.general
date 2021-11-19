@@ -32,10 +32,9 @@ class TestLookupModule(TestCase):
         MockPamSecrets(),
     )
     def test_get_pam_secret(self):
-        terms = []
+        terms = ['dummy secret']
         variables = []
         kwargs = {
-            "secret_ids": ['dummy secret'],
             "base_url": 'https://dummy.url',
             "api_key": 'dummy'
         }
