@@ -87,20 +87,6 @@ class Cargo(object):
         self.executable = [module.get_bin_path('cargo', True)]
 
     @property
-    def installed_packages(self):
-        cmd = ['install', '--list']
-        data = self._exec(cmd, True, False, False)
-
-        package_regex = re.compile(r'^(\w+) v(.+):$')
-        installed_packages = {}
-        for line in data.splitlines():
-            package_info = package_regex.match(line)
-            if package_info:
-                installed_packages[package_info[1]] = package_info[2]
-
-        return installed_packages
-
-    @property
     def path(self):
         return self._path
 
@@ -117,6 +103,19 @@ class Cargo(object):
             return out
         return ''
 
+    def get_installed(self):
+        cmd = ['install', '--list']
+        data = self._exec(cmd, True, False, False)
+
+        package_regex = re.compile(r'^(\w+) v(.+):$')
+        installed = {}
+        for line in data.splitlines():
+            package_info = package_regex.match(line)
+            if package_info:
+                installed[package_info[1]] = package_info[2]
+
+        return installed
+
     def install(self):
         cmd = ['install']
         if self.name:
@@ -130,7 +129,7 @@ class Cargo(object):
         return self._exec(cmd)
 
     def is_outdated(self, name):
-        installed_version = self.installed_packages.get(name)
+        installed_version = self.get_installed().get(name)
 
         cmd = ['search', name, '--limit', '1']
         data = self._exec(cmd, True, False, False)
@@ -171,17 +170,17 @@ def main():
     cargo = Cargo(module, name=name, path=path, state=state, version=version)
 
     changed = False
+    installed_packages = cargo.get_installed()
     if state == 'present':
-        # TODO write get_version function and installed_packages -> installed
-        if name not in cargo.installed_packages or version != cargo.installed_packages.get(name):
+        if name not in installed_packages or version != installed_packages[name]:
             changed = True
             cargo.install()
     elif state == 'latest':
-        if name not in cargo.installed_packages or cargo.is_outdated(name):
+        if name not in installed_packages or cargo.is_outdated(name):
             changed = True
             cargo.install()
     else:  # absent
-        if name in cargo.installed_packages:
+        if name in installed_packages:
             changed = True
             cargo.uninstall()
 
