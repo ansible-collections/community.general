@@ -296,6 +296,39 @@ def get_installed_state(m, packages):
     return parse_zypper_xml(m, cmd, fail_not_found=False)[0]
 
 
+def run_zypper(m, cmd):
+    "run zypper command, parse xml results and return dom and some command metadata"
+    if not set(cmd) | {'-x', '--xmlout'}:
+        cmd += '--xmlout'
+
+    rc, stdout, stderr = m.run_command(cmd, check_rc=False)
+
+    try:
+        dom = parseXML(stdout)
+    except xml.parsers.expat.ExpatError as exc:
+        m.fail_json(msg="Failed to parse zypper xml output: %s" % to_native(exc),
+                    rc=rc, stdout=stdout, stderr=stderr, cmd=cmd)
+
+    retvals = {
+            'rc': rc,
+            'stdout': stdout,
+            'stderr': stderr,
+            }
+
+    return dom, retvals
+
+def zypper_ref_results(dom):
+    "reads dom returned from zypper ref and determines if any repositories were refreshed"
+    progress = dom.getElementsByTagName('progress')
+
+    # tags matching `<progress id='raw-refresh' ... done=1>` represent successful refresh
+    raw_refresh = [tag for tag in progress if tag.getAttribute('id') == 'raw-refresh']
+    done = [tag for tag in raw_refresh if tag.hasAttribute('done')]
+
+    return {
+            'changed': len(done) > 0,
+            }
+
 def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
     rc, stdout, stderr = m.run_command(cmd, check_rc=False)
 
@@ -342,7 +375,9 @@ def get_cmd(m, subcommand):
     "puts together the basic zypper command arguments with those passed to the module"
     is_install = subcommand in ['install', 'update', 'patch', 'dist-upgrade']
     is_refresh = subcommand == 'refresh'
-    cmd = [m.get_bin_path('zypper', required=True), '--quiet', '--non-interactive', '--xmlout']
+    cmd = [m.get_bin_path('zypper', required=True), '--non-interactive', '--xmlout']
+    if not is_refresh:
+        cmd.append('--quiet')
     if transactional_updates():
         cmd = [m.get_bin_path('transactional-update', required=True), '--continue', '--drop-if-no-change', '--quiet', 'run'] + cmd
     if m.params['extra_args_precommand']:
@@ -493,9 +528,9 @@ def repo_refresh(m):
     retvals = {'rc': 0, 'stdout': '', 'stderr': ''}
 
     cmd = get_cmd(m, 'refresh')
-
-    retvals['cmd'] = cmd
-    result, retvals['rc'], retvals['stdout'], retvals['stderr'] = parse_zypper_xml(m, cmd)
+    dom, results = run_zypper(m, cmd)
+    retvals.update(results)
+    retvals.update(zypper_ref_results(dom))
 
     return retvals
 
@@ -549,7 +584,6 @@ def main():
         #  to show the cache was updated and exit
         if not module.params['name']:
             module.exit_json(
-                changed=True,
                 **retvals
             )
 
