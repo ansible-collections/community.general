@@ -4,10 +4,11 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: cargo
 short_description: Manage Rust packages with cargo
@@ -19,7 +20,8 @@ options:
   name:
     description:
       - The name of a Rust package to install.
-    type: str
+    type: list
+    elements: str
     required: true
   path:
     description:
@@ -29,7 +31,9 @@ options:
     type: path
   version:
     description:
-      - The version to be installed.
+      ->
+      The version to install. If I(name) contains multiple values, the module will
+      try to install all of them in this version.
     type: str
     required: false
   state:
@@ -41,9 +45,9 @@ options:
     choices: [ "present", "absent", "latest" ]
 requirements:
     - cargo installed in bin path (recommended /usr/local/bin)
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Install "ludusavi" Rust package.
   community.general.cargo:
     name: ludusavi
@@ -67,7 +71,7 @@ EXAMPLES = r'''
   community.general.cargo:
     name: ludusavi
     state: latest
-'''
+"""
 
 import os
 import re
@@ -78,13 +82,12 @@ from ansible.module_utils.basic import AnsibleModule
 class Cargo(object):
     def __init__(self, module, **kwargs):
         self.module = module
-        self.name = kwargs['name']
-        self._path = None
-        self.path = kwargs['path']
-        self.state = kwargs['state']
-        self.version = kwargs['version']
+        self.name = kwargs["name"]
+        self.path = kwargs["path"]
+        self.state = kwargs["state"]
+        self.version = kwargs["version"]
 
-        self.executable = [module.get_bin_path('cargo', True)]
+        self.executable = [module.get_bin_path("cargo", True)]
 
     @property
     def path(self):
@@ -96,18 +99,20 @@ class Cargo(object):
             self.module.fail_json(msg="Path %s is not a directory" % path)
         self._path = path
 
-    def _exec(self, args, run_in_check_mode=False, check_rc=True, add_package_name=True):
+    def _exec(
+        self, args, run_in_check_mode=False, check_rc=True, add_package_name=True
+    ):
         if not self.module.check_mode or (self.module.check_mode and run_in_check_mode):
             cmd = self.executable + args
             rc, out, err = self.module.run_command(cmd, check_rc=check_rc)
             return out
-        return ''
+        return ""
 
     def get_installed(self):
-        cmd = ['install', '--list']
+        cmd = ["install", "--list"]
         data = self._exec(cmd, True, False, False)
 
-        package_regex = re.compile(r'^(\w+) v(.+):$')
+        package_regex = re.compile(r"^(\w+) v(.+):$")
         installed = {}
         for line in data.splitlines():
             package_info = package_regex.match(line)
@@ -117,21 +122,21 @@ class Cargo(object):
         return installed
 
     def install(self):
-        cmd = ['install']
+        cmd = ["install"]
         if self.name:
-            cmd.append(self.name)
+            cmd.extend(self.name)
         if self.path:
-            cmd.append('--root')
+            cmd.append("--root")
             cmd.append(self.path)
         if self.version:
-            cmd.append('--version')
+            cmd.append("--version")
             cmd.append(self.version)
         return self._exec(cmd)
 
     def is_outdated(self, name):
         installed_version = self.get_installed().get(name)
 
-        cmd = ['search', name, '--limit', '1']
+        cmd = ["search", name, "--limit", "1"]
         data = self._exec(cmd, True, False, False)
 
         match = re.search(r'"(.+)"', data)
@@ -141,51 +146,55 @@ class Cargo(object):
         return installed_version != latest_version
 
     def uninstall(self):
-        cmd = ['uninstall']
+        cmd = ["uninstall"]
         if self.name:
-            cmd.append(self.name)
+            cmd.extend(self.name)
         return self._exec(cmd)
 
 
 def main():
     arg_spec = dict(
-        name=dict(required=True, type='str'),
-        path=dict(default=None, type='path'),
-        state=dict(default='present', choices=['present', 'absent', 'latest']),
-        version=dict(default=None, type='str'),
+        name=dict(required=True, type="list", elements="str"),
+        path=dict(default=None, type="path"),
+        state=dict(default="present", choices=["present", "absent", "latest"]),
+        version=dict(default=None, type="str"),
     )
-    module = AnsibleModule(
-        argument_spec=arg_spec,
-        supports_check_mode=True
-    )
+    module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)
 
-    name = module.params['name']
-    path = module.params['path']
-    state = module.params['state']
-    version = module.params['version']
+    name = module.params["name"]
+    path = module.params["path"]
+    state = module.params["state"]
+    version = module.params["version"]
 
     if not name:
-        module.fail_json(msg='Package name must be specified')
+        module.fail_json(msg="Package name must be specified")
+
+    # Set LANG env since we parse stdout
+    module.run_command_environ_update = dict(
+        LANG="C", LC_ALL="C", LC_MESSAGES="C", LC_CTYPE="C"
+    )
 
     cargo = Cargo(module, name=name, path=path, state=state, version=version)
-
     changed = False
     installed_packages = cargo.get_installed()
-    if state == 'present':
-        if name not in installed_packages or version != installed_packages[name]:
+    if state == "present":
+        if any(
+            (n not in installed_packages or version != installed_packages[n])
+            for n in name
+        ):
             changed = True
             cargo.install()
-    elif state == 'latest':
-        if name not in installed_packages or cargo.is_outdated(name):
+    elif state == "latest":
+        if any(n not in installed_packages or cargo.is_outdated(n) for n in name):
             changed = True
             cargo.install()
     else:  # absent
-        if name in installed_packages:
+        if any(n in installed_packages for n in name):
             changed = True
             cargo.uninstall()
 
     module.exit_json(changed=changed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
