@@ -11,29 +11,28 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: lxd_container
-short_description: Manage LXD Containers
+short_description: Manage LXD instances
 description:
-  - Management of LXD containers
+  - Management of LXD containers and virtual machines.
 author: "Hiroaki Nakamura (@hnakamur)"
 options:
     name:
         description:
-          - Name of a container.
+          - Name of an instance.
         type: str
         required: true
     architecture:
         description:
-          - 'The architecture for the container (for example C(x86_64) or C(i686)).
+          - 'The architecture for the instance (for example C(x86_64) or C(i686)).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).'
         type: str
         required: false
     config:
         description:
-          - 'The config for the container (for example C({"limits.cpu": "2"})).
+          - 'The config for the instance (for example C({"limits.cpu": "2"})).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).'
-          - If the container already exists and its "config" values in metadata
-            obtained from GET /1.0/containers/<name>
-            U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#10containersname)
+          - If the instance already exists and its "config" values in metadata
+            obtained from the LXD API U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#instances-containers-and-virtual-machines)
             are different, this module tries to apply the configurations.
           - The keys starting with C(volatile.) are ignored for this comparison when I(ignore_volatile_options=true).
         type: dict
@@ -50,25 +49,25 @@ options:
         version_added: 3.7.0
     profiles:
         description:
-          - Profile to be used by the container.
+          - Profile to be used by the instance.
         type: list
         elements: str
     devices:
         description:
-          - 'The devices for the container
+          - 'The devices for the instance
             (for example C({ "rootfs": { "path": "/dev/kvm", "type": "unix-char" }})).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).'
         type: dict
         required: false
     ephemeral:
         description:
-          - Whether or not the container is ephemeral (for example C(true) or C(false)).
+          - Whether or not the instance is ephemeral (for example C(true) or C(false)).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1).
         required: false
         type: bool
     source:
         description:
-          - 'The source for the container
+          - 'The source for the instance
             (e.g. { "type": "image",
                     "mode": "pull",
                     "server": "https://images.linuxcontainers.org",
@@ -86,39 +85,49 @@ options:
           - absent
           - frozen
         description:
-          - Define the state of a container.
+          - Define the state of an instance.
         required: false
         default: started
         type: str
     target:
         description:
-          - For cluster deployments. Will attempt to create a container on a target node.
-            If container exists elsewhere in a cluster, then container will not be replaced or moved.
+          - For cluster deployments. Will attempt to create an instance on a target node.
+            If the instance exists elsewhere in a cluster, then it will not be replaced or moved.
             The name should respond to same name of the node you see in C(lxc cluster list).
         type: str
         required: false
         version_added: 1.0.0
     timeout:
         description:
-          - A timeout for changing the state of the container.
+          - A timeout for changing the state of the instance.
           - This is also used as a timeout for waiting until IPv4 addresses
-            are set to the all network interfaces in the container after
+            are set to the all network interfaces in the instance after
             starting or restarting.
         required: false
         default: 30
         type: int
+    type:
+        description:
+          - Instance type can be either C(virtual-machine) or C(container).
+        required: false
+        default: container
+        choices:
+          - container
+          - virtual-machine
+        type: str
+        version_added: 4.1.0
     wait_for_ipv4_addresses:
         description:
           - If this is true, the C(lxd_container) waits until IPv4 addresses
-            are set to the all network interfaces in the container after
+            are set to the all network interfaces in the instance after
             starting or restarting.
         required: false
         default: false
         type: bool
     force_stop:
         description:
-          - If this is true, the C(lxd_container) forces to stop the container
-            when it stops or restarts the container.
+          - If this is true, the C(lxd_container) forces to stop the instance
+            when it stops or restarts the instance.
         required: false
         default: false
         type: bool
@@ -160,18 +169,18 @@ options:
         required: false
         type: str
 notes:
-  - Containers must have a unique name. If you attempt to create a container
+  - Instances can be a container or a virtual machine, both of them must have unique name. If you attempt to create an instance
     with a name that already existed in the users namespace the module will
     simply return as "unchanged".
-  - There are two ways to run commands in containers, using the command
+  - There are two ways to run commands inside a container or virtual machine, using the command
     module or using the ansible lxd connection plugin bundled in Ansible >=
-    2.1, the later requires python to be installed in the container which can
+    2.1, the later requires python to be installed in the instance which can
     be done with the command module.
-  - You can copy a file from the host to the container
+  - You can copy a file from the host to the instance
     with the Ansible M(ansible.builtin.copy) and M(ansible.builtin.template) module and the `lxd` connection plugin.
     See the example below.
-  - You can copy a file in the created container to the localhost
-    with `command=lxc file pull container_name/dir/filename filename`.
+  - You can copy a file in the created instance to the localhost
+    with `command=lxc file pull instance_name/dir/filename filename`.
     See the first example below.
 '''
 
@@ -240,6 +249,7 @@ EXAMPLES = '''
       community.general.lxd_container:
         name: mycontainer
         state: absent
+        type: container
 
 # An example for restarting a container
 - hosts: localhost
@@ -249,6 +259,7 @@ EXAMPLES = '''
       community.general.lxd_container:
         name: mycontainer
         state: restarted
+        type: container
 
 # An example for restarting a container using https to connect to the LXD server
 - hosts: localhost
@@ -306,16 +317,36 @@ EXAMPLES = '''
           mode: pull
           alias: ubuntu/xenial/amd64
         target: node02
+
+# An example for creating a virtual machine
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Create container on another node
+      community.general.lxd_container:
+        name: new-vm-1
+        type: virtual-machine
+        state: started
+        ignore_volatile_options: true
+        wait_for_ipv4_addresses: true
+        profiles: ["default"]
+        source:
+          protocol: simplestreams
+          type: image
+          mode: pull
+          server: https://images.linuxcontainers.org
+          alias: debian/11
+        timeout: 600
 '''
 
 RETURN = '''
 addresses:
-  description: Mapping from the network device name to a list of IPv4 addresses in the container
+  description: Mapping from the network device name to a list of IPv4 addresses in the instance.
   returned: when state is started or restarted
   type: dict
   sample: {"eth0": ["10.155.92.191"]}
 old_state:
-  description: The old state of the container
+  description: The old state of the instance.
   returned: when state is started or restarted
   type: str
   sample: "stopped"
@@ -325,7 +356,7 @@ logs:
   type: list
   sample: "(too long to be placed here)"
 actions:
-  description: List of actions performed for the container.
+  description: List of actions performed for the instance.
   returned: success
   type: list
   sample: '["create", "start"]'
@@ -384,6 +415,15 @@ class LXDContainerManagement(object):
         self.addresses = None
         self.target = self.module.params['target']
 
+        self.type = self.module.params['type']
+
+        # LXD Rest API provides additional endpoints for creating containers and virtual-machines.
+        self.api_endpoint = None
+        if self.type == 'container':
+            self.api_endpoint = '/1.0/containers'
+        elif self.type == 'virtual-machine':
+            self.api_endpoint = '/1.0/virtual-machines'
+
         self.key_file = self.module.params.get('client_key')
         if self.key_file is None:
             self.key_file = '{0}/.config/lxc/client.key'.format(os.environ['HOME'])
@@ -419,20 +459,20 @@ class LXDContainerManagement(object):
             if param_val is not None:
                 self.config[attr] = param_val
 
-    def _get_container_json(self):
+    def _get_instance_json(self):
         return self.client.do(
-            'GET', '/1.0/containers/{0}'.format(self.name),
+            'GET', '{0}/{1}'.format(self.api_endpoint, self.name),
             ok_error_codes=[404]
         )
 
-    def _get_container_state_json(self):
+    def _get_instance_state_json(self):
         return self.client.do(
-            'GET', '/1.0/containers/{0}/state'.format(self.name),
+            'GET', '{0}/{1}/state'.format(self.api_endpoint, self.name),
             ok_error_codes=[404]
         )
 
     @staticmethod
-    def _container_json_to_module_state(resp_json):
+    def _instance_json_to_module_state(resp_json):
         if resp_json['type'] == 'error':
             return 'absent'
         return ANSIBLE_LXD_STATES[resp_json['metadata']['status']]
@@ -441,45 +481,45 @@ class LXDContainerManagement(object):
         body_json = {'action': action, 'timeout': self.timeout}
         if force_stop:
             body_json['force'] = True
-        return self.client.do('PUT', '/1.0/containers/{0}/state'.format(self.name), body_json=body_json)
+        return self.client.do('PUT', '{0}/{1}/state'.format(self.api_endpoint, self.name), body_json=body_json)
 
-    def _create_container(self):
+    def _create_instance(self):
         config = self.config.copy()
         config['name'] = self.name
         if self.target:
-            self.client.do('POST', '/1.0/containers?' + urlencode(dict(target=self.target)), config)
+            self.client.do('POST', '{0}?{1}'.format(self.api_endpoint, urlencode(dict(target=self.target))), config)
         else:
-            self.client.do('POST', '/1.0/containers', config)
+            self.client.do('POST', self.api_endpoint, config)
         self.actions.append('create')
 
-    def _start_container(self):
+    def _start_instance(self):
         self._change_state('start')
         self.actions.append('start')
 
-    def _stop_container(self):
+    def _stop_instance(self):
         self._change_state('stop', self.force_stop)
         self.actions.append('stop')
 
-    def _restart_container(self):
+    def _restart_instance(self):
         self._change_state('restart', self.force_stop)
         self.actions.append('restart')
 
-    def _delete_container(self):
-        self.client.do('DELETE', '/1.0/containers/{0}'.format(self.name))
+    def _delete_instance(self):
+        self.client.do('DELETE', '{0}/{1}'.format(self.api_endpoint, self.name))
         self.actions.append('delete')
 
-    def _freeze_container(self):
+    def _freeze_instance(self):
         self._change_state('freeze')
         self.actions.append('freeze')
 
-    def _unfreeze_container(self):
+    def _unfreeze_instance(self):
         self._change_state('unfreeze')
         self.actions.append('unfreez')
 
-    def _container_ipv4_addresses(self, ignore_devices=None):
+    def _instance_ipv4_addresses(self, ignore_devices=None):
         ignore_devices = ['lo'] if ignore_devices is None else ignore_devices
 
-        resp_json = self._get_container_state_json()
+        resp_json = self._get_instance_state_json()
         network = resp_json['metadata']['network'] or {}
         network = dict((k, v) for k, v in network.items() if k not in ignore_devices) or {}
         addresses = dict((k, [a['address'] for a in v['addresses'] if a['family'] == 'inet']) for k, v in network.items()) or {}
@@ -494,7 +534,7 @@ class LXDContainerManagement(object):
             due = datetime.datetime.now() + datetime.timedelta(seconds=self.timeout)
             while datetime.datetime.now() < due:
                 time.sleep(1)
-                addresses = self._container_ipv4_addresses()
+                addresses = self._instance_ipv4_addresses()
                 if self._has_all_ipv4_addresses(addresses):
                     self.addresses = addresses
                     return
@@ -504,72 +544,72 @@ class LXDContainerManagement(object):
 
     def _started(self):
         if self.old_state == 'absent':
-            self._create_container()
-            self._start_container()
+            self._create_instance()
+            self._start_instance()
         else:
             if self.old_state == 'frozen':
-                self._unfreeze_container()
+                self._unfreeze_instance()
             elif self.old_state == 'stopped':
-                self._start_container()
-            if self._needs_to_apply_container_configs():
-                self._apply_container_configs()
+                self._start_instance()
+            if self._needs_to_apply_instance_configs():
+                self._apply_instance_configs()
         if self.wait_for_ipv4_addresses:
             self._get_addresses()
 
     def _stopped(self):
         if self.old_state == 'absent':
-            self._create_container()
+            self._create_instance()
         else:
             if self.old_state == 'stopped':
-                if self._needs_to_apply_container_configs():
-                    self._start_container()
-                    self._apply_container_configs()
-                    self._stop_container()
+                if self._needs_to_apply_instance_configs():
+                    self._start_instance()
+                    self._apply_instance_configs()
+                    self._stop_instance()
             else:
                 if self.old_state == 'frozen':
-                    self._unfreeze_container()
-                if self._needs_to_apply_container_configs():
-                    self._apply_container_configs()
-                self._stop_container()
+                    self._unfreeze_instance()
+                if self._needs_to_apply_instance_configs():
+                    self._apply_instance_configs()
+                self._stop_instance()
 
     def _restarted(self):
         if self.old_state == 'absent':
-            self._create_container()
-            self._start_container()
+            self._create_instance()
+            self._start_instance()
         else:
             if self.old_state == 'frozen':
-                self._unfreeze_container()
-            if self._needs_to_apply_container_configs():
-                self._apply_container_configs()
-            self._restart_container()
+                self._unfreeze_instance()
+            if self._needs_to_apply_instance_configs():
+                self._apply_instance_configs()
+            self._restart_instance()
         if self.wait_for_ipv4_addresses:
             self._get_addresses()
 
     def _destroyed(self):
         if self.old_state != 'absent':
             if self.old_state == 'frozen':
-                self._unfreeze_container()
+                self._unfreeze_instance()
             if self.old_state != 'stopped':
-                self._stop_container()
-            self._delete_container()
+                self._stop_instance()
+            self._delete_instance()
 
     def _frozen(self):
         if self.old_state == 'absent':
-            self._create_container()
-            self._start_container()
-            self._freeze_container()
+            self._create_instance()
+            self._start_instance()
+            self._freeze_instance()
         else:
             if self.old_state == 'stopped':
-                self._start_container()
-            if self._needs_to_apply_container_configs():
-                self._apply_container_configs()
-            self._freeze_container()
+                self._start_instance()
+            if self._needs_to_apply_instance_configs():
+                self._apply_instance_configs()
+            self._freeze_instance()
 
-    def _needs_to_change_container_config(self, key):
+    def _needs_to_change_instance_config(self, key):
         if key not in self.config:
             return False
         if key == 'config' and self.ignore_volatile_options:  # the old behavior is to ignore configurations by keyword "volatile"
-            old_configs = dict((k, v) for k, v in self.old_container_json['metadata'][key].items() if not k.startswith('volatile.'))
+            old_configs = dict((k, v) for k, v in self.old_instance_json['metadata'][key].items() if not k.startswith('volatile.'))
             for k, v in self.config['config'].items():
                 if k not in old_configs:
                     return True
@@ -577,7 +617,7 @@ class LXDContainerManagement(object):
                     return True
             return False
         elif key == 'config':  # next default behavior
-            old_configs = dict((k, v) for k, v in self.old_container_json['metadata'][key].items())
+            old_configs = dict((k, v) for k, v in self.old_instance_json['metadata'][key].items())
             for k, v in self.config['config'].items():
                 if k not in old_configs:
                     return True
@@ -585,39 +625,41 @@ class LXDContainerManagement(object):
                     return True
             return False
         else:
-            old_configs = self.old_container_json['metadata'][key]
+            old_configs = self.old_instance_json['metadata'][key]
             return self.config[key] != old_configs
 
-    def _needs_to_apply_container_configs(self):
+    def _needs_to_apply_instance_configs(self):
         return (
-            self._needs_to_change_container_config('architecture') or
-            self._needs_to_change_container_config('config') or
-            self._needs_to_change_container_config('ephemeral') or
-            self._needs_to_change_container_config('devices') or
-            self._needs_to_change_container_config('profiles')
+            self._needs_to_change_instance_config('architecture') or
+            self._needs_to_change_instance_config('config') or
+            self._needs_to_change_instance_config('ephemeral') or
+            self._needs_to_change_instance_config('devices') or
+            self._needs_to_change_instance_config('profiles')
         )
 
-    def _apply_container_configs(self):
-        old_metadata = self.old_container_json['metadata']
+    def _apply_instance_configs(self):
+        old_metadata = self.old_instance_json['metadata']
         body_json = {
             'architecture': old_metadata['architecture'],
             'config': old_metadata['config'],
             'devices': old_metadata['devices'],
             'profiles': old_metadata['profiles']
         }
-        if self._needs_to_change_container_config('architecture'):
+
+        if self._needs_to_change_instance_config('architecture'):
             body_json['architecture'] = self.config['architecture']
-        if self._needs_to_change_container_config('config'):
+        if self._needs_to_change_instance_config('config'):
             for k, v in self.config['config'].items():
                 body_json['config'][k] = v
-        if self._needs_to_change_container_config('ephemeral'):
+        if self._needs_to_change_instance_config('ephemeral'):
             body_json['ephemeral'] = self.config['ephemeral']
-        if self._needs_to_change_container_config('devices'):
+        if self._needs_to_change_instance_config('devices'):
             body_json['devices'] = self.config['devices']
-        if self._needs_to_change_container_config('profiles'):
+        if self._needs_to_change_instance_config('profiles'):
             body_json['profiles'] = self.config['profiles']
-        self.client.do('PUT', '/1.0/containers/{0}'.format(self.name), body_json=body_json)
-        self.actions.append('apply_container_configs')
+
+        self.client.do('PUT', '{0}/{1}'.format(self.api_endpoint, self.name), body_json=body_json)
+        self.actions.append('apply_instance_configs')
 
     def run(self):
         """Run the main method."""
@@ -627,8 +669,8 @@ class LXDContainerManagement(object):
                 self.client.authenticate(self.trust_password)
             self.ignore_volatile_options = self.module.params.get('ignore_volatile_options')
 
-            self.old_container_json = self._get_container_json()
-            self.old_state = self._container_json_to_module_state(self.old_container_json)
+            self.old_instance_json = self._get_instance_json()
+            self.old_state = self._instance_json_to_module_state(self.old_instance_json)
             action = getattr(self, LXD_ANSIBLE_STATES[self.state])
             action()
 
@@ -698,6 +740,11 @@ def main():
                 type='int',
                 default=30
             ),
+            type=dict(
+                type='str',
+                default='container',
+                choices=['container', 'virtual-machine'],
+            ),
             wait_for_ipv4_addresses=dict(
                 type='bool',
                 default=False
@@ -736,6 +783,7 @@ def main():
             'This will change in the future. Please test your scripts'
             'by "ignore_volatile_options: false". To keep the old behavior, set that option explicitly to "true"',
             version='6.0.0', collection_name='community.general')
+
     lxd_manage = LXDContainerManagement(module=module)
     lxd_manage.run()
 
