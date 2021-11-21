@@ -126,6 +126,7 @@ EXAMPLES = '''
 '''
 
 import traceback
+import binascii
 
 PYGHMI_IMP_ERR = None
 try:
@@ -169,10 +170,13 @@ def main():
     if state == 'absent' and bootdev == 'default':
         module.fail_json(msg="The bootdev 'default' cannot be used with state 'absent'.")
 
-    if module.params['key']:
-        key = bytes.fromhex(module.params['key'])
-    else:
-        key = None
+    try:
+        if module.params['key']:
+            key = binascii.unhexlify(module.params['key'])
+        else:
+            key = None
+    except Exception as e:
+        module.fail_json(msg="Unable to convert 'key' from hex string.")
 
     # --- run command ---
     try:
