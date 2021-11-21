@@ -145,7 +145,7 @@ def main():
             port=dict(default=623, type='int'),
             user=dict(required=True, no_log=True),
             password=dict(required=True, no_log=True),
-            key=dict(required=False, type='str', no_log=True),
+            key=dict(type='str', no_log=True),
             state=dict(default='present', choices=['present', 'absent']),
             bootdev=dict(required=True, choices=['network', 'hd', 'floppy', 'safe', 'optical', 'setup', 'default']),
             persistent=dict(default=False, type='bool'),
