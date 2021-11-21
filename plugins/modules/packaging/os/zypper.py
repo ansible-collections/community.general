@@ -310,12 +310,13 @@ def run_zypper(m, cmd):
                     rc=rc, stdout=stdout, stderr=stderr, cmd=cmd)
 
     retvals = {
-            'rc': rc,
-            'stdout': stdout,
-            'stderr': stderr,
-            }
+        'rc': rc,
+        'stdout': stdout,
+        'stderr': stderr,
+        }
 
     return dom, retvals
+
 
 def zypper_ref_results(dom):
     "reads dom returned from zypper ref and determines if any repositories were refreshed"
@@ -326,8 +327,9 @@ def zypper_ref_results(dom):
     done = [tag for tag in raw_refresh if tag.hasAttribute('done')]
 
     return {
-            'changed': len(done) > 0,
-            }
+        'changed': len(done) > 0,
+        }
+
 
 def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
     rc, stdout, stderr = m.run_command(cmd, check_rc=False)
