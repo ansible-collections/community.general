@@ -397,10 +397,27 @@
       - zypperin2 is not changed
 
 # check for https://github.com/ansible-collections/community.general/issues/3570
+- name: clear repository cache
+  command:
+    cmd: zypper clean -a
+
 - name: update_cache=yes without any packages
   zypper:
     update_cache: True
-  register: zypper_result_update_cache_yes
+  register: zypper_result_update_cache_changed
+
+- name: update_cache=yes again should be unchanged
+  zypper:
+    update_cache: True
+  register: zypper_result_update_cache_unchanged
+
+- assert:
+    that:
+      - zypper_result_update_cache_changed is successful
+      - zypper_result_update_cache_changed is changed
+
+      - zypper_result_update_cache_unchanged is successful
+      - zypper_result_update_cache_changed is not changed
 
 - name: update_cache=no without any packages
   zypper:
@@ -409,8 +426,6 @@
 
 - assert:
     that:
-      - zypper_result_update_cache_yes is successful
-
       - zypper_result_update_cache_no is successful
       - zypper_result_update_cache_no is not changed
 
