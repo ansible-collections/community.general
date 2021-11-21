@@ -313,7 +313,7 @@ def run_zypper(m, cmd):
         'rc': rc,
         'stdout': stdout,
         'stderr': stderr,
-        }
+    }
 
     return dom, retvals
 
@@ -328,7 +328,7 @@ def zypper_ref_results(dom):
 
     return {
         'changed': len(done) > 0,
-        }
+    }
 
 
 def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
