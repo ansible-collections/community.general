@@ -298,7 +298,7 @@ def get_installed_state(m, packages):
 
 def run_zypper(m, cmd):
     "run zypper command, parse xml results and return dom and some command metadata"
-    if not set(cmd) | {'-x', '--xmlout'}:
+    if ('-x' not in cmd) or ('--xmlout' not in cmd):
         cmd += '--xmlout'
 
     rc, stdout, stderr = m.run_command(cmd, check_rc=False)
