@@ -88,9 +88,11 @@ options:
         default: false
     rescan:
         description:
-        - rescan an established session for discovering new targets.
+        - Rescan an established session for discovering new targets.
+        - When I(target) is ommited, will rescan all sessions.
         type: bool
         default: false
+        version_added: 4.1.0
 
 '''
 
@@ -189,13 +191,15 @@ def iscsi_discover(module, portal, port):
     cmd = [iscsiadm_cmd, '--mode', 'discovery', '--type', 'sendtargets', '--portal', '%s:%s' % (portal, port)]
     module.run_command(cmd, check_rc=True)
 
+
 def iscsi_rescan(module, target=None):
-    if target == None:
+    if target is None:
         cmd = [iscsiadm_cmd, '--mode', 'session', '--rescan']
     else:
         cmd = [iscsiadm_cmd, '--mode', 'node', '--rescan', '-T', target]
     rc, out, err = module.run_command(cmd)
     return out
+
 
 def target_loggedon(module, target, portal=None, port=None):
     cmd = [iscsiadm_cmd, '--mode', 'session']
@@ -441,7 +445,7 @@ def main():
             result['changed'] |= True
             result['automatic_portal_changed'] = True
 
-    if rescan != False:
+    if rescan is not False:
         result['changed'] = True
         result['sessions'] = iscsi_rescan(module, target)
 
