@@ -67,13 +67,16 @@ EXAMPLES = '''
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+    register: result_sessions
 '''
 
 CATEGORY_COMMANDS_ALL = {
     "Sessions": ["GetiLOSessions"]
 }
 
-CATEGORY_COMMANDS_DEFAULT = {}
+CATEGORY_COMMANDS_DEFAULT = {
+  "Sessions": "GetiLOSessions"
+}
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
@@ -130,8 +133,8 @@ def main():
                 # True if we don't specify a command --> use default
                 command_list.append(CATEGORY_COMMANDS_DEFAULT[category])
             elif "all" in module.params['command']:
-                for entry in range(len(CATEGORY_COMMANDS_ALL[category])):
-                    command_list.append(CATEGORY_COMMANDS_ALL[category][entry])
+                for entry in CATEGORY_COMMANDS_ALL[category]:
+                    command_list.append(entry)
             # one or more commands
             else:
                 command_list = module.params['command']
@@ -144,17 +147,13 @@ def main():
             # Fail if even one category given is invalid
             module.fail_json(msg="Invalid Category: %s" % category)
 
-    # Organize by Categories / Commands
-    if category == "Sessions":
-        for command in command_list:
-            if command == "GetiLOSessions":
-                result = rf_utils.get_ilo_sessions()
+        # Organize by Categories / Commands
+        if category == "Sessions":
+            for command in command_list:
+                if command == "GetiLOSessions":
+                    result[command] = rf_utils.get_ilo_sessions()
 
-    if result['ret']:
-        del result['ret']
-        module.exit_json(redfish_info=result)
-    else:
-        module.fail_json(msg=to_native(result))
+    module.exit_json(ilo_redfish_info=result)
 
 
 if __name__ == '__main__':
