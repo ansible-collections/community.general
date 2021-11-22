@@ -104,16 +104,18 @@ packages:
     sample: [ package, other-package ]
 
 stdout:
-    description: output from pacman
+    description: Output from pacman.
     returned: success, when needed
     type: str
     sample: ":: Synchronizing package databases...  core is up to date :: Starting full system upgrade..."
+    version_added: 4.1.0
 
 stderr:
-    description: error output from pacman
+    description: Error output from pacman.
     returned: success, when needed
     type: str
     sample: "warning: libtool: local (2.4.6+44+gb9b44533-14) is newer than core (2.4.6+42+gb88cebd5-15)\nwarning ..."
+    version_added: 4.1.0
 '''
 
 EXAMPLES = '''
