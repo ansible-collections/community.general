@@ -99,7 +99,7 @@ state: RUNNING
 # simple lxd.yml including virtual machines and containers
 plugin: community.general.lxd
 url: unix:/var/snap/lxd/common/lxd/unix.socket
-typefilter: both
+type_filter: both
 
 # grouping lxd.yml
 groupby:
@@ -964,7 +964,7 @@ class InventoryModule(BaseInventoryPlugin):
             None"""
         iter_keys = list(self.data['instances'].keys())
         for instance_name in iter_keys:
-            if self._get_data_entry('instances/{0}/instances/metadata/type'.format(instance_name)) != self.typefilter:
+            if self._get_data_entry('instances/{0}/instances/metadata/type'.format(instance_name)) != self.type_filter:
                 del self.data['instances'][instance_name]
 
     def _populate(self):
@@ -989,7 +989,7 @@ class InventoryModule(BaseInventoryPlugin):
         # The first version of the inventory only supported containers.
         # This will change in the future.
         # The following function cleans up the data.
-        if self.typefilter != 'both':
+        if self.type_filter != 'both':
             self.cleandata()
 
         self.extract_information_from_instance_configs()
@@ -1033,7 +1033,7 @@ class InventoryModule(BaseInventoryPlugin):
             self.plugin = self.get_option('plugin')
             self.prefered_instance_network_family = self.get_option('prefered_instance_network_family')
             self.prefered_instance_network_interface = self.get_option('prefered_instance_network_interface')
-            self.typefilter = self.get_option('typefilter')
+            self.type_filter = self.get_option('type_filter')
             if self.get_option('state').lower() == 'none':  # none in config is str()
                 self.filter = None
             else:
