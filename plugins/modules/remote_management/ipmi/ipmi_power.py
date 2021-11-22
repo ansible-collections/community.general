@@ -35,6 +35,12 @@ options:
       - Password to connect to the BMC.
     required: true
     type: str
+  key:
+    description:
+      - Encryption key to connect to the BMC in hex format.
+    required: false
+    type: str
+    version_added: 4.1.0
   state:
     description:
       - Whether to ensure that the machine in desired state.
@@ -76,6 +82,7 @@ EXAMPLES = '''
 '''
 
 import traceback
+import binascii
 
 PYGHMI_IMP_ERR = None
 try:
@@ -95,6 +102,7 @@ def main():
             state=dict(required=True, choices=['on', 'off', 'shutdown', 'reset', 'boot']),
             user=dict(required=True, no_log=True),
             password=dict(required=True, no_log=True),
+            key=dict(type='str', no_log=True),
             timeout=dict(default=300, type='int'),
         ),
         supports_check_mode=True,
@@ -110,10 +118,18 @@ def main():
     state = module.params['state']
     timeout = module.params['timeout']
 
+    try:
+        if module.params['key']:
+            key = binascii.unhexlify(module.params['key'])
+        else:
+            key = None
+    except Exception as e:
+        module.fail_json(msg="Unable to convert 'key' from hex string.")
+
     # --- run command ---
     try:
         ipmi_cmd = command.Command(
-            bmc=name, userid=user, password=password, port=port
+            bmc=name, userid=user, password=password, port=port, kg=key
         )
         module.debug('ipmi instantiated - name: "%s"' % name)
 
