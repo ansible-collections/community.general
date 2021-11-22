@@ -54,11 +54,10 @@ DOCUMENTATION = r'''
             type: str
             default: none
             choices: [ 'STOPPED', 'STARTING', 'RUNNING', 'none' ]
-        typefilter:
+        type_filter:
             description:
-            - Filter the instances by type 'virtual-machine', 'container' or 'both'.
-            - The first version of the inventory only supported container.
-            - This will change in the future.
+            - Filter the instances by type C(virtual-machine), C(container) or C(both).
+            - The first version of the inventory only supported containers.
             type: str
             default: container
             choices: [ 'virtual-machine', 'container', 'both' ]
@@ -97,7 +96,7 @@ plugin: community.general.lxd
 url: unix:/var/snap/lxd/common/lxd/unix.socket
 state: RUNNING
 
-# simple lxd.yml including Virtual-machines and container
+# simple lxd.yml including virtual machines and containers
 plugin: community.general.lxd
 url: unix:/var/snap/lxd/common/lxd/unix.socket
 typefilter: both
@@ -987,7 +986,7 @@ class InventoryModule(BaseInventoryPlugin):
             self.get_instance_data(self._get_instances())
             self.get_network_data(self._get_networks())
 
-        # The first version of the inventory only supported container.
+        # The first version of the inventory only supported containers.
         # This will change in the future.
         # The following function cleans up the data.
         if self.typefilter != 'both':

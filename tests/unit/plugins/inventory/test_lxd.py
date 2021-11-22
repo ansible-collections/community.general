@@ -47,6 +47,7 @@ def inventory():
     inv.prefered_instance_network_family = 'inet'
     inv.filter = 'running'
     inv.dump_data = False
+    inv.typefilter = ...
 
     return inv
 
