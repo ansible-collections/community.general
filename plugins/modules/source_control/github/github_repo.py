@@ -42,16 +42,18 @@ options:
   description:
     description:
     - Description for the repository.
+    - Defaults to empty if I(force_defaults=true), which is the default in this module.
+    - Defaults to empty if I(force_defaults=false) when creating a new repository.
     - This is only used when I(state) is C(present).
     type: str
-    default: ''
     required: false
   private:
     description:
-    - Whether the new repository should be private or not.
+    - Whether the repository should be private or not.
+    - Defaults to C(false) if I(force_defaults=true), which is the default in this module.
+    - Defaults to C(false) if I(force_defaults=false) when creating a new repository.
     - This is only used when I(state) is C(present).
     type: bool
-    default: no
     required: false
   state:
     description:
@@ -72,6 +74,14 @@ options:
     type: str
     default: 'https://api.github.com'
     version_added: "3.5.0"
+  force_defaults:
+    description:
+    - Overwrite current I(description) and I(private) attributes with defaults if set to C(true), which currently is the default.
+    - The default for this option will be deprecated in a future version of this collection, and eventually change to C(false).
+    type: bool
+    default: true
+    required: false
+    version_added: 4.1.0
 requirements:
 - PyGithub>=1.54
 notes:
@@ -92,6 +102,7 @@ EXAMPLES = '''
     description: "Just for fun"
     private: yes
     state: present
+    force_defaults: no
   register: result
 
 - name: Delete the repository
@@ -117,7 +128,7 @@ import sys
 
 GITHUB_IMP_ERR = None
 try:
-    from github import Github, GithubException
+    from github import Github, GithubException, GithubObject
     from github.GithubException import UnknownObjectException
     HAS_GITHUB_PACKAGE = True
 except Exception:
@@ -135,7 +146,7 @@ def authenticate(username=None, password=None, access_token=None, api_url=None):
         return Github(base_url=api_url, login_or_token=username, password=password)
 
 
-def create_repo(gh, name, organization=None, private=False, description='', check_mode=False):
+def create_repo(gh, name, organization=None, private=None, description=None, check_mode=False):
     result = dict(
         changed=False,
         repo=dict())
@@ -151,16 +162,21 @@ def create_repo(gh, name, organization=None, private=False, description='', chec
     except UnknownObjectException:
         if not check_mode:
             repo = target.create_repo(
-                name=name, private=private, description=description)
+                name=name,
+                private=GithubObject.NotSet if private is None else private,
+                description=GithubObject.NotSet if description is None else description,
+            )
             result['repo'] = repo.raw_data
 
         result['changed'] = True
 
     changes = {}
-    if repo is None or repo.raw_data['private'] != private:
-        changes['private'] = private
-    if repo is None or repo.raw_data['description'] != description:
-        changes['description'] = description
+    if private is not None:
+        if repo is None or repo.raw_data['private'] != private:
+            changes['private'] = private
+    if description is not None:
+        if repo is None or repo.raw_data['description'] not in (description, description or None):
+            changes['description'] = description
 
     if changes:
         if not check_mode:
@@ -193,6 +209,10 @@ def delete_repo(gh, name, organization=None, check_mode=False):
 
 
 def run_module(params, check_mode=False):
+    if params['force_defaults']:
+        params['description'] = params['description'] or ''
+        params['private'] = params['private'] or False
+
     gh = authenticate(
         username=params['username'], password=params['password'], access_token=params['access_token'],
         api_url=params['api_url'])
@@ -216,17 +236,17 @@ def run_module(params, check_mode=False):
 
 def main():
     module_args = dict(
-        username=dict(type='str', required=False, default=None),
-        password=dict(type='str', required=False, default=None, no_log=True),
-        access_token=dict(type='str', required=False,
-                          default=None, no_log=True),
+        username=dict(type='str'),
+        password=dict(type='str', no_log=True),
+        access_token=dict(type='str', no_log=True),
         name=dict(type='str', required=True),
         state=dict(type='str', required=False, default="present",
                    choices=["present", "absent"]),
         organization=dict(type='str', required=False, default=None),
-        private=dict(type='bool', required=False, default=False),
-        description=dict(type='str', required=False, default=''),
+        private=dict(type='bool'),
+        description=dict(type='str'),
         api_url=dict(type='str', required=False, default='https://api.github.com'),
+        force_defaults=dict(type='bool', default=True),
     )
     module = AnsibleModule(
         argument_spec=module_args,
