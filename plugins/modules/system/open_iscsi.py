@@ -86,6 +86,14 @@ options:
         - Whether the list of nodes in the persistent iSCSI database should be returned by the module.
         type: bool
         default: false
+    rescan:
+        description:
+        - Rescan an established session for discovering new targets.
+        - When I(target) is omitted, will rescan all sessions.
+        type: bool
+        default: false
+        version_added: 4.1.0
+
 '''
 
 EXAMPLES = r'''
@@ -123,6 +131,11 @@ EXAMPLES = r'''
     login: false
     portal: 10.1.1.250
     auto_portal_startup: false
+    target: iqn.1986-03.com.sun:02:f8c1f9e0-c3ec-ec84-c9c9-8bfb0cd5de3d
+
+- name: Rescan one or all established sessions to discover new targets (omit target for all sessions)
+  community.general.open_iscsi:
+    rescan: true
     target: iqn.1986-03.com.sun:02:f8c1f9e0-c3ec-ec84-c9c9-8bfb0cd5de3d
 '''
 
@@ -177,6 +190,15 @@ def iscsi_get_cached_nodes(module, portal=None):
 def iscsi_discover(module, portal, port):
     cmd = [iscsiadm_cmd, '--mode', 'discovery', '--type', 'sendtargets', '--portal', '%s:%s' % (portal, port)]
     module.run_command(cmd, check_rc=True)
+
+
+def iscsi_rescan(module, target=None):
+    if target is None:
+        cmd = [iscsiadm_cmd, '--mode', 'session', '--rescan']
+    else:
+        cmd = [iscsiadm_cmd, '--mode', 'node', '--rescan', '-T', target]
+    rc, out, err = module.run_command(cmd)
+    return out
 
 
 def target_loggedon(module, target, portal=None, port=None):
@@ -305,6 +327,7 @@ def main():
             auto_portal_startup=dict(type='bool'),
             discover=dict(type='bool', default=False),
             show_nodes=dict(type='bool', default=False),
+            rescan=dict(type='bool', default=False),
         ),
 
         required_together=[['node_user', 'node_pass'], ['node_user_in', 'node_pass_in']],
@@ -330,6 +353,7 @@ def main():
     automatic_portal = module.params['auto_portal_startup']
     discover = module.params['discover']
     show_nodes = module.params['show_nodes']
+    rescan = module.params['rescan']
 
     check = module.check_mode
 
@@ -420,6 +444,10 @@ def main():
         else:
             result['changed'] |= True
             result['automatic_portal_changed'] = True
+
+    if rescan is not False:
+        result['changed'] = True
+        result['sessions'] = iscsi_rescan(module, target)
 
     module.exit_json(**result)
 
