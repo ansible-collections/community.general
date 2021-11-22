@@ -89,7 +89,7 @@ options:
     rescan:
         description:
         - Rescan an established session for discovering new targets.
-        - When I(target) is ommited, will rescan all sessions.
+        - When I(target) is omitted, will rescan all sessions.
         type: bool
         default: false
         version_added: 4.1.0
