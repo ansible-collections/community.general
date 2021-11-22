@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 name: revbitspss
 author: RevBits (@RevBits) <info@revbits.com>
-short_description: Get secrets from RevBits PAM server
+short_description: get secrets from RevBits PAM server
 version_added: 4.1.0
 description:
     - Uses the revbits_ansible Python SDK to get Secrets from RevBits PAM
