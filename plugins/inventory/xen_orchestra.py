@@ -69,6 +69,11 @@ simple_config_file:
     password: xo_pwd
     validate_certs: true
     use_ssl: true
+    groups:
+        kube_nodes: "'kube_node' in tags"
+    compose:
+        ansible_port: 2222
+
 '''
 
 import json
@@ -165,6 +170,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             'hosts': self.get_object('host'),
         }
 
+    def _apply_constructable(self, name, variables):
+        strict = self.get_option('strict')
+        self._add_host_to_composed_groups(self.get_option('groups'), variables, name, strict=strict)
+        self._add_host_to_keyed_groups(self.get_option('keyed_groups'), variables, name, strict=strict)
+        self._set_composite_vars(self.get_option('compose'), variables, name, strict=strict)
+
     def _add_vms(self, vms, hosts, pools):
         for uuid, vm in vms.items():
             group = 'with_ip'
@@ -212,6 +223,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 entry_name, 'is_managed', vm.get('managementAgentDetected', False))
             self.inventory.set_variable(
                 entry_name, 'os_version', vm['os_version'])
+
+            self._apply_constructable(entry_name, self.inventory.get_host(entry_name).get_vars())
 
     def _add_hosts(self, hosts, pools):
         for host in hosts.values():

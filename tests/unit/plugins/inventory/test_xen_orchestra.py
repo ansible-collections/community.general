@@ -129,6 +129,19 @@ objects = {
 }
 
 
+def get_option(option):
+    if option == 'groups':
+        return {}
+    elif option == 'keyed_groups':
+        return []
+    elif option == 'compose':
+        return {}
+    elif option == 'strict':
+        return False
+    else:
+        return None
+
+
 def serialize_groups(groups):
     return list(map(str, groups))
 
@@ -144,7 +157,8 @@ def test_verify_file_bad_config(inventory):
     assert inventory.verify_file('foobar.xen_orchestra.yml') is False
 
 
-def test_populate(inventory):
+def test_populate(inventory, mocker):
+    inventory.get_option = mocker.MagicMock(side_effect=get_option)
     inventory._populate(objects)
     actual = sorted(inventory.inventory.hosts.keys())
     expected = sorted(['c96ec4dd-28ac-4df4-b73c-4371bd202728', '222d8594-9426-468a-ad69-7a6f02330fa3',
