@@ -75,7 +75,7 @@ CATEGORY_COMMANDS_ALL = {
 }
 
 CATEGORY_COMMANDS_DEFAULT = {
-  "Sessions": "GetiLOSessions"
+    "Sessions": "GetiLOSessions"
 }
 
 from ansible.module_utils.basic import AnsibleModule
