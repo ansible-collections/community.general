@@ -57,14 +57,6 @@ DOCUMENTATION = '''
             description: Use wss when connecting to the Xen Orchestra API
             type: boolean
             default: true
-        strict:
-            version_added: 4.1.0
-        compose:
-            version_added: 4.1.0
-        groups:
-            version_added: 4.1.0
-        keyed_groups:
-            version_added: 4.1.0
 '''
 
 
