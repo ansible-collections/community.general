@@ -1,0 +1,7 @@
+---
+minor_changes:
+  - nmcli - add multiple addresses support for ``ip6`` parameter
+    (https://github.com/ansible-collections/community.general/issues/1088).
+bugfixes:
+  - nmcli - fix returning "changed" when no mask set for ipv6 address on task rerun
+    (https://github.com/ansible-collections/community.general/issues/3768).
