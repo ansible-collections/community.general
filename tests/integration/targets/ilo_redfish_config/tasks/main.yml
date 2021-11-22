@@ -7,7 +7,6 @@
     password: "{{ password }}"
     attribute_name: StaticNTPServers
     attribute_value: 1.2.3.4
-    auth_token: "{{ result.session.token }}"
 
 - name: Set DNS Server
   ilo_redfish_config:
@@ -18,7 +17,6 @@
     password: "{{ password }}"
     attribute_name: DNSServers
     attribute_value: 192.168.1.1
-    auth_token: "{{ result.session.token }}"
 
 - name: Set Domain name
   ilo_redfish_config:
@@ -29,7 +27,6 @@
     password: "{{ password }}"
     attribute_name: DomainName
     attribute_value: tst.sgp.hp.mfg
-    auth_token: "{{ result.session.token }}"
 
 - name: Disable WINS Reg
   ilo_redfish_config:
@@ -39,7 +36,6 @@
     username: "{{ username }}"
     password: "{{ password }}"
     attribute_name: WINSRegistration
-    auth_token: "{{ result.session.token }}"
 
 - name: Set TimeZone
   ilo_redfish_config:
@@ -50,4 +46,3 @@
     password: "{{ password }}"
     attribute_name: TimeZone
     attribute_value: Chennai
-    auth_token: "{{ result.session.token }}"
