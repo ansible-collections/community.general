@@ -16,8 +16,15 @@
   msimpleda:
     a: 2
   register: simple2
-  vars:
-    ansible_deprecation_warnings: yes
+
+- set_fact:
+    attr2_d:
+      msg: Attribute attr2 is deprecated
+      version: 9.9.9
+      collection_name: community.general
+    attr2_d_29:
+      msg: Attribute attr2 is deprecated
+      version: 9.9.9
 
 - debug:
     msg: simple2={{ simple2.deprecations|selectattr("msg") }}
@@ -28,5 +35,6 @@
       - simple2.a == 2
       - simple2.attr2 == "def"
       - '"deprecations" in simple2'
-      - simple2.deprecations|selectattr("msg", "==", "Attribute attr2 is deprecated")|length == 1
-      - simple2.deprecations|selectattr("version", "==", "9.9.9")|length == 1
+      - attr2_depr_dict in simple2.deprecations
+  vars:
+    attr2_depr_dict: "{{ ((ansible_version.major, ansible_version.minor) < (2, 10))|ternary(attr2_d_29, attr2_d) }}"
