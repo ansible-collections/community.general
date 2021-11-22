@@ -61,7 +61,7 @@ DOCUMENTATION = r'''
             type: str
             default: container
             choices: [ 'virtual-machine', 'container', 'both' ]
-            version_added: 4.0.0
+            version_added: 4.1.0
         prefered_instance_network_interface:
             description:
             - If an instance has multiple network interfaces, select which one is the prefered as pattern.
