@@ -225,6 +225,8 @@ files:
     maintainers: konstruktoid
   $lookups/redis.py:
     maintainers: $team_ansible_core jpmens
+  $lookups/revbitspss.py:
+    maintainers: RevBits
   $lookups/shelvefile.py: {}
   $lookups/tss.py:
     maintainers: amigus endlesstrax
