@@ -149,7 +149,6 @@ def main():
         'commands': {
             'type': 'list',
             'elements': 'str',
-            'default': [],
         },
         'group': {},
         'name': {
