@@ -861,7 +861,7 @@ def main():
     # special handling of mappers list to allow change detection
     if module.params.get('mappers') is not None:
         if module.params['provider_id'] in ['kerberos', 'sssd']:
-            module.fail_json(msg='Cannot configure mappers for Kerberos federations.')
+            module.fail_json(msg='Cannot configure mappers for {type} provider.'.format(type=module.params['provider_id']))
         for change in module.params['mappers']:
             change = dict((k, v) for k, v in change.items() if change[k] is not None)
             if change.get('id') is None and change.get('name') is None:
