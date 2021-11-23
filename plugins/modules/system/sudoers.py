@@ -48,7 +48,9 @@ options:
     type: str
   state:
     default: "present"
-    choices: [ present, absent ]
+    choices:
+      - present
+      - absent
     description:
       - Whether the rule should exist or not.
     type: str
@@ -90,6 +92,7 @@ EXAMPLES = '''
 
 import os
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_native
 
 
 class Sudoers(object):
@@ -185,7 +188,7 @@ def main():
         changed = sudoers.run()
         module.exit_json(changed=changed)
     except Exception as e:
-        module.fail_json(msg=str(e))
+        module.fail_json(msg=to_native(e))
 
 
 if __name__ == '__main__':
