@@ -106,10 +106,16 @@ class Sudoers(object):
         self.commands = module.params['commands']
 
     def write(self):
+        if self.check_mode:
+            return
+
         with open(self.file, 'w') as f:
             f.write(self.content())
 
     def delete(self):
+        if self.check_mode:
+            return
+
         os.remove(self.file)
 
     def exists(self):
@@ -131,16 +137,13 @@ class Sudoers(object):
 
     def run(self):
         if self.state == 'absent' and self.exists():
-            if not self.check_mode:
-                self.delete()
+            self.delete()
             return True
 
         if self.exists() and self.matches():
             return False
 
-        if not self.check_mode:
-            self.write()
-
+        self.write()
         return True
 
 
