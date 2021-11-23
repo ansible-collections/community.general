@@ -26,9 +26,6 @@
       msg: Attribute attr2 is deprecated
       version: 9.9.9
 
-- debug:
-    msg: simple2={{ simple2.deprecations|selectattr("msg") }}
-
 - name: assert simple2
   assert:
     that:
