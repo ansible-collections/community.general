@@ -15,48 +15,48 @@ module: sudoers
 short_description: manage sudoers files
 version_added: "4.1.0"
 description:
-    - This module allows for the manipulation of sudoers files.
+  - This module allows for the manipulation of sudoers files.
 author:
-    - "Jon Ellis (@JonEllis0) <ellis.jp@gmail.com>"
+  - "Jon Ellis (@JonEllis0) <ellis.jp@gmail.com>"
 options:
-    commands:
-        description:
-            - The commands allowed by the sudoers rule.
-            - Multiple can be added by passing a list of commands.
-        type: list
-        elements: str
-    group:
-        description:
-            - The name of the group for the sudoers rule.
-            - This option cannot be used in conjunction with I(user).
-        type: str
-    name:
-        required: true
-        description:
-            - The name of the sudoers rule.
-            - This will be used for the filename for the sudoers file managed by this rule.
-        type: str
-    nopassword:
-        description:
-            - Whether a password will be required to run the sudo'd command.
-        default: true
-        type: bool
-    sudoers_path:
-        description:
-            - The path which sudoers config files will be managed in.
-        default: /etc/sudoers.d
-        type: str
-    state:
-        default: "present"
-        choices: [ present, absent ]
-        description:
-            - Whether the rule should exist or not.
-        type: str
-    user:
-        description:
-            - The name of the user for the sudoers rule.
-            - This option cannot be used in conjunction with I(group).
-        type: str
+  commands:
+    description:
+      - The commands allowed by the sudoers rule.
+      - Multiple can be added by passing a list of commands.
+    type: list
+    elements: str
+  group:
+    description:
+      - The name of the group for the sudoers rule.
+      - This option cannot be used in conjunction with I(user).
+    type: str
+  name:
+    required: true
+    description:
+      - The name of the sudoers rule.
+      - This will be used for the filename for the sudoers file managed by this rule.
+    type: str
+  nopassword:
+    description:
+      - Whether a password will be required to run the sudo'd command.
+    default: true
+    type: bool
+  sudoers_path:
+    description:
+      - The path which sudoers config files will be managed in.
+    default: /etc/sudoers.d
+    type: str
+  state:
+    default: "present"
+    choices: [ present, absent ]
+    description:
+      - Whether the rule should exist or not.
+    type: str
+  user:
+    description:
+      - The name of the user for the sudoers rule.
+      - This option cannot be used in conjunction with I(group).
+    type: str
 '''
 
 EXAMPLES = '''
