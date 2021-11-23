@@ -1,2 +1,0 @@
-minor_changes:
-  - gitlab - clean up modules and utils (https://github.com/ansible-collections/community.general/pull/3694).

@@ -1069,3 +1069,51 @@ releases:
     - 4.0.2.yml
     - deprecate-ansible-2.9-2.10.yml
     release_date: '2021-11-16'
+  4.1.0:
+    changes:
+      bugfixes:
+      - github_repo - ``private`` and ``description`` attributes should not be set
+        to default values when the repo already exists (https://github.com/ansible-collections/community.general/pull/2386).
+      - terraform - fix command options being ignored during planned/plan in function
+        ``build_plan`` such as ``lock`` or ``lock_timeout`` (https://github.com/ansible-collections/community.general/issues/3707,
+        https://github.com/ansible-collections/community.general/pull/3726).
+      minor_changes:
+      - gitlab - clean up modules and utils (https://github.com/ansible-collections/community.general/pull/3694).
+      - ipmi_boot - add support for user-specified IPMI encryption key (https://github.com/ansible-collections/community.general/issues/3698).
+      - ipmi_power - add support for user-specified IPMI encryption key (https://github.com/ansible-collections/community.general/issues/3698).
+      - listen_ports_facts - add support for ``ss`` command besides ``netstat`` (https://github.com/ansible-collections/community.general/pull/3708).
+      - lxd_container - adds ``type`` option which also allows to operate on virtual
+        machines and not just containers (https://github.com/ansible-collections/community.general/pull/3661).
+      - nmcli - add multiple addresses support for ``ip4`` parameter (https://github.com/ansible-collections/community.general/issues/1088,
+        https://github.com/ansible-collections/community.general/pull/3738).
+      - open_iscsi - extended module to allow rescanning of established session for
+        one or all targets (https://github.com/ansible-collections/community.general/issues/3763).
+      - pacman - add ``stdout`` and ``stderr`` as return values (https://github.com/ansible-collections/community.general/pull/3758).
+      - redfish_command - add ``GetHostInterfaces`` command to enable reporting Redfish
+        Host Interface information (https://github.com/ansible-collections/community.general/issues/3693).
+      - redfish_command - add ``SetHostInterface`` command to enable configuring the
+        Redfish Host Interface (https://github.com/ansible-collections/community.general/issues/3632).
+      release_summary: Regular bugfix and feature release.
+    fragments:
+    - 1088-nmcli_add_multiple_addresses_support.yml
+    - 2386-github_repo-fix-idempotency-issues.yml
+    - 3632-add-redfish-host-interface-config-support.yml
+    - 3661-lxd_container-add-vm-support.yml
+    - 3693-add-redfish-host-interface-info-support.yml
+    - 3694-gitlab-cleanup.yml
+    - 3702-ipmi-encryption-key.yml
+    - 3708-listen_ports_facts-add-ss-support.yml
+    - 3726-terraform-missing-parameters-planned-fix.yml
+    - 3758-pacman-add-stdout-stderr.yml
+    - 3765-extend-open_iscsi-with-rescan.yml
+    - 4.1.0.yml
+    plugins:
+      inventory:
+      - description: Xen Orchestra inventory source
+        name: xen_orchestra
+        namespace: null
+      lookup:
+      - description: Get secrets from RevBits PAM server
+        name: revbitspss
+        namespace: null
+    release_date: '2021-11-23'
