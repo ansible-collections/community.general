@@ -64,6 +64,7 @@ options:
         choices:
             - ldap
             - kerberos
+            - sssd
 
     provider_type:
         description:
@@ -83,9 +84,9 @@ options:
     config:
         description:
             - Dict specifying the configuration options for the provider; the contents differ depending on
-              the value of I(provider_id). Examples are given below for C(ldap) and C(kerberos). It is easiest
-              to obtain valid config values by dumping an already-existing user federation configuration
-              through check-mode in the I(existing) field.
+              the value of I(provider_id). Examples are given below for C(ldap), C(kerberos) and C(sssd).
+              It is easiest to obtain valid config values by dumping an already-existing user federation
+              configuration through check-mode in the I(existing) field.
         type: dict
         suboptions:
             enabled:
@@ -531,6 +532,22 @@ EXAMPLES = '''
         allowPasswordAuthentication: false
         updateProfileFirstLogin: false
 
+  - name: Create sssd user federation
+    community.general.keycloak_user_federation:
+      auth_keycloak_url: https://keycloak.example.com/auth
+      auth_realm: master
+      auth_username: admin
+      auth_password: password
+      realm: my-realm
+      name: my-sssd
+      state: present
+      provider_id: sssd
+      provider_type: org.keycloak.storage.UserStorageProvider
+      config:
+        priority: 0
+        enabled: true
+        cachePolicy: DEFAULT
+
   - name: Delete user federation
     community.general.keycloak_user_federation:
       auth_keycloak_url: https://keycloak.example.com/auth
@@ -765,7 +782,7 @@ def main():
         realm=dict(type='str', default='master'),
         id=dict(type='str'),
         name=dict(type='str'),
-        provider_id=dict(type='str', aliases=['providerId'], choices=['ldap', 'kerberos']),
+        provider_id=dict(type='str', aliases=['providerId'], choices=['ldap', 'kerberos', 'sssd']),
         provider_type=dict(type='str', aliases=['providerType'], default='org.keycloak.storage.UserStorageProvider'),
         parent_id=dict(type='str', aliases=['parentId']),
         mappers=dict(type='list', elements='dict', options=mapper_spec),
@@ -843,7 +860,7 @@ def main():
 
     # special handling of mappers list to allow change detection
     if module.params.get('mappers') is not None:
-        if module.params['provider_id'] == 'kerberos':
+        if module.params['provider_id'] in ['kerberos', 'sssd']:
             module.fail_json(msg='Cannot configure mappers for Kerberos federations.')
         for change in module.params['mappers']:
             change = dict((k, v) for k, v in change.items() if change[k] is not None)
