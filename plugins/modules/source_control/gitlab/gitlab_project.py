@@ -391,7 +391,7 @@ def main():
         api_token=dict(type='str', no_log=True),
         group=dict(type='str'),
         name=dict(type='str', required=True),
-        path=dict(type='str'),
+        path=dict(type='path'),
         description=dict(type='str'),
         initialize_with_readme=dict(type='bool', default=False),
         default_branch=dict(type='str'),

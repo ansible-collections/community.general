@@ -321,7 +321,7 @@ def main():
         auto_devops_enabled=dict(type='bool'),
         subgroup_creation_level=dict(type='str', choices=['maintainer', 'owner']),
         require_two_factor_authentication=dict(type='bool'),
-        avatar_path=dict(type='str'),
+        avatar_path=dict(type='path'),
     ))
 
     module = AnsibleModule(
