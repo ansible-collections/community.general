@@ -523,9 +523,7 @@ class LXDVirtualMachineManagement(object):
         else:
             if self.old_state == 'stopped':
                 if self._needs_to_apply_virtual_machine_configs():
-                    self._start_virtual_machine()
                     self._apply_virtual_machine_configs()
-                    self._stop_virtual_machine()
             else:
                 if self.old_state == 'frozen':
                     self._unfreeze_virtual_machine()
