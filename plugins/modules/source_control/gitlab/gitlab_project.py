@@ -164,9 +164,9 @@ options:
     version_added: "3.7.0"
   avatar_path:
     description:
-      - Absolute path image to configure avatar (200k max)
-      - Works only for create new project, not update
-    type: str
+      - Absolute path image to configure avatar. File size should not exceed 200 kb.
+      - This option is only used on creation, not for updates.
+    type: path
     version_added: "4.2.0"
   default_branch:
     description:
@@ -301,8 +301,10 @@ class GitLabProject(object):
             project = self.create_project(namespace, project_options)
 
             # add avatar to project
-            if options['avatar_path']:
-                project.avatar = open(options['avatar_path'], 'rb')
+            try:
+                group.avatar = open(options['avatar_path'], 'rb')
+            except IOError as e:
+                self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
 
             changed = True
         else:
