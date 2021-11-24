@@ -144,7 +144,7 @@ options:
     ip6:
         description:
             - The IPv6 address to this interface.
-            - Use the format C(abbe::cafe/128 or abbe::cafe).
+            - Use the format C(abbe::cafe/128) or C(abbe::cafe).
             - If defined and I(method6) is not specified, automatically set C(ipv6.method) to C(manual).
         type: list
         elements: str
@@ -1280,7 +1280,7 @@ class Nmcli(object):
         # IP address options.
         if self.ip_conn_type and not self.master:
             options.update({
-                'ipv4.addresses': self.enforce_ipv4_cidr_notation(self.ip4),
+                'ipv4.addresses': self.ip4,
                 'ipv4.dhcp-client-id': self.dhcp_client_id,
                 'ipv4.dns': self.dns4,
                 'ipv4.dns-search': self.dns4_search,
@@ -1293,7 +1293,7 @@ class Nmcli(object):
                 'ipv4.never-default': self.never_default4,
                 'ipv4.method': self.ipv4_method,
                 'ipv4.may-fail': self.may_fail4,
-                'ipv6.addresses': self.enforce_ipv6_cidr_notation(self.ip6),
+                'ipv6.addresses': self.ip6,
                 'ipv6.dns': self.dns6,
                 'ipv6.dns-search': self.dns6_search,
                 'ipv6.ignore-auto-dns': self.dns6_ignore_auto,
@@ -1503,18 +1503,6 @@ class Nmcli(object):
             'ipip',
             'sit',
         )
-
-    @staticmethod
-    def enforce_ipv4_cidr_notation(ip4_addresses):
-        if ip4_addresses is None:
-            return None
-        return [address if '/' in address else address + '/32' for address in ip4_addresses]
-
-    @staticmethod
-    def enforce_ipv6_cidr_notation(ip6_addresses):
-        if ip6_addresses is None:
-            return None
-        return [address if '/' in address else address + '/128' for address in ip6_addresses]
 
     @staticmethod
     def bool_to_string(boolean):

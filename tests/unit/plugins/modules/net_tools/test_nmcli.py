@@ -573,16 +573,6 @@ TESTCASE_ETHERNET_STATIC_MULTIPLE_IP4_ADDRESSES = [
         'dns4': ['1.1.1.1', '8.8.8.8'],
         'state': 'present',
         '_ansible_check_mode': False,
-    },
-    {
-        'type': 'ethernet',
-        'conn_name': 'non_existent_nw_device',
-        'ifname': 'ethernet_non_existant',
-        'ip4': ['10.10.10.10', '10.10.20.10'],
-        'gw4': '10.10.10.1',
-        'dns4': ['1.1.1.1', '8.8.8.8'],
-        'state': 'present',
-        '_ansible_check_mode': False,
     }
 ]
 
@@ -607,16 +597,6 @@ TESTCASE_ETHERNET_STATIC_MULTIPLE_IP6_ADDRESSES = [
         'conn_name': 'non_existent_nw_device',
         'ifname': 'ethernet_non_existant',
         'ip6': ['2001:db8::cafe/128', '2002:db8::cafe/128'],
-        'gw6': '2001:db8::cafa',
-        'dns6': ['2001:4860:4860::8888', '2001:4860:4860::8844'],
-        'state': 'present',
-        '_ansible_check_mode': False,
-    },
-    {
-        'type': 'ethernet',
-        'conn_name': 'non_existent_nw_device',
-        'ifname': 'ethernet_non_existant',
-        'ip6': ['2001:db8::cafe', '2002:db8::cafe'],
         'gw6': '2001:db8::cafa',
         'dns6': ['2001:4860:4860::8888', '2001:4860:4860::8844'],
         'state': 'present',
