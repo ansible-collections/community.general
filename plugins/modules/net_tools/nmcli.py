@@ -144,7 +144,7 @@ options:
     ip6:
         description:
             - The IPv6 address to this interface.
-            - Use the format C(abbe::cafe/128 or abbe::cafe).
+            - Use the format C(abbe::cafe/128) or C(abbe::cafe).
             - If defined and I(method6) is not specified, automatically set C(ipv6.method) to C(manual).
         type: list
         elements: str
