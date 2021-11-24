@@ -87,6 +87,7 @@ options:
               the value of I(provider_id). Examples are given below for C(ldap), C(kerberos) and C(sssd).
               It is easiest to obtain valid config values by dumping an already-existing user federation
               configuration through check-mode in the I(existing) field.
+            - The value C(sssd) has been supported since community.general 4.2.0.
         type: dict
         suboptions:
             enabled:
