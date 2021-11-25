@@ -86,8 +86,8 @@ EXAMPLES = '''
 
 - name: Revoke the previous sudo grants given to the alice user
   sudoers:
-      name: alice-service
-      state: absent
+    name: alice-service
+    state: absent
 '''
 
 import os
