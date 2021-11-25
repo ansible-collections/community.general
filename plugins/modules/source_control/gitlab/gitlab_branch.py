@@ -12,7 +12,7 @@ short_description: Create/delete branch
 description:
   - Create/Delete branches.
 author:
-  - paytroff (@paytroff)
+  - Werner Dijkerman (@dj-wasabi)
 requirements:
   - python >= 2.7
   - python-gitlab >= 2.3.0
@@ -114,6 +114,7 @@ class GitlabBranch(object):
     def delete_branch(self, branch):
         branch.unprotect()
         return branch.delete()
+
 
 def main():
     argument_spec = basic_auth_argument_spec()
