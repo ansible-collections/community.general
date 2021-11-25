@@ -13,7 +13,7 @@ description:
   - Create/Delete branches.
 requirements:
   - python >= 2.7
-  - python-gitlab >= 2.10.0
+  - python-gitlab >= 2.3.0
 extends_documentation_fragment:
 - community.general.auth_basic
 
@@ -108,7 +108,6 @@ class GitlabBranch(object):
 
     def create_branch(self, branch, ref_branch):
         return self.project.branches.create({'branch': branch, 'ref': ref_branch})
-        return
 
     def delete_branch(self, branch):
         branch.unprotect()
@@ -159,7 +158,7 @@ def main():
     this_gitlab = GitlabBranch(module=module, project=project, gitlab_instance=gitlab_instance)
 
     this_branch = this_gitlab.get_branch(branch)
-        
+
     if not this_branch and state == "present":
         r_branch = this_gitlab.get_branch(ref_branch)
         if not r_branch:
