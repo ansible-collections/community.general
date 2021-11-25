@@ -175,7 +175,6 @@ options:
       - requires initialize_with_readme = true
     type: str
     version_added: "4.2.0"
-      
 '''
 
 EXAMPLES = r'''
