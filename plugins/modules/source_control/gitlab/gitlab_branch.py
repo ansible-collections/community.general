@@ -177,7 +177,7 @@ def main():
         except Exception as e:
             module.fail_json(msg="Error delete branch.", exception=traceback.format_exc())
     else:
-      module.exit_json(changed=False, msg="No changes are needed.")
+        module.exit_json(changed=False, msg="No changes are needed.")
 
 
 if __name__ == '__main__':
