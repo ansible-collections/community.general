@@ -294,18 +294,17 @@ class GitLabProject(object):
             })
             if options['initialize_with_readme']:
                 project_options['initialize_with_readme'] = options['initialize_with_readme']
-            
+
             if options['default_branch']:
                 project_options['default_branch'] = options['default_branch']
-            
+
             project_options = self.get_options_with_value(project_options)
             project = self.create_project(namespace, project_options)
-            
+
             # add avatar to project
             if options['avatar_path']:
                 project.avatar = open(options['avatar_path'], 'rb')
-            
-            
+
             changed = True
         else:
             changed, project = self.update_project(self.project_object, project_options)
@@ -458,7 +457,7 @@ def main():
     shared_runners_enabled = module.params['shared_runners_enabled']
     avatar_path = module.params['avatar_path']
     default_branch = module.params['default_branch']
-    
+
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
