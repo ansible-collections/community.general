@@ -11,6 +11,8 @@ module: gitlab_branch
 short_description: Create/delete branch
 description:
   - Create/Delete branches.
+author:
+  - paytroff (@paytroff)
 requirements:
   - python >= 2.7
   - python-gitlab >= 2.3.0
