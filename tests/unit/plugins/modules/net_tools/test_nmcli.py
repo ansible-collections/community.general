@@ -586,29 +586,6 @@ TESTCASE_ETHERNET_STATIC_MULTIPLE_IP4_ADDRESSES = [
     }
 ]
 
-TESTCASE_ETHERNET_STATIC_MULTIPLE_IP6_ADDRESSES = [
-    {
-        'type': 'ethernet',
-        'conn_name': 'non_existent_nw_device',
-        'ifname': 'ethernet_non_existant',
-        'ip6': ['2001:db8::cafe/128', '2002:db8::cafe/128'],
-        'gw6': '2001:db8::cafa',
-        'dns6': ['2001:4860:4860::8888', '2001:4860:4860::8844'],
-        'state': 'present',
-        '_ansible_check_mode': False,
-    },
-    {
-        'type': 'ethernet',
-        'conn_name': 'non_existent_nw_device',
-        'ifname': 'ethernet_non_existant',
-        'ip6': ['2001:db8::cafe', '2002:db8::cafe'],
-        'gw6': '2001:db8::cafa',
-        'dns6': ['2001:4860:4860::8888', '2001:4860:4860::8844'],
-        'state': 'present',
-        '_ansible_check_mode': False,
-    }
-]
-
 TESTCASE_ETHERNET_STATIC_MULTIPLE_IP4_ADDRESSES_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
 connection.interface-name:              ethernet_non_existant
@@ -1028,13 +1005,6 @@ def mocked_ethernet_connection_static_multiple_ip4_addresses_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
                execute_return=(0, TESTCASE_ETHERNET_STATIC_MULTIPLE_IP4_ADDRESSES_SHOW_OUTPUT, ""))
-
-
-@pytest.fixture
-def mocked_ethernet_connection_static_multiple_ip6_addresses_unchanged(mocker):
-    mocker_set(mocker,
-               connection_exists=True,
-               execute_return=(0, TESTCASE_ETHERNET_STATIC_MULTIPLE_IP6_ADDRESSES_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
@@ -2637,64 +2607,10 @@ def test_create_ethernet_with_mulitple_ip4_addresses_static(mocked_generic_conne
     assert results['changed']
 
 
-@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_STATIC_MULTIPLE_IP6_ADDRESSES, indirect=['patch_ansible_module'])
-def test_create_ethernet_with_mulitple_ip6_addresses_static(mocked_generic_connection_create, capfd):
-    """
-    Test : Create ethernet connection with multiple IPv6 addresses configuration
-    """
-
-    with pytest.raises(SystemExit):
-        nmcli.main()
-
-    assert nmcli.Nmcli.execute_command.call_count == 2
-    arg_list = nmcli.Nmcli.execute_command.call_args_list
-    add_args, add_kw = arg_list[0]
-
-    assert add_args[0][0] == '/usr/bin/nmcli'
-    assert add_args[0][1] == 'con'
-    assert add_args[0][2] == 'add'
-    assert add_args[0][3] == 'type'
-    assert add_args[0][4] == 'ethernet'
-    assert add_args[0][5] == 'con-name'
-    assert add_args[0][6] == 'non_existent_nw_device'
-
-    add_args_text = list(map(to_text, add_args[0]))
-    for param in ['connection.interface-name', 'ethernet_non_existant',
-                  'ipv6.addresses', '2001:db8::cafe/128,2002:db8::cafe/128',
-                  'ipv6.gateway', '2001:db8::cafa',
-                  'ipv6.dns', '2001:4860:4860::8888,2001:4860:4860::8844']:
-        assert param in add_args_text
-
-    up_args, up_kw = arg_list[1]
-    assert up_args[0][0] == '/usr/bin/nmcli'
-    assert up_args[0][1] == 'con'
-    assert up_args[0][2] == 'up'
-    assert up_args[0][3] == 'non_existent_nw_device'
-
-    out, err = capfd.readouterr()
-    results = json.loads(out)
-    assert not results.get('failed')
-    assert results['changed']
-
-
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_STATIC_MULTIPLE_IP4_ADDRESSES, indirect=['patch_ansible_module'])
 def test_ethernet_connection_static_with_mulitple_ip4_addresses_unchanged(mocked_ethernet_connection_static_multiple_ip4_addresses_unchanged, capfd):
     """
     Test : Ethernet connection with static IP configuration unchanged
-    """
-    with pytest.raises(SystemExit):
-        nmcli.main()
-
-    out, err = capfd.readouterr()
-    results = json.loads(out)
-    assert not results.get('failed')
-    assert not results['changed']
-
-
-@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_STATIC_MULTIPLE_IP6_ADDRESSES, indirect=['patch_ansible_module'])
-def test_ethernet_connection_static_with_mulitple_ip6_addresses_unchanged(mocked_ethernet_connection_static_multiple_ip6_addresses_unchanged, capfd):
-    """
-    Test : Ethernet connection with multiple IPv6 addresses configuration unchanged
     """
     with pytest.raises(SystemExit):
         nmcli.main()
@@ -2723,32 +2639,6 @@ def test_add_second_ip4_address_to_ethernet_connection(mocked_ethernet_connectio
     assert args[0][3] == 'non_existent_nw_device'
 
     for param in ['ipv4.addresses', '10.10.10.10/32,10.10.20.10/32']:
-        assert param in args[0]
-
-    out, err = capfd.readouterr()
-    results = json.loads(out)
-    assert not results.get('failed')
-    assert results['changed']
-
-
-@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_STATIC_MULTIPLE_IP6_ADDRESSES, indirect=['patch_ansible_module'])
-def test_add_second_ip6_address_to_ethernet_connection(mocked_ethernet_connection_static_modify, capfd):
-    """
-    Test : Modify ethernet connection from DHCP to static
-    """
-    with pytest.raises(SystemExit):
-        nmcli.main()
-
-    assert nmcli.Nmcli.execute_command.call_count == 2
-    arg_list = nmcli.Nmcli.execute_command.call_args_list
-    args, kwargs = arg_list[1]
-
-    assert args[0][0] == '/usr/bin/nmcli'
-    assert args[0][1] == 'con'
-    assert args[0][2] == 'modify'
-    assert args[0][3] == 'non_existent_nw_device'
-
-    for param in ['ipv6.addresses', '2001:db8::cafe/128,2002:db8::cafe/128']:
         assert param in args[0]
 
     out, err = capfd.readouterr()
