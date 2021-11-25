@@ -218,7 +218,7 @@ class GitLabGroup(object):
             if options.get('require_two_factor_authentication'):
                 payload['require_two_factor_authentication'] = options['require_two_factor_authentication']
             group = self.create_group(payload)
-            
+
             # add avatar to group
             if options['avatar_path']:
                 group.avatar = open(options['avatar_path'], 'rb')
@@ -347,7 +347,7 @@ def main():
     subgroup_creation_level = module.params['subgroup_creation_level']
     require_two_factor_authentication = module.params['require_two_factor_authentication']
     avatar_path = module.params['avatar_path']
-    
+
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
