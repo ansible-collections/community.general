@@ -11,7 +11,7 @@ module: gitlab_branch
 short_description: Create or delete a branch
 version_added: 4.2.0
 description:
-  - Create/Delete branches
+  - This module allows to create or delete branches.
 author:
   - Werner Dijkerman (@dj-wasabi)
 requirements:
