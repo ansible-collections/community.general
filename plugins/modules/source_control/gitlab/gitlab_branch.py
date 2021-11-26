@@ -169,7 +169,7 @@ def main():
         if not r_branch:
             module.fail_json(msg="Ref branch {b} not exist.".format(b=ref_branch))
         this_gitlab.create_branch(branch, ref_branch)
-        module.exit_json(changed=True, msg="Created the branch {b}.".format(b=ref_branch))
+        module.exit_json(changed=True, msg="Created the branch {b}.".format(b=branch))
     elif this_branch and state == "present":
         module.exit_json(changed=False, msg="Branch {b} already exist".format(b=branch))
     elif this_branch and state == "absent":
