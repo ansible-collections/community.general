@@ -14,6 +14,7 @@ description:
   - This module allows to create or delete branches.
 author:
   - Werner Dijkerman (@dj-wasabi)
+  - paytroff (@paytroff)
 requirements:
   - python >= 2.7
   - python-gitlab >= 2.3.0
