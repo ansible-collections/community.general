@@ -86,7 +86,7 @@ options:
   avatar_path:
     description:
       - Absolute path image to configure avatar (200k max)
-      - Works only for create new group, not update
+      - This option is only used on creation, not for updates.
     type: str
     version_added: 4.2.0
 '''
