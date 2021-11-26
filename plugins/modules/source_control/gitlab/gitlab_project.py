@@ -424,7 +424,6 @@ def main():
         ],
         required_together=[
             ['api_username', 'api_password'],
-            ['default_branch', 'initialize_with_readme']
         ],
         required_one_of=[
             ['api_username', 'api_token']
@@ -457,6 +456,9 @@ def main():
     shared_runners_enabled = module.params['shared_runners_enabled']
     avatar_path = module.params['avatar_path']
     default_branch = module.params['default_branch']
+
+    if default_branch and not initialize_with_readme:
+        module.fail_json(msg="Param default_branch need param initialize_with_readme set to true")
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
