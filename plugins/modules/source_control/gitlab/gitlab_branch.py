@@ -60,14 +60,13 @@ EXAMPLES = '''
     ref_branch: main
     state: present
 
-- name: Create branch branch2 from main
+- name: Delete branch branch2
   community.general.gitlab_branch:
     api_url: https://gitlab.com
     api_token: secret_access_token
     project: "group1/project1"
     branch: branch2
-    ref_branch: main
-    state: present
+    state: absent
 
 '''
 
