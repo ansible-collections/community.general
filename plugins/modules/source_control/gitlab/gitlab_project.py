@@ -302,7 +302,7 @@ class GitLabProject(object):
 
             # add avatar to project
             try:
-                group.avatar = open(options['avatar_path'], 'rb')
+                project.avatar = open(options['avatar_path'], 'rb')
             except IOError as e:
                 self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
 
@@ -391,7 +391,7 @@ def main():
         api_token=dict(type='str', no_log=True),
         group=dict(type='str'),
         name=dict(type='str', required=True),
-        path=dict(type='path'),
+        path=dict(type='str'),
         description=dict(type='str'),
         initialize_with_readme=dict(type='bool', default=False),
         default_branch=dict(type='str'),
@@ -413,7 +413,7 @@ def main():
         squash_option=dict(type='str', choices=['never', 'always', 'default_off', 'default_on']),
         ci_config_path=dict(type='str'),
         shared_runners_enabled=dict(type='bool'),
-        avatar_path=dict(type='str'),
+        avatar_path=dict(type='path'),
     ))
 
     module = AnsibleModule(
