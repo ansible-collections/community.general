@@ -170,9 +170,8 @@ options:
     version_added: "4.2.0"
   default_branch:
     description:
-      - Branch name default
-      - Works only for create new project, not update
-      - requires initialize_with_readme = true
+      - Default branch name for a new project.
+      - This option is only used on creation, not for updates. This is also only used if I(initialize_with_readme=true).
     type: str
     version_added: "4.2.0"
 '''
