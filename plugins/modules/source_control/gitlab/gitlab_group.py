@@ -221,7 +221,10 @@ class GitLabGroup(object):
 
             # add avatar to group
             if options['avatar_path']:
-                group.avatar = open(options['avatar_path'], 'rb')
+                try:
+                    group.avatar = open(options['avatar_path'], 'rb')
+                except IOError as e:
+                    self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
             changed = True
         else:
             changed, group = self.update_group(self.group_object, {
