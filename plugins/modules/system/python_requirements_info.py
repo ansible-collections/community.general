@@ -121,7 +121,7 @@ def main():
             python_version=sys.version,
             python_system_path=sys.path,
         )
-    pkg_dep_re = re.compile(r'(^[a-zA-Z][a-zA-Z0-9_-]+)(==|[><]=?)?([0-9.]+)?$')
+    pkg_dep_re = re.compile(r'(^[a-zA-Z][a-zA-Z0-9_-]+)(?:(==|[><]=?)([0-9.]+))?$')
 
     results = dict(
         not_found=[],
@@ -131,7 +131,7 @@ def main():
 
     for dep in (module.params.get('dependencies') or []):
         match = pkg_dep_re.match(dep)
-        if match is None:
+        if not match:
             module.fail_json(msg="Failed to parse version requirement '{0}'. Must be formatted like 'ansible>2.6'".format(dep))
         pkg, op, version = match.groups()
         if op is not None and op not in operations:
