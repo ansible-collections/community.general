@@ -85,7 +85,7 @@ options:
     version_added: 3.7.0
   avatar_path:
     description:
-      - Absolute path image to configure avatar (200k max)
+      - Absolute path image to configure avatar. File size should not exceed 200 kb.
       - This option is only used on creation, not for updates.
     type: path
     version_added: 4.2.0
