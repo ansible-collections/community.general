@@ -8,7 +8,8 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: gitlab_branch
-short_description: Create/delete branch
+short_description: Create or delete a branch
+version_added: 4.2.0
 description:
   - Create/Delete branches
 author:
