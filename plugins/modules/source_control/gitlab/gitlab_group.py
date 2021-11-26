@@ -87,7 +87,7 @@ options:
     description:
       - Absolute path image to configure avatar (200k max)
       - This option is only used on creation, not for updates.
-    type: str
+    type: path
     version_added: 4.2.0
 '''
 
