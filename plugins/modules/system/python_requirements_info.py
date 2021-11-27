@@ -48,13 +48,22 @@ python_version:
   returned: always
   type: str
   sample: "2.7.15 (default, May  1 2018, 16:44:08)\n[GCC 4.2.1 Compatible Apple LLVM 9.1.0 (clang-902.0.39.1)]"
+python_version_info:
+  description: breakdown version of python
+  returned: always
+  type: dict
+  sample:
+    major: 3
+    minor: 8
+    micro: 10
+    releaselevel: final
+    serial: 0
 python_system_path:
   description: List of paths python is looking for modules in
   returned: always
   type: list
   sample:
   - /usr/local/opt/python@2/site-packages/
-  - /usr/lib/python/site-packages/
   - /usr/lib/python/site-packages/
 valid:
   description: A dictionary of dependencies that matched their desired versions. If no version was specified, then I(desired) will be null
@@ -106,11 +115,28 @@ operations = {
     '==': operator.eq,
 }
 
+if sys.version.startswith('2.6'):
+    python_version_info = dict(
+        major=sys.version_info[0],
+        minor=sys.version_info[1],
+        micro=sys.version_info[2],
+        releaselevel=sys.version_info[3],
+        serial=sys.version_info[4],
+    )
+else:
+    python_version_info = dict(
+        major=sys.version_info.major,
+        minor=sys.version_info.minor,
+        micro=sys.version_info.micro,
+        releaselevel=sys.version_info.releaselevel,
+        serial=sys.version_info.serial,
+    )
+
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            dependencies=dict(type='list', elements='str')
+            dependencies=dict(type='list', elements='str', default=[])
         ),
         supports_check_mode=True,
     )
@@ -119,6 +145,7 @@ def main():
             msg='Could not import "distutils" and "pkg_resources" libraries to introspect python environment.',
             python=sys.executable,
             python_version=sys.version,
+            python_version_info=python_version_info,
             python_system_path=sys.path,
         )
     pkg_dep_re = re.compile(r'(^[a-zA-Z][a-zA-Z0-9_-]+)(?:(==|[><]=?)([0-9.]+))?$')
@@ -129,7 +156,7 @@ def main():
         valid={},
     )
 
-    for dep in (module.params.get('dependencies') or []):
+    for dep in module.params['dependencies']:
         match = pkg_dep_re.match(dep)
         if not match:
             module.fail_json(msg="Failed to parse version requirement '{0}'. Must be formatted like 'ansible>2.6'".format(dep))
@@ -161,6 +188,7 @@ def main():
     module.exit_json(
         python=sys.executable,
         python_version=sys.version,
+        python_version_info=python_version_info,
         python_system_path=sys.path,
         **results
     )
