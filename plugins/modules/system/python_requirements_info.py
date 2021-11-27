@@ -10,8 +10,8 @@ DOCUMENTATION = '''
 module: python_requirements_info
 short_description: Show python path and assert dependency versions
 description:
-    - Get info about available Python requirements on the target host, including listing required libraries and gathering versions.
-    - This module was called C(python_requirements_facts) before Ansible 2.9. The usage did not change.
+  - Get info about available Python requirements on the target host, including listing required libraries and gathering versions.
+  - This module was called C(python_requirements_facts) before Ansible 2.9. The usage did not change.
 options:
   dependencies:
     type: list
@@ -22,8 +22,8 @@ options:
       I(ansible), the module with a specific version like I(boto3==1.6.1), or a
       partial version like I(requests>2) are all valid specifications.
 author:
-- Will Thames (@willthames)
-- Ryan Scott Brown (@ryansb)
+  - Will Thames (@willthames)
+  - Ryan Scott Brown (@ryansb)
 '''
 
 EXAMPLES = '''
@@ -33,8 +33,8 @@ EXAMPLES = '''
 - name: Check for modern boto3 and botocore versions
   community.general.python_requirements_info:
     dependencies:
-    - boto3>1.6
-    - botocore<2
+      - boto3>1.6
+      - botocore<2
 '''
 
 RETURN = '''
