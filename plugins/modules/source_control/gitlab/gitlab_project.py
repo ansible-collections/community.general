@@ -292,9 +292,8 @@ class GitLabProject(object):
             })
             if options['initialize_with_readme']:
                 project_options['initialize_with_readme'] = options['initialize_with_readme']
-
-            if options['default_branch']:
-                project_options['default_branch'] = options['default_branch']
+                if options['default_branch']:
+                    project_options['default_branch'] = options['default_branch']
 
             project_options = self.get_options_with_value(project_options)
             project = self.create_project(namespace, project_options)
