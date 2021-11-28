@@ -532,6 +532,26 @@ ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 """
 
+TESTCASE_ETHERNET_STATIC_IP6_ADDRESS_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              ethernet_non_existant
+connection.autoconnect:                 yes
+802-3-ethernet.mtu:                     auto
+ipv6.method:                            manual
+ipv6.addresses:                         2001:db8::cafe/128
+ipv6.gateway:                           2001:db8::cafa
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+ipv6.never-default:                     no
+ipv6.may-fail:                          yes
+ipv6.dns:                               2001:4860:4860::8888,2001:4860:4860::8844
+ipv4.method:                            disabled
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+"""
+
 TESTCASE_WIRELESS = [
     {
         'type': 'wifi',
@@ -637,7 +657,6 @@ ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
 ipv4.may-fail:                          yes
 ipv4.dns:                               1.1.1.1,8.8.8.8
-ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 ipv6.method:                            manual
@@ -841,6 +860,17 @@ def mocked_ethernet_connection_static_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
                execute_return=(0, TESTCASE_ETHERNET_STATIC_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_ethernet_connection_with_ipv6_address_static_modify(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_ETHERNET_STATIC_IP6_ADDRESS_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
 
 
 @pytest.fixture
