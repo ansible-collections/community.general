@@ -188,11 +188,13 @@ options:
             - If enabled, it makes the kernel generate a temporary IPv6 address in addition to the public one.
         type: str
         choices: [disabled, prefer-public-addr, prefer-temp-addr, unknown]
+        version_added: 4.2.0
     addr_gen_mode6:
         description:
             - Configure method for creating the address for use with IPv6 Stateless Address Autoconfiguration.
         type: str
         choices: [eui64, stable-privacy]
+        version_added: 4.2.0
     mtu:
         description:
             - The connection MTU, e.g. 9000. This can't be applied when creating the interface and is done once the interface has been created.
