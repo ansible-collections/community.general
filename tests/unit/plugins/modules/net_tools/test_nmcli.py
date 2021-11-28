@@ -568,7 +568,17 @@ TESTCASE_ETHERNET_STATIC_MULTIPLE_IP4_ADDRESSES = [
         'type': 'ethernet',
         'conn_name': 'non_existent_nw_device',
         'ifname': 'ethernet_non_existant',
-        'ip4': ['10.10.10.10/24', '10.10.20.10/24'],
+        'ip4': ['10.10.10.10/32', '10.10.20.10/32'],
+        'gw4': '10.10.10.1',
+        'dns4': ['1.1.1.1', '8.8.8.8'],
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'ethernet_non_existant',
+        'ip4': ['10.10.10.10', '10.10.20.10'],
         'gw4': '10.10.10.1',
         'dns4': ['1.1.1.1', '8.8.8.8'],
         'state': 'present',
@@ -582,7 +592,7 @@ connection.interface-name:              ethernet_non_existant
 connection.autoconnect:                 yes
 802-3-ethernet.mtu:                     auto
 ipv4.method:                            manual
-ipv4.addresses:                         10.10.10.10/24,10.10.20.10/24
+ipv4.addresses:                         10.10.10.10/32, 10.10.20.10/32
 ipv4.gateway:                           10.10.10.1
 ipv4.ignore-auto-dns:                   no
 ipv4.ignore-auto-routes:                no
@@ -592,6 +602,47 @@ ipv4.dns:                               1.1.1.1,8.8.8.8
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+"""
+
+TESTCASE_ETHERNET_STATIC_IP6_ADDRESS_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              ethernet_non_existant
+connection.autoconnect:                 yes
+802-3-ethernet.mtu:                     auto
+ipv6.method:                            manual
+ipv6.addresses:                         2001:db8::cafe/128
+ipv6.gateway:                           2001:db8::cafa
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+ipv6.never-default:                     no
+ipv6.may-fail:                          yes
+ipv6.dns:                               2001:4860:4860::8888,2001:4860:4860::8844
+ipv4.method:                            disabled
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+"""
+
+
+TESTCASE_ETHERNET_STATIC_MULTIPLE_IP6_ADDRESSES_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              ethernet_non_existant
+connection.autoconnect:                 yes
+802-3-ethernet.mtu:                     auto
+ipv6.method:                            manual
+ipv6.addresses:                         2001:db8::cafe/128, 2002:db8::cafe/128
+ipv6.gateway:                           2001:db8::cafa
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+ipv6.never-default:                     no
+ipv6.may-fail:                          yes
+ipv6.dns:                               2001:4860:4860::8888,2001:4860:4860::8844
+ipv4.method:                            disabled
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
 """
 
 TESTCASE_WIRELESS = [
@@ -699,7 +750,6 @@ ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
 ipv4.may-fail:                          yes
 ipv4.dns:                               1.1.1.1,8.8.8.8
-ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 ipv6.method:                            manual
@@ -718,7 +768,6 @@ ipv4.ignore-auto-routes:                no
 ipv4.never-default:                     no
 ipv4.may-fail:                          yes
 ipv4.dns:                               1.1.1.1,8.8.8.8
-ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 ipv6.method:                            manual
@@ -965,6 +1014,17 @@ def mocked_ethernet_connection_static_modify(mocker):
                execute_return=None,
                execute_side_effect=(
                    (0, TESTCASE_ETHERNET_STATIC_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
+
+
+@pytest.fixture
+def mocked_ethernet_connection_with_ipv6_address_static_modify(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_ETHERNET_STATIC_IP6_ADDRESS_SHOW_OUTPUT, ""),
                    (0, "", ""),
                ))
 
@@ -2530,7 +2590,7 @@ def test_create_ethernet_with_mulitple_ip4_addresses_static(mocked_generic_conne
 
     add_args_text = list(map(to_text, add_args[0]))
     for param in ['connection.interface-name', 'ethernet_non_existant',
-                  'ipv4.addresses', '10.10.10.10/24,10.10.20.10/24',
+                  'ipv4.addresses', '10.10.10.10/32,10.10.20.10/32',
                   'ipv4.gateway', '10.10.10.1',
                   'ipv4.dns', '1.1.1.1,8.8.8.8']:
         assert param in add_args_text
@@ -2578,7 +2638,7 @@ def test_add_second_ip4_address_to_ethernet_connection(mocked_ethernet_connectio
     assert args[0][2] == 'modify'
     assert args[0][3] == 'non_existent_nw_device'
 
-    for param in ['ipv4.addresses', '10.10.10.10/24,10.10.20.10/24']:
+    for param in ['ipv4.addresses', '10.10.10.10/32,10.10.20.10/32']:
         assert param in args[0]
 
     out, err = capfd.readouterr()
