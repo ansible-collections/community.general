@@ -61,7 +61,7 @@ options:
   ack_ansible29:
     description:
     - Acknowledge using Ansible 2.9 with its limitations, and prevents the module from generating warnings about them.
-    - This option is completely ignored if using a version Ansible greater than C(2.9.x).
+    - This option is completely ignored if using a version of Ansible greater than C(2.9.x).
     type: bool
     default: false
 """
