@@ -609,28 +609,6 @@ ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 """
 
-TESTCASE_ETHERNET_STATIC_IP6_PRIVACY_AND_ADDR_GEN_MODE_UNCHANGED_OUTPUT = """\
-connection.id:                          non_existent_nw_device
-connection.interface-name:              ethernet_non_existant
-connection.autoconnect:                 yes
-802-3-ethernet.mtu:                     auto
-ipv6.method:                            manual
-ipv6.addresses:                         2001:db8::cafe/128
-ipv6.gateway:                           2001:db8::cafa
-ipv6.ignore-auto-dns:                   no
-ipv6.ignore-auto-routes:                no
-ipv6.never-default:                     no
-ipv6.may-fail:                          yes
-ipv6.ip6-privacy:                       1 (enabled, prefer public IP)
-ipv6.addr-gen-mode:                     eui64
-ipv6.dns:                               2001:4860:4860::8888
-ipv4.method:                            disabled
-ipv4.ignore-auto-dns:                   no
-ipv4.ignore-auto-routes:                no
-ipv4.never-default:                     no
-ipv4.may-fail:                          yes
-"""
-
 TESTCASE_WIRELESS = [
     {
         'type': 'wifi',
@@ -782,6 +760,27 @@ ipv6.method:                            manual
 ipv6.addresses:                         2001:db8::1/128
 """
 
+TESTCASE_ETHERNET_STATIC_IP6_PRIVACY_AND_ADDR_GEN_MODE_UNCHANGED_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              ethernet_non_existant
+connection.autoconnect:                 yes
+802-3-ethernet.mtu:                     auto
+ipv6.method:                            manual
+ipv6.addresses:                         2001:db8::cafe/128
+ipv6.gateway:                           2001:db8::cafa
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+ipv6.never-default:                     no
+ipv6.may-fail:                          yes
+ipv6.ip6-privacy:                       1 (enabled, prefer public IP)
+ipv6.addr-gen-mode:                     eui64
+ipv6.dns:                               2001:4860:4860::8888
+ipv4.method:                            disabled
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+"""
 
 TESTCASE_GSM = [
     {
