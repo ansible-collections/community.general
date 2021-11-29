@@ -21,6 +21,7 @@ options:
       Supported operators: <, >, <=, >=, or ==. The bare module name like
       I(ansible), the module with a specific version like I(boto3==1.6.1), or a
       partial version like I(requests>2) are all valid specifications.
+    default: []
 author:
   - Will Thames (@willthames)
   - Ryan Scott Brown (@ryansb)
@@ -52,19 +53,40 @@ python_version_info:
   description: breakdown version of python
   returned: always
   type: dict
-  sample:
-    major: 3
-    minor: 8
-    micro: 10
-    releaselevel: final
-    serial: 0
+  contains:
+    major:
+      description: The C(major) component of the python interpreter version.
+      returned: always
+      type: int
+      sample: 3
+    minor:
+      description: The C(minor) component of the python interpreter version.
+      returned: always
+      type: int
+      sample: 8
+    micro:
+      description: The C(micro) component of the python interpreter version.
+      returned: always
+      type: int
+      sample: 10
+    releaselevel:
+      description: The C(releaselevel) component of the python interpreter version.
+      returned: always
+      type: str
+      sample: final
+    serial:
+      description: The C(serial) component of the python interpreter version.
+      returned: always
+      type: int
+      sample: 0
+  version_added: 4.2.0
 python_system_path:
   description: List of paths python is looking for modules in
   returned: always
   type: list
   sample:
-  - /usr/local/opt/python@2/site-packages/
-  - /usr/lib/python/site-packages/
+    - /usr/local/opt/python@2/site-packages/
+    - /usr/lib/python/site-packages/
 valid:
   description: A dictionary of dependencies that matched their desired versions. If no version was specified, then I(desired) will be null
   returned: always
@@ -89,8 +111,8 @@ not_found:
   returned: always
   type: list
   sample:
-  - boto4
-  - requests
+    - boto4
+    - requests
 '''
 
 import re
@@ -115,22 +137,13 @@ operations = {
     '==': operator.eq,
 }
 
-if sys.version.startswith('2.6'):
-    python_version_info = dict(
-        major=sys.version_info[0],
-        minor=sys.version_info[1],
-        micro=sys.version_info[2],
-        releaselevel=sys.version_info[3],
-        serial=sys.version_info[4],
-    )
-else:
-    python_version_info = dict(
-        major=sys.version_info.major,
-        minor=sys.version_info.minor,
-        micro=sys.version_info.micro,
-        releaselevel=sys.version_info.releaselevel,
-        serial=sys.version_info.serial,
-    )
+python_version_info = dict(
+    major=sys.version_info[0],
+    minor=sys.version_info[1],
+    micro=sys.version_info[2],
+    releaselevel=sys.version_info[3],
+    serial=sys.version_info[4],
+)
 
 
 def main():
