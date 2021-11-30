@@ -69,8 +69,24 @@
     a: 5
     b: foo
     c: bar
+    trigger_depr_attr: true
     state: both_x_a
   register: state5
+
+- ansible.builtin.set_fact:
+    vardict_gt29:
+      msg: >-
+        ModuleHelper.VarDict attribute is deprecated, use VarDict from the
+        ansible_collections.community.general.plugins.module_utils.mh.mixins.vars
+        module instead
+      version: 6.0.0
+      collection_name: community.general
+    vardict_29:
+      msg: >-
+        ModuleHelper.VarDict attribute is deprecated, use VarDict from the
+        ansible_collections.community.general.plugins.module_utils.mh.mixins.vars
+        module instead
+      version: 6.0.0
 
 - name: assert state5
   assert:
@@ -80,3 +96,6 @@
       - state5.c == "bar"
       - state5.result == "foobarfoobarfoobarfoobarfoobar"
       - state5 is changed
+      - vardict_depr in state5.deprecations
+  vars:
+    vardict_depr: '{{ (ansible_version.major == 2 and ansible_version.minor == 9) | ternary(vardict_29, vardict_gt29) }}'
