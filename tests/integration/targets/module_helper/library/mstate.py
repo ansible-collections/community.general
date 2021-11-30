@@ -24,6 +24,10 @@ options:
   c:
     description: cccc
     type: str
+  trigger_depr_attr:
+    description: tries to access VarDict
+    type: bool
+    default: false
   state:
     description: test states
     type: str
@@ -45,12 +49,15 @@ class MState(StateModuleHelper):
             a=dict(type='int', required=True),
             b=dict(type='str'),
             c=dict(type='str'),
+            trigger_depr_attr=dict(type='bool', default=False),
             state=dict(type='str', choices=['join', 'b_x_a', 'c_x_a', 'both_x_a', 'nop'], default='join'),
         ),
     )
 
     def __init_module__(self):
         self.vars.set('result', "abc", diff=True)
+        if self.vars.trigger_depr_attr:
+            dummy = self.VarDict
 
     def state_join(self):
         self.vars['result'] = "".join([str(self.vars.a), str(self.vars.b), str(self.vars.c)])
