@@ -41,14 +41,20 @@
     that:
       - create_branch is not changed
 
-- name: Cleanup branch {{ gitlab_branch }} ( Idempotency test )
+- name: Cleanup branch {{ gitlab_branch }}
   community.general.gitlab_branch:
     api_url: https://gitlab.com
     api_token: secret_access_token
     project: "{{ gitlab_project_name }}"
     branch: "{{ gitlab_branch }}"
     state: absent
-
+  register: delete_branch
+  
+- name: Test module is idempotent
+  assert:
+    that:
+      - delete_branch is changed
+      
 - name: Clean up {{ gitlab_project_name }}
   gitlab_project:
     server_url: "{{ gitlab_host }}"
