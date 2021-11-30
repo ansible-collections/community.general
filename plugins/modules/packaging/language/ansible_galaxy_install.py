@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = """
 module: ansible_galaxy_install
 author:
-    - "Alexei Znamensky (@russoz)"
+  - "Alexei Znamensky (@russoz)"
 short_description: Install Ansible roles or collections using ansible-galaxy
 version_added: 3.5.0
 description:
@@ -24,44 +24,46 @@ requirements:
 options:
   type:
     description:
-    - The type of installation performed by C(ansible-galaxy).
-    - If I(type) is C(both), then I(requirements_file) must be passed and it may contain both roles and collections.
-    - "Note however that the opposite is not true: if using a I(requirements_file), then I(type) can be any of the three choices."
-    - "B(Ansible 2.9): The option C(both) will have the same effect as C(role)."
+      - The type of installation performed by C(ansible-galaxy).
+      - If I(type) is C(both), then I(requirements_file) must be passed and it may contain both roles and collections.
+      - "Note however that the opposite is not true: if using a I(requirements_file), then I(type) can be any of the three choices."
+      - "B(Ansible 2.9): The option C(both) will have the same effect as C(role)."
     type: str
     choices: [collection, role, both]
     required: true
   name:
     description:
-    - Name of the collection or role being installed.
-    - Versions can be specified with C(ansible-galaxy) usual formats. For example, C(community.docker:1.6.1) or C(ansistrano.deploy,3.8.0).
-    - I(name) and I(requirements_file) are mutually exclusive.
+      - Name of the collection or role being installed.
+      - >
+        Versions can be specified with C(ansible-galaxy) usual formats.
+        For example, the collection C(community.docker:1.6.1) or the role C(ansistrano.deploy,3.8.0).
+      - I(name) and I(requirements_file) are mutually exclusive.
     type: str
   requirements_file:
     description:
-    - Path to a file containing a list of requirements to be installed.
-    - It works for I(type) equals to C(collection) and C(role).
-    - I(name) and I(requirements_file) are mutually exclusive.
-    - "B(Ansible 2.9): It can only be used to install either I(type=role) or I(type=collection), but not both at the same run."
+      - Path to a file containing a list of requirements to be installed.
+      - It works for I(type) equals to C(collection) and C(role).
+      - I(name) and I(requirements_file) are mutually exclusive.
+      - "B(Ansible 2.9): It can only be used to install either I(type=role) or I(type=collection), but not both at the same run."
     type: path
   dest:
     description:
-    - The path to the directory containing your collections or roles, according to the value of I(type).
-    - >
-      Please notice that C(ansible-galaxy) will not install collections with I(type=both), when I(requirements_file)
-      contains both roles and collections and I(dest) is specified.
+      - The path to the directory containing your collections or roles, according to the value of I(type).
+      - >
+        Please notice that C(ansible-galaxy) will not install collections with I(type=both), when I(requirements_file)
+        contains both roles and collections and I(dest) is specified.
     type: path
   force:
     description:
-    - Force overwriting an existing role or collection.
-    - Using I(force=true) is mandatory when downgrading.
-    - "B(Ansible 2.9 and 2.10): Must be C(true) to upgrade roles and collections."
+      - Force overwriting an existing role or collection.
+      - Using I(force=true) is mandatory when downgrading.
+      - "B(Ansible 2.9 and 2.10): Must be C(true) to upgrade roles and collections."
     type: bool
     default: false
   ack_ansible29:
     description:
-    - Acknowledge using Ansible 2.9 with its limitations, and prevents the module from generating warnings about them.
-    - This option is completely ignored if using a version Ansible greater than C(2.9.x).
+      - Acknowledge using Ansible 2.9 with its limitations, and prevents the module from generating warnings about them.
+      - This option is completely ignored if using a version of Ansible greater than C(2.9.x).
     type: bool
     default: false
 """
@@ -114,9 +116,9 @@ RETURN = """
     returned: always
   installed_roles:
     description:
-    - If I(requirements_file) is specified instead, returns dictionary with all the roles installed per path.
-    - If I(name) is specified, returns that role name and the version installed per path.
-    - "B(Ansible 2.9): Returns empty because C(ansible-galaxy) has no C(list) subcommand."
+      - If I(requirements_file) is specified instead, returns dictionary with all the roles installed per path.
+      - If I(name) is specified, returns that role name and the version installed per path.
+      - "B(Ansible 2.9): Returns empty because C(ansible-galaxy) has no C(list) subcommand."
     type: dict
     returned: always when installing roles
     contains:
@@ -131,9 +133,9 @@ RETURN = """
         ansistrano.deploy: 3.8.0
   installed_collections:
     description:
-    - If I(requirements_file) is specified instead, returns dictionary with all the collections installed per path.
-    - If I(name) is specified, returns that collection name and the version installed per path.
-    - "B(Ansible 2.9): Returns empty because C(ansible-galaxy) has no C(list) subcommand."
+      - If I(requirements_file) is specified instead, returns dictionary with all the collections installed per path.
+      - If I(name) is specified, returns that collection name and the version installed per path.
+      - "B(Ansible 2.9): Returns empty because C(ansible-galaxy) has no C(list) subcommand."
     type: dict
     returned: always when installing collections
     contains:
