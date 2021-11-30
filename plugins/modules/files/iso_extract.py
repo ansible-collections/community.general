@@ -85,11 +85,6 @@ import os.path
 import shutil
 import tempfile
 
-try:  # python 3.3+
-    from shlex import quote
-except ImportError:  # older python
-    from pipes import quote
-
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -154,9 +149,9 @@ def main():
 
     # Use 7zip when we have a binary, otherwise try to mount
     if binary:
-        cmd = '%s x "%s" -o"%s" %s' % (binary, image, tmp_dir, ' '.join([quote(f) for f in extract_files]))
+        cmd = [binary, 'x', image, '-o%s' % tmp_dir] + extract_files
     else:
-        cmd = 'mount -o loop,ro "%s" "%s"' % (image, tmp_dir)
+        cmd = [module.get_bin_path('mount'), '-o', 'loop,ro', image, tmp_dir]
 
     rc, out, err = module.run_command(cmd)
     if rc != 0:
@@ -201,7 +196,7 @@ def main():
                 result['changed'] = True
     finally:
         if not binary:
-            module.run_command('umount "%s"' % tmp_dir)
+            module.run_command([module.get_bin_path('umount'), tmp_dir])
 
         shutil.rmtree(tmp_dir)
 
