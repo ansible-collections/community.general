@@ -15,7 +15,7 @@ version_added: 4.1.0
 description:
   - Builds Redfish URIs locally and sends them to iLO to
     set or update a configuration attribute.
-  - For use with HPE iLO operations that require Redfish OEM extensions
+  - For use with HPE iLO operations that require Redfish OEM extensions.
 options:
   category:
     required: true
@@ -160,7 +160,7 @@ def main():
         )
 
         for command in command_list:
-            result = dispatch[command](mgr_attributes)
+            result[command] = dispatch[command](mgr_attributes)
 
     if result['ret']:
         module.exit_json(changed=result.get('changed'),
