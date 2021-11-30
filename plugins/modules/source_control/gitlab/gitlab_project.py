@@ -162,6 +162,18 @@ options:
       - Enable shared runners for this project.
     type: bool
     version_added: "3.7.0"
+  avatar_path:
+    description:
+      - Absolute path image to configure avatar. File size should not exceed 200 kb.
+      - This option is only used on creation, not for updates.
+    type: path
+    version_added: "4.2.0"
+  default_branch:
+    description:
+      - Default branch name for a new project.
+      - This option is only used on creation, not for updates. This is also only used if I(initialize_with_readme=true).
+    type: str
+    version_added: "4.2.0"
 '''
 
 EXAMPLES = r'''
@@ -280,8 +292,18 @@ class GitLabProject(object):
             })
             if options['initialize_with_readme']:
                 project_options['initialize_with_readme'] = options['initialize_with_readme']
+                if options['default_branch']:
+                    project_options['default_branch'] = options['default_branch']
+
             project_options = self.get_options_with_value(project_options)
             project = self.create_project(namespace, project_options)
+
+            # add avatar to project
+            try:
+                project.avatar = open(options['avatar_path'], 'rb')
+            except IOError as e:
+                self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
+
             changed = True
         else:
             changed, project = self.update_project(self.project_object, project_options)
@@ -370,6 +392,7 @@ def main():
         path=dict(type='str'),
         description=dict(type='str'),
         initialize_with_readme=dict(type='bool', default=False),
+        default_branch=dict(type='str'),
         issues_enabled=dict(type='bool', default=True),
         merge_requests_enabled=dict(type='bool', default=True),
         merge_method=dict(type='str', default='merge', choices=["merge", "rebase_merge", "ff"]),
@@ -388,6 +411,7 @@ def main():
         squash_option=dict(type='str', choices=['never', 'always', 'default_off', 'default_on']),
         ci_config_path=dict(type='str'),
         shared_runners_enabled=dict(type='bool'),
+        avatar_path=dict(type='path'),
     ))
 
     module = AnsibleModule(
@@ -429,6 +453,11 @@ def main():
     squash_option = module.params['squash_option']
     ci_config_path = module.params['ci_config_path']
     shared_runners_enabled = module.params['shared_runners_enabled']
+    avatar_path = module.params['avatar_path']
+    default_branch = module.params['default_branch']
+
+    if default_branch and not initialize_with_readme:
+        module.fail_json(msg="Param default_branch need param initialize_with_readme set to true")
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -480,6 +509,7 @@ def main():
             "path": project_path,
             "description": project_description,
             "initialize_with_readme": initialize_with_readme,
+            "default_branch": default_branch,
             "issues_enabled": issues_enabled,
             "merge_requests_enabled": merge_requests_enabled,
             "merge_method": merge_method,
@@ -496,6 +526,7 @@ def main():
             "squash_option": squash_option,
             "ci_config_path": ci_config_path,
             "shared_runners_enabled": shared_runners_enabled,
+            "avatar_path": avatar_path,
         }):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.project_object._attrs)
