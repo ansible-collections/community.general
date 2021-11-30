@@ -34,7 +34,7 @@ options:
     type: str
   value:
     description:
-      - The value to set the named name/key to, it automatically sets the I(state) to 'set'.
+      - The value to set the named name/key to, it automatically sets the I(state) to C(present).
     type: str
   state:
     description:
