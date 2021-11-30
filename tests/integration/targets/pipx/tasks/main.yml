@@ -124,3 +124,29 @@
         - '"ansible-lint" in inject_pkgs_ansible_lint.application'
         - '"licenses" in inject_pkgs_ansible_lint.application["ansible-lint"]["injected"]'
         - uninstall_ansible_lint is changed
+
+##############################################################################
+- name: install jupyter - not working smoothly in freebsd
+  block:
+  - name: ensure application jupyter is uninstalled
+    community.general.pipx:
+      name: jupyter
+      state: absent
+
+  - name: install application jupyter
+    community.general.pipx:
+      name: jupyter
+      install_deps: true
+    register: install_jupyter
+
+  - name: cleanup jupyter
+    community.general.pipx:
+      state: absent
+      name: jupyter
+
+  - name: check assertions
+    assert:
+      that:
+        - install_jupyter is changed
+        - '"ipython" in install_jupyter.stdout'
+  when: ansible_system != 'FreeBSD'

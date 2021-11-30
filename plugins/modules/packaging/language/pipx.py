@@ -167,7 +167,7 @@ class PipX(CmdStateModuleHelper):
     command_args_formats = dict(
         state=dict(fmt=lambda v: [_state_map.get(v, v)]),
         name_source=dict(fmt=lambda n, s: [s] if s else [n], stars=1),
-        install_deps=dict(fmt="--install-deps", style=ArgFormat.BOOLEAN),
+        install_deps=dict(fmt="--include-deps", style=ArgFormat.BOOLEAN),
         inject_packages=dict(fmt=lambda v: v),
         force=dict(fmt="--force", style=ArgFormat.BOOLEAN),
         include_injected=dict(fmt="--include-injected", style=ArgFormat.BOOLEAN),
