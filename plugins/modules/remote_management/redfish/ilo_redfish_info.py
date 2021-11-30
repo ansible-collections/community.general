@@ -70,11 +70,12 @@ EXAMPLES = '''
     register: result_sessions
 '''
 RETURN = '''
-result:
-    description: different results depending on task
+ilo_redfish_info:
+    description: Returns iLO sessions.
+    contains: All the active sessions of an iLO.
     returned: always
     type: dict
-    sample: List of iLO Sessions
+    sample: Dictionary of iLO Sessions
 '''
 
 CATEGORY_COMMANDS_ALL = {
