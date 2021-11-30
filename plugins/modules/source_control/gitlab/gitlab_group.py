@@ -83,6 +83,12 @@ options:
       - Require all users in this group to setup two-factor authentication.
     type: bool
     version_added: 3.7.0
+  avatar_path:
+    description:
+      - Absolute path image to configure avatar. File size should not exceed 200 kb.
+      - This option is only used on creation, not for updates.
+    type: path
+    version_added: 4.2.0
 '''
 
 EXAMPLES = '''
@@ -212,6 +218,13 @@ class GitLabGroup(object):
             if options.get('require_two_factor_authentication'):
                 payload['require_two_factor_authentication'] = options['require_two_factor_authentication']
             group = self.create_group(payload)
+
+            # add avatar to group
+            if options['avatar_path']:
+                try:
+                    group.avatar = open(options['avatar_path'], 'rb')
+                except IOError as e:
+                    self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
             changed = True
         else:
             changed, group = self.update_group(self.group_object, {
@@ -308,6 +321,7 @@ def main():
         auto_devops_enabled=dict(type='bool'),
         subgroup_creation_level=dict(type='str', choices=['maintainer', 'owner']),
         require_two_factor_authentication=dict(type='bool'),
+        avatar_path=dict(type='path'),
     ))
 
     module = AnsibleModule(
@@ -335,6 +349,7 @@ def main():
     auto_devops_enabled = module.params['auto_devops_enabled']
     subgroup_creation_level = module.params['subgroup_creation_level']
     require_two_factor_authentication = module.params['require_two_factor_authentication']
+    avatar_path = module.params['avatar_path']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -373,6 +388,7 @@ def main():
             "auto_devops_enabled": auto_devops_enabled,
             "subgroup_creation_level": subgroup_creation_level,
             "require_two_factor_authentication": require_two_factor_authentication,
+            "avatar_path": avatar_path,
         }):
             module.exit_json(changed=True, msg="Successfully created or updated the group %s" % group_name, group=gitlab_group.group_object._attrs)
         else:
