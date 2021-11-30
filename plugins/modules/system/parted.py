@@ -493,7 +493,7 @@ def check_parted_label(device):
         return False
 
     # Older parted versions return a message in the stdout and RC > 0.
-    rc, out, err = module.run_command("%s -s -m %s print" % (parted_exec, device))
+    rc, out, err = module.run_command([parted_exec, "-s", "-m", device, "print"])
     if rc != 0 and 'unrecognised disk label' in out.lower():
         return True
 
@@ -533,7 +533,7 @@ def parted_version():
     """
     global module, parted_exec
 
-    rc, out, err = module.run_command("%s --version" % parted_exec)
+    rc, out, err = module.run_command([parted_exec, "--version"])
     if rc != 0:
         module.fail_json(
             msg="Failed to get parted version.", rc=rc, out=out, err=err
