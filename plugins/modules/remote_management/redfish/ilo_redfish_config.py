@@ -162,11 +162,7 @@ def main():
         for command in command_list:
             result[command] = dispatch[command](mgr_attributes)
 
-    if result['ret']:
-        module.exit_json(changed=result.get('changed'),
-                         msg=to_native(result.get('msg')))
-    else:
-        module.fail_json(msg=to_native(result['msg']))
+    module.exit_json(ilo_redfish_config=result)
 
 
 if __name__ == '__main__':
