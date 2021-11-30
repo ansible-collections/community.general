@@ -63,7 +63,7 @@ def query_log_status(module, le_path, path, state="present"):
     """ Returns whether a log is followed or not. """
 
     if state == "present":
-        rc, out, err = module.run_command("%s followed %s" % (le_path, path))
+        rc, out, err = module.run_command([le_path, "followed", path])
         if rc == 0:
             return True
 
@@ -87,7 +87,7 @@ def follow_log(module, le_path, logs, name=None, logtype=None):
             cmd.extend(['--name', name])
         if logtype:
             cmd.extend(['--type', logtype])
-        rc, out, err = module.run_command(' '.join(cmd))
+        rc, out, err = module.run_command(cmd)
 
         if not query_log_status(module, le_path, log):
             module.fail_json(msg="failed to follow '%s': %s" % (log, err.strip()))
