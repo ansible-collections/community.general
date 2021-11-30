@@ -69,6 +69,13 @@ EXAMPLES = '''
       password: "{{ password }}"
     register: result_sessions
 '''
+RETURN = '''
+result:
+    description: different results depending on task
+    returned: always
+    type: dict
+    sample: List of iLO Sessions
+'''
 
 CATEGORY_COMMANDS_ALL = {
     "Sessions": ["GetiLOSessions"]

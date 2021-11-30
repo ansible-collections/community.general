@@ -89,6 +89,14 @@ EXAMPLES = '''
       attribute_value: Chennai
 '''
 
+RETURN = '''
+msg:
+    description: Message with action result or error description
+    returned: always
+    type: str
+    sample: "Action was successful"
+'''
+
 CATEGORY_COMMANDS_ALL = {
     "Manager": ["SetTimeZone", "SetDNSserver", "SetDomainName", "SetNTPServers", "SetWINSReg"]
 }
