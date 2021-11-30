@@ -12,6 +12,7 @@
     that:
       - "'python' in basic_info"
       - "'python_version' in basic_info"
+      - basic_info.python_version_info == ansible_python.version
 
 - name: run python_requirements_info module
   python_requirements_info:
