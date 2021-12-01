@@ -467,12 +467,12 @@ def get_device_info(device, unit):
     if label_needed:
         return get_unlabeled_device_info(device, unit)
 
-    command = "%s -s -m %s -- unit '%s' print" % (parted_exec, device, unit)
+    command = [parted_exec, "-s", "-m", device, "--", "unit", unit, "print"]
     rc, out, err = module.run_command(command)
     if rc != 0 and 'unrecognised disk label' not in err:
         module.fail_json(msg=(
             "Error while getting device information with parted "
-            "script: '%s'" % command),
+            "script: '%s'" % " ".join(command)),
             rc=rc, out=out, err=err
         )
 
@@ -557,12 +557,12 @@ def parted(script, device, align):
         align_option = ''
 
     if script and not module.check_mode:
-        command = "%s -s -m %s %s -- %s" % (parted_exec, align_option, device, script)
+        command = [parted_exec, '-s', '-m', align_option, device, '--', script]
         rc, out, err = module.run_command(command)
 
         if rc != 0:
             module.fail_json(
-                msg="Error while running parted script: %s" % command.strip(),
+                msg="Error while running parted script: %s" % " ".join(command).strip(),
                 rc=rc, out=out, err=err
             )
 
