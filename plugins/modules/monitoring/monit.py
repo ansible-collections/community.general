@@ -149,7 +149,7 @@ class Monit(object):
         """
         monit_command = "validate" if validate else "status"
         check_rc = False if validate else True  # 'validate' always has rc = 1
-        command = ' '.join([self.monit_bin_path, monit_command, self.command_args, self.process_name])
+        command = [self.monit_bin_path, monit_command, self.command_args, self.process_name]
         rc, out, err = self.module.run_command(command, check_rc=check_rc)
         return self._parse_status(out, err)
 
@@ -234,7 +234,7 @@ class Monit(object):
         self.exit_success(state='reloaded')
 
     def present(self):
-        self.run_command(['reload'])
+        self.run_command('reload')
 
         timeout_time = time.time() + self.timeout
         while not self.is_process_present():
