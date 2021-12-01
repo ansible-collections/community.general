@@ -40,7 +40,7 @@ class MonitTest(unittest.TestCase):
             with self.assertRaises(AnsibleExitJson):
                 self.monit.stop()
         self.module.fail_json.assert_not_called()
-        self.module.run_command.assert_called_with('monit stop processX', check_rc=True)
+        self.module.run_command.assert_called_with(['monit', 'stop', 'processX'], check_rc=True)
 
     def test_change_state_fail(self):
         with self.patch_status([monit.Status.OK] * 3):
