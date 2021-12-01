@@ -417,7 +417,7 @@ class JIRA(StateModuleHelper):
             ),
             username=dict(type='str', required=True),
             password=dict(type='str', required=True, no_log=True),
-            token=dict(type='str', required=False, no_log=True),
+            token=dict(type='str', no_log=True),
             project=dict(type='str', ),
             summary=dict(type='str', ),
             description=dict(type='str', ),
