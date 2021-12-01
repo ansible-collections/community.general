@@ -1146,13 +1146,6 @@ class Nmcli(object):
     platform = 'Generic'
     distribution = None
 
-    IP6_PRIVACY_VALUES = {
-        'disabled': '0',
-        'prefer-public-addr': '1 (enabled, prefer public IP)',
-        'prefer-temp-addr': '2 (enabled, prefer temporary IP)',
-        'unknown': '-1'
-    }
-
     SECRET_OPTIONS = (
         '802-11-wireless-security.leap-password',
         '802-11-wireless-security.psk',
@@ -1466,11 +1459,22 @@ class Nmcli(object):
         else:
             return to_text(mtu)
 
-    @classmethod
-    def ip6_privacy_to_num(cls, privacy):
-        if privacy in cls.IP6_PRIVACY_VALUES.keys():
-            return cls.IP6_PRIVACY_VALUES[privacy]
-        return None
+    @staticmethod
+    def ip6_privacy_to_num(privacy):
+        ip6_privacy_values = {
+            'disabled': '0',
+            'prefer-public-addr': '1 (enabled, prefer public IP)',
+            'prefer-temp-addr': '2 (enabled, prefer temporary IP)',
+            'unknown': '-1',
+        }
+
+        if privacy is None:
+            return None
+
+        if privacy not in ip6_privacy_values:
+            raise AssertionError(f'{privacy} is invalid ip_privacy6 option')
+
+        return ip6_privacy_values[privacy]
 
     @property
     def slave_conn_type(self):
