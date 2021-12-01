@@ -1,6 +1,4 @@
 ---
 minor_changes:
-  - lxd connection plugin - fix the lxd connection plugin to have all inventory
-    option vars work. ansible_host, ansible_lxd_remote, and ansible_lxd_project
-    worked prior to this change. ansible_lxd_host, ansible_executable, and
-    ansible_lxd_executable now work with the fix (https://github.com/ansible-collections/community.general/pull/3798).
+  - lxd connection plugin - make sure that ``ansible_lxd_host``, ``ansible_executable``, and
+    ``ansible_lxd_executable`` work (https://github.com/ansible-collections/community.general/pull/3798).
