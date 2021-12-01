@@ -82,7 +82,7 @@ PACKAGE_STATE_MAP = dict(
 
 def is_plugin_present(module, plugin_bin, plugin_name):
     cmd_args = [plugin_bin, "list", plugin_name]
-    rc, out, err = module.run_command(" ".join(cmd_args))
+    rc, out, err = module.run_command(cmd_args)
     return rc == 0
 
 
