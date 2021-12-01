@@ -84,7 +84,7 @@ ilo_redfish_info:
             description: Name to use to log in to the management processor.
             type: str
         ret:
-            description: Check variable to see if the information was succesfully retrived. 
+            description: Check variable to see if the information was succesfully retrived.
             type: str
         msg:
             description: Information of all active iLO sessions.
