@@ -172,7 +172,7 @@ class Svc(object):
             self.execute_command([self.svc_cmd, '-dx', src_log])
 
     def get_status(self):
-        (rc, out, err) = self.execute_command([self.svstat_cmd, self.svc_full])
+        rc, out, err = self.execute_command([self.svstat_cmd, self.svc_full])
 
         if err is not None and err:
             self.full_state = self.state = err
@@ -223,7 +223,7 @@ class Svc(object):
 
     def execute_command(self, cmd):
         try:
-            (rc, out, err) = self.module.run_command(' '.join(cmd))
+            rc, out, err = self.module.run_command(cmd)
         except Exception as e:
             self.module.fail_json(msg="failed to execute: %s" % to_native(e), exception=traceback.format_exc())
         return (rc, out, err)
