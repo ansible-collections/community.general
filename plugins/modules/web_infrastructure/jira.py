@@ -46,6 +46,12 @@ options:
     description:
       - The password to log-in with.
 
+  token:
+    type: str
+    required: false
+    description:
+      - The personal access token to log-in with.
+
   project:
     type: str
     required: false
@@ -206,7 +212,7 @@ options:
             done.
 
 notes:
-  - "Currently this only works with basic-auth."
+  - "Currently this only works with basic-auth, or tokens."
   - "To use with JIRA Cloud, pass the login e-mail as the I(username) and the API token as I(password)."
 
 author:
@@ -410,6 +416,7 @@ class JIRA(StateModuleHelper):
             ),
             username=dict(type='str', required=True),
             password=dict(type='str', required=True, no_log=True),
+            token=dict(type='str', required=False, no_log=True),
             project=dict(type='str', ),
             summary=dict(type='str', ),
             description=dict(type='str', ),
@@ -655,10 +662,16 @@ class JIRA(StateModuleHelper):
         headers = {}
         if isinstance(additional_headers, dict):
             headers = additional_headers.copy()
-        headers.update({
-            "Content-Type": content_type,
-            "Authorization": "Basic %s" % auth,
-        })
+        if self.vars.token is not None:
+            headers.update({
+                "Content-Type": content_type,
+                "Authorization": "Bearer %s" % self.vars.token,
+            })
+        else:
+            headers.update({
+                "Content-Type": content_type,
+                "Authorization": "Basic %s" % auth,
+            })
 
         response, info = fetch_url(
             self.module, url, data=data, method=method, timeout=self.vars.timeout, headers=headers
