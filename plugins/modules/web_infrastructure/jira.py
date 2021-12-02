@@ -443,6 +443,7 @@ class JIRA(StateModuleHelper):
         mutually_exclusive=[
             ['username', 'token'],
             ['password', 'token'],
+            ['assignee', 'account_id'],
         ],
         required_together=[
             ['username', 'password'],
@@ -459,7 +460,6 @@ class JIRA(StateModuleHelper):
             ('operation', 'link', ['linktype', 'inwardissue', 'outwardissue']),
             ('operation', 'search', ['jql']),
         ),
-        mutually_exclusive=[('assignee', 'account_id')],
         supports_check_mode=False
     )
 
