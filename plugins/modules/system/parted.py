@@ -750,10 +750,10 @@ def main():
                 flags_on = list(set(flags) - set(partition['flags']))
 
                 for f in flags_on:
-                    script += ["set", str(number), f , "on"]
+                    script += ["set", str(number), f, "on"]
 
                 for f in flags_off:
-                    script += ["set", str(number), f , "off"]
+                    script += ["set", str(number), f, "off"]
 
         # Set the unit of the run
         if unit and script:
