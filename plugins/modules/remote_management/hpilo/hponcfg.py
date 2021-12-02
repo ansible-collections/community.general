@@ -5,6 +5,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+from os import supports_follow_symlinks
 __metaclass__ = type
 
 
@@ -70,11 +71,13 @@ EXAMPLES = r'''
 '''
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.module_helper import (
+    CmdModuleHelper, ArgFormat, ModuleHelperException
+)
 
 
-def main():
-
-    module = AnsibleModule(
+class HPOnCfg(CmdModuleHelper):
+    module = dict(
         argument_spec=dict(
             src=dict(type='path', required=True, aliases=['path']),
             minfw=dict(type='str'),
@@ -82,30 +85,24 @@ def main():
             verbose=dict(default=False, type='bool'),
         )
     )
+    command_args_formats = dict(
+        src=dict(fmt=["-f", "{0}"]),
+        verbose=dict(fmt="-v", style=ArgFormat.BOOLEAN),
+        minfw=dict(fmt=["-m", "{0}"]),
+    )
+    check_rc = True
 
-    # Consider every action a change (not idempotent yet!)
-    changed = True
+    def __init_module__(self):
+        self.command = self.vars.executable
+        # Consider every action a change (not idempotent yet!)
+        self.changed = True
 
-    src = module.params['src']
-    minfw = module.params['minfw']
-    executable = module.params['executable']
-    verbose = module.params['verbose']
+    def __run__(self):
+        self.run_command(params=['src', 'verbose', 'minfw'])
 
-    options = ' -f %s' % src
 
-    if verbose:
-        options += ' -v'
-
-    if minfw:
-        options += ' -m %s' % minfw
-
-    rc, stdout, stderr = module.run_command('%s %s' % (executable, options))
-
-    if rc != 0:
-        module.fail_json(rc=rc, msg="Failed to run hponcfg", stdout=stdout, stderr=stderr)
-
-    module.exit_json(changed=changed, stdout=stdout, stderr=stderr)
-
+def main():
+    HPOnCfg.execute()
 
 if __name__ == '__main__':
     main()
