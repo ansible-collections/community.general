@@ -660,25 +660,26 @@ class JIRA(StateModuleHelper):
         if data and content_type == 'application/json':
             data = json.dumps(data)
 
+       headers = {}
+        if isinstance(additional_headers, dict):
+            headers = additional_headers.copy()
+
         # NOTE: fetch_url uses a password manager, which follows the
         # standard request-then-challenge basic-auth semantics. However as
         # JIRA allows some unauthorised operations it doesn't necessarily
         # send the challenge, so the request occurs as the anonymous user,
         # resulting in unexpected results. To work around this we manually
-        # inject the basic-auth header up-front to ensure that JIRA treats
+        # inject the auth header up-front to ensure that JIRA treats
         # the requests as authorized for this user.
-        auth = to_text(base64.b64encode(to_bytes('{0}:{1}'.format(self.vars.username, self.vars.password),
-                                                 errors='surrogate_or_strict')))
 
-        headers = {}
-        if isinstance(additional_headers, dict):
-            headers = additional_headers.copy()
-        if self.vars.token is not None:
+         if self.vars.token is not None:
             headers.update({
                 "Content-Type": content_type,
                 "Authorization": "Bearer %s" % self.vars.token,
             })
         else:
+           auth = to_text(base64.b64encode(to_bytes('{0}:{1}'.format(self.vars.username, self.vars.password),
+                                                        errors='surrogate_or_strict')))
             headers.update({
                 "Content-Type": content_type,
                 "Authorization": "Basic %s" % auth,
