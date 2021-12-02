@@ -415,8 +415,8 @@ class JIRA(StateModuleHelper):
                 choices=['attach', 'create', 'comment', 'edit', 'update', 'fetch', 'transition', 'link', 'search'],
                 aliases=['command'], required=True
             ),
-            username=dict(type='str', required=True),
-            password=dict(type='str', required=True, no_log=True),
+            username=dict(type='str'),
+            password=dict(type='str', no_log=True),
             token=dict(type='str', no_log=True),
             project=dict(type='str', ),
             summary=dict(type='str', ),
