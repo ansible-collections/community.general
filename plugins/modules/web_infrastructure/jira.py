@@ -661,8 +661,8 @@ class JIRA(StateModuleHelper):
             data = json.dumps(data)
 
        headers = {}
-        if isinstance(additional_headers, dict):
-            headers = additional_headers.copy()
+       if isinstance(additional_headers, dict):
+           headers = additional_headers.copy()
 
         # NOTE: fetch_url uses a password manager, which follows the
         # standard request-then-challenge basic-auth semantics. However as
@@ -672,13 +672,13 @@ class JIRA(StateModuleHelper):
         # inject the auth header up-front to ensure that JIRA treats
         # the requests as authorized for this user.
 
-         if self.vars.token is not None:
+        if self.vars.token is not None:
             headers.update({
                 "Content-Type": content_type,
                 "Authorization": "Bearer %s" % self.vars.token,
             })
         else:
-           auth = to_text(base64.b64encode(to_bytes('{0}:{1}'.format(self.vars.username, self.vars.password),
+            auth = to_text(base64.b64encode(to_bytes('{0}:{1}'.format(self.vars.username, self.vars.password),
                                                         errors='surrogate_or_strict')))
             headers.update({
                 "Content-Type": content_type,
