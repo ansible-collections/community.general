@@ -462,10 +462,15 @@ class CallbackModule(CallbackBase):
         )
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
-        self.errors += 1
+        if ignore_errors:
+            status = 'ok'
+        else:
+            status = 'failed'
+            self.errors += 1
+
         self.opentelemetry.finish_task(
             self.tasks_data,
-            'failed',
+            status,
             result
         )
 
