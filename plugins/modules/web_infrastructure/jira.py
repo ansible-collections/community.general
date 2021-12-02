@@ -679,7 +679,7 @@ class JIRA(StateModuleHelper):
             })
         else:
             auth = to_text(base64.b64encode(to_bytes('{0}:{1}'.format(self.vars.username, self.vars.password),
-                                                        errors='surrogate_or_strict')))
+                                                     errors='surrogate_or_strict')))
             headers.update({
                 "Content-Type": content_type,
                 "Authorization": "Basic %s" % auth,
