@@ -51,6 +51,7 @@ options:
     required: false
     description:
       - The personal access token to log-in with.
+      - Mutually exclusive with I(username) and I(password).
     version_added: 4.2.0
 
   project:
