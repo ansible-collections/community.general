@@ -122,7 +122,7 @@ class Monit(object):
         return self._monit_version
 
     def _get_monit_version(self):
-        rc, out, err = self.module.run_command('%s -V' % self.monit_bin_path, check_rc=True)
+        rc, out, err = self.module.run_command([self.monit_bin_path, '-V'], check_rc=True)
         version_line = out.split('\n')[0]
         raw_version = re.search(r"([0-9]+\.){1,2}([0-9]+)?", version_line).group()
         return raw_version, tuple(map(int, raw_version.split('.')))
@@ -140,7 +140,7 @@ class Monit(object):
 
     @property
     def command_args(self):
-        return "-B" if self.monit_version() > (5, 18) else ""
+        return ["-B"] if self.monit_version() > (5, 18) else []
 
     def get_status(self, validate=False):
         """Return the status of the process in monit.
@@ -149,7 +149,7 @@ class Monit(object):
         """
         monit_command = "validate" if validate else "status"
         check_rc = False if validate else True  # 'validate' always has rc = 1
-        command = ' '.join([self.monit_bin_path, monit_command, self.command_args, self.process_name])
+        command = [self.monit_bin_path, monit_command] + self.command_args + [self.process_name]
         rc, out, err = self.module.run_command(command, check_rc=check_rc)
         return self._parse_status(out, err)
 
@@ -182,7 +182,8 @@ class Monit(object):
             return status
 
     def is_process_present(self):
-        rc, out, err = self.module.run_command('%s summary %s' % (self.monit_bin_path, self.command_args), check_rc=True)
+        command = [self.monit_bin_path, 'summary'] + self.command_args
+        rc, out, err = self.module.run_command(command, check_rc=True)
         return bool(re.findall(r'\b%s\b' % self.process_name, out))
 
     def is_process_running(self):
@@ -190,7 +191,7 @@ class Monit(object):
 
     def run_command(self, command):
         """Runs a monit command, and returns the new status."""
-        return self.module.run_command('%s %s %s' % (self.monit_bin_path, command, self.process_name), check_rc=True)
+        return self.module.run_command([self.monit_bin_path, command, self.process_name], check_rc=True)
 
     def wait_for_status_change(self, current_status):
         running_status = self.get_status()
@@ -228,7 +229,7 @@ class Monit(object):
         return current_status
 
     def reload(self):
-        rc, out, err = self.module.run_command('%s reload' % self.monit_bin_path)
+        rc, out, err = self.module.run_command([self.monit_bin_path, 'reload'])
         if rc != 0:
             self.exit_fail('monit reload failed', stdout=out, stderr=err)
         self.exit_success(state='reloaded')
