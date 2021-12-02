@@ -140,7 +140,7 @@ class Monit(object):
 
     @property
     def command_args(self):
-        return "-B" if self.monit_version() > (5, 18) else None
+        return ["-B"] if self.monit_version() > (5, 18) else []
 
     def get_status(self, validate=False):
         """Return the status of the process in monit.
@@ -149,8 +149,7 @@ class Monit(object):
         """
         monit_command = "validate" if validate else "status"
         check_rc = False if validate else True  # 'validate' always has rc = 1
-        command = [self.monit_bin_path, monit_command, self.command_args, self.process_name]
-        command = [c for c in command if c is not None]
+        command = [self.monit_bin_path, monit_command] + self.command_args + [self.process_name]
         rc, out, err = self.module.run_command(command, check_rc=check_rc)
         return self._parse_status(out, err)
 
@@ -183,8 +182,7 @@ class Monit(object):
             return status
 
     def is_process_present(self):
-        command = [self.monit_bin_path, 'summary', self.command_args]
-        command = [c for c in command if c is not None]
+        command = [self.monit_bin_path, 'summary'] + self.command_args
         rc, out, err = self.module.run_command(command, check_rc=True)
         return bool(re.findall(r'\b%s\b' % self.process_name, out))
 
