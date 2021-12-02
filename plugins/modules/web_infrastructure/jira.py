@@ -660,9 +660,9 @@ class JIRA(StateModuleHelper):
         if data and content_type == 'application/json':
             data = json.dumps(data)
 
-       headers = {}
-       if isinstance(additional_headers, dict):
-           headers = additional_headers.copy()
+        headers = {}
+        if isinstance(additional_headers, dict):
+            headers = additional_headers.copy()
 
         # NOTE: fetch_url uses a password manager, which follows the
         # standard request-then-challenge basic-auth semantics. However as
