@@ -36,15 +36,15 @@ options:
 
   username:
     type: str
-    required: true
+    required: false
     description:
-      - The username to log-in with.
+      - The username to log-in with. Must be used with password.  Mutually exclusive with token.
 
   password:
     type: str
-    required: true
+    required: false
     description:
-      - The password to log-in with.
+      - The password to log-in with. Must be used with username.  Mutually exclusive with token.
 
   token:
     type: str
@@ -440,6 +440,16 @@ class JIRA(StateModuleHelper):
             validate_certs=dict(default=True, type='bool'),
             account_id=dict(type='str'),
         ),
+        mutually_exclusive=[
+            ['username', 'token'],
+            ['password', 'token'],
+        ],
+        required_together=[
+            ['username', 'password'],
+        ],
+        required_one_of=[
+            ['username', 'token'],
+        ],
         required_if=(
             ('operation', 'attach', ['issue', 'attachment']),
             ('operation', 'create', ['project', 'issuetype', 'summary']),
