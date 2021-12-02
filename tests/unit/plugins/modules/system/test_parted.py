@@ -263,12 +263,12 @@ class TestParted(ModuleTestCase):
             # When using multiple flags:
             # order of execution is non deterministic, because set() operations are used in
             # the current implementation.
-            expected_calls_order1 = [call('unit KiB set 3 lvm on set 3 boot on ',
+            expected_calls_order1 = [call(['unit', 'KiB', 'set', '3', 'lvm', 'on', 'set', '3', 'boot', 'on'],
                                           '/dev/sdb', 'optimal')]
-            expected_calls_order2 = [call('unit KiB set 3 boot on set 3 lvm on ',
+            expected_calls_order2 = [call(['unit', 'KiB', 'set', '3', 'boot', 'on', 'set', '3', 'lvm', 'on'],
                                           '/dev/sdb', 'optimal')]
             self.assertTrue(self.parted.mock_calls == expected_calls_order1 or
-                            self.parted.mock_calls == expected_calls_order2)
+                            self.parted.mock_calls == expected_calls_order2, "mock_calls = %s" % self.parted.mock_calls)
 
     def test_create_new_primary_lvm_partition(self):
         # use check_mode, see previous test comment
@@ -298,7 +298,7 @@ class TestParted(ModuleTestCase):
             '_ansible_check_mode': True,
         })
         with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict2):
-            self.execute_module(changed=True, script='unit KiB mklabel gpt mkpart primary 0% 100% unit KiB name 1 \'"lvmpartition"\' set 1 lvm on')
+            self.execute_module(changed=True, script='unit KiB mklabel gpt mkpart primary 0% 100% unit KiB name 1 lvmpartition set 1 lvm on')
 
     def test_change_label_gpt(self):
         # When partitions already exists and label is changed, mkpart should be called even when partition already exists,
