@@ -5,7 +5,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-from os import supports_follow_symlinks
 __metaclass__ = type
 
 
@@ -70,9 +69,8 @@ EXAMPLES = r'''
     executable: /opt/hp/tools/hponcfg
 '''
 
-from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    CmdModuleHelper, ArgFormat, ModuleHelperException
+    CmdModuleHelper, ArgFormat
 )
 
 
