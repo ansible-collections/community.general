@@ -71,23 +71,16 @@ RETURN = '''
 ilo_redfish_info:
     description: Returns iLO sessions.
     contains:
-        Description:
-            description: Provides a description of the resource.
-            type: str
-        Id:
-            description: The sessionId.
-            type: str
-        Name:
-            description: The name of the resource.
-            type: str
-        UserName:
-            description: Name to use to log in to the management processor.
-            type: str
         ret:
             description: Check variable to see if the information was succesfully retrived.
             type: str
         msg:
-            description: Information of all active iLO sessions.
+            description: 
+                - Information of all active iLO sessions.
+                - Provides a description of the resource.
+                - Provides the sessionId.
+                - Provides the name of the resource.
+                - Provides the UserName which is the name to use to log in to the management processor.
             type: dict
     returned: always
     type: dict
