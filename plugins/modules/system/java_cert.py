@@ -439,7 +439,7 @@ def delete_cert(module, executable, keystore_path, keystore_pass, alias, keystor
 
 def test_keytool(module, executable):
     ''' Test if keytool is actually executable or not '''
-    module.run_command("%s" % executable, check_rc=True)
+    module.run_command([executable], check_rc=True)
 
 
 def test_keystore(module, keystore_path):
