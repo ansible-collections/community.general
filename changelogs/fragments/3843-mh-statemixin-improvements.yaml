@@ -1,0 +1,2 @@
+minor_changes:
+    - module_helper module utils - ``StateMixin`` now accepts any variable in ``self.vars`` as ``state_param`` (https://github.com/ansible-collections/community.general/pull/3843).
