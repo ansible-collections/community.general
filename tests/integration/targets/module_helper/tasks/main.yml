@@ -4,4 +4,5 @@
 - include_tasks: msimple.yml
 - include_tasks: mdepfail.yml
 - include_tasks: mstate.yml
+- include_tasks: mstate_complex.yml
 - include_tasks: msimpleda.yml
