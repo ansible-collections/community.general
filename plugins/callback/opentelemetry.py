@@ -268,6 +268,8 @@ class OpenTelemetrySource(object):
             elif host_data.status == 'skipped':
                 message = res['skip_reason'] if 'skip_reason' in res else 'skipped'
                 status = Status(status_code=StatusCode.UNSET)
+            elif host_data.status == 'ignored':
+                status = Status(status_code=StatusCode.UNSET)
 
         span.set_status(status)
         if isinstance(task_data.args, dict) and "gather_facts" not in task_data.action:
@@ -464,7 +466,7 @@ class CallbackModule(CallbackBase):
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         if ignore_errors:
-            status = 'ok'
+            status = 'ignored'
         else:
             status = 'failed'
             self.errors += 1
