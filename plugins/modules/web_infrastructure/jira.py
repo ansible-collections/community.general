@@ -43,7 +43,6 @@ options:
 
   password:
     type: str
-    required: false
     description:
       - The password to log-in with.
       - Must be used with I(username).  Mutually exclusive with I(token).
