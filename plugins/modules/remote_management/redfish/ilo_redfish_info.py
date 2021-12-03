@@ -75,7 +75,7 @@ ilo_redfish_info:
             description: Check variable to see if the information was succesfully retrived.
             type: str
         msg:
-            description: 
+            description:
                 - Information of all active iLO sessions.
                 - Provides a description of the resource.
                 - Provides the sessionId.
