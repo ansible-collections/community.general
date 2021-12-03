@@ -38,13 +38,15 @@ options:
     type: str
     required: false
     description:
-      - The username to log-in with. Must be used with password.  Mutually exclusive with token.
+      - The username to log-in with.
+      - Must be used with I(password). Mutually exclusive with I(token).
 
   password:
     type: str
     required: false
     description:
-      - The password to log-in with. Must be used with username.  Mutually exclusive with token.
+      - The password to log-in with.
+      - Must be used with I(username).  Mutually exclusive with I(token).
 
   token:
     type: str
