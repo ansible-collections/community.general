@@ -183,6 +183,18 @@ options:
         type: str
         choices: [ignore, auto, dhcp, link-local, manual, shared, disabled]
         version_added: 2.2.0
+    ip_privacy6:
+        description:
+            - If enabled, it makes the kernel generate a temporary IPv6 address in addition to the public one.
+        type: str
+        choices: [disabled, prefer-public-addr, prefer-temp-addr, unknown]
+        version_added: 4.2.0
+    addr_gen_mode6:
+        description:
+            - Configure method for creating the address for use with IPv6 Stateless Address Autoconfiguration.
+        type: str
+        choices: [eui64, stable-privacy]
+        version_added: 4.2.0
     mtu:
         description:
             - The connection MTU, e.g. 9000. This can't be applied when creating the interface and is done once the interface has been created.
@@ -1181,6 +1193,8 @@ class Nmcli(object):
         self.dns6_search = module.params['dns6_search']
         self.dns6_ignore_auto = module.params['dns6_ignore_auto']
         self.method6 = module.params['method6']
+        self.ip_privacy6 = module.params['ip_privacy6']
+        self.addr_gen_mode6 = module.params['addr_gen_mode6']
         self.mtu = module.params['mtu']
         self.stp = module.params['stp']
         self.priority = module.params['priority']
@@ -1285,6 +1299,8 @@ class Nmcli(object):
                 'ipv6.gateway': self.gw6,
                 'ipv6.ignore-auto-routes': self.gw6_ignore_auto,
                 'ipv6.method': self.ipv6_method,
+                'ipv6.ip6-privacy': self.ip_privacy6,
+                'ipv6.addr-gen-mode': self.addr_gen_mode6
             })
 
         # Layer 2 options.
@@ -1398,6 +1414,8 @@ class Nmcli(object):
                 elif setting == self.mtu_setting:
                     # MTU is 'auto' by default when detecting changes.
                     convert_func = self.mtu_to_string
+                elif setting == 'ipv6.ip6-privacy':
+                    convert_func = self.ip6_privacy_to_num
             elif setting_type is list:
                 # Convert lists to strings for nmcli create/modify commands.
                 convert_func = self.list_to_string
@@ -1450,6 +1468,23 @@ class Nmcli(object):
             return 'auto'
         else:
             return to_text(mtu)
+
+    @staticmethod
+    def ip6_privacy_to_num(privacy):
+        ip6_privacy_values = {
+            'disabled': '0',
+            'prefer-public-addr': '1 (enabled, prefer public IP)',
+            'prefer-temp-addr': '2 (enabled, prefer temporary IP)',
+            'unknown': '-1',
+        }
+
+        if privacy is None:
+            return None
+
+        if privacy not in ip6_privacy_values:
+            raise AssertionError('{privacy} is invalid ip_privacy6 option'.format(privacy=privacy))
+
+        return ip6_privacy_values[privacy]
 
     @property
     def slave_conn_type(self):
@@ -1818,6 +1853,8 @@ def main():
             dns6_search=dict(type='list', elements='str'),
             dns6_ignore_auto=dict(type='bool', default=False),
             method6=dict(type='str', choices=['ignore', 'auto', 'dhcp', 'link-local', 'manual', 'shared', 'disabled']),
+            ip_privacy6=dict(type='str', choices=['disabled', 'prefer-public-addr', 'prefer-temp-addr', 'unknown']),
+            addr_gen_mode6=dict(type='str', choices=['eui64', 'stable-privacy']),
             # Bond Specific vars
             mode=dict(type='str', default='balance-rr',
                       choices=['802.3ad', 'active-backup', 'balance-alb', 'balance-rr', 'balance-tlb', 'balance-xor', 'broadcast']),
