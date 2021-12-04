@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # (C) 2021, Victor Martinez <VictorMartinezRubio@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -267,6 +268,8 @@ class OpenTelemetrySource(object):
             elif host_data.status == 'skipped':
                 message = res['skip_reason'] if 'skip_reason' in res else 'skipped'
                 status = Status(status_code=StatusCode.UNSET)
+            elif host_data.status == 'ignored':
+                status = Status(status_code=StatusCode.UNSET)
 
         span.set_status(status)
         if isinstance(task_data.args, dict) and "gather_facts" not in task_data.action:
@@ -462,10 +465,15 @@ class CallbackModule(CallbackBase):
         )
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
-        self.errors += 1
+        if ignore_errors:
+            status = 'ignored'
+        else:
+            status = 'failed'
+            self.errors += 1
+
         self.opentelemetry.finish_task(
             self.tasks_data,
-            'failed',
+            status,
             result
         )
 
