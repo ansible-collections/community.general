@@ -586,6 +586,21 @@ TESTCASE_ETHERNET_STATIC_MULTIPLE_IP4_ADDRESSES = [
     }
 ]
 
+TESTCASE_ETHERNET_STATIC_IP6_PRIVACY_AND_ADDR_GEN_MODE = [
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'ethernet_non_existant',
+        'ip6': '2001:db8::cafe/128',
+        'gw6': '2001:db8::cafa',
+        'dns6': ['2001:4860:4860::8888'],
+        'state': 'present',
+        'ip_privacy6': 'prefer-public-addr',
+        'addr_gen_mode6': 'eui64',
+        '_ansible_check_mode': False,
+    }
+]
+
 TESTCASE_ETHERNET_STATIC_MULTIPLE_IP4_ADDRESSES_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
 connection.interface-name:              ethernet_non_existant
@@ -794,6 +809,27 @@ ipv6.method:                            manual
 ipv6.addresses:                         2001:db8::1/128
 """
 
+TESTCASE_ETHERNET_STATIC_IP6_PRIVACY_AND_ADDR_GEN_MODE_UNCHANGED_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              ethernet_non_existant
+connection.autoconnect:                 yes
+802-3-ethernet.mtu:                     auto
+ipv6.method:                            manual
+ipv6.addresses:                         2001:db8::cafe/128
+ipv6.gateway:                           2001:db8::cafa
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+ipv6.never-default:                     no
+ipv6.may-fail:                          yes
+ipv6.ip6-privacy:                       1 (enabled, prefer public IP)
+ipv6.addr-gen-mode:                     eui64
+ipv6.dns:                               2001:4860:4860::8888
+ipv4.method:                            disabled
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+"""
 
 TESTCASE_GSM = [
     {
@@ -1005,6 +1041,13 @@ def mocked_ethernet_connection_static_multiple_ip4_addresses_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
                execute_return=(0, TESTCASE_ETHERNET_STATIC_MULTIPLE_IP4_ADDRESSES_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_ethernet_connection_static_ip6_privacy_and_addr_gen_mode_unchange(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_ETHERNET_STATIC_IP6_PRIVACY_AND_ADDR_GEN_MODE_UNCHANGED_OUTPUT, ""))
 
 
 @pytest.fixture
@@ -2645,3 +2688,59 @@ def test_add_second_ip4_address_to_ethernet_connection(mocked_ethernet_connectio
     results = json.loads(out)
     assert not results.get('failed')
     assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_STATIC_IP6_PRIVACY_AND_ADDR_GEN_MODE, indirect=['patch_ansible_module'])
+def test_create_ethernet_addr_gen_mode_and_ip6_privacy_static(mocked_generic_connection_create, capfd):
+    """
+    Test : Create ethernet connection with static IP configuration
+    """
+
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 2
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[0]
+
+    assert add_args[0][0] == '/usr/bin/nmcli'
+    assert add_args[0][1] == 'con'
+    assert add_args[0][2] == 'add'
+    assert add_args[0][3] == 'type'
+    assert add_args[0][4] == 'ethernet'
+    assert add_args[0][5] == 'con-name'
+    assert add_args[0][6] == 'non_existent_nw_device'
+
+    add_args_text = list(map(to_text, add_args[0]))
+    for param in ['connection.interface-name', 'ethernet_non_existant',
+                  'ipv6.addresses', '2001:db8::cafe/128',
+                  'ipv6.gateway', '2001:db8::cafa',
+                  'ipv6.dns', '2001:4860:4860::8888',
+                  'ipv6.ip6-privacy', 'prefer-public-addr',
+                  'ipv6.addr-gen-mode', 'eui64']:
+        assert param in add_args_text
+
+    up_args, up_kw = arg_list[1]
+    assert up_args[0][0] == '/usr/bin/nmcli'
+    assert up_args[0][1] == 'con'
+    assert up_args[0][2] == 'up'
+    assert up_args[0][3] == 'non_existent_nw_device'
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_STATIC_IP6_PRIVACY_AND_ADDR_GEN_MODE, indirect=['patch_ansible_module'])
+def test_ethernet_connection_static_with_mulitple_ip4_addresses_unchanged(mocked_ethernet_connection_static_ip6_privacy_and_addr_gen_mode_unchange, capfd):
+    """
+    Test : Ethernet connection with static IP configuration unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
