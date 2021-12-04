@@ -1472,7 +1472,7 @@ class Nmcli(object):
             return None
 
         if privacy not in ip6_privacy_values:
-            raise AssertionError(f'{privacy} is invalid ip_privacy6 option')
+            raise AssertionError('{privacy} is invalid ip_privacy6 option'.format(privacy=privacy))
 
         return ip6_privacy_values[privacy]
 
