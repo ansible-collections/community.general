@@ -1,7 +1,7 @@
 # (c) 2021, Alexei Znamensky
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-- name: test msimple 1
+- name: test msimple (set a=80)
   msimple:
     a: 80
   register: simple1
@@ -55,3 +55,30 @@
       - simple4.c == "abc change"
       - simple4.abc == "changed abc"
       - simple4 is changed
+
+- name: test msimple 5a
+  msimple:
+    a: 3   # should triple b and c
+    b: oh
+    c: my
+  register: simple5a
+
+- name: test msimple 5b
+  check_mode: true
+  msimple:
+    a: 3   # should triple b and c
+    b: oh
+    c: my
+  register: simple5b
+
+- name: assert simple5
+  assert:
+    that:
+      - simple5a.a == 3
+      - simple5a.b == "ohohoh"
+      - simple5a.c == "mymymy"
+      - simple5a is not changed
+      - simple5b.a == 3
+      - simple5b.b == "oh"
+      - simple5b.c == "my"
+      - simple5b is not changed
