@@ -262,7 +262,9 @@ def query_set(module, set, action):
             module.fail_json(msg='set %s cannot be removed' % set)
         return False
 
-    world_sets_path = '/var/lib/portage/world_sets'
+    # When providing ROOT via ansible enviroment, portage.root may return a
+    # portage._LegacyGlobalProxy instance. Force it to be a string.
+    world_sets_path = os.path.join(str(portage.root), portage.const.WORLD_SETS_FILE)
     if not os.path.exists(world_sets_path):
         return False
 
