@@ -36,7 +36,6 @@ options:
 
   username:
     type: str
-    required: false
     description:
       - The username to log-in with.
       - Must be used with I(password). Mutually exclusive with I(token).
