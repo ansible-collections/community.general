@@ -1,4 +1,4 @@
 ---
 minor_changes:
-  - hpilo_info - add "server_name", "snmp_im_settings", "network_settings", "global_settings", "supported_boot_mode", "one_time_boot", "pending_boot_mode", "persistent_boot", "current_boot_mode", "security_msg", "all_licenses", "all_user_info", "all_users" return values from HP ILO
+  - hpilo_info - add ``server_name``, ``snmp_im_settings``, ``network_settings``, ``global_settings``, ``supported_boot_mode``, ``one_time_boot``, ``pending_boot_mode``, ``persistent_boot``, ``current_boot_mode``, ``security_msg``, ``all_licenses``, ``all_user_info``, ``all_users`` return values from HP ILO.
     (https://github.com/ansible-collections/community.general/pull/3701).
