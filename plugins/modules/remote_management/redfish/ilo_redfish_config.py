@@ -144,6 +144,7 @@ def main():
     rf_utils = iLORedfishUtils(creds, root_uri, timeout, module)
     mgr_attributes = {'mgr_attr_name': module.params['attribute_name'],
                       'mgr_attr_value': module.params['attribute_value']}
+    changed = False
 
     offending = [
         cmd for cmd in command_list if cmd not in CATEGORY_COMMANDS_ALL[category]]
@@ -167,8 +168,9 @@ def main():
 
         for command in command_list:
             result[command] = dispatch[command](mgr_attributes)
+            changed = result[command]['changed']
 
-    module.exit_json(ilo_redfish_config=result)
+    module.exit_json(ilo_redfish_config=result, changed=changed)
 
 
 if __name__ == '__main__':
