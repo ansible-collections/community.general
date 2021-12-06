@@ -97,7 +97,6 @@ ilo_redfish_info:
                             description: Name to use to log in to the management processor.
                             type: str
     returned: always
-    sample: Dictionary of iLO Sessions
 '''
 
 CATEGORY_COMMANDS_ALL = {
