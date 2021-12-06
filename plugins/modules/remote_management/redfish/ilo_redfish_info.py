@@ -9,6 +9,7 @@ DOCUMENTATION = '''
 ---
 module: ilo_redfish_info
 short_description: Gathers server information through iLO using Redfish APIs
+version_added: 4.2.0
 description:
   - Builds Redfish URIs locally and sends them to iLO to
     get information back.
