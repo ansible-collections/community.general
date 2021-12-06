@@ -81,7 +81,7 @@ ilo_redfish_info:
                     type: str
                 msg:
                     description: Information of all active iLO sessions.
-                    type: dict
+                    type: list
                     elements: dict
                     contains:
                         Description:
