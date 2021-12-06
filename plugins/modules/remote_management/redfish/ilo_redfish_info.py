@@ -67,6 +67,7 @@ EXAMPLES = '''
       password: "{{ password }}"
     register: result_sessions
 '''
+
 RETURN = '''
 ilo_redfish_info:
     description: Returns iLO sessions.
