@@ -78,7 +78,7 @@ ilo_redfish_info:
             contains:
                 ret:
                     description: Check variable to see if the information was succesfully retrived.
-                    type: str
+                    type: bool
                 msg:
                     description: Information of all active iLO sessions.
                     type: list
