@@ -169,7 +169,7 @@ def main():
         for command in command_list:
             result[command] = dispatch[command](mgr_attributes)
             if 'changed' in result[command]:
-              changed |= result[command]['changed']
+                changed |= result[command]['changed']
 
     module.exit_json(ilo_redfish_config=result, changed=changed)
 
