@@ -736,7 +736,7 @@ def main():
                 # Wrap double quotes in single quotes so the shell doesn't strip
                 # the double quotes as those need to be included in the arg
                 # passed to parted
-                script += ['name', str(number), name]
+                script += ['name', str(number), '"%s"' % name]
 
             # Manage flags
             if flags:
