@@ -143,7 +143,7 @@ options:
         version_added: 3.3.0
     ip6:
         description:
-            - The IPv6 address to this interface.
+            - List of IPv6 addresses to this interface.
             - Use the format C(abbe::cafe/128) or C(abbe::cafe).
             - If defined and I(method6) is not specified, automatically set C(ipv6.method) to C(manual).
         type: list
