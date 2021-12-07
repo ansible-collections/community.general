@@ -253,7 +253,7 @@ def set_interface_option(module, lines, iface, option, raw_value, state, address
             last_line_dict = iface_lines[-1]
             return add_option_after_line(option, value, iface, lines, last_line_dict, iface_options, address_family)
 
-        if option in ["pre-up", "up", "down", "post-up"] and all(ito for ito in target_options if ito['value'] != value):
+        if option in ["pre-up", "up", "down", "post-up"] and all(ito['value'] != value for ito in target_options):
             return add_option_after_line(option, value, iface, lines, target_options[-1], iface_options, address_family)
 
         # if more than one option found edit the last one
