@@ -1366,8 +1366,7 @@ class LxcContainerManagement(object):
         ]
 
         rc, stdout, err = self.module.run_command(
-            build_command=build_command,
-            unsafe_shell=True
+            build_command
         )
 
         os.umask(old_umask)
