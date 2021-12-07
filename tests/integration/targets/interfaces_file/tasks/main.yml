@@ -2,6 +2,7 @@
 - name:
   set_fact:
     interfaces_testfile: '{{ remote_tmp_dir }}/interfaces'
+    interfaces_testfile_3841: '{{ remote_tmp_dir }}/interfaces_3841'
 
 - name: Copy interfaces file
   copy:
@@ -31,3 +32,32 @@
 - assert:
     that:
     - ifile_2 is not changed
+
+- name: 3841 - copy interfaces file
+  copy:
+    src: 'files/interfaces_ff_3841'
+    dest: '{{ interfaces_testfile_3841 }}'
+
+- name: 3841 - floating_ip_interface_up_ip 2a01:a:b:c::1/64 dev eth0
+  interfaces_file:
+    option: up
+    iface: eth0
+    dest: "{{ interfaces_testfile_3841 }}"
+    value: 'ip addr add 2a01:a:b:c::1/64 dev eth0'
+    state: present
+  register: ifile_3841_a
+
+- name: 3841 - floating_ip_interface_up_ip 2a01:a:b:c::1/64 dev eth0 (again)
+  interfaces_file:
+    option: up
+    iface: eth0
+    dest: "{{ interfaces_testfile_3841 }}"
+    value: 'ip addr add 2a01:a:b:c::1/64 dev eth0'
+    state: present
+  register: ifile_3841_b
+
+- name: 3841 - check assertions
+  assert:
+    that:
+      - ifile_3841_a is changed
+      - ifile_3841_b is not changed
