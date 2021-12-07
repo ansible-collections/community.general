@@ -115,7 +115,7 @@ class iLORedfishUtils(RedfishUtils):
         data = response["data"]
 
         if key not in data:
-            return {'ret': False, 'msg': "Key %s not found" % key}
+            return {'ret': False, 'changed': False, 'msg': "Key %s not found" % key}
 
         timezones = data["TimeZoneList"]
         index = ""
