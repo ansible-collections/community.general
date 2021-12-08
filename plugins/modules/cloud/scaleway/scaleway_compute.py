@@ -16,7 +16,7 @@ DOCUMENTATION = '''
 ---
 module: scaleway_compute
 short_description: Scaleway compute management module
-author: Remy Leone (@sieben)
+author: Remy Leone (@remyleone)
 description:
     - "This module manages compute instances on Scaleway."
 extends_documentation_fragment:

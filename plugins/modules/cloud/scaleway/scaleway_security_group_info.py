@@ -15,7 +15,7 @@ description:
   - Gather information about the Scaleway security groups available.
 author:
   - "Yanis Guenane (@Spredzy)"
-  - "Remy Leone (@sieben)"
+  - "Remy Leone (@remyleone)"
 options:
   region:
     type: str

@@ -16,7 +16,7 @@ DOCUMENTATION = '''
 ---
 module: scaleway_sshkey
 short_description: Scaleway SSH keys management module
-author: Remy Leone (@sieben)
+author: Remy Leone (@remyleone)
 description:
     - This module manages SSH keys on Scaleway account
       U(https://developer.scaleway.com)

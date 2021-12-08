@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
     name: scaleway
     author:
-      - Remy Leone (@sieben)
+      - Remy Leone (@remyleone)
     short_description: Scaleway inventory source
     description:
         - Get inventory hosts from Scaleway.
