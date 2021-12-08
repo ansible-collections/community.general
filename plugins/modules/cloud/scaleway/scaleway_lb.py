@@ -16,7 +16,7 @@ DOCUMENTATION = '''
 ---
 module: scaleway_lb
 short_description: Scaleway load-balancer management module
-author: Remy Leone (@sieben)
+author: Remy Leone (@remyleone)
 description:
     - "This module manages load-balancers on Scaleway."
 extends_documentation_fragment:
