@@ -15,7 +15,7 @@ description:
   - Gather information about the servers.
   - U(https://www.online.net/en/dedicated-server)
 author:
-  - "Remy Leone (@sieben)"
+  - "Remy Leone (@remyleone)"
 extends_documentation_fragment:
 - community.general.online
 
