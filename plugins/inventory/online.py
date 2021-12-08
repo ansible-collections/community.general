@@ -8,7 +8,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
     name: online
     author:
-      - Remy Leone (@sieben)
+      - Remy Leone (@remyleone)
     short_description: Scaleway (previously Online SAS or Online.net) inventory source
     description:
         - Get inventory hosts from Scaleway (previously Online SAS or Online.net).
