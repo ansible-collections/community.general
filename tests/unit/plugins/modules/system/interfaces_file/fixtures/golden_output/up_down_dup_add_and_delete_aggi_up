@@ -1,0 +1,9 @@
+# this file covers duplicates issue for up/down option, #3841
+auto lo
+iface lo inet loopback
+
+auto aggi
+iface aggi inet dhcp
+ address 10.44.15.196
+ netmask 255.255.255.248
+ mtu 1500
