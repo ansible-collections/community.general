@@ -16,7 +16,7 @@ DOCUMENTATION = '''
 ---
 module: scaleway_user_data
 short_description: Scaleway user_data management module
-author: Remy Leone (@sieben)
+author: Remy Leone (@remyleone)
 description:
     - "This module manages user_data on compute instances on Scaleway."
     - "It can be used to configure cloud-init for instance"

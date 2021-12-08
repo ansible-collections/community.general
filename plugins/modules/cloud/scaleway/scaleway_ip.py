@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 ---
 module: scaleway_ip
 short_description: Scaleway IP management module
-author: Remy Leone (@sieben)
+author: Remy Leone (@remyleone)
 description:
     - This module manages IP on Scaleway account
       U(https://developer.scaleway.com)
