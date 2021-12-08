@@ -1,0 +1,24 @@
+{
+    "aggi": {
+        "address": "10.44.15.196",
+        "address_family": "inet",
+        "down": [],
+        "method": "dhcp",
+        "mtu": "1500",
+        "netmask": "255.255.255.248",
+        "post-up": [],
+        "pre-up": [],
+        "up": [
+            "route add -net 224.0.0.0 netmask 240.0.0.0 dev aggi",
+            "route add -net 224.0.0.0 netmask 240.0.0.0 dev aggi"
+        ]
+    },
+    "lo": {
+        "address_family": "inet",
+        "down": [],
+        "method": "loopback",
+        "post-up": [],
+        "pre-up": [],
+        "up": []
+    }
+}

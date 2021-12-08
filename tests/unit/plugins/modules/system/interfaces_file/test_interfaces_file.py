@@ -79,7 +79,7 @@ class TestInterfacesFileModule(unittest.TestCase):
         goldenstring = string
         if not os.path.isfile(testfilepath):
             f = io.open(testfilepath, 'wb')
-            f.write(string)
+            f.write(string.encode())
             f.close()
         else:
             with open(testfilepath, 'r') as goldenfile:
@@ -94,7 +94,7 @@ class TestInterfacesFileModule(unittest.TestCase):
             self.compareInterfacesLinesToFile(lines, testfile)
             self.compareInterfacesToFile(ifaces, testfile)
 
-    def test_add_up_aoption_to_aggi(self):
+    def test_add_up_option_to_aggi(self):
         testcases = {
             "add_aggi_up": [
                 {
@@ -116,6 +116,34 @@ class TestInterfacesFileModule(unittest.TestCase):
                     'option': 'up',
                     'value': None,
                     'state': 'absent',
+                },
+            ],
+            "add_aggi_up_twice": [
+                {
+                    'iface': 'aggi',
+                    'option': 'up',
+                    'value': 'route add -net 224.0.0.0 netmask 240.0.0.0 dev aggi',
+                    'state': 'present',
+                },
+                {
+                    'iface': 'aggi',
+                    'option': 'up',
+                    'value': 'route add -net 224.0.0.0 netmask 240.0.0.0 dev aggi',
+                    'state': 'present',
+                },
+            ],
+            "aggi_remove_dup": [
+                {
+                    'iface': 'aggi',
+                    'option': 'up',
+                    'value': None,
+                    'state': 'absent',
+                },
+                {
+                    'iface': 'aggi',
+                    'option': 'up',
+                    'value': 'route add -net 224.0.0.0 netmask 240.0.0.0 dev aggi',
+                    'state': 'present',
                 },
             ],
             "set_aggi_slaves": [
