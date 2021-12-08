@@ -15,7 +15,7 @@ description:
   - Gather information about the Scaleway servers available.
 author:
   - "Yanis Guenane (@Spredzy)"
-  - "Remy Leone (@sieben)"
+  - "Remy Leone (@remyleone)"
 extends_documentation_fragment:
 - community.general.scaleway
 
