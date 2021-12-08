@@ -694,7 +694,7 @@ class JIRA(StateModuleHelper):
             try:
                 error = json.loads(info['body'])
             except Exception:
-                self.module.fail_json(msg=to_native(info['body']), exception=traceback.format_exc())
+                self.module.fail_json(msg=to_native(info.get('body')), exception=traceback.format_exc())
             if error:
                 msg = []
                 for key in ('errorMessages', 'errors'):
