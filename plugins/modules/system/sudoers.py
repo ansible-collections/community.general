@@ -63,20 +63,24 @@ options:
 
 EXAMPLES = '''
 - name: Allow the backup user to sudo /usr/local/bin/backup
-  sudoers:
+  community.general.sudoers:
     name: allow-backup
     state: present
     user: backup
     commands: /usr/local/bin/backup
 
-- name: Allow the monitoring group to run sudo /usr/local/bin/gather-app-metrics without requiring a password
-  sudoers:
+- name: |
+    Allow the monitoring group to run sudo /usr/local/bin/gather-app-metrics
+    without requiring a password
+  community.general.sudoers:
     name: monitor-app
     group: monitoring
     commands: /usr/local/bin/gather-app-metrics
 
-- name: Allow the alice user to run sudo /bin/systemctl restart my-service or sudo /bin/systemctl reload my-service, but a password is required
-  sudoers:
+- name: |
+    Allow the alice user to run sudo /bin/systemctl restart my-service or
+    sudo /bin/systemctl reload my-service, but a password is required
+  community.general.sudoers:
     name: alice-service
     user: alice
     commands:
@@ -85,9 +89,15 @@ EXAMPLES = '''
     nopassword: false
 
 - name: Revoke the previous sudo grants given to the alice user
+<<<<<<< HEAD
   sudoers:
     name: alice-service
     state: absent
+=======
+  community.general.sudoers:
+      name: alice-service
+      state: absent
+>>>>>>> 5421b234 (Update examples and formatting)
 '''
 
 import os
