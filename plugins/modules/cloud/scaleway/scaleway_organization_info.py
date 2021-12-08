@@ -15,7 +15,7 @@ description:
   - Gather information about the Scaleway organizations available.
 author:
   - "Yanis Guenane (@Spredzy)"
-  - "Remy Leone (@sieben)"
+  - "Remy Leone (@remyleone)"
 options:
   api_url:
     description:

@@ -12,7 +12,7 @@ short_description: Gather information about Online user.
 description:
   - Gather information about the user.
 author:
-  - "Remy Leone (@sieben)"
+  - "Remy Leone (@remyleone)"
 extends_documentation_fragment:
 - community.general.online
 '''
