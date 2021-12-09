@@ -19,6 +19,8 @@ description:
     For Linux it can use C(timedatectl) or edit C(/etc/sysconfig/clock) or C(/etc/timezone) and C(hwclock).
     On SmartOS, C(sm-set-timezone), for macOS, C(systemsetup), for BSD, C(/etc/localtime) is modified.
     On AIX, C(chtz) is used.
+  - Make sure that the zoneinfo files are installed with the appropriate OS package, like C(tzdata) (usually always installed,
+    when not using a minimal installation like Alpine Linux).
   - As of Ansible 2.3 support was added for SmartOS and BSDs.
   - As of Ansible 2.4 support was added for macOS.
   - As of Ansible 2.9 support was added for AIX 6.1+
