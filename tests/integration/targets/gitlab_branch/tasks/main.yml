@@ -1,0 +1,64 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Install required libs
+  pip:
+    name: python-gitlab
+    state: present
+
+- name: Create {{ gitlab_project_name }}
+  gitlab_project:
+    server_url: "{{ gitlab_host }}"
+    validate_certs: False
+    login_token: "{{ gitlab_login_token }}"
+    name: "{{ gitlab_project_name }}"
+    initialize_with_readme: True
+    state: present
+
+- name: Create branch {{ gitlab_branch }} 
+  community.general.gitlab_branch:
+    api_url: https://gitlab.com
+    api_token: secret_access_token
+    project: "{{ gitlab_project_name }}"
+    branch: "{{ gitlab_branch }}"
+    ref_branch: main
+    state: present
+
+- name: Create branch {{ gitlab_branch }} ( Idempotency test )
+  community.general.gitlab_branch:
+    api_url: https://gitlab.com
+    api_token: secret_access_token
+    project: "{{ gitlab_project_name }}"
+    branch: "{{ gitlab_branch }}"
+    ref_branch: main
+    state: present
+  register: create_branch
+
+- name: Test module is idempotent
+  assert:
+    that:
+      - create_branch is not changed
+
+- name: Cleanup branch {{ gitlab_branch }}
+  community.general.gitlab_branch:
+    api_url: https://gitlab.com
+    api_token: secret_access_token
+    project: "{{ gitlab_project_name }}"
+    branch: "{{ gitlab_branch }}"
+    state: absent
+  register: delete_branch
+  
+- name: Test module is idempotent
+  assert:
+    that:
+      - delete_branch is changed
+      
+- name: Clean up {{ gitlab_project_name }}
+  gitlab_project:
+    server_url: "{{ gitlab_host }}"
+    validate_certs: False
+    login_token: "{{ gitlab_login_token }}"
+    name: "{{ gitlab_project_name }}"
+    state: absent

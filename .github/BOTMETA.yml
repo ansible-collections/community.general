@@ -951,6 +951,8 @@ files:
     maintainers: SamyCoenen
   $modules/source_control/gitlab/gitlab_user.py:
     maintainers: LennertMertens stgrace
+  $modules/source_control/gitlab/gitlab_branch.py:
+    maintainers: paytroff
   $modules/source_control/hg.py:
     maintainers: yeukhon
   $modules/storage/emc/emc_vnx_sg_member.py:
