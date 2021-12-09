@@ -89,15 +89,9 @@ EXAMPLES = '''
     nopassword: false
 
 - name: Revoke the previous sudo grants given to the alice user
-<<<<<<< HEAD
-  sudoers:
+  community.general.sudoers:
     name: alice-service
     state: absent
-=======
-  community.general.sudoers:
-      name: alice-service
-      state: absent
->>>>>>> 5421b234 (Update examples and formatting)
 '''
 
 import os
