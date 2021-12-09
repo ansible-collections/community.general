@@ -174,7 +174,7 @@ options:
     type: bool
     default: no
 
-requirements: [ portage ]
+requirements: [ portage or gentoolkit ]
 author:
     - "William L Thomson Jr (@wltjr)"
     - "Yap Sok Ann (@sayap)"
@@ -231,8 +231,6 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
-import portage
-
 
 def query_package(module, package, action):
     if package.startswith('@'):
@@ -241,8 +239,14 @@ def query_package(module, package, action):
 
 
 def query_atom(module, atom, action):
-    installed = portage.vartree().dbapi.match(atom)
-    return bool(installed)
+    try:
+        installed = module.vartree.dbapi.match(atom)
+        return bool(installed)
+    except AttributeError:
+        cmd = '%s list %s' % (module.equery_path, atom)
+
+        rc, out, err = module.run_command(cmd)
+        return rc == 0
 
 
 def query_set(module, set, action):
@@ -262,9 +266,12 @@ def query_set(module, set, action):
             module.fail_json(msg='set %s cannot be removed' % set)
         return False
 
-    # When providing ROOT via ansible enviroment, portage.root may return a
-    # portage._LegacyGlobalProxy instance. Force it to be a string.
-    world_sets_path = os.path.join(str(portage.root), portage.const.WORLD_SETS_FILE)
+    try:
+        # When providing ROOT via ansible enviroment, portage.root may return a
+        # portage._LegacyGlobalProxy instance. Force it to be a string.
+        world_sets_path = os.path.join(str(portage.root), portage.const.WORLD_SETS_FILE)
+    except NameError:
+        world_sets_path = "/var/lib/portage/world_sets"
     if not os.path.exists(world_sets_path):
         return False
 
@@ -508,6 +515,12 @@ def main():
     )
 
     module.emerge_path = module.get_bin_path('emerge', required=True)
+    try:
+        import portage
+        module.vartree = portage.vartree()
+    except ImportError:
+        # It is required if the portage module isn't found
+        module.equery_path = module.get_bin_path('equery', required=True)
 
     p = module.params
 
