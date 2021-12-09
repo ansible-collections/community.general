@@ -1,0 +1,2 @@
+minor_changes:
+    - jira - add support for Bearer token auth (https://github.com/ansible-collections/community.general/pull/3838).
