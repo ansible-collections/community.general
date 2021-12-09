@@ -143,10 +143,11 @@ options:
         version_added: 3.3.0
     ip6:
         description:
-            - The IPv6 address to this interface.
-            - Use the format C(abbe::cafe/128 or abbe::cafe).
+            - List of IPv6 addresses to this interface.
+            - Use the format C(abbe::cafe/128) or C(abbe::cafe).
             - If defined and I(method6) is not specified, automatically set C(ipv6.method) to C(manual).
-        type: str
+        type: list
+        elements: str
     gw6:
         description:
             - The IPv6 gateway for this interface.
@@ -1510,13 +1511,10 @@ class Nmcli(object):
         return [address if '/' in address else address + '/32' for address in ip4_addresses]
 
     @staticmethod
-    def enforce_ipv6_cidr_notation(ip6_address):
-        if ip6_address is None:
+    def enforce_ipv6_cidr_notation(ip6_addresses):
+        if ip6_addresses is None:
             return None
-        elif '/' in ip6_address:
-            return ip6_address
-        else:
-            return ip6_address + '/128'
+        return [address if '/' in address else address + '/128' for address in ip6_addresses]
 
     @staticmethod
     def bool_to_string(boolean):
@@ -1543,6 +1541,7 @@ class Nmcli(object):
                        '802-11-wireless.hidden'):
             return bool
         elif setting in ('ipv4.addresses',
+                         'ipv6.addresses',
                          'ipv4.dns',
                          'ipv4.dns-search',
                          'ipv4.routes',
@@ -1846,7 +1845,7 @@ def main():
             method4=dict(type='str', choices=['auto', 'link-local', 'manual', 'shared', 'disabled']),
             may_fail4=dict(type='bool', default=True),
             dhcp_client_id=dict(type='str'),
-            ip6=dict(type='str'),
+            ip6=dict(type='list', elements='str'),
             gw6=dict(type='str'),
             gw6_ignore_auto=dict(type='bool', default=False),
             dns6=dict(type='list', elements='str'),
