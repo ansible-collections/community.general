@@ -97,7 +97,7 @@ def _validate_pv(module, vg, pvs):
     """
 
     lspv_cmd = module.get_bin_path('lspv', True)
-    rc, current_lspv, stderr = module.run_command("%s" % lspv_cmd)
+    rc, current_lspv, stderr = module.run_command([lspv_cmd])
     if rc != 0:
         module.fail_json(msg="Failed executing 'lspv' command.", rc=rc, stdout=current_lspv, stderr=stderr)
 
@@ -116,7 +116,7 @@ def _validate_pv(module, vg, pvs):
             # Disk None, looks free.
             # Check if PV is not already in use by Oracle ASM.
             lquerypv_cmd = module.get_bin_path('lquerypv', True)
-            rc, current_lquerypv, stderr = module.run_command("%s -h /dev/%s 20 10" % (lquerypv_cmd, pv))
+            rc, current_lquerypv, stderr = module.run_command([lquerypv_cmd, "-h", "/dev/%s" % pv, "20", "10"])
             if rc != 0:
                 module.fail_json(msg="Failed executing lquerypv command.", rc=rc, stdout=current_lquerypv, stderr=stderr)
 
@@ -144,11 +144,11 @@ def _validate_vg(module, vg):
              None (VG does not exist), message.
     """
     lsvg_cmd = module.get_bin_path('lsvg', True)
-    rc, current_active_vgs, err = module.run_command("%s -o" % lsvg_cmd)
+    rc, current_active_vgs, err = module.run_command([lsvg_cmd, "-o"])
     if rc != 0:
         module.fail_json(msg="Failed executing '%s' command." % lsvg_cmd)
 
-    rc, current_all_vgs, err = module.run_command("%s" % lsvg_cmd)
+    rc, current_all_vgs, err = module.run_command([lsvg_cmd])
     if rc != 0:
         module.fail_json(msg="Failed executing '%s' command." % lsvg_cmd)
 
@@ -197,7 +197,7 @@ def create_extend_vg(module, vg, pvs, pp_size, vg_type, force, vg_validation):
 
         if not module.check_mode:
             extendvg_cmd = module.get_bin_path('extendvg', True)
-            rc, output, err = module.run_command("%s %s %s" % (extendvg_cmd, vg, ' '.join(pvs)))
+            rc, output, err = module.run_command([extendvg_cmd, vg] + pvs)
             if rc != 0:
                 changed = False
                 msg = "Extending volume group '%s' has failed." % vg
@@ -213,7 +213,7 @@ def create_extend_vg(module, vg, pvs, pp_size, vg_type, force, vg_validation):
 
         if not module.check_mode:
             mkvg_cmd = module.get_bin_path('mkvg', True)
-            rc, output, err = module.run_command("%s %s %s %s -y %s %s" % (mkvg_cmd, vg_opt[vg_type], pp_size, force_opt[force], vg, ' '.join(pvs)))
+            rc, output, err = module.run_command([mkvg_cmd, vg_opt[vg_type], pp_size, force_opt[force], "-y", vg] + pvs)
             if rc != 0:
                 changed = False
                 msg = "Creating volume group '%s' failed." % vg
@@ -239,7 +239,7 @@ def reduce_vg(module, vg, pvs, vg_validation):
         # Remove VG if pvs are note informed.
         # Remark: AIX will permit remove only if the VG has not LVs.
         lsvg_cmd = module.get_bin_path('lsvg', True)
-        rc, current_pvs, err = module.run_command("%s -p %s" % (lsvg_cmd, vg))
+        rc, current_pvs, err = module.run_command([lsvg_cmd, "-p", vg])
         if rc != 0:
             module.fail_json(msg="Failing to execute '%s' command." % lsvg_cmd)
 
@@ -263,7 +263,7 @@ def reduce_vg(module, vg, pvs, vg_validation):
 
     if not module.check_mode:
         reducevg_cmd = module.get_bin_path('reducevg', True)
-        rc, stdout, stderr = module.run_command("%s -df %s %s" % (reducevg_cmd, vg, ' '.join(pvs_to_remove)))
+        rc, stdout, stderr = module.run_command([reducevg_cmd, "-df", vg] + pvs_to_remove)
         if rc != 0:
             module.fail_json(msg="Unable to remove '%s'." % vg, rc=rc, stdout=stdout, stderr=stderr)
 
@@ -286,7 +286,7 @@ def state_vg(module, vg, state, vg_validation):
         msg = ''
         if not module.check_mode:
             varyonvg_cmd = module.get_bin_path('varyonvg', True)
-            rc, varyonvg_out, err = module.run_command("%s %s" % (varyonvg_cmd, vg))
+            rc, varyonvg_out, err = module.run_command([varyonvg_cmd, vg])
             if rc != 0:
                 module.fail_json(msg="Command 'varyonvg' failed.", rc=rc, err=err)
 
@@ -303,7 +303,7 @@ def state_vg(module, vg, state, vg_validation):
 
         if not module.check_mode:
             varyonvg_cmd = module.get_bin_path('varyoffvg', True)
-            rc, varyonvg_out, stderr = module.run_command("%s %s" % (varyonvg_cmd, vg))
+            rc, varyonvg_out, stderr = module.run_command([varyonvg_cmd, vg])
             if rc != 0:
                 module.fail_json(msg="Command 'varyoffvg' failed.", rc=rc, stdout=varyonvg_out, stderr=stderr)
 
