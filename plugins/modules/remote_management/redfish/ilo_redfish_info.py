@@ -50,10 +50,6 @@ options:
       - Timeout in seconds for URL requests to iLO.
     default: 10
     type: int
-
-requirements:
-    - "python >= 3.8"
-    - "ansible >= 3.2"
 author:
     - "Bhavya B (@bhavya06)"
 '''

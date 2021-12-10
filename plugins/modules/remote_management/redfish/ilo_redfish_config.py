@@ -59,9 +59,6 @@ options:
     description:
       - Value of the attribute.
     type: str
-requirements:
-    - "python >= 3.8"
-    - "ansible >= 3.2"
 author:
     - "Bhavya B (@bhavya06)"
 '''
