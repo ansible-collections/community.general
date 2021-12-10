@@ -288,7 +288,7 @@ persistent_boot:
     description: The persistant boot
     returned: always
     type: list
-    elements: ... (fill type in here) ...
+    elements: string
     sample: 
       persistent_boot:
         -   - Boot0013
@@ -353,6 +353,7 @@ all_users:
     description: Display all user in ILO
     returned: always
     type: list
+    elements: string
     sample: 
     - Administrator
     version_added: 4.1.0
