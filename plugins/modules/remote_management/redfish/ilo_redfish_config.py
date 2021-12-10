@@ -52,12 +52,12 @@ options:
   attribute_name:
     required: true
     description:
-      - Name of the attribute.
+      - Name of the attribute to be configured.
     type: str
   attribute_value:
     required: false
     description:
-      - Value of the attribute.
+      - Value of the attribute to be configured.
     type: str
 author:
     - "Bhavya B (@bhavya06)"
