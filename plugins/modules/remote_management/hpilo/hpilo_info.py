@@ -324,7 +324,8 @@ security_msg:
 all_licenses:
     description: Display list of dict about the licences (expired or not)
     returned: always
-    type: list of dict
+    type: list
+    elements: dict
     sample: 
     -   license_class: FQL
         license_install_date: Sun Mar 12 16:44:03 1988
