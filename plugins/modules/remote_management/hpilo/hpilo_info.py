@@ -288,6 +288,7 @@ persistent_boot:
     description: The persistant boot
     returned: always
     type: list
+    elements: ... (fill type in here) ...
     sample: 
       persistent_boot:
         -   - Boot0013
