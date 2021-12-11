@@ -100,6 +100,6 @@ class BecomeModule(BecomeBase):
 
         exe = self.get_option('become_exe')
 
-        flags = '' #self.get_option('become_flags')
+        flags = self.get_option('become_flags')
         noexe = not self.get_option('wrap_exe')
-        return '%s %s /usr/bin/sh -c %s' % (exe, flags, self._build_success_command(cmd, shell, noexe=noexe))
+        return '%s %s %s' % (exe, flags, self._build_success_command(cmd, shell))
