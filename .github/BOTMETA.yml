@@ -619,6 +619,8 @@ files:
     labels: cloudflare_dns
   $modules/net_tools/dnsimple.py:
     maintainers: drcapulet
+  $modules/net_tools/dnsimple_info.py:
+    maintainers: edhilgendorf
   $modules/net_tools/dnsmadeeasy.py:
     maintainers: briceburg
   $modules/net_tools/gandi_livedns.py:
