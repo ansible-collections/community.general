@@ -1,0 +1,48 @@
+- name: Set NTP Servers
+  ilo_redfish_config:
+    category: Manager
+    command: SetNTPServers
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    attribute_name: StaticNTPServers
+    attribute_value: 1.2.3.4
+
+- name: Set DNS Server
+  ilo_redfish_config:
+    category: Manager
+    command: SetDNSserver
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    attribute_name: DNSServers
+    attribute_value: 192.168.1.1
+
+- name: Set Domain name
+  ilo_redfish_config:
+    category: Manager
+    command: SetDomainName
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    attribute_name: DomainName
+    attribute_value: tst.sgp.hp.mfg
+
+- name: Disable WINS Reg
+  ilo_redfish_config:
+    category: Manager
+    command: SetWINSReg
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    attribute_name: WINSRegistration
+
+- name: Set TimeZone
+  ilo_redfish_config:
+    category: Manager
+    command: SetTimeZone
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    attribute_name: TimeZone
+    attribute_value: Chennai
