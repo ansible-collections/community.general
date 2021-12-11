@@ -1,0 +1,8 @@
+- name: Get sessions
+  ilo_redfish_info:
+    category: Sessions
+    command: GetiLOSessions
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_sessions
