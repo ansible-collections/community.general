@@ -26,6 +26,8 @@ extends_documentation_fragment:
   - community.general.redis
 
 seealso:
+  - module: community.general.redis_data
+  - module: community.general.redis_data_incr
   - module: community.general.redis_info
   - module: community.general.redis
 '''

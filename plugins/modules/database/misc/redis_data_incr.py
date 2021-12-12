@@ -47,7 +47,7 @@ notes:
      run the C(GET) command on the key, otherwise the module will fail.
 
 seealso:
-    - module: community.general.redis_set
+    - module: community.general.redis_data
     - module: community.general.redis_data_info
     - module: community.general.redis
 '''

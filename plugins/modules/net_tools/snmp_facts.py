@@ -127,7 +127,7 @@ ansible_sysname:
   type: str
   sample: ubuntu-user
 ansible_syslocation:
-  description: The physical location of this node (e.g., `telephone closet, 3rd floor').
+  description: The physical location of this node (e.g., C(telephone closet, 3rd floor)).
   returned: success
   type: str
   sample: Sitting on the Dock of the Bay
