@@ -93,7 +93,7 @@ DOCUMENTATION = '''
       environment variable and keep I(endpoints), I(host), and I(port) unused.
     seealso:
     - module: community.general.etcd3
-    - ref: etcd_lookup
+    - ref: ansible_collections.community.general.etcd_lookup
       description: The etcd v2 lookup.
 
     requirements:
