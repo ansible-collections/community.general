@@ -60,6 +60,7 @@ extends_documentation_fragment:
   - community.general.redis.documentation
 
 seealso:
+    - module: community.general.redis_data_incr
     - module: community.general.redis_data_info
     - module: community.general.redis
 '''
