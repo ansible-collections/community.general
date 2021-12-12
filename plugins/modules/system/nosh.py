@@ -45,7 +45,7 @@ options:
         required: false
         type: bool
         description:
-            - Enable or disable the service according to local preferences in *.preset files.
+            - Enable or disable the service according to local preferences in C(*.preset) files.
               Mutually exclusive with I(enabled). Only has an effect if set to true. Will take
               effect prior to I(state=reset).
     user:
