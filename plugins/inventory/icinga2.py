@@ -45,8 +45,8 @@ DOCUMENTATION = '''
         type: boolean
         default: true
       inventory_attr:
-        description: 
-          - Allows the override of the inventory name based on different attributes. 
+        description:
+          - Allows the override of the inventory name based on different attributes.
           - This allows for changing the way limits are used.
         type: string
         default: name
@@ -205,7 +205,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             if self.inventory_attr == "address":
                 host_name = host_attrs['address']
             if self.inventory_attr == "display_name":
-                host_name = host_attrs['display_name']  
+                host_name = host_attrs['display_name']
             if host_attrs['state'] == 0:
                 host_attrs['state'] = 'on'
             else:
@@ -224,7 +224,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                                         host_attrs['state'])
             self.inventory.set_variable(host_name, 'state_type',
                                         host_attrs['state_type'])
-                                        
         return groups_dict
 
     def parse(self, inventory, loader, path, cache=True):
