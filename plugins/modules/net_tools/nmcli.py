@@ -1373,6 +1373,9 @@ class Nmcli(object):
             options.update({
                 'vlan.id': self.vlanid,
                 'vlan.parent': self.vlandev,
+                'vlan.flags': self.flags,
+                'vlan.ingress': self.ingress,
+                'vlan.egress': self.egress,
             })
         elif self.type == 'vxlan':
             options.update({
