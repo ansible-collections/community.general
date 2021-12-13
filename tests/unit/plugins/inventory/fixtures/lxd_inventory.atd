@@ -1,7 +1,7 @@
 {
-    "containers":{
+    "instances":{
         "vlantest":{
-            "containers":{
+            "instances":{
                 "metadata":{
                     "config":{
                         "image.os":"ubuntu",
