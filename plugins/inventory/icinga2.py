@@ -3,6 +3,7 @@
 # Copyright (c) 2021 Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import (absolute_import, division, print_function)
+from json.decoder import JSONDecodeError
 
 __metaclass__ = type
 
@@ -129,8 +130,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         try:
             response = open_url(request_url, **request_args)
         except HTTPError as e:
-            error_body = json.loads(e.read().decode())
-            self.display.vvv("Error returned: {0}".format(error_body))
+            try:
+                error_body = json.loads(e.read().decode())
+                self.display.vvv("Error returned: {0}".format(error_body))
+            except JSONDecodeError:
+                error_body = {"status": None}
             if e.code == 404:
                 if error_body['status'] == "No objects found.":
                     raise AnsibleParserError("Host filter returned no data. Please confirm your host_filter value is valid")
