@@ -1,0 +1,10 @@
+---
+breaking_changes:
+  - icinga2 - Inventory object names will now default to the host object name by default as opposed to the address field. This can be changed using ``inventory_attr`` in your config file.
+    (https://github.com/ansible-collections/community.general/issues/3875)
+minor_changes:
+  - icinga2 - Added the `display_name` field to variables 
+    (https://github.com/ansible-collections/community.general/issues/3875).
+bugfixes:
+  - icinga2 - Handle 404 error when filter produces no results 
+    (https://github.com/ansible-collections/community.general/issues/3875).
