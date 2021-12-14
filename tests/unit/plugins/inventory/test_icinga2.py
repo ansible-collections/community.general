@@ -37,6 +37,7 @@ def query_hosts(hosts=None, attrs=None, joins=None, host_filter=None):
             'attrs': {
                 'address': 'test-host1.home.local',
                 'groups': ['home_servers', 'servers_dell'],
+                'display_name': 'Test Host 1',
                 'state': 0.0,
                 'state_type': 1.0
             },
@@ -48,6 +49,7 @@ def query_hosts(hosts=None, attrs=None, joins=None, host_filter=None):
         {
             'attrs': {
                 'address': 'test-host2.home.local',
+                'display_name': 'Test Host 2',
                 'groups': ['home_servers', 'servers_hp'],
                 'state': 1.0,
                 'state_type': 1.0
@@ -95,4 +97,5 @@ def test_populate(inventory, mocker):
 
     # check if host state rules apply properyl
     assert host1_info.get_vars()['state'] == 'on'
+    assert host1_info.get_vars()['display_name'] == "Test Host 1"
     assert host2_info.get_vars()['state'] == 'off'
