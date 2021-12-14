@@ -134,7 +134,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             if e.code == 404:
                 if error_body['status'] == "No objects found.":
                     raise AnsibleParserError("Host filter returned no data. Please confirm your host_filter value is valid")
-            raise AnsibleParserError("Unexpected data returned: {0} -- {1}".format(e,error_body))
+            raise AnsibleParserError("Unexpected data returned: {0} -- {1}".format(e, error_body))
 
         response_body = response.read()
         json_data = json.loads(response_body.decode('utf-8'))
