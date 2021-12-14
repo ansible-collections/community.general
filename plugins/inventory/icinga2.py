@@ -38,7 +38,6 @@ DOCUMENTATION = '''
       host_filter:
         description:
           - An Icinga2 API valid host filter. Leave blank for no filtering
-          - Note: Quotations must be escaped
         type: string
         required: false
       validate_certs:
@@ -50,8 +49,9 @@ DOCUMENTATION = '''
           - Allows the override of the inventory name based on different attributes.
           - This allows for changing the way limits are used.
         type: string
-        default: name
+        default: address
         choices: ['name', 'display_name', 'address']
+        version_added: 4.2.0
 '''
 
 EXAMPLES = r'''

@@ -66,7 +66,6 @@ def test_populate(inventory, mocker):
     inventory.icinga2_user = 'ansible'
     inventory.icinga2_password = 'password'
     inventory.icinga2_url = 'https://localhost:5665' + '/v1'
-    inventory.icinga2_url = 'https://localhost:5665' + '/v1'
     inventory.inventory_attr = "address"
 
     # bypass authentication and API fetch calls
