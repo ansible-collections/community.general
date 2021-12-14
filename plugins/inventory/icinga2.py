@@ -133,8 +133,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             try:
                 error_body = json.loads(e.read().decode())
                 self.display.vvv("Error returned: {0}".format(error_body))
-            except json.JSONDecodeError:
+            except json.decoder.JSONDecodeError:
                 error_body = {"status": None}
+            except Exception:
+                raise AnsibleParserError("Unexpected error occurred")
             if e.code == 404:
                 if error_body['status'] == "No objects found.":
                     raise AnsibleParserError("Host filter returned no data. Please confirm your host_filter value is valid")
