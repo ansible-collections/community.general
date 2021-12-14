@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - portage - Make the module work on systems without the non-system package
+    gentoolkit. If possible, use the ansible interpreter's 'portage' module.
+    (https://github.com/ansible-collections/community.general/pull/3870)
