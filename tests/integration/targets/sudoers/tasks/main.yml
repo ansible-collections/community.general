@@ -1,4 +1,6 @@
 ---
+# Initialise environment
+
 - name: Register sudoers.d directory
   set_fact:
     sudoers_path: /etc/sudoers.d
@@ -10,7 +12,7 @@
     recurse: true
 
 
-
+# Run module and collect data
 
 - name: Create first rule
   community.general.sudoers:
@@ -106,7 +108,7 @@
   register: revoke_rule_1_stat
 
 
-
+# Run assersions
 
 - name: Check changed status
   ansible.builtin.assert:
