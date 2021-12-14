@@ -359,6 +359,10 @@ except ImportError:
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible.module_utils.common.text.converters import to_native
 
+from ansible_collections.community.general.plugins.module_utils.proxmox import (
+    ansible_to_proxmox_bool
+)
+
 
 VZ_TYPE = None
 
@@ -605,14 +609,14 @@ def main():
                             netif=module.params['netif'],
                             mounts=module.params['mounts'],
                             ip_address=module.params['ip_address'],
-                            onboot=int(module.params['onboot']),
+                            onboot=ansible_to_proxmox_bool(module.params['onboot']),
                             cpuunits=module.params['cpuunits'],
                             nameserver=module.params['nameserver'],
                             searchdomain=module.params['searchdomain'],
-                            force=int(module.params['force']),
+                            force=ansible_to_proxmox_bool(module.params['force']),
                             pubkey=module.params['pubkey'],
                             features=",".join(module.params['features']) if module.params['features'] is not None else None,
-                            unprivileged=int(module.params['unprivileged']),
+                            unprivileged=ansible_to_proxmox_bool(module.params['unprivileged']),
                             description=module.params['description'],
                             hookscript=module.params['hookscript'])
 
