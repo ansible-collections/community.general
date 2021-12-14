@@ -130,7 +130,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             response = open_url(request_url, **request_args)
         except HTTPError as e:
             error_body = json.loads(e.read().decode())
-            self.display.vvv("Error returned: {}".format(error_body))
+            self.display.vvv("Error returned: {0}".format(error_body))
             if e.code == 404:
                 if error_body['status'] == "No objects found.":
                     raise AnsibleParserError("Host filter returned no data. Please confirm your host_filter value is valid")
