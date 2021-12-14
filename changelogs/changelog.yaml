@@ -2004,3 +2004,29 @@ releases:
     - 3709-support-batch-mode.yml
     - 3726-terraform-missing-parameters-planned-fix.yml
     release_date: '2021-11-23'
+  3.8.3:
+    changes:
+      bugfixes:
+      - interfaces_file - fixed the check for existing option in interface (https://github.com/ansible-collections/community.general/issues/3841).
+      - nmcli - fix returning "changed" when no mask set for IPv4 or IPv6 addresses
+        on task rerun (https://github.com/ansible-collections/community.general/issues/3768).
+      - nmcli - pass ``flags``, ``ingress``, ``egress`` params to ``nmcli`` (https://github.com/ansible-collections/community.general/issues/1086).
+      - opentelemetry_plugin - honour ``ignore_errors`` when a task has failed instead
+        of reporting an error (https://github.com/ansible-collections/community.general/pull/3837).
+      - pipx - passes the correct command line option ``--include-apps`` (https://github.com/ansible-collections/community.general/issues/3791).
+      - proxmox - fixed ``onboot`` parameter causing module failures when undefined
+        (https://github.com/ansible-collections/community.general/issues/3844).
+      minor_changes:
+      - lxd connection plugin - make sure that ``ansible_lxd_host``, ``ansible_executable``,
+        and ``ansible_lxd_executable`` work (https://github.com/ansible-collections/community.general/pull/3798).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 3.8.3.yml
+    - 3768-nmcli_fix_changed_when_no_mask_set.yml
+    - 3798-fix-lxd-connection-option-vars-support.yml
+    - 3800-pipx-include-apps.yaml
+    - 3837-opentelemetry_plugin-honour_ignore_errors.yaml
+    - 3862-interfaces-file-fix-dup-option.yaml
+    - 3874-proxmox-fix-onboot-param.yml
+    - 3896-nmcli_vlan_missing_options.yaml
+    release_date: '2021-12-14'

@@ -1,2 +1,0 @@
-bugfixes:
-    - pipx - passes the correct command line option ``--include-apps`` (https://github.com/ansible-collections/community.general/issues/3791).
