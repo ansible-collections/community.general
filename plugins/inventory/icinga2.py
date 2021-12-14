@@ -133,7 +133,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             try:
                 error_body = json.loads(e.read().decode())
                 self.display.vvv("Error returned: {0}".format(error_body))
-            except JSONDecodeError:
+            except json.JSONDecodeError:
                 error_body = {"status": None}
             if e.code == 404:
                 if error_body['status'] == "No objects found.":
