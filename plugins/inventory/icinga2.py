@@ -47,6 +47,7 @@ DOCUMENTATION = '''
         description:
           - Allows the override of the inventory name based on different attributes.
           - This allows for changing the way limits are used.
+          - The current default, C(address), is sometimes not unique or present. We recommend to use C(name) instead.
         type: string
         default: address
         choices: ['name', 'display_name', 'address']
@@ -134,7 +135,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 self.display.vvv("Error returned: {0}".format(error_body))
             except Exception:
                 error_body = {"status": None}
-            if e.code == 404 and error_body['status'] == "No objects found.":
+            if e.code == 404 and error_body.get('status') == "No objects found.":
                 raise AnsibleParserError("Host filter returned no data. Please confirm your host_filter value is valid")
             raise AnsibleParserError("Unexpected data returned: {0} -- {1}".format(e, error_body))
 
@@ -203,25 +204,30 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         for entry in json_data:
             host_attrs = entry['attrs']
             if self.inventory_attr == "name":
-                host_name = entry['name']
+                host_name = entry.get('name')
             if self.inventory_attr == "address":
-                host_name = host_attrs['address']
+                # When looking for address for inventory, if missing fallback to object name
+                if host_attrs.get('address') != '':
+                    host_name = host_attrs.get('address')
+                else:
+                    host_name = entry.get('name')
             if self.inventory_attr == "display_name":
-                host_name = host_attrs['display_name']
+                host_name = host_attrs.get('display_name')
             if host_attrs['state'] == 0:
                 host_attrs['state'] = 'on'
             else:
                 host_attrs['state'] = 'off'
-            host_groups = host_attrs['groups']
+            host_groups = host_attrs.get('groups')
             self.inventory.add_host(host_name)
             for group in host_groups:
                 if group not in self.inventory.groups.keys():
                     self.inventory.add_group(group)
                 self.inventory.add_child(group, host_name)
-            if 'address' in host_attrs.keys():
-                self.inventory.set_variable(host_name, 'ansible_host', host_attrs['address'])
-            self.inventory.set_variable(host_name, 'hostname', entry['name'])
-            self.inventory.set_variable(host_name, 'display_name', host_attrs['display_name'])
+            # If the address attribute is populated, override ansible_host with the value
+            if host_attrs.get('address') != '':
+                self.inventory.set_variable(host_name, 'ansible_host', host_attrs.get('address'))
+            self.inventory.set_variable(host_name, 'hostname', entry.get('name'))
+            self.inventory.set_variable(host_name, 'display_name', host_attrs.get('display_name'))
             self.inventory.set_variable(host_name, 'state',
                                         host_attrs['state'])
             self.inventory.set_variable(host_name, 'state_type',
