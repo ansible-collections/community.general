@@ -32,9 +32,17 @@ options:
       choices: [ 'absent', 'present' ]
       default: 'present'
       type: str
+    apply_live:
+      description:
+      - Stage packages and overlay them on the running system tree.
+      - Corresponds to the C(--apply-live) option. Default behavior (C(no)); C(yes) overlays the requested package(s) to the live system.
+      required: false
+      default: "no"
+      type: bool
 author:
 - Dusty Mabe (@dustymabe)
 - Abhijeet Kasurde (@Akasurde)
+- Elliana Perry (@TkPegatron)
 notes:
 - Does not support C(check_mode).
 '''
@@ -49,6 +57,12 @@ EXAMPLES = r'''
   community.general.rpm_ostree_pkg:
     name: nfs-utils
     state: absent
+
+- name: Install overlay package and merge with the live system
+  community.general.rpm_ostree_pkg:
+    name: nfs-utils
+    state: present
+    apply_live: yes
 '''
 
 RETURN = r'''
@@ -97,6 +111,7 @@ class RpmOstreePkg:
         self.module = module
         self.params = module.params
         self.state = module.params['state']
+        self.apply_live = module.params['apply_live']
 
     def ensure(self):
         results = dict(
@@ -125,6 +140,10 @@ class RpmOstreePkg:
         for pkg in self.params['name']:
             cmd.append(pkg)
             results['packages'].append(pkg)
+            
+        # Append apply-live
+        if self.apply_live and self.state not in ('absent'):
+            cmd.append('--apply-live')
 
         rc, out, err = self.module.run_command(cmd)
 
@@ -163,6 +182,10 @@ def main():
                 type='list',
                 elements='str',
             ),
+            apply_live=dict(
+                required=False,
+                type='bool',
+            )
         ),
     )
 
