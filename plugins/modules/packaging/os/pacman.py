@@ -249,8 +249,8 @@ class Pacman(object):
         if self.m.params["update_cache"]:
             self.update_package_db()
 
-        if not (self.m.params["name"] or self.m.params["upgrade"]):
-            self.success()
+            if not (self.m.params["name"] or self.m.params["upgrade"]):
+                self.success()
 
         if self.m.params["upgrade"]:
             self.upgrade()
