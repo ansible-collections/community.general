@@ -234,7 +234,8 @@ class Pacman(object):
         self.exit_params["msg"] = msg  # mandatory, but might be empty
 
     def fail(self, msg=None, stdout=None, stderr=None):
-        self._set_mandatory_exit_params(msg, stdout, stderr)
+        self.add_exit_infos(msg, stdout, stderr)
+        self._set_mandatory_exit_params()
         self.m.fail_json(**self.exit_params)
 
     def success(self):
