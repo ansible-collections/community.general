@@ -694,7 +694,7 @@ class JIRA(StateModuleHelper):
             try:
                 error = json.loads(info['body'])
             except Exception:
-                msg = 'ERROR request {method} "{url}": {status} {msg}\n{body}'.format(
+                msg = 'The request "{method} {url}" returned the unexpected status code {status} {msg}\n{body}'.format(
                     status=info['status'],
                     msg=info['msg'],
                     body=info.get('body'),
