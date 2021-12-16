@@ -108,7 +108,7 @@
   register: revoke_rule_1_stat
 
 
-# Run assersions
+# Run assertions
 
 - name: Check changed status
   ansible.builtin.assert:
