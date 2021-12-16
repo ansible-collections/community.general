@@ -414,12 +414,16 @@ class Pacman(object):
             self.changed = True
             return
 
-        force_params = "--refresh --refresh" if self.m.params["force"] else ""
-        cmd = "%s --sync --refresh %s %s" % (
+        cmd = [
             self.pacman_path,
-            self.m.params["update_cache_extra_args"],
-            force_params,
-        )
+            "--sync",
+            "--refresh",
+        ]
+        if self.m.params["update_cache_extra_args"]:
+            cmd += self.m.params["update_cache_extra_args"]
+        if self.m.params["force"]:
+            cmd += ["--refresh"]
+
         rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
 
         self.changed = True
@@ -578,7 +582,7 @@ class Pacman(object):
         )
 
 
-def main():
+def setup_module():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(type="list", elements="str", aliases=["pkg", "package"]),
@@ -590,11 +594,10 @@ def main():
             force=dict(type="bool", default=False),
             executable=dict(type="str", default="pacman"),
             extra_args=dict(type="str", default=""),
-            upgrade=dict(type="bool", default=False),
+            upgrade=dict(type="bool"),
             upgrade_extra_args=dict(type="str", default=""),
             update_cache=dict(
                 type="bool",
-                default=False,
                 aliases=["update-cache"],
                 deprecated_aliases=[
                     dict(
@@ -612,10 +615,15 @@ def main():
     )
 
     # Split extra_args as the shell would for easier handling later
-    for str_args in ["extra_args", "upgrade_extra_args"]:
+    for str_args in ["extra_args", "upgrade_extra_args", "update_cache_extra_args"]:
         module.params[str_args] = shlex.split(module.params[str_args])
 
-    Pacman(module).run()
+    return module
+
+
+def main():
+
+    Pacman(setup_module()).run()
 
 
 if __name__ == "__main__":
