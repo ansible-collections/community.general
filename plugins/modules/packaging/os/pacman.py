@@ -233,9 +233,11 @@ class Pacman(object):
             self.exit_params["stderr"] = stderrs
         self.exit_params["msg"] = msg  # mandatory, but might be empty
 
-    def fail(self, msg=None, stdout=None, stderr=None):
+    def fail(self, msg=None, stdout=None, stderr=None, **kwargs):
         self.add_exit_infos(msg, stdout, stderr)
         self._set_mandatory_exit_params()
+        if kwargs:
+            self.exit_params.update(**kwargs)
         self.m.fail_json(**self.exit_params)
 
     def success(self):
@@ -471,7 +473,7 @@ class Pacman(object):
                         if self.target_state == "absent":
                             continue  # Don't bark for unavailable packages when trying to remove them
                         else:
-                            self.m.fail_json(
+                            self.fail(
                                 msg="Failed to list package %s" % (pkg),
                                 cmd=cmd,
                                 stdout=stdout,
@@ -494,7 +496,7 @@ class Pacman(object):
             "upgradable_pkgs": {pkgname: (current_version,latest_version)},
         }
 
-        Calls fail_json() if a package requested for install cannot be found
+        Fails the module if a package requested for install cannot be found
         """
 
         VersionTuple = namedtuple("Upgrade", ["current", "latest"])
@@ -552,14 +554,14 @@ class Pacman(object):
                     continue
                 s = l.split()
                 if len(s) != 4:
-                    self.fail_json(msg="Invalid line: %s" % l)
+                    self.fail(msg="Invalid line: %s" % l)
 
                 pkg = s[0]
                 current = s[1]
                 latest = s[3]
                 upgradable_pkgs[pkg] = VersionTuple(current=current, latest=latest)
         else:
-            self.m.fail_json(
+            self.m.fail(
                 "Couldn't get list of packages to upgrade",
                 stdout=stdout,
                 stderr=stderr,
