@@ -142,7 +142,7 @@ class RpmOstreePkg:
             results['packages'].append(pkg)
             
         # Append apply-live
-        if self.apply_live and self.state not in ('absent'):
+        if self.apply_live and self.state not in ('absent', ):
             cmd.append('--apply-live')
 
         rc, out, err = self.module.run_command(cmd)
