@@ -36,8 +36,7 @@ options:
       description:
       - Stage packages and overlay them on the running system tree.
       - Corresponds to the C(--apply-live) option. Default behavior C(no). If set to C(yes), overlays the requested package(s) to the live system.
-      required: false
-      default: "no"
+      default: false
       type: bool
 author:
 - Dusty Mabe (@dustymabe)
