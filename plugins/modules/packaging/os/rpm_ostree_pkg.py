@@ -38,6 +38,7 @@ options:
       - Corresponds to the C(--apply-live) option. Default behavior C(no). If set to C(yes), overlays the requested package(s) to the live system.
       default: false
       type: bool
+      version_added: '4.2.0'
 author:
 - Dusty Mabe (@dustymabe)
 - Abhijeet Kasurde (@Akasurde)
