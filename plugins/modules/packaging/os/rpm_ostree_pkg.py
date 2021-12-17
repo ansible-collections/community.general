@@ -185,6 +185,7 @@ def main():
             apply_live=dict(
                 required=False,
                 type='bool',
+                default=False,
             )
         ),
     )
