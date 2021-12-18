@@ -300,14 +300,17 @@ class Pacman(object):
         if rc != 0:
             self.fail("Failed to list package(s) to install", stdout=stdout, stderr=stderr)
 
-        installed_pkgs = [l.strip() for l in stdout.splitlines()]
+        name_ver = [l.strip() for l in stdout.splitlines()]
         before = []
         after = []
-        for p in installed_pkgs:
+        installed_pkgs = []
+        self.exit_params["packages"] = []
+        for p in name_ver:
             name, version = p.split()
             if name in self.inventory["installed_pkgs"]:
                 before.append("%s-%s" % (name, self.inventory["installed_pkgs"][name]))
             after.append("%s-%s" % (name, version))
+            installed_pkgs.append(name)
 
         self.exit_params["diff"] = {
             "before": "\n".join(before) + "\n" if before else "",
@@ -325,6 +328,8 @@ class Pacman(object):
         rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
         if rc != 0:
             self.fail("Failed to install package(s)", stdout=stdout, stderr=stderr)
+
+        self.exit_params["packages"] = installed_pkgs
         self.add_exit_infos(
             "Installed %d package(s)" % len(installed_pkgs), stdout=stdout, stderr=stderr
         )
@@ -364,6 +369,7 @@ class Pacman(object):
         }
 
         if self.m.check_mode:
+            self.exit_params["packages"] = removed_pkgs
             self.add_exit_infos("Would have removed %d packages" % len(removed_pkgs))
             return
 
@@ -373,6 +379,7 @@ class Pacman(object):
         rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
         if rc != 0:
             self.fail("failed to remove package(s)", stdout=stdout, stderr=stderr)
+        self.exit_params["packages"] = removed_pkgs
         self.add_exit_infos("Removed %d package(s)" % len(removed_pkgs), stdout=stdout, stderr=stderr)
 
     def upgrade(self):
