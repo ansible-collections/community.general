@@ -437,7 +437,7 @@ def add_vdooptions(params):
     if params.get('physicalthreads') is not None:
         options.append("--vdoPhysicalThreads=" + params['physicalthreads'])
 
-    return vdocmdoptions
+    return options
 
 
 def run_module():
