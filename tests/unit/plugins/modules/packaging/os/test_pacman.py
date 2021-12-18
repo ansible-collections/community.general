@@ -172,87 +172,87 @@ class TestPacman:
                     [  # pacman --query
                         0,
                         """file 5.41-1
-                filesystem 2021.11.11-1
-                findutils 4.8.0-1
-                gawk 5.1.1-1
-                gettext 0.21-1
-                grep 3.7-1
-                gzip 1.11-1
-                pacman 6.0.1-2
-                pacman-mirrorlist 20211114-1
-                sed 4.8-1
-                sqlite 3.36.0-1
-                """,
+                        filesystem 2021.11.11-1
+                        findutils 4.8.0-1
+                        gawk 5.1.1-1
+                        gettext 0.21-1
+                        grep 3.7-1
+                        gzip 1.11-1
+                        pacman 6.0.1-2
+                        pacman-mirrorlist 20211114-1
+                        sed 4.8-1
+                        sqlite 3.36.0-1
+                        """,
                         "",
                     ],
                     (  # pacman --query --group
                         0,
                         """base-devel file
-                base-devel findutils
-                base-devel gawk
-                base-devel gettext
-                base-devel grep
-                base-devel gzip
-                base-devel pacman
-                base-devel sed
-                """,
+                        base-devel findutils
+                        base-devel gawk
+                        base-devel gettext
+                        base-devel grep
+                        base-devel gzip
+                        base-devel pacman
+                        base-devel sed
+                        """,
                         "",
                     ),
                     (  # pacman --sync --list
                         0,
                         """core acl 2.3.1-1 [installed]
-                core amd-ucode 20211027.1d00989-1
-                core archlinux-keyring 20211028-1 [installed]
-                core argon2 20190702-3 [installed]
-                core attr 2.5.1-1 [installed]
-                core audit 3.0.6-5 [installed: 3.0.6-2]
-                core autoconf 2.71-1
-                core automake 1.16.5-1
-                core b43-fwcutter 019-3
-                core gawk 5.1.1-1 [installed]
-                core grep 3.7-1 [installed]
-                core sqlite 3.37.0-1 [installed: 3.36.0-1]
-                code sudo 1.9.8.p2-3
-                """,
+                        core amd-ucode 20211027.1d00989-1
+                        core archlinux-keyring 20211028-1 [installed]
+                        core argon2 20190702-3 [installed]
+                        core attr 2.5.1-1 [installed]
+                        core audit 3.0.6-5 [installed: 3.0.6-2]
+                        core autoconf 2.71-1
+                        core automake 1.16.5-1
+                        core b43-fwcutter 019-3
+                        core gawk 5.1.1-1 [installed]
+                        core grep 3.7-1 [installed]
+                        core sqlite 3.37.0-1 [installed: 3.36.0-1]
+                        code sudo 1.9.8.p2-3
+                        """,
                         "",
                     ),
                     (  # pacman --sync --group --group
                         0,
                         """base-devel autoconf
-                base-devel automake
-                base-devel binutils
-                base-devel bison
-                base-devel fakeroot
-                base-devel file
-                base-devel findutils
-                base-devel flex
-                base-devel gawk
-                base-devel gcc
-                base-devel gettext
-                base-devel grep
-                base-devel groff
-                base-devel gzip
-                base-devel libtool
-                base-devel m4
-                base-devel make
-                base-devel pacman
-                base-devel patch
-                base-devel pkgconf
-                base-devel sed
-                base-devel sudo
-                base-devel texinfo
-                base-devel which
-                some-group libtool
-                some-group sudo
-                some-group binutils
-                """,
+                        base-devel automake
+                        base-devel binutils
+                        base-devel bison
+                        base-devel fakeroot
+                        base-devel file
+                        base-devel findutils
+                        base-devel flex
+                        base-devel gawk
+                        base-devel gcc
+                        base-devel gettext
+                        base-devel grep
+                        base-devel groff
+                        base-devel gzip
+                        base-devel libtool
+                        base-devel m4
+                        base-devel make
+                        base-devel pacman
+                        base-devel patch
+                        base-devel pkgconf
+                        base-devel sed
+                        base-devel sudo
+                        base-devel texinfo
+                        base-devel which
+                        some-group libtool
+                        some-group sudo
+                        some-group binutils
+                        """,
                         "",
                     ),
                     (  # pacman --query --upgrades
                         0,
                         """sqlite 3.36.0-1 -> 3.37.0-1
-                systemd 249.6-3 -> 249.7-2 [ignored]
-                """,
+                        systemd 249.6-3 -> 249.7-2 [ignored]
+                        """,
                         "",
                     ),
                 ],
