@@ -30,6 +30,14 @@ options:
     description:
       - GitLab token for logging in.
     type: str
+  api_oauth_token:
+    description:
+      - GitLab OAuth token for logging in.
+    type: str
+  api_job_token:
+    description:
+      - GitLab CI job token for logging in.
+    type: str
   group:
     description:
       - Id or the full path of the group of which this projects belongs to.
@@ -209,6 +217,19 @@ EXAMPLES = r'''
     initialize_with_readme: true
     state: present
   delegate_to: localhost
+
+- name: get the initial root password
+  ansible.builtin.shell: |
+    grep 'Password:' /etc/gitlab/initial_root_password | sed -e 's/Password\: \(.*\)/\1/'
+  register: initial_root_password
+
+- name: Create a GitLab Project using a username/password via oauth_token
+  community.general.gitlab_project:
+    api_url: https://gitlab.example.com/
+    api_username: root
+    api_password: "{{ initial_root_password }}"
+    name: my_second_project
+    group: "10481470"
 '''
 
 RETURN = r'''
@@ -299,10 +320,11 @@ class GitLabProject(object):
             project = self.create_project(namespace, project_options)
 
             # add avatar to project
-            try:
-                project.avatar = open(options['avatar_path'], 'rb')
-            except IOError as e:
-                self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
+            if options['avatar_path']:
+                try:
+                    project.avatar = open(options['avatar_path'], 'rb')
+                except IOError as e:
+                    self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
 
             changed = True
         else:
@@ -387,6 +409,8 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(dict(
         api_token=dict(type='str', no_log=True),
+        api_oauth_token=dict(type='str', no_log=True),
+        api_job_token=dict(type='str', no_log=True),
         group=dict(type='str'),
         name=dict(type='str', required=True),
         path=dict(type='str'),
@@ -419,13 +443,19 @@ def main():
         mutually_exclusive=[
             ['api_username', 'api_token'],
             ['api_password', 'api_token'],
+            ['api_username', 'api_oauth_token'],
+            ['api_password', 'api_oauth_token'],
+            ['api_username', 'api_job_token'],
+            ['api_password', 'api_job_token'],
+            ['api_token', 'api_oauth_token'],
+            ['api_token', 'api_job_token'],
             ['group', 'username'],
         ],
         required_together=[
             ['api_username', 'api_password'],
         ],
         required_one_of=[
-            ['api_username', 'api_token']
+            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
         ],
         supports_check_mode=True,
     )

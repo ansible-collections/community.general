@@ -23,7 +23,14 @@ options:
     api_token:
         description:
             - A personal access token to authenticate with the GitLab API.
-        required: true
+        type: str
+    api_oauth_token:
+        description:
+            - GitLab OAuth token for logging in.
+        type: str
+    api_job_token:
+        description:
+            - GitLab CI job token for logging in.
         type: str
     gitlab_group:
         description:
@@ -242,7 +249,9 @@ class GitLabGroup(object):
 def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(dict(
-        api_token=dict(type='str', required=True, no_log=True),
+        api_token=dict(type='str', no_log=True),
+        api_oauth_token=dict(type='str', no_log=True),
+        api_job_token=dict(type='str', no_log=True),
         gitlab_group=dict(type='str', required=True),
         gitlab_user=dict(type='list', elements='str'),
         state=dict(type='str', default='present', choices=['present', 'absent']),
@@ -265,13 +274,19 @@ def main():
             ['api_password', 'api_token'],
             ['gitlab_user', 'gitlab_users_access'],
             ['access_level', 'gitlab_users_access'],
+            ['api_username', 'api_oauth_token'],
+            ['api_password', 'api_oauth_token'],
+            ['api_username', 'api_job_token'],
+            ['api_password', 'api_job_token'],
+            ['api_token', 'api_oauth_token'],
+            ['api_token', 'api_job_token'],
         ],
         required_together=[
             ['api_username', 'api_password'],
             ['gitlab_user', 'access_level'],
         ],
         required_one_of=[
-            ['api_username', 'api_token'],
+            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token'],
             ['gitlab_user', 'gitlab_users_access'],
         ],
         required_if=[

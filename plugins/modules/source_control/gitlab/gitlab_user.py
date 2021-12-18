@@ -37,6 +37,14 @@ options:
     description:
       - GitLab token for logging in.
     type: str
+  api_oauth_token:
+    description:
+      - GitLab OAuth token for logging in.
+    type: str
+  api_job_token:
+    description:
+      - GitLab CI job token for logging in.
+    type: str
   name:
     description:
       - Name of the user you want to create.
@@ -581,6 +589,8 @@ def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(dict(
         api_token=dict(type='str', no_log=True),
+        api_oauth_token=dict(type='str', no_log=True),
+        api_job_token=dict(type='str', no_log=True),
         name=dict(type='str'),
         state=dict(type='str', default="present", choices=["absent", "present", "blocked", "unblocked"]),
         username=dict(type='str', required=True),
@@ -604,12 +614,18 @@ def main():
         mutually_exclusive=[
             ['api_username', 'api_token'],
             ['api_password', 'api_token'],
+            ['api_username', 'api_oauth_token'],
+            ['api_password', 'api_oauth_token'],
+            ['api_username', 'api_job_token'],
+            ['api_password', 'api_job_token'],
+            ['api_token', 'api_oauth_token'],
+            ['api_token', 'api_job_token'],
         ],
         required_together=[
             ['api_username', 'api_password'],
         ],
         required_one_of=[
-            ['api_username', 'api_token']
+            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
         ],
         supports_check_mode=True,
         required_if=(
