@@ -190,6 +190,7 @@ from collections import defaultdict, namedtuple
 
 
 Package = namedtuple("Package", ["name", "source"])
+VersionTuple = namedtuple("VersionTuple", ["current", "latest"])
 
 
 class Pacman(object):
@@ -363,6 +364,7 @@ class Pacman(object):
             self.fail("failed to list package(s) to remove", stdout=stdout, stderr=stderr)
 
         removed_pkgs = stdout.split()
+        self.exit_params["packages"] = removed_pkgs
         self.exit_params["diff"] = {
             "before": "\n".join(removed_pkgs) + "\n",  # trailing \n to avoid diff complaints
             "after": "",
@@ -397,17 +399,22 @@ class Pacman(object):
             diff["before"] += "%s-%s\n" % (pkg, versions.current)
             diff["after"] += "%s-%s\n" % (pkg, versions.latest)
         self.exit_params["diff"] = diff
-        self.exit_params["packages"] = (self.inventory["upgradable_pkgs"].keys(),)
+        self.exit_params["packages"] = self.inventory["upgradable_pkgs"].keys()
 
         if self.m.check_mode:
             self.add_exit_infos(
                 "%d packages would have been upgraded" % (len(self.inventory["upgradable_pkgs"]))
             )
         else:
-            cmd = "%s --sync --sysupgrade --quiet --noconfirm %s" % (
+            cmd = [
                 self.pacman_path,
-                self.m.params["upgrade_extra_args"],
-            )
+                "--sync",
+                "--sys-upgrade",
+                "--quiet",
+                "--noconfirm",
+            ]
+            if self.m.params["upgrade_extra_args"]:
+                cmd += self.m.params["upgrade_extra_args"]
             rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
             if rc == 0:
                 self.add_exit_infos("System upgraded", stdout=stdout, stderr=stderr)
@@ -440,23 +447,11 @@ class Pacman(object):
         else:
             self.fail("could not update package db", stdout=stdout, stderr=stderr)
 
-    def expand_package_groups(self, pkgs):
-        expanded = []
-
-        for pkg in pkgs:
-            if not pkg:
-                continue
-            if pkg in self.inventory["available_groups"]:
-                expanded.extend(self.inventory["available_groups"][pkg])
-            else:
-                expanded.append(pkg)
-
-        return expanded
-
     def package_list(self):
-        """Resolves packages groups to their package list, and extracts package names from packages given as files or URLs
+        """Takes the input package list and resolves packages groups to their package list using the inventory,
+        extracts package names from packages given as files or URLs using calls to pacman
 
-        Returns a list of Package
+        Returns the expanded/resolved list as a list of Package
         """
         pkg_list = []
         for pkg in self.m.params["name"]:
@@ -511,12 +506,13 @@ class Pacman(object):
         Fails the module if a package requested for install cannot be found
         """
 
-        VersionTuple = namedtuple("Upgrade", ["current", "latest"])
-
         installed_pkgs = {}
         dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--query"], check_rc=True)
         # pacman 6.0.1-2
         for l in stdout.splitlines():
+            l = l.strip()
+            if not l:
+                continue
             pkg, ver = l.split()
             installed_pkgs[pkg] = ver
 
@@ -528,6 +524,9 @@ class Pacman(object):
         # base-devel findutils
         # ...
         for l in stdout.splitlines():
+            l = l.strip()
+            if not l:
+                continue
             group, pkgname = l.split()
             installed_groups[group].add(pkgname)
 
@@ -535,6 +534,9 @@ class Pacman(object):
         dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--sync", "--list"], check_rc=True)
         # core pacman 6.0.1-2
         for l in stdout.splitlines():
+            l = l.strip()
+            if not l:
+                continue
             repo, pkg, ver = l.split()[:3]
             available_pkgs[pkg] = ver
 
@@ -547,6 +549,9 @@ class Pacman(object):
         # vim-plugins vim-ale
         # ...
         for l in stdout.splitlines():
+            l = l.strip()
+            if not l:
+                continue
             group, pkg = l.split()
             available_groups[group].add(pkg)
 
@@ -562,6 +567,9 @@ class Pacman(object):
             # strace 5.14-1 -> 5.15-1
             # systemd 249.7-1 -> 249.7-2 [ignored]
             for l in stdout.splitlines():
+                l = l.strip()
+                if not l:
+                    continue
                 if "[ignored]" in l:
                     continue
                 s = l.split()
