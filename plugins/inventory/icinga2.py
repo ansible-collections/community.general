@@ -207,7 +207,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 host_name = entry.get('name')
             if self.inventory_attr == "address":
                 # When looking for address for inventory, if missing fallback to object name
-                if host_attrs.get('address') != '':
+                if host_attrs.get('address', '') != '':
                     host_name = host_attrs.get('address')
                 else:
                     host_name = entry.get('name')
