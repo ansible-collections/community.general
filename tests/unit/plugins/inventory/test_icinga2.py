@@ -37,6 +37,7 @@ def query_hosts(hosts=None, attrs=None, joins=None, host_filter=None):
             'attrs': {
                 'address': 'test-host1.home.local',
                 'groups': ['home_servers', 'servers_dell'],
+                'display_name': 'Test Host 1',
                 'state': 0.0,
                 'state_type': 1.0
             },
@@ -48,6 +49,7 @@ def query_hosts(hosts=None, attrs=None, joins=None, host_filter=None):
         {
             'attrs': {
                 'address': 'test-host2.home.local',
+                'display_name': 'Test Host 2',
                 'groups': ['home_servers', 'servers_hp'],
                 'state': 1.0,
                 'state_type': 1.0
@@ -55,6 +57,19 @@ def query_hosts(hosts=None, attrs=None, joins=None, host_filter=None):
             'joins': {},
             'meta': {},
             'name': 'test-host2',
+            'type': 'Host'
+        },
+        {
+            'attrs': {
+                'address': '',
+                'display_name': 'Test Host 3',
+                'groups': ['not_home_servers', 'servers_hp'],
+                'state': 1.0,
+                'state_type': 1.0
+            },
+            'joins': {},
+            'meta': {},
+            'name': 'test-host3.example.com',
             'type': 'Host'
         }
     ]
@@ -66,6 +81,7 @@ def test_populate(inventory, mocker):
     inventory.icinga2_user = 'ansible'
     inventory.icinga2_password = 'password'
     inventory.icinga2_url = 'https://localhost:5665' + '/v1'
+    inventory.inventory_attr = "address"
 
     # bypass authentication and API fetch calls
     inventory._check_api = mocker.MagicMock(side_effect=check_api)
@@ -77,6 +93,9 @@ def test_populate(inventory, mocker):
     print(host1_info)
     host2_info = inventory.inventory.get_host('test-host2.home.local')
     print(host2_info)
+    host3_info = inventory.inventory.get_host('test-host3.example.com')
+    assert inventory.inventory.get_host('test-host3.example.com') is not None
+    print(host3_info)
 
     # check if host in the home_servers group
     assert 'home_servers' in inventory.inventory.groups
@@ -87,11 +106,29 @@ def test_populate(inventory, mocker):
     assert group1_data.hosts == group1_test_data
     # Test servers_hp group
     group2_data = inventory.inventory.groups['servers_hp']
-    group2_test_data = [host2_info]
+    group2_test_data = [host2_info, host3_info]
     print(group2_data.hosts)
     print(group2_test_data)
     assert group2_data.hosts == group2_test_data
 
-    # check if host state rules apply properyl
+    # check if host state rules apply properly
     assert host1_info.get_vars()['state'] == 'on'
+    assert host1_info.get_vars()['display_name'] == "Test Host 1"
     assert host2_info.get_vars()['state'] == 'off'
+    assert host3_info.get_vars().get('ansible_host') is None
+
+    # Confirm attribute options switcher
+    inventory.inventory_attr = "name"
+    inventory._populate()
+    assert inventory.inventory.get_host('test-host3.example.com') is not None
+    host2_info = inventory.inventory.get_host('test-host2')
+    assert host2_info is not None
+    assert host2_info.get_vars().get('ansible_host') == 'test-host2.home.local'
+
+    # Confirm attribute options switcher
+    inventory.inventory_attr = "display_name"
+    inventory._populate()
+    assert inventory.inventory.get_host('Test Host 3') is not None
+    host2_info = inventory.inventory.get_host('Test Host 2')
+    assert host2_info is not None
+    assert host2_info.get_vars().get('ansible_host') == 'test-host2.home.local'
