@@ -50,7 +50,7 @@ valid_inventory_data = {
         "sqlite": "3.36.0-1",
     },
     "installed_groups": {
-        "base-devel": {"gawk", "grep", "file", "findutils", "pacman", "sed", "gzip", "gettext"}
+        "base-devel": set(["gawk", "grep", "file", "findutils", "pacman", "sed", "gzip", "gettext"])
     },
     "available_pkgs": {
         "acl": "2.3.1-1",
@@ -151,7 +151,7 @@ class TestPacman:
         with pytest.raises(AnsibleFailJson) as e:
             P.fail(**args)
 
-        assert all([item in e.value.args[0] for item in args])
+        assert all(item in e.value.args[0] for item in args)
 
     def test_build_inventory(self):
         self.mock_run_command.side_effect = [
@@ -286,7 +286,9 @@ class TestPacman:
         ],
     )
     def test_update_db(self, empty_inventory, module_args, expected_call):
-        set_module_args({"update_cache": True, **module_args})
+        args = {"update_cache": True}
+        args.update(module_args)
+        set_module_args(args)
 
         self.mock_run_command.return_value = [0, "stdout", "stderr"]
         with pytest.raises(AnsibleExitJson) as e:
@@ -466,7 +468,7 @@ class TestPacman:
                 [],
                 {
                     "calls": [
-                        mock.ANY,  #  args already tested above
+                        mock.ANY,  # args already tested above
                         mock.ANY,
                     ],
                     "side_effect": [(1, "", "nope"), (1, "", "stillnope")],
