@@ -200,14 +200,14 @@ class Pacman(object):
         self.m.run_command_environ_update = dict(LC_ALL="C")
         p = self.m.params
 
-        self.pacman_path = self.m.get_bin_path(p["executable"], True)
-        self.inventory = self._build_inventory()
-
         self._msgs = []
         self._stdouts = []
         self._stderrs = []
         self.changed = False
         self.exit_params = {}
+
+        self.pacman_path = self.m.get_bin_path(p["executable"], True)
+        self.inventory = self._build_inventory()
 
         # Normalize for old configs
         if p["state"] == "installed":
@@ -560,8 +560,9 @@ class Pacman(object):
             [self.pacman_path, "--query", "--upgrades"], check_rc=False
         )
 
-        # non-zero exit with nothing in stdout && stderr = nothing to upgrade, all good
-        if rc == 1 and stderr == "" and stdout == "":
+        # non-zero exit with nothing in stdou= nothing to upgrade, all good
+        # stderr can have warnings, so not checked here
+        if rc == 1 and stdout == "":
             pass  # nothing to upgrade
         elif rc == 0:
             # strace 5.14-1 -> 5.15-1
@@ -581,8 +582,9 @@ class Pacman(object):
                 latest = s[3]
                 upgradable_pkgs[pkg] = VersionTuple(current=current, latest=latest)
         else:
-            self.m.fail(
-                "Couldn't get list of packages to upgrade",
+            # stuff in stdout but rc!=0, abort
+            self.fail(
+                "Couldn't get list of packages available for upgrade",
                 stdout=stdout,
                 stderr=stderr,
                 rc=rc,

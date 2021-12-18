@@ -23,7 +23,6 @@ from ansible_collections.community.general.plugins.modules.packaging.os.pacman i
     Package,
     VersionTuple,
 )
-from collections import defaultdict
 
 import pytest
 import json
@@ -34,8 +33,8 @@ def get_bin_path(self, arg, required=False):
     return arg
 
 
-# This inventory data is tightly coupled with the inventory test and the valid_inventory fixture
-valid_inventory_data = {
+# This inventory data is tightly coupled with the inventory test and the mock_valid_inventory fixture
+valid_inventory = {
     "installed_pkgs": {
         "file": "5.41-1",
         "filesystem": "2021.11.11-1",
@@ -103,6 +102,14 @@ valid_inventory_data = {
     },
 }
 
+empty_inventory = {
+    "installed_pkgs": {},
+    "available_pkgs": {},
+    "installed_groups": {},
+    "available_groups": {},
+    "upgradable_pkgs": {},
+}
+
 
 class TestPacman:
     @pytest.fixture(autouse=True)
@@ -123,13 +130,13 @@ class TestPacman:
         )
 
     @pytest.fixture
-    def empty_inventory(self, mocker):
-        inv = defaultdict(dict)
+    def mock_empty_inventory(self, mocker):
+        inv = empty_inventory
         return mocker.patch.object(pacman.Pacman, "_build_inventory", return_value=inv)
 
     @pytest.fixture
-    def valid_inventory(self, mocker):
-        return mocker.patch.object(pacman.Pacman, "_build_inventory", return_value=valid_inventory_data)
+    def mock_valid_inventory(self, mocker):
+        return mocker.patch.object(pacman.Pacman, "_build_inventory", return_value=valid_inventory)
 
     def test_fail_without_required_args(self):
         with pytest.raises(AnsibleFailJson) as e:
@@ -137,13 +144,13 @@ class TestPacman:
             pacman.main()
         assert "one of the following is required" in str(e)
 
-    def test_success(self, empty_inventory):
+    def test_success(self, mock_empty_inventory):
         set_module_args({"update_cache": True})  # Simplest args to let init go through
         P = pacman.Pacman(pacman.setup_module())
         with pytest.raises(AnsibleExitJson) as e:
             P.success()
 
-    def test_fail(self, empty_inventory):
+    def test_fail(self, mock_empty_inventory):
         set_module_args({"update_cache": True})
         P = pacman.Pacman(pacman.setup_module())
 
@@ -155,11 +162,16 @@ class TestPacman:
 
         assert all(item in e.value.args[0] for item in args)
 
-    def test_build_inventory(self):
-        self.mock_run_command.side_effect = [
-            [  # pacman --query
-                0,
-                """file 5.41-1
+    @pytest.mark.parametrize(
+        "expected, run_command_side_effect, raises",
+        [
+            (
+                # Regular run
+                valid_inventory,
+                [
+                    [  # pacman --query
+                        0,
+                        """file 5.41-1
                 filesystem 2021.11.11-1
                 findutils 4.8.0-1
                 gawk 5.1.1-1
@@ -171,11 +183,11 @@ class TestPacman:
                 sed 4.8-1
                 sqlite 3.36.0-1
                 """,
-                "",
-            ],
-            (  # pacman --query --group
-                0,
-                """base-devel file
+                        "",
+                    ],
+                    (  # pacman --query --group
+                        0,
+                        """base-devel file
                 base-devel findutils
                 base-devel gawk
                 base-devel gettext
@@ -184,11 +196,11 @@ class TestPacman:
                 base-devel pacman
                 base-devel sed
                 """,
-                "",
-            ),
-            (  # pacman --sync --list
-                0,
-                """core acl 2.3.1-1 [installed]
+                        "",
+                    ),
+                    (  # pacman --sync --list
+                        0,
+                        """core acl 2.3.1-1 [installed]
                 core amd-ucode 20211027.1d00989-1
                 core archlinux-keyring 20211028-1 [installed]
                 core argon2 20190702-3 [installed]
@@ -202,11 +214,11 @@ class TestPacman:
                 core sqlite 3.37.0-1 [installed: 3.36.0-1]
                 code sudo 1.9.8.p2-3
                 """,
-                "",
-            ),
-            (  # pacman --sync --group --group
-                0,
-                """base-devel autoconf
+                        "",
+                    ),
+                    (  # pacman --sync --group --group
+                        0,
+                        """base-devel autoconf
                 base-devel automake
                 base-devel binutils
                 base-devel bison
@@ -234,24 +246,66 @@ class TestPacman:
                 some-group sudo
                 some-group binutils
                 """,
-                "",
-            ),
-            (  # pacman --query --upgrades
-                0,
-                """sqlite 3.36.0-1 -> 3.37.0-1
+                        "",
+                    ),
+                    (  # pacman --query --upgrades
+                        0,
+                        """sqlite 3.36.0-1 -> 3.37.0-1
                 systemd 249.6-3 -> 249.7-2 [ignored]
                 """,
-                "",
+                        "",
+                    ),
+                ],
+                None,
             ),
-        ]
+            (
+                # All good, but call to --query --upgrades return 1. aka nothing to upgrade
+                # with a pacman warning
+                empty_inventory,
+                [
+                    (0, "", ""),
+                    (0, "", ""),
+                    (0, "", ""),
+                    (0, "", ""),
+                    (
+                        1,
+                        "",
+                        "warning: config file /etc/pacman.conf, line 34: directive 'TotalDownload' in section 'options' not recognized.",
+                    ),
+                ],
+                None,
+            ),
+            (
+                # failure
+                empty_inventory,
+                [
+                    (0, "", ""),
+                    (0, "", ""),
+                    (0, "", ""),
+                    (0, "", ""),
+                    (
+                        1,
+                        "partial\npkg\\nlist",
+                        "some warning",
+                    ),
+                ],
+                AnsibleFailJson,
+            ),
+        ],
+    )
+    def test_build_inventory(self, expected, run_command_side_effect, raises):
+        self.mock_run_command.side_effect = run_command_side_effect
 
         set_module_args({"update_cache": True})
-        P = pacman.Pacman(pacman.setup_module())
-
-        assert P.inventory == valid_inventory_data
+        if raises:
+            with pytest.raises(raises):
+                P = pacman.Pacman(pacman.setup_module())
+        else:
+            P = pacman.Pacman(pacman.setup_module())
+            assert P.inventory == expected
 
     @pytest.mark.parametrize("check_mode_value", [True, False])
-    def test_upgrade_check_empty_inventory(self, empty_inventory, check_mode_value):
+    def test_upgrade_check_empty_inventory(self, mock_empty_inventory, check_mode_value):
         set_module_args({"upgrade": True, "_ansible_check_mode": check_mode_value})
         P = pacman.Pacman(pacman.setup_module())
         with pytest.raises(AnsibleExitJson) as e:
@@ -262,7 +316,7 @@ class TestPacman:
         assert not out["changed"]
         assert "diff" not in out
 
-    def test_update_db_check(self, empty_inventory):
+    def test_update_db_check(self, mock_empty_inventory):
         set_module_args({"update_cache": True, "_ansible_check_mode": True})
         P = pacman.Pacman(pacman.setup_module())
 
@@ -287,7 +341,7 @@ class TestPacman:
             ),
         ],
     )
-    def test_update_db(self, empty_inventory, module_args, expected_call):
+    def test_update_db(self, mock_empty_inventory, module_args, expected_call):
         args = {"update_cache": True}
         args.update(module_args)
         set_module_args(args)
@@ -334,7 +388,7 @@ class TestPacman:
             ),
         ],
     )
-    def test_upgrade(self, valid_inventory, check_mode_value, run_command_data, upgrade_extra_args):
+    def test_upgrade(self, mock_valid_inventory, check_mode_value, run_command_data, upgrade_extra_args):
         args = {"upgrade": True, "_ansible_check_mode": check_mode_value}
         if upgrade_extra_args:
             args["upgrade_extra_args"] = upgrade_extra_args
@@ -361,7 +415,7 @@ class TestPacman:
         assert out["changed"]
         assert out["diff"]["before"] and out["diff"]["after"]
 
-    def test_upgrade_fail(self, valid_inventory):
+    def test_upgrade_fail(self, mock_valid_inventory):
         set_module_args({"upgrade": True})
         self.mock_run_command.return_value = [1, "stdout", "stderr"]
         P = pacman.Pacman(pacman.setup_module())
@@ -479,7 +533,9 @@ class TestPacman:
             ),
         ],
     )
-    def test_package_list(self, valid_inventory, state, pkg_names, expected, run_command_data, raises):
+    def test_package_list(
+        self, mock_valid_inventory, state, pkg_names, expected, run_command_data, raises
+    ):
         set_module_args({"name": pkg_names, "state": state})
         P = pacman.Pacman(pacman.setup_module())
         if run_command_data:
@@ -502,7 +558,7 @@ class TestPacman:
         ],
     )
     def test_op_packages_nothing_to_do(
-        self, valid_inventory, mock_package_list, check_mode_value, name, state, package_list
+        self, mock_valid_inventory, mock_package_list, check_mode_value, name, state, package_list
     ):
         set_module_args({"name": name, "state": state, "_ansible_check_mode": check_mode_value})
         mock_package_list.return_value = package_list
@@ -829,7 +885,7 @@ class TestPacman:
     )
     def test_op_packages(
         self,
-        valid_inventory,
+        mock_valid_inventory,
         module_args,
         expected_packages,
         run_command_data,
