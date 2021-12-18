@@ -560,7 +560,7 @@ class Pacman(object):
             [self.pacman_path, "--query", "--upgrades"], check_rc=False
         )
 
-        # non-zero exit with nothing in stdou= nothing to upgrade, all good
+        # non-zero exit with nothing in stdout -> nothing to upgrade, all good
         # stderr can have warnings, so not checked here
         if rc == 1 and stdout == "":
             pass  # nothing to upgrade
