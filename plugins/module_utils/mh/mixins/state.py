@@ -39,8 +39,6 @@ class StateMixin(object):
         except AttributeError:
             func = self.__state_fallback__
         return func()
-        if self.state_param is None:
-            return self.default_state_param
 
     def __state_fallback__(self):
         raise ValueError("Cannot find method: {0}".format(self._method(self._state_value)))
