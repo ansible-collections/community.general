@@ -128,7 +128,7 @@ RETURN = '''
 '''
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    ModuleHelper, CmdMixin, StateMixin, ArgFormat, ModuleHelperException
+    CmdStateModuleHelper, ArgFormat, ModuleHelperException
 )
 
 
@@ -151,7 +151,7 @@ class XFConfException(Exception):
     pass
 
 
-class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
+class XFConfProperty(CmdStateModuleHelper):
     change_params = 'value',
     diff_params = 'value',
     output_params = ('property', 'channel', 'value')
