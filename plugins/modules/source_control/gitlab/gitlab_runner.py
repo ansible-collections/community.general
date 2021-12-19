@@ -31,22 +31,12 @@ author:
 requirements:
   - python >= 2.7
   - python-gitlab >= 1.5.0
+  - requests (python library https://github.com/psf/requests)
 extends_documentation_fragment:
-- community.general.auth_basic
+  - community.general.auth_basic
+  - community.general.gitlab
 
 options:
-  api_token:
-    description:
-      - Your private token to interact with the GitLab API.
-    type: str
-  api_oauth_token:
-    description:
-      - GitLab OAuth token for logging in.
-    type: str
-  api_job_token:
-    description:
-      - GitLab CI job token for logging in.
-    type: str
   project:
     description:
       - ID or full path of the project in the form of group/name.
@@ -194,7 +184,7 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
 
 try:
     cmp
@@ -331,10 +321,8 @@ class GitLabRunner(object):
 
 def main():
     argument_spec = basic_auth_argument_spec()
+    argument_spec.update(auth_argument_spec())
     argument_spec.update(dict(
-        api_token=dict(type='str', no_log=True),
-        api_oauth_token=dict(type='str', no_log=True),
-        api_job_token=dict(type='str', no_log=True),
         description=dict(type='str', required=True, aliases=["name"]),
         active=dict(type='bool', default=True),
         owned=dict(type='bool', default=False),
@@ -352,11 +340,8 @@ def main():
         argument_spec=argument_spec,
         mutually_exclusive=[
             ['api_username', 'api_token'],
-            ['api_password', 'api_token'],
             ['api_username', 'api_oauth_token'],
-            ['api_password', 'api_oauth_token'],
             ['api_username', 'api_job_token'],
-            ['api_password', 'api_job_token'],
             ['api_token', 'api_oauth_token'],
             ['api_token', 'api_job_token'],
         ],

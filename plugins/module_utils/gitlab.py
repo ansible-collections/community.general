@@ -30,6 +30,17 @@ except Exception:
     HAS_GITLAB_PACKAGE = False
 
 
+def auth_argument_spec(spec=None):
+    arg_spec = (dict(
+        api_token=dict(type='str', no_log=True),
+        api_oauth_token=dict(type='str', no_log=True),
+        api_job_token=dict(type='str', no_log=True),
+    ))
+    if spec:
+        arg_spec.update(spec)
+    return arg_spec
+
+
 def find_project(gitlab_instance, identifier):
     try:
         project = gitlab_instance.projects.get(identifier)

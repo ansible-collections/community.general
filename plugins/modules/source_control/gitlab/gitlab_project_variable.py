@@ -19,8 +19,10 @@ author:
 requirements:
   - python >= 2.7
   - python-gitlab python module
+  - requests (python library https://github.com/psf/requests)
 extends_documentation_fragment:
-- community.general.auth_basic
+  - community.general.auth_basic
+  - community.general.gitlab
 
 options:
   state:
@@ -30,18 +32,6 @@ options:
     default: present
     type: str
     choices: ["present", "absent"]
-  api_token:
-    description:
-      - GitLab access token with API permissions.
-    type: str
-  api_oauth_token:
-    description:
-      - GitLab OAuth token for logging in.
-    type: str
-  api_job_token:
-    description:
-      - GitLab CI job token for logging in.
-    type: str
   project:
     description:
       - The path and name of the project.
@@ -150,7 +140,7 @@ except Exception:
     GITLAB_IMP_ERR = traceback.format_exc()
     HAS_GITLAB_PACKAGE = False
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
 
 
 class GitlabProjectVariables(object):
@@ -277,10 +267,8 @@ def native_python_main(this_gitlab, purge, var_list, state, module):
 
 def main():
     argument_spec = basic_auth_argument_spec()
+    argument_spec.update(auth_argument_spec())
     argument_spec.update(
-        api_token=dict(type='str', no_log=True),
-        api_oauth_token=dict(type='str', no_log=True),
-        api_job_token=dict(type='str', no_log=True),
         project=dict(type='str', required=True),
         purge=dict(type='bool', required=False, default=False),
         vars=dict(type='dict', required=False, default=dict(), no_log=True),
@@ -291,11 +279,8 @@ def main():
         argument_spec=argument_spec,
         mutually_exclusive=[
             ['api_username', 'api_token'],
-            ['api_password', 'api_token'],
             ['api_username', 'api_oauth_token'],
-            ['api_password', 'api_oauth_token'],
             ['api_username', 'api_job_token'],
-            ['api_password', 'api_job_token'],
             ['api_token', 'api_oauth_token'],
             ['api_token', 'api_job_token'],
         ],
