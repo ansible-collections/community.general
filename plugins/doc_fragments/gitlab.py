@@ -10,6 +10,9 @@ class ModuleDocFragment(object):
 
     # Standard files documentation fragment
     DOCUMENTATION = r'''
+requirements:
+  - requests (python library https://github.com/psf/requests)
+
 options:
   api_token:
     description:
@@ -19,8 +22,10 @@ options:
     description:
       - GitLab OAuth token for logging in.
     type: str
+    version_added: 4.2.0
   api_job_token:
     description:
       - GitLab CI job token for logging in.
     type: str
+    version_added: 4.2.0
 '''

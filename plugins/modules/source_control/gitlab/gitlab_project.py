@@ -22,7 +22,6 @@ author:
 requirements:
   - python >= 2.7
   - python-gitlab python module
-  - requests (python library https://github.com/psf/requests)
 extends_documentation_fragment:
   - community.general.auth_basic
   - community.general.gitlab
@@ -310,11 +309,10 @@ class GitLabProject(object):
             project = self.create_project(namespace, project_options)
 
             # add avatar to project
-            if options['avatar_path']:
-                try:
-                    project.avatar = open(options['avatar_path'], 'rb')
-                except IOError as e:
-                    self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
+            try:
+                project.avatar = open(options['avatar_path'], 'rb')
+            except IOError as e:
+                self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
 
             changed = True
         else:

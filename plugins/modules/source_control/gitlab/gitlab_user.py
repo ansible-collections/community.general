@@ -28,7 +28,6 @@ author:
 requirements:
   - python >= 2.7
   - python-gitlab python module
-  - requests (python library https://github.com/psf/requests)
   - administrator rights on the GitLab server
 extends_documentation_fragment:
   - community.general.auth_basic

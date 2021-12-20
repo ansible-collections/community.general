@@ -31,7 +31,6 @@ author:
 requirements:
   - python >= 2.7
   - python-gitlab >= 1.5.0
-  - requests (python library https://github.com/psf/requests)
 extends_documentation_fragment:
   - community.general.auth_basic
   - community.general.gitlab

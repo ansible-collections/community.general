@@ -20,7 +20,6 @@ author:
   - Zainab Alsaffar (@zanssa)
 requirements:
   - python-gitlab python module <= 1.15.0
-  - requests (python library https://github.com/psf/requests)
   - owner or maintainer rights to project on the GitLab server
 extends_documentation_fragment:
   - community.general.auth_basic
