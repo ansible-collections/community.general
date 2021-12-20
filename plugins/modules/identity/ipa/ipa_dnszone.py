@@ -165,7 +165,7 @@ def ensure(module, client):
     # state is absent
     else:
         # check for generic zone existence
-        if client.dnszone_find(zone_name): 
+        if client.dnszone_find(zone_name):
             changed = True
             if not module.check_mode:
                 client.dnszone_del(zone_name=zone_name)
