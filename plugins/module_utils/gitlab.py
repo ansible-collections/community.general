@@ -7,27 +7,38 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-import json
 from distutils.version import StrictVersion
 
 from ansible.module_utils.basic import missing_required_lib
-from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_native
 
 try:
     from urllib import quote_plus  # Python 2.X
+    from urlparse import urljoin
 except ImportError:
-    from urllib.parse import quote_plus  # Python 3+
+    from urllib.parse import quote_plus, urljoin  # Python 3+
 
 import traceback
 
 GITLAB_IMP_ERR = None
 try:
     import gitlab
+    import requests
     HAS_GITLAB_PACKAGE = True
 except Exception:
     GITLAB_IMP_ERR = traceback.format_exc()
     HAS_GITLAB_PACKAGE = False
+
+
+def auth_argument_spec(spec=None):
+    arg_spec = (dict(
+        api_token=dict(type='str', no_log=True),
+        api_oauth_token=dict(type='str', no_log=True),
+        api_job_token=dict(type='str', no_log=True),
+    ))
+    if spec:
+        arg_spec.update(spec)
+    return arg_spec
 
 
 def find_project(gitlab_instance, identifier):
@@ -58,6 +69,8 @@ def gitlab_authentication(module):
     gitlab_user = module.params['api_username']
     gitlab_password = module.params['api_password']
     gitlab_token = module.params['api_token']
+    gitlab_oauth_token = module.params['api_oauth_token']
+    gitlab_job_token = module.params['api_job_token']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -70,7 +83,16 @@ def gitlab_authentication(module):
             gitlab_instance = gitlab.Gitlab(url=gitlab_url, ssl_verify=validate_certs, email=gitlab_user, password=gitlab_password,
                                             private_token=gitlab_token, api_version=4)
         else:
-            gitlab_instance = gitlab.Gitlab(url=gitlab_url, ssl_verify=validate_certs, private_token=gitlab_token, api_version=4)
+            # We can create an oauth_token using a username and password
+            # https://docs.gitlab.com/ee/api/oauth2.html#authorization-code-flow
+            if gitlab_user:
+                data = {'grant_type': 'password', 'username': gitlab_user, 'password': gitlab_password}
+                resp = requests.post(urljoin(gitlab_url, "oauth/token"), data=data, verify=validate_certs)
+                resp_data = resp.json()
+                gitlab_oauth_token = resp_data["access_token"]
+
+            gitlab_instance = gitlab.Gitlab(url=gitlab_url, ssl_verify=validate_certs, private_token=gitlab_token,
+                                            oauth_token=gitlab_oauth_token, job_token=gitlab_job_token, api_version=4)
 
         gitlab_instance.auth()
     except (gitlab.exceptions.GitlabAuthenticationError, gitlab.exceptions.GitlabGetError) as e:
