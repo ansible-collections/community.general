@@ -14,95 +14,75 @@ module: gitlab_project_members
 short_description: Manage project members on GitLab Server
 version_added: 2.2.0
 description:
-    - This module allows to add and remove members to/from a project, or change a member's access level in a project on GitLab.
+  - This module allows to add and remove members to/from a project, or change a member's access level in a project on GitLab.
 author:
-    - Sergey Mikhaltsov (@metanovii)
-    - Zainab Alsaffar (@zanssa)
+  - Sergey Mikhaltsov (@metanovii)
+  - Zainab Alsaffar (@zanssa)
 requirements:
-    - python-gitlab python module <= 1.15.0
-    - owner or maintainer rights to project on the GitLab server
+  - python-gitlab python module <= 1.15.0
+  - owner or maintainer rights to project on the GitLab server
+extends_documentation_fragment:
+  - community.general.auth_basic
+  - community.general.gitlab
+
 options:
-    api_token:
-        description:
-            - A personal access token to authenticate with the GitLab API.
+  project:
+    description:
+      - The name (or full path) of the GitLab project the member is added to/removed from.
+    required: true
+    type: str
+  gitlab_user:
+    description:
+      - A username or a list of usernames to add to/remove from the GitLab project.
+      - Mutually exclusive with I(gitlab_users_access).
+    type: list
+    elements: str
+  access_level:
+    description:
+      - The access level for the user.
+      - Required if I(state=present), user state is set to present.
+    type: str
+    choices: ['guest', 'reporter', 'developer', 'maintainer']
+  gitlab_users_access:
+    description:
+      - Provide a list of user to access level mappings.
+      - Every dictionary in this list specifies a user (by username) and the access level the user should have.
+      - Mutually exclusive with I(gitlab_user) and I(access_level).
+      - Use together with I(purge_users) to remove all users not specified here from the project.
+    type: list
+    elements: dict
+    suboptions:
+      name:
+        description: A username or a list of usernames to add to/remove from the GitLab project.
+        type: str
         required: true
-        type: str
-    validate_certs:
+      access_level:
         description:
-            - Whether or not to validate TLS/SSL certificates when supplying a HTTPS endpoint.
-            - Should only be set to C(false) if you can guarantee that you are talking to the correct server
-              and no man-in-the-middle attack can happen.
-        default: true
-        type: bool
-    api_username:
-        description:
-            - The username to use for authentication against the API.
-        type: str
-    api_password:
-        description:
-            - The password to use for authentication against the API.
-        type: str
-    api_url:
-        description:
-            - The resolvable endpoint for the API.
-        type: str
-    project:
-        description:
-            - The name (or full path) of the GitLab project the member is added to/removed from.
-        required: true
-        type: str
-    gitlab_user:
-        description:
-            - A username or a list of usernames to add to/remove from the GitLab project.
-            - Mutually exclusive with I(gitlab_users_access).
-        type: list
-        elements: str
-    access_level:
-        description:
-            - The access level for the user.
-            - Required if I(state=present), user state is set to present.
+          - The access level for the user.
+          - Required if I(state=present), user state is set to present.
         type: str
         choices: ['guest', 'reporter', 'developer', 'maintainer']
-    gitlab_users_access:
-        description:
-            - Provide a list of user to access level mappings.
-            - Every dictionary in this list specifies a user (by username) and the access level the user should have.
-            - Mutually exclusive with I(gitlab_user) and I(access_level).
-            - Use together with I(purge_users) to remove all users not specified here from the project.
-        type: list
-        elements: dict
-        suboptions:
-            name:
-                description: A username or a list of usernames to add to/remove from the GitLab project.
-                type: str
-                required: true
-            access_level:
-                description:
-                    - The access level for the user.
-                    - Required if I(state=present), user state is set to present.
-                type: str
-                choices: ['guest', 'reporter', 'developer', 'maintainer']
-                required: true
-        version_added: 3.7.0
-    state:
-        description:
-            - State of the member in the project.
-            - On C(present), it adds a user to a GitLab project.
-            - On C(absent), it removes a user from a GitLab project.
-        choices: ['present', 'absent']
-        default: 'present'
-        type: str
-    purge_users:
-        description:
-            - Adds/remove users of the given access_level to match the given I(gitlab_user)/I(gitlab_users_access) list.
-              If omitted do not purge orphaned members.
-            - Is only used when I(state=present).
-        type: list
-        elements: str
-        choices: ['guest', 'reporter', 'developer', 'maintainer']
-        version_added: 3.7.0
+        required: true
+    version_added: 3.7.0
+  state:
+    description:
+      - State of the member in the project.
+      - On C(present), it adds a user to a GitLab project.
+      - On C(absent), it removes a user from a GitLab project.
+    choices: ['present', 'absent']
+    default: 'present'
+    type: str
+  purge_users:
+    description:
+      - Adds/remove users of the given access_level to match the given I(gitlab_user)/I(gitlab_users_access) list.
+        If omitted do not purge orphaned members.
+      - Is only used when I(state=present).
+    type: list
+    elements: str
+    choices: ['guest', 'reporter', 'developer', 'maintainer']
+    version_added: 3.7.0
 notes:
-    - Supports C(check_mode).
+  - Supports C(check_mode).
 '''
 
 EXAMPLES = r'''
@@ -176,7 +156,7 @@ RETURN = r''' # '''
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
 
 import traceback
 
@@ -257,8 +237,8 @@ class GitLabProjectMembers(object):
 
 def main():
     argument_spec = basic_auth_argument_spec()
+    argument_spec.update(auth_argument_spec())
     argument_spec.update(dict(
-        api_token=dict(type='str', required=True, no_log=True),
         project=dict(type='str', required=True),
         gitlab_user=dict(type='list', elements='str'),
         state=dict(type='str', default='present', choices=['present', 'absent']),
@@ -280,7 +260,10 @@ def main():
         argument_spec=argument_spec,
         mutually_exclusive=[
             ['api_username', 'api_token'],
-            ['api_password', 'api_token'],
+            ['api_username', 'api_oauth_token'],
+            ['api_username', 'api_job_token'],
+            ['api_token', 'api_oauth_token'],
+            ['api_token', 'api_job_token'],
             ['gitlab_user', 'gitlab_users_access'],
             ['access_level', 'gitlab_users_access'],
         ],
@@ -289,7 +272,7 @@ def main():
             ['gitlab_user', 'access_level'],
         ],
         required_one_of=[
-            ['api_username', 'api_token'],
+            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token'],
             ['gitlab_user', 'gitlab_users_access'],
         ],
         required_if=[
