@@ -299,10 +299,11 @@ class GitLabProject(object):
             project = self.create_project(namespace, project_options)
 
             # add avatar to project
-            try:
-                project.avatar = open(options['avatar_path'], 'rb')
-            except IOError as e:
-                self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
+            if options['avatar_path']:
+                try:
+                    project.avatar = open(options['avatar_path'], 'rb')
+                except IOError as e:
+                    self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
 
             changed = True
         else:
