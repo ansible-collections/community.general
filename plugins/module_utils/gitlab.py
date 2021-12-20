@@ -87,7 +87,7 @@ def gitlab_authentication(module):
             # https://docs.gitlab.com/ee/api/oauth2.html#authorization-code-flow
             if gitlab_user:
                 data = {'grant_type': 'password', 'username': gitlab_user, 'password': gitlab_password}
-                resp = requests.post(urljoin(gitlab_url, "oauth/token"), data=data)
+                resp = requests.post(urljoin(gitlab_url, "oauth/token"), data=data, verify=validate_certs)
                 resp_data = resp.json()
                 gitlab_oauth_token = resp_data["access_token"]
 
