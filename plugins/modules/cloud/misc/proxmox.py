@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: proxmox
-short_description: management of instances in Proxmox VE cluster
+short_description: management of container instances in Proxmox VE cluster
 description:
   - allows you to create/delete/stop instances in Proxmox VE cluster
   - Starting in Ansible 2.1, it automatically detects containerization type (lxc for PVE 4, openvz for older)
@@ -167,6 +167,13 @@ options:
       - compatibility
       - no_defaults
     version_added: "1.3.0"
+  clone:
+    description:
+      - ID of the container to be cloned.
+      - I(description), I(hostname), and I(pool) will be copied from the cloned container if not specified.
+      - If I(storage) is not set, a linked clone is created when cloning a template, or a full clone is created when cloning a normal container.
+        If I(storage) is set, a full clone will always be made.
+    type: int
 author: Sergei Antipov (@UnderGreen)
 extends_documentation_fragment:
   - community.general.proxmox.documentation
@@ -292,6 +299,17 @@ EXAMPLES = r'''
      - nesting=1
      - mount=cifs,nfs
 
+- name: >
+    Create a linked clone of the container with id 100. The newly created container with be a
+    linked clone if container 100 is a template, and a full clone if not.
+  community.general.proxmox:
+    vmid: 201
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    clone: 100
+    hostname: clone.example.org
 
 - name: Start container
   community.general.proxmox:
@@ -418,7 +436,17 @@ def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, sw
         kwargs['cpus'] = cpus
         kwargs['disk'] = disk
 
-    taskid = getattr(proxmox_node, VZ_TYPE).create(vmid=vmid, storage=storage, memory=memory, swap=swap, **kwargs)
+    if kwargs['clone'] is not None:
+        # Only accept parameters that are compatible with the clone endpoint
+        valid_clone_parameters = ['hostname', 'pool', 'storage']
+        clone_parameters = {}
+        for param in valid_clone_parameters:
+            if module.params[param] is not None:
+                clone_parameters[param] = module.params[param]
+
+        taskid = getattr(proxmox_node, VZ_TYPE).clone(vmid=kwargs['clone'], newid=vmid, **clone_parameters)
+    else:
+        taskid = getattr(proxmox_node, VZ_TYPE).create(vmid=vmid, storage=storage, memory=memory, swap=swap, **kwargs)
 
     while timeout:
         if (proxmox_node.tasks(taskid).status.get()['status'] == 'stopped' and
@@ -519,6 +547,7 @@ def main():
             description=dict(type='str'),
             hookscript=dict(type='str'),
             proxmox_default_behavior=dict(type='str', default='no_defaults', choices=['compatibility', 'no_defaults']),
+            clone=dict(type='int'),
         ),
         required_if=[('state', 'present', ['node', 'hostname', 'ostemplate'])],
         required_together=[('api_token_id', 'api_token_secret')],
@@ -618,7 +647,8 @@ def main():
                             features=",".join(module.params['features']) if module.params['features'] is not None else None,
                             unprivileged=ansible_to_proxmox_bool(module.params['unprivileged']),
                             description=module.params['description'],
-                            hookscript=module.params['hookscript'])
+                            hookscript=module.params['hookscript'],
+                            clone=module.params['clone'])
 
             module.exit_json(changed=True, msg="deployed VM %s from template %s" % (vmid, module.params['ostemplate']))
         except Exception as e:
