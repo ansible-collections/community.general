@@ -1,0 +1,2 @@
+bugfixes:
+  - gitlab - gitlab_project needs to check for avatar_path before trying to open (https://github.com/ansible-collections/community.general/issues/3926).
