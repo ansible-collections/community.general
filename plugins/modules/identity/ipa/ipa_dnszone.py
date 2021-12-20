@@ -35,6 +35,8 @@ options:
   allowsyncptr:
     description: Allow synchronization of forward and reverse records in the zone.
     required: false
+    default: false
+    choices: [false, true]
     type: bool
 extends_documentation_fragment:
 - community.general.ipa.documentation
@@ -57,14 +59,6 @@ EXAMPLES = r'''
     zone_name: example.com
     dynamicupdate: true
 
-- name: Ensure dns zone is present and is allowing sync
-  community.general.ipa_dnszone:
-    ipa_host: spider.example.com
-    ipa_pass: Passw0rd!
-    state: present
-    zone_name: example.com
-    allowsyncptr: true
-
 - name: Ensure that dns zone is removed
   community.general.ipa_dnszone:
     zone_name: example.com
@@ -72,6 +66,14 @@ EXAMPLES = r'''
     ipa_user: admin
     ipa_pass: topsecret
     state: absent
+
+- name: Ensure dns zone is present and is allowing sync
+  community.general.ipa_dnszone:
+    ipa_host: spider.example.com
+    ipa_pass: Passw0rd!
+    state: present
+    zone_name: example.com
+    allowsyncptr: true
 '''
 
 RETURN = r'''
@@ -112,6 +114,17 @@ class DNSZoneIPAClient(IPAClient):
             item=itens
         )
 
+    def dnszone_mod(self, zone_name=None, details=None):
+        itens = {}
+        if details is not None:
+            itens.update(details)
+
+        return self._post_json(
+            method='dnszone_mod',
+            name=zone_name,
+            item=itens
+        )
+
     def dnszone_del(self, zone_name=None, record_name=None, details=None):
         return self._post_json(
             method='dnszone_del', name=zone_name, item={})
@@ -122,19 +135,29 @@ def ensure(module, client):
     state = module.params['state']
     dynamicupdate = module.params['dynamicupdate']
     allowsyncptr = module.params['allowsyncptr']
-
-    ipa_dnszone = client.dnszone_find(zone_name)
-
     changed = False
+
+    # does zone exist with all config params
+    ipa_dnszone = client.dnszone_find(zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
+
     if state == 'present':
         if not ipa_dnszone:
-            changed = True
-            if not module.check_mode:
-                client.dnszone_add(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
+
+            # check for generic zone existence
+            if client.dnszone_find(zone_name):
+                if not module.check_mode:
+                    changed = True
+                    client.dnszone_mod(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
+            else:
+                changed = True
+                if not module.check_mode:
+                    client.dnszone_add(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
         else:
             changed = False
+    # state is absent
     else:
-        if ipa_dnszone:
+        # check for generic zone existence
+        if client.dnszone_find(zone_name): 
             changed = True
             if not module.check_mode:
                 client.dnszone_del(zone_name=zone_name)
@@ -147,7 +170,7 @@ def main():
     argument_spec.update(zone_name=dict(type='str', required=True),
                          state=dict(type='str', default='present', choices=['present', 'absent']),
                          dynamicupdate=dict(type='str', required=False, default='false', choices=['true', 'false']),
-                         allowsyncptr=dict(type='bool', required=False),
+                         allowsyncptr=dict(type='bool', required=False, default=False, choices=[True, False]),
                          )
 
     module = AnsibleModule(argument_spec=argument_spec,
