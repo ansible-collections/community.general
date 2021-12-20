@@ -12,78 +12,76 @@ DOCUMENTATION = r'''
 module: gitlab_group_members
 short_description: Manage group members on GitLab Server
 description:
-    - This module allows to add and remove members to/from a group, or change a member's access level in a group on GitLab.
+  - This module allows to add and remove members to/from a group, or change a member's access level in a group on GitLab.
 version_added: '1.2.0'
 author: Zainab Alsaffar (@zanssa)
 requirements:
-    - python-gitlab python module <= 1.15.0
-    - administrator rights on the GitLab server
-extends_documentation_fragment: community.general.auth_basic
+  - python-gitlab python module <= 1.15.0
+  - administrator rights on the GitLab server
+extends_documentation_fragment:
+  - community.general.auth_basic
+  - community.general.gitlab
+
 options:
-    api_token:
-        description:
-            - A personal access token to authenticate with the GitLab API.
-        required: true
+  gitlab_group:
+    description:
+      - The C(full_path) of the GitLab group the member is added to/removed from.
+      - Setting this to C(name) or C(path) is deprecated and will be removed in community.general 6.0.0. Use C(full_path) instead.
+    required: true
+    type: str
+  gitlab_user:
+    description:
+      - A username or a list of usernames to add to/remove from the GitLab group.
+      - Mutually exclusive with I(gitlab_users_access).
+    type: list
+    elements: str
+  access_level:
+    description:
+      - The access level for the user.
+      - Required if I(state=present), user state is set to present.
+      - Mutually exclusive with I(gitlab_users_access).
+    type: str
+    choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
+  gitlab_users_access:
+    description:
+      - Provide a list of user to access level mappings.
+      - Every dictionary in this list specifies a user (by username) and the access level the user should have.
+      - Mutually exclusive with I(gitlab_user) and I(access_level).
+      - Use together with I(purge_users) to remove all users not specified here from the group.
+    type: list
+    elements: dict
+    suboptions:
+      name:
+        description: A username or a list of usernames to add to/remove from the GitLab group.
         type: str
-    gitlab_group:
-        description:
-            - The C(full_path) of the GitLab group the member is added to/removed from.
-            - Setting this to C(name) or C(path) is deprecated and will be removed in community.general 6.0.0. Use C(full_path) instead.
         required: true
-        type: str
-    gitlab_user:
+      access_level:
         description:
-            - A username or a list of usernames to add to/remove from the GitLab group.
-            - Mutually exclusive with I(gitlab_users_access).
-        type: list
-        elements: str
-    access_level:
-        description:
-            - The access level for the user.
-            - Required if I(state=present), user state is set to present.
-            - Mutually exclusive with I(gitlab_users_access).
+          - The access level for the user.
+          - Required if I(state=present), user state is set to present.
         type: str
         choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
-    gitlab_users_access:
-        description:
-            - Provide a list of user to access level mappings.
-            - Every dictionary in this list specifies a user (by username) and the access level the user should have.
-            - Mutually exclusive with I(gitlab_user) and I(access_level).
-            - Use together with I(purge_users) to remove all users not specified here from the group.
-        type: list
-        elements: dict
-        suboptions:
-            name:
-                description: A username or a list of usernames to add to/remove from the GitLab group.
-                type: str
-                required: true
-            access_level:
-                description:
-                    - The access level for the user.
-                    - Required if I(state=present), user state is set to present.
-                type: str
-                choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
-                required: true
-        version_added: 3.6.0
-    state:
-        description:
-            - State of the member in the group.
-            - On C(present), it adds a user to a GitLab group.
-            - On C(absent), it removes a user from a GitLab group.
-        choices: ['present', 'absent']
-        default: 'present'
-        type: str
-    purge_users:
-        description:
-            - Adds/remove users of the given access_level to match the given I(gitlab_user)/I(gitlab_users_access) list.
-              If omitted do not purge orphaned members.
-            - Is only used when I(state=present).
-        type: list
-        elements: str
-        choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
-        version_added: 3.6.0
+        required: true
+    version_added: 3.6.0
+  state:
+    description:
+      - State of the member in the group.
+      - On C(present), it adds a user to a GitLab group.
+      - On C(absent), it removes a user from a GitLab group.
+    choices: ['present', 'absent']
+    default: 'present'
+    type: str
+  purge_users:
+    description:
+      - Adds/remove users of the given access_level to match the given I(gitlab_user)/I(gitlab_users_access) list.
+        If omitted do not purge orphaned members.
+      - Is only used when I(state=present).
+    type: list
+    elements: str
+    choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
+    version_added: 3.6.0
 notes:
-    - Supports C(check_mode).
+  - Supports C(check_mode).
 '''
 
 EXAMPLES = r'''
@@ -155,7 +153,7 @@ RETURN = r''' # '''
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
 
 import traceback
 
@@ -241,8 +239,8 @@ class GitLabGroup(object):
 
 def main():
     argument_spec = basic_auth_argument_spec()
+    argument_spec.update(auth_argument_spec())
     argument_spec.update(dict(
-        api_token=dict(type='str', required=True, no_log=True),
         gitlab_group=dict(type='str', required=True),
         gitlab_user=dict(type='list', elements='str'),
         state=dict(type='str', default='present', choices=['present', 'absent']),
@@ -262,16 +260,19 @@ def main():
         argument_spec=argument_spec,
         mutually_exclusive=[
             ['api_username', 'api_token'],
-            ['api_password', 'api_token'],
             ['gitlab_user', 'gitlab_users_access'],
             ['access_level', 'gitlab_users_access'],
+            ['api_username', 'api_oauth_token'],
+            ['api_username', 'api_job_token'],
+            ['api_token', 'api_oauth_token'],
+            ['api_token', 'api_job_token'],
         ],
         required_together=[
             ['api_username', 'api_password'],
             ['gitlab_user', 'access_level'],
         ],
         required_one_of=[
-            ['api_username', 'api_token'],
+            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token'],
             ['gitlab_user', 'gitlab_users_access'],
         ],
         required_if=[
