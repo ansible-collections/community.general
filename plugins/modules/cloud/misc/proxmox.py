@@ -417,8 +417,10 @@ def proxmox_version(proxmox):
     return LooseVersion(apireturn['version'])
 
 
-def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, **kwargs):
+def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, clone, **kwargs):
     proxmox_node = proxmox.nodes(node)
+
+    # Remove all empty kwarg entries
     kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
 
     if VZ_TYPE == 'lxc':
@@ -438,7 +440,7 @@ def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, sw
         kwargs['cpus'] = cpus
         kwargs['disk'] = disk
 
-    if kwargs['clone'] is not None:
+    if clone is not None:
         # Only accept parameters that are compatible with the clone endpoint
         valid_clone_parameters = ['hostname', 'pool', 'storage']
         clone_parameters = {}
@@ -446,7 +448,9 @@ def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, sw
             if module.params[param] is not None:
                 clone_parameters[param] = module.params[param]
 
-        taskid = getattr(proxmox_node, VZ_TYPE).clone(vmid=kwargs['clone'], newid=vmid, **clone_parameters)
+        #taskid = getattr(proxmox_node, VZ_TYPE).clone.post(vmid=kwargs['clone'], newid=vmid, **clone_parameters)
+        #taskid = getattr(proxmox_node, VZ_TYPE).post("{vmid}/clone".format(vmid=kwargs['clone']), newid=vmid, **clone_parameters)
+        taskid = proxmox_node.lxc(clone).clone.post(newid=vmid, **clone_parameters)
     else:
         taskid = getattr(proxmox_node, VZ_TYPE).create(vmid=vmid, storage=storage, memory=memory, swap=swap, **kwargs)
 
@@ -636,7 +640,7 @@ def main():
             module.fail_json(msg="pre-creation checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
 
         try:
-            create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout,
+            create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, clone,
                             cores=module.params['cores'],
                             pool=module.params['pool'],
                             password=module.params['password'],
@@ -654,8 +658,7 @@ def main():
                             features=",".join(module.params['features']) if module.params['features'] is not None else None,
                             unprivileged=ansible_to_proxmox_bool(module.params['unprivileged']),
                             description=module.params['description'],
-                            hookscript=module.params['hookscript'],
-                            clone=module.params['clone'])
+                            hookscript=module.params['hookscript'])
 
             module.exit_json(changed=True, msg="deployed VM %s from template %s" % (vmid, module.params['ostemplate']))
         except Exception as e:
@@ -673,7 +676,7 @@ def main():
             module.fail_json(msg="pre-clone checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
 
         try:
-            create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout,
+            create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, clone,
                             cores=module.params['cores'],
                             pool=module.params['pool'],
                             password=module.params['password'],
