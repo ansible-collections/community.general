@@ -174,6 +174,7 @@ options:
       - If I(storage) is not set, a linked clone is created when cloning a template, or a full clone is created when cloning a normal container.
         If I(storage) is set, a full clone will always be made.
     type: int
+    version_added: 4.3.0
 author: Sergei Antipov (@UnderGreen)
 extends_documentation_fragment:
   - community.general.proxmox.documentation
