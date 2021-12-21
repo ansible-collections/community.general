@@ -87,6 +87,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ipa import IPAClient, ipa_argument_spec
 from ansible.module_utils.common.text.converters import to_native
 
+
 class DNSZoneIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
         super(DNSZoneIPAClient, self).__init__(module, host, port, protocol)
@@ -157,7 +158,7 @@ def ensure(module, client):
     # state is absent
     else:
         # check for generic zone existence
-        if ipa_dnszone: 
+        if ipa_dnszone:
             changed = True
             if not module.check_mode:
                 client.dnszone_del(zone_name=zone_name)
