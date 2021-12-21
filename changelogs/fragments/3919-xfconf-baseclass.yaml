@@ -1,2 +1,0 @@
-minor_changes:
-    - xfconf - minor refactor on the base class for the module (https://github.com/ansible-collections/community.general/pull/3919).
