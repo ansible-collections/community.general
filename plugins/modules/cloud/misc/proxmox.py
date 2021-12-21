@@ -404,6 +404,7 @@ def get_instance(proxmox, vmid):
 
 
 def content_check(proxmox, node, ostemplate, template_store):
+    """Check if the given ostemplate actually exists in the template store of a node."""
     return [True for cnt in proxmox.nodes(node).storage(template_store).content.get() if cnt['volid'] == ostemplate]
 
 
