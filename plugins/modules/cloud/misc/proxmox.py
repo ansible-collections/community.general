@@ -630,7 +630,10 @@ def main():
             elif not content_check(proxmox, node, module.params['ostemplate'], template_store):
                 module.fail_json(msg="ostemplate '%s' not exists on node %s and storage %s"
                                  % (module.params['ostemplate'], node, template_store))
+        except Exception as e:
+            module.fail_json(msg="pre-creation checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
 
+        try:
             create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout,
                             cores=module.params['cores'],
                             pool=module.params['pool'],
