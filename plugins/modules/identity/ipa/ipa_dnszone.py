@@ -59,14 +59,6 @@ EXAMPLES = r'''
     zone_name: example.com
     dynamicupdate: true
 
-- name: Ensure dns zone is present and is allowing sync
-  community.general.ipa_dnszone:
-    ipa_host: spider.example.com
-    ipa_pass: Passw0rd!
-    state: present
-    zone_name: example.com
-    allowsyncptr: true
-
 - name: Ensure that dns zone is removed
   community.general.ipa_dnszone:
     zone_name: example.com
@@ -95,13 +87,13 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ipa import IPAClient, ipa_argument_spec
 from ansible.module_utils.common.text.converters import to_native
 
-
 class DNSZoneIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
         super(DNSZoneIPAClient, self).__init__(module, host, port, protocol)
 
     def dnszone_find(self, zone_name, details=None):
-        itens = {'idnsname': zone_name}
+        itens = {'all': 'true',
+                 'idnsname': zone_name, }
         if details is not None:
             itens.update(details)
 
@@ -143,29 +135,29 @@ def ensure(module, client):
     state = module.params['state']
     dynamicupdate = module.params['dynamicupdate']
     allowsyncptr = module.params['allowsyncptr']
+
     changed = False
 
-    # does zone exist with all config params
-    ipa_dnszone = client.dnszone_find(zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
+    # does zone exist
+    ipa_dnszone = client.dnszone_find(zone_name)
 
     if state == 'present':
         if not ipa_dnszone:
 
-            # check for generic zone existence
-            if client.dnszone_find(zone_name):
-                if not module.check_mode:
-                    changed = True
-                    client.dnszone_mod(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
-            else:
+            if not module.check_mode:
                 changed = True
-                if not module.check_mode:
-                    client.dnszone_add(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
+                client.dnszone_add(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
+        elif ipa_dnszone['idnsallowdynupdate'][0] != dynamicupdate.upper() or ipa_dnszone['idnsallowsyncptr'][0] != str(allowsyncptr).upper():
+            changed = True
+            if not module.check_mode:
+                client.dnszone_mod(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
         else:
             changed = False
+
     # state is absent
     else:
         # check for generic zone existence
-        if client.dnszone_find(zone_name):
+        if ipa_dnszone: 
             changed = True
             if not module.check_mode:
                 client.dnszone_del(zone_name=zone_name)
