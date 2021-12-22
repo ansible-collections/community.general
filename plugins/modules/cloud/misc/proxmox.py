@@ -463,7 +463,7 @@ def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, sw
             # Not cloning a template, but also no defined storage. This isn't possible.
             module.fail_json(changed=False, msg="Cloned container is not a template, storage needs to be specified.")
 
-        clone_parameters = { }
+        clone_parameters = {}
         clone_parameters['full'] = create_full_copy
         for param in valid_clone_parameters:
             if module.params[param] is not None:
@@ -576,13 +576,13 @@ def main():
             clone=dict(type='int'),
         ),
         required_if=[
-          ('state', 'present', ['node', 'hostname']),
-          ('state', 'present', ('clone', 'ostemplate'), True), # Require one of clone and ostemplate. Together with mutually_exclusive this ensures that we
-                                                               # either clone a container or create a new one from a template file.
+            ('state', 'present', ['node', 'hostname']),
+            ('state', 'present', ('clone', 'ostemplate'), True),  # Require one of clone and ostemplate. Together with mutually_exclusive this ensures that we
+                                                                  # either clone a container or create a new one from a template file.
         ],
         required_together=[('api_token_id', 'api_token_secret')],
         required_one_of=[('api_password', 'api_token_id')],
-        mutually_exclusive=[('clone', 'ostemplate')], # Creating a new container is done either by cloning an existing one, or based on a template.
+        mutually_exclusive=[('clone', 'ostemplate')],  # Creating a new container is done either by cloning an existing one, or based on a template.
     )
 
     if not HAS_PROXMOXER:
