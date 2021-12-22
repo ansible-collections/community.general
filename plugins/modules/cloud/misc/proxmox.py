@@ -408,6 +408,13 @@ def content_check(proxmox, node, ostemplate, template_store):
     return [True for cnt in proxmox.nodes(node).storage(template_store).content.get() if cnt['volid'] == ostemplate]
 
 
+def is_template_container(proxmox, node, vmid):
+    """Check if the specified container is a template"""
+    proxmox_node = proxmox.nodes(node)
+    config = getattr(proxmox_node, VZ_TYPE)(vmid).config.get()
+    return config['template']
+
+
 def node_check(proxmox, node):
     return [True for nd in proxmox.nodes.get() if nd['node'] == node]
 
@@ -441,10 +448,18 @@ def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, sw
         kwargs['disk'] = disk
 
     if clone is not None:
-        # Only accept parameters that are compatible with the clone endpoint
-        # TODO: Don't accept 'storage' parameters when cloning a template
-        #valid_clone_parameters = ['hostname', 'pool', 'storage']
-        valid_clone_parameters = ['hostname', 'pool']
+        clone_is_template = is_template_container(proxmox, node, clone)
+
+        # Only accept parameters that are compatible with the clone endpoint.
+        valid_clone_parameters = []
+        if not clone_is_template:
+            if module.params['storage'] is None:
+                module.fail_json(changed=False, msg="Cloned container is not a template, storage needs to be specified.")
+
+            valid_clone_parameters = ['hostname', 'pool', 'storage']
+        else:
+            valid_clone_parameters = ['hostname', 'pool']
+
         clone_parameters = {}
         for param in valid_clone_parameters:
             if module.params[param] is not None:
