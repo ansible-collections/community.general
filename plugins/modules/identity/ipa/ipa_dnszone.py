@@ -145,8 +145,8 @@ def ensure(module, client):
     if state == 'present':
         if not ipa_dnszone:
 
+            changed = True
             if not module.check_mode:
-                changed = True
                 client.dnszone_add(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
         elif ipa_dnszone['idnsallowdynupdate'][0] != dynamicupdate.upper() or ipa_dnszone['idnsallowsyncptr'][0] != str(allowsyncptr).upper():
             changed = True
