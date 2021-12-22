@@ -442,15 +442,16 @@ def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, sw
 
     if clone is not None:
         # Only accept parameters that are compatible with the clone endpoint
-        valid_clone_parameters = ['hostname', 'pool', 'storage']
+        # TODO: Don't accept 'storage' parameters when cloning a template
+        #valid_clone_parameters = ['hostname', 'pool', 'storage']
+        valid_clone_parameters = ['hostname', 'pool']
         clone_parameters = {}
         for param in valid_clone_parameters:
             if module.params[param] is not None:
                 clone_parameters[param] = module.params[param]
 
-        #taskid = getattr(proxmox_node, VZ_TYPE).clone.post(vmid=kwargs['clone'], newid=vmid, **clone_parameters)
-        #taskid = getattr(proxmox_node, VZ_TYPE).post("{vmid}/clone".format(vmid=kwargs['clone']), newid=vmid, **clone_parameters)
-        taskid = proxmox_node.lxc(clone).clone.post(newid=vmid, **clone_parameters)
+        # TODO: Check if openvz VZ_TYPE also supports this endpoint
+        taskid = getattr(proxmox_node, VZ_TYPE)(clone).clone.post(newid=vmid, **clone_parameters)
     else:
         taskid = getattr(proxmox_node, VZ_TYPE).create(vmid=vmid, storage=storage, memory=memory, swap=swap, **kwargs)
 
@@ -693,8 +694,7 @@ def main():
                             features=",".join(module.params['features']) if module.params['features'] is not None else None,
                             unprivileged=ansible_to_proxmox_bool(module.params['unprivileged']),
                             description=module.params['description'],
-                            hookscript=module.params['hookscript'],
-                            clone=module.params['clone'])
+                            hookscript=module.params['hookscript'])
 
             module.exit_json(changed=True, msg="cloned VM %s from %s" % (vmid, clone))
         except Exception as e:
