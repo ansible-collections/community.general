@@ -122,9 +122,9 @@ import operator
 HAS_DISTUTILS = False
 try:
     import pkg_resources
-    from ansible_collections.community.general.plugins.module_utils.version import Version
+    from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
     HAS_DISTUTILS = True
-except Exception:
+except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
@@ -187,7 +187,7 @@ def main():
                 'installed': existing,
                 'desired': None,
             }
-        elif operations[op](Version(existing), Version(version)):
+        elif operations[op](LooseVersion(existing), LooseVersion(version)):
             results['valid'][pkg] = {
                 'installed': existing,
                 'desired': dep,

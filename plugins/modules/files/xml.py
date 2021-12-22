@@ -358,7 +358,7 @@ import traceback
 
 from io import BytesIO
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 LXML_IMP_ERR = None
 try:
@@ -904,9 +904,9 @@ def main():
     # Check if we have lxml 2.3.0 or newer installed
     if not HAS_LXML:
         module.fail_json(msg=missing_required_lib("lxml"), exception=LXML_IMP_ERR)
-    elif Version('.'.join(to_native(f) for f in etree.LXML_VERSION)) < Version('2.3.0'):
+    elif LooseVersion('.'.join(to_native(f) for f in etree.LXML_VERSION)) < LooseVersion('2.3.0'):
         module.fail_json(msg='The xml ansible module requires lxml 2.3.0 or newer installed on the managed machine')
-    elif Version('.'.join(to_native(f) for f in etree.LXML_VERSION)) < Version('3.0.0'):
+    elif LooseVersion('.'.join(to_native(f) for f in etree.LXML_VERSION)) < LooseVersion('3.0.0'):
         module.warn('Using lxml version lower than 3.0.0 does not guarantee predictable element attribute order.')
 
     # Check if the file exists

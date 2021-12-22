@@ -98,7 +98,7 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 PASSLIB_IMP_ERR = None
 try:
@@ -134,7 +134,7 @@ def present(dest, username, password, crypt_scheme, create, check_mode):
         if check_mode:
             return ("Create %s" % dest, True)
         create_missing_directories(dest)
-        if Version(passlib.__version__) >= Version('1.6'):
+        if LooseVersion(passlib.__version__) >= LooseVersion('1.6'):
             ht = HtpasswdFile(dest, new=True, default_scheme=crypt_scheme, context=context)
         else:
             ht = HtpasswdFile(dest, autoload=False, default=crypt_scheme, context=context)
@@ -145,7 +145,7 @@ def present(dest, username, password, crypt_scheme, create, check_mode):
         ht.save()
         return ("Created %s and added %s" % (dest, username), True)
     else:
-        if Version(passlib.__version__) >= Version('1.6'):
+        if LooseVersion(passlib.__version__) >= LooseVersion('1.6'):
             ht = HtpasswdFile(dest, new=False, default_scheme=crypt_scheme, context=context)
         else:
             ht = HtpasswdFile(dest, default=crypt_scheme, context=context)
@@ -172,7 +172,7 @@ def absent(dest, username, check_mode):
     """ Ensures user is absent
 
     Returns (msg, changed) """
-    if Version(passlib.__version__) >= Version('1.6'):
+    if LooseVersion(passlib.__version__) >= LooseVersion('1.6'):
         ht = HtpasswdFile(dest, new=False)
     else:
         ht = HtpasswdFile(dest)

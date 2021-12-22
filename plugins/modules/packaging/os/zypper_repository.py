@@ -140,7 +140,7 @@ from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.six.moves import configparser, StringIO
 from io import open
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 REPO_OPTS = ['alias', 'name', 'priority', 'enabled', 'autorefresh', 'gpgcheck']
 
@@ -251,7 +251,7 @@ def addmodify_repo(module, repodata, old_repos, zypper_version, warnings):
     # priority on addrepo available since 1.12.25
     # https://github.com/openSUSE/zypper/blob/b9b3cb6db76c47dc4c47e26f6a4d2d4a0d12b06d/package/zypper.changes#L327-L336
     if repodata['priority']:
-        if zypper_version >= Version('1.12.25'):
+        if zypper_version >= LooseVersion('1.12.25'):
             cmd.extend(['--priority', str(repodata['priority'])])
         else:
             warnings.append("Setting priority only available for zypper >= 1.12.25. Ignoring priority argument.")
@@ -262,7 +262,7 @@ def addmodify_repo(module, repodata, old_repos, zypper_version, warnings):
     # gpgcheck available since 1.6.2
     # https://github.com/openSUSE/zypper/blob/b9b3cb6db76c47dc4c47e26f6a4d2d4a0d12b06d/package/zypper.changes#L2446-L2449
     # the default changed in the past, so don't assume a default here and show warning for old zypper versions
-    if zypper_version >= Version('1.6.2'):
+    if zypper_version >= LooseVersion('1.6.2'):
         if repodata['gpgcheck'] == '1':
             cmd.append('--gpgcheck')
         else:
@@ -297,8 +297,8 @@ def remove_repo(module, repo):
 def get_zypper_version(module):
     rc, stdout, stderr = module.run_command([module.get_bin_path('zypper', required=True), '--version'])
     if rc != 0 or not stdout.startswith('zypper '):
-        return Version('1.0')
-    return Version(stdout.split()[1])
+        return LooseVersion('1.0')
+    return LooseVersion(stdout.split()[1])
 
 
 def runrefreshrepo(module, auto_import_keys=False, shortname=None):

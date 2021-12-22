@@ -727,7 +727,7 @@ import time
 import traceback
 from ansible.module_utils.six.moves.urllib.parse import quote
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 try:
     from proxmoxer import ProxmoxAPI
@@ -966,7 +966,7 @@ def stop_vm(module, proxmox, vm, force):
 
 def proxmox_version(proxmox):
     apireturn = proxmox.version.get()
-    return Version(apireturn['version'])
+    return LooseVersion(apireturn['version'])
 
 
 def main():
@@ -1123,7 +1123,7 @@ def main():
         proxmox = ProxmoxAPI(api_host, verify_ssl=validate_certs, **auth_args)
         global PVE_MAJOR_VERSION
         version = proxmox_version(proxmox)
-        PVE_MAJOR_VERSION = 3 if version < Version('4.0') else version.version[0]
+        PVE_MAJOR_VERSION = 3 if version < LooseVersion('4.0') else version.version[0]
     except Exception as e:
         module.fail_json(msg='authorization on proxmox cluster failed with exception: %s' % e)
 

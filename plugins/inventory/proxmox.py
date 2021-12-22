@@ -124,12 +124,12 @@ from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 # 3rd party imports
 try:
     import requests
-    if Version(requests.__version__) < Version('1.1.0'):
+    if LooseVersion(requests.__version__) < LooseVersion('1.1.0'):
         raise ImportError
     HAS_REQUESTS = True
 except ImportError:

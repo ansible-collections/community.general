@@ -125,7 +125,7 @@ import ssl
 import traceback
 import platform
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 HAS_PAHOMQTT = True
 PAHOMQTT_IMP_ERR = None
@@ -208,7 +208,7 @@ def main():
         if tls_version:
             tls_version = tls_map.get(tls_version, ssl.PROTOCOL_SSLv23)
         else:
-            if Version(platform.python_version()) <= Version("3.5.2"):
+            if LooseVersion(platform.python_version()) <= LooseVersion("3.5.2"):
                 # Specifying `None` on later versions of python seems sufficient to
                 # instruct python to autonegotiate the SSL/TLS connection. On versions
                 # 3.5.2 and lower though we need to specify the version.

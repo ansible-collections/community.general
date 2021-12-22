@@ -155,7 +155,7 @@ stdout:
 from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 OUTDATED_FLATPAK_VERSION_ERROR_MESSAGE = "Unknown option --columns=application"
 
@@ -172,7 +172,7 @@ def install_flat(module, binary, remote, names, method, no_dependencies):
             id_names.append(name)
     base_command = [binary, "install", "--{0}".format(method)]
     flatpak_version = _flatpak_version(module, binary)
-    if Version(flatpak_version) < Version('1.1.3'):
+    if LooseVersion(flatpak_version) < LooseVersion('1.1.3'):
         base_command += ["-y"]
     else:
         base_command += ["--noninteractive"]
@@ -196,7 +196,7 @@ def uninstall_flat(module, binary, names, method):
     ]
     command = [binary, "uninstall"]
     flatpak_version = _flatpak_version(module, binary)
-    if Version(flatpak_version) < Version('1.1.3'):
+    if LooseVersion(flatpak_version) < LooseVersion('1.1.3'):
         command += ["-y"]
     else:
         command += ["--noninteractive"]

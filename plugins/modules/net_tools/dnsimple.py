@@ -150,7 +150,7 @@ RETURN = r"""# """
 import traceback
 import re
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 class DNSimpleV1():
@@ -392,7 +392,7 @@ def main():
     is_solo = module.params.get('solo')
     sandbox = module.params.get('sandbox')
 
-    DNSIMPLE_MAJOR_VERSION = Version(dnsimple_version).version[0]
+    DNSIMPLE_MAJOR_VERSION = LooseVersion(dnsimple_version).version[0]
 
     try:
         if DNSIMPLE_MAJOR_VERSION > 1:

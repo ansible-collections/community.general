@@ -137,7 +137,7 @@ import sqlite3
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 # Function used for executing commands.
@@ -435,7 +435,7 @@ def parse_package_name(names, pkg_spec, module):
         if pkg_spec[name]['branch']:
             branch_release = "6.0"
 
-            if Version(platform.release()) < Version(branch_release):
+            if LooseVersion(platform.release()) < LooseVersion(branch_release):
                 module.fail_json(msg="package name using 'branch' syntax requires at least OpenBSD %s: %s" % (branch_release, name))
 
         # Sanity check that there are no trailing dashes in flavor.

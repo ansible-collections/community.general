@@ -82,7 +82,7 @@ import ssl
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 # 3rd party imports
 try:
@@ -90,7 +90,7 @@ try:
     import websocket
     from websocket import create_connection
 
-    if Version(websocket.__version__) <= Version('1.0.0'):
+    if LooseVersion(websocket.__version__) <= LooseVersion('1.0.0'):
         raise ImportError
 except ImportError as e:
     HAS_WEBSOCKET = False

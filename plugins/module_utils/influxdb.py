@@ -10,7 +10,7 @@ import traceback
 
 from ansible.module_utils.basic import missing_required_lib
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 REQUESTS_IMP_ERR = None
 try:
@@ -81,12 +81,12 @@ class InfluxDb():
             udp_port=self.params['udp_port'],
             proxies=self.params['proxies'],
         )
-        influxdb_api_version = Version(influxdb_version)
-        if influxdb_api_version >= Version('4.1.0'):
+        influxdb_api_version = LooseVersion(influxdb_version)
+        if influxdb_api_version >= LooseVersion('4.1.0'):
             # retries option is added in version 4.1.0
             args.update(retries=self.params['retries'])
 
-        if influxdb_api_version >= Version('5.1.0'):
+        if influxdb_api_version >= LooseVersion('5.1.0'):
             # path argument is added in version 5.1.0
             args.update(path=self.path)
 

@@ -162,7 +162,7 @@ import os
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 def diversion_state(module, command, path):
@@ -205,9 +205,9 @@ def main():
     # Option --listpackage is needed and comes with 1.15.0
     rc, stdout, stderr = module.run_command([DPKG_DIVERT, '--version'], check_rc=True)
     [current_version] = [x for x in stdout.splitlines()[0].split() if re.match('^[0-9]+[.][0-9]', x)]
-    if Version(current_version) < Version("1.15.0"):
+    if LooseVersion(current_version) < LooseVersion("1.15.0"):
         module.fail_json(msg="Unsupported dpkg version (<1.15.0).")
-    no_rename_is_supported = (Version(current_version) >= Version("1.19.1"))
+    no_rename_is_supported = (LooseVersion(current_version) >= LooseVersion("1.19.1"))
 
     b_path = to_bytes(path, errors='surrogate_or_strict')
     path_exists = os.path.exists(b_path)

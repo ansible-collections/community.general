@@ -74,7 +74,7 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.api import basic_auth_argument_spec
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 GITLAB_IMP_ERR = None
 try:
@@ -175,7 +175,7 @@ def main():
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
     gitlab_version = gitlab.__version__
-    if Version(gitlab_version) < Version('2.3.0'):
+    if LooseVersion(gitlab_version) < LooseVersion('2.3.0'):
         module.fail_json(msg="community.general.gitlab_proteched_branch requires python-gitlab Python module >= 2.3.0 (installed version: [%s])."
                              " Please upgrade python-gitlab to version 2.3.0 or above." % gitlab_version)
 

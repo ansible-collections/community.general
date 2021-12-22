@@ -120,7 +120,7 @@ __version__ = '${version}'
 import os
 import traceback
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 REQUESTS_IMP_ERR = None
 try:
@@ -167,7 +167,7 @@ class ClcAntiAffinityPolicy:
         if not REQUESTS_FOUND:
             self.module.fail_json(msg=missing_required_lib('requests'),
                                   exception=REQUESTS_IMP_ERR)
-        if requests.__version__ and Version(requests.__version__) < Version('2.5.0'):
+        if requests.__version__ and LooseVersion(requests.__version__) < LooseVersion('2.5.0'):
             self.module.fail_json(
                 msg='requests library  version should be >= 2.5.0')
 

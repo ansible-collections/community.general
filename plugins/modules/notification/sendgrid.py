@@ -124,7 +124,7 @@ EXAMPLES = r'''
 import os
 import traceback
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 SENDGRID_IMP_ERR = None
 try:
@@ -162,7 +162,7 @@ def post_sendgrid_api(module, username, password, from_address, to_addresses,
         return fetch_url(module, SENDGRID_URI, data=encoded_data, headers=headers, method='POST')
     else:
         # Remove this check when adding Sendgrid API v3 support
-        if Version(sendgrid.version.__version__) > Version("1.6.22"):
+        if LooseVersion(sendgrid.version.__version__) > LooseVersion("1.6.22"):
             module.fail_json(msg="Please install sendgrid==1.6.22 or lower since module uses Sendgrid V2 APIs.")
 
         if api_key:

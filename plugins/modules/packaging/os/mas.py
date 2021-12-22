@@ -99,7 +99,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 import os
 
-from ansible_collections.community.general.plugins.module_utils.version import Version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 class Mas(object):
@@ -146,7 +146,7 @@ class Mas(object):
 
         # Is the version recent enough?
         rc, out, err = self.run(['version'])
-        if rc != 0 or not out.strip() or Version(out.strip()) < Version('1.5.0'):
+        if rc != 0 or not out.strip() or LooseVersion(out.strip()) < LooseVersion('1.5.0'):
             self.module.fail_json(msg='`mas` tool in version 1.5.0+ needed, got ' + out.strip())
 
     def check_signin(self):
