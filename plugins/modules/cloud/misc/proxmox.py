@@ -674,7 +674,7 @@ def main():
                 module.fail_json(msg="ostemplate '%s' not exists on node %s and storage %s"
                                  % (module.params['ostemplate'], node, template_store))
         except Exception as e:
-            module.fail_json(msg="pre-creation checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
+            module.fail_json(msg="Pre-creation checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
 
         try:
             create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, clone,
@@ -697,9 +697,9 @@ def main():
                             description=module.params['description'],
                             hookscript=module.params['hookscript'])
 
-            module.exit_json(changed=True, msg="deployed VM %s from template %s" % (vmid, module.params['ostemplate']))
+            module.exit_json(changed=True, msg="Deployed VM %s from template %s" % (vmid, module.params['ostemplate']))
         except Exception as e:
-            module.fail_json(msg="creation of %s VM %s failed with exception: %s" % (VZ_TYPE, vmid, e))
+            module.fail_json(msg="Creation of %s VM %s failed with exception: %s" % (VZ_TYPE, vmid, e))
 
     # Clone a container
     elif state == 'present' and clone is not None:
@@ -712,7 +712,7 @@ def main():
             if not get_instance(proxmox, clone):
                 module.exit_json(changed=False, msg="Container to be cloned does not exist")
         except Exception as e:
-            module.fail_json(msg="pre-clone checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
+            module.fail_json(msg="Pre-clone checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
 
         try:
             create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, clone,
@@ -734,9 +734,9 @@ def main():
                             description=module.params['description'],
                             hookscript=module.params['hookscript'])
 
-            module.exit_json(changed=True, msg="cloned VM %s from %s" % (vmid, clone))
+            module.exit_json(changed=True, msg="Cloned VM %s from %s" % (vmid, clone))
         except Exception as e:
-            module.fail_json(msg="cloning %s VM %s failed with exception: %s" % (VZ_TYPE, vmid, e))
+            module.fail_json(msg="Cloning %s VM %s failed with exception: %s" % (VZ_TYPE, vmid, e))
 
     elif state == 'started':
         try:
