@@ -628,7 +628,7 @@ def main():
     if state == 'present' and clone is None:
         try:
             if get_instance(proxmox, vmid) and not module.params['force']:
-                module.exit_json(changed=False, msg="VM with vmid = %s is already exists" % vmid)
+                module.exit_json(changed=False, msg="VM with vmid %s is already exists" % vmid)
             # If no vmid was passed, there cannot be another VM named 'hostname'
             if not module.params['vmid'] and get_vmid(proxmox, hostname) and not module.params['force']:
                 module.exit_json(changed=False, msg="VM with hostname %s already exists and has ID number %s" % (hostname, get_vmid(proxmox, hostname)[0]))
@@ -669,10 +669,12 @@ def main():
     elif state == 'present' and clone is not None:
         try:
             if get_instance(proxmox, vmid) and not module.params['force']:
-                module.exit_json(changed=False, msg="VM with vmid = %s is already exists" % vmid)
+                module.exit_json(changed=False, msg="VM with vmid %s is already exists" % vmid)
             # If no vmid was passed, there cannot be another VM named 'hostname'
             if not module.params['vmid'] and get_vmid(proxmox, hostname) and not module.params['force']:
                 module.exit_json(changed=False, msg="VM with hostname %s already exists and has ID number %s" % (hostname, get_vmid(proxmox, hostname)[0]))
+            if not get_instance(proxmox, clone):
+                module.exit_json(changed=False, msg="Container to be cloned does not exist")
         except Exception as e:
             module.fail_json(msg="pre-clone checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
 
@@ -699,7 +701,6 @@ def main():
             module.exit_json(changed=True, msg="cloned VM %s from %s" % (vmid, clone))
         except Exception as e:
             module.fail_json(msg="cloning %s VM %s failed with exception: %s" % (VZ_TYPE, vmid, e))
-
 
     elif state == 'started':
         try:
