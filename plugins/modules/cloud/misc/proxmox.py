@@ -171,10 +171,19 @@ options:
     description:
       - ID of the container to be cloned.
       - I(description), I(hostname), and I(pool) will be copied from the cloned container if not specified.
-      - If the cloned container is a template container a linked clone will be created if I(storage) is not specified.
-        If I(storage) is specified, a full clone will be made. If the cloned container is not a template, I(storage) must
-        always be defined.
+      - The type of clone created is defined by the I(clone-type) parameter.
     type: int
+    version_added: 4.3.0
+  clone_type:
+    description:
+      - Type of the clone created.
+      - C(full) creates a full clone, and I(storage) must be specified.
+      - C(linked) creates a linked clone, and the cloned container must be a template container.
+      - C(opportunistic) creates a linked clone if the cloned container is a template container, and a full clone if not.
+        I(storage) may be specified, if not it will fall back to the default.
+    type: str
+    choices: ['full', 'linked', 'opportunistic']
+    default: opportunistic
     version_added: 4.3.0
 author: Sergei Antipov (@UnderGreen)
 extends_documentation_fragment:
@@ -467,7 +476,7 @@ def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, sw
         create_full_copy = not clone_is_template
 
         # Only accept parameters that are compatible with the clone endpoint.
-        valid_clone_parameters = ['hostname', 'pool', 'description', 'storage']
+        valid_clone_parameters = ['hostname', 'pool', 'description']
         if module.params['storage'] is not None and clone_is_template:
             # Cloning a template, so create a full copy instead of a linked copy
             create_full_copy = True
@@ -475,8 +484,24 @@ def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, sw
             # Not cloning a template, but also no defined storage. This isn't possible.
             module.fail_json(changed=False, msg="Cloned container is not a template, storage needs to be specified.")
 
+        if module.params['clone_type'] == 'linked':
+            if not clone_is_template:
+                module.fail_json(changed=False, msg="'linked' clone type is specified, but cloned container is not a template container.")
+            # Don't need to do more, by default create_full_copy is set to false already
+        elif module.params['clone_type'] == 'opportunistic':
+            if not clone_is_template:
+                # Cloned container is not a template, so we need our 'storage' parameter
+                valid_clone_parameters.append('storage')
+        elif module.params['clone_type'] == 'full':
+            create_full_copy = True
+            valid_clone_parameters.append('storage')
+
         clone_parameters = {}
-        clone_parameters['full'] = create_full_copy
+
+        if create_full_copy:
+            clone_parameters['full'] = '1'
+        else:
+            clone_parameters['full'] = '0'
         for param in valid_clone_parameters:
             if module.params[param] is not None:
                 clone_parameters[param] = module.params[param]
@@ -586,13 +611,17 @@ def main():
             hookscript=dict(type='str'),
             proxmox_default_behavior=dict(type='str', default='no_defaults', choices=['compatibility', 'no_defaults']),
             clone=dict(type='int'),
+            clone_type=dict(default='opportunistic', choices=['full', 'linked', 'opportunistic']),
         ),
         required_if=[
             ('state', 'present', ['node', 'hostname']),
             ('state', 'present', ('clone', 'ostemplate'), True),  # Require one of clone and ostemplate. Together with mutually_exclusive this ensures that we
                                                                   # either clone a container or create a new one from a template file.
         ],
-        required_together=[('api_token_id', 'api_token_secret')],
+        required_together=[
+            ('api_token_id', 'api_token_secret'),
+            ('clone', 'clone_type')
+        ],
         required_one_of=[('api_password', 'api_token_id')],
         mutually_exclusive=[('clone', 'ostemplate')],  # Creating a new container is done either by cloning an existing one, or based on a template.
     )
