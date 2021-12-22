@@ -93,37 +93,37 @@ class DNSZoneIPAClient(IPAClient):
         super(DNSZoneIPAClient, self).__init__(module, host, port, protocol)
 
     def dnszone_find(self, zone_name, details=None):
-        itens = {'all': 'true',
+        items = {'all': 'true',
                  'idnsname': zone_name, }
         if details is not None:
-            itens.update(details)
+            items.update(details)
 
         return self._post_json(
             method='dnszone_find',
             name=zone_name,
-            item=itens
+            item=items
         )
 
     def dnszone_add(self, zone_name=None, details=None):
-        itens = {}
+        items = {}
         if details is not None:
-            itens.update(details)
+            items.update(details)
 
         return self._post_json(
             method='dnszone_add',
             name=zone_name,
-            item=itens
+            item=items
         )
 
     def dnszone_mod(self, zone_name=None, details=None):
-        itens = {}
+        items = {}
         if details is not None:
-            itens.update(details)
+            items.update(details)
 
         return self._post_json(
             method='dnszone_mod',
             name=zone_name,
-            item=itens
+            item=items
         )
 
     def dnszone_del(self, zone_name=None, record_name=None, details=None):
