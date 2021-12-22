@@ -171,8 +171,9 @@ options:
     description:
       - ID of the container to be cloned.
       - I(description), I(hostname), and I(pool) will be copied from the cloned container if not specified.
-      - If I(storage) is not set, a linked clone is created when cloning a template, or a full clone is created when cloning a normal container.
-        If I(storage) is set, a full clone will always be made.
+      - If the cloned container is a template container a linked clone will be created if I(storage) is not specified.
+        If I(storage) is specified, a full clone will be made. If the cloned container is not a template, I(storage) must
+        always be defined.
     type: int
     version_added: 4.3.0
 author: Sergei Antipov (@UnderGreen)
@@ -301,8 +302,8 @@ EXAMPLES = r'''
      - mount=cifs,nfs
 
 - name: >
-    Create a linked clone of the container with id 100. The newly created container with be a
-    linked clone if container 100 is a template, and a full clone if not.
+    Create a linked clone of the template container with id 100. The newly created container with be a
+    linked clone, because no storage parameter is defined.
   community.general.proxmox:
     vmid: 201
     node: uk-mc02
@@ -409,7 +410,7 @@ def content_check(proxmox, node, ostemplate, template_store):
 
 
 def is_template_container(proxmox, node, vmid):
-    """Check if the specified container is a template"""
+    """Check if the specified container is a template."""
     proxmox_node = proxmox.nodes(node)
     config = getattr(proxmox_node, VZ_TYPE)(vmid).config.get()
     return config['template']
@@ -450,17 +451,20 @@ def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, sw
     if clone is not None:
         clone_is_template = is_template_container(proxmox, node, clone)
 
+        # By default, create a full copy only when the cloned container is not a template.
+        create_full_copy = not clone_is_template
+
         # Only accept parameters that are compatible with the clone endpoint.
-        valid_clone_parameters = []
-        if not clone_is_template:
-            if module.params['storage'] is None:
-                module.fail_json(changed=False, msg="Cloned container is not a template, storage needs to be specified.")
+        valid_clone_parameters = ['hostname', 'pool', 'description', 'storage']
+        if module.params['storage'] is not None and clone_is_template:
+            # Cloning a template, so create a full copy instead of a linked copy
+            create_full_copy = True
+        elif module.params['storage'] is None and not clone_is_template:
+            # Not cloning a template, but also no defined storage. This isn't possible.
+            module.fail_json(changed=False, msg="Cloned container is not a template, storage needs to be specified.")
 
-            valid_clone_parameters = ['hostname', 'pool', 'storage']
-        else:
-            valid_clone_parameters = ['hostname', 'pool']
-
-        clone_parameters = {}
+        clone_parameters = { }
+        clone_parameters['full'] = create_full_copy
         for param in valid_clone_parameters:
             if module.params[param] is not None:
                 clone_parameters[param] = module.params[param]
