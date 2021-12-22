@@ -115,7 +115,6 @@ EXAMPLES = '''
     fstype: vfat
 '''
 
-from distutils.version import LooseVersion
 import os
 import platform
 import re
@@ -123,6 +122,8 @@ import stat
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
+
+from ansible_collections.community.general.plugins.module_utils.version import Version
 
 
 class Device(object):
@@ -341,7 +342,7 @@ class Btrfs(Filesystem):
             match = re.search(r" v([0-9.]+)", stderr)
         if match:
             # v0.20-rc1 doesn't have --force parameter added in following version v3.12
-            if LooseVersion(match.group(1)) >= LooseVersion('3.12'):
+            if Version(match.group(1)) >= Version('3.12'):
                 self.MKFS_FORCE_FLAGS = ['-f']
         else:
             # assume version is greater or equal to 3.12
@@ -369,7 +370,7 @@ class F2fs(Filesystem):
         if match is not None:
             # Since 1.9.0, mkfs.f2fs check overwrite before make filesystem
             # before that version -f switch wasn't used
-            if LooseVersion(match.group(1)) >= LooseVersion('1.9.0'):
+            if Version(match.group(1)) >= Version('1.9.0'):
                 self.MKFS_FORCE_FLAGS = ['-f']
 
     def get_fs_size(self, dev):

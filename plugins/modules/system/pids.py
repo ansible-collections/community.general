@@ -56,12 +56,13 @@ pids:
 
 import abc
 import re
-from distutils.version import LooseVersion
 from os.path import basename
 
 from ansible.module_utils import six
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
+
+from ansible_collections.community.general.plugins.module_utils.version import Version
 
 try:
     import psutil
@@ -85,10 +86,10 @@ class PSAdapter(object):
 
     @staticmethod
     def from_package(psutil):
-        version = LooseVersion(psutil.__version__)
-        if version < LooseVersion('2.0.0'):
+        version = Version(psutil.__version__)
+        if version < Version('2.0.0'):
             return PSAdapter100(psutil)
-        elif version < LooseVersion('5.3.0'):
+        elif version < Version('5.3.0'):
             return PSAdapter200(psutil)
         else:
             return PSAdapter530(psutil)

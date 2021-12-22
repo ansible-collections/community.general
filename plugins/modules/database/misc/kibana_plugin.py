@@ -117,8 +117,9 @@ state:
 '''
 
 import os
-from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils.version import Version
 
 
 PACKAGE_STATE_MAP = dict(
@@ -159,7 +160,7 @@ def parse_error(string):
 
 
 def install_plugin(module, plugin_bin, plugin_name, url, timeout, allow_root, kibana_version='4.6'):
-    if LooseVersion(kibana_version) > LooseVersion('4.6'):
+    if Version(kibana_version) > Version('4.6'):
         kibana_plugin_bin = os.path.join(os.path.dirname(plugin_bin), 'kibana-plugin')
         cmd_args = [kibana_plugin_bin, "install"]
         if url:
@@ -190,7 +191,7 @@ def install_plugin(module, plugin_bin, plugin_name, url, timeout, allow_root, ki
 
 
 def remove_plugin(module, plugin_bin, plugin_name, allow_root, kibana_version='4.6'):
-    if LooseVersion(kibana_version) > LooseVersion('4.6'):
+    if Version(kibana_version) > Version('4.6'):
         kibana_plugin_bin = os.path.join(os.path.dirname(plugin_bin), 'kibana-plugin')
         cmd_args = [kibana_plugin_bin, "remove", plugin_name]
     else:

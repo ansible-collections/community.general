@@ -143,7 +143,8 @@ annotation:
 import json
 import time
 import traceback
-from distutils.version import LooseVersion
+
+from ansible_collections.community.general.plugins.module_utils.version import Version
 
 REQUESTS_IMP_ERR = None
 try:
@@ -164,7 +165,7 @@ def check_requests_dep(module):
         module.fail_json(msg=missing_required_lib('requests'), exception=REQUESTS_IMP_ERR)
     else:
         required_version = '2.0.0' if PY3 else '1.0.0'
-        if LooseVersion(requests.__version__) < LooseVersion(required_version):
+        if Version(requests.__version__) < Version(required_version):
             module.fail_json(msg="'requests' library version should be >= %s, found: %s." % (required_version, requests.__version__))
 
 

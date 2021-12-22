@@ -348,7 +348,8 @@ EXAMPLES = r'''
 
 import time
 import traceback
-from distutils.version import LooseVersion
+
+from ansible_collections.community.general.plugins.module_utils.version import Version
 
 try:
     from proxmoxer import ProxmoxAPI
@@ -394,7 +395,7 @@ def node_check(proxmox, node):
 
 def proxmox_version(proxmox):
     apireturn = proxmox.version.get()
-    return LooseVersion(apireturn['version'])
+    return Version(apireturn['version'])
 
 
 def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, **kwargs):
@@ -411,7 +412,7 @@ def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, sw
             kwargs.update(kwargs['mounts'])
             del kwargs['mounts']
         if 'pubkey' in kwargs:
-            if proxmox_version(proxmox) >= LooseVersion('4.2'):
+            if proxmox_version(proxmox) >= Version('4.2'):
                 kwargs['ssh-public-keys'] = kwargs['pubkey']
             del kwargs['pubkey']
     else:
@@ -571,7 +572,7 @@ def main():
     try:
         proxmox = ProxmoxAPI(api_host, verify_ssl=validate_certs, **auth_args)
         global VZ_TYPE
-        VZ_TYPE = 'openvz' if proxmox_version(proxmox) < LooseVersion('4.0') else 'lxc'
+        VZ_TYPE = 'openvz' if proxmox_version(proxmox) < Version('4.0') else 'lxc'
     except Exception as e:
         module.fail_json(msg='authorization on proxmox cluster failed with exception: %s' % e)
 

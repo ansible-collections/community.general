@@ -74,10 +74,11 @@ subca:
   type: dict
 '''
 
-from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.ipa import IPAClient, ipa_argument_spec
 from ansible.module_utils.common.text.converters import to_native
+
+from ansible_collections.community.general.plugins.module_utils.version import Version
 
 
 class SubCAIPAClient(IPAClient):
@@ -162,7 +163,7 @@ def ensure(module, client):
                 client.subca_del(subca_name=subca_name)
     elif state == 'disable':
         ipa_version = client.get_ipa_version()
-        if LooseVersion(ipa_version) < LooseVersion('4.4.2'):
+        if Version(ipa_version) < Version('4.4.2'):
             module.fail_json(msg="Current version of IPA server [%s] does not support 'CA disable' option. Please upgrade to "
                                  "version greater than 4.4.2")
         if ipa_subca:
@@ -171,7 +172,7 @@ def ensure(module, client):
                 client.subca_disable(subca_name=subca_name)
     elif state == 'enable':
         ipa_version = client.get_ipa_version()
-        if LooseVersion(ipa_version) < LooseVersion('4.4.2'):
+        if Version(ipa_version) < Version('4.4.2'):
             module.fail_json(msg="Current version of IPA server [%s] does not support 'CA enable' option. Please upgrade to "
                                  "version greater than 4.4.2")
         if ipa_subca:
