@@ -172,6 +172,7 @@ options:
       - ID of the container to be cloned.
       - I(description), I(hostname), and I(pool) will be copied from the cloned container if not specified.
       - The type of clone created is defined by the I(clone-type) parameter.
+      - This operator is only supported for Proxmox clusters that use LXC containerization (PVE version >= 4)
     type: int
     version_added: 4.3.0
   clone_type:
@@ -470,6 +471,9 @@ def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, sw
         kwargs['disk'] = disk
 
     if clone is not None:
+        if VZ_TYPE != 'lxc':
+            module.fail_json(changed=False, msg="Clone operator is only supported for LXC enabled proxmox clusters.")
+
         clone_is_template = is_template_container(proxmox, node, clone)
 
         # By default, create a full copy only when the cloned container is not a template.
@@ -506,7 +510,6 @@ def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, sw
             if module.params[param] is not None:
                 clone_parameters[param] = module.params[param]
 
-        # TODO: Check if openvz VZ_TYPE also supports this endpoint
         taskid = getattr(proxmox_node, VZ_TYPE)(clone).clone.post(newid=vmid, **clone_parameters)
     else:
         taskid = getattr(proxmox_node, VZ_TYPE).create(vmid=vmid, storage=storage, memory=memory, swap=swap, **kwargs)
