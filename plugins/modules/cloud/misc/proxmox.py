@@ -313,6 +313,18 @@ EXAMPLES = r'''
     clone: 100
     hostname: clone.example.org
 
+- name: >
+    Create a full clone of the container with id 100.
+  community.general.proxmox:
+    vmid: 201
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    clone: 100
+    hostname: clone.example.org
+    storage: local
+
 - name: Start container
   community.general.proxmox:
     vmid: 100
