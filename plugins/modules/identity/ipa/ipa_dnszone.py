@@ -30,13 +30,11 @@ options:
     description: Apply dynamic update to zone
     required: false
     default: false
-    choices: [false, true]
     type: bool
   allowsyncptr:
     description: Allow synchronization of forward and reverse records in the zone.
     required: false
     default: false
-    choices: [false, true]
     type: bool
 extends_documentation_fragment:
 - community.general.ipa.documentation
@@ -170,8 +168,8 @@ def main():
     argument_spec = ipa_argument_spec()
     argument_spec.update(zone_name=dict(type='str', required=True),
                          state=dict(type='str', default='present', choices=['present', 'absent']),
-                         dynamicupdate=dict(type='bool', required=False, default=False, choices=[True, False]),
-                         allowsyncptr=dict(type='bool', required=False, default=False, choices=[True, False]),
+                         dynamicupdate=dict(type='bool', required=False, default=False),
+                         allowsyncptr=dict(type='bool', required=False, default=False),
                          )
 
     module = AnsibleModule(argument_spec=argument_spec,
