@@ -13,17 +13,15 @@ from collections import Counter
 def counter(sequence):
     ''' Count elements in a sequence. Returns dict with count result. '''
     if not isinstance(sequence, Sequence):
-        raise AnsibleFilterError('First argument for counter must be a sequence (str or list). %s is %s' %
+        raise AnsibleFilterError('Argument for community.general.counter must be a sequence (string or list). %s is %s' %
                                  (sequence, type(sequence)))
 
-    for element in sequence:
-        try:
-            hash(element)
-        except TypeError:
-            raise AnsibleFilterError('Sequence elements must be hashable (int, float or str). %s is %s.' %
-                                     (element, type(element)))
-
-    result = dict(Counter(sequence))
+    try:
+        result = dict(Counter(sequence))
+    except TypeError as e:
+        raise AnsibleFilterError(
+            "community.general.counter needs a sequence with hashable elements (int, float or str) - %s" % (e)
+        )
     return result
 
 

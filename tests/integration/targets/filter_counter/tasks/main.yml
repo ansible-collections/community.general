@@ -22,7 +22,7 @@
   assert:
     that:
       - res is failed
-      - res.msg is match('First argument for counter must be a sequence')
+      - res.msg is match('Argument for community.general.counter must be a sequence')
 
 - name: test fail element not hashable
   debug:
@@ -30,8 +30,8 @@
   ignore_errors: yes
   register: res
 
-- name: verify test fail argument not a sequence
+- name: verify test fail element not hashable
   assert:
     that:
       - res is failed
-      - res.msg is match('Sequence elements must be hashable')
+      - res.msg is match('community.general.counter needs a sequence with hashable elements')
