@@ -16,4 +16,4 @@ except ImportError:
     try:
         from distutils.version import LooseVersion
     except ImportError as exc:
-        raise_from(ImportError('To use this plugin or module with ansible-core < 2.11, you need to use Python < 2.12 with distutils.version present'), exc)
+        raise_from(ImportError('To use this plugin or module with ansible-core < 2.11, you need to use Python < 3.12 with distutils.version present'), exc)
