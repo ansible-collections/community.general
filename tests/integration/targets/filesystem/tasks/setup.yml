@@ -8,7 +8,7 @@
     state: present
   # xfsprogs on OpenSUSE requires Python 3, skip this for our newer Py2 OpenSUSE builds
   when: not (item == 'xfsprogs' and ansible_os_family == 'Suse' and ansible_python.version.major == 2 and ansible_distribution_major_version|int != 42)
-  with_items:
+  loop:
     - e2fsprogs
     - xfsprogs
 
@@ -32,12 +32,11 @@
 
 - name: "Install btrfs progs (OpenSuse)"
   ansible.builtin.package:
-    name: '{{ item }}'
+    name:
+      - python{{ ansible_python.version.major }}-xml
+      - btrfsprogs
     state: present
   when: ansible_os_family == 'Suse'
-  with_items:
-    - python{{ ansible_python.version.major }}-xml
-    - btrfsprogs
 
 - name: "Install reiserfs utils (Fedora)"
   ansible.builtin.package:
@@ -46,9 +45,11 @@
   when:
     - ansible_distribution == 'Fedora' and (ansible_facts.distribution_major_version | int < 35)
 
-- name: "Install reiserfs (OpenSuse)"
+- name: "Install reiserfs and util-linux-systemd (for findmnt) (OpenSuse)"
   ansible.builtin.package:
-    name: reiserfs
+    name:
+      - reiserfs
+      - util-linux-systemd
     state: present
   when:
     - ansible_os_family == 'Suse'
@@ -100,10 +101,9 @@
 
 - name: "Install dosfstools and lvm2 (Linux)"
   ansible.builtin.package:
-    name: '{{ item }}'
-  with_items:
-    - dosfstools
-    - lvm2
+    name:
+      - dosfstools
+      - lvm2
   when: ansible_system == 'Linux'
 
 - name: "Install fatresize and get version"
