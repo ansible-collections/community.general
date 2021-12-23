@@ -29,9 +29,9 @@ options:
   dynamicupdate:
     description: Apply dynamic update to zone
     required: false
-    default: "false"
-    choices: ["false", "true"]
-    type: str
+    default: false
+    choices: [false, true]
+    type: bool
   allowsyncptr:
     description: Allow synchronization of forward and reverse records in the zone.
     required: false
@@ -148,7 +148,7 @@ def ensure(module, client):
             changed = True
             if not module.check_mode:
                 client.dnszone_add(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
-        elif ipa_dnszone['idnsallowdynupdate'][0] != dynamicupdate.upper() or ipa_dnszone['idnsallowsyncptr'][0] != str(allowsyncptr).upper():
+        elif ipa_dnszone['idnsallowdynupdate'][0] != str(dynamicupdate).upper() or ipa_dnszone['idnsallowsyncptr'][0] != str(allowsyncptr).upper():
             changed = True
             if not module.check_mode:
                 client.dnszone_mod(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate, 'idnsallowsyncptr': allowsyncptr})
@@ -170,7 +170,7 @@ def main():
     argument_spec = ipa_argument_spec()
     argument_spec.update(zone_name=dict(type='str', required=True),
                          state=dict(type='str', default='present', choices=['present', 'absent']),
-                         dynamicupdate=dict(type='str', required=False, default='false', choices=['true', 'false']),
+                         dynamicupdate=dict(type='bool', required=False, default=False, choices=[True, False]),
                          allowsyncptr=dict(type='bool', required=False, default=False, choices=[True, False]),
                          )
 
