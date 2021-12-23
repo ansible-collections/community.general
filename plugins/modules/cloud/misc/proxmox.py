@@ -621,8 +621,7 @@ def main():
                                                                   # either clone a container or create a new one from a template file.
         ],
         required_together=[
-            ('api_token_id', 'api_token_secret'),
-            ('clone', 'clone_type')
+            ('api_token_id', 'api_token_secret')
         ],
         required_one_of=[('api_password', 'api_token_id')],
         mutually_exclusive=[('clone', 'ostemplate')],  # Creating a new container is done either by cloning an existing one, or based on a template.
