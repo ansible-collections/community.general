@@ -746,24 +746,7 @@ def main():
             module.fail_json(msg="Pre-clone checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
 
         try:
-            create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, clone,
-                            cores=module.params['cores'],
-                            pool=module.params['pool'],
-                            password=module.params['password'],
-                            hostname=module.params['hostname'],
-                            netif=module.params['netif'],
-                            mounts=module.params['mounts'],
-                            ip_address=module.params['ip_address'],
-                            onboot=ansible_to_proxmox_bool(module.params['onboot']),
-                            cpuunits=module.params['cpuunits'],
-                            nameserver=module.params['nameserver'],
-                            searchdomain=module.params['searchdomain'],
-                            force=ansible_to_proxmox_bool(module.params['force']),
-                            pubkey=module.params['pubkey'],
-                            features=",".join(module.params['features']) if module.params['features'] is not None else None,
-                            unprivileged=ansible_to_proxmox_bool(module.params['unprivileged']),
-                            description=module.params['description'],
-                            hookscript=module.params['hookscript'])
+            create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, clone)
 
             module.exit_json(changed=True, msg="Cloned VM %s from %s" % (vmid, clone))
         except Exception as e:
