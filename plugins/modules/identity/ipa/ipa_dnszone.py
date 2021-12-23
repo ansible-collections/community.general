@@ -28,14 +28,13 @@ options:
     type: str
   dynamicupdate:
     description: Apply dynamic update to zone
-    required: false
     default: false
     type: bool
   allowsyncptr:
     description: Allow synchronization of forward and reverse records in the zone.
-    required: false
     default: false
     type: bool
+    version_added: 4.3.0
 extends_documentation_fragment:
 - community.general.ipa.documentation
 
