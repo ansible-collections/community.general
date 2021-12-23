@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: proxmox
-short_description: management of container instances in Proxmox VE cluster
+short_description: management of instances in Proxmox VE cluster
 description:
   - allows you to create/delete/stop instances in Proxmox VE cluster
   - Starting in Ansible 2.1, it automatically detects containerization type (lxc for PVE 4, openvz for older)
@@ -427,7 +427,6 @@ def get_instance(proxmox, vmid):
 
 
 def content_check(proxmox, node, ostemplate, template_store):
-    """Check if the given ostemplate actually exists in the template store of a node."""
     return [True for cnt in proxmox.nodes(node).storage(template_store).content.get() if cnt['volid'] == ostemplate]
 
 
