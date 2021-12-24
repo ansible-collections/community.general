@@ -119,11 +119,12 @@ compose:
 import re
 
 from ansible.module_utils.common._collections_compat import MutableMapping
-from distutils.version import LooseVersion
 
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.module_utils.six.moves.urllib.parse import urlencode
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 # 3rd party imports
 try:

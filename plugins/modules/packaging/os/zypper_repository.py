@@ -133,14 +133,14 @@ except ImportError:
     XML_IMP_ERR = traceback.format_exc()
     HAS_XML = False
 
-from distutils.version import LooseVersion
-
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.six.moves import configparser, StringIO
 from io import open
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 REPO_OPTS = ['alias', 'name', 'priority', 'enabled', 'autorefresh', 'gpgcheck']
 

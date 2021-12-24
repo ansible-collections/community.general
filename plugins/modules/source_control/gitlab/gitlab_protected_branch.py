@@ -73,7 +73,8 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.api import basic_auth_argument_spec
-from distutils.version import LooseVersion
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 GITLAB_IMP_ERR = None
 try:

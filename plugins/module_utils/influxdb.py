@@ -9,7 +9,8 @@ __metaclass__ = type
 import traceback
 
 from ansible.module_utils.basic import missing_required_lib
-from distutils.version import LooseVersion
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 REQUESTS_IMP_ERR = None
 try:

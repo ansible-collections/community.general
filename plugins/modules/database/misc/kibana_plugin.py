@@ -117,8 +117,9 @@ state:
 '''
 
 import os
-from distutils.version import LooseVersion
 from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 PACKAGE_STATE_MAP = dict(
