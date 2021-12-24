@@ -230,10 +230,11 @@ command:
 import os
 import json
 import tempfile
-from distutils.version import LooseVersion
 from ansible.module_utils.six.moves import shlex_quote
 
 from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 module = None
 

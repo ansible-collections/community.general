@@ -148,8 +148,9 @@ EXAMPLES = '''
 RETURN = r"""# """
 
 import traceback
-from distutils.version import LooseVersion
 import re
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 class DNSimpleV1():

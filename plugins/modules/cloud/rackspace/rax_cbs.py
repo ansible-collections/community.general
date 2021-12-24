@@ -97,7 +97,7 @@ EXAMPLES = '''
       register: my_volume
 '''
 
-from distutils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 try:
     import pyrax

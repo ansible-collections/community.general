@@ -56,12 +56,13 @@ pids:
 
 import abc
 import re
-from distutils.version import LooseVersion
 from os.path import basename
 
 from ansible.module_utils import six
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 try:
     import psutil
