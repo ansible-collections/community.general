@@ -323,8 +323,7 @@ EXAMPLES = r'''
     clone: 100
     hostname: clone.example.org
 
-- name: >
-    Create a full clone of the container with id 100.
+- name: Create a full clone of the container with id 100
   community.general.proxmox:
     vmid: 201
     node: uk-mc02
