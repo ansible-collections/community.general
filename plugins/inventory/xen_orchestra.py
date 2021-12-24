@@ -79,10 +79,10 @@ simple_config_file:
 import json
 import ssl
 
-from distutils.version import LooseVersion
-
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 # 3rd party imports
 try:

@@ -356,8 +356,9 @@ import os
 import re
 import traceback
 
-from distutils.version import LooseVersion
 from io import BytesIO
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 LXML_IMP_ERR = None
 try:

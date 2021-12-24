@@ -124,7 +124,7 @@ EXAMPLES = r'''
 import os
 import traceback
 
-from distutils.version import LooseVersion
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 SENDGRID_IMP_ERR = None
 try:
