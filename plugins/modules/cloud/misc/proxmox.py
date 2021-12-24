@@ -313,7 +313,7 @@ EXAMPLES = r'''
 
 - name: >
     Create a linked clone of the template container with id 100. The newly created container with be a
-    linked clone, because no storage parameter is defined.
+    linked clone, because no storage parameter is defined
   community.general.proxmox:
     vmid: 201
     node: uk-mc02
