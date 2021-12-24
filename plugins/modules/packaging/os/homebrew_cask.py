@@ -140,7 +140,8 @@ EXAMPLES = '''
 import os
 import re
 import tempfile
-from distutils import version
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.basic import AnsibleModule
@@ -493,7 +494,7 @@ class HomebrewCask(object):
 
     def _brew_cask_command_is_deprecated(self):
         # The `brew cask` replacements were fully available in 2.6.0 (https://brew.sh/2020/12/01/homebrew-2.6.0/)
-        return version.LooseVersion(self._get_brew_version()) >= version.LooseVersion('2.6.0')
+        return LooseVersion(self._get_brew_version()) >= LooseVersion('2.6.0')
     # /checks ------------------------------------------------------ }}}
 
     # commands ----------------------------------------------------- {{{
