@@ -7,10 +7,10 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from distutils.version import StrictVersion
-
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 try:
     from urllib import quote_plus  # Python 2.X
@@ -79,7 +79,7 @@ def gitlab_authentication(module):
         # python-gitlab library remove support for username/password authentication since 1.13.0
         # Changelog : https://github.com/python-gitlab/python-gitlab/releases/tag/v1.13.0
         # This condition allow to still support older version of the python-gitlab library
-        if StrictVersion(gitlab.__version__) < StrictVersion("1.13.0"):
+        if LooseVersion(gitlab.__version__) < LooseVersion("1.13.0"):
             gitlab_instance = gitlab.Gitlab(url=gitlab_url, ssl_verify=validate_certs, email=gitlab_user, password=gitlab_password,
                                             private_token=gitlab_token, api_version=4)
         else:

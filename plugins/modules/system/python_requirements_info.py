@@ -122,7 +122,7 @@ import operator
 HAS_DISTUTILS = False
 try:
     import pkg_resources
-    from distutils.version import LooseVersion
+    from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
     HAS_DISTUTILS = True
 except ImportError:
     pass
