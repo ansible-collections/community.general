@@ -172,7 +172,7 @@ options:
       - ID of the container to be cloned.
       - I(description), I(hostname), and I(pool) will be copied from the cloned container if not specified.
       - The type of clone created is defined by the I(clone_type) parameter.
-      - This operator is only supported for Proxmox clusters that use LXC containerization (PVE version >= 4)
+      - This operator is only supported for Proxmox clusters that use LXC containerization (PVE version >= 4).
     type: int
     version_added: 4.3.0
   clone_type:
