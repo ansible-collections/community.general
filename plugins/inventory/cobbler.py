@@ -68,7 +68,6 @@ user: ansible-tester
 password: secure
 '''
 
-from distutils.version import LooseVersion
 import socket
 
 from ansible.errors import AnsibleError
