@@ -184,7 +184,7 @@ class Snap(CmdStateModuleHelper):
         state=dict(fmt=_state_map),
         classic=dict(fmt="--classic", style=ArgFormat.BOOLEAN),
         channel=dict(fmt=lambda v: [] if v == 'stable' else ['--channel', '{0}'.format(v)]),
-        options=dict(fmt=lambda v: list(v)),
+        options=dict(fmt=list),
         json_format=dict(fmt="-d", style=ArgFormat.BOOLEAN),
     )
     check_rc = False
