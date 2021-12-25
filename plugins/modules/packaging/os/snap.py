@@ -50,7 +50,7 @@ options:
     options:
         description:
             - Set options with pattern key=value or snap:key=value. If a snap name is given, the option will be applied
-              to that snap only. If the snap name is omitted, the options will be applied to all snaps. Options will 
+              to that snap only. If the snap name is omitted, the options will be applied to all snaps. Options will
               only be applied to active snaps.
         required: false
         type: list
@@ -71,8 +71,8 @@ EXAMPLES = '''
     name:
       - foo
       - bar
-      
-# Install "foo" snap with options par1=A and par2=B 
+
+# Install "foo" snap with options par1=A and par2=B
 - name: Install "foo" with options
   community.general.snap:
     name:
@@ -81,7 +81,7 @@ EXAMPLES = '''
       - par1=A
       - par2=B
 
-# Install "foo" and "bar" snaps with common option com=A and specific options fooPar=X and barPar=Y  
+# Install "foo" and "bar" snaps with common option com=A and specific options fooPar=X and barPar=Y
 - name: Install "foo" and "bar" with options
   community.general.snap:
     name:
@@ -155,8 +155,8 @@ __state_map = dict(
     disabled='disable',
     info='info',  # not public
     list='list',  # not public
-    set='set', # not public
-    get='get', # not public
+    set='set',  # not public
+    get='get',  # not public
 )
 
 
@@ -184,7 +184,7 @@ class Snap(CmdStateModuleHelper):
         state=dict(fmt=_state_map),
         classic=dict(fmt="--classic", style=ArgFormat.BOOLEAN),
         channel=dict(fmt=lambda v: [] if v == 'stable' else ['--channel', '{0}'.format(v)]),
-        options=dict(fmt=lambda v: [p for p in v]),
+        options=dict(fmt=lambda v: list(v)),
         json_format=dict(fmt="-d", style=ArgFormat.BOOLEAN),
     )
     check_rc = False
