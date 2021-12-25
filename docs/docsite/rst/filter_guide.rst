@@ -334,11 +334,11 @@ This produces:
         }
     }
 
-This plugin is very useful for selecting resources based on current allocation:
+This plugin is useful for selecting resources based on current allocation:
 
 .. code-block:: yaml+jinja
 
-    - name: Get ID of SCSI controller(s) with less than 4 disks attached and choose the one with least disks
+    - name: Get ID of SCSI controller(s) with less than 4 disks attached and choose the one with the least disks
       debug:
         msg: >-
           {{
@@ -368,7 +368,7 @@ This produces:
 
 .. code-block:: ansible-output
 
-    TASK [Get a SCSI controller id with less than 4 disks and choose the one with least disks]
+    TASK [Get ID of SCSI controller(s) with less than 4 disks attached and choose the one with the least disks]
     ok: [localhost] => {
         "msg": "scsi_2"
     }
