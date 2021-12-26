@@ -50,11 +50,12 @@ options:
     options:
         description:
             - Set options with pattern C(key=value) or C(snap:key=value). If a snap name is given, the option will be applied
-              to that snap only. If the snap name is omitted, the options will be applied to all snaps. Options will
+              to that snap only. If the snap name is omitted, the options will be applied to all snaps listed in I(name). Options will
               only be applied to active snaps.
         required: false
         type: list
         elements: str
+        version_added: 4.3.0
 
 author:
     - Victor Carceler (@vcarceler) <vcarceler@iespuigcastellar.xeill.net>
@@ -133,7 +134,7 @@ snaps_removed:
     type: list
     returned: When any snaps have been removed
 options_changed:
-    description: The list of options set/changed in format "snap:key=value"
+    description: The list of options set/changed in format C(snap:key=value).
     type: list
     returned: When any options have been changed/set
 '''
