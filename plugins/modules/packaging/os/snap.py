@@ -49,7 +49,7 @@ options:
         default: stable
     options:
         description:
-            - Set options with pattern key=value or snap:key=value. If a snap name is given, the option will be applied
+            - Set options with pattern C(key=value) or C(snap:key=value). If a snap name is given, the option will be applied
               to that snap only. If the snap name is omitted, the options will be applied to all snaps. Options will
               only be applied to active snaps.
         required: false
