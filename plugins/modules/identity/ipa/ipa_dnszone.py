@@ -27,7 +27,7 @@ options:
     choices: ["absent", "present"]
     type: str
   dynamicupdate:
-    description: Apply dynamic update to zone
+    description: Apply dynamic update to zone.
     default: false
     type: bool
   allowsyncptr:
