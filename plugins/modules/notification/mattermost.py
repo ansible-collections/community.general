@@ -46,6 +46,7 @@ options:
       - Define a list of attachments.
       - For more information, see U(https://developers.mattermost.com/integrate/admin-guide/admin-message-attachments/).
       - Required when I(text) is not set.
+    version_added: 4.3.0
   channel:
     type: str
     description:
@@ -122,13 +123,16 @@ def main():
         argument_spec=dict(
             url=dict(type='str', required=True),
             api_key=dict(type='str', required=True, no_log=True),
-            text=dict(type='str', required=True),
+            text=dict(type='str', default=None),
             channel=dict(type='str', default=None),
             username=dict(type='str', default='Ansible'),
             icon_url=dict(type='str', default='https://www.ansible.com/favicon.ico'),
             validate_certs=dict(default=True, type='bool'),
             attachments=dict(type='list', elements='dict'),
-        )
+        ),
+        required_one_of=[
+          ('text', 'attachments')
+        ],
     )
     # init return dict
     result = dict(changed=False, msg="OK")
