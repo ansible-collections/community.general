@@ -54,12 +54,12 @@ options:
   organization:
     type: str
     description:
-      - Organization identifier
+      - Organization identifier ( don't use project if organization is set )
 
   project:
     type: str
     description:
-      - Project identifier
+      - Project identifier ( don't use organization if project is set )
 
   state:
     type: str
@@ -136,7 +136,7 @@ EXAMPLES = '''
     name: foobar
     state: present
     image: 89ee4018-f8c3-4dc4-a6b5-bca14f985ebe
-    organization: 951df375-e094-4d26-97c1-ba548eeb9c42
+    project: 951df375-e094-4d26-97c1-ba548eeb9c42
     region: ams1
     commercial_type: VC1S
     tags:
@@ -148,7 +148,7 @@ EXAMPLES = '''
     name: foobar
     state: present
     image: 89ee4018-f8c3-4dc4-a6b5-bca14f985ebe
-    organization: 951df375-e094-4d26-97c1-ba548eeb9c42
+    project: 951df375-e094-4d26-97c1-ba548eeb9c42
     region: ams1
     commercial_type: VC1S
     security_group: 4a31b633-118e-4900-bd52-facf1085fc8d
@@ -161,7 +161,7 @@ EXAMPLES = '''
     name: foobar
     state: absent
     image: 89ee4018-f8c3-4dc4-a6b5-bca14f985ebe
-    organization: 951df375-e094-4d26-97c1-ba548eeb9c42
+    project: 951df375-e094-4d26-97c1-ba548eeb9c42
     region: ams1
     commercial_type: VC1S
 '''
