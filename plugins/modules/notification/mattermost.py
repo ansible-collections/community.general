@@ -131,7 +131,7 @@ def main():
             attachments=dict(type='list', elements='dict'),
         ),
         required_one_of=[
-            ('text', 'attachments')
+            ('text', 'attachments'),
         ],
     )
     # init return dict
