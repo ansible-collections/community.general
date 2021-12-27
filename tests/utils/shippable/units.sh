@@ -22,6 +22,10 @@ esac
 
 ansible-test env --timeout "${timeout}" --color -v
 
+if [ "$2" == "2.10" ]; then
+    sed -i -E 's/^redis($| .*)/redis < 4.1.0/g' tests/unit/requirements.txt
+fi
+
 # shellcheck disable=SC2086
 ansible-test units --color -v --docker default --python "${version}" ${COVERAGE:+"$COVERAGE"} ${CHANGED:+"$CHANGED"} \
     "${options[@]:+${options[@]}}" \
