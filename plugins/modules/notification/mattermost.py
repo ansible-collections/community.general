@@ -123,7 +123,7 @@ def main():
         argument_spec=dict(
             url=dict(type='str', required=True),
             api_key=dict(type='str', required=True, no_log=True),
-            text=dict(type='str', default=None),
+            text=dict(type='str'),
             channel=dict(type='str', default=None),
             username=dict(type='str', default='Ansible'),
             icon_url=dict(type='str', default='https://www.ansible.com/favicon.ico'),
