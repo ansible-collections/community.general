@@ -284,7 +284,7 @@ def create_server(compute_api, server):
             
     if server["security_group"]:
         data["security_group"] = server["security_group"]
-
+        
     response = compute_api.post(path="servers", data=data)
 
     if not response.ok:
