@@ -13,4 +13,11 @@ repository: https://github.com/ansible-collections/community.general
 documentation: https://docs.ansible.com/ansible/latest/collections/community/general/
 homepage: https://github.com/ansible-collections/community.general
 issues: https://github.com/ansible-collections/community.general/issues
+build_ignore:
+  - tests
+  - changelogs/fragements/keep
+  - .azure-pipelines
+  - .github
+  - .gitignore
+  - .pre-commit-config.yaml
 #type: flatmap
