@@ -54,7 +54,8 @@ options:
   organization:
     type: str
     description:
-      - Organization identifier ( don't use project if organization is set )
+      - Organization identifier.
+      - Exactly one of I(project) and I(organization) must be specified.
 
   project:
     type: str
