@@ -54,8 +54,15 @@ options:
   organization:
     type: str
     description:
-      - Organization identifier
-    required: true
+      - Organization identifier.
+      - Exactly one of I(project) and I(organization) must be specified.
+
+  project:
+    type: str
+    description:
+      - Project identifier.
+      - Exactly one of I(project) and I(organization) must be specified.
+    version_added: 4.3.0
 
   state:
     type: str
@@ -132,7 +139,7 @@ EXAMPLES = '''
     name: foobar
     state: present
     image: 89ee4018-f8c3-4dc4-a6b5-bca14f985ebe
-    organization: 951df375-e094-4d26-97c1-ba548eeb9c42
+    project: 951df375-e094-4d26-97c1-ba548eeb9c42
     region: ams1
     commercial_type: VC1S
     tags:
@@ -144,7 +151,7 @@ EXAMPLES = '''
     name: foobar
     state: present
     image: 89ee4018-f8c3-4dc4-a6b5-bca14f985ebe
-    organization: 951df375-e094-4d26-97c1-ba548eeb9c42
+    project: 951df375-e094-4d26-97c1-ba548eeb9c42
     region: ams1
     commercial_type: VC1S
     security_group: 4a31b633-118e-4900-bd52-facf1085fc8d
@@ -157,7 +164,7 @@ EXAMPLES = '''
     name: foobar
     state: absent
     image: 89ee4018-f8c3-4dc4-a6b5-bca14f985ebe
-    organization: 951df375-e094-4d26-97c1-ba548eeb9c42
+    project: 951df375-e094-4d26-97c1-ba548eeb9c42
     region: ams1
     commercial_type: VC1S
 '''
@@ -269,9 +276,14 @@ def create_server(compute_api, server):
             "commercial_type": server["commercial_type"],
             "image": server["image"],
             "dynamic_ip_required": server["dynamic_ip_required"],
-            "name": server["name"],
-            "organization": server["organization"]
+            "name": server["name"]
             }
+
+    if server["project"]:
+        data["project"] = server["project"]
+
+    if server["organization"]:
+        data["organization"] = server["organization"]
 
     if server["security_group"]:
         data["security_group"] = server["security_group"]
@@ -628,6 +640,7 @@ def core(module):
         "enable_ipv6": module.params["enable_ipv6"],
         "tags": module.params["tags"],
         "organization": module.params["organization"],
+        "project": module.params["project"],
         "security_group": module.params["security_group"]
     }
     module.params['api_url'] = SCALEWAY_LOCATION[region]["api_endpoint"]
@@ -655,7 +668,8 @@ def main():
         public_ip=dict(default="absent"),
         state=dict(choices=list(state_strategy.keys()), default='present'),
         tags=dict(type="list", elements="str", default=[]),
-        organization=dict(required=True),
+        organization=dict(),
+        project=dict(),
         wait=dict(type="bool", default=False),
         wait_timeout=dict(type="int", default=300),
         wait_sleep_time=dict(type="int", default=3),
@@ -664,6 +678,12 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
+        mutually_exclusive=[
+            ('organization', 'project'),
+        ],
+        required_one_of=[
+            ('organization', 'project'),
+        ],
     )
 
     core(module)
