@@ -275,13 +275,13 @@ def create_server(compute_api, server):
             "dynamic_ip_required": server["dynamic_ip_required"],
             "name": server["name"]
             }
-    
+
     if server["project"]:
         data["project"] = server["project"]
-        
+
     if server["organization"]:
         data["organization"] = server["organization"]
-            
+
     if server["security_group"]:
         data["security_group"] = server["security_group"]
 
