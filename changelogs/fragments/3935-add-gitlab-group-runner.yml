@@ -1,0 +1,4 @@
+minor_changes:
+    - 'gitlab_runner - allow to register group runner (https://github.com/ansible-collections/community.general/pull/3935).'
+bugfixes:
+    - 'gitlab_runner module - fix project/group runner CRUD operations (https://github.com/ansible-collections/community.general/pull/3935).'

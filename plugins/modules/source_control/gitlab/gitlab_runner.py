@@ -36,9 +36,14 @@ extends_documentation_fragment:
   - community.general.gitlab
 
 options:
+  group:
+    description:
+      - ID or full path of the group in the form of C(group/subgroup).
+    type: str
+    version_added: '4.3.0'
   project:
     description:
-      - ID or full path of the project in the form of group/name.
+      - ID or full path of the project in the form of C(group/name).
     type: str
     version_added: '3.7.0'
   description:
@@ -193,13 +198,18 @@ except NameError:
 
 
 class GitLabRunner(object):
-    def __init__(self, module, gitlab_instance, project=None):
+    def __init__(self, module, gitlab_instance, group=None, project=None):
         self._module = module
         self._gitlab = gitlab_instance
         # Whether to operate on GitLab-instance-wide or project-wide runners
         # See https://gitlab.com/gitlab-org/gitlab-ce/issues/60774
         # for group runner token access
-        self._runners_endpoint = project.runners if project else gitlab_instance.runners
+        if group:
+            self._runners_endpoint = group.runners
+        elif project:
+            self._runners_endpoint = project.runners
+        else:
+            self._runners_endpoint = gitlab_instance.runners
         self.runner_object = None
 
     def create_or_update_runner(self, description, options):
@@ -248,7 +258,7 @@ class GitLabRunner(object):
             return True
 
         try:
-            runner = self._runners_endpoint.create(arguments)
+            runner = self._gitlab.runners.create(arguments)
         except (gitlab.exceptions.GitlabCreateError) as e:
             self._module.fail_json(msg="Failed to create runner: %s " % to_native(e))
 
@@ -292,10 +302,10 @@ class GitLabRunner(object):
             # object, so we need to handle both
             if hasattr(runner, "description"):
                 if (runner.description == description):
-                    return self._runners_endpoint.get(runner.id)
+                    return self._gitlab.runners.get(runner.id)
             else:
                 if (runner['description'] == description):
-                    return self._runners_endpoint.get(runner['id'])
+                    return self._gitlab.runners.get(runner['id'])
 
     '''
     @param description Description of the runner
@@ -332,6 +342,7 @@ def main():
         maximum_timeout=dict(type='int', default=3600),
         registration_token=dict(type='str', no_log=True),
         project=dict(type='str'),
+        group=dict(type='str'),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     ))
 
@@ -343,6 +354,7 @@ def main():
             ['api_username', 'api_job_token'],
             ['api_token', 'api_oauth_token'],
             ['api_token', 'api_job_token'],
+            ['group', 'project'],
         ],
         required_together=[
             ['api_username', 'api_password'],
@@ -366,6 +378,7 @@ def main():
     access_level = module.params['access_level']
     maximum_timeout = module.params['maximum_timeout']
     registration_token = module.params['registration_token']
+    group = module.params['group']
     project = module.params['project']
 
     if not HAS_GITLAB_PACKAGE:
@@ -373,13 +386,20 @@ def main():
 
     gitlab_instance = gitlab_authentication(module)
     gitlab_project = None
-    if project:
+    gitlab_group = None
+
+    if group:
+        try:
+            gitlab_group = gitlab_instance.groups.get(group)
+        except gitlab.exceptions.GitlabGetError as e:
+            module.fail_json(msg='No such a group %s' % group, exception=to_native(e))
+    elif project:
         try:
             gitlab_project = gitlab_instance.projects.get(project)
         except gitlab.exceptions.GitlabGetError as e:
             module.fail_json(msg='No such a project %s' % project, exception=to_native(e))
 
-    gitlab_runner = GitLabRunner(module, gitlab_instance, gitlab_project)
+    gitlab_runner = GitLabRunner(module, gitlab_instance, gitlab_group, gitlab_project)
     runner_exists = gitlab_runner.exists_runner(runner_description, owned)
 
     if state == 'absent':
