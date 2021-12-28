@@ -59,7 +59,9 @@ options:
   project:
     type: str
     description:
-      - Project identifier ( don't use organization if project is set )
+      - Project identifier.
+      - Exactly one of I(project) and I(organization) must be specified.
+    version_added: 4.3.0
 
   state:
     type: str
