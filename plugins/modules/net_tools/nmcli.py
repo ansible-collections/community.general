@@ -1236,6 +1236,7 @@ class Nmcli(object):
         self.wifi = module.params['wifi']
         self.wifi_sec = module.params['wifi_sec']
         self.gsm = module.params['gsm']
+        self.wireguard = module.params['wireguard']
 
         if self.method4:
             self.ipv4_method = self.method4
@@ -1249,6 +1250,8 @@ class Nmcli(object):
         if self.method6:
             self.ipv6_method = self.method6
         elif self.type == 'dummy' and not self.ip6:
+            self.ipv6_method = 'disabled'
+        elif self.type == 'wireguard' and not self.ip6:
             self.ipv6_method = 'disabled'
         elif self.ip6:
             self.ipv6_method = 'manual'
@@ -1404,6 +1407,12 @@ class Nmcli(object):
                     options.update({
                         'gsm.%s' % name: value,
                     })
+        elif self.type == 'wireguard':
+            if self.wireguard:
+                for name, value in self.wireguard.items():
+                    options.update({
+                        'wireguard.%s' % name: value,
+                    })
         # Convert settings values based on the situation.
         for setting, value in options.items():
             setting_type = self.settings_type(setting)
@@ -1445,6 +1454,7 @@ class Nmcli(object):
             'vlan',
             'wifi',
             'gsm',
+            'wireguard',
         )
 
     @property
@@ -1834,6 +1844,7 @@ def main():
                           'vxlan',
                           'wifi',
                           'gsm',
+                          'wireguard',
                       ]),
             ip4=dict(type='list', elements='str'),
             gw4=dict(type='str'),
@@ -1907,6 +1918,7 @@ def main():
             wifi=dict(type='dict'),
             wifi_sec=dict(type='dict', no_log=True),
             gsm=dict(type='dict'),
+            wireguard=dict(type='dict'),
         ),
         mutually_exclusive=[['never_default4', 'gw4']],
         required_if=[("type", "wifi", [("ssid")])],
