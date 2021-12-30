@@ -109,6 +109,7 @@ def core(module):
     region = module.params["region"]
     state = module.params['state']
     name = module.params['name']
+    organization = module.params['organization']
     project = module.params['project']
     size = module.params['size']
     volume_type = module.params['volume_type']
@@ -128,7 +129,13 @@ def core(module):
         if volume['project'] == project and volume['name'] == name:
             volumeByName = volume
 
+        if volume['organization'] == organization and volume['name'] == name:
+            volumeByName = volume
+
     if state in ('present',):
+        if project is None:
+            project = organization
+
         if volumeByName is not None:
             module.exit_json(changed=False)
 
@@ -164,12 +171,19 @@ def main():
         name=dict(required=True),
         size=dict(type='int'),
         project=dict(),
+        organization=dict(),
         volume_type=dict(),
         region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
+        mutually_exclusive=[
+            ('organization', 'project'),
+        ],
+        required_one_of=[
+            ('organization', 'project'),
+        ],
     )
 
     core(module)
@@ -177,4 +191,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-  
