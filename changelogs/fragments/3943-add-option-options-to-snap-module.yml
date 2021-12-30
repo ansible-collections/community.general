@@ -1,0 +1,2 @@
+minor_changes:
+   - Add option C(options) to module C(snap) permitting to set options using the C(snap set) command.
