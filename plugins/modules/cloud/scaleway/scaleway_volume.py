@@ -55,6 +55,10 @@ options:
     type: str
     description:
      - ScaleWay project ID to which volume belongs.
+  organization:
+    type: str
+    description:
+     - [deprecated] ScaleWay organization ID to which volume belongs.
   size:
     type: int
     description:
