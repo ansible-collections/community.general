@@ -121,11 +121,11 @@
 - name: Check contents
   ansible.builtin.assert:
     that:
-      - "rule_1_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command\n'"
-      - "rule_2_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command1, /usr/local/bin/command2\n'"
-      - "rule_3_contents['content'] | b64decode == 'alice ALL= /usr/local/bin/command\n'"
-      - "rule_4_contents['content'] | b64decode == '%students ALL=NOPASSWD: /usr/local/bin/command\n'"
-      - "rule_5_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command\n'"
+      - rule_1_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command\n'
+      - rule_2_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command1, /usr/local/bin/command2\n'
+      - rule_3_contents['content'] | b64decode == 'alice ALL= /usr/local/bin/command\n'
+      - rule_4_contents['content'] | b64decode == '%students ALL=NOPASSWD: /usr/local/bin/command\n'
+      - rule_5_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command\n'
 
 - name: Check stats
   ansible.builtin.assert:
