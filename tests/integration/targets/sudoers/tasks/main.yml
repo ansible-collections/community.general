@@ -81,7 +81,7 @@
   register: rule_4_contents
 
 
-- name: Create rule using a group
+- name: Create rule in a different directory
   community.general.sudoers:
     name: my-sudo-rule-5
     state: present
