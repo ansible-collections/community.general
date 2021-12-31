@@ -4,10 +4,17 @@
 - name: Register sudoers.d directory
   set_fact:
     sudoers_path: /etc/sudoers.d
+    alt_sudoers_path: /etc/sudoers_alt
 
 - name: Ensure sudoers directory exists
   ansible.builtin.file:
     path: "{{ sudoers_path }}"
+    state: directory
+    recurse: true
+
+- name: Ensure alternative sudoers directory exists
+  ansible.builtin.file:
+    path: "{{ alt_sudoers_path }}"
     state: directory
     recurse: true
 
@@ -81,18 +88,18 @@
   register: rule_4_contents
 
 
-- name: Create rule in a different directory
+- name: Create rule in a alternative directory
   community.general.sudoers:
     name: my-sudo-rule-5
     state: present
     user: alice
     commands: /usr/local/bin/command
-    sudoers_path: /tmp
+    sudoers_path: "{{ alt_sudoers_path }}"
   register: rule_5
 
-- name: Grab contents of my-sudo-rule-5 (in /tmp)
+- name: Grab contents of my-sudo-rule-5 (in alternative directory)
   ansible.builtin.slurp:
-    src: /tmp/my-sudo-rule-5
+    src: "{{ alt_sudoers_path }}/my-sudo-rule-5"
   register: rule_5_contents
 
 
