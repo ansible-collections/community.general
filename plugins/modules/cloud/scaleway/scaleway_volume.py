@@ -59,7 +59,7 @@ options:
   organization:
     type: str
     description:
-     - DEPRECATED ScaleWay organization ID to which volume belongs.
+     - ScaleWay organization ID to which volume belongs.
   size:
     type: int
     description:
