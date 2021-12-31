@@ -69,7 +69,7 @@ EXAMPLES = '''
     user: backup
     commands: /usr/local/bin/backup
 
-- name: |
+- name: >-
     Allow the monitoring group to run sudo /usr/local/bin/gather-app-metrics
     without requiring a password
   community.general.sudoers:
@@ -77,7 +77,7 @@ EXAMPLES = '''
     group: monitoring
     commands: /usr/local/bin/gather-app-metrics
 
-- name: |
+- name: >-
     Allow the alice user to run sudo /bin/systemctl restart my-service or
     sudo /bin/systemctl reload my-service, but a password is required
   community.general.sudoers:
