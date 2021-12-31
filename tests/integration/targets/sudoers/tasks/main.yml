@@ -137,4 +137,4 @@
 - name: Check stats
   ansible.builtin.assert:
     that:
-      - revoke_rule_1_stat.stat.exists is false
+      - not revoke_rule_1_stat.stat.exists
