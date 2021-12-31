@@ -55,7 +55,7 @@ options:
     type: str
     description:
      - ScaleWay project ID to which volume belongs.
-   version_added: 4.3.0
+    version_added: 4.3.0
   organization:
     type: str
     description:
