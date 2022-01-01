@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 ---
 module: sudoers
 short_description: manage sudoers files
-version_added: "4.1.0"
+version_added: "4.3.0"
 description:
   - This module allows for the manipulation of sudoers files.
 author:
