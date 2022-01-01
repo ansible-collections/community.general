@@ -48,26 +48,26 @@ requirements:
 """
 
 EXAMPLES = r"""
-- name: Install "ludusavi" Rust package.
+- name: Install "ludusavi" Rust package
   community.general.cargo:
     name: ludusavi
 
-- name: Install "ludusavi" Rust package in version 0.10.0.
+- name: Install "ludusavi" Rust package in version 0.10.0
   community.general.cargo:
     name: ludusavi
     version: '0.10.0'
 
-- name: Install "ludusavi" Rust package to global location.
+- name: Install "ludusavi" Rust package to global location
   community.general.cargo:
     name: ludusavi
     path: /usr/local
 
-- name: Remove "ludusavi" Rust package.
+- name: Remove "ludusavi" Rust package
   community.general.cargo:
     name: ludusavi
     state: absent
 
-- name: Update "ludusavi" Rust package its latest version.
+- name: Update "ludusavi" Rust package its latest version
   community.general.cargo:
     name: ludusavi
     state: latest
