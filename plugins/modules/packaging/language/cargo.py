@@ -121,10 +121,9 @@ class Cargo(object):
 
         return installed
 
-    def install(self):
+    def install(self, packages=None):
         cmd = ["install"]
-        if self.name:
-            cmd.extend(self.name)
+        cmd.extend(packages or self.name)
         if self.path:
             cmd.append("--root")
             cmd.append(self.path)
@@ -145,10 +144,9 @@ class Cargo(object):
 
         return installed_version != latest_version
 
-    def uninstall(self):
+    def uninstall(self, packages=None):
         cmd = ["uninstall"]
-        if self.name:
-            cmd.extend(self.name)
+        cmd.extend(packages or self.name)
         return self._exec(cmd)
 
 
@@ -178,20 +176,27 @@ def main():
     changed = False
     installed_packages = cargo.get_installed()
     if state == "present":
-        if any(
-            (n not in installed_packages or version != installed_packages[n])
+        to_install = [
+            n
             for n in name
-        ):
+            if (n not in installed_packages)
+            or (version and version != installed_packages[n])
+        ]
+        if to_install:
             changed = True
-            cargo.install()
+            cargo.install(to_install)
     elif state == "latest":
-        if any(n not in installed_packages or cargo.is_outdated(n) for n in name):
+        to_update = [
+            n for n in name if n not in installed_packages or cargo.is_outdated(n)
+        ]
+        if to_update:
             changed = True
-            cargo.install()
+            cargo.install(to_update)
     else:  # absent
-        if any(n in installed_packages for n in name):
+        to_uninstall = [n for n in name if n in installed_packages]
+        if to_uninstall:
             changed = True
-            cargo.uninstall()
+            cargo.uninstall(to_uninstall)
 
     module.exit_json(changed=changed)
 
