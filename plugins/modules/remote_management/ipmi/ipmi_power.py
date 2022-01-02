@@ -94,7 +94,7 @@ status:
     sample: [
               {
                 "powerstate": "on",
-                "targetAddress': 48,
+                "targetAddress": 48,
               },
               {
                 "powerstate": "on",
@@ -121,7 +121,7 @@ status:
     sample: [
               {
                 "powerstate": "on",
-                "targetAddress': 48,
+                "targetAddress": 48,
               },
               {
                 "powerstate": "on",
