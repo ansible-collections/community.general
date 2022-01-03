@@ -346,7 +346,7 @@ def build_payload_for_slack(text, channel, thread_id, username, icon_url, icon_e
 
 def get_slack_message(module, token, channel, ts):
     headers = {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=UTF-8',
         'Accept': 'application/json',
         'Authorization': 'Bearer ' + token
     }
@@ -383,7 +383,7 @@ def do_notify_slack(module, domain, token, payload):
         slack_uri = OLD_SLACK_INCOMING_WEBHOOK % (domain, token)
 
     headers = {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=UTF-8',
         'Accept': 'application/json',
     }
     if use_webapi:
