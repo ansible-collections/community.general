@@ -75,8 +75,8 @@ options:
       state:
         description:
           - Whether to ensure that the machine specified by I(targetAddress) in desired state.
-          - If this option isn't set, the power state is set by I(state).
-          - If both this option and I(state) are set, this option overwrittens I(state).
+          - If this option is not set, the power state is set by I(state).
+          - If both this option and I(state) are set, this option takes precedence over I(state).
         choices: ['on', 'off', shutdown, reset, boot]
         type: str
 
@@ -89,17 +89,17 @@ author: "Bulat Gaifullin (@bgaifullin) <gaifullinbf@gmail.com>"
 RETURN = '''
 powerstate:
     description: The current power state of the machine.
-    returned: success
+    returned: success and I(machine) is not provided
     type: str
     sample: on
 status:
     description: The current power state of the machine when the machine option is set.
-    returned: success
+    returned: success and I(machine) is provided
     type: list
     elements: dict
     contains:
         powerstate:
-          description: The current power state of the machine specified by targetAddress.
+          description: The current power state of the machine specified by I(targetAddress).
           type: str
         targetAddress:
           description: The remote target address.
@@ -211,7 +211,7 @@ def main():
         module.debug('ipmi instantiated - name: "%s"' % name)
 
         changed = False
-        if not machine:
+        if machine is None:
             current = ipmi_cmd.get_power()
             if current['powerstate'] != state:
                 response = {'powerstate': state} if module.check_mode \
@@ -254,7 +254,8 @@ def main():
 
                         response.append(
                             {'targetAddress:': taddr, 'powerstate': new['powerstate']})
-                else:
+
+                if current['powerstate'] == tstate or module.check_mode:
                     response.append({'targetAddress:': taddr, 'powerstate': tstate})
 
             module.exit_json(changed=changed, status=response)
