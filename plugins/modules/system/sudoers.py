@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: sudoers
-short_description: manage sudoers files
+short_description: Manage sudoers files
 version_added: "4.3.0"
 description:
   - This module allows for the manipulation of sudoers files.
