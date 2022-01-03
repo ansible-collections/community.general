@@ -125,6 +125,9 @@ def core(module):
     status_code = response.status_code
     volumes_json = response.json
 
+    if project is None:
+        project = organization
+
     if not response.ok:
         module.fail_json(msg='Error getting volume [{0}: {1}]'.format(
             status_code, response.json['message']))
@@ -134,13 +137,7 @@ def core(module):
         if volume['project'] == project and volume['name'] == name:
             volumeByName = volume
 
-        if volume['organization'] == organization and volume['name'] == name:
-            volumeByName = volume
-
     if state in ('present',):
-        if project is None:
-            project = organization
-
         if volumeByName is not None:
             module.exit_json(changed=False)
 
