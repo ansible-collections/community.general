@@ -50,6 +50,7 @@ options:
             - shutdown -- Have system request OS proper shutdown
             - reset -- Request system reset without waiting for OS
             - boot -- If system is off, then 'on', else 'reset'"
+      - Either this option or I(machine) is required.
     choices: ['on', 'off', shutdown, reset, boot]
     type: str
   timeout:
@@ -61,6 +62,7 @@ options:
     description:
       - Provide a list of the remote target address for the bridge IPMI request,
         and the power status.
+      - Either this option or I(state) is required.
     required: false
     type: list
     elements: dict
@@ -69,9 +71,12 @@ options:
         description:
           - Remote target address for the bridge IPMI request.
         type: int
+        required: true
       state:
         description:
-          - Whether to ensure that the machine specified by targetAddress in desired state.
+          - Whether to ensure that the machine specified by I(targetAddress) in desired state.
+          - If this option isn't set, the power state is set by I(state).
+          - If both this option and I(state) are set, this option overwrittens I(state).
         choices: ['on', 'off', shutdown, reset, boot]
         type: str
 
@@ -91,33 +96,14 @@ status:
     description: The current power state of the machine when the machine option is set.
     returned: success
     type: list
-    sample: [
-              {
-                "powerstate": "on",
-                "targetAddress": 48,
-              },
-              {
-                "powerstate": "on",
-                "targetAddress": 50,
-              },
-    ]
-
-requirements:
-  - "python >= 2.6"
-  - pyghmi
-author: "Bulat Gaifullin (@bgaifullin) <gaifullinbf@gmail.com>"
-'''
-
-RETURN = '''
-powerstate:
-    description: The current power state of the machine.
-    returned: success
-    type: str
-    sample: on
-status:
-    description: The current power state of the machine when the machine option is set.
-    returned: success
-    type: list
+    elements: dict
+    contains:
+        powerstate:
+          description: The current power state of the machine specified by targetAddress.
+          type: str
+        targetAddress:
+          description: The remote target address.
+          type: int
     sample: [
               {
                 "powerstate": "on",
@@ -187,7 +173,7 @@ def main():
             machine=dict(
                 type='list', elements='dict',
                 options=dict(
-                    targetAddress=dict(type='int'),
+                    targetAddress=dict(required=True, type='int'),
                     state=dict(type='str', choices=['on', 'off', 'shutdown', 'reset', 'boot']),
                 ),
             ),
@@ -249,27 +235,27 @@ def main():
                     # bridge_request is supported on pyghmi 1.5.30 and later
                     current = ipmi_cmd.get_power(bridge_request={"addr": taddr})
                 except TypeError:
-                    module.fail_json(msg="targetAddress isn't supported on this module")
+                    module.fail_json(
+                        msg="targetAddress isn't supported on the installed pyghmi.")
 
                 if entry['state']:
-                    state = entry['state']
-                elif not state:
+                    tstate = entry['state']
+                elif state:
+                    tstate = state
+                else:
                     module.fail_json(msg="Either state or suboption of machine state should be set.")
 
-                if current['powerstate'] != state:
-                    if module.check_mode:
-                        pass
-                    else:
-                        new = ipmi_cmd.set_power(state, wait=timeout, bridge_request={"addr": taddr})
+                if current['powerstate'] != tstate:
+                    changed = True
+                    if not module.check_mode:
+                        new = ipmi_cmd.set_power(tstate, wait=timeout, bridge_request={"addr": taddr})
                         if 'error' in new:
-                            module.fail_json(msg=response['error'])
+                            module.fail_json(msg=new['error'])
 
                         response.append(
                             {'targetAddress:': taddr, 'powerstate': new['powerstate']})
-
-                        changed = True
                 else:
-                    response.append({'targetAddress:': taddr, 'powerstate': state})
+                    response.append({'targetAddress:': taddr, 'powerstate': tstate})
 
             module.exit_json(changed=changed, status=response)
     except Exception as e:
