@@ -141,9 +141,9 @@ import time
 import yaml
 
 
-from distutils import util
 from ansible.errors import AnsibleError, AnsibleAssertionError
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.utils.display import Display
 from ansible.utils.encrypt import random_password
 from ansible.plugins.lookup import LookupBase
@@ -211,7 +211,7 @@ class LookupModule(LookupBase):
             try:
                 for key in ['create', 'returnall', 'overwrite', 'backup', 'nosymbols']:
                     if not isinstance(self.paramvals[key], bool):
-                        self.paramvals[key] = util.strtobool(self.paramvals[key])
+                        self.paramvals[key] = boolean(self.paramvals[key])
             except (ValueError, AssertionError) as e:
                 raise AnsibleError(e)
             if self.paramvals['missing'] not in ['error', 'warn', 'create', 'empty']:
