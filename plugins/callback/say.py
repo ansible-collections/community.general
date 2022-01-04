@@ -21,11 +21,11 @@ DOCUMENTATION = '''
       - In 2.8, this callback has been renamed from C(osx_say) into M(community.general.say).
 '''
 
-import distutils.spawn
 import platform
 import subprocess
 import os
 
+from ansible.module_utils.common.process import get_bin_path
 from ansible.plugins.callback import CallbackBase
 
 
@@ -47,21 +47,24 @@ class CallbackModule(CallbackBase):
         self.HAPPY_VOICE = None
         self.LASER_VOICE = None
 
-        self.synthesizer = distutils.spawn.find_executable('say')
-        if not self.synthesizer:
-            self.synthesizer = distutils.spawn.find_executable('espeak')
-            if self.synthesizer:
+        try:
+            self.synthesizer = get_bin_path('say')
+            if platform.system() != 'Darwin':
+                # 'say' binary available, it might be GNUstep tool which doesn't support 'voice' parameter
+                self._display.warning("'say' executable found but system is '%s': ignoring voice parameter" % platform.system())
+            else:
+                self.FAILED_VOICE = 'Zarvox'
+                self.REGULAR_VOICE = 'Trinoids'
+                self.HAPPY_VOICE = 'Cellos'
+                self.LASER_VOICE = 'Princess'
+        except ValueError:
+            try:
+                self.synthesizer = get_bin_path('espeak')
                 self.FAILED_VOICE = 'klatt'
                 self.HAPPY_VOICE = 'f5'
                 self.LASER_VOICE = 'whisper'
-        elif platform.system() != 'Darwin':
-            # 'say' binary available, it might be GNUstep tool which doesn't support 'voice' parameter
-            self._display.warning("'say' executable found but system is '%s': ignoring voice parameter" % platform.system())
-        else:
-            self.FAILED_VOICE = 'Zarvox'
-            self.REGULAR_VOICE = 'Trinoids'
-            self.HAPPY_VOICE = 'Cellos'
-            self.LASER_VOICE = 'Princess'
+            except ValueError:
+                self.synthesizer = None
 
         # plugin disable itself if say is not present
         # ansible will not call any callback if disabled is set to True
