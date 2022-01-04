@@ -1092,6 +1092,8 @@ files:
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/system/ssh_config.py:
     maintainers: gaqzi Akasurde
+  $modules/system/sudoers.py:
+    maintainers: JonEllis
   $modules/system/svc.py:
     maintainers: bcoca
   $modules/system/syspatch.py:

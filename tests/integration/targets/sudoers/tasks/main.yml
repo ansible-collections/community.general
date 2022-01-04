@@ -1,0 +1,140 @@
+---
+# Initialise environment
+
+- name: Register sudoers.d directory
+  set_fact:
+    sudoers_path: /etc/sudoers.d
+    alt_sudoers_path: /etc/sudoers_alt
+
+- name: Ensure sudoers directory exists
+  ansible.builtin.file:
+    path: "{{ sudoers_path }}"
+    state: directory
+    recurse: true
+
+- name: Ensure alternative sudoers directory exists
+  ansible.builtin.file:
+    path: "{{ alt_sudoers_path }}"
+    state: directory
+    recurse: true
+
+
+# Run module and collect data
+
+- name: Create first rule
+  community.general.sudoers:
+    name: my-sudo-rule-1
+    state: present
+    user: alice
+    commands: /usr/local/bin/command
+  register: rule_1
+
+- name: Grab contents of my-sudo-rule-1
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-1"
+  register: rule_1_contents
+
+- name: Create first rule again
+  community.general.sudoers:
+    name: my-sudo-rule-1
+    state: present
+    user: alice
+    commands: /usr/local/bin/command
+  register: rule_1_again
+
+
+- name: Create second rule with two commands
+  community.general.sudoers:
+    name: my-sudo-rule-2
+    state: present
+    user: alice
+    commands:
+      - /usr/local/bin/command1
+      - /usr/local/bin/command2
+  register: rule_2
+
+- name: Grab contents of my-sudo-rule-2
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-2"
+  register: rule_2_contents
+
+
+- name: Create rule requiring a password
+  community.general.sudoers:
+    name: my-sudo-rule-3
+    state: present
+    user: alice
+    commands: /usr/local/bin/command
+    nopassword: false
+  register: rule_3
+
+- name: Grab contents of my-sudo-rule-3
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-3"
+  register: rule_3_contents
+
+
+- name: Create rule using a group
+  community.general.sudoers:
+    name: my-sudo-rule-4
+    state: present
+    group: students
+    commands: /usr/local/bin/command
+  register: rule_4
+
+- name: Grab contents of my-sudo-rule-4
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-4"
+  register: rule_4_contents
+
+
+- name: Create rule in a alternative directory
+  community.general.sudoers:
+    name: my-sudo-rule-5
+    state: present
+    user: alice
+    commands: /usr/local/bin/command
+    sudoers_path: "{{ alt_sudoers_path }}"
+  register: rule_5
+
+- name: Grab contents of my-sudo-rule-5 (in alternative directory)
+  ansible.builtin.slurp:
+    src: "{{ alt_sudoers_path }}/my-sudo-rule-5"
+  register: rule_5_contents
+
+
+- name: Revoke rule 1
+  community.general.sudoers:
+    name: my-sudo-rule-1
+    state: absent
+  register: revoke_rule_1
+
+- name: Stat rule 1
+  ansible.builtin.stat:
+    path: "{{ sudoers_path }}/my-sudo-rule-1"
+  register: revoke_rule_1_stat
+
+
+# Run assertions
+
+- name: Check changed status
+  ansible.builtin.assert:
+    that:
+      - rule_1 is changed
+      - rule_1_again is not changed
+      - rule_5 is changed
+      - revoke_rule_1 is changed
+
+- name: Check contents
+  ansible.builtin.assert:
+    that:
+      - "rule_1_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command\n'"
+      - "rule_2_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command1, /usr/local/bin/command2\n'"
+      - "rule_3_contents['content'] | b64decode == 'alice ALL= /usr/local/bin/command\n'"
+      - "rule_4_contents['content'] | b64decode == '%students ALL=NOPASSWD: /usr/local/bin/command\n'"
+      - "rule_5_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command\n'"
+
+- name: Check stats
+  ansible.builtin.assert:
+    that:
+      - not revoke_rule_1_stat.stat.exists
