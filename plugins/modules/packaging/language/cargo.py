@@ -105,12 +105,12 @@ class Cargo(object):
         if not self.module.check_mode or (self.module.check_mode and run_in_check_mode):
             cmd = self.executable + args
             rc, out, err = self.module.run_command(cmd, check_rc=check_rc)
-            return out
-        return ""
+            return out, err
+        return "", ""
 
     def get_installed(self):
         cmd = ["install", "--list"]
-        data = self._exec(cmd, True, False, False)
+        data, _ = self._exec(cmd, True, False, False)
 
         package_regex = re.compile(r"^(\w+) v(.+):$")
         installed = {}
@@ -173,7 +173,7 @@ def main():
     )
 
     cargo = Cargo(module, name=name, path=path, state=state, version=version)
-    changed = False
+    changed, out, err = False, None, None
     installed_packages = cargo.get_installed()
     if state == "present":
         to_install = [
@@ -184,21 +184,21 @@ def main():
         ]
         if to_install:
             changed = True
-            cargo.install(to_install)
+            out, err = cargo.install(to_install)
     elif state == "latest":
         to_update = [
             n for n in name if n not in installed_packages or cargo.is_outdated(n)
         ]
         if to_update:
             changed = True
-            cargo.install(to_update)
+            out, err = cargo.install(to_update)
     else:  # absent
         to_uninstall = [n for n in name if n in installed_packages]
         if to_uninstall:
             changed = True
-            cargo.uninstall(to_uninstall)
+            out, err = cargo.uninstall(to_uninstall)
 
-    module.exit_json(changed=changed)
+    module.exit_json(changed=changed, stdout=out, stderr=err)
 
 
 if __name__ == "__main__":
