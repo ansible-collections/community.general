@@ -337,21 +337,23 @@ class Snap(CmdStateModuleHelper):
 
                 if options_changed:
                     self.changed = True
-                    params = [{'state': 'set'}, {'name': snap_name}, {'options': options_changed}]
 
-                    rc, out, err = self.run_command(params=params)
+                    if not self.module.check_mode:
+                        params = [{'state': 'set'}, {'name': snap_name}, {'options': options_changed}]
 
-                    if rc != 0:
-                        if 'has no "configure" hook' in err:
-                            msg = "Snap '{snap}' does not have any configurable options".format(snap=snap_name)
+                        rc, out, err = self.run_command(params=params)
+
+                        if rc != 0:
+                            if 'has no "configure" hook' in err:
+                                msg = "Snap '{snap}' does not have any configurable options".format(snap=snap_name)
+                                raise ModuleHelperException(msg)
+
+                            msg = "Cannot set options '{options}' for snap '{snap}': error={error}".format(
+                                options=" ".join(options_changed), snap=snap_name, error=err)
                             raise ModuleHelperException(msg)
 
-                        msg = "Cannot set options '{options}' for snap '{snap}': error={error}".format(
-                            options=" ".join(options_changed), snap=snap_name, error=err)
-                        raise ModuleHelperException(msg)
-
-                if len(overall_options_changed) > 0:
-                    self.vars.options_changed = overall_options_changed
+            if overall_options_changed:
+                self.vars.options_changed = overall_options_changed
 
     def _generic_state_action(self, actionable_func, actionable_var, params=None):
         actionable_snaps = [s for s in self.vars.name if actionable_func(s)]
