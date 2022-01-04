@@ -303,9 +303,10 @@ class Snap(CmdStateModuleHelper):
 
     def set_options(self):
         actionable_snaps = [s for s in self.vars.name if self.is_snap_installed(s)]
-        overall_options_changed = []
 
         if self.vars.options is not None:
+            overall_options_changed = []
+
             for snap_name in actionable_snaps:
                 option_map = self.retrieve_option_map(snap_name=snap_name)
 
