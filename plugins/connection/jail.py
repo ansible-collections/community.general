@@ -31,7 +31,6 @@ DOCUMENTATION = '''
             - name: ansible_jail_user
 '''
 
-import distutils.spawn
 import os
 import os.path
 import subprocess
@@ -39,6 +38,7 @@ import traceback
 
 from ansible.errors import AnsibleError
 from ansible.module_utils.six.moves import shlex_quote
+from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
 from ansible.plugins.connection import ConnectionBase, BUFSIZE
 from ansible.utils.display import Display
@@ -75,10 +75,10 @@ class Connection(ConnectionBase):
 
     @staticmethod
     def _search_executable(executable):
-        cmd = distutils.spawn.find_executable(executable)
-        if not cmd:
+        try:
+            return get_bin_path(executable)
+        except ValueError:
             raise AnsibleError("%s command not found in PATH" % executable)
-        return cmd
 
     def list_jails(self):
         p = subprocess.Popen([self.jls_cmd, '-q', 'name'],
