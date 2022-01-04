@@ -1242,6 +1242,8 @@ class Nmcli(object):
             self.ipv4_method = self.method4
         elif self.type == 'dummy' and not self.ip4:
             self.ipv4_method = 'disabled'
+        elif self.type == 'wireguard' and not self.ip4:
+            self.ipv4_method = 'disabled'
         elif self.ip4:
             self.ipv4_method = 'manual'
         else:
