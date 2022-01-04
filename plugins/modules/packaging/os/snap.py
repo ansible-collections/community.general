@@ -335,7 +335,7 @@ class Snap(CmdStateModuleHelper):
                             options_changed.append(option_without_prefix)
                             overall_options_changed.append(option_with_prefix)
 
-                if len(options_changed) > 0:
+                if options_changed:
                     self.changed = True
                     params = [{'state': 'set'}, {'name': snap_name}, {'options': options_changed}]
 
