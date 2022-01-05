@@ -94,10 +94,11 @@ options:
     default: false
   show_diff:
     description:
-      - Wether to print file changes details
+      - Whether to print file changes details
+      - Alias C(show-diff) has been deprecated and will be removed in community.general 7.0.0.
+    aliases: ['show-diff']
     type: bool
     default: false
-    aliases: [show-diff]
 requirements:
 - puppet
 author:
