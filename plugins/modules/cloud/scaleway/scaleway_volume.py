@@ -51,6 +51,11 @@ options:
     description:
      - Name used to identify the volume.
     required: true
+  project:
+    type: str
+    description:
+     - Scaleway project ID to which volume belongs.
+    version_added: 4.3.0
   organization:
     type: str
     description:
@@ -71,7 +76,7 @@ EXAMPLES = '''
     name: my-volume
     state: present
     region: par1
-    organization: "{{ scw_org }}"
+    project: "{{ scw_org }}"
     "size": 10000000000
     volume_type: l_ssd
   register: server_creation_check_task
@@ -93,7 +98,7 @@ data:
         "export_uri": null,
         "id": "c675f420-cfeb-48ff-ba2a-9d2a4dbe3fcd",
         "name": "volume-0-3",
-        "organization": "000a115d-2852-4b0a-9ce8-47f1134ba95a",
+        "project": "000a115d-2852-4b0a-9ce8-47f1134ba95a",
          "server": null,
          "size": 10000000000,
          "volume_type": "l_ssd"
@@ -106,16 +111,22 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def core(module):
+    region = module.params["region"]
     state = module.params['state']
     name = module.params['name']
     organization = module.params['organization']
+    project = module.params['project']
     size = module.params['size']
     volume_type = module.params['volume_type']
+    module.params['api_url'] = SCALEWAY_LOCATION[region]["api_endpoint"]
 
     account_api = Scaleway(module)
     response = account_api.get('volumes')
     status_code = response.status_code
     volumes_json = response.json
+
+    if project is None:
+        project = organization
 
     if not response.ok:
         module.fail_json(msg='Error getting volume [{0}: {1}]'.format(
@@ -123,14 +134,14 @@ def core(module):
 
     volumeByName = None
     for volume in volumes_json['volumes']:
-        if volume['organization'] == organization and volume['name'] == name:
+        if volume['project'] == project and volume['name'] == name:
             volumeByName = volume
 
     if state in ('present',):
         if volumeByName is not None:
             module.exit_json(changed=False)
 
-        payload = {'name': name, 'organization': organization, 'size': size, 'volume_type': volume_type}
+        payload = {'name': name, 'project': project, 'size': size, 'volume_type': volume_type}
 
         response = account_api.post('/volumes', payload)
 
@@ -161,6 +172,7 @@ def main():
         state=dict(default='present', choices=['absent', 'present']),
         name=dict(required=True),
         size=dict(type='int'),
+        project=dict(),
         organization=dict(),
         volume_type=dict(),
         region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
@@ -168,6 +180,12 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
+        mutually_exclusive=[
+            ('organization', 'project'),
+        ],
+        required_one_of=[
+            ('organization', 'project'),
+        ],
     )
 
     core(module)
