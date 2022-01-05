@@ -182,7 +182,7 @@ def main():
             logdest=dict(type='str', default='stdout', choices=['all', 'stdout', 'syslog']),
             show_diff=dict(
                 type='bool', default=False, aliases=['show-diff'],
-                deprecated_aliases=[dict(name='show-diff', version='7.0.0', collection_name='community.general')])),
+                deprecated_aliases=[dict(name='show-diff', version='7.0.0', collection_name='community.general')]),
             facts=dict(type='dict'),
             facter_basename=dict(type='str', default='ansible'),
             environment=dict(type='str'),
