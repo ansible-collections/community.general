@@ -55,8 +55,9 @@ options:
             - Type C(generic) is added in Ansible 2.5.
             - Type C(infiniband) is added in community.general 2.0.0.
             - Type C(gsm) is added in community.general 3.7.0.
+            - Type C(wireguard) is added in community.general x.y.z
         type: str
-        choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi, gsm ]
+        choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi, gsm, wireguard ]
     mode:
         description:
             - This is the type of device or network connection that you wish to create for a bond or bridge.
@@ -754,6 +755,65 @@ options:
                     - The username used to authenticate with the network, if required.
                     - Many providers do not require a username, or accept any username.
                     - But if a username is required, it is specified here.
+    wireguard:
+        description:
+            - The configuration of the Wireguard connection.
+            - Note the list of suboption attributes may vary depending on which version of NetworkManager/nmcli is installed on the host.
+            - 'An up-to-date list of supported attributes can be found here:
+              U(https://networkmanager.dev/docs/api/latest/settings-wireguard.html).'
+            - 'For instance to configure a listen port:
+              C({listen-port: 12345}).'
+        type: dict
+        version_added: x.y.z
+        suboptions:
+            fwmark:
+                description:
+                    - The 32-bit fwmark for outgoing packets.
+                    - The use of fwmark is optional and is by default off. Setting it to 0 disables it.
+                    - Note that "ip4-auto-default-route" or "ip6-auto-default-route" enabled, implies to automatically choose a fwmark.
+                type: int
+                default: 0
+            ip4-auto-default-route:
+                description:
+                    - Whether to enable special handling of the IPv4 default route.
+                    - If enabled, the IPv4 default route from wireguard.peer-routes will be placed to a dedicated routing-table and two policy routing
+                        rules will be added.
+                    - The fwmark number is also used as routing-table for the default-route, and if fwmark is zero, an unused fwmark/table is chosen
+                        automatically. This corresponds to what wg-quick does with Table=auto and what WireGuard calls "Improved Rule-based Routing"
+                type: bool
+            ip6-auto-default-route:
+                description:
+                    - Like ip4-auto-default-route, but for the IPv6 default route.
+                type: bool
+            listen-port:
+                description: The listen-port. If listen-port is not specified, the port will be chosen randomly when the interface comes up.
+                type: int
+                default: 0
+            mtu:
+                description:
+                    - If non-zero, only transmit packets of the specified size or smaller, breaking larger packets up into multiple fragments.
+                    - If zero a default MTU is used. Note that contrary to wg-quick's MTU setting, this does not take into account the current routes
+                        at the time of activation.
+                type: int
+                default: 0
+            peer-routes:
+                description:
+                    - Whether to automatically add routes for the AllowedIPs ranges of the peers.
+                    - If TRUE (the default), NetworkManager will automatically add routes in the routing tables according to ipv4.route-table and
+                        ipv6.route-table. Usually you want this automatism enabled.
+                    - If FALSE, no such routes are added automatically. In this case, the user may want to configure static routes in ipv4.routes and
+                        ipv6.routes, respectively.
+                    - Note that if the peer's AllowedIPs is "0.0.0.0/0" or "::/0" and the profile's ipv4.never-default or ipv6.never-default setting
+                        is enabled, the peer route for this peer won't be added automatically.
+                type: bool
+                default: true
+            private-key:
+                description: The 256 bit private-key in base64 encoding.
+                type: str
+            private-key-flags:
+                description: NMSettingSecretFlags indicating how to handle the I(wireguard.private-key) property.
+                type: int
+                choices: [ 0, 1, 2 ]
 '''
 
 EXAMPLES = r'''
@@ -1123,6 +1183,17 @@ EXAMPLES = r'''
         username: my-provider-username
         password: my-provider-password
         pin: my-sim-pin
+    autoconnect: true
+    state: present
+
+- name: Create a wireguard connection
+  community.general.nmcli:
+    type: wireguard
+    conn_name: my-wg-provider
+    ifname: mywg0
+    wireguard:
+        listen-port: 51820
+        private-key: my-private-key
     autoconnect: true
     state: present
 
