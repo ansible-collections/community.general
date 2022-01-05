@@ -110,14 +110,14 @@ class Cargo(object):
 
     def get_installed(self):
         cmd = ["install", "--list"]
-        data, _ = self._exec(cmd, True, False, False)
+        data, dummy = self._exec(cmd, True, False, False)
 
         package_regex = re.compile(r"^(\w+) v(.+):$")
         installed = {}
         for line in data.splitlines():
             package_info = package_regex.match(line)
             if package_info:
-                installed[package_info[1]] = package_info[2]
+                installed[package_info.group(1)] = package_info.group(2)
 
         return installed
 
