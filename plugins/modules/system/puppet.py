@@ -92,6 +92,11 @@ options:
       - Enable full debugging.
     type: bool
     default: false
+  show_diff:
+    description:
+      - Wether to print file changes details
+    type: bool
+    default: false
 requirements:
 - puppet
 author:
@@ -174,9 +179,7 @@ def main():
             manifest=dict(type='str'),
             noop=dict(type='bool'),
             logdest=dict(type='str', default='stdout', choices=['all', 'stdout', 'syslog']),
-            show_diff=dict(
-                type='bool', default=False, aliases=['show-diff'],
-                removed_in_version='7.0.0', removed_from_collection='community.general'),
+            show_diff=dict(type='bool', default=False, aliases=['show-diff']),
             facts=dict(type='dict'),
             facter_basename=dict(type='str', default='ansible'),
             environment=dict(type='str'),
