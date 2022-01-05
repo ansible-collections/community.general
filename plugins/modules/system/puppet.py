@@ -181,6 +181,7 @@ def main():
             manifest=dict(type='str'),
             noop=dict(type='bool'),
             logdest=dict(type='str', default='stdout', choices=['all', 'stdout', 'syslog']),
+            # The following is not related to Ansible's diff; see https://github.com/ansible-collections/community.general/pull/3980#issuecomment-1005666154
             show_diff=dict(
                 type='bool', default=False, aliases=['show-diff'],
                 deprecated_aliases=[dict(name='show-diff', version='7.0.0', collection_name='community.general')]),
