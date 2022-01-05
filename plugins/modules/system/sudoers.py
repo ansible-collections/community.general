@@ -17,7 +17,7 @@ version_added: "4.3.0"
 description:
   - This module allows for the manipulation of sudoers files.
 author:
-  - "Jon Ellis (@JonEllis0) <ellis.jp@gmail.com>"
+  - "Jon Ellis (@JonEllis) <ellis.jp@gmail.com>"
 options:
   commands:
     description:
