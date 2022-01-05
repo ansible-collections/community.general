@@ -55,9 +55,10 @@ options:
             - Type C(generic) is added in Ansible 2.5.
             - Type C(infiniband) is added in community.general 2.0.0.
             - Type C(gsm) is added in community.general 3.7.0.
-            - Type C(wireguard) is added in community.general x.y.z
+            - Type C(wireguard) is added in community.general 4.3.0
         type: str
-        choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi, gsm, wireguard ]
+        choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi, gsm,
+            wireguard ]
     mode:
         description:
             - This is the type of device or network connection that you wish to create for a bond or bridge.
@@ -764,7 +765,7 @@ options:
             - 'For instance to configure a listen port:
               C({listen-port: 12345}).'
         type: dict
-        version_added: x.y.z
+        version_added: 4.3.0
         suboptions:
             fwmark:
                 description:
