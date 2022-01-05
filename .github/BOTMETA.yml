@@ -166,9 +166,9 @@ files:
   $inventories/proxmox.py:
     maintainers: $team_virt ilijamt
   $inventories/xen_orchestra.py:
-    maintainers: shinuza
+    maintainers: ddelnano shinuza
   $inventories/icinga2.py:
-    maintainers: bongoeadgc6
+    maintainers: BongoEADGC6
   $inventories/scaleway.py:
     maintainers: $team_scaleway
     labels: cloud scaleway
@@ -324,6 +324,10 @@ files:
   $modules/cloud/misc/proxmox_kvm.py:
     maintainers: helldorado
     ignore: skvidal
+  $modules/cloud/misc/proxmox_nic.py:
+    maintainers: Kogelvis
+  $modules/cloud/misc/proxmox_tasks_info:
+    maintainers: paginabianca
   $modules/cloud/misc/proxmox_template.py:
     maintainers: UnderGreen
     ignore: skvidal
@@ -905,6 +909,10 @@ files:
   $modules/remote_management/manageiq/:
     labels: manageiq
     maintainers: $team_manageiq
+  $modules/remote_management/manageiq/manageiq_alert_profiles.py:
+    maintainers: elad661
+  $modules/remote_management/manageiq/manageiq_alerts.py:
+    maintainers: elad661
   $modules/remote_management/manageiq/manageiq_group.py:
     maintainers: evertmulder
   $modules/remote_management/manageiq/manageiq_tenant.py:
