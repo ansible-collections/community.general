@@ -11,3 +11,4 @@
     - ansible_distribution != 'MacOSX'
     - ansible_distribution != 'RedHat' or ansible_distribution_version is version('8.0', '>=')
     - ansible_distribution != 'CentOS' or ansible_distribution_version is version('7.0', '>=')
+    - ansible_distribution != 'Ubuntu' or ansible_distribution_version is version('18', '>=')
