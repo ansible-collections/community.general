@@ -1,2 +1,2 @@
 minor_changes:
-  - puppet - add documentation for parameter ``show_diff`` and remove deprecation warning (https://github.com/ansible-collections/community.general/pull/3980).
+  - puppet - remove deprecation for ``show_diff`` parameter (https://github.com/ansible-collections/community.general/pull/3980).
