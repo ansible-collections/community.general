@@ -1,5 +1,0 @@
----
-- name: Remove snapd
-  package:
-    name: "{{ snap_packages }}"
-    state: absent

@@ -1,0 +1,23 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Print information on which we distinguish
+  debug:
+    msg: "Distribution '{{ ansible_facts.distribution }}', version '{{ ansible_facts.distribution_version }}', OS family '{{ ansible_facts.os_family }}'"
+
+- name: Include distribution specific tasks
+  include_tasks: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "D-{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_version }}.yml"
+        - "D-{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml"
+        - "{{ ansible_facts.os_family }}-{{ ansible_facts.distribution_major_version }}.yml"
+        - "D-{{ ansible_facts.distribution }}.yml"
+        - "{{ ansible_facts.os_family }}.yml"
+        - "nothing.yml"
+      paths:
+        - "{{ role_path }}/tasks"
