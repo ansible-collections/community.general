@@ -97,6 +97,7 @@ options:
       - Wether to print file changes details
     type: bool
     default: false
+    aliases: [show-diff]
 requirements:
 - puppet
 author:
