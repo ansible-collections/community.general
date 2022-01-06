@@ -86,6 +86,9 @@ URL_IDENTITY_PROVIDER_MAPPER = "{url}/admin/realms/{realm}/identity-provider/ins
 URL_COMPONENTS = "{url}/admin/realms/{realm}/components"
 URL_COMPONENT = "{url}/admin/realms/{realm}/components/{id}"
 
+URL_USERS = "{url}/admin/realms/{realm}/users"
+URL_USER = "{url}/admin/realms/{realm}/users/{id}"
+
 
 def keycloak_argument_spec():
     """
@@ -94,7 +97,8 @@ def keycloak_argument_spec():
     :return: argument_spec dict
     """
     return dict(
-        auth_keycloak_url=dict(type='str', aliases=['url'], required=True, no_log=False),
+        auth_keycloak_url=dict(type='str', aliases=[
+                               'url'], required=True, no_log=False),
         auth_client_id=dict(type='str', default='admin-cli'),
         auth_realm=dict(type='str'),
         auth_client_secret=dict(type='str', default=None, no_log=True),
@@ -123,7 +127,8 @@ def get_token(module_params):
     base_url = module_params.get('auth_keycloak_url')
 
     if not base_url.lower().startswith(('http', 'https')):
-        raise KeycloakError("auth_url '%s' should either start with 'http' or 'https'." % base_url)
+        raise KeycloakError(
+            "auth_url '%s' should either start with 'http' or 'https'." % base_url)
 
     if token is None:
         base_url = module_params.get('auth_keycloak_url')
@@ -224,6 +229,7 @@ class KeycloakAPI(object):
     """ Keycloak API access; Keycloak uses OAuth 2.0 to protect its API, an access token for which
         is obtained through OpenID connect
     """
+
     def __init__(self, module, connection_header):
         self.module = module
         self.baseurl = self.module.params.get('auth_keycloak_url')
@@ -425,7 +431,8 @@ class KeycloakAPI(object):
         :param realm: Realm from which to obtain the rolemappings.
         :return: The rollemappings of specified group and client of the realm (default "master").
         """
-        client_roles_url = URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid)
+        client_roles_url = URL_CLIENT_ROLES.format(
+            url=self.baseurl, realm=realm, id=cid)
         try:
             return json.loads(to_native(open_url(client_roles_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -457,7 +464,8 @@ class KeycloakAPI(object):
         :param realm: client from this realm
         :return: dict of rolemapping representation or None if none matching exist
         """
-        rolemappings_url = URL_CLIENT_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
+        rolemappings_url = URL_CLIENT_ROLEMAPPINGS.format(
+            url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
             rolemappings = json.loads(to_native(open_url(rolemappings_url, method="GET", headers=self.restheaders,
                                                          validate_certs=self.validate_certs).read()))
@@ -477,7 +485,8 @@ class KeycloakAPI(object):
         :param realm: Realm from which to obtain the rolemappings.
         :return: The rollemappings of specified group and client of the realm (default "master").
         """
-        available_rolemappings_url = URL_CLIENT_ROLEMAPPINGS_AVAILABLE.format(url=self.baseurl, realm=realm, id=gid, client=cid)
+        available_rolemappings_url = URL_CLIENT_ROLEMAPPINGS_AVAILABLE.format(
+            url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
             return json.loads(to_native(open_url(available_rolemappings_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -493,7 +502,8 @@ class KeycloakAPI(object):
         :param realm: Realm from which to obtain the rolemappings.
         :return: The rollemappings of specified group and client of the realm (default "master").
         """
-        available_rolemappings_url = URL_CLIENT_ROLEMAPPINGS_COMPOSITE.format(url=self.baseurl, realm=realm, id=gid, client=cid)
+        available_rolemappings_url = URL_CLIENT_ROLEMAPPINGS_COMPOSITE.format(
+            url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
             return json.loads(to_native(open_url(available_rolemappings_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -510,9 +520,11 @@ class KeycloakAPI(object):
         :param realm: Realm from which to obtain the rolemappings.
         :return: None.
         """
-        available_rolemappings_url = URL_CLIENT_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
+        available_rolemappings_url = URL_CLIENT_ROLEMAPPINGS.format(
+            url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
-            open_url(available_rolemappings_url, method="POST", headers=self.restheaders, data=json.dumps(role_rep), validate_certs=self.validate_certs)
+            open_url(available_rolemappings_url, method="POST", headers=self.restheaders,
+                     data=json.dumps(role_rep), validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg="Could not fetch available rolemappings for client %s in group %s, realm %s: %s"
                                       % (cid, gid, realm, str(e)))
@@ -526,9 +538,11 @@ class KeycloakAPI(object):
         :param realm: Realm from which to obtain the rolemappings.
         :return: None.
         """
-        available_rolemappings_url = URL_CLIENT_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
+        available_rolemappings_url = URL_CLIENT_ROLEMAPPINGS.format(
+            url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
-            open_url(available_rolemappings_url, method="DELETE", headers=self.restheaders, validate_certs=self.validate_certs)
+            open_url(available_rolemappings_url, method="DELETE",
+                     headers=self.restheaders, validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg="Could not delete available rolemappings for client %s in group %s, realm %s: %s"
                                       % (cid, gid, realm, str(e)))
@@ -653,7 +667,8 @@ class KeycloakAPI(object):
         :param realm: Realm in which the clientscope resides; default 'master'.
         :return The clientscopes of this realm (default "master")
         """
-        clientscopes_url = URL_CLIENTSCOPES.format(url=self.baseurl, realm=realm)
+        clientscopes_url = URL_CLIENTSCOPES.format(
+            url=self.baseurl, realm=realm)
         try:
             return json.loads(to_native(open_url(clientscopes_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -670,7 +685,8 @@ class KeycloakAPI(object):
         :param cid: UUID of the clientscope to be returned
         :param realm: Realm in which the clientscope resides; default 'master'.
         """
-        clientscope_url = URL_CLIENTSCOPE.format(url=self.baseurl, realm=realm, id=cid)
+        clientscope_url = URL_CLIENTSCOPE.format(
+            url=self.baseurl, realm=realm, id=cid)
         try:
             return json.loads(to_native(open_url(clientscope_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -715,7 +731,8 @@ class KeycloakAPI(object):
         :param clientscoperep: a ClientScopeRepresentation of the clientscope to be created. Must contain at minimum the field name.
         :return: HTTPResponse object on success
         """
-        clientscopes_url = URL_CLIENTSCOPES.format(url=self.baseurl, realm=realm)
+        clientscopes_url = URL_CLIENTSCOPES.format(
+            url=self.baseurl, realm=realm)
         try:
             return open_url(clientscopes_url, method='POST', headers=self.restheaders,
                             data=json.dumps(clientscoperep), validate_certs=self.validate_certs)
@@ -729,7 +746,8 @@ class KeycloakAPI(object):
         :param grouprep: A GroupRepresentation of the updated group.
         :return HTTPResponse object on success
         """
-        clientscope_url = URL_CLIENTSCOPE.format(url=self.baseurl, realm=realm, id=clientscoperep['id'])
+        clientscope_url = URL_CLIENTSCOPE.format(
+            url=self.baseurl, realm=realm, id=clientscoperep['id'])
 
         try:
             return open_url(clientscope_url, method='PUT', headers=self.restheaders,
@@ -752,7 +770,8 @@ class KeycloakAPI(object):
 
         if cid is None and name is None:
             # prefer an exception since this is almost certainly a programming error in the module itself.
-            raise Exception("Unable to delete group - one of group ID or name must be provided.")
+            raise Exception(
+                "Unable to delete group - one of group ID or name must be provided.")
 
         # only lookup the name if cid isn't provided.
         # in the case that both are provided, prefer the ID, since it's one
@@ -768,13 +787,15 @@ class KeycloakAPI(object):
             return None
 
         # should have a good cid by here.
-        clientscope_url = URL_CLIENTSCOPE.format(realm=realm, id=cid, url=self.baseurl)
+        clientscope_url = URL_CLIENTSCOPE.format(
+            realm=realm, id=cid, url=self.baseurl)
         try:
             return open_url(clientscope_url, method='DELETE', headers=self.restheaders,
                             validate_certs=self.validate_certs)
 
         except Exception as e:
-            self.module.fail_json(msg="Unable to delete clientscope %s: %s" % (cid, str(e)))
+            self.module.fail_json(
+                msg="Unable to delete clientscope %s: %s" % (cid, str(e)))
 
     def get_clientscope_protocolmappers(self, cid, realm="master"):
         """ Fetch the name and ID of all clientscopes on the Keycloak server.
@@ -786,7 +807,8 @@ class KeycloakAPI(object):
         :param realm: Realm in which the clientscope resides; default 'master'.
         :return The protocolmappers of this realm (default "master")
         """
-        protocolmappers_url = URL_CLIENTSCOPE_PROTOCOLMAPPERS.format(id=cid, url=self.baseurl, realm=realm)
+        protocolmappers_url = URL_CLIENTSCOPE_PROTOCOLMAPPERS.format(
+            id=cid, url=self.baseurl, realm=realm)
         try:
             return json.loads(to_native(open_url(protocolmappers_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -805,7 +827,8 @@ class KeycloakAPI(object):
         :param cid: UUID of the clientscope to be returned
         :param realm: Realm in which the clientscope resides; default 'master'.
         """
-        protocolmapper_url = URL_CLIENTSCOPE_PROTOCOLMAPPER.format(url=self.baseurl, realm=realm, id=cid, mapper_id=pid)
+        protocolmapper_url = URL_CLIENTSCOPE_PROTOCOLMAPPER.format(
+            url=self.baseurl, realm=realm, id=cid, mapper_id=pid)
         try:
             return json.loads(to_native(open_url(protocolmapper_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -833,7 +856,8 @@ class KeycloakAPI(object):
         :param realm: Realm in which the clientscope resides; default 'master'
         """
         try:
-            all_protocolmappers = self.get_clientscope_protocolmappers(cid, realm=realm)
+            all_protocolmappers = self.get_clientscope_protocolmappers(
+                cid, realm=realm)
 
             for protocolmapper in all_protocolmappers:
                 if protocolmapper['name'] == name:
@@ -852,7 +876,8 @@ class KeycloakAPI(object):
         :param mapper_rep: a ProtocolMapperRepresentation of the protocolmapper to be created. Must contain at minimum the field name.
         :return: HTTPResponse object on success
         """
-        protocolmappers_url = URL_CLIENTSCOPE_PROTOCOLMAPPERS.format(url=self.baseurl, id=cid, realm=realm)
+        protocolmappers_url = URL_CLIENTSCOPE_PROTOCOLMAPPERS.format(
+            url=self.baseurl, id=cid, realm=realm)
         try:
             return open_url(protocolmappers_url, method='POST', headers=self.restheaders,
                             data=json.dumps(mapper_rep), validate_certs=self.validate_certs)
@@ -867,7 +892,8 @@ class KeycloakAPI(object):
         :param mapper_rep: A ProtocolMapperRepresentation of the updated protocolmapper.
         :return HTTPResponse object on success
         """
-        protocolmapper_url = URL_CLIENTSCOPE_PROTOCOLMAPPER.format(url=self.baseurl, realm=realm, id=cid, mapper_id=mapper_rep['id'])
+        protocolmapper_url = URL_CLIENTSCOPE_PROTOCOLMAPPER.format(
+            url=self.baseurl, realm=realm, id=cid, mapper_id=mapper_rep['id'])
 
         try:
             return open_url(protocolmapper_url, method='PUT', headers=self.restheaders,
@@ -902,7 +928,8 @@ class KeycloakAPI(object):
         :param gid: UUID of the group to be returned
         :param realm: Realm in which the group resides; default 'master'.
         """
-        groups_url = URL_GROUP.format(url=self.baseurl, realm=realm, groupid=gid)
+        groups_url = URL_GROUP.format(
+            url=self.baseurl, realm=realm, groupid=gid)
         try:
             return json.loads(to_native(open_url(groups_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -962,7 +989,8 @@ class KeycloakAPI(object):
         :param grouprep: A GroupRepresentation of the updated group.
         :return HTTPResponse object on success
         """
-        group_url = URL_GROUP.format(url=self.baseurl, realm=realm, groupid=grouprep['id'])
+        group_url = URL_GROUP.format(
+            url=self.baseurl, realm=realm, groupid=grouprep['id'])
 
         try:
             return open_url(group_url, method='PUT', headers=self.restheaders,
@@ -984,7 +1012,8 @@ class KeycloakAPI(object):
 
         if groupid is None and name is None:
             # prefer an exception since this is almost certainly a programming error in the module itself.
-            raise Exception("Unable to delete group - one of group ID or name must be provided.")
+            raise Exception(
+                "Unable to delete group - one of group ID or name must be provided.")
 
         # only lookup the name if groupid isn't provided.
         # in the case that both are provided, prefer the ID, since it's one
@@ -1000,12 +1029,14 @@ class KeycloakAPI(object):
             return None
 
         # should have a good groupid by here.
-        group_url = URL_GROUP.format(realm=realm, groupid=groupid, url=self.baseurl)
+        group_url = URL_GROUP.format(
+            realm=realm, groupid=groupid, url=self.baseurl)
         try:
             return open_url(group_url, method='DELETE', headers=self.restheaders,
                             validate_certs=self.validate_certs)
         except Exception as e:
-            self.module.fail_json(msg="Unable to delete group %s: %s" % (groupid, str(e)))
+            self.module.fail_json(
+                msg="Unable to delete group %s: %s" % (groupid, str(e)))
 
     def get_realm_roles(self, realm='master'):
         """ Obtains role representations for roles in a realm
@@ -1031,7 +1062,8 @@ class KeycloakAPI(object):
         :param name: Name of the role to fetch.
         :param realm: Realm in which the role resides; default 'master'.
         """
-        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(name))
+        role_url = URL_REALM_ROLE.format(
+            url=self.baseurl, realm=realm, name=quote(name))
         try:
             return json.loads(to_native(open_url(role_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -1065,7 +1097,8 @@ class KeycloakAPI(object):
         :param rolerep: A RoleRepresentation of the updated role.
         :return HTTPResponse object on success
         """
-        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(rolerep['name']))
+        role_url = URL_REALM_ROLE.format(
+            url=self.baseurl, realm=realm, name=quote(rolerep['name']))
         try:
             return open_url(role_url, method='PUT', headers=self.restheaders,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
@@ -1079,7 +1112,8 @@ class KeycloakAPI(object):
         :param name: The name of the role.
         :param realm: The realm in which this role resides, default "master".
         """
-        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(name))
+        role_url = URL_REALM_ROLE.format(
+            url=self.baseurl, realm=realm, name=quote(name))
         try:
             return open_url(role_url, method='DELETE', headers=self.restheaders,
                             validate_certs=self.validate_certs)
@@ -1098,7 +1132,8 @@ class KeycloakAPI(object):
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
-        rolelist_url = URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid)
+        rolelist_url = URL_CLIENT_ROLES.format(
+            url=self.baseurl, realm=realm, id=cid)
         try:
             return json.loads(to_native(open_url(rolelist_url, method='GET', headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -1122,7 +1157,8 @@ class KeycloakAPI(object):
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
-        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(name))
+        role_url = URL_CLIENT_ROLE.format(
+            url=self.baseurl, realm=realm, id=cid, name=quote(name))
         try:
             return json.loads(to_native(open_url(role_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -1148,7 +1184,8 @@ class KeycloakAPI(object):
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
-        roles_url = URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid)
+        roles_url = URL_CLIENT_ROLES.format(
+            url=self.baseurl, realm=realm, id=cid)
         try:
             return open_url(roles_url, method='POST', headers=self.restheaders,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
@@ -1168,7 +1205,8 @@ class KeycloakAPI(object):
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
-        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep['name']))
+        role_url = URL_CLIENT_ROLE.format(
+            url=self.baseurl, realm=realm, id=cid, name=quote(rolerep['name']))
         try:
             return open_url(role_url, method='PUT', headers=self.restheaders,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
@@ -1187,7 +1225,8 @@ class KeycloakAPI(object):
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
-        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(name))
+        role_url = URL_CLIENT_ROLE.format(
+            url=self.baseurl, realm=realm, id=cid, name=quote(name))
         try:
             return open_url(role_url, method='DELETE', headers=self.restheaders,
                             validate_certs=self.validate_certs)
@@ -1205,14 +1244,16 @@ class KeycloakAPI(object):
         try:
             authentication_flow = {}
             # Check if the authentication flow exists on the Keycloak serveraders
-            authentications = json.load(open_url(URL_AUTHENTICATION_FLOWS.format(url=self.baseurl, realm=realm), method='GET', headers=self.restheaders))
+            authentications = json.load(open_url(URL_AUTHENTICATION_FLOWS.format(
+                url=self.baseurl, realm=realm), method='GET', headers=self.restheaders))
             for authentication in authentications:
                 if authentication["alias"] == alias:
                     authentication_flow = authentication
                     break
             return authentication_flow
         except Exception as e:
-            self.module.fail_json(msg="Unable get authentication flow %s: %s" % (alias, str(e)))
+            self.module.fail_json(
+                msg="Unable get authentication flow %s: %s" % (alias, str(e)))
 
     def delete_authentication_flow_by_id(self, id, realm='master'):
         """
@@ -1221,7 +1262,8 @@ class KeycloakAPI(object):
         :param realm: realm of client to be deleted
         :return: HTTPResponse object on success
         """
-        flow_url = URL_AUTHENTICATION_FLOW.format(url=self.baseurl, realm=realm, id=id)
+        flow_url = URL_AUTHENTICATION_FLOW.format(
+            url=self.baseurl, realm=realm, id=id)
 
         try:
             return open_url(flow_url, method='DELETE', headers=self.restheaders,
@@ -1316,7 +1358,8 @@ class KeycloakAPI(object):
                 headers=self.restheaders,
                 data=json.dumps(updatedExec))
         except Exception as e:
-            self.module.fail_json(msg="Unable to update executions %s: %s" % (updatedExec, str(e)))
+            self.module.fail_json(
+                msg="Unable to update executions %s: %s" % (updatedExec, str(e)))
 
     def add_authenticationConfig_to_execution(self, executionId, authenticationConfig, realm='master'):
         """ Add autenticatorConfig to the execution
@@ -1335,7 +1378,8 @@ class KeycloakAPI(object):
                 headers=self.restheaders,
                 data=json.dumps(authenticationConfig))
         except Exception as e:
-            self.module.fail_json(msg="Unable to add authenticationConfig %s: %s" % (executionId, str(e)))
+            self.module.fail_json(
+                msg="Unable to add authenticationConfig %s: %s" % (executionId, str(e)))
 
     def create_subflow(self, subflowName, flowAlias, realm='master'):
         """ Create new sublow on the flow
@@ -1358,7 +1402,8 @@ class KeycloakAPI(object):
                 headers=self.restheaders,
                 data=json.dumps(newSubFlow))
         except Exception as e:
-            self.module.fail_json(msg="Unable to create new subflow %s: %s" % (subflowName, str(e)))
+            self.module.fail_json(
+                msg="Unable to create new subflow %s: %s" % (subflowName, str(e)))
 
     def create_execution(self, execution, flowAlias, realm='master'):
         """ Create new execution on the flow
@@ -1380,7 +1425,8 @@ class KeycloakAPI(object):
                 headers=self.restheaders,
                 data=json.dumps(newExec))
         except Exception as e:
-            self.module.fail_json(msg="Unable to create new execution %s: %s" % (execution["provider"], str(e)))
+            self.module.fail_json(msg="Unable to create new execution %s: %s" % (
+                execution["provider"], str(e)))
 
     def change_execution_priority(self, executionId, diff, realm='master'):
         """ Raise or lower execution priority of diff time
@@ -1410,7 +1456,8 @@ class KeycloakAPI(object):
                         method='POST',
                         headers=self.restheaders)
         except Exception as e:
-            self.module.fail_json(msg="Unable to change execution priority %s: %s" % (executionId, str(e)))
+            self.module.fail_json(
+                msg="Unable to change execution priority %s: %s" % (executionId, str(e)))
 
     def get_executions_representation(self, config, realm='master'):
         """
@@ -1468,7 +1515,8 @@ class KeycloakAPI(object):
         :param alias: Alias of the identity provider to fetch.
         :param realm: Realm in which the identity provider resides; default 'master'.
         """
-        idp_url = URL_IDENTITY_PROVIDER.format(url=self.baseurl, realm=realm, alias=alias)
+        idp_url = URL_IDENTITY_PROVIDER.format(
+            url=self.baseurl, realm=realm, alias=alias)
         try:
             return json.loads(to_native(open_url(idp_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -1502,7 +1550,8 @@ class KeycloakAPI(object):
         :param realm: Realm in which this identity provider resides, default "master".
         :return HTTPResponse object on success
         """
-        idp_url = URL_IDENTITY_PROVIDER.format(url=self.baseurl, realm=realm, alias=idprep['alias'])
+        idp_url = URL_IDENTITY_PROVIDER.format(
+            url=self.baseurl, realm=realm, alias=idprep['alias'])
         try:
             return open_url(idp_url, method='PUT', headers=self.restheaders,
                             data=json.dumps(idprep), validate_certs=self.validate_certs)
@@ -1515,7 +1564,8 @@ class KeycloakAPI(object):
         :param alias: Alias of the identity provider.
         :param realm: Realm in which this identity provider resides, default "master".
         """
-        idp_url = URL_IDENTITY_PROVIDER.format(url=self.baseurl, realm=realm, alias=alias)
+        idp_url = URL_IDENTITY_PROVIDER.format(
+            url=self.baseurl, realm=realm, alias=alias)
         try:
             return open_url(idp_url, method='DELETE', headers=self.restheaders,
                             validate_certs=self.validate_certs)
@@ -1529,7 +1579,8 @@ class KeycloakAPI(object):
         :param realm: realm to be queried
         :return: list of representations for identity provider mappers
         """
-        mappers_url = URL_IDENTITY_PROVIDER_MAPPERS.format(url=self.baseurl, realm=realm, alias=alias)
+        mappers_url = URL_IDENTITY_PROVIDER_MAPPERS.format(
+            url=self.baseurl, realm=realm, alias=alias)
         try:
             return json.loads(to_native(open_url(mappers_url, method='GET', headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -1547,7 +1598,8 @@ class KeycloakAPI(object):
         :param alias: Alias of the identity provider.
         :param realm: Realm in which the identity provider resides; default 'master'.
         """
-        mapper_url = URL_IDENTITY_PROVIDER_MAPPER.format(url=self.baseurl, realm=realm, alias=alias, id=mid)
+        mapper_url = URL_IDENTITY_PROVIDER_MAPPER.format(
+            url=self.baseurl, realm=realm, alias=alias, id=mid)
         try:
             return json.loads(to_native(open_url(mapper_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -1568,7 +1620,8 @@ class KeycloakAPI(object):
         :param realm: Realm in which this identity provider resides, default "master".
         :return: HTTPResponse object on success
         """
-        mappers_url = URL_IDENTITY_PROVIDER_MAPPERS.format(url=self.baseurl, realm=realm, alias=alias)
+        mappers_url = URL_IDENTITY_PROVIDER_MAPPERS.format(
+            url=self.baseurl, realm=realm, alias=alias)
         try:
             return open_url(mappers_url, method='POST', headers=self.restheaders,
                             data=json.dumps(mapper), validate_certs=self.validate_certs)
@@ -1583,7 +1636,8 @@ class KeycloakAPI(object):
         :param realm: Realm in which this identity provider resides, default "master".
         :return HTTPResponse object on success
         """
-        mapper_url = URL_IDENTITY_PROVIDER_MAPPER.format(url=self.baseurl, realm=realm, alias=alias, id=mapper['id'])
+        mapper_url = URL_IDENTITY_PROVIDER_MAPPER.format(
+            url=self.baseurl, realm=realm, alias=alias, id=mapper['id'])
         try:
             return open_url(mapper_url, method='PUT', headers=self.restheaders,
                             data=json.dumps(mapper), validate_certs=self.validate_certs)
@@ -1597,7 +1651,8 @@ class KeycloakAPI(object):
         :param alias: Alias of the identity provider.
         :param realm: Realm in which this identity provider resides, default "master".
         """
-        mapper_url = URL_IDENTITY_PROVIDER_MAPPER.format(url=self.baseurl, realm=realm, alias=alias, id=mid)
+        mapper_url = URL_IDENTITY_PROVIDER_MAPPER.format(
+            url=self.baseurl, realm=realm, alias=alias, id=mid)
         try:
             return open_url(mapper_url, method='DELETE', headers=self.restheaders,
                             validate_certs=self.validate_certs)
