@@ -1802,3 +1802,42 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Could not update user %s in realm %s: %s'
                                       % (userrep['username'], realm, str(e)))
+
+    def delete_user(self, username=None, id=None, realm="master"):
+        """ Delete a user. One of username or id must be provided.
+
+        Providing the user ID is preferred as it avoids a second lookup to
+        convert a username to an ID.
+
+        :param username: The username of the user. A lookup will be performed to retrieve the user ID.
+        :param id: The ID of the user (preferred to username).
+        :param realm: The realm in which this user resides, default "master".
+        """
+
+        if id is None and username is None:
+            # prefer an exception since this is almost certainly a programming error in the module itself.
+            raise Exception(
+                "Unable to delete user - one of user ID or username must be provided.")
+
+        # only lookup the username if id isn't provided.
+        # in the case that both are provided, prefer the ID, since it's one
+        # less lookup.
+        if id is None and username is not None:
+            for user in self.get_users_by_username(username=username, realm=realm):
+                if user['username'] == username:
+                    id = user['id']
+                    break
+
+        # if the user doesn't exist - no problem, nothing to delete.
+        if id is None:
+            return None
+
+        # should have a good id by here.
+        user_url = URL_USER.format(
+            realm=realm, id=id, url=self.baseurl)
+        try:
+            return open_url(user_url, method='DELETE', headers=self.restheaders,
+                            validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(
+                msg="Unable to delete user %s: %s" % (id, str(e)))
