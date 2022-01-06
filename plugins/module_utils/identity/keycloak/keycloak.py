@@ -1749,3 +1749,17 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Unable to delete component %s in realm %s: %s'
                                       % (cid, realm, str(e)))
+
+    def create_user(self, userrep, realm='master'):
+        """ Create a Keycloak user.
+
+        :param userrep: a UserRepresentation of the user to be created. Must contain at minimum the field name.
+        :return: HTTPResponse object on success
+        """
+        users_url = URL_USERS.format(url=self.baseurl, realm=realm)
+        try:
+            return open_url(users_url, method='POST', headers=self.restheaders,
+                            data=json.dumps(userrep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg="Could not create user %s in realm %s: %s"
+                                      % (userrep['user_username'], realm, str(e)))
