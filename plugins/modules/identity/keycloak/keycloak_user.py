@@ -182,7 +182,7 @@ options:
         description:
             - The service account client ID
         aliases:
-          - requiredActions
+          - serviceAccountClientId
         type: str
 
 
