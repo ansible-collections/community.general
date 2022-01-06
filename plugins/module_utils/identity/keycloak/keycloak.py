@@ -1786,3 +1786,19 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Could not fetch user %s in realm %s: %s'
                                       % (username, realm, str(e)))
+
+    def update_user(self, userrep, realm="master"):
+        """ Update an existing user.
+
+        :param userrep: A UserRepresentation of the updated user.
+        :return HTTPResponse object on success
+        """
+        user_url = URL_USER.format(
+            url=self.baseurl, realm=realm, id=userrep['id'])
+
+        try:
+            return open_url(user_url, method='PUT', headers=self.restheaders,
+                            data=json.dumps(userrep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not update user %s in realm %s: %s'
+                                      % (userrep['username'], realm, str(e)))
