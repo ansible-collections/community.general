@@ -58,18 +58,65 @@ options:
             - They Keycloak realm under which this user resides.
         default: 'master'
 
-    id:
-        type: str
+    access:
+        type: dict
         description:
-            - The unique identifier for this user.
-            - This parameter is not required for updating or deleting a user but
-              providing it will reduce the number of API calls required.
-
+            - The access.
     attributes:
         type: dict
         description:
             - A dict of key/value pairs to set as custom attributes for the user.
             - Values may be single values (e.g. a string) or a list of strings.
+    client_consents:
+        description:
+            - The client consents
+        aliases:
+            - clientConsents
+        type: list
+        elements: dict
+        options:
+            client_id:
+                description:
+                    - The client ID
+                aliases:
+                    - clientId
+                type: str
+            granted_client_scopes:
+                description:
+                    - The granted client scopes
+                aliases:
+                    - grantedClientScopes
+                type: list
+                elements: str
+    credentials:
+        description:
+            - The credentials
+        type: list
+        elements: dict
+        options:
+            priority:
+                description:
+                    - The priority
+                type: int
+            type:
+                description:
+                    - The type
+                type: str
+            temporary:
+                description:
+                    - The temporary
+                type: bool
+            value:
+                description:
+                    - The value
+                type: str
+    id:
+        description:
+            - The unique identifier for this user.
+            - This parameter is not required for updating or deleting a user but
+              providing it will reduce the number of API calls required.
+        type: str
+
 
 extends_documentation_fragment:
 - community.general.keycloak
