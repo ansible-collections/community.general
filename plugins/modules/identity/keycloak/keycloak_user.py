@@ -325,6 +325,7 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
     keycloak_argument_spec, get_token, KeycloakError
 from ansible.module_utils.basic import AnsibleModule
 
+
 def main():
     """
     Module execution
