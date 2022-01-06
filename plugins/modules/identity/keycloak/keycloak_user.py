@@ -106,11 +106,83 @@ options:
                 description:
                     - The value
                 type: str
+    disableable_credential_types:
+        description:
+            - The disableable credential types
+        aliases:
+            - disableableCredentialTypes
+        type: list
+        elements: str
+    email:
+        description:
+            - The email
+        type: str
+    email_verified:
+        description:
+            - The email verified
+        aliases:
+            - emailVerified
+        type: bool
+    enabled:
+        description:
+            - The enabled
+        type: bool
+    first_name:
+        description:
+            - The first name
+        aliases:
+            - firstName
+        type: str
+    groups:
+        description:
+            - The group pathes
+        type: list
+        elements: str
     id:
         description:
             - The unique identifier for this user.
             - This parameter is not required for updating or deleting a user but
               providing it will reduce the number of API calls required.
+        type: str
+    last_name:
+        description:
+            - The last name
+        aliases:
+            - lastName
+        type: str
+    not_before:
+        description:
+            - The not before
+        aliases:
+            - notBefore
+        type: int
+    origin:
+        description:
+            - The origin
+        type: str
+    realm_roles:
+        description:
+            - The realm roles
+        aliases:
+            - realmRoles
+        type: list
+        elements: str
+    required_actions:
+        description:
+            - The required actions
+        aliases:
+            - requiredActions
+        type: list
+        elements: str
+    self:
+        description:
+            - The self
+        type: str
+    service_account_client_id:
+        description:
+            - The service account client ID
+        aliases:
+          - requiredActions
         type: str
 
 
