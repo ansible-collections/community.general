@@ -70,7 +70,7 @@ options:
             - clientConsents
         type: list
         elements: dict
-        options:
+        suboptions:
             client_id:
                 description:
                     - The client ID
@@ -89,7 +89,7 @@ options:
             - The credentials
         type: list
         elements: dict
-        options:
+        suboptions:
             priority:
                 description:
                     - The priority
