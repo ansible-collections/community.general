@@ -1763,3 +1763,26 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg="Could not create user %s in realm %s: %s"
                                       % (userrep['user_username'], realm, str(e)))
+
+    def get_users_by_username(self, username, realm='master'):
+        """ Fetch the name and ID of user by username on the Keycloak server.
+
+        To fetch the full data of the user.
+
+        :param username: The username of the user. A lookup will be performed to retrieve the user ID.
+        :param realm: Return the groups of this realm (default "master").
+        """
+        users_url = URL_USERS.format(
+            url=self.baseurl, realm=realm) + '?' + urlencode(dict(username=username))
+        try:
+            return json.loads(to_native(open_url(users_url, method="GET", headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+        except HTTPError as e:
+            if e.code == 404:
+                return None
+            else:
+                self.module.fail_json(msg='Could not fetch user %s in realm %s: %s'
+                                          % (username, realm, str(e)))
+        except Exception as e:
+            self.module.fail_json(msg='Could not fetch user %s in realm %s: %s'
+                                      % (username, realm, str(e)))
