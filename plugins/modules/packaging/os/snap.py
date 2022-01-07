@@ -265,6 +265,35 @@ class Snap(CmdStateModuleHelper):
         notes = match.group('notes')
         return "disabled" not in notes.split(',')
 
+    def process_actionable_snaps(self, actionable_snaps):
+        self.changed = True
+        self.vars.snaps_installed = actionable_snaps
+
+        if self.module.check_mode:
+            return
+
+        params = ['state', 'classic', 'channel']  # get base cmd parts
+        has_one_pkg_params = bool(self.vars.classic) or self.vars.channel != 'stable'
+        has_multiple_snaps = len(actionable_snaps) > 1
+
+        if has_one_pkg_params and has_multiple_snaps:
+            commands = [params + [{'actionable_snaps': [s]}] for s in actionable_snaps]
+        else:
+            commands = [params + [{'actionable_snaps': actionable_snaps}]]
+        self.vars.cmd, rc, out, err = self._run_multiple_commands(commands)
+
+        if rc != 0:
+            classic_snap_pattern = re.compile(r'^error: This revision of snap "(?P<package_name>\w+)"'
+                                              r' was published using classic confinement')
+            match = classic_snap_pattern.match(err)
+            if match:
+                err_pkg = match.group('package_name')
+                msg = "Couldn't install {name} because it requires classic confinement".format(name=err_pkg)
+            else:
+                msg = "Ooops! Snap installation failed while executing '{cmd}', please examine logs and " \
+                      "error output for more details.".format(cmd=self.vars.cmd)
+            raise ModuleHelperException(msg=msg)
+
     def state_present(self):
 
         self.vars.meta('classic').set(output=True)
@@ -272,32 +301,7 @@ class Snap(CmdStateModuleHelper):
         actionable_snaps = [s for s in self.vars.name if not self.is_snap_installed(s)]
 
         if actionable_snaps:
-            self.changed = True
-            self.vars.snaps_installed = actionable_snaps
-
-            if self.module.check_mode:
-                return
-
-            params = ['state', 'classic', 'channel']  # get base cmd parts
-            has_one_pkg_params = bool(self.vars.classic) or self.vars.channel != 'stable'
-            has_multiple_snaps = len(actionable_snaps) > 1
-            if has_one_pkg_params and has_multiple_snaps:
-                commands = [params + [{'actionable_snaps': [s]}] for s in actionable_snaps]
-            else:
-                commands = [params + [{'actionable_snaps': actionable_snaps}]]
-            self.vars.cmd, rc, out, err = self._run_multiple_commands(commands)
-
-            if rc != 0:
-                classic_snap_pattern = re.compile(r'^error: This revision of snap "(?P<package_name>\w+)"'
-                                                  r' was published using classic confinement')
-                match = classic_snap_pattern.match(err)
-                if match:
-                    err_pkg = match.group('package_name')
-                    msg = "Couldn't install {name} because it requires classic confinement".format(name=err_pkg)
-                else:
-                    msg = "Ooops! Snap installation failed while executing '{cmd}', please examine logs and " \
-                          "error output for more details.".format(cmd=self.vars.cmd)
-                raise ModuleHelperException(msg=msg)
+            self.process_actionable_snaps(actionable_snaps)
 
         self.set_options()
 
