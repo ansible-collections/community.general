@@ -771,9 +771,8 @@ options:
                 description:
                     - The 32-bit fwmark for outgoing packets.
                     - The use of fwmark is optional and is by default off. Setting it to 0 disables it.
-                    - Note that C(ip4-auto-default-route) or C(ip6-auto-default-route) enabled, implies to automatically choose a fwmark.
+                    - Note that I(wireguard.ip4-auto-default-route) or I(wireguard.ip6-auto-default-route) enabled, implies to automatically choose a fwmark.
                 type: int
-                default: 0
             ip4-auto-default-route:
                 description:
                     - Whether to enable special handling of the IPv4 default route.
@@ -784,20 +783,18 @@ options:
                 type: bool
             ip6-auto-default-route:
                 description:
-                    - Like C(ip4-auto-default-route), but for the IPv6 default route.
+                    - Like I(wireguard.ip4-auto-default-route), but for the IPv6 default route.
                 type: bool
             listen-port:
-                description: The Wireguard connection listen-port. If C(listen-port) is not specified, the port will be chosen randomly when the
+                description: The WireGuard connection listen-port. If not specified, the port will be chosen randomly when the
                     interface comes up.
                 type: int
-                default: 0
             mtu:
                 description:
                     - If non-zero, only transmit packets of the specified size or smaller, breaking larger packets up into multiple fragments.
                     - If zero a default MTU is used. Note that contrary to wg-quick's MTU setting, this does not take into account the current routes
                         at the time of activation.
                 type: int
-                default: 0
             peer-routes:
                 description:
                     - Whether to automatically add routes for the AllowedIPs ranges of the peers.
@@ -808,7 +805,6 @@ options:
                     - Note that if the peer's AllowedIPs is C(0.0.0.0/0) or C(::/0) and the profile's C(ipv4.never-default) or C(ipv6.never-default)
                         setting is enabled, the peer route for this peer won't be added automatically.
                 type: bool
-                default: true
             private-key:
                 description: The 256 bit private-key in base64 encoding.
                 type: str
@@ -1313,9 +1309,7 @@ class Nmcli(object):
 
         if self.method4:
             self.ipv4_method = self.method4
-        elif self.type == 'dummy' and not self.ip4:
-            self.ipv4_method = 'disabled'
-        elif self.type == 'wireguard' and not self.ip4:
+        elif self.type in ('dummy', 'wireguard') and not self.ip4:
             self.ipv4_method = 'disabled'
         elif self.ip4:
             self.ipv4_method = 'manual'
@@ -1324,9 +1318,7 @@ class Nmcli(object):
 
         if self.method6:
             self.ipv6_method = self.method6
-        elif self.type == 'dummy' and not self.ip6:
-            self.ipv6_method = 'disabled'
-        elif self.type == 'wireguard' and not self.ip6:
+        elif self.type in ('dummy', 'wireguard') and not self.ip6:
             self.ipv6_method = 'disabled'
         elif self.ip6:
             self.ipv6_method = 'manual'
