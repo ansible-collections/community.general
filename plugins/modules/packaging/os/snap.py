@@ -302,59 +302,60 @@ class Snap(CmdStateModuleHelper):
         self.set_options()
 
     def set_options(self):
+        if self.vars.options is None:
+            return
+
         actionable_snaps = [s for s in self.vars.name if self.is_snap_installed(s)]
+        overall_options_changed = []
 
-        if self.vars.options is not None:
-            overall_options_changed = []
+        for snap_name in actionable_snaps:
+            option_map = self.retrieve_option_map(snap_name=snap_name)
 
-            for snap_name in actionable_snaps:
-                option_map = self.retrieve_option_map(snap_name=snap_name)
+            options_changed = []
 
-                options_changed = []
+            for option_string in self.vars.options:
+                match = self.__set_param_re.match(option_string)
 
-                for option_string in self.vars.options:
-                    match = self.__set_param_re.match(option_string)
+                if not match:
+                    msg = "Cannot parse set option '{option_string}'".format(option_string=option_string)
+                    raise ModuleHelperException(msg)
 
-                    if not match:
-                        msg = "Cannot parse set option '{option_string}'".format(option_string=option_string)
-                        raise ModuleHelperException(msg)
+                snap_prefix = match.group("snap_prefix")
+                selected_snap_name = snap_prefix[:-1] if snap_prefix else None
 
-                    snap_prefix = match.group("snap_prefix")
-                    selected_snap_name = snap_prefix[:-1] if snap_prefix else None
+                if selected_snap_name is not None and selected_snap_name not in self.vars.name:
+                    msg = "Snap option '{option_string}' refers to snap which is not in the list of snap names".format(option_string=option_string)
+                    raise ModuleHelperException(msg)
 
-                    if selected_snap_name is not None and selected_snap_name not in self.vars.name:
-                        msg = "Snap option '{option_string}' refers to snap which is not in the list of snap names".format(option_string=option_string)
-                        raise ModuleHelperException(msg)
+                if selected_snap_name is None or (snap_name is not None and snap_name == selected_snap_name):
+                    key = match.group("key")
+                    value = match.group("value")
 
-                    if selected_snap_name is None or (snap_name is not None and snap_name == selected_snap_name):
-                        key = match.group("key")
-                        value = match.group("value")
+                    if key not in option_map or key in option_map and option_map[key] != value:
+                        option_without_prefix = key + "=" + value
+                        option_with_prefix = option_string if selected_snap_name is not None else snap_name + ":" + option_string
+                        options_changed.append(option_without_prefix)
+                        overall_options_changed.append(option_with_prefix)
 
-                        if key not in option_map or key in option_map and option_map[key] != value:
-                            option_without_prefix = key + "=" + value
-                            option_with_prefix = option_string if selected_snap_name is not None else snap_name + ":" + option_string
-                            options_changed.append(option_without_prefix)
-                            overall_options_changed.append(option_with_prefix)
+            if options_changed:
+                self.changed = True
 
-                if options_changed:
-                    self.changed = True
+                if not self.module.check_mode:
+                    params = [{'state': 'set'}, {'name': snap_name}, {'options': options_changed}]
 
-                    if not self.module.check_mode:
-                        params = [{'state': 'set'}, {'name': snap_name}, {'options': options_changed}]
+                    rc, out, err = self.run_command(params=params)
 
-                        rc, out, err = self.run_command(params=params)
-
-                        if rc != 0:
-                            if 'has no "configure" hook' in err:
-                                msg = "Snap '{snap}' does not have any configurable options".format(snap=snap_name)
-                                raise ModuleHelperException(msg)
-
-                            msg = "Cannot set options '{options}' for snap '{snap}': error={error}".format(
-                                options=" ".join(options_changed), snap=snap_name, error=err)
+                    if rc != 0:
+                        if 'has no "configure" hook' in err:
+                            msg = "Snap '{snap}' does not have any configurable options".format(snap=snap_name)
                             raise ModuleHelperException(msg)
 
-            if overall_options_changed:
-                self.vars.options_changed = overall_options_changed
+                        msg = "Cannot set options '{options}' for snap '{snap}': error={error}".format(
+                            options=" ".join(options_changed), snap=snap_name, error=err)
+                        raise ModuleHelperException(msg)
+
+        if overall_options_changed:
+            self.vars.options_changed = overall_options_changed
 
     def _generic_state_action(self, actionable_func, actionable_var, params=None):
         actionable_snaps = [s for s in self.vars.name if actionable_func(s)]
