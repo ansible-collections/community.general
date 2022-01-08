@@ -958,6 +958,21 @@ class KeycloakAPI(object):
             self.module.fail_json(msg="Could not create group %s in realm %s: %s"
                                       % (grouprep['name'], realm, str(e)))
 
+    def create_subgroup(self, parent_id, grouprep, realm="master"):
+        """ Create or set a Keycloak group as subgroup under parent.
+
+        :param parent_id: parent group ID.
+        :param grouprep: a GroupRepresentation of the subgroup to be created. Must contain at minimum the field name.
+        :return: HTTPResponse object on success
+        """
+        subgroup_url = URL_SUBGROUP.format(url=self.baseurl, realm=realm, groupid=parent_id)
+        try:
+            open_url(subgroup_url, method='POST', headers=self.restheaders,
+                     data=json.dumps(grouprep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg="Could not create subgroup %s under %s in realm %s: %s"
+                                      % (grouprep['name'], parent_id, realm, str(e)))
+
     def update_group(self, grouprep, realm="master"):
         """ Update an existing group.
 
