@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli - add ``wireguard`` connection type (https://github.com/ansible-collections/community.general/pull/3985).
