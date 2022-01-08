@@ -66,6 +66,7 @@ options:
     required: false
     type: list
     elements: dict
+    version_added: 4.3.0
     suboptions:
       targetAddress:
         description:
@@ -97,6 +98,7 @@ status:
     returned: success and I(machine) is provided
     type: list
     elements: dict
+    version_added: 4.3.0
     contains:
         powerstate:
           description: The current power state of the machine specified by I(targetAddress).
