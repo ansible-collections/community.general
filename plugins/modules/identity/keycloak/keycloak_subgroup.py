@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2019, Adam Goossens <adam.goossens@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -189,6 +188,7 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
     keycloak_argument_spec, get_token, KeycloakError
 from ansible.module_utils.basic import AnsibleModule
 
+
 def main():
     """
     Module execution
@@ -231,15 +231,16 @@ def main():
 
     # Filter and map the parameters names that apply to the subgroup
     subgroup_params = [x for x in module.params
-                    if x not in list(keycloak_argument_spec().keys()) + ['realm', 'parent_id', 'parent_name'] and
-                    module.params.get(x) is not None]
+                       if x not in list(keycloak_argument_spec().keys()) + ['realm', 'parent_id', 'parent_name'] and
+                       module.params.get(x) is not None]
 
     # See if parent exists in Keycloak
     if parent_id is None:
         parent_group = kc.get_group_by_name(parent_name, realm=realm)
 
         if parent_group is None:
-            module.fail_json(msg='Parent group not found {parent_name}'.format(parent_name=parent_name))
+            module.fail_json(msg='Parent group not found {parent_name}'.format(
+                parent_name=parent_name))
 
         parent_id = parent_group['id']
 
