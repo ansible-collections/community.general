@@ -18,7 +18,7 @@ stage="${S:-prod}"
 provider="${P:-default}"
 
 if [ "${platform}" == "rhel" ] && [[ "${version}" =~ ^8 ]]; then
-    echo "pynacl >= 1.4.0, < 1.5.0; python_version == '3.6'" >> tests/util/constraints.txt
+    echo "pynacl >= 1.4.0, < 1.5.0; python_version == '3.6'" >> tests/utils/constraints.txt
 fi
 
 # shellcheck disable=SC2086
