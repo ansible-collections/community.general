@@ -1,10 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Copyright (c) 2019, Adam Goossens <adam.goossens@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-__metaclass__ = type
 
 DOCUMENTATION = '''
 ---
@@ -184,9 +184,10 @@ subgroup:
 
 '''
 
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
     keycloak_argument_spec, get_token, KeycloakError
-from ansible.module_utils.basic import AnsibleModule
+__metaclass__ = type
 
 
 def main():
@@ -226,7 +227,7 @@ def main():
     realm = module.params.get('realm')
     parent_id = module.params.get('parent_id')
     parent_name = module.params.get('parent_name')
-    id = module.params.get('id')
+    group_id = module.params.get('id')
     name = module.params.get('name')
 
     # Filter and map the parameters names that apply to the subgroup
@@ -245,10 +246,10 @@ def main():
         parent_id = parent_group['id']
 
     # See if it already exists in Keycloak
-    if id is None:
+    if group_id is None:
         before_subgroup = kc.get_group_by_name(name, realm=realm)
     else:
-        before_subgroup = kc.get_group_by_groupid(id, realm=realm)
+        before_subgroup = kc.get_group_by_groupid(group_id, realm=realm)
 
     desired_subgroup = {}
 
@@ -260,8 +261,10 @@ def main():
 
     if before_subgroup:
         # set to parent
-        kc.create_subgroup(parent_id=parent_id, grouprep=desired_subgroup, realm=realm)
-        after_subgroup = kc.get_group_by_groupid(before_subgroup['id'], realm=realm)
+        kc.create_subgroup(parent_id=parent_id,
+                           grouprep=desired_subgroup, realm=realm)
+        after_subgroup = kc.get_group_by_groupid(
+            before_subgroup['id'], realm=realm)
 
         result['end_state'] = after_subgroup
         result['subgroup'] = result['end_state']
@@ -270,8 +273,10 @@ def main():
         module.exit_json(**result)
     else:
         # create it
-        kc.create_subgroup(parent_id=parent_id, grouprep=desired_subgroup, realm=realm)
-        after_subgroup = kc.get_group_by_name(desired_subgroup['name'], realm=realm)
+        kc.create_subgroup(parent_id=parent_id,
+                           grouprep=desired_subgroup, realm=realm)
+        after_subgroup = kc.get_group_by_name(
+            desired_subgroup['name'], realm=realm)
 
         result['end_state'] = after_subgroup
         result['subgroup'] = result['end_state']
