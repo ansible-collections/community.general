@@ -142,8 +142,7 @@ def main():
         realm=dict(default='master'),
     )
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=False)
+    module = AnsibleModule(argument_spec=argument_spec)
 
     result = dict(changed=False, msg='', realm_info='')
 
