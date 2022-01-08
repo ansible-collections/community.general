@@ -24,7 +24,7 @@ ansible-test env --timeout "${timeout}" --color -v
 
 if [ "$2" == "2.9" ]; then
     # 1.5.0+ will not install for Python 3.6+ in the 2.9 setting (due to `enum` being installed)
-    echo "pynacl < 1.5.0; python_version >= '3.6'" >> tests/unit/requirements.txt
+    echo "pynacl >= 1.4.0, < 1.5.0; python_version >= '3.6'" >> tests/unit/requirements.txt
 fi
 
 if [ "$2" == "2.10" ]; then
