@@ -1,0 +1,25 @@
+---
+- name: Install application helloworld-yliu 0.1.0
+  community.general.cargo:
+    name: helloworld-yliu
+    version: 0.1.0
+  register: install_helloworld_010
+
+- name: Upgrade helloworld-yliu 0.1.0
+  community.general.cargo:
+    name: helloworld-yliu
+    state: latest
+  register: upgrade_helloworld_010
+
+- name: Downgrade helloworld-yliu 0.1.0
+  community.general.cargo:
+    name: helloworld-yliu
+    version: 0.1.0
+  register: downgrade_helloworld_010
+
+- name: Check assertions helloworld-yliu 0.1.0
+  assert:
+    that:
+        - install_helloworld_010 is changed
+        - upgrade_helloworld_010 is changed
+        - downgrade_helloworld_010 is changed

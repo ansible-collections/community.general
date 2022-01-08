@@ -1,0 +1,14 @@
+---
+- block:
+  - name: Install cargo
+    package:
+      name: cargo
+      state: present
+  - set_fact:
+      has_cargo: true
+  when:
+    - ansible_system != 'FreeBSD' or ansible_distribution_version is version('13.0', '>')
+    - ansible_distribution != 'MacOSX'
+    - ansible_distribution != 'RedHat' or ansible_distribution_version is version('8.0', '>=')
+    - ansible_distribution != 'CentOS' or ansible_distribution_version is version('7.0', '>=')
+    - ansible_distribution != 'Ubuntu' or ansible_distribution_version is version('18', '>=')
