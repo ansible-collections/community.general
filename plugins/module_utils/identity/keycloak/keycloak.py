@@ -930,15 +930,28 @@ class KeycloakAPI(object):
         :param name: Name of the group to fetch.
         :param realm: Realm in which the group resides; default 'master'
         """
-        groups_url = URL_GROUPS.format(url=self.baseurl, realm=realm)
+
+        def find_group_by_name(name, groups):
+            """ Find group by name recursively.
+
+            :param name: Name of the group.
+            :param groups: Group hierarchy.
+            """
+            for group in groups:
+                if group['name'] == name:
+                    return group
+                if 'subGroups' in group and group['subGroups']:
+                    sub_groups = group['subGroups']
+                    return find_group_by_name(name, sub_groups)
+
+            return None
+
         try:
             all_groups = self.get_groups(realm=realm)
 
-            for group in all_groups:
-                if group['name'] == name:
-                    return self.get_group_by_groupid(group['id'], realm=realm)
+            group = find_group_by_name(name, all_groups)
 
-            return None
+            return group
 
         except Exception as e:
             self.module.fail_json(msg="Could not fetch group %s in realm %s: %s"
