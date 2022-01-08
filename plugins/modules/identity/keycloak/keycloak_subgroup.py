@@ -55,6 +55,7 @@ options:
               providing it will reduce the number of API calls required.
     name:
         type: str
+        required: true
         description:
             - Name of the subgroup.
 
