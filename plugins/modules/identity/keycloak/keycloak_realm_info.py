@@ -65,7 +65,7 @@ msg:
 end_state:
     description: Representation of the realm public infomation.
     returned: on success
-    type: complex
+    type: dict
     contains:
         realm:
             description: Realm ID.
