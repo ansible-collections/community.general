@@ -1007,6 +1007,34 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg="Unable to delete group %s: %s" % (groupid, str(e)))
 
+    def create_default_group(self, groupid, realm="master"):
+        """ Set a Keycloak group as default group under realm.
+
+        :param groupid: group ID.
+        :return: HTTPResponse object on success
+        """
+        default_group_url = URL_DEFAULTGROUP.format(url=self.baseurl, realm=realm, groupid=groupid)
+        try:
+            open_url(default_group_url, method='PUT', headers=self.restheaders,
+                     validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg="Could not set default group %s in realm %s: %s"
+                                      % (groupid, realm, str(e)))
+
+    def delete_default_group(self, groupid, realm="master"):
+        """ Remove a Keycloak default group under realm.
+
+        :param groupid: group ID.
+        :return: HTTPResponse object on success
+        """
+        default_group_url = URL_DEFAULTGROUP.format(url=self.baseurl, realm=realm, groupid=groupid)
+        try:
+            open_url(default_group_url, method='DELETE', headers=self.restheaders,
+                     validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg="Could not remove default group %s in realm %s: %s"
+                                      % (groupid, realm, str(e)))
+
     def get_realm_roles(self, realm='master'):
         """ Obtains role representations for roles in a realm
 
