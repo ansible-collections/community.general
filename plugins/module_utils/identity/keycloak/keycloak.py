@@ -428,7 +428,7 @@ class KeycloakAPI(object):
 
         :param cid: ID of the client from which to obtain the rolemappings.
         :param realm: Realm from which to obtain the rolemappings.
-        :return: The rollemappings of specified group and client of the realm (default "master").
+        :return: The rollemappings of specified client of the realm (default "master").
         """
         client_roles_url = URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid)
         try:
