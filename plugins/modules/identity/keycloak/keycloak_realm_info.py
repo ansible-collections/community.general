@@ -41,7 +41,7 @@ options:
     realm:
         type: str
         description:
-            - They Keycloak realm id.
+            - They Keycloak realm ID.
         default: 'master'
 
 author:
