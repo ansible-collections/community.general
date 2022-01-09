@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: keycloak_client_scope_mapping
+module: keycloak_client_scopemapping
 
 short_description: Allows administration of Keycloak client-level roles of the client's scope via the Keycloak API
 
