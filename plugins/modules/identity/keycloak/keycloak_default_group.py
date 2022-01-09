@@ -91,11 +91,13 @@ end_state:
     description: Empty.
     returned: on success
     type: complex
+    contains: {}
 
 default_group:
     description: Empty
     returned: always
     type: complex
+    contains: {}
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
