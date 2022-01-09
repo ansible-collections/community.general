@@ -426,9 +426,9 @@ class KeycloakAPI(object):
     def get_client_roles_by_id(self, cid, realm="master"):
         """ Fetch the roles of the a client on the Keycloak server.
 
-        :param cid: ID of the client from which to obtain the rolemappings.
-        :param realm: Realm from which to obtain the rolemappings.
-        :return: The rollemappings of specified client of the realm (default "master").
+        :param cid: ID of the client from which to obtain the roles.
+        :param realm: Realm from which to obtain roles.
+        :return: The roles of specified client of the realm (default "master").
         """
         client_roles_url = URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid)
         try:
@@ -437,6 +437,20 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg="Could not fetch rolemappings for client %s in realm %s: %s"
                                       % (cid, realm, str(e)))
+
+    def get_client_role_name_by_id(self, cid, rid, realm="master"):
+        """ Get the role name of a client.
+
+        :param cid: ID of the client from which to obtain the roles.
+        :param rid: ID of the role.
+        :param realm: Realm from which to obtain the roles.
+        :return: The name of the role, None if not found.
+        """
+        roles = self.get_client_roles_by_id(cid, realm=realm)
+        for role in roles:
+            if rid == role['id']:
+                return role['name']
+        return None
 
     def get_client_role_by_name(self, gid, cid, name, realm="master"):
         """ Get the role ID of a client.
