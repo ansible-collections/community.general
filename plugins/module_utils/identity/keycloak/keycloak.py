@@ -49,6 +49,10 @@ URL_CLIENT_ROLES = "{url}/admin/realms/{realm}/clients/{id}/roles"
 URL_CLIENT_ROLE = "{url}/admin/realms/{realm}/clients/{id}/roles/{name}"
 URL_CLIENT_ROLE_COMPOSITES = "{url}/admin/realms/{realm}/clients/{id}/roles/{name}/composites"
 
+URL_CLIENT_SCOPEMAPPINGS_CLIENT = "{url}/admin/realms/{realm}/clients/{id}/scope-mappings/clients/{client}"
+URL_CLIENT_SCOPEMAPPINGS_CLIENT_AVAILABLE = "{url}/admin/realms/{realm}/clients/{id}/scope-mappings/clients/{client}/available"
+URL_CLIENT_SCOPEMAPPINGS_CLIENT_COMPOSITE = "{url}/admin/realms/{realm}/clients/{id}/scope-mappings/clients/{client}/composite"
+
 URL_REALM_ROLES = "{url}/admin/realms/{realm}/roles"
 URL_REALM_ROLE = "{url}/admin/realms/{realm}/roles/{name}"
 URL_REALM_ROLE_COMPOSITES = "{url}/admin/realms/{realm}/roles/{name}/composites"
@@ -224,6 +228,7 @@ class KeycloakAPI(object):
     """ Keycloak API access; Keycloak uses OAuth 2.0 to protect its API, an access token for which
         is obtained through OpenID connect
     """
+
     def __init__(self, module, connection_header):
         self.module = module
         self.baseurl = self.module.params.get('auth_keycloak_url')
@@ -500,6 +505,89 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg="Could not fetch available rolemappings for client %s in group %s, realm %s: %s"
                                       % (cid, gid, realm, str(e)))
+
+    def add_client_scopemappings_client(self, cid, client, rolereps, realm="master"):
+        """ Add client-level roles to the client's scope
+
+        :param cid Client ID to grant
+        :param client Target client ID of the roles
+        :param rolereps Role representations of the target client
+        """
+        client_scopemappings_client_url = URL_CLIENT_SCOPEMAPPINGS_CLIENT.format(
+            url=self.baseurl, realm=realm, id=cid, client=client)
+        try:
+            open_url(client_scopemappings_client_url, method="POST", headers=self.restheaders,
+                     data=json.dumps(rolereps), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg="Could not assign roles from client %s to client %s, realm %s: %s"
+                                      % (client, cid, realm, str(e)))
+
+    def remove_client_scopemappings_client(self, cid, client, rolereps, realm="master"):
+        """ Remove client-level roles from the client's scope.
+
+        :param cid Client ID to grant
+        :param client Target client ID of the roles
+        :param rolereps Role representations of the target client
+        """
+        client_scopemappings_client_url = URL_CLIENT_SCOPEMAPPINGS_CLIENT.format(
+            url=self.baseurl, realm=realm, id=cid, client=client)
+        try:
+            open_url(client_scopemappings_client_url, method="DELETE", headers=self.restheaders,
+                     data=json.dumps(rolereps), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg="Could not remove assigned roles from client %s to client %s, realm %s: %s"
+                                      % (client, cid, realm, str(e)))
+
+    def get_client_scopemappings_client(self, cid, client, realm="master"):
+        """ Fetch the roles associated with a client's scope, returns roles for the client.
+
+        :param cid: ID of the client from which to obtain the scope mapping.
+        :param client: ID of the client associated to the role to grant.
+        :param realm: Realm from which to obtain the scope mapping.
+        :return: The scope mapping of specified client and client of the realm (default "master").
+        """
+        client_scopemappings_client_url = URL_CLIENT_SCOPEMAPPINGS_CLIENT.format(
+            url=self.baseurl, realm=realm, id=cid, client=client)
+        try:
+            return json.loads(to_native(open_url(client_scopemappings_client_url, method="GET", headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.module.fail_json(msg="Could not fetch scope mappings of the client %s for client %s, realm %s: %s"
+                                      % (cid, client, realm, str(e)))
+
+    def get_client_scopemappings_client_available(self, cid, client, realm="master"):
+        """ Fetch available client-level roles, returns the roles for the client that can be associated with the client's scope
+
+        :param cid: ID of the client from which to obtain the scope mapping.
+        :param client: ID of the client associated to the role to grant.
+        :param realm: Realm from which to obtain the scope mapping.
+        :return: The scope mapping of specified client and client of the realm (default "master").
+        """
+        client_scopemappings_client_available_url = URL_CLIENT_SCOPEMAPPINGS_CLIENT_AVAILABLE.format(
+            url=self.baseurl, realm=realm, id=cid, client=client)
+        try:
+            return json.loads(to_native(open_url(client_scopemappings_client_available_url, method="GET", headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.module.fail_json(msg="Could not fetch scope mappings of the client %s for client %s, realm %s: %s"
+                                      % (cid, client, realm, str(e)))
+
+    def get_client_scopemappings_client_composite(self, cid, client, realm="master"):
+        """ Fetch effective client roles, returns the roles for the client that are associated with the client's scope.
+
+        :param cid: ID of the client from which to obtain the scope mapping.
+        :param client: ID of the client associated to the role to grant.
+        :param realm: Realm from which to obtain the scope mapping.
+        :return: The scope mapping of specified client and client of the realm (default "master").
+        """
+        client_scopemappings_client_composite_url = URL_CLIENT_SCOPEMAPPINGS_CLIENT_COMPOSITE.format(
+            url=self.baseurl, realm=realm, id=cid, client=client)
+        try:
+            return json.loads(to_native(open_url(client_scopemappings_client_composite_url, method="GET", headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.module.fail_json(msg="Could not fetch scope mappings of the client %s for client %s, realm %s: %s"
+                                      % (cid, client, realm, str(e)))
 
     def add_group_rolemapping(self, gid, cid, role_rep, realm="master"):
         """ Fetch the composite role of a client in a specified goup on the Keycloak server.
