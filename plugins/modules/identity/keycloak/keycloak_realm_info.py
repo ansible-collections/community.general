@@ -73,7 +73,7 @@ end_state:
             returned: always
             sample: MyRealm
         public_key:
-            description: Public key of the realm
+            description: Public key of the realm.
             type: str
             returned: always
             sample: MIIBIjANBgkqhkiG9w0BAQEFAAO...
