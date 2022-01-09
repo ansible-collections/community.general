@@ -20,7 +20,7 @@ from ansible.module_utils.six import StringIO
 
 
 @contextmanager
-def patch_keycloak_api(get_group_by_name=None, get_client_id=None, get_client_role_by_name=None,
+def patch_keycloak_api(get_group_by_name=None, get_client_id=None, get_client_role_id_by_name=None,
                        get_client_rolemapping_by_id=None, get_client_available_rolemappings=None,
                        get_client_composite_rolemappings=None, add_group_rolemapping=None,
                        delete_group_rolemapping=None):
@@ -43,8 +43,8 @@ def patch_keycloak_api(get_group_by_name=None, get_client_id=None, get_client_ro
                       side_effect=get_group_by_name) as mock_get_group_by_name:
         with patch.object(obj, 'get_client_id',
                           side_effect=get_client_id) as mock_get_client_id:
-            with patch.object(obj, 'get_client_role_by_name',
-                              side_effect=get_client_role_by_name) as mock_get_client_role_by_name:
+            with patch.object(obj, 'get_client_role_id_by_name',
+                              side_effect=get_client_role_id_by_name) as mock_get_client_role_by_name:
                 with patch.object(obj, 'get_client_rolemapping_by_id',
                                   side_effect=get_client_rolemapping_by_id) as mock_get_client_rolemapping_by_id:
                     with patch.object(obj, 'get_client_available_rolemappings',
@@ -188,7 +188,7 @@ class TestKeycloakRealm(ModuleTestCase):
 
         with mock_good_connection():
             with patch_keycloak_api(get_group_by_name=return_value_get_group_by_name, get_client_id=return_value_get_client_id,
-                                    get_client_role_by_name=return_value_get_client_role_by_name,
+                                    get_client_role_id_by_name=return_value_get_client_role_by_name,
                                     get_client_available_rolemappings=return_value_get_client_available_rolemappings,
                                     get_client_composite_rolemappings=return_value_get_client_composite_rolemappings) \
                     as (mock_get_group_by_name, mock_get_client_id, mock_get_client_role_by_name, mock_add_group_rolemapping,
@@ -272,7 +272,7 @@ class TestKeycloakRealm(ModuleTestCase):
 
         with mock_good_connection():
             with patch_keycloak_api(get_group_by_name=return_value_get_group_by_name, get_client_id=return_value_get_client_id,
-                                    get_client_role_by_name=return_value_get_client_role_by_name,
+                                    get_client_role_id_by_name=return_value_get_client_role_by_name,
                                     get_client_available_rolemappings=return_value_get_client_available_rolemappings,
                                     get_client_composite_rolemappings=return_value_get_client_composite_rolemappings) \
                     as (mock_get_group_by_name, mock_get_client_id, mock_get_client_role_by_name, mock_add_group_rolemapping,
@@ -374,7 +374,7 @@ class TestKeycloakRealm(ModuleTestCase):
 
         with mock_good_connection():
             with patch_keycloak_api(get_group_by_name=return_value_get_group_by_name, get_client_id=return_value_get_client_id,
-                                    get_client_role_by_name=return_value_get_client_role_by_name,
+                                    get_client_role_id_by_name=return_value_get_client_role_by_name,
                                     get_client_available_rolemappings=return_value_get_client_available_rolemappings,
                                     get_client_composite_rolemappings=return_value_get_client_composite_rolemappings) \
                     as (mock_get_group_by_name, mock_get_client_id, mock_get_client_role_by_name, mock_add_group_rolemapping,
@@ -461,7 +461,7 @@ class TestKeycloakRealm(ModuleTestCase):
 
         with mock_good_connection():
             with patch_keycloak_api(get_group_by_name=return_value_get_group_by_name, get_client_id=return_value_get_client_id,
-                                    get_client_role_by_name=return_value_get_client_role_by_name,
+                                    get_client_role_id_by_name=return_value_get_client_role_by_name,
                                     get_client_available_rolemappings=return_value_get_client_available_rolemappings,
                                     get_client_composite_rolemappings=return_value_get_client_composite_rolemappings) \
                     as (mock_get_group_by_name, mock_get_client_id, mock_get_client_role_by_name, mock_add_group_rolemapping,
@@ -547,7 +547,7 @@ class TestKeycloakRealm(ModuleTestCase):
 
         with mock_good_connection():
             with patch_keycloak_api(get_group_by_name=return_value_get_group_by_name, get_client_id=return_value_get_client_id,
-                                    get_client_role_by_name=return_value_get_client_role_by_name,
+                                    get_client_role_id_by_name=return_value_get_client_role_by_name,
                                     get_client_available_rolemappings=return_value_get_client_available_rolemappings,
                                     get_client_composite_rolemappings=return_value_get_client_composite_rolemappings) \
                     as (mock_get_group_by_name, mock_get_client_id, mock_get_client_role_by_name, mock_add_group_rolemapping,

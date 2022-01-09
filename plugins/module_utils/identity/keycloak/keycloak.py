@@ -452,17 +452,16 @@ class KeycloakAPI(object):
                 return role['name']
         return None
 
-    def get_client_role_by_name(self, gid, cid, name, realm="master"):
+    def get_client_role_id_by_name(self, cid, name, realm="master"):
         """ Get the role ID of a client.
 
-        :param gid: ID of the group from which to obtain the rolemappings.
-        :param cid: ID of the client from which to obtain the rolemappings.
+        :param cid: ID of the client from which to obtain the roles.
         :param name: Name of the role.
-        :param realm: Realm from which to obtain the rolemappings.
+        :param realm: Realm from which to obtain the roles.
         :return: The ID of the role, None if not found.
         """
-        rolemappings = self.get_client_roles_by_id(cid, realm=realm)
-        for role in rolemappings:
+        roles = self.get_client_roles_by_id(cid, realm=realm)
+        for role in roles:
             if name == role['name']:
                 return role['id']
         return None

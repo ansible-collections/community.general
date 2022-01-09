@@ -277,7 +277,7 @@ def main():
                 module.fail_json(msg='Either the `name` or `id` has to be specified on each role.')
             # Fetch missing role_id
             if role['id'] is None:
-                role_id = kc.get_client_role_by_name(gid, cid, role['name'], realm=realm)
+                role_id = kc.get_client_role_id_by_name(cid, role['name'], realm=realm)
                 if role_id is not None:
                     role['id'] = role_id
                 else:
