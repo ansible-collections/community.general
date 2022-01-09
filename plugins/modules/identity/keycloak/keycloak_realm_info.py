@@ -94,37 +94,36 @@ end_state:
             sample: 0
 
 realm_info:
-  description:
-      - Representation of the realm public infomation.
-      - Deprecated return value, it will be removed in community.general 6.0.0. Please use the return value I(end_state) instead.
-  returned: always
-  type: complex
-  contains:
-      realm:
-          description: Realm ID.
-          type: str
-          returned: always
-          sample: MyRealm
-      public_key:
-          description: Public key of the realm
-          type: str
-          returned: always
-          sample: MIIBIjANBgkqhkiG9w0BAQEFAAO...
-      token-service:
-          description: Token endpoint URL
-          type: str
-          returned: always
-          sample: https://auth.example.com/auth/realms/MyRealm/protocol/openid-connect
-      account-service:
-          description: Account console URL
-          type: str
-          returned: always
-          sample: https://auth.example.com/auth/realms/MyRealm/account
-      tokens-not-before:
-          description: The token not before
-          type: int
-          returned: always
-          sample: 0
+    description:
+        - Representation of the realm public infomation.
+    returned: always
+    type: complex
+    contains:
+        realm:
+            description: Realm ID.
+            type: str
+            returned: always
+            sample: MyRealm
+        public_key:
+            description: Public key of the realm
+            type: str
+            returned: always
+            sample: MIIBIjANBgkqhkiG9w0BAQEFAAO...
+        token-service:
+            description: Token endpoint URL
+            type: str
+            returned: always
+            sample: https://auth.example.com/auth/realms/MyRealm/protocol/openid-connect
+        account-service:
+            description: Account console URL
+            type: str
+            returned: always
+            sample: https://auth.example.com/auth/realms/MyRealm/account
+        tokens-not-before:
+            description: The token not before
+            type: int
+            returned: always
+            sample: 0
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI
