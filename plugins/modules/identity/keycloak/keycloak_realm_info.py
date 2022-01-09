@@ -12,6 +12,8 @@ module: keycloak_realm_info
 
 short_description: Allows obtaining Keycloak realm public information via Keycloak API
 
+version_added: 4.3.0
+
 description:
     - This module allows you to get Keycloak realm public information via the Keycloak REST API.
 
