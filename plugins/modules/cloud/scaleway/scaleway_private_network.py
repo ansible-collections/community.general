@@ -99,10 +99,9 @@ data:
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway
 from ansible.module_utils.basic import AnsibleModule
 
-def get_private_network(api, name):
-    response = api.get('private-networks', params={'name':name, 'order_by':'name_asc'})
-#    raise Exception(response.body)
-    # a amélioré si plusier nom proche /changer message
+def get_private_network(api, name, page=1):
+    page_size = 10
+    response = api.get('private-networks', params={'name':name, 'order_by':'name_asc', 'page':page, 'page_size':page_size})
     if not response.ok:
         msg = "Error during get private network creation: %s: '%s' (%s)" % (response.info['msg'],
                                                                response.json['message'],
@@ -111,12 +110,17 @@ def get_private_network(api, name):
 
     if response.json['total_count'] == 0:
         return None
-    # a enlever
-    #return None
-    #raise Exception(response.json['total_count'])
-    if response.json['private_networks'][0]['name'] == name:
-        return response.json['private_networks'][0]
-        
+
+    i = 0
+    while i < len(response.json['private_networks']):
+        if response.json['private_networks'][i]['name'] == name:
+            return response.json['private_networks'][i]
+        i += 1
+
+    # search on next page if needed 
+    if ( page * page_size ) < response.json['total_count']:
+        return get_private_network(api, name, page+1)
+
     return None
 
 def present_strategy(api, wished_private_network):
