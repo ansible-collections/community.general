@@ -11,11 +11,11 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: scaleway_vpc
+module: scaleway_private_network
 short_description: Scaleway VPC management module
 author: Pascal MANGIN (@pastral)
 description:
-    - This module manages VPC on Scaleway account ( inspired by Scaleway_ip )
+    - This module manages VPC on Scaleway account
       U(https://developer.scaleway.com)
 extends_documentation_fragment:
 - community.general.scaleway
@@ -99,27 +99,31 @@ data:
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway
 from ansible.module_utils.basic import AnsibleModule
 
-def get_private_network_id(api, name):
-    response = api.get('private-networks')
-
+def get_private_network(api, name):
+    response = api.get('private-networks', params={'name':name, 'order_by':'name_asc'})
+#    raise Exception(response.body)
     # a amélioré si plusier nom proche /changer message
-    if not creation_response.ok:
-        msg = "Error during ip creation: %s: '%s' (%s)" % (creation_response.info['msg'],
-                                                               creation_response.json['message'],
-                                                               creation_response.json)
-            api.module.fail_json(msg=msg)
+    if not response.ok:
+        msg = "Error during get private network creation: %s: '%s' (%s)" % (response.info['msg'],
+                                                               response.json['message'],
+                                                               response.json)
+        api.module.fail_json(msg=msg)
 
-    if response.json['private_networks[0].name'] == name:
-        
-        return response.json['private_networks[0].id']
+    if response.json['total_count'] == 0:
+        return None
+    # a enlever
+    #return None
+    #raise Exception(response.json['total_count'])
+    if response.json['private_networks'][0]['name'] == name:
+        return response.json['private_networks'][0]
         
     return None
 
 def present_strategy(api, wished_private_network):
 
     changed = False
-    private_network_id = get_private_network_id(api, wished_private_network['name'])
-    if(private_network_id is not None:
+    private_network = get_private_network(api, wished_private_network['name'])
+    if private_network is not None:
        return changed, {}
 
     changed = True
@@ -131,7 +135,7 @@ def present_strategy(api, wished_private_network):
         'project_id' : wished_private_network['project']
         }
 
-    response = api.post(path='private-networks/'+private_network_id, data=data)
+    response = api.post(path='private-networks/', data=data)
 
     if not response.ok:
        api.module.fail_json(msg='Error creating private network [{0}: {1}]'.format(
@@ -142,15 +146,15 @@ def present_strategy(api, wished_private_network):
 def absent_strategy(api, wished_private_network):
 
     changed = False
-    private_network_id = get_private_network_id(api, wished_private_network['name'])
-    if(private_network_id is None:
+    private_network = get_private_network(api, wished_private_network['name'])
+    if private_network is None:
        return changed, {}
 
     changed = True
     if api.module.check_mode:
         return changed, {"status": "private network would be destroyed"}
-       
-    response = api.delete('private-networks/'+private_network_id)
+
+    response = api.delete('private-networks/'+private_network['id'])
 
     if not response.ok:
        api.module.fail_json(msg='Error deleting private network [{0}: {1}]'.format(
@@ -167,7 +171,7 @@ def core(module):
     }
        
     region = module.params["region"]
-    module.params['api_url'] = SCALEWAY_LOCATION[region]["api_endpoint"]
+    module.params['api_url'] = SCALEWAY_LOCATION[region]["api_endpoint_vpc"]
 
     api = Scaleway(module=module)
     if module.params["state"] == "absent":
