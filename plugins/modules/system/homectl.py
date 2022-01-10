@@ -101,7 +101,7 @@ options:
     environment:
         description:
             - String separated by comma each containing an environment variable and its value to
-              set for the user's login session, in a format compatible with I(putenv()).
+              set for the user's login session, in a format compatible with ``putenv()``.
             - Any environment variable listed here is automatically set by pam_systemd for all
               login sessions of the user.
         type: list
