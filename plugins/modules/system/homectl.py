@@ -27,22 +27,21 @@ options:
     password:
         description:
             - Set the user's password to this.
-            - Homed requires this value has to be cleartext on account creation. Beware of security issues.
-            - See here: U(https://systemd.io/USER_RECORD/).
-            - password an array of strings, each containing a plain text password.
+            - Homed requires this value to be in cleartext on user creation and updating a user.
+            - See U(https://systemd.io/USER_RECORD/).
         required: true
         type: str
     state:
         description:
-            - Whether the account should exist or not, taking action if the state is different from what is stated.
-        choices: [ 'absent', 'present' ]
+            - The operation to take on the user such as remove, add user, and modify user.
+        choices: [ 'absent', 'present', 'modify' ]
         default: present
         type: str
     storage:
         description:
             - Indicates the storage mechanism for the user's home directory.
+            - If not specified homed by default implies classic.
         choices: [ 'classic', 'luks', 'directory', 'subvolume', 'fscrypt', 'cifs' ]
-        default: classic
         type: str
     disksize:
         description:
@@ -70,7 +69,7 @@ options:
         description:
             - The name of an icon picked by the user, for example for the purpose of an avatar.
             - Should follow the semantics defined in the Icon Naming Specification.
-            - https://specifications.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
+            - See U(https://specifications.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html) for specifics.
         type: str
     homedir:
         description:
@@ -78,34 +77,35 @@ options:
         type: path
     uid:
         description:
-            -  Sets the UID of the user.
+            -  Sets the uid of the user.
         type: int
     gid:
         description:
-            - Sets the I(GID) of the user.
+            - Sets the gid of the user.
         type: int
     umask:
         description:
-            - Sets the umask for the user's login sessions 0000..0777
+            - Sets the umask for the user's login sessions
+            - Value from C(0000) to C(0777).
         type: int
     member:
         description:
             - String separated by comma each indicating a UNIX group this user shall be a member of.
-        type: list
-        elements: str
+            - Groups the user should be a member of should be supplied as comma separated list.
+        aliases: [ 'memberof' ]
+        type: str
     shell:
         description:
             - Shell binary to use for terminal logins of given user.
+            - If not specified homed by default uses ``/bin/bash``
         type: str
-        default: /bin/bash
     environment:
         description:
             - String separated by comma each containing an environment variable and its value to
               set for the user's login session, in a format compatible with ``putenv()``.
             - Any environment variable listed here is automatically set by pam_systemd for all
               login sessions of the user.
-        type: list
-        elements: str
+        type: str
     timezone:
         description:
             - Preferred timezone to use for the user.
@@ -150,20 +150,23 @@ class Homectl(object):
 
     # Cannot run homectl commands if service is not active
     def homed_service_active(self):
-        active = True
+        is_active = True
         cmd = ["systemctl", "show", "systemd-homed.service", "-p", "ActiveState"]
         rc, show_service_stdout, stderr = self.module.run_command(cmd)
         if rc == 0:
             state = show_service_stdout.rsplit("=")[1]
-            if state != "active":
-                active = False
-        return active
+            if state.strip() != "active":
+                is_active = False
+        return is_active
 
     def user_exists(self):
         # Get user properties if they exist in json
         # TODO can be used to query later on in a dict for updating record.
         exists = False
-        cmd = "homectl inspect %s -j" % self.name
+        cmd = [self.module.get_bin_path('homectl', True)]
+        cmd.append("inspect")
+        cmd.append(self.name)
+        cmd.append("-j")
         rc, stdout, stderr = self.module.run_command(cmd, use_unsafe_shell=True)
         if rc == 0:
             exists = True
@@ -241,14 +244,22 @@ class Homectl(object):
         cmd.append(self.name)
         return(self.module.run_command(cmd, use_unsafe_shell=True))
 
+    def modify_user(self):
+        record = self.create_json_record()
+        cmd = [self.module.get_bin_path('homectl', True)]
+        cmd.append('update')
+        cmd.append(self.name)
+        cmd.append("--identity=-")  # Read the user record from standard input.
+        return(self.module.run_command(cmd, data=record, use_unsafe_shell=True))
+
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='present', choices=['absent', 'present']),
+            state=dict(type='str', default='present', choices=['absent', 'present', 'modify']),
             name=dict(type='str', required=True, aliases=['user', 'username']),
             password=dict(type='str', no_log=True, required=True),
-            storage=dict(type='str', default='classic', choices=['classic', 'luks', 'directory', 'subvolume', 'fscrypt', 'cifs']),
+            storage=dict(type='str', choices=['classic', 'luks', 'directory', 'subvolume', 'fscrypt', 'cifs']),
             disksize=dict(type='str'),
             realname=dict(type='str', aliases=['real_name']),
             realm=dict(type='str'),
@@ -259,10 +270,10 @@ def main():
             uid=dict(type='int'),
             gid=dict(type='int'),
             umask=dict(type='int'),
-            environment=dict(type='list', elements='str'),
+            environment=dict(type='str'),
             timezone=dict(type='str'),
-            member=dict(type='list', elements='str'),
-            shell=dict(type='str', default='/bin/bash'),
+            member=dict(type='str', aliases=['memberof']),
+            shell=dict(type='str'),
         ),
         supports_check_mode=True,
     )
@@ -303,6 +314,19 @@ def main():
             result['msg'] = "User %s created!" % homectl.name
         else:
             result['msg'] = "User already Exists!"
+            result['changed'] = False
+
+    if homectl.state == 'modify':
+        if homectl.user_exists():
+            if module.check_mode:
+                module.exit_json(changed=True)
+            rc, stdout, stderr = homectl.modify_user()
+            if rc != 0:
+                module.fail_json(name=homectl.name, msg=stderr, rc=rc)
+            result['changed'] = True
+            result['msg'] = "User %s modified" % homectl.name
+        else:
+            result['msg'] = "User doesn't exist!"
             result['changed'] = False
 
     module.exit_json(**result)
