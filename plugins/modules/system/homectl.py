@@ -28,7 +28,7 @@ options:
         description:
             - Set the user's password to this.
             - Homed requires this value has to be cleartext on account creation. Beware of security issues.
-            - See here https://systemd.io/USER_RECORD/
+            - See here: U(https://systemd.io/USER_RECORD/).
             - password an array of strings, each containing a plain text password.
         required: true
         type: str
