@@ -151,8 +151,8 @@ class Homectl(object):
     # Cannot run homectl commands if service is not active
     def homed_service_active(self):
         active = True
-        cmd = "systemctl show systemd-homed.service -p ActiveState"
-        rc, show_service_stdout, stderr = self.module.run_command(cmd, use_unsafe_shell=True)
+        cmd = ["systemctl", "show", "systemd-homed.service", "-p", "ActiveState"]
+        rc, show_service_stdout, stderr = self.module.run_command(cmd)
         if rc == 0:
             state = show_service_stdout.rsplit("=")[1]
             if state != "active":
