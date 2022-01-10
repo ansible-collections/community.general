@@ -78,7 +78,7 @@ options:
         type: path
     uid:
         description:
-            -  Sets the I(UID) of the user.
+            -  Sets the UID of the user.
         type: int
     gid:
         description:
