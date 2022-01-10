@@ -92,6 +92,13 @@ options:
       - Enable full debugging.
     type: bool
     default: false
+  show_diff:
+    description:
+      - Whether to print file changes details
+      - Alias C(show-diff) has been deprecated and will be removed in community.general 7.0.0.
+    aliases: ['show-diff']
+    type: bool
+    default: false
 requirements:
 - puppet
 author:
@@ -174,9 +181,10 @@ def main():
             manifest=dict(type='str'),
             noop=dict(type='bool'),
             logdest=dict(type='str', default='stdout', choices=['all', 'stdout', 'syslog']),
+            # The following is not related to Ansible's diff; see https://github.com/ansible-collections/community.general/pull/3980#issuecomment-1005666154
             show_diff=dict(
                 type='bool', default=False, aliases=['show-diff'],
-                removed_in_version='7.0.0', removed_from_collection='community.general'),
+                deprecated_aliases=[dict(name='show-diff', version='7.0.0', collection_name='community.general')]),
             facts=dict(type='dict'),
             facter_basename=dict(type='str', default='ansible'),
             environment=dict(type='str'),
