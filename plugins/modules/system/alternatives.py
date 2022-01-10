@@ -104,7 +104,7 @@ def main():
         # available alternatives
         current_path_regex = re.compile(r'^\s*link currently points to (.*)$',
                                         re.MULTILINE)
-        alternative_regex = re.compile(r'^(\/.*)\s-\spriority', re.MULTILINE)
+        alternative_regex = re.compile(r'^(\/.*)\s-\s(?:family\s\S+\s)?priority', re.MULTILINE)
 
         match = current_path_regex.search(display_output)
         if match:
