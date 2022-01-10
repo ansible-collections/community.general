@@ -14,6 +14,7 @@ module: homectl
 author:
     - "James Livulpi (@jameslivulpi)"
 short_description: Manage user accounts with systemd-homed
+version_added: 4.4.0
 description:
     - Manages a user's home directory managed by systemd-homed
 options:
