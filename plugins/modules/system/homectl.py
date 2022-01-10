@@ -8,37 +8,39 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = '''
+---
 module: homectl
-short_description: Manage user accounts with systemd-homed
 author:
-    - James Livulpi
+    - "James Livulpi (@jameslivulpi)"
+short_description: Manage user accounts with systemd-homed
 description:
     - Manages a user's home directory managed by systemd-homed
 options:
     name:
         description:
             - The user name to create, remove, or modify.
-        type: str
         required: true
-        aliases: [ user, username ]
+        aliases: [ 'user', 'username' ]
+        type: str
     password:
         description:
             - Set the user's password to this.
             - Homed requires this value has to be cleartext on account creation. Beware of security issues.
             - See here https://systemd.io/USER_RECORD/
-            - password → an array of strings, each containing a plain text password.
+            - password an array of strings, each containing a plain text password.
+        required: true
         type: str
     state:
         description:
             - Whether the account should exist or not, taking action if the state is different from what is stated.
-        type: str
-        choices: [ absent, present ]
+        choices: [ 'absent', 'present' ]
         default: present
+        type: str
     storage:
-         description:
-            - Indicates the storage mechanism for the user’s home directory.
-        choices: [ 'classic', 'luks', 'directory', 'subvolume', 'fscrypt', 'cifs']
+        description:
+            - Indicates the storage mechanism for the user's home directory.
+        choices: [ 'classic', 'luks', 'directory', 'subvolume', 'fscrypt', 'cifs' ]
         default: classic
         type: str
     disksize:
@@ -48,11 +50,12 @@ options:
         type: str
     realname:
         description:
-            - The user’s real (“human”) name.
+            - The user's real ('human') name.
+        aliases: [ 'real_name' ]
         type: str
     realm:
         description:
-            - The “realm” a user is defined in.
+            - The 'realm' a user is defined in.
         type: str
     email:
         description:
@@ -67,6 +70,7 @@ options:
             - The name of an icon picked by the user, for example for the purpose of an avatar.
             - Should follow the semantics defined in the Icon Naming Specification.
             - https://specifications.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
+        type: str
     homedir:
         description:
             - Absolute file system path to the home directory.
@@ -81,8 +85,7 @@ options:
         type: int
     umask:
         description:
-            - Sets the umask for the user’s login sessions.
-            - ex: 0000..0777
+            - Sets the umask for the user's login sessions 0000..0777
         type: int
     member:
         description:
@@ -96,25 +99,25 @@ options:
         default: /bin/bash
     environment:
         description:
-            - String separated by comma each containing an environment variable and its value to set for the user’s login session, in a format compatible with I(putenv()).
-            - Any environment variable listed here is automatically set by pam_systemd for all login sessions of the user.
+            - String separated by comma each containing an environment variable and its value to
+              set for the user's login session, in a format compatible with I(putenv()).
+            - Any environment variable listed here is automatically set by pam_systemd for all
+              login sessions of the user.
+        type: list
+        elements: str
     timezone:
         description:
             - Preferred timezone to use for the user.
-            - Should be a tzdata compatible location string,
-            - ex: America/New_York
+            - Should be a tzdata compatible location string such as 'America/New_York'
+        type: str
 
-    #TODO
 '''
 
-EXAMPLES = r'''#TODO'''
+EXAMPLES = '''#TODO'''
 
-RETURN = r'''#TODO'''
+RETURN = '''#TODO'''
 
 import crypt
-from dateutil import tz
-
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.basic import jsonify
 from ansible.module_utils.common.text.formatters import human_to_bytes
@@ -179,7 +182,7 @@ class Homectl(object):
         if self.gid:
             record['gid'] = self.gid
         if self.member:
-            record['memberOf'] = [s for s in self.member.split(",")]
+            record['memberOf'] = list(self.member.split(','))
 
         if self.realname:
             record['realName'] = self.realname
@@ -213,14 +216,10 @@ class Homectl(object):
             record['umask'] = self.umask
 
         if self.environment:
-            record['environment'] = [s for s in self.environment.split(",")]
+            record['environment'] = list(self.environment.split(','))
 
         if self.timezone:
-            # Verify its in proper TZ format e.g., America/New_York, Europe/Amsterdam, etc.
-            if tz.gettz(self.timezone):
-                record['timeZone'] = self.timezone
-            else:
-                self.module.fail_json(msg="timezone is not fomatted correctly!")
+            record['timeZone'] = self.timezone
 
         return jsonify(record)
 
@@ -228,11 +227,11 @@ class Homectl(object):
         record = self.create_json_record()
         cmd = [self.module.get_bin_path('homectl', True)]
         cmd.append("create")
-        cmd.append("--identity=-") #read the user record from standard input.
+        cmd.append("--identity=-")  # Read the user record from standard input.
         return(self.module.run_command(cmd, data=record, use_unsafe_shell=True))
 
     def _hash_password(self, password):
-        #TODO handle errors etc.
+        # TODO handle errors etc.
         return(crypt.crypt(password))
 
     def remove_user(self):
@@ -241,13 +240,14 @@ class Homectl(object):
         cmd.append(self.name)
         return(self.module.run_command(cmd, use_unsafe_shell=True))
 
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(type='str', default='present', choices=['absent', 'present']),
             name=dict(type='str', required=True, aliases=['user', 'username']),
             password=dict(type='str', no_log=True, required=True),
-            storage=dict(type='str'),
+            storage=dict(type='str', default='classic', choices=['classic', 'luks', 'directory', 'subvolume', 'fscrypt', 'cifs']),
             disksize=dict(type='str'),
             realname=dict(type='str', aliases=['real_name']),
             realm=dict(type='str'),
@@ -260,8 +260,8 @@ def main():
             umask=dict(type='int'),
             environment=dict(type='list', elements='str'),
             timezone=dict(type='str'),
-            member=dict(type='str'),
-            shell=dict(type='str'),
+            member=dict(type='list', elements='str'),
+            shell=dict(type='str', default='/bin/bash'),
         ),
         supports_check_mode=True,
     )
@@ -305,6 +305,7 @@ def main():
             result['changed'] = False
 
     module.exit_json(**result)
+
 
 if __name__ == '__main__':
     main()
