@@ -109,7 +109,7 @@ options:
     timezone:
         description:
             - Preferred timezone to use for the user.
-            - Should be a tzdata compatible location string such as 'America/New_York'
+            - Should be a tzdata compatible location string such as C(America/New_York).
         type: str
 
 '''
