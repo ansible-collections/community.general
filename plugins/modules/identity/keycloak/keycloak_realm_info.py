@@ -62,37 +62,6 @@ msg:
     returned: always
     type: str
 
-end_state:
-    description: Representation of the realm public infomation.
-    returned: on success
-    type: dict
-    contains:
-        realm:
-            description: Realm ID.
-            type: str
-            returned: always
-            sample: MyRealm
-        public_key:
-            description: Public key of the realm.
-            type: str
-            returned: always
-            sample: MIIBIjANBgkqhkiG9w0BAQEFAAO...
-        token-service:
-            description: Token endpoint URL
-            type: str
-            returned: always
-            sample: https://auth.example.com/auth/realms/MyRealm/protocol/openid-connect
-        account-service:
-            description: Account console URL
-            type: str
-            returned: always
-            sample: https://auth.example.com/auth/realms/MyRealm/account
-        tokens-not-before:
-            description: The token not before
-            type: int
-            returned: always
-            sample: 0
-
 realm_info:
     description:
         - Representation of the realm public infomation.
@@ -154,7 +123,6 @@ def main():
 
     realm_info = kc.get_realm_info_by_id(realm=realm)
 
-    result['end_state'] = realm_info
     result['realm_info'] = realm_info
     result['msg'] = 'Get realm public info successful for ID {realm}'.format(realm=realm)
     module.exit_json(**result)
