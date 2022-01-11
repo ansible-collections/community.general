@@ -1,2 +1,0 @@
-minor_changes:
-  - proxmox - add ``clone`` parameter (https://github.com/ansible-collections/community.general/pull/3930).

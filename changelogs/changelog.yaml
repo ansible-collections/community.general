@@ -1238,3 +1238,74 @@ releases:
       name: ilo_redfish_info
       namespace: remote_management.redfish
     release_date: '2021-12-21'
+  4.3.0:
+    changes:
+      bugfixes:
+      - Various modules and plugins - use vendored version of ``distutils.version``
+        instead of the deprecated Python standard library ``distutils`` (https://github.com/ansible-collections/community.general/pull/3936).
+      - alternatives - fix output parsing for alternatives groups (https://github.com/ansible-collections/community.general/pull/3976).
+      - jail connection plugin - replace deprecated ``distutils.spawn.find_executable``
+        with Ansible's ``get_bin_path`` to find the executable (https://github.com/ansible-collections/community.general/pull/3934).
+      - lxd connection plugin - replace deprecated ``distutils.spawn.find_executable``
+        with Ansible's ``get_bin_path`` to find the ``lxc`` executable (https://github.com/ansible-collections/community.general/pull/3934).
+      - passwordstore lookup plugin - replace deprecated ``distutils.util.strtobool``
+        with Ansible's ``convert_bool.boolean`` to interpret values for the ``create``,
+        ``returnall``, ``overwrite``, 'backup``, and ``nosymbols`` options (https://github.com/ansible-collections/community.general/pull/3934).
+      - say callback plugin - replace deprecated ``distutils.spawn.find_executable``
+        with Ansible's ``get_bin_path`` to find the ``say`` resp. ``espeak`` executables
+        (https://github.com/ansible-collections/community.general/pull/3934).
+      - scaleway_user_data - fix double-quote added where no double-quote is needed
+        to user data in scaleway's server (``Content-type`` -> ``Content-Type``) (https://github.com/ansible-collections/community.general/pull/3940).
+      - slack - add ``charset`` to HTTP headers to avoid Slack API warning (https://github.com/ansible-collections/community.general/issues/3932).
+      - zone connection plugin - replace deprecated ``distutils.spawn.find_executable``
+        with Ansible's ``get_bin_path`` to find the executable (https://github.com/ansible-collections/community.general/pull/3934).
+      minor_changes:
+      - ipa_dnszone - ``dynamicupdate`` is now a boolean parameter, instead of a string
+        parameter accepting ``"true"`` and ``"false"``. Also the module is now idempotent
+        with respect to ``dynamicupdate`` (https://github.com/ansible-collections/community.general/pull/3374).
+      - ipa_dnszone - add DNS zone synchronization support (https://github.com/ansible-collections/community.general/pull/3374).
+      - ipmi_power - add ``machine`` option to ensure the power state via the remote
+        target address (https://github.com/ansible-collections/community.general/pull/3968).
+      - mattermost - add the possibility to send attachments instead of text messages
+        (https://github.com/ansible-collections/community.general/pull/3946).
+      - nmcli - add ``wireguard`` connection type (https://github.com/ansible-collections/community.general/pull/3985).
+      - proxmox - add ``clone`` parameter (https://github.com/ansible-collections/community.general/pull/3930).
+      - puppet - remove deprecation for ``show_diff`` parameter. Its alias ``show-diff``
+        is still deprecated and will be removed in community.general 7.0.0 (https://github.com/ansible-collections/community.general/pull/3980).
+      - scaleway_compute - add possibility to use project identifier (new ``project``
+        option) instead of deprecated organization identifier (https://github.com/ansible-collections/community.general/pull/3951).
+      - scaleway_volume - all volumes are systematically created on par1 (https://github.com/ansible-collections/community.general/pull/3964).
+      release_summary: Regular feature and bugfix release.
+    fragments:
+    - 3374-add-ipa-ptr-sync-support.yml
+    - 3921-add-counter-filter-plugin.yml
+    - 3930-proxmox-add-clone.yaml
+    - 3933-slack-charset-header.yaml
+    - 3934-distutils.yml
+    - 3936-distutils.version.yml
+    - 3940_fix_contenttype_scaleway_user_data.yml
+    - 3946-mattermost_attachments.yml
+    - 3951-scaleway_compute_add_project_id.yml
+    - 3964-scaleway_volume_add_region.yml
+    - 3968-ipmi_power-add-machine-option.yaml
+    - 3976-fix-alternatives-parsing.yml
+    - 3980-puppet-show_diff.yml
+    - 3985-nmcli-add-wireguard-connection-type.yml
+    - 4.3.0.yml
+    modules:
+    - description: Manage Rust packages with cargo
+      name: cargo
+      namespace: packaging.language
+    - description: Allows obtaining Keycloak realm public information via Keycloak
+        API
+      name: keycloak_realm_info
+      namespace: identity.keycloak
+    - description: Manage sudoers files
+      name: sudoers
+      namespace: system
+    plugins:
+      filter:
+      - description: Counts hashable elements in a sequence
+        name: counter
+        namespace: null
+    release_date: '2022-01-11'
