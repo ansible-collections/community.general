@@ -65,7 +65,7 @@ options:
             - Values may be single values (e.g. a string) or a list of strings.
     client_consents:
         description:
-            - The client consents
+            - The client consents.
         aliases:
             - clientConsents
         type: list
@@ -73,69 +73,69 @@ options:
         suboptions:
             client_id:
                 description:
-                    - The client ID
+                    - The client ID.
                 aliases:
                     - clientId
                 type: str
             granted_client_scopes:
                 description:
-                    - The granted client scopes
+                    - The granted client scopes.
                 aliases:
                     - grantedClientScopes
                 type: list
                 elements: str
     credentials:
         description:
-            - The credentials
+            - The credentials.
         type: list
         elements: dict
         suboptions:
             priority:
                 description:
-                    - The priority
+                    - The priority.
                 type: int
             type:
                 description:
-                    - The type
+                    - The type.
                 type: str
             temporary:
                 description:
-                    - The temporary
+                    - The temporary.
                 type: bool
             value:
                 description:
-                    - The value
+                    - The value.
                 type: str
     disableable_credential_types:
         description:
-            - The disableable credential types
+            - The disableable credential types.
         aliases:
             - disableableCredentialTypes
         type: list
         elements: str
     email:
         description:
-            - The email
+            - The email.
         type: str
     email_verified:
         description:
-            - The email verified
+            - The email verified.
         aliases:
             - emailVerified
         type: bool
     enabled:
         description:
-            - The enabled
+            - The enabled.
         type: bool
     first_name:
         description:
-            - The first name
+            - The first name.
         aliases:
             - firstName
         type: str
     groups:
         description:
-            - The group pathes
+            - The group pathes.
         type: list
         elements: str
     id:
@@ -146,41 +146,41 @@ options:
         type: str
     last_name:
         description:
-            - The last name
+            - The last name.
         aliases:
             - lastName
         type: str
     not_before:
         description:
-            - The not before
+            - The not before.
         aliases:
             - notBefore
         type: int
     origin:
         description:
-            - The origin
+            - The origin.
         type: str
     realm_roles:
         description:
-            - The realm roles
+            - The realm roles.
         aliases:
             - realmRoles
         type: list
         elements: str
     required_actions:
         description:
-            - The required actions
+            - The required actions.
         aliases:
             - requiredActions
         type: list
         elements: str
     self:
         description:
-            - The self
+            - The self.
         type: str
     service_account_client_id:
         description:
-            - The service account client ID
+            - The service account client ID.
         aliases:
           - serviceAccountClientId
         type: str
@@ -414,8 +414,7 @@ def main():
 
     # Filter and map the parameters names that apply to the user
     user_params = [x for x in module.params
-                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
-                   module.params.get(x) is not None]
+                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and module.params.get(x) is not None]
 
     found_users = kc.get_users_by_username(username, realm=realm)
 
