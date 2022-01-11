@@ -66,7 +66,7 @@ realm_info:
     description:
         - Representation of the realm public infomation.
     returned: always
-    type: complex
+    type: dict
     contains:
         realm:
             description: Realm ID.
