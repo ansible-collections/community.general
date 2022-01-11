@@ -1,2 +1,0 @@
-bugfixes:
-  - "Various modules and plugins - use vendored version of ``distutils.version`` instead of the deprecated Python standard library ``distutils`` (https://github.com/ansible-collections/community.general/pull/3936)."
