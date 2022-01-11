@@ -29,7 +29,7 @@ options:
             - Set the user's password to this.
             - Homed requires this value to be in cleartext on user creation and updating a user.
             - See U(https://systemd.io/USER_RECORD/).
-        required: true
+            - This is required for I(state=present) and I(state=modify)
         type: str
     state:
         description:
@@ -48,6 +48,11 @@ options:
             - The intended home directory disk space.
             - Human readable value such as 10G, 10M, 10B, etc
         type: str
+    resize:
+        description:
+            - When used with I(disksize) this will attempt to resize the home directory immediately.
+        default: false
+        type: bool
     realname:
         description:
             - The user's real ('human') name.
@@ -111,14 +116,96 @@ options:
             - Preferred timezone to use for the user.
             - Should be a tzdata compatible location string such as C(America/New_York).
         type: str
-
+    locked:
+        description:
+            - Whether the user account should be locked or not.
+        type: bool
 '''
 
-EXAMPLES = '''#TODO'''
+EXAMPLES = '''
+- name: Add the user 'james'
+  community.general.homectl:
+    name: johnd
+    password: myreallysecurepassword1!
+    state: present
 
-RETURN = '''#TODO'''
+- name: Add the user 'tom' with a zsh shell, uid of 1000, and gid of 2000
+  community.general.homectl:
+    name: tom
+    password: myreallysecurepassword1!
+    state: present
+    shell: /bin/zsh
+    uid: 1000
+    gid: 2000
+
+- name: Modify an existing user 'frank' to have 10G of diskspace and resize usage now
+  community.general.homectl:
+    name: frank
+    password: myreallysecurepassword1!
+    state: modify
+    disksize: 10G
+    resize: yes
+
+- name: Remove an existing user 'tom'
+  community.general.homectl:
+    name: frank
+    state: absent
+'''
+
+RETURN = '''
+data:
+    description: A json dictionary returned from C(homectl inspect -j)
+    returned: success
+    type: dict
+    sample: {
+        "data": {
+            "binding": {
+                "e9ed2a5b0033427286b228e97c1e8343": {
+                    "fileSystemType": "btrfs",
+                    "fileSystemUuid": "7bd59491-2812-4642-a492-220c3f0c6c0b",
+                    "gid": 60268,
+                    "imagePath": "/home/james.home",
+                    "luksCipher": "aes",
+                    "luksCipherMode": "xts-plain64",
+                    "luksUuid": "7f05825a-2c38-47b4-90e1-f21540a35a81",
+                    "luksVolumeKeySize": 32,
+                    "partitionUuid": "5a906126-d3c8-4234-b230-8f6e9b427b2f",
+                    "storage": "luks",
+                    "uid": 60268
+                }
+            },
+            "diskSize": 3221225472,
+            "disposition": "regular",
+            "lastChangeUSec": 1641941238208691,
+            "lastPasswordChangeUSec": 1641941238208691,
+            "privileged": {
+                "hashedPassword": [
+                    "$6$ov9AKni.trf76inT$tTtfSyHgbPTdUsG0CvSSQZXGqFGdHKQ9Pb6e0BTZhDmlgrL/vA5BxrXduBi8u/PCBiYUffGLIkGhApjKMK3bV."
+                ]
+            },
+            "signature": [
+                {
+                    "data": "o6zVFbymcmk4YTVaY6KPQK23YCp+VkXdGEeniZeV1pzIbFzoaZBvVLPkNKMoPAQbodY5BYfBtuy41prNL78qAg==",
+                    "key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAbs7ELeiEYBxkUQhxZ+5NGyu6J7gTtZtZ5vmIw3jowcY=\n-----END PUBLIC KEY-----\n"
+                }
+            ],
+            "status": {
+                "e9ed2a5b0033427286b228e97c1e8343": {
+                    "diskCeiling": 21845405696,
+                    "diskFloor": 268435456,
+                    "diskSize": 3221225472,
+                    "service": "io.systemd.Home",
+                    "signedLocally": true,
+                    "state": "inactive"
+                }
+             },
+            "userName": "james",
+        }
+    }
+'''
 
 import crypt
+import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.basic import jsonify
 from ansible.module_utils.common.text.formatters import human_to_bytes
@@ -134,6 +221,7 @@ class Homectl(object):
         self.password = module.params['password']
         self.storage = module.params['storage']
         self.disksize = module.params['disksize']
+        self.resize = module.params['resize']
         self.realname = module.params['realname']
         self.realm = module.params['realm']
         self.email = module.params['email']
@@ -147,6 +235,7 @@ class Homectl(object):
         self.shell = module.params['shell']
         self.environment = module.params['environment']
         self.timezone = module.params['timezone']
+        self.locked = module.params['locked']
 
     # Cannot run homectl commands if service is not active
     def homed_service_active(self):
@@ -172,6 +261,45 @@ class Homectl(object):
             exists = True
         return exists
 
+    def create_user(self):
+        record = self.create_json_record()
+        cmd = [self.module.get_bin_path('homectl', True)]
+        cmd.append("create")
+        cmd.append("--identity=-")  # Read the user record from standard input.
+        return(self.module.run_command(cmd, data=record, use_unsafe_shell=True))
+
+    def _hash_password(self, password):
+        # TODO handle errors etc.
+        return(crypt.crypt(password))
+
+    def remove_user(self):
+        cmd = [self.module.get_bin_path('homectl', True)]
+        cmd.append('remove')
+        cmd.append(self.name)
+        return(self.module.run_command(cmd, use_unsafe_shell=True))
+
+    def modify_user(self):
+        record = self.create_json_record()
+        cmd = [self.module.get_bin_path('homectl', True)]
+        cmd.append('update')
+        cmd.append(self.name)
+        cmd.append('--identity=-')  # Read the user record from standard input.
+        # Resize disksize now resize = true
+        # This is not valid in user record (json) and requires it to be passed on command.
+        if self.disksize and self.resize:
+            cmd.append('--and-resize')
+            cmd.append('true')
+        return(self.module.run_command(cmd, data=record, use_unsafe_shell=True))
+
+    def get_user_metadata(self):
+        cmd = [self.module.get_bin_path('homectl', True)]
+        cmd.append("inspect")
+        cmd.append(self.name)
+        cmd.append("-j")
+        cmd.append("--no-pager")
+        rc, stdout, stderr = self.module.run_command(cmd)
+        return stdout
+
     # Build up dictionary to jsonify for homectl commands.
     def create_json_record(self):
         record = {}
@@ -185,6 +313,7 @@ class Homectl(object):
 
         if self.gid:
             record['gid'] = self.gid
+
         if self.member:
             record['memberOf'] = list(self.member.split(','))
 
@@ -225,32 +354,10 @@ class Homectl(object):
         if self.timezone:
             record['timeZone'] = self.timezone
 
+        if self.locked:
+            record['locked'] = self.locked
+
         return jsonify(record)
-
-    def create_user(self):
-        record = self.create_json_record()
-        cmd = [self.module.get_bin_path('homectl', True)]
-        cmd.append("create")
-        cmd.append("--identity=-")  # Read the user record from standard input.
-        return(self.module.run_command(cmd, data=record, use_unsafe_shell=True))
-
-    def _hash_password(self, password):
-        # TODO handle errors etc.
-        return(crypt.crypt(password))
-
-    def remove_user(self):
-        cmd = [self.module.get_bin_path('homectl', True)]
-        cmd.append('remove')
-        cmd.append(self.name)
-        return(self.module.run_command(cmd, use_unsafe_shell=True))
-
-    def modify_user(self):
-        record = self.create_json_record()
-        cmd = [self.module.get_bin_path('homectl', True)]
-        cmd.append('update')
-        cmd.append(self.name)
-        cmd.append("--identity=-")  # Read the user record from standard input.
-        return(self.module.run_command(cmd, data=record, use_unsafe_shell=True))
 
 
 def main():
@@ -258,9 +365,10 @@ def main():
         argument_spec=dict(
             state=dict(type='str', default='present', choices=['absent', 'present', 'modify']),
             name=dict(type='str', required=True, aliases=['user', 'username']),
-            password=dict(type='str', no_log=True, required=True),
+            password=dict(type='str', no_log=True),
             storage=dict(type='str', choices=['classic', 'luks', 'directory', 'subvolume', 'fscrypt', 'cifs']),
             disksize=dict(type='str'),
+            resize=dict(type='bool', default=False),
             realname=dict(type='str', aliases=['real_name']),
             realm=dict(type='str'),
             email=dict(type='str'),
@@ -274,14 +382,22 @@ def main():
             timezone=dict(type='str'),
             member=dict(type='str', aliases=['memberof']),
             shell=dict(type='str'),
+            locked=dict(type='bool')
+
         ),
         supports_check_mode=True,
+        required_by={
+            'resize': 'disksize',
+        },
+        required_if=[
+            ('state', 'modify', ['password']),
+            ('state', 'present', ['password']),
+        ]
     )
 
     homectl = Homectl(module)
     rc = None
     result = {}
-    result['name'] = homectl.name
     result['state'] = homectl.state
 
     # First we need to make sure homed service is active
@@ -297,10 +413,12 @@ def main():
             if rc != 0:
                 module.fail_json(name=homectl.name, msg=stderr, rc=rc)
             result['changed'] = True
+            result['rc'] = rc
             result['msg'] = "User %s removed!" % homectl.name
         else:
-            result['msg'] = "User Doesn't Exist!"
             result['changed'] = False
+            result['rc'] = rc
+            result['msg'] = "User Doesn't Exist!"
 
     # Handle adding a user
     if homectl.state == 'present':
@@ -310,12 +428,18 @@ def main():
             rc, stdout, stderr = homectl.create_user()
             if rc != 0:
                 module.fail_json(name=homectl.name, msg=stderr, rc=rc)
+            user_metadata = json.loads(homectl.get_user_metadata())
+            result['data'] = user_metadata
+            result['rc'] = rc
             result['changed'] = True
             result['msg'] = "User %s created!" % homectl.name
         else:
-            result['msg'] = "User already Exists!"
+            user_metadata = json.loads(homectl.get_user_metadata())
+            result['data'] = user_metadata
             result['changed'] = False
+            result['msg'] = "User already Exists!"
 
+    # Modifying a user if exists
     if homectl.state == 'modify':
         if homectl.user_exists():
             if module.check_mode:
@@ -323,11 +447,15 @@ def main():
             rc, stdout, stderr = homectl.modify_user()
             if rc != 0:
                 module.fail_json(name=homectl.name, msg=stderr, rc=rc)
+            user_metadata = json.loads(homectl.get_user_metadata())
+            result['data'] = user_metadata
             result['changed'] = True
+            result['rc'] = rc
             result['msg'] = "User %s modified" % homectl.name
         else:
-            result['msg'] = "User doesn't exist!"
             result['changed'] = False
+            result['rc'] = rc
+            result['msg'] = "User doesn't exist!"
 
     module.exit_json(**result)
 
