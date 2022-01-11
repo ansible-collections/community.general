@@ -540,6 +540,8 @@ files:
     maintainers: adamgoossens
   $modules/identity/keycloak/keycloak_identity_provider.py:
     maintainers: laurpaum
+  $modules/identity/keycloak/keycloak_realm_info.py:
+    maintainers: fynncfchen
   $modules/identity/keycloak/keycloak_realm.py:
     maintainers: kris2kris
   $modules/identity/keycloak/keycloak_role.py:
