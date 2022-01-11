@@ -55,7 +55,7 @@ options:
             - This parameter is not required for updating or deleting the rolemapping but
               providing it will reduce the number of API calls required.
     client_role:
-        description: Scope mapping of the client-level role
+        description: Scope mapping of the client-level role.
         type: dict
         suboptions:
             id:
