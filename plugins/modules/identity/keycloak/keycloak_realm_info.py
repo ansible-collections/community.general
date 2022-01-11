@@ -74,22 +74,22 @@ realm_info:
             returned: always
             sample: MyRealm
         public_key:
-            description: Public key of the realm
+            description: Public key of the realm.
             type: str
             returned: always
             sample: MIIBIjANBgkqhkiG9w0BAQEFAAO...
         token-service:
-            description: Token endpoint URL
+            description: Token endpoint URL.
             type: str
             returned: always
             sample: https://auth.example.com/auth/realms/MyRealm/protocol/openid-connect
         account-service:
-            description: Account console URL
+            description: Account console URL.
             type: str
             returned: always
             sample: https://auth.example.com/auth/realms/MyRealm/account
         tokens-not-before:
-            description: The token not before
+            description: The token not before.
             type: int
             returned: always
             sample: 0
