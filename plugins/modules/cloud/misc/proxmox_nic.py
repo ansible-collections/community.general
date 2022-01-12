@@ -145,7 +145,7 @@ class ProxmoxNicAnsible(ProxmoxAnsible):
         vm = self.get_vm(vmid)
 
         try:
-            vminfo = self.proxmox_api.nodes(vm[0]['node']).qemu(vmid).config.get()
+            vminfo = self.proxmox_api.nodes(vm['node']).qemu(vmid).config.get()
         except Exception as e:
             self.module.fail_json(msg='Getting information for VM with vmid = %s failed with exception: %s' % (vmid, e))
 
@@ -211,18 +211,18 @@ class ProxmoxNicAnsible(ProxmoxAnsible):
 
         if ((interface not in vminfo) or (vminfo[interface] != config_provided)):
             if not self.module.check_mode:
-                self.proxmox_api.nodes(vm[0]['node']).qemu(vmid).config.set(**net)
+                self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**net)
             return True
 
         return False
 
     def delete_nic(self, vmid, interface):
         vm = self.get_vm(vmid)
-        vminfo = self.proxmox_api.nodes(vm[0]['node']).qemu(vmid).config.get()
+        vminfo = self.proxmox_api.nodes(vm['node']).qemu(vmid).config.get()
 
         if interface in vminfo:
             if not self.module.check_mode:
-                self.proxmox_api.nodes(vm[0]['node']).qemu(vmid).config.set(vmid=vmid, delete=interface)
+                self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(vmid=vmid, delete=interface)
             return True
 
         return False
@@ -270,8 +270,7 @@ def main():
         vmid = proxmox.get_vmid(name)
 
     # Ensure VM id exists
-    if not proxmox.get_vm(vmid):
-        module.fail_json(vmid=vmid, msg='VM with vmid = %s does not exist in cluster' % vmid)
+    proxmox.get_vm(vmid)
 
     if state == 'present':
         try:

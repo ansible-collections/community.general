@@ -124,5 +124,13 @@ class ProxmoxAnsible(object):
 
         return vms[0]
 
-    def get_vm(self, vmid):
-        return [vm for vm in self.proxmox_api.cluster.resources.get(type='vm') if vm['vmid'] == int(vmid)]
+    def get_vm(self, vmid, ignore_missing=False):
+        vms = [vm for vm in self.proxmox_api.cluster.resources.get(type='vm') if vm['vmid'] == int(vmid)]
+
+        if vms:
+            return vms[0]
+        else:
+            if ignore_missing:
+              return None
+
+             module.fail_json(msg='VM with vmid = %s not exists in cluster' % vmid)

@@ -921,20 +921,20 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         return True
 
     def start_vm(self, vm):
-        vmid = vm[0]['vmid']
-        proxmox_node = self.proxmox_api.nodes(vm[0]['node'])
+        vmid = vm['vmid']
+        proxmox_node = self.proxmox_api.nodes(vm['node'])
         taskid = proxmox_node.qemu(vmid).status.start.post()
-        if not self.wait_for_task(vm[0]['node'], taskid):
+        if not self.wait_for_task(vm['node'], taskid):
             self.module.fail_json(msg='Reached timeout while waiting for starting VM. Last line in task before timeout: %s' %
                                   proxmox_node.tasks(taskid).log.get()[:1])
             return False
         return True
 
     def stop_vm(self, vm, force):
-        vmid = vm[0]['vmid']
-        proxmox_node = self.proxmox_api.nodes(vm[0]['node'])
+        vmid = vm['vmid']
+        proxmox_node = self.proxmox_api.nodes(vm['node'])
         taskid = proxmox_node.qemu(vmid).status.shutdown.post(forceStop=(1 if force else 0))
-        if not self.wait_for_task(vm[0]['node'], taskid):
+        if not self.wait_for_task(vm['node'], taskid):
             self.module.fail_json(msg='Reached timeout while waiting for stopping VM. Last line in task before timeout: %s' %
                                   proxmox_node.tasks(taskid).log.get()[:1])
             return False
@@ -1101,16 +1101,15 @@ def main():
             module.fail_json(msg='VM with name = %s does not exist in cluster' % clone)
 
         # Ensure source VM id exists when cloning
-        if not proxmox.get_vm(vmid):
-            module.fail_json(vmid=vmid, msg='VM with vmid = %s does not exist in cluster' % vmid)
+        proxmox.get_vm(vmid)
 
         # Ensure the choosen VM name doesn't already exist when cloning
         existing_vmid = proxmox.get_vmid(name)
         if existing_vmid:
-            module.exit_json(changed=False, vmid=existing_vmid[0], msg="VM with name <%s> already exists" % name)
+            module.exit_json(changed=False, vmid=existing_vmid, msg="VM with name <%s> already exists" % name)
 
         # Ensure the choosen VM id doesn't already exist when cloning
-        if proxmox.get_vm(newid):
+        if proxmox.get_vm(newid, ignore_errors=True):
             module.exit_json(changed=False, vmid=vmid, msg="vmid %s with VM name %s already exists" % (newid, name))
 
     if delete is not None:
@@ -1129,10 +1128,10 @@ def main():
 
     if state == 'present':
         try:
-            if proxmox.get_vm(vmid) and not (update or clone):
+            if proxmox.get_vm(vmid, ignore_missing=True) and not (update or clone):
                 module.exit_json(changed=False, vmid=vmid, msg="VM with vmid <%s> already exists" % vmid)
             elif proxmox.get_vmid(name, ignore_missing=True) and not (update or clone):
-                module.exit_json(changed=False, vmid=proxmox.get_vmid(name)[0], msg="VM with name <%s> already exists" % name)
+                module.exit_json(changed=False, vmid=proxmox.get_vmid(name), msg="VM with name <%s> already exists" % name)
             elif not (node, name):
                 module.fail_json(msg='node, name is mandatory for creating/updating vm')
             elif not proxmox.get_node(node):
@@ -1225,10 +1224,8 @@ def main():
             if not vmid:
                 module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
             vm = proxmox.get_vm(vmid)
-            if not vm:
-                module.fail_json(vmid=vmid, msg='VM with vmid <%s> does not exist in cluster' % vmid)
-            status['status'] = vm[0]['status']
-            if vm[0]['status'] == 'running':
+            status['status'] = vm['status']
+            if vm['status'] == 'running':
                 module.exit_json(changed=False, vmid=vmid, msg="VM %s is already running" % vmid, **status)
 
             if proxmox.start_vm(vm):
@@ -1243,11 +1240,9 @@ def main():
                 module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
 
             vm = proxmox.get_vm(vmid)
-            if not vm:
-                module.fail_json(vmid=vmid, msg='VM with vmid = %s does not exist in cluster' % vmid)
 
-            status['status'] = vm[0]['status']
-            if vm[0]['status'] == 'stopped':
+            status['status'] = vm['status']
+            if vm['status'] == 'stopped':
                 module.exit_json(changed=False, vmid=vmid, msg="VM %s is already stopped" % vmid, **status)
 
             if proxmox.stop_vm(vm, force=module.params['force']):
@@ -1262,10 +1257,8 @@ def main():
                 module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
 
             vm = proxmox.get_vm(vmid)
-            if not vm:
-                module.fail_json(vmid=vmid, msg='VM with vmid = %s does not exist in cluster' % vmid)
-            status['status'] = vm[0]['status']
-            if vm[0]['status'] == 'stopped':
+            status['status'] = vm['status']
+            if vm['status'] == 'stopped':
                 module.exit_json(changed=False, vmid=vmid, msg="VM %s is not running" % vmid, **status)
 
             if proxmox.stop_vm(vm, force=module.params['force']) and proxmox.start_vm(vm):
@@ -1276,19 +1269,19 @@ def main():
     elif state == 'absent':
         status = {}
         try:
-            vm = proxmox.get_vm(vmid)
+            vm = proxmox.get_vm(vmid, ignore_missing=True)
             if not vm:
                 module.exit_json(changed=False, vmid=vmid)
 
-            proxmox_node = proxmox.proxmox_api.nodes(vm[0]['node'])
-            status['status'] = vm[0]['status']
-            if vm[0]['status'] == 'running':
+            proxmox_node = proxmox.proxmox_api.nodes(vm['node'])
+            status['status'] = vm['status']
+            if vm['status'] == 'running':
                 if module.params['force']:
                     proxmox.stop_vm(vm, True)
                 else:
                     module.exit_json(changed=False, vmid=vmid, msg="VM %s is running. Stop it before deletion or use force=yes." % vmid)
             taskid = proxmox_node.qemu.delete(vmid)
-            if not proxmox.wait_for_task(vm[0]['node'], taskid):
+            if not proxmox.wait_for_task(vm['node'], taskid):
                 module.fail_json(msg='Reached timeout while waiting for removing VM. Last line in task before timeout: %s' %
                                  proxmox_node.tasks(taskid).log.get()[:1])
             else:
@@ -1301,11 +1294,9 @@ def main():
         if not vmid:
             module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
         vm = proxmox.get_vm(vmid)
-        if not vm:
-            module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
         if not name:
-            name = vm[0]['name']
-        current = proxmox.proxmox_api.nodes(vm[0]['node']).qemu(vmid).status.current.get()['status']
+            name = vm['name']
+        current = proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).status.current.get()['status']
         status['status'] = current
         if status:
             module.exit_json(changed=False, vmid=vmid, msg="VM %s with vmid = %s is %s" % (name, vmid, current), **status)

@@ -174,11 +174,7 @@ def main():
     elif not vmid:
         module.exit_json(changed=False, msg="Vmid could not be fetched for the following action: %s" % state)
 
-    vms = proxmox.get_vm(vmid)
-    if vms:
-        vm = vms[0]
-    else:
-        module.fail_json(msg='VM with vmid = %s not exists in cluster' % vmid)
+    vm = proxmox.get_vm(vmid)
 
     if state == 'present':
         try:
