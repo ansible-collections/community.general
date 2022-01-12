@@ -29,11 +29,9 @@ from ansible_collections.community.general.plugins.module_utils.version import L
 def proxmox_auth_argument_spec():
     return dict(
         api_host=dict(type='str',
-                      required=True,
                       fallback=(env_fallback, ['PROXMOX_HOST'])
                       ),
         api_user=dict(type='str',
-                      required=True,
                       fallback=(env_fallback, ['PROXMOX_USER'])
                       ),
         api_password=dict(type='str',
@@ -90,15 +88,31 @@ class ProxmoxAnsible(object):
         api_token_secret = self.module.params['api_token_secret']
         validate_certs = self.module.params['validate_certs']
 
-        auth_args = {'user': api_user}
-        if api_password:
-            auth_args['password'] = api_password
+        auth_args = {}
+
+        if api_host:
+            api_host = [api_host]
+
+            auth_args['backend'] = 'https'
+            auth_args['user'] = api_user
+
+            if api_password:
+                auth_args['password'] = api_password
+            elif api_token_id and api_token_secret:
+                auth_args['token_name'] = api_token_id
+                auth_args['token_value'] = api_token_secret
+            else:
+                self.module.fail_json('api_host is specified but any of the following are missing: api_password, api_token_id')
+
+            auth_args['verify_ssl'] = validate_certs
         else:
-            auth_args['token_name'] = api_token_id
-            auth_args['token_value'] = api_token_secret
+            api_host = []
+
+            auth_args['backend'] = 'local'
+            auth_args['user'] = 'root@pam'
 
         try:
-            return ProxmoxAPI(api_host, verify_ssl=validate_certs, **auth_args)
+            return ProxmoxAPI(*api_host, **auth_args)
         except Exception as e:
             self.module.fail_json(msg='%s' % e, exception=traceback.format_exc())
 

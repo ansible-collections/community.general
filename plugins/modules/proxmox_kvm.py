@@ -1140,7 +1140,7 @@ def main():
         argument_spec=module_args,
         mutually_exclusive=[('delete', 'revert'), ('delete', 'update'), ('revert', 'update'), ('clone', 'update'), ('clone', 'delete'), ('clone', 'revert')],
         required_together=[('api_token_id', 'api_token_secret')],
-        required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
+        required_one_of=[('name', 'vmid')],
         required_if=[('state', 'present', ['node'])],
     )
 
