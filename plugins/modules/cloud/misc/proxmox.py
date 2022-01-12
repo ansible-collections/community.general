@@ -413,10 +413,6 @@ def is_template_container(proxmox, node, vmid):
     return config['template']
 
 
-def node_check(proxmox, node):
-    return [True for nd in proxmox.nodes.get() if nd['node'] == node]
-
-
 def proxmox_version(proxmox):
     apireturn = proxmox.version.get()
     return LooseVersion(apireturn['version'])
@@ -652,7 +648,7 @@ def main():
             # If no vmid was passed, there cannot be another VM named 'hostname'
             if not module.params['vmid'] and proxmox_ansible.get_vmid(hostname, ignore_missing=True) and not module.params['force']:
                 module.exit_json(changed=False, msg="VM with hostname %s already exists and has ID number %s" % (hostname, proxmox_ansible.get_vmid(hostname)))
-            elif not node_check(proxmox, node):
+            elif not proxmox_ansible.get_node(node):
                 module.fail_json(msg="node '%s' not exists in cluster" % node)
             elif not content_check(proxmox, node, module.params['ostemplate'], template_store):
                 module.fail_json(msg="ostemplate '%s' not exists on node %s and storage %s"

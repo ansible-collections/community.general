@@ -100,6 +100,10 @@ class ProxmoxAnsible(object):
         except Exception as e:
             self.module.fail_json(msg='%s' % e, exception=traceback.format_exc())
 
+    def get_node(self, node):
+        nodes = [n for n in self.proxmox_api.nodes.get() if n['node'] == node]
+        return nodes[0] if nodes else None
+
     def get_nextvmid(self):
         vmid = self.proxmox_api.cluster.nextid.get()
         return vmid

@@ -747,9 +747,6 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         apireturn = self.proxmox_api.version.get()
         return LooseVersion(apireturn['version'])
 
-    def node_check(self, node):
-        return [True for nd in self.proxmox_api.nodes.get() if nd['node'] == node]
-
     def get_vminfo(self, node, vmid, **kwargs):
         global results
         results = {}
@@ -1138,7 +1135,7 @@ def main():
                 module.exit_json(changed=False, vmid=proxmox.get_vmid(name)[0], msg="VM with name <%s> already exists" % name)
             elif not (node, name):
                 module.fail_json(msg='node, name is mandatory for creating/updating vm')
-            elif not proxmox.node_check(node):
+            elif not proxmox.get_node(node):
                 module.fail_json(msg="node '%s' does not exist in cluster" % node)
 
             proxmox.create_vm(vmid, newid, node, name, memory, cpu, cores, sockets, update,
