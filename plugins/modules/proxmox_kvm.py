@@ -1132,14 +1132,16 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                     self.module.fail_json(msg='%s is not a valid tag' % tag)
             kwargs['tags'] = ",".join(kwargs['tags'])
 
-        # -args and skiplock require root@pam user - but can not use api tokens
-        if self.module.params['api_user'] == "root@pam" and self.module.params['args'] is not None:
-            kwargs['args'] = self.module.params['args']
-        elif self.module.params['api_user'] != "root@pam" and self.module.params['args'] is not None:
-            self.module.fail_json(msg='args parameter require root@pam user. ')
+        # -args and skiplock require root@pam user but cannot use API tokens
+        if self.module.params['api_user'] == 'root@pam':
+            if self.module.params['args'] is not None:
+                kwargs['args'] = self.module.params['args']
+        else:
+            if self.module.params['args'] is not None:
+                self.module.fail_json(msg='args parameter require root@pam user. ')
 
-        if self.module.params['api_user'] != "root@pam" and self.module.params['skiplock'] is not None:
-            self.module.fail_json(msg='skiplock parameter require root@pam user. ')
+            if self.module.params['skiplock'] is not None:
+                self.module.fail_json(msg='skiplock parameter require root@pam user. ')
 
         if update:
             if proxmox_node.qemu(vmid).config.set(name=name, memory=memory, cpu=cpu, cores=cores, sockets=sockets, **kwargs) is None:
@@ -1336,7 +1338,7 @@ def main():
         argument_spec=module_args,
         mutually_exclusive=[('delete', 'revert'), ('delete', 'update'), ('revert', 'update'), ('clone', 'update'), ('clone', 'delete'), ('clone', 'revert')],
         required_together=[('api_token_id', 'api_token_secret')],
-        required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
+        required_one_of=[('name', 'vmid')],
         required_if=[('state', 'present', ['node'])],
     )
 

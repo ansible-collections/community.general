@@ -741,10 +741,7 @@ def get_ansible_module():
             ("state", "present", ("clone", "ostemplate", "update"), True),
         ],
         required_together=[("api_token_id", "api_token_secret")],
-        required_one_of=[
-            ("api_password", "api_token_id"),
-            ("vmid", "hostname"),
-        ],
+        required_one_of=[("vmid", "hostname")],
         mutually_exclusive=[
             # Creating a new container is done either by cloning an existing one, or based on a template.
             ("clone", "ostemplate", "update"),

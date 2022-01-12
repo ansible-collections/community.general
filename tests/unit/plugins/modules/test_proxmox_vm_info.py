@@ -450,14 +450,6 @@ class TestProxmoxVmInfoModule(ModuleTestCase):
         self.connect_mock.stop()
         super(TestProxmoxVmInfoModule, self).tearDown()
 
-    def test_module_fail_when_required_args_missing(self):
-        with pytest.raises(AnsibleFailJson) as exc_info:
-            with set_module_args({}):
-                self.module.main()
-
-        result = exc_info.value.args[0]
-        assert result["msg"] == "missing required arguments: api_host, api_user"
-
     def test_get_lxc_vms_information(self):
         with pytest.raises(AnsibleExitJson) as exc_info:
             with set_module_args(get_module_args(type="lxc")):
