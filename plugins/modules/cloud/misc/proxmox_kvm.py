@@ -743,10 +743,6 @@ def parse_dev(devstr):
 
 
 class ProxmoxKvmAnsible(ProxmoxAnsible):
-    def version(self):
-        apireturn = self.proxmox_api.version.get()
-        return LooseVersion(apireturn['version'])
-
     def get_vminfo(self, node, vmid, **kwargs):
         global results
         results = {}

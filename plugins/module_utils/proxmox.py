@@ -22,6 +22,7 @@ except ImportError:
 
 from ansible.module_utils.basic import env_fallback, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 def proxmox_auth_argument_spec():
@@ -100,6 +101,10 @@ class ProxmoxAnsible(object):
         except Exception as e:
             self.module.fail_json(msg='%s' % e, exception=traceback.format_exc())
 
+    def version(self):
+        apireturn = self.proxmox_api.version.get()
+        return LooseVersion(apireturn['version'])
+
     def get_node(self, node):
         nodes = [n for n in self.proxmox_api.nodes.get() if n['node'] == node]
         return nodes[0] if nodes else None
@@ -109,10 +114,7 @@ class ProxmoxAnsible(object):
         return vmid
 
     def get_vmid(self, name, ignore_missing=False):
-        try:
-            vms = [vm['vmid'] for vm in self.proxmox_api.cluster.resources.get(type='vm') if vm.get('name') == name]
-        except Exception as e:
-            self.module.fail_json(msg='Error: %s occurred while retrieving VM with name = %s' % (e, name))
+        vms = [vm['vmid'] for vm in self.proxmox_api.cluster.resources.get(type='vm') if vm.get('name') == name]
 
         if not vms:
             if ignore_missing:
@@ -131,6 +133,6 @@ class ProxmoxAnsible(object):
             return vms[0]
         else:
             if ignore_missing:
-              return None
+                return None
 
-             module.fail_json(msg='VM with vmid = %s not exists in cluster' % vmid)
+            self.module.fail_json(msg='VM with vmid %s does not exist in cluster' % vmid)
