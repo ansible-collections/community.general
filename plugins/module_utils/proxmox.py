@@ -21,6 +21,7 @@ except ImportError:
 
 
 from ansible.module_utils.basic import env_fallback, missing_required_lib
+from ansible.module_utils.common.text.converters import to_native
 
 
 def proxmox_auth_argument_spec():
@@ -98,3 +99,26 @@ class ProxmoxAnsible(object):
             return ProxmoxAPI(api_host, verify_ssl=validate_certs, **auth_args)
         except Exception as e:
             self.module.fail_json(msg='%s' % e, exception=traceback.format_exc())
+
+    def get_nextvmid(self):
+        vmid = self.proxmox_api.cluster.nextid.get()
+        return vmid
+
+    def get_vmid(self, name, ignore_missing=False):
+        try:
+            vms = [vm['vmid'] for vm in self.proxmox_api.cluster.resources.get(type='vm') if vm.get('name') == name]
+        except Exception as e:
+            self.module.fail_json(msg='Error: %s occurred while retrieving VM with name = %s' % (e, name))
+
+        if not vms:
+            if ignore_missing:
+                return None
+
+            self.module.fail_json(msg='No VM found with name: %s' % name)
+        elif len(vms) > 1:
+            self.module.fail_json(msg='Multiple VMs found with name: %s, provide vmid instead' % name)
+
+        return vms[0]
+
+    def get_vm(self, vmid):
+        return [vm for vm in self.proxmox_api.cluster.resources.get(type='vm') if vm['vmid'] == int(vmid)]
