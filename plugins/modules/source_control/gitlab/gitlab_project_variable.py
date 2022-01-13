@@ -324,8 +324,10 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
         # key and environment scope are sufficient
         for item in existing_variables:
             item.pop('value')
+            item.pop('variable_type')
         for item in requested_variables:
             item.pop('value')
+            item.pop('variable_type')
 
         if not purge:
             remove_requested = [x for x in requested_variables if x in existing_variables]
