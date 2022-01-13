@@ -399,12 +399,6 @@ def main():
     change, raw_return_value, before, after = native_python_main(this_gitlab, purge, variables, state, module)
 
     # postprocessing
-    added = [x.get('key') for x in raw_return_value['added']]
-    updated = [x.get('key') for x in raw_return_value['updated']]
-    removed = [x.get('key') for x in raw_return_value['removed']]
-    untouched = [x.get('key') for x in raw_return_value['untouched']]
-    return_value = dict(added=added, updated=updated, removed=removed, untouched=untouched)
-
     for item in after:
         item.pop('project_id')
         item['name'] = item.pop('key')
@@ -412,11 +406,17 @@ def main():
         item.pop('project_id')
         item['name'] = item.pop('key')
 
-    return_value['untouched'] = [x for x in before if x in after]
     diff = dict(
         before=yaml.safe_dump(before),
         after=yaml.safe_dump(after)
     )
+
+    raw_return_value['untouched'] = [x for x in before if x in after]
+    added = [x.get('key') for x in raw_return_value['added']]
+    updated = [x.get('key') for x in raw_return_value['updated']]
+    removed = [x.get('key') for x in raw_return_value['removed']]
+    untouched = [x.get('name') for x in raw_return_value['untouched']]
+    return_value = dict(added=added, updated=updated, removed=removed, untouched=untouched)
 
     module.exit_json(changed=change, project_variable=return_value, diff=diff)
 
