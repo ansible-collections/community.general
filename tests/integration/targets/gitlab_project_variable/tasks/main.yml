@@ -35,8 +35,9 @@
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     project: "{{ gitlab_project_name }}"
-    vars:
-      ACCESS_KEY_ID: checkmode
+    variables:
+      - name: ACCESS_KEY_ID
+        value: checkmode
   register: gitlab_project_variable_state
 
 - name: state must be changed
@@ -455,8 +456,8 @@
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     project: "{{ gitlab_project_name }}"
-    vars:
-      my_test_var:
+    variables:
+      - name: my_test_var
         value: my_test_value
         variable_type: file
     purge: False

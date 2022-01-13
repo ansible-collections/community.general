@@ -396,15 +396,15 @@ def main():
 
     this_gitlab = GitlabProjectVariables(module=module, gitlab_instance=gitlab_instance)
 
-    change, return_value, before, after = native_python_main(this_gitlab, purge, variables, state, module)
+    change, raw_return_value, before, after = native_python_main(this_gitlab, purge, variables, state, module)
 
     # postprocessing
-    for item in return_value['added']:
-        item['name'] = item.pop('key')
-    for item in return_value['removed']:
-        item['name'] = item.pop('key')
-    for item in return_value['updated']:
-        item['name'] = item.pop('key')
+    added = [x.get('key') for x in raw_return_value['added']]
+    updated = [x.get('key') for x in raw_return_value['updated']]
+    removed = [x.get('key') for x in raw_return_value['removed']]
+    untouched = [x.get('key') for x in raw_return_value['untouched']]
+    return_value = dict(added=added, updated=updated, removed=removed, untouched=untouched)
+
     for item in after:
         item.pop('project_id')
         item['name'] = item.pop('key')
