@@ -79,7 +79,7 @@ options:
         description:
           - Wether variable value is protected or not.
         type: bool
-        default: true
+        default: false
       variable_type:
         description:
           - Wether a variable is an env or a file.
@@ -231,13 +231,14 @@ class GitlabProjectVariables(object):
 
     def create_variable(self, var_obj):
         if self._module.check_mode:
-            return
+            return True
         var = {
             "key": var_obj.get('key'), "value": var_obj.get('value'),
             "masked": var_obj.get('masked'), "protected": var_obj.get('protected'),
             "variable_type": var_obj.get('variable_type'), "environment_scope": var_obj.get('environment_scope')
         }
-        return self.project.variables.create(var)
+        self.project.variables.create(var)
+        return True
 
     def update_variable(self, var_obj):
         if self._module.check_mode:
@@ -269,7 +270,9 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
         item['key'] = item.pop('name')
         item['value'] = str(item.get('value'))
         if item.get('protected') is None:
-            item['protected'] = True
+            item['protected'] = False
+            module.deprecate("The 'protected' attribute will be set to 'True' if not defined.",
+                             version='5.0.0', collection_name='community.general')
         if item.get('masked') is None:
             item['masked'] = False
         if item.get('environment_scope') is None:
