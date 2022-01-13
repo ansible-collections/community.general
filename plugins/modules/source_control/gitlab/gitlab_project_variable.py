@@ -55,6 +55,42 @@ options:
         See GitLab documentation on acceptable values for a masked variable (https://docs.gitlab.com/ce/ci/variables/#masked-variables).
     default: {}
     type: dict
+  variables:
+    description:
+      - List of dicts
+    default: []
+    type: list
+    elements: dict
+    suboptions:
+      name:
+        description:
+          - The name of the variable.
+        type: str
+      value:
+        description:
+          - The variable value.
+        type: str
+      masked:
+        description:
+          - Wether variable value is masked or not.
+        type: bool
+        default: false
+      protected:
+        description:
+          - Wether variable value is protected or not.
+        type: bool
+        default: true
+      variable_type:
+        description:
+          - Wether a variable is an env or a file.
+        type: str
+        choices: ["env_var", "file"]
+        default: env_var
+      environment_scope:
+        description:
+          - The scope for the variable.
+        type: str
+        default: '*'
 '''
 
 
@@ -142,6 +178,37 @@ except Exception:
 from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
 
 
+def vars_to_variables(vars):
+    # transform old vars to new variables structure
+    variables = list()
+    for item in vars.keys():
+        if isinstance(vars.get(item), str):
+            variables.append(
+                {
+                    "name": item,
+                    "value": vars.get(item)
+                }
+            )
+        else:
+            new_item = {"name": item, "value": vars.get(item).get('value')}
+
+            if vars.get(item).get('masked'):
+                new_item['masked'] = vars.get(item).get('masked')
+
+            if vars.get(item).get('protected'):
+                new_item['protected'] = vars.get(item).get('protected')
+
+            if vars.get(item).get('environment_scope'):
+                new_item['environment_scope'] = vars.get(item).get('environment_scope')
+
+            if vars.get(item).get('variable_type'):
+                new_item['variable_type'] = vars.get(item).get('variable_type')
+
+            variables.append(new_item)
+
+    return variables
+
+
 class GitlabProjectVariables(object):
 
     def __init__(self, module, gitlab_instance):
@@ -162,104 +229,90 @@ class GitlabProjectVariables(object):
             vars_page = self.project.variables.list(page=page_nb)
         return variables
 
-    def create_variable(self, key, value, masked, protected, variable_type, environment_scope):
+    def create_variable(self, var_obj):
         if self._module.check_mode:
             return
         var = {
-            "key": key, "value": value,
-            "masked": masked, "protected": protected,
-            "variable_type": variable_type,
+            "key": var_obj.get('key'), "value": var_obj.get('value'),
+            "masked": var_obj.get('masked'), "protected": var_obj.get('protected'),
+            "variable_type": var_obj.get('variable_type'), "environment_scope": var_obj.get('environment_scope')
         }
-        if environment_scope is not None:
-            var["environment_scope"] = environment_scope
         return self.project.variables.create(var)
 
-    def update_variable(self, key, var, value, masked, protected, variable_type, environment_scope):
-        if (var.value == value and var.protected == protected and var.masked == masked
-                and var.variable_type == variable_type
-                and (var.environment_scope == environment_scope or environment_scope is None)):
-            return False
-
+    def update_variable(self, var_obj):
         if self._module.check_mode:
             return True
-
-        if (var.protected == protected and var.masked == masked
-                and var.variable_type == variable_type
-                and (var.environment_scope == environment_scope or environment_scope is None)):
-            var.value = value
-            var.save()
-            return True
-
-        self.delete_variable(key)
-        self.create_variable(key, value, masked, protected, variable_type, environment_scope)
+        self.delete_variable(var_obj)
+        self.create_variable(var_obj)
         return True
 
-    def delete_variable(self, key):
+    def delete_variable(self, var_obj):
         if self._module.check_mode:
             return
-        return self.project.variables.delete(key)
+        return self.project.variables.delete(var_obj.get('key'))
 
 
-def native_python_main(this_gitlab, purge, var_list, state, module):
+def native_python_main(this_gitlab, purge, requested_variables, state, module):
 
     change = False
     return_value = dict(added=list(), updated=list(), removed=list(), untouched=list())
 
     gitlab_keys = this_gitlab.list_all_project_variables()
-    existing_variables = [x.get_id() for x in gitlab_keys]
+    existing_variables = [x.attributes for x in gitlab_keys]
 
-    for key in var_list:
+    # preprocessing:filter out and enrich before compare
+    for item in existing_variables:
+        item.pop('project_id')
 
-        if isinstance(var_list[key], string_types) or isinstance(var_list[key], (integer_types, float)):
-            value = var_list[key]
-            masked = False
-            protected = False
-            variable_type = 'env_var'
-            environment_scope = None
-        elif isinstance(var_list[key], dict):
-            value = var_list[key].get('value')
-            masked = var_list[key].get('masked', False)
-            protected = var_list[key].get('protected', False)
-            variable_type = var_list[key].get('variable_type', 'env_var')
-            environment_scope = var_list[key].get('environment_scope')
+    for item in requested_variables:
+        item['key'] = item.pop('name')
+        item['value'] = str(item.get('value'))
+        if item.get('protected') is None:
+            item['protected'] = True
+        if item.get('masked') is None:
+            item['masked'] = False
+        if item.get('environment_scope') is None:
+            item['environment_scope'] = '*'
+        if item.get('variable_type') is None:
+            item['variable_type'] = 'env_var'
+
+    if state == 'present':
+        add_or_update = [x for x in requested_variables if x not in existing_variables]
+        for item in add_or_update:
+            try:
+                if this_gitlab.create_variable(item):
+                    return_value['added'].append(item)
+
+            except Exception:
+                if this_gitlab.update_variable(item):
+                    return_value['updated'].append(item)
+
+        if purge:
+            # refetch and filter
+            gitlab_keys = this_gitlab.list_all_project_variables()
+            existing_variables = [x.attributes for x in gitlab_keys]
+            for item in existing_variables:
+                item.pop('project_id')
+
+            remove = [x for x in existing_variables if x not in requested_variables]
+            for item in remove:
+                if this_gitlab.remove_variable(item):
+                    return_value['removed'].append(item)
+
+    elif state == 'absent':
+        if not purge:
+            remove_requested = [x for x in requested_variables if x not in existing_variables]
+            for item in remove_requested:
+                if this_gitlab.remove_variable(item):
+                    return_value['removed'].append(item)
+
         else:
-            module.fail_json(msg="value must be of type string, integer or dict")
+            for item in existing_variables:
+                if this_gitlab.remove_variable(item):
+                    return_value['removed'].append(item)
 
-        if key in existing_variables:
-            index = existing_variables.index(key)
-            existing_variables[index] = None
-
-            if state == 'present':
-                single_change = this_gitlab.update_variable(key,
-                                                            gitlab_keys[index],
-                                                            value, masked,
-                                                            protected,
-                                                            variable_type,
-                                                            environment_scope)
-                change = single_change or change
-                if single_change:
-                    return_value['updated'].append(key)
-                else:
-                    return_value['untouched'].append(key)
-
-            elif state == 'absent':
-                this_gitlab.delete_variable(key)
-                change = True
-                return_value['removed'].append(key)
-
-        elif key not in existing_variables and state == 'present':
-            this_gitlab.create_variable(key, value, masked, protected, variable_type, environment_scope)
-            change = True
-            return_value['added'].append(key)
-
-    existing_variables = list(filter(None, existing_variables))
-    if purge:
-        for item in existing_variables:
-            this_gitlab.delete_variable(item)
-            change = True
-            return_value['removed'].append(item)
-    else:
-        return_value['untouched'].extend(existing_variables)
+    if len(return_value['added'] + return_value['removed'] + return_value['updated']) > 0:
+        change = True
 
     return change, return_value
 
@@ -271,7 +324,8 @@ def main():
         project=dict(type='str', required=True),
         purge=dict(type='bool', required=False, default=False),
         vars=dict(type='dict', required=False, default=dict(), no_log=True),
-        state=dict(type='str', default="present", choices=["absent", "present"])
+        variables=dict(type='list', elements='dict', required=False, default=list(), no_log=True),
+        state=dict(type='str', default="present", choices=["absent", "present"]),
     )
 
     module = AnsibleModule(
@@ -282,6 +336,7 @@ def main():
             ['api_username', 'api_job_token'],
             ['api_token', 'api_oauth_token'],
             ['api_token', 'api_job_token'],
+            ['vars', 'variables']
         ],
         required_together=[
             ['api_username', 'api_password'],
@@ -294,6 +349,12 @@ def main():
 
     purge = module.params['purge']
     var_list = module.params['vars']
+
+    if var_list:
+        variables = vars_to_variables(var_list)
+    else:
+        variables = module.params['variables']
+
     state = module.params['state']
 
     if not HAS_GITLAB_PACKAGE:
@@ -303,7 +364,7 @@ def main():
 
     this_gitlab = GitlabProjectVariables(module=module, gitlab_instance=gitlab_instance)
 
-    change, return_value = native_python_main(this_gitlab, purge, var_list, state, module)
+    change, return_value = native_python_main(this_gitlab, purge, variables, state, module)
 
     module.exit_json(changed=change, project_variable=return_value)
 
