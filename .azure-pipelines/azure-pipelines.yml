@@ -206,14 +206,14 @@ stages:
         parameters:
           testFormat: devel/{0}
           targets:
-            - name: macOS 11.1
-              test: macos/11.1
+            - name: macOS 12.0
+              test: macos/12.0
             - name: RHEL 7.9
               test: rhel/7.9
             - name: RHEL 8.5
               test: rhel/8.5
-            - name: FreeBSD 12.2
-              test: freebsd/12.2
+            - name: FreeBSD 12.3
+              test: freebsd/12.3
             - name: FreeBSD 13.0
               test: freebsd/13.0
           groups:
