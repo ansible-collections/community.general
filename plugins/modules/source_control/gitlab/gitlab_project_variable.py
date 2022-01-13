@@ -249,7 +249,7 @@ class GitlabProjectVariables(object):
     def delete_variable(self, var_obj):
         if self._module.check_mode:
             return True
-        self.project.variables.delete(var_obj.get('key'))
+        self.project.variables.delete(var_obj.get('key'), filter={'environment_scope': var_obj.get('environment_scope')})
         return True
 
 
