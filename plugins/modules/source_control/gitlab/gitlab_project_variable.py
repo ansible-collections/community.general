@@ -248,8 +248,9 @@ class GitlabProjectVariables(object):
 
     def delete_variable(self, var_obj):
         if self._module.check_mode:
-            return
-        return self.project.variables.delete(var_obj.get('key'))
+            return True
+        self.project.variables.delete(var_obj.get('key'))
+        return True
 
 
 def native_python_main(this_gitlab, purge, requested_variables, state, module):
@@ -296,19 +297,19 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
 
             remove = [x for x in existing_variables if x not in requested_variables]
             for item in remove:
-                if this_gitlab.remove_variable(item):
+                if this_gitlab.delete_variable(item):
                     return_value['removed'].append(item)
 
     elif state == 'absent':
         if not purge:
             remove_requested = [x for x in requested_variables if x not in existing_variables]
             for item in remove_requested:
-                if this_gitlab.remove_variable(item):
+                if this_gitlab.delete_variable(item):
                     return_value['removed'].append(item)
 
         else:
             for item in existing_variables:
-                if this_gitlab.remove_variable(item):
+                if this_gitlab.delete_variable(item):
                     return_value['removed'].append(item)
 
     if len(return_value['added'] + return_value['removed'] + return_value['updated']) > 0:
