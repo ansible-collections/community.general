@@ -1,0 +1,4 @@
+bugfixes:
+  - gitlab_project_variable - allow to set same variable name under different environment scopes (https://github.com/ansible-collections/community.general/issues/4038).
+minor_changes:
+  - gitlab_project_variable - add diff support (https://github.com/ansible-collections/community.general/issues/4038).
