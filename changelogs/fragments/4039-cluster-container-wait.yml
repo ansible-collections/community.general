@@ -1,0 +1,2 @@
+bugfixes:
+  - "Adds a wait period when creating clustered containers for when the task is still Running and not immediately jump to success. This would error out when the task was still running."
