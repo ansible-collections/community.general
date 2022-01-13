@@ -101,9 +101,14 @@ EXAMPLES = '''
     api_token: secret_access_token
     project: markuman/dotfiles
     purge: false
-    vars:
-      ACCESS_KEY_ID: abc123
-      SECRET_ACCESS_KEY: 321cba
+    variables:
+      - name: ACCESS_KEY_ID
+        value: abc123
+      - name: SECRET_ACCESS_KEY
+        value: dassgrfaeui8989
+        masked: yes
+        protected: yes
+        environment_scope: production
 
 - name: Set or update some CI/CD variables
   community.general.gitlab_project_variable:
@@ -160,6 +165,12 @@ project_variable:
 
 import traceback
 
+try:
+    import yaml
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
+
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.api import basic_auth_argument_spec
@@ -182,11 +193,13 @@ def vars_to_variables(vars):
     # transform old vars to new variables structure
     variables = list()
     for item in vars.keys():
-        if isinstance(vars.get(item), str):
+        if (isinstance(vars.get(item), str) or
+           isinstance(vars.get(item), int) or
+           isinstance(vars.get(item), float)):
             variables.append(
                 {
                     "name": item,
-                    "value": vars.get(item)
+                    "value": str(vars.get(item))
                 }
             )
         else:
@@ -260,6 +273,9 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
     return_value = dict(added=list(), updated=list(), removed=list(), untouched=list())
 
     gitlab_keys = this_gitlab.list_all_project_variables()
+    before = [x.attributes for x in gitlab_keys]
+
+    gitlab_keys = this_gitlab.list_all_project_variables()
     existing_variables = [x.attributes for x in gitlab_keys]
 
     # preprocessing:filter out and enrich before compare
@@ -304,6 +320,13 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
                     return_value['removed'].append(item)
 
     elif state == 'absent':
+        # value does not matter on removing variables.
+        # key and environment scope are sufficient
+        for item in existing_variables:
+            item.pop('value')
+        for item in requested_variables:
+            item.pop('value')
+
         if not purge:
             remove_requested = [x for x in requested_variables if x in existing_variables]
             for item in remove_requested:
@@ -318,7 +341,10 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
     if len(return_value['added'] + return_value['removed'] + return_value['updated']) > 0:
         change = True
 
-    return change, return_value
+    gitlab_keys = this_gitlab.list_all_project_variables()
+    after = [x.attributes for x in gitlab_keys]
+
+    return change, return_value, before, after
 
 
 def main():
@@ -368,9 +394,29 @@ def main():
 
     this_gitlab = GitlabProjectVariables(module=module, gitlab_instance=gitlab_instance)
 
-    change, return_value = native_python_main(this_gitlab, purge, variables, state, module)
+    change, return_value, before, after = native_python_main(this_gitlab, purge, variables, state, module)
 
-    module.exit_json(changed=change, project_variable=return_value)
+    # postprocessing
+    for item in return_value['added']:
+        item['name'] = item.pop('key')
+    for item in return_value['removed']:
+        item['name'] = item.pop('key')
+    for item in return_value['updated']:
+        item['name'] = item.pop('key')
+    for item in after:
+        item.pop('project_id')
+        item['name'] = item.pop('key')
+    for item in before:
+        item.pop('project_id')
+        item['name'] = item.pop('key')
+
+    return_value['untouched'] = [x for x in before if x in after]
+    diff = dict(
+        before=yaml.safe_dump(before),
+        after=yaml.safe_dump(after)
+    )
+
+    module.exit_json(changed=change, project_variable=return_value, diff=diff)
 
 
 if __name__ == '__main__':
