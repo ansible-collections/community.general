@@ -28,6 +28,7 @@ options:
         description:
             - Set the user's password to this.
             - Homed requires this value to be in cleartext on user creation and updating a user.
+            - The module takes the password and generates a password hash in SHA-512 with 10000 rounds of salt generation using crypt.
             - See U(https://systemd.io/USER_RECORD/).
             - This is required for I(state=present) and I(state=modify)
         type: str
@@ -40,7 +41,7 @@ options:
     storage:
         description:
             - Indicates the storage mechanism for the user's home directory.
-            - If not specified homed by default implies classic.
+            - If the storage type is not specified, ``homed.conf(5)`` defines which default storage to use.
         choices: [ 'classic', 'luks', 'directory', 'subvolume', 'fscrypt', 'cifs' ]
         type: str
     disksize:
@@ -78,15 +79,24 @@ options:
         type: str
     homedir:
         description:
-            - Absolute file system path to the home directory.
+            - Path to use as home directory for the user.
+            - This is the directory the user's home directory is mounted to while the user is logged in.
+                - This is not where the user's data is actually stored, see I(imagepath) for that.
+        type: path
+    imagepath:
+        description:
+            - Path to place the user's home directory.
+            - See U(https://www.freedesktop.org/software/systemd/man/homectl.html#--image-path=PATH) for more information.
         type: path
     uid:
         description:
-            -  Sets the uid of the user.
+            - Sets the uid of the user.
+            - If using I(gid) homed requires the value to be the same
         type: int
     gid:
         description:
             - Sets the gid of the user.
+            - If using I(uid) homed requires the value to be the same
         type: int
     umask:
         description:
@@ -136,7 +146,7 @@ EXAMPLES = '''
     state: present
     shell: /bin/zsh
     uid: 1000
-    gid: 2000
+    gid: 1000
 
 - name: Modify an existing user 'frank' to have 10G of diskspace and resize usage now
   community.general.homectl:
@@ -228,6 +238,7 @@ class Homectl(object):
         self.location = module.params['location']
         self.iconname = module.params['iconname']
         self.homedir = module.params['homedir']
+        self.imagepath = module.params['imagepath']
         self.uid = module.params['uid']
         self.gid = module.params['gid']
         self.umask = module.params['umask']
@@ -269,8 +280,10 @@ class Homectl(object):
         return(self.module.run_command(cmd, data=record, use_unsafe_shell=True))
 
     def _hash_password(self, password):
-        # TODO handle errors etc.
-        return(crypt.crypt(password))
+        method = crypt.METHOD_SHA512
+        salt = crypt.mksalt(method, rounds=10000)
+        pw_hash = crypt.crypt(password, salt)
+        return pw_hash
 
     def remove_user(self):
         cmd = [self.module.get_bin_path('homectl', True)]
@@ -326,6 +339,9 @@ class Homectl(object):
         if self.homedir:
             record['homeDirectory'] = self.homedir
 
+        if self.imagepath:
+            record['imagePath'] = self.imagepath
+
         if self.disksize:
             # convert humand readble to bytes
             record['diskSize'] = human_to_bytes(self.disksize)
@@ -375,6 +391,7 @@ def main():
             location=dict(type='str'),
             iconname=dict(type='str'),
             homedir=dict(type='path'),
+            imagepath=dict(type='path'),
             uid=dict(type='int'),
             gid=dict(type='int'),
             umask=dict(type='int'),
@@ -383,15 +400,13 @@ def main():
             member=dict(type='str', aliases=['memberof']),
             shell=dict(type='str'),
             locked=dict(type='bool')
-
         ),
         supports_check_mode=True,
-        required_by={
-            'resize': 'disksize',
-        },
+
         required_if=[
             ('state', 'modify', ['password']),
             ('state', 'present', ['password']),
+            ('resize', True, ['disksize']),
         ]
     )
 

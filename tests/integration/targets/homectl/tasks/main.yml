@@ -1,0 +1,105 @@
+# Get systemd version and if it doesn't exist don't run these tests.
+- name: check systemd version
+  command: "systemctl --version"
+  register: systemd_version
+  ignore_errors: yes
+
+- block:
+    - name: Check and start systemd-homed service
+      service:
+        name: systemd-homed.service
+        state: started
+        enabled: yes
+
+    - name: Add a user 'james'
+      community.general.homectl:
+        name: james
+        password: myreallysecurepassword1!
+        state: present
+
+    - name: verify user added
+      command: homectl inspect james
+      register: james_info
+
+    - name: Add the user 'tom' with a zsh shell, uid of 1000, and gid of 1000
+      community.general.homectl:
+        name: tom
+        password: myreallysecurepassword1!
+        state: present
+        shell: /bin/zsh
+        uid: 1000
+        gid: 1000
+        disksize: 10G
+      register: tom_userinfo
+
+    - name: Try to add user 'james' that already exists
+      community.general.homectl:
+        name: james
+        password: myreallysecurepassword1!
+        state: present
+        shell: /bin/ksh
+      register: user_exists
+
+    - name: Try to use 'resize=yes' option without 'disksize' option (not allowed)
+      community.general.homectl:
+        name: foo
+        password: uq4895738!@#$%dfd
+        state: present
+        resize: yes
+      register: resize_out
+      ignore_errors: yes
+
+    - name: Use option 'disksize=1G' without option resize (allowed)
+      community.general.homectl:
+        name: foobar
+        password: "uq4895738!@#$%dfd"
+        state: present
+        disksize: 1G
+      register: disk_out
+      ignore_errors: yes
+
+    - name: Try to Create user without giving password
+      community.general.homectl:
+        name: danielle
+      register: danielle_out
+      ignore_errors: yes
+
+    - name: remove users without requiring password
+      community.general.homectl:
+        name: foobar
+        state: absent
+      register: delete_foobar
+
+    - name: modify user 'james' to have zsh shell and timezone 'America/New_York'
+      community.general.homectl:
+        name: james
+        password: myreallysecurepassword1!
+        state: modify
+        shell: /bin/zsh
+        timezone: America/New_York
+      register: lukuser_modify_out
+
+
+    - name: Try to remove user 'janet' that doesn't exist
+      community.general.homectl:
+        name: janet
+        state: absent
+      register: user_not_exist
+      ignore_errors: yes
+
+    - assert:
+        that:
+          - james_info.rc == 0
+          - tom_userinfo.data['gid'] == 1000 and tom_userinfo.data['uid'] == 1000
+          - user_exists is not changed
+          - resize_out is not changed
+          - disk_out is changed
+          - delete_foobar is changed
+          - danielle_out is not changed
+          - lukuser_modify_out.data['timeZone'] == "America/New_York" and lukuser_modify_out.data['shell'] == "/bin/zsh"
+          - user_not_exist is not changed and user_not_exist.msg == "User Doesn't Exist!"
+
+
+  # homectl was first introduced in systemd 245 so check version  >= 245
+  # As of Ubuntu 21 homed does not come with it.
+  when: (systemd_version.stdout | regex_search('[0-9][0-9][0-9]') | int >= 245) and ansible_distribution != 'Ubuntu'
