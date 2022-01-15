@@ -137,7 +137,7 @@ def present_strategy(api, wished_private_network):
     private_network = get_private_network(api, wished_private_network['name'])
     if private_network is not None:
         if set(wished_private_network['tags']) == set(private_network['tags']):
-            return changed, {}
+            return changed, private_network
         else:
             # private network need to be updated
             data = {
