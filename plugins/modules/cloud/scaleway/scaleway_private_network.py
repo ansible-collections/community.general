@@ -57,6 +57,14 @@ options:
     description:
     - namle of the vpc
 
+  tags:
+    type: list
+    elements: str
+    description:
+    - List of tags to apply to the instance
+    required: false
+    default: []
+
 '''
 
 EXAMPLES = '''
@@ -128,16 +136,35 @@ def present_strategy(api, wished_private_network):
     changed = False
     private_network = get_private_network(api, wished_private_network['name'])
     if private_network is not None:
-       return changed, {}
+        if set(wished_private_network['tags']) == set(private_network['tags']):
+            return changed, {}
+        else:
+            # private network need to be updated
+            data = {
+                'name' : wished_private_network['name'],
+                'tags' : wished_private_network['tags']
+                 }
+            changed = True
+            if api.module.check_mode:
+                return changed, {"status": "private network would be updated"}
 
+            response = api.patch(path='private-networks/'+private_network['id'], data=data)
+            if not response.ok:
+               api.module.fail_json(msg='Error updating private network [{0}: {1}]'.format(
+                   response.status_code, response.json))
+
+            return changed, response.json
+       
+    # private network need to be create
     changed = True
     if api.module.check_mode:
         return changed, {"status": "private network would be created"}
 
     data = {
         'name' : wished_private_network['name'],
-        'project_id' : wished_private_network['project']
-        }
+        'project_id' : wished_private_network['project'],
+        'tags' : wished_private_network['tags']
+         }
 
     response = api.post(path='private-networks/', data=data)
 
@@ -171,6 +198,7 @@ def core(module):
 
     wished_private_network = {
         "project": module.params['project'],
+        "tags": module.params['tags'],
         "name": module.params['name']
     }
        
@@ -191,6 +219,7 @@ def main():
         state=dict(default='present', choices=['absent', 'present']),
         project=dict(required=True),
         region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
+        tags=dict(type="list", elements="str", default=[]),
         name=dict()
     ))
     module = AnsibleModule(
