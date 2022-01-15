@@ -110,6 +110,7 @@ data:
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway
 from ansible.module_utils.basic import AnsibleModule
 
+
 def get_private_network(api, name, page=1):
     page_size = 10
     response = api.get('private-networks', params={'name': name, 'order_by': 'name_asc', 'page': page, 'page_size': page_size})
@@ -127,10 +128,11 @@ def get_private_network(api, name, page=1):
         i += 1
 
     # search on next page if needed
-    if ( page * page_size ) < response.json['total_count']:
-        return get_private_network( api, name, page+1 )
+    if (page * page_size) < response.json['total_count']:
+        return get_private_network(api, name, page + 1)
 
     return None
+
 
 def present_strategy(api, wished_private_network):
 
@@ -141,15 +143,14 @@ def present_strategy(api, wished_private_network):
             return changed, private_network
         else:
             # private network need to be updated
-            data = {
-                'name': wished_private_network['name'],
-                'tags': wished_private_network['tags']
-                 }
+            data = {'name': wished_private_network['name'],
+                    'tags': wished_private_network['tags']
+                    }
             changed = True
             if api.module.check_mode:
                 return changed, {"status": "private network would be updated"}
 
-            response = api.patch(path='private-networks/'+private_network['id'], data=data)
+            response = api.patch(path='private-networks/' + private_network['id'], data=data)
             if not response.ok:
                 api.module.fail_json(msg='Error updating private network [{0}: {1}]'.format(response.status_code, response.json))
 
@@ -160,11 +161,10 @@ def present_strategy(api, wished_private_network):
     if api.module.check_mode:
         return changed, {"status": "private network would be created"}
 
-    data = {
-        'name' : wished_private_network['name'],
-        'project_id' : wished_private_network['project'],
-        'tags' : wished_private_network['tags']
-         }
+    data = {'name': wished_private_network['name'],
+            'project_id': wished_private_network['project'],
+            'tags': wished_private_network['tags']
+            }
 
     response = api.post(path='private-networks/', data=data)
 
@@ -173,24 +173,26 @@ def present_strategy(api, wished_private_network):
 
     return changed, response.json
 
+
 def absent_strategy(api, wished_private_network):
 
     changed = False
     private_network = get_private_network(api, wished_private_network['name'])
     if private_network is None:
-       return changed, {}
+        return changed, {}
 
     changed = True
     if api.module.check_mode:
         return changed, {"status": "private network would be destroyed"}
 
-    response = api.delete('private-networks/'+private_network['id'])
+    response = api.delete('private-networks/' + private_network['id'])
 
     if not response.ok:
         api.module.fail_json(msg='Error deleting private network [{0}: {1}]'.format(
             response.status_code, response.json))
 
     return changed, response.json
+
 
 def core(module):
 
