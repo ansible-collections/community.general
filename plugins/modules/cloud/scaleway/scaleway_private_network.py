@@ -12,10 +12,10 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: scaleway_private_network
-short_description: Scaleway VPC management module
+short_description: Scaleway private network management module
 author: Pascal MANGIN (@pastral)
 description:
-    - This module manages VPC on Scaleway account
+    - This module manages private network on Scaleway account
       U(https://developer.scaleway.com)
 extends_documentation_fragment:
 - community.general.scaleway
@@ -68,7 +68,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: Create an VPC
+- name: Create an private network
   community.general.scaleway_vpc:
     project: '{{ scw_project }}'
     name: 'vpc_one'
@@ -76,9 +76,9 @@ EXAMPLES = '''
     region: par1
   register: vpc_creation_task
 
-- name: Make sure VPC deleted
+- name: Make sure private network with name 'foo' is deleted in region par1
   community.general.scaleway_ip:
-    id: '{{ vpc_creation_task.scaleway_ip.id }}'
+    name: 'foo'
     state: absent
     region: par1
 '''
@@ -88,20 +88,23 @@ data:
     description: This is only present when C(state=present)
     returned: when C(state=present)
     type: dict
-    sample: {
-      "ips": [
-        {
-            "organization": "951df375-e094-4d26-97c1-ba548eeb9c42",
-            "reverse": null,
-            "id": "dd9e8df6-6775-4863-b517-e0b0ee3d7477",
-            "server": {
-                "id": "3f1568ca-b1a2-4e98-b6f7-31a0588157f1",
-                "name": "ansible_tuto-1"
-            },
-            "address": "212.47.232.136"
+    sample: 
+        "scaleway_private_network": {
+            "created_at": "2022-01-15T11:11:12.676445Z",
+            "id": "12345678-f1e6-40ec-83e5-12345d67ed89",
+            "name": "network",
+            "organization_id": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
+            "project_id": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
+            "tags": [
+                "tag1",
+                "tag2",
+                "tag3",
+                "tag4",
+                "tag5"
+            ],
+            "updated_at": "2022-01-15T11:12:04.624837Z",
+            "zone": "fr-par-2"
         }
-    ]
-    }
 '''
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway
