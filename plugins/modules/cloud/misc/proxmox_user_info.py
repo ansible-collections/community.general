@@ -156,7 +156,7 @@ proxmox_users:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
-    proxmox_auth_argument_spec, ProxmoxAnsible, proxmox_to_ansible_bool, HAS_PROXMOXER, PROXMOXER_IMP_ERR)
+    proxmox_auth_argument_spec, ProxmoxAnsible, proxmox_to_ansible_bool)
 
 
 class ProxmoxUserInfoAnsible(ProxmoxAnsible):
@@ -231,9 +231,6 @@ def main():
     result = dict(
         changed=False
     )
-
-    if not HAS_PROXMOXER:
-        module.fail_json(msg=missing_required_lib('proxmoxer'), exception=PROXMOXER_IMP_ERR)
 
     proxmox = ProxmoxUserInfoAnsible(module)
     domain = module.params['domain']
