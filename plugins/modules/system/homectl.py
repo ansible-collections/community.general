@@ -164,7 +164,7 @@ EXAMPLES = '''
 
 RETURN = '''
 data:
-    description: A json dictionary returned from C(homectl inspect -j)
+    description: A json dictionary returned from C(homectl inspect -j).
     returned: success
     type: dict
     sample: {
