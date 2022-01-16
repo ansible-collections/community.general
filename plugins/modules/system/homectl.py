@@ -90,7 +90,7 @@ options:
         type: path
     uid:
         description:
-            - Sets the uid of the user.
+            - Sets the UID of the user.
             - If using I(gid) homed requires the value to be the same
         type: int
     gid:
