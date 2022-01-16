@@ -112,7 +112,7 @@ options:
     shell:
         description:
             - Shell binary to use for terminal logins of given user.
-            - If not specified homed by default uses ``/bin/bash``
+            - If not specified homed by default uses C(/bin/bash).
         type: str
     environment:
         description:
