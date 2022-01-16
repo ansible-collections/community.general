@@ -63,7 +63,6 @@ options:
     elements: str
     description:
     - List of tags to apply to the instance.
-    required: false
     default: []
 
 '''
