@@ -62,17 +62,16 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 # file must be named xen_orchestra.yaml or xen_orchestra.yml
-simple_config_file:
-    plugin: community.general.xen_orchestra
-    api_host: 192.168.1.255
-    user: xo
-    password: xo_pwd
-    validate_certs: true
-    use_ssl: true
-    groups:
-        kube_nodes: "'kube_node' in tags"
-    compose:
-        ansible_port: 2222
+plugin: community.general.xen_orchestra
+api_host: 192.168.1.255
+user: xo
+password: xo_pwd
+validate_certs: true
+use_ssl: true
+groups:
+    kube_nodes: "'kube_node' in tags"
+compose:
+    ansible_port: 2222
 
 '''
 
