@@ -85,7 +85,7 @@ EXAMPLES = '''
 
 RETURN = '''
 data:
-    description: This is only present when C(state=present)
+    description: Information on the VPC.
     returned: when C(state=present)
     type: dict
     sample:
