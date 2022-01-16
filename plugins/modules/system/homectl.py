@@ -91,7 +91,7 @@ options:
     uid:
         description:
             - Sets the UID of the user.
-            - If using I(gid) homed requires the value to be the same
+            - If using I(gid) homed requires the value to be the same.
         type: int
     gid:
         description:
