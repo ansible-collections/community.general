@@ -56,7 +56,7 @@ options:
   name:
     type: str
     description:
-    - namle of the vpc
+    - Name of the VPC.
 
   tags:
     type: list
