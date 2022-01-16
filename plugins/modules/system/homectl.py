@@ -433,7 +433,7 @@ def main():
         else:
             result['changed'] = False
             result['rc'] = rc
-            result['msg'] = "User Doesn't Exist!"
+            result['msg'] = "User does not exist!"
 
     # Handle adding a user
     if homectl.state == 'present':
