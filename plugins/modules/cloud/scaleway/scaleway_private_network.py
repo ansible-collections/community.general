@@ -77,7 +77,7 @@ EXAMPLES = '''
   register: vpc_creation_task
 
 - name: Make sure private network with name 'foo' is deleted in region par1
-  community.general.scaleway_ip:
+  community.general.scaleway_vpc:
     name: 'foo'
     state: absent
     region: par1
