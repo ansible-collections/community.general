@@ -116,7 +116,7 @@ msg:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
-    proxmox_auth_argument_spec, ProxmoxAnsible, HAS_PROXMOXER, PROXMOXER_IMP_ERR)
+    proxmox_auth_argument_spec, ProxmoxAnsible)
 
 
 class ProxmoxTaskInfoAnsible(ProxmoxAnsible):
@@ -163,9 +163,6 @@ def main():
         supports_check_mode=True)
     result = dict(changed=False)
 
-    if not HAS_PROXMOXER:
-        module.fail_json(msg=missing_required_lib(
-            'proxmoxer'), exception=PROXMOXER_IMP_ERR)
     proxmox = ProxmoxTaskInfoAnsible(module)
     upid = module.params['task']
     node = module.params['node']

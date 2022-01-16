@@ -12,6 +12,7 @@ import pytest
 import json
 
 from ansible_collections.community.general.plugins.modules.cloud.misc import proxmox_tasks_info
+import ansible_collections.community.general.plugins.module_utils.proxmox as proxmox_utils
 from ansible_collections.community.general.plugins.module_utils.proxmox import ProxmoxAnsible
 from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
@@ -144,7 +145,7 @@ def test_get_tasks(connect_mock, capfd, mocker):
         return m
 
     connect_mock.side_effect = f
-    proxmox_tasks_info.HAS_PROXMOXER = True
+    proxmox_utils.HAS_PROXMOXER = True
 
     with pytest.raises(SystemExit):
         proxmox_tasks_info.main()
@@ -170,7 +171,7 @@ def test_get_single_task(connect_mock, capfd, mocker):
         return m
 
     connect_mock.side_effect = f
-    proxmox_tasks_info.HAS_PROXMOXER = True
+    proxmox_utils.HAS_PROXMOXER = True
 
     with pytest.raises(SystemExit):
         proxmox_tasks_info.main()
@@ -197,7 +198,7 @@ def test_get_non_existent_task(connect_mock, capfd, mocker):
         return m
 
     connect_mock.side_effect = f
-    proxmox_tasks_info.HAS_PROXMOXER = True
+    proxmox_utils.HAS_PROXMOXER = True
 
     with pytest.raises(SystemExit):
         proxmox_tasks_info.main()
