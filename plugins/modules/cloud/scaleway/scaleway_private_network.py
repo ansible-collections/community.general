@@ -17,7 +17,7 @@ version_added: 4.4.0
 author: Pascal MANGIN (@pastral)
 description:
     - This module manages private network on Scaleway account
-      U(https://developer.scaleway.com)
+      (U(https://developer.scaleway.com)).
 extends_documentation_fragment:
 - community.general.scaleway
 
