@@ -47,7 +47,7 @@ options:
     disksize:
         description:
             - The intended home directory disk space.
-            - Human readable value such as 10G, 10M, 10B, etc
+            - Human readable value such as C(10G), C(10M), or C(10B).
         type: str
     resize:
         description:
