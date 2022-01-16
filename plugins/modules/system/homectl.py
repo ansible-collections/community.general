@@ -81,7 +81,7 @@ options:
         description:
             - Path to use as home directory for the user.
             - This is the directory the user's home directory is mounted to while the user is logged in.
-                - This is not where the user's data is actually stored, see I(imagepath) for that.
+            - This is not where the user's data is actually stored, see I(imagepath) for that.
         type: path
     imagepath:
         description:
