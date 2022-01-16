@@ -30,7 +30,7 @@ options:
             - Homed requires this value to be in cleartext on user creation and updating a user.
             - The module takes the password and generates a password hash in SHA-512 with 10000 rounds of salt generation using crypt.
             - See U(https://systemd.io/USER_RECORD/).
-            - This is required for I(state=present) and I(state=modify)
+            - This is required for I(state=present) and I(state=modify).
         type: str
     state:
         description:
