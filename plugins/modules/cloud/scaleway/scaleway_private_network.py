@@ -86,7 +86,7 @@ EXAMPLES = '''
 RETURN = '''
 data:
     description: Information on the VPC.
-    returned: when C(state=present)
+    returned: success when C(state=present)
     type: dict
     sample:
         "scaleway_private_network": {
