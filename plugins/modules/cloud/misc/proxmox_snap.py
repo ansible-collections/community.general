@@ -197,7 +197,7 @@ def main():
     )
 
     if not HAS_PROXMOXER:
-        module.fail_json(msg=missing_required_lib('python-proxmoxer'),
+        module.fail_json(msg=missing_required_lib('proxmoxer'),
                          exception=PROXMOXER_IMP_ERR)
 
     state = module.params['state']
