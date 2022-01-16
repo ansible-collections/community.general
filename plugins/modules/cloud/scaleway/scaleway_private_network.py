@@ -41,7 +41,7 @@ options:
   region:
     type: str
     description:
-     - Scaleway region to use (for example par1)
+     - Scaleway region to use (for example C(par1)).
     required: true
     choices:
       - ams1
