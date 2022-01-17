@@ -244,7 +244,7 @@ class Yarn(object):
         for json_line in result.strip().split('\n'):
             data = json.loads(json_line)
             if self.globally:
-                if data['type'] == 'list':
+                if data['type'] == 'list' and data['data']['type'].startswith('bins-'):
                     # This is a string in format: 'bins-<PACKAGE_NAME>'
                     installed.append(data['data']['type'][5:])
             else:
