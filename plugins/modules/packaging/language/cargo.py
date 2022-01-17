@@ -136,7 +136,7 @@ class Cargo(object):
         installed_version = self.get_installed().get(name)
 
         cmd = ["search", name, "--limit", "1"]
-        data = self._exec(cmd, True, False, False)
+        data, dummy = self._exec(cmd, True, False, False)
 
         match = re.search(r'"(.+)"', data)
         if match:
