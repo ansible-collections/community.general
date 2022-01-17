@@ -74,7 +74,7 @@
       community.general.homectl:
         name: james
         password: myreallysecurepassword1!
-        state: modify
+        state: present
         shell: /bin/zsh
         timezone: America/New_York
       register: lukuser_modify_out
@@ -91,13 +91,13 @@
         that:
           - james_info.rc == 0
           - tom_userinfo.data['gid'] == 1000 and tom_userinfo.data['uid'] == 1000
-          - user_exists is not changed
+          - user_exists is changed and user_exists.data['shell'] == '/bin/ksh'
           - resize_out is not changed
           - disk_out is changed
           - delete_foobar is changed
           - danielle_out is not changed
           - lukuser_modify_out.data['timeZone'] == "America/New_York" and lukuser_modify_out.data['shell'] == "/bin/zsh"
-          - user_not_exist is not changed and user_not_exist.msg == "User Doesn't Exist!"
+          - user_not_exist is not changed and user_not_exist.msg == "User does not exist!"
 
 
   # homectl was first introduced in systemd 245 so check version  >= 245

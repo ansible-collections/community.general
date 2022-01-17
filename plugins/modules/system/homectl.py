@@ -20,7 +20,7 @@ description:
 options:
     name:
         description:
-            - The user name to create, remove, or modify.
+            - The user name to create, remove, or update.
         required: true
         aliases: [ 'user', 'username' ]
         type: str
@@ -30,12 +30,12 @@ options:
             - Homed requires this value to be in cleartext on user creation and updating a user.
             - The module takes the password and generates a password hash in SHA-512 with 10000 rounds of salt generation using crypt.
             - See U(https://systemd.io/USER_RECORD/).
-            - This is required for I(state=present) and I(state=modify).
+            - This is required for I(state=present).
         type: str
     state:
         description:
-            - The operation to take on the user such as remove, add user, and modify user.
-        choices: [ 'absent', 'present', 'modify' ]
+            - The operation to take on the user.
+        choices: [ 'absent', 'present' ]
         default: present
         type: str
     storage:
@@ -112,7 +112,7 @@ options:
     shell:
         description:
             - Shell binary to use for terminal logins of given user.
-            - If not specified homed by default uses C(/bin/bash).
+            - If not specified homed by default uses ``/bin/bash``
         type: str
     environment:
         description:
@@ -152,7 +152,7 @@ EXAMPLES = '''
   community.general.homectl:
     name: frank
     password: myreallysecurepassword1!
-    state: modify
+    state: present
     disksize: 10G
     resize: yes
 
@@ -379,7 +379,7 @@ class Homectl(object):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='present', choices=['absent', 'present', 'modify']),
+            state=dict(type='str', default='present', choices=['absent', 'present']),
             name=dict(type='str', required=True, aliases=['user', 'username']),
             password=dict(type='str', no_log=True),
             storage=dict(type='str', choices=['classic', 'luks', 'directory', 'subvolume', 'fscrypt', 'cifs']),
@@ -404,7 +404,6 @@ def main():
         supports_check_mode=True,
 
         required_if=[
-            ('state', 'modify', ['password']),
             ('state', 'present', ['password']),
             ('resize', True, ['disksize']),
         ]
@@ -449,14 +448,6 @@ def main():
             result['changed'] = True
             result['msg'] = "User %s created!" % homectl.name
         else:
-            user_metadata = json.loads(homectl.get_user_metadata())
-            result['data'] = user_metadata
-            result['changed'] = False
-            result['msg'] = "User already Exists!"
-
-    # Modifying a user if exists
-    if homectl.state == 'modify':
-        if homectl.user_exists():
             if module.check_mode:
                 module.exit_json(changed=True)
             rc, stdout, stderr = homectl.modify_user()
@@ -467,10 +458,6 @@ def main():
             result['changed'] = True
             result['rc'] = rc
             result['msg'] = "User %s modified" % homectl.name
-        else:
-            result['changed'] = False
-            result['rc'] = rc
-            result['msg'] = "User doesn't exist!"
 
     module.exit_json(**result)
 
