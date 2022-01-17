@@ -112,7 +112,7 @@ class Cargo(object):
         cmd = ["install", "--list"]
         data, dummy = self._exec(cmd, True, False, False)
 
-        package_regex = re.compile(r"^(\w+) v(.+):$")
+        package_regex = re.compile(r"^([\w\-]+) v(.+):$")
         installed = {}
         for line in data.splitlines():
             package_info = package_regex.match(line)
