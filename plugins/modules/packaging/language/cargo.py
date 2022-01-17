@@ -140,7 +140,7 @@ class Cargo(object):
 
         match = re.search(r'"(.+)"', data)
         if match:
-            latest_version = match[1]
+            latest_version = match.group(1)
 
         return installed_version != latest_version
 
