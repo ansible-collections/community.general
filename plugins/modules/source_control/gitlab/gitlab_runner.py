@@ -32,13 +32,10 @@ requirements:
   - python >= 2.7
   - python-gitlab >= 1.5.0
 extends_documentation_fragment:
-- community.general.auth_basic
+  - community.general.auth_basic
+  - community.general.gitlab
 
 options:
-  api_token:
-    description:
-      - Your private token to interact with the GitLab API.
-    type: str
   project:
     description:
       - ID or full path of the project in the form of group/name.
@@ -92,7 +89,7 @@ options:
     type: str
   maximum_timeout:
     description:
-      - The maximum timeout that a runner has to pick up a specific job.
+      - The maximum time that a runner has to complete a specific job.
     required: False
     default: 3600
     type: int
@@ -186,7 +183,7 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import gitlabAuthentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
 
 try:
     cmp
@@ -203,32 +200,34 @@ class GitLabRunner(object):
         # See https://gitlab.com/gitlab-org/gitlab-ce/issues/60774
         # for group runner token access
         self._runners_endpoint = project.runners if project else gitlab_instance.runners
-        self.runnerObject = None
+        self.runner_object = None
 
-    def createOrUpdateRunner(self, description, options):
+    def create_or_update_runner(self, description, options):
         changed = False
 
         # Because we have already call userExists in main()
-        if self.runnerObject is None:
-            runner = self.createRunner({
+        if self.runner_object is None:
+            runner = self.create_runner({
                 'description': description,
                 'active': options['active'],
                 'token': options['registration_token'],
                 'locked': options['locked'],
                 'run_untagged': options['run_untagged'],
                 'maximum_timeout': options['maximum_timeout'],
-                'tag_list': options['tag_list']})
+                'tag_list': options['tag_list'],
+            })
             changed = True
         else:
-            changed, runner = self.updateRunner(self.runnerObject, {
+            changed, runner = self.update_runner(self.runner_object, {
                 'active': options['active'],
                 'locked': options['locked'],
                 'run_untagged': options['run_untagged'],
                 'maximum_timeout': options['maximum_timeout'],
                 'access_level': options['access_level'],
-                'tag_list': options['tag_list']})
+                'tag_list': options['tag_list'],
+            })
 
-        self.runnerObject = runner
+        self.runner_object = runner
         if changed:
             if self._module.check_mode:
                 self._module.exit_json(changed=True, msg="Successfully created or updated the runner %s" % description)
@@ -244,7 +243,7 @@ class GitLabRunner(object):
     '''
     @param arguments Attributes of the runner
     '''
-    def createRunner(self, arguments):
+    def create_runner(self, arguments):
         if self._module.check_mode:
             return True
 
@@ -259,7 +258,7 @@ class GitLabRunner(object):
     @param runner Runner object
     @param arguments Attributes of the runner
     '''
-    def updateRunner(self, runner, arguments):
+    def update_runner(self, runner, arguments):
         changed = False
 
         for arg_key, arg_value in arguments.items():
@@ -282,7 +281,7 @@ class GitLabRunner(object):
     '''
     @param description Description of the runner
     '''
-    def findRunner(self, description, owned=False):
+    def find_runner(self, description, owned=False):
         if owned:
             runners = self._runners_endpoint.list(as_list=False)
         else:
@@ -301,28 +300,28 @@ class GitLabRunner(object):
     '''
     @param description Description of the runner
     '''
-    def existsRunner(self, description, owned=False):
-        # When runner exists, object will be stored in self.runnerObject.
-        runner = self.findRunner(description, owned)
+    def exists_runner(self, description, owned=False):
+        # When runner exists, object will be stored in self.runner_object.
+        runner = self.find_runner(description, owned)
 
         if runner:
-            self.runnerObject = runner
+            self.runner_object = runner
             return True
         return False
 
-    def deleteRunner(self):
+    def delete_runner(self):
         if self._module.check_mode:
             return True
 
-        runner = self.runnerObject
+        runner = self.runner_object
 
         return runner.delete()
 
 
 def main():
     argument_spec = basic_auth_argument_spec()
+    argument_spec.update(auth_argument_spec())
     argument_spec.update(dict(
-        api_token=dict(type='str', no_log=True),
         description=dict(type='str', required=True, aliases=["name"]),
         active=dict(type='bool', default=True),
         owned=dict(type='bool', default=False),
@@ -340,13 +339,16 @@ def main():
         argument_spec=argument_spec,
         mutually_exclusive=[
             ['api_username', 'api_token'],
-            ['api_password', 'api_token'],
+            ['api_username', 'api_oauth_token'],
+            ['api_username', 'api_job_token'],
+            ['api_token', 'api_oauth_token'],
+            ['api_token', 'api_job_token'],
         ],
         required_together=[
             ['api_username', 'api_password'],
         ],
         required_one_of=[
-            ['api_username', 'api_token'],
+            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token'],
         ],
         required_if=[
             ('state', 'present', ['registration_token']),
@@ -369,7 +371,7 @@ def main():
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
-    gitlab_instance = gitlabAuthentication(module)
+    gitlab_instance = gitlab_authentication(module)
     gitlab_project = None
     if project:
         try:
@@ -378,28 +380,29 @@ def main():
             module.fail_json(msg='No such a project %s' % project, exception=to_native(e))
 
     gitlab_runner = GitLabRunner(module, gitlab_instance, gitlab_project)
-    runner_exists = gitlab_runner.existsRunner(runner_description, owned)
+    runner_exists = gitlab_runner.exists_runner(runner_description, owned)
 
     if state == 'absent':
         if runner_exists:
-            gitlab_runner.deleteRunner()
+            gitlab_runner.delete_runner()
             module.exit_json(changed=True, msg="Successfully deleted runner %s" % runner_description)
         else:
             module.exit_json(changed=False, msg="Runner deleted or does not exists")
 
     if state == 'present':
-        if gitlab_runner.createOrUpdateRunner(runner_description, {
-                                              "active": runner_active,
-                                              "tag_list": tag_list,
-                                              "run_untagged": run_untagged,
-                                              "locked": runner_locked,
-                                              "access_level": access_level,
-                                              "maximum_timeout": maximum_timeout,
-                                              "registration_token": registration_token}):
-            module.exit_json(changed=True, runner=gitlab_runner.runnerObject._attrs,
+        if gitlab_runner.create_or_update_runner(runner_description, {
+            "active": runner_active,
+            "tag_list": tag_list,
+            "run_untagged": run_untagged,
+            "locked": runner_locked,
+            "access_level": access_level,
+            "maximum_timeout": maximum_timeout,
+            "registration_token": registration_token,
+        }):
+            module.exit_json(changed=True, runner=gitlab_runner.runner_object._attrs,
                              msg="Successfully created or updated the runner %s" % runner_description)
         else:
-            module.exit_json(changed=False, runner=gitlab_runner.runnerObject._attrs,
+            module.exit_json(changed=False, runner=gitlab_runner.runner_object._attrs,
                              msg="No need to update the runner %s" % runner_description)
 
 

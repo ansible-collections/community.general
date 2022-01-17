@@ -12,6 +12,7 @@
     that:
       - "'python' in basic_info"
       - "'python_version' in basic_info"
+      - basic_info.python_version_info == ansible_python.version
 
 - name: run python_requirements_info module
   python_requirements_info:
@@ -25,3 +26,15 @@
     that:
       - "'installed' in dep_info.valid.pip"
       - "'notreal' in dep_info.not_found"
+
+- name: wrong specs
+  python_requirements_info:
+    dependencies:
+      - ansible<
+  register: wrong_spec1
+  ignore_errors: true
+
+- name: ensure wrong specs return error
+  assert:
+    that:
+      - wrong_spec1 is failed

@@ -158,10 +158,11 @@ diversion:
 
 import re
 import os
-from distutils.version import LooseVersion
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_native
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 def diversion_state(module, command, path):

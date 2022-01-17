@@ -1,0 +1,6 @@
+---
+- name: Install dnf versionlock plugin
+  dnf:
+    name: dnf-plugin-versionlock
+    state: present
+...

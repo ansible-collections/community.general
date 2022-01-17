@@ -13,7 +13,7 @@ short_description: management of instances in Proxmox VE cluster
 description:
   - allows you to create/delete/stop instances in Proxmox VE cluster
   - Starting in Ansible 2.1, it automatically detects containerization type (lxc for PVE 4, openvz for older)
-  - From community.general 4.0.0 on, there will be no default values, see I(proxmox_default_behavior).
+  - Since community.general 4.0.0 on, there are no more default values, see I(proxmox_default_behavior).
 options:
   password:
     description:
@@ -40,37 +40,27 @@ options:
         comma-delimited list C([volume=]<volume> [,acl=<1|0>] [,mountoptions=<opt[;opt...]>] [,quota=<1|0>]
         [,replicate=<1|0>] [,ro=<1|0>] [,shared=<1|0>] [,size=<DiskSize>])."
       - See U(https://pve.proxmox.com/wiki/Linux_Container) for a full description.
-      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(3). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 4.0.0.
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(3).
     type: str
   cores:
     description:
       - Specify number of cores per socket.
-      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(1). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 4.0.0.
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(1).
     type: int
   cpus:
     description:
       - numbers of allocated cpus for instance
-      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(1). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 4.0.0.
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(1).
     type: int
   memory:
     description:
       - memory size in MB for instance
-      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(512). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 4.0.0.
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(512).
     type: int
   swap:
     description:
       - swap memory size in MB for instance
-      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(0). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 4.0.0.
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(0).
     type: int
   netif:
     description:
@@ -94,9 +84,7 @@ options:
   onboot:
     description:
       - specifies whether a VM will be started during system bootup
-      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(no). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 4.0.0.
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(no).
     type: bool
   storage:
     description:
@@ -106,9 +94,7 @@ options:
   cpuunits:
     description:
       - CPU weight for a VM
-      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(1000). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 4.0.0.
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(1000).
     type: int
   nameserver:
     description:
@@ -168,20 +154,38 @@ options:
     version_added: '0.2.0'
   proxmox_default_behavior:
     description:
-      - Various module options used to have default values. This cause problems when
-        user expects different behavior from proxmox by default or fill options which cause
-        problems when they have been set.
-      - The default value is C(compatibility), which will ensure that the default values
-        are used when the values are not explicitly specified by the user.
-      - From community.general 4.0.0 on, the default value will switch to C(no_defaults). To avoid
-        deprecation warnings, please set I(proxmox_default_behavior) to an explicit
-        value.
+      - As of community.general 4.0.0, various options no longer have default values.
+        These default values caused problems when users expected different behavior from Proxmox
+        by default or filled options which caused problems when set.
+      - The value C(compatibility) (default before community.general 4.0.0) will ensure that the default values
+        are used when the values are not explicitly specified by the user. The new default is C(no_defaults),
+        which makes sure these options have no defaults.
       - This affects the I(disk), I(cores), I(cpus), I(memory), I(onboot), I(swap), I(cpuunits) options.
     type: str
+    default: no_defaults
     choices:
       - compatibility
       - no_defaults
     version_added: "1.3.0"
+  clone:
+    description:
+      - ID of the container to be cloned.
+      - I(description), I(hostname), and I(pool) will be copied from the cloned container if not specified.
+      - The type of clone created is defined by the I(clone_type) parameter.
+      - This operator is only supported for Proxmox clusters that use LXC containerization (PVE version >= 4).
+    type: int
+    version_added: 4.3.0
+  clone_type:
+    description:
+      - Type of the clone created.
+      - C(full) creates a full clone, and I(storage) must be specified.
+      - C(linked) creates a linked clone, and the cloned container must be a template container.
+      - C(opportunistic) creates a linked clone if the cloned container is a template container, and a full clone if not.
+        I(storage) may be specified, if not it will fall back to the default.
+    type: str
+    choices: ['full', 'linked', 'opportunistic']
+    default: opportunistic
+    version_added: 4.3.0
 author: Sergei Antipov (@UnderGreen)
 extends_documentation_fragment:
   - community.general.proxmox.documentation
@@ -307,6 +311,28 @@ EXAMPLES = r'''
      - nesting=1
      - mount=cifs,nfs
 
+- name: >
+    Create a linked clone of the template container with id 100. The newly created container with be a
+    linked clone, because no storage parameter is defined
+  community.general.proxmox:
+    vmid: 201
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    clone: 100
+    hostname: clone.example.org
+
+- name: Create a full clone of the container with id 100
+  community.general.proxmox:
+    vmid: 201
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    clone: 100
+    hostname: clone.example.org
+    storage: local
 
 - name: Start container
   community.general.proxmox:
@@ -363,7 +389,8 @@ EXAMPLES = r'''
 
 import time
 import traceback
-from distutils.version import LooseVersion
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 try:
     from proxmoxer import ProxmoxAPI
@@ -373,6 +400,10 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible.module_utils.common.text.converters import to_native
+
+from ansible_collections.community.general.plugins.module_utils.proxmox import (
+    ansible_to_proxmox_bool
+)
 
 
 VZ_TYPE = None
@@ -399,6 +430,13 @@ def content_check(proxmox, node, ostemplate, template_store):
     return [True for cnt in proxmox.nodes(node).storage(template_store).content.get() if cnt['volid'] == ostemplate]
 
 
+def is_template_container(proxmox, node, vmid):
+    """Check if the specified container is a template."""
+    proxmox_node = proxmox.nodes(node)
+    config = getattr(proxmox_node, VZ_TYPE)(vmid).config.get()
+    return config['template']
+
+
 def node_check(proxmox, node):
     return [True for nd in proxmox.nodes.get() if nd['node'] == node]
 
@@ -408,8 +446,10 @@ def proxmox_version(proxmox):
     return LooseVersion(apireturn['version'])
 
 
-def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, **kwargs):
+def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, clone, **kwargs):
     proxmox_node = proxmox.nodes(node)
+
+    # Remove all empty kwarg entries
     kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
 
     if VZ_TYPE == 'lxc':
@@ -429,7 +469,49 @@ def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, sw
         kwargs['cpus'] = cpus
         kwargs['disk'] = disk
 
-    taskid = getattr(proxmox_node, VZ_TYPE).create(vmid=vmid, storage=storage, memory=memory, swap=swap, **kwargs)
+    if clone is not None:
+        if VZ_TYPE != 'lxc':
+            module.fail_json(changed=False, msg="Clone operator is only supported for LXC enabled proxmox clusters.")
+
+        clone_is_template = is_template_container(proxmox, node, clone)
+
+        # By default, create a full copy only when the cloned container is not a template.
+        create_full_copy = not clone_is_template
+
+        # Only accept parameters that are compatible with the clone endpoint.
+        valid_clone_parameters = ['hostname', 'pool', 'description']
+        if module.params['storage'] is not None and clone_is_template:
+            # Cloning a template, so create a full copy instead of a linked copy
+            create_full_copy = True
+        elif module.params['storage'] is None and not clone_is_template:
+            # Not cloning a template, but also no defined storage. This isn't possible.
+            module.fail_json(changed=False, msg="Cloned container is not a template, storage needs to be specified.")
+
+        if module.params['clone_type'] == 'linked':
+            if not clone_is_template:
+                module.fail_json(changed=False, msg="'linked' clone type is specified, but cloned container is not a template container.")
+            # Don't need to do more, by default create_full_copy is set to false already
+        elif module.params['clone_type'] == 'opportunistic':
+            if not clone_is_template:
+                # Cloned container is not a template, so we need our 'storage' parameter
+                valid_clone_parameters.append('storage')
+        elif module.params['clone_type'] == 'full':
+            create_full_copy = True
+            valid_clone_parameters.append('storage')
+
+        clone_parameters = {}
+
+        if create_full_copy:
+            clone_parameters['full'] = '1'
+        else:
+            clone_parameters['full'] = '0'
+        for param in valid_clone_parameters:
+            if module.params[param] is not None:
+                clone_parameters[param] = module.params[param]
+
+        taskid = getattr(proxmox_node, VZ_TYPE)(clone).clone.post(newid=vmid, **clone_parameters)
+    else:
+        taskid = getattr(proxmox_node, VZ_TYPE).create(vmid=vmid, storage=storage, memory=memory, swap=swap, **kwargs)
 
     while timeout:
         if (proxmox_node.tasks(taskid).status.get()['status'] == 'stopped' and
@@ -529,11 +611,20 @@ def main():
             unprivileged=dict(type='bool', default=False),
             description=dict(type='str'),
             hookscript=dict(type='str'),
-            proxmox_default_behavior=dict(type='str', choices=['compatibility', 'no_defaults']),
+            proxmox_default_behavior=dict(type='str', default='no_defaults', choices=['compatibility', 'no_defaults']),
+            clone=dict(type='int'),
+            clone_type=dict(default='opportunistic', choices=['full', 'linked', 'opportunistic']),
         ),
-        required_if=[('state', 'present', ['node', 'hostname', 'ostemplate'])],
-        required_together=[('api_token_id', 'api_token_secret')],
+        required_if=[
+            ('state', 'present', ['node', 'hostname']),
+            ('state', 'present', ('clone', 'ostemplate'), True),  # Require one of clone and ostemplate. Together with mutually_exclusive this ensures that we
+                                                                  # either clone a container or create a new one from a template file.
+        ],
+        required_together=[
+            ('api_token_id', 'api_token_secret')
+        ],
         required_one_of=[('api_password', 'api_token_id')],
+        mutually_exclusive=[('clone', 'ostemplate')],  # Creating a new container is done either by cloning an existing one, or based on a template.
     )
 
     if not HAS_PROXMOXER:
@@ -557,14 +648,8 @@ def main():
     if module.params['ostemplate'] is not None:
         template_store = module.params['ostemplate'].split(":")[0]
     timeout = module.params['timeout']
+    clone = module.params['clone']
 
-    if module.params['proxmox_default_behavior'] is None:
-        module.params['proxmox_default_behavior'] = 'compatibility'
-        module.deprecate(
-            'The proxmox_default_behavior option will change its default value from "compatibility" to '
-            '"no_defaults" in community.general 4.0.0. To remove this warning, please specify an explicit value for it now',
-            version='4.0.0', collection_name='community.general'
-        )
     if module.params['proxmox_default_behavior'] == 'compatibility':
         old_default_values = dict(
             disk="3",
@@ -605,7 +690,8 @@ def main():
     elif not vmid:
         module.exit_json(changed=False, msg="Vmid could not be fetched for the following action: %s" % state)
 
-    if state == 'present':
+    # Create a new container
+    if state == 'present' and clone is None:
         try:
             if get_instance(proxmox, vmid) and not module.params['force']:
                 module.exit_json(changed=False, msg="VM with vmid = %s is already exists" % vmid)
@@ -617,8 +703,11 @@ def main():
             elif not content_check(proxmox, node, module.params['ostemplate'], template_store):
                 module.fail_json(msg="ostemplate '%s' not exists on node %s and storage %s"
                                  % (module.params['ostemplate'], node, template_store))
+        except Exception as e:
+            module.fail_json(msg="Pre-creation checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
 
-            create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout,
+        try:
+            create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, clone,
                             cores=module.params['cores'],
                             pool=module.params['pool'],
                             password=module.params['password'],
@@ -627,20 +716,40 @@ def main():
                             netif=module.params['netif'],
                             mounts=module.params['mounts'],
                             ip_address=module.params['ip_address'],
-                            onboot=int(module.params['onboot']),
+                            onboot=ansible_to_proxmox_bool(module.params['onboot']),
                             cpuunits=module.params['cpuunits'],
                             nameserver=module.params['nameserver'],
                             searchdomain=module.params['searchdomain'],
-                            force=int(module.params['force']),
+                            force=ansible_to_proxmox_bool(module.params['force']),
                             pubkey=module.params['pubkey'],
                             features=",".join(module.params['features']) if module.params['features'] is not None else None,
-                            unprivileged=int(module.params['unprivileged']),
+                            unprivileged=ansible_to_proxmox_bool(module.params['unprivileged']),
                             description=module.params['description'],
                             hookscript=module.params['hookscript'])
 
-            module.exit_json(changed=True, msg="deployed VM %s from template %s" % (vmid, module.params['ostemplate']))
+            module.exit_json(changed=True, msg="Deployed VM %s from template %s" % (vmid, module.params['ostemplate']))
         except Exception as e:
-            module.fail_json(msg="creation of %s VM %s failed with exception: %s" % (VZ_TYPE, vmid, e))
+            module.fail_json(msg="Creation of %s VM %s failed with exception: %s" % (VZ_TYPE, vmid, e))
+
+    # Clone a container
+    elif state == 'present' and clone is not None:
+        try:
+            if get_instance(proxmox, vmid) and not module.params['force']:
+                module.exit_json(changed=False, msg="VM with vmid = %s is already exists" % vmid)
+            # If no vmid was passed, there cannot be another VM named 'hostname'
+            if not module.params['vmid'] and get_vmid(proxmox, hostname) and not module.params['force']:
+                module.exit_json(changed=False, msg="VM with hostname %s already exists and has ID number %s" % (hostname, get_vmid(proxmox, hostname)[0]))
+            if not get_instance(proxmox, clone):
+                module.exit_json(changed=False, msg="Container to be cloned does not exist")
+        except Exception as e:
+            module.fail_json(msg="Pre-clone checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
+
+        try:
+            create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, clone)
+
+            module.exit_json(changed=True, msg="Cloned VM %s from %s" % (vmid, clone))
+        except Exception as e:
+            module.fail_json(msg="Cloning %s VM %s failed with exception: %s" % (VZ_TYPE, vmid, e))
 
     elif state == 'started':
         try:

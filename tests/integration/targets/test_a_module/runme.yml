@@ -1,0 +1,37 @@
+- hosts: localhost
+  tasks:
+    - name: Test a_module
+      assert:
+        that:
+          # Modules/actions that do not exist
+          - "'foo_bar' is not community.general.a_module"
+          - "'foo.bar.baz' is not community.general.a_module"
+          # Short name and FQCN for builtin and other collections
+          - "'file' is community.general.a_module"
+          - "'set_fact' is community.general.a_module"
+          - "'ansible.builtin.file' is community.general.a_module"
+          - "'ansible.builtin.set_fact' is community.general.a_module"
+          - "'ansible.builtin.foo_bar' is not community.general.a_module"
+          - "'community.crypto.acme_certificate' is community.general.a_module"
+          - "'community.crypto.openssl_privatekey_pipe' is community.general.a_module"
+          - "'community.crypto.foo_bar' is not community.general.a_module"
+          # Modules from this collection (that exist or not)
+          - "'community.general.ufw' is community.general.a_module"
+          - "'community.general.foooo_really_does_not_exist' is not community.general.a_module"
+          # Local module
+          - "'local_module' is community.general.a_module"
+          # Local collection module (that exist or not)
+          - "'testns.testcoll.collection_module' is community.general.a_module"
+          - "'testns.testcoll.foobar' is not community.general.a_module"
+
+    - name: Test a_module in case of routing
+      assert:
+        that:
+          # Redirected module
+          - "'ufw' is community.general.a_module"
+          # Redirected module where target collection does not exist
+          # (the target collection must not have been installed in CI!)
+          - "'onyx_pfc_interface' is not community.general.a_module"
+          # Tombstoned module
+          - "'community.general.docker_image_facts' is not community.general.a_module"
+      when: ansible_version.string is version('2.10.0', '>=')

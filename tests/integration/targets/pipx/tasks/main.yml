@@ -1,0 +1,152 @@
+---
+- name: install pipx
+  pip:
+    name: pipx
+    extra_args: --user
+
+##############################################################################
+- name: ensure application tox is uninstalled
+  community.general.pipx:
+    state: absent
+    name: tox
+  register: uninstall_tox
+
+- name: install application tox
+  community.general.pipx:
+    name: tox
+  register: install_tox
+
+- name: install application tox again
+  community.general.pipx:
+    name: tox
+  register: install_tox_again
+  ignore_errors: yes
+
+- name: install application tox again force
+  community.general.pipx:
+    name: tox
+    force: yes
+  register: install_tox_again_force
+
+- name: uninstall application tox
+  community.general.pipx:
+    state: absent
+    name: tox
+  register: uninstall_tox
+
+- name: check assertions tox
+  assert:
+    that:
+        - install_tox is changed
+        - "'tox' in install_tox.application"
+        - install_tox_again is not changed
+        - install_tox_again_force is changed
+        - uninstall_tox is changed
+        - "'tox' not in uninstall_tox.application"
+
+##############################################################################
+- name: install application tox 3.24.0
+  community.general.pipx:
+    name: tox
+    source: tox==3.24.0
+  register: install_tox_324
+
+- name: reinstall tox 3.24.0
+  community.general.pipx:
+    name: tox
+    state: reinstall
+  register: reinstall_tox_324
+
+- name: upgrade tox 3.24.0
+  community.general.pipx:
+    name: tox
+    state: upgrade
+  register: upgrade_tox_324
+
+- name: downgrade tox 3.24.0
+  community.general.pipx:
+    name: tox
+    source: tox==3.24.0
+    force: yes
+  register: downgrade_tox_324
+
+- name: cleanup tox 3.24.0
+  community.general.pipx:
+    state: absent
+    name: tox
+  register: uninstall_tox_324
+
+- name: check assertions tox 3.24.0
+  assert:
+    that:
+        - install_tox_324 is changed
+        - "'tox' in install_tox_324.application"
+        - install_tox_324.application.tox.version == '3.24.0'
+        - reinstall_tox_324 is changed
+        - reinstall_tox_324.application.tox.version == '3.24.0'
+        - upgrade_tox_324 is changed
+        - upgrade_tox_324.application.tox.version != '3.24.0'
+        - downgrade_tox_324 is changed
+        - downgrade_tox_324.application.tox.version == '3.24.0'
+        - uninstall_tox_324 is changed
+        - "'tox' not in uninstall_tox_324.application"
+
+##############################################################################
+- name: ensure application ansible-lint is uninstalled
+  community.general.pipx:
+    name: ansible-lint
+    state: absent
+
+- name: install application ansible-lint
+  community.general.pipx:
+    name: ansible-lint
+  register: install_ansible_lint
+
+- name: inject packages
+  community.general.pipx:
+    state: inject
+    name: ansible-lint
+    inject_packages:
+      - licenses
+  register: inject_pkgs_ansible_lint
+
+- name: cleanup ansible-lint
+  community.general.pipx:
+    state: absent
+    name: ansible-lint
+  register: uninstall_ansible_lint
+
+- name: check assertions inject_packages
+  assert:
+    that:
+        - install_ansible_lint is changed
+        - inject_pkgs_ansible_lint is changed
+        - '"ansible-lint" in inject_pkgs_ansible_lint.application'
+        - '"licenses" in inject_pkgs_ansible_lint.application["ansible-lint"]["injected"]'
+        - uninstall_ansible_lint is changed
+
+##############################################################################
+- name: install jupyter - not working smoothly in freebsd
+  block:
+  - name: ensure application jupyter is uninstalled
+    community.general.pipx:
+      name: jupyter
+      state: absent
+
+  - name: install application jupyter
+    community.general.pipx:
+      name: jupyter
+      install_deps: true
+    register: install_jupyter
+
+  - name: cleanup jupyter
+    community.general.pipx:
+      state: absent
+      name: jupyter
+
+  - name: check assertions
+    assert:
+      that:
+        - install_jupyter is changed
+        - '"ipython" in install_jupyter.stdout'
+  when: ansible_system != 'FreeBSD'

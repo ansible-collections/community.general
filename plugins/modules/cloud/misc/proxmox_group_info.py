@@ -73,7 +73,7 @@ proxmox_groups:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
-    proxmox_auth_argument_spec, ProxmoxAnsible, HAS_PROXMOXER, PROXMOXER_IMP_ERR)
+    proxmox_auth_argument_spec, ProxmoxAnsible)
 
 
 class ProxmoxGroupInfoAnsible(ProxmoxAnsible):
@@ -124,14 +124,11 @@ def main():
         changed=False
     )
 
-    if not HAS_PROXMOXER:
-        module.fail_json(msg=missing_required_lib('proxmoxer'), exception=PROXMOXER_IMP_ERR)
-
     proxmox = ProxmoxGroupInfoAnsible(module)
     group = module.params['group']
 
     if group:
-        groups = [proxmox.get_group(group=group)]
+        groups = [proxmox.get_group(groupid=group)]
     else:
         groups = proxmox.get_groups()
     result['proxmox_groups'] = [group.group for group in groups]

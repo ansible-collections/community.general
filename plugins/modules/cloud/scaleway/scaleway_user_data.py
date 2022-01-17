@@ -16,7 +16,7 @@ DOCUMENTATION = '''
 ---
 module: scaleway_user_data
 short_description: Scaleway user_data management module
-author: Remy Leone (@sieben)
+author: Remy Leone (@remyleone)
 description:
     - "This module manages user_data on compute instances on Scaleway."
     - "It can be used to configure cloud-init for instance"
@@ -75,7 +75,7 @@ def patch_user_data(compute_api, server_id, key, value):
     compute_api.module.debug("Starting patching user_data attributes")
 
     path = "servers/%s/user_data/%s" % (server_id, key)
-    response = compute_api.patch(path=path, data=value, headers={"Content-type": "text/plain"})
+    response = compute_api.patch(path=path, data=value, headers={"Content-Type": "text/plain"})
     if not response.ok:
         msg = 'Error during user_data patching: %s %s' % (response.status_code, response.body)
         compute_api.module.fail_json(msg=msg)

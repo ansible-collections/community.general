@@ -1,0 +1,38 @@
+# (c) 2021, Alexei Znamensky
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- set_fact:
+    attr2_d:
+      msg: Attribute attr2 is deprecated
+      version: 9.9.9
+      collection_name: community.general
+    attr2_d_29:
+      msg: Attribute attr2 is deprecated
+      version: 9.9.9
+- set_fact:
+    attr2_depr_dict: "{{ ((ansible_version.major, ansible_version.minor) < (2, 10))|ternary(attr2_d_29, attr2_d) }}"
+
+- name: test msimpleda 1
+  msimpleda:
+    a: 1
+  register: simple1
+
+- name: assert simple1
+  assert:
+    that:
+      - simple1.a == 1
+      - simple1.attr1 == "abc"
+      - ("deprecations" not in simple1) or attr2_depr_dict not in simple1.deprecations
+
+- name: test msimpleda 2
+  msimpleda:
+    a: 2
+  register: simple2
+
+- name: assert simple2
+  assert:
+    that:
+      - simple2.a == 2
+      - simple2.attr2 == "def"
+      - '"deprecations" in simple2'
+      - attr2_depr_dict in simple2.deprecations

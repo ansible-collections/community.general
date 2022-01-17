@@ -43,10 +43,10 @@ DOCUMENTATION = '''
 '''
 
 import os
-from distutils.spawn import find_executable
 from subprocess import Popen, PIPE
 
 from ansible.errors import AnsibleError, AnsibleConnectionFailure, AnsibleFileNotFound
+from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.plugins.connection import ConnectionBase
 
@@ -62,9 +62,9 @@ class Connection(ConnectionBase):
         super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
 
         self._host = self._play_context.remote_addr
-        self._lxc_cmd = find_executable("lxc")
-
-        if not self._lxc_cmd:
+        try:
+            self._lxc_cmd = get_bin_path("lxc")
+        except ValueError:
             raise AnsibleError("lxc command not found in PATH")
 
         if self._play_context.remote_user is not None and self._play_context.remote_user != 'root':
@@ -89,9 +89,9 @@ class Connection(ConnectionBase):
             local_cmd.extend(["--project", self.get_option("project")])
         local_cmd.extend([
             "exec",
-            "%s:%s" % (self.get_option("remote"), self._host),
+            "%s:%s" % (self.get_option("remote"), self.get_option("remote_addr")),
             "--",
-            self._play_context.executable, "-c", cmd
+            self.get_option("executable"), "-c", cmd
         ])
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
@@ -126,7 +126,7 @@ class Connection(ConnectionBase):
         local_cmd.extend([
             "file", "push",
             in_path,
-            "%s:%s/%s" % (self.get_option("remote"), self._host, out_path)
+            "%s:%s/%s" % (self.get_option("remote"), self.get_option("remote_addr"), out_path)
         ])
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
@@ -145,7 +145,7 @@ class Connection(ConnectionBase):
             local_cmd.extend(["--project", self.get_option("project")])
         local_cmd.extend([
             "file", "pull",
-            "%s:%s/%s" % (self.get_option("remote"), self._host, in_path),
+            "%s:%s/%s" % (self.get_option("remote"), self.get_option("remote_addr"), in_path),
             out_path
         ])
 

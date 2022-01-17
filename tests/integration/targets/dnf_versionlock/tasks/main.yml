@@ -1,0 +1,8 @@
+---
+- block:
+    - include_tasks: install.yml
+    - include_tasks: lock_bash.yml
+    - include_tasks: lock_updates.yml
+  when: (ansible_distribution == 'Fedora' and ansible_distribution_major_version is version('23', '>=')) or
+        (ansible_distribution in ['RedHat', 'CentOS'] and ansible_distribution_major_version is version('8', '>='))
+...

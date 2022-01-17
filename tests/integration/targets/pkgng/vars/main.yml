@@ -1,0 +1,5 @@
+---
+pkgng_test_outofdate_pkg_path: "/tmp/ansible_pkgng_test_package.pkg"
+pkgng_test_pkg_name: zsh
+pkgng_test_pkg_category: shells
+pkgng_test_pkg_sentinelfile_path: /usr/local/bin/zsh

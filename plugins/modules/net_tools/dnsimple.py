@@ -94,13 +94,6 @@ EXAMPLES = '''
     account_api_token: dummyapitoken
   delegate_to: localhost
 
-- name: Fetch my.com domain records
-  community.general.dnsimple:
-    domain: my.com
-    state: present
-  delegate_to: localhost
-  register: records
-
 - name: Delete a domain
   community.general.dnsimple:
     domain: my.com
@@ -155,8 +148,9 @@ EXAMPLES = '''
 RETURN = r"""# """
 
 import traceback
-from distutils.version import LooseVersion
 import re
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 class DNSimpleV1():

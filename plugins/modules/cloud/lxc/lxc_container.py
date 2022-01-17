@@ -422,6 +422,7 @@ import shutil
 import subprocess
 import tempfile
 import time
+import shlex
 
 try:
     import lxc
@@ -661,9 +662,8 @@ class LxcContainerManagement(object):
         """
 
         for key, value in variables_dict.items():
-            build_command.append(
-                '%s %s' % (key, value)
-            )
+            build_command.append(str(key))
+            build_command.append(str(value))
         return build_command
 
     def _get_vars(self, variables):
@@ -685,24 +685,6 @@ class LxcContainerManagement(object):
             if _var not in false_values:
                 return_dict[v] = _var
         return return_dict
-
-    def _run_command(self, build_command, unsafe_shell=False):
-        """Return information from running an Ansible Command.
-
-        This will squash the build command list into a string and then
-        execute the command via Ansible. The output is returned to the method.
-        This output is returned as `return_code`, `stdout`, `stderr`.
-
-        :param build_command: Used for the command and all options.
-        :type build_command: ``list``
-        :param unsafe_shell: Enable or Disable unsafe sell commands.
-        :type unsafe_shell: ``bol``
-        """
-
-        return self.module.run_command(
-            ' '.join(build_command),
-            use_unsafe_shell=unsafe_shell
-        )
 
     def _config(self):
         """Configure an LXC container.
@@ -810,7 +792,7 @@ class LxcContainerManagement(object):
         elif self.module.params.get('backing_store') == 'overlayfs':
             build_command.append('--snapshot')
 
-        rc, return_data, err = self._run_command(build_command)
+        rc, return_data, err = self.module.run_command(build_command)
         if rc != 0:
             message = "Failed executing %s." % os.path.basename(clone_cmd)
             self.failure(
@@ -843,7 +825,7 @@ class LxcContainerManagement(object):
 
         build_command = [
             self.module.get_bin_path('lxc-create', True),
-            '--name %s' % self.container_name,
+            '--name', self.container_name,
             '--quiet'
         ]
 
@@ -869,10 +851,12 @@ class LxcContainerManagement(object):
                 log_path = os.getenv('HOME')
 
             build_command.extend([
-                '--logfile %s' % os.path.join(
+                '--logfile',
+                os.path.join(
                     log_path, 'lxc-%s.log' % self.container_name
                 ),
-                '--logpriority %s' % self.module.params.get(
+                '--logpriority',
+                self.module.params.get(
                     'container_log_level'
                 ).upper()
             ])
@@ -880,9 +864,10 @@ class LxcContainerManagement(object):
         # Add the template commands to the end of the command if there are any
         template_options = self.module.params.get('template_options', None)
         if template_options:
-            build_command.append('-- %s' % template_options)
+            build_command.append('--')
+            build_command += shlex.split(template_options)
 
-        rc, return_data, err = self._run_command(build_command)
+        rc, return_data, err = self.module.run_command(build_command)
         if rc != 0:
             message = "Failed executing lxc-create."
             self.failure(
@@ -1186,7 +1171,7 @@ class LxcContainerManagement(object):
             self.module.get_bin_path('lxc-config', True),
             "lxc.bdev.lvm.vg"
         ]
-        rc, vg, err = self._run_command(build_command)
+        rc, vg, err = self.module.run_command(build_command)
         if rc != 0:
             self.failure(
                 err=err,
@@ -1204,7 +1189,7 @@ class LxcContainerManagement(object):
         build_command = [
             self.module.get_bin_path('lvs', True)
         ]
-        rc, stdout, err = self._run_command(build_command)
+        rc, stdout, err = self.module.run_command(build_command)
         if rc != 0:
             self.failure(
                 err=err,
@@ -1231,7 +1216,7 @@ class LxcContainerManagement(object):
             '--units',
             'g'
         ]
-        rc, stdout, err = self._run_command(build_command)
+        rc, stdout, err = self.module.run_command(build_command)
         if rc != 0:
             self.failure(
                 err=err,
@@ -1262,7 +1247,7 @@ class LxcContainerManagement(object):
             '--units',
             'g'
         ]
-        rc, stdout, err = self._run_command(build_command)
+        rc, stdout, err = self.module.run_command(build_command)
         if rc != 0:
             self.failure(
                 err=err,
@@ -1311,7 +1296,7 @@ class LxcContainerManagement(object):
             os.path.join(vg, source_lv),
             "-L%sg" % snapshot_size_gb
         ]
-        rc, stdout, err = self._run_command(build_command)
+        rc, stdout, err = self.module.run_command(build_command)
         if rc != 0:
             self.failure(
                 err=err,
@@ -1336,7 +1321,7 @@ class LxcContainerManagement(object):
             "/dev/%s/%s" % (vg, lv_name),
             mount_point,
         ]
-        rc, stdout, err = self._run_command(build_command)
+        rc, stdout, err = self.module.run_command(build_command)
         if rc != 0:
             self.failure(
                 err=err,
@@ -1380,9 +1365,8 @@ class LxcContainerManagement(object):
             '.'
         ]
 
-        rc, stdout, err = self._run_command(
-            build_command=build_command,
-            unsafe_shell=True
+        rc, stdout, err = self.module.run_command(
+            build_command
         )
 
         os.umask(old_umask)
@@ -1410,7 +1394,7 @@ class LxcContainerManagement(object):
             "-f",
             "%s/%s" % (vg, lv_name),
         ]
-        rc, stdout, err = self._run_command(build_command)
+        rc, stdout, err = self.module.run_command(build_command)
         if rc != 0:
             self.failure(
                 err=err,
@@ -1442,11 +1426,10 @@ class LxcContainerManagement(object):
                 self.module.get_bin_path('rsync', True),
                 '-aHAX',
                 fs_path,
-                temp_dir
+                temp_dir,
             ]
-            rc, stdout, err = self._run_command(
+            rc, stdout, err = self.module.run_command(
                 build_command,
-                unsafe_shell=True
             )
             if rc != 0:
                 self.failure(
@@ -1467,7 +1450,7 @@ class LxcContainerManagement(object):
             self.module.get_bin_path('umount', True),
             mount_point,
         ]
-        rc, stdout, err = self._run_command(build_command)
+        rc, stdout, err = self.module.run_command(build_command)
         if rc != 0:
             self.failure(
                 err=err,
@@ -1489,12 +1472,12 @@ class LxcContainerManagement(object):
 
         build_command = [
             self.module.get_bin_path('mount', True),
-            '-t overlayfs',
-            '-o lowerdir=%s,upperdir=%s' % (lowerdir, upperdir),
+            '-t', 'overlayfs',
+            '-o', 'lowerdir=%s,upperdir=%s' % (lowerdir, upperdir),
             'overlayfs',
             mount_point,
         ]
-        rc, stdout, err = self._run_command(build_command)
+        rc, stdout, err = self.module.run_command(build_command)
         if rc != 0:
             self.failure(
                 err=err,

@@ -102,6 +102,20 @@ packages:
     returned: when upgrade is set to yes
     type: list
     sample: [ package, other-package ]
+
+stdout:
+    description: Output from pacman.
+    returned: success, when needed
+    type: str
+    sample: ":: Synchronizing package databases...  core is up to date :: Starting full system upgrade..."
+    version_added: 4.1.0
+
+stderr:
+    description: Error output from pacman.
+    returned: success, when needed
+    type: str
+    sample: "warning: libtool: local (2.4.6+44+gb9b44533-14) is newer than core (2.4.6+42+gb88cebd5-15)\nwarning ..."
+    version_added: 4.1.0
 '''
 
 EXAMPLES = '''
@@ -189,38 +203,43 @@ def get_name(module, pacman_output):
     module.fail_json(msg="get_name: fail to retrieve package name from pacman output")
 
 
-def query_package(module, pacman_path, name, state="present"):
+def query_package(module, pacman_path, name, state):
     """Query the package status in both the local system and the repository. Returns a boolean to indicate if the package is installed, a second
     boolean to indicate if the package is up-to-date and a third boolean to indicate whether online information were available
     """
-    if state == "present":
-        lcmd = "%s --query %s" % (pacman_path, name)
-        lrc, lstdout, lstderr = module.run_command(lcmd, check_rc=False)
-        if lrc != 0:
-            # package is not installed locally
+
+    lcmd = "%s --query %s" % (pacman_path, name)
+    lrc, lstdout, lstderr = module.run_command(lcmd, check_rc=False)
+    if lrc != 0:
+        # package is not installed locally
+        return False, False, False
+    else:
+        # a non-zero exit code doesn't always mean the package is installed
+        # for example, if the package name queried is "provided" by another package
+        installed_name = get_name(module, lstdout)
+        if installed_name != name:
             return False, False, False
-        else:
-            # a non-zero exit code doesn't always mean the package is installed
-            # for example, if the package name queried is "provided" by another package
-            installed_name = get_name(module, lstdout)
-            if installed_name != name:
-                return False, False, False
 
-        # get the version installed locally (if any)
-        lversion = get_version(lstdout)
+    # no need to check the repository if state is present or absent
+    # return False for package version check, because we didn't check it
+    if state == 'present' or state == 'absent':
+        return True, False, False
 
-        rcmd = "%s --sync --print-format \"%%n %%v\" %s" % (pacman_path, name)
-        rrc, rstdout, rstderr = module.run_command(rcmd, check_rc=False)
-        # get the version in the repository
-        rversion = get_version(rstdout)
+    # get the version installed locally (if any)
+    lversion = get_version(lstdout)
 
-        if rrc == 0:
-            # Return True to indicate that the package is installed locally, and the result of the version number comparison
-            # to determine if the package is up-to-date.
-            return True, (lversion == rversion), False
+    rcmd = "%s --sync --print-format \"%%n %%v\" %s" % (pacman_path, name)
+    rrc, rstdout, rstderr = module.run_command(rcmd, check_rc=False)
+    # get the version in the repository
+    rversion = get_version(rstdout)
+
+    if rrc == 0:
+        # Return True to indicate that the package is installed locally, and the result of the version number comparison
+        # to determine if the package is up-to-date.
+        return True, (lversion == rversion), False
 
     # package is installed but cannot fetch remote Version. Last True stands for the error
-        return True, True, True
+    return True, True, True
 
 
 def update_package_db(module, pacman_path):
@@ -231,9 +250,9 @@ def update_package_db(module, pacman_path):
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
     if rc == 0:
-        return True
+        return stdout, stderr
     else:
-        module.fail_json(msg="could not update package db")
+        module.fail_json(msg="could not update package db", stdout=stdout, stderr=stderr)
 
 
 def upgrade(module, pacman_path):
@@ -268,11 +287,11 @@ def upgrade(module, pacman_path):
         rc, stdout, stderr = module.run_command(cmdupgrade, check_rc=False)
         if rc == 0:
             if packages:
-                module.exit_json(changed=True, msg='System upgraded', packages=packages, diff=diff)
+                module.exit_json(changed=True, msg='System upgraded', packages=packages, diff=diff, stdout=stdout, stderr=stderr)
             else:
                 module.exit_json(changed=False, msg='Nothing to upgrade', packages=packages)
         else:
-            module.fail_json(msg="Could not upgrade")
+            module.fail_json(msg="Could not upgrade", stdout=stdout, stderr=stderr)
     else:
         module.exit_json(changed=False, msg='Nothing to upgrade', packages=packages)
 
@@ -288,10 +307,12 @@ def remove_packages(module, pacman_path, packages):
         module.params["extra_args"] += " --nodeps --nodeps"
 
     remove_c = 0
+    stdout_total = ""
+    stderr_total = ""
     # Using a for loop in case of error, we can report the package that failed
     for package in packages:
         # Query the package first, to see if we even need to remove
-        installed, updated, unknown = query_package(module, pacman_path, package)
+        installed, updated, unknown = query_package(module, pacman_path, package, 'absent')
         if not installed:
             continue
 
@@ -299,8 +320,10 @@ def remove_packages(module, pacman_path, packages):
         rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
         if rc != 0:
-            module.fail_json(msg="failed to remove %s" % (package))
+            module.fail_json(msg="failed to remove %s" % (package), stdout=stdout, stderr=stderr)
 
+        stdout_total += stdout
+        stderr_total += stderr
         if module._diff:
             d = stdout.split('\n')[2].split(' ')[2:]
             for i, pkg in enumerate(d):
@@ -311,7 +334,7 @@ def remove_packages(module, pacman_path, packages):
         remove_c += 1
 
     if remove_c > 0:
-        module.exit_json(changed=True, msg="removed %s package(s)" % remove_c, diff=diff)
+        module.exit_json(changed=True, msg="removed %s package(s)" % remove_c, diff=diff, stdout=stdout_total, stderr=stderr_total)
 
     module.exit_json(changed=False, msg="package(s) already absent")
 
@@ -330,7 +353,7 @@ def install_packages(module, pacman_path, state, packages, package_files):
     to_install_files = []
     for i, package in enumerate(packages):
         # if the package is installed and state == present or state == latest and is up-to-date then skip
-        installed, updated, latestError = query_package(module, pacman_path, package)
+        installed, updated, latestError = query_package(module, pacman_path, package, state)
         if latestError and state == 'latest':
             package_err.append(package)
 
@@ -347,7 +370,7 @@ def install_packages(module, pacman_path, state, packages, package_files):
         rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
         if rc != 0:
-            module.fail_json(msg="failed to install %s: %s" % (" ".join(to_install_repos), stderr))
+            module.fail_json(msg="failed to install %s: %s" % (" ".join(to_install_repos), stderr), stdout=stdout, stderr=stderr)
 
         # As we pass `--needed` to pacman returns a single line of ` there is nothing to do` if no change is performed.
         # The check for > 3 is here because we pick the 4th line in normal operation.
@@ -366,7 +389,7 @@ def install_packages(module, pacman_path, state, packages, package_files):
         rc, stdout, stderr = module.run_command(cmd, check_rc=False)
 
         if rc != 0:
-            module.fail_json(msg="failed to install %s: %s" % (" ".join(to_install_files), stderr))
+            module.fail_json(msg="failed to install %s: %s" % (" ".join(to_install_files), stderr), stdout=stdout, stderr=stderr)
 
         # As we pass `--needed` to pacman returns a single line of ` there is nothing to do` if no change is performed.
         # The check for > 3 is here because we pick the 4th line in normal operation.
@@ -384,7 +407,7 @@ def install_packages(module, pacman_path, state, packages, package_files):
         message = "But could not ensure 'latest' state for %s package(s) as remote version could not be fetched." % (package_err)
 
     if install_c > 0:
-        module.exit_json(changed=True, msg="installed %s package(s). %s" % (install_c, message), diff=diff)
+        module.exit_json(changed=True, msg="installed %s package(s). %s" % (install_c, message), diff=diff, stdout=stdout, stderr=stderr)
 
     module.exit_json(changed=False, msg="package(s) already installed. %s" % (message), diff=diff)
 
@@ -399,7 +422,7 @@ def check_packages(module, pacman_path, packages, state):
     }
 
     for package in packages:
-        installed, updated, unknown = query_package(module, pacman_path, package)
+        installed, updated, unknown = query_package(module, pacman_path, package, state)
         if ((state in ["present", "latest"] and not installed) or
                 (state == "absent" and installed) or
                 (state == "latest" and not updated)):
@@ -474,9 +497,9 @@ def main():
         p['state'] = 'absent'
 
     if p["update_cache"] and not module.check_mode:
-        update_package_db(module, pacman_path)
+        stdout, stderr = update_package_db(module, pacman_path)
         if not (p['name'] or p['upgrade']):
-            module.exit_json(changed=True, msg='Updated the package master lists')
+            module.exit_json(changed=True, msg='Updated the package master lists', stdout=stdout, stderr=stderr)
 
     if p['update_cache'] and module.check_mode and not (p['name'] or p['upgrade']):
         module.exit_json(changed=True, msg='Would have updated the package cache')

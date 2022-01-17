@@ -18,7 +18,8 @@ requirements:
   - python >= 2.7
   - python-gitlab >= 2.3.0
 extends_documentation_fragment:
-- community.general.auth_basic
+  - community.general.auth_basic
+  - community.general.gitlab
 
 options:
   state:
@@ -27,11 +28,6 @@ options:
     default: present
     type: str
     choices: ["present", "absent"]
-  api_token:
-    description:
-      - GitLab access token with API permissions.
-    required: true
-    type: str
   project:
     description:
       - The path and name of the project.
@@ -77,7 +73,8 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.api import basic_auth_argument_spec
-from distutils.version import LooseVersion
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 GITLAB_IMP_ERR = None
 try:
@@ -87,7 +84,7 @@ except Exception:
     GITLAB_IMP_ERR = traceback.format_exc()
     HAS_GITLAB_PACKAGE = False
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import gitlabAuthentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
 
 
 class GitlabProtectedBranch(object):
@@ -141,8 +138,8 @@ class GitlabProtectedBranch(object):
 
 def main():
     argument_spec = basic_auth_argument_spec()
+    argument_spec.update(auth_argument_spec())
     argument_spec.update(
-        api_token=dict(type='str', required=True, no_log=True),
         project=dict(type='str', required=True),
         name=dict(type='str', required=True),
         merge_access_levels=dict(type='str', default="maintainer", choices=["maintainer", "developer", "nobody"]),
@@ -154,13 +151,16 @@ def main():
         argument_spec=argument_spec,
         mutually_exclusive=[
             ['api_username', 'api_token'],
-            ['api_password', 'api_token'],
+            ['api_username', 'api_oauth_token'],
+            ['api_username', 'api_job_token'],
+            ['api_token', 'api_oauth_token'],
+            ['api_token', 'api_job_token'],
         ],
         required_together=[
             ['api_username', 'api_password'],
         ],
         required_one_of=[
-            ['api_username', 'api_token']
+            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
         ],
         supports_check_mode=True
     )
@@ -179,7 +179,7 @@ def main():
         module.fail_json(msg="community.general.gitlab_proteched_branch requires python-gitlab Python module >= 2.3.0 (installed version: [%s])."
                              " Please upgrade python-gitlab to version 2.3.0 or above." % gitlab_version)
 
-    gitlab_instance = gitlabAuthentication(module)
+    gitlab_instance = gitlab_authentication(module)
     this_gitlab = GitlabProtectedBranch(module=module, project=project, gitlab_instance=gitlab_instance)
 
     p_branch = this_gitlab.protected_branch_exist(name=name)

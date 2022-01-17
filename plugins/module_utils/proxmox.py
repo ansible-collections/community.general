@@ -54,9 +54,23 @@ def proxmox_to_ansible_bool(value):
     return True if value == 1 else False
 
 
+def ansible_to_proxmox_bool(value):
+    '''Convert Ansible representation of a boolean to be proxmox-friendly'''
+    if value is None:
+        return None
+
+    if not isinstance(value, bool):
+        raise ValueError("%s must be of type bool not %s" % (value, type(value)))
+
+    return 1 if value else 0
+
+
 class ProxmoxAnsible(object):
     """Base class for Proxmox modules"""
     def __init__(self, module):
+        if not HAS_PROXMOXER:
+            module.fail_json(msg=missing_required_lib('proxmoxer'), exception=PROXMOXER_IMP_ERR)
+
         self.module = module
         self.proxmox_api = self._connect()
         # Test token validity

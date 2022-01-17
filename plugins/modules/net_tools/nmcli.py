@@ -55,8 +55,10 @@ options:
             - Type C(generic) is added in Ansible 2.5.
             - Type C(infiniband) is added in community.general 2.0.0.
             - Type C(gsm) is added in community.general 3.7.0.
+            - Type C(wireguard) is added in community.general 4.3.0
         type: str
-        choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi, gsm ]
+        choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi, gsm,
+            wireguard ]
     mode:
         description:
             - This is the type of device or network connection that you wish to create for a bond or bridge.
@@ -69,10 +71,11 @@ options:
         type: str
     ip4:
         description:
-            - The IPv4 address to this interface.
-            - Use the format C(192.0.2.24/24).
+            - List of IPv4 addresses to this interface.
+            - Use the format C(192.0.2.24/24) or C(192.0.2.24).
             - If defined and I(method4) is not specified, automatically set C(ipv4.method) to C(manual).
-        type: str
+        type: list
+        elements: str
     gw4:
         description:
             - The IPv4 gateway for this interface.
@@ -142,10 +145,11 @@ options:
         version_added: 3.3.0
     ip6:
         description:
-            - The IPv6 address to this interface.
-            - Use the format C(abbe::cafe).
+            - List of IPv6 addresses to this interface.
+            - Use the format C(abbe::cafe/128) or C(abbe::cafe).
             - If defined and I(method6) is not specified, automatically set C(ipv6.method) to C(manual).
-        type: str
+        type: list
+        elements: str
     gw6:
         description:
             - The IPv6 gateway for this interface.
@@ -182,6 +186,18 @@ options:
         type: str
         choices: [ignore, auto, dhcp, link-local, manual, shared, disabled]
         version_added: 2.2.0
+    ip_privacy6:
+        description:
+            - If enabled, it makes the kernel generate a temporary IPv6 address in addition to the public one.
+        type: str
+        choices: [disabled, prefer-public-addr, prefer-temp-addr, unknown]
+        version_added: 4.2.0
+    addr_gen_mode6:
+        description:
+            - Configure method for creating the address for use with IPv6 Stateless Address Autoconfiguration.
+        type: str
+        choices: [eui64, stable-privacy]
+        version_added: 4.2.0
     mtu:
         description:
             - The connection MTU, e.g. 9000. This can't be applied when creating the interface and is done once the interface has been created.
@@ -740,6 +756,62 @@ options:
                     - The username used to authenticate with the network, if required.
                     - Many providers do not require a username, or accept any username.
                     - But if a username is required, it is specified here.
+    wireguard:
+        description:
+            - The configuration of the Wireguard connection.
+            - Note the list of suboption attributes may vary depending on which version of NetworkManager/nmcli is installed on the host.
+            - 'An up-to-date list of supported attributes can be found here:
+              U(https://networkmanager.dev/docs/api/latest/settings-wireguard.html).'
+            - 'For instance to configure a listen port:
+              C({listen-port: 12345}).'
+        type: dict
+        version_added: 4.3.0
+        suboptions:
+            fwmark:
+                description:
+                    - The 32-bit fwmark for outgoing packets.
+                    - The use of fwmark is optional and is by default off. Setting it to 0 disables it.
+                    - Note that I(wireguard.ip4-auto-default-route) or I(wireguard.ip6-auto-default-route) enabled, implies to automatically choose a fwmark.
+                type: int
+            ip4-auto-default-route:
+                description:
+                    - Whether to enable special handling of the IPv4 default route.
+                    - If enabled, the IPv4 default route from I(wireguard.peer-routes) will be placed to a dedicated routing-table and two policy
+                        routing rules will be added.
+                    - The fwmark number is also used as routing-table for the default-route, and if fwmark is zero, an unused fwmark/table is chosen
+                        automatically. This corresponds to what wg-quick does with Table=auto and what WireGuard calls "Improved Rule-based Routing"
+                type: bool
+            ip6-auto-default-route:
+                description:
+                    - Like I(wireguard.ip4-auto-default-route), but for the IPv6 default route.
+                type: bool
+            listen-port:
+                description: The WireGuard connection listen-port. If not specified, the port will be chosen randomly when the
+                    interface comes up.
+                type: int
+            mtu:
+                description:
+                    - If non-zero, only transmit packets of the specified size or smaller, breaking larger packets up into multiple fragments.
+                    - If zero a default MTU is used. Note that contrary to wg-quick's MTU setting, this does not take into account the current routes
+                        at the time of activation.
+                type: int
+            peer-routes:
+                description:
+                    - Whether to automatically add routes for the AllowedIPs ranges of the peers.
+                    - If C(true) (the default), NetworkManager will automatically add routes in the routing tables according to C(ipv4.route-table) and
+                        C(ipv6.route-table). Usually you want this automatism enabled.
+                    - If C(false), no such routes are added automatically. In this case, the user may want to configure static routes in C(ipv4.routes)
+                        and C(ipv6.routes), respectively.
+                    - Note that if the peer's AllowedIPs is C(0.0.0.0/0) or C(::/0) and the profile's C(ipv4.never-default) or C(ipv6.never-default)
+                        setting is enabled, the peer route for this peer won't be added automatically.
+                type: bool
+            private-key:
+                description: The 256 bit private-key in base64 encoding.
+                type: str
+            private-key-flags:
+                description: C(NMSettingSecretFlags) indicating how to handle the I(wireguard.private-key) property.
+                type: int
+                choices: [ 0, 1, 2 ]
 '''
 
 EXAMPLES = r'''
@@ -822,7 +894,9 @@ EXAMPLES = r'''
 # nmcli_ethernet:
 #   - conn_name: em1
 #     ifname: em1
-#     ip4: '{{ tenant_ip }}'
+#     ip4:
+#       - '{{ tenant_ip }}'
+#       - '{{ second_tenant_ip }}'
 #     gw4: '{{ tenant_gw }}'
 #   - conn_name: em2
 #     ifname: em2
@@ -844,6 +918,7 @@ EXAMPLES = r'''
 # storage_ip: "192.0.2.91/23"
 # external_ip: "198.51.100.23/21"
 # tenant_ip: "203.0.113.77/23"
+# second_tenant_ip: "204.0.113.77/23"
 # ```
 
 
@@ -997,6 +1072,26 @@ EXAMPLES = r'''
       type: ethernet
       state: present
 
+  - name: Add second ip4 address
+    community.general.nmcli:
+      conn_name: my-eth1
+      ifname: eth1
+      type: ethernet
+      ip4:
+        - 192.0.2.100/24
+        - 192.0.3.100/24
+      state: present
+
+  - name: Add second ip6 address
+    community.general.nmcli:
+      conn_name: my-eth1
+      ifname: eth1
+      type: ethernet
+      ip6:
+        - 2001:db8::cafe
+        - 2002:db8::cafe
+      state: present
+
   - name: Add VxLan
     community.general.nmcli:
       type: vxlan
@@ -1089,6 +1184,17 @@ EXAMPLES = r'''
     autoconnect: true
     state: present
 
+- name: Create a wireguard connection
+  community.general.nmcli:
+    type: wireguard
+    conn_name: my-wg-provider
+    ifname: mywg0
+    wireguard:
+        listen-port: 51820
+        private-key: my-private-key
+    autoconnect: true
+    state: present
+
 '''
 
 RETURN = r"""#
@@ -1157,6 +1263,8 @@ class Nmcli(object):
         self.dns6_search = module.params['dns6_search']
         self.dns6_ignore_auto = module.params['dns6_ignore_auto']
         self.method6 = module.params['method6']
+        self.ip_privacy6 = module.params['ip_privacy6']
+        self.addr_gen_mode6 = module.params['addr_gen_mode6']
         self.mtu = module.params['mtu']
         self.stp = module.params['stp']
         self.priority = module.params['priority']
@@ -1197,10 +1305,11 @@ class Nmcli(object):
         self.wifi = module.params['wifi']
         self.wifi_sec = module.params['wifi_sec']
         self.gsm = module.params['gsm']
+        self.wireguard = module.params['wireguard']
 
         if self.method4:
             self.ipv4_method = self.method4
-        elif self.type == 'dummy' and not self.ip4:
+        elif self.type in ('dummy', 'wireguard') and not self.ip4:
             self.ipv4_method = 'disabled'
         elif self.ip4:
             self.ipv4_method = 'manual'
@@ -1209,7 +1318,7 @@ class Nmcli(object):
 
         if self.method6:
             self.ipv6_method = self.method6
-        elif self.type == 'dummy' and not self.ip6:
+        elif self.type in ('dummy', 'wireguard') and not self.ip6:
             self.ipv6_method = 'disabled'
         elif self.ip6:
             self.ipv6_method = 'manual'
@@ -1241,7 +1350,7 @@ class Nmcli(object):
         # IP address options.
         if self.ip_conn_type and not self.master:
             options.update({
-                'ipv4.addresses': self.ip4,
+                'ipv4.addresses': self.enforce_ipv4_cidr_notation(self.ip4),
                 'ipv4.dhcp-client-id': self.dhcp_client_id,
                 'ipv4.dns': self.dns4,
                 'ipv4.dns-search': self.dns4_search,
@@ -1254,13 +1363,15 @@ class Nmcli(object):
                 'ipv4.never-default': self.never_default4,
                 'ipv4.method': self.ipv4_method,
                 'ipv4.may-fail': self.may_fail4,
-                'ipv6.addresses': self.ip6,
+                'ipv6.addresses': self.enforce_ipv6_cidr_notation(self.ip6),
                 'ipv6.dns': self.dns6,
                 'ipv6.dns-search': self.dns6_search,
                 'ipv6.ignore-auto-dns': self.dns6_ignore_auto,
                 'ipv6.gateway': self.gw6,
                 'ipv6.ignore-auto-routes': self.gw6_ignore_auto,
                 'ipv6.method': self.ipv6_method,
+                'ipv6.ip6-privacy': self.ip_privacy6,
+                'ipv6.addr-gen-mode': self.addr_gen_mode6
             })
 
         # Layer 2 options.
@@ -1332,6 +1443,9 @@ class Nmcli(object):
             options.update({
                 'vlan.id': self.vlanid,
                 'vlan.parent': self.vlandev,
+                'vlan.flags': self.flags,
+                'vlan.ingress': self.ingress,
+                'vlan.egress': self.egress,
             })
         elif self.type == 'vxlan':
             options.update({
@@ -1360,6 +1474,12 @@ class Nmcli(object):
                     options.update({
                         'gsm.%s' % name: value,
                     })
+        elif self.type == 'wireguard':
+            if self.wireguard:
+                for name, value in self.wireguard.items():
+                    options.update({
+                        'wireguard.%s' % name: value,
+                    })
         # Convert settings values based on the situation.
         for setting, value in options.items():
             setting_type = self.settings_type(setting)
@@ -1374,6 +1494,8 @@ class Nmcli(object):
                 elif setting == self.mtu_setting:
                     # MTU is 'auto' by default when detecting changes.
                     convert_func = self.mtu_to_string
+                elif setting == 'ipv6.ip6-privacy':
+                    convert_func = self.ip6_privacy_to_num
             elif setting_type is list:
                 # Convert lists to strings for nmcli create/modify commands.
                 convert_func = self.list_to_string
@@ -1399,6 +1521,7 @@ class Nmcli(object):
             'vlan',
             'wifi',
             'gsm',
+            'wireguard',
         )
 
     @property
@@ -1427,6 +1550,23 @@ class Nmcli(object):
         else:
             return to_text(mtu)
 
+    @staticmethod
+    def ip6_privacy_to_num(privacy):
+        ip6_privacy_values = {
+            'disabled': '0',
+            'prefer-public-addr': '1 (enabled, prefer public IP)',
+            'prefer-temp-addr': '2 (enabled, prefer temporary IP)',
+            'unknown': '-1',
+        }
+
+        if privacy is None:
+            return None
+
+        if privacy not in ip6_privacy_values:
+            raise AssertionError('{privacy} is invalid ip_privacy6 option'.format(privacy=privacy))
+
+        return ip6_privacy_values[privacy]
+
     @property
     def slave_conn_type(self):
         return self.type in (
@@ -1443,6 +1583,18 @@ class Nmcli(object):
             'ipip',
             'sit',
         )
+
+    @staticmethod
+    def enforce_ipv4_cidr_notation(ip4_addresses):
+        if ip4_addresses is None:
+            return None
+        return [address if '/' in address else address + '/32' for address in ip4_addresses]
+
+    @staticmethod
+    def enforce_ipv6_cidr_notation(ip6_addresses):
+        if ip6_addresses is None:
+            return None
+        return [address if '/' in address else address + '/128' for address in ip6_addresses]
 
     @staticmethod
     def bool_to_string(boolean):
@@ -1468,11 +1620,12 @@ class Nmcli(object):
                        'ipv6.ignore-auto-routes',
                        '802-11-wireless.hidden'):
             return bool
-        elif setting in ('ipv4.dns',
+        elif setting in ('ipv4.addresses',
+                         'ipv6.addresses',
+                         'ipv4.dns',
                          'ipv4.dns-search',
                          'ipv4.routes',
                          'ipv4.routing-rules',
-                         'ipv4.route-metric'
                          'ipv6.dns',
                          'ipv6.dns-search',
                          '802-11-wireless-security.group',
@@ -1696,6 +1849,8 @@ class Nmcli(object):
                     # Depending on version nmcli adds double-qoutes to gsm.apn
                     # Need to strip them in order to compare both
                     current_value = current_value.strip('"')
+                if key == self.mtu_setting and self.mtu is None:
+                    self.mtu = 0
             else:
                 # parameter does not exist
                 current_value = None
@@ -1704,6 +1859,8 @@ class Nmcli(object):
                 # compare values between two lists
                 if sorted(current_value) != sorted(value):
                     changed = True
+            elif all([key == self.mtu_setting, self.type == 'dummy', current_value is None, value == 'auto', self.mtu is None]):
+                value = None
             else:
                 if current_value != to_text(value):
                     changed = True
@@ -1754,8 +1911,9 @@ def main():
                           'vxlan',
                           'wifi',
                           'gsm',
+                          'wireguard',
                       ]),
-            ip4=dict(type='str'),
+            ip4=dict(type='list', elements='str'),
             gw4=dict(type='str'),
             gw4_ignore_auto=dict(type='bool', default=False),
             routes4=dict(type='list', elements='str'),
@@ -1768,13 +1926,15 @@ def main():
             method4=dict(type='str', choices=['auto', 'link-local', 'manual', 'shared', 'disabled']),
             may_fail4=dict(type='bool', default=True),
             dhcp_client_id=dict(type='str'),
-            ip6=dict(type='str'),
+            ip6=dict(type='list', elements='str'),
             gw6=dict(type='str'),
             gw6_ignore_auto=dict(type='bool', default=False),
             dns6=dict(type='list', elements='str'),
             dns6_search=dict(type='list', elements='str'),
             dns6_ignore_auto=dict(type='bool', default=False),
             method6=dict(type='str', choices=['ignore', 'auto', 'dhcp', 'link-local', 'manual', 'shared', 'disabled']),
+            ip_privacy6=dict(type='str', choices=['disabled', 'prefer-public-addr', 'prefer-temp-addr', 'unknown']),
+            addr_gen_mode6=dict(type='str', choices=['eui64', 'stable-privacy']),
             # Bond Specific vars
             mode=dict(type='str', default='balance-rr',
                       choices=['802.3ad', 'active-backup', 'balance-alb', 'balance-rr', 'balance-tlb', 'balance-xor', 'broadcast']),
@@ -1825,6 +1985,7 @@ def main():
             wifi=dict(type='dict'),
             wifi_sec=dict(type='dict', no_log=True),
             gsm=dict(type='dict'),
+            wireguard=dict(type='dict'),
         ),
         mutually_exclusive=[['never_default4', 'gw4']],
         required_if=[("type", "wifi", [("ssid")])],

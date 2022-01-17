@@ -38,6 +38,7 @@ from ansible.module_utils.six.moves.urllib.parse import urlencode, quote
 from ansible.module_utils.six.moves.urllib.error import HTTPError
 from ansible.module_utils.common.text.converters import to_native, to_text
 
+URL_REALM_INFO = "{url}/realms/{realm}"
 URL_REALMS = "{url}/admin/realms"
 URL_REALM = "{url}/admin/realms/{realm}"
 
@@ -229,6 +230,31 @@ class KeycloakAPI(object):
         self.baseurl = self.module.params.get('auth_keycloak_url')
         self.validate_certs = self.module.params.get('validate_certs')
         self.restheaders = connection_header
+
+    def get_realm_info_by_id(self, realm='master'):
+        """ Obtain realm public info by id
+
+        :param realm: realm id
+        :return: dict of real, representation or None if none matching exist
+        """
+        realm_info_url = URL_REALM_INFO.format(url=self.baseurl, realm=realm)
+
+        try:
+            return json.loads(to_native(open_url(realm_info_url, method='GET', headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+
+        except HTTPError as e:
+            if e.code == 404:
+                return None
+            else:
+                self.module.fail_json(msg='Could not obtain realm %s: %s' % (realm, str(e)),
+                                      exception=traceback.format_exc())
+        except ValueError as e:
+            self.module.fail_json(msg='API returned incorrect JSON when trying to obtain realm %s: %s' % (realm, str(e)),
+                                  exception=traceback.format_exc())
+        except Exception as e:
+            self.module.fail_json(msg='Could not obtain realm %s: %s' % (realm, str(e)),
+                                  exception=traceback.format_exc())
 
     def get_realm_by_id(self, realm='master'):
         """ Obtain realm representation by id
@@ -1031,7 +1057,7 @@ class KeycloakAPI(object):
         :param name: Name of the role to fetch.
         :param realm: Realm in which the role resides; default 'master'.
         """
-        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=name)
+        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(name))
         try:
             return json.loads(to_native(open_url(role_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -1065,7 +1091,7 @@ class KeycloakAPI(object):
         :param rolerep: A RoleRepresentation of the updated role.
         :return HTTPResponse object on success
         """
-        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=rolerep['name'])
+        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(rolerep['name']))
         try:
             return open_url(role_url, method='PUT', headers=self.restheaders,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
@@ -1079,7 +1105,7 @@ class KeycloakAPI(object):
         :param name: The name of the role.
         :param realm: The realm in which this role resides, default "master".
         """
-        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=name)
+        role_url = URL_REALM_ROLE.format(url=self.baseurl, realm=realm, name=quote(name))
         try:
             return open_url(role_url, method='DELETE', headers=self.restheaders,
                             validate_certs=self.validate_certs)
@@ -1122,7 +1148,7 @@ class KeycloakAPI(object):
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
-        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=name)
+        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(name))
         try:
             return json.loads(to_native(open_url(role_url, method="GET", headers=self.restheaders,
                                                  validate_certs=self.validate_certs).read()))
@@ -1168,7 +1194,7 @@ class KeycloakAPI(object):
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
-        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=rolerep['name'])
+        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(rolerep['name']))
         try:
             return open_url(role_url, method='PUT', headers=self.restheaders,
                             data=json.dumps(rolerep), validate_certs=self.validate_certs)
@@ -1187,7 +1213,7 @@ class KeycloakAPI(object):
         if cid is None:
             self.module.fail_json(msg='Could not find client %s in realm %s'
                                       % (clientid, realm))
-        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=name)
+        role_url = URL_CLIENT_ROLE.format(url=self.baseurl, realm=realm, id=cid, name=quote(name))
         try:
             return open_url(role_url, method='DELETE', headers=self.restheaders,
                             validate_certs=self.validate_certs)

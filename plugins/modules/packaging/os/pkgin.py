@@ -281,9 +281,9 @@ def install_packages(module, packages):
         install_c += 1
 
     if install_c > 0:
-        module.exit_json(changed=True, msg=format_action_message(module, "installed", install_c))
+        module.exit_json(changed=True, msg=format_action_message(module, "installed", install_c), stdout=out, stderr=err)
 
-    module.exit_json(changed=False, msg="package(s) already present", stdout=out, stderr=err)
+    module.exit_json(changed=False, msg="package(s) already present")
 
 
 def update_package_db(module):

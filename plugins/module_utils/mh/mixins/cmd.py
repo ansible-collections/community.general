@@ -141,11 +141,7 @@ class CmdMixin(object):
                     fmt = find_format(param)
                     value = extra_params[param]
                 else:
-                    self.module.deprecate("Cannot determine value for parameter: {0}. "
-                                          "From version 4.0.0 onwards this will generate an exception".format(param),
-                                          version="4.0.0", collection_name="community.general")
-                    continue
-
+                    raise self.ModuleHelperException('Cannot determine value for parameter: {0}'.format(param))
             else:
                 raise self.ModuleHelperException("run_command parameter must be either a str or a dict: {0}".format(param))
             cmd_args = add_arg_formatted_param(cmd_args, fmt, value)
@@ -162,8 +158,9 @@ class CmdMixin(object):
                     publish_rc=True,
                     publish_out=True,
                     publish_err=True,
+                    publish_cmd=True,
                     *args, **kwargs):
-        self.vars.cmd_args = self._calculate_args(extra_params, params)
+        cmd_args = self._calculate_args(extra_params, params)
         options = dict(self.run_command_fixed_options)
         options['check_rc'] = options.get('check_rc', self.check_rc)
         options.update(kwargs)
@@ -175,13 +172,15 @@ class CmdMixin(object):
             })
             self.update_output(force_lang=self.force_lang)
             options['environ_update'] = env_update
-        rc, out, err = self.module.run_command(self.vars.cmd_args, *args, **options)
+        rc, out, err = self.module.run_command(cmd_args, *args, **options)
         if publish_rc:
             self.update_output(rc=rc)
         if publish_out:
             self.update_output(stdout=out)
         if publish_err:
             self.update_output(stderr=err)
+        if publish_cmd:
+            self.update_output(cmd_args=cmd_args)
         if process_output is None:
             _process = self.process_command_output
         else:

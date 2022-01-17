@@ -30,13 +30,10 @@ requirements:
   - python-gitlab python module
   - administrator rights on the GitLab server
 extends_documentation_fragment:
-- community.general.auth_basic
+  - community.general.auth_basic
+  - community.general.gitlab
 
 options:
-  api_token:
-    description:
-      - GitLab token for logging in.
-    type: str
   name:
     description:
       - Name of the user you want to create.
@@ -238,33 +235,34 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import findGroup, gitlabAuthentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, find_group, gitlab_authentication
 
 
 class GitLabUser(object):
     def __init__(self, module, gitlab_instance):
         self._module = module
         self._gitlab = gitlab_instance
-        self.userObject = None
+        self.user_object = None
         self.ACCESS_LEVEL = {
             'guest': gitlab.GUEST_ACCESS,
             'reporter': gitlab.REPORTER_ACCESS,
             'developer': gitlab.DEVELOPER_ACCESS,
             'master': gitlab.MAINTAINER_ACCESS,
             'maintainer': gitlab.MAINTAINER_ACCESS,
-            'owner': gitlab.OWNER_ACCESS}
+            'owner': gitlab.OWNER_ACCESS,
+        }
 
     '''
     @param username Username of the user
     @param options User options
     '''
-    def createOrUpdateUser(self, username, options):
+    def create_or_update_user(self, username, options):
         changed = False
         potentionally_changed = False
 
         # Because we have already call userExists in main()
-        if self.userObject is None:
-            user = self.createUser({
+        if self.user_object is None:
+            user = self.create_user({
                 'name': options['name'],
                 'username': username,
                 'password': options['password'],
@@ -277,8 +275,8 @@ class GitLabUser(object):
             })
             changed = True
         else:
-            changed, user = self.updateUser(
-                self.userObject, {
+            changed, user = self.update_user(
+                self.user_object, {
                     # add "normal" parameters here, put uncheckable
                     # params in the dict below
                     'name': {'value': options['name']},
@@ -313,7 +311,7 @@ class GitLabUser(object):
 
         # Assign ssh keys
         if options['sshkey_name'] and options['sshkey_file']:
-            key_changed = self.addSshKeyToUser(user, {
+            key_changed = self.add_ssh_key_to_user(user, {
                 'name': options['sshkey_name'],
                 'file': options['sshkey_file'],
                 'expires_at': options['sshkey_expires_at']})
@@ -321,10 +319,10 @@ class GitLabUser(object):
 
         # Assign group
         if options['group_path']:
-            group_changed = self.assignUserToGroup(user, options['group_path'], options['access_level'])
+            group_changed = self.assign_user_to_group(user, options['group_path'], options['access_level'])
             changed = changed or group_changed
 
-        self.userObject = user
+        self.user_object = user
         if (changed or potentionally_changed) and not self._module.check_mode:
             try:
                 user.save()
@@ -341,7 +339,7 @@ class GitLabUser(object):
     '''
     @param group User object
     '''
-    def getUserId(self, user):
+    def get_user_id(self, user):
         if user is not None:
             return user.id
         return None
@@ -350,7 +348,7 @@ class GitLabUser(object):
     @param user User object
     @param sshkey_name Name of the ssh key
     '''
-    def sshKeyExists(self, user, sshkey_name):
+    def ssh_key_exists(self, user, sshkey_name):
         keyList = map(lambda k: k.title, user.keys.list())
 
         return sshkey_name in keyList
@@ -359,8 +357,8 @@ class GitLabUser(object):
     @param user User object
     @param sshkey Dict containing sshkey infos {"name": "", "file": "", "expires_at": ""}
     '''
-    def addSshKeyToUser(self, user, sshkey):
-        if not self.sshKeyExists(user, sshkey['name']):
+    def add_ssh_key_to_user(self, user, sshkey):
+        if not self.ssh_key_exists(user, sshkey['name']):
             if self._module.check_mode:
                 return True
 
@@ -381,7 +379,7 @@ class GitLabUser(object):
     @param group Group object
     @param user_id Id of the user to find
     '''
-    def findMember(self, group, user_id):
+    def find_member(self, group, user_id):
         try:
             member = group.members.get(user_id)
         except gitlab.exceptions.GitlabGetError:
@@ -392,8 +390,8 @@ class GitLabUser(object):
     @param group Group object
     @param user_id Id of the user to check
     '''
-    def memberExists(self, group, user_id):
-        member = self.findMember(group, user_id)
+    def member_exists(self, group, user_id):
+        member = self.find_member(group, user_id)
 
         return member is not None
 
@@ -402,8 +400,8 @@ class GitLabUser(object):
     @param user_id Id of the user to check
     @param access_level GitLab access_level to check
     '''
-    def memberAsGoodAccessLevel(self, group, user_id, access_level):
-        member = self.findMember(group, user_id)
+    def member_as_good_access_level(self, group, user_id, access_level):
+        member = self.find_member(group, user_id)
 
         return member.access_level == access_level
 
@@ -412,8 +410,8 @@ class GitLabUser(object):
     @param group_path Complete path of the Group including parent group path. <parent_path>/<group_path>
     @param access_level GitLab access_level to assign
     '''
-    def assignUserToGroup(self, user, group_identifier, access_level):
-        group = findGroup(self._gitlab, group_identifier)
+    def assign_user_to_group(self, user, group_identifier, access_level):
+        group = find_group(self._gitlab, group_identifier)
 
         if self._module.check_mode:
             return True
@@ -421,16 +419,16 @@ class GitLabUser(object):
         if group is None:
             return False
 
-        if self.memberExists(group, self.getUserId(user)):
-            member = self.findMember(group, self.getUserId(user))
-            if not self.memberAsGoodAccessLevel(group, member.id, self.ACCESS_LEVEL[access_level]):
+        if self.member_exists(group, self.get_user_id(user)):
+            member = self.find_member(group, self.get_user_id(user))
+            if not self.member_as_good_access_level(group, member.id, self.ACCESS_LEVEL[access_level]):
                 member.access_level = self.ACCESS_LEVEL[access_level]
                 member.save()
                 return True
         else:
             try:
                 group.members.create({
-                    'user_id': self.getUserId(user),
+                    'user_id': self.get_user_id(user),
                     'access_level': self.ACCESS_LEVEL[access_level]})
             except gitlab.exceptions.GitlabCreateError as e:
                 self._module.fail_json(msg="Failed to assign user to group: %s" % to_native(e))
@@ -441,7 +439,7 @@ class GitLabUser(object):
     @param user User object
     @param arguments User attributes
     '''
-    def updateUser(self, user, arguments, uncheckable_args):
+    def update_user(self, user, arguments, uncheckable_args):
         changed = False
 
         for arg_key, arg_value in arguments.items():
@@ -449,7 +447,7 @@ class GitLabUser(object):
 
             if av is not None:
                 if arg_key == "identities":
-                    changed = self.addIdentities(user, av, uncheckable_args['overwrite_identities']['value'])
+                    changed = self.add_identities(user, av, uncheckable_args['overwrite_identities']['value'])
 
                 elif getattr(user, arg_key) != av:
                     setattr(user, arg_value.get('setter', arg_key), av)
@@ -466,7 +464,7 @@ class GitLabUser(object):
     '''
     @param arguments User attributes
     '''
-    def createUser(self, arguments):
+    def create_user(self, arguments):
         if self._module.check_mode:
             return True
 
@@ -478,7 +476,7 @@ class GitLabUser(object):
         try:
             user = self._gitlab.users.create(arguments)
             if identities:
-                self.addIdentities(user, identities)
+                self.add_identities(user, identities)
 
         except (gitlab.exceptions.GitlabCreateError) as e:
             self._module.fail_json(msg="Failed to create user: %s " % to_native(e))
@@ -490,10 +488,10 @@ class GitLabUser(object):
     @param identites List of identities to be added/updated
     @param overwrite_identities Overwrite user identities with identities passed to this module
     '''
-    def addIdentities(self, user, identities, overwrite_identities=False):
+    def add_identities(self, user, identities, overwrite_identities=False):
         changed = False
         if overwrite_identities:
-            changed = self.deleteIdentities(user, identities)
+            changed = self.delete_identities(user, identities)
 
         for identity in identities:
             if identity not in user.identities:
@@ -508,7 +506,7 @@ class GitLabUser(object):
     @param user User object
     @param identites List of identities to be added/updated
     '''
-    def deleteIdentities(self, user, identities):
+    def delete_identities(self, user, identities):
         changed = False
         for identity in user.identities:
             if identity not in identities:
@@ -520,7 +518,7 @@ class GitLabUser(object):
     '''
     @param username Username of the user
     '''
-    def findUser(self, username):
+    def find_user(self, username):
         users = self._gitlab.users.list(search=username)
         for user in users:
             if (user.username == username):
@@ -529,42 +527,42 @@ class GitLabUser(object):
     '''
     @param username Username of the user
     '''
-    def existsUser(self, username):
-        # When user exists, object will be stored in self.userObject.
-        user = self.findUser(username)
+    def exists_user(self, username):
+        # When user exists, object will be stored in self.user_object.
+        user = self.find_user(username)
         if user:
-            self.userObject = user
+            self.user_object = user
             return True
         return False
 
     '''
     @param username Username of the user
     '''
-    def isActive(self, username):
-        user = self.findUser(username)
+    def is_active(self, username):
+        user = self.find_user(username)
         return user.attributes['state'] == 'active'
 
-    def deleteUser(self):
+    def delete_user(self):
         if self._module.check_mode:
             return True
 
-        user = self.userObject
+        user = self.user_object
 
         return user.delete()
 
-    def blockUser(self):
+    def block_user(self):
         if self._module.check_mode:
             return True
 
-        user = self.userObject
+        user = self.user_object
 
         return user.block()
 
-    def unblockUser(self):
+    def unblock_user(self):
         if self._module.check_mode:
             return True
 
-        user = self.userObject
+        user = self.user_object
 
         return user.unblock()
 
@@ -578,8 +576,8 @@ def sanitize_arguments(arguments):
 
 def main():
     argument_spec = basic_auth_argument_spec()
+    argument_spec.update(auth_argument_spec())
     argument_spec.update(dict(
-        api_token=dict(type='str', no_log=True),
         name=dict(type='str'),
         state=dict(type='str', default="present", choices=["absent", "present", "blocked", "unblocked"]),
         username=dict(type='str', required=True),
@@ -602,13 +600,16 @@ def main():
         argument_spec=argument_spec,
         mutually_exclusive=[
             ['api_username', 'api_token'],
-            ['api_password', 'api_token'],
+            ['api_username', 'api_oauth_token'],
+            ['api_username', 'api_job_token'],
+            ['api_token', 'api_oauth_token'],
+            ['api_token', 'api_job_token'],
         ],
         required_together=[
             ['api_username', 'api_password'],
         ],
         required_one_of=[
-            ['api_username', 'api_token']
+            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
         ],
         supports_check_mode=True,
         required_if=(
@@ -636,55 +637,56 @@ def main():
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
-    gitlab_instance = gitlabAuthentication(module)
+    gitlab_instance = gitlab_authentication(module)
 
     gitlab_user = GitLabUser(module, gitlab_instance)
-    user_exists = gitlab_user.existsUser(user_username)
+    user_exists = gitlab_user.exists_user(user_username)
     if user_exists:
-        user_is_active = gitlab_user.isActive(user_username)
+        user_is_active = gitlab_user.is_active(user_username)
     else:
         user_is_active = False
 
     if state == 'absent':
         if user_exists:
-            gitlab_user.deleteUser()
+            gitlab_user.delete_user()
             module.exit_json(changed=True, msg="Successfully deleted user %s" % user_username)
         else:
             module.exit_json(changed=False, msg="User deleted or does not exists")
 
     if state == 'blocked':
         if user_exists and user_is_active:
-            gitlab_user.blockUser()
+            gitlab_user.block_user()
             module.exit_json(changed=True, msg="Successfully blocked user %s" % user_username)
         else:
             module.exit_json(changed=False, msg="User already blocked or does not exists")
 
     if state == 'unblocked':
         if user_exists and not user_is_active:
-            gitlab_user.unblockUser()
+            gitlab_user.unblock_user()
             module.exit_json(changed=True, msg="Successfully unblocked user %s" % user_username)
         else:
             module.exit_json(changed=False, msg="User is not blocked or does not exists")
 
     if state == 'present':
-        if gitlab_user.createOrUpdateUser(user_username, {
-                                          "name": user_name,
-                                          "password": user_password,
-                                          "reset_password": user_reset_password,
-                                          "email": user_email,
-                                          "sshkey_name": user_sshkey_name,
-                                          "sshkey_file": user_sshkey_file,
-                                          "sshkey_expires_at": user_sshkey_expires_at,
-                                          "group_path": group_path,
-                                          "access_level": access_level,
-                                          "confirm": confirm,
-                                          "isadmin": user_isadmin,
-                                          "external": user_external,
-                                          "identities": user_identities,
-                                          "overwrite_identities": overwrite_identities}):
-            module.exit_json(changed=True, msg="Successfully created or updated the user %s" % user_username, user=gitlab_user.userObject._attrs)
+        if gitlab_user.create_or_update_user(user_username, {
+            "name": user_name,
+            "password": user_password,
+            "reset_password": user_reset_password,
+            "email": user_email,
+            "sshkey_name": user_sshkey_name,
+            "sshkey_file": user_sshkey_file,
+            "sshkey_expires_at": user_sshkey_expires_at,
+            "group_path": group_path,
+            "access_level": access_level,
+            "confirm": confirm,
+            "isadmin": user_isadmin,
+            "external": user_external,
+            "identities": user_identities,
+            "overwrite_identities": overwrite_identities,
+        }):
+            module.exit_json(changed=True, msg="Successfully created or updated the user %s" % user_username, user=gitlab_user.user_object._attrs)
         else:
-            module.exit_json(changed=False, msg="No need to update the user %s" % user_username, user=gitlab_user.userObject._attrs)
+            module.exit_json(changed=False, msg="No need to update the user %s" % user_username, user=gitlab_user.user_object._attrs)
 
 
 if __name__ == '__main__':

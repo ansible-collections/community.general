@@ -23,13 +23,10 @@ requirements:
   - python >= 2.7
   - python-gitlab python module
 extends_documentation_fragment:
-- community.general.auth_basic
+  - community.general.auth_basic
+  - community.general.gitlab
 
 options:
-  api_token:
-    description:
-      - GitLab token for logging in.
-    type: str
   group:
     description:
       - Id or the full path of the group of which this projects belongs to.
@@ -48,6 +45,13 @@ options:
     description:
       - An description for the project.
     type: str
+  initialize_with_readme:
+    description:
+      - Will initialize the project with a default C(README.md).
+      - Is only used when the project is created, and ignored otherwise.
+    type: bool
+    default: false
+    version_added: "4.0.0"
   issues_enabled:
     description:
       - Whether you want to create issues or not.
@@ -155,6 +159,18 @@ options:
       - Enable shared runners for this project.
     type: bool
     version_added: "3.7.0"
+  avatar_path:
+    description:
+      - Absolute path image to configure avatar. File size should not exceed 200 kb.
+      - This option is only used on creation, not for updates.
+    type: path
+    version_added: "4.2.0"
+  default_branch:
+    description:
+      - Default branch name for a new project.
+      - This option is only used on creation, not for updates. This is also only used if I(initialize_with_readme=true).
+    type: str
+    version_added: "4.2.0"
 '''
 
 EXAMPLES = r'''
@@ -187,8 +203,22 @@ EXAMPLES = r'''
     wiki_enabled: True
     snippets_enabled: True
     import_url: http://git.example.com/example/lab.git
+    initialize_with_readme: true
     state: present
   delegate_to: localhost
+
+- name: get the initial root password
+  ansible.builtin.shell: |
+    grep 'Password:' /etc/gitlab/initial_root_password | sed -e 's/Password\: \(.*\)/\1/'
+  register: initial_root_password
+
+- name: Create a GitLab Project using a username/password via oauth_token
+  community.general.gitlab_project:
+    api_url: https://gitlab.example.com/
+    api_username: root
+    api_password: "{{ initial_root_password }}"
+    name: my_second_project
+    group: "10481470"
 '''
 
 RETURN = r'''
@@ -229,21 +259,21 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import findGroup, findProject, gitlabAuthentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, find_group, find_project, gitlab_authentication
 
 
 class GitLabProject(object):
     def __init__(self, module, gitlab_instance):
         self._module = module
         self._gitlab = gitlab_instance
-        self.projectObject = None
+        self.project_object = None
 
     '''
     @param project_name Name of the project
     @param namespace Namespace Object (User or Group)
     @param options Options of the project
     '''
-    def createOrUpdateProject(self, project_name, namespace, options):
+    def create_or_update_project(self, project_name, namespace, options):
         changed = False
         project_options = {
             'name': project_name,
@@ -265,18 +295,31 @@ class GitLabProject(object):
             'shared_runners_enabled': options['shared_runners_enabled'],
         }
         # Because we have already call userExists in main()
-        if self.projectObject is None:
+        if self.project_object is None:
             project_options.update({
                 'path': options['path'],
                 'import_url': options['import_url'],
             })
-            project_options = self.getOptionsWithValue(project_options)
-            project = self.createProject(namespace, project_options)
+            if options['initialize_with_readme']:
+                project_options['initialize_with_readme'] = options['initialize_with_readme']
+                if options['default_branch']:
+                    project_options['default_branch'] = options['default_branch']
+
+            project_options = self.get_options_with_value(project_options)
+            project = self.create_project(namespace, project_options)
+
+            # add avatar to project
+            if options['avatar_path']:
+                try:
+                    project.avatar = open(options['avatar_path'], 'rb')
+                except IOError as e:
+                    self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
+
             changed = True
         else:
-            changed, project = self.updateProject(self.projectObject, project_options)
+            changed, project = self.update_project(self.project_object, project_options)
 
-        self.projectObject = project
+        self.project_object = project
         if changed:
             if self._module.check_mode:
                 self._module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name)
@@ -292,7 +335,7 @@ class GitLabProject(object):
     @param namespace Namespace Object (User or Group)
     @param arguments Attributes of the project
     '''
-    def createProject(self, namespace, arguments):
+    def create_project(self, namespace, arguments):
         if self._module.check_mode:
             return True
 
@@ -307,7 +350,7 @@ class GitLabProject(object):
     '''
     @param arguments Attributes of the project
     '''
-    def getOptionsWithValue(self, arguments):
+    def get_options_with_value(self, arguments):
         ret_arguments = dict()
         for arg_key, arg_value in arguments.items():
             if arguments[arg_key] is not None:
@@ -319,7 +362,7 @@ class GitLabProject(object):
     @param project Project Object
     @param arguments Attributes of the project
     '''
-    def updateProject(self, project, arguments):
+    def update_project(self, project, arguments):
         changed = False
 
         for arg_key, arg_value in arguments.items():
@@ -330,11 +373,11 @@ class GitLabProject(object):
 
         return (changed, project)
 
-    def deleteProject(self):
+    def delete_project(self):
         if self._module.check_mode:
             return True
 
-        project = self.projectObject
+        project = self.project_object
 
         return project.delete()
 
@@ -342,23 +385,25 @@ class GitLabProject(object):
     @param namespace User/Group object
     @param name Name of the project
     '''
-    def existsProject(self, namespace, path):
-        # When project exists, object will be stored in self.projectObject.
-        project = findProject(self._gitlab, namespace.full_path + '/' + path)
+    def exists_project(self, namespace, path):
+        # When project exists, object will be stored in self.project_object.
+        project = find_project(self._gitlab, namespace.full_path + '/' + path)
         if project:
-            self.projectObject = project
+            self.project_object = project
             return True
         return False
 
 
 def main():
     argument_spec = basic_auth_argument_spec()
+    argument_spec.update(auth_argument_spec())
     argument_spec.update(dict(
-        api_token=dict(type='str', no_log=True),
         group=dict(type='str'),
         name=dict(type='str', required=True),
         path=dict(type='str'),
         description=dict(type='str'),
+        initialize_with_readme=dict(type='bool', default=False),
+        default_branch=dict(type='str'),
         issues_enabled=dict(type='bool', default=True),
         merge_requests_enabled=dict(type='bool', default=True),
         merge_method=dict(type='str', default='merge', choices=["merge", "rebase_merge", "ff"]),
@@ -377,20 +422,24 @@ def main():
         squash_option=dict(type='str', choices=['never', 'always', 'default_off', 'default_on']),
         ci_config_path=dict(type='str'),
         shared_runners_enabled=dict(type='bool'),
+        avatar_path=dict(type='path'),
     ))
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         mutually_exclusive=[
             ['api_username', 'api_token'],
-            ['api_password', 'api_token'],
+            ['api_username', 'api_oauth_token'],
+            ['api_username', 'api_job_token'],
+            ['api_token', 'api_oauth_token'],
+            ['api_token', 'api_job_token'],
             ['group', 'username'],
         ],
         required_together=[
             ['api_username', 'api_password'],
         ],
         required_one_of=[
-            ['api_username', 'api_token']
+            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
         ],
         supports_check_mode=True,
     )
@@ -399,6 +448,7 @@ def main():
     project_name = module.params['name']
     project_path = module.params['path']
     project_description = module.params['description']
+    initialize_with_readme = module.params['initialize_with_readme']
     issues_enabled = module.params['issues_enabled']
     merge_requests_enabled = module.params['merge_requests_enabled']
     merge_method = module.params['merge_method']
@@ -417,11 +467,16 @@ def main():
     squash_option = module.params['squash_option']
     ci_config_path = module.params['ci_config_path']
     shared_runners_enabled = module.params['shared_runners_enabled']
+    avatar_path = module.params['avatar_path']
+    default_branch = module.params['default_branch']
+
+    if default_branch and not initialize_with_readme:
+        module.fail_json(msg="Param default_branch need param initialize_with_readme set to true")
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
-    gitlab_instance = gitlabAuthentication(module)
+    gitlab_instance = gitlab_authentication(module)
 
     # Set project_path to project_name if it is empty.
     if project_path is None:
@@ -432,7 +487,7 @@ def main():
     namespace = None
     namespace_id = None
     if group_identifier:
-        group = findGroup(gitlab_instance, group_identifier)
+        group = find_group(gitlab_instance, group_identifier)
         if group is None:
             module.fail_json(msg="Failed to create project: group %s doesn't exists" % group_identifier)
 
@@ -454,39 +509,42 @@ def main():
 
     if not namespace:
         module.fail_json(msg="Failed to find the namespace for the project")
-    project_exists = gitlab_project.existsProject(namespace, project_path)
+    project_exists = gitlab_project.exists_project(namespace, project_path)
 
     if state == 'absent':
         if project_exists:
-            gitlab_project.deleteProject()
+            gitlab_project.delete_project()
             module.exit_json(changed=True, msg="Successfully deleted project %s" % project_name)
         module.exit_json(changed=False, msg="Project deleted or does not exists")
 
     if state == 'present':
 
-        if gitlab_project.createOrUpdateProject(project_name, namespace, {
-                                                "path": project_path,
-                                                "description": project_description,
-                                                "issues_enabled": issues_enabled,
-                                                "merge_requests_enabled": merge_requests_enabled,
-                                                "merge_method": merge_method,
-                                                "wiki_enabled": wiki_enabled,
-                                                "snippets_enabled": snippets_enabled,
-                                                "visibility": visibility,
-                                                "import_url": import_url,
-                                                "lfs_enabled": lfs_enabled,
-                                                "allow_merge_on_skipped_pipeline": allow_merge_on_skipped_pipeline,
-                                                "only_allow_merge_if_all_discussions_are_resolved": only_allow_merge_if_all_discussions_are_resolved,
-                                                "only_allow_merge_if_pipeline_succeeds": only_allow_merge_if_pipeline_succeeds,
-                                                "packages_enabled": packages_enabled,
-                                                "remove_source_branch_after_merge": remove_source_branch_after_merge,
-                                                "squash_option": squash_option,
-                                                "ci_config_path": ci_config_path,
-                                                "shared_runners_enabled": shared_runners_enabled,
-                                                }):
+        if gitlab_project.create_or_update_project(project_name, namespace, {
+            "path": project_path,
+            "description": project_description,
+            "initialize_with_readme": initialize_with_readme,
+            "default_branch": default_branch,
+            "issues_enabled": issues_enabled,
+            "merge_requests_enabled": merge_requests_enabled,
+            "merge_method": merge_method,
+            "wiki_enabled": wiki_enabled,
+            "snippets_enabled": snippets_enabled,
+            "visibility": visibility,
+            "import_url": import_url,
+            "lfs_enabled": lfs_enabled,
+            "allow_merge_on_skipped_pipeline": allow_merge_on_skipped_pipeline,
+            "only_allow_merge_if_all_discussions_are_resolved": only_allow_merge_if_all_discussions_are_resolved,
+            "only_allow_merge_if_pipeline_succeeds": only_allow_merge_if_pipeline_succeeds,
+            "packages_enabled": packages_enabled,
+            "remove_source_branch_after_merge": remove_source_branch_after_merge,
+            "squash_option": squash_option,
+            "ci_config_path": ci_config_path,
+            "shared_runners_enabled": shared_runners_enabled,
+            "avatar_path": avatar_path,
+        }):
 
-            module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.projectObject._attrs)
-        module.exit_json(changed=False, msg="No need to update the project %s" % project_name, project=gitlab_project.projectObject._attrs)
+            module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.project_object._attrs)
+        module.exit_json(changed=False, msg="No need to update the project %s" % project_name, project=gitlab_project.project_object._attrs)
 
 
 if __name__ == '__main__':

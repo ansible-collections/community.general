@@ -1605,9 +1605,6 @@ class RedfishUtils(object):
         cur_boot_next = boot.get('BootNext')
         cur_override_mode = boot.get('BootSourceOverrideMode')
 
-        if not boot_override_mode:
-            boot_override_mode = cur_override_mode
-
         if override_enabled == 'Disabled':
             payload = {
                 'Boot': {
@@ -1643,16 +1640,18 @@ class RedfishUtils(object):
                 }
             }
         else:
-            if cur_enabled == override_enabled and target == bootdevice and cur_override_mode == boot_override_mode:
+            if (cur_enabled == override_enabled and target == bootdevice and
+                    (cur_override_mode == boot_override_mode or not boot_override_mode)):
                 # If properties are already set, no changes needed
                 return {'ret': True, 'changed': False}
             payload = {
                 'Boot': {
                     'BootSourceOverrideEnabled': override_enabled,
-                    'BootSourceOverrideMode': boot_override_mode,
                     'BootSourceOverrideTarget': bootdevice
                 }
             }
+            if boot_override_mode:
+                payload['Boot']['BootSourceOverrideMode'] = boot_override_mode
 
         response = self.patch_request(self.root_uri + self.systems_uri, payload)
         if response['ret'] is False:
@@ -1835,12 +1834,16 @@ class RedfishUtils(object):
                 result['ret'] = True
                 data = response['data']
 
-                for device in data[u'Fans']:
-                    fan = {}
-                    for property in properties:
-                        if property in device:
-                            fan[property] = device[property]
-                    fan_results.append(fan)
+                # Checking if fans are present
+                if u'Fans' in data:
+                    for device in data[u'Fans']:
+                        fan = {}
+                        for property in properties:
+                            if property in device:
+                                fan[property] = device[property]
+                        fan_results.append(fan)
+                else:
+                    return {'ret': False, 'msg': "No Fans present"}
         result["entries"] = fan_results
         return result
 
@@ -2030,15 +2033,28 @@ class RedfishUtils(object):
     def get_multi_memory_inventory(self):
         return self.aggregate_systems(self.get_memory_inventory)
 
+    def get_nic(self, resource_uri):
+        result = {}
+        properties = ['Name', 'Id', 'Description', 'FQDN', 'IPv4Addresses', 'IPv6Addresses',
+                      'NameServers', 'MACAddress', 'PermanentMACAddress',
+                      'SpeedMbps', 'MTUSize', 'AutoNeg', 'Status']
+        response = self.get_request(self.root_uri + resource_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+        nic = {}
+        for property in properties:
+            if property in data:
+                nic[property] = data[property]
+        result['entries'] = nic
+        return(result)
+
     def get_nic_inventory(self, resource_uri):
         result = {}
         nic_list = []
         nic_results = []
         key = "EthernetInterfaces"
-        # Get these entries, but does not fail if not found
-        properties = ['Name', 'Id', 'Description', 'FQDN', 'IPv4Addresses', 'IPv6Addresses',
-                      'NameServers', 'MACAddress', 'PermanentMACAddress',
-                      'SpeedMbps', 'MTUSize', 'AutoNeg', 'Status']
 
         response = self.get_request(self.root_uri + resource_uri)
         if response['ret'] is False:
@@ -2062,18 +2078,9 @@ class RedfishUtils(object):
             nic_list.append(nic[u'@odata.id'])
 
         for n in nic_list:
-            nic = {}
-            uri = self.root_uri + n
-            response = self.get_request(uri)
-            if response['ret'] is False:
-                return response
-            data = response['data']
-
-            for property in properties:
-                if property in data:
-                    nic[property] = data[property]
-
-            nic_results.append(nic)
+            nic = self.get_nic(n)
+            if nic['ret']:
+                nic_results.append(nic['entries'])
         result["entries"] = nic_results
         return result
 
@@ -2698,39 +2705,14 @@ class RedfishUtils(object):
         return self.aggregate_managers(self.get_manager_health_report)
 
     def set_manager_nic(self, nic_addr, nic_config):
-        # Get EthernetInterface collection
-        response = self.get_request(self.root_uri + self.manager_uri)
-        if response['ret'] is False:
-            return response
-        data = response['data']
-        if 'EthernetInterfaces' not in data:
-            return {'ret': False, 'msg': "EthernetInterfaces resource not found"}
-        ethernetinterfaces_uri = data["EthernetInterfaces"]["@odata.id"]
-        response = self.get_request(self.root_uri + ethernetinterfaces_uri)
-        if response['ret'] is False:
-            return response
-        data = response['data']
-        uris = [a.get('@odata.id') for a in data.get('Members', []) if
-                a.get('@odata.id')]
+        # Get the manager ethernet interface uri
+        nic_info = self.get_manager_ethernet_uri(nic_addr)
 
-        # Find target EthernetInterface
-        target_ethernet_uri = None
-        target_ethernet_current_setting = None
-        if nic_addr == 'null':
-            # Find root_uri matched EthernetInterface when nic_addr is not specified
-            nic_addr = (self.root_uri).split('/')[-1]
-            nic_addr = nic_addr.split(':')[0]  # split port if existing
-        for uri in uris:
-            response = self.get_request(self.root_uri + uri)
-            if response['ret'] is False:
-                return response
-            data = response['data']
-            if '"' + nic_addr.lower() + '"' in str(data).lower() or "'" + nic_addr.lower() + "'" in str(data).lower():
-                target_ethernet_uri = uri
-                target_ethernet_current_setting = data
-                break
-        if target_ethernet_uri is None:
-            return {'ret': False, 'msg': "No matched EthernetInterface found under Manager"}
+        if nic_info.get('nic_addr') is None:
+            return nic_info
+        else:
+            target_ethernet_uri = nic_info['nic_addr']
+            target_ethernet_current_setting = nic_info['ethernet_setting']
 
         # Convert input to payload and check validity
         payload = {}
@@ -2762,7 +2744,9 @@ class RedfishUtils(object):
             if isinstance(set_value, dict):
                 for subprop in payload[property].keys():
                     if subprop not in target_ethernet_current_setting[property]:
-                        return {'ret': False, 'msg': "Sub-property %s in nic_config is invalid" % subprop}
+                        # Not configured already; need to apply the request
+                        need_change = True
+                        break
                     sub_set_value = payload[property][subprop]
                     sub_cur_value = target_ethernet_current_setting[property][subprop]
                     if sub_set_value != sub_cur_value:
@@ -2776,7 +2760,9 @@ class RedfishUtils(object):
                 for i in range(len(set_value)):
                     for subprop in payload[property][i].keys():
                         if subprop not in target_ethernet_current_setting[property][i]:
-                            return {'ret': False, 'msg': "Sub-property %s in nic_config is invalid" % subprop}
+                            # Not configured already; need to apply the request
+                            need_change = True
+                            break
                         sub_set_value = payload[property][i][subprop]
                         sub_cur_value = target_ethernet_current_setting[property][i][subprop]
                         if sub_set_value != sub_cur_value:
@@ -2789,3 +2775,208 @@ class RedfishUtils(object):
         if response['ret'] is False:
             return response
         return {'ret': True, 'changed': True, 'msg': "Modified Manager NIC"}
+
+    # A helper function to get the EthernetInterface URI
+    def get_manager_ethernet_uri(self, nic_addr='null'):
+        # Get EthernetInterface collection
+        response = self.get_request(self.root_uri + self.manager_uri)
+        if not response['ret']:
+            return response
+        data = response['data']
+        if 'EthernetInterfaces' not in data:
+            return {'ret': False, 'msg': "EthernetInterfaces resource not found"}
+        ethernetinterfaces_uri = data["EthernetInterfaces"]["@odata.id"]
+        response = self.get_request(self.root_uri + ethernetinterfaces_uri)
+        if not response['ret']:
+            return response
+        data = response['data']
+        uris = [a.get('@odata.id') for a in data.get('Members', []) if
+                a.get('@odata.id')]
+
+        # Find target EthernetInterface
+        target_ethernet_uri = None
+        target_ethernet_current_setting = None
+        if nic_addr == 'null':
+            # Find root_uri matched EthernetInterface when nic_addr is not specified
+            nic_addr = (self.root_uri).split('/')[-1]
+            nic_addr = nic_addr.split(':')[0]  # split port if existing
+        for uri in uris:
+            response = self.get_request(self.root_uri + uri)
+            if not response['ret']:
+                return response
+            data = response['data']
+            data_string = json.dumps(data)
+            if nic_addr.lower() in data_string.lower():
+                target_ethernet_uri = uri
+                target_ethernet_current_setting = data
+                break
+
+        nic_info = {}
+        nic_info['nic_addr'] = target_ethernet_uri
+        nic_info['ethernet_setting'] = target_ethernet_current_setting
+
+        if target_ethernet_uri is None:
+            return {}
+        else:
+            return nic_info
+
+    def set_hostinterface_attributes(self, hostinterface_config, hostinterface_id=None):
+        response = self.get_request(self.root_uri + self.manager_uri)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+        if 'HostInterfaces' not in data:
+            return {'ret': False, 'msg': "HostInterfaces resource not found"}
+
+        hostinterfaces_uri = data["HostInterfaces"]["@odata.id"]
+        response = self.get_request(self.root_uri + hostinterfaces_uri)
+        if response['ret'] is False:
+            return response
+        data = response['data']
+        uris = [a.get('@odata.id') for a in data.get('Members', []) if a.get('@odata.id')]
+        # Capture list of URIs that match a specified HostInterface resource ID
+        if hostinterface_id:
+            matching_hostinterface_uris = [uri for uri in uris if hostinterface_id in uri.split('/')[-1]]
+
+        if hostinterface_id and matching_hostinterface_uris:
+            hostinterface_uri = list.pop(matching_hostinterface_uris)
+        elif hostinterface_id and not matching_hostinterface_uris:
+            return {'ret': False, 'msg': "HostInterface ID %s not present." % hostinterface_id}
+        elif len(uris) == 1:
+            hostinterface_uri = list.pop(uris)
+        else:
+            return {'ret': False, 'msg': "HostInterface ID not defined and multiple interfaces detected."}
+
+        response = self.get_request(self.root_uri + hostinterface_uri)
+        if response['ret'] is False:
+            return response
+        current_hostinterface_config = response['data']
+        payload = {}
+        for property in hostinterface_config.keys():
+            value = hostinterface_config[property]
+            if property not in current_hostinterface_config:
+                return {'ret': False, 'msg': "Property %s in hostinterface_config is invalid" % property}
+            if isinstance(value, dict):
+                if isinstance(current_hostinterface_config[property], dict):
+                    payload[property] = value
+                elif isinstance(current_hostinterface_config[property], list):
+                    payload[property] = list()
+                    payload[property].append(value)
+                else:
+                    return {'ret': False, 'msg': "Value of property %s in hostinterface_config is invalid" % property}
+            else:
+                payload[property] = value
+
+        need_change = False
+        for property in payload.keys():
+            set_value = payload[property]
+            cur_value = current_hostinterface_config[property]
+            if not isinstance(set_value, dict) and not isinstance(set_value, list):
+                if set_value != cur_value:
+                    need_change = True
+            if isinstance(set_value, dict):
+                for subprop in payload[property].keys():
+                    if subprop not in current_hostinterface_config[property]:
+                        need_change = True
+                        break
+                    sub_set_value = payload[property][subprop]
+                    sub_cur_value = current_hostinterface_config[property][subprop]
+                    if sub_set_value != sub_cur_value:
+                        need_change = True
+            if isinstance(set_value, list):
+                if len(set_value) != len(cur_value):
+                    need_change = True
+                    continue
+                for i in range(len(set_value)):
+                    for subprop in payload[property][i].keys():
+                        if subprop not in current_hostinterface_config[property][i]:
+                            need_change = True
+                            break
+                        sub_set_value = payload[property][i][subprop]
+                        sub_cur_value = current_hostinterface_config[property][i][subprop]
+                        if sub_set_value != sub_cur_value:
+                            need_change = True
+        if not need_change:
+            return {'ret': True, 'changed': False, 'msg': "Host Interface already configured"}
+
+        response = self.patch_request(self.root_uri + hostinterface_uri, payload)
+        if response['ret'] is False:
+            return response
+        return {'ret': True, 'changed': True, 'msg': "Modified Host Interface"}
+
+    def get_hostinterfaces(self):
+        result = {}
+        hostinterface_results = []
+        properties = ['Id', 'Name', 'Description', 'HostInterfaceType', 'Status',
+                      'InterfaceEnabled', 'ExternallyAccessible', 'AuthenticationModes',
+                      'AuthNoneRoleId', 'CredentialBootstrapping']
+        manager_uri_list = self.manager_uris
+        for manager_uri in manager_uri_list:
+            response = self.get_request(self.root_uri + manager_uri)
+            if response['ret'] is False:
+                return response
+
+            result['ret'] = True
+            data = response['data']
+
+            if 'HostInterfaces' in data:
+                hostinterfaces_uri = data[u'HostInterfaces'][u'@odata.id']
+            else:
+                continue
+
+            response = self.get_request(self.root_uri + hostinterfaces_uri)
+            data = response['data']
+
+            if 'Members' in data:
+                for hostinterface in data['Members']:
+                    hostinterface_uri = hostinterface['@odata.id']
+                    hostinterface_response = self.get_request(self.root_uri + hostinterface_uri)
+                    # dictionary for capturing individual HostInterface properties
+                    hostinterface_data_temp = {}
+                    if hostinterface_response['ret'] is False:
+                        return hostinterface_response
+                    hostinterface_data = hostinterface_response['data']
+                    for property in properties:
+                        if property in hostinterface_data:
+                            if hostinterface_data[property] is not None:
+                                hostinterface_data_temp[property] = hostinterface_data[property]
+                    # Check for the presence of a ManagerEthernetInterface
+                    # object, a link to a _single_ EthernetInterface that the
+                    # BMC uses to communicate with the host.
+                    if 'ManagerEthernetInterface' in hostinterface_data:
+                        interface_uri = hostinterface_data['ManagerEthernetInterface']['@odata.id']
+                        interface_response = self.get_nic(interface_uri)
+                        if interface_response['ret'] is False:
+                            return interface_response
+                        hostinterface_data_temp['ManagerEthernetInterface'] = interface_response['entries']
+
+                    # Check for the presence of a HostEthernetInterfaces
+                    # object, a link to a _collection_ of EthernetInterfaces
+                    # that the host uses to communicate with the BMC.
+                    if 'HostEthernetInterfaces' in hostinterface_data:
+                        interfaces_uri = hostinterface_data['HostEthernetInterfaces']['@odata.id']
+                        interfaces_response = self.get_request(self.root_uri + interfaces_uri)
+                        if interfaces_response['ret'] is False:
+                            return interfaces_response
+                        interfaces_data = interfaces_response['data']
+                        if 'Members' in interfaces_data:
+                            for interface in interfaces_data['Members']:
+                                interface_uri = interface['@odata.id']
+                                interface_response = self.get_nic(interface_uri)
+                                if interface_response['ret'] is False:
+                                    return interface_response
+                                # Check if this is the first
+                                # HostEthernetInterfaces item and create empty
+                                # list if so.
+                                if 'HostEthernetInterfaces' not in hostinterface_data_temp:
+                                    hostinterface_data_temp['HostEthernetInterfaces'] = []
+
+                                hostinterface_data_temp['HostEthernetInterfaces'].append(interface_response['entries'])
+
+                    hostinterface_results.append(hostinterface_data_temp)
+            else:
+                continue
+        result["entries"] = hostinterface_results
+        if not result["entries"]:
+            return {'ret': False, 'msg': "No HostInterface objects found"}
+        return result
