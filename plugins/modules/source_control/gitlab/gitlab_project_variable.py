@@ -83,7 +83,7 @@ options:
         default: false
       variable_type:
         description:
-          - Wether a variable is an env or a file.
+          - Wether a variable is an environment variable (C(env_var)) or a file (C(file)).
         type: str
         choices: ["env_var", "file"]
         default: env_var
