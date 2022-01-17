@@ -57,7 +57,8 @@ options:
     type: dict
   variables:
     description:
-      - List of dicts
+      - List of dicts.
+    version_added: 4.4.0
     default: []
     type: list
     elements: dict
