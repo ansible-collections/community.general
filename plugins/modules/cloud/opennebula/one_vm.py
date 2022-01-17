@@ -80,7 +80,7 @@ options:
       - C(poweredoff) - power-off instances
       - C(rebooted) - reboot instances
       - C(absent) - terminate instances
-      - C(release) - releases instances created with C(vm_start_on_hold)
+      - C(release) - releases instances created with C(vm_start_on_hold). This has been added in community.general 4.4.0.
     choices: ["present", "absent", "running", "rebooted", "poweredoff", "release"]
     default: present
     type: str
