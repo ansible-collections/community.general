@@ -1,0 +1,3 @@
+bugfixes:
+  - yarn - fix incorrect handling of `yarn list` and `yarn global list` output that could result in fatal error
+  - yarn - fix incorrectly reported status when installing a package globally
