@@ -241,16 +241,14 @@ class Yarn(object):
         if error:
             self.module.fail_json(msg=error)
 
-        data = json.loads(result)
-        try:
-            dependencies = data['data']['trees']
-        except KeyError:
-            missing.append(self.name)
-            return installed, missing
+        for json_line in result.strip().split('\n'):
+            data = json.loads(json_line)
+            if data['type'] == 'tree':
+                dependencies = data['data']['trees']
 
-        for dep in dependencies:
-            name, version = dep['name'].rsplit('@', 1)
-            installed.append(name)
+                for dep in dependencies:
+                    name, version = dep['name'].rsplit('@', 1)
+                    installed.append(name)
 
         if self.name not in installed:
             missing.append(self.name)
