@@ -243,12 +243,17 @@ class Yarn(object):
 
         for json_line in result.strip().split('\n'):
             data = json.loads(json_line)
-            if data['type'] == 'tree':
-                dependencies = data['data']['trees']
+            if self.globally:
+                if data['type'] == 'list':
+                    # This is a string in format: 'bins-<PACKAGE_NAME>'
+                    installed.append(data['data']['type'][5:])
+            else:
+                if data['type'] == 'tree':
+                    dependencies = data['data']['trees']
 
-                for dep in dependencies:
-                    name, version = dep['name'].rsplit('@', 1)
-                    installed.append(name)
+                    for dep in dependencies:
+                        name, version = dep['name'].rsplit('@', 1)
+                        installed.append(name)
 
         if self.name not in installed:
             missing.append(self.name)
