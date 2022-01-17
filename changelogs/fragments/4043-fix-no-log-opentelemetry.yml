@@ -1,0 +1,2 @@
+bugfixes:
+  - "opentelemetry - fix generating a trace with a task containing ``no_log: true`` (https://github.com/ansible-collections/community.general/pull/4043)."
