@@ -79,6 +79,15 @@
         timezone: America/New_York
       register: lukuser_modify_out
 
+    - name: create user 'jake' with all mount options
+      community.general.homectl:
+        name: jake
+        password: myreallysecurepassword12!
+        mountopts: noexec,nosuid,nodev
+        sshkeys: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDUSW/q2qFZPr2vS0qrmAs+1iQI1jLIBdJ4CVIhE3KnIwxkkiInS8mJ+t0FBTeK3ks3GZLPVYC1v9o2P+oqyUk1CiBnCsMXGJud+L/t8b5r8MiJMyP7Jzd6yhmcvenjvz+vY06jQ9chWAtThEknuaOMongIpQQzSLGbdMy0yMsz4GEjicwdcj1PDwItPvUt4TL4K7V9NE672idADlRt6qng4UwpziqlYgsyIG46ettDras8hGAPricrhFWUS2rLDsCD0thkPFdR8HL1ZWTZ6LtolhO4MYtgntzXn708TTmFC2oIDluzyxVoUYmsfVotVdXFZcOWffnwbCgU+tn75JXTLozgTbV3VWmkxpJFErCWPerxcZv3+7b0f36/Y0gRNjM9HERLDSE1c8yz29NOLY0qH5306aByjOaerxNq9+ZOU/Fmf5/VfGIUp/FdLxDw+V0AzejFG580VAcstEMsOHSdwTbi3gf6LoGSiRyWKKDod0TZCMC6RzbcMHI9CClGl0s= jameslivulpi@Jamess-MBP.fios-router.home"
+      register: jake_out
+
+
 
     - name: Try to remove user 'janet' that doesn't exist
       community.general.homectl:
@@ -98,6 +107,7 @@
           - danielle_out is not changed
           - lukuser_modify_out.data['timeZone'] == "America/New_York" and lukuser_modify_out.data['shell'] == "/bin/zsh"
           - user_not_exist is not changed and user_not_exist.msg == "User does not exist!"
+          - jake_out is changed and jake_out.data['mountNoDevices'] == True and jake_out.data['mountNoSuid'] == True and jake_out.data['mountNoExecute'] == True
 
 
   # homectl was first introduced in systemd 245 so check version  >= 245
