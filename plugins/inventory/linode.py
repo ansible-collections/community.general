@@ -68,7 +68,9 @@ plugin: community.general.linode
 
 # You can use Jinja to template the access token.
 plugin: community.general.linode
-access_token: "{{ lookup('ini', 'token section=your_username file=~/.config/linode-cli') }}"
+access_token: "{{ lookup('ini', 'token', section='your_username', file='~/.config/linode-cli') }}"
+# For older Ansible versions, you need to write this as:
+# access_token: "{{ lookup('ini', 'token section=your_username file=~/.config/linode-cli') }}"
 
 # Example with regions, types, groups and access token
 plugin: community.general.linode
