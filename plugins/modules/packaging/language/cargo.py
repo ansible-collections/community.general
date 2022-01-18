@@ -112,7 +112,7 @@ class Cargo(object):
         cmd = ["install", "--list"]
         data, dummy = self._exec(cmd, True, False, False)
 
-        package_regex = re.compile(r"^(\w+) v(.+):$")
+        package_regex = re.compile(r"^([\w\-]+) v(.+):$")
         installed = {}
         for line in data.splitlines():
             package_info = package_regex.match(line)
@@ -136,11 +136,11 @@ class Cargo(object):
         installed_version = self.get_installed().get(name)
 
         cmd = ["search", name, "--limit", "1"]
-        data = self._exec(cmd, True, False, False)
+        data, dummy = self._exec(cmd, True, False, False)
 
         match = re.search(r'"(.+)"', data)
         if match:
-            latest_version = match[1]
+            latest_version = match.group(1)
 
         return installed_version != latest_version
 
