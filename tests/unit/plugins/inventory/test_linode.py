@@ -40,7 +40,7 @@ def inventory():
     return InventoryModule()
 
 
-def test_empty_access_token_lookup(inventory):
+def test_missing_access_token_lookup(inventory):
     loader = DataLoader()
     inventory._options = {'access_token': None}
     with pytest.raises(AnsibleError) as error_message:
