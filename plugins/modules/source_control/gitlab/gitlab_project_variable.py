@@ -194,8 +194,8 @@ def vars_to_variables(vars):
     # transform old vars to new variables structure
     variables = list()
     for item in vars.keys():
-        if (isinstance(vars.get(item), str) or
-           isinstance(vars.get(item), int) or
+        if (isinstance(vars.get(item), string_types) or
+           isinstance(vars.get(item), integer_types) or
            isinstance(vars.get(item), float)):
             variables.append(
                 {
