@@ -56,9 +56,10 @@ options:
     default: {}
     type: dict
   variables:
-    description:
-      - List of dicts.
     version_added: 4.4.0
+    description:
+      - A list of dictionries that represents CI/CD variables.
+      - This modules works internal with this sructure, even if the older I(vars) parameter is used.
     default: []
     type: list
     elements: dict
@@ -183,20 +184,20 @@ except Exception:
 from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
 
 
-def vars_to_variables(vars):
+def vars_to_variables(vars, module):
     # transform old vars to new variables structure
     variables = list()
     for item in vars.keys():
         if (isinstance(vars.get(item), string_types) or
-           isinstance(vars.get(item), integer_types) or
-           isinstance(vars.get(item), float)):
+           isinstance(vars.get(item), (integer_types, float))):
             variables.append(
                 {
                     "name": item,
                     "value": str(vars.get(item))
                 }
             )
-        else:
+
+        elif isinstance(vars.get(item), dict):
             new_item = {"name": item, "value": vars.get(item).get('value')}
 
             if vars.get(item).get('masked'):
@@ -211,7 +212,8 @@ def vars_to_variables(vars):
             if vars.get(item).get('variable_type'):
                 new_item['variable_type'] = vars.get(item).get('variable_type')
 
-            variables.append(new_item)
+        else:
+            module.fail_json(msg="value must be of type string, integer, float or dict")
 
     return variables
 
@@ -377,7 +379,7 @@ def main():
     var_list = module.params['vars']
 
     if var_list:
-        variables = vars_to_variables(var_list)
+        variables = vars_to_variables(var_list, module)
     else:
         variables = module.params['variables']
 
