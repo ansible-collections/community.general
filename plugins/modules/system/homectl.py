@@ -124,7 +124,7 @@ options:
         description:
             - The absolute path to the skeleton directory to populate a new home directory from.
             - This is only used when a home directory is first created.
-            - If not specified homed by default uses C(/etc/skel).
+            - If not specified homed by default uses ``/etc/skel``
         aliases: [ 'skel' ]
         type: path
     shell:
@@ -197,9 +197,9 @@ EXAMPLES = '''
     disksize: 10G
     resize: yes
 
-- name: Remove an existing user 'tom'
+- name: Remove an existing user 'janet'
   community.general.homectl:
-    name: frank
+    name: janet
     state: absent
 '''
 
@@ -301,11 +301,11 @@ class Homectl(object):
     # Cannot run homectl commands if service is not active
     def homed_service_active(self):
         is_active = True
-        cmd = ["systemctl", "show", "systemd-homed.service", "-p", "ActiveState"]
+        cmd = ['systemctl', 'show', 'systemd-homed.service', '-p', 'ActiveState']
         rc, show_service_stdout, stderr = self.module.run_command(cmd)
         if rc == 0:
-            state = show_service_stdout.rsplit("=")[1]
-            if state.strip() != "active":
+            state = show_service_stdout.rsplit('=')[1]
+            if state.strip() != 'active':
                 is_active = False
         return is_active
 
@@ -313,10 +313,10 @@ class Homectl(object):
         # Get user properties if they exist in json
         exists = False
         cmd = [self.module.get_bin_path('homectl', True)]
-        cmd.append("inspect")
+        cmd.append('inspect')
         cmd.append(self.name)
-        cmd.append("-j")
-        rc, stdout, stderr = self.module.run_command(cmd, use_unsafe_shell=True)
+        cmd.append('-j')
+        rc, stdout, stderr = self.module.run_command(cmd)
         if rc == 0:
             exists = True
         return exists
@@ -324,9 +324,9 @@ class Homectl(object):
     def create_user(self):
         record = self.create_json_record(create=True)
         cmd = [self.module.get_bin_path('homectl', True)]
-        cmd.append("create")
-        cmd.append("--identity=-")  # Read the user record from standard input.
-        return(self.module.run_command(cmd, data=record, use_unsafe_shell=True))
+        cmd.append('create')
+        cmd.append('--identity=-')  # Read the user record from standard input.
+        return(self.module.run_command(cmd, data=record))
 
     def _hash_password(self, password):
         method = crypt.METHOD_SHA512
@@ -338,7 +338,7 @@ class Homectl(object):
         cmd = [self.module.get_bin_path('homectl', True)]
         cmd.append('remove')
         cmd.append(self.name)
-        return self.module.run_command(cmd, use_unsafe_shell=True)
+        return self.module.run_command(cmd)
 
     def modify_user(self):
         record = self.create_json_record()
@@ -351,14 +351,15 @@ class Homectl(object):
         if self.disksize and self.resize:
             cmd.append('--and-resize')
             cmd.append('true')
-        return(self.module.run_command(cmd, data=record, use_unsafe_shell=True))
+            self.result['changed'] = True
+        return cmd, record
 
     def get_user_metadata(self):
         cmd = [self.module.get_bin_path('homectl', True)]
-        cmd.append("inspect")
+        cmd.append('inspect')
         cmd.append(self.name)
-        cmd.append("-j")
-        cmd.append("--no-pager")
+        cmd.append('-j')
+        cmd.append('--no-pager')
         rc, stdout, stderr = self.module.run_command(cmd)
         return stdout
 
@@ -372,15 +373,15 @@ class Homectl(object):
             user_metadata = json.loads(self.get_user_metadata())
             # Remove elements that are not meant to be updated from record.
             # These are always part of the record when a user exists.
-            del user_metadata['signature']
-            del user_metadata['binding']
-            del user_metadata['status']
+            user_metadata.pop('signature', None)
+            user_metadata.pop('binding', None)
+            user_metadata.pop('status', None)
             # Let last change Usec be updated by homed when command runs.
-            del user_metadata['lastChangeUSec']
+            user_metadata.pop('lastChangeUSec', None)
             # Now only change fields that are called on leaving whats currently in the record intact.
             record = user_metadata
 
-        record["userName"] = self.name
+        record['userName'] = self.name
         record['secret'] = {'password': [self.password]}
 
         if create:
@@ -394,7 +395,7 @@ class Homectl(object):
             self.result['changed'] = True
 
         if self.memberof:
-            member_list = list(self.memberof.split(","))
+            member_list = list(self.memberof.split(','))
             if member_list != record.get('memberOf', [None]):
                 record['memberOf'] = member_list
                 self.result['changed'] = True
@@ -571,7 +572,7 @@ def main():
 
     # First we need to make sure homed service is active
     if not homectl.homed_service_active():
-        module.fail_json(msg="systemd-homed.service is not active")
+        module.fail_json(msg='systemd-homed.service is not active')
 
     # handle removing user
     if homectl.state == 'absent':
@@ -581,11 +582,12 @@ def main():
             rc, stdout, stderr = homectl.remove_user()
             if rc != 0:
                 module.fail_json(name=homectl.name, msg=stderr, rc=rc)
+            homectl.result['changed'] = True
             homectl.result['rc'] = rc
-            homectl.result['msg'] = "User %s removed!" % homectl.name
+            homectl.result['msg'] = 'User %s removed!' % homectl.name
         else:
             homectl.result['changed'] = False
-            homectl.result['msg'] = "User does not exist!"
+            homectl.result['msg'] = 'User does not exist!'
 
     # Handle adding a user
     if homectl.state == 'present':
@@ -598,18 +600,21 @@ def main():
             user_metadata = json.loads(homectl.get_user_metadata())
             homectl.result['data'] = user_metadata
             homectl.result['rc'] = rc
-            homectl.result['msg'] = "User %s created!" % homectl.name
+            homectl.result['msg'] = 'User %s created!' % homectl.name
         else:
+            # Run this to see if changed would be True or False which is useful for check_mode
+            cmd, record = homectl.modify_user()
             if module.check_mode:
-                module.exit_json(changed=True)
-            rc, stdout, stderr = homectl.modify_user()
+                module.exit_json(**homectl.result)
+            # Now actually modify the user
+            rc, stdout, stderr = module.run_command(cmd, data=record)
             if rc != 0:
-                module.fail_json(name=homectl.name, msg=stderr, rc=rc)
+                module.fail_json(name=homectl.name, msg=stderr, rc=rc, changed=False)
             user_metadata = json.loads(homectl.get_user_metadata())
             homectl.result['data'] = user_metadata
             homectl.result['rc'] = rc
             if homectl.result['changed']:
-                homectl.result['msg'] = "User %s modified" % homectl.name
+                homectl.result['msg'] = 'User %s modified' % homectl.name
 
     module.exit_json(**homectl.result)
 

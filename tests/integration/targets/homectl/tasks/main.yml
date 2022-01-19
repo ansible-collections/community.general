@@ -64,11 +64,11 @@
       register: danielle_out
       ignore_errors: yes
 
-    - name: remove users without requiring password
+    - name: remove user 'foobar' without requiring password
       community.general.homectl:
         name: foobar
         state: absent
-      register: delete_foobar
+      register: delete_foobar_out
 
     - name: modify user 'james' to have zsh shell and timezone 'America/New_York'
       community.general.homectl:
@@ -84,10 +84,8 @@
         name: jake
         password: myreallysecurepassword12!
         mountopts: noexec,nosuid,nodev
-        sshkeys: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDUSW/q2qFZPr2vS0qrmAs+1iQI1jLIBdJ4CVIhE3KnIwxkkiInS8mJ+t0FBTeK3ks3GZLPVYC1v9o2P+oqyUk1CiBnCsMXGJud+L/t8b5r8MiJMyP7Jzd6yhmcvenjvz+vY06jQ9chWAtThEknuaOMongIpQQzSLGbdMy0yMsz4GEjicwdcj1PDwItPvUt4TL4K7V9NE672idADlRt6qng4UwpziqlYgsyIG46ettDras8hGAPricrhFWUS2rLDsCD0thkPFdR8HL1ZWTZ6LtolhO4MYtgntzXn708TTmFC2oIDluzyxVoUYmsfVotVdXFZcOWffnwbCgU+tn75JXTLozgTbV3VWmkxpJFErCWPerxcZv3+7b0f36/Y0gRNjM9HERLDSE1c8yz29NOLY0qH5306aByjOaerxNq9+ZOU/Fmf5/VfGIUp/FdLxDw+V0AzejFG580VAcstEMsOHSdwTbi3gf6LoGSiRyWKKDod0TZCMC6RzbcMHI9CClGl0s= jameslivulpi@Jamess-MBP.fios-router.home"
+        sshkeys: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDUSW/q2qFZPr2vS0qrmAs+1iQI1jLIBdJ4CVIhE3KnIwxkkiInS8mJ+t0FBTeK3ks3GZLPVYC1v9o2P+oqyUk1CiBnCsMXGJud+L/t8b5r8MiJMyP7Jzd6yhmcvenjvz+vY06jQ9chWAtThEknuaOMongIpQQzSLGbdMy0yMsz4GEjicwdcj1PDwItPvUt4TL4K7V9NE672idADlRt6qng4UwpziqlYgsyIG46ettDras8hGAPricrhFWUS2rLDsCD0thkPFdR8HL1ZWTZ6LtolhO4MYtgntzXn708TTmFC2oIDluzyxVoUYmsfVotVdXFZcOWffnwbCgU+tn75JXTLozgTbV3VWmkxpJFErCWPerxcZv3+7b0f36/Y0gRNjM9HERLDSE1c8yz29NOLY0qH5306aByjOaerxNq9+ZOU/Fmf5/VfGIUp/FdLxDw+V0AzejFG580VAcstEMsOHSdwTbi3gf6LoGSiRyWKKDod0TZCMC6RzfdsfdsfI9CClGl0s= test@router.home"
       register: jake_out
-
-
 
     - name: Try to remove user 'janet' that doesn't exist
       community.general.homectl:
@@ -96,6 +94,39 @@
       register: user_not_exist
       ignore_errors: yes
 
+    - name: Use check_mode to try and create user 'diana'
+      community.general.homectl:
+        name: diana
+        password: helloworld123!@
+        state: present
+      check_mode: yes
+      register: diana_create_checkmode_out
+
+    - name: Verify user 'diana' was not created with check_mode
+      command: homectl inspect diana
+      register: user_diana_exists
+      ignore_errors: yes
+
+    - name: Try to modify user 'jake' with only noexec mount option in check_mode
+      community.general.homectl:
+        name: jake
+        password: myreallysecurepassword12!
+        state: present
+        mountopts: noexec
+      register: jake_checkmode_out
+
+    - name: Verify user 'jake' was not modified and still has all mount options
+      command: homectl inspect jake
+      register: user_jake_details_out
+
+    - name: Modify user 'jake' with only noexec mount option
+      community.general.homectl:
+        name: jake
+        password: myreallysecurepassword12!
+        state: present
+        mountopts: noexec
+      register: jake_modify_out
+
     - assert:
         that:
           - james_info.rc == 0
@@ -103,12 +134,15 @@
           - user_exists is changed and user_exists.data['shell'] == '/bin/ksh'
           - resize_out is not changed
           - disk_out is changed
-          - delete_foobar is changed
+          - delete_foobar_out is changed
           - danielle_out is not changed
           - lukuser_modify_out.data['timeZone'] == "America/New_York" and lukuser_modify_out.data['shell'] == "/bin/zsh"
           - user_not_exist is not changed and user_not_exist.msg == "User does not exist!"
           - jake_out is changed and jake_out.data['mountNoDevices'] == True and jake_out.data['mountNoSuid'] == True and jake_out.data['mountNoExecute'] == True
-
+          - diana_create_checkmode_out is changed and 'No home for user diana known' in user_diana_exists.stderr
+          - "jake_checkmode_out is changed and 'Mount Flags: suid dev noexec' in user_jake_details_out.stdout"
+          - jake_modify_out is changed and jake_modify_out.data['privileged']['sshAuthorizedKeys'] is not none
+          - jake_modify_out.data['mountNoDevices'] == False and jake_modify_out.data['mountNoExecute'] == True and jake_modify_out.data['mountNoSuid'] == False
 
   # homectl was first introduced in systemd 245 so check version  >= 245
   # As of Ubuntu 21 homed does not come with it.
