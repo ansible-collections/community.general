@@ -212,6 +212,8 @@ def vars_to_variables(vars, module):
             if vars.get(item).get('variable_type'):
                 new_item['variable_type'] = vars.get(item).get('variable_type')
 
+            variables.append(new_item)
+
         else:
             module.fail_json(msg="value must be of type string, integer, float or dict")
 
