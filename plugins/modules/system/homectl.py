@@ -507,22 +507,31 @@ class Homectl(object):
         if self.mountopts:
             opts = list(self.mountopts.split(','))
             if 'nosuid' in opts:
-                record['mountNoSuid'] = True
-                self.result['changed'] = True
+                if record.get('mountNoSuid') is not True:
+                    record['mountNoSuid'] = True
+                    self.result['changed'] = True
             else:
-                record['mountNoSuid'] = False
+                if record.get('mountNoSuid') is not False:
+                    record['mountNoSuid'] = False
+                    self.result['changed'] = True
 
             if 'nodev' in opts:
-                record['mountNoDevices'] = True
-                self.result['changed'] = True
+                if record.get('mountNoDevices') is not True:
+                    record['mountNoDevices'] = True
+                    self.result['changed'] = True
             else:
-                record['mountNoDevices'] = False
+                if record.get('mountNoDevices') is not False:
+                    record['mountNoDevices'] = False
+                    self.result['changed'] = True
 
             if 'noexec' in opts:
-                record['mountNoExecute'] = True
-                self.result['changed'] = True
+                if record.get('mountNoExecute') is not True:
+                    record['mountNoExecute'] = True
+                    self.result['changed'] = True
             else:
-                record['mountNoExecute'] = False
+                if record.get('mountNoExecute') is not False:
+                    record['mountNoExecute'] = False
+                    self.result['changed'] = True
 
         return jsonify(record)
 
@@ -606,10 +615,12 @@ def main():
             cmd, record = homectl.modify_user()
             if module.check_mode:
                 module.exit_json(**homectl.result)
-            # Now actually modify the user
-            rc, stdout, stderr = module.run_command(cmd, data=record)
-            if rc != 0:
-                module.fail_json(name=homectl.name, msg=stderr, rc=rc, changed=False)
+            rc = 0
+            # Now actually modify the user if changed was set to true at any point.
+            if homectl.result['changed']:
+                rc, stdout, stderr = module.run_command(cmd, data=record)
+                if rc != 0:
+                    module.fail_json(name=homectl.name, msg=stderr, rc=rc, changed=False)
             user_metadata = json.loads(homectl.get_user_metadata())
             homectl.result['data'] = user_metadata
             homectl.result['rc'] = rc

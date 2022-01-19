@@ -113,11 +113,15 @@
         password: myreallysecurepassword12!
         state: present
         mountopts: noexec
+      check_mode: yes
       register: jake_checkmode_out
 
     - name: Verify user 'jake' was not modified and still has all mount options
       command: homectl inspect jake
       register: user_jake_details_out
+
+    - debug:
+        var: user_jake_details_out
 
     - name: Modify user 'jake' with only noexec mount option
       community.general.homectl:
@@ -126,6 +130,14 @@
         state: present
         mountopts: noexec
       register: jake_modify_out
+
+    - name: modify user 'jake' again with only noexec mount option to make sure changed is false as nothing has changed.
+      community.general.homectl:
+        name: jake
+        password: myreallysecurepassword12!
+        state: present
+        mountopts: noexec
+      register: jake_modify_again_out
 
     - assert:
         that:
@@ -140,9 +152,10 @@
           - user_not_exist is not changed and user_not_exist.msg == "User does not exist!"
           - jake_out is changed and jake_out.data['mountNoDevices'] == True and jake_out.data['mountNoSuid'] == True and jake_out.data['mountNoExecute'] == True
           - diana_create_checkmode_out is changed and 'No home for user diana known' in user_diana_exists.stderr
-          - "jake_checkmode_out is changed and 'Mount Flags: suid dev noexec' in user_jake_details_out.stdout"
+          - "jake_checkmode_out is changed and 'Mount Flags: nosuid nodev noexec' in user_jake_details_out.stdout"
           - jake_modify_out is changed and jake_modify_out.data['privileged']['sshAuthorizedKeys'] is not none
           - jake_modify_out.data['mountNoDevices'] == False and jake_modify_out.data['mountNoExecute'] == True and jake_modify_out.data['mountNoSuid'] == False
+          - jake_modify_again_out is not changed
 
   # homectl was first introduced in systemd 245 so check version  >= 245
   # As of Ubuntu 21 homed does not come with it.
