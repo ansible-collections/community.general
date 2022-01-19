@@ -1,2 +1,4 @@
+minor_changes:
+  - "lxc_container module - adds wait_for_container parameter to the lxc_container module. This is a bool true or false. If true it will wait till the running task reports success as the status. Defaults to false. Not required."
 bugfixes:
-  - "Adds a wait period when creating clustered containers for when the task is still Running and not immediately jump to success. This would error out when the task was still running."
+  - "lxd inventory plugin, lxd_container module, lxd_profile module - adds a wait period (if specified in wait_for_container) when creating clustered containers for when the task is still running and not immediately jump to success. This would error out when the task was still running (https://github.com/ansible-collections/community.general/pull/4039)."
