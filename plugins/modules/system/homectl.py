@@ -124,7 +124,7 @@ options:
         description:
             - The absolute path to the skeleton directory to populate a new home directory from.
             - This is only used when a home directory is first created.
-            - If not specified homed by default uses ``/etc/skel``
+            - If not specified homed by default uses C(/etc/skel).
         aliases: [ 'skel' ]
         type: path
     shell:
