@@ -1,2 +1,2 @@
 ---
-- include_tasks: lists_mergeby.yml
+- import_tasks: lists_mergeby.yml
