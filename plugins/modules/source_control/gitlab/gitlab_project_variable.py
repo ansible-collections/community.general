@@ -165,13 +165,6 @@ project_variable:
 '''
 
 import traceback
-
-try:
-    import yaml
-    HAS_YAML = True
-except ImportError:
-    HAS_YAML = False
-
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.api import basic_auth_argument_spec
@@ -408,8 +401,8 @@ def main():
         item['name'] = item.pop('key')
 
     diff = dict(
-        before=yaml.safe_dump(before),
-        after=yaml.safe_dump(after)
+        before=before,
+        after=after
     )
 
     raw_return_value['untouched'] = [x for x in before if x in after]
