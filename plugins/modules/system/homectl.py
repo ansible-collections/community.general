@@ -180,9 +180,9 @@ EXAMPLES = '''
     password: myreallysecurepassword1!
     state: present
 
-- name: Add the user 'tom' with a zsh shell, uid of 1000, and gid of 2000
+- name: Add the user 'alice' with a zsh shell, uid of 1000, and gid of 2000
   community.general.homectl:
-    name: tom
+    name: alice
     password: myreallysecurepassword1!
     state: present
     shell: /bin/zsh
@@ -338,7 +338,7 @@ class Homectl(object):
         cmd = [self.module.get_bin_path('homectl', True)]
         cmd.append('remove')
         cmd.append(self.name)
-        return(self.module.run_command(cmd, use_unsafe_shell=True))
+        return self.module.run_command(cmd, use_unsafe_shell=True)
 
     def modify_user(self):
         record = self.create_json_record()
