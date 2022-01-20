@@ -1,2 +1,2 @@
 minor_changes:
-  - scaleway plugin inventory - Add profile parameter, ``scw_profile`` (https://github.com/ansible-collections/community.general/pull/4049).
+  - scaleway inventory plugin - add profile parameter ``scw_profile`` (https://github.com/ansible-collections/community.general/pull/4049).
