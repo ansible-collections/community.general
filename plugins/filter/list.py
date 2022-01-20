@@ -10,20 +10,17 @@ from ansible.module_utils.six import string_types
 from ansible.module_utils.common._collections_compat import Mapping, Sequence
 from ansible.utils.vars import merge_hash
 from ansible.release import __version__ as ansible_version
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 from collections import defaultdict
 from operator import itemgetter
-from packaging.specifiers import SpecifierSet
-from packaging.version import Version
 
 
 def merge_hash_wrapper(x, y, recursive=False, list_merge='replace'):
     ''' Wrapper of the function merge_hash from ansible.utils.vars. Only 2 paramaters are allowed
         for Ansible 2.9 and lower.'''
 
-    vspec = SpecifierSet(">=2.10")
-
-    if Version(ansible_version) not in vspec:
+    if LooseVersion(ansible_version) < LooseVersion('2.10'):
         if list_merge != 'replace' or recursive:
             msg = ("Non default options of list_merge(default=replace) or recursive(default=False) "
                    "are not allowed in Ansible version 2.9 or lower. Ansible version is %s, "
