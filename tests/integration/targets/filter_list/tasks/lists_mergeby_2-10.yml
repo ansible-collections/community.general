@@ -36,9 +36,6 @@
     - name: Merge 2 lists by attribute name. list_merge='append'. assert
       assert:
         that: my_list | difference(result102) | length == 0
-  when:
-    - ansible_version.major >= 2
-    - ansible_version.minor >= 10
   tags: t102
 
 - name: 103.Merge 2 lists by attribute name. list_merge='prepend'
