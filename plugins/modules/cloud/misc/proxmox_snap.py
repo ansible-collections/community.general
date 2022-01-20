@@ -170,7 +170,7 @@ def main():
 
     # If hostname is set get the VM id from ProxmoxAPI
     if not vmid and hostname:
-        vmid = proxmox.get_vmid(hostname)
+        vmid = proxmox.get_vmid(hostname, choose_first_if_multiple=True)
     elif not vmid:
         module.exit_json(changed=False, msg="Vmid could not be fetched for the following action: %s" % state)
 

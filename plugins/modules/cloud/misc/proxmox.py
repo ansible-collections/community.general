@@ -626,7 +626,7 @@ def main():
     if not vmid and state == 'present':
         vmid = proxmox.get_nextvmid()
     elif not vmid and hostname:
-        vmid = proxmox.get_vmid(hostname)
+        vmid = proxmox.get_vmid(hostname, choose_first_if_multiple=True)
     elif not vmid:
         module.exit_json(changed=False, msg="Vmid could not be fetched for the following action: %s" % state)
 
@@ -636,8 +636,11 @@ def main():
             if proxmox.get_vm(vmid, ignore_missing=True) and not module.params['force']:
                 module.exit_json(changed=False, msg="VM with vmid = %s is already exists" % vmid)
             # If no vmid was passed, there cannot be another VM named 'hostname'
-            if not module.params['vmid'] and proxmox.get_vmid(hostname, ignore_missing=True) and not module.params['force']:
-                module.exit_json(changed=False, msg="VM with hostname %s already exists and has ID number %s" % (hostname, proxmox.get_vmid(hostname)))
+            if (not module.params['vmid'] and
+                    proxmox.get_vmid(hostname, ignore_missing=True, choose_first_if_multiple=True) and
+                    not module.params['force']):
+                vmid = proxmox.get_vmid(hostname, choose_first_if_multiple=True)
+                module.exit_json(changed=False, msg="VM with hostname %s already exists and has ID number %s" % (hostname, vmid))
             elif not proxmox.get_node(node):
                 module.fail_json(msg="node '%s' not exists in cluster" % node)
             elif not proxmox.content_check(node, module.params['ostemplate'], template_store):
@@ -677,8 +680,11 @@ def main():
             if proxmox.get_vm(vmid, ignore_missing=True) and not module.params['force']:
                 module.exit_json(changed=False, msg="VM with vmid = %s is already exists" % vmid)
             # If no vmid was passed, there cannot be another VM named 'hostname'
-            if not module.params['vmid'] and proxmox.get_vmid(hostname, ignore_missing=True) and not module.params['force']:
-                module.exit_json(changed=False, msg="VM with hostname %s already exists and has ID number %s" % (hostname, proxmox.get_vmid(hostname)))
+            if (not module.params['vmid'] and
+                    proxmox.get_vmid(hostname, ignore_missing=True, choose_first_if_multiple=True) and
+                    not module.params['force']):
+                vmid = proxmox.get_vmid(hostname, choose_first_if_multiple=True)
+                module.exit_json(changed=False, msg="VM with hostname %s already exists and has ID number %s" % (hostname, vmid))
             if not proxmox.get_vm(clone, ignore_missing=True):
                 module.exit_json(changed=False, msg="Container to be cloned does not exist")
         except Exception as e:

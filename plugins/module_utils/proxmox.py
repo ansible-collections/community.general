@@ -113,16 +113,23 @@ class ProxmoxAnsible(object):
         vmid = self.proxmox_api.cluster.nextid.get()
         return vmid
 
-    def get_vmid(self, name, ignore_missing=False):
+    def get_vmid(self, name, ignore_missing=False, choose_first_if_multiple=False):
         vms = [vm['vmid'] for vm in self.proxmox_api.cluster.resources.get(type='vm') if vm.get('name') == name]
 
         if not vms:
             if ignore_missing:
                 return None
 
-            self.module.fail_json(msg='No VM found with name: %s' % name)
+            self.module.fail_json(msg='No VM with name %s found' % name)
         elif len(vms) > 1:
-            self.module.fail_json(msg='Multiple VMs found with name: %s, provide vmid instead' % name)
+            if choose_first_if_multiple:
+                self.module.deprecate(
+                    'Multiple VMs with name %s found, choosing the first one. ' % name +
+                    'This will be an error in the future. To ensure the correct VM is used, ' +
+                    'also pass the vmid parameter.',
+                    version='5.0.0', collection_name='community.general')
+            else:
+                self.module.fail_json(msg='Multiple VMs with name %s found, provide vmid instead' % name)
 
         return vms[0]
 
