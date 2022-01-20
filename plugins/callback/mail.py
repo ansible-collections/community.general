@@ -100,28 +100,21 @@ class CallbackModule(CallbackBase):
 
         smtp = smtplib.SMTP(self.smtphost, port=self.smtpport)
 
-        b_sender = to_bytes(self.sender)
-        b_to = to_bytes(self.to)
-        b_cc = to_bytes(self.cc)
-        b_bcc = to_bytes(self.bcc)
-        b_subject = to_bytes(subject)
-        b_body = to_bytes(body)
-
-        b_content = b'From: %s\n' % b_sender
-        b_content += b'To: %s\n' % b_to
+        content = 'From: %s\n' % self.sender
+        content += 'To: %s\n' % self.to
         if self.cc:
-            b_content += b'Cc: %s\n' % b_cc
-        b_content += b'Subject: %s\n\n' % b_subject
-        b_content += b_body
+            content += 'Cc: %s\n' % self.cc
+        content += 'Subject: %s\n\n' % subject.strip()
+        content += body
 
-        b_addresses = b_to.split(b',')
+        addresses = self.to.split(',')
         if self.cc:
-            b_addresses += b_cc.split(b',')
+            addresses += self.cc.split(',')
         if self.bcc:
-            b_addresses += b_bcc.split(b',')
+            addresses += self.bcc.split(',')
 
-        for b_address in b_addresses:
-            smtp.sendmail(b_sender, b_address, b_content)
+        for address in addresses:
+            smtp.sendmail(self.sender, address, to_bytes(content))
 
         smtp.quit()
 
