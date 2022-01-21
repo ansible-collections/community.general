@@ -48,10 +48,19 @@ cd ~/dev/ansible_collections/community/general
 
 Then you can run `ansible-test` (which is a part of [ansible-core](https://pypi.org/project/ansible-core/)) inside the checkout. The following example commands expect that you have installed Docker or Podman. Note that Podman has only been supported by more recent ansible-core releases. If you are using Docker, the following will work with Ansible 2.9+.
 
+The following commands show how to run sanity tests:
+
 ```.bash
-# Run sanity tests:
+# Run sanity tests for all files in the collection:
 ansible-test sanity --docker -v
 
+# Run sanity tests for the given files and directories:
+ansible-test sanity --docker -v plugins/modules/system/pids.py tests/integration/targets/pids/
+```
+
+The following commands show how to run unit tests:
+
+```.bash
 # Run all unit tests:
 ansible-test units --docker -v
 
@@ -60,15 +69,20 @@ ansible-test units --docker -v --python 3.8
 
 # Run a specific unit test (for the nmcli module) for one Python version:
 ansible-test units --docker -v --python 3.8 tests/unit/plugins/modules/net_tools/test_nmcli.py
+```
 
+The following commands show how to run integration tests:
+
+```.bash
 # Run integration tests for the interfaces_files module in a Docker container using the
 # fedora35 operating system image (the supported images depend on your ansible-core version):
 ansible-test integration --docker fedora35 -v interfaces_file
+
 # Run integration tests for the flattened lookup **without any isolation**:
 ansible-test integration -v lookup_flattened
-# If you are unsure about the target name for a module or plugin, you can take a look in
-# tests/integration/targets/. Tests for plugins have the plugin type prepended.
 ```
+
+If you are unsure about the integration test target name for a module or plugin, you can take a look in `tests/integration/targets/`. Tests for plugins have the plugin type prepended.
 
 ## Creating new modules or plugins
 
