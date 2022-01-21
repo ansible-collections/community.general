@@ -126,11 +126,11 @@ options:
         type: bool
     wait_for_container:
         description:
-            - If this is true, the tasks will wait till the task reports a
-              Success status when performing container operations
-        required: false
+            - If set to C(true), the tasks will wait till the task reports a
+              success status when performing container operations.
         default: false
         type: bool
+        version_added: 4.4.0
     force_stop:
         description:
           - If this is true, the C(lxd_container) forces to stop the instance
