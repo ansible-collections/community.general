@@ -36,6 +36,38 @@ If you want to test a PR locally, refer to [our testing guide](https://github.co
 
 If you find any inconsistencies or places in this document which can be improved, feel free to raise an issue or pull request to fix it.
 
+## Run sanity, unit or integration tests locally
+
+You have to check out the repository into a specific path structure to be able to run `ansible-test`. The path to the git checkout must end with `.../ansible_collections/community/general`. Please see [our testing guide](https://github.com/ansible/community-docs/blob/main/test_pr_locally_guide.rst) for instructions on how to check out the repository into a correct path structure. The short version of these instructions is:
+
+```.bash
+mkdir -p ~/dev/ansible_collections/community
+git clone https://github.com/ansible-collections/community.general.git ~/dev/ansible_collections/community/general
+cd ~/dev/ansible_collections/community/general
+```
+
+Then you can run `ansible-test` (which is a part of [ansible-core](https://pypi.org/project/ansible-core/)) inside the checkout. The following example commands expect that you have installed Docker or Podman. Note that Podman has only been supported by more recent ansible-core releases. If you are using Docker, the following will work with other 
+
+```.bash
+# Run sanity tests:
+ansible-test sanity --docker -v
+
+# Run all unit tests:
+ansible-test units --docker -v
+# Run all unit tests for one Python version (a lot faster):
+ansible-test units --docker -v --python 3.8
+# Run a specific unit test (for the nmcli module) for one Python version:
+ansible-test units --docker -v --python 3.8 tests/unit/plugins/modules/net_tools/test_nmcli.py
+
+# Run integration tests for the interfaces_files module in a Docker container using the
+# fedora35 operating system image (the supported images depend on your ansible-core version)
+ansible-test integration --docker fedora35 -v interfaces_file
+# Run integration tests for the flattened lookup **without any isolation**
+ansible-test integration -v lookup_flattened
+# If you are unsure about the target name for a module or plugin, you can take a look in
+# tests/integration/targets/. Tests for plugins have the plugin type prepended.
+```
+
 ## Creating new modules or plugins
 
 Creating new modules and plugins requires a bit more work than other Pull Requests.
