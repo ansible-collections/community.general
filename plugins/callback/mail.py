@@ -59,6 +59,7 @@ notes:
 import json
 import os
 import re
+import email.utils
 import smtplib
 
 from ansible.module_utils.six import string_types
@@ -100,10 +101,12 @@ class CallbackModule(CallbackBase):
 
         smtp = smtplib.SMTP(self.smtphost, port=self.smtpport)
 
-        content = 'From: %s\n' % self.sender
+        content = 'Date: %s\n' % email.utils.formatdate()
+        content += 'From: %s\n' % self.sender
         content += 'To: %s\n' % self.to
         if self.cc:
             content += 'Cc: %s\n' % self.cc
+        content += 'Message-ID: %s\n' % email.utils.make_msgid()
         content += 'Subject: %s\n\n' % subject.strip()
         content += body
 
