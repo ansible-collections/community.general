@@ -46,7 +46,7 @@ git clone https://github.com/ansible-collections/community.general.git ~/dev/ans
 cd ~/dev/ansible_collections/community/general
 ```
 
-Then you can run `ansible-test` (which is a part of [ansible-core](https://pypi.org/project/ansible-core/)) inside the checkout. The following example commands expect that you have installed Docker or Podman. Note that Podman has only been supported by more recent ansible-core releases. If you are using Docker, the following will work with other 
+Then you can run `ansible-test` (which is a part of [ansible-core](https://pypi.org/project/ansible-core/)) inside the checkout. The following example commands expect that you have installed Docker or Podman. Note that Podman has only been supported by more recent ansible-core releases. If you are using Docker, the following will work with Ansible 2.9+.
 
 ```.bash
 # Run sanity tests:
