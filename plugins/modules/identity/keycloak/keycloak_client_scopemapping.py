@@ -12,7 +12,7 @@ module: keycloak_client_scopemapping
 
 short_description: Allows administration of Keycloak client-level roles of the client's scope via the Keycloak API
 
-version_added: 3.5.0
+version_added: 4.4.0
 
 description:
     - This module allows you to add, remove Keycloak client-level roles scope mapping with the Keycloak REST API.
