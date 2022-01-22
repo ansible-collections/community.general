@@ -44,9 +44,11 @@ DOCUMENTATION = '''
         type: list
         default: []
         elements: str
-        version_added: 4.4.0
       include_profiles:
-        description: Profiles to include from inventory (exclude all others)
+        description:
+          - Profiles to include from inventory.
+          - If specified, all other profiles will be excluded.
+          - I(exclude_profiles) is ignored if I(include_profiles) is specified.
         type: list
         default: []
         elements: str
@@ -174,15 +176,10 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         return group_name
 
     def _exclude_profile(self, profile):
-        if len(self.include_profiles) > 0:
-            if profile in self.include_profiles:
-                return False
-            else:
-                return True
-        elif profile in self.exclude_profiles:
-            return True
+        if self.include_profiles:
+            return profile not in self.include_profiles
         else:
-            return False
+            return profile in self.exclude_profiles
 
     def parse(self, inventory, loader, path, cache=True):
 
