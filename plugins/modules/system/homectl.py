@@ -340,7 +340,7 @@ class Homectl(object):
         cmd.append(self.name)
         return self.module.run_command(cmd)
 
-    def modify_user(self):
+    def prepare_modify_user_command(self):
         record = self.create_json_record()
         cmd = [self.module.get_bin_path('homectl', True)]
         cmd.append('update')
@@ -612,7 +612,7 @@ def main():
             homectl.result['msg'] = 'User %s created!' % homectl.name
         else:
             # Run this to see if changed would be True or False which is useful for check_mode
-            cmd, record = homectl.modify_user()
+            cmd, record = homectl.prepare_modify_user_command()
             if module.check_mode:
                 module.exit_json(**homectl.result)
             rc = 0
