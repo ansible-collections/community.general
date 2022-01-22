@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_client_scopemapping
 
-short_description: Allows administration of Keycloak client-level roles of the client's scope via the Keycloak API
+short_description: Administration of Keycloak client-level roles of the client's scope via the Keycloak API
 
 version_added: 4.4.0
 
