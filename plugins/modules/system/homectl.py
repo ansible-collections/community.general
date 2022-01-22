@@ -29,7 +29,7 @@ options:
             - Homed requires this value to be in cleartext on user creation and updating a user.
             - The module takes the password and generates a password hash in SHA-512 with 10000 rounds of salt generation using crypt.
             - See U(https://systemd.io/USER_RECORD/).
-            - This is required for I(state=present).
+            - This is required for I(state=present). When an existing user is updated this is checked against the stored hash in homed.
         type: str
     state:
         description:
@@ -310,16 +310,18 @@ class Homectl(object):
         return is_active
 
     def user_exists(self):
-        # Get user properties if they exist in json
         exists = False
-        cmd = [self.module.get_bin_path('homectl', True)]
-        cmd.append('inspect')
-        cmd.append(self.name)
-        cmd.append('-j')
-        rc, stdout, stderr = self.module.run_command(cmd)
+        valid_pw = False
+        # Get user properties if they exist in json
+        rc, stdout, stderr = self.get_user_metadata()
         if rc == 0:
             exists = True
-        return exists
+            # User exists now compare password given with current hashed password stored in the user metadata.
+            if self.state != 'absent':  # Don't need checking on remove user
+                stored_pwhash = json.loads(stdout)['privileged']['hashedPassword'][0]
+                if self._check_password(stored_pwhash):
+                    valid_pw = True
+        return exists, valid_pw
 
     def create_user(self):
         record = self.create_json_record(create=True)
@@ -333,6 +335,10 @@ class Homectl(object):
         salt = crypt.mksalt(method, rounds=10000)
         pw_hash = crypt.crypt(password, salt)
         return pw_hash
+
+    def _check_password(self, pwhash):
+        hash = crypt.crypt(self.password, pwhash)
+        return pwhash == hash
 
     def remove_user(self):
         cmd = [self.module.get_bin_path('homectl', True)]
@@ -361,7 +367,7 @@ class Homectl(object):
         cmd.append('-j')
         cmd.append('--no-pager')
         rc, stdout, stderr = self.module.run_command(cmd)
-        return stdout
+        return rc, stdout, stderr
 
     # Build up dictionary to jsonify for homectl commands.
     def create_json_record(self, create=False):
@@ -370,7 +376,8 @@ class Homectl(object):
         self.result['changed'] = False
         # Get the current user record if not creating a new user record.
         if not create:
-            user_metadata = json.loads(self.get_user_metadata())
+            rc, user_metadata, stderr = self.get_user_metadata()
+            user_metadata = json.loads(user_metadata)
             # Remove elements that are not meant to be updated from record.
             # These are always part of the record when a user exists.
             user_metadata.pop('signature', None)
@@ -585,7 +592,8 @@ def main():
 
     # handle removing user
     if homectl.state == 'absent':
-        if homectl.user_exists():
+        user_exists, valid_pwhash = homectl.user_exists()
+        if user_exists:
             if module.check_mode:
                 module.exit_json(changed=True)
             rc, stdout, stderr = homectl.remove_user()
@@ -600,29 +608,37 @@ def main():
 
     # Handle adding a user
     if homectl.state == 'present':
-        if not homectl.user_exists():
+        user_exists, valid_pwhash = homectl.user_exists()
+        if not user_exists:
             if module.check_mode:
                 module.exit_json(changed=True)
             rc, stdout, stderr = homectl.create_user()
             if rc != 0:
                 module.fail_json(name=homectl.name, msg=stderr, rc=rc)
-            user_metadata = json.loads(homectl.get_user_metadata())
-            homectl.result['data'] = user_metadata
+            rc, user_metadata, stderr = homectl.get_user_metadata()
+            homectl.result['data'] = json.loads(user_metadata)
             homectl.result['rc'] = rc
             homectl.result['msg'] = 'User %s created!' % homectl.name
         else:
-            # Run this to see if changed would be True or False which is useful for check_mode
-            cmd, record = homectl.prepare_modify_user_command()
+            if valid_pwhash:
+                # Run this to see if changed would be True or False which is useful for check_mode
+                cmd, record = homectl.prepare_modify_user_command()
+            else:
+                # User gave wrong password fail with message
+                homectl.result['changed'] = False
+                homectl.result['msg'] = 'User exists but password is incorrect!'
+                module.fail_json(**homectl.result)
+
             if module.check_mode:
                 module.exit_json(**homectl.result)
-            rc = 0
+
             # Now actually modify the user if changed was set to true at any point.
             if homectl.result['changed']:
                 rc, stdout, stderr = module.run_command(cmd, data=record)
                 if rc != 0:
                     module.fail_json(name=homectl.name, msg=stderr, rc=rc, changed=False)
-            user_metadata = json.loads(homectl.get_user_metadata())
-            homectl.result['data'] = user_metadata
+            rc, user_metadata, stderr = homectl.get_user_metadata()
+            homectl.result['data'] = json.loads(user_metadata)
             homectl.result['rc'] = rc
             if homectl.result['changed']:
                 homectl.result['msg'] = 'User %s modified' % homectl.name

@@ -4,6 +4,11 @@
   register: systemd_version
   ignore_errors: yes
 
+- name: check homectl version
+  command: homectl --version
+  register: homectl_version
+  ignore_errors: yes
+
 - block:
     - name: Check and start systemd-homed service
       service:
@@ -120,9 +125,6 @@
       command: homectl inspect jake
       register: user_jake_details_out
 
-    - debug:
-        var: user_jake_details_out
-
     - name: Modify user 'jake' with only noexec mount option
       community.general.homectl:
         name: jake
@@ -138,6 +140,16 @@
         state: present
         mountopts: noexec
       register: jake_modify_again_out
+
+    - name: Try to modify user 'jake' with an incorrect password
+      community.general.homectl:
+        name: jake
+        password: incorrectPassword!
+        state: present
+        mountopts: noexec
+        locked: yes
+      ignore_errors: yes
+      register: jake_incorrect_pass_out
 
     - assert:
         that:
@@ -156,7 +168,7 @@
           - jake_modify_out is changed and jake_modify_out.data['privileged']['sshAuthorizedKeys'] is not none
           - jake_modify_out.data['mountNoDevices'] == False and jake_modify_out.data['mountNoExecute'] == True and jake_modify_out.data['mountNoSuid'] == False
           - jake_modify_again_out is not changed
+          - jake_incorrect_pass_out is not changed and jake_incorrect_pass_out is failed and jake_incorrect_pass_out.msg == 'User exists but password is incorrect!'
 
-  # homectl was first introduced in systemd 245 so check version  >= 245
-  # As of Ubuntu 21 homed does not come with it.
-  when: (systemd_version.stdout | regex_search('[0-9][0-9][0-9]') | int >= 245) and ansible_distribution != 'Ubuntu'
+  # homectl was first introduced in systemd 245 so check version  >= 245 and make sure system has systemd and homectl command
+  when: systemd_version.rc == 0 and (systemd_version.stdout | regex_search('[0-9][0-9][0-9]') | int >= 245) and homectl_version.rc == 0
