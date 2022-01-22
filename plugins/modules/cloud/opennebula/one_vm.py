@@ -80,8 +80,7 @@ options:
       - C(poweredoff) - power-off instances
       - C(rebooted) - reboot instances
       - C(absent) - terminate instances
-      - C(release) - releases instances created with C(vm_start_on_hold). This has been added in community.general 4.4.0.
-    choices: ["present", "absent", "running", "rebooted", "poweredoff", "release"]
+    choices: ["present", "absent", "running", "rebooted", "poweredoff"]
     default: present
     type: str
   hard:
@@ -1261,6 +1260,11 @@ def resume_vm(module, client, vm):
     vm = client.vm.info(vm.ID)
     changed = False
 
+    state = vm.STATE
+    if state in [VM_STATES.index('HOLD')]:
+        changed = release_vm(module, client, vm)
+        return changed
+
     lcm_state = vm.LCM_STATE
     if lcm_state == LCM_STATES.index('SHUTDOWN_POWEROFF'):
         module.fail_json(msg="Cannot perform action 'resume' because this action is not available " +
@@ -1289,19 +1293,13 @@ def release_vm(module, client, vm):
 
     state = vm.STATE
     if state != VM_STATES.index('HOLD'):
-        module.fail_json(msg="Cannot perform action 'release' because VM is not in state 'HOLD'.")
+        module.fail_json(msg="Cannot perform action 'release' because this action is not available " +
+                         "because VM is not in state 'HOLD'.")
     else:
         changed = True
 
     if changed and not module.check_mode:
         client.vm.action('release', vm.ID)
-
-
-def release_vms(module, client, vms):
-    changed = False
-
-    for vm in vms:
-        changed = release_vm(module, client, vm) or changed
 
     return changed
 
@@ -1393,7 +1391,7 @@ def main():
         "vm_start_on_hold": {"default": False, "type": "bool"},
         "state": {
             "default": "present",
-            "choices": ['present', 'absent', 'rebooted', 'poweredoff', 'running', 'release'],
+            "choices": ['present', 'absent', 'rebooted', 'poweredoff', 'running'],
             "type": "str"
         },
         "mode": {"required": False, "type": "str"},
@@ -1595,8 +1593,6 @@ def main():
             changed = poweroff_vms(module, one_client, vms, hard)
         elif state == 'running':
             changed = resume_vms(module, one_client, vms)
-        elif state == 'release':
-            changed = release_vms(module, one_client, vms)
 
         instances_list = vms
         tagged_instances_list = []
@@ -1612,8 +1608,7 @@ def main():
             'absent': wait_for_done,
             'rebooted': wait_for_running,
             'poweredoff': wait_for_poweroff,
-            'running': wait_for_running,
-            'release': wait_for_running
+            'running': wait_for_running
         }
         for vm in vms:
             if vm is not None:
