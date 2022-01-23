@@ -57,7 +57,7 @@ options:
     realname:
         description:
             - The user's real ('human') name.
-            - This can also be used to add a comment to maintain compatability from C(useradd).
+            - This can also be used to add a comment to maintain compatability with C(useradd).
         aliases: [ 'comment' ]
         type: str
     realm:
@@ -124,13 +124,13 @@ options:
         description:
             - The absolute path to the skeleton directory to populate a new home directory from.
             - This is only used when a home directory is first created.
-            - If not specified homed by default uses ``/etc/skel``
+            - If not specified homed by default uses C(/etc/skel).
         aliases: [ 'skel' ]
         type: path
     shell:
         description:
             - Shell binary to use for terminal logins of given user.
-            - If not specified homed by default uses ``/bin/bash``
+            - If not specified homed by default uses C(/bin/bash).
         type: str
     environment:
         description:
@@ -161,7 +161,7 @@ options:
     sshkeys:
         description:
             - String separated by comma each listing a SSH public key that is authorized to access the account.
-            - The keys should follow the same format as the lines in a traditional ``~/.ssh/authorized_key`` file.
+            - The keys should follow the same format as the lines in a traditional C(~/.ssh/authorized_key) file.
         type: str
     notbefore:
         description:
