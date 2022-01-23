@@ -85,7 +85,7 @@ author:
 '''
 
 EXAMPLES = '''
-- name: Map a client role to a client, authentication with credentials
+- name: Map several client roles to a client, authentication with credentials
   community.general.keycloak_client_scope_mapping:
     realm: MyCustomRealm
     auth_client_id: admin-cli
