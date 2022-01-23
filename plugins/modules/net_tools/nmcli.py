@@ -161,6 +161,18 @@ options:
         type: bool
         default: false
         version_added: 3.2.0
+    routes6:
+        description:
+            - The list of IPv6 routes.
+            - Use the format C(fd12:3456:789a:1::/64 2001:dead:beef::1).
+        type: list
+        elements: str
+        version_added: 4.4.0
+    route_metric6:
+        description:
+            - Set metric level of IPv6 routes configured on interface.
+        type: int
+        version_added: 4.4.0
     dns6:
         description:
             - A list of up to 3 dns servers.
@@ -1259,6 +1271,8 @@ class Nmcli(object):
         self.ip6 = module.params['ip6']
         self.gw6 = module.params['gw6']
         self.gw6_ignore_auto = module.params['gw6_ignore_auto']
+        self.routes6 = module.params['routes6']
+        self.route_metric6 = module.params['route_metric6']
         self.dns6 = module.params['dns6']
         self.dns6_search = module.params['dns6_search']
         self.dns6_ignore_auto = module.params['dns6_ignore_auto']
@@ -1369,6 +1383,8 @@ class Nmcli(object):
                 'ipv6.ignore-auto-dns': self.dns6_ignore_auto,
                 'ipv6.gateway': self.gw6,
                 'ipv6.ignore-auto-routes': self.gw6_ignore_auto,
+                'ipv6.routes': self.routes6,
+                'ipv6.route-metric': self.route_metric6,
                 'ipv6.method': self.ipv6_method,
                 'ipv6.ip6-privacy': self.ip_privacy6,
                 'ipv6.addr-gen-mode': self.addr_gen_mode6
@@ -1628,6 +1644,7 @@ class Nmcli(object):
                          'ipv4.routing-rules',
                          'ipv6.dns',
                          'ipv6.dns-search',
+                         'ipv6.routes',
                          '802-11-wireless-security.group',
                          '802-11-wireless-security.leap-password-flags',
                          '802-11-wireless-security.pairwise',
@@ -1753,7 +1770,7 @@ class Nmcli(object):
                             alias_key = alias_pair[0]
                             alias_value = alias_pair[1]
                             conn_info[alias_key] = alias_value
-                elif key == 'ipv4.routes':
+                elif key in ('ipv4.routes', 'ipv6.routes'):
                     conn_info[key] = [s.strip() for s in raw_value.split(';')]
                 elif key_type == list:
                     conn_info[key] = [s.strip() for s in raw_value.split(',')]
@@ -1832,8 +1849,8 @@ class Nmcli(object):
 
             if key in conn_info:
                 current_value = conn_info[key]
-                if key == 'ipv4.routes' and current_value is not None:
-                    # ipv4.routes do not have same options and show_connection() format
+                if key in ('ipv4.routes', 'ipv6.routes') and current_value is not None:
+                    # ipv4.routes and ipv6.routes do not have same options and show_connection() format
                     # options: ['10.11.0.0/24 10.10.0.2', '10.12.0.0/24 10.10.0.2 200']
                     # show_connection(): ['{ ip = 10.11.0.0/24, nh = 10.10.0.2 }', '{ ip = 10.12.0.0/24, nh = 10.10.0.2, mt = 200 }']
                     # Need to convert in order to compare both
@@ -1932,6 +1949,8 @@ def main():
             dns6=dict(type='list', elements='str'),
             dns6_search=dict(type='list', elements='str'),
             dns6_ignore_auto=dict(type='bool', default=False),
+            routes6=dict(type='list', elements='str'),
+            route_metric6=dict(type='int'),
             method6=dict(type='str', choices=['ignore', 'auto', 'dhcp', 'link-local', 'manual', 'shared', 'disabled']),
             ip_privacy6=dict(type='str', choices=['disabled', 'prefer-public-addr', 'prefer-temp-addr', 'unknown']),
             addr_gen_mode6=dict(type='str', choices=['eui64', 'stable-privacy']),
