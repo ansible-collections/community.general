@@ -10,7 +10,9 @@ DOCUMENTATION = '''
 ---
 module: keycloak_clientsecret
 
-short_description: Allows administration of Keycloak client secret via Keycloak API
+short_description: Administration of Keycloak client secret via Keycloak API
+
+version_added: 4.4.0
 
 description:
     - This module allows you to get or generate new Keycloak client secret via the Keycloak REST API.
