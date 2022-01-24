@@ -55,7 +55,7 @@ options:
         required: false
         type: list
         elements: str
-        version_added: 4.3.0
+        version_added: 4.4.0
 
 author:
     - Victor Carceler (@vcarceler) <vcarceler@iespuigcastellar.xeill.net>
@@ -137,6 +137,7 @@ options_changed:
     description: The list of options set/changed in format C(snap:key=value).
     type: list
     returned: When any options have been changed/set
+    version_added: 4.4.0
 '''
 
 import re
