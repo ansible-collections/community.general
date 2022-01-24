@@ -10,7 +10,9 @@ DOCUMENTATION = '''
 ---
 module: keycloak_subgroup
 
-short_description: Allows set or create subgroup via Keycloak API
+short_description: Set or create subgroup via Keycloak API
+
+version_added: 4.4.0
 
 description:
     - This module allows you to set or create subgroup under Keycloak groups via the Keycloak REST API.
