@@ -1,5 +1,8 @@
 bugfixes:
-  - gitlab_project_variable - allow to set same variable name under different environment scopes (https://github.com/ansible-collections/community.general/issues/4038).
+  - >
+    gitlab_project_variable - allow to set same variable name under different environment scopes.
+    Due this change, the return value ``project_variable`` differs from previous version in check mode.
+    It was counted ``updated`` values, because it overwrites accidentally environment scopes (https://github.com/ansible-collections/community.general/issues/4038).
   - gitlab_project_variable - fix immutable change behaviour for float and integer variables (https://github.com/ansible-collections/community.general/issues/4038).
 minor_changes:
   - gitlab_project_variable - add diff support (https://github.com/ansible-collections/community.general/issues/4038).

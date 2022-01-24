@@ -172,7 +172,6 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.six import string_types
 from ansible.module_utils.six import integer_types
 
-
 GITLAB_IMP_ERR = None
 try:
     import gitlab
@@ -265,6 +264,36 @@ class GitlabProjectVariables(object):
         return True
 
 
+def compare(requested_variables, existing_variables, state):
+    # we need to do this, because it was determined in a previous version - more or less buggy
+    # basically it is not necessary and might results in more/other bugs!
+    # but it is required  and only relevant for check mode!!
+    # logic represents state 'present' when not purge. all other can be derived from that
+    # untouched => equal in both
+    # updated => name and scope are equal
+    # added => name and scope does not exist
+    untouched = list()
+    updated = list()
+    added = list()
+
+    if state == 'present':
+        existing_key_scope_vars = list()
+        for item in existing_variables:
+            existing_key_scope_vars.append({'key': item.get('key'), 'environment_scope': item.get('environment_scope')})
+
+        for idx in range(len(requested_variables)):
+            if requested_variables[idx] in existing_variables:
+                    untouched.append(requested_variables[idx])
+            else:
+                compare_item = {'key': requested_variables[idx].get('name'), 'environment_scope': requested_variables[idx].get('environment_scope', '*')}
+                if compare_item in existing_key_scope_vars:
+                    updated.append(requested_variables[idx])
+                else:
+                    added.append(requested_variables[idx])
+
+    return untouched, updated, added
+
+
 def native_python_main(this_gitlab, purge, requested_variables, state, module):
 
     change = False
@@ -293,6 +322,9 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
             item['environment_scope'] = '*'
         if item.get('variable_type') is None:
             item['variable_type'] = 'env_var'
+
+    if module.check_mode:
+        untouched, updated, added = compare(requested_variables, existing_variables, state)
 
     if state == 'present':
         add_or_update = [x for x in requested_variables if x not in existing_variables]
@@ -337,6 +369,9 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
             for item in existing_variables:
                 if this_gitlab.delete_variable(item):
                     return_value['removed'].append(item)
+
+    if module.check_mode:
+        return_value = dict(added=added, updated=updated, removed=return_value['removed'], untouched=untouched)
 
     if len(return_value['added'] + return_value['removed'] + return_value['updated']) > 0:
         change = True
@@ -409,11 +444,15 @@ def main():
         after=after
     )
 
-    raw_return_value['untouched'] = [x for x in before if x in after]
+    untouched_key_name = 'key'
+    if not module.check_mode:
+        untouched_key_name = 'name'
+        raw_return_value['untouched'] = [x for x in before if x in after]
+
     added = [x.get('key') for x in raw_return_value['added']]
     updated = [x.get('key') for x in raw_return_value['updated']]
     removed = [x.get('key') for x in raw_return_value['removed']]
-    untouched = [x.get('name') for x in raw_return_value['untouched']]
+    untouched = [x.get(untouched_key_name) for x in raw_return_value['untouched']]
     return_value = dict(added=added, updated=updated, removed=removed, untouched=untouched)
 
     module.exit_json(changed=change, project_variable=return_value, diff=diff)
