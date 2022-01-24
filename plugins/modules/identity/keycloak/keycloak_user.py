@@ -10,7 +10,9 @@ DOCUMENTATION = '''
 ---
 module: keycloak_user
 
-short_description: Allows administration of Keycloak users via Keycloak API
+short_description: Administration of Keycloak users via Keycloak API
+
+version_added: 4.4.0
 
 description:
     - This module allows you to add, remove or modify Keycloak users via the Keycloak REST API.
