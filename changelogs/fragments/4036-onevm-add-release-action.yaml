@@ -1,0 +1,2 @@
+minor_changes:
+  - opennebula - add the release action for VMs in the ``HOLD`` state (https://github.com/ansible-collections/community.general/pull/4036).

@@ -1260,6 +1260,11 @@ def resume_vm(module, client, vm):
     vm = client.vm.info(vm.ID)
     changed = False
 
+    state = vm.STATE
+    if state in [VM_STATES.index('HOLD')]:
+        changed = release_vm(module, client, vm)
+        return changed
+
     lcm_state = vm.LCM_STATE
     if lcm_state == LCM_STATES.index('SHUTDOWN_POWEROFF'):
         module.fail_json(msg="Cannot perform action 'resume' because this action is not available " +
@@ -1278,6 +1283,23 @@ def resume_vms(module, client, vms):
 
     for vm in vms:
         changed = resume_vm(module, client, vm) or changed
+
+    return changed
+
+
+def release_vm(module, client, vm):
+    vm = client.vm.info(vm.ID)
+    changed = False
+
+    state = vm.STATE
+    if state != VM_STATES.index('HOLD'):
+        module.fail_json(msg="Cannot perform action 'release' because this action is not available " +
+                         "because VM is not in state 'HOLD'.")
+    else:
+        changed = True
+
+    if changed and not module.check_mode:
+        client.vm.action('release', vm.ID)
 
     return changed
 
