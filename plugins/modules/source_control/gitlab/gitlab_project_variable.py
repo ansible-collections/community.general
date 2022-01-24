@@ -283,7 +283,7 @@ def compare(requested_variables, existing_variables, state):
 
         for idx in range(len(requested_variables)):
             if requested_variables[idx] in existing_variables:
-                    untouched.append(requested_variables[idx])
+                untouched.append(requested_variables[idx])
             else:
                 compare_item = {'key': requested_variables[idx].get('name'), 'environment_scope': requested_variables[idx].get('environment_scope', '*')}
                 if compare_item in existing_key_scope_vars:
