@@ -122,6 +122,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Unmap client role from a client
+- name: Remove a single client role map from a client (leaves the other roles in place)
   community.general.keycloak_client_scope_mapping:
     realm: MyCustomRealm
     auth_client_id: admin-cli
