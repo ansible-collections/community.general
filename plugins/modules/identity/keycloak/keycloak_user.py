@@ -176,10 +176,6 @@ options:
             - requiredActions
         type: list
         elements: str
-    self:
-        description:
-            - The self.
-        type: str
     service_account_client_id:
         description:
             - The service account client ID.
@@ -378,7 +374,6 @@ def main():
         realm_roles=dict(type='list', elements='str', aliases=['realmRoles']),
         required_actions=dict(type='list', elements='str',
                               aliases=['requiredActions']),
-        self=dict(type='str'),
         service_account_client_id=dict(
             type='str', aliases=['serviceAccountClientId']),
     )
