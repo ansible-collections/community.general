@@ -111,9 +111,9 @@ EXAMPLES = '''
     auth_keycloak_url: https://auth.example.com/auth
     token: TOKEN
     state: present
-    id: 6e1d65de-f01a-4d3a-b7c6-3d581165966f
+    id: c0f8490c-b224-4737-a567-20223e4c1727
     client_role:
-        id: 6e1d65de-f01a-4d3a-b7c6-3d581165966f
+        id: 27112a16-c847-4def-9140-2b97a1f4108a
         roles:
           - name: role_name1
             id: role_id1
@@ -131,9 +131,9 @@ EXAMPLES = '''
     auth_username: USERNAME
     auth_password: PASSWORD
     state: absent
-    id: 6e1d65de-f01a-4d3a-b7c6-3d581165966f
+    id: c0f8490c-b224-4737-a567-20223e4c1727
     client_role:
-        id: 52c4d786-b790-4570-9fc2-037aee19a2c2
+        id: 27112a16-c847-4def-9140-2b97a1f4108a
         roles:
           - name: role_name3
             id: role_id3
