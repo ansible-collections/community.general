@@ -64,7 +64,7 @@ options:
         type: dict
         description:
             - A dict of key/value pairs to set as custom attributes for the user.
-            - Values may be single values (e.g. a string) or a list of strings.
+            - Values may be single values (for example a string) or a list of strings.
     client_consents:
         description:
             - The client consents.
