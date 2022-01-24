@@ -154,7 +154,7 @@ options:
         type: str
     not_before:
         description:
-            - The not before.
+            - To ensure any tokens issued before a specific time become invalid.
         aliases:
             - notBefore
         type: int
