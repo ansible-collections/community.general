@@ -10,7 +10,9 @@ DOCUMENTATION = '''
 ---
 module: keycloak_default_group
 
-short_description: Allows administration of Keycloak default groups via Keycloak API
+short_description: Administration of Keycloak default groups via Keycloak API
+
+version_added: 4.4.0
 
 description:
     - This module allows you to add or remove Keycloak default groups via the Keycloak REST API.
