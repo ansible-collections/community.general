@@ -1,0 +1,2 @@
+bugfixes:
+  - python_requirements_info - store ``mismatched`` return values per package
