@@ -59,7 +59,7 @@ options:
         type: dict
         suboptions:
             id:
-                description: ID of the client
+                description: ID of the client.
                 type: str
             client_id:
                 description: Name of the client
