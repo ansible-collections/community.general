@@ -1,0 +1,2 @@
+minor_changes:
+   - snap - add option ``options`` permitting to set options using the ``snap set`` command (https://github.com/ansible-collections/community.general/pull/3943).
