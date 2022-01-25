@@ -310,7 +310,7 @@ class TestPacman:
         P = pacman.Pacman(pacman.setup_module())
         with pytest.raises(AnsibleExitJson) as e:
             P.run()
-        self.mock_run_command.assert_not_called()
+        self.mock_run_command.call_count == 0
         out = e.value.args[0]
         assert "packages" not in out
         assert not out["changed"]
@@ -322,7 +322,7 @@ class TestPacman:
 
         with pytest.raises(AnsibleExitJson) as e:
             P.run()
-        self.mock_run_command.assert_not_called()
+        self.mock_run_command.call_count == 0
         out = e.value.args[0]
         assert out["changed"]
 
@@ -404,7 +404,7 @@ class TestPacman:
         out = e.value.args[0]
 
         if check_mode_value:
-            self.mock_run_command.assert_not_called()
+            self.mock_run_command.call_count == 0
 
         if run_command_data and "args" in run_command_data:
             self.mock_run_command.assert_called_with(mock.ANY, run_command_data["args"], check_rc=False)
@@ -422,7 +422,7 @@ class TestPacman:
 
         with pytest.raises(AnsibleFailJson) as e:
             P.run()
-        self.mock_run_command.assert_called()
+        self.mock_run_command.call_count == 1
         out = e.value.args[0]
         assert out["failed"]
         assert out["stdout"] == "stdout"
@@ -524,8 +524,16 @@ class TestPacman:
                 [],
                 {
                     "calls": [
-                        mock.ANY,  # args already tested above
-                        mock.ANY,
+                        mock.call(
+                            mock.ANY,
+                            ["pacman", "--sync", "--print-format", "%n", "unknown-package-to-remove"],
+                            check_rc=False,
+                        ),
+                        mock.call(
+                            mock.ANY,
+                            ["pacman", "--upgrade", "--print-format", "%n", "unknown-package-to-remove"],
+                            check_rc=False,
+                        ),
                     ],
                     "side_effect": [(1, "", "nope"), (1, "", "stillnope")],
                 },
@@ -569,7 +577,7 @@ class TestPacman:
         assert "packages" not in out
         assert not out["changed"]
         assert "diff" not in out
-        self.mock_run_command.assert_not_called()
+        self.mock_run_command.call_count == 0
 
     @pytest.mark.parametrize(
         "module_args, expected_packages, run_command_data, raises",
@@ -690,7 +698,19 @@ class TestPacman:
                 ["grep-3.7-1"],
                 {
                     "calls": [
-                        mock.ANY,  # args alreaded tested above
+                        mock.call(
+                            mock.ANY,
+                            [
+                                "pacman",
+                                "--remove",
+                                "--noconfirm",
+                                "--noprogressbar",
+                                "--print-format",
+                                "%n-%v",
+                                "grep",
+                            ],
+                            check_rc=False,
+                        )
                     ],
                     "side_effect": [
                         (1, "stdout", "stderr"),
@@ -704,8 +724,24 @@ class TestPacman:
                 ["grep-3.7-1"],
                 {
                     "calls": [
-                        mock.ANY,
-                        mock.ANY,
+                        mock.call(
+                            mock.ANY,
+                            [
+                                "pacman",
+                                "--remove",
+                                "--noconfirm",
+                                "--noprogressbar",
+                                "--print-format",
+                                "%n-%v",
+                                "grep",
+                            ],
+                            check_rc=False,
+                        ),
+                        mock.call(
+                            mock.ANY,
+                            ["pacman", "--remove", "--noconfirm", "--noprogressbar", "grep"],
+                            check_rc=False,
+                        ),
                     ],
                     "side_effect": [
                         (0, "grep", ""),
