@@ -58,8 +58,8 @@ options:
   variables:
     version_added: 4.4.0
     description:
-      - A list of dictionries that represents CI/CD variables.
-      - This modules works internal with this sructure, even if the older I(vars) parameter is used.
+      - A list of dictionaries that represents CI/CD variables.
+      - This module works internal with this structure, even if the older I(vars) parameter is used.
     default: []
     type: list
     elements: dict
@@ -68,10 +68,12 @@ options:
         description:
           - The name of the variable.
         type: str
+        required: true
       value:
         description:
           - The variable value.
         type: str
+        required: true
       masked:
         description:
           - Wether variable value is masked or not.
@@ -389,7 +391,14 @@ def main():
         project=dict(type='str', required=True),
         purge=dict(type='bool', required=False, default=False),
         vars=dict(type='dict', required=False, default=dict(), no_log=True),
-        variables=dict(type='list', elements='dict', required=False, default=list(), no_log=True),
+        variables=dict(type='list', elements='dict', required=False, default=list(), options=dict(
+            name=dict(type='str', required=True),
+            value=dict(type='str', required=True, no_log=True),
+            masked=dict(type='bool', default=False),
+            protected=dict(type='bool', default=False),
+            environment_scope=dict(type='str', default='*'),
+            variable_type=dict(type='str', default='env_var', choices=["env_var", "file"])
+        )),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )
 
