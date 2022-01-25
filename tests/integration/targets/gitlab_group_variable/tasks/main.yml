@@ -21,9 +21,9 @@
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     group: "{{ gitlab_group_name }}"
-    vars:
-      ACCESS_KEY_ID: checkmode
-  check_mode: yes
+    variables:
+      - name: ACCESS_KEY_ID
+        value: checkmode
   register: gitlab_group_variable_state
 
 - name: check_mode state must be changed
@@ -426,8 +426,8 @@
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     group: "{{ gitlab_group_name }}"
-    vars:
-      my_test_var:
+    variables:
+      - name: my_test_var
         value: my_test_value
         variable_type: file
     purge: False
@@ -582,4 +582,34 @@
       - gitlab_group_variable_state.group_variable.added|length == 0
       - gitlab_group_variable_state.group_variable.untouched|length == 0
       - gitlab_group_variable_state.group_variable.removed|length == 40
+      - gitlab_group_variable_state.group_variable.updated|length == 0
+
+- name: same vars, diff scope
+  gitlab_group_variable:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    group: "{{ gitlab_group_name }}"
+    purge: True
+    variables:
+      - name: SECRET_ACCESS_KEY
+        value: 3214cbad
+        masked: true
+        protected: true
+        variable_type: env_var
+        environment_scope: production
+      - name: SECRET_ACCESS_KEY
+        value: hello_world
+        masked: true
+        protected: true
+        variable_type: env_var
+        environment_scope: development
+  register: gitlab_group_variable_state
+
+- name: verify two vars
+  assert:
+    that:
+      - gitlab_group_variable_state.changed
+      - gitlab_group_variable_state.group_variable.added|length == 2
+      - gitlab_group_variable_state.group_variable.untouched|length == 0
+      - gitlab_group_variable_state.group_variable.removed|length == 0
       - gitlab_group_variable_state.group_variable.updated|length == 0
