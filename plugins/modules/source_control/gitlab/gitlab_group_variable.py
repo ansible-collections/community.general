@@ -116,21 +116,6 @@ EXAMPLES = r'''
         variable_type: env_var
         environment_scope: production
 
-- name: Set or update some CI/CD variables
-  community.general.gitlab_group_variable:
-    api_url: https://gitlab.com
-    api_token: secret_access_token
-    group: scodeman/testgroup/
-    purge: false
-    vars:
-      ACCESS_KEY_ID: abc123
-      SECRET_ACCESS_KEY: 321cba
-        value: 3214cbad
-        masked: true
-        protected: true
-        variable_type: env_var
-        environment_scope: '*'
-
 - name: Delete one variable
   community.general.gitlab_group_variable:
     api_url: https://gitlab.com
@@ -185,6 +170,7 @@ except Exception:
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
 
+
 def vars_to_variables(vars, module):
     # transform old vars to new variables structure
     variables = list()
@@ -219,6 +205,7 @@ def vars_to_variables(vars, module):
             module.fail_json(msg="value must be of type string, integer, float or dict")
 
     return variables
+
 
 class GitlabGroupVariables(object):
 
@@ -264,6 +251,7 @@ class GitlabGroupVariables(object):
         self.group.variables.delete(var_obj.get('key'), filter={'environment_scope': var_obj.get('environment_scope')})
         return True
 
+
 def compare(requested_variables, existing_variables, state):
     # we need to do this, because it was determined in a previous version - more or less buggy
     # basically it is not necessary and might results in more/other bugs!
@@ -292,6 +280,7 @@ def compare(requested_variables, existing_variables, state):
                     added.append(requested_variables[idx])
 
     return untouched, updated, added
+
 
 def native_python_main(this_gitlab, purge, requested_variables, state, module):
 
@@ -380,6 +369,7 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
 
     return change, return_value, before, after
 
+
 def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
@@ -417,7 +407,7 @@ def main():
         variables = vars_to_variables(var_list, module)
     else:
         variables = module.params['variables']
-    
+
     state = module.params['state']
 
     if not HAS_GITLAB_PACKAGE:
@@ -429,7 +419,7 @@ def main():
 
     changed, raw_return_value, before, after = native_python_main(this_gitlab, purge, variables, state, module)
 
-        # postprocessing
+    # postprocessing
     for item in after:
         item.pop('group_id')
         item['name'] = item.pop('key')
