@@ -56,44 +56,44 @@ options:
         See GitLab documentation on acceptable values for a masked variable (U(https://docs.gitlab.com/ce/ci/variables/#masked-variables)).
     default: {}
     type: dict
-    variables:
-      version_added: 4.4.0
-      description:
-        - A list of dictionaries that represents CI/CD variables.
-        - This modules works internal with this sructure, even if the older I(vars) parameter is used.
-      default: []
-      type: list
-      elements: dict
-      suboptions:
-        name:
-          description:
-            - The name of the variable
-          type: str
-        value:
-          description:
-            - The variable value
-          type: str
-        masked:
-          description:
-            - Wether variable value is masked or not.
-          type: bool
-          default: false
-        protected:
-          description:
-            - Wether variable value is protected or not.
-          type: bool
-          default: false
-        variable_type:
-          description:
-            - Wether a variable is an environment variable (C(env_var)) or a file (C(file)).
-          type: str
-          choices: [ "env_var", "file" ]
-          default: env_var
-        environment_scope:
-          description:
-            - The scope for the variable.
-          type: str
-          default: '*'
+  variables:
+    version_added: 4.4.0
+    description:
+      - A list of dictionaries that represents CI/CD variables.
+      - This modules works internal with this sructure, even if the older I(vars) parameter is used.
+    default: []
+    type: list
+    elements: dict
+    suboptions:
+      name:
+        description:
+          - The name of the variable
+        type: str
+      value:
+        description:
+          - The variable value
+        type: str
+      masked:
+        description:
+          - Wether variable value is masked or not.
+        type: bool
+        default: false
+      protected:
+        description:
+          - Wether variable value is protected or not.
+        type: bool
+        default: false
+      variable_type:
+        description:
+          - Wether a variable is an environment variable (C(env_var)) or a file (C(file)).
+        type: str
+        choices: [ "env_var", "file" ]
+        default: env_var
+      environment_scope:
+        description:
+          - The scope for the variable.
+        type: str
+        default: '*'
 notes:
 - Supports I(check_mode).
 '''
