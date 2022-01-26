@@ -264,7 +264,7 @@ This produces:
 
 .. versionadded:: 2.0.0
 
-It is possible to use a list of lists as an input of the filer
+It is possible to use a list of lists as an input of the filer:
 
 .. literalinclude:: ../examples/lists_mergeby/example-002.yml
    :language: yaml+jinja
