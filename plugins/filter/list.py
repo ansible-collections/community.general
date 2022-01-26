@@ -77,8 +77,8 @@ def lists_mergeby(*terms, **kwargs):
     for sublist in terms[:-1]:
         if not isinstance(sublist, Sequence):
             msg = ("All arguments before the argument index for community.general.lists_mergeby "
-                   "must be lists.")
-            raise AnsibleFilterError(msg)
+                   "must be lists. %s is %s")
+            raise AnsibleFilterError(msg % (sublist, type(sublist)))
         if len(sublist) > 0:
             if all(isinstance(l, Sequence) for l in sublist):
                 for item in sublist:
