@@ -142,7 +142,7 @@ class TestPacman:
         with pytest.raises(AnsibleFailJson) as e:
             set_module_args({})
             pacman.main()
-        assert "one of the following is required" in str(e)
+        assert e.match(r"one of the following is required")
 
     def test_success(self, mock_empty_inventory):
         set_module_args({"update_cache": True})  # Simplest args to let init go through
