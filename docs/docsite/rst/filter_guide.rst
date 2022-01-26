@@ -255,7 +255,7 @@ If you have two or more lists of dictionaries and want to combine them into a li
 In the example below the lists are merged by the attribute *name*:
 
 .. literalinclude:: ../examples/lists_mergeby/example-001.yml
-   :language: yaml
+   :language: yaml+jinja
 
 This produces:
 
