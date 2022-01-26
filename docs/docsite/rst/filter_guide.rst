@@ -252,29 +252,97 @@ If you have two or more lists of dictionaries and want to combine them into a li
 
 .. note:: The output of the examples in this section use the YAML callback plugin. Quoting: "Ansible output that can be quite a bit easier to read than the default JSON formatting." See :ref:`the documentation for the community.general.yaml callback plugin <ansible_collections.community.general.yaml_callback>`.
 
-In the example below the lists are merged by the attribute *name*:
+In the example below the lists are merged by the attribute ``name``:
 
-.. literalinclude:: ../examples/lists_mergeby/example-001.yml
+.. literalinclude:: examples/lists_mergeby/example-001.yml
    :language: yaml+jinja
 
 This produces:
 
-.. literalinclude:: ../examples/lists_mergeby/example-001.out
+.. literalinclude:: examples/lists_mergeby/example-001.out
    :language: yaml
 
 .. versionadded:: 2.0.0
 
-It is possible to use a list of lists as an input of the filer:
+It is possible to use a list of lists as an input of the filter:
 
-.. literalinclude:: ../examples/lists_mergeby/example-002.yml
+.. literalinclude:: examples/lists_mergeby/example-002.yml
    :language: yaml+jinja
 
 This produces the same result as in the previous example:
 
-.. literalinclude:: ../examples/lists_mergeby/example-002.out
+.. literalinclude:: examples/lists_mergeby/example-002.out
    :language: yaml
 
-.. versionadded:: 4.4.0
+The filter also accepts two optional parameters: ``recursive`` and ``list_merge``. These parameters are only supported when used with ansible-base 2.10 or ansible-core, but not with Ansible 2.9.
+
+**recursive**
+    Is a boolean, default to ``False``. Should the ``combine`` recursively merge nested hashes. Note: It does not depend on the value of the ``hash_behaviour`` setting in ``ansible.cfg``.
+
+**list_merge**
+    Is a string, its possible values are ``replace`` (default), ``keep``, ``append``, ``prepend``, ``append_rp`` or ``prepend_rp``. It modifies the behaviour of community.general.lists_mergeby when the hashes to merge contain arrays/lists.
+
+The examples below set ``recursive=True`` and display the differences among all six options of ``list_merge``. Functionality of the parameters is exactly the same as in the filter ``combine``. See `Combining hashes/dictionaries <https://docs.ansible.com/ansible/devel/user_guide/playbooks_filters.html#combining-hashes-dictionaries>`_ to learn details about these options.
+
+Example **list_merge=replace** (default)
+
+.. literalinclude:: examples/lists_mergeby/example-003.yml
+   :language: yaml+jinja
+
+This produces:
+
+.. literalinclude:: examples/lists_mergeby/example-003.out
+   :language: yaml
+
+Example **list_merge=keep**
+
+.. literalinclude:: examples/lists_mergeby/example-004.yml
+   :language: yaml+jinja
+
+This produces:
+
+.. literalinclude:: examples/lists_mergeby/example-004.out
+   :language: yaml
+
+Example **list_merge=append**
+
+.. literalinclude:: examples/lists_mergeby/example-005.yml
+   :language: yaml+jinja
+
+This produces:
+
+.. literalinclude:: examples/lists_mergeby/example-005.out
+   :language: yaml
+
+Example **list_merge=prepend**
+
+.. literalinclude:: examples/lists_mergeby/example-006.yml
+   :language: yaml+jinja
+
+This produces:
+
+.. literalinclude:: examples/lists_mergeby/example-006.out
+   :language: yaml
+
+Example **list_merge=append_rp**
+
+.. literalinclude:: examples/lists_mergeby/example-007.yml
+   :language: yaml+jinja
+
+This produces:
+
+.. literalinclude:: examples/lists_mergeby/example-007.out
+   :language: yaml
+
+Example **list_merge=prepend_rp**
+
+.. literalinclude:: examples/lists_mergeby/example-008.yml
+   :language: yaml+jinja
+
+This produces:
+
+.. literalinclude:: examples/lists_mergeby/example-008.out
+   :language: yaml
 
 
 Counting elements in a sequence

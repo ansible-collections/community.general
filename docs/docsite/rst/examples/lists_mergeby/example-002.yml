@@ -1,7 +1,8 @@
 ---
 - name: Merge two lists by common attribute 'name'
   set_fact:
-    list3: "{{ [list1, list2] | community.general.lists_mergeby('name') }}"
+    list3: "{{ [list1, list2]|
+               community.general.lists_mergeby('name') }}"
   vars:
     list1:
       - name: foo
@@ -14,6 +15,6 @@
       - name: foo
         path: /foo
       - name: baz
-        path: /bazzz
+        path: /baz
 - debug:
     var: list3
