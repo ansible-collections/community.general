@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - import_tasks: example-001.yml
+      tags: t001
+    - import_tasks: example-002.yml
+      tags: t002

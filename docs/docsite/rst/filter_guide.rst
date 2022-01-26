@@ -1,3 +1,4 @@
+
 .. _ansible_collections.community.general.docsite.filter_guide:
 
 community.general Filter Guide
@@ -247,55 +248,34 @@ This produces:
 Merging lists of dictionaries
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you have two lists of dictionaries and want to combine them into a list of merged dictionaries, where two dictionaries are merged if they coincide in one attribute, you can use the ``lists_mergeby`` filter.
+If you have two or more lists of dictionaries and want to combine them into a list of merged dictionaries, where the dictionaries are merged by an attribute, you can use the ``lists_mergeby`` filter.
 
-.. code-block:: yaml+jinja
+.. note:: The output of the examples in this section use the yaml callback plugin. Quoting: "Ansible output that can be quite a bit easier to read than the default JSON formatting." See ``shell> ansible-doc -t callback yaml``
 
-    - name: Merge two lists by common attribute 'name'
-      debug:
-        var: list1 | community.general.lists_mergeby(list2, 'name')
-      vars:
-        list1:
-          - name: foo
-            extra: true
-          - name: bar
-            extra: false
-          - name: meh
-            extra: true
-        list2:
-          - name: foo
-            path: /foo
-          - name: baz
-            path: /bazzz
+In the example below the lists are merged by the attribute *name*
+
+.. literalinclude:: ../examples/lists_mergeby/example-001.yml
+   :language: yaml
 
 This produces:
 
-.. code-block:: ansible-output
+.. literalinclude:: ../examples/lists_mergeby/example-001.out
+   :language: yaml
 
-    TASK [Merge two lists by common attribute 'name']  ****************************************
-    ok: [localhost] => {
-        "list1 | community.general.lists_mergeby(list2, 'name')": [
-            {
-                "extra": false,
-                "name": "bar"
-            },
-            {
-                "name": "baz",
-                "path": "/bazzz"
-            },
-            {
-                "extra": true,
-                "name": "foo",
-                "path": "/foo"
-            },
-            {
-                "extra": true,
-                "name": "meh"
-            }
-        ]
-    }
+.. versionadded:: 2.0.0
 
-.. versionadded: 2.0.0
+It is possible to use a list of lists as an input of the filer
+
+.. literalinclude:: ../examples/lists_mergeby/example-002.yml
+   :language: yaml
+
+This produces the same result as in the previous example:
+
+.. literalinclude:: ../examples/lists_mergeby/example-002.out
+   :language: yaml
+
+.. versionadded:: 4.4.0
+
 
 Counting elements in a sequence
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
