@@ -267,7 +267,7 @@ This produces:
 It is possible to use a list of lists as an input of the filer
 
 .. literalinclude:: ../examples/lists_mergeby/example-002.yml
-   :language: yaml
+   :language: yaml+jinja
 
 This produces the same result as in the previous example:
 
