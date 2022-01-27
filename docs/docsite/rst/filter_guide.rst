@@ -284,7 +284,7 @@ The filter also accepts two optional parameters: ``recursive`` and ``list_merge`
 
 The examples below set ``recursive=true`` and display the differences among all six options of ``list_merge``. Functionality of the parameters is exactly the same as in the filter ``combine``. See `Combining hashes/dictionaries <https://docs.ansible.com/ansible/devel/user_guide/playbooks_filters.html#combining-hashes-dictionaries>`_ to learn details about these options.
 
-Example **list_merge=replace** (default)
+Example **list_merge=replace** (default):
 
 .. literalinclude:: examples/lists_mergeby/example-003.yml
    :language: yaml+jinja
