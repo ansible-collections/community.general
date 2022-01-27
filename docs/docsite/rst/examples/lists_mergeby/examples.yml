@@ -12,7 +12,7 @@ examples:
   - label: 'This produces:'
     file: example-004.out
     lang: 'yaml'
-  - label: 'Example list_merge=append'
+  - label: 'Example ``list_merge=append``:'
     file: example-005.yml
     lang: 'yaml+jinja'
   - label: 'This produces:'
