@@ -344,7 +344,7 @@ The filter also accepts two optional parameters: ``recursive`` and ``list_merge`
 
 The examples below set ``recursive=true`` and display the differences among all six options of ``list_merge``. Functionality of the parameters is exactly the same as in the filter ``combine``. See :ref:`Combining hashes/dictionaries <combine_filter>` to learn details about these options.
 
-Example list_merge=replace (default):
+Example ``list_merge=replace`` (default):
 
 .. code-block:: yaml+jinja
 
@@ -396,7 +396,7 @@ This produces:
       - 4
       - key: value
 
-Example list_merge=keep
+Example ``list_merge=keep``:
 
 .. code-block:: yaml+jinja
 
@@ -449,7 +449,7 @@ This produces:
       - 2
       - 3
 
-Example list_merge=append
+Example ``list_merge=append``:
 
 .. code-block:: yaml+jinja
 
@@ -507,7 +507,7 @@ This produces:
       - 4
       - key: value
 
-Example list_merge=prepend
+Example ``list_merge=prepend``:
 
 .. code-block:: yaml+jinja
 
@@ -565,7 +565,7 @@ This produces:
       - 2
       - 3
 
-Example list_merge=append_rp
+Example ``list_merge=append_rp``:
 
 .. code-block:: yaml+jinja
 
@@ -622,7 +622,7 @@ This produces:
       - 4
       - key: value
 
-Example list_merge=prepend_rp
+Example ``list_merge=prepend_rp``:
 
 .. code-block:: yaml+jinja
 
