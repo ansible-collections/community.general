@@ -3,7 +3,7 @@
   set_fact:
     list3: "{{ [list1, list2]|
                community.general.lists_mergeby('name',
-                                               recursive=True,
+                                               recursive=true,
                                                list_merge='keep') }}"
   vars:
     list1:
