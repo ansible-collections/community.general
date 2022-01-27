@@ -1,0 +1,2 @@
+bugfixes:
+  - listen_ports_facts - local port regex was not handling well ipv6 only binding. Fixes the regex for ss
