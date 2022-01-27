@@ -18,7 +18,7 @@ examples:
   - label: 'This produces:'
     file: example-005.out
     lang: 'yaml'
-  - label: 'Example list_merge=prepend'
+  - label: 'Example ``list_merge=prepend``:'
     file: example-006.yml
     lang: 'yaml+jinja'
   - label: 'This produces:'
