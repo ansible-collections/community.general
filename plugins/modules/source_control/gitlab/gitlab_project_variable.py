@@ -410,7 +410,7 @@ def main():
             ['api_username', 'api_job_token'],
             ['api_token', 'api_oauth_token'],
             ['api_token', 'api_job_token'],
-            ['vars', 'variables']
+            ['vars', 'variables'],
         ],
         required_together=[
             ['api_username', 'api_password'],
