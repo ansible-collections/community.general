@@ -6,7 +6,7 @@ examples:
   - label: 'This produces:'
     file: example-003.out
     lang: 'yaml'
-  - label: 'Example list_merge=keep'
+  - label: 'Example ``list_merge=keep``:'
     file: example-004.yml
     lang: 'yaml+jinja'
   - label: 'This produces:'
