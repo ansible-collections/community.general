@@ -274,7 +274,7 @@ This produces the same result as in the previous example:
 .. literalinclude:: examples/lists_mergeby/example-002.out
    :language: yaml
 
-The filter also accepts two optional parameters: ``recursive`` and ``list_merge``. These parameters are only supported when used with ansible-base 2.10 or ansible-core, but not with Ansible 2.9.
+The filter also accepts two optional parameters: ``recursive`` and ``list_merge``. These parameters are only supported when used with ansible-base 2.10 or ansible-core, but not with Ansible 2.9. This is available since community.general 4.4.0.
 
 **recursive**
     Is a boolean, default to ``False``. Should the ``combine`` recursively merge nested hashes. Note: It does not depend on the value of the ``hash_behaviour`` setting in ``ansible.cfg``.
