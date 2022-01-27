@@ -6,7 +6,7 @@
   when: debug_test|d(false)|bool
   tags: t0
 
-- name: 1.Test lists merged by attribute name
+- name: 1. Test lists merged by attribute name
   block:
     - name: Test lists merged by attribute name debug
       debug:
