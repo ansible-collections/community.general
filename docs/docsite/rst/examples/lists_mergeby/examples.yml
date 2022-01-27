@@ -1,6 +1,6 @@
 ---
 examples:
-  - label: 'Example list_merge=replace (default):'
+  - label: 'Example ``list_merge=replace`` (default):'
     file: example-003.yml
     lang: 'yaml+jinja'
   - label: 'This produces:'
