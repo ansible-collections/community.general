@@ -232,7 +232,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                                         host_attrs['state'])
             self.inventory.set_variable(host_name, 'state_type',
                                         host_attrs['state_type'])
-            if host_attrs['vars'] is not None:
+            if host_attrs.get('vars') is not None:
                 if host_attrs['vars'].get('ansible_user') is not None:
                     self.inventory.set_variable(host_name, 'ansible_user', host_attrs['vars'].get('ansible_user'))
                 if host_attrs['vars'].get('ansible_port') is not None:
