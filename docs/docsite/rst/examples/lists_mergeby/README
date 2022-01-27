@@ -1,0 +1,9 @@
+Antsibull only copies .rst files
+--------------------------------
+https://github.com/ansible-community/antsibull/blob/1eb595309ec0e01310edd59682e808dde3fc8a3a/src/antsibull/extra_docs.py#L44-L60
+https://github.com/ansible-community/antsibull/blob/1eb595309ec0e01310edd59682e808dde3fc8a3a/src/antsibull/extra_docs.py#L194-L206
+
+Copy yml and out files to rst
+-----------------------------
+for i in *.yml; do cp $i $i.rst; done
+for i in *.out; do cp $i $i.rst; done

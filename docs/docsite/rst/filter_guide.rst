@@ -254,24 +254,24 @@ If you have two or more lists of dictionaries and want to combine them into a li
 
 In the example below the lists are merged by the attribute ``name``:
 
-.. literalinclude:: examples/lists_mergeby/example-001.yml
+.. literalinclude:: examples/lists_mergeby/example-001.yml.rst
    :language: yaml+jinja
 
 This produces:
 
-.. literalinclude:: examples/lists_mergeby/example-001.out
+.. literalinclude:: examples/lists_mergeby/example-001.out.rst
    :language: yaml
 
 .. versionadded:: 2.0.0
 
 It is possible to use a list of lists as an input of the filter:
 
-.. literalinclude:: examples/lists_mergeby/example-002.yml
+.. literalinclude:: examples/lists_mergeby/example-002.yml.rst
    :language: yaml+jinja
 
 This produces the same result as in the previous example:
 
-.. literalinclude:: examples/lists_mergeby/example-002.out
+.. literalinclude:: examples/lists_mergeby/example-002.out.rst
    :language: yaml
 
 The filter also accepts two optional parameters: ``recursive`` and ``list_merge``. These parameters are only supported when used with ansible-base 2.10 or ansible-core, but not with Ansible 2.9. This is available since community.general 4.4.0.
@@ -286,62 +286,62 @@ The examples below set ``recursive=true`` and display the differences among all 
 
 Example **list_merge=replace** (default):
 
-.. literalinclude:: examples/lists_mergeby/example-003.yml
+.. literalinclude:: examples/lists_mergeby/example-003.yml.rst
    :language: yaml+jinja
 
 This produces:
 
-.. literalinclude:: examples/lists_mergeby/example-003.out
+.. literalinclude:: examples/lists_mergeby/example-003.out.rst
    :language: yaml
 
 Example **list_merge=keep**
 
-.. literalinclude:: examples/lists_mergeby/example-004.yml
+.. literalinclude:: examples/lists_mergeby/example-004.yml.rst
    :language: yaml+jinja
 
 This produces:
 
-.. literalinclude:: examples/lists_mergeby/example-004.out
+.. literalinclude:: examples/lists_mergeby/example-004.out.rst
    :language: yaml
 
 Example **list_merge=append**
 
-.. literalinclude:: examples/lists_mergeby/example-005.yml
+.. literalinclude:: examples/lists_mergeby/example-005.yml.rst
    :language: yaml+jinja
 
 This produces:
 
-.. literalinclude:: examples/lists_mergeby/example-005.out
+.. literalinclude:: examples/lists_mergeby/example-005.out.rst
    :language: yaml
 
 Example **list_merge=prepend**
 
-.. literalinclude:: examples/lists_mergeby/example-006.yml
+.. literalinclude:: examples/lists_mergeby/example-006.yml.rst
    :language: yaml+jinja
 
 This produces:
 
-.. literalinclude:: examples/lists_mergeby/example-006.out
+.. literalinclude:: examples/lists_mergeby/example-006.out.rst
    :language: yaml
 
 Example **list_merge=append_rp**
 
-.. literalinclude:: examples/lists_mergeby/example-007.yml
+.. literalinclude:: examples/lists_mergeby/example-007.yml.rst
    :language: yaml+jinja
 
 This produces:
 
-.. literalinclude:: examples/lists_mergeby/example-007.out
+.. literalinclude:: examples/lists_mergeby/example-007.out.rst
    :language: yaml
 
 Example **list_merge=prepend_rp**
 
-.. literalinclude:: examples/lists_mergeby/example-008.yml
+.. literalinclude:: examples/lists_mergeby/example-008.yml.rst
    :language: yaml+jinja
 
 This produces:
 
-.. literalinclude:: examples/lists_mergeby/example-008.out
+.. literalinclude:: examples/lists_mergeby/example-008.out.rst
    :language: yaml
 
 
