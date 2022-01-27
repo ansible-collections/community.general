@@ -7,11 +7,24 @@
 # Copyright: (c) 2022, Joseph Torcasso <jtorcass@redhat.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 ---
+  - name: Find brew binary
+    command: which brew
+    register: brew_which
+    when: ansible_distribution in ['MacOSX']
+
+  - name: Get owner of brew binary
+    stat:
+      path: "{{ brew_which.stdout }}"
+    register: brew_stat
+    when: ansible_distribution in ['MacOSX']
+
   - block:
       - name: Install cask
         homebrew_cask:
           name: "{{ cask }}"
           state: present
+        become: yes
+        become_user: "{{ brew_stat.stat.pw_name }}"
         register: cask_install_result
 
       - assert:
@@ -23,6 +36,8 @@
         homebrew_cask:
           name: "{{ cask }}"
           state: present
+        become: yes
+        become_user: "{{ brew_stat.stat.pw_name }}"
         register: cask_install_result
 
       - assert:
@@ -36,6 +51,8 @@
           name: "{{ cask }}"
           state: present
           install_options: force
+        become: yes
+        become_user: "{{ brew_stat.stat.pw_name }}"
         register: cask_install_result
 
       - assert:
@@ -49,4 +66,6 @@
           name: "{{ cask }}"
           state: absent
           install_options: force
+        become: yes
+        become_user: "{{ brew_stat.stat.pw_name }}"
         ignore_errors: yes
