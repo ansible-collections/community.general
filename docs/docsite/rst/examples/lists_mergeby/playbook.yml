@@ -2,19 +2,29 @@
 - hosts: localhost
   gather_facts: false
   tasks:
-    - import_tasks: example-001.yml
-      tags: t001
-    - import_tasks: example-002.yml
-      tags: t002
-    - import_tasks: example-003.yml
-      tags: t003
-    - import_tasks: example-004.yml
-      tags: t004
-    - import_tasks: example-005.yml
-      tags: t005
-    - import_tasks: example-006.yml
-      tags: t006
-    - import_tasks: example-007.yml
-      tags: t007
-    - import_tasks: example-008.yml
-      tags: t008
+
+    - block:
+        - import_tasks: example-001.yml
+          tags: t001
+        - import_tasks: example-002.yml
+          tags: t002
+        - import_tasks: example-003.yml
+          tags: t003
+        - import_tasks: example-004.yml
+          tags: t004
+        - import_tasks: example-005.yml
+          tags: t005
+        - import_tasks: example-006.yml
+          tags: t006
+        - import_tasks: example-007.yml
+          tags: t007
+        - import_tasks: example-008.yml
+          tags: t008
+      when: examples|d(false)|bool
+
+    - block:
+        - include_vars: examples.yml
+        - template:
+            src: examples.rst.j2
+            dest: examples.rst
+      when: template|d(false)|bool
