@@ -282,7 +282,7 @@ The filter also accepts two optional parameters: ``recursive`` and ``list_merge`
 **list_merge**
     Is a string, its possible values are ``replace`` (default), ``keep``, ``append``, ``prepend``, ``append_rp`` or ``prepend_rp``. It modifies the behaviour of community.general.lists_mergeby when the hashes to merge contain arrays/lists.
 
-The examples below set ``recursive=True`` and display the differences among all six options of ``list_merge``. Functionality of the parameters is exactly the same as in the filter ``combine``. See `Combining hashes/dictionaries <https://docs.ansible.com/ansible/devel/user_guide/playbooks_filters.html#combining-hashes-dictionaries>`_ to learn details about these options.
+The examples below set ``recursive=true`` and display the differences among all six options of ``list_merge``. Functionality of the parameters is exactly the same as in the filter ``combine``. See `Combining hashes/dictionaries <https://docs.ansible.com/ansible/devel/user_guide/playbooks_filters.html#combining-hashes-dictionaries>`_ to learn details about these options.
 
 Example **list_merge=replace** (default)
 
