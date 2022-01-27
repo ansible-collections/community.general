@@ -24,7 +24,7 @@ examples:
   - label: 'This produces:'
     file: example-006.out
     lang: 'yaml'
-  - label: 'Example list_merge=append_rp'
+  - label: 'Example ``list_merge=append_rp``:'
     file: example-007.yml
     lang: 'yaml+jinja'
   - label: 'This produces:'
