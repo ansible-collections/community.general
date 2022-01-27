@@ -232,14 +232,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                                         host_attrs['state'])
             self.inventory.set_variable(host_name, 'state_type',
                                         host_attrs['state_type'])
-            try:
-                self.inventory.set_variable(host_name, 'ansible_user', host_attrs['vars']['ansible_user'])
-            except:
-                pass
-            try:
-                self.inventory.set_variable(host_name, 'ansible_port', host_attrs['vars']['ansible_port'])
-            except:
-                pass
+            if host_attrs['vars'] != None:
+                if host_attrs['vars'].get('ansible_user') != None:
+                    self.inventory.set_variable(host_name, 'ansible_user', host_attrs['vars'].get('ansible_user'))
+                if host_attrs['vars'].get('ansible_port') != None:
+                    self.inventory.set_variable(host_name, 'ansible_port', host_attrs['vars'].get('ansible_port'))
         return groups_dict
 
     def parse(self, inventory, loader, path, cache=True):
