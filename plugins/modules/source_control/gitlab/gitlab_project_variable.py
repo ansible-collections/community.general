@@ -316,7 +316,7 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
         item['value'] = str(item.get('value'))
         if item.get('protected') is None:
             item['protected'] = False
-            module.deprecate("The 'protected' attribute will be set to 'True' if not defined.",
+            module.deprecate("The 'protected' attribute will be set to 'true' if not defined.",
                              version='5.0.0', collection_name='community.general')
         if item.get('masked') is None:
             item['masked'] = False
