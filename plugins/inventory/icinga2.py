@@ -180,7 +180,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         """Query for all hosts """
         self.display.vvv("Querying Icinga2 for inventory")
         query_args = {
-            "attrs": ["address", "display_name", "state_type", "state", "groups"],
+            "attrs": ["address", "display_name", "state_type", "state", "groups", "vars"],
         }
         if self.host_filter is not None:
             query_args['host_filter'] = self.host_filter
@@ -232,6 +232,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                                         host_attrs['state'])
             self.inventory.set_variable(host_name, 'state_type',
                                         host_attrs['state_type'])
+            try:
+                self.inventory.set_variable(host_name, 'ansible_user', host_attrs['vars']['ansible_user'])
+            except:
+                pass
+            try:
+                self.inventory.set_variable(host_name, 'ansible_port', host_attrs['vars']['ansible_port'])
+            except:
+                pass
         return groups_dict
 
     def parse(self, inventory, loader, path, cache=True):
