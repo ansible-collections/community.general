@@ -375,7 +375,7 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
     if module.check_mode:
         return_value = dict(added=added, updated=updated, removed=return_value['removed'], untouched=untouched)
 
-    if len(return_value['added'] + return_value['removed'] + return_value['updated']) > 0:
+    if return_value['added'] or return_value['removed'] or return_value['updated']:
         change = True
 
     gitlab_keys = this_gitlab.list_all_project_variables()
