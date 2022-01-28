@@ -1,0 +1,28 @@
+---
+- name: Merge recursive by 'name', replace lists (default)
+  set_fact:
+    list3: "{{ [list1, list2]|
+               community.general.lists_mergeby('name',
+                                               recursive=true) }}"
+  vars:
+    list1:
+      - name: myname01
+        param01:
+          x: default_value
+          y: default_value
+          list:
+            - default_value
+      - name: myname02
+        param01: [1, 1, 2, 3]
+
+    list2:
+      - name: myname01
+        param01:
+          y: patch_value
+          z: patch_value
+          list:
+            - patch_value
+      - name: myname02
+        param01: [3, 4, 4, {key: value}]
+- debug:
+    var: list3

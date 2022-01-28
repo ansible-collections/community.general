@@ -1,0 +1,38 @@
+---
+examples:
+  - label: 'Example ``list_merge=replace`` (default):'
+    file: example-003.yml
+    lang: 'yaml+jinja'
+  - label: 'This produces:'
+    file: example-003.out
+    lang: 'yaml'
+  - label: 'Example ``list_merge=keep``:'
+    file: example-004.yml
+    lang: 'yaml+jinja'
+  - label: 'This produces:'
+    file: example-004.out
+    lang: 'yaml'
+  - label: 'Example ``list_merge=append``:'
+    file: example-005.yml
+    lang: 'yaml+jinja'
+  - label: 'This produces:'
+    file: example-005.out
+    lang: 'yaml'
+  - label: 'Example ``list_merge=prepend``:'
+    file: example-006.yml
+    lang: 'yaml+jinja'
+  - label: 'This produces:'
+    file: example-006.out
+    lang: 'yaml'
+  - label: 'Example ``list_merge=append_rp``:'
+    file: example-007.yml
+    lang: 'yaml+jinja'
+  - label: 'This produces:'
+    file: example-007.out
+    lang: 'yaml'
+  - label: 'Example ``list_merge=prepend_rp``:'
+    file: example-008.yml
+    lang: 'yaml+jinja'
+  - label: 'This produces:'
+    file: example-008.out
+    lang: 'yaml'

@@ -1,2 +1,7 @@
 ---
-- include_tasks: lists_mergeby.yml
+- name: Test list_merge default options
+  import_tasks: lists_mergeby_default.yml
+
+- name: Test list_merge non-default options in Ansible 2.10 and higher
+  import_tasks: lists_mergeby_2-10.yml
+  when: ansible_version.full is version('2.10', '>=')
