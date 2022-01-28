@@ -1,0 +1,140 @@
+---
+
+- name: 101.Merge 2 lists by attribute name. list_merge='keep'
+  block:
+    - name: Merge 2 lists by attribute name. list_merge='keep'. set
+      set_fact:
+        my_list: "{{ [list100, list101]|
+                     community.general.lists_mergeby('name', list_merge='keep') }}"
+    - name: Merge 2 lists by attribute name. list_merge='keep'. debug
+      debug:
+        msg: |-
+          my_list:
+            {{ my_list|to_nice_yaml|indent(2) }}
+          my_list|difference(result101):
+            {{ my_list|difference(result101)|to_nice_yaml|indent(2) }}
+      when: debug_test|d(false)|bool
+    - name: Merge 2 lists by attribute name. list_merge='keep'. assert
+      assert:
+        that: my_list | difference(result101) | length == 0
+  tags: t101
+
+- name: 102.Merge 2 lists by attribute name. list_merge='append'
+  block:
+    - name: Merge 2 lists by attribute name. list_merge='append'. set
+      set_fact:
+        my_list: "{{ [list100, list101]|
+                     community.general.lists_mergeby('name', list_merge='append') }}"
+    - name: Merge 2 lists by attribute name. list_merge='append'. debug
+      debug:
+        msg: |-
+          my_list:
+            {{ my_list|to_nice_yaml|indent(2) }}
+          my_list|difference(result102):
+            {{ my_list|difference(result102)|to_nice_yaml|indent(2) }}
+      when: debug_test|d(false)|bool
+    - name: Merge 2 lists by attribute name. list_merge='append'. assert
+      assert:
+        that: my_list | difference(result102) | length == 0
+  tags: t102
+
+- name: 103.Merge 2 lists by attribute name. list_merge='prepend'
+  block:
+    - name: Merge 2 lists by attribute name. list_merge='prepend'. set
+      set_fact:
+        my_list: "{{ [list100, list101]|
+                     community.general.lists_mergeby('name', list_merge='prepend') }}"
+    - name: Merge 2 lists by attribute name. list_merge='prepend'. debug
+      debug:
+        msg: |-
+          my_list:
+            {{ my_list|to_nice_yaml|indent(2) }}
+          my_list|difference(result103):
+            {{ my_list|difference(result103)|to_nice_yaml|indent(2) }}
+      when: debug_test|d(false)|bool
+    - name: Merge 2 lists by attribute name. list_merge='prepend'. assert
+      assert:
+        that: my_list | difference(result103) | length == 0
+  tags: t103
+
+- name: 104.Merge 2 lists by attribute name. list_merge='append_rp'
+  block:
+    - name: Merge 2 lists by attribute name. list_merge='append_rp'. set
+      set_fact:
+        my_list: "{{ [list102, list103]|
+                     community.general.lists_mergeby('name', list_merge='append_rp') }}"
+    - name: Merge 2 lists by attribute name. list_merge='append_rp'. debug
+      debug:
+        msg: |-
+          my_list:
+            {{ my_list|to_nice_yaml|indent(2) }}
+          my_list|difference(result104):
+            {{ my_list|difference(result104)|to_nice_yaml|indent(2) }}
+      when: debug_test|d(false)|bool
+    - name: Merge 2 lists by attribute name. list_merge='append_rp'. assert
+      assert:
+        that: my_list | difference(result104) | length == 0
+  tags: t104
+
+- name: 105.Merge 2 lists by attribute name. list_merge='prepend_rp'
+  block:
+    - name: Merge 2 lists by attribute name. list_merge='prepend_rp'. set
+      set_fact:
+        my_list: "{{ [list102, list103]|
+                     community.general.lists_mergeby('name', list_merge='prepend_rp') }}"
+    - name: Merge 2 lists by attribute name. list_merge='prepend_rp'. debug
+      debug:
+        msg: |-
+          my_list:
+            {{ my_list|to_nice_yaml|indent(2) }}
+          my_list|difference(result105):
+            {{ my_list|difference(result105)|to_nice_yaml|indent(2) }}
+      when: debug_test|d(false)|bool
+    - name: Merge 2 lists by attribute name. list_merge='prepend_rp'. assert
+      assert:
+        that: my_list | difference(result105) | length == 0
+  tags: t105
+
+# Test recursive
+
+- name: 200.Merge by name. recursive=True list_merge='append_rp'
+  block:
+    - name: Merge by name. recursive=True list_merge='append_rp'. set
+      set_fact:
+        my_list: "{{ [list200, list201]|
+                     community.general.lists_mergeby('name',
+                                                     recursive=True,
+                                                     list_merge='append_rp') }}"
+    - name: Merge by name. recursive=True list_merge='append_rp'. debug
+      debug:
+        msg: |-
+          my_list:
+            {{ my_list|to_nice_yaml|indent(2) }}
+          my_list|difference(result200):
+            {{ my_list|difference(result200)|to_nice_yaml|indent(2) }}
+      when: debug_test|d(false)|bool
+    - name: Merge by name. recursive=True list_merge='append_rp'. assert
+      assert:
+        that: my_list | difference(result200) | length == 0
+  tags: t200
+
+- name: 201.Merge by name. recursive=False list_merge='append_rp'
+  block:
+    - name: Merge by name. recursive=False list_merge='append_rp'. set
+      set_fact:
+        my_list: "{{ [list200, list201]|
+                     community.general.lists_mergeby('name',
+                                                     recursive=False,
+                                                     list_merge='append_rp') }}"
+    - name: Merge by name. recursive=False list_merge='append_rp'. debug
+      debug:
+        msg: |-
+          my_list:
+            {{ my_list|to_nice_yaml|indent(2) }}
+          my_list|difference(result201):
+            {{ my_list|difference(result201)|to_nice_yaml|indent(2) }}
+      when: debug_test|d(false)|bool
+    - name: Merge by name. recursive=False list_merge='append_rp'. assert
+      assert:
+        that: my_list | difference(result201) | length == 0
+  tags: t201
