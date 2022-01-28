@@ -75,6 +75,7 @@ def query_hosts(hosts=None, attrs=None, joins=None, host_filter=None):
     ]
     return json_host_data
 
+
 def get_option(option):
     if option == 'groups':
         return {}
@@ -86,6 +87,7 @@ def get_option(option):
         return False
     else:
         return None
+
 
 def test_populate(inventory, mocker):
     # module settings
