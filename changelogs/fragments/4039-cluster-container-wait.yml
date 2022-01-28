@@ -1,0 +1,2 @@
+minor_changes:
+  - "lxc_container - added ``wait_for_container`` parameter. If ``true`` the module will wait until the running task reports success as the status (https://github.com/ansible-collections/community.general/pull/4039)."
