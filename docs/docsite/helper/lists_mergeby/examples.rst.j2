@@ -1,0 +1,8 @@
+{% for i in examples %}
+{{ i.label }}
+
+.. code-block:: {{ i.lang }}
+
+  {{ lookup('file', source_path ~ i.file)|indent(2) }}
+
+{% endfor %}
