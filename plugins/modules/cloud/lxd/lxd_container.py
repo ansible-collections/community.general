@@ -124,6 +124,13 @@ options:
         required: false
         default: false
         type: bool
+    wait_for_container:
+        description:
+            - If set to C(true), the tasks will wait till the task reports a
+              success status when performing container operations.
+        default: false
+        type: bool
+        version_added: 4.4.0
     force_stop:
         description:
           - If this is true, the C(lxd_container) forces to stop the instance
@@ -414,6 +421,7 @@ class LXDContainerManagement(object):
         self.force_stop = self.module.params['force_stop']
         self.addresses = None
         self.target = self.module.params['target']
+        self.wait_for_container = self.module.params['wait_for_container']
 
         self.type = self.module.params['type']
 
@@ -487,9 +495,9 @@ class LXDContainerManagement(object):
         config = self.config.copy()
         config['name'] = self.name
         if self.target:
-            self.client.do('POST', '{0}?{1}'.format(self.api_endpoint, urlencode(dict(target=self.target))), config)
+            self.client.do('POST', '{0}?{1}'.format(self.api_endpoint, urlencode(dict(target=self.target))), config, wait_for_container=self.wait_for_container)
         else:
-            self.client.do('POST', self.api_endpoint, config)
+            self.client.do('POST', self.api_endpoint, config, wait_for_container=self.wait_for_container)
         self.actions.append('create')
 
     def _start_instance(self):
@@ -744,6 +752,10 @@ def main():
                 type='str',
                 default='container',
                 choices=['container', 'virtual-machine'],
+            ),
+            wait_for_container=dict(
+                type='bool',
+                default=False
             ),
             wait_for_ipv4_addresses=dict(
                 type='bool',
