@@ -337,10 +337,10 @@ This produces the same result as in the previous example:
 The filter also accepts two optional parameters: ``recursive`` and ``list_merge``. These parameters are only supported when used with ansible-base 2.10 or ansible-core, but not with Ansible 2.9. This is available since community.general 4.4.0.
 
 **recursive**
-    Is a boolean, default to ``False``. Should the ``combine`` recursively merge nested hashes. Note: It does not depend on the value of the ``hash_behaviour`` setting in ``ansible.cfg``.
+    Is a boolean, default to ``False``. Should the ``community.general.lists_mergeby`` recursively merge nested hashes. Note: It does not depend on the value of the ``hash_behaviour`` setting in ``ansible.cfg``.
 
 **list_merge**
-    Is a string, its possible values are ``replace`` (default), ``keep``, ``append``, ``prepend``, ``append_rp`` or ``prepend_rp``. It modifies the behaviour of community.general.lists_mergeby when the hashes to merge contain arrays/lists.
+    Is a string, its possible values are ``replace`` (default), ``keep``, ``append``, ``prepend``, ``append_rp`` or ``prepend_rp``. It modifies the behaviour of ``community.general.lists_mergeby`` when the hashes to merge contain arrays/lists.
 
 The examples below set ``recursive=true`` and display the differences among all six options of ``list_merge``. Functionality of the parameters is exactly the same as in the filter ``combine``. See :ref:`Combining hashes/dictionaries <combine_filter>` to learn details about these options.
 
