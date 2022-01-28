@@ -1,0 +1,166 @@
+---
+
+- name: Debug ansible_version
+  debug:
+    var: ansible_version
+  when: debug_test|d(false)|bool
+  tags: t0
+
+- name: 1. Test lists merged by attribute name
+  block:
+    - name: Test lists merged by attribute name debug
+      debug:
+        msg: "{{ list1 | community.general.lists_mergeby(list2, 'name') }}"
+      when: debug_test|d(false)|bool
+    - name: Test lists merged by attribute name assert
+      assert:
+        that:
+          - "(list1 | community.general.lists_mergeby(list2, 'name') | list |
+              difference(list3) | length) == 0"
+  tags: t1
+
+- name: 2.Test list1 empty
+  block:
+    - name: Test list1 empty debug
+      debug:
+        msg: "{{ [] | community.general.lists_mergeby(list2, 'name') }}"
+      when: debug_test|d(false)|bool
+    - name: Test list1 empty assert
+      assert:
+        that:
+          - "([] | community.general.lists_mergeby(list2, 'name') | list |
+              difference(list2) | length) == 0"
+  tags: t2
+
+- name: 3.Test all lists empty
+  block:
+    - name: Test all lists empty debug
+      debug:
+        msg: "{{ [] | community.general.lists_mergeby([], 'name') }}"
+      when: debug_test|d(false)|bool
+    - name: Test all lists empty assert
+      assert:
+        that:
+          - "([] | community.general.lists_mergeby([], 'name') | list |
+              length) == 0"
+  tags: t3
+
+- name: 4.First argument must be list
+  block:
+    - name: First argument must be list set
+      set_fact:
+        my_list: "{{ {'x': 'y'} | community.general.lists_mergeby(list2, 'name') }}"
+      register: result
+      ignore_errors: true
+    - name: First argument must be list debug
+      debug:
+        var: my_list
+      when: debug_test|d(false)|bool
+    - name: First argument must be list assert
+      assert:
+        that:
+          - result is failed
+          - '"All arguments before the argument index for community.general.lists_mergeby must be lists." in result.msg'
+  tags: t4
+
+- name: 5.Second argument must be list
+  block:
+    - name: Second argument must be list set
+      set_fact:
+        my_list: "{{ list1 | community.general.lists_mergeby({'x': 'y'}, 'name') }}"
+      register: result
+      ignore_errors: true
+    - name: Second argument must be list set debug
+      debug:
+        var: my_list
+      when: debug_test|d(false)|bool
+    - name: Second argument must be list set assert
+      assert:
+        that:
+          - result is failed
+          - '"All arguments before the argument index for community.general.lists_mergeby must be lists." in result.msg'
+  tags: t5
+
+- name: 6.First arguments after the lists must be string
+  block:
+    - name: First arguments after the lists must be string set
+      set_fact:
+        my_list: "{{ list1 | community.general.lists_mergeby(list2, {'x': 'y'}) }}"
+      register: result
+      ignore_errors: true
+    - name: First arguments after the lists must be string debug
+      debug:
+        var: my_list
+      when: debug_test|d(false)|bool
+    - name: First arguments after the lists must be string assert
+      assert:
+        that:
+          - result is failed
+          - '"First argument after the lists for community.general.lists_mergeby must be string." in result.msg'
+  tags: t6
+
+- name: 7.Elements of list must be dictionaries
+  block:
+    - name: Elements of list must be dictionaries set
+      set_fact:
+        my_list: "{{ list4 | community.general.lists_mergeby(list2, 'name') }}"
+      register: result
+      ignore_errors: true
+    - name: Elements of list must be dictionaries debug
+      debug:
+        var: my_list
+      when: debug_test|d(false)|bool
+    - name: Elements of list must be dictionaries assert
+      assert:
+        that:
+          - result is failed
+          - '"Elements of list arguments for lists_mergeby must be dictionaries." in result.msg'
+  tags: t7
+
+- name: 8.Merge 3 lists by attribute name. 1 list in params.
+  block:
+    - name: Merge 3 lists by attribute name. 1 list in params. set
+      set_fact:
+        my_list: "{{ [list1, list2] | community.general.lists_mergeby(list5, 'name') }}"
+    - name: Merge 3 lists by attribute name. 1 list in params. debug
+      debug:
+        var: my_list
+      when: debug_test|d(false)|bool
+    - name: Merge 3 lists by attribute name. 1 list in params. assert
+      assert:
+        that: my_list | difference(result1) | length == 0
+  tags: t8
+
+- name: 9.Merge 3 lists by attribute name. No list in the params.
+  block:
+    - name: Merge 3 lists by attribute name. No list in the params. set
+      set_fact:
+        my_list: "{{ [list1, list2, list5] | community.general.lists_mergeby('name') }}"
+    - name: Merge 3 lists by attribute name. No list in the params. debug
+      debug:
+        var: my_list
+      when: debug_test|d(false)|bool
+    - name: Merge 3 lists by attribute name. No list in the params. asset
+      assert:
+        that: my_list | difference(result1) | length == 0
+  tags: t9
+
+# Test list_merge default options
+
+- name: 100.Merge 2 lists by attribute name. list_merge='replace'
+  block:
+    - name: Merge 2 lists by attribute name. list_merge='replace'. set
+      set_fact:
+        my_list: "{{ [list100, list101] | community.general.lists_mergeby('name') }}"
+    - name: Merge 2 lists by attribute name. list_merge='replace'. debug
+      debug:
+        msg: |-
+          my_list:
+            {{ my_list|to_nice_yaml|indent(2) }}
+          my_list|difference(result100):
+            {{ my_list|difference(result100)|to_nice_yaml|indent(2) }}
+      when: debug_test|d(false)|bool
+    - name: Merge 2 lists by attribute name. list_merge='replace'. assert
+      assert:
+        that: my_list | difference(result100) | length == 0
+  tags: t100
