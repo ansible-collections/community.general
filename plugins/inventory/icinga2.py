@@ -16,6 +16,8 @@ DOCUMENTATION = '''
         - Get inventory hosts from the Icinga2 API.
         - "Uses a configuration file as an inventory source, it must end in
           C(.icinga2.yml) or C(.icinga2.yaml)."
+    extends_documentation_fragment:
+        - constructed
     options:
       plugin:
         description: Name of the plugin.
@@ -63,6 +65,17 @@ password: secure
 host_filter: \"linux-servers\" in host.groups
 validate_certs: false
 inventory_attr: name
+groups:
+  # simple name matching
+  webservers: inventory_hostname.startswith('web')
+
+  # using icinga2 template
+  databaseservers: "'db-template' in (icinga2.templates|list)"
+
+compose:
+  # set 'ansible_user' and 'ansible_port' from icinga2 host vars
+  ansible_user: icinga2.vars.ansible_user
+  ansible_port: icinga2.vars.ansible_port
 '''
 
 import json
@@ -180,7 +193,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         """Query for all hosts """
         self.display.vvv("Querying Icinga2 for inventory")
         query_args = {
-            "attrs": ["address", "display_name", "state_type", "state", "groups", "vars"],
+            "attrs": ["address", "address6", "name", "display_name", "state_type", "state", "templates", "groups", "vars", "zone"],
         }
         if self.host_filter is not None:
             query_args['host_filter'] = self.host_filter
@@ -189,6 +202,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         # Manipulate returned API data to Ansible inventory spec
         ansible_inv = self._convert_inv(results_json)
         return ansible_inv
+
+    def _apply_constructable(self, name, variables):
+        strict = self.get_option('strict')
+        self._add_host_to_composed_groups(self.get_option('groups'), variables, name, strict=strict)
+        self._add_host_to_keyed_groups(self.get_option('keyed_groups'), variables, name, strict=strict)
+        self._set_composite_vars(self.get_option('compose'), variables, name, strict=strict)
 
     def _populate(self):
         groups = self._to_json(self.get_inventory_from_icinga())
@@ -232,11 +251,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                                         host_attrs['state'])
             self.inventory.set_variable(host_name, 'state_type',
                                         host_attrs['state_type'])
-            if host_attrs.get('vars') is not None:
-                if host_attrs['vars'].get('ansible_user') is not None:
-                    self.inventory.set_variable(host_name, 'ansible_user', host_attrs['vars'].get('ansible_user'))
-                if host_attrs['vars'].get('ansible_port') is not None:
-                    self.inventory.set_variable(host_name, 'ansible_port', host_attrs['vars'].get('ansible_port'))
+            # Adds all attributes to a host variable 'icinga2'
+            self.inventory.set_variable(host_name, 'icinga2', host_attrs)
+            self._apply_constructable(host_name, self.inventory.get_host(host_name).get_vars())
         return groups_dict
 
     def parse(self, inventory, loader, path, cache=True):
