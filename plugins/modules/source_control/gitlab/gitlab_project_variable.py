@@ -448,11 +448,6 @@ def main():
         item.pop('project_id')
         item['name'] = item.pop('key')
 
-    diff = dict(
-        before=before,
-        after=after
-    )
-
     untouched_key_name = 'key'
     if not module.check_mode:
         untouched_key_name = 'name'
