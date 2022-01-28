@@ -73,9 +73,12 @@ groups:
   databaseservers: "'db-template' in (icinga2.templates|list)"
 
 compose:
+  # set all icinga2 attributes to a host variable 'icinga2_attrs'
+  icinga2_attrs: icinga2_attributes
+
   # set 'ansible_user' and 'ansible_port' from icinga2 host vars
-  ansible_user: icinga2.vars.ansible_user
-  ansible_port: icinga2.vars.ansible_port
+  ansible_user: icinga2_attributes.vars.ansible_user
+  ansible_port: icinga2_attributes.vars.ansible_port
 '''
 
 import json
@@ -251,9 +254,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                                         host_attrs['state'])
             self.inventory.set_variable(host_name, 'state_type',
                                         host_attrs['state_type'])
-            # Adds all attributes to a host variable 'icinga2'
-            self.inventory.set_variable(host_name, 'icinga2', host_attrs)
-            self._apply_constructable(host_name, self.inventory.get_host(host_name).get_vars())
+            # Adds all attributes to a variable 'icinga2_attributes'
+            construct_vars = dict(self.inventory.get_host(host_name).get_vars())
+            construct_vars['icinga2_attributes'] = host_attrs
+            self._apply_constructable(host_name, construct_vars)
         return groups_dict
 
     def parse(self, inventory, loader, path, cache=True):
