@@ -1,0 +1,41 @@
+---
+# The following runs all examples:
+#
+#    ANSIBLE_STDOUT_CALLBACK=community.general.yaml ansible-playbook playbook.yml -e examples=true
+#
+# You need to copy the YAML output of example-XXX.yml into example-XXX.out.
+#
+# The following generates examples.rst out of the .out files:
+#
+#    ansible-playbook playbook.yml -e template=true
+- hosts: localhost
+  gather_facts: false
+  vars:
+    source_path: ../../rst/examples/lists_mergeby/
+  tasks:
+
+    - block:
+        - import_tasks: '{{ source_path }}example-001.yml'
+          tags: t001
+        - import_tasks: '{{ source_path }}example-002.yml'
+          tags: t002
+        - import_tasks: '{{ source_path }}example-003.yml'
+          tags: t003
+        - import_tasks: '{{ source_path }}example-004.yml'
+          tags: t004
+        - import_tasks: '{{ source_path }}example-005.yml'
+          tags: t005
+        - import_tasks: '{{ source_path }}example-006.yml'
+          tags: t006
+        - import_tasks: '{{ source_path }}example-007.yml'
+          tags: t007
+        - import_tasks: '{{ source_path }}example-008.yml'
+          tags: t008
+      when: examples|d(false)|bool
+
+    - block:
+        - include_vars: examples.yml
+        - template:
+            src: examples.rst.j2
+            dest: examples.rst
+      when: template|d(false)|bool
