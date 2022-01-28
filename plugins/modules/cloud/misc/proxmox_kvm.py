@@ -120,6 +120,15 @@ options:
       - Specify if to prevent changes if current configuration file has different SHA1 digest.
       - This can be used to prevent concurrent modifications.
     type: str
+  efidisk0:
+    description:
+      - Specify volume to use as EFI disk.
+      - Values allowed are - C("storage:1,format=value,efitype=4m,pre-enrolled-keys=0|1")
+      - C(storage) is the storage identifier where to create the disk.
+      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
+      - C(pre-enrolled_keys) specifies if the efidisk should come pre-loaded with distribution-specific and Microsoft
+       Standard Secure Boot keys(C(1)) or not (C(0)). It also enables Secure Boot by default if set to C(1).
+    type: str
   force:
     description:
       - Allow to force stop VM.
@@ -960,6 +969,7 @@ def main():
         delete=dict(type='str'),
         description=dict(type='str'),
         digest=dict(type='str'),
+        efidisk0=dict(type='str'),
         force=dict(type='bool'),
         format=dict(type='str', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk', 'unspecified']),
         freeze=dict(type='bool'),
@@ -1149,6 +1159,7 @@ def main():
                               cpuunits=module.params['cpuunits'],
                               description=module.params['description'],
                               digest=module.params['digest'],
+                              efidiskO=module.params['efidisk0'],
                               force=module.params['force'],
                               freeze=module.params['freeze'],
                               hostpci=module.params['hostpci'],
