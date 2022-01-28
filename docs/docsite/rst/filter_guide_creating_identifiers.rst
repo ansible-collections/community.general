@@ -58,7 +58,7 @@ You can use the ``random_mac`` filter to complete a partial `MAC address <https:
     - name: "Create a random MAC starting with 00:11:22:"
       debug:
         msg: "{{ '00:11:22' | community.general.random_mac }}"
-  
+
 This produces:
 
 .. code-block:: ansible-output
