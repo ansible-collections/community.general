@@ -163,7 +163,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 class Yarn(object):
 
-    DEFAULT_GLOBAL_INSTALLATION_PATH = '~/.config/yarn/global'
+    DEFAULT_GLOBAL_INSTALLATION_PATH = os.path.expanduser('~/.config/yarn/global')
 
     def __init__(self, module, **kwargs):
         self.module = module
