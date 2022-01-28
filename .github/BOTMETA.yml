@@ -1022,6 +1022,8 @@ files:
   $modules/system/gconftool2.py:
     maintainers: Akasurde kevensen
     labels: gconftool2
+  $modules/system/homectl.py:
+    maintainers: jameslivulpi
   $modules/system/interfaces_file.py:
     maintainers: obourdon hryamzik
     labels: interfaces_file
