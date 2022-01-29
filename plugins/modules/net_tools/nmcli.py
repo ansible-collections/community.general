@@ -1899,7 +1899,7 @@ class Nmcli(object):
         if not self.type:
 
             connection_map = {
-            '802-3-ethernet': 'ethernet'
+                '802-3-ethernet': 'ethernet'
             }
 
             current_con_type = self.show_connection().get('connection.type')
@@ -1908,10 +1908,10 @@ class Nmcli(object):
 
                 if not self.ip4:
                     self.ip4 = self.show_connection().get('ipv4.addresses')
-        
+
                 if not self.ip6:
                     self.ip6 = self.show_connection().get('ipv6.addresses')
-        
+
         options.update(self.connection_options(detect_change=True))
         return self._compare_conn_params(self.show_connection(), options)
 

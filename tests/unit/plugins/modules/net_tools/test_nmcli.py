@@ -1314,6 +1314,7 @@ def mocked_ethernet_connection_with_ipv6_static_address_static_route_create(mock
                    (0, "", ""),
                ))
 
+
 @pytest.fixture
 def mocked_ethernet_connection_with_ipv4_static_address_static_route_metric_modify(mocker):
     mocker_set(mocker,
@@ -1324,6 +1325,7 @@ def mocked_ethernet_connection_with_ipv4_static_address_static_route_metric_modi
                    (0, "", ""),
                ))
 
+
 @pytest.fixture
 def mocked_ethernet_connection_with_ipv6_static_address_static_route_metric_modify(mocker):
     mocker_set(mocker,
@@ -1333,6 +1335,7 @@ def mocked_ethernet_connection_with_ipv6_static_address_static_route_metric_modi
                    (0, TESTCASE_ETHERNET_MOD_IPV6_INT_WITH_ROUTE_AND_METRIC_SHOW_OUTPUT, ""),
                    (0, "", ""),
                ))
+
 
 @pytest.fixture
 def mocked_ethernet_connection_with_ipv6_static_address_multiple_static_routes_create(mocker):
@@ -2486,7 +2489,8 @@ def test_ethernet_connection_static_unchanged(mocked_ethernet_connection_static_
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_MOD_IPV4_INT_WITH_ROUTE_AND_METRIC, indirect=['patch_ansible_module'])
-def test_ethernet_connection_static_ipv4_address_static_route_with_metric_modify(mocked_ethernet_connection_with_ipv4_static_address_static_route_metric_modify, capfd):
+def test_ethernet_connection_static_ipv4_address_static_route_with_metric_modify(
+        mocked_ethernet_connection_with_ipv4_static_address_static_route_metric_modify, capfd):
     """
     Test : Modify ethernet connection with static IPv4 address and static route
     """
@@ -2550,7 +2554,8 @@ def test_ethernet_connection_static_ipv6_address_static_route_create(mocked_ethe
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_MOD_IPV6_INT_WITH_ROUTE_AND_METRIC, indirect=['patch_ansible_module'])
-def test_ethernet_connection_static_ipv6_address_static_route_metric_modify(mocked_ethernet_connection_with_ipv6_static_address_static_route_metric_modify, capfd):
+def test_ethernet_connection_static_ipv6_address_static_route_metric_modify(
+        mocked_ethernet_connection_with_ipv6_static_address_static_route_metric_modify, capfd):
     """
     Test : Modify ethernet connection with static IPv6 address and static route
     """
@@ -2577,7 +2582,7 @@ def test_ethernet_connection_static_ipv6_address_static_route_metric_modify(mock
     assert results.get('changed') is True
     assert not results.get('failed')
 
-    
+
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_MULTIPLE_ROUTES, indirect=['patch_ansible_module'])
 def test_ethernet_connection_static_ipv6_address_multiple_static_routes_with_metric_create(
         mocked_ethernet_connection_with_ipv6_static_address_multiple_static_routes_with_metric_create, capfd):
