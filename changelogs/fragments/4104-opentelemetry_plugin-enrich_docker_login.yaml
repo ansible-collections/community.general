@@ -1,0 +1,2 @@
+minor_changes:
+    - opentelemetry_plugin - enrich service when using the ``docker_login`` (https://github.com/ansible-collections/community.general/pull/4104).
