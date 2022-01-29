@@ -1,0 +1,2 @@
+bugfixes:
+  - python_requirements_info - store ``mismatched`` return values per package as documented in the module (https://github.com/ansible-collections/community.general/pull/4078).
