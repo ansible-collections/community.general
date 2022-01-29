@@ -1,2 +1,2 @@
-bugfixes:
-  - nmcli - Remove nmcli modify dependency on type parameter (https://github.com/ansible-collections/community.general/issues/2858).
+minor_changes:
+  - nmcli - remove nmcli modify dependency on ``type`` parameter (https://github.com/ansible-collections/community.general/issues/2858).
