@@ -153,7 +153,7 @@ def main():
                 'desired': dep,
             }
         else:
-            results['mismatched'] = {
+            results['mismatched'][pkg] = {
                 'installed': existing,
                 'desired': dep,
             }
