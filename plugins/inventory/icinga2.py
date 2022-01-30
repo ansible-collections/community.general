@@ -70,7 +70,7 @@ groups:
   webservers: inventory_hostname.startswith('web')
 
   # using icinga2 template
-  databaseservers: "'db-template' in (icinga2.templates|list)"
+  databaseservers: "'db-template' in (icinga2_attributes.templates|list)"
 
 compose:
   # set all icinga2 attributes to a host variable 'icinga2_attrs'
