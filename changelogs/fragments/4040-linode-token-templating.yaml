@@ -1,0 +1,2 @@
+minor_changes:
+  - linode inventory plugin - allow templating of ``access_token`` variable in Linode inventory plugin (https://github.com/ansible-collections/community.general/pull/4040).

@@ -66,6 +66,12 @@ EXAMPLES = r'''
 # Minimal example. `LINODE_ACCESS_TOKEN` is exposed in environment.
 plugin: community.general.linode
 
+# You can use Jinja to template the access token.
+plugin: community.general.linode
+access_token: "{{ lookup('ini', 'token', section='your_username', file='~/.config/linode-cli') }}"
+# For older Ansible versions, you need to write this as:
+# access_token: "{{ lookup('ini', 'token section=your_username file=~/.config/linode-cli') }}"
+
 # Example with regions, types, groups and access token
 plugin: community.general.linode
 access_token: foobar
@@ -105,6 +111,7 @@ import os
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.six import string_types
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
+from ansible.template import Templar
 
 
 try:
@@ -119,10 +126,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
     NAME = 'community.general.linode'
 
-    def _build_client(self):
+    def _build_client(self, loader):
         """Build the Linode client."""
 
+        t = Templar(loader=loader)
+
         access_token = self.get_option('access_token')
+        if t.is_template(access_token):
+            access_token = t.template(variable=access_token, disable_lookups=False)
 
         if access_token is None:
             try:
@@ -287,7 +298,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             raise AnsibleError('the Linode dynamic inventory plugin requires linode_api4.')
 
         config_data = self._read_config_data(path)
-        self._build_client()
+        self._build_client(loader)
 
         self._get_instances_inventory()
 
