@@ -126,7 +126,7 @@ options:
       - Values allowed are - C("storage:1,format=value,efitype=4m,pre-enrolled-keys=0|1").
       - C(storage) is the storage identifier where to create the disk.
       - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
-      - C(pre-enrolled_keys) specifies if the efidisk should come pre-loaded with distribution-specific and Microsoft
+      - C(pre-enrolled-keys) specifies if the efidisk should come pre-loaded with distribution-specific and Microsoft
        Standard Secure Boot keys(C(1)) or not (C(0)). It also enables Secure Boot by default if set to C(1).
     type: str
     version_added: 4.4.0
