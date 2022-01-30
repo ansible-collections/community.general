@@ -16,6 +16,7 @@ Let us use the lists below in the following examples
       extra: false
     - name: meh
       extra: true
+
   list2:
     - name: foo
       path: /foo
@@ -34,15 +35,15 @@ This produces:
 .. code-block:: yaml
 
   list3:
-    -   extra: false
-        name: bar
-    -   name: baz
-        path: /baz
-    -   extra: true
-        name: foo
-        path: /foo
-    -   extra: true
-        name: meh
+  - extra: false
+    name: bar
+  - name: baz
+    path: /baz
+  - extra: true
+    name: foo
+    path: /foo
+  - extra: true
+    name: meh
 
 
 .. versionadded:: 2.0.0
@@ -59,15 +60,15 @@ This produces the same result as in the previous example:
 .. code-block:: yaml
 
   list3:
-    -   extra: false
-        name: bar
-    -   name: baz
-        path: /baz
-    -   extra: true
-        name: foo
-        path: /foo
-    -   extra: true
-        name: meh
+  - extra: false
+    name: bar
+  - name: baz
+    path: /baz
+  - extra: true
+    name: foo
+    path: /foo
+  - extra: true
+    name: meh
 
 
 The filter also accepts two optional parameters: ``recursive`` and ``list_merge``. These parameters are only supported when used with ansible-base 2.10 or ansible-core, but not with Ansible 2.9. This is available since community.general 4.4.0.
@@ -117,19 +118,19 @@ This produces:
 .. code-block:: yaml
 
   list3:
-    -   name: myname01
-        param01:
-            list:
-            - patch_value
-            x: default_value
-            y: patch_value
-            z: patch_value
-    -   name: myname02
-        param01:
-        - 3
-        - 4
-        - 4
-        -   key: value
+  - name: myname01
+    param01:
+      list:
+      - patch_value
+      x: default_value
+      y: patch_value
+      z: patch_value
+  - name: myname02
+    param01:
+    - 3
+    - 4
+    - 4
+    - key: value
 
 Example ``list_merge=keep``:
 
@@ -145,19 +146,19 @@ This produces:
 .. code-block:: yaml
 
   list3:
-    -   name: myname01
-        param01:
-            list:
-            - default_value
-            x: default_value
-            y: patch_value
-            z: patch_value
-    -   name: myname02
-        param01:
-        - 1
-        - 1
-        - 2
-        - 3
+  - name: myname01
+    param01:
+      list:
+      - default_value
+      x: default_value
+      y: patch_value
+      z: patch_value
+  - name: myname02
+    param01:
+    - 1
+    - 1
+    - 2
+    - 3
 
 Example ``list_merge=append``:
 
@@ -173,24 +174,24 @@ This produces:
 .. code-block:: yaml
 
   list3:
-    -   name: myname01
-        param01:
-            list:
-            - default_value
-            - patch_value
-            x: default_value
-            y: patch_value
-            z: patch_value
-    -   name: myname02
-        param01:
-        - 1
-        - 1
-        - 2
-        - 3
-        - 3
-        - 4
-        - 4
-        -   key: value
+  - name: myname01
+    param01:
+      list:
+      - default_value
+      - patch_value
+      x: default_value
+      y: patch_value
+      z: patch_value
+  - name: myname02
+    param01:
+    - 1
+    - 1
+    - 2
+    - 3
+    - 3
+    - 4
+    - 4
+    - key: value
 
 Example ``list_merge=prepend``:
 
@@ -206,24 +207,24 @@ This produces:
 .. code-block:: yaml
 
   list3:
-    -   name: myname01
-        param01:
-            list:
-            - patch_value
-            - default_value
-            x: default_value
-            y: patch_value
-            z: patch_value
-    -   name: myname02
-        param01:
-        - 3
-        - 4
-        - 4
-        -   key: value
-        - 1
-        - 1
-        - 2
-        - 3
+  - name: myname01
+    param01:
+      list:
+      - patch_value
+      - default_value
+      x: default_value
+      y: patch_value
+      z: patch_value
+  - name: myname02
+    param01:
+    - 3
+    - 4
+    - 4
+    - key: value
+    - 1
+    - 1
+    - 2
+    - 3
 
 Example ``list_merge=append_rp``:
 
@@ -239,23 +240,23 @@ This produces:
 .. code-block:: yaml
 
   list3:
-    -   name: myname01
-        param01:
-            list:
-            - default_value
-            - patch_value
-            x: default_value
-            y: patch_value
-            z: patch_value
-    -   name: myname02
-        param01:
-        - 1
-        - 1
-        - 2
-        - 3
-        - 4
-        - 4
-        -   key: value
+  - name: myname01
+    param01:
+      list:
+      - default_value
+      - patch_value
+      x: default_value
+      y: patch_value
+      z: patch_value
+  - name: myname02
+    param01:
+    - 1
+    - 1
+    - 2
+    - 3
+    - 4
+    - 4
+    - key: value
 
 Example ``list_merge=prepend_rp``:
 
@@ -271,21 +272,21 @@ This produces:
 .. code-block:: yaml
 
   list3:
-    -   name: myname01
-        param01:
-            list:
-            - patch_value
-            - default_value
-            x: default_value
-            y: patch_value
-            z: patch_value
-    -   name: myname02
-        param01:
-        - 3
-        - 4
-        - 4
-        -   key: value
-        - 1
-        - 1
-        - 2
+  - name: myname01
+    param01:
+      list:
+      - patch_value
+      - default_value
+      x: default_value
+      y: patch_value
+      z: patch_value
+  - name: myname02
+    param01:
+    - 3
+    - 4
+    - 4
+    - key: value
+    - 1
+    - 1
+    - 2
 

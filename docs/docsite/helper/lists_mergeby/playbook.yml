@@ -1,15 +1,25 @@
 ---
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 1) Run all examples and create example-XXX.out
 # shell> ansible-playbook playbook.yml -e examples=true
 #
-# 2) Optionally, create examples_all.rst
+# 2) Optionally, for testing, create examples_all.rst
 # shell> ansible-playbook playbook.yml -e examples_all=true
 #
-# 3) Create other REST files. See the blocks below.
+# 3) Create docs REST files
 # shell> ansible-playbook playbook.yml -e merging_lists_of_dictionaries=true
+#
+# Notes:
+# * Use YAML callback, e.g. set ANSIBLE_STDOUT_CALLBACK=community.general.yaml
+# * Use sphinx-view to render and review the REST files
+#   shell> sphinx-view <path_to_helper>/examples_all.rst
+# * Proofread and copy completed docs *.rst files into the directory rst.
+# * Then delete the *.rst and *.out files from this directory. Do not
+#   add *.rst and *.out in this directory to the version control.
+#
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# docs/docsite/helper/lists_mergeby/playbook.yml
+# community.general/docs/docsite/helper/lists_mergeby/playbook.yml
 
 - hosts: localhost
   gather_facts: false

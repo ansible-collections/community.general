@@ -5,6 +5,7 @@ list1:
     extra: false
   - name: meh
     extra: true
+
 list2:
   - name: foo
     path: /foo
