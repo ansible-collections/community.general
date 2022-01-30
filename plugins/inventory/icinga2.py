@@ -78,7 +78,7 @@ compose:
 
   # set 'ansible_user' and 'ansible_port' from icinga2 host vars
   ansible_user: icinga2_attributes.vars.ansible_user
-  ansible_port: icinga2_attributes.vars.ansible_port
+  ansible_port: icinga2_attributes.vars.ansible_port | default(22)
 '''
 
 import json
