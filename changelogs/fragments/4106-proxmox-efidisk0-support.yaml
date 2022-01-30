@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - Added efidisk0 support when creating VM with OVMF UEFI BIOS
+bugfixes:
+  - Fixes VM created with OVMF BIOS are invalid (https://github.com/ansible-collections/community.general/issues/1638)
