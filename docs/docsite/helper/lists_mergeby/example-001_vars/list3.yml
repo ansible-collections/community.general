@@ -1,2 +1,0 @@
-list3: "{{ list1|
-           community.general.lists_mergeby(list2, 'name') }}"
