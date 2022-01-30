@@ -31,6 +31,7 @@ mandatory_py_version = pytest.mark.skipif(
 
 
 from ansible.errors import AnsibleError, AnsibleParserError
+from ansible.parsing.dataloader import DataLoader
 from ansible_collections.community.general.plugins.inventory.linode import InventoryModule
 
 
@@ -39,10 +40,11 @@ def inventory():
     return InventoryModule()
 
 
-def test_access_token_lookup(inventory):
+def test_missing_access_token_lookup(inventory):
+    loader = DataLoader()
     inventory._options = {'access_token': None}
     with pytest.raises(AnsibleError) as error_message:
-        inventory._build_client()
+        inventory._build_client(loader)
         assert 'Could not retrieve Linode access token' in error_message
 
 
