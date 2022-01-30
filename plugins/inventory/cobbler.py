@@ -40,7 +40,9 @@ DOCUMENTATION = '''
         type: boolean
         default: no
       exclude_profiles:
-        description: Profiles to exclude from inventory
+        description:
+          - Profiles to exclude from inventory.
+          - Ignored if I(include_profiles) is specified.
         type: list
         default: []
         elements: str
