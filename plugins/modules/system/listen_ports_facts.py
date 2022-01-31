@@ -197,7 +197,7 @@ def netStatParse(raw):
 
 def ss_parse(raw):
     results = list()
-    regex_conns = re.compile(pattern=r'\[?(.+?)\]?:([0-9]+)')
+    regex_conns = re.compile(pattern=r'\[?(.+?)\]?:([0-9]+)$')
     regex_pid = re.compile(pattern=r'"(.*?)",pid=(\d+)')
 
     lines = raw.splitlines()
