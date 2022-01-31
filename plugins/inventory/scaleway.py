@@ -31,6 +31,12 @@ DOCUMENTATION = r'''
         tags:
             description: Filter results on a specific tag.
             type: list
+        scw_profile:
+            description:
+            - The config profile to use in config file.
+            - By default uses the one specified as C(active_profile) in the config file, or falls back to C(default) if that is not defined.
+            type: string
+            version_added: 4.4.0
         oauth_token:
             description:
             - Scaleway OAuth token.
@@ -303,7 +309,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         if not oauth_token and os.path.exists(scw_config_path):
             with open(scw_config_path) as fh:
                 scw_config = yaml.safe_load(fh)
-                active_profile = scw_config.get('active_profile', 'default')
+                ansible_profile = self.get_option('scw_profile')
+
+                if ansible_profile:
+                    active_profile = ansible_profile
+                else:
+                    active_profile = scw_config.get('active_profile', 'default')
+
                 if active_profile == 'default':
                     oauth_token = scw_config.get('secret_key')
                 else:
