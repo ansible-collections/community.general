@@ -1,0 +1,2 @@
+minor_changes:
+  - icinga2 inventory plugin - implemented constructed interface (https://github.com/ansible-collections/community.general/pull/4088).
