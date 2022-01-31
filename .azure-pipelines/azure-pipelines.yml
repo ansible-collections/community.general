@@ -324,8 +324,6 @@ stages:
           targets:
             - name: CentOS 6
               test: centos6
-            - name: CentOS 8
-              test: centos8
             - name: Fedora 34
               test: fedora34
             - name: openSUSE 15 py3
