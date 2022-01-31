@@ -35,8 +35,9 @@
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     project: "{{ gitlab_project_name }}"
-    vars:
-      ACCESS_KEY_ID: checkmode
+    variables:
+      - name: ACCESS_KEY_ID
+        value: checkmode
   register: gitlab_project_variable_state
 
 - name: state must be changed
@@ -455,8 +456,8 @@
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     project: "{{ gitlab_project_name }}"
-    vars:
-      my_test_var:
+    variables:
+      - name: my_test_var
         value: my_test_value
         variable_type: file
     purge: False
@@ -470,7 +471,8 @@
       - gitlab_project_variable_state.project_variable.untouched|length == 0
       - gitlab_project_variable_state.project_variable.removed|length == 0
       - gitlab_project_variable_state.project_variable.updated|length == 0
-      - gitlab_project_variable_state.project_variable.added[0] == "my_test_var"
+      # VALUE_SPECIFIED_IN_NO_LOG_PARAMETER
+      #- gitlab_project_variable_state.project_variable.added[0] == "my_test_var"
 
 - name: change variable_type attribute
   gitlab_project_variable:
@@ -611,4 +613,34 @@
       - gitlab_project_variable_state.project_variable.added|length == 0
       - gitlab_project_variable_state.project_variable.untouched|length == 0
       - gitlab_project_variable_state.project_variable.removed|length == 40
+      - gitlab_project_variable_state.project_variable.updated|length == 0
+
+- name: same vars, diff scope
+  gitlab_project_variable:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    project: "{{ gitlab_project_name }}"
+    purge: True
+    variables:
+      - name: SECRET_ACCESS_KEY
+        value: 3214cbad
+        masked: true
+        protected: true
+        variable_type: env_var
+        environment_scope: production
+      - name: SECRET_ACCESS_KEY
+        value: hello_world
+        masked: true
+        protected: true
+        variable_type: env_var
+        environment_scope: development
+  register: gitlab_project_variable_state
+
+- name: verify two vars
+  assert:
+    that:
+      - gitlab_project_variable_state.changed
+      - gitlab_project_variable_state.project_variable.added|length == 2
+      - gitlab_project_variable_state.project_variable.untouched|length == 0
+      - gitlab_project_variable_state.project_variable.removed|length == 0
       - gitlab_project_variable_state.project_variable.updated|length == 0
