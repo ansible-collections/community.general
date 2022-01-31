@@ -248,7 +248,7 @@ class GitLabRunner(object):
             return True
 
         try:
-            runner = self._runners_endpoint.create(arguments)
+            runner = self._gitlab.runners.create(arguments)
         except (gitlab.exceptions.GitlabCreateError) as e:
             self._module.fail_json(msg="Failed to create runner: %s " % to_native(e))
 
@@ -292,10 +292,10 @@ class GitLabRunner(object):
             # object, so we need to handle both
             if hasattr(runner, "description"):
                 if (runner.description == description):
-                    return self._runners_endpoint.get(runner.id)
+                    return self._gitlab.runners.get(runner.id)
             else:
                 if (runner['description'] == description):
-                    return self._runners_endpoint.get(runner['id'])
+                    return self._gitlab.runners.get(runner['id'])
 
     '''
     @param description Description of the runner
