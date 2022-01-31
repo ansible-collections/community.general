@@ -15,3 +15,9 @@
     ansible_pkg_mgr: community.general.zypper
     cacheable: yes
   when: ansible_os_family == "Suse"
+
+- shell:
+    cmd: |
+      sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*.repo
+      sed -i 's%#baseurl=http://mirror.centos.org/$contentdir/$releasever/%baseurl=https://vault.centos.org/8.4.2105/%g' /etc/yum.repos.d/CentOS-Linux-*.repo
+  when: ansible_distribution in 'CentOS' and ansible_distribution_major_version == '8'
