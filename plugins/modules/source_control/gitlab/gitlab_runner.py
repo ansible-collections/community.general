@@ -39,6 +39,7 @@ options:
   project:
     description:
       - ID or full path of the project in the form of group/name.
+      - Mutually exclusive with I(owned) since community.general 4.5.0.
     type: str
     version_added: '3.7.0'
   description:
@@ -63,6 +64,7 @@ options:
   owned:
     description:
       - Searches only runners available to the user when searching for existing, when false admin token required.
+      - Mutually exclusive with I(project) since community.general 4.5.0.
     default: no
     type: bool
     version_added: 2.0.0
@@ -281,11 +283,11 @@ class GitLabRunner(object):
     '''
     @param description Description of the runner
     '''
-    def find_runner(self, description, owned=False):
-        if owned:
-            runners = self._runners_endpoint.list(as_list=False)
-        else:
+    def find_runner(self, description, list_all_shared_runners=True):
+        if list_all_shared_runners:
             runners = self._runners_endpoint.all(as_list=False)
+        else:
+            runners = self._runners_endpoint.list(as_list=False)
 
         for runner in runners:
             # python-gitlab 2.2 through at least 2.5 returns a list of dicts for list() instead of a Runner
@@ -300,9 +302,9 @@ class GitLabRunner(object):
     '''
     @param description Description of the runner
     '''
-    def exists_runner(self, description, owned=False):
+    def exists_runner(self, description, list_all_shared_runners=True):
         # When runner exists, object will be stored in self.runner_object.
-        runner = self.find_runner(description, owned)
+        runner = self.find_runner(description, list_all_shared_runners)
 
         if runner:
             self.runner_object = runner
@@ -343,6 +345,7 @@ def main():
             ['api_username', 'api_job_token'],
             ['api_token', 'api_oauth_token'],
             ['api_token', 'api_job_token'],
+            ['project', 'owned'],
         ],
         required_together=[
             ['api_username', 'api_password'],
@@ -357,7 +360,6 @@ def main():
     )
 
     state = module.params['state']
-    owned = module.params['owned']
     runner_description = module.params['description']
     runner_active = module.params['active']
     tag_list = module.params['tag_list']
@@ -367,6 +369,8 @@ def main():
     maximum_timeout = module.params['maximum_timeout']
     registration_token = module.params['registration_token']
     project = module.params['project']
+    # /runners/all API endpoint is only applicable for instance runners, not for project runners
+    list_all_shared_runners = not module.params['owned'] and not project
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -380,7 +384,7 @@ def main():
             module.fail_json(msg='No such a project %s' % project, exception=to_native(e))
 
     gitlab_runner = GitLabRunner(module, gitlab_instance, gitlab_project)
-    runner_exists = gitlab_runner.exists_runner(runner_description, owned)
+    runner_exists = gitlab_runner.exists_runner(runner_description, list_all_shared_runners)
 
     if state == 'absent':
         if runner_exists:

@@ -65,11 +65,11 @@ class TestGitlabRunner(GitlabModuleTestCase):
     @with_httmock(resp_find_runners_list)
     @with_httmock(resp_get_runner)
     def test_runner_exist_owned(self):
-        rvalue = self.moduleUtil.exists_runner("test-1-20201214", True)
+        rvalue = self.moduleUtil.exists_runner("test-1-20201214", False)
 
         self.assertEqual(rvalue, True)
 
-        rvalue = self.moduleUtil.exists_runner("test-3-00000000", True)
+        rvalue = self.moduleUtil.exists_runner("test-3-00000000", False)
 
         self.assertEqual(rvalue, False)
 
