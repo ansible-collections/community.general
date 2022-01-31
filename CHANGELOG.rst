@@ -6,6 +6,19 @@ Community General Release Notes
 
 This changelog describes changes after version 1.0.0.
 
+v2.5.8
+======
+
+Release Summary
+---------------
+
+Announcement release.
+
+Major Changes
+-------------
+
+- The community.general 2.x.y release stream will be **End of Life** on 2022-05-23, which coincides with the latest day that community.general 5.0.0 must be released (see `the Roadmap for Ansible 6 <https://github.com/ansible/ansible/blob/devel/docs/docsite/rst/roadmap/COLLECTIONS_6.rst#release-schedule>`_). At this point, community.general 2.0.0 has been released almost 1.5 years ago. It received new features for half a year, bugfixes for another half a year, and has only been receiving major bugfixes or security fixes until then. Please note that we `recently decided to shorten this last period from one year to roughly six months <https://github.com/ansible-community/community-topics/issues/55>`_. Thank you very much to everyone who contributed to the 2.x.y releases!
+
 v2.5.7
 ======
 
