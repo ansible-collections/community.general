@@ -79,22 +79,26 @@ options:
       masked:
         description:
           - Wether variable value is masked or not.
+          - Support for masked values requires GitLab >= 11.10.
         type: bool
         default: false
       protected:
         description:
           - Wether variable value is protected or not.
+          - Support for protected values requires GitLab >= 9.3.
         type: bool
         default: false
       variable_type:
         description:
           - Wether a variable is an environment variable (C(env_var)) or a file (C(file)).
+          - Support for I(variable_type) requires GitLab >= 11.11.
         type: str
         choices: ["env_var", "file"]
         default: env_var
       environment_scope:
         description:
           - The scope for the variable.
+          - Support for I(environment_scope) requires GitLab Premium >= 13.11.
         type: str
         default: '*'
 '''
@@ -204,19 +208,17 @@ def vars_to_variables(vars, module):
             )
 
         elif isinstance(value, dict):
-            new_item = {"name": item, "value": value.get('value')}
 
-            if value.get('masked'):
-                new_item['masked'] = value.get('masked')
-
-            if value.get('protected'):
-                new_item['protected'] = value.get('protected')
+            new_item = {
+                "name": item,
+                "value": value.get('value'),
+                "masked": value.get('masked'),
+                "protected": value.get('protected'),
+                "variable_type": value.get('variable_type'),
+            }
 
             if value.get('environment_scope'):
                 new_item['environment_scope'] = value.get('environment_scope')
-
-            if value.get('variable_type'):
-                new_item['variable_type'] = value.get('variable_type')
 
             variables.append(new_item)
 
@@ -297,7 +299,7 @@ def compare(requested_variables, existing_variables, state):
             if var in existing_variables:
                 untouched.append(var)
             else:
-                compare_item = {'key': var.get('name'), 'environment_scope': var.get('environment_scope', '*')}
+                compare_item = {'key': var.get('name'), 'environment_scope': var.get('environment_scope')}
                 if compare_item in existing_key_scope_vars:
                     updated.append(var)
                 else:
