@@ -1,0 +1,2 @@
+bugfixes:
+  - 'gitlab_runner - use correct API endpoint to create and retrieve project level runners when using ``project`` (https://github.com/ansible-collections/community.general/pull/3965).'
