@@ -40,10 +40,21 @@ DOCUMENTATION = '''
         type: boolean
         default: no
       exclude_profiles:
-        description: Profiles to exclude from inventory
+        description:
+          - Profiles to exclude from inventory.
+          - Ignored if I(include_profiles) is specified.
         type: list
         default: []
         elements: str
+      include_profiles:
+        description:
+          - Profiles to include from inventory.
+          - If specified, all other profiles will be excluded.
+          - I(exclude_profiles) is ignored if I(include_profiles) is specified.
+        type: list
+        default: []
+        elements: str
+        version_added: 4.4.0
       group_by:
         description: Keys to group hosts by
         type: list
@@ -71,8 +82,7 @@ password: secure
 import socket
 
 from ansible.errors import AnsibleError
-from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
-from ansible.module_utils.common._collections_compat import MutableMapping
+from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.six import iteritems
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, to_safe_group_name
 
@@ -94,18 +104,9 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
     NAME = 'community.general.cobbler'
 
     def __init__(self):
-
         super(InventoryModule, self).__init__()
-
-        # from config
-        self.cobbler_url = None
-        self.exclude_profiles = []  # A list of profiles to exclude
-
-        self.connection = None
-        self.token = None
-
         self.cache_key = None
-        self.use_cache = None
+        self.connection = None
 
     def verify_file(self, path):
         valid = False
@@ -177,6 +178,12 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             self.inventory.add_child(group_name, child)
         return group_name
 
+    def _exclude_profile(self, profile):
+        if self.include_profiles:
+            return profile not in self.include_profiles
+        else:
+            return profile in self.exclude_profiles
+
     def parse(self, inventory, loader, path, cache=True):
 
         super(InventoryModule, self).parse(inventory, loader, path)
@@ -190,15 +197,16 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         self.use_cache = cache and self.get_option('cache')
 
         self.exclude_profiles = self.get_option('exclude_profiles')
+        self.include_profiles = self.get_option('include_profiles')
         self.group_by = self.get_option('group_by')
 
         for profile in self._get_profiles():
             if profile['parent']:
                 self.display.vvvv('Processing profile %s with parent %s\n' % (profile['name'], profile['parent']))
-                if profile['parent'] not in self.exclude_profiles:
+                if not self._exclude_profile(profile['parent']):
                     parent_group_name = self._add_safe_group_name(profile['parent'])
                     self.display.vvvv('Added profile parent group %s\n' % parent_group_name)
-                    if profile['name'] not in self.exclude_profiles:
+                    if not self._exclude_profile(profile['name']):
                         group_name = self._add_safe_group_name(profile['name'])
                         self.display.vvvv('Added profile group %s\n' % group_name)
                         self.inventory.add_child(parent_group_name, group_name)
@@ -210,7 +218,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 while i < len(profile_elements) - 1:
                     profile_group = '-'.join(profile_elements[0:i + 1])
                     profile_group_child = '-'.join(profile_elements[0:i + 2])
-                    if profile_group in self.exclude_profiles:
+                    if self._exclude_profile(profile_group):
                         self.display.vvvv('Excluding profile %s\n' % profile_group)
                         break
                     group_name = self._add_safe_group_name(profile_group)
@@ -231,7 +239,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             hostname = host['hostname']  # None
             interfaces = host['interfaces']
 
-            if host['profile'] in self.exclude_profiles:
+            if self._exclude_profile(host['profile']):
                 self.display.vvvv('Excluding host %s in profile %s\n' % (host['name'], host['profile']))
                 continue
 
