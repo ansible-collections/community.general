@@ -19,6 +19,14 @@ DOCUMENTATION = '''
     extends_documentation_fragment:
         - constructed
     options:
+      strict:
+        version_added: 4.4.0
+      compose:
+        version_added: 4.4.0
+      groups:
+        version_added: 4.4.0
+      keyed_groups:
+        version_added: 4.4.0
       plugin:
         description: Name of the plugin.
         required: true
