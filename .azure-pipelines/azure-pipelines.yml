@@ -268,8 +268,6 @@ stages:
               test: centos6
             - name: CentOS 7
               test: centos7
-            - name: CentOS 8
-              test: centos8
             - name: Fedora 33
               test: fedora33
             - name: Fedora 34
@@ -294,8 +292,6 @@ stages:
         parameters:
           testFormat: 2.11/linux/{0}
           targets:
-            - name: CentOS 8
-              test: centos8
             - name: Fedora 33
               test: fedora33
             - name: openSUSE 15 py3
@@ -313,8 +309,6 @@ stages:
         parameters:
           testFormat: 2.10/linux/{0}
           targets:
-            - name: CentOS 8
-              test: centos8
             - name: Fedora 32
               test: fedora32
             - name: openSUSE 15 py3
@@ -332,8 +326,6 @@ stages:
         parameters:
           testFormat: 2.9/linux/{0}
           targets:
-            - name: CentOS 8
-              test: centos8
             - name: Fedora 31
               test: fedora31
             - name: openSUSE 15 py3
