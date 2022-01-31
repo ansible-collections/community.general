@@ -76,6 +76,19 @@ def query_hosts(hosts=None, attrs=None, joins=None, host_filter=None):
     return json_host_data
 
 
+def get_option(option):
+    if option == 'groups':
+        return {}
+    elif option == 'keyed_groups':
+        return []
+    elif option == 'compose':
+        return {}
+    elif option == 'strict':
+        return False
+    else:
+        return None
+
+
 def test_populate(inventory, mocker):
     # module settings
     inventory.icinga2_user = 'ansible'
@@ -86,6 +99,7 @@ def test_populate(inventory, mocker):
     # bypass authentication and API fetch calls
     inventory._check_api = mocker.MagicMock(side_effect=check_api)
     inventory._query_hosts = mocker.MagicMock(side_effect=query_hosts)
+    inventory.get_option = mocker.MagicMock(side_effect=get_option)
     inventory._populate()
 
     # get different hosts
