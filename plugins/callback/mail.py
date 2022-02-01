@@ -11,14 +11,16 @@ name: mail
 type: notification
 short_description: Sends failure events via email
 description:
-- This callback will report failures via email
+- This callback will report failures via email.
 author:
 - Dag Wieers (@dagwieers)
 requirements:
 - whitelisting in configuration
 options:
   mta:
-    description: Mail Transfer Agent, server that accepts SMTP
+    description:
+        - Mail Transfer Agent, server that accepts SMTP.
+    type: str
     env:
         - name: SMTPHOST
     ini:
@@ -26,34 +28,47 @@ options:
           key: smtphost
     default: localhost
   mtaport:
-    description: Mail Transfer Agent Port, port at which server SMTP
+    description:
+        - Mail Transfer Agent Port.
+        - Port at which server SMTP.
+    type: int
     ini:
         - section: callback_mail
           key: smtpport
     default: 25
   to:
-    description: Mail recipient
+    description:
+        - Mail recipient.
+    type: list
+    elements: str
     ini:
         - section: callback_mail
           key: to
-    default: root
+    default: [root]
   sender:
-    description: Mail sender
+    description:
+        - Mail sender.
+        - Note that this will be required from community.general 6.0.0 on.
+    type: str
     ini:
         - section: callback_mail
           key: sender
   cc:
-    description: CC'd recipient
+    description:
+        - CC'd recipients.
+    type: list
+    elements: str
     ini:
         - section: callback_mail
           key: cc
   bcc:
-    description: BCC'd recipient
+    description:
+        - BCC'd recipients.
+    type: list
+    elements: str
     ini:
         - section: callback_mail
           key: bcc
-notes:
-- "TODO: expand configuration options now that plugins can leverage Ansible's configuration"
 '''
 
 import json
@@ -89,9 +104,13 @@ class CallbackModule(CallbackBase):
         super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         self.sender = self.get_option('sender')
+        if self.sender is None:
+            self._display.deprecated(
+                'The sender for the mail callback has not been specified. This will be an error in the future',
+                version='6.0.0', collection_name='community.general')
         self.to = self.get_option('to')
         self.smtphost = self.get_option('mta')
-        self.smtpport = int(self.get_option('mtaport'))
+        self.smtpport = self.get_option('mtaport')
         self.cc = self.get_option('cc')
         self.bcc = self.get_option('bcc')
 
@@ -103,18 +122,22 @@ class CallbackModule(CallbackBase):
 
         content = 'Date: %s\n' % email.utils.formatdate()
         content += 'From: %s\n' % self.sender
-        content += 'To: %s\n' % self.to
+        if self.to:
+            content += 'To: %s\n' % ','.join(self.to)
         if self.cc:
-            content += 'Cc: %s\n' % self.cc
+            content += 'Cc: %s\n' % ','.join(self.cc)
         content += 'Message-ID: %s\n' % email.utils.make_msgid()
         content += 'Subject: %s\n\n' % subject.strip()
         content += body
 
-        addresses = self.to.split(',')
+        addresses = self.to
         if self.cc:
-            addresses += self.cc.split(',')
+            addresses += self.cc
         if self.bcc:
-            addresses += self.bcc.split(',')
+            addresses += self.bcc
+
+        if not addresses:
+            self._display.warning('No receiver has been specified for the mail callback plugin.')
 
         for address in addresses:
             smtp.sendmail(self.sender, address, to_bytes(content))
