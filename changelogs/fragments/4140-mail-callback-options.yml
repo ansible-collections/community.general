@@ -1,0 +1,4 @@
+minor_changes:
+  - "mail callback plugin - properly use Ansible's option handling to split lists (https://github.com/ansible-collections/community.general/pull/4140)."
+deprecated_features:
+  - "mail callback plugin - not specifying ``sender`` is deprecated and will be disallowed in community.general 6.0.0 (https://github.com/ansible-collections/community.general/pull/4140)."
