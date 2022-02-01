@@ -137,7 +137,7 @@ class CallbackModule(CallbackBase):
             addresses += self.bcc
 
         if not addresses:
-            self._display.warning('No receiver has been specified for the mail callback plugin')
+            self._display.warning('No receiver has been specified for the mail callback plugin.')
 
         for address in addresses:
             smtp.sendmail(self.sender, address, to_bytes(content))
