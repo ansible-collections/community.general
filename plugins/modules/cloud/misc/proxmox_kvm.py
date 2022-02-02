@@ -553,6 +553,30 @@ EXAMPLES = '''
     bios: ovmf
     efidisk0: 'VMs_LVM:1,format=qcow2,efitype=4m,pre-enrolled_keys=1'
 
+- name: Create VM with 1 10GB SATA disk and an EFI disk, with Secure Boot disabled by default
+  community.general.proxmox_kvm:
+    api_user: root@pam
+    api_password: secret
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    sata:
+      sata0: 'VMs_LVM:10,format=raw'
+    bios: ovmf
+    efidisk0: 'VMs_LVM_thin:1,format=raw,efitype=4m,pre-enrolled_keys=0'
+
+- name: Create VM with 1 10GB SATA disk and an EFI disk, with Secure Boot enabled by default
+  community.general.proxmox_kvm:
+    api_user: root@pam
+    api_password: secret
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    sata:
+      sata0: 'VMs_LVM:10,format=raw'
+    bios: ovmf
+    efidisk0: 'VMs_LVM:1,format=qcow2,efitype=4m,pre-enrolled_keys=1'
+
 - name: >
     Clone VM with only source VM name.
     The VM source is spynal.
