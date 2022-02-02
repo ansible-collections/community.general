@@ -48,6 +48,8 @@ options:
       - When the list element is a simple key-value pair, set masked and protected to false.
       - When the list element is a dict with the keys I(value), I(masked) and I(protected), the user can
         have full control about whether a value should be masked, protected or both.
+      - Support for group variables requires GitLab >= 9.5.
+      - Support for environment_scope requires GitLab Premium >= 13.11.
       - Support for protected values requires GitLab >= 9.3.
       - Support for masked values requires GitLab >= 11.10.
       - A I(value) must be a string or a number.
@@ -174,30 +176,32 @@ from ansible_collections.community.general.plugins.module_utils.gitlab import au
 def vars_to_variables(vars, module):
     # transform old vars to new variables structure
     variables = list()
-    for item in vars.keys():
-        if (isinstance(vars.get(item), string_types) or
-           isinstance(vars.get(item), (integer_types, float))):
+    for item, value in vars.items():
+        if (isinstance(value, string_types) or
+           isinstance(value, (integer_types, float))):
             variables.append(
                 {
                     "name": item,
-                    "value": str(vars.get(item))
+                    "value": str(value),
+                    "masked": False,
+                    "protected": False,
+                    "variable_type": "env_var",
                 }
             )
 
-        elif isinstance(vars.get(item), dict):
-            new_item = {"name": item, "value": vars.get(item).get('value')}
+        elif isinstance(value, dict):
+            new_item = {"name": item, "value": value.get('value')}
 
-            if vars.get(item).get('masked'):
-                new_item['masked'] = vars.get(item).get('masked')
+            new_item = {
+                "name": item,
+                "value": value.get('value'),
+                "masked": value.get('masked'),
+                "protected": value.get('protected'),
+                "variable_type": value.get('variable_type'),
+            }
 
-            if vars.get(item).get('protected'):
-                new_item['protected'] = vars.get(item).get('protected')
-
-            if vars.get(item).get('environment_scope'):
-                new_item['environment_scope'] = vars.get(item).get('environment_scope')
-
-            if vars.get(item).get('variable_type'):
-                new_item['variable_type'] = vars.get(item).get('variable_type')
+            if value.get('environment_scope'):
+                new_item['environment_scope'] = value.get('environment_scope')
 
             variables.append(new_item)
 
@@ -231,10 +235,15 @@ class GitlabGroupVariables(object):
         if self._module.check_mode:
             return True
         var = {
-            "key": var_obj.get('key'), "value": var_obj.get('value'),
-            "masked": var_obj.get('masked'), "protected": var_obj.get('protected'),
-            "variable_type": var_obj.get('variable_type'), "environment_scope": var_obj.get('environment_scope')
+            "key": var_obj.get('key'),
+            "value": var_obj.get('value'),
+            "masked": var_obj.get('masked'),
+            "protected": var_obj.get('protected'),
+            "variable_type": var_obj.get('variable_type'),
         }
+        if var_obj.get('environment_scope') is not None:
+          var["environment_scope"] = var_obj.get('environment_scope')
+
         self.group.variables.create(var)
         return True
 
@@ -269,15 +278,15 @@ def compare(requested_variables, existing_variables, state):
         for item in existing_variables:
             existing_key_scope_vars.append({'key': item.get('key'), 'environment_scope': item.get('environment_scope')})
 
-        for idx in range(len(requested_variables)):
-            if requested_variables[idx] in existing_variables:
-                untouched.append(requested_variables[idx])
+        for var in requested_variables:
+            if var in existing_variables:
+                untouched.append(var)
             else:
-                compare_item = {'key': requested_variables[idx].get('name'), 'environment_scope': requested_variables[idx].get('environment_scope', '*')}
+                compare_item = {'key': var.get('name'), 'environment_scope': var.get('environment_scope')}
                 if compare_item in existing_key_scope_vars:
-                    updated.append(requested_variables[idx])
+                    updated.append(var)
                 else:
-                    added.append(requested_variables[idx])
+                    added.append(var)
 
     return untouched, updated, added
 
@@ -302,8 +311,6 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
         item['value'] = str(item.get('value'))
         if item.get('protected') is None:
             item['protected'] = False
-            module.deprecate("The 'protected' attribute will be set to 'True' if not defined.",
-                             version='5.0.0', collection_name='community.general')
         if item.get('masked') is None:
             item['masked'] = False
         if item.get('environment_scope') is None:
@@ -377,7 +384,14 @@ def main():
         group=dict(type='str', required=True),
         purge=dict(type='bool', required=False, default=False),
         vars=dict(type='dict', required=False, default=dict(), no_log=True),
-        variables=dict(type='list', elements='dict', required=False, default=list(), no_log=True),
+        variables=dict(type='list', elements='dict', required=False, default=list(), options=dict(
+            name=dict(type='str', required=True),
+            value=dict(type='str', required=True, no_log=True),
+            masked=dict(type='bool', default=False),
+            protected=dict(type='bool', default=False),
+            environment_scope=dict(type='str', default='*'),
+            variable_type=dict(type='str', default='env_var', choices=["env_var", "file"])
+        )),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )
 
@@ -389,7 +403,7 @@ def main():
             ['api_username', 'api_job_token'],
             ['api_token', 'api_oauth_token'],
             ['api_token', 'api_job_token'],
-            ['vars', 'variables']
+            ['vars', 'variables'],
         ],
         required_together=[
             ['api_username', 'api_password'],
@@ -426,11 +440,6 @@ def main():
     for item in before:
         item.pop('group_id')
         item['name'] = item.pop('key')
-
-    diff = dict(
-        before=before,
-        after=after
-    )
 
     untouched_key_name = 'key'
     if not module.check_mode:
