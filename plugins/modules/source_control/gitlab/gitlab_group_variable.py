@@ -59,7 +59,7 @@ options:
     default: {}
     type: dict
   variables:
-    version_added: 4.4.0
+    version_added: 4.5.0
     description:
       - A list of dictionaries that represents CI/CD variables.
       - This modules works internal with this sructure, even if the older I(vars) parameter is used.
