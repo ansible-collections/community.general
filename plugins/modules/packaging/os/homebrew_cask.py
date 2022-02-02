@@ -102,6 +102,12 @@ EXAMPLES = '''
     state: present
     install_options: 'debug,appdir=/Applications'
 
+- name: Install cask with force option
+  community.general.homebrew_cask:
+    name: alfred
+    state: present
+    install_options: force
+
 - name: Allow external app
   community.general.homebrew_cask:
     name: alfred
@@ -600,7 +606,7 @@ class HomebrewCask(object):
             self.message = 'Invalid cask: {0}.'.format(self.current_cask)
             raise HomebrewCaskException(self.message)
 
-        if self._current_cask_is_installed():
+        if '--force' not in self.install_options and self._current_cask_is_installed():
             self.unchanged_count += 1
             self.message = 'Cask already installed: {0}'.format(
                 self.current_cask,
