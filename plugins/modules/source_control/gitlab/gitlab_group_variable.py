@@ -76,7 +76,7 @@ options:
         description:
           - The variable value
         type: str
-        required: false
+        required: true
       masked:
         description:
           - Wether variable value is masked or not.
@@ -86,7 +86,7 @@ options:
         description:
           - Wether variable value is protected or not.
         type: bool
-        default: true
+        default: false
       variable_type:
         description:
           - Wether a variable is an environment variable (C(env_var)) or a file (C(file)).
@@ -186,7 +186,7 @@ def vars_to_variables(vars, module):
                     "name": item,
                     "value": str(value),
                     "masked": False,
-                    "protected": True,
+                    "protected": False,
                     "variable_type": "env_var",
                 }
             )
@@ -312,7 +312,7 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
         item['key'] = item.pop('name')
         item['value'] = str(item.get('value'))
         if item.get('protected') is None:
-            item['protected'] = True
+            item['protected'] = False
         if item.get('masked') is None:
             item['masked'] = False
         if item.get('environment_scope') is None:
@@ -388,9 +388,9 @@ def main():
         vars=dict(type='dict', required=False, default=dict(), no_log=True),
         variables=dict(type='list', elements='dict', required=False, default=list(), options=dict(
             name=dict(type='str', required=True),
-            value=dict(type='str', required=False, no_log=True),
+            value=dict(type='str', required=True, no_log=True),
             masked=dict(type='bool', default=False),
-            protected=dict(type='bool', default=True),
+            protected=dict(type='bool', default=False),
             environment_scope=dict(type='str', default='*'),
             variable_type=dict(type='str', default='env_var', choices=["env_var", "file"])
         )),
