@@ -115,8 +115,10 @@ groups:
 compose:
   ansible_port: 2222
   
-# Using the inventory to allow ansible to connect via the first IP address of the VM / Container (Default is connection by name of QEMU/LXC guests)
-# Note: The false | default('mystr') pattern is necessary due to how compose parses Jinja2. This would add the variable to every host used by the inventory
+# Using the inventory to allow ansible to connect via the first IP address of the VM / Container
+# (Default is connection by name of QEMU/LXC guests)
+# Note: The false | default('mystr') pattern is necessary due to how compose parses Jinja2.
+#       This would add the variable to every host used by the inventory.
 plugin: community.general.proxmox
 url: http://pve.domain.com:8006
 user: ansible@pve
