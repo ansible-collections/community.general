@@ -71,10 +71,12 @@ options:
         description:
           - The name of the variable
         type: str
+        required: true
       value:
         description:
           - The variable value
         type: str
+        required: false
       masked:
         description:
           - Wether variable value is masked or not.
@@ -84,7 +86,7 @@ options:
         description:
           - Wether variable value is protected or not.
         type: bool
-        default: false
+        default: true
       variable_type:
         description:
           - Wether a variable is an environment variable (C(env_var)) or a file (C(file)).
@@ -184,7 +186,7 @@ def vars_to_variables(vars, module):
                     "name": item,
                     "value": str(value),
                     "masked": False,
-                    "protected": False,
+                    "protected": True,
                     "variable_type": "env_var",
                 }
             )
@@ -242,7 +244,7 @@ class GitlabGroupVariables(object):
             "variable_type": var_obj.get('variable_type'),
         }
         if var_obj.get('environment_scope') is not None:
-          var["environment_scope"] = var_obj.get('environment_scope')
+            var["environment_scope"] = var_obj.get('environment_scope')
 
         self.group.variables.create(var)
         return True
@@ -310,7 +312,7 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
         item['key'] = item.pop('name')
         item['value'] = str(item.get('value'))
         if item.get('protected') is None:
-            item['protected'] = False
+            item['protected'] = True
         if item.get('masked') is None:
             item['masked'] = False
         if item.get('environment_scope') is None:
@@ -386,9 +388,9 @@ def main():
         vars=dict(type='dict', required=False, default=dict(), no_log=True),
         variables=dict(type='list', elements='dict', required=False, default=list(), options=dict(
             name=dict(type='str', required=True),
-            value=dict(type='str', required=True, no_log=True),
+            value=dict(type='str', required=False, no_log=True),
             masked=dict(type='bool', default=False),
-            protected=dict(type='bool', default=False),
+            protected=dict(type='bool', default=True),
             environment_scope=dict(type='str', default='*'),
             variable_type=dict(type='str', default='env_var', choices=["env_var", "file"])
         )),
