@@ -1,0 +1,2 @@
+bugfixes:
+  - homebrew_cask - fix force install operation (https://github.com/ansible-collections/community.general/issues/3703).
