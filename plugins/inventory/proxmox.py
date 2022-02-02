@@ -114,11 +114,11 @@ groups:
   mailservers: "'mail' in (proxmox_tags_parsed|list)"
 compose:
   ansible_port: 2222
-  
+
 # Using the inventory to allow ansible to connect via the first IP address of the VM / Container
 # (Default is connection by name of QEMU/LXC guests)
-# Note: The false | default('mystr') pattern is necessary due to how compose parses Jinja2.
-#       This would add the variable to every host used by the inventory.
+# Note: my_inv_var demonstrates how to add the variable to every host used by the inventory.
+# my.proxmox.yml
 plugin: community.general.proxmox
 url: http://pve.domain.com:8006
 user: ansible@pve
@@ -126,8 +126,10 @@ password: secure
 validate_certs: false
 want_facts: true
 compose:
-  ansible_host: proxmox_ipconfig0.ip | default(proxmox_net0.ip) | ipaddr('address') 
-  my_inv_var: false | default('inv_var_literal_value',true)
+  ansible_host: proxmox_ipconfig0.ip | default(proxmox_net0.ip) | ipaddr('address')
+  my_inv_var_1: "'my_var1_value'"
+  my_inv_var_2: >
+    "my_var_2_value"
 '''
 
 import re
