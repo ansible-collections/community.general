@@ -693,5 +693,4 @@
   assert:
     that:
       - gitlab_project_variable_state.changed
-      - gitlab_project_variable_state.project_variable.removed|length == 0
-      - gitlab_project_variable_state.project_variable.updated|length == 0
+      - gitlab_project_variable_state.project_variable.removed|length == 1
