@@ -528,7 +528,7 @@ EXAMPLES = '''
       virtio2: 'VMs:5,format=raw'
     cores: 4
     vcpus: 2
-    
+
 - name: Create VM with 1 10GB SATA disk and an EFI disk, with Secure Boot disabled by default
   community.general.proxmox_kvm:
     api_user: root@pam
@@ -540,7 +540,7 @@ EXAMPLES = '''
       sata0: 'VMs_LVM:10,format=raw'
     bios: ovmf
     efidisk0: 'VMs_LVM_thin:1,format=raw,efitype=4m,pre-enrolled_keys=0'
-    
+
 - name: Create VM with 1 10GB SATA disk and an EFI disk, with Secure Boot enabled by default
   community.general.proxmox_kvm:
     api_user: root@pam
