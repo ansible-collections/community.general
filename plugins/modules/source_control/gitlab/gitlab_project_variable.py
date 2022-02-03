@@ -74,8 +74,9 @@ options:
       value:
         description:
           - The variable value.
+          - It is required when I(state) is C(present).
+          - It is not required when I(state) is C(absent).
         type: str
-        required: true
       masked:
         description:
           - Wether variable value is masked or not.
@@ -403,7 +404,7 @@ def main():
         vars=dict(type='dict', required=False, default=dict(), no_log=True),
         variables=dict(type='list', elements='dict', required=False, default=list(), options=dict(
             name=dict(type='str', required=True),
-            value=dict(type='str', required=True, no_log=True),
+            value=dict(type='str', no_log=True),
             masked=dict(type='bool', default=False),
             protected=dict(type='bool', default=False),
             environment_scope=dict(type='str', default='*'),
@@ -433,13 +434,16 @@ def main():
 
     purge = module.params['purge']
     var_list = module.params['vars']
+    state = module.params['state']
 
     if var_list:
         variables = vars_to_variables(var_list, module)
     else:
         variables = module.params['variables']
 
-    state = module.params['state']
+    if state == 'present':
+        if None in [x.get('value') for x in variables]:
+            module.fail_json(msg='value parameter is required in state present')
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
