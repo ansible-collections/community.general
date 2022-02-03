@@ -227,6 +227,7 @@
     vars:
       ACCESS_KEY_ID:
         environment_scope: testing
+        value: checkmode
   register: gitlab_project_variable_state
 
 - name: state must be changed
@@ -242,6 +243,7 @@
     vars:
       ACCESS_KEY_ID:
         environment_scope: testing
+        value: checkmode
   register: gitlab_project_variable_state
 
 - name: state must not be changed
