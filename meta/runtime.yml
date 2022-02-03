@@ -154,6 +154,10 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: Use community.general.github_webhook and community.general.github_webhook_info
           instead.
+    hana_query:
+      tombstone:
+        removal_version: 5.0.0
+        redirect: community.sap.hana_query
     hetzner_failover_ip:
       redirect: community.hrobot.failover_ip
     hetzner_failover_ip_info:
@@ -499,6 +503,14 @@ plugin_routing:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.redfish_info instead.
+    sapcar_extract:
+      tombstone:
+        removal_version: 5.0.0
+        redirect: community.sap.sapcar_extract
+    sap_task_list_execute:
+      tombstone:
+        removal_version: 5.0.0
+        redirect: community.sap.sap_task_list_execute
     scaleway_image_facts:
       tombstone:
         removal_version: 3.0.0

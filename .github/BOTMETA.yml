@@ -497,6 +497,7 @@ files:
     labels: mssql_script
   $modules/database/saphana/hana_query.py:
     maintainers: rainerleber
+    migrated_to: community.sap
   $modules/database/vertica/:
     maintainers: dareko
   $modules/files/archive.py:
@@ -513,6 +514,7 @@ files:
     maintainers: dagwieers
   $modules/files/sapcar_extract.py:
     maintainers: RainerLeber
+    migrated_to: community.sap
   $modules/files/xattr.py:
     maintainers: bcoca
     labels: xattr
@@ -1092,6 +1094,7 @@ files:
     maintainers: jsumners
   $modules/system/sap_task_list_execute:
     maintainers: rainerleber
+    migrated_to: community.sap
   $modules/system/sefcontext.py:
     maintainers: dagwieers
   $modules/system/selinux_permissive.py:
