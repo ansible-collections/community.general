@@ -24,6 +24,7 @@
     variables:
       - name: ACCESS_KEY_ID
         value: checkmode
+  check_mode: yes
   register: gitlab_group_variable_state
 
 - name: check_mode state must be changed
