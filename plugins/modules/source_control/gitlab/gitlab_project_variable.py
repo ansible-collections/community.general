@@ -432,6 +432,9 @@ def main():
         supports_check_mode=True
     )
 
+    if not HAS_GITLAB_PACKAGE:
+        module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
+
     purge = module.params['purge']
     var_list = module.params['vars']
     state = module.params['state']
@@ -444,9 +447,6 @@ def main():
     if state == 'present':
         if None in [x.get('value') for x in variables]:
             module.fail_json(msg='value parameter is required in state present')
-
-    if not HAS_GITLAB_PACKAGE:
-        module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
     gitlab_instance = gitlab_authentication(module)
 
