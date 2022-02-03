@@ -74,7 +74,7 @@ options:
       value:
         description:
           - The variable value.
-          - Required when I(state=present).
+          - Required when I(state=fact).
         type: str
       masked:
         description:
@@ -401,23 +401,14 @@ def main():
         project=dict(type='str', required=True),
         purge=dict(type='bool', required=False, default=False),
         vars=dict(type='dict', required=False, default=dict(), no_log=True),
-        variables=dict(
-            type='list',
-            elements='dict',
-            required=False,
-            default=list(),
-            required_if=(
-                ['state', 'present', ('value',)],
-            ),
-            options=dict(
-                name=dict(type='str', required=True),
-                value=dict(type='str', no_log=True),
-                masked=dict(type='bool', default=False),
-                protected=dict(type='bool', default=False),
-                environment_scope=dict(type='str', default='*'),
-                variable_type=dict(type='str', default='env_var', choices=["env_var", "file"])
-            )
-        ),
+        variables=dict(type='list', elements='dict', required=False, default=list(), options=dict(
+            name=dict(type='str', required=True),
+            value=dict(type='str', no_log=True),
+            masked=dict(type='bool', default=False),
+            protected=dict(type='bool', default=False),
+            environment_scope=dict(type='str', default='*'),
+            variable_type=dict(type='str', default='env_var', choices=["env_var", "file"])
+        )),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     )
 
