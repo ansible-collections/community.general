@@ -663,7 +663,7 @@
       - gitlab_project_variable_state.failed
       - gitlab_project_variable_state is not changed
 
-- name: set a new variable to delete is later
+- name: set a new variable to delete it later
   gitlab_project_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
