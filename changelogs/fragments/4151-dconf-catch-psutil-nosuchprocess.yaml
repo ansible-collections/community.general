@@ -1,0 +1,2 @@
+bugfixes:
+  - "dconf - Skip processes that disappeared while we inspected them (#4151)"
