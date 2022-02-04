@@ -444,7 +444,7 @@ def main():
         variables = module.params['variables']
 
     if state == 'present':
-        if None in [x.get('value') for x in variables]:
+        if any(x['value'] is None for x in variables):
             module.fail_json(msg='value parameter is required in state present')
 
     gitlab_instance = gitlab_authentication(module)
