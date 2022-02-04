@@ -74,7 +74,7 @@ options:
       value:
         description:
           - The variable value.
-          - Required when I(state=fact).
+          - Required when I(state=present).
         type: str
       masked:
         description:
