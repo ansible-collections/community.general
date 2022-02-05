@@ -1,0 +1,10 @@
+---
+- name: 8. Merge recursive by 'name', prepend lists 'remove present'
+  include_vars:
+    dir: example-008_vars
+- debug:
+    var: list3
+  when: debug|d(false)|bool
+- template:
+    src: list3.out.j2
+    dest: example-008.out

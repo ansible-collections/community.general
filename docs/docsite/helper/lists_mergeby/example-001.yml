@@ -1,0 +1,10 @@
+---
+- name: 1. Merge two lists by common attribute 'name'
+  include_vars:
+    dir: example-001_vars
+- debug:
+    var: list3
+  when: debug|d(false)|bool
+- template:
+    src: list3.out.j2
+    dest: example-001.out
