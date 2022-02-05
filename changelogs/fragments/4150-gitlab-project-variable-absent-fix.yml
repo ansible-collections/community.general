@@ -1,0 +1,2 @@
+bugfixes:
+  - gitlab_project_variable - ``value`` is not necessary when deleting variables (https://github.com/ansible-collections/community.general/pull/4150).
