@@ -74,8 +74,8 @@ options:
       value:
         description:
           - The variable value.
+          - Required when I(state=present).
         type: str
-        required: true
       masked:
         description:
           - Wether variable value is masked or not.
@@ -403,7 +403,7 @@ def main():
         vars=dict(type='dict', required=False, default=dict(), no_log=True),
         variables=dict(type='list', elements='dict', required=False, default=list(), options=dict(
             name=dict(type='str', required=True),
-            value=dict(type='str', required=True, no_log=True),
+            value=dict(type='str', no_log=True),
             masked=dict(type='bool', default=False),
             protected=dict(type='bool', default=False),
             environment_scope=dict(type='str', default='*'),
@@ -431,18 +431,21 @@ def main():
         supports_check_mode=True
     )
 
+    if not HAS_GITLAB_PACKAGE:
+        module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
+
     purge = module.params['purge']
     var_list = module.params['vars']
+    state = module.params['state']
 
     if var_list:
         variables = vars_to_variables(var_list, module)
     else:
         variables = module.params['variables']
 
-    state = module.params['state']
-
-    if not HAS_GITLAB_PACKAGE:
-        module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
+    if state == 'present':
+        if any(x['value'] is None for x in variables):
+            module.fail_json(msg='value parameter is required in state present')
 
     gitlab_instance = gitlab_authentication(module)
 
