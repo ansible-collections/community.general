@@ -1,2 +1,2 @@
 bugfixes:
-  - "dconf - Skip processes that disappeared while we inspected them (#4151)"
+  - "dconf - skip processes that disappeared while we inspected them (https://github.com/ansible-collections/community.general/issues/4151)."
