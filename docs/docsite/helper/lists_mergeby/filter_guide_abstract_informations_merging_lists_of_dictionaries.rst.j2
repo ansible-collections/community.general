@@ -5,7 +5,7 @@ If you have two or more lists of dictionaries and want to combine them into a li
 
 .. note:: The output of the examples in this section use the YAML callback plugin. Quoting: "Ansible output that can be quite a bit easier to read than the default JSON formatting." See :ref:`the documentation for the community.general.yaml callback plugin <ansible_collections.community.general.yaml_callback>`.
 
-Let us use the lists below in the following examples
+Let us use the lists below in the following examples:
 
 .. code-block:: yaml
 
