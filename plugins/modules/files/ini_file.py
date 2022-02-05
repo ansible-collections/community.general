@@ -368,9 +368,9 @@ def do_ini(module, filename, section=None, option=None, values=None,
         else:
             # drop the entire section
             if len(section_lines) != 0:
-              section_lines = []
-              msg = 'section removed'
-              changed = True
+                section_lines = []
+                msg = 'section removed'
+                changed = True
 
     # reassemble the ini_lines after manipulation
     ini_lines = before + section_lines + after
