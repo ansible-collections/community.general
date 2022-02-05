@@ -69,7 +69,7 @@ options:
     suboptions:
       name:
         description:
-          - The name of the variable
+          - The name of the variable.
         type: str
         required: true
       value:
