@@ -5,30 +5,30 @@ If you have two or more lists of dictionaries and want to combine them into a li
 
 .. note:: The output of the examples in this section use the YAML callback plugin. Quoting: "Ansible output that can be quite a bit easier to read than the default JSON formatting." See :ref:`the documentation for the community.general.yaml callback plugin <ansible_collections.community.general.yaml_callback>`.
 
+Let us use the lists below in the following examples:
+
+.. code-block:: yaml
+
+  list1:
+    - name: foo
+      extra: true
+    - name: bar
+      extra: false
+    - name: meh
+      extra: true
+
+  list2:
+    - name: foo
+      path: /foo
+    - name: baz
+      path: /baz
+
 In the example below the lists are merged by the attribute ``name``:
 
 .. code-block:: yaml+jinja
 
-  ---
-  - name: Merge two lists by common attribute 'name'
-    set_fact:
-      list3: "{{ list1|
-                 community.general.lists_mergeby(list2, 'name') }}"
-    vars:
-      list1:
-        - name: foo
-          extra: true
-        - name: bar
-          extra: false
-        - name: meh
-          extra: true
-      list2:
-        - name: foo
-          path: /foo
-        - name: baz
-          path: /baz
-  - debug:
-      var: list3
+  list3: "{{ list1|
+             community.general.lists_mergeby(list2, 'name') }}"
 
 This produces:
 
@@ -45,32 +45,15 @@ This produces:
   - extra: true
     name: meh
 
+
 .. versionadded:: 2.0.0
 
 It is possible to use a list of lists as an input of the filter:
 
 .. code-block:: yaml+jinja
 
-  ---
-  - name: Merge two lists by common attribute 'name'
-    set_fact:
-      list3: "{{ [list1, list2]|
-                 community.general.lists_mergeby('name') }}"
-    vars:
-      list1:
-        - name: foo
-          extra: true
-        - name: bar
-          extra: false
-        - name: meh
-          extra: true
-      list2:
-        - name: foo
-          path: /foo
-        - name: baz
-          path: /baz
-  - debug:
-      var: list3
+  list3: "{{ [list1, list2]|
+             community.general.lists_mergeby('name') }}"
 
 This produces the same result as in the previous example:
 
@@ -87,6 +70,7 @@ This produces the same result as in the previous example:
   - extra: true
     name: meh
 
+
 The filter also accepts two optional parameters: ``recursive`` and ``list_merge``. These parameters are only supported when used with ansible-base 2.10 or ansible-core, but not with Ansible 2.9. This is available since community.general 4.4.0.
 
 **recursive**
@@ -97,337 +81,212 @@ The filter also accepts two optional parameters: ``recursive`` and ``list_merge`
 
 The examples below set ``recursive=true`` and display the differences among all six options of ``list_merge``. Functionality of the parameters is exactly the same as in the filter ``combine``. See :ref:`Combining hashes/dictionaries <combine_filter>` to learn details about these options.
 
+Let us use the lists below in the following examples
+
+.. code-block:: yaml
+
+  list1:
+    - name: myname01
+      param01:
+        x: default_value
+        y: default_value
+        list:
+          - default_value
+    - name: myname02
+      param01: [1, 1, 2, 3]
+
+  list2:
+    - name: myname01
+      param01:
+        y: patch_value
+        z: patch_value
+        list:
+          - patch_value
+    - name: myname02
+      param01: [3, 4, 4, {key: value}]
+
 Example ``list_merge=replace`` (default):
 
 .. code-block:: yaml+jinja
 
-  ---
-  - name: Merge recursive by 'name', replace lists (default)
-    set_fact:
-      list3: "{{ [list1, list2]|
-                 community.general.lists_mergeby('name',
-                                                 recursive=true) }}"
-    vars:
-      list1:
-        - name: myname01
-          param01:
-            x: default_value
-            y: default_value
-            list:
-              - default_value
-        - name: myname02
-          param01: [1, 1, 2, 3]
-
-      list2:
-        - name: myname01
-          param01:
-            y: patch_value
-            z: patch_value
-            list:
-              - patch_value
-        - name: myname02
-          param01: [3, 4, 4, {key: value}]
-  - debug:
-      var: list3
+  list3: "{{ [list1, list2]|
+             community.general.lists_mergeby('name',
+                                             recursive=true) }}"
 
 This produces:
 
 .. code-block:: yaml
 
-    list3:
-    - name: myname01
-      param01:
-        list:
-        - patch_value
-        x: default_value
-        y: patch_value
-        z: patch_value
-    - name: myname02
-      param01:
-      - 3
-      - 4
-      - 4
-      - key: value
+  list3:
+  - name: myname01
+    param01:
+      list:
+      - patch_value
+      x: default_value
+      y: patch_value
+      z: patch_value
+  - name: myname02
+    param01:
+    - 3
+    - 4
+    - 4
+    - key: value
 
 Example ``list_merge=keep``:
 
 .. code-block:: yaml+jinja
 
-  ---
-  - name: Merge recursive by 'name', keep lists
-    set_fact:
-      list3: "{{ [list1, list2]|
-                 community.general.lists_mergeby('name',
-                                                 recursive=true,
-                                                 list_merge='keep') }}"
-    vars:
-      list1:
-        - name: myname01
-          param01:
-            x: default_value
-            y: default_value
-            list:
-              - default_value
-        - name: myname02
-          param01: [1, 1, 2, 3]
-
-      list2:
-        - name: myname01
-          param01:
-            y: patch_value
-            z: patch_value
-            list:
-              - patch_value
-        - name: myname02
-          param01: [3, 4, 4, {key: value}]
-  - debug:
-      var: list3
+  list3: "{{ [list1, list2]|
+             community.general.lists_mergeby('name',
+                                             recursive=true,
+                                             list_merge='keep') }}"
 
 This produces:
 
 .. code-block:: yaml
 
-    list3:
-    - name: myname01
-      param01:
-        list:
-        - default_value
-        x: default_value
-        y: patch_value
-        z: patch_value
-    - name: myname02
-      param01:
-      - 1
-      - 1
-      - 2
-      - 3
+  list3:
+  - name: myname01
+    param01:
+      list:
+      - default_value
+      x: default_value
+      y: patch_value
+      z: patch_value
+  - name: myname02
+    param01:
+    - 1
+    - 1
+    - 2
+    - 3
 
 Example ``list_merge=append``:
 
 .. code-block:: yaml+jinja
 
-  ---
-  - name: Merge recursive by 'name', append lists
-    set_fact:
-      list3: "{{ [list1, list2]|
-                 community.general.lists_mergeby('name',
-                                                 recursive=true,
-                                                 list_merge='append') }}"
-    vars:
-      list1:
-        - name: myname01
-          param01:
-            x: default_value
-            y: default_value
-            list:
-              - default_value
-        - name: myname02
-          param01: [1, 1, 2, 3]
-
-      list2:
-        - name: myname01
-          param01:
-            y: patch_value
-            z: patch_value
-            list:
-              - patch_value
-        - name: myname02
-          param01: [3, 4, 4, {key: value}]
-  - debug:
-      var: list3
+  list3: "{{ [list1, list2]|
+             community.general.lists_mergeby('name',
+                                             recursive=true,
+                                             list_merge='append') }}"
 
 This produces:
 
 .. code-block:: yaml
 
-    list3:
-    - name: myname01
-      param01:
-        list:
-        - default_value
-        - patch_value
-        x: default_value
-        y: patch_value
-        z: patch_value
-    - name: myname02
-      param01:
-      - 1
-      - 1
-      - 2
-      - 3
-      - 3
-      - 4
-      - 4
-      - key: value
+  list3:
+  - name: myname01
+    param01:
+      list:
+      - default_value
+      - patch_value
+      x: default_value
+      y: patch_value
+      z: patch_value
+  - name: myname02
+    param01:
+    - 1
+    - 1
+    - 2
+    - 3
+    - 3
+    - 4
+    - 4
+    - key: value
 
 Example ``list_merge=prepend``:
 
 .. code-block:: yaml+jinja
 
-  ---
-  - name: Merge recursive by 'name', prepend lists
-    set_fact:
-      list3: "{{ [list1, list2]|
-                 community.general.lists_mergeby('name',
-                                                 recursive=true,
-                                                 list_merge='prepend') }}"
-    vars:
-      list1:
-        - name: myname01
-          param01:
-            x: default_value
-            y: default_value
-            list:
-              - default_value
-        - name: myname02
-          param01: [1, 1, 2, 3]
-
-      list2:
-        - name: myname01
-          param01:
-            y: patch_value
-            z: patch_value
-            list:
-              - patch_value
-        - name: myname02
-          param01: [3, 4, 4, {key: value}]
-  - debug:
-      var: list3
+  list3: "{{ [list1, list2]|
+             community.general.lists_mergeby('name',
+                                             recursive=true,
+                                             list_merge='prepend') }}"
 
 This produces:
 
 .. code-block:: yaml
 
-    list3:
-    - name: myname01
-      param01:
-        list:
-        - patch_value
-        - default_value
-        x: default_value
-        y: patch_value
-        z: patch_value
-    - name: myname02
-      param01:
-      - 3
-      - 4
-      - 4
-      - key: value
-      - 1
-      - 1
-      - 2
-      - 3
+  list3:
+  - name: myname01
+    param01:
+      list:
+      - patch_value
+      - default_value
+      x: default_value
+      y: patch_value
+      z: patch_value
+  - name: myname02
+    param01:
+    - 3
+    - 4
+    - 4
+    - key: value
+    - 1
+    - 1
+    - 2
+    - 3
 
 Example ``list_merge=append_rp``:
 
 .. code-block:: yaml+jinja
 
-  ---
-  - name: Merge recursive by 'name', append lists 'remove present'
-    set_fact:
-      list3: "{{ [list1, list2]|
-                 community.general.lists_mergeby('name',
-                                                 recursive=true,
-                                                 list_merge='append_rp') }}"
-    vars:
-      list1:
-        - name: myname01
-          param01:
-            x: default_value
-            y: default_value
-            list:
-              - default_value
-        - name: myname02
-          param01: [1, 1, 2, 3]
-
-      list2:
-        - name: myname01
-          param01:
-            y: patch_value
-            z: patch_value
-            list:
-              - patch_value
-        - name: myname02
-          param01: [3, 4, 4, {key: value}]
-  - debug:
-      var: list3
+  list3: "{{ [list1, list2]|
+             community.general.lists_mergeby('name',
+                                             recursive=true,
+                                             list_merge='append_rp') }}"
 
 This produces:
 
 .. code-block:: yaml
 
-    list3:
-    - name: myname01
-      param01:
-        list:
-        - default_value
-        - patch_value
-        x: default_value
-        y: patch_value
-        z: patch_value
-    - name: myname02
-      param01:
-      - 1
-      - 1
-      - 2
-      - 3
-      - 4
-      - 4
-      - key: value
+  list3:
+  - name: myname01
+    param01:
+      list:
+      - default_value
+      - patch_value
+      x: default_value
+      y: patch_value
+      z: patch_value
+  - name: myname02
+    param01:
+    - 1
+    - 1
+    - 2
+    - 3
+    - 4
+    - 4
+    - key: value
 
 Example ``list_merge=prepend_rp``:
 
 .. code-block:: yaml+jinja
 
-  ---
-  - name: Merge recursive by 'name', prepend lists 'remove present'
-    set_fact:
-      list3: "{{ [list1, list2]|
-                 community.general.lists_mergeby('name',
-                                                 recursive=true,
-                                                 list_merge='prepend_rp') }}"
-    vars:
-      list1:
-        - name: myname01
-          param01:
-            x: default_value
-            y: default_value
-            list:
-              - default_value
-        - name: myname02
-          param01: [1, 1, 2, 3]
-
-      list2:
-        - name: myname01
-          param01:
-            y: patch_value
-            z: patch_value
-            list:
-              - patch_value
-        - name: myname02
-          param01: [3, 4, 4, {key: value}]
-  - debug:
-      var: list3
+  list3: "{{ [list1, list2]|
+             community.general.lists_mergeby('name',
+                                             recursive=true,
+                                             list_merge='prepend_rp') }}"
 
 This produces:
 
 .. code-block:: yaml
 
-    list3:
-    - name: myname01
-      param01:
-        list:
-        - patch_value
-        - default_value
-        x: default_value
-        y: patch_value
-        z: patch_value
-    - name: myname02
-      param01:
-      - 3
-      - 4
-      - 4
-      - key: value
-      - 1
-      - 1
-      - 2
+  list3:
+  - name: myname01
+    param01:
+      list:
+      - patch_value
+      - default_value
+      x: default_value
+      y: patch_value
+      z: patch_value
+  - name: myname02
+    param01:
+    - 3
+    - 4
+    - 4
+    - key: value
+    - 1
+    - 1
+    - 2
+
