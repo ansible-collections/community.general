@@ -1,0 +1,2 @@
+bugfixes:
+  - ini_file - When removing nothing don't report changed.
