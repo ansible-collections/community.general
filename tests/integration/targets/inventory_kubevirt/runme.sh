@@ -23,7 +23,7 @@ source virtualenv.sh
 python --version
 pip --version
 pip show setuptools
-pip install openshift -c constraints.txt
+pip install 'openshift<0.13.0' -c constraints.txt
 
 ./server.py &
 
