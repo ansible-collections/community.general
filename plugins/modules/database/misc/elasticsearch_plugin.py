@@ -167,10 +167,6 @@ def install_plugin(module, plugin_bin, plugin_name, version, src, url, proxy_hos
         if timeout:
             cmd_args.append("--timeout %s" % timeout)
 
-        if version:
-            plugin_name = plugin_name + '/' + version
-            cmd_args[2] = plugin_name
-
     if proxy_host and proxy_port:
         cmd_args.append("-DproxyHost=%s -DproxyPort=%s" % (proxy_host, proxy_port))
 
@@ -183,6 +179,8 @@ def install_plugin(module, plugin_bin, plugin_name, version, src, url, proxy_hos
     if src:
         cmd_args.append(src)
     else:
+        if is_old_command and version:
+            plugin_name = plugin_name + '/' + version
         cmd_args.append(plugin_name)
 
     cmd = " ".join(cmd_args)
