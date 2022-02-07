@@ -247,13 +247,13 @@
       ACCESS_KEY_ID:
         environment_scope: testing
         value: checkmode
-  register: gitlab_project_variable_state
+  register: gitlab_group_variable_state
   when: gitlab_premium_tests is defined
 
 - name: state must not be changed
   assert:
     that:
-      - gitlab_project_variable_state is not changed
+      - gitlab_group_variable_state is not changed
   when: gitlab_premium_tests is defined
 
 - name: purge all variables at the beginning
