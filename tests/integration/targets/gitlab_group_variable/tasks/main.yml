@@ -700,3 +700,4 @@
     that:
       - gitlab_group_variable_state.changed
       - gitlab_group_variable_state.group_variable.removed|length == 1
+      
