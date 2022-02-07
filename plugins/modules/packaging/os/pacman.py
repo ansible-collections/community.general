@@ -4,7 +4,7 @@
 # Copyright: (c) 2012, Afterburn <https://github.com/afterburn>
 # Copyright: (c) 2013, Aaron Bull Schaefer <aaron@elasticdog.com>
 # Copyright: (c) 2015, Indrajit Raychaudhuri <irc+code@indrajit.com>
-# Copyright: (c) 2021, Jean Raby <jean@raby.sh>
+# Copyright: (c) 2022, Jean Raby <jean@raby.sh>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -21,6 +21,7 @@ author:
     - Indrajit Raychaudhuri (@indrajitr)
     - Aaron Bull Schaefer (@elasticdog) <aaron@elasticdog.com>
     - Maxime de Roucy (@tchernomax)
+    - Jean Raby (@jraby)
 options:
     name:
         description:
