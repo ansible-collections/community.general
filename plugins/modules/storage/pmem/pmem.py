@@ -11,20 +11,21 @@ DOCUMENTATION = r'''
 author:
  - Masayoshi Mizuma (@mizumm)
 module: pmem
-short_description: Configure Intel Optane Persistent Memory modules.
+short_description: Configure Intel Optane Persistent Memory modules
+version_added: 4.5.0
 description:
  - This module allows Configuring Intel Optane Persistent Memory modules
    (PMem) using ipmctl and ndctl command line tools.
 requirements:
- - ipmctl and ndctl command line tools.
+ - ipmctl and ndctl command line tools
  - xmltodict
 options:
   AppDirect:
     description:
-     - Percentage of the total capacity to use in AppDirect Mode (0-100).
+     - Percentage of the total capacity to use in AppDirect Mode (C(0)-C(100)).
      - Create AppDirect capacity utilizing hardware interleaving across the
        requested PMem modules if applicable given the specified target.
-     - Total of AppDirect, MemoryMode and Reserved must be 100
+     - Total of I(AppDirect), I(MemoryMode) and I(Reserved) must be C(100)
     type: int
   AppDirectInterleaved:
     description:
@@ -34,11 +35,11 @@ options:
     default: true
   MemoryMode:
     description:
-     - Percentage of the total capacity to use in Memory Mode (0-100).
+     - Percentage of the total capacity to use in Memory Mode (C(0)-C(100)).
     type: int
   Reserved:
     description:
-     - Percentage of the capacity to reserve (0-100). Reserved will not be mapped
+     - Percentage of the capacity to reserve (C(0)-C(100)). Reserved will not be mapped
        into the system physical address space and will be presented as Reserved
        Capacity with Show Device and Show Memory Resources Commands.
      - Reserved will be set automatically if this isn't configured.
@@ -46,34 +47,34 @@ options:
     required: false
   Socket:
     description:
-     - This enables to set the configuration for each socket by using the socket id.
-     - Total of AppDirect, MemoryMode and Reserved must be 100 within one socket.
+     - This enables to set the configuration for each socket by using the socket ID.
+     - Total of I(AppDirect), I(MemoryMode) and I(Reserved) must be C(100) within one socket.
     type: list
     elements: dict
     suboptions:
       id:
-        description: The socket id of the PMem module.
+        description: The socket ID of the PMem module.
         type: int
         required: true
       AppDirect:
         description:
-         - Percentage of the total capacity to use in AppDirect Mode (0-100) within the socket id.
+         - Percentage of the total capacity to use in AppDirect Mode (C(0)-C(100)) within the socket ID.
         type: int
         required: true
       AppDirectInterleaved:
         description:
-         - Create AppDirect capacity that is interleaved any other PMem modules within the socket id.
+         - Create AppDirect capacity that is interleaved any other PMem modules within the socket ID.
         type: bool
         required: false
         default: true
       MemoryMode:
         description:
-         - Percentage of the total capacity to use in Memory Mode (0-100) within the socket id.
+         - Percentage of the total capacity to use in Memory Mode (C(0)-C(100)) within the socket ID.
         type: int
         required: true
       Reserved:
         description:
-          - Percentage of the capacity to reserve (0-100) within the socket id.
+          - Percentage of the capacity to reserve (C(0)-C(100)) within the socket ID.
         type: int
 '''
 
@@ -86,7 +87,7 @@ reboot_required:
 result:
     description:
      - Shows the value of AppDirect, MemoryMode and Reserved size in bytes.
-     - If ``Socket`` argument is provided, shows the values in each socket with ``Socket`` which says the socket id.
+     - If I(Socket) argument is provided, shows the values in each socket with C(Socket) which contains the socket ID.
     returned: success
     type: list
     elements: dict
@@ -101,14 +102,21 @@ result:
           description: Reserved size in bytes.
           type: int
         Socket:
-          description: The socket id to be configured.
+          description: The socket ID to be configured.
           type: int
     sample: [
                 {
                     "AppDirect": 111669149696,
                     "MemoryMode": 970662608896,
-                    "Reserved": 3626500096
+                    "Reserved": 3626500096,
+                    "Socket": 0
                 },
+                {
+                    "AppDirect": 111669149696,
+                    "MemoryMode": 970662608896,
+                    "Reserved": 3626500096,
+                    "Socket": 1
+                }
             ]
 '''
 
