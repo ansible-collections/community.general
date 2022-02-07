@@ -20,35 +20,35 @@ requirements:
  - ipmctl and ndctl command line tools
  - xmltodict
 options:
-  AppDirect:
+  appdirect:
     description:
      - Percentage of the total capacity to use in AppDirect Mode (C(0)-C(100)).
      - Create AppDirect capacity utilizing hardware interleaving across the
        requested PMem modules if applicable given the specified target.
-     - Total of I(AppDirect), I(MemoryMode) and I(Reserved) must be C(100)
+     - Total of I(appdirect), I(memorymode) and I(reserved) must be C(100)
     type: int
-  AppDirectInterleaved:
+  appdirect_interleaved:
     description:
      - Create AppDirect capacity that is interleaved any other PMem modules.
     type: bool
     required: false
     default: true
-  MemoryMode:
+  memorymode:
     description:
      - Percentage of the total capacity to use in Memory Mode (C(0)-C(100)).
     type: int
-  Reserved:
+  reserved:
     description:
-     - Percentage of the capacity to reserve (C(0)-C(100)). Reserved will not be mapped
-       into the system physical address space and will be presented as Reserved
-       Capacity with Show Device and Show Memory Resources Commands.
-     - Reserved will be set automatically if this isn't configured.
+     - Percentage of the capacity to reserve (C(0)-C(100)). I(reserved) will not be mapped
+       into the system physical address space and will be presented as reserved
+       capacity with Show Device and Show Memory Resources Commands.
+     - I(reserved) will be set automatically if this is not configured.
     type: int
     required: false
-  Socket:
+  socket:
     description:
      - This enables to set the configuration for each socket by using the socket ID.
-     - Total of I(AppDirect), I(MemoryMode) and I(Reserved) must be C(100) within one socket.
+     - Total of I(appdirect), I(memorymode) and I(reserved) must be C(100) within one socket.
     type: list
     elements: dict
     suboptions:
@@ -56,23 +56,23 @@ options:
         description: The socket ID of the PMem module.
         type: int
         required: true
-      AppDirect:
+      appdirect:
         description:
          - Percentage of the total capacity to use in AppDirect Mode (C(0)-C(100)) within the socket ID.
         type: int
         required: true
-      AppDirectInterleaved:
+      appdirect_interleaved:
         description:
          - Create AppDirect capacity that is interleaved any other PMem modules within the socket ID.
         type: bool
         required: false
         default: true
-      MemoryMode:
+      memorymode:
         description:
          - Percentage of the total capacity to use in Memory Mode (C(0)-C(100)) within the socket ID.
         type: int
         required: true
-      Reserved:
+      reserved:
         description:
           - Percentage of the capacity to reserve (C(0)-C(100)) within the socket ID.
         type: int
@@ -86,70 +86,70 @@ reboot_required:
     sample: True
 result:
     description:
-     - Shows the value of AppDirect, MemoryMode and Reserved size in bytes.
-     - If I(Socket) argument is provided, shows the values in each socket with C(Socket) which contains the socket ID.
+     - Shows the value of AppDirect, Memory Mode and Reserved size in bytes.
+     - If I(socket) argument is provided, shows the values in each socket with C(socket) which contains the socket ID.
     returned: success
     type: list
     elements: dict
     contains:
-        AppDirect:
+        appdirect:
           description: AppDirect size in bytes.
           type: int
-        MemoryMode:
-          description: MemosyMode size in bytes.
+        memorymode:
+          description: Memory Mode size in bytes.
           type: int
-        Reserved:
+        reserved:
           description: Reserved size in bytes.
           type: int
-        Socket:
+        socket:
           description: The socket ID to be configured.
           type: int
     sample: [
                 {
-                    "AppDirect": 111669149696,
-                    "MemoryMode": 970662608896,
-                    "Reserved": 3626500096,
-                    "Socket": 0
+                    "appdirect": 111669149696,
+                    "memorymode": 970662608896,
+                    "reserved": 3626500096,
+                    "socket": 0
                 },
                 {
-                    "AppDirect": 111669149696,
-                    "MemoryMode": 970662608896,
-                    "Reserved": 3626500096,
-                    "Socket": 1
+                    "appdirect": 111669149696,
+                    "memorymode": 970662608896,
+                    "reserved": 3626500096,
+                    "socket": 1
                 }
             ]
 '''
 
 EXAMPLES = r'''
-- name: Configure the Pmem as AppDirect 10, MemoryMode 70, and the Reserved 20 percent.
+- name: Configure the Pmem as AppDirect 10, Memory Mode 70, and the Reserved 20 percent.
   community.general.pmem:
-    AppDirect: 10
-    MemoryMode: 70
+    appdirect: 10
+    memorymode: 70
 
-- name: Configure the Pmem as AppDirect 10, MemoryMode 80, and the Reserved 10 percent.
+- name: Configure the Pmem as AppDirect 10, Memory Mode 80, and the Reserved 10 percent.
   community.general.pmem:
-    AppDirect: 10
-    MemoryMode: 80
-    Reserved: 10
+    appdirect: 10
+    memorymode: 80
+    reserved: 10
 
-- name: Configure the Pmem as AppDirect with not interleaved 10, MemoryMode 70, and the Reserved 20 percent.
+- name: Configure the Pmem as AppDirect with not interleaved 10, Memory Mode 70, and the Reserved 20 percent.
   community.general.pmem:
-    AppDirect: 10
-    AppDirectInterleaved: False
-    MemoryMode: 70
+    appdirect: 10
+    appdirect_interleaved: False
+    memorymode: 70
 
 - name: Configure the Pmem each socket.
   community.general.pmem:
-    Socket:
+    socket:
       - id: 0
-        AppDirect: 10
-        AppDirectInterleaved: False
-        MemoryMode: 70
-        Reserved: 20
+        appdirect: 10
+        appdirect_interleaved: False
+        memorymode: 70
+        reserved: 20
       - id: 1
-        AppDirect: 10
-        MemoryMode: 80
-        Reserved: 10
+        appdirect: 10
+        memorymode: 80
+        reserved: 10
 '''
 
 import json
@@ -170,41 +170,41 @@ class PersistentMemory(object):
     def __init__(self):
         module = AnsibleModule(
             argument_spec=dict(
-                AppDirect=dict(type='int'),
-                AppDirectInterleaved=dict(type='bool', default=True),
-                MemoryMode=dict(type='int'),
-                Reserved=dict(type='int'),
-                Socket=dict(
+                appdirect=dict(type='int'),
+                appdirect_interleaved=dict(type='bool', default=True),
+                memorymode=dict(type='int'),
+                reserved=dict(type='int'),
+                socket=dict(
                     type='list', elements='dict',
                     options=dict(
                         id=dict(required=True, type='int'),
-                        AppDirect=dict(required=True, type='int'),
-                        AppDirectInterleaved=dict(type='bool', default=True),
-                        MemoryMode=dict(required=True, type='int'),
-                        Reserved=dict(type='int'),
+                        appdirect=dict(required=True, type='int'),
+                        appdirect_interleaved=dict(type='bool', default=True),
+                        memorymode=dict(required=True, type='int'),
+                        reserved=dict(type='int'),
                     ),
                 ),
             ),
             required_together=(
-                ['AppDirect', 'MemoryMode'],
+                ['appdirect', 'memorymode'],
             ),
             required_one_of=(
-                ['AppDirect', 'MemoryMode', 'Socket'],
+                ['appdirect', 'memorymode', 'socket'],
             ),
             mutually_exclusive=(
-                ['AppDirect', 'Socket'],
-                ['MemoryMode', 'Socket'],
+                ['appdirect', 'socket'],
+                ['memorymode', 'socket'],
             ),
         )
 
         self.ipmctl_exec = module.get_bin_path('ipmctl', True)
         self.ndctl_exec = module.get_bin_path('ndctl', True)
 
-        self.appdirect = module.params['AppDirect']
-        self.interleaved = module.params['AppDirectInterleaved']
-        self.memmode = module.params['MemoryMode']
-        self.reserved = module.params['Reserved']
-        self.socket = module.params['Socket']
+        self.appdirect = module.params['appdirect']
+        self.interleaved = module.params['appdirect_interleaved']
+        self.memmode = module.params['memorymode']
+        self.reserved = module.params['reserved']
+        self.socket = module.params['socket']
 
         self.module = module
         self.changed = False
@@ -243,16 +243,16 @@ class PersistentMemory(object):
     def pmem_argument_check(self):
         def percent_check(self, appdirect, memmode, reserved=None):
             if appdirect is None or (appdirect < 0 or appdirect > 100):
-                return 'AppDirect percent should be from 0 to 100.'
+                return 'appdirect percent should be from 0 to 100.'
             if memmode is None or (memmode < 0 or memmode > 100):
-                return 'MemoryMode percent should be from 0 to 100.'
+                return 'memorymode percent should be from 0 to 100.'
 
             if reserved is None:
                 if appdirect + memmode > 100:
                     return 'Total percent should be less equal 100.'
             else:
                 if reserved < 0 or reserved > 100:
-                    return 'Reserved percent should be from 0 to 100.'
+                    return 'reserved percent should be from 0 to 100.'
                 if appdirect + memmode + reserved != 100:
                     return 'Total percent should be 100.'
 
@@ -279,7 +279,7 @@ class PersistentMemory(object):
 
             for skt in self.socket:
                 ret = percent_check(
-                    self, skt['AppDirect'], skt['MemoryMode'], skt['Reserved'])
+                    self, skt['appdirect'], skt['memorymode'], skt['reserved'])
                 if ret is not None:
                     return ret
 
@@ -334,9 +334,9 @@ class PersistentMemory(object):
             ipmctl_opts = ""
 
             if skt:
-                appdirect = skt['AppDirect']
-                memmode = skt['MemoryMode']
-                reserved = skt['Reserved']
+                appdirect = skt['appdirect']
+                memmode = skt['memorymode']
+                reserved = skt['reserved']
                 socket_id = skt['id']
                 ipmctl_opts += "-socket %d " % socket_id
             else:
@@ -346,9 +346,9 @@ class PersistentMemory(object):
 
             if reserved is None:
                 res = 100 - memmode - appdirect
-                ipmctl_opts += "MemoryMode=%d Reserved=%d " % (memmode, res)
+                ipmctl_opts += "memorymode=%d reserved=%d " % (memmode, res)
             else:
-                ipmctl_opts += "MemoryMode=%d Reserved=%d " % (memmode, reserved)
+                ipmctl_opts += "memorymode=%d reserved=%d " % (memmode, reserved)
 
             if self.interleaved:
                 ipmctl_opts += "PersistentMemoryType=AppDirect "
@@ -379,10 +379,10 @@ class PersistentMemory(object):
             return rc, errmsg
 
         def get_allocation_result(self, goal, skt=None):
-            ret = {'AppDirect': 0, 'MemoryMode': 0}
+            ret = {'appdirect': 0, 'memorymode': 0}
 
             if skt:
-                ret['Socket'] = skt['id']
+                ret['socket'] = skt['id']
 
             out = xmltodict.parse(goal, dict_constructor=dict)['ConfigGoalList']['ConfigGoal']
             for entry in out:
@@ -395,12 +395,12 @@ class PersistentMemory(object):
 
                 for key, v in entry.items():
                     if key == 'MemorySize':
-                        ret['MemoryMode'] += int(v.split()[0])
-                    elif key == 'AppDirect1Size' or key == 'AppDirect2Size':
-                        ret['AppDirect'] += int(v.split()[0])
+                        ret['memorymode'] += int(v.split()[0])
+                    elif key == 'AppDirect1Size' or key == 'AapDirect2Size':
+                        ret['appdirect'] += int(v.split()[0])
 
             capacity = self.pmem_get_capacity(skt)
-            ret['Reserved'] = capacity - ret['AppDirect'] - ret['MemoryMode']
+            ret['reserved'] = capacity - ret['appdirect'] - ret['memorymode']
 
             return ret
 

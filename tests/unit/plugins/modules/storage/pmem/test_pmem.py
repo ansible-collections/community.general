@@ -200,51 +200,51 @@ class TestPmem(ModuleTestCase):
             maxIndex = 0
 
         for i in range(0, maxIndex):
-            self.assertAlmostEqual(test_result[i]['AppDirect'], appdirect[i])
-            self.assertAlmostEqual(test_result[i]['MemoryMode'], memmode[i])
-            self.assertAlmostEqual(test_result[i]['Reserved'], reserved[i])
+            self.assertAlmostEqual(test_result[i]['appdirect'], appdirect[i])
+            self.assertAlmostEqual(test_result[i]['memorymode'], memmode[i])
+            self.assertAlmostEqual(test_result[i]['reserved'], reserved[i])
             if socket:
-                self.assertAlmostEqual(test_result[i]['Socket'], i)
+                self.assertAlmostEqual(test_result[i]['socket'], i)
 
     def test_fail_when_required_args_missing(self):
         with self.assertRaises(AnsibleFailJson):
             set_module_args({})
             pmem_module.main()
 
-    def test_fail_when_AppDirect_only(self):
+    def test_fail_when_appdirect_only(self):
         with self.assertRaises(AnsibleFailJson):
             set_module_args({
-                'AppDirect': 10,
+                'appdirect': 10,
             })
             pmem_module.main()
 
     def test_fail_when_MemosyMode_only(self):
         with self.assertRaises(AnsibleFailJson):
             set_module_args({
-                'MemoryMode': 70,
+                'memorymode': 70,
             })
             pmem_module.main()
 
-    def test_fail_when_Reserved_only(self):
+    def test_fail_when_reserved_only(self):
         with self.assertRaises(AnsibleFailJson):
             set_module_args({
-                'Reserved': 10,
+                'reserved': 10,
             })
             pmem_module.main()
 
-    def test_fail_when_AppDirect_MemoryMode_Reserved_total_not_100(self):
+    def test_fail_when_appdirect_memorymode_reserved_total_not_100(self):
         with self.assertRaises(AnsibleFailJson):
             set_module_args({
-                'AppDirect': 10,
-                'MemoryMode': 70,
-                'Reserved': 10,
+                'appdirect': 10,
+                'memorymode': 70,
+                'reserved': 10,
             })
             pmem_module.main()
 
-    def test_when_AppDirect_MemoryMode(self):
+    def test_when_appdirect_memorymode(self):
         set_module_args({
-            'AppDirect': 10,
-            'MemoryMode': 70,
+            'appdirect': 10,
+            'memorymode': 70,
         })
         with patch(
                 'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
@@ -253,11 +253,11 @@ class TestPmem(ModuleTestCase):
                 pmem_module.main()
             self.result_check(result, False, [25769803776], [188978561024], [328230764544])
 
-    def test_when_AppDirect_MemoryMode_Reserved(self):
+    def test_when_appdirect_memorymode_reserved(self):
         set_module_args({
-            'AppDirect': 10,
-            'MemoryMode': 70,
-            'Reserved': 20,
+            'appdirect': 10,
+            'memorymode': 70,
+            'reserved': 20,
         })
         with patch(
                 'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
@@ -266,12 +266,12 @@ class TestPmem(ModuleTestCase):
                 pmem_module.main()
             self.result_check(result, False, [25769803776], [188978561024], [328230764544])
 
-    def test_when_AppDirect_NotInterleaved_MemoryMode_Reserved(self):
+    def test_when_appdirect_notinterleaved_memorymode_reserved(self):
         set_module_args({
-            'AppDirect': 10,
-            'AppDirectInterleaved': False,
-            'MemoryMode': 70,
-            'Reserved': 20,
+            'appdirect': 10,
+            'appdirect_interleaved': False,
+            'memorymode': 70,
+            'reserved': 20,
         })
         with patch(
                 'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
@@ -280,67 +280,67 @@ class TestPmem(ModuleTestCase):
                 pmem_module.main()
             self.result_check(result, False, [25769803776], [188978561024], [328230764544])
 
-    def test_fail_when_Socket_id_AppDirect(self):
+    def test_fail_when_socket_id_appdirect(self):
         with self.assertRaises(AnsibleFailJson):
             set_module_args({
-                'Socket': [
+                'socket': [
                     {
                         'id': 0,
-                        'AppDirect': 10,
+                        'appdirect': 10,
                     },
                     {
                         'id': 1,
-                        'AppDirect': 10,
+                        'appdirect': 10,
                     },
                 ],
             })
             pmem_module.main()
 
-    def test_fail_when_Socket0_id_MemoryMode_Socket1_id_AppDirect(self):
+    def test_fail_when_socket0_id_memorymode_socket1_id_appdirect(self):
         with self.assertRaises(AnsibleFailJson):
             set_module_args({
-                'Socket': [
+                'socket': [
                     {
                         'id': 0,
-                        ' MemoryMode': 70,
+                        ' memorymode': 70,
                     },
                     {
                         'id': 1,
-                        'AppDirect': 10,
+                        'appdirect': 10,
                     },
                 ],
             })
             pmem_module.main()
 
-    def test_fail_when_Socket0_without_id(self):
+    def test_fail_when_socket0_without_id(self):
         with self.assertRaises(AnsibleFailJson):
             set_module_args({
-                'Socket': [
+                'socket': [
                     {
-                        'AppDirect': 10,
-                        'MemoryMode': 70,
+                        'appdirect': 10,
+                        'memorymode': 70,
                     },
                     {
                         'id': 1,
-                        'AppDirect': 10,
-                        'MemoryMode': 70,
+                        'appdirect': 10,
+                        'memorymode': 70,
                     },
                 ],
             })
             pmem_module.main()
 
-    def test_when_Socket0_and_1_AppDirect_MemoryMode(self):
+    def test_when_socket0_and_1_appdirect_memorymode(self):
         set_module_args({
-            'Socket': [
+            'socket': [
                 {
                     'id': 0,
-                    'AppDirect': 10,
-                    'MemoryMode': 70,
+                    'appdirect': 10,
+                    'memorymode': 70,
                 },
                 {
                     'id': 1,
-                    'AppDirect': 10,
-                    'MemoryMode': 70,
+                    'appdirect': 10,
+                    'memorymode': 70,
                 },
             ],
         })
@@ -353,20 +353,20 @@ class TestPmem(ModuleTestCase):
             self.result_check(
                 result, True, [12884901888, 12884901888], [94489280512, 94489280512], [164115382272, 164115382272])
 
-    def test_when_Socket0_and_1_AppDirect_MemoryMode_Reserved(self):
+    def test_when_socket0_and_1_appdirect_memorymode_reserved(self):
         set_module_args({
-            'Socket': [
+            'socket': [
                 {
                     'id': 0,
-                    'AppDirect': 10,
-                    'MemoryMode': 70,
-                    'Reserved': 20,
+                    'appdirect': 10,
+                    'memorymode': 70,
+                    'reserved': 20,
                 },
                 {
                     'id': 1,
-                    'AppDirect': 10,
-                    'MemoryMode': 70,
-                    'Reserved': 20,
+                    'appdirect': 10,
+                    'memorymode': 70,
+                    'reserved': 20,
                 },
             ],
         })
@@ -379,21 +379,21 @@ class TestPmem(ModuleTestCase):
             self.result_check(
                 result, True, [12884901888, 12884901888], [94489280512, 94489280512], [164115382272, 164115382272])
 
-    def test_when_Socket0_AppDirectNotInterleaved_MemoryMode_Reserved_Socket1_AppDirect_MemoryMode_Reserved(self):
+    def test_when_socket0_appdirect_notinterleaved_memorymode_reserved_socket1_appdirect_memorymode_reserved(self):
         set_module_args({
-            'Socket': [
+            'socket': [
                 {
                     'id': 0,
-                    'AppDirect': 10,
-                    'AppDirectInterleaved': False,
-                    'MemoryMode': 70,
-                    'Reserved': 20,
+                    'appdirect': 10,
+                    'appdirect_interleaved': False,
+                    'memorymode': 70,
+                    'reserved': 20,
                 },
                 {
                     'id': 1,
-                    'AppDirect': 10,
-                    'MemoryMode': 70,
-                    'Reserved': 20,
+                    'appdirect': 10,
+                    'memorymode': 70,
+                    'reserved': 20,
                 },
             ],
         })
