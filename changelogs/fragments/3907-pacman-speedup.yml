@@ -1,0 +1,4 @@
+minor_changes:
+  - pacman - The module has been rewritten and is now much faster when using ``state: latest``. (https://github.com/ansible-collections/community.general/pull/3907)
+    Operations are now done all packages at once instead of package per package (fixes https://github.com/ansible-collections/community.general/issues/4079)
+    and the configured output format of ``pacman`` doesn't affect the module's operation. (https://github.com/ansible-collections/community.general/issues/3783)
