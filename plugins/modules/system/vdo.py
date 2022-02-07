@@ -386,7 +386,6 @@ def deactivate_vdo(module, vdoname, vdocmd):
 
 
 def add_vdooptions(params):
-    vdocmdoptions = ""
     options = []
 
     if params.get('logicalsize') is not None:
@@ -437,7 +436,7 @@ def add_vdooptions(params):
     if params.get('physicalthreads') is not None:
         options.append("--vdoPhysicalThreads=" + params['physicalthreads'])
 
-    return vdocmdoptions
+    return options
 
 
 def run_module():
