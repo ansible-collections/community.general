@@ -135,6 +135,8 @@ EXAMPLES = '''
 
 import re
 
+from pathlib import PurePosixPath
+
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -316,7 +318,14 @@ def main():
     if module.params['user_install'] and module.params['install_dir']:
         module.fail_json(msg="install_dir requires user_install=false")
 
-    if not module.params['gem_source']:
+    if module.params['gem_source']:
+        filename = PurePosixPath(module.params['gem_source']).name
+        match = re.match(r".*(\d+\.\d+\.\d+)", filename)
+        if match:
+            module.params['version'] = match.group(1)
+        else:
+            module.fail_json(msg="Unable to parse version from gem_source")
+    else:
         module.params['gem_source'] = module.params['name']
 
     changed = False
