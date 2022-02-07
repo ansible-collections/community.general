@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 # Copyright: (c) 2019, Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import (absolute_import, division, print_function)
@@ -6,8 +8,9 @@ __metaclass__ = type
 import json
 import pytest
 
-from ansible_collections.community.general.tests.unit.compat.mock import MagicMock
+from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, patch
 from ansible_collections.community.general.plugins.modules.cloud.misc import proxmox_snap
+import ansible_collections.community.general.plugins.module_utils.proxmox as proxmox_utils
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 
 
@@ -32,8 +35,8 @@ def get_resources(type):
              "status": "running"}]
 
 
-def fake_api(api_host, api_user, api_password, validate_certs):
-    r = MagicMock()
+def fake_api(mocker):
+    r = mocker.MagicMock()
     r.cluster.resources.get = MagicMock(side_effect=get_resources)
     return r
 
@@ -48,7 +51,8 @@ def test_proxmox_snap_without_argument(capfd):
     assert json.loads(out)['failed']
 
 
-def test_create_snapshot_check_mode(capfd, mocker):
+@patch('ansible_collections.community.general.plugins.module_utils.proxmox.ProxmoxAnsible._connect')
+def test_create_snapshot_check_mode(connect_mock, capfd, mocker):
     set_module_args({"hostname": "test-lxc",
                      "api_user": "root@pam",
                      "api_password": "secret",
@@ -58,8 +62,8 @@ def test_create_snapshot_check_mode(capfd, mocker):
                      "timeout": "1",
                      "force": True,
                      "_ansible_check_mode": True})
-    proxmox_snap.HAS_PROXMOXER = True
-    proxmox_snap.setup_api = mocker.MagicMock(side_effect=fake_api)
+    proxmox_utils.HAS_PROXMOXER = True
+    connect_mock.side_effect = lambda: fake_api(mocker)
     with pytest.raises(SystemExit) as results:
         proxmox_snap.main()
 
@@ -68,7 +72,8 @@ def test_create_snapshot_check_mode(capfd, mocker):
     assert not json.loads(out)['changed']
 
 
-def test_remove_snapshot_check_mode(capfd, mocker):
+@patch('ansible_collections.community.general.plugins.module_utils.proxmox.ProxmoxAnsible._connect')
+def test_remove_snapshot_check_mode(connect_mock, capfd, mocker):
     set_module_args({"hostname": "test-lxc",
                      "api_user": "root@pam",
                      "api_password": "secret",
@@ -78,8 +83,8 @@ def test_remove_snapshot_check_mode(capfd, mocker):
                      "timeout": "1",
                      "force": True,
                      "_ansible_check_mode": True})
-    proxmox_snap.HAS_PROXMOXER = True
-    proxmox_snap.setup_api = mocker.MagicMock(side_effect=fake_api)
+    proxmox_utils.HAS_PROXMOXER = True
+    connect_mock.side_effect = lambda: fake_api(mocker)
     with pytest.raises(SystemExit) as results:
         proxmox_snap.main()
 
