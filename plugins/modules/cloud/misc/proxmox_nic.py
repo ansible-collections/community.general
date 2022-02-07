@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
+#
 # Copyright: (c) 2021, Lammert Hellinga (@Kogelvis) <lammert@hellinga.it>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -136,120 +136,96 @@ msg:
   sample: "Nic net0 unchanged on VM with vmid 103"
 '''
 
-try:
-    from proxmoxer import ProxmoxAPI
-    HAS_PROXMOXER = True
-except ImportError:
-    HAS_PROXMOXER = False
-
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible_collections.community.general.plugins.module_utils.proxmox import proxmox_auth_argument_spec
+from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec, ProxmoxAnsible)
 
 
-def get_vmid(module, proxmox, name):
-    try:
-        vms = [vm['vmid'] for vm in proxmox.cluster.resources.get(type='vm') if vm.get('name') == name]
-    except Exception as e:
-        module.fail_json(msg='Error: %s occurred while retrieving VM with name = %s' % (e, name))
+class ProxmoxNicAnsible(ProxmoxAnsible):
+    def update_nic(self, vmid, interface, model, **kwargs):
+        vm = self.get_vm(vmid)
 
-    if not vms:
-        module.fail_json(msg='No VM found with name: %s' % name)
-    elif len(vms) > 1:
-        module.fail_json(msg='Multiple VMs found with name: %s, provide vmid instead' % name)
+        try:
+            vminfo = self.proxmox_api.nodes(vm['node']).qemu(vmid).config.get()
+        except Exception as e:
+            self.module.fail_json(msg='Getting information for VM with vmid = %s failed with exception: %s' % (vmid, e))
 
-    return vms[0]
+        if interface in vminfo:
+            # Convert the current config to a dictionary
+            config = vminfo[interface].split(',')
+            config.sort()
 
+            config_current = {}
 
-def get_vm(proxmox, vmid):
-    return [vm for vm in proxmox.cluster.resources.get(type='vm') if vm['vmid'] == int(vmid)]
+            for i in config:
+                kv = i.split('=')
+                try:
+                    config_current[kv[0]] = kv[1]
+                except IndexError:
+                    config_current[kv[0]] = ''
 
+            # determine the current model nic and mac-address
+            models = ['e1000', 'e1000-82540em', 'e1000-82544gc', 'e1000-82545em', 'i82551', 'i82557b',
+                      'i82559er', 'ne2k_isa', 'ne2k_pci', 'pcnet', 'rtl8139', 'virtio', 'vmxnet3']
+            current_model = set(models) & set(config_current.keys())
+            current_model = current_model.pop()
+            current_mac = config_current[current_model]
 
-def update_nic(module, proxmox, vmid, interface, model, **kwargs):
-    vm = get_vm(proxmox, vmid)
+            # build nic config string
+            config_provided = "{0}={1}".format(model, current_mac)
+        else:
+            config_provided = model
 
-    try:
-        vminfo = proxmox.nodes(vm[0]['node']).qemu(vmid).config.get()
-    except Exception as e:
-        module.fail_json(msg='Getting information for VM with vmid = %s failed with exception: %s' % (vmid, e))
+        if kwargs['mac']:
+            config_provided = "{0}={1}".format(model, kwargs['mac'])
 
-    if interface in vminfo:
-        # Convert the current config to a dictionary
-        config = vminfo[interface].split(',')
-        config.sort()
+        if kwargs['bridge']:
+            config_provided += ",bridge={0}".format(kwargs['bridge'])
 
-        config_current = {}
+        if kwargs['firewall']:
+            config_provided += ",firewall=1"
 
-        for i in config:
-            kv = i.split('=')
-            try:
-                config_current[kv[0]] = kv[1]
-            except IndexError:
-                config_current[kv[0]] = ''
+        if kwargs['link_down']:
+            config_provided += ',link_down=1'
 
-        # determine the current model nic and mac-address
-        models = ['e1000', 'e1000-82540em', 'e1000-82544gc', 'e1000-82545em', 'i82551', 'i82557b',
-                  'i82559er', 'ne2k_isa', 'ne2k_pci', 'pcnet', 'rtl8139', 'virtio', 'vmxnet3']
-        current_model = set(models) & set(config_current.keys())
-        current_model = current_model.pop()
-        current_mac = config_current[current_model]
+        if kwargs['mtu']:
+            config_provided += ",mtu={0}".format(kwargs['mtu'])
+            if model != 'virtio':
+                self.module.warn(
+                    'Ignoring MTU for nic {0} on VM with vmid {1}, '
+                    'model should be set to \'virtio\': '.format(interface, vmid))
 
-        # build nic config string
-        config_provided = "{0}={1}".format(model, current_mac)
-    else:
-        config_provided = model
+        if kwargs['queues']:
+            config_provided += ",queues={0}".format(kwargs['queues'])
 
-    if kwargs['mac']:
-        config_provided = "{0}={1}".format(model, kwargs['mac'])
+        if kwargs['rate']:
+            config_provided += ",rate={0}".format(kwargs['rate'])
 
-    if kwargs['bridge']:
-        config_provided += ",bridge={0}".format(kwargs['bridge'])
+        if kwargs['tag']:
+            config_provided += ",tag={0}".format(kwargs['tag'])
 
-    if kwargs['firewall']:
-        config_provided += ",firewall=1"
+        if kwargs['trunks']:
+            config_provided += ",trunks={0}".format(';'.join(str(x) for x in kwargs['trunks']))
 
-    if kwargs['link_down']:
-        config_provided += ',link_down=1'
+        net = {interface: config_provided}
+        vm = self.get_vm(vmid)
 
-    if kwargs['mtu']:
-        config_provided += ",mtu={0}".format(kwargs['mtu'])
-        if model != 'virtio':
-            module.warn(
-                'Ignoring MTU for nic {0} on VM with vmid {1}, '
-                'model should be set to \'virtio\': '.format(interface, vmid))
+        if ((interface not in vminfo) or (vminfo[interface] != config_provided)):
+            if not self.module.check_mode:
+                self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**net)
+            return True
 
-    if kwargs['queues']:
-        config_provided += ",queues={0}".format(kwargs['queues'])
+        return False
 
-    if kwargs['rate']:
-        config_provided += ",rate={0}".format(kwargs['rate'])
+    def delete_nic(self, vmid, interface):
+        vm = self.get_vm(vmid)
+        vminfo = self.proxmox_api.nodes(vm['node']).qemu(vmid).config.get()
 
-    if kwargs['tag']:
-        config_provided += ",tag={0}".format(kwargs['tag'])
+        if interface in vminfo:
+            if not self.module.check_mode:
+                self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(vmid=vmid, delete=interface)
+            return True
 
-    if kwargs['trunks']:
-        config_provided += ",trunks={0}".format(';'.join(str(x) for x in kwargs['trunks']))
-
-    net = {interface: config_provided}
-    vm = get_vm(proxmox, vmid)
-
-    if ((interface not in vminfo) or (vminfo[interface] != config_provided)):
-        if not module.check_mode:
-            proxmox.nodes(vm[0]['node']).qemu(vmid).config.set(**net)
-        return True
-
-    return False
-
-
-def delete_nic(module, proxmox, vmid, interface):
-    vm = get_vm(proxmox, vmid)
-    vminfo = proxmox.nodes(vm[0]['node']).qemu(vmid).config.get()
-
-    if interface in vminfo:
-        if not module.check_mode:
-            proxmox.nodes(vm[0]['node']).qemu(vmid).config.set(vmid=vmid, delete=interface)
-        return True
-
-    return False
+        return False
 
 
 def main():
@@ -281,53 +257,33 @@ def main():
         supports_check_mode=True,
     )
 
-    if not HAS_PROXMOXER:
-        module.fail_json(msg='proxmoxer required for this module')
+    proxmox = ProxmoxNicAnsible(module)
 
-    api_host = module.params['api_host']
-    api_password = module.params['api_password']
-    api_token_id = module.params['api_token_id']
-    api_token_secret = module.params['api_token_secret']
-    api_user = module.params['api_user']
     interface = module.params['interface']
     model = module.params['model']
     name = module.params['name']
     state = module.params['state']
-    validate_certs = module.params['validate_certs']
     vmid = module.params['vmid']
-
-    auth_args = {'user': api_user}
-    if not (api_token_id and api_token_secret):
-        auth_args['password'] = api_password
-    else:
-        auth_args['token_name'] = api_token_id
-        auth_args['token_value'] = api_token_secret
-
-    try:
-        proxmox = ProxmoxAPI(api_host, verify_ssl=validate_certs, **auth_args)
-    except Exception as e:
-        module.fail_json(msg='authorization on proxmox cluster failed with exception: %s' % e)
 
     # If vmid is not defined then retrieve its value from the vm name,
     if not vmid:
-        vmid = get_vmid(module, proxmox, name)
+        vmid = proxmox.get_vmid(name)
 
     # Ensure VM id exists
-    if not get_vm(proxmox, vmid):
-        module.fail_json(vmid=vmid, msg='VM with vmid = %s does not exist in cluster' % vmid)
+    proxmox.get_vm(vmid)
 
     if state == 'present':
         try:
-            if update_nic(module, proxmox, vmid, interface, model,
-                          bridge=module.params['bridge'],
-                          firewall=module.params['firewall'],
-                          link_down=module.params['link_down'],
-                          mac=module.params['mac'],
-                          mtu=module.params['mtu'],
-                          queues=module.params['queues'],
-                          rate=module.params['rate'],
-                          tag=module.params['tag'],
-                          trunks=module.params['trunks']):
+            if proxmox.update_nic(vmid, interface, model,
+                                  bridge=module.params['bridge'],
+                                  firewall=module.params['firewall'],
+                                  link_down=module.params['link_down'],
+                                  mac=module.params['mac'],
+                                  mtu=module.params['mtu'],
+                                  queues=module.params['queues'],
+                                  rate=module.params['rate'],
+                                  tag=module.params['tag'],
+                                  trunks=module.params['trunks']):
                 module.exit_json(changed=True, vmid=vmid, msg="Nic {0} updated on VM with vmid {1}".format(interface, vmid))
             else:
                 module.exit_json(vmid=vmid, msg="Nic {0} unchanged on VM with vmid {1}".format(interface, vmid))
@@ -336,7 +292,7 @@ def main():
 
     elif state == 'absent':
         try:
-            if delete_nic(module, proxmox, vmid, interface):
+            if proxmox.delete_nic(vmid, interface):
                 module.exit_json(changed=True, vmid=vmid, msg="Nic {0} deleted on VM with vmid {1}".format(interface, vmid))
             else:
                 module.exit_json(vmid=vmid, msg="Nic {0} does not exist on VM with vmid {1}".format(interface, vmid))
