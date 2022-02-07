@@ -21,6 +21,8 @@ except ImportError:
 
 
 from ansible.module_utils.basic import env_fallback, missing_required_lib
+from ansible.module_utils.common.text.converters import to_native
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 
 def proxmox_auth_argument_spec():
@@ -98,3 +100,46 @@ class ProxmoxAnsible(object):
             return ProxmoxAPI(api_host, verify_ssl=validate_certs, **auth_args)
         except Exception as e:
             self.module.fail_json(msg='%s' % e, exception=traceback.format_exc())
+
+    def version(self):
+        apireturn = self.proxmox_api.version.get()
+        return LooseVersion(apireturn['version'])
+
+    def get_node(self, node):
+        nodes = [n for n in self.proxmox_api.nodes.get() if n['node'] == node]
+        return nodes[0] if nodes else None
+
+    def get_nextvmid(self):
+        vmid = self.proxmox_api.cluster.nextid.get()
+        return vmid
+
+    def get_vmid(self, name, ignore_missing=False, choose_first_if_multiple=False):
+        vms = [vm['vmid'] for vm in self.proxmox_api.cluster.resources.get(type='vm') if vm.get('name') == name]
+
+        if not vms:
+            if ignore_missing:
+                return None
+
+            self.module.fail_json(msg='No VM with name %s found' % name)
+        elif len(vms) > 1:
+            if choose_first_if_multiple:
+                self.module.deprecate(
+                    'Multiple VMs with name %s found, choosing the first one. ' % name +
+                    'This will be an error in the future. To ensure the correct VM is used, ' +
+                    'also pass the vmid parameter.',
+                    version='5.0.0', collection_name='community.general')
+            else:
+                self.module.fail_json(msg='Multiple VMs with name %s found, provide vmid instead' % name)
+
+        return vms[0]
+
+    def get_vm(self, vmid, ignore_missing=False):
+        vms = [vm for vm in self.proxmox_api.cluster.resources.get(type='vm') if vm['vmid'] == int(vmid)]
+
+        if vms:
+            return vms[0]
+        else:
+            if ignore_missing:
+                return None
+
+            self.module.fail_json(msg='VM with vmid %s does not exist in cluster' % vmid)
