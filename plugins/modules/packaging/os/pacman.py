@@ -68,7 +68,7 @@ options:
             - Whether or not to refresh the master package lists.
             - This can be run as part of a package installation or as a separate step.
             - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
-            - If not specified, it defaults to C(False).
+            - If not specified, it defaults to C(false).
         type: bool
         aliases: [ update-cache ]
 
