@@ -82,7 +82,7 @@ options:
         description:
             - Whether or not to upgrade the whole system.
               Can't be used in combination with C(name).
-            - If not specified, it defaults to C(False).
+            - If not specified, it defaults to C(false).
         type: bool
 
     upgrade_extra_args:
@@ -508,7 +508,7 @@ class Pacman(object):
 
         installed_pkgs = {}
         dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--query"], check_rc=True)
-        # pacman 6.0.1-2
+        # Format of a line: "pacman 6.0.1-2"
         for l in stdout.splitlines():
             l = l.strip()
             if not l:
@@ -520,9 +520,10 @@ class Pacman(object):
         dummy, stdout, dummy = self.m.run_command(
             [self.pacman_path, "--query", "--group"], check_rc=True
         )
-        # base-devel file
-        # base-devel findutils
-        # ...
+        # Format of lines:
+        #     base-devel file
+        #     base-devel findutils
+        #     ...
         for l in stdout.splitlines():
             l = l.strip()
             if not l:
@@ -532,7 +533,7 @@ class Pacman(object):
 
         available_pkgs = {}
         dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--sync", "--list"], check_rc=True)
-        # core pacman 6.0.1-2
+        # Format of a line: "core pacman 6.0.1-2"
         for l in stdout.splitlines():
             l = l.strip()
             if not l:
@@ -544,10 +545,11 @@ class Pacman(object):
         dummy, stdout, dummy = self.m.run_command(
             [self.pacman_path, "--sync", "--group", "--group"], check_rc=True
         )
-        # vim-plugins vim-airline
-        # vim-plugins vim-airline-themes
-        # vim-plugins vim-ale
-        # ...
+        # Format of lines:
+        #     vim-plugins vim-airline
+        #     vim-plugins vim-airline-themes
+        #     vim-plugins vim-ale
+        #     ...
         for l in stdout.splitlines():
             l = l.strip()
             if not l:
@@ -565,8 +567,9 @@ class Pacman(object):
         if rc == 1 and stdout == "":
             pass  # nothing to upgrade
         elif rc == 0:
-            # strace 5.14-1 -> 5.15-1
-            # systemd 249.7-1 -> 249.7-2 [ignored]
+            # Format of lines:
+            #     strace 5.14-1 -> 5.15-1
+            #     systemd 249.7-1 -> 249.7-2 [ignored]
             for l in stdout.splitlines():
                 l = l.strip()
                 if not l:
