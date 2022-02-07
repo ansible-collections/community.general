@@ -207,7 +207,6 @@ class Pacman(object):
         self.exit_params = {}
 
         self.pacman_path = self.m.get_bin_path(p["executable"], True)
-        self.inventory = self._build_inventory()
 
         # Normalize for old configs
         if p["state"] == "installed":
@@ -253,6 +252,7 @@ class Pacman(object):
             if not (self.m.params["name"] or self.m.params["upgrade"]):
                 self.success()
 
+        self.inventory = self._build_inventory()
         if self.m.params["upgrade"]:
             self.upgrade()
             self.success()

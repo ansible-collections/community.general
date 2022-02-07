@@ -300,9 +300,10 @@ class TestPacman:
         if raises:
             with pytest.raises(raises):
                 P = pacman.Pacman(pacman.setup_module())
+                P._build_inventory()
         else:
             P = pacman.Pacman(pacman.setup_module())
-            assert P.inventory == expected
+            assert P._build_inventory() == expected
 
     @pytest.mark.parametrize("check_mode_value", [True, False])
     def test_upgrade_check_empty_inventory(self, mock_empty_inventory, check_mode_value):
@@ -546,6 +547,7 @@ class TestPacman:
     ):
         set_module_args({"name": pkg_names, "state": state})
         P = pacman.Pacman(pacman.setup_module())
+        P.inventory = P._build_inventory()
         if run_command_data:
             self.mock_run_command.side_effect = run_command_data["side_effect"]
 
