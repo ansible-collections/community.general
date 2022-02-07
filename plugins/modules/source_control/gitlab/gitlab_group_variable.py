@@ -77,7 +77,6 @@ options:
           - The variable value.
           - Required when I(state=present).
         type: str
-        required: true
       masked:
         description:
           - Wether variable value is masked or not.
