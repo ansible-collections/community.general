@@ -49,6 +49,14 @@ DOCUMENTATION = '''
           - The L(W3C Trace Context header traceparent,https://www.w3.org/TR/trace-context-1/#traceparent-header).
         env:
           - name: TRACEPARENT
+      disable_logs:
+        default: false
+        type: bool
+        description:
+          - Disable sending logs.
+        env:
+          - name: ANSIBLE_OPENTELEMETRY_DISABLE_LOGS
+        version_added: 3.9.0
     requirements:
       - opentelemetry-api (Python library)
       - opentelemetry-exporter-otlp (Python library)
