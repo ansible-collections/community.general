@@ -319,7 +319,7 @@ def main():
 
     if module.params['gem_source']:
         filename = os.path.basename(module.params['gem_source'])
-        match = re.match(r".*(\d+\.\d+\.\d+)", filename)
+        match = re.match(r".*-(\d+\.\d+\.\d+)", filename)
         if match:
             module.params['version'] = match.group(1)
         else:
