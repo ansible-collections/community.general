@@ -130,7 +130,7 @@ options:
        Standard Secure Boot keys(C(1)) or not (C(0)). It also enables Secure Boot by default if set to C(1).
       - Cannot be set if efidisk0 is not set.
     type: str
-    version_added: 4.4.0
+    version_added: 4.5.0
   efidisk0:
     description:
       - Specify volume to use as EFI disk.
@@ -138,7 +138,7 @@ options:
       - C(storage) is the storage identifier where to create the disk.
       - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
     type: str
-    version_added: 4.4.0
+    version_added: 4.5.0
   force:
     description:
       - Allow to force stop VM.
