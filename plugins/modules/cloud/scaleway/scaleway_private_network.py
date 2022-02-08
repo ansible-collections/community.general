@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 ---
 module: scaleway_private_network
 short_description: Scaleway private network management module
-version_added: 4.4.0
+version_added: 4.5.0
 author: Pascal MANGIN (@pastral)
 description:
     - This module manages private network on Scaleway account
