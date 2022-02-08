@@ -84,7 +84,7 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-data:
+scaleway_private_network:
     description: Information on the VPC.
     returned: success when C(state=present)
     type: dict
