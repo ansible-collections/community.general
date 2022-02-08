@@ -4,12 +4,14 @@
 # Copyright: (c) 2012, Afterburn <https://github.com/afterburn>
 # Copyright: (c) 2013, Aaron Bull Schaefer <aaron@elasticdog.com>
 # Copyright: (c) 2015, Indrajit Raychaudhuri <irc+code@indrajit.com>
+# Copyright: (c) 2022, Jean Raby <jean@raby.sh>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: pacman
 short_description: Manage packages with I(pacman)
@@ -19,6 +21,7 @@ author:
     - Indrajit Raychaudhuri (@indrajitr)
     - Aaron Bull Schaefer (@elasticdog) <aaron@elasticdog.com>
     - Maxime de Roucy (@tchernomax)
+    - Jean Raby (@jraby)
 options:
     name:
         description:
@@ -66,7 +69,7 @@ options:
             - Whether or not to refresh the master package lists.
             - This can be run as part of a package installation or as a separate step.
             - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
-        default: no
+            - If not specified, it defaults to C(false).
         type: bool
         aliases: [ update-cache ]
 
@@ -80,7 +83,7 @@ options:
         description:
             - Whether or not to upgrade the whole system.
               Can't be used in combination with C(name).
-        default: no
+            - If not specified, it defaults to C(false).
         type: bool
 
     upgrade_extra_args:
@@ -94,9 +97,9 @@ notes:
     it is much more efficient to pass the list directly to the I(name) option.
   - To use an AUR helper (I(executable) option), a few extra setup steps might be required beforehand.
     For example, a dedicated build user with permissions to install packages could be necessary.
-'''
+"""
 
-RETURN = '''
+RETURN = """
 packages:
     description: a list of packages that have been changed
     returned: when upgrade is set to yes
@@ -116,9 +119,9 @@ stderr:
     type: str
     sample: "warning: libtool: local (2.4.6+44+gb9b44533-14) is newer than core (2.4.6+42+gb88cebd5-15)\nwarning ..."
     version_added: 4.1.0
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 - name: Install package foo from repo
   community.general.pacman:
     name: foo
@@ -180,357 +183,468 @@ EXAMPLES = '''
     name: baz
     state: absent
     force: yes
-'''
+"""
 
-import re
-
+import shlex
 from ansible.module_utils.basic import AnsibleModule
+from collections import defaultdict, namedtuple
 
 
-def get_version(pacman_output):
-    """Take pacman -Q or pacman -S output and get the Version"""
-    fields = pacman_output.split()
-    if len(fields) == 2:
-        return fields[1]
-    return None
+Package = namedtuple("Package", ["name", "source"])
+VersionTuple = namedtuple("VersionTuple", ["current", "latest"])
 
 
-def get_name(module, pacman_output):
-    """Take pacman -Q or pacman -S output and get the package name"""
-    fields = pacman_output.split()
-    if len(fields) == 2:
-        return fields[0]
-    module.fail_json(msg="get_name: fail to retrieve package name from pacman output")
+class Pacman(object):
+    def __init__(self, module):
+        self.m = module
 
+        self.m.run_command_environ_update = dict(LC_ALL="C")
+        p = self.m.params
 
-def query_package(module, pacman_path, name, state):
-    """Query the package status in both the local system and the repository. Returns a boolean to indicate if the package is installed, a second
-    boolean to indicate if the package is up-to-date and a third boolean to indicate whether online information were available
-    """
+        self._msgs = []
+        self._stdouts = []
+        self._stderrs = []
+        self.changed = False
+        self.exit_params = {}
 
-    lcmd = "%s --query %s" % (pacman_path, name)
-    lrc, lstdout, lstderr = module.run_command(lcmd, check_rc=False)
-    if lrc != 0:
-        # package is not installed locally
-        return False, False, False
-    else:
-        # a non-zero exit code doesn't always mean the package is installed
-        # for example, if the package name queried is "provided" by another package
-        installed_name = get_name(module, lstdout)
-        if installed_name != name:
-            return False, False, False
+        self.pacman_path = self.m.get_bin_path(p["executable"], True)
 
-    # no need to check the repository if state is present or absent
-    # return False for package version check, because we didn't check it
-    if state == 'present' or state == 'absent':
-        return True, False, False
+        # Normalize for old configs
+        if p["state"] == "installed":
+            self.target_state = "present"
+        elif p["state"] == "removed":
+            self.target_state = "absent"
+        else:
+            self.target_state = p["state"]
 
-    # get the version installed locally (if any)
-    lversion = get_version(lstdout)
+    def add_exit_infos(self, msg=None, stdout=None, stderr=None):
+        if msg:
+            self._msgs.append(msg)
+        if stdout:
+            self._stdouts.append(stdout)
+        if stderr:
+            self._stderrs.append(stderr)
 
-    rcmd = "%s --sync --print-format \"%%n %%v\" %s" % (pacman_path, name)
-    rrc, rstdout, rstderr = module.run_command(rcmd, check_rc=False)
-    # get the version in the repository
-    rversion = get_version(rstdout)
+    def _set_mandatory_exit_params(self):
+        msg = "\n".join(self._msgs)
+        stdouts = "\n".join(self._stdouts)
+        stderrs = "\n".join(self._stderrs)
+        if stdouts:
+            self.exit_params["stdout"] = stdouts
+        if stderrs:
+            self.exit_params["stderr"] = stderrs
+        self.exit_params["msg"] = msg  # mandatory, but might be empty
 
-    if rrc == 0:
-        # Return True to indicate that the package is installed locally, and the result of the version number comparison
-        # to determine if the package is up-to-date.
-        return True, (lversion == rversion), False
+    def fail(self, msg=None, stdout=None, stderr=None, **kwargs):
+        self.add_exit_infos(msg, stdout, stderr)
+        self._set_mandatory_exit_params()
+        if kwargs:
+            self.exit_params.update(**kwargs)
+        self.m.fail_json(**self.exit_params)
 
-    # package is installed but cannot fetch remote Version. Last True stands for the error
-    return True, True, True
+    def success(self):
+        self._set_mandatory_exit_params()
+        self.m.exit_json(changed=self.changed, **self.exit_params)
 
+    def run(self):
+        if self.m.params["update_cache"]:
+            self.update_package_db()
 
-def update_package_db(module, pacman_path):
-    if module.params['force']:
-        module.params["update_cache_extra_args"] += " --refresh --refresh"
+            if not (self.m.params["name"] or self.m.params["upgrade"]):
+                self.success()
 
-    cmd = "%s --sync --refresh %s" % (pacman_path, module.params["update_cache_extra_args"])
-    rc, stdout, stderr = module.run_command(cmd, check_rc=False)
+        self.inventory = self._build_inventory()
+        if self.m.params["upgrade"]:
+            self.upgrade()
+            self.success()
 
-    if rc == 0:
-        return stdout, stderr
-    else:
-        module.fail_json(msg="could not update package db", stdout=stdout, stderr=stderr)
+        if self.m.params["name"]:
+            pkgs = self.package_list()
 
-
-def upgrade(module, pacman_path):
-    cmdupgrade = "%s --sync --sysupgrade --quiet --noconfirm %s" % (pacman_path, module.params["upgrade_extra_args"])
-    cmdneedrefresh = "%s --query --upgrades" % (pacman_path)
-    rc, stdout, stderr = module.run_command(cmdneedrefresh, check_rc=False)
-    data = stdout.split('\n')
-    data.remove('')
-    packages = []
-    diff = {
-        'before': '',
-        'after': '',
-    }
-
-    if rc == 0:
-        # Match lines of `pacman -Qu` output of the form:
-        #   (package name) (before version-release) -> (after version-release)
-        # e.g., "ansible 2.7.1-1 -> 2.7.2-1"
-        regex = re.compile(r'([\w+\-.@]+) (\S+-\S+) -> (\S+-\S+)')
-        for p in data:
-            if '[ignored]' not in p:
-                m = regex.search(p)
-                packages.append(m.group(1))
-                if module._diff:
-                    diff['before'] += "%s-%s\n" % (m.group(1), m.group(2))
-                    diff['after'] += "%s-%s\n" % (m.group(1), m.group(3))
-        if module.check_mode:
-            if packages:
-                module.exit_json(changed=True, msg="%s package(s) would be upgraded" % (len(data)), packages=packages, diff=diff)
+            if self.target_state == "absent":
+                self.remove_packages(pkgs)
+                self.success()
             else:
-                module.exit_json(changed=False, msg='Nothing to upgrade', packages=packages)
-        rc, stdout, stderr = module.run_command(cmdupgrade, check_rc=False)
+                self.install_packages(pkgs)
+                self.success()
+
+        # This shouldn't happen...
+        self.fail("This is a bug")
+
+    def install_packages(self, pkgs):
+        pkgs_to_install = []
+        for p in pkgs:
+            if (
+                p.name not in self.inventory["installed_pkgs"]
+                or self.target_state == "latest"
+                and p.name in self.inventory["upgradable_pkgs"]
+            ):
+                pkgs_to_install.append(p)
+
+        if len(pkgs_to_install) == 0:
+            self.add_exit_infos("package(s) already installed")
+            return
+
+        self.changed = True
+        cmd_base = [
+            self.pacman_path,
+            "--sync",
+            "--noconfirm",
+            "--noprogressbar",
+            "--needed",
+        ]
+        if self.m.params["extra_args"]:
+            cmd_base.extend(self.m.params["extra_args"])
+
+        # Dry run first to gather what will be done
+        cmd = cmd_base + ["--print-format", "%n %v"] + [p.source for p in pkgs_to_install]
+        rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
+        if rc != 0:
+            self.fail("Failed to list package(s) to install", stdout=stdout, stderr=stderr)
+
+        name_ver = [l.strip() for l in stdout.splitlines()]
+        before = []
+        after = []
+        installed_pkgs = []
+        self.exit_params["packages"] = []
+        for p in name_ver:
+            name, version = p.split()
+            if name in self.inventory["installed_pkgs"]:
+                before.append("%s-%s" % (name, self.inventory["installed_pkgs"][name]))
+            after.append("%s-%s" % (name, version))
+            installed_pkgs.append(name)
+
+        self.exit_params["diff"] = {
+            "before": "\n".join(before) + "\n" if before else "",
+            "after": "\n".join(after) + "\n" if after else "",
+        }
+
+        if self.m.check_mode:
+            self.add_exit_infos("Would have installed %d packages" % len(installed_pkgs))
+            self.exit_params["packages"] = installed_pkgs
+            return
+
+        # actually do it
+        cmd = cmd_base + [p.source for p in pkgs_to_install]
+
+        rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
+        if rc != 0:
+            self.fail("Failed to install package(s)", stdout=stdout, stderr=stderr)
+
+        self.exit_params["packages"] = installed_pkgs
+        self.add_exit_infos(
+            "Installed %d package(s)" % len(installed_pkgs), stdout=stdout, stderr=stderr
+        )
+
+    def remove_packages(self, pkgs):
+        force_args = ["--nodeps", "--nodeps"] if self.m.params["force"] else []
+
+        # filter out pkgs that are already absent
+        pkg_names_to_remove = [p.name for p in pkgs if p.name in self.inventory["installed_pkgs"]]
+
+        if len(pkg_names_to_remove) == 0:
+            self.add_exit_infos("package(s) already absent")
+            return
+
+        # There's something to do, set this in advance
+        self.changed = True
+
+        cmd_base = [self.pacman_path, "--remove", "--noconfirm", "--noprogressbar"]
+        if self.m.params["extra_args"]:
+            cmd_base.extend(self.m.params["extra_args"])
+        if force_args:
+            cmd_base.extend(force_args)
+
+        # This is a bit of a TOCTOU but it is better than parsing the output of
+        # pacman -R, which is different depending on the user config (VerbosePkgLists)
+        # Start by gathering what would be removed
+        cmd = cmd_base + ["--print-format", "%n-%v"] + pkg_names_to_remove
+
+        rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
+        if rc != 0:
+            self.fail("failed to list package(s) to remove", stdout=stdout, stderr=stderr)
+
+        removed_pkgs = stdout.split()
+        self.exit_params["packages"] = removed_pkgs
+        self.exit_params["diff"] = {
+            "before": "\n".join(removed_pkgs) + "\n",  # trailing \n to avoid diff complaints
+            "after": "",
+        }
+
+        if self.m.check_mode:
+            self.exit_params["packages"] = removed_pkgs
+            self.add_exit_infos("Would have removed %d packages" % len(removed_pkgs))
+            return
+
+        # actually do it
+        cmd = cmd_base + pkg_names_to_remove
+
+        rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
+        if rc != 0:
+            self.fail("failed to remove package(s)", stdout=stdout, stderr=stderr)
+        self.exit_params["packages"] = removed_pkgs
+        self.add_exit_infos("Removed %d package(s)" % len(removed_pkgs), stdout=stdout, stderr=stderr)
+
+    def upgrade(self):
+        """Runs pacman --sync --sysupgrade if there are upgradable packages"""
+
+        if len(self.inventory["upgradable_pkgs"]) == 0:
+            self.add_exit_infos("Nothing to upgrade")
+            return
+
+        self.changed = True  # there are upgrades, so there will be changes
+
+        # Build diff based on inventory first.
+        diff = {"before": "", "after": ""}
+        for pkg, versions in self.inventory["upgradable_pkgs"].items():
+            diff["before"] += "%s-%s\n" % (pkg, versions.current)
+            diff["after"] += "%s-%s\n" % (pkg, versions.latest)
+        self.exit_params["diff"] = diff
+        self.exit_params["packages"] = self.inventory["upgradable_pkgs"].keys()
+
+        if self.m.check_mode:
+            self.add_exit_infos(
+                "%d packages would have been upgraded" % (len(self.inventory["upgradable_pkgs"]))
+            )
+        else:
+            cmd = [
+                self.pacman_path,
+                "--sync",
+                "--sys-upgrade",
+                "--quiet",
+                "--noconfirm",
+            ]
+            if self.m.params["upgrade_extra_args"]:
+                cmd += self.m.params["upgrade_extra_args"]
+            rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
+            if rc == 0:
+                self.add_exit_infos("System upgraded", stdout=stdout, stderr=stderr)
+            else:
+                self.fail("Could not upgrade", stdout=stdout, stderr=stderr)
+
+    def update_package_db(self):
+        """runs pacman --sync --refresh"""
+        if self.m.check_mode:
+            self.add_exit_infos("Would have updated the package db")
+            self.changed = True
+            return
+
+        cmd = [
+            self.pacman_path,
+            "--sync",
+            "--refresh",
+        ]
+        if self.m.params["update_cache_extra_args"]:
+            cmd += self.m.params["update_cache_extra_args"]
+        if self.m.params["force"]:
+            cmd += ["--refresh"]
+
+        rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
+
+        self.changed = True
+
         if rc == 0:
-            if packages:
-                module.exit_json(changed=True, msg='System upgraded', packages=packages, diff=diff, stdout=stdout, stderr=stderr)
-            else:
-                module.exit_json(changed=False, msg='Nothing to upgrade', packages=packages)
+            self.add_exit_infos("Updated package db", stdout=stdout, stderr=stderr)
         else:
-            module.fail_json(msg="Could not upgrade", stdout=stdout, stderr=stderr)
-    else:
-        module.exit_json(changed=False, msg='Nothing to upgrade', packages=packages)
+            self.fail("could not update package db", stdout=stdout, stderr=stderr)
 
+    def package_list(self):
+        """Takes the input package list and resolves packages groups to their package list using the inventory,
+        extracts package names from packages given as files or URLs using calls to pacman
 
-def remove_packages(module, pacman_path, packages):
-    data = []
-    diff = {
-        'before': '',
-        'after': '',
-    }
+        Returns the expanded/resolved list as a list of Package
+        """
+        pkg_list = []
+        for pkg in self.m.params["name"]:
+            if not pkg:
+                continue
 
-    if module.params["force"]:
-        module.params["extra_args"] += " --nodeps --nodeps"
-
-    remove_c = 0
-    stdout_total = ""
-    stderr_total = ""
-    # Using a for loop in case of error, we can report the package that failed
-    for package in packages:
-        # Query the package first, to see if we even need to remove
-        installed, updated, unknown = query_package(module, pacman_path, package, 'absent')
-        if not installed:
-            continue
-
-        cmd = "%s --remove --noconfirm --noprogressbar %s %s" % (pacman_path, module.params["extra_args"], package)
-        rc, stdout, stderr = module.run_command(cmd, check_rc=False)
-
-        if rc != 0:
-            module.fail_json(msg="failed to remove %s" % (package), stdout=stdout, stderr=stderr)
-
-        stdout_total += stdout
-        stderr_total += stderr
-        if module._diff:
-            d = stdout.split('\n')[2].split(' ')[2:]
-            for i, pkg in enumerate(d):
-                d[i] = re.sub('-[0-9].*$', '', d[i].split('/')[-1])
-                diff['before'] += "%s\n" % pkg
-            data.append('\n'.join(d))
-
-        remove_c += 1
-
-    if remove_c > 0:
-        module.exit_json(changed=True, msg="removed %s package(s)" % remove_c, diff=diff, stdout=stdout_total, stderr=stderr_total)
-
-    module.exit_json(changed=False, msg="package(s) already absent")
-
-
-def install_packages(module, pacman_path, state, packages, package_files):
-    install_c = 0
-    package_err = []
-    message = ""
-    data = []
-    diff = {
-        'before': '',
-        'after': '',
-    }
-
-    to_install_repos = []
-    to_install_files = []
-    for i, package in enumerate(packages):
-        # if the package is installed and state == present or state == latest and is up-to-date then skip
-        installed, updated, latestError = query_package(module, pacman_path, package, state)
-        if latestError and state == 'latest':
-            package_err.append(package)
-
-        if installed and (state == 'present' or (state == 'latest' and updated)):
-            continue
-
-        if package_files[i]:
-            to_install_files.append(package_files[i])
-        else:
-            to_install_repos.append(package)
-
-    if to_install_repos:
-        cmd = "%s --sync --noconfirm --noprogressbar --needed %s %s" % (pacman_path, module.params["extra_args"], " ".join(to_install_repos))
-        rc, stdout, stderr = module.run_command(cmd, check_rc=False)
-
-        if rc != 0:
-            module.fail_json(msg="failed to install %s: %s" % (" ".join(to_install_repos), stderr), stdout=stdout, stderr=stderr)
-
-        # As we pass `--needed` to pacman returns a single line of ` there is nothing to do` if no change is performed.
-        # The check for > 3 is here because we pick the 4th line in normal operation.
-        if len(stdout.split('\n')) > 3:
-            data = stdout.split('\n')[3].split(' ')[2:]
-            data = [i for i in data if i != '']
-            for i, pkg in enumerate(data):
-                data[i] = re.sub('-[0-9].*$', '', data[i].split('/')[-1])
-                if module._diff:
-                    diff['after'] += "%s\n" % pkg
-
-            install_c += len(to_install_repos)
-
-    if to_install_files:
-        cmd = "%s --upgrade --noconfirm --noprogressbar --needed %s %s" % (pacman_path, module.params["extra_args"], " ".join(to_install_files))
-        rc, stdout, stderr = module.run_command(cmd, check_rc=False)
-
-        if rc != 0:
-            module.fail_json(msg="failed to install %s: %s" % (" ".join(to_install_files), stderr), stdout=stdout, stderr=stderr)
-
-        # As we pass `--needed` to pacman returns a single line of ` there is nothing to do` if no change is performed.
-        # The check for > 3 is here because we pick the 4th line in normal operation.
-        if len(stdout.split('\n')) > 3:
-            data = stdout.split('\n')[3].split(' ')[2:]
-            data = [i for i in data if i != '']
-            for i, pkg in enumerate(data):
-                data[i] = re.sub('-[0-9].*$', '', data[i].split('/')[-1])
-                if module._diff:
-                    diff['after'] += "%s\n" % pkg
-
-            install_c += len(to_install_files)
-
-    if state == 'latest' and len(package_err) > 0:
-        message = "But could not ensure 'latest' state for %s package(s) as remote version could not be fetched." % (package_err)
-
-    if install_c > 0:
-        module.exit_json(changed=True, msg="installed %s package(s). %s" % (install_c, message), diff=diff, stdout=stdout, stderr=stderr)
-
-    module.exit_json(changed=False, msg="package(s) already installed. %s" % (message), diff=diff)
-
-
-def check_packages(module, pacman_path, packages, state):
-    would_be_changed = []
-    diff = {
-        'before': '',
-        'after': '',
-        'before_header': '',
-        'after_header': ''
-    }
-
-    for package in packages:
-        installed, updated, unknown = query_package(module, pacman_path, package, state)
-        if ((state in ["present", "latest"] and not installed) or
-                (state == "absent" and installed) or
-                (state == "latest" and not updated)):
-            would_be_changed.append(package)
-    if would_be_changed:
-        if state == "absent":
-            state = "removed"
-
-        if module._diff and (state == 'removed'):
-            diff['before_header'] = 'removed'
-            diff['before'] = '\n'.join(would_be_changed) + '\n'
-        elif module._diff and ((state == 'present') or (state == 'latest')):
-            diff['after_header'] = 'installed'
-            diff['after'] = '\n'.join(would_be_changed) + '\n'
-
-        module.exit_json(changed=True, msg="%s package(s) would be %s" % (
-            len(would_be_changed), state), diff=diff)
-    else:
-        module.exit_json(changed=False, msg="package(s) already %s" % state, diff=diff)
-
-
-def expand_package_groups(module, pacman_path, pkgs):
-    expanded = []
-
-    __, stdout, __ = module.run_command([pacman_path, "--sync", "--groups", "--quiet"], check_rc=True)
-    available_groups = stdout.splitlines()
-
-    for pkg in pkgs:
-        if pkg:  # avoid empty strings
-            if pkg in available_groups:
-                # A group was found matching the package name: expand it
-                cmd = [pacman_path, "--sync", "--groups", "--quiet", pkg]
-                rc, stdout, stderr = module.run_command(cmd, check_rc=True)
-                expanded.extend([name.strip() for name in stdout.splitlines()])
+            if pkg in self.inventory["available_groups"]:
+                # Expand group members
+                for group_member in self.inventory["available_groups"][pkg]:
+                    pkg_list.append(Package(name=group_member, source=group_member))
+            elif pkg in self.inventory["available_pkgs"]:
+                # just a regular pkg
+                pkg_list.append(Package(name=pkg, source=pkg))
             else:
-                expanded.append(pkg)
+                # Last resort, call out to pacman to extract the info,
+                # pkg is possibly in the <repo>/<pkgname> format, or a filename or a URL
 
-    return expanded
+                # Start with <repo>/<pkgname> case
+                cmd = [self.pacman_path, "--sync", "--print-format", "%n", pkg]
+                rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
+                if rc != 0:
+                    # fallback to filename / URL
+                    cmd = [self.pacman_path, "--upgrade", "--print-format", "%n", pkg]
+                    rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
+                    if rc != 0:
+                        if self.target_state == "absent":
+                            continue  # Don't bark for unavailable packages when trying to remove them
+                        else:
+                            self.fail(
+                                msg="Failed to list package %s" % (pkg),
+                                cmd=cmd,
+                                stdout=stdout,
+                                stderr=stderr,
+                                rc=rc,
+                            )
+                pkg_name = stdout.strip()
+                pkg_list.append(Package(name=pkg_name, source=pkg))
+
+        return pkg_list
+
+    def _build_inventory(self):
+        """Build a cache datastructure used for all pkg lookups
+        Returns a dict:
+        {
+            "installed_pkgs": {pkgname: version},
+            "installed_groups": {groupname: set(pkgnames)},
+            "available_pkgs": {pkgname: version},
+            "available_groups": {groupname: set(pkgnames)},
+            "upgradable_pkgs": {pkgname: (current_version,latest_version)},
+        }
+
+        Fails the module if a package requested for install cannot be found
+        """
+
+        installed_pkgs = {}
+        dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--query"], check_rc=True)
+        # Format of a line: "pacman 6.0.1-2"
+        for l in stdout.splitlines():
+            l = l.strip()
+            if not l:
+                continue
+            pkg, ver = l.split()
+            installed_pkgs[pkg] = ver
+
+        installed_groups = defaultdict(set)
+        dummy, stdout, dummy = self.m.run_command(
+            [self.pacman_path, "--query", "--group"], check_rc=True
+        )
+        # Format of lines:
+        #     base-devel file
+        #     base-devel findutils
+        #     ...
+        for l in stdout.splitlines():
+            l = l.strip()
+            if not l:
+                continue
+            group, pkgname = l.split()
+            installed_groups[group].add(pkgname)
+
+        available_pkgs = {}
+        dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--sync", "--list"], check_rc=True)
+        # Format of a line: "core pacman 6.0.1-2"
+        for l in stdout.splitlines():
+            l = l.strip()
+            if not l:
+                continue
+            repo, pkg, ver = l.split()[:3]
+            available_pkgs[pkg] = ver
+
+        available_groups = defaultdict(set)
+        dummy, stdout, dummy = self.m.run_command(
+            [self.pacman_path, "--sync", "--group", "--group"], check_rc=True
+        )
+        # Format of lines:
+        #     vim-plugins vim-airline
+        #     vim-plugins vim-airline-themes
+        #     vim-plugins vim-ale
+        #     ...
+        for l in stdout.splitlines():
+            l = l.strip()
+            if not l:
+                continue
+            group, pkg = l.split()
+            available_groups[group].add(pkg)
+
+        upgradable_pkgs = {}
+        rc, stdout, stderr = self.m.run_command(
+            [self.pacman_path, "--query", "--upgrades"], check_rc=False
+        )
+
+        # non-zero exit with nothing in stdout -> nothing to upgrade, all good
+        # stderr can have warnings, so not checked here
+        if rc == 1 and stdout == "":
+            pass  # nothing to upgrade
+        elif rc == 0:
+            # Format of lines:
+            #     strace 5.14-1 -> 5.15-1
+            #     systemd 249.7-1 -> 249.7-2 [ignored]
+            for l in stdout.splitlines():
+                l = l.strip()
+                if not l:
+                    continue
+                if "[ignored]" in l:
+                    continue
+                s = l.split()
+                if len(s) != 4:
+                    self.fail(msg="Invalid line: %s" % l)
+
+                pkg = s[0]
+                current = s[1]
+                latest = s[3]
+                upgradable_pkgs[pkg] = VersionTuple(current=current, latest=latest)
+        else:
+            # stuff in stdout but rc!=0, abort
+            self.fail(
+                "Couldn't get list of packages available for upgrade",
+                stdout=stdout,
+                stderr=stderr,
+                rc=rc,
+            )
+
+        return dict(
+            installed_pkgs=installed_pkgs,
+            installed_groups=installed_groups,
+            available_pkgs=available_pkgs,
+            available_groups=available_groups,
+            upgradable_pkgs=upgradable_pkgs,
+        )
 
 
-def main():
+def setup_module():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='list', elements='str', aliases=['pkg', 'package']),
-            state=dict(type='str', default='present', choices=['present', 'installed', 'latest', 'absent', 'removed']),
-            force=dict(type='bool', default=False),
-            executable=dict(type='str', default='pacman'),
-            extra_args=dict(type='str', default=''),
-            upgrade=dict(type='bool', default=False),
-            upgrade_extra_args=dict(type='str', default=''),
+            name=dict(type="list", elements="str", aliases=["pkg", "package"]),
+            state=dict(
+                type="str",
+                default="present",
+                choices=["present", "installed", "latest", "absent", "removed"],
+            ),
+            force=dict(type="bool", default=False),
+            executable=dict(type="str", default="pacman"),
+            extra_args=dict(type="str", default=""),
+            upgrade=dict(type="bool"),
+            upgrade_extra_args=dict(type="str", default=""),
             update_cache=dict(
-                type='bool', default=False, aliases=['update-cache'],
-                deprecated_aliases=[dict(name='update-cache', version='5.0.0', collection_name='community.general')]),
-            update_cache_extra_args=dict(type='str', default=''),
+                type="bool",
+                aliases=["update-cache"],
+                deprecated_aliases=[
+                    dict(
+                        name="update-cache",
+                        version="5.0.0",
+                        collection_name="community.general",
+                    )
+                ],
+            ),
+            update_cache_extra_args=dict(type="str", default=""),
         ),
-        required_one_of=[['name', 'update_cache', 'upgrade']],
-        mutually_exclusive=[['name', 'upgrade']],
+        required_one_of=[["name", "update_cache", "upgrade"]],
+        mutually_exclusive=[["name", "upgrade"]],
         supports_check_mode=True,
     )
 
-    module.run_command_environ_update = dict(LC_ALL='C')
+    # Split extra_args as the shell would for easier handling later
+    for str_args in ["extra_args", "upgrade_extra_args", "update_cache_extra_args"]:
+        module.params[str_args] = shlex.split(module.params[str_args])
 
-    p = module.params
+    return module
 
-    # find pacman binary
-    pacman_path = module.get_bin_path(p['executable'], True)
 
-    # normalize the state parameter
-    if p['state'] in ['present', 'installed']:
-        p['state'] = 'present'
-    elif p['state'] in ['absent', 'removed']:
-        p['state'] = 'absent'
+def main():
 
-    if p["update_cache"] and not module.check_mode:
-        stdout, stderr = update_package_db(module, pacman_path)
-        if not (p['name'] or p['upgrade']):
-            module.exit_json(changed=True, msg='Updated the package master lists', stdout=stdout, stderr=stderr)
-
-    if p['update_cache'] and module.check_mode and not (p['name'] or p['upgrade']):
-        module.exit_json(changed=True, msg='Would have updated the package cache')
-
-    if p['upgrade']:
-        upgrade(module, pacman_path)
-
-    if p['name']:
-        pkgs = expand_package_groups(module, pacman_path, p['name'])
-
-        pkg_files = []
-        for i, pkg in enumerate(pkgs):
-            if not pkg:  # avoid empty strings
-                continue
-            elif re.match(r".*\.pkg\.tar(\.(gz|bz2|xz|lrz|lzo|Z|zst))?$", pkg):
-                # The package given is a filename, extract the raw pkg name from
-                # it and store the filename
-                pkg_files.append(pkg)
-                pkgs[i] = re.sub(r'-[0-9].*$', '', pkgs[i].split('/')[-1])
-            else:
-                pkg_files.append(None)
-
-        if module.check_mode:
-            check_packages(module, pacman_path, pkgs, p['state'])
-
-        if p['state'] in ['present', 'latest']:
-            install_packages(module, pacman_path, p['state'], pkgs, pkg_files)
-        elif p['state'] == 'absent':
-            remove_packages(module, pacman_path, pkgs)
-    else:
-        module.exit_json(changed=False, msg="No package specified to work on.")
+    Pacman(setup_module()).run()
 
 
 if __name__ == "__main__":
