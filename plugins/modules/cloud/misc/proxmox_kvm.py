@@ -120,14 +120,23 @@ options:
       - Specify if to prevent changes if current configuration file has different SHA1 digest.
       - This can be used to prevent concurrent modifications.
     type: str
+  efi:
+    description:
+      - Specify options to pass to the EFI disk
+      - Values allowed are - C("efitype=2m|4m,pre-enrolled-keys=0|1)
+      - C(efitype) specifies the size of the EFI disk. C(efitype=2m) sets the EFI disk size to 2MB, preventing it to
+       store EFI keys, and thus preventing it to use C(pre-enrolled-keys=1).
+      - C(pre-enrolled-keys) specifies if the efidisk should come pre-loaded with distribution-specific and Microsoft
+       Standard Secure Boot keys(C(1)) or not (C(0)). It also enables Secure Boot by default if set to C(1).
+      - Cannot be set if efidisk0 is not set.
+    type: str
+    version_added: 4.4.0
   efidisk0:
     description:
       - Specify volume to use as EFI disk.
-      - Values allowed are - C("storage:1,format=value,efitype=4m,pre-enrolled-keys=0|1").
+      - Values allowed are - C("storage:1,format=value").
       - C(storage) is the storage identifier where to create the disk.
       - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
-      - C(pre-enrolled-keys) specifies if the efidisk should come pre-loaded with distribution-specific and Microsoft
-       Standard Secure Boot keys(C(1)) or not (C(0)). It also enables Secure Boot by default if set to C(1).
     type: str
     version_added: 4.4.0
   force:
@@ -539,7 +548,8 @@ EXAMPLES = '''
     sata:
       sata0: 'VMs_LVM:10,format=raw'
     bios: ovmf
-    efidisk0: 'VMs_LVM_thin:1,format=raw,efitype=4m,pre-enrolled_keys=0'
+    efi: 'efitype=4m,pre-enrolled_keys=0'
+    efidisk0: 'VMs_LVM_thin:1,format=raw'
 
 - name: Create VM with 1 10GB SATA disk and an EFI disk, with Secure Boot enabled by default
   community.general.proxmox_kvm:
@@ -551,31 +561,8 @@ EXAMPLES = '''
     sata:
       sata0: 'VMs_LVM:10,format=raw'
     bios: ovmf
-    efidisk0: 'VMs_LVM:1,format=qcow2,efitype=4m,pre-enrolled_keys=1'
-
-- name: Create VM with 1 10GB SATA disk and an EFI disk, with Secure Boot disabled by default
-  community.general.proxmox_kvm:
-    api_user: root@pam
-    api_password: secret
-    api_host: helldorado
-    name: spynal
-    node: sabrewulf
-    sata:
-      sata0: 'VMs_LVM:10,format=raw'
-    bios: ovmf
-    efidisk0: 'VMs_LVM_thin:1,format=raw,efitype=4m,pre-enrolled_keys=0'
-
-- name: Create VM with 1 10GB SATA disk and an EFI disk, with Secure Boot enabled by default
-  community.general.proxmox_kvm:
-    api_user: root@pam
-    api_password: secret
-    api_host: helldorado
-    name: spynal
-    node: sabrewulf
-    sata:
-      sata0: 'VMs_LVM:10,format=raw'
-    bios: ovmf
-    efidisk0: 'VMs_LVM:1,format=qcow2,efitype=4m,pre-enrolled_keys=1'
+    efi: 'efitype=4m,pre-enrolled_keys=1'
+    efidisk0: 'VMs_LVM:1,format=raw'
 
 - name: >
     Clone VM with only source VM name.
@@ -823,7 +810,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
 
         # Split information by type
         re_net = re.compile(r'net[0-9]')
-        re_dev = re.compile(r'(virtio|ide|scsi|sata)[0-9]')
+        re_dev = re.compile(r'(virtio|ide|scsi|sata|efidisk)[0-9]')
         for k in kwargs.keys():
             if re_net.match(k):
                 mac[k] = parse_mac(vm[k])
@@ -956,6 +943,12 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         if self.module.params['api_user'] != "root@pam" and self.module.params['skiplock'] is not None:
             self.module.fail_json(msg='skiplock parameter require root@pam user. ')
 
+        # check sanity of efidisk0 option, pre-enrolled-keys=1 should not be set with efitype=2m
+        if 'efidisk0' in kwargs:
+            re_efi = re.compile(r'efitype=2m.*pre-enrolled-keys=1|pre-enrolled-keys=1.*efitype=2m')
+            if re_efi.match(kwargs['efidisk0']):
+                self.module.fail_json(msg='efitype=2m cannont be set with pre-enrolled-keys=1. ')
+
         if update:
             if proxmox_node.qemu(vmid).config.set(name=name, memory=memory, cpu=cpu, cores=cores, sockets=sockets, **kwargs) is None:
                 return True
@@ -1020,6 +1013,7 @@ def main():
         delete=dict(type='str'),
         description=dict(type='str'),
         digest=dict(type='str'),
+        efi=dict(type='str'),
         efidisk0=dict(type='str'),
         force=dict(type='bool'),
         format=dict(type='str', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk', 'unspecified']),
@@ -1089,6 +1083,7 @@ def main():
         required_together=[('api_token_id', 'api_token_secret')],
         required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
         required_if=[('state', 'present', ['node'])],
+        required_by={'efi': 'efidisk0'},
     )
 
     clone = module.params['clone']
@@ -1193,6 +1188,10 @@ def main():
                 module.fail_json(msg='node, name is mandatory for creating/updating vm')
             elif not proxmox.get_node(node):
                 module.fail_json(msg="node '%s' does not exist in cluster" % node)
+
+            # Merge efi option into efidisk0
+            if ('efidisk0' in module.params) and ('efi' in module.params):
+                module.params['efidisk0'] += module.params['efi']
 
             proxmox.create_vm(vmid, newid, node, name, memory, cpu, cores, sockets, update,
                               acpi=module.params['acpi'],
