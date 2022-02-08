@@ -212,7 +212,7 @@ class OpenTelemetrySource(object):
         task.dump = dump
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def generate_distributed_traces(self, otel_service_name, ansible_playbook, tasks_data, status, traceparent):
+    def generate_distributed_traces(self, otel_service_name, ansible_playbook, tasks_data, status, traceparent, disable_logs):
         """ generate distributed traces from the collected TaskData and HostData """
 
         tasks = []
@@ -248,9 +248,9 @@ class OpenTelemetrySource(object):
             for task in tasks:
                 for host_uuid, host_data in task.host_data.items():
                     with tracer.start_as_current_span(task.name, start_time=task.start, end_on_exit=False) as span:
-                        self.update_span_data(task, host_data, span)
+                        self.update_span_data(task, host_data, span, disable_logs)
 
-    def update_span_data(self, task_data, host_data, span):
+    def update_span_data(self, task_data, host_data, span, disable_logs):
         """ update the span with the given TaskData and HostData """
 
         name = '[%s] %s: %s' % (host_data.name, task_data.play, task_data.name)
@@ -297,7 +297,8 @@ class OpenTelemetrySource(object):
         # This will allow to enrich the service map
         self.add_attributes_for_service_map_if_possible(span, task_data)
         # Send logs
-        span.add_event(task_data.dump)
+        if not disable_logs:
+            span.add_event(task_data.dump)
         span.end(end_time=host_data.finish)
 
     def set_span_attribute(self, span, attributeName, attributeValue):
@@ -401,6 +402,7 @@ class CallbackModule(CallbackBase):
     def __init__(self, display=None):
         super(CallbackModule, self).__init__(display=display)
         self.hide_task_arguments = None
+        self.disable_logs = None
         self.otel_service_name = None
         self.ansible_playbook = None
         self.play_name = None
@@ -430,6 +432,8 @@ class CallbackModule(CallbackBase):
                                   "Disabling the `opentelemetry` callback plugin.".format(environment_variable))
 
         self.hide_task_arguments = self.get_option('hide_task_arguments')
+
+        self.disable_logs = self.get_option('disable_logs')
 
         self.otel_service_name = self.get_option('otel_service_name')
 
@@ -525,7 +529,8 @@ class CallbackModule(CallbackBase):
             self.ansible_playbook,
             self.tasks_data,
             status,
-            self.traceparent
+            self.traceparent,
+            self.disable_logs
         )
 
     def v2_runner_on_async_failed(self, result, **kwargs):
