@@ -89,7 +89,7 @@ scaleway_private_network:
     returned: success when C(state=present)
     type: dict
     sample:
-        "scaleway_private_network": {
+        {
             "created_at": "2022-01-15T11:11:12.676445Z",
             "id": "12345678-f1e6-40ec-83e5-12345d67ed89",
             "name": "network",
