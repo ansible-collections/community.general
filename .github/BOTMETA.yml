@@ -819,7 +819,7 @@ files:
   $modules/packaging/os/opkg.py:
     maintainers: skinp
   $modules/packaging/os/pacman.py:
-    maintainers: elasticdog indrajitr tchernomax
+    maintainers: elasticdog indrajitr tchernomax jraby
     labels: pacman
     ignore: elasticdog
   $modules/packaging/os/pacman_key.py:
