@@ -1,0 +1,2 @@
+bugfixes:
+- homebrew - detect already installed cask using homebrew command to maintain idempotency (https://github.com/ansible-collections/community.general/issues/864).

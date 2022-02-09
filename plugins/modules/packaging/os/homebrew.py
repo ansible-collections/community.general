@@ -471,20 +471,33 @@ class Homebrew(object):
             self.message = 'Invalid package: {0}.'.format(self.current_package)
             raise HomebrewException(self.message)
 
-        cmd = [
-            "{brew_path}".format(brew_path=self.brew_path),
-            "info",
-            self.current_package,
-        ]
-        rc, out, err = self.module.run_command(cmd)
-        for line in out.split('\n'):
-            if (
-                re.search(r'Built from source', line)
-                or re.search(r'Poured from bottle', line)
-            ):
+        if "homebrew/cask" in self.current_package:
+            cmd = [
+                "{brew_path}".format(brew_path=self.brew_path),
+                "ls", "--cask",
+                self.current_package,
+            ]
+            rc, out, err = self.module.run_command(cmd)
+            if rc == 0:
                 return True
+            return False
+        else:
+            cmd = [
+                "{brew_path}".format(brew_path=self.brew_path),
+                "info",
+                self.current_package,
+            ]
 
-        return False
+            rc, out, err = self.module.run_command(cmd)
+
+            for line in out.split('\n'):
+                if (
+                    re.search(r'Built from source', line)
+                    or re.search(r'Poured from bottle', line)
+                ):
+                    return True
+
+            return False
 
     def _current_package_is_outdated(self):
         if not self.valid_package(self.current_package):
