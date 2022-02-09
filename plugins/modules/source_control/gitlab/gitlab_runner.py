@@ -201,7 +201,13 @@ class GitLabRunner(object):
         # Whether to operate on GitLab-instance-wide or project-wide runners
         # See https://gitlab.com/gitlab-org/gitlab-ce/issues/60774
         # for group runner token access
-        self._runners_endpoint = project.runners if project else gitlab_instance.runners
+        if project:
+            self._runners_endpoint = project.runners.list
+        elif module.params['owned']:
+            self._runners_endpoint = gitlab_instance.runners.list
+        else:
+            self._runners_endpoint = gitlab_instance.runners.all
+
         self.runner_object = None
 
     def create_or_update_runner(self, description, options):
@@ -283,11 +289,8 @@ class GitLabRunner(object):
     '''
     @param description Description of the runner
     '''
-    def find_runner(self, description, list_all_shared_runners=True):
-        if list_all_shared_runners:
-            runners = self._runners_endpoint.all(as_list=False)
-        else:
-            runners = self._runners_endpoint.list(as_list=False)
+    def find_runner(self, description):
+        runners = self._runners_endpoint(as_list=False)
 
         for runner in runners:
             # python-gitlab 2.2 through at least 2.5 returns a list of dicts for list() instead of a Runner
@@ -302,9 +305,9 @@ class GitLabRunner(object):
     '''
     @param description Description of the runner
     '''
-    def exists_runner(self, description, list_all_shared_runners=True):
+    def exists_runner(self, description):
         # When runner exists, object will be stored in self.runner_object.
-        runner = self.find_runner(description, list_all_shared_runners)
+        runner = self.find_runner(description)
 
         if runner:
             self.runner_object = runner
@@ -369,8 +372,6 @@ def main():
     maximum_timeout = module.params['maximum_timeout']
     registration_token = module.params['registration_token']
     project = module.params['project']
-    # /runners/all API endpoint is only applicable for instance runners, not for project runners
-    list_all_shared_runners = not module.params['owned'] and not project
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -384,7 +385,7 @@ def main():
             module.fail_json(msg='No such a project %s' % project, exception=to_native(e))
 
     gitlab_runner = GitLabRunner(module, gitlab_instance, gitlab_project)
-    runner_exists = gitlab_runner.exists_runner(runner_description, list_all_shared_runners)
+    runner_exists = gitlab_runner.exists_runner(runner_description)
 
     if state == 'absent':
         if runner_exists:
