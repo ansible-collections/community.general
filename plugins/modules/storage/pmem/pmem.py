@@ -216,33 +216,36 @@ class PersistentMemory(object):
         self.result = []
 
     def pmem_run_command(self, command, returnCheck=True):
-        self.module.log(msg="pmem_run_command: execute: %s" % command)
+        # in case command[] has number
+        cmd = list(map(str, command))
 
-        rc, out, err = self.module.run_command(command)
+        self.module.log(msg="pmem_run_command: execute: %s" % cmd)
+
+        rc, out, err = self.module.run_command(cmd)
 
         self.module.log(msg="pmem_run_command: result: %s" % out)
 
         if returnCheck and rc != 0:
             self.module.fail_json(msg="Error while running: %s" %
-                                  command, rc=rc, out=out, err=err)
+                                  cmd, rc=rc, out=out, err=err)
 
         return out
 
     def pmem_run_ipmctl(self, command, returnCheck=True):
 
-        command = "%s " % self.ipmctl_exec + command
+        command = [self.ipmctl_exec] + command
 
         return self.pmem_run_command(command, returnCheck)
 
     def pmem_run_ndctl(self, command, returnCheck=True):
 
-        command = "%s " % self.ndctl_exec + command
+        command = [self.ndctl_exec] + command
 
         return self.pmem_run_command(command, returnCheck)
 
     def pmem_is_dcpmm_installed(self):
         # To check this system has dcpmm
-        command = "show -system -capabilities"
+        command = ['show', '-system', '-capabilities']
         return self.pmem_run_ipmctl(command)
 
     def pmem_argument_check(self):
@@ -262,7 +265,7 @@ class PersistentMemory(object):
                     return 'Total percent should be 100.'
 
         def socket_id_check(self):
-            command = "show -o nvmxml -socket"
+            command = ['show', '-o', 'nvmxml', '-socket']
             out = self.pmem_run_ipmctl(command)
             sockets_dict = xmltodict.parse(out, dict_constructor=dict)['SocketList']['Socket']
             socket_ids = []
@@ -291,7 +294,7 @@ class PersistentMemory(object):
             return None
 
     def pmem_remove_namespaces(self):
-        command = 'list -N'
+        command = ['list', '-N']
         out = self.pmem_run_ndctl(command)
 
         # There's nothing namespaces in this system. Nothing to do.
@@ -302,17 +305,17 @@ class PersistentMemory(object):
 
         # Disable and destroy all namespaces
         for ns in namespaces:
-            command = "disable-namespace %s" % ns['dev']
+            command = ['disable-namespace', ns['dev']]
             self.pmem_run_ndctl(command)
 
-            command = "destroy-namespace %s" % ns['dev']
+            command = ['destroy-namespace', ns['dev']]
             self.pmem_run_ndctl(command)
 
         return
 
     def pmem_delete_goal(self):
         # delete the goal request
-        command = "delete -goal"
+        command = ['delete', '-goal']
         self.pmem_run_ipmctl(command)
 
     def pmem_init_env(self):
@@ -320,9 +323,9 @@ class PersistentMemory(object):
         self.pmem_delete_goal()
 
     def pmem_get_capacity(self, skt=None):
-        command = "show -d Capacity -u B -o nvmxml -dimm "
+        command = ['show', '-d', 'Capacity', '-u', 'B', '-o', 'nvmxml', '-dimm']
         if skt:
-            command += '-socket %d' % skt['id']
+            command += ['-socket', skt['id']]
         out = self.pmem_run_ipmctl(command)
 
         dimm_list = xmltodict.parse(out, dict_constructor=dict)['DimmList']['Dimm']
@@ -336,14 +339,14 @@ class PersistentMemory(object):
 
     def pmem_create_memory_allocation(self, skt=None):
         def build_ipmctl_creation_opts(self, skt=None):
-            ipmctl_opts = ""
+            ipmctl_opts = []
 
             if skt:
                 appdirect = skt['appdirect']
                 memmode = skt['memorymode']
                 reserved = skt['reserved']
                 socket_id = skt['id']
-                ipmctl_opts += "-socket %d " % socket_id
+                ipmctl_opts += ['-socket', socket_id]
             else:
                 appdirect = self.appdirect
                 memmode = self.memmode
@@ -351,14 +354,14 @@ class PersistentMemory(object):
 
             if reserved is None:
                 res = 100 - memmode - appdirect
-                ipmctl_opts += "memorymode=%d reserved=%d " % (memmode, res)
+                ipmctl_opts += ['memorymode=%d' % memmode, 'reserved=%d' % res]
             else:
-                ipmctl_opts += "memorymode=%d reserved=%d " % (memmode, reserved)
+                ipmctl_opts += ['memorymode=%d' % memmode, 'reserved=%d' % reserved]
 
             if self.interleaved:
-                ipmctl_opts += "PersistentMemoryType=AppDirect "
+                ipmctl_opts += ['PersistentMemoryType=AppDirect']
             else:
-                ipmctl_opts += "PersistentMemoryType=AppDirectNotInterleaved "
+                ipmctl_opts += ['PersistentMemoryType=AppDirectNotInterleaved']
 
             return ipmctl_opts
 
@@ -414,14 +417,14 @@ class PersistentMemory(object):
         ipmctl_opts = build_ipmctl_creation_opts(self, skt)
 
         # First, do dry run ipmctl create command to check the error and warning.
-        command = "create -goal %s" % ipmctl_opts
+        command = ['create', '-goal'] + ipmctl_opts
         out = self.pmem_run_ipmctl(command, returnCheck=False)
         rc, errmsg = is_allocation_good(self, out, command)
         if rc is False:
             return reboot_required, {}, errmsg
 
         # Run actual creation here
-        command = "create -u B -o nvmxml -force -goal %s" % ipmctl_opts
+        command = ['create', '-u', 'B', '-o', 'nvmxml', '-force', '-goal'] + ipmctl_opts
         goal = self.pmem_run_ipmctl(command)
         ret = get_allocation_result(self, goal, skt)
         reboot_required = True
