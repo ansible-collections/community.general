@@ -946,7 +946,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         # check sanity of efidisk0 option, pre-enrolled-keys=1 should not be set with efitype=2m
         if 'efidisk0' in kwargs:
             re_efi = re.compile(r'efitype=2m.*pre-enrolled-keys=1|pre-enrolled-keys=1.*efitype=2m')
-            if re_efi.match(kwargs['efidisk0']):
+            if re_efi.match(kwargs['efidisk0']) is not None:
                 self.module.fail_json(msg='efitype=2m cannont be set with pre-enrolled-keys=1. ')
 
         if update:
@@ -1190,8 +1190,8 @@ def main():
                 module.fail_json(msg="node '%s' does not exist in cluster" % node)
 
             # Merge efi option into efidisk0
-            if ('efidisk0' in module.params) and ('efi' in module.params):
-                module.params['efidisk0'] += module.params['efi']
+            if ('efidisk0' in module.params) and ('efi' in module.params) and (module.params['efi'] is not None):
+                module.params['efidisk0'] += "," + module.params['efi']
 
             proxmox.create_vm(vmid, newid, node, name, memory, cpu, cores, sockets, update,
                               acpi=module.params['acpi'],
@@ -1209,7 +1209,7 @@ def main():
                               cpuunits=module.params['cpuunits'],
                               description=module.params['description'],
                               digest=module.params['digest'],
-                              efidiskO=module.params['efidisk0'],
+                              efidisk0=module.params['efidisk0'],
                               force=module.params['force'],
                               freeze=module.params['freeze'],
                               hostpci=module.params['hostpci'],
