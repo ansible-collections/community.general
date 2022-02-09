@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: scaleway_private_network
-short_description: Scaleway private network management module
+short_description: Scaleway private network management
 version_added: 4.5.0
 author: Pascal MANGIN (@pastral)
 description:
