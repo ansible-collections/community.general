@@ -155,7 +155,7 @@ EXAMPLES = r'''
 import json
 import re
 import traceback
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 try:
     import xmltodict
@@ -196,6 +196,11 @@ class PersistentMemory(object):
                 ['memorymode', 'socket'],
             ),
         )
+
+        if not HAS_XMLTODICT_LIBRARY:
+            module.fail_json(
+                msg=missing_required_lib('xmltodict'),
+                exception=XMLTODICT_LIBRARY_IMPORT_ERROR)
 
         self.ipmctl_exec = module.get_bin_path('ipmctl', True)
         self.ndctl_exec = module.get_bin_path('ndctl', True)

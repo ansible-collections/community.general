@@ -5,6 +5,10 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import pytest
+
+pytest.importorskip('xmltodict')
+
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args, AnsibleFailJson, AnsibleExitJson
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 
