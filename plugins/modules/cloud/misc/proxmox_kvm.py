@@ -120,24 +120,38 @@ options:
       - Specify if to prevent changes if current configuration file has different SHA1 digest.
       - This can be used to prevent concurrent modifications.
     type: str
-  efi:
-    description:
-      - Specify options to pass to the EFI disk
-      - Values allowed are - C("efitype=2m|4m,pre-enrolled-keys=0|1)
-      - C(efitype) specifies the size of the EFI disk. C(efitype=2m) sets the EFI disk size to 2MB, preventing it to
-       store EFI keys, and thus preventing it to use C(pre-enrolled-keys=1).
-      - C(pre-enrolled-keys) specifies if the efidisk should come pre-loaded with distribution-specific and Microsoft
-       Standard Secure Boot keys(C(1)) or not (C(0)). It also enables Secure Boot by default if set to C(1).
-      - Cannot be set if efidisk0 is not set.
-    type: str
-    version_added: 4.5.0
   efidisk0:
     description:
-      - Specify volume to use as EFI disk.
-      - Values allowed are - C("storage:1,format=value").
-      - C(storage) is the storage identifier where to create the disk.
-      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
-    type: str
+      - Specify a hash/dictionary of EFI disk options.
+      - Requires I(bios=ovmf) to be set to be able to use it.
+    type: dict
+    suboptions:
+      storage:
+        description:
+          - C(storage) is the storage identifier where to create the disk.
+        type: str
+      format:
+        description:
+          - C(format) is the drive's backing file's data format. Please refer to the Proxmox VE Administrator Guide,
+           section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest
+           version, tables 3 to 14) to find out format supported by the provided storage backend.
+        type: str
+      efitype:
+        description:
+          - C(efitype) indicates the size of the EFI disk.
+          - C(2m) will allow for a 2MB EFI disk, which will be enough to persist boot order and new boot entries.
+          - C(4m) will allow for a 4MB EFI disk, which will additionally allow to store EFI keys in order to enable
+           Secure Boot
+        type: str
+        choices:
+          - 2m
+          - 4m
+      pre_enrolled_keys:
+        description:
+          - C(pre_enrolled_keys) indicates whether EFI keys for Secure Boot should be enrolled C(1) in the VM firmware
+           upon creation or not (0).
+          - If set to C(1), Secure Boot will also be enabled by default when the VM is created.
+        type: bool
     version_added: 4.5.0
   force:
     description:
@@ -548,8 +562,11 @@ EXAMPLES = '''
     sata:
       sata0: 'VMs_LVM:10,format=raw'
     bios: ovmf
-    efi: 'efitype=4m,pre-enrolled_keys=0'
-    efidisk0: 'VMs_LVM_thin:1,format=raw'
+    efidisk0:
+      storage: VMs_LVM_thin
+      format: raw
+      efitype: 4m
+      pre_enrolled_keys: False
 
 - name: Create VM with 1 10GB SATA disk and an EFI disk, with Secure Boot enabled by default
   community.general.proxmox_kvm:
@@ -561,8 +578,11 @@ EXAMPLES = '''
     sata:
       sata0: 'VMs_LVM:10,format=raw'
     bios: ovmf
-    efi: 'efitype=4m,pre-enrolled_keys=1'
-    efidisk0: 'VMs_LVM:1,format=raw'
+    efidisk0:
+      storage: VMs_LVM
+      format: raw
+      efitype: 4m
+      pre_enrolled_keys: 1
 
 - name: >
     Clone VM with only source VM name.
@@ -901,6 +921,28 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             if 'pool' in kwargs:
                 del kwargs['pool']
 
+        # Check that the bios option is set to ovmf if the efidisk0 option is present
+        if 'efidisk0' in kwargs:
+            if ('bios' not in kwargs) or ('ovmf' != kwargs['bios']):
+                self.module.fail_json(msg='efidisk0 cannot be used if bios is not set to ovmf. ')
+
+        # Flatten efidisk0 option to a string so that it's a string which is what Proxmoxer and the API expect
+        if 'efidisk0' in kwargs:
+            efidisk0_str = ''
+            # Regexp to catch underscores in keys name, to replace them after by hypens
+            hyphen_re = re.compile(r'_')
+            # If present, the storage definition should be the first argument
+            if 'storage' in kwargs['efidisk0']:
+                efidisk0_str += kwargs['efidisk0'].get('storage') + ':1,'
+                kwargs['efidisk0'].pop('storage')
+            for k in list(kwargs['efidisk0'].keys()):
+                if 'pre_enrolled_keys' == k:
+                    efidisk0_str += hyphen_re.sub('-', k) + "=" + str(int(kwargs['efidisk0'].get(k))) + ','
+                else:
+                    efidisk0_str += hyphen_re.sub('-', k) + "=" + str(kwargs['efidisk0'].get(k)) + ','
+            # copy the string minus the last coma
+            kwargs['efidisk0'] = efidisk0_str[:-1]
+
         # Convert all dict in kwargs to elements.
         # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
         for k in list(kwargs.keys()):
@@ -942,12 +984,6 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
 
         if self.module.params['api_user'] != "root@pam" and self.module.params['skiplock'] is not None:
             self.module.fail_json(msg='skiplock parameter require root@pam user. ')
-
-        # check sanity of efidisk0 option, pre-enrolled-keys=1 should not be set with efitype=2m
-        if 'efidisk0' in kwargs:
-            re_efi = re.compile(r'efitype=2m.*pre-enrolled-keys=1|pre-enrolled-keys=1.*efitype=2m')
-            if re_efi.match(kwargs['efidisk0']) is not None:
-                self.module.fail_json(msg='efitype=2m cannont be set with pre-enrolled-keys=1. ')
 
         if update:
             if proxmox_node.qemu(vmid).config.set(name=name, memory=memory, cpu=cpu, cores=cores, sockets=sockets, **kwargs) is None:
@@ -1013,8 +1049,13 @@ def main():
         delete=dict(type='str'),
         description=dict(type='str'),
         digest=dict(type='str'),
-        efi=dict(type='str'),
-        efidisk0=dict(type='str'),
+        efidisk0=dict(type='dict',
+                      options=dict(
+                          storage=dict(type='str'),
+                          format=dict(type='str'),
+                          efitype=dict(type='str', choices=['2m', '4m']),
+                          pre_enrolled_keys=dict(type='bool'),
+                      )),
         force=dict(type='bool'),
         format=dict(type='str', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk', 'unspecified']),
         freeze=dict(type='bool'),
@@ -1083,7 +1124,6 @@ def main():
         required_together=[('api_token_id', 'api_token_secret')],
         required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
         required_if=[('state', 'present', ['node'])],
-        required_by={'efi': 'efidisk0'},
     )
 
     clone = module.params['clone']
