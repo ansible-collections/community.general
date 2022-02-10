@@ -180,9 +180,9 @@ class DBusWrapper(object):
         self.module.debug("Trying to detect existing D-Bus user session for user: %d" % uid)
 
         for pid in psutil.pids():
-            process = psutil.Process(pid)
-            process_real_uid, dummy, dummy = process.uids()
             try:
+                process = psutil.Process(pid)
+                process_real_uid, dummy, dummy = process.uids()
                 if process_real_uid == uid and 'DBUS_SESSION_BUS_ADDRESS' in process.environ():
                     dbus_session_bus_address_candidate = process.environ()['DBUS_SESSION_BUS_ADDRESS']
                     self.module.debug("Found D-Bus user session candidate at address: %s" % dbus_session_bus_address_candidate)
@@ -197,6 +197,9 @@ class DBusWrapper(object):
 
             # This can happen with things like SSH sessions etc.
             except psutil.AccessDenied:
+                pass
+            # Process has disappeared while inspecting it
+            except psutil.NoSuchProcess:
                 pass
 
         self.module.debug("Failed to find running D-Bus user session, will use dbus-run-session")
