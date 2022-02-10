@@ -135,7 +135,7 @@ def get_token(module_params):
         auth_username = module_params.get('auth_username')
         auth_password = module_params.get('auth_password')
         client_secret = module_params.get('auth_client_secret')
-        connection_timeout = module_params.get('connection_timeout');
+        connection_timeout = module_params.get('connection_timeout')
         auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
         temp_payload = {
             'grant_type': 'password',
@@ -541,7 +541,8 @@ class KeycloakAPI(object):
         """
         available_rolemappings_url = URL_CLIENT_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
-            open_url(available_rolemappings_url, method="POST", headers=self.restheaders, data=json.dumps(role_rep), validate_certs=self.validate_certs, timeout=self.connection_timeout)
+            open_url(available_rolemappings_url, method="POST", headers=self.restheaders, data=json.dumps(role_rep),
+                     validate_certs=self.validate_certs, timeout=self.connection_timeout)
         except Exception as e:
             self.module.fail_json(msg="Could not fetch available rolemappings for client %s in group %s, realm %s: %s"
                                       % (cid, gid, realm, str(e)))
@@ -557,7 +558,8 @@ class KeycloakAPI(object):
         """
         available_rolemappings_url = URL_CLIENT_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
-            open_url(available_rolemappings_url, method="DELETE", headers=self.restheaders, validate_certs=self.validate_certs, timeout=self.connection_timeout)
+            open_url(available_rolemappings_url, method="DELETE", headers=self.restheaders,
+                     validate_certs=self.validate_certs, timeout=self.connection_timeout)
         except Exception as e:
             self.module.fail_json(msg="Could not delete available rolemappings for client %s in group %s, realm %s: %s"
                                       % (cid, gid, realm, str(e)))
@@ -1234,7 +1236,8 @@ class KeycloakAPI(object):
         try:
             authentication_flow = {}
             # Check if the authentication flow exists on the Keycloak serveraders
-            authentications = json.load(open_url(URL_AUTHENTICATION_FLOWS.format(url=self.baseurl, realm=realm), method='GET', headers=self.restheaders, timeout=self.connection_timeout))
+            authentications = json.load(open_url(URL_AUTHENTICATION_FLOWS.format(url=self.baseurl, realm=realm), method='GET',
+                                                 headers=self.restheaders, timeout=self.connection_timeout))
             for authentication in authentications:
                 if authentication["alias"] == alias:
                     authentication_flow = authentication
