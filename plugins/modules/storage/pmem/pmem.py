@@ -217,7 +217,7 @@ class PersistentMemory(object):
 
     def pmem_run_command(self, command, returnCheck=True):
         # in case command[] has number
-        cmd = list(map(str, command))
+        cmd = [str(part) for part in command]
 
         self.module.log(msg='pmem_run_command: execute: %s' % cmd)
 
