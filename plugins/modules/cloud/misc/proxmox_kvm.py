@@ -936,7 +936,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                 efidisk0_str += kwargs['efidisk0'].get('storage') + ':1,'
                 kwargs['efidisk0'].pop('storage')
             # Join other elements from the dict as key=value using commas as separator, replacing any underscore in key
-            # by hyphens (needed for pre_enrolled_keys to pre-enrolled_keys)
+            # by hyphens (needed for pre_enrolled_keys to pre-enrolled-keys)
             efidisk0_str += ','.join([hyphen_re.sub('-', k) + "=" + str(v) for k, v in kwargs['efidisk0'].items()
                                       if 'storage' != k])
             kwargs['efidisk0'] = efidisk0_str
@@ -1226,10 +1226,6 @@ def main():
                 module.fail_json(msg='node, name is mandatory for creating/updating vm')
             elif not proxmox.get_node(node):
                 module.fail_json(msg="node '%s' does not exist in cluster" % node)
-
-            # Merge efi option into efidisk0
-            if ('efidisk0' in module.params) and ('efi' in module.params) and (module.params['efi'] is not None):
-                module.params['efidisk0'] += "," + module.params['efi']
 
             proxmox.create_vm(vmid, newid, node, name, memory, cpu, cores, sockets, update,
                               acpi=module.params['acpi'],
