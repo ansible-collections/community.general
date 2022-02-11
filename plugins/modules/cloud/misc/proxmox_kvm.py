@@ -204,7 +204,7 @@ options:
       - Enable/disable hugepages memory.
     type: str
     choices: ['any', '2', '1024']
-  ide:
+  ide_dictstr:
     description:
       - A hash/dictionary of volume used as IDE hard disk or CD-ROM. C(ide='{"key":"value", "key":"value"}').
       - Keys allowed are - C(ide[n]) where 0 ≤ n ≤ 3.
@@ -215,6 +215,199 @@ options:
         Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for
         the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
     type: dict
+    aliases:
+      - ide
+  ide_listdict:
+    description:
+      - to be written
+    type: list
+    elements: dict
+    suboptions:
+      name:
+        description:
+          - to be written
+        type: str
+        choices: ['ide0', 'ide1', 'ide2', 'ide3']
+      storage:
+        description:
+          - to be written
+        type: str
+      size_in_gb:
+        description:
+          - to be written
+        type: float
+      aio:
+        description:
+          - to be written
+        type: str
+        choices: ['native', 'threads', 'io_uring']
+      backup:
+        description:
+          - to be written
+        type: bool
+      bps:
+        description:
+          - to be written
+        type: int
+      bps_max_length:
+        description:
+          - to be written
+        type: int
+      bps_rd:
+        description:
+          - to be written
+        type: int
+      bps_rd_max_length:
+        description:
+          - to be written
+        type: int
+      bps_wr:
+        description:
+          - to be written
+        type: int
+      bps_wr_max_length:
+        description:
+          - to be written
+        type: int
+      cache:
+        description:
+          - to be written
+        type: str
+        choices: ['directsync', 'none', 'unsafe', 'writeback', 'writethrough']
+      cyls:
+        description:
+          - to be written
+        type: int
+      detect_zeroes:
+        description:
+          - to be written
+        type: bool
+      discard:
+        description:
+          - to be written
+        type: str
+        choices: ['ignore', 'on']
+      format:
+        description:
+          - to be written
+        type: str
+        choices: ['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk']
+      heads:
+        description:
+          - to be written
+        type: int
+      iops:
+        description:
+          - to be written
+        type: int
+      iops_max:
+        description:
+          - to be written
+        type: int
+      iops_max_length:
+        description:
+          - to be written
+        type: int
+      iops_rd:
+        description:
+          - to be written
+        type: int
+      iops_rd_max:
+        description:
+          - to be written
+        type: int
+      iops_rd_max_length:
+        description:
+          - to be written
+        type: int
+      iops_wr:
+        description:
+          - to be written
+        type: int
+      iops_wr_max:
+        description:
+          - to be written
+        type: int
+      iops_wr_max_length:
+        description:
+          - to be written
+        type: int
+      mbps:
+        description:
+          - to be written
+        type: int
+      mbps_max:
+        description:
+          - to be written
+        type: int
+      mbps_rd:
+        description:
+          - to be written
+        type: int
+      mbps_rd_max:
+        description:
+          - to be written
+        type: int
+      mbps_wr:
+        description:
+          - to be written
+        type: int
+      mbps_wr_max:
+        description:
+          - to be written
+        type: int
+      media:
+        description:
+          - to be written
+        type: str
+        choices: ['disk', 'cdrom']
+      model:
+        description:
+          - to be written
+        type: str
+      replicate:
+        description:
+          - to be written
+        type: bool
+      rerror:
+        description:
+          - to be written
+        type: str
+        choices: ['ignore', 'report', 'stop']
+      secs:
+        description:
+          - to be written
+        type: int
+      serial:
+        description:
+          - to be written
+        type: str
+      shared:
+        description:
+          - to be written
+        type: bool
+      size:
+        description:
+          - to be written
+        type: str
+      snapshot:
+        description:
+          - to be written
+        type: bool
+      trans:
+        description:
+          - to be written
+        type: str
+        choices: ['none', 'lba', 'auto']
+      werror:
+        description:
+          - to be written
+        type: str
+        choices: ['enospc', 'ignore', 'report', 'stop']
+      wwn:
+        description:
+          - to be written
+        type: str
   ipconfig:
     description:
       - 'cloud-init: Set the IP configuration.'
@@ -338,7 +531,7 @@ options:
     description:
       - Revert a pending change.
     type: str
-  sata:
+  sata_dictstr:
     description:
       - A hash/dictionary of volume used as sata hard disk or CD-ROM. C(sata='{"key":"value", "key":"value"}').
       - Keys allowed are - C(sata[n]) where 0 ≤ n ≤ 5.
@@ -349,7 +542,200 @@ options:
         Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for
         the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
     type: dict
-  scsi:
+    aliases:
+      - sata
+  sata_listdict:
+    description:
+      - to be written
+    type: list
+    elements: dict
+    suboptions:
+      name:
+        description:
+          - to be written
+        type: str
+        choices: ['sata0', 'sata1', 'sata2', 'sata3', 'sata4', 'sata5']
+      storage:
+        description:
+          - to be written
+        type: str
+      size_in_gb:
+        description:
+          - to be written
+        type: float
+      aio:
+        description:
+          - to be written
+        type: str
+        choices: ['native', 'threads', 'io_uring']
+      backup:
+        description:
+          - to be written
+        type: bool
+      bps:
+        description:
+          - to be written
+        type: int
+      bps_max_length:
+        description:
+          - to be written
+        type: int
+      bps_rd:
+        description:
+          - to be written
+        type: int
+      bps_rd_max_length:
+        description:
+          - to be written
+        type: int
+      bps_wr:
+        description:
+          - to be written
+        type: int
+      bps_wr_max_length:
+        description:
+          - to be written
+        type: int
+      cache:
+        description:
+          - to be written
+        type: str
+        choices: ['directsync', 'none', 'unsafe', 'writeback', 'writethrough']
+      cyls:
+        description:
+          - to be written
+        type: int
+      detect_zeroes:
+        description:
+          - to be written
+        type: bool
+      discard:
+        description:
+          - to be written
+        type: str
+        choices: ['ignore', 'on']
+      format:
+        description:
+          - to be written
+        type: str
+        choices: ['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk']
+      heads:
+        description:
+          - to be written
+        type: int
+      iops:
+        description:
+          - to be written
+        type: int
+      iops_max:
+        description:
+          - to be written
+        type: int
+      iops_max_length:
+        description:
+          - to be written
+        type: int
+      iops_rd:
+        description:
+          - to be written
+        type: int
+      iops_rd_max:
+        description:
+          - to be written
+        type: int
+      iops_rd_max_length:
+        description:
+          - to be written
+        type: int
+      iops_wr:
+        description:
+          - to be written
+        type: int
+      iops_wr_max:
+        description:
+          - to be written
+        type: int
+      iops_wr_max_length:
+        description:
+          - to be written
+        type: int
+      mbps:
+        description:
+          - to be written
+        type: int
+      mbps_max:
+        description:
+          - to be written
+        type: int
+      mbps_rd:
+        description:
+          - to be written
+        type: int
+      mbps_rd_max:
+        description:
+          - to be written
+        type: int
+      mbps_wr:
+        description:
+          - to be written
+        type: int
+      mbps_wr_max:
+        description:
+          - to be written
+        type: int
+      media:
+        description:
+          - to be written
+        type: str
+        choices: ['disk', 'cdrom']
+      replicate:
+        description:
+          - to be written
+        type: bool
+      rerror:
+        description:
+          - to be written
+        type: str
+        choices: ['ignore', 'report', 'stop']
+      secs:
+        description:
+          - to be written
+        type: int
+      serial:
+        description:
+          - to be written
+        type: str
+      shared:
+        description:
+          - to be written
+        type: bool
+      size:
+        description:
+          - to be written
+        type: str
+      snapshot:
+        description:
+          - to be written
+        type: bool
+      ssd:
+        description:
+          - to be written
+        type: bool
+      trans:
+        description:
+          - to be written
+        type: str
+        choices: ['none', 'lba', 'auto']
+      werror:
+        description:
+          - to be written
+        type: str
+        choices: ['enospc', 'ignore', 'report', 'stop']
+      wwn:
+        description:
+          - to be written
+        type: str
+  scsi_dictstr:
     description:
       - A hash/dictionary of volume used as SCSI hard disk or CD-ROM. C(scsi='{"key":"value", "key":"value"}').
       - Keys allowed are - C(sata[n]) where 0 ≤ n ≤ 13.
@@ -360,6 +746,213 @@ options:
         Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for
         the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
     type: dict
+    aliases:
+      - scsi
+  scsi_listdict:
+    description:
+      - to be written
+    type: list
+    elements: dict
+    suboptions:
+      name:
+        description:
+          - to be written
+        type: str
+        choices: ['scsi0', 'scsi1', 'scsi2', 'scsi3', 'scsi4', 'scsi5', 'scsi6', 'scsi7', 'scsi8', 'scsi9', 'scsi10',
+        'scsi11', 'scsi12', 'scsi13', 'scsi14', 'scsi15', 'scsi16', 'scsi17', 'scsi18', 'scsi19', 'scsi20', 'scsi21',
+        'scsi22', 'scsi23', 'scsi24', 'scsi25', 'scsi26', 'scsi27', 'scsi28', 'scsi29', 'scsi30']
+      storage:
+        description:
+          - to be written
+        type: str
+      size_in_gb:
+        description:
+          - to be written
+        type: float
+      aio:
+        description:
+          - to be written
+        type: str
+        choices: ['native', 'threads', 'io_uring']
+      backup:
+        description:
+          - to be written
+        type: bool
+      bps:
+        description:
+          - to be written
+        type: int
+      bps_max_length:
+        description:
+          - to be written
+        type: int
+      bps_rd:
+        description:
+          - to be written
+        type: int
+      bps_rd_max_length:
+        description:
+          - to be written
+        type: int
+      bps_wr:
+        description:
+          - to be written
+        type: int
+      bps_wr_max_length:
+        description:
+          - to be written
+        type: int
+      cache:
+        description:
+          - to be written
+        type: str
+        choices: ['directsync', 'none', 'unsafe', 'writeback', 'writethrough']
+      cyls:
+        description:
+          - to be written
+        type: int
+      detect_zeroes:
+        description:
+          - to be written
+        type: bool
+      discard:
+        description:
+          - to be written
+        type: str
+        choices: ['ignore', 'on']
+      format:
+        description:
+          - to be written
+        type: str
+        choices: ['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk']
+      heads:
+        description:
+          - to be written
+        type: int
+      iops:
+        description:
+          - to be written
+        type: int
+      iops_max:
+        description:
+          - to be written
+        type: int
+      iops_max_length:
+        description:
+          - to be written
+        type: int
+      iops_rd:
+        description:
+          - to be written
+        type: int
+      iops_rd_max:
+        description:
+          - to be written
+        type: int
+      iops_rd_max_length:
+        description:
+          - to be written
+        type: int
+      iops_wr:
+        description:
+          - to be written
+        type: int
+      iops_wr_max:
+        description:
+          - to be written
+        type: int
+      iops_wr_max_length:
+        description:
+          - to be written
+        type: int
+      mbps:
+        description:
+          - to be written
+        type: int
+      mbps_max:
+        description:
+          - to be written
+        type: int
+      mbps_rd:
+        description:
+          - to be written
+        type: int
+      mbps_rd_max:
+        description:
+          - to be written
+        type: int
+      mbps_wr:
+        description:
+          - to be written
+        type: int
+      mbps_wr_max:
+        description:
+          - to be written
+        type: int
+      media:
+        description:
+          - to be written
+        type: str
+        choices: ['disk', 'cdrom']
+      queues:
+        description:
+          - to be written
+        type: int
+      replicate:
+        description:
+          - to be written
+        type: bool
+      rerror:
+        description:
+          - to be written
+        type: str
+        choices: ['ignore', 'report', 'stop']
+      ro:
+        description:
+          - to be writtent
+        type: bool
+      scsibloc:
+        description:
+          - to be written
+        type: bool
+      secs:
+        description:
+          - to be written
+        type: int
+      serial:
+        description:
+          - to be written
+        type: str
+      shared:
+        description:
+          - to be written
+        type: bool
+      size:
+        description:
+          - to be written
+        type: str
+      snapshot:
+        description:
+          - to be written
+        type: bool
+      ssd:
+        description:
+          - to be written
+        type: bool
+      trans:
+        description:
+          - to be written
+        type: str
+        choices: ['none', 'lba', 'auto']
+      werror:
+        description:
+          - to be written
+        type: str
+        choices: ['enospc', 'ignore', 'report', 'stop']
+      wwn:
+        description:
+          - to be written
+        type: str
   scsihw:
     description:
       - Specifies the SCSI controller model.
@@ -481,7 +1074,7 @@ options:
       - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(std).
     type: str
     choices: ['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']
-  virtio:
+  virtio_dictstr:
     description:
       - A hash/dictionary of volume used as VIRTIO hard disk. C(virtio='{"key":"value", "key":"value"}').
       - Keys allowed are - C(virto[n]) where 0 ≤ n ≤ 15.
@@ -492,6 +1085,200 @@ options:
         Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html)
         for the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
     type: dict
+    aliases:
+      - virtio
+  virtio_listdict:
+    description:
+      - to be written
+    type: list
+    elements: dict
+    suboptions:
+      name:
+        description:
+          - to be written
+        type: str
+        choices: ['virtio0', 'virtio1', 'virtio2', 'virtio3', 'virtio4', 'virtio5', 'virtio6', 'virtio7', 'virtio8',
+        'virtio9', 'virtio10', 'virtio11', 'virtio12', 'virtio13', 'virtio14', 'virtio15']
+      storage:
+        description:
+          - to be written
+        type: str
+      size_in_gb:
+        description:
+          - to be written
+        type: float
+      aio:
+        description:
+          - to be written
+        type: str
+        choices: ['native', 'threads', 'io_uring']
+      backup:
+        description:
+          - to be written
+        type: bool
+      bps:
+        description:
+          - to be written
+        type: int
+      bps_max_length:
+        description:
+          - to be written
+        type: int
+      bps_rd:
+        description:
+          - to be written
+        type: int
+      bps_rd_max_length:
+        description:
+          - to be written
+        type: int
+      bps_wr:
+        description:
+          - to be written
+        type: int
+      bps_wr_max_length:
+        description:
+          - to be written
+        type: int
+      cache:
+        description:
+          - to be written
+        type: str
+        choices: ['directsync', 'none', 'unsafe', 'writeback', 'writethrough']
+      cyls:
+        description:
+          - to be written
+        type: int
+      detect_zeroes:
+        description:
+          - to be written
+        type: bool
+      discard:
+        description:
+          - to be written
+        type: str
+        choices: ['ignore', 'on']
+      format:
+        description:
+          - to be written
+        type: str
+        choices: ['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk']
+      heads:
+        description:
+          - to be written
+        type: int
+      iops:
+        description:
+          - to be written
+        type: int
+      iops_max:
+        description:
+          - to be written
+        type: int
+      iops_max_length:
+        description:
+          - to be written
+        type: int
+      iops_rd:
+        description:
+          - to be written
+        type: int
+      iops_rd_max:
+        description:
+          - to be written
+        type: int
+      iops_rd_max_length:
+        description:
+          - to be written
+        type: int
+      iops_wr:
+        description:
+          - to be written
+        type: int
+      iops_wr_max:
+        description:
+          - to be written
+        type: int
+      iops_wr_max_length:
+        description:
+          - to be written
+        type: int
+      mbps:
+        description:
+          - to be written
+        type: int
+      mbps_max:
+        description:
+          - to be written
+        type: int
+      mbps_rd:
+        description:
+          - to be written
+        type: int
+      mbps_rd_max:
+        description:
+          - to be written
+        type: int
+      mbps_wr:
+        description:
+          - to be written
+        type: int
+      mbps_wr_max:
+        description:
+          - to be written
+        type: int
+      media:
+        description:
+          - to be written
+        type: str
+        choices: ['disk', 'cdrom']
+      replicate:
+        description:
+          - to be written
+        type: bool
+      rerror:
+        description:
+          - to be written
+        type: str
+        choices: ['ignore', 'report', 'stop']
+      ro:
+        description:
+          - to be written
+        type: bool
+      secs:
+        description:
+          - to be written
+        type: int
+      serial:
+        description:
+          - to be written
+        type: str
+      shared:
+        description:
+          - to be written
+        type: bool
+      size:
+        description:
+          - to be written
+        type: str
+      snapshot:
+        description:
+          - to be written
+        type: bool
+      trans:
+        description:
+          - to be written
+        type: str
+        choices: ['none', 'lba', 'auto']
+      werror:
+        description:
+          - to be written
+        type: str
+        choices: ['enospc', 'ignore', 'report', 'stop']
+      wwn:
+        description:
+          - to be written
+        type: str
   watchdog:
     description:
       - Creates a virtual hardware watchdog device.
@@ -952,6 +1739,20 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                                       if 'storage' != k])
             kwargs['efidisk0'] = efidisk0_str
 
+        # Flatten ide_listdict, sata_listdic, scsi_listdict, virtio_listdict into {name: str} dicts and push them to
+        # kwargs, and then deleting the original *_listdicts as they are not understood by PVE API
+        for key in ['ide_listdict', 'sata_listdict', 'scsi_listdict', 'virtio_listdict']:
+            if key in kwargs.keys():
+                for item in kwargs[key]:
+                    dict_key = item['name']
+                    # Storage backend and volume has to be first, and has to look like <storage>:<size>
+                    flattened_str = item['storage'] + ':' + str(item['size_in_gb']) + ','
+                    # Add remaining options as key=value, using commas as separator
+                    flattened_str += ','.join([k + '=' + str(v) for k, v in item.items() if k not in ['name', 'storage',
+                                                                                                      'size_in_gb']])
+                    kwargs.update({dict_key: flattened_str})
+                del kwargs[key]
+
         # Convert all dict in kwargs to elements.
         # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
         for k in list(kwargs.keys()):
@@ -1037,6 +1838,73 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
 
 def main():
     module_args = proxmox_auth_argument_spec()
+    format_arg_spec = dict(type='str', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk'])
+    common_storage_arg_spec = dict(storage=dict(type='str'),
+                                   size_in_gb=dict(type='float'),
+                                   aio=dict(type='str', choices=['native', 'threads', 'io_uring']),
+                                   backup=dict(type='bool'),
+                                   bps=dict(type='int'),
+                                   bps_max_length=dict(type='int'),
+                                   bps_rd=dict(type='int'),
+                                   bps_rd_max_length=dict(type='int'),
+                                   bps_wr=dict(type='int'),
+                                   bps_wr_max_length=dict(type='int'),
+                                   cache=dict(type='str', choices=['directsync', 'none', 'unsafe',
+                                                                   'writeback', 'writethrough']),
+                                   cyls=dict(type='int'),
+                                   detect_zeroes=dict(type='bool'),
+                                   discard=dict(type='str', choices=['ignore', 'on']),
+                                   format=format_arg_spec,
+                                   heads=dict(type='int'),
+                                   iops=dict(type='int'),
+                                   iops_max=dict(type='int'),
+                                   iops_max_length=dict(type='int'),
+                                   iops_rd=dict(type='int'),
+                                   iops_rd_max=dict(type='int'),
+                                   iops_rd_max_length=dict(type='int'),
+                                   iops_wr=dict(type='int'),
+                                   iops_wr_max=dict(type='int'),
+                                   iops_wr_max_length=dict(type='int'),
+                                   mbps=dict(type='int'),
+                                   mbps_max=dict(type='int'),
+                                   mbps_rd=dict(type='int'),
+                                   mbps_rd_max=dict(type='int'),
+                                   mbps_wr=dict(type='int'),
+                                   mbps_wr_max=dict(type='int'),
+                                   media=dict(type='str', choices=['cdrom', 'disk']),
+                                   replicate=dict(type='bool'),
+                                   rerror=dict(type='str', choices=['ignore', 'report', 'stop']),
+                                   secs=dict(type='int'),
+                                   serial=dict(type='str'),
+                                   shared=dict(type='bool'),
+                                   size=dict(type='str'),
+                                   snapshot=dict(type='bool'),
+                                   trans=dict(type='str', choices=['none', 'lba', 'auto']),
+                                   werror=dict(type='str', choices=['enospc', 'ignore', 'report', 'stop']),
+                                   wwn=dict(type='str')
+                                   )
+    ide_storage_arg_spec = common_storage_arg_spec.copy()
+    ide_storage_arg_spec.update(dict(
+        name=dict(type='str', choices=['ide' + str(n) for n in range(0, 4)]),
+        model=dict(type='str')
+    ))
+    sata_storage_arg_spec = common_storage_arg_spec.copy()
+    sata_storage_arg_spec.update(dict(
+        name=dict(type='str', choices=['sata' + str(n) for n in range(0, 6)]),
+        ssd=dict(type='bool')
+    ))
+    scsi_storage_arg_spec = sata_storage_arg_spec.copy()
+    scsi_storage_arg_spec.update(dict(
+        name=dict(type='str', choices=['scsi' + str(n) for n in range(0, 31)]),
+        queues=dict(type='int'),
+        ro=dict(type='bool'),
+        scsibloc=dict(type='bool'),
+    ))
+    virtio_storage_arg_spec = common_storage_arg_spec.copy()
+    virtio_storage_arg_spec.update(dict(
+        name=dict(type='str', choices=['virtio' + str(n) for n in range(0, 16)]),
+        ro=dict(type='bool'),
+    ))
     kvm_args = dict(
         acpi=dict(type='bool'),
         agent=dict(type='bool'),
@@ -1072,7 +1940,11 @@ def main():
         hostpci=dict(type='dict'),
         hotplug=dict(type='str'),
         hugepages=dict(choices=['any', '2', '1024']),
-        ide=dict(type='dict'),
+        ide_dictstr=dict(type='dict', aliases=['ide']),
+        ide_listdict=dict(type='list',
+                          elements='dict',
+                          options=ide_storage_arg_spec
+                          ),
         ipconfig=dict(type='dict'),
         keyboard=dict(type='str'),
         kvm=dict(type='bool'),
@@ -1096,8 +1968,14 @@ def main():
         protection=dict(type='bool'),
         reboot=dict(type='bool'),
         revert=dict(type='str'),
-        sata=dict(type='dict'),
-        scsi=dict(type='dict'),
+        sata_dictstr=dict(type='dict', aliases=['sata']),
+        sata_listdict=dict(type='list',
+                           elements='dict',
+                           options=sata_storage_arg_spec),
+        scsi_dictstr=dict(type='dict', aliases=['scsi']),
+        scsi_listdict=dict(type='list',
+                           elements='dict',
+                           options=scsi_storage_arg_spec),
         scsihw=dict(choices=['lsi', 'lsi53c810', 'virtio-scsi-pci', 'virtio-scsi-single', 'megasas', 'pvscsi']),
         serial=dict(type='dict'),
         searchdomains=dict(type='list', elements='str'),
@@ -1120,7 +1998,11 @@ def main():
         update=dict(type='bool', default=False),
         vcpus=dict(type='int'),
         vga=dict(choices=['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']),
-        virtio=dict(type='dict'),
+        virtio_dictstr=dict(type='dict', aliases=['virtio']),
+        virtio_listdict=dict(type='list',
+                             elements='dict',
+                             options=virtio_storage_arg_spec
+                             ),
         vmid=dict(type='int'),
         watchdog=dict(),
         proxmox_default_behavior=dict(type='str', default='no_defaults', choices=['compatibility', 'no_defaults']),
@@ -1129,7 +2011,10 @@ def main():
 
     module = AnsibleModule(
         argument_spec=module_args,
-        mutually_exclusive=[('delete', 'revert'), ('delete', 'update'), ('revert', 'update'), ('clone', 'update'), ('clone', 'delete'), ('clone', 'revert')],
+        mutually_exclusive=[('delete', 'revert'), ('delete', 'update'), ('revert', 'update'), ('clone', 'update'),
+                            ('clone', 'delete'), ('clone', 'revert'), ('ide_dictstr', 'ide_listdict'),
+                            ('sata_dictstr', 'sata_listdict'), ('scsi_dictstr', 'scsi_listdict'),
+                            ('virtio_dictstr', 'virtio_listdict')],
         required_together=[('api_token_id', 'api_token_secret')],
         required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
         required_if=[('state', 'present', ['node'])],
@@ -1260,7 +2145,8 @@ def main():
                               hostpci=module.params['hostpci'],
                               hotplug=module.params['hotplug'],
                               hugepages=module.params['hugepages'],
-                              ide=module.params['ide'],
+                              ide=module.params['ide_dictstr'],
+                              ide_listdict=module.params['ide_listdict'],
                               ipconfig=module.params['ipconfig'],
                               keyboard=module.params['keyboard'],
                               kvm=module.params['kvm'],
@@ -1278,8 +2164,10 @@ def main():
                               pool=module.params['pool'],
                               protection=module.params['protection'],
                               reboot=module.params['reboot'],
-                              sata=module.params['sata'],
-                              scsi=module.params['scsi'],
+                              sata=module.params['sata_dictstr'],
+                              sata_listdict=module.params['sata_lsit_dict'],
+                              scsi=module.params['scsi_dictstr'],
+                              scsi_listdict=module.params['scsi_listdict'],
                               scsihw=module.params['scsihw'],
                               serial=module.params['serial'],
                               shares=module.params['shares'],
