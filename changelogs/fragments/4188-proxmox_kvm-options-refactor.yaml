@@ -1,0 +1,2 @@
+breaking_changes:
+  - proxmox_kvm - refactor of several options to tranform them into dicts instead of strings (https://github.com/ansible-collections/community.general/pull/4188)
