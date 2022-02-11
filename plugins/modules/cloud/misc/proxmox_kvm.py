@@ -935,13 +935,11 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             if 'storage' in kwargs['efidisk0']:
                 efidisk0_str += kwargs['efidisk0'].get('storage') + ':1,'
                 kwargs['efidisk0'].pop('storage')
-            for k in list(kwargs['efidisk0'].keys()):
-                if 'pre_enrolled_keys' == k:
-                    efidisk0_str += hyphen_re.sub('-', k) + "=" + str(int(kwargs['efidisk0'].get(k))) + ','
-                else:
-                    efidisk0_str += hyphen_re.sub('-', k) + "=" + str(kwargs['efidisk0'].get(k)) + ','
-            # copy the string minus the last coma
-            kwargs['efidisk0'] = efidisk0_str[:-1]
+            # Join other elements from the dict as key=value using commas as separator, replacing any underscore in key
+            # by hyphens (needed for pre_enrolled_keys to pre-enrolled_keys)
+            efidisk0_str += ','.join([hyphen_re.sub('-', k) + "=" + str(v) for k, v in kwargs['efidisk0'].items()
+                                      if 'storage' != k])
+            kwargs['efidisk0'] = efidisk0_str
 
         # Convert all dict in kwargs to elements.
         # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
