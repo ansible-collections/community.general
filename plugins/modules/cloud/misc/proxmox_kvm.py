@@ -131,6 +131,9 @@ options:
       - Target drive's backing file's data format.
       - Used only with clone
       - Use I(format=unspecified) and I(full=false) for a linked clone.
+      - Please refer to the Proxmox VE Administrator Guide, section Proxmox VE Storage (see
+        U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest version, tables 3 to 14) to find out format
+        supported by the provided storage backend.
       - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(qcow2).
         If I(proxmox_default_behavior) is set to C(no_defaults), not specifying this option is equivalent to setting it to C(unspecified).
     type: str
@@ -175,7 +178,9 @@ options:
       - Values allowed are - C("storage:size,format=value").
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
-      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
+      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE
+        Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for
+        the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
     type: dict
   ipconfig:
     description:
@@ -307,7 +312,9 @@ options:
       - Values allowed are -  C("storage:size,format=value").
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
-      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
+      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE
+        Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for
+        the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
     type: dict
   scsi:
     description:
@@ -316,7 +323,9 @@ options:
       - Values allowed are -  C("storage:size,format=value").
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
-      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
+      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE
+        Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for
+        the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
     type: dict
   scsihw:
     description:
@@ -446,7 +455,9 @@ options:
       - Values allowed are -  C("storage:size,format=value").
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
-      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
+      - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol). Please refer to the Proxmox VE
+        Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html)
+        for the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
     type: dict
   watchdog:
     description:
