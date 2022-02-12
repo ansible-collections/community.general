@@ -286,7 +286,7 @@ options:
       - The l26 is Linux 2.6/3.X Kernel.
       - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(l26).
     type: str
-    choices: ['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'l24', 'l26', 'solaris']
+    choices: ['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'win11', 'l24', 'l26', 'solaris']
   parallel:
     description:
       - A hash/dictionary of map host parallel devices. C(parallel='{"key":"value", "key":"value"}').
@@ -996,7 +996,7 @@ def main():
         numa=dict(type='dict'),
         numa_enabled=dict(type='bool'),
         onboot=dict(type='bool'),
-        ostype=dict(choices=['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'l24', 'l26', 'solaris']),
+        ostype=dict(choices=['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'win11', 'l24', 'l26', 'solaris']),
         parallel=dict(type='dict'),
         pool=dict(type='str'),
         protection=dict(type='bool'),
