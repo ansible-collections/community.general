@@ -61,4 +61,11 @@ options:
             - Verify TLS certificates (do not disable this in production).
         type: bool
         default: yes
+
+    connection_timeout:
+        description:
+            - Controls the HTTP connections timeout period (in seconds) to Keycloak API.
+        type: int
+        default: 10
+        version_added: 4.5.0
 '''
