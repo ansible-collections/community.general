@@ -418,6 +418,8 @@ files:
     maintainers: Spredzy
   $modules/cloud/scaleway/scaleway_organization_info.py:
     maintainers: Spredzy
+  $modules/cloud/scaleway/scaleway_private_network.py:
+    maintainers: pastral
   $modules/cloud/scaleway/scaleway_security_group.py:
     maintainers: DenBeke
   $modules/cloud/scaleway/scaleway_security_group_info.py:
