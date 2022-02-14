@@ -1528,6 +1528,7 @@ class Nmcli(object):
             'bridge',
             'dummy',
             'ethernet',
+            '802-3-ethernet',
             'generic',
             'gre',
             'infiniband',
@@ -1536,6 +1537,7 @@ class Nmcli(object):
             'team',
             'vlan',
             'wifi',
+            '802-11-wireless',
             'gsm',
             'wireguard',
         )
