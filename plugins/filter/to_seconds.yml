@@ -1,5 +1,5 @@
 DOCUMENTATION:
-  name: to_seconds
+  name: community.general.to_seconds
   short_description: Converte a date/time string to seconds
   description:
     - Parse a human readable date/time string and convert to seconds
@@ -9,10 +9,9 @@ DOCUMENTATION:
       type: string
       required: true
     
-EXAMPLES:
-- name: Convert string to seconds
-  debug:
-    msg: "{{ '30h 20m 10s 123ms' | community.general.to_time_unit('seconds') }}"
+EXAMPLES: |
+  # convert a duration into seconds
+  "{{ '30h 20m 10s 123ms' | community.general.to_time_unit('seconds') }}"
 
 RETURN:
   _value:
