@@ -845,7 +845,7 @@ def main():
         before_comp = {}
 
     # if user federation exists, get associated mappers
-    if cid is not None:
+    if cid is not None and before_comp:
         before_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name'))
 
     # Build a proposed changeset from parameters given to this module
