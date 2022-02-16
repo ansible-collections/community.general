@@ -19,7 +19,8 @@ def _dummy(x):
 
 pytestmark = []
 try:
-    from .gitlab import (GitlabModuleTestCase,
+    from .gitlab import (FakeAnsibleModule,
+                         GitlabModuleTestCase,
                          python_version_match_requirement,
                          resp_find_runners_all,
                          resp_find_runners_list, resp_get_runner,
@@ -49,33 +50,34 @@ class TestGitlabRunner(GitlabModuleTestCase):
     def setUp(self):
         super(TestGitlabRunner, self).setUp()
 
-        self.moduleUtil = GitLabRunner(module=self.mock_module, gitlab_instance=self.gitlab_instance)
+        self.module_util_all = GitLabRunner(module=FakeAnsibleModule({"owned": False}), gitlab_instance=self.gitlab_instance)
+        self.module_util_owned = GitLabRunner(module=FakeAnsibleModule({"owned": True}), gitlab_instance=self.gitlab_instance)
 
     @with_httmock(resp_find_runners_all)
     @with_httmock(resp_get_runner)
     def test_runner_exist_all(self):
-        rvalue = self.moduleUtil.exists_runner("test-1-20150125")
+        rvalue = self.module_util_all.exists_runner("test-1-20150125")
 
         self.assertEqual(rvalue, True)
 
-        rvalue = self.moduleUtil.exists_runner("test-3-00000000")
+        rvalue = self.module_util_all.exists_runner("test-3-00000000")
 
         self.assertEqual(rvalue, False)
 
     @with_httmock(resp_find_runners_list)
     @with_httmock(resp_get_runner)
     def test_runner_exist_owned(self):
-        rvalue = self.moduleUtil.exists_runner("test-1-20201214", True)
+        rvalue = self.module_util_owned.exists_runner("test-1-20201214")
 
         self.assertEqual(rvalue, True)
 
-        rvalue = self.moduleUtil.exists_runner("test-3-00000000", True)
+        rvalue = self.module_util_owned.exists_runner("test-3-00000000")
 
         self.assertEqual(rvalue, False)
 
     @with_httmock(resp_create_runner)
     def test_create_runner(self):
-        runner = self.moduleUtil.create_runner({"token": "token", "description": "test-1-20150125"})
+        runner = self.module_util_all.create_runner({"token": "token", "description": "test-1-20150125"})
 
         self.assertEqual(type(runner), Runner)
         self.assertEqual(runner.description, "test-1-20150125")
@@ -83,15 +85,15 @@ class TestGitlabRunner(GitlabModuleTestCase):
     @with_httmock(resp_find_runners_all)
     @with_httmock(resp_get_runner)
     def test_update_runner(self):
-        runner = self.moduleUtil.find_runner("test-1-20150125")
+        runner = self.module_util_all.find_runner("test-1-20150125")
 
-        changed, newRunner = self.moduleUtil.update_runner(runner, {"description": "Runner description"})
+        changed, newRunner = self.module_util_all.update_runner(runner, {"description": "Runner description"})
 
         self.assertEqual(changed, True)
         self.assertEqual(type(newRunner), Runner)
         self.assertEqual(newRunner.description, "Runner description")
 
-        changed, newRunner = self.moduleUtil.update_runner(runner, {"description": "Runner description"})
+        changed, newRunner = self.module_util_all.update_runner(runner, {"description": "Runner description"})
 
         self.assertEqual(changed, False)
         self.assertEqual(newRunner.description, "Runner description")
@@ -100,8 +102,8 @@ class TestGitlabRunner(GitlabModuleTestCase):
     @with_httmock(resp_get_runner)
     @with_httmock(resp_delete_runner)
     def test_delete_runner(self):
-        self.moduleUtil.exists_runner("test-1-20150125")
+        self.module_util_all.exists_runner("test-1-20150125")
 
-        rvalue = self.moduleUtil.delete_runner()
+        rvalue = self.module_util_all.delete_runner()
 
         self.assertEqual(rvalue, None)

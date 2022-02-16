@@ -17,8 +17,9 @@ import gitlab
 
 
 class FakeAnsibleModule(object):
-    def __init__(self):
+    def __init__(self, module_params=None):
         self.check_mode = False
+        self.params = module_params if module_params else {}
 
     def fail_json(self, **args):
         pass
