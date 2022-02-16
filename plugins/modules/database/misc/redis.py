@@ -36,6 +36,11 @@ options:
             - The port to connect to
         default: 6379
         type: int
+    tls:
+        description:
+            - Specify whether or not to use TLS for the connection.
+        type: bool
+        default: false
     master_host:
         description:
             - The host of the master instance [replica command]
@@ -181,6 +186,7 @@ def main():
             login_password=dict(type='str', no_log=True),
             login_host=dict(type='str', default='localhost'),
             login_port=dict(type='int', default=6379),
+            tls=dict(type='bool', default=False),
             master_host=dict(type='str'),
             master_port=dict(type='int'),
             replica_mode=dict(type='str', default='replica', choices=['master', 'replica', 'slave'], aliases=["slave_mode"]),
@@ -198,6 +204,7 @@ def main():
     login_password = module.params['login_password']
     login_host = module.params['login_host']
     login_port = module.params['login_port']
+    ssl = module.params['tls']
     command = module.params['command']
     if command == "slave":
         command = "replica"
@@ -219,7 +226,7 @@ def main():
                 module.fail_json(msg='In replica mode master port must be provided')
 
         # Connect and check
-        r = redis.StrictRedis(host=login_host, port=login_port, password=login_password)
+        r = redis.StrictRedis(host=login_host, port=login_port, password=login_password, ssl=ssl)
         try:
             r.ping()
         except Exception as e:
@@ -270,7 +277,7 @@ def main():
                 module.fail_json(msg="In db mode the db number must be provided")
 
         # Connect and check
-        r = redis.StrictRedis(host=login_host, port=login_port, password=login_password, db=db)
+        r = redis.StrictRedis(host=login_host, port=login_port, password=login_password, ssl=ssl, db=db)
         try:
             r.ping()
         except Exception as e:
@@ -301,7 +308,7 @@ def main():
         except ValueError:
             value = module.params['value']
 
-        r = redis.StrictRedis(host=login_host, port=login_port, password=login_password)
+        r = redis.StrictRedis(host=login_host, port=login_port, password=login_password, ssl=ssl)
 
         try:
             r.ping()
