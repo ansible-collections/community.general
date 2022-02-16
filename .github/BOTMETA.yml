@@ -1134,6 +1134,8 @@ files:
     maintainers: farhan7500 gautamphegde
   $modules/storage/ibm/:
     maintainers: tzure
+  $modules/storage/pmem/pmem.py:
+    maintainers: mizumm
   $modules/storage/vexata/:
     maintainers: vexata
   $modules/storage/zfs/:
