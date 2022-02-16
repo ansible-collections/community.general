@@ -120,6 +120,39 @@ options:
       - Specify if to prevent changes if current configuration file has different SHA1 digest.
       - This can be used to prevent concurrent modifications.
     type: str
+  efidisk0:
+    description:
+      - Specify a hash/dictionary of EFI disk options.
+      - Requires I(bios=ovmf) to be set to be able to use it.
+    type: dict
+    suboptions:
+      storage:
+        description:
+          - C(storage) is the storage identifier where to create the disk.
+        type: str
+      format:
+        description:
+          - C(format) is the drive's backing file's data format. Please refer to the Proxmox VE Administrator Guide,
+           section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html) for the latest
+           version, tables 3 to 14) to find out format supported by the provided storage backend.
+        type: str
+      efitype:
+        description:
+          - C(efitype) indicates the size of the EFI disk.
+          - C(2m) will allow for a 2MB EFI disk, which will be enough to persist boot order and new boot entries.
+          - C(4m) will allow for a 4MB EFI disk, which will additionally allow to store EFI keys in order to enable
+           Secure Boot
+        type: str
+        choices:
+          - 2m
+          - 4m
+      pre_enrolled_keys:
+        description:
+          - C(pre_enrolled_keys) indicates whether EFI keys for Secure Boot should be enrolled C(1) in the VM firmware
+           upon creation or not (0).
+          - If set to C(1), Secure Boot will also be enabled by default when the VM is created.
+        type: bool
+    version_added: 4.5.0
   force:
     description:
       - Allow to force stop VM.
@@ -530,6 +563,38 @@ EXAMPLES = '''
     cores: 4
     vcpus: 2
 
+- name: Create VM with 1 10GB SATA disk and an EFI disk, with Secure Boot disabled by default
+  community.general.proxmox_kvm:
+    api_user: root@pam
+    api_password: secret
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    sata:
+      sata0: 'VMs_LVM:10,format=raw'
+    bios: ovmf
+    efidisk0:
+      storage: VMs_LVM_thin
+      format: raw
+      efitype: 4m
+      pre_enrolled_keys: False
+
+- name: Create VM with 1 10GB SATA disk and an EFI disk, with Secure Boot enabled by default
+  community.general.proxmox_kvm:
+    api_user: root@pam
+    api_password: secret
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    sata:
+      sata0: 'VMs_LVM:10,format=raw'
+    bios: ovmf
+    efidisk0:
+      storage: VMs_LVM
+      format: raw
+      efitype: 4m
+      pre_enrolled_keys: 1
+
 - name: >
     Clone VM with only source VM name.
     The VM source is spynal.
@@ -776,7 +841,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
 
         # Split information by type
         re_net = re.compile(r'net[0-9]')
-        re_dev = re.compile(r'(virtio|ide|scsi|sata)[0-9]')
+        re_dev = re.compile(r'(virtio|ide|scsi|sata|efidisk)[0-9]')
         for k in kwargs.keys():
             if re_net.match(k):
                 mac[k] = parse_mac(vm[k])
@@ -847,7 +912,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             urlencoded_ssh_keys = quote(kwargs['sshkeys'], safe='')
             kwargs['sshkeys'] = str(urlencoded_ssh_keys)
 
-        # If update, don't update disk (virtio, ide, sata, scsi) and network interface
+        # If update, don't update disk (virtio, efidisk0, ide, sata, scsi) and network interface
         # pool parameter not supported by qemu/<vmid>/config endpoint on "update" (PVE 6.2) - only with "create"
         if update:
             if 'virtio' in kwargs:
@@ -858,12 +923,34 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                 del kwargs['scsi']
             if 'ide' in kwargs:
                 del kwargs['ide']
+            if 'efidisk0' in kwargs:
+                del kwargs['efidisk0']
             if 'net' in kwargs:
                 del kwargs['net']
             if 'force' in kwargs:
                 del kwargs['force']
             if 'pool' in kwargs:
                 del kwargs['pool']
+
+        # Check that the bios option is set to ovmf if the efidisk0 option is present
+        if 'efidisk0' in kwargs:
+            if ('bios' not in kwargs) or ('ovmf' != kwargs['bios']):
+                self.module.fail_json(msg='efidisk0 cannot be used if bios is not set to ovmf. ')
+
+        # Flatten efidisk0 option to a string so that it's a string which is what Proxmoxer and the API expect
+        if 'efidisk0' in kwargs:
+            efidisk0_str = ''
+            # Regexp to catch underscores in keys name, to replace them after by hypens
+            hyphen_re = re.compile(r'_')
+            # If present, the storage definition should be the first argument
+            if 'storage' in kwargs['efidisk0']:
+                efidisk0_str += kwargs['efidisk0'].get('storage') + ':1,'
+                kwargs['efidisk0'].pop('storage')
+            # Join other elements from the dict as key=value using commas as separator, replacing any underscore in key
+            # by hyphens (needed for pre_enrolled_keys to pre-enrolled-keys)
+            efidisk0_str += ','.join([hyphen_re.sub('-', k) + "=" + str(v) for k, v in kwargs['efidisk0'].items()
+                                      if 'storage' != k])
+            kwargs['efidisk0'] = efidisk0_str
 
         # Convert all dict in kwargs to elements.
         # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
@@ -971,6 +1058,13 @@ def main():
         delete=dict(type='str'),
         description=dict(type='str'),
         digest=dict(type='str'),
+        efidisk0=dict(type='dict',
+                      options=dict(
+                          storage=dict(type='str'),
+                          format=dict(type='str'),
+                          efitype=dict(type='str', choices=['2m', '4m']),
+                          pre_enrolled_keys=dict(type='bool'),
+                      )),
         force=dict(type='bool'),
         format=dict(type='str', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk', 'unspecified']),
         freeze=dict(type='bool'),
@@ -1160,6 +1254,7 @@ def main():
                               cpuunits=module.params['cpuunits'],
                               description=module.params['description'],
                               digest=module.params['digest'],
+                              efidisk0=module.params['efidisk0'],
                               force=module.params['force'],
                               freeze=module.params['freeze'],
                               hostpci=module.params['hostpci'],
