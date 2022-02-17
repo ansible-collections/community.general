@@ -41,6 +41,7 @@ options:
             - Specify whether or not to use TLS for the connection.
         type: bool
         default: false
+        version_added: 4.5.0
     master_host:
         description:
             - The host of the master instance [replica command]

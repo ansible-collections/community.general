@@ -1,2 +1,2 @@
 minor_changes:
-  - redis - add tls support to module
+  - redis - add TLS support to module (https://github.com/ansible-collections/community.general/pull/4207).
