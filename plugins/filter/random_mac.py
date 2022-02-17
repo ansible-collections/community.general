@@ -24,7 +24,7 @@ DOCUMENTATION = '''
   name: random_mac
   short_description: Generate a random MAC address
   description:
-    - Generates random networking interfaces MAC addresses for a given prefix'
+    - Generates random networking interfaces MAC addresses for a given prefix.
   positional: true_val, false_val
   options:
     _input:
