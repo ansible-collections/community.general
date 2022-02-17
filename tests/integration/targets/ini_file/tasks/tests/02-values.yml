@@ -504,6 +504,13 @@
     state: absent
   register: result20
 
+- name: test-values 20 - remove section 'drinks' again to ensure idempotency"
+  ini_file:
+    path: "{{ output_file }}"
+    section: drinks
+    state: absent
+  register: result20_remove_again  
+
 - name: test-values 20 - read content from output file
   slurp:
     src: "{{ output_file }}"
@@ -517,6 +524,7 @@
   assert:
     that:
       - result20 is changed
+      - result20_remove_again is not changed
       - result20.msg == 'section removed'
       - content20 == "\n"
 
