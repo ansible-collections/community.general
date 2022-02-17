@@ -32,20 +32,22 @@ DOCUMENTATION = '''
       type: string
       required: true
     seed:
-      description: A randomization seed to initialize the process, used to get repeatable results
+      description:
+        - A randomization seed to initialize the process, used to get repeatable results.
+        - If no seed is provided, a system random source such as C(/dev/urandom) is used.
       required: false
       type: string
 '''
 
 EXAMPLES = '''
+- name: Random MAC given a prefix
+  debug:
+    msg: "{{ '52:54:00' | community.general.random_mac }}"
+    # => '52:54:00:ef:1c:03'
 
-# random MAC given a prefix
-"{{ '52:54:00' | community.general.random_mac }}"
-# => '52:54:00:ef:1c:03'
-
-# with a seed
-"{{ '52:54:00' | community.general.random_mac(seed=inventory_hostname) }}"
-
+- name: With a seed
+  debug:
+    msg: "{{ '52:54:00' | community.general.random_mac(seed=inventory_hostname) }}"
 '''
 
 import re
