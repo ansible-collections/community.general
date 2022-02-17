@@ -154,6 +154,7 @@ display = Display()
 
 # backhacked check_output with input for python 2.7
 # http://stackoverflow.com/questions/10103551/passing-data-to-subprocess-check-output
+# note: contains special logic for calling 'pass', so not a drop-in replacement for check_output
 def check_output2(*popenargs, **kwargs):
     if 'stdout' in kwargs:
         raise ValueError('stdout argument not allowed, it will be overridden.')
@@ -175,9 +176,10 @@ def check_output2(*popenargs, **kwargs):
         process.wait()
         raise
     retcode = process.poll()
-    if retcode != 0 or \
-            b'encryption failed: Unusable public key' in b_out or \
-            b'encryption failed: Unusable public key' in b_err:
+    if retcode == 0 and (b'encryption failed: Unusable public key' in b_out or
+                         b'encryption failed: Unusable public key' in b_err):
+        retcode = 78  # os.EX_CONFIG
+    if retcode != 0:
         cmd = kwargs.get("args")
         if cmd is None:
             cmd = popenargs[0]
@@ -228,12 +230,11 @@ class LookupModule(LookupBase):
             # Collect pass environment variables from the plugin's parameters.
             self.env = os.environ.copy()
 
-            # Set PASSWORD_STORE_DIR if directory is set
-            if self.paramvals['directory']:
-                if os.path.isdir(self.paramvals['directory']):
-                    self.env['PASSWORD_STORE_DIR'] = self.paramvals['directory']
-                else:
-                    raise AnsibleError('Passwordstore directory \'{0}\' does not exist'.format(self.paramvals['directory']))
+            # Set PASSWORD_STORE_DIR
+            if os.path.isdir(self.paramvals['directory']):
+                self.env['PASSWORD_STORE_DIR'] = self.paramvals['directory']
+            else:
+                raise AnsibleError('Passwordstore directory \'{0}\' does not exist'.format(self.paramvals['directory']))
 
             # Set PASSWORD_STORE_UMASK if umask is set
             if 'umask' in self.paramvals:
@@ -261,19 +262,20 @@ class LookupModule(LookupBase):
                     if ':' in line:
                         name, value = line.split(':', 1)
                         self.passdict[name.strip()] = value.strip()
+            if os.path.isfile(os.path.join(self.paramvals['directory'], self.passname + ".gpg")):
+                # Only accept password as found, if there a .gpg file for it (might be a tree node otherwise)
+                return True
         except (subprocess.CalledProcessError) as e:
-            if e.returncode != 0 and 'not in the password store' in e.output:
-                # if pass returns 1 and return string contains 'is not in the password store.'
-                # We need to determine if this is valid or Error.
-                if self.paramvals['missing'] == 'error':
-                    raise AnsibleError('passwordstore: passname {0} not found and missing=error is set'.format(self.passname))
-                else:
-                    if self.paramvals['missing'] == 'warn':
-                        display.warning('passwordstore: passname {0} not found'.format(self.passname))
-                    return False
-            else:
+            # 'not in password store' is the expected error if a password wasn't found
+            if 'not in the password store' not in e.output:
                 raise AnsibleError(e)
-        return True
+
+        if self.paramvals['missing'] == 'error':
+            raise AnsibleError('passwordstore: passname {0} not found and missing=error is set'.format(self.passname))
+        elif self.paramvals['missing'] == 'warn':
+            display.warning('passwordstore: passname {0} not found'.format(self.passname))
+
+        return False
 
     def get_newpass(self):
         if self.paramvals['nosymbols']:
@@ -329,7 +331,9 @@ class LookupModule(LookupBase):
         result = []
         self.paramvals = {
             'subkey': 'password',
-            'directory': variables.get('passwordstore'),
+            'directory': variables.get('passwordstore', os.environ.get(
+                                       'PASSWORD_STORE_DIR',
+                                       os.path.expanduser('~/.password-store'))),
             'create': False,
             'returnall': False,
             'overwrite': False,
