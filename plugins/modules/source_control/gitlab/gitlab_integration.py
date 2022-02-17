@@ -186,7 +186,7 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import findProject, gitlabAuthentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import gitlabAuthentication
 
 '''
 This dict has been auto-generated 2021/04/01 from https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/api/helpers/services_helpers.rb
