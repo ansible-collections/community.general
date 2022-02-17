@@ -229,6 +229,7 @@ class LookupModule(LookupBase):
 
             # Collect pass environment variables from the plugin's parameters.
             self.env = os.environ.copy()
+            self.env['LANGUAGE'] = 'C'  # make sure to get errors in English as required by check_output2
 
             # Set PASSWORD_STORE_DIR
             if os.path.isdir(self.paramvals['directory']):
