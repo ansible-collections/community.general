@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2021, Raphaël Droz <raphael@droz.eu>
+# Copyright: (c) 2022, Raphaël Droz <raphael@droz.eu>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: gitlab_integration
 short_description: Setup or delete GitLab integration integrations
-version_added: '2.5.0'
+version_added: '4.5.0'
 description:
   - Creates, updates, or deletes GitLab integrations formerly known as "services".
 author:
@@ -59,7 +59,6 @@ options:
       - external-wiki
       - flowdock
       - hangouts-chat
-      - hipchat
       - irker
       - jenkins
       - jira
@@ -72,12 +71,14 @@ options:
       - prometheus
       - pushover
       - redmine
+      - shimo
       - slack
       - slack-slash-commands
       - teamcity
       - unify-circuit
       - webex-teams
       - youtrack
+      - zentao
   params:
     description:
       - The description of the integration, see documentation at U(https://docs.gitlab.com/ee/api/integrations.html).
@@ -186,7 +187,7 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import gitlabAuthentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlabAuthentication
 
 '''
 This dict has been auto-generated 2021/04/01 from https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/api/helpers/services_helpers.rb
@@ -399,6 +400,7 @@ class GitLabIntegrations(object):
 
 def main():
     base_spec = basic_auth_argument_spec()
+    base_spec.update(auth_argument_spec())
     base_spec.update(dict(
         api_token=dict(type='str', no_log=True),
         project=dict(required=True),
@@ -412,13 +414,16 @@ def main():
     constraints = dict(
         mutually_exclusive=[
             ['api_username', 'api_token'],
-            ['api_password', 'api_token']
+            ['api_username', 'api_oauth_token'],
+            ['api_username', 'api_job_token'],
+            ['api_token', 'api_oauth_token'],
+            ['api_token', 'api_job_token'],
         ],
         required_together=[
             ['api_username', 'api_password']
         ],
         required_one_of=[
-            ['api_username', 'api_token']
+            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
         ],
         required_if=[
             ['state', 'present', ['params']]
