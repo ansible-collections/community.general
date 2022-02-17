@@ -43,6 +43,12 @@
 #### timezone tests
 ####
 
+- name: make sure diffutils are installed on ArchLinux
+  package:
+    name: diffutils
+    state: present
+  when: ansible_distribution == 'Archlinux'
+
 - name: make sure the dbus service is started under systemd
   systemd:
     name: dbus

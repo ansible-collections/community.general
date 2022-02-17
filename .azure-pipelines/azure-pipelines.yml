@@ -382,6 +382,26 @@ stages:
             - 2
             - 3
 
+### Community Docker
+  - stage: Docker_community_devel
+    displayName: Docker (community images) devel
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: devel/linux-community/{0}
+          targets:
+            - name: Debian Bullseye
+              test: debian-bullseye/3.9
+            - name: ArchLinux
+              test: archlinux/3.10
+            - name: CentOS Stream 8
+              test: centos-stream8/3.8
+          groups:
+            - 1
+            - 2
+            - 3
+
 ### Cloud
   - stage: Cloud_devel
     displayName: Cloud devel
@@ -457,6 +477,7 @@ stages:
       - Docker_2_10
       - Docker_2_11
       - Docker_2_12
+      - Docker_community_devel
       - Cloud_devel
       - Cloud_2_9
       - Cloud_2_10

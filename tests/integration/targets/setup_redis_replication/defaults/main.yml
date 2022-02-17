@@ -1,5 +1,9 @@
 # General
 redis_packages:
+  Archlinux:
+  - redis
+  Debian:
+  - redis-server
   Ubuntu:
   - redis-server
   openSUSE Leap:
@@ -12,6 +16,8 @@ redis_packages:
   - redis
 
 redis_bin:
+  Archlinux: /usr/bin/redis-server
+  Debian: /usr/bin/redis-server
   Ubuntu: /usr/bin/redis-server
   openSUSE Leap: /usr/sbin/redis-server
   Fedora: /usr/bin/redis-server
