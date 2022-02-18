@@ -1,0 +1,2 @@
+bugfixes:
+  - "yum_versionlock - fix matching of existing entries with names passed to the module. Match yum and dnf lock format (https://github.com/ansible-collections/community.general/pull/4183)."

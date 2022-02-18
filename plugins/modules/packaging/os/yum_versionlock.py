@@ -17,7 +17,7 @@ description:
 options:
   name:
     description:
-      - Package name or a list of packages.
+      - Package name or a list of package names with optional wildcards.
     type: list
     required: true
     elements: str
@@ -74,9 +74,16 @@ state:
     sample: present
 '''
 
+import re
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 from fnmatch import fnmatch
+
+# on DNF-based distros, yum is a symlink to dnf, so we try to handle their different entry formats.
+NEVRA_RE_YUM = re.compile(r'^(?P<exclude>!)?(?P<epoch>\d+):(?P<name>.+)-'
+                          r'(?P<version>.+)-(?P<release>.+)\.(?P<arch>.+)$')
+NEVRA_RE_DNF = re.compile(r"^(?P<exclude>!)?(?P<name>.+)-(?P<epoch>\d+):(?P<version>.+)-"
+                          r"(?P<release>.+)\.(?P<arch>.+)$")
 
 
 class YumVersionLock:
@@ -102,6 +109,15 @@ class YumVersionLock:
         self.module.fail_json(msg="Error: " + to_native(err) + to_native(out))
 
 
+def match(entry, name):
+    m = NEVRA_RE_YUM.match(entry)
+    if not m:
+        m = NEVRA_RE_DNF.match(entry)
+    if not m:
+        return False
+    return fnmatch(m.group("name"), name)
+
+
 def main():
     """ start main program to add/remove a package to yum versionlock"""
     module = AnsibleModule(
@@ -123,20 +139,20 @@ def main():
 
     # Ensure versionlock state of packages
     packages_list = []
-    if state in ('present'):
+    if state in ('present', ):
         command = 'add'
         for single_pkg in packages:
-            if not any(fnmatch(pkg.split(":", 1)[-1], single_pkg) for pkg in versionlock_packages.split()):
+            if not any(match(pkg, single_pkg) for pkg in versionlock_packages.split()):
                 packages_list.append(single_pkg)
         if packages_list:
             if module.check_mode:
                 changed = True
             else:
                 changed = yum_v.ensure_state(packages_list, command)
-    elif state in ('absent'):
+    elif state in ('absent', ):
         command = 'delete'
         for single_pkg in packages:
-            if any(fnmatch(pkg, single_pkg) for pkg in versionlock_packages.split()):
+            if any(match(pkg, single_pkg) for pkg in versionlock_packages.split()):
                 packages_list.append(single_pkg)
         if packages_list:
             if module.check_mode:
