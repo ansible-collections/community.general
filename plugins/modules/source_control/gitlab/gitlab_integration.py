@@ -399,6 +399,29 @@ class GitLabIntegrations(object):
             setattr(obj, k, v)
 
 
+# Equivalent of doing `AnsibleModule(argument_spec=base_spec, **constraints)`
+def mimic_ansible_module_validation(specs, constraints):
+    from ansible.module_utils.basic import ModuleArgumentSpecValidator, _load_params
+    from ansible.module_utils.errors import UnsupportedError
+    import os
+
+    params = _load_params()
+    first_level_validator = ModuleArgumentSpecValidator(specs, **constraints)
+    validation_result = first_level_validator.validate(params)
+    try:
+        error = validation_result.errors[0]
+    except IndexError:
+        error = None
+    # Fail for validation errors, even in check mode
+    if error:
+        msg = validation_result.errors.msg
+        if isinstance(error, UnsupportedError):
+            msg = "Unsupported parameters for ({name}) {kind}: {msg}".format(name=os.path.basename(__file__), kind='module', msg=msg)
+        # Since we can't use fail_json() before AnsibleModule instanciation, we raise an Exception
+        raise Exception(msg)
+
+    return validation_result.validated_parameters
+
 def main():
     base_spec = basic_auth_argument_spec()
     base_spec.update(auth_argument_spec())
@@ -428,22 +451,35 @@ def main():
         ],
         required_if=[
             ['state', 'present', ['params']]
-        ],
-        supports_check_mode=True
+        ]
     )
 
-    stub_init = AnsibleModule(argument_spec=base_spec, **constraints)
-    integration = stub_init.params['integration']
-    state = stub_init.params['state']
+    # Equivalent of doing `AnsibleModule(argument_spec=base_spec, **constraints)`
+    try:
+        validated_params = mimic_ansible_module_validation(base_spec, constraints)
+        state = validated_params['state']
+        exception = None
+    except Exception as e:
+        # Ok, our validator found an error. Preserve it
+        # so that we can fail_json() once we have an AnsibleModule ready.
+        state = None
+        exception = e
+
+    # Some additional constraints once we know the top-level argument structure is correct
     if state == 'present':
+        integration = validated_params['integration']
         # since we know the integration (which has been validated), recreate a module_specs to validate suboptions
         sub_arg_specs = dict((k, v) for k, v in SRV_DEF[integration].items() if k != '_events')
         base_spec['params'] = dict(required=False, type='dict', options=sub_arg_specs)
         if '_events' in SRV_DEF[integration]:
             base_spec['events'] = dict(required=True, type='list', elements='str', choices=SRV_DEF[integration]['_events'])
-        module = AnsibleModule(argument_spec=base_spec, **constraints)
-    else:
-        module = stub_init
+
+    constraints.update({"supports_check_mode": True})
+    module = AnsibleModule(argument_spec=base_spec, **constraints)
+
+    # fail_json() now available
+    if exception:
+        module.fail_json(e)
 
     project = module.params['project']
     active = True
