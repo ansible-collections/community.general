@@ -19,7 +19,8 @@ author:
 requirements:
   - python-gitlab python module
 extends_documentation_fragment:
-- community.general.auth_basic
+  - community.general.auth_basic
+  - community.general.gitlab
 
 options:
   api_token:
@@ -185,12 +186,12 @@ except ImportError:
 
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_native
+from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlabAuthentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
 
 '''
-This dict has been auto-generated 2021/04/01 from https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/api/helpers/services_helpers.rb
+This dict has been auto-generated 2022/02/17 from https://gitlab.com/gitlab-org/gitlab-foss/-/blob/master/lib/api/helpers/integrations_helpers.rb
 following these steps:
 1. Download above-mentioned file.
 2. Prepend:
@@ -202,6 +203,7 @@ end
 
 3. Append:
 ```ruby
+services = API::Helpers::IntegrationsHelpers.integrations
 no_log_keys = [:api_key, :webhook, :token, :password]
 services.each do |service_slug, params|
   new_settings = {}
@@ -222,7 +224,6 @@ services.each do |service_slug, params|
     if (no_log_keys.find_index(entry[:name])) != nil
       e[:no_log] = true
     end
-    # e[:desc] = entry[:desc]
     new_settings[entry[:name]] = e
   end
   services[service_slug] = new_settings
@@ -453,7 +454,7 @@ def main():
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
-    gitlab_instance = gitlabAuthentication(module)
+    gitlab_instance = gitlab_authentication(module)
 
     try:
         project = gitlab_instance.projects.get(project)
