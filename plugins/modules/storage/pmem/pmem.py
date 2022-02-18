@@ -76,6 +76,41 @@ options:
         description:
           - Percentage of the capacity to reserve (C(0)-C(100)) within the socket ID.
         type: int
+  namespace:
+    description:
+     - This enables to set the configuration for the namespace of the PMem.
+    type: list
+    elements: dict
+    version_added: 4.6.0
+    suboptions:
+      mode:
+        description:
+         - The mode of namespace. The detail of the mode is in the man page of ndctl-create-namespace.
+        type: str
+        required: true
+        choices: ['raw', 'sector', 'fsdax', 'devdax']
+      type:
+        description:
+         - The type of namespace. The detail of the type is in the man page of ndctl-create-namespace.
+        type: str
+        required: false
+        choices: ['pmem', 'blk']
+      size:
+        description:
+          - The size of namespace. This option supports the suffixes "k" or "K" for KiB,
+            "m" or "M" for MiB, "g" or "G" for GiB and "t" or "T" for TiB.
+          - This option is required if multiple namespaces are configured.
+          - If this option is not set, all of the avaiable space of a region is configured.
+        type: str
+        required: false
+  namespace_append:
+    description:
+     - Enable to append the new namespaces to the system.
+     - The default is false so the all existed namespaces are removed by default.
+    type: bool
+    default: false
+    required: false
+    version_added: 4.6.0
 '''
 
 RETURN = r'''
@@ -88,6 +123,7 @@ result:
     description:
      - Shows the value of AppDirect, Memory Mode and Reserved size in bytes.
      - If I(socket) argument is provided, shows the values in each socket with C(socket) which contains the socket ID.
+     - If I(namespace) argument is provided, shows the detail of each namespace.
     returned: success
     type: list
     elements: dict
@@ -104,6 +140,9 @@ result:
         socket:
           description: The socket ID to be configured.
           type: int
+        namespace:
+          description: The list of the detail of namespace.
+          type: list
     sample: [
                 {
                     "appdirect": 111669149696,
@@ -150,6 +189,16 @@ EXAMPLES = r'''
         appdirect: 10
         memorymode: 80
         reserved: 10
+
+- name: Configure the two namespaces.
+  community.general.pmem:
+    namespace:
+      - size: 1GiB
+        type: pmem
+        mode: raw
+      - size: 320MiB
+        type: pmem
+        mode: sector
 '''
 
 import json
@@ -164,6 +213,13 @@ except ImportError:
     XMLTODICT_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 else:
     HAS_XMLTODICT_LIBRARY = True
+
+size_pattn = re.compile(r'([0-9]+) *(TiB|GiB|MiB|KiB|TB|GB|MB|KB|T|G|M|K|B)', re.IGNORECASE)
+tb_pattn = re.compile(r'(T|TiB|TB)', re.IGNORECASE)
+gb_pattn = re.compile(r'(G|GiB|GB)', re.IGNORECASE)
+mb_pattn = re.compile(r'(M|MiB|MB)', re.IGNORECASE)
+kb_pattn = re.compile(r'(K|KiB|KB)', re.IGNORECASE)
+b_pattn = re.compile(r'(B)', re.IGNORECASE)
 
 
 class PersistentMemory(object):
@@ -184,16 +240,31 @@ class PersistentMemory(object):
                         reserved=dict(type='int'),
                     ),
                 ),
+                namespace=dict(
+                    type='list', elements='dict',
+                    options=dict(
+                        mode=dict(required=True, type='str', choices=['raw', 'sector', 'fsdax', 'devdax']),
+                        type=dict(type='str', choices=['pmem', 'blk']),
+                        size=dict(type='str'),
+                    ),
+                ),
+                namespace_append=dict(type='bool', default=False),
             ),
             required_together=(
                 ['appdirect', 'memorymode'],
             ),
             required_one_of=(
-                ['appdirect', 'memorymode', 'socket'],
+                ['appdirect', 'memorymode', 'socket', 'namespace'],
             ),
             mutually_exclusive=(
                 ['appdirect', 'socket'],
                 ['memorymode', 'socket'],
+                ['appdirect', 'namespace'],
+                ['memorymode', 'namespace'],
+                ['socket', 'namespace'],
+                ['appdirect', 'namespace_append'],
+                ['memorymode', 'namespace_append'],
+                ['socket', 'namespace_append'],
             ),
         )
 
@@ -210,6 +281,8 @@ class PersistentMemory(object):
         self.memmode = module.params['memorymode']
         self.reserved = module.params['reserved']
         self.socket = module.params['socket']
+        self.namespace = module.params['namespace']
+        self.namespace_append = module.params['namespace_append']
 
         self.module = module
         self.changed = False
@@ -248,7 +321,96 @@ class PersistentMemory(object):
         command = ['show', '-system', '-capabilities']
         return self.pmem_run_ipmctl(command)
 
+    def pmem_get_region_align_size(self, region):
+        aligns = []
+        for rg in region:
+            if rg['align'] not in aligns:
+                aligns.append(rg['align'])
+
+        return aligns
+
+    def pmem_get_available_region_size(self, region):
+        available_size = []
+        for rg in region:
+            available_size.append(rg['available_size'])
+
+        return available_size
+
+    def pmem_get_available_region_type(self, region):
+        types = []
+        for rg in region:
+            if rg['type'] not in types:
+                types.append(rg['type'])
+
+        return types
+
     def pmem_argument_check(self):
+        def convert_to_bytes(size_str):
+            size = int(size_pattn.match(size_str).group(1))
+            unit = size_pattn.match(size_str).group(2)
+            errmsg = ''
+
+            if tb_pattn.match(unit):
+                mult = 1024**4
+            elif gb_pattn.match(unit):
+                mult = 1024**3
+            elif mb_pattn.match(unit):
+                mult = 1024**2
+            elif kb_pattn.match(unit):
+                mult = 1024**1
+            elif b_pattn.match(unit):
+                mult = 1
+            else:
+                mult = 0
+                errmsg = 'Something wrong while parsing size option: %s' % size_str
+
+            return size * mult, errmsg
+
+        def namespace_check(self):
+            command = ['list', '-R']
+            out = self.pmem_run_ndctl(command)
+            if not out:
+                return 'Available region(s) is not in this system.'
+            region = json.loads(out)
+
+            aligns = self.pmem_get_region_align_size(region)
+            if len(aligns) != 1:
+                return 'Not supported the regions whose alignment size is different.'
+
+            available_size = self.pmem_get_available_region_size(region)
+            types = self.pmem_get_available_region_type(region)
+            for ns in self.namespace:
+                if ns['size']:
+                    if not size_pattn.match(ns['size']):
+                        return 'The format of size: NNN TB|GB|MB|KB|B'
+
+                    size_byte, errmsg = convert_to_bytes(ns['size'])
+                    if errmsg:
+                        return errmsg
+
+                    if size_byte % aligns[0] != 0:
+                        return 'size: %s should be align with %d' % (ns['size'], aligns[0])
+
+                    is_space_enough = False
+                    for i, avail in enumerate(available_size):
+                        if avail > size_byte:
+                            available_size[i] -= size_byte
+                            is_space_enough = True
+                            break
+
+                    if is_space_enough is False:
+                        return 'There is not available region for size: %s' % ns['size']
+
+                    ns['size_byte'] = size_byte
+
+                elif len(self.namespace) != 1:
+                    return 'size option is required to configure multiple namespaces'
+
+                if ns['type'] not in types:
+                    return 'type %s is not supported in this system. Supported type: %s' % (ns['type'], types)
+
+            return None
+
         def percent_check(self, appdirect, memmode, reserved=None):
             if appdirect is None or (appdirect < 0 or appdirect > 100):
                 return 'appdirect percent should be from 0 to 100.'
@@ -278,7 +440,9 @@ class PersistentMemory(object):
 
             return None
 
-        if self.socket is None:
+        if self.namespace:
+            return namespace_check(self)
+        elif self.socket is None:
             return percent_check(self, self.appdirect, self.memmode, self.reserved)
         else:
             ret = socket_id_check(self)
@@ -319,8 +483,10 @@ class PersistentMemory(object):
         self.pmem_run_ipmctl(command)
 
     def pmem_init_env(self):
-        self.pmem_remove_namespaces()
-        self.pmem_delete_goal()
+        if self.namespace is None or (self.namespace and self.namespace_append is False):
+            self.pmem_remove_namespaces()
+        if self.namespace is None:
+            self.pmem_delete_goal()
 
     def pmem_get_capacity(self, skt=None):
         command = ['show', '-d', 'Capacity', '-u', 'B', '-o', 'nvmxml', '-dimm']
@@ -431,6 +597,17 @@ class PersistentMemory(object):
 
         return reboot_required, ret, ''
 
+    def pmem_config_namespaces(self, namespace):
+        command = ['create-namespace', '-m', namespace['mode']]
+        if namespace['type']:
+            command += ['-t', namespace['type']]
+        if 'size_byte' in namespace:
+            command += ['-s', namespace['size_byte']]
+
+        self.pmem_run_ndctl(command)
+
+        return None
+
 
 def main():
 
@@ -445,7 +622,17 @@ def main():
     pmem.pmem_init_env()
     pmem.changed = True
 
-    if pmem.socket is None:
+    if pmem.namespace:
+        for ns in pmem.namespace:
+            pmem.pmem_config_namespaces(ns)
+
+        command = ['list', '-N']
+        out = pmem.pmem_run_ndctl(command)
+        all_ns = json.loads(out)
+
+        pmem.result = all_ns
+        reboot_required = False
+    elif pmem.socket is None:
         reboot_required, ret, errmsg = pmem.pmem_create_memory_allocation()
         if errmsg:
             pmem.module.fail_json(msg=errmsg)
