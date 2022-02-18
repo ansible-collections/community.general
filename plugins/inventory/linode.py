@@ -21,7 +21,18 @@ DOCUMENTATION = r'''
           Linode) and not tags.
     extends_documentation_fragment:
         - constructed
+        - inventory_cache
     options:
+        cache:
+            version_added: 4.5.0
+        cache_plugin:
+            version_added: 4.5.0
+        cache_timeout:
+            version_added: 4.5.0
+        cache_connection:
+            version_added: 4.5.0
+        cache_prefix:
+            version_added: 4.5.0
         plugin:
             description: Marks this as an instance of the 'linode' plugin.
             required: true
@@ -110,19 +121,20 @@ import os
 
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.six import string_types
-from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
+from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.template import Templar
 
 
 try:
     from linode_api4 import LinodeClient
+    from linode_api4.objects.linode import Instance
     from linode_api4.errors import ApiError as LinodeApiError
     HAS_LINODE = True
 except ImportError:
     HAS_LINODE = False
 
 
-class InventoryModule(BaseInventoryPlugin, Constructable):
+class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     NAME = 'community.general.linode'
 
@@ -282,26 +294,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
         return regions, types, tags
 
-    def verify_file(self, path):
-        """Verify the Linode configuration file."""
-        if super(InventoryModule, self).verify_file(path):
-            endings = ('linode.yaml', 'linode.yml')
-            if any((path.endswith(ending) for ending in endings)):
-                return True
-        return False
+    def _cacheable_inventory(self):
+        return [i._raw_json for i in self.instances]
 
-    def parse(self, inventory, loader, path, cache=True):
-        """Dynamically parse Linode the cloud inventory."""
-        super(InventoryModule, self).parse(inventory, loader, path)
-
-        if not HAS_LINODE:
-            raise AnsibleError('the Linode dynamic inventory plugin requires linode_api4.')
-
-        config_data = self._read_config_data(path)
-        self._build_client(loader)
-
-        self._get_instances_inventory()
-
+    def populate(self, config_data):
         strict = self.get_option('strict')
         regions, types, tags = self._get_query_options(config_data)
         self._filter_by_config(regions, types, tags)
@@ -326,3 +322,45 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 variables,
                 instance.label,
                 strict=strict)
+
+    def verify_file(self, path):
+        """Verify the Linode configuration file."""
+        if super(InventoryModule, self).verify_file(path):
+            endings = ('linode.yaml', 'linode.yml')
+            if any((path.endswith(ending) for ending in endings)):
+                return True
+        return False
+
+    def parse(self, inventory, loader, path, cache=True):
+        """Dynamically parse Linode the cloud inventory."""
+        super(InventoryModule, self).parse(inventory, loader, path)
+        self.instances = None
+
+        if not HAS_LINODE:
+            raise AnsibleError('the Linode dynamic inventory plugin requires linode_api4.')
+
+        config_data = self._read_config_data(path)
+        self._consume_options(config_data)
+
+        cache_key = self.get_cache_key(path)
+
+        if cache:
+            cache = self.get_option('cache')
+
+        update_cache = False
+        if cache:
+            try:
+                self.instances = [Instance(None, i["id"], i) for i in self._cache[cache_key]]
+            except KeyError:
+                update_cache = True
+
+        # Check for None rather than False in order to allow
+        # for empty sets of cached instances
+        if self.instances is None:
+            self._build_client(loader)
+            self._get_instances_inventory()
+
+        if update_cache:
+            self._cache[cache_key] = self._cacheable_inventory()
+
+        self.populate(config_data)
