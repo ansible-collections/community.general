@@ -120,27 +120,34 @@ class CallbackModule(CallbackBase):
 
         smtp = smtplib.SMTP(self.smtphost, port=self.smtpport)
 
-        content = 'Date: %s\n' % email.utils.formatdate()
-        content += 'From: %s\n' % self.sender
+        sender_address = email.utils.parseaddr(self.sender)
         if self.to:
-            content += 'To: %s\n' % ','.join(self.to)
+            to_addresses = email.utils.getaddresses(self.to)
         if self.cc:
-            content += 'Cc: %s\n' % ','.join(self.cc)
+            cc_addresses = email.utils.getaddresses(self.cc)
+        if self.bcc:
+            bcc_addresses = email.utils.getaddresses(self.bcc)
+
+        content = 'Date: %s\n' % email.utils.formatdate()
+        content += 'From: %s\n' % email.utils.formataddr(sender_address)
+        if self.to:
+            content += 'To: %s\n' % ', '.join([email.utils.formataddr(pair) for pair in to_addresses])
+        if self.cc:
+            content += 'Cc: %s\n' % ', '.join([email.utils.formataddr(pair) for pair in cc_addresses])
         content += 'Message-ID: %s\n' % email.utils.make_msgid()
         content += 'Subject: %s\n\n' % subject.strip()
         content += body
 
-        addresses = self.to
+        addresses = to_addresses
         if self.cc:
-            addresses += self.cc
+            addresses += cc_addresses
         if self.bcc:
-            addresses += self.bcc
+            addresses += bcc_addresses
 
         if not addresses:
             self._display.warning('No receiver has been specified for the mail callback plugin.')
 
-        for address in addresses:
-            smtp.sendmail(self.sender, address, to_bytes(content))
+        smtp.sendmail(self.sender, [address for name, address in addresses], to_bytes(content))
 
         smtp.quit()
 
