@@ -97,8 +97,8 @@ options:
         choices: ['pmem', 'blk']
       size:
         description:
-          - The size of namespace. This option supports the suffixes "k" or "K" for KiB,
-            "m" or "M" for MiB, "g" or "G" for GiB and "t" or "T" for TiB.
+          - The size of namespace. This option supports the suffixes C(k) or C(K) or C(KB) for KiB,
+            C(m) or C(M) or C(MB) for MiB, C(g) or C(G) or C(GB) for GiB and C(t) or C(T) or C(TB) for TiB.
           - This option is required if multiple namespaces are configured.
           - If this option is not set, all of the avaiable space of a region is configured.
         type: str
@@ -143,6 +143,7 @@ result:
         namespace:
           description: The list of the detail of namespace.
           type: list
+          version_added: 4.6.0
     sample: [
                 {
                     "appdirect": 111669149696,
@@ -193,10 +194,10 @@ EXAMPLES = r'''
 - name: Configure the two namespaces.
   community.general.pmem:
     namespace:
-      - size: 1GiB
+      - size: 1GB
         type: pmem
         mode: raw
-      - size: 320MiB
+      - size: 320MB
         type: pmem
         mode: sector
 '''
@@ -204,7 +205,7 @@ EXAMPLES = r'''
 import json
 import re
 import traceback
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib, human_to_bytes
 
 try:
     import xmltodict
@@ -213,13 +214,6 @@ except ImportError:
     XMLTODICT_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 else:
     HAS_XMLTODICT_LIBRARY = True
-
-size_pattn = re.compile(r'([0-9]+) *(TiB|GiB|MiB|KiB|TB|GB|MB|KB|T|G|M|K|B)', re.IGNORECASE)
-tb_pattn = re.compile(r'(T|TiB|TB)', re.IGNORECASE)
-gb_pattn = re.compile(r'(G|GiB|GB)', re.IGNORECASE)
-mb_pattn = re.compile(r'(M|MiB|MB)', re.IGNORECASE)
-kb_pattn = re.compile(r'(K|KiB|KB)', re.IGNORECASE)
-b_pattn = re.compile(r'(B)', re.IGNORECASE)
 
 
 class PersistentMemory(object):
@@ -345,27 +339,6 @@ class PersistentMemory(object):
         return types
 
     def pmem_argument_check(self):
-        def convert_to_bytes(size_str):
-            size = int(size_pattn.match(size_str).group(1))
-            unit = size_pattn.match(size_str).group(2)
-            errmsg = ''
-
-            if tb_pattn.match(unit):
-                mult = 1024**4
-            elif gb_pattn.match(unit):
-                mult = 1024**3
-            elif mb_pattn.match(unit):
-                mult = 1024**2
-            elif kb_pattn.match(unit):
-                mult = 1024**1
-            elif b_pattn.match(unit):
-                mult = 1
-            else:
-                mult = 0
-                errmsg = 'Something wrong while parsing size option: %s' % size_str
-
-            return size * mult, errmsg
-
         def namespace_check(self):
             command = ['list', '-R']
             out = self.pmem_run_ndctl(command)
@@ -381,12 +354,10 @@ class PersistentMemory(object):
             types = self.pmem_get_available_region_type(region)
             for ns in self.namespace:
                 if ns['size']:
-                    if not size_pattn.match(ns['size']):
-                        return 'The format of size: NNN TB|GB|MB|KB|B'
-
-                    size_byte, errmsg = convert_to_bytes(ns['size'])
-                    if errmsg:
-                        return errmsg
+                    try:
+                        size_byte = human_to_bytes(ns['size'])
+                    except ValueError:
+                        return 'The format of size: NNN TB|GB|MB|KB|T|G|M|K|B'
 
                     if size_byte % aligns[0] != 0:
                         return 'size: %s should be align with %d' % (ns['size'], aligns[0])

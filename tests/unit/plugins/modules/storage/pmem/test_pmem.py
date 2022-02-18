@@ -523,11 +523,11 @@ class TestPmem(ModuleTestCase):
             set_module_args({
                 'namespace': [
                     {
-                        'size': '1GiB',
+                        'size': '1GB',
                         'type': 'pmem',
                     },
                     {
-                        'size': '2GiB',
+                        'size': '2GB',
                         'type': 'blk',
                     },
                 ],
@@ -539,7 +539,7 @@ class TestPmem(ModuleTestCase):
             set_module_args({
                 'namespace': [
                     {
-                        'size': '1GiB',
+                        'size': '1GB',
                         'type': 'pmem',
                         'mode': 'sector',
                     },
@@ -571,12 +571,12 @@ class TestPmem(ModuleTestCase):
             set_module_args({
                 'namespace': [
                     {
-                        'size': '400MiB',
+                        'size': '400MB',
                         'type': 'pmem',
                         'mode': 'sector'
                     },
                     {
-                        'size': '500MiB',
+                        'size': '500MB',
                         'type': 'pmem',
                         'mode': 'sector'
                     },
@@ -592,12 +592,12 @@ class TestPmem(ModuleTestCase):
             set_module_args({
                 'namespace': [
                     {
-                        'size': '4GiB',
+                        'size': '4GB',
                         'type': 'pmem',
                         'mode': 'sector'
                     },
                     {
-                        'size': '5GiB',
+                        'size': '5GB',
                         'type': 'blk',
                         'mode': 'sector'
                     },
@@ -617,7 +617,7 @@ class TestPmem(ModuleTestCase):
                         'mode': 'sector'
                     },
                     {
-                        'size': '500GiB',
+                        'size': '500GB',
                         'type': 'blk',
                         'mode': 'sector'
                     },
@@ -633,12 +633,12 @@ class TestPmem(ModuleTestCase):
             set_module_args({
                 'namespace': [
                     {
-                        'size': '400GiB',
+                        'size': '400GB',
                         'type': 'pmem',
                         'mode': 'sector'
                     },
                     {
-                        'size': '500GiB',
+                        'size': '500GB',
                         'type': 'pmem',
                         'mode': 'sector'
                     },
@@ -669,7 +669,7 @@ class TestPmem(ModuleTestCase):
         set_module_args({
             'namespace': [
                 {
-                    'size': '640MiB',
+                    'size': '640MB',
                     'type': 'pmem',
                     'mode': 'raw'
                 },
@@ -687,12 +687,12 @@ class TestPmem(ModuleTestCase):
         set_module_args({
             'namespace': [
                 {
-                    'size': '1GiB',
+                    'size': '1GB',
                     'type': 'pmem',
                     'mode': 'sector'
                 },
                 {
-                    'size': '640MiB',
+                    'size': '640MB',
                     'type': 'pmem',
                     'mode': 'raw',
                 },
