@@ -36,8 +36,9 @@
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     group: "{{ gitlab_group_name }}"
-    vars:
-      ACCESS_KEY_ID: checkmode
+    variables:
+      - name: ACCESS_KEY_ID
+        value: checkmode
   register: gitlab_group_variable_state
 
 - name: state must be changed
@@ -218,6 +219,42 @@
   assert:
     that:
       - gitlab_group_variable_state is not changed
+
+- name: change environment scope
+  gitlab_group_variable:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    group: "{{ gitlab_group_name }}"
+    vars:
+      ACCESS_KEY_ID:
+        environment_scope: testing
+        value: checkmode
+  register: gitlab_group_variable_state
+  when: gitlab_premium_tests is defined
+
+- name: state must be changed
+  assert:
+    that:
+      - gitlab_group_variable_state is changed
+  when: gitlab_premium_tests is defined
+
+- name: apply again the environment scope change 
+  gitlab_group_variable:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    group: "{{ gitlab_group_name }}"
+    vars:
+      ACCESS_KEY_ID:
+        environment_scope: testing
+        value: checkmode
+  register: gitlab_group_variable_state
+  when: gitlab_premium_tests is defined
+
+- name: state must not be changed
+  assert:
+    that:
+      - gitlab_group_variable_state is not changed
+  when: gitlab_premium_tests is defined
 
 - name: purge all variables at the beginning
   gitlab_group_variable:
@@ -426,8 +463,8 @@
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     group: "{{ gitlab_group_name }}"
-    vars:
-      my_test_var:
+    variables:
+      - name: my_test_var
         value: my_test_value
         variable_type: file
     purge: False
@@ -583,3 +620,84 @@
       - gitlab_group_variable_state.group_variable.untouched|length == 0
       - gitlab_group_variable_state.group_variable.removed|length == 40
       - gitlab_group_variable_state.group_variable.updated|length == 0
+
+- name: same vars, diff scope
+  gitlab_group_variable:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    group: "{{ gitlab_group_name }}"
+    purge: True
+    variables:
+      - name: SECRET_ACCESS_KEY
+        value: 3214cbad
+        masked: true
+        protected: true
+        variable_type: env_var
+        environment_scope: production
+      - name: SECRET_ACCESS_KEY
+        value: hello_world
+        masked: true
+        protected: true
+        variable_type: env_var
+        environment_scope: development
+  register: gitlab_group_variable_state
+  when: gitlab_premium_tests is defined
+
+- name: verify two vars
+  assert:
+    that:
+      - gitlab_group_variable_state.changed
+      - gitlab_group_variable_state.group_variable.added|length == 2
+      - gitlab_group_variable_state.group_variable.untouched|length == 0
+      - gitlab_group_variable_state.group_variable.removed|length == 0
+      - gitlab_group_variable_state.group_variable.updated|length == 0
+  when: gitlab_premium_tests is defined
+
+- name: throw error when state is present but no value is given
+  gitlab_group_variable:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    group: "{{ gitlab_group_name }}"
+    variables:
+      - name: delete_me
+  register: gitlab_group_variable_state
+  ignore_errors: yes
+
+- name: verify fail
+  assert:
+    that:
+      - gitlab_group_variable_state.failed
+      - gitlab_group_variable_state is not changed
+
+- name: set a new variable to delete it later
+  gitlab_group_variable:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    group: "{{ gitlab_group_name }}"
+    purge: True
+    variables:
+      - name: delete_me
+        value: ansible
+  register: gitlab_group_variable_state
+
+- name: verify the change
+  assert:
+    that:
+      - gitlab_group_variable_state.changed
+
+- name: delete variable without referencing its value
+  gitlab_group_variable:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    group: "{{ gitlab_group_name }}"
+    state: absent
+    variables:
+      - name: delete_me
+  register: gitlab_group_variable_state
+
+- name: verify deletion
+  assert:
+    that:
+      - gitlab_group_variable_state.changed
+      - gitlab_group_variable_state.group_variable.removed|length == 1
+      
