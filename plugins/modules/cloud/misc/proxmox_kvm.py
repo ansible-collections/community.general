@@ -1739,10 +1739,27 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                                       if 'storage' != k])
             kwargs['efidisk0'] = efidisk0_str
 
+        # Convert old style arguments (dicts of str) to new style arguments (lists of dicts)
+        for old_key, new_key in [('ide_dictstr', 'ide_listdict'), ('sata_dictstr', 'sata_listdict'),
+                                 ('scsi_dictstr', 'scsi_listdict'), ('virtio_dictstr', 'virtio_listdict')]:
+            if old_key in kwargs:
+                # typekey should be ide(n), sata(n), scsi(n), virtio(n) and item should be the string to be passed
+                # to the api
+                for typekey, item in kwargs[old_key].items():
+                    # item is a comma separated string of key=values pair, except for the storage which generally comes
+                    # first in the form of storage_backend:size_in_gb
+                    options = dict(option.split('=') for option in item.split(',') if ':' not in option)
+                    # extract storage and size if present
+                    [[storage, size_in_gb]] = [option.split(':') for option in item.split(',') if ':' in option]
+                    options.update(name=typekey, storage=storage, size_in_gb=size_in_gb)
+                    # append the new dict to the list of dicts of new arguments
+                    kwargs[new_key].append(options)
+                del kwargs[old_key]
+
         # Flatten ide_listdict, sata_listdic, scsi_listdict, virtio_listdict into {name: str} dicts and push them to
         # kwargs, and then deleting the original *_listdicts as they are not understood by PVE API
         for key in ['ide_listdict', 'sata_listdict', 'scsi_listdict', 'virtio_listdict']:
-            if key in kwargs.keys():
+            if key in kwargs:
                 for item in kwargs[key]:
                     dict_key = item['name']
                     # Storage backend and volume has to be first, and has to look like <storage>:<size>
@@ -2165,7 +2182,7 @@ def main():
                               protection=module.params['protection'],
                               reboot=module.params['reboot'],
                               sata=module.params['sata_dictstr'],
-                              sata_listdict=module.params['sata_lsit_dict'],
+                              sata_listdict=module.params['sata_lsitdict'],
                               scsi=module.params['scsi_dictstr'],
                               scsi_listdict=module.params['scsi_listdict'],
                               scsihw=module.params['scsihw'],
@@ -2184,7 +2201,8 @@ def main():
                               template=module.params['template'],
                               vcpus=module.params['vcpus'],
                               vga=module.params['vga'],
-                              virtio=module.params['virtio'],
+                              virtio=module.params['virtio_dictstr'],
+                              virtio_listdict=module.params['virtio_listdict'],
                               watchdog=module.params['watchdog'])
 
             if not clone:
