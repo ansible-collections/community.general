@@ -261,7 +261,6 @@ output:
 '''
 
 import datetime
-import itertools
 import os
 import traceback
 from functools import partial
