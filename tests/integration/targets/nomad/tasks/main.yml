@@ -1,6 +1,9 @@
 - name: Skip unsupported platforms
   meta: end_play
-  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version is not version('7', '>=')
+  # TODO: figure out why Alpine does not work!
+  when: |
+    ansible_distribution == 'CentOS' and ansible_distribution_major_version is not version('7', '>=')
+    or ansible_distribution == 'Alpine'
 
 - name: Install Nomad and test
   vars:

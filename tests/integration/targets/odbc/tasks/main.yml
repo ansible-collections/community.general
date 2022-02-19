@@ -30,7 +30,12 @@
     - name: Changing DSN for Suse
       set_fact:
         dsn: "DRIVER={PSQL};Server=localhost;Port=5432;Database=postgres;Uid={{ my_user }};Pwd={{ my_pass_decrypted }};UseUnicode=True"
-      when: ansible_os_family == 'Suse'
+      when: ansible_os_family == 'Suse' or ansible_os_family == 'Alpine'
+
+    - name: Changing DSN for Alpine
+      set_fact:
+        dsn: "DRIVER={/usr/lib/psqlodbcw.so};Server=localhost;Port=5432;Database=postgres;Uid={{ my_user }};Pwd={{ my_pass_decrypted }};UseUnicode=True"
+      when: ansible_os_family == 'Alpine'
 
     - name: Changing DSN for Debian
       set_fact:

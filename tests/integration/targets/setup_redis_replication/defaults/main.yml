@@ -1,5 +1,7 @@
 # General
 redis_packages:
+  Alpine:
+  - redis
   Archlinux:
   - redis
   Debian:
@@ -16,6 +18,7 @@ redis_packages:
   - redis
 
 redis_bin:
+  Alpine: /usr/bin/redis-server
   Archlinux: /usr/bin/redis-server
   Debian: /usr/bin/redis-server
   Ubuntu: /usr/bin/redis-server

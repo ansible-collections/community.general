@@ -103,6 +103,10 @@
   command: su - postgres -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data'"
   when: ansible_os_family == "Archlinux"
 
+- name: Initialize postgres (Alpine)
+  command: su - postgres -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgresql/data'"
+  when: ansible_os_family == "Alpine"
+
 - name: Initialize postgres (Debian)
   shell: . /usr/share/postgresql-common/maintscripts-functions && set_system_locale && /usr/bin/pg_createcluster -u postgres {{ pg_ver }} main
   args:

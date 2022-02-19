@@ -1,0 +1,6 @@
+postgresql_packages:
+  - "postgresql"
+  - "py3-psycopg2"
+
+pg_hba_location: "/var/lib/postgresql/data/pg_hba.conf"
+pg_dir: "/var/lib/postgresql/data"
