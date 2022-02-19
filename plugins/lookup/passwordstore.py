@@ -98,7 +98,7 @@ DOCUMENTATION = '''
       locktimeout:
         description:
           - Lock timeout applied when I(lock) is not C(none).
-          - Time with a unit suffix, "s", "m", "h" for seconds, minutes, and hours. So, e.g, C(900s) equals C(15m).
+          - Time with a unit suffix, C(s), C(m), C(h) for seconds, minutes, and hours, respectively. For example, C(900s) equals C(15m).
           - Correlates with C(pinentry-timeout) in C(~/.gnupg/gpg-agent.conf), see C(man gpg-agent) for details.
         ini:
           - section: passwordstore_lookup
