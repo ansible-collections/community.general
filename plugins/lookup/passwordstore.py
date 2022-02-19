@@ -215,8 +215,8 @@ def check_output2(*popenargs, **kwargs):
         process.wait()
         raise
     retcode = process.poll()
-    if retcode == 0 and (b'encryption failed: Unusable public key' in
-                         b_out or b'encryption failed: Unusable public key' in b_err):
+    if retcode == 0 and (b'encryption failed: Unusable public key' in b_out or
+                         b'encryption failed: Unusable public key' in b_err):
         retcode = 78  # os.EX_CONFIG
     if retcode != 0:
         cmd = kwargs.get("args")
@@ -262,13 +262,6 @@ class LookupModule(LookupBase):
                     self.paramvals['length'] = int(self.paramvals['length'])
                 else:
                     raise AnsibleError("{0} is not a correct value for length".format(self.paramvals['length']))
-
-            if not re.match('^[0-9]+[smh]$', self.paramvals['locktimeout']):
-                raise AnsibleError("{0} is not a correct value for locktimeout".format(self.paramvals['locktimeout']))
-
-            unit_to_seconds = {"s": 1, "m": 60, "h": 3600}
-            self.paramvals['locktimeout_secs'] = (int(self.paramvals['locktimeout'][:-1]) * unit_to_seconds[
-                                                  self.paramvals['locktimeout'][-1]])
 
             if self.paramvals['create']:
                 self.paramvals['missing'] = 'create'
@@ -374,8 +367,26 @@ class LookupModule(LookupBase):
             else:
                 return None
 
+    @contextmanager
+    def opt_lock(self, type):
+        if self.get_option('lock') == type:
+            tmpdir = os.environ.get('TMPDIR', '/tmp')
+            lockfile = os.path.join(tmpdir, '.passwordstore.lock')
+            timeout = self.get_option('locktimeout')
+            if not re.match('^[0-9]+[smh]$', timeout):
+                raise AnsibleError("{0} is not a correct value for locktimeout".format(timeout))
+            unit_to_seconds = {"s": 1, "m": 60, "h": 3600}
+            timeout = int(timeout[:-1]) * unit_to_seconds[timeout[-1]]
+            with FileLock().lock_file(lockfile, tmpdir, timeout):
+                self.locked = type
+                yield
+            self.locked = None
+        else:
+            yield
+
     def run(self, terms, variables, **kwargs):
         result = []
+        self.locked = None
         self.paramvals = {
             'subkey': 'password',
             'directory': variables.get('passwordstore', os.environ.get(
@@ -389,35 +400,21 @@ class LookupModule(LookupBase):
             'length': 16,
             'backup': False,
             'missing': 'error',
-            'lock': self.get_option('lock'),
-            'locktimeout': self.get_option('locktimeout'),
-            'locktimeout_secs': 0,
         }
-
-        tmpdir = os.environ.get('TMPDIR', '/tmp')
-        lockfile = os.path.join(tmpdir, '.passwordstore.lock')
-
-        @contextmanager
-        def opt_lock(type):
-            if self.paramvals['lock'] == type:
-                with FileLock().lock_file(lockfile, tmpdir, self.paramvals['locktimeout_secs']):
-                    yield
-            else:
-                yield
 
         for term in terms:
             self.parse_params(term)   # parse the input into paramvals
-            with opt_lock('readwrite'):
+            with self.opt_lock('readwrite'):
                 if self.check_pass():     # password exists
                     if self.paramvals['overwrite'] and self.paramvals['subkey'] == 'password':
-                        with opt_lock('write'):
+                        with self.opt_lock('write'):
                             result.append(self.update_password())
                     else:
                         result.append(self.get_passresult())
                 else:                     # password does not exist
                     if self.paramvals['missing'] == 'create':
-                        with opt_lock('write'):
-                            if self.paramvals['lock'] == 'write' and self.check_pass():  # lookup password again if under write lock
+                        with self.opt_lock('write'):
+                            if self.locked == 'write' and self.check_pass():  # lookup password again if under write lock
                                 result.append(self.get_passresult())
                             else:
                                 result.append(self.generate_password())
