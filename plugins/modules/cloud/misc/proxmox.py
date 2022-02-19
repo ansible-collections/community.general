@@ -183,6 +183,7 @@ EXAMPLES = r'''
     api_host: node1
     password: 123456
     hostname: example.org
+    storage: local-lvm
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
 - name: Create new container with hookscript and description
@@ -194,6 +195,7 @@ EXAMPLES = r'''
     api_host: node1
     password: 123456
     hostname: example.org
+    storage: local-lvm
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     hookscript: 'local:snippets/vm_hook.sh'
     description: created with ansible
@@ -206,6 +208,7 @@ EXAMPLES = r'''
     api_host: 'node1'
     password: '123456'
     hostname: 'example.org'
+    storage: local-lvm
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
 - name: Create new container with minimal options with force(it will rewrite existing container)
@@ -217,6 +220,7 @@ EXAMPLES = r'''
     api_host: node1
     password: 123456
     hostname: example.org
+    storage: local-lvm
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     force: yes
 
@@ -228,6 +232,7 @@ EXAMPLES = r'''
     api_host: node1
     password: 123456
     hostname: example.org
+    storage: local-lvm
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
 - name: Create new container with minimal options defining network interface with dhcp
@@ -239,6 +244,7 @@ EXAMPLES = r'''
     api_host: node1
     password: 123456
     hostname: example.org
+    storage: local-lvm
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     netif: '{"net0":"name=eth0,ip=dhcp,ip6=dhcp,bridge=vmbr0"}'
 
@@ -251,6 +257,7 @@ EXAMPLES = r'''
     api_host: node1
     password: 123456
     hostname: example.org
+    storage: local-lvm
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     netif: '{"net0":"name=eth0,gw=192.168.0.1,ip=192.168.0.2/24,bridge=vmbr0"}'
 
@@ -263,6 +270,7 @@ EXAMPLES = r'''
     api_host: node1
     password: 123456
     hostname: example.org
+    storage: local-lvm
     ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     mounts: '{"mp0":"local:8,mp=/mnt/test/"}'
 
@@ -275,6 +283,7 @@ EXAMPLES = r'''
     api_host: node1
     password: 123456
     hostname: example.org
+    storage: local-lvm
     ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     cores: 2
 
@@ -287,6 +296,7 @@ EXAMPLES = r'''
     api_host: node1
     password: 123456
     hostname: example.org
+    storage: local-lvm
     ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     features:
      - nesting=1
