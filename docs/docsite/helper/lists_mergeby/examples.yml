@@ -1,0 +1,50 @@
+---
+examples:
+  - label: 'In the example below the lists are merged by the attribute ``name``:'
+    file: example-001_vars/list3.yml
+    lang: 'yaml+jinja'
+  - label: 'This produces:'
+    file: example-001.out
+    lang: 'yaml'
+  - label: 'It is possible to use a list of lists as an input of the filter:'
+    file: example-002_vars/list3.yml
+    lang: 'yaml+jinja'
+  - label: 'This produces the same result as in the previous example:'
+    file: example-002.out
+    lang: 'yaml'
+  - label: 'Example ``list_merge=replace`` (default):'
+    file: example-003_vars/list3.yml
+    lang: 'yaml+jinja'
+  - label: 'This produces:'
+    file: example-003.out
+    lang: 'yaml'
+  - label: 'Example ``list_merge=keep``:'
+    file: example-004_vars/list3.yml
+    lang: 'yaml+jinja'
+  - label: 'This produces:'
+    file: example-004.out
+    lang: 'yaml'
+  - label: 'Example ``list_merge=append``:'
+    file: example-005_vars/list3.yml
+    lang: 'yaml+jinja'
+  - label: 'This produces:'
+    file: example-005.out
+    lang: 'yaml'
+  - label: 'Example ``list_merge=prepend``:'
+    file: example-006_vars/list3.yml
+    lang: 'yaml+jinja'
+  - label: 'This produces:'
+    file: example-006.out
+    lang: 'yaml'
+  - label: 'Example ``list_merge=append_rp``:'
+    file: example-007_vars/list3.yml
+    lang: 'yaml+jinja'
+  - label: 'This produces:'
+    file: example-007.out
+    lang: 'yaml'
+  - label: 'Example ``list_merge=prepend_rp``:'
+    file: example-008_vars/list3.yml
+    lang: 'yaml+jinja'
+  - label: 'This produces:'
+    file: example-008.out
+    lang: 'yaml'

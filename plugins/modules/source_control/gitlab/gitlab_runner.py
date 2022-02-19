@@ -39,6 +39,7 @@ options:
   project:
     description:
       - ID or full path of the project in the form of group/name.
+      - Mutually exclusive with I(owned) since community.general 4.5.0.
     type: str
     version_added: '3.7.0'
   description:
@@ -63,6 +64,7 @@ options:
   owned:
     description:
       - Searches only runners available to the user when searching for existing, when false admin token required.
+      - Mutually exclusive with I(project) since community.general 4.5.0.
     default: no
     type: bool
     version_added: 2.0.0
@@ -199,7 +201,13 @@ class GitLabRunner(object):
         # Whether to operate on GitLab-instance-wide or project-wide runners
         # See https://gitlab.com/gitlab-org/gitlab-ce/issues/60774
         # for group runner token access
-        self._runners_endpoint = project.runners if project else gitlab_instance.runners
+        if project:
+            self._runners_endpoint = project.runners.list
+        elif module.params['owned']:
+            self._runners_endpoint = gitlab_instance.runners.list
+        else:
+            self._runners_endpoint = gitlab_instance.runners.all
+
         self.runner_object = None
 
     def create_or_update_runner(self, description, options):
@@ -248,7 +256,7 @@ class GitLabRunner(object):
             return True
 
         try:
-            runner = self._runners_endpoint.create(arguments)
+            runner = self._gitlab.runners.create(arguments)
         except (gitlab.exceptions.GitlabCreateError) as e:
             self._module.fail_json(msg="Failed to create runner: %s " % to_native(e))
 
@@ -281,28 +289,25 @@ class GitLabRunner(object):
     '''
     @param description Description of the runner
     '''
-    def find_runner(self, description, owned=False):
-        if owned:
-            runners = self._runners_endpoint.list(as_list=False)
-        else:
-            runners = self._runners_endpoint.all(as_list=False)
+    def find_runner(self, description):
+        runners = self._runners_endpoint(as_list=False)
 
         for runner in runners:
             # python-gitlab 2.2 through at least 2.5 returns a list of dicts for list() instead of a Runner
             # object, so we need to handle both
             if hasattr(runner, "description"):
                 if (runner.description == description):
-                    return self._runners_endpoint.get(runner.id)
+                    return self._gitlab.runners.get(runner.id)
             else:
                 if (runner['description'] == description):
-                    return self._runners_endpoint.get(runner['id'])
+                    return self._gitlab.runners.get(runner['id'])
 
     '''
     @param description Description of the runner
     '''
-    def exists_runner(self, description, owned=False):
+    def exists_runner(self, description):
         # When runner exists, object will be stored in self.runner_object.
-        runner = self.find_runner(description, owned)
+        runner = self.find_runner(description)
 
         if runner:
             self.runner_object = runner
@@ -343,6 +348,7 @@ def main():
             ['api_username', 'api_job_token'],
             ['api_token', 'api_oauth_token'],
             ['api_token', 'api_job_token'],
+            ['project', 'owned'],
         ],
         required_together=[
             ['api_username', 'api_password'],
@@ -357,7 +363,6 @@ def main():
     )
 
     state = module.params['state']
-    owned = module.params['owned']
     runner_description = module.params['description']
     runner_active = module.params['active']
     tag_list = module.params['tag_list']
@@ -380,7 +385,7 @@ def main():
             module.fail_json(msg='No such a project %s' % project, exception=to_native(e))
 
     gitlab_runner = GitLabRunner(module, gitlab_instance, gitlab_project)
-    runner_exists = gitlab_runner.exists_runner(runner_description, owned)
+    runner_exists = gitlab_runner.exists_runner(runner_description)
 
     if state == 'absent':
         if runner_exists:

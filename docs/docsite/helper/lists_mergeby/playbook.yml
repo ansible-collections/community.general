@@ -1,0 +1,59 @@
+---
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# 1) Run all examples and create example-XXX.out
+# shell> ansible-playbook playbook.yml -e examples=true
+#
+# 2) Optionally, for testing, create examples_all.rst
+# shell> ansible-playbook playbook.yml -e examples_all=true
+#
+# 3) Create docs REST files
+# shell> ansible-playbook playbook.yml -e merging_lists_of_dictionaries=true
+#
+# Notes:
+# * Use YAML callback, e.g. set ANSIBLE_STDOUT_CALLBACK=community.general.yaml
+# * Use sphinx-view to render and review the REST files
+#   shell> sphinx-view <path_to_helper>/examples_all.rst
+# * Proofread and copy completed docs *.rst files into the directory rst.
+# * Then delete the *.rst and *.out files from this directory. Do not
+#   add *.rst and *.out in this directory to the version control.
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# community.general/docs/docsite/helper/lists_mergeby/playbook.yml
+
+- hosts: localhost
+  gather_facts: false
+  tasks:
+
+    - block:
+        - import_tasks: example-001.yml
+          tags: t001
+        - import_tasks: example-002.yml
+          tags: t002
+        - import_tasks: example-003.yml
+          tags: t003
+        - import_tasks: example-004.yml
+          tags: t004
+        - import_tasks: example-005.yml
+          tags: t005
+        - import_tasks: example-006.yml
+          tags: t006
+        - import_tasks: example-007.yml
+          tags: t007
+        - import_tasks: example-008.yml
+          tags: t008
+      when: examples|d(false)|bool
+
+    - block:
+        - include_vars: examples.yml
+        - template:
+            src: examples_all.rst.j2
+            dest: examples_all.rst
+      when: examples_all|d(false)|bool
+
+    - block:
+        - include_vars: examples.yml
+        - template:
+            src: filter_guide_abstract_informations_merging_lists_of_dictionaries.rst.j2
+            dest: filter_guide_abstract_informations_merging_lists_of_dictionaries.rst
+      when: merging_lists_of_dictionaries|d(false)|bool

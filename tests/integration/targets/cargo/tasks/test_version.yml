@@ -1,0 +1,46 @@
+---
+- name: Install application helloworld-yliu 0.1.0
+  community.general.cargo:
+    name: helloworld-yliu
+    version: 0.1.0
+  register: install_helloworld_010
+
+- name: Install application helloworld-yliu 0.1.0 (idempotent)
+  community.general.cargo:
+    name: helloworld-yliu
+    version: 0.1.0
+  register: install_helloworld_010_idem
+
+- name: Upgrade helloworld-yliu 0.1.0
+  community.general.cargo:
+    name: helloworld-yliu
+    state: latest
+  register: upgrade_helloworld_010
+
+- name: Upgrade helloworld-yliu 0.1.0 (idempotent)
+  community.general.cargo:
+    name: helloworld-yliu
+    state: latest
+  register: upgrade_helloworld_010_idem
+
+- name: Downgrade helloworld-yliu 0.1.0
+  community.general.cargo:
+    name: helloworld-yliu
+    version: 0.1.0
+  register: downgrade_helloworld_010
+
+- name: Downgrade helloworld-yliu 0.1.0 (idempotent)
+  community.general.cargo:
+    name: helloworld-yliu
+    version: 0.1.0
+  register: downgrade_helloworld_010_idem
+
+- name: Check assertions helloworld-yliu
+  assert:
+    that:
+        - install_helloworld_010 is changed
+        - install_helloworld_010_idem is not changed
+        - upgrade_helloworld_010 is changed
+        - upgrade_helloworld_010_idem is not changed
+        - downgrade_helloworld_010 is changed
+        - downgrade_helloworld_010_idem is not changed

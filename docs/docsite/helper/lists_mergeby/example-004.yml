@@ -1,0 +1,10 @@
+---
+- name: 4. Merge recursive by 'name', keep lists
+  include_vars:
+    dir: example-004_vars
+- debug:
+    var: list3
+  when: debug|d(false)|bool
+- template:
+    src: list3.out.j2
+    dest: example-004.out

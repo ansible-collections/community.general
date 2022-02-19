@@ -11,14 +11,16 @@ name: mail
 type: notification
 short_description: Sends failure events via email
 description:
-- This callback will report failures via email
+- This callback will report failures via email.
 author:
 - Dag Wieers (@dagwieers)
 requirements:
 - whitelisting in configuration
 options:
   mta:
-    description: Mail Transfer Agent, server that accepts SMTP
+    description:
+        - Mail Transfer Agent, server that accepts SMTP.
+    type: str
     env:
         - name: SMTPHOST
     ini:
@@ -26,39 +28,53 @@ options:
           key: smtphost
     default: localhost
   mtaport:
-    description: Mail Transfer Agent Port, port at which server SMTP
+    description:
+        - Mail Transfer Agent Port.
+        - Port at which server SMTP.
+    type: int
     ini:
         - section: callback_mail
           key: smtpport
     default: 25
   to:
-    description: Mail recipient
+    description:
+        - Mail recipient.
+    type: list
+    elements: str
     ini:
         - section: callback_mail
           key: to
-    default: root
+    default: [root]
   sender:
-    description: Mail sender
+    description:
+        - Mail sender.
+        - Note that this will be required from community.general 6.0.0 on.
+    type: str
     ini:
         - section: callback_mail
           key: sender
   cc:
-    description: CC'd recipient
+    description:
+        - CC'd recipients.
+    type: list
+    elements: str
     ini:
         - section: callback_mail
           key: cc
   bcc:
-    description: BCC'd recipient
+    description:
+        - BCC'd recipients.
+    type: list
+    elements: str
     ini:
         - section: callback_mail
           key: bcc
-notes:
-- "TODO: expand configuration options now that plugins can leverage Ansible's configuration"
 '''
 
 import json
 import os
 import re
+import email.utils
 import smtplib
 
 from ansible.module_utils.six import string_types
@@ -88,9 +104,13 @@ class CallbackModule(CallbackBase):
         super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         self.sender = self.get_option('sender')
+        if self.sender is None:
+            self._display.deprecated(
+                'The sender for the mail callback has not been specified. This will be an error in the future',
+                version='6.0.0', collection_name='community.general')
         self.to = self.get_option('to')
         self.smtphost = self.get_option('mta')
-        self.smtpport = int(self.get_option('mtaport'))
+        self.smtpport = self.get_option('mtaport')
         self.cc = self.get_option('cc')
         self.bcc = self.get_option('bcc')
 
@@ -100,28 +120,34 @@ class CallbackModule(CallbackBase):
 
         smtp = smtplib.SMTP(self.smtphost, port=self.smtpport)
 
-        b_sender = to_bytes(self.sender)
-        b_to = to_bytes(self.to)
-        b_cc = to_bytes(self.cc)
-        b_bcc = to_bytes(self.bcc)
-        b_subject = to_bytes(subject)
-        b_body = to_bytes(body)
-
-        b_content = b'From: %s\n' % b_sender
-        b_content += b'To: %s\n' % b_to
+        sender_address = email.utils.parseaddr(self.sender)
+        if self.to:
+            to_addresses = email.utils.getaddresses(self.to)
         if self.cc:
-            b_content += b'Cc: %s\n' % b_cc
-        b_content += b'Subject: %s\n\n' % b_subject
-        b_content += b_body
-
-        b_addresses = b_to.split(b',')
-        if self.cc:
-            b_addresses += b_cc.split(b',')
+            cc_addresses = email.utils.getaddresses(self.cc)
         if self.bcc:
-            b_addresses += b_bcc.split(b',')
+            bcc_addresses = email.utils.getaddresses(self.bcc)
 
-        for b_address in b_addresses:
-            smtp.sendmail(b_sender, b_address, b_content)
+        content = 'Date: %s\n' % email.utils.formatdate()
+        content += 'From: %s\n' % email.utils.formataddr(sender_address)
+        if self.to:
+            content += 'To: %s\n' % ', '.join([email.utils.formataddr(pair) for pair in to_addresses])
+        if self.cc:
+            content += 'Cc: %s\n' % ', '.join([email.utils.formataddr(pair) for pair in cc_addresses])
+        content += 'Message-ID: %s\n' % email.utils.make_msgid()
+        content += 'Subject: %s\n\n' % subject.strip()
+        content += body
+
+        addresses = to_addresses
+        if self.cc:
+            addresses += cc_addresses
+        if self.bcc:
+            addresses += bcc_addresses
+
+        if not addresses:
+            self._display.warning('No receiver has been specified for the mail callback plugin.')
+
+        smtp.sendmail(self.sender, [address for name, address in addresses], to_bytes(content))
 
         smtp.quit()
 

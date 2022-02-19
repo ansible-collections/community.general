@@ -319,9 +319,9 @@ class OpenTelemetrySource(object):
     @staticmethod
     def url_from_args(args):
         # the order matters
-        url_args = ("url", "api_url", "baseurl", "repo", "server_url", "chart_repo_url")
+        url_args = ("url", "api_url", "baseurl", "repo", "server_url", "chart_repo_url", "registry_url", "endpoint", "uri", "updates_url")
         for arg in url_args:
-            if args.get(arg):
+            if args is not None and args.get(arg):
                 return args.get(arg)
         return ""
 

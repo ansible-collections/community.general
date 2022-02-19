@@ -92,6 +92,12 @@ TESTCASE_CONNECTION = [
         'state': 'absent',
         '_ansible_check_mode': True,
     },
+    {
+        'type': 'wireguard',
+        'conn_name': 'non_existent_nw_device',
+        'state': 'absent',
+        '_ansible_check_mode': True,
+    },
 ]
 
 TESTCASE_GENERIC = [
@@ -152,6 +158,129 @@ ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 """
 
+TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE = [
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'ethernet_non_existant',
+        'ip6': '2001:beef:cafe:10::1/64',
+        'routes6': ['fd2e:446f:d85d:5::/64 2001:beef:cafe:10::2'],
+        'method6': 'manual',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+]
+
+TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              ethernet_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            auto
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            manual
+ipv6.addresses:                         2001:beef:cafe:10::1/64
+ipv6.routes:                            { ip = fd2e:446f:d85d:5::/64, nh = 2001:beef:cafe:10::2 }
+ipv6.route-metric:                      -1
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+"""
+
+TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_MULTIPLE_ROUTES = [
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'ethernet_non_existant',
+        'ip6': '2001:beef:cafe:10::1/64',
+        'routes6': ['fd2e:446f:d85d:5::/64 2001:beef:cafe:10::2', 'fd2e:8890:abcd:25::/64 2001:beef:cafe:10::5'],
+        'method6': 'manual',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+]
+
+TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_MULTIPLE_ROUTES_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              ethernet_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            auto
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            manual
+ipv6.addresses:                         2001:beef:cafe:10::1/64
+ipv6.routes:                            { ip = fd2e:446f:d85d:5::/64, nh = 2001:beef:cafe:10::2 }; { ip = fd2e:8890:abcd:25::/64, nh = 2001:beef:cafe:10::5 }
+ipv6.route-metric:                      -1
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+"""
+
+TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE_AND_METRIC = [
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'ethernet_non_existant',
+        'method4': 'disabled',
+        'ip6': '2001:beef:cafe:10::1/64',
+        'routes6': ['fd2e:446f:d85d:5::/64 2001:beef:cafe:10::2'],
+        'route_metric6': 5,
+        'method6': 'manual',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+]
+
+TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE_AND_METRIC_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              ethernet_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            auto
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            manual
+ipv6.addresses:                         2001:beef:cafe:10::1/64
+ipv6.routes:                            { ip = fd2e:446f:d85d:5::/64, nh = 2001:beef:cafe:10::2 }
+ipv6.route-metric:                      5
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+"""
+
+TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_MULTIPLE_ROUTES_AND_METRIC = [
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'ethernet_non_existant',
+        'method4': 'disabled',
+        'ip6': '2001:beef:cafe:10::1/64',
+        'routes6': ['fd2e:446f:d85d:5::/64 2001:beef:cafe:10::2', 'fd2e:8890:abcd:25::/64 2001:beef:cafe:10::5'],
+        'route_metric6': 5,
+        'method6': 'manual',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+]
+
+TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_MULTIPLE_ROUTES_AND_METRIC_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              ethernet_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            auto
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            manual
+ipv6.addresses:                         2001:beef:cafe:10::1/64
+ipv6.routes:                            { ip = fd2e:446f:d85d:5::/64, nh = 2001:beef:cafe:10::2 }; { ip = fd2e:8890:abcd:25::/64, nh = 2001:beef:cafe:10::5 }
+ipv6.route-metric:                      5
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+"""
 
 TESTCASE_GENERIC_DNS4_SEARCH = [
     {
@@ -900,6 +1029,49 @@ gsm.sim-operator-id:                    --
 gsm.mtu:                                auto
 """
 
+TESTCASE_WIREGUARD = [
+    {
+        'type': 'wireguard',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'wg_non_existant',
+        'wireguard': {
+            'listen-port': '51820',
+            'private-key': '<hidden>',
+        },
+        'method4': 'manual',
+        'ip4': '10.10.10.10/24',
+        'method6': 'manual',
+        'ip6': '2001:db8::1/128',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    }
+]
+
+TESTCASE_WIREGUARD_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.type:                        wireguard
+connection.interface-name:              wg_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            manual
+ipv4.addresses:                         10.10.10.10/24
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv6.method:                            manual
+ipv6.addresses:                         2001:db8::1/128
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+wireguard.private-key:                  <hidden>
+wireguard.private-key-flags:            0 (none)
+wireguard.listen-port:                  51820
+wireguard.fwmark:                       0x0
+wireguard.peer-routes:                  yes
+wireguard.mtu:                          0
+wireguard.ip4-auto-default-route:       -1 (default)
+wireguard.ip6-auto-default-route:       -1 (default)
+"""
+
 
 def mocker_set(mocker,
                connection_exists=False,
@@ -1092,6 +1264,46 @@ def mocked_ethernet_connection_static_modify(mocker):
 
 
 @pytest.fixture
+def mocked_ethernet_connection_with_ipv6_static_address_static_route_create(mocker):
+    mocker_set(mocker,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
+
+
+@pytest.fixture
+def mocked_ethernet_connection_with_ipv6_static_address_multiple_static_routes_create(mocker):
+    mocker_set(mocker,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_MULTIPLE_ROUTES_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
+
+
+@pytest.fixture
+def mocked_ethernet_connection_with_ipv6_static_address_static_route_with_metric_create(mocker):
+    mocker_set(mocker,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE_AND_METRIC_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
+
+
+@pytest.fixture
+def mocked_ethernet_connection_with_ipv6_static_address_multiple_static_routes_with_metric_create(mocker):
+    mocker_set(mocker,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_MULTIPLE_ROUTES_AND_METRIC_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
+
+
+@pytest.fixture
 def mocked_ethernet_connection_with_ipv6_address_static_modify(mocker):
     mocker_set(mocker,
                connection_exists=True,
@@ -1199,6 +1411,13 @@ def mocked_gsm_connection_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
                execute_return=(0, TESTCASE_GSM_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_wireguard_connection_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_WIREGUARD_SHOW_OUTPUT, ""))
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_BOND, indirect=['patch_ansible_module'])
@@ -2205,6 +2424,150 @@ def test_ethernet_connection_static_unchanged(mocked_ethernet_connection_static_
     assert not results['changed']
 
 
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE, indirect=['patch_ansible_module'])
+def test_ethernet_connection_static_ipv6_address_static_route_create(mocked_ethernet_connection_with_ipv6_static_address_static_route_create, capfd):
+    """
+    Test : Create ethernet connection with static IPv6 address and static route
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[0]
+
+    assert add_args[0][0] == '/usr/bin/nmcli'
+    assert add_args[0][1] == 'con'
+    assert add_args[0][2] == 'add'
+    assert add_args[0][3] == 'type'
+    assert add_args[0][4] == 'ethernet'
+    assert add_args[0][5] == 'con-name'
+    assert add_args[0][6] == 'non_existent_nw_device'
+
+    add_args_text = list(map(to_text, add_args[0]))
+
+    for param in ['connection.interface-name', 'ethernet_non_existant',
+                  'con-name', 'non_existent_nw_device',
+                  'ipv6.addresses', '2001:beef:cafe:10::1/64',
+                  'ipv6.method', 'manual',
+                  'ipv6.routes', 'fd2e:446f:d85d:5::/64 2001:beef:cafe:10::2']:
+        assert param in add_args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_MULTIPLE_ROUTES, indirect=['patch_ansible_module'])
+def test_ethernet_connection_static_ipv6_address_multiple_static_routes_with_metric_create(
+        mocked_ethernet_connection_with_ipv6_static_address_multiple_static_routes_with_metric_create, capfd):
+    """
+    Test : Create ethernet connection with static IPv6 address and multiple static routes
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[0]
+
+    assert add_args[0][0] == '/usr/bin/nmcli'
+    assert add_args[0][1] == 'con'
+    assert add_args[0][2] == 'add'
+    assert add_args[0][3] == 'type'
+    assert add_args[0][4] == 'ethernet'
+    assert add_args[0][5] == 'con-name'
+    assert add_args[0][6] == 'non_existent_nw_device'
+
+    add_args_text = list(map(to_text, add_args[0]))
+
+    for param in ['connection.interface-name', 'ethernet_non_existant',
+                  'con-name', 'non_existent_nw_device',
+                  'ipv6.addresses', '2001:beef:cafe:10::1/64',
+                  'ipv6.method', 'manual',
+                  'ipv6.routes', 'fd2e:446f:d85d:5::/64 2001:beef:cafe:10::2,fd2e:8890:abcd:25::/64 2001:beef:cafe:10::5']:
+        assert param in add_args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE_AND_METRIC, indirect=['patch_ansible_module'])
+def test_ethernet_connection_static_ipv6_address_static_route_with_metric_create(
+        mocked_ethernet_connection_with_ipv6_static_address_static_route_with_metric_create, capfd):
+    """
+    Test : Create ethernet connection with static IPv6 address and static route with metric
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[0]
+
+    assert add_args[0][0] == '/usr/bin/nmcli'
+    assert add_args[0][1] == 'con'
+    assert add_args[0][2] == 'add'
+    assert add_args[0][3] == 'type'
+    assert add_args[0][4] == 'ethernet'
+    assert add_args[0][5] == 'con-name'
+    assert add_args[0][6] == 'non_existent_nw_device'
+
+    add_args_text = list(map(to_text, add_args[0]))
+
+    for param in ['connection.interface-name', 'ethernet_non_existant',
+                  'con-name', 'non_existent_nw_device',
+                  'ipv6.addresses', '2001:beef:cafe:10::1/64',
+                  'ipv6.method', 'manual',
+                  'ipv6.routes', 'fd2e:446f:d85d:5::/64 2001:beef:cafe:10::2',
+                  'ipv6.route-metric', '5']:
+        assert param in add_args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_MULTIPLE_ROUTES_AND_METRIC, indirect=['patch_ansible_module'])
+def test_ethernet_connection_static_ipv6_address_static_route_create(mocked_ethernet_connection_with_ipv6_static_address_static_route_create, capfd):
+    """
+    Test : Create ethernet connection with static IPv6 address and multiple static routes with metric
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[0]
+
+    assert add_args[0][0] == '/usr/bin/nmcli'
+    assert add_args[0][1] == 'con'
+    assert add_args[0][2] == 'add'
+    assert add_args[0][3] == 'type'
+    assert add_args[0][4] == 'ethernet'
+    assert add_args[0][5] == 'con-name'
+    assert add_args[0][6] == 'non_existent_nw_device'
+
+    add_args_text = list(map(to_text, add_args[0]))
+
+    for param in ['connection.interface-name', 'ethernet_non_existant',
+                  'con-name', 'non_existent_nw_device',
+                  'ipv6.addresses', '2001:beef:cafe:10::1/64',
+                  'ipv6.method', 'manual',
+                  'ipv6.routes', 'fd2e:446f:d85d:5::/64 2001:beef:cafe:10::2,fd2e:8890:abcd:25::/64 2001:beef:cafe:10::5',
+                  'ipv6.route-metric', '5']:
+        assert param in add_args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_WIRELESS, indirect=['patch_ansible_module'])
 def test_create_wireless(mocked_wireless_create, capfd):
     """
@@ -2828,3 +3191,81 @@ def test_ethernet_connection_static_with_mulitple_ip4_addresses_unchanged(mocked
     results = json.loads(out)
     assert not results.get('failed')
     assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_WIREGUARD, indirect=['patch_ansible_module'])
+def test_create_wireguard(mocked_generic_connection_create, capfd):
+    """
+    Test : Create wireguard connection with static IP configuration
+    """
+
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[0]
+
+    assert add_args[0][0] == '/usr/bin/nmcli'
+    assert add_args[0][1] == 'con'
+    assert add_args[0][2] == 'add'
+    assert add_args[0][3] == 'type'
+    assert add_args[0][4] == 'wireguard'
+    assert add_args[0][5] == 'con-name'
+    assert add_args[0][6] == 'non_existent_nw_device'
+
+    add_args_text = list(map(to_text, add_args[0]))
+    for param in ['connection.interface-name', 'wg_non_existant',
+                  'ipv4.method', 'manual',
+                  'ipv4.addresses', '10.10.10.10/24',
+                  'ipv6.method', 'manual',
+                  'ipv6.addresses', '2001:db8::1/128',
+                  'wireguard.listen-port', '51820',
+                  'wireguard.private-key', '<hidden>']:
+        assert param in add_args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_WIREGUARD, indirect=['patch_ansible_module'])
+def test_wireguard_connection_unchanged(mocked_wireguard_connection_unchanged, capfd):
+    """
+    Test : Wireguard connection with static IP configuration unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_WIREGUARD, indirect=['patch_ansible_module'])
+def test_wireguard_mod(mocked_generic_connection_modify, capfd):
+    """
+    Test : Modify wireguard connection
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert args[0][0] == '/usr/bin/nmcli'
+    assert args[0][1] == 'con'
+    assert args[0][2] == 'modify'
+    assert args[0][3] == 'non_existent_nw_device'
+
+    args_text = list(map(to_text, args[0]))
+    for param in ['wireguard.listen-port', '51820']:
+        assert param in args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']

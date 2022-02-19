@@ -163,7 +163,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 class Yarn(object):
 
-    DEFAULT_GLOBAL_INSTALLATION_PATH = '~/.config/yarn/global'
+    DEFAULT_GLOBAL_INSTALLATION_PATH = os.path.expanduser('~/.config/yarn/global')
 
     def __init__(self, module, **kwargs):
         self.module = module
@@ -241,16 +241,19 @@ class Yarn(object):
         if error:
             self.module.fail_json(msg=error)
 
-        data = json.loads(result)
-        try:
-            dependencies = data['data']['trees']
-        except KeyError:
-            missing.append(self.name)
-            return installed, missing
+        for json_line in result.strip().split('\n'):
+            data = json.loads(json_line)
+            if self.globally:
+                if data['type'] == 'list' and data['data']['type'].startswith('bins-'):
+                    # This is a string in format: 'bins-<PACKAGE_NAME>'
+                    installed.append(data['data']['type'][5:])
+            else:
+                if data['type'] == 'tree':
+                    dependencies = data['data']['trees']
 
-        for dep in dependencies:
-            name, version = dep['name'].rsplit('@', 1)
-            installed.append(name)
+                    for dep in dependencies:
+                        name, version = dep['name'].rsplit('@', 1)
+                        installed.append(name)
 
         if self.name not in installed:
             missing.append(self.name)

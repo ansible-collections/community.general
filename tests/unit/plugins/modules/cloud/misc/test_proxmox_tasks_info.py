@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#
 # Copyright: (c) 2021, Andreas Botzner (@paginabianca) <andreas at botzner dot com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 #
@@ -12,6 +13,7 @@ import pytest
 import json
 
 from ansible_collections.community.general.plugins.modules.cloud.misc import proxmox_tasks_info
+import ansible_collections.community.general.plugins.module_utils.proxmox as proxmox_utils
 from ansible_collections.community.general.plugins.module_utils.proxmox import ProxmoxAnsible
 from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
@@ -129,6 +131,14 @@ def test_without_required_parameters(connect_mock, capfd, mocker):
     assert json.loads(out)['failed']
 
 
+def mock_api_tasks_response(mocker):
+    m = mocker.MagicMock()
+    g = mocker.MagicMock()
+    m.nodes = mocker.MagicMock(return_value=g)
+    g.tasks.get = mocker.MagicMock(return_value=TASKS)
+    return m
+
+
 @patch('ansible_collections.community.general.plugins.module_utils.proxmox.ProxmoxAnsible._connect')
 def test_get_tasks(connect_mock, capfd, mocker):
     set_module_args({'api_host': 'proxmoxhost',
@@ -136,15 +146,8 @@ def test_get_tasks(connect_mock, capfd, mocker):
                      'api_password': 'supersecret',
                      'node': NODE})
 
-    def f():
-        m = mocker.MagicMock()
-        g = mocker.MagicMock()
-        m.nodes = mocker.MagicMock(return_value=g)
-        g.tasks.get = mocker.MagicMock(return_value=TASKS)
-        return m
-
-    connect_mock.side_effect = f
-    proxmox_tasks_info.HAS_PROXMOXER = True
+    connect_mock.side_effect = lambda: mock_api_tasks_response(mocker)
+    proxmox_utils.HAS_PROXMOXER = True
 
     with pytest.raises(SystemExit):
         proxmox_tasks_info.main()
@@ -162,15 +165,8 @@ def test_get_single_task(connect_mock, capfd, mocker):
                      'node': NODE,
                      'task': TASK_UPID})
 
-    def f():
-        m = mocker.MagicMock()
-        g = mocker.MagicMock()
-        m.nodes = mocker.MagicMock(return_value=g)
-        g.tasks.get = mocker.MagicMock(return_value=TASKS)
-        return m
-
-    connect_mock.side_effect = f
-    proxmox_tasks_info.HAS_PROXMOXER = True
+    connect_mock.side_effect = lambda: mock_api_tasks_response(mocker)
+    proxmox_utils.HAS_PROXMOXER = True
 
     with pytest.raises(SystemExit):
         proxmox_tasks_info.main()
@@ -189,15 +185,8 @@ def test_get_non_existent_task(connect_mock, capfd, mocker):
                      'node': NODE,
                      'task': 'UPID:nonexistent'})
 
-    def f():
-        m = mocker.MagicMock()
-        g = mocker.MagicMock()
-        m.nodes = mocker.MagicMock(return_value=g)
-        g.tasks.get = mocker.MagicMock(return_value=TASKS)
-        return m
-
-    connect_mock.side_effect = f
-    proxmox_tasks_info.HAS_PROXMOXER = True
+    connect_mock.side_effect = lambda: mock_api_tasks_response(mocker)
+    proxmox_utils.HAS_PROXMOXER = True
 
     with pytest.raises(SystemExit):
         proxmox_tasks_info.main()

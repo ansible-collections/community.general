@@ -166,9 +166,9 @@ files:
   $inventories/proxmox.py:
     maintainers: $team_virt ilijamt
   $inventories/xen_orchestra.py:
-    maintainers: shinuza
+    maintainers: ddelnano shinuza
   $inventories/icinga2.py:
-    maintainers: bongoeadgc6
+    maintainers: BongoEADGC6
   $inventories/scaleway.py:
     maintainers: $team_scaleway
     labels: cloud scaleway
@@ -324,6 +324,10 @@ files:
   $modules/cloud/misc/proxmox_kvm.py:
     maintainers: helldorado
     ignore: skvidal
+  $modules/cloud/misc/proxmox_nic.py:
+    maintainers: Kogelvis
+  $modules/cloud/misc/proxmox_tasks_info:
+    maintainers: paginabianca
   $modules/cloud/misc/proxmox_template.py:
     maintainers: UnderGreen
     ignore: skvidal
@@ -414,6 +418,8 @@ files:
     maintainers: Spredzy
   $modules/cloud/scaleway/scaleway_organization_info.py:
     maintainers: Spredzy
+  $modules/cloud/scaleway/scaleway_private_network.py:
+    maintainers: pastral
   $modules/cloud/scaleway/scaleway_security_group.py:
     maintainers: DenBeke
   $modules/cloud/scaleway/scaleway_security_group_info.py:
@@ -536,6 +542,8 @@ files:
     maintainers: adamgoossens
   $modules/identity/keycloak/keycloak_identity_provider.py:
     maintainers: laurpaum
+  $modules/identity/keycloak/keycloak_realm_info.py:
+    maintainers: fynncfchen
   $modules/identity/keycloak/keycloak_realm.py:
     maintainers: kris2kris
   $modules/identity/keycloak/keycloak_role.py:
@@ -724,6 +732,8 @@ files:
     maintainers: mwarkentin
   $modules/packaging/language/bundler.py:
     maintainers: thoiberg
+  $modules/packaging/language/cargo.py:
+    maintainers: radek-sprta
   $modules/packaging/language/composer.py:
     maintainers: dmtrs
     ignore: resmo
@@ -811,7 +821,7 @@ files:
   $modules/packaging/os/opkg.py:
     maintainers: skinp
   $modules/packaging/os/pacman.py:
-    maintainers: elasticdog indrajitr tchernomax
+    maintainers: elasticdog indrajitr tchernomax jraby
     labels: pacman
     ignore: elasticdog
   $modules/packaging/os/pacman_key.py:
@@ -905,6 +915,10 @@ files:
   $modules/remote_management/manageiq/:
     labels: manageiq
     maintainers: $team_manageiq
+  $modules/remote_management/manageiq/manageiq_alert_profiles.py:
+    maintainers: elad661
+  $modules/remote_management/manageiq/manageiq_alerts.py:
+    maintainers: elad661
   $modules/remote_management/manageiq/manageiq_group.py:
     maintainers: evertmulder
   $modules/remote_management/manageiq/manageiq_tenant.py:
@@ -965,6 +979,8 @@ files:
     maintainers: farhan7500 gautamphegde
   $modules/storage/ibm/:
     maintainers: tzure
+  $modules/storage/pmem/pmem.py:
+    maintainers: mizumm
   $modules/storage/vexata/:
     maintainers: vexata
   $modules/storage/zfs/:
@@ -1010,6 +1026,8 @@ files:
   $modules/system/gconftool2.py:
     maintainers: Akasurde kevensen
     labels: gconftool2
+  $modules/system/homectl.py:
+    maintainers: jameslivulpi
   $modules/system/interfaces_file.py:
     maintainers: obourdon hryamzik
     labels: interfaces_file
@@ -1092,6 +1110,8 @@ files:
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/system/ssh_config.py:
     maintainers: gaqzi Akasurde
+  $modules/system/sudoers.py:
+    maintainers: JonEllis
   $modules/system/svc.py:
     maintainers: bcoca
   $modules/system/syspatch.py:
@@ -1217,7 +1237,7 @@ macros:
   team_cyberark_conjur: jvanderhoof ryanprior
   team_e_spirit: MatrixCrawler getjack
   team_flatpak: JayKayy oolongbrothers
-  team_gitlab: Lunik Shaps dj-wasabi marwatk waheedi zanssa scodeman metanovii sh0shin
+  team_gitlab: Lunik Shaps dj-wasabi marwatk waheedi zanssa scodeman metanovii sh0shin nejch lgatellier
   team_hpux: bcoca davx8342
   team_huawei: QijunPan TommyLike edisonxiang freesky-edward hwDCN niuzhenguo xuxiaowei0512 yanzhangi zengchen1024 zhongjun2
   team_ipa: Akasurde Nosmoht fxfitz justchris1
