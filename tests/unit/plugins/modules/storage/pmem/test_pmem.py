@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import pytest
+import json
 
 pytest.importorskip('xmltodict')
 
@@ -165,6 +166,102 @@ show_skt = """<?xml version="1.0"?>
  </Socket>
 </SocketList>"""
 
+# ndctl_region: the mock return value of pmem_run_command with:
+# ndctl list -R
+ndctl_region = """[
+  {
+    "dev":"region1",
+    "size":51539607552,
+    "align":16777216,
+    "available_size":50465865728,
+    "max_available_extent":50465865728,
+    "type":"pmem",
+    "iset_id":4694373484956518536,
+    "persistence_domain":"memory_controller"
+  },
+  {
+    "dev":"region0",
+    "size":51539607552,
+    "align":16777216,
+    "available_size":51539607552,
+    "max_available_extent":51539607552,
+    "type":"pmem",
+    "iset_id":4588538894081362056,
+    "persistence_domain":"memory_controller"
+  }
+]"""
+
+# ndctl_region_empty: the mock return value of pmem_run_command with:
+# ndctl list -R
+ndctl_region_empty = ""
+
+# ndctl_without_size: the mock return value of pmem_run_command with:
+# ndctl create-namespace -t pmem -m sector
+ndctl_create_without_size = """{
+  "dev":"namespace1.0",
+  "mode":"sector",
+  "size":"47.95 GiB (51.49 GB)",
+  "uuid":"1aca23a5-941c-4f4a-9d88-e531f0b5a27e",
+  "sector_size":4096,
+  "blockdev":"pmem1s"
+}"""
+
+# ndctl_list_N: the mock return value of pmem_run_command with:
+# ndctl list -N
+ndctl_list_N = """[
+  {
+    "dev":"namespace1.0",
+    "mode":"sector",
+    "size":51488243712,
+    "uuid":"1aca23a5-941c-4f4a-9d88-e531f0b5a27e",
+    "sector_size":4096,
+    "blockdev":"pmem1s"
+  }
+]"""
+
+# ndctl_result_1G: the mock return value of pmem_run_command with:
+# ndctl create-namespace -t pmem -m sector -s 1073741824
+ndctl_create_1G = """{
+  "dev":"namespace0.0",
+  "mode":"sector",
+  "size":"1021.97 MiB (1071.62 MB)",
+  "uuid":"5ba4e51b-3028-4b06-8495-b6834867a9af",
+  "sector_size":4096,
+  "blockdev":"pmem0s"
+}"""
+
+# ndctl_result_640M: the mock return value of pmem_run_command with:
+# ndctl create-namespace -t pmem -m raw -s 671088640
+ndctl_create_640M = """{
+  "dev":"namespace1.0",
+  "mode":"raw",
+  "size":"640.00 MiB (671.09 MB)",
+  "uuid":"5ac1f81d-86e6-4f07-9460-8c4d37027f7a",
+  "sector_size":512,
+  "blockdev":"pmem1"
+}"""
+
+# ndctl_list_N_tow_namespaces: the mock return value of pmem_run_command with:
+# ndctl list -N
+ndctl_list_N_two_namespaces = """[
+  {
+    "dev":"namespace1.0",
+    "mode":"sector",
+    "size":1071616000,
+    "uuid":"afcf050d-3a8b-4f48-88a5-16d7c40ab2d8",
+    "sector_size":4096,
+    "blockdev":"pmem1s"
+  },
+  {
+    "dev":"namespace1.1",
+    "mode":"raw",
+    "size":671088640,
+    "uuid":"fb704339-729b-4cc7-b260-079f2633d84f",
+    "sector_size":512,
+    "blockdev":"pmem1.1"
+  }
+]"""
+
 
 class TestPmem(ModuleTestCase):
     def setUp(self):
@@ -209,6 +306,17 @@ class TestPmem(ModuleTestCase):
             self.assertAlmostEqual(test_result[i]['reserved'], reserved[i])
             if socket:
                 self.assertAlmostEqual(test_result[i]['socket'], i)
+
+    def result_check_ns(self, result, namespace):
+        self.assertTrue(result.exception.args[0]['changed'])
+        self.assertFalse(result.exception.args[0]['reboot_required'])
+
+        test_result = result.exception.args[0]['result']
+        expected = json.loads(namespace)
+
+        for i, notuse in enumerate(test_result):
+            self.assertEqual(test_result[i]['dev'], expected[i]['dev'])
+            self.assertEqual(test_result[i]['size'], expected[i]['size'])
 
     def test_fail_when_required_args_missing(self):
         with self.assertRaises(AnsibleFailJson):
@@ -409,3 +517,190 @@ class TestPmem(ModuleTestCase):
                 pmem_module.main()
             self.result_check(
                 result, True, [12884901888, 12884901888], [94489280512, 94489280512], [164115382272, 164115382272])
+
+    def test_fail_when_namespace_without_mode(self):
+        with self.assertRaises(AnsibleFailJson):
+            set_module_args({
+                'namespace': [
+                    {
+                        'size': '1GB',
+                        'type': 'pmem',
+                    },
+                    {
+                        'size': '2GB',
+                        'type': 'blk',
+                    },
+                ],
+            })
+            pmem_module.main()
+
+    def test_fail_when_region_is_empty(self):
+        with self.assertRaises(AnsibleFailJson):
+            set_module_args({
+                'namespace': [
+                    {
+                        'size': '1GB',
+                        'type': 'pmem',
+                        'mode': 'sector',
+                    },
+                ],
+            })
+            with patch(
+                    'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                    side_effect=[ndctl_region_empty]):
+                pmem_module.main()
+
+    def test_fail_when_namespace_invalid_size(self):
+        with self.assertRaises(AnsibleFailJson):
+            set_module_args({
+                'namespace': [
+                    {
+                        'size': '1XXX',
+                        'type': 'pmem',
+                        'mode': 'sector',
+                    },
+                ],
+            })
+            with patch(
+                    'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                    side_effect=[ndctl_region]):
+                pmem_module.main()
+
+    def test_fail_when_size_is_invalid_alignment(self):
+        with self.assertRaises(AnsibleFailJson):
+            set_module_args({
+                'namespace': [
+                    {
+                        'size': '400MB',
+                        'type': 'pmem',
+                        'mode': 'sector'
+                    },
+                    {
+                        'size': '500MB',
+                        'type': 'pmem',
+                        'mode': 'sector'
+                    },
+                ],
+            })
+            with patch(
+                    'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                    side_effect=[ndctl_region]):
+                pmem_module.main()
+
+    def test_fail_when_blk_is_unsupported_type(self):
+        with self.assertRaises(AnsibleFailJson):
+            set_module_args({
+                'namespace': [
+                    {
+                        'size': '4GB',
+                        'type': 'pmem',
+                        'mode': 'sector'
+                    },
+                    {
+                        'size': '5GB',
+                        'type': 'blk',
+                        'mode': 'sector'
+                    },
+                ],
+            })
+            with patch(
+                    'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                    side_effect=[ndctl_region]):
+                pmem_module.main()
+
+    def test_fail_when_size_isnot_set_to_multiple_namespaces(self):
+        with self.assertRaises(AnsibleFailJson):
+            set_module_args({
+                'namespace': [
+                    {
+                        'type': 'pmem',
+                        'mode': 'sector'
+                    },
+                    {
+                        'size': '500GB',
+                        'type': 'blk',
+                        'mode': 'sector'
+                    },
+                ],
+            })
+            with patch(
+                    'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                    side_effect=[ndctl_region]):
+                pmem_module.main()
+
+    def test_fail_when_size_of_namespace_over_available(self):
+        with self.assertRaises(AnsibleFailJson):
+            set_module_args({
+                'namespace': [
+                    {
+                        'size': '400GB',
+                        'type': 'pmem',
+                        'mode': 'sector'
+                    },
+                    {
+                        'size': '500GB',
+                        'type': 'pmem',
+                        'mode': 'sector'
+                    },
+                ],
+            })
+            with patch(
+                    'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                    side_effect=[ndctl_region]):
+                pmem_module.main()
+
+    def test_when_namespace0_without_size(self):
+        set_module_args({
+            'namespace': [
+                {
+                    'type': 'pmem',
+                    'mode': 'sector'
+                },
+            ],
+        })
+        with patch(
+                'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                side_effect=[ndctl_region, ndctl_create_without_size, ndctl_list_N]):
+            with self.assertRaises(AnsibleExitJson) as result:
+                pmem_module.main()
+            self.result_check_ns(result, ndctl_list_N)
+
+    def test_when_namespace0_with_namespace_append(self):
+        set_module_args({
+            'namespace': [
+                {
+                    'size': '640MB',
+                    'type': 'pmem',
+                    'mode': 'raw'
+                },
+            ],
+            'namespace_append': True,
+        })
+        with patch(
+                'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                side_effect=[ndctl_region, ndctl_create_640M, ndctl_list_N_two_namespaces]):
+            with self.assertRaises(AnsibleExitJson) as result:
+                pmem_module.main()
+            self.result_check_ns(result, ndctl_list_N_two_namespaces)
+
+    def test_when_namespace0_1GiB_pmem_sector_namespace1_640MiB_pmem_raw(self):
+        set_module_args({
+            'namespace': [
+                {
+                    'size': '1GB',
+                    'type': 'pmem',
+                    'mode': 'sector'
+                },
+                {
+                    'size': '640MB',
+                    'type': 'pmem',
+                    'mode': 'raw',
+                },
+            ],
+        })
+        with patch(
+                'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                side_effect=[ndctl_region, ndctl_create_1G, ndctl_create_640M, ndctl_list_N_two_namespaces]):
+            with self.assertRaises(AnsibleExitJson) as result:
+                pmem_module.main()
+            self.result_check_ns(result, ndctl_list_N_two_namespaces)
