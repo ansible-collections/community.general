@@ -15,7 +15,7 @@ DOCUMENTATION = '''
       - Enables Ansible to retrieve, create or update passwords from the passwordstore.org pass utility.
         It also retrieves YAML style keys stored as multilines in the passwordfile.
       - To avoid problems when accessing multiple secrets at once, add C(auto-expand-secmem) to
-        C(~/.gnupg/gpg-agent.conf). Where this is not possible, consider using C(lock=readwrite) instead.
+        C(~/.gnupg/gpg-agent.conf). Where this is not possible, consider using I(lock=readwrite) instead.
     options:
       _terms:
         description: query key.
@@ -372,21 +372,20 @@ class LookupModule(LookupBase):
         if self.get_option('lock') == type:
             tmpdir = os.environ.get('TMPDIR', '/tmp')
             lockfile = os.path.join(tmpdir, '.passwordstore.lock')
-            timeout = self.get_option('locktimeout')
-            if not re.match('^[0-9]+[smh]$', timeout):
-                raise AnsibleError("{0} is not a correct value for locktimeout".format(timeout))
-            unit_to_seconds = {"s": 1, "m": 60, "h": 3600}
-            timeout = int(timeout[:-1]) * unit_to_seconds[timeout[-1]]
-            with FileLock().lock_file(lockfile, tmpdir, timeout):
+            with FileLock().lock_file(lockfile, tmpdir, self.lock_timeout):
                 self.locked = type
                 yield
             self.locked = None
         else:
             yield
 
-    def run(self, terms, variables, **kwargs):
-        result = []
+    def setup(self, variables):
         self.locked = None
+        timeout = self.get_option('locktimeout')
+        if not re.match('^[0-9]+[smh]$', timeout):
+            raise AnsibleError("{0} is not a correct value for locktimeout".format(timeout))
+        unit_to_seconds = {"s": 1, "m": 60, "h": 3600}
+        self.lock_timeout = int(timeout[:-1]) * unit_to_seconds[timeout[-1]]
         self.paramvals = {
             'subkey': 'password',
             'directory': variables.get('passwordstore', os.environ.get(
@@ -401,6 +400,10 @@ class LookupModule(LookupBase):
             'backup': False,
             'missing': 'error',
         }
+
+    def run(self, terms, variables, **kwargs):
+        self.setup(variables)
+        result = []
 
         for term in terms:
             self.parse_params(term)   # parse the input into paramvals
