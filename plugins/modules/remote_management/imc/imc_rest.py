@@ -261,7 +261,6 @@ output:
 '''
 
 import datetime
-import itertools
 import os
 import traceback
 from functools import partial
@@ -283,6 +282,7 @@ except ImportError:
     HAS_XMLJSON_COBRA = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.six.moves import zip_longest
 from ansible.module_utils.urls import fetch_url
 
 
@@ -318,7 +318,7 @@ def merge(one, two):
         return copy
 
     elif isinstance(one, list) and isinstance(two, list):
-        return [merge(alpha, beta) for (alpha, beta) in itertools.izip_longest(one, two)]
+        return [merge(alpha, beta) for (alpha, beta) in zip_longest(one, two)]
 
     return one if two is None else two
 
