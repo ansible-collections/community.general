@@ -1,3 +1,0 @@
-minor_changes:
-  - pmem - add ``namespace`` and ``namespace_append`` options to configure the namespace
-    of PMem (https://github.com/ansible-collections/community.general/pull/4225).

@@ -81,7 +81,6 @@ options:
      - This enables to set the configuration for the namespace of the PMem.
     type: list
     elements: dict
-    version_added: 4.6.0
     suboptions:
       mode:
         description:
@@ -110,7 +109,6 @@ options:
     type: bool
     default: false
     required: false
-    version_added: 4.6.0
 '''
 
 RETURN = r'''
@@ -143,7 +141,6 @@ result:
         namespace:
           description: The list of the detail of namespace.
           type: list
-          version_added: 4.6.0
     sample: [
                 {
                     "appdirect": 111669149696,
