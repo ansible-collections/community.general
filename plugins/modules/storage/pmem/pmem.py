@@ -105,7 +105,7 @@ options:
   namespace_append:
     description:
      - Enable to append the new namespaces to the system.
-     - The default is C(false) so the all existing namespaces not listed in I{namespace) are removed.
+     - The default is C(false) so the all existing namespaces not listed in I(namespace) are removed.
     type: bool
     default: false
     required: false
