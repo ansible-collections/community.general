@@ -67,6 +67,26 @@ def ansible_to_proxmox_bool(value):
     return 1 if value else 0
 
 
+def proxmox_string_to_ansible_dict(string):
+    """Convert a comma separated string of key=value pairs that is obtained from the API or from params to a dict in
+     the format of {key: value}. For some API endpoints, the first part contains just the value and no key. In this case
+     the resulting dict will have a key that is the empty string ('') whose value is the verbatim value from the API"""
+    return dict(pair.split('=') if '=' in pair else ['', pair] for pair in string.split(','))
+
+
+def ansible_dict_to_proxmox_string(kv_dict):
+    """Convert a dict in the format of {key: value} in a strnig that the PVE API can understand, namely a comma
+     separated string of key=value pairs. Developer is responsible for the dict having the correct key/values pairs. In
+     case the API expects the first argument not to have a key (for instance storage definitions usually start with the
+     volume specification) then use an empty string ('') as the key, the function will output it as the first part of
+     the string"""
+    if isinstance(kv_dict, dict):
+        join_list = []
+        if '' in kv_dict:
+            join_list.append(kv_dict[''])
+            del kv_dict['']
+        return ','.join([k + '=' + str(v) for k, v in kv_dict.items()])
+
 class ProxmoxAnsible(object):
     """Base class for Proxmox modules"""
     def __init__(self, module):

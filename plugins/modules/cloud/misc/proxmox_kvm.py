@@ -228,135 +228,139 @@ options:
           - to be written
         type: str
         choices: ['ide0', 'ide1', 'ide2', 'ide3']
-      storage:
+      storage : &storage_option_storage
         description:
           - to be written
         type: str
-      size_in_gb:
+      size_in_gb : &storage_option_size_in_gb
         description:
           - to be written
         type: float
-      aio:
+      aio : &storage_option_aio
         description:
           - to be written
         type: str
         choices: ['native', 'threads', 'io_uring']
-      backup:
+      backup : &storage_option_backup
         description:
           - to be written
         type: bool
-      bps:
+      bps : &storage_option_bps
         description:
           - to be written
         type: int
-      bps_max_length:
+      bps_max_length : &storage_option_bps_max_length
         description:
           - to be written
         type: int
-      bps_rd:
+      bps_rd : &storage_option_bps_rd
         description:
           - to be written
         type: int
-      bps_rd_max_length:
+      bps_rd_max_length : &storage_option_bps_rd_max_length
         description:
           - to be written
         type: int
-      bps_wr:
+      bps_wr : &storage_option_bps_wr
         description:
           - to be written
         type: int
-      bps_wr_max_length:
+      bps_wr_max_length : &storage_option_bps_wr_max_length
         description:
           - to be written
         type: int
-      cache:
+      cache : &storage_option_cache
         description:
           - to be written
         type: str
         choices: ['directsync', 'none', 'unsafe', 'writeback', 'writethrough']
-      cyls:
+      cyls : &storage_option_cyls
         description:
           - to be written
         type: int
-      detect_zeroes:
+      detect_zeroes : &storage_option_detect_zeroes
         description:
           - to be written
         type: bool
-      discard:
+      discard : &storage_option_discard
         description:
           - to be written
         type: str
         choices: ['ignore', 'on']
-      format:
+      file : &storage_option_file
+        description:
+          - to be written
+        type: str
+      format : &storage_option_format
         description:
           - to be written
         type: str
         choices: ['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk']
-      heads:
+      heads : &storage_option_heads
         description:
           - to be written
         type: int
-      iops:
+      iops : &storage_option_iops
         description:
           - to be written
         type: int
-      iops_max:
+      iops_max : &storage_option_iops_max
         description:
           - to be written
         type: int
-      iops_max_length:
+      iops_max_length : &storage_option_iops_max_length
         description:
           - to be written
         type: int
-      iops_rd:
+      iops_rd : &storage_option_iops_rd
         description:
           - to be written
         type: int
-      iops_rd_max:
+      iops_rd_max : &storage_option_iops_rd_max
         description:
           - to be written
         type: int
-      iops_rd_max_length:
+      iops_rd_max_length : &storage_option_iops_rd_max_length
         description:
           - to be written
         type: int
-      iops_wr:
+      iops_wr : &storage_option_iops_wr
         description:
           - to be written
         type: int
-      iops_wr_max:
+      iops_wr_max : &storage_option_iops_wr_max
         description:
           - to be written
         type: int
-      iops_wr_max_length:
+      iops_wr_max_length : &storage_option_iops_wr_max_length
         description:
           - to be written
         type: int
-      mbps:
+      mbps : &storage_option_mbps
         description:
           - to be written
         type: int
-      mbps_max:
+      mbps_max : &storage_option_mbps_max
         description:
           - to be written
         type: int
-      mbps_rd:
+      mbps_rd : &storage_option_mbps_rd
         description:
           - to be written
         type: int
-      mbps_rd_max:
+      mbps_rd_max : &storage_option_mbps_rd_max
         description:
           - to be written
         type: int
-      mbps_wr:
+      mbps_wr : &storage_option_mbps_wr
         description:
           - to be written
         type: int
-      mbps_wr_max:
+      mbps_wr_max : &storage_option_mbps_wr_max
         description:
           - to be written
         type: int
-      media:
+      media : &storage_option_media
         description:
           - to be written
         type: str
@@ -365,49 +369,50 @@ options:
         description:
           - to be written
         type: str
-      replicate:
+      replicate : &storage_option_replicate
         description:
           - to be written
         type: bool
-      rerror:
+      rerror : &storage_option_rerror
         description:
           - to be written
         type: str
         choices: ['ignore', 'report', 'stop']
-      secs:
+      secs : &storage_option_secs
         description:
           - to be written
         type: int
-      serial:
+      serial : &storage_option_serial
         description:
           - to be written
         type: str
-      shared:
+      shared : &storage_option_shared
         description:
           - to be written
         type: bool
-      size:
+      size : &storage_option_size
         description:
           - to be written
         type: str
-      snapshot:
+      snapshot : &storage_option_snapshot
         description:
           - to be written
         type: bool
-      trans:
+      trans : &storage_option_trans
         description:
           - to be written
         type: str
         choices: ['none', 'lba', 'auto']
-      werror:
+      werror : &storage_option_werror
         description:
           - to be written
         type: str
         choices: ['enospc', 'ignore', 'report', 'stop']
-      wwn:
+      wwn : &storage_option_wwn
         description:
           - to be written
         type: str
+    version_added: 5.0.0
   ipconfig:
     description:
       - 'cloud-init: Set the IP configuration.'
@@ -555,186 +560,54 @@ options:
           - to be written
         type: str
         choices: ['sata0', 'sata1', 'sata2', 'sata3', 'sata4', 'sata5']
-      storage:
-        description:
-          - to be written
-        type: str
-      size_in_gb:
-        description:
-          - to be written
-        type: float
-      aio:
-        description:
-          - to be written
-        type: str
-        choices: ['native', 'threads', 'io_uring']
-      backup:
-        description:
-          - to be written
-        type: bool
-      bps:
-        description:
-          - to be written
-        type: int
-      bps_max_length:
-        description:
-          - to be written
-        type: int
-      bps_rd:
-        description:
-          - to be written
-        type: int
-      bps_rd_max_length:
-        description:
-          - to be written
-        type: int
-      bps_wr:
-        description:
-          - to be written
-        type: int
-      bps_wr_max_length:
-        description:
-          - to be written
-        type: int
-      cache:
-        description:
-          - to be written
-        type: str
-        choices: ['directsync', 'none', 'unsafe', 'writeback', 'writethrough']
-      cyls:
-        description:
-          - to be written
-        type: int
-      detect_zeroes:
-        description:
-          - to be written
-        type: bool
-      discard:
-        description:
-          - to be written
-        type: str
-        choices: ['ignore', 'on']
-      format:
-        description:
-          - to be written
-        type: str
-        choices: ['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk']
-      heads:
-        description:
-          - to be written
-        type: int
-      iops:
-        description:
-          - to be written
-        type: int
-      iops_max:
-        description:
-          - to be written
-        type: int
-      iops_max_length:
-        description:
-          - to be written
-        type: int
-      iops_rd:
-        description:
-          - to be written
-        type: int
-      iops_rd_max:
-        description:
-          - to be written
-        type: int
-      iops_rd_max_length:
-        description:
-          - to be written
-        type: int
-      iops_wr:
-        description:
-          - to be written
-        type: int
-      iops_wr_max:
-        description:
-          - to be written
-        type: int
-      iops_wr_max_length:
-        description:
-          - to be written
-        type: int
-      mbps:
-        description:
-          - to be written
-        type: int
-      mbps_max:
-        description:
-          - to be written
-        type: int
-      mbps_rd:
-        description:
-          - to be written
-        type: int
-      mbps_rd_max:
-        description:
-          - to be written
-        type: int
-      mbps_wr:
-        description:
-          - to be written
-        type: int
-      mbps_wr_max:
-        description:
-          - to be written
-        type: int
-      media:
-        description:
-          - to be written
-        type: str
-        choices: ['disk', 'cdrom']
-      replicate:
-        description:
-          - to be written
-        type: bool
-      rerror:
-        description:
-          - to be written
-        type: str
-        choices: ['ignore', 'report', 'stop']
-      secs:
-        description:
-          - to be written
-        type: int
-      serial:
-        description:
-          - to be written
-        type: str
-      shared:
-        description:
-          - to be written
-        type: bool
-      size:
-        description:
-          - to be written
-        type: str
-      snapshot:
-        description:
-          - to be written
-        type: bool
+      storage: *storage_option_storage
+      size_in_gb: *storage_option_size_in_gb
+      aio: *storage_option_aio
+      backup: *storage_option_backup
+      bps: *storage_option_bps
+      bps_max_length: *storage_option_bps_max_length
+      bps_rd: *storage_option_bps_rd
+      bps_rd_max_length: *storage_option_bps_max_length
+      bps_wr: *storage_option_bps_wr
+      bps_wr_max_length: *storage_option_wr_max_length
+      cache: *storage_option_cache
+      cyls: *storage_option_cyls
+      detect_zeroes: *storage_option_detect_zeroes
+      discard: *storage_option_discard
+      file: *storage_option_file
+      format: *storage_option_format
+      heads: *storage_option_heads
+      iops: *storage_option_iops
+      iops_max: *storage_option_iops_max
+      iops_max_length: *storage_option_iops_max_length
+      iops_rd: *storage_option_iops_rd
+      iops_rd_max: *storage_option_iops_rd_max
+      iops_rd_max_length: *storage_option_iops_rd_max_length
+      iops_wr: *storage_option_iops_wr
+      iops_wr_max: *storage_option_iops_wr_max
+      iops_wr_max_length: *storage_option_iops_wr_max_length
+      mbps: *storage_option_mbps
+      mbps_max: *storage_option_mbps_max
+      mbps_rd: *storage_option_mbps_rd
+      mbps_rd_max: *storage_option_mbps_rd_max
+      mbps_wr: *storage_mbps_wr
+      mbps_wr_max: *storage_mbps_wr_max
+      media: *storage_option_media
+      replicate: *storage_option_replicate
+      rerror: *storage_option_rerror
+      secs: *storage_option_secs
+      serial: *storage_option_serial
+      shared: *storage_option_shared
+      size: *storage_option_size
+      snapshot: *storage_option_snapshot
       ssd:
         description:
           - to be written
         type: bool
-      trans:
-        description:
-          - to be written
-        type: str
-        choices: ['none', 'lba', 'auto']
-      werror:
-        description:
-          - to be written
-        type: str
-        choices: ['enospc', 'ignore', 'report', 'stop']
-      wwn:
-        description:
-          - to be written
-        type: str
+      trans: *storage_option_trans
+      werror: *storage_option_werror
+      wwn: *storage_option_wwn
+    version_added: 5.0.0
   scsi_dictstr:
     description:
       - A hash/dictionary of volume used as SCSI hard disk or CD-ROM. C(scsi='{"key":"value", "key":"value"}').
@@ -761,198 +634,66 @@ options:
         choices: ['scsi0', 'scsi1', 'scsi2', 'scsi3', 'scsi4', 'scsi5', 'scsi6', 'scsi7', 'scsi8', 'scsi9', 'scsi10',
         'scsi11', 'scsi12', 'scsi13', 'scsi14', 'scsi15', 'scsi16', 'scsi17', 'scsi18', 'scsi19', 'scsi20', 'scsi21',
         'scsi22', 'scsi23', 'scsi24', 'scsi25', 'scsi26', 'scsi27', 'scsi28', 'scsi29', 'scsi30']
-      storage:
-        description:
-          - to be written
-        type: str
-      size_in_gb:
-        description:
-          - to be written
-        type: float
-      aio:
-        description:
-          - to be written
-        type: str
-        choices: ['native', 'threads', 'io_uring']
-      backup:
-        description:
-          - to be written
-        type: bool
-      bps:
-        description:
-          - to be written
-        type: int
-      bps_max_length:
-        description:
-          - to be written
-        type: int
-      bps_rd:
-        description:
-          - to be written
-        type: int
-      bps_rd_max_length:
-        description:
-          - to be written
-        type: int
-      bps_wr:
-        description:
-          - to be written
-        type: int
-      bps_wr_max_length:
-        description:
-          - to be written
-        type: int
-      cache:
-        description:
-          - to be written
-        type: str
-        choices: ['directsync', 'none', 'unsafe', 'writeback', 'writethrough']
-      cyls:
-        description:
-          - to be written
-        type: int
-      detect_zeroes:
-        description:
-          - to be written
-        type: bool
-      discard:
-        description:
-          - to be written
-        type: str
-        choices: ['ignore', 'on']
-      format:
-        description:
-          - to be written
-        type: str
-        choices: ['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk']
-      heads:
-        description:
-          - to be written
-        type: int
-      iops:
-        description:
-          - to be written
-        type: int
-      iops_max:
-        description:
-          - to be written
-        type: int
-      iops_max_length:
-        description:
-          - to be written
-        type: int
-      iops_rd:
-        description:
-          - to be written
-        type: int
-      iops_rd_max:
-        description:
-          - to be written
-        type: int
-      iops_rd_max_length:
-        description:
-          - to be written
-        type: int
-      iops_wr:
-        description:
-          - to be written
-        type: int
-      iops_wr_max:
-        description:
-          - to be written
-        type: int
-      iops_wr_max_length:
-        description:
-          - to be written
-        type: int
-      mbps:
-        description:
-          - to be written
-        type: int
-      mbps_max:
-        description:
-          - to be written
-        type: int
-      mbps_rd:
-        description:
-          - to be written
-        type: int
-      mbps_rd_max:
-        description:
-          - to be written
-        type: int
-      mbps_wr:
-        description:
-          - to be written
-        type: int
-      mbps_wr_max:
-        description:
-          - to be written
-        type: int
-      media:
-        description:
-          - to be written
-        type: str
-        choices: ['disk', 'cdrom']
+      storage: *storage_option_storage
+      size_in_gb: *storage_option_size_in_gb
+      aio: *storage_option_aio
+      backup: *storage_option_backup
+      bps: *storage_option_bps
+      bps_max_length: *storage_option_bps_max_length
+      bps_rd: *storage_option_bps_rd
+      bps_rd_max_length: *storage_option_bps_rd_max_length
+      bps_wr: *storage_option_bps_wr
+      bps_wr_max_length: *storage_option_bps_wr_max_length
+      cache: *storage_option_cache
+      cyls: *storage_option_cyls
+      detect_zeroes: *storage_option_detect_zeroes
+      discard: *storage_option_discard
+      file: *storage_option_file
+      format: *storage_option_format
+      heads: *storage_option_heads
+      iops: *storage_option_iops
+      iops_max: *storage_option_iops_max
+      iops_max_length: *storage_option_iops_max_length
+      iops_rd: *storage_option_iops_rd
+      iops_rd_max: *storage_option_iops_rd_max
+      iops_rd_max_length: *storage_option_iops_rd_max_length
+      iops_wr: *storage_option_iops_wr
+      iops_wr_max: *storage_option_iops_wr_max
+      iops_wr_max_length: *storage_option_iops_wr_max_length
+      mbps: *storage_option_mbps
+      mbps_max: *storage_option_mbps_max
+      mbps_rd: *storage_option_mbps_rd
+      mbps_rd_max: *storage_option_mbps_rd_max
+      mbps_wr: *storage_option_mbps_wr
+      mbps_wr_max: *storage_option_mbps_wr_max
+      media: *storage_option_media
       queues:
         description:
           - to be written
         type: int
-      replicate:
-        description:
-          - to be written
-        type: bool
-      rerror:
-        description:
-          - to be written
-        type: str
-        choices: ['ignore', 'report', 'stop']
+      replicate: *storage_option_replicate
+      rerror: *storage_option_rerror
       ro:
         description:
-          - to be writtent
+          - to be written
         type: bool
       scsibloc:
         description:
           - to be written
         type: bool
-      secs:
-        description:
-          - to be written
-        type: int
-      serial:
-        description:
-          - to be written
-        type: str
-      shared:
-        description:
-          - to be written
-        type: bool
-      size:
-        description:
-          - to be written
-        type: str
-      snapshot:
-        description:
-          - to be written
-        type: bool
+      secs: *storage_option_secs
+      serial: *storage_option_serial
+      shared: *storage_option_shared
+      size: *storage_option_size
+      snapshot: *storage_option_snapshot
       ssd:
         description:
           - to be written
         type: bool
-      trans:
-        description:
-          - to be written
-        type: str
-        choices: ['none', 'lba', 'auto']
-      werror:
-        description:
-          - to be written
-        type: str
-        choices: ['enospc', 'ignore', 'report', 'stop']
-      wwn:
-        description:
-          - to be written
-        type: str
+      trans: *storage_option_trans
+      werror: *storage_option_werror
+      wwn: *storage_option_wwn
+    version_added: 5.0.0
   scsihw:
     description:
       - Specifies the SCSI controller model.
@@ -1099,186 +840,54 @@ options:
         type: str
         choices: ['virtio0', 'virtio1', 'virtio2', 'virtio3', 'virtio4', 'virtio5', 'virtio6', 'virtio7', 'virtio8',
         'virtio9', 'virtio10', 'virtio11', 'virtio12', 'virtio13', 'virtio14', 'virtio15']
-      storage:
-        description:
-          - to be written
-        type: str
-      size_in_gb:
-        description:
-          - to be written
-        type: float
-      aio:
-        description:
-          - to be written
-        type: str
-        choices: ['native', 'threads', 'io_uring']
-      backup:
-        description:
-          - to be written
-        type: bool
-      bps:
-        description:
-          - to be written
-        type: int
-      bps_max_length:
-        description:
-          - to be written
-        type: int
-      bps_rd:
-        description:
-          - to be written
-        type: int
-      bps_rd_max_length:
-        description:
-          - to be written
-        type: int
-      bps_wr:
-        description:
-          - to be written
-        type: int
-      bps_wr_max_length:
-        description:
-          - to be written
-        type: int
-      cache:
-        description:
-          - to be written
-        type: str
-        choices: ['directsync', 'none', 'unsafe', 'writeback', 'writethrough']
-      cyls:
-        description:
-          - to be written
-        type: int
-      detect_zeroes:
-        description:
-          - to be written
-        type: bool
-      discard:
-        description:
-          - to be written
-        type: str
-        choices: ['ignore', 'on']
-      format:
-        description:
-          - to be written
-        type: str
-        choices: ['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk']
-      heads:
-        description:
-          - to be written
-        type: int
-      iops:
-        description:
-          - to be written
-        type: int
-      iops_max:
-        description:
-          - to be written
-        type: int
-      iops_max_length:
-        description:
-          - to be written
-        type: int
-      iops_rd:
-        description:
-          - to be written
-        type: int
-      iops_rd_max:
-        description:
-          - to be written
-        type: int
-      iops_rd_max_length:
-        description:
-          - to be written
-        type: int
-      iops_wr:
-        description:
-          - to be written
-        type: int
-      iops_wr_max:
-        description:
-          - to be written
-        type: int
-      iops_wr_max_length:
-        description:
-          - to be written
-        type: int
-      mbps:
-        description:
-          - to be written
-        type: int
-      mbps_max:
-        description:
-          - to be written
-        type: int
-      mbps_rd:
-        description:
-          - to be written
-        type: int
-      mbps_rd_max:
-        description:
-          - to be written
-        type: int
-      mbps_wr:
-        description:
-          - to be written
-        type: int
-      mbps_wr_max:
-        description:
-          - to be written
-        type: int
-      media:
-        description:
-          - to be written
-        type: str
-        choices: ['disk', 'cdrom']
-      replicate:
-        description:
-          - to be written
-        type: bool
-      rerror:
-        description:
-          - to be written
-        type: str
-        choices: ['ignore', 'report', 'stop']
+      storage: *storage_option_storage
+      size_in_gb: *storage_option_size_in_gb
+      aio: *storage_option_aio
+      backup: *storage_option_backup
+      bps: *storage_option_bps
+      bps_max_length: *storage_option_bps_max_length
+      bps_rd: *storage_option_bps_rd
+      bps_rd_max_length: *storage_option_bps_rd_max_length
+      bps_wr: *storage_option_bps_wr
+      bps_wr_max_length: *storage_option_bps_wr_max_length
+      cache: *storage_option_cache
+      cyls: *storage_option_cyls
+      detect_zeroes: *storage_option_detect_zeroes
+      discard: *storage_option_discard
+      file: *storage_option_file
+      format: *storage_option_format
+      heads: *storage_option_heads
+      iops: *storage_option_iops
+      iops_max: *storage_option_iops_max
+      iops_max_length: *storage_option_iops_max_length
+      iops_rd: *storage_option_iops_rd
+      iops_rd_max: *storage_option_iops_rd_max
+      iops_rd_max_length: *storage_option_iops_rd_max_length
+      iops_wr: *storage_option_iops_wr
+      iops_wr_max: *storage_option_iops_wr_max
+      iops_wr_max_length: *storage_option_iops_wr_max_length
+      mbps: *storage_option_mbps
+      mbps_max: *storage_option_mbps_max
+      mbps_rd: *storage_option_mbps_rd
+      mbps_rd_max: *storage_option_mbps_rd_max
+      mbps_wr: *storage_option_mbps_wr
+      mbps_wr_max: *storage_option_mbps_wr_max
+      media: *storage_option_media
+      replicate: *storage_option_replicate
+      rerror: *storage_option_rerror
       ro:
         description:
           - to be written
         type: bool
-      secs:
-        description:
-          - to be written
-        type: int
-      serial:
-        description:
-          - to be written
-        type: str
-      shared:
-        description:
-          - to be written
-        type: bool
-      size:
-        description:
-          - to be written
-        type: str
-      snapshot:
-        description:
-          - to be written
-        type: bool
-      trans:
-        description:
-          - to be written
-        type: str
-        choices: ['none', 'lba', 'auto']
-      werror:
-        description:
-          - to be written
-        type: str
-        choices: ['enospc', 'ignore', 'report', 'stop']
-      wwn:
-        description:
-          - to be written
-        type: str
+      secs: *storage_option_secs
+      serial: *storage_option_serial
+      shared: *storage_option_shared
+      size: *storage_option_size
+      snapshot: *storage_option_snapshot
+      trans: *storage_option_trans
+      werror: *storage_option_werror
+      wwn: *storage_option_wwn
+    version_added: 5.0.0
   watchdog:
     description:
       - Creates a virtual hardware watchdog device.
@@ -1675,6 +1284,102 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
 
         proxmox_node = self.proxmox_api.nodes(node)
 
+        module_params = self.module.params
+
+        update = module_params['update']
+        vmid = module_params['vmid']
+        newid = module_params['newid']
+        clone = module_params['clone']
+
+        create_params = dict(
+            node=module_params['node'],
+            vmid=module_params['vmid'],
+            acpi=module_params['acpi'],
+            agent=module_params['agent'],
+            arch=module_params['arch'],
+            args=module_params['args'],
+            audio0=module_params['audio0'],
+            autostart=module_params['autostart'],
+            background_delay=module_params['background_delay'],
+            balloon=module_params['balloon'],
+            bios=module_params['bios'],
+            boot=module_params['boot'],
+            bootdisk=module_params['bootdisk'],
+            cdrom=module_params['cdrom'],
+            cicustom=module_params['cicustom'],
+            cipassword=module_params['cipassword'],
+            citype=module_params['citype'],
+            ciuser=module_params['ciuser'],
+            cores=module_params['cores'],
+            cpu=module_params['cpu'],
+            cpulimit=module_params['cpulimit'],
+            cpuunits=module_params['cpuunits'],
+            delete=module_params['delete'],
+            description=module_params['description'],
+            digest=module_params['digest'],
+            efidisk0=module_params['efidisk0'],
+            force=module_params['force'],
+            freeze=module_params['freeze'],
+            hookscript=module_params['hookscript'],
+            hostpci=module_params['hostpci'],
+            hotplug=module_params['hotplug'],
+            hugepages=module_params['hugepages'],
+            ide_dictstr=module_params['ide_dictstr'],
+            ide_listdict=module_params['ide_listdict'],
+            ipconfig=module_params['ipconfig'],
+            ivshmem=module_params['ivshmem'],
+            keephugepages=module_params['keephugepages'],
+            keyboard=module_params['keyboard'],
+            kvm=module_params['kvm'],
+            localtime=module_params['localtime'],
+            lock=module_params['lock'],
+            machine=module_params['machine'],
+            memory=module_params['memory'],
+            migrate_downtime=module_params['migrate_downtime'],
+            migrate_speed=module_params['migrate_speed'],
+            name=module_params['name'],
+            nameserver=module_params['nameserver'],
+            net=module_params['net'],
+            numa=module_params['numa_enabled'],
+            numas=module_params['numa'],
+            onboot=module_params['onboot'],
+            ostype=module_params['ostype'],
+            parallel=module_params['parallel'],
+            protection=module_params['protection'],
+            reboot=module_params['reboot'],
+            revert=module_params['revert'],
+            rng0=module_params['rng0'],
+            sata_dictstr=module_params['sata_dictstr'],
+            sata_listdict=module_params['sata_listdict'],
+            scsi_dictstr=module_params['scsi_dictstr'],
+            scsi_listdict=module_params['scsi_listdict'],
+            scsihw=module_params['scsihw'],
+            searchdomain=module_params['searchdomain'],
+            serial=module_params['serial'],
+            shares=module_params['shares'],
+            skiplock=module_params['skiplock'],
+            smbios1=module_params['smbios'],
+            smp=module_params['smp'],
+            sockets=module_params['sockets'],
+            spice_enhancements=module_params['spice_enhancements'],
+            sshkeys=module_params['sshkeys'],
+            startdate=module_params['startdate'],
+            startup=module_params['startup'],
+            tablet=module_params['tablet'],
+            tags=module_params['tags'],
+            tdf=module_params['tdf'],
+            template=module_params['template'],
+            unused=module_params['unused'],
+            usb=module_params['usb'],
+            vcpus=module_params['vcpus'],
+            vga=module_params['vga'],
+            virtio_dictstr=module_params['virtio_dictstr'],
+            virtio_listdict=module_params['virtio_listdict'],
+            vmgenid=module_params['vmgenid'],
+            vmstatestorage=module_params['vmstatestorage'],
+            watchdog=module_params['watchdog']
+        )
+
         # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
         kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
         kwargs.update(dict([k, int(v)] for k, v in kwargs.items() if isinstance(v, bool)))
@@ -1871,6 +1576,7 @@ def main():
                                    cyls=dict(type='int'),
                                    detect_zeroes=dict(type='bool'),
                                    discard=dict(type='str', choices=['ignore', 'on']),
+                                   file=dict(type='str'),
                                    format=format_arg_spec,
                                    heads=dict(type='int'),
                                    iops=dict(type='int'),
@@ -1960,7 +1666,8 @@ def main():
         ide_dictstr=dict(type='dict', aliases=['ide']),
         ide_listdict=dict(type='list',
                           elements='dict',
-                          options=ide_storage_arg_spec
+                          options=ide_storage_arg_spec,
+                          mutually_exclusive=[('file', 'size_in_gb')],
                           ),
         ipconfig=dict(type='dict'),
         keyboard=dict(type='str'),
@@ -1988,11 +1695,15 @@ def main():
         sata_dictstr=dict(type='dict', aliases=['sata']),
         sata_listdict=dict(type='list',
                            elements='dict',
-                           options=sata_storage_arg_spec),
+                           options=sata_storage_arg_spec,
+                           mutually_exclusive=[('file', 'size_in_gb')],
+                           ),
         scsi_dictstr=dict(type='dict', aliases=['scsi']),
         scsi_listdict=dict(type='list',
                            elements='dict',
-                           options=scsi_storage_arg_spec),
+                           options=scsi_storage_arg_spec,
+                           mutually_exclusive=[('file', 'size_in_gb')],
+                           ),
         scsihw=dict(choices=['lsi', 'lsi53c810', 'virtio-scsi-pci', 'virtio-scsi-single', 'megasas', 'pvscsi']),
         serial=dict(type='dict'),
         searchdomains=dict(type='list', elements='str'),
@@ -2018,7 +1729,8 @@ def main():
         virtio_dictstr=dict(type='dict', aliases=['virtio']),
         virtio_listdict=dict(type='list',
                              elements='dict',
-                             options=virtio_storage_arg_spec
+                             options=virtio_storage_arg_spec,
+                             mutually_exclusive=[('file', 'size_in_gb')],
                              ),
         vmid=dict(type='int'),
         watchdog=dict(),
