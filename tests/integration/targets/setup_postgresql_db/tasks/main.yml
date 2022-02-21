@@ -99,6 +99,14 @@
   command: /sbin/service postgresql initdb
   when: ansible_os_family == "RedHat" and ansible_service_mgr != "systemd"
 
+- name: Initialize postgres (Archlinux)
+  command: su - postgres -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data'"
+  when: ansible_os_family == "Archlinux"
+
+- name: Initialize postgres (Alpine)
+  command: su - postgres -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgresql/data'"
+  when: ansible_os_family == "Alpine"
+
 - name: Initialize postgres (Debian)
   shell: . /usr/share/postgresql-common/maintscripts-functions && set_system_locale && /usr/bin/pg_createcluster -u postgres {{ pg_ver }} main
   args:
