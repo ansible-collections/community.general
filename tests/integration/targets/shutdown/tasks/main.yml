@@ -4,11 +4,11 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- name: Install systemd-sysv on ubuntu 18
+- name: Install systemd-sysv on Ubuntu 18 and Debian
   apt:
     name: systemd-sysv
     state: present
-  when: ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')
+  when: (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')) or (ansible_distribution == 'Debian')
   register: systemd_sysv_install
 
 - name: Execute shutdown with custom message and delay

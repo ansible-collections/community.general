@@ -1,0 +1,6 @@
+cryptography_package_name: py-cryptography
+cryptography_package_name_python3: py3-cryptography
+pyopenssl_package_name: py-openssl
+pyopenssl_package_name_python3: py3-openssl
+openssl_package_name: openssl
+cryptography_from_pip: false
