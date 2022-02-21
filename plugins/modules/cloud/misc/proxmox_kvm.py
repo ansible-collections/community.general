@@ -569,7 +569,7 @@ options:
       bps_rd: *storage_option_bps_rd
       bps_rd_max_length: *storage_option_bps_max_length
       bps_wr: *storage_option_bps_wr
-      bps_wr_max_length: *storage_option_wr_max_length
+      bps_wr_max_length: *storage_option_bps_wr_max_length
       cache: *storage_option_cache
       cyls: *storage_option_cyls
       detect_zeroes: *storage_option_detect_zeroes
@@ -590,8 +590,8 @@ options:
       mbps_max: *storage_option_mbps_max
       mbps_rd: *storage_option_mbps_rd
       mbps_rd_max: *storage_option_mbps_rd_max
-      mbps_wr: *storage_mbps_wr
-      mbps_wr_max: *storage_mbps_wr_max
+      mbps_wr: *storage_option_mbps_wr
+      mbps_wr_max: *storage_option_mbps_wr_max
       media: *storage_option_media
       replicate: *storage_option_replicate
       rerror: *storage_option_rerror

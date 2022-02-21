@@ -87,6 +87,7 @@ def ansible_dict_to_proxmox_string(kv_dict):
             del kv_dict['']
         return ','.join([k + '=' + str(v) for k, v in kv_dict.items()])
 
+
 class ProxmoxAnsible(object):
     """Base class for Proxmox modules"""
     def __init__(self, module):
