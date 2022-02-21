@@ -42,7 +42,7 @@ DOCUMENTATION = '''
           - section: callback_syslog_json
             key: syslog_facility
       setup:
-        description: log setup tasks
+        description: Log setup tasks.
         env:
           - name: SYSLOG_SETUP
         type: bool
