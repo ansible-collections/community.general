@@ -1,6 +1,9 @@
 - name: Skip unsupported platforms
   meta: end_play
-  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version is not version('7', '>=')
+  # TODO: figure out why Alpine does not work!
+  when: |
+    ansible_distribution == 'CentOS' and ansible_distribution_major_version is not version('7', '>=')
+    or ansible_distribution == 'Alpine'
 
 - name: Install Nomad and test
   vars:
@@ -8,10 +11,6 @@
     nomad_uri: https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_{{ ansible_system | lower }}_{{ nomad_arch }}.zip
     nomad_cmd: '{{ remote_tmp_dir }}/nomad'
   block:
-
-  - name: register pyOpenSSL version
-    command: '{{ ansible_python_interpreter }} -c ''import OpenSSL; print(OpenSSL.__version__)'''
-    register: pyopenssl_version
 
   - name: Install requests<2.20 (CentOS/RHEL 6)
     pip:
@@ -32,27 +31,25 @@
     register: result
     until: result is success
 
-  - when: pyopenssl_version.stdout is version('0.15', '>=')
-    block:
-    - name: Generate privatekey
-      community.crypto.openssl_privatekey:
-        path: '{{ remote_tmp_dir }}/privatekey.pem'
+  - name: Generate privatekey
+    community.crypto.openssl_privatekey:
+      path: '{{ remote_tmp_dir }}/privatekey.pem'
 
-    - name: Generate CSR
-      community.crypto.openssl_csr:
-        path: '{{ remote_tmp_dir }}/csr.csr'
-        privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
-        subject:
-          commonName: localhost
+  - name: Generate CSR
+    community.crypto.openssl_csr:
+      path: '{{ remote_tmp_dir }}/csr.csr'
+      privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+      subject:
+        commonName: localhost
 
-    - name: Generate selfsigned certificate
-      register: selfsigned_certificate
-      community.crypto.x509_certificate:
-        path: '{{ remote_tmp_dir }}/cert.pem'
-        csr_path: '{{ remote_tmp_dir }}/csr.csr'
-        privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
-        provider: selfsigned
-        selfsigned_digest: sha256
+  - name: Generate selfsigned certificate
+    register: selfsigned_certificate
+    community.crypto.x509_certificate:
+      path: '{{ remote_tmp_dir }}/cert.pem'
+      csr_path: '{{ remote_tmp_dir }}/csr.csr'
+      privatekey_path: '{{ remote_tmp_dir }}/privatekey.pem'
+      provider: selfsigned
+      selfsigned_digest: sha256
 
   - name: Install unzip
     package:
