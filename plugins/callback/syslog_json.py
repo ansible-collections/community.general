@@ -44,7 +44,7 @@ DOCUMENTATION = '''
       setup:
         description: Log setup tasks.
         env:
-          - name: SYSLOG_SETUP
+          - name: ANSIBLE_SYSLOG_SETUP
         type: bool
         default: true
         ini:
