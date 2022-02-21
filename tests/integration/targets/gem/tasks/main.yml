@@ -21,201 +21,205 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
-- include_vars: '{{ item }}'
-  with_first_found:
-    - files:
-        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
-        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
-        - '{{ ansible_os_family }}.yml'
-        - 'default.yml'
-      paths: '../vars'
+- when:
+    - not (ansible_os_family == 'Alpine')  # TODO
+  block:
 
-- name: Install dependencies for test
-  package:
-    name: "{{ item }}"
-    state: present
-  loop: "{{ test_packages }}"
-  when: ansible_distribution != "MacOSX"
+  - include_vars: '{{ item }}'
+    with_first_found:
+      - files:
+          - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
+          - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
+          - '{{ ansible_os_family }}.yml'
+          - 'default.yml'
+        paths: '../vars'
 
-- name: Install a gem
-  gem:
-    name: gist
-    state: present
-  register: install_gem_result
-  ignore_errors: yes
+  - name: Install dependencies for test
+    package:
+      name: "{{ item }}"
+      state: present
+    loop: "{{ test_packages }}"
+    when: ansible_distribution != "MacOSX"
 
-# when running as root on Fedora, '--install-dir' is set in the os defaults which is
-# incompatible with '--user-install', we ignore this error for this case only
-- name: fail if failed to install gem
-  fail:
-    msg: "failed to install gem: {{ install_gem_result.msg }}"
-  when:
-  - install_gem_result is failed
-  - not (ansible_user_uid == 0 and "User --install-dir or --user-install but not both" not in install_gem_result.msg)
-
-- block:
-  - name: List gems
-    command: gem list
-    register: current_gems
-
-  - name: Ensure gem was installed
-    assert:
-      that:
-        - install_gem_result is changed
-        - current_gems.stdout is search('gist\s+\([0-9.]+\)')
-
-  - name: Remove a gem
+  - name: Install a gem
     gem:
       name: gist
-      state: absent
-    register: remove_gem_results
+      state: present
+    register: install_gem_result
+    ignore_errors: yes
 
-  - name: List gems
-    command: gem list
-    register: current_gems
+  # when running as root on Fedora, '--install-dir' is set in the os defaults which is
+  # incompatible with '--user-install', we ignore this error for this case only
+  - name: fail if failed to install gem
+    fail:
+      msg: "failed to install gem: {{ install_gem_result.msg }}"
+    when:
+    - install_gem_result is failed
+    - not (ansible_user_uid == 0 and "User --install-dir or --user-install but not both" not in install_gem_result.msg)
 
-  - name: Verify gem is not installed
+  - block:
+    - name: List gems
+      command: gem list
+      register: current_gems
+
+    - name: Ensure gem was installed
+      assert:
+        that:
+          - install_gem_result is changed
+          - current_gems.stdout is search('gist\s+\([0-9.]+\)')
+
+    - name: Remove a gem
+      gem:
+        name: gist
+        state: absent
+      register: remove_gem_results
+
+    - name: List gems
+      command: gem list
+      register: current_gems
+
+    - name: Verify gem is not installed
+      assert:
+        that:
+          - remove_gem_results is changed
+          - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
+    when: not install_gem_result is failed
+
+  # install gem in --no-user-install
+  - block:
+    - name: Install a gem with --no-user-install
+      gem:
+        name: gist
+        state: present
+        user_install: no
+      register: install_gem_result
+
+    - name: List gems
+      command: gem list
+      register: current_gems
+
+    - name: Ensure gem was installed
+      assert:
+        that:
+          - install_gem_result is changed
+          - current_gems.stdout is search('gist\s+\([0-9.]+\)')
+
+    - name: Remove a gem
+      gem:
+        name: gist
+        state: absent
+      register: remove_gem_results
+
+    - name: List gems
+      command: gem list
+      register: current_gems
+
+    - name: Verify gem is not installed
+      assert:
+        that:
+          - remove_gem_results is changed
+          - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
+    when: ansible_user_uid == 0
+
+  # Check cutom gem directory
+  - name: Install gem in a custom directory with incorrect options
+    gem:
+      name: gist
+      state: present
+      install_dir: "{{ remote_tmp_dir }}/gems"
+    ignore_errors: yes
+    register: install_gem_fail_result
+
+  - debug:
+      var: install_gem_fail_result
+    tags: debug
+
+  - name: Ensure previous task failed
     assert:
       that:
-        - remove_gem_results is changed
-        - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
-  when: not install_gem_result is failed
+        - install_gem_fail_result is failed
+        - install_gem_fail_result.msg == 'install_dir requires user_install=false'
 
-# install gem in --no-user-install
-- block:
-  - name: Install a gem with --no-user-install
+  - name: Install a gem in a custom directory
     gem:
       name: gist
       state: present
       user_install: no
+      install_dir: "{{ remote_tmp_dir }}/gems"
     register: install_gem_result
 
-  - name: List gems
-    command: gem list
-    register: current_gems
+  - name: Find gems in custom directory
+    find:
+      paths: "{{ remote_tmp_dir }}/gems/gems"
+      file_type: directory
+      contains: gist
+    register: gem_search
 
-  - name: Ensure gem was installed
+  - name: Ensure gem was installed in custom directory
     assert:
       that:
         - install_gem_result is changed
-        - current_gems.stdout is search('gist\s+\([0-9.]+\)')
+        - gem_search.files[0].path is search('gist-[0-9.]+')
+    ignore_errors: yes
 
-  - name: Remove a gem
+  - name: Remove a gem in a custom directory
     gem:
       name: gist
       state: absent
-    register: remove_gem_results
+      user_install: no
+      install_dir: "{{ remote_tmp_dir }}/gems"
+    register: install_gem_result
 
-  - name: List gems
-    command: gem list
-    register: current_gems
+  - name: Find gems in custom directory
+    find:
+      paths: "{{ remote_tmp_dir }}/gems/gems"
+      file_type: directory
+      contains: gist
+    register: gem_search
 
-  - name: Verify gem is not installed
+  - name: Ensure gem was removed in custom directory
     assert:
       that:
-        - remove_gem_results is changed
-        - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
-  when: ansible_user_uid == 0
+        - install_gem_result is changed
+        - gem_search.files | length == 0
 
-# Check cutom gem directory
-- name: Install gem in a custom directory with incorrect options
-  gem:
-    name: gist
-    state: present
-    install_dir: "{{ remote_tmp_dir }}/gems"
-  ignore_errors: yes
-  register: install_gem_fail_result
+  # Custom directory for executables (--bindir)
+  - name: Install gem with custom bindir
+    gem:
+      name: gist
+      state: present
+      bindir: "{{ remote_tmp_dir }}/custom_bindir"
+      norc: yes
+      user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
+    register: install_gem_result
 
-- debug:
-    var: install_gem_fail_result
-  tags: debug
+  - name: Get stats of gem executable
+    stat:
+      path: "{{ remote_tmp_dir }}/custom_bindir/gist"
+    register: gem_bindir_stat
 
-- name: Ensure previous task failed
-  assert:
-    that:
-      - install_gem_fail_result is failed
-      - install_gem_fail_result.msg == 'install_dir requires user_install=false'
+  - name: Ensure gem executable was installed in custom directory
+    assert:
+      that:
+        - install_gem_result is changed
+        - gem_bindir_stat.stat.exists and gem_bindir_stat.stat.isreg
 
-- name: Install a gem in a custom directory
-  gem:
-    name: gist
-    state: present
-    user_install: no
-    install_dir: "{{ remote_tmp_dir }}/gems"
-  register: install_gem_result
+  - name: Remove gem with custom bindir
+    gem:
+      name: gist
+      state: absent
+      bindir: "{{ remote_tmp_dir }}/custom_bindir"
+      norc: yes
+      user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
+    register: install_gem_result
 
-- name: Find gems in custom directory
-  find:
-    paths: "{{ remote_tmp_dir }}/gems/gems"
-    file_type: directory
-    contains: gist
-  register: gem_search
+  - name: Get stats of gem executable
+    stat:
+      path: "{{ remote_tmp_dir }}/custom_bindir/gist"
+    register: gem_bindir_stat
 
-- name: Ensure gem was installed in custom directory
-  assert:
-    that:
-      - install_gem_result is changed
-      - gem_search.files[0].path is search('gist-[0-9.]+')
-  ignore_errors: yes
-
-- name: Remove a gem in a custom directory
-  gem:
-    name: gist
-    state: absent
-    user_install: no
-    install_dir: "{{ remote_tmp_dir }}/gems"
-  register: install_gem_result
-
-- name: Find gems in custom directory
-  find:
-    paths: "{{ remote_tmp_dir }}/gems/gems"
-    file_type: directory
-    contains: gist
-  register: gem_search
-
-- name: Ensure gem was removed in custom directory
-  assert:
-    that:
-      - install_gem_result is changed
-      - gem_search.files | length == 0
-
-# Custom directory for executables (--bindir)
-- name: Install gem with custom bindir
-  gem:
-    name: gist
-    state: present
-    bindir: "{{ remote_tmp_dir }}/custom_bindir"
-    norc: yes
-    user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
-  register: install_gem_result
-
-- name: Get stats of gem executable
-  stat:
-    path: "{{ remote_tmp_dir }}/custom_bindir/gist"
-  register: gem_bindir_stat
-
-- name: Ensure gem executable was installed in custom directory
-  assert:
-    that:
-      - install_gem_result is changed
-      - gem_bindir_stat.stat.exists and gem_bindir_stat.stat.isreg
-
-- name: Remove gem with custom bindir
-  gem:
-    name: gist
-    state: absent
-    bindir: "{{ remote_tmp_dir }}/custom_bindir"
-    norc: yes
-    user_install: no  # Avoid conflicts between --install-dir and --user-install when running as root on CentOS / Fedora / RHEL
-  register: install_gem_result
-
-- name: Get stats of gem executable
-  stat:
-    path: "{{ remote_tmp_dir }}/custom_bindir/gist"
-  register: gem_bindir_stat
-
-- name: Ensure gem executable was removed from custom directory
-  assert:
-    that:
-      - install_gem_result is changed
-      - not gem_bindir_stat.stat.exists
+  - name: Ensure gem executable was removed from custom directory
+    assert:
+      that:
+        - install_gem_result is changed
+        - not gem_bindir_stat.stat.exists

@@ -4,6 +4,9 @@
 ####################################################################
 
 - name: Set up dummy flatpak repository remote
+  when: |
+      ansible_distribution == 'Fedora' or
+      ansible_distribution == 'Ubuntu' and not ansible_distribution_major_version | int < 16
   block:
   - name: Copy repo into place
     unarchive:

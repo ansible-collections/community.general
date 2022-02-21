@@ -1,44 +1,11 @@
 # We run two servers listening different ports
 # to be able to check replication (one server for master, another for replica).
 
-- name: Install redis server apt dependencies
-  apt:
+- name: Install redis dependencies
+  package:
     name: "{{ redis_packages[ansible_distribution] }}"
     state: latest
-    policy_rc_d: 101
-  when:
-  - ansible_facts.pkg_mgr == 'apt'
-  notify: cleanup redis
-
-- name: Install redis server rpm dependencies
-  yum:
-    name: "{{ redis_packages[ansible_distribution] }}"
-    state: latest
-  when:
-  - ansible_facts.pkg_mgr == 'yum'
-  notify: cleanup redis
-
-- name: Install redis rpm dependencies
-  dnf:
-    name: "{{ redis_packages[ansible_distribution] }}"
-    state: latest
-  when: ansible_facts.pkg_mgr == 'dnf'
-  notify: cleanup redis
-
-- name: Install redis server zypper dependencies
-  zypper:
-    name: "{{ redis_packages[ansible_distribution] }}"
-    state: latest
-  when:
-  - ansible_facts.pkg_mgr == 'community.general.zypper'
-  notify: cleanup redis
-
-- name: Install redis FreeBSD dependencies
-  community.general.pkgng:
-    name: "{{ redis_packages[ansible_distribution] }}"
-    state: latest
-  when:
-  - ansible_facts.pkg_mgr == 'community.general.pkgng'
+    policy_rc_d: "{{ 101 if ansible_facts.pkg_mgr == 'apt' else omit }}"
   notify: cleanup redis
 
 - name: Install redis module

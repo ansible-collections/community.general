@@ -1,0 +1,3 @@
+cron_pkg: cronie
+cron_service: cronie
+list_pkg_files: pacman -Ql

@@ -31,3 +31,5 @@
   with_items:
     - {node_version: 4.8.0, yarn_version: 1.6.0}  # Lowest compatible nodejs version
     - {node_version: 8.0.0, yarn_version: 1.6.0}
+  when:
+    - not (ansible_os_family == 'Alpine')  # TODO

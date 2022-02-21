@@ -1,5 +1,5 @@
 ---
-- name: "Create filesystem"
+- name: "Create filesystem ({{ fstype }})"
   community.general.filesystem:
     dev: '{{ dev }}'
     fstype: '{{ fstype }}'

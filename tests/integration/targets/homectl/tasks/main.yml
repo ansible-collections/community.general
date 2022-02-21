@@ -171,4 +171,6 @@
           - jake_incorrect_pass_out is not changed and jake_incorrect_pass_out is failed and jake_incorrect_pass_out.msg == 'User exists but password is incorrect!'
 
   # homectl was first introduced in systemd 245 so check version  >= 245 and make sure system has systemd and homectl command
-  when: systemd_version.rc == 0 and (systemd_version.stdout | regex_search('[0-9][0-9][0-9]') | int >= 245) and homectl_version.rc == 0
+  when:
+    - systemd_version.rc == 0 and (systemd_version.stdout | regex_search('[0-9][0-9][0-9]') | int >= 245) and homectl_version.rc == 0
+    - ansible_distribution != 'Archlinux'  # TODO!

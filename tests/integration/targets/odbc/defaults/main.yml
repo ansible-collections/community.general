@@ -5,6 +5,13 @@ my_pass: 'md5d5e044ccd9b4b8adc89e8fed2eb0db8a'
 my_pass_decrypted: '6EjMk<hcX3<5(Yp?Xi5aQ8eS`a#Ni'
 dsn: "DRIVER={PostgreSQL};Server=localhost;Port=5432;Database=postgres;Uid={{ my_user }};Pwd={{ my_pass_decrypted }};UseUnicode=True"
 packages:
+  Alpine:
+    - psqlodbc
+    - unixodbc
+    - unixodbc-dev
+    - g++
+  Archlinux:
+    - unixodbc
   RedHat:
     - postgresql-odbc
     - unixODBC
