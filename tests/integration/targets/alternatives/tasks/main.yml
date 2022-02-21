@@ -68,4 +68,13 @@
   # in chkconfig-1.7-2 fails when /etc/alternatives/dummy link is missing,
   # error is: 'failed to read link /usr/bin/dummy: No such file or directory'.
   # Moreover Fedora 24 is no longer maintained.
-  when: ansible_distribution != 'Fedora' or ansible_distribution_major_version|int > 24
+  #
+  # *Disable tests on Arch Linux*
+  # TODO: figure out whether there is an alternatives tool for Arch Linux
+  #
+  # *Disable tests on Alpine*
+  # TODO: figure out whether there is an alternatives tool for Alpine
+  when:
+    - ansible_distribution != 'Fedora' or ansible_distribution_major_version|int > 24
+    - ansible_distribution != 'Archlinux'
+    - ansible_distribution != 'Alpine'

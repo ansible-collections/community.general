@@ -310,6 +310,8 @@ stages:
               test: ubuntu1804
             - name: Ubuntu 20.04
               test: ubuntu2004
+            - name: Alpine 3
+              test: alpine3
           groups:
             - 1
             - 2
@@ -348,6 +350,8 @@ stages:
               test: fedora33
             - name: openSUSE 15 py2
               test: opensuse15py2
+            - name: Alpine 3
+              test: alpine3
           groups:
             - 2
             - 3
@@ -379,6 +383,26 @@ stages:
             - name: openSUSE 15 py3
               test: opensuse15
           groups:
+            - 2
+            - 3
+
+### Community Docker
+  - stage: Docker_community_devel
+    displayName: Docker (community images) devel
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: devel/linux-community/{0}
+          targets:
+            - name: Debian Bullseye
+              test: debian-bullseye/3.9
+            - name: ArchLinux
+              test: archlinux/3.10
+            - name: CentOS Stream 8
+              test: centos-stream8/3.8
+          groups:
+            - 1
             - 2
             - 3
 
@@ -457,6 +481,7 @@ stages:
       - Docker_2_10
       - Docker_2_11
       - Docker_2_12
+      - Docker_community_devel
       - Cloud_devel
       - Cloud_2_9
       - Cloud_2_10

@@ -21,6 +21,7 @@
     - not (ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('16.04', '<='))
     - ansible_system != "FreeBSD"
     - not (ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version is version('8', '>='))
+    - ansible_os_family != 'Archlinux'  # TODO
 
 - name: "Install btrfs tools (Ubuntu <= 16.04)"
   ansible.builtin.package:
@@ -60,7 +61,7 @@
     state: present
   when:
     - ansible_system == 'Linux'
-    - ansible_os_family not in ['Suse', 'RedHat']
+    - ansible_os_family not in ['Suse', 'RedHat', 'Alpine']
 
 - name: "Install reiserfs progs (FreeBSD)"
   ansible.builtin.package:
@@ -111,6 +112,7 @@
     - ansible_system == 'Linux'
     - ansible_os_family != 'Suse'
     - ansible_os_family != 'RedHat' or (ansible_distribution == 'CentOS' and ansible_distribution_version is version('7.0', '=='))
+    - ansible_os_family != 'Alpine'
   block:
     - name: "Install fatresize"
       ansible.builtin.package:
