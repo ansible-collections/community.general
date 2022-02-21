@@ -1200,7 +1200,12 @@ import traceback
 from ansible.module_utils.six.moves.urllib.parse import quote
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
-from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec, ProxmoxAnsible)
+from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec,
+                                                                                ProxmoxAnsible,
+                                                                                ansible_to_proxmox_bool,
+                                                                                proxmox_to_ansible_bool,
+                                                                                proxmox_string_to_ansible_dict,
+                                                                                ansible_dict_to_proxmox_string)
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
@@ -1284,102 +1289,6 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
 
         proxmox_node = self.proxmox_api.nodes(node)
 
-        module_params = self.module.params
-
-        update = module_params['update']
-        vmid = module_params['vmid']
-        newid = module_params['newid']
-        clone = module_params['clone']
-
-        create_params = dict(
-            node=module_params['node'],
-            vmid=module_params['vmid'],
-            acpi=module_params['acpi'],
-            agent=module_params['agent'],
-            arch=module_params['arch'],
-            args=module_params['args'],
-            audio0=module_params['audio0'],
-            autostart=module_params['autostart'],
-            background_delay=module_params['background_delay'],
-            balloon=module_params['balloon'],
-            bios=module_params['bios'],
-            boot=module_params['boot'],
-            bootdisk=module_params['bootdisk'],
-            cdrom=module_params['cdrom'],
-            cicustom=module_params['cicustom'],
-            cipassword=module_params['cipassword'],
-            citype=module_params['citype'],
-            ciuser=module_params['ciuser'],
-            cores=module_params['cores'],
-            cpu=module_params['cpu'],
-            cpulimit=module_params['cpulimit'],
-            cpuunits=module_params['cpuunits'],
-            delete=module_params['delete'],
-            description=module_params['description'],
-            digest=module_params['digest'],
-            efidisk0=module_params['efidisk0'],
-            force=module_params['force'],
-            freeze=module_params['freeze'],
-            hookscript=module_params['hookscript'],
-            hostpci=module_params['hostpci'],
-            hotplug=module_params['hotplug'],
-            hugepages=module_params['hugepages'],
-            ide_dictstr=module_params['ide_dictstr'],
-            ide_listdict=module_params['ide_listdict'],
-            ipconfig=module_params['ipconfig'],
-            ivshmem=module_params['ivshmem'],
-            keephugepages=module_params['keephugepages'],
-            keyboard=module_params['keyboard'],
-            kvm=module_params['kvm'],
-            localtime=module_params['localtime'],
-            lock=module_params['lock'],
-            machine=module_params['machine'],
-            memory=module_params['memory'],
-            migrate_downtime=module_params['migrate_downtime'],
-            migrate_speed=module_params['migrate_speed'],
-            name=module_params['name'],
-            nameserver=module_params['nameserver'],
-            net=module_params['net'],
-            numa=module_params['numa_enabled'],
-            numas=module_params['numa'],
-            onboot=module_params['onboot'],
-            ostype=module_params['ostype'],
-            parallel=module_params['parallel'],
-            protection=module_params['protection'],
-            reboot=module_params['reboot'],
-            revert=module_params['revert'],
-            rng0=module_params['rng0'],
-            sata_dictstr=module_params['sata_dictstr'],
-            sata_listdict=module_params['sata_listdict'],
-            scsi_dictstr=module_params['scsi_dictstr'],
-            scsi_listdict=module_params['scsi_listdict'],
-            scsihw=module_params['scsihw'],
-            searchdomain=module_params['searchdomain'],
-            serial=module_params['serial'],
-            shares=module_params['shares'],
-            skiplock=module_params['skiplock'],
-            smbios1=module_params['smbios'],
-            smp=module_params['smp'],
-            sockets=module_params['sockets'],
-            spice_enhancements=module_params['spice_enhancements'],
-            sshkeys=module_params['sshkeys'],
-            startdate=module_params['startdate'],
-            startup=module_params['startup'],
-            tablet=module_params['tablet'],
-            tags=module_params['tags'],
-            tdf=module_params['tdf'],
-            template=module_params['template'],
-            unused=module_params['unused'],
-            usb=module_params['usb'],
-            vcpus=module_params['vcpus'],
-            vga=module_params['vga'],
-            virtio_dictstr=module_params['virtio_dictstr'],
-            virtio_listdict=module_params['virtio_listdict'],
-            vmgenid=module_params['vmgenid'],
-            vmstatestorage=module_params['vmstatestorage'],
-            watchdog=module_params['watchdog']
-        )
-
         # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
         kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
         kwargs.update(dict([k, int(v)] for k, v in kwargs.items() if isinstance(v, bool)))
@@ -1431,18 +1340,16 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
 
         # Flatten efidisk0 option to a string so that it's a string which is what Proxmoxer and the API expect
         if 'efidisk0' in kwargs:
-            efidisk0_str = ''
-            # Regexp to catch underscores in keys name, to replace them after by hypens
-            hyphen_re = re.compile(r'_')
-            # If present, the storage definition should be the first argument
+            # Change pre_enrolled_keys to pre-enrolled-keys key if present
+            if 'pre_enrolled_keys' in kwargs['efidisk0']:
+                kwargs['efidisk0']['pre-enrolled-keys'] = kwargs['efidisk0'].pop('pre_enrolled_keys')
+            # If present, the storage definition should be associated to the '' key
             if 'storage' in kwargs['efidisk0']:
-                efidisk0_str += kwargs['efidisk0'].get('storage') + ':1,'
-                kwargs['efidisk0'].pop('storage')
+                kwargs['efidisk0'][''] = kwargs['efidisk0'].get('storage') + ':1,'
+                del kwargs['efidisk0']['storage']
             # Join other elements from the dict as key=value using commas as separator, replacing any underscore in key
             # by hyphens (needed for pre_enrolled_keys to pre-enrolled-keys)
-            efidisk0_str += ','.join([hyphen_re.sub('-', k) + "=" + str(v) for k, v in kwargs['efidisk0'].items()
-                                      if 'storage' != k])
-            kwargs['efidisk0'] = efidisk0_str
+            kwargs['efidisk0'] = ansible_dict_to_proxmox_string(kwargs['efidisk0'])
 
         # Convert old style arguments (dicts of str) to new style arguments (lists of dicts)
         for old_key, new_key in [('ide_dictstr', 'ide_listdict'), ('sata_dictstr', 'sata_listdict'),
@@ -1453,9 +1360,10 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                 for typekey, item in kwargs[old_key].items():
                     # item is a comma separated string of key=values pair, except for the storage which generally comes
                     # first in the form of storage_backend:size_in_gb
-                    options = dict(option.split('=') for option in item.split(',') if ':' not in option)
+                    options = proxmox_string_to_ansible_dict(item)
                     # extract storage and size if present
-                    [[storage, size_in_gb]] = [option.split(':') for option in item.split(',') if ':' in option]
+                    storage, size_in_gb = options['']
+                    del options['']
                     options.update(name=typekey, storage=storage, size_in_gb=size_in_gb)
                     # append the new dict to the list of dicts of new arguments
                     kwargs[new_key].append(options)
@@ -1467,12 +1375,16 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             if key in kwargs:
                 for item in kwargs[key]:
                     dict_key = item['name']
-                    # Storage backend and volume has to be first, and has to look like <storage>:<size>
-                    flattened_str = item['storage'] + ':' + str(item['size_in_gb']) + ','
+                    # Create storage volume key from dict values
+                    storage_dict = {'': ''}
+                    if 'file' in item and item['file'] is not None:
+                        storage_dict[''] += item['storage'] + ':' + item['file']
+                    else:
+                        storage_dict[''] += item['storage'] + ':' + item['size_in_gb']
+                    item.update(storage_dict)
+                    del item['name'], item['storage'], item['size_in_gb'], storage_dict
                     # Add remaining options as key=value, using commas as separator
-                    flattened_str += ','.join([k + '=' + str(v) for k, v in item.items() if k not in ['name', 'storage',
-                                                                                                      'size_in_gb']])
-                    kwargs.update({dict_key: flattened_str})
+                    kwargs.update({dict_key: ansible_dict_to_proxmox_string(item)})
                 del kwargs[key]
 
         # Convert all dict in kwargs to elements.
