@@ -31,11 +31,6 @@ options:
       - Specify the password to authenticate with.
       - Usually not used when target is localhost.
     type: str
-  tls:
-    description:
-      - Specify whether or not to use TLS for the connection.
-    type: bool
-    default: true
   validate_certs:
     description:
       - Specify whether or not to validate TLS certificates.

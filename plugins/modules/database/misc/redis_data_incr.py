@@ -41,6 +41,7 @@ options:
 
 extends_documentation_fragment:
   - community.general.redis.documentation
+  - community.general.redis_tls_true.documentation
 
 notes:
    - For C(check_mode) to work, the specified I(redis_user) needs permission to

@@ -22,26 +22,6 @@ options:
             - C(replica) sets a redis instance in replica or master mode. (C(slave) is an alias for C(replica).)
         choices: [ config, flush, replica, slave ]
         type: str
-    login_password:
-        description:
-            - The password used to authenticate with (usually not used)
-        type: str
-    login_host:
-        description:
-            - The host running the database
-        default: localhost
-        type: str
-    login_port:
-        description:
-            - The port to connect to
-        default: 6379
-        type: int
-    tls:
-        description:
-            - Specify whether or not to use TLS for the connection.
-        type: bool
-        default: false
-        version_added: 4.5.0
     master_host:
         description:
             - The host of the master instance [replica command]
@@ -80,6 +60,10 @@ options:
               to specify it in the usal form of 1KB, 2M, 400MB where the base is 1024.
               Units are case insensitive i.e. 1m = 1mb = 1M = 1MB.
         type: str
+
+extends_documentation_fragment:
+  - community.general.redis.documentation
+  - community.general.redis_tls_false.documentation
 
 notes:
    - Requires the redis-py Python package on the remote host. You can
@@ -150,6 +134,8 @@ else:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.formatters import human_to_bytes
 from ansible.module_utils.common.text.converters import to_native
+from ansible_collections.community.general.plugins.module_utils.redis import (
+    fail_imports, redis_auth_argument_spec, redis_auth_params)
 import re
 
 
@@ -181,31 +167,28 @@ def flush(client, db=None):
 
 # Module execution.
 def main():
+    redis_auth_args = redis_auth_argument_spec(tls_default=False)
+    module_args = dict(
+        command=dict(type='str', choices=['config', 'flush', 'replica', 'slave']),
+        master_host=dict(type='str'),
+        master_port=dict(type='int'),
+        replica_mode=dict(type='str', default='replica', choices=['master', 'replica', 'slave'],
+                          aliases=["slave_mode"]),
+        db=dict(type='int'),
+        flush_mode=dict(type='str', default='all', choices=['all', 'db']),
+        name=dict(type='str'),
+        value=dict(type='str'),
+    )
+    module_args.update(redis_auth_args)
     module = AnsibleModule(
-        argument_spec=dict(
-            command=dict(type='str', choices=['config', 'flush', 'replica', 'slave']),
-            login_password=dict(type='str', no_log=True),
-            login_host=dict(type='str', default='localhost'),
-            login_port=dict(type='int', default=6379),
-            tls=dict(type='bool', default=False),
-            master_host=dict(type='str'),
-            master_port=dict(type='int'),
-            replica_mode=dict(type='str', default='replica', choices=['master', 'replica', 'slave'], aliases=["slave_mode"]),
-            db=dict(type='int'),
-            flush_mode=dict(type='str', default='all', choices=['all', 'db']),
-            name=dict(type='str'),
-            value=dict(type='str')
-        ),
+        argument_spec=module_args,
         supports_check_mode=True,
     )
 
-    if not redis_found:
-        module.fail_json(msg=missing_required_lib('redis'), exception=REDIS_IMP_ERR)
+    fail_imports(module, module.params['tls'])
 
-    login_password = module.params['login_password']
-    login_host = module.params['login_host']
-    login_port = module.params['login_port']
-    ssl = module.params['tls']
+    redis_params = redis_auth_params(module)
+
     command = module.params['command']
     if command == "slave":
         command = "replica"
@@ -227,7 +210,7 @@ def main():
                 module.fail_json(msg='In replica mode master port must be provided')
 
         # Connect and check
-        r = redis.StrictRedis(host=login_host, port=login_port, password=login_password, ssl=ssl)
+        r = redis.StrictRedis(**redis_params)
         try:
             r.ping()
         except Exception as e:
@@ -278,7 +261,7 @@ def main():
                 module.fail_json(msg="In db mode the db number must be provided")
 
         # Connect and check
-        r = redis.StrictRedis(host=login_host, port=login_port, password=login_password, ssl=ssl, db=db)
+        r = redis.StrictRedis(db=db, **redis_params)
         try:
             r.ping()
         except Exception as e:
@@ -309,7 +292,7 @@ def main():
         except ValueError:
             value = module.params['value']
 
-        r = redis.StrictRedis(host=login_host, port=login_port, password=login_password, ssl=ssl)
+        r = redis.StrictRedis(**redis_params)
 
         try:
             r.ping()
