@@ -50,6 +50,7 @@ DOCUMENTATION = '''
         ini:
           - section: callback_syslog_json
             key: syslog_setup
+        version_added: 4.5.0
 '''
 
 import os
