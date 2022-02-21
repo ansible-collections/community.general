@@ -55,7 +55,8 @@ options:
     type: path
   no_deps:
     description:
-      - Refrain from installing dependencies
+      - Refrain from installing dependencies.
+    version_added: 4.5.0
     type: bool
     default: false
   force:
