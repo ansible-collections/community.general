@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: gitlab_integration
-short_description: Setup or delete GitLab integration integrations
+short_description: Setup or delete GitLab integrations
 version_added: '4.5.0'
 description:
   - Creates, updates, or deletes GitLab integrations formerly known as "services".
