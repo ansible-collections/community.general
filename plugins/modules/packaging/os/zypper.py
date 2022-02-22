@@ -529,7 +529,7 @@ def main():
             extra_args=dict(required=False, default=None),
             allow_vendor_change=dict(required=False, default=False, type='bool'),
             replacefiles=dict(required=False, default=False, type='bool'),
-            clean_deps=dict(required=False, default=False, type='bool')
+            clean_deps=dict(required=False, default=False, type='bool'),
         ),
         supports_check_mode=True
     )
