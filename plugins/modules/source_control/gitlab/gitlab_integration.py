@@ -439,15 +439,13 @@ def main():
         mutually_exclusive=[
             ['api_username', 'api_token'],
             ['api_username', 'api_oauth_token'],
-            ['api_username', 'api_job_token'],
             ['api_token', 'api_oauth_token'],
-            ['api_token', 'api_job_token'],
         ],
         required_together=[
             ['api_username', 'api_password']
         ],
         required_one_of=[
-            ['api_username', 'api_token', 'api_oauth_token', 'api_job_token']
+            ['api_username', 'api_token', 'api_oauth_token']
         ],
         required_if=[
             ['state', 'present', ['params']]
