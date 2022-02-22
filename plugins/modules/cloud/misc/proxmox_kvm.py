@@ -223,194 +223,215 @@ options:
     type: list
     elements: dict
     suboptions:
-      name:
+      name: &storage_option_name
         description:
-          - to be written
+          - API name of the disk device that is going to be added.
+          - Should be C(ide(n)) with C(n) between 0 and 3 included.
         type: str
         choices: ['ide0', 'ide1', 'ide2', 'ide3']
       storage : &storage_option_storage
         description:
-          - to be written
+          - C(storage) is the storage identifier where to create the disk.
         type: str
       size_in_gb : &storage_option_size_in_gb
         description:
-          - to be written
+          - Disk size in GB in order to create a new volume.
+          - Mutually exclusive with C(file).
         type: float
-      aio : &storage_option_aio
+      aio: &storage_option_aio
         description:
-          - to be written
+          - "Indicate which Async I/O driver is used for the VM:"
+          - C(native) is Linux AIO,
+          - C(threads) makes use of thread pools,
+          - C(io_uring) is developped to give better performance that traditional Linux AIO.
         type: str
         choices: ['native', 'threads', 'io_uring']
       backup : &storage_option_backup
         description:
-          - to be written
+          - Whether this disk should be included when making a backup of the VM.
         type: bool
       bps : &storage_option_bps
         description:
-          - to be written
+          - Sets the maximum read/write speed for this disk in bytes per seconds.
         type: int
       bps_max_length : &storage_option_bps_max_length
         description:
-          - to be written
+          - Sets the maximum length of I/O bursts in seconds.
         type: int
       bps_rd : &storage_option_bps_rd
         description:
-          - to be written
+          - Sets the maximum read speed in bytes per second.
         type: int
       bps_rd_max_length : &storage_option_bps_rd_max_length
         description:
-          - to be written
+          - Sets the maximum length of read I/O bursts in seconds.
         type: int
       bps_wr : &storage_option_bps_wr
         description:
-          - to be written
+          - Sets the maximum write speed in bytes per second.
         type: int
       bps_wr_max_length : &storage_option_bps_wr_max_length
         description:
-          - to be written
+          - Sets the maximum length of write I/O bursts in seconds.
         type: int
       cache : &storage_option_cache
         description:
-          - to be written
+          - Controls how the host cache is used to access block data.
         type: str
         choices: ['directsync', 'none', 'unsafe', 'writeback', 'writethrough']
       cyls : &storage_option_cyls
         description:
-          - to be written
+          - Force the drive's physical geometry to have a specific cylinder count.
         type: int
       detect_zeroes : &storage_option_detect_zeroes
         description:
-          - to be written
+          - Controls whether to detect and try to optimize writes of zeroes.
         type: bool
       discard : &storage_option_discard
         description:
-          - to be written
+          - Controls whether to pass discard/trim requests to the underlying storage.
         type: str
         choices: ['ignore', 'on']
       file : &storage_option_file
         description:
-          - to be written
+          - Indicate a file that contains the disk if you want to reuse an existing volume
+          - Mutually exclusive with C(size_in_gb)
         type: str
       format : &storage_option_format
         description:
-          - to be written
+          - The drive's backing file's data format. Please refer to the Proxmox VE
+            Administrator Guide, section Proxmox VE Storage (see U(https://pve.proxmox.com/pve-docs/chapter-pvesm.html)
+            for the latest version, tables 3 to 14) to find out format supported by the provided storage backend.
         type: str
         choices: ['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk']
       heads : &storage_option_heads
         description:
-          - to be written
+          - Force the drive's physical geometry to have a specific head count.
         type: int
       iops : &storage_option_iops
         description:
-          - to be written
+          - Sets the maximum read/write I/O in operations per second.
         type: int
       iops_max : &storage_option_iops_max
         description:
-          - to be written
+          - Sets the maximum unthrottled read/write I/O pool in operations per second.
         type: int
       iops_max_length : &storage_option_iops_max_length
         description:
-          - to be written
+          - Sets the maximum length of I/O bursts in seconds.
         type: int
       iops_rd : &storage_option_iops_rd
         description:
-          - to be written
+          - Sets the maximum read I/O in operations per second.
         type: int
       iops_rd_max : &storage_option_iops_rd_max
         description:
-          - to be written
+          - Sets the maximum unthrottled read I/O pool in operations per second.
         type: int
       iops_rd_max_length : &storage_option_iops_rd_max_length
         description:
-          - to be written
+          - Sets the maximum length of read I/O bursts in seconds.
         type: int
       iops_wr : &storage_option_iops_wr
         description:
-          - to be written
+          - Sets the maximum write I/O in operations per second.
         type: int
       iops_wr_max : &storage_option_iops_wr_max
         description:
-          - to be written
+          - Sets the maximum unthrottled write I/O pool in operations per second.
         type: int
       iops_wr_max_length : &storage_option_iops_wr_max_length
         description:
-          - to be written
+          - Sets the maximum length of write I/O bursts in seconds.
         type: int
       mbps : &storage_option_mbps
         description:
-          - to be written
+          - Sets maximum read/write speed in megabytes per second.
         type: int
       mbps_max : &storage_option_mbps_max
         description:
-          - to be written
+          - Maximum unthrottled read/write pool in megabytes per second.
         type: int
       mbps_rd : &storage_option_mbps_rd
         description:
-          - to be written
+          - Sets maximum read speed in megabytes per second.
         type: int
       mbps_rd_max : &storage_option_mbps_rd_max
         description:
-          - to be written
+          - Maximum unthrottled read pool in megabytes per second.
         type: int
       mbps_wr : &storage_option_mbps_wr
         description:
-          - to be written
+          - Sets maximum write speed in megabytes per second.
         type: int
       mbps_wr_max : &storage_option_mbps_wr_max
         description:
-          - to be written
+          - Sets maximum write speed in megabytes per second.
         type: int
       media : &storage_option_media
         description:
-          - to be written
+          - Indicate if the volume should be considered as a VM disk (C(disk)) or an optical drive (C(cdrom))
         type: str
         choices: ['disk', 'cdrom']
       model:
         description:
-          - to be written
+          - The drive's reported model name, url-encoded, up to 40 bytes long.
         type: str
       replicate : &storage_option_replicate
         description:
-          - to be written
+          - Whether the drive should considered for replication jobs.
         type: bool
       rerror : &storage_option_rerror
         description:
-          - to be written
+          - Specify which action to take on read errors.
+          - C(ignore) will ignore the error and try to continue.
+          - C(stop) will pause the VM.
+          - C(report) will report the error to the guest.
         type: str
         choices: ['ignore', 'report', 'stop']
       secs : &storage_option_secs
         description:
-          - to be written
+          - Force the drive's physical geometry to have a specific sector count.
         type: int
       serial : &storage_option_serial
         description:
-          - to be written
+          - The drive's reported serial number, url-encoded, up to 20 bytes long.
         type: str
       shared : &storage_option_shared
         description:
-          - to be written
+          - Mark this locally-managed volume as available on all nodes.
+          - "WARNING: This option does not share the volume automatically, it assumes it is shared already."
         type: bool
       size : &storage_option_size
         description:
-          - to be written
+          - Disk size. This is purely informational and has no effect.
         type: str
       snapshot : &storage_option_snapshot
         description:
-          - to be written
+          - Controls qemu's snapshot mode feature. If activated, changes made to the disk are temporary and will be
+            discarded when the VM is shutdown.
+        type: bool
+      ssd: &storage_option_ssd
+        description:
+          - Whether to expose this drive as an SSD, rather than a rotational hard disk.
         type: bool
       trans : &storage_option_trans
         description:
-          - to be written
+          - Force disk geometry bios translation mode.
         type: str
         choices: ['none', 'lba', 'auto']
       werror : &storage_option_werror
         description:
-          - to be written
+          - Specify which action to take on write errors.
+          - C(ignore) will ignore the error and try to continue?
+          - C(stop) will pause the VM.
+          - C(report) will report the error to the guest.
+          - C(enospc) will pause the VM only is the host disk is full and report the error to the guest otherwise.
         type: str
         choices: ['enospc', 'ignore', 'report', 'stop']
       wwn : &storage_option_wwn
         description:
-          - to be written
+          - The drive's worldwide name, encoded as 16 bytes hex string, prefixed by I(0x).
         type: str
     version_added: 5.0.0
   ipconfig:
@@ -557,7 +578,8 @@ options:
     suboptions:
       name:
         description:
-          - to be written
+          - API name of the disk device that is going to be added.
+          - Should be C(sata(n)) with C(n) between 0 and 5 included.
         type: str
         choices: ['sata0', 'sata1', 'sata2', 'sata3', 'sata4', 'sata5']
       storage: *storage_option_storage
@@ -600,10 +622,7 @@ options:
       shared: *storage_option_shared
       size: *storage_option_size
       snapshot: *storage_option_snapshot
-      ssd:
-        description:
-          - to be written
-        type: bool
+      ssd: *storage_option_ssd
       trans: *storage_option_trans
       werror: *storage_option_werror
       wwn: *storage_option_wwn
@@ -629,7 +648,8 @@ options:
     suboptions:
       name:
         description:
-          - to be written
+          - API name of the disk device that is going to be added.
+          - Should be C(scsi(n)) with C(n) between 0 and 30 included.
         type: str
         choices: ['scsi0', 'scsi1', 'scsi2', 'scsi3', 'scsi4', 'scsi5', 'scsi6', 'scsi7', 'scsi8', 'scsi9', 'scsi10',
         'scsi11', 'scsi12', 'scsi13', 'scsi14', 'scsi15', 'scsi16', 'scsi17', 'scsi18', 'scsi19', 'scsi20', 'scsi21',
@@ -669,27 +689,26 @@ options:
       media: *storage_option_media
       queues:
         description:
-          - to be written
+          - Number of queues.
+          - Must be greater than 2
         type: int
       replicate: *storage_option_replicate
       rerror: *storage_option_rerror
-      ro:
+      ro: &storage_option_ro
         description:
-          - to be written
+          - Whether the drive is read-only.
         type: bool
-      scsibloc:
+      scsiblock:
         description:
-          - to be written
+          - Whether to use scsi-block for full passthrough of host block device.
+          - WARNING can lead to I/O errors in combination with low memory or high memory fragmentation
         type: bool
       secs: *storage_option_secs
       serial: *storage_option_serial
       shared: *storage_option_shared
       size: *storage_option_size
       snapshot: *storage_option_snapshot
-      ssd:
-        description:
-          - to be written
-        type: bool
+      ssd: *storage_option_ssd
       trans: *storage_option_trans
       werror: *storage_option_werror
       wwn: *storage_option_wwn
@@ -836,7 +855,8 @@ options:
     suboptions:
       name:
         description:
-          - to be written
+          - API name of the disk device that is going to be added.
+          - Should be C(virtio(n)) with C(n) between 0 and 15 included.
         type: str
         choices: ['virtio0', 'virtio1', 'virtio2', 'virtio3', 'virtio4', 'virtio5', 'virtio6', 'virtio7', 'virtio8',
         'virtio9', 'virtio10', 'virtio11', 'virtio12', 'virtio13', 'virtio14', 'virtio15']
@@ -875,10 +895,7 @@ options:
       media: *storage_option_media
       replicate: *storage_option_replicate
       rerror: *storage_option_rerror
-      ro:
-        description:
-          - to be written
-        type: bool
+      ro: *storage_option_ro
       secs: *storage_option_secs
       serial: *storage_option_serial
       shared: *storage_option_shared
@@ -1520,20 +1537,19 @@ def main():
                                    )
     ide_storage_arg_spec = common_storage_arg_spec.copy()
     ide_storage_arg_spec.update(dict(
-        name=dict(type='str', choices=['ide' + str(n) for n in range(0, 4)]),
-        model=dict(type='str')
+        name=dict(type='str', choices=['ide' + str(n) for n in range(0, 4)]), model=dict(type='str'), ssd=dict(type='bool')
     ))
     sata_storage_arg_spec = common_storage_arg_spec.copy()
     sata_storage_arg_spec.update(dict(
-        name=dict(type='str', choices=['sata' + str(n) for n in range(0, 6)]),
-        ssd=dict(type='bool')
+        name=dict(type='str', choices=['sata' + str(n) for n in range(0, 6)]), ssd=dict(type='bool')
     ))
     scsi_storage_arg_spec = sata_storage_arg_spec.copy()
     scsi_storage_arg_spec.update(dict(
         name=dict(type='str', choices=['scsi' + str(n) for n in range(0, 31)]),
         queues=dict(type='int'),
         ro=dict(type='bool'),
-        scsibloc=dict(type='bool'),
+        scsiblock=dict(type='bool'),
+        ssd=dict(type='bool')
     ))
     virtio_storage_arg_spec = common_storage_arg_spec.copy()
     virtio_storage_arg_spec.update(dict(
