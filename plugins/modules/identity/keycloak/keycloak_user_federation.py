@@ -845,7 +845,7 @@ def main():
         before_comp = {}
 
     # if user federation exists, get associated mappers
-    if cid is not None:
+    if cid is not None and before_comp:
         before_comp['mappers'] = sorted(kc.get_components(urlencode(dict(parent=cid)), realm), key=lambda x: x.get('name'))
 
     # Build a proposed changeset from parameters given to this module
@@ -921,12 +921,23 @@ def main():
         after_comp = kc.create_component(desired_comp, realm)
 
         for mapper in updated_mappers:
-            if mapper.get('id') is not None:
-                kc.update_component(mapper, realm)
+            found = kc.get_components(urlencode(dict(parent=cid, name=mapper['name'])), realm)
+            if len(found) > 1:
+                module.fail_json(msg='Found multiple mappers with name `{name}`. Cannot continue.'.format(name=mapper['name']))
+            if len(found) == 1:
+                old_mapper = found[0]
             else:
-                if mapper.get('parentId') is None:
-                    mapper['parentId'] = after_comp['id']
-                mapper = kc.create_component(mapper, realm)
+                old_mapper = {}
+
+            new_mapper = old_mapper.copy()
+            new_mapper.update(mapper)
+
+            if new_mapper.get('id') is not None:
+                kc.update_component(new_mapper, realm)
+            else:
+                if new_mapper.get('parentId') is None:
+                    new_mapper['parentId'] = after_comp['id']
+                mapper = kc.create_component(new_mapper, realm)
 
         after_comp['mappers'] = updated_mappers
         result['end_state'] = sanitize(after_comp)
