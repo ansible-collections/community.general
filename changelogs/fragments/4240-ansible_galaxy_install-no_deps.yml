@@ -1,0 +1,2 @@
+minor_changes:
+  - ansible_galaxy_install - added option ``no_deps`` to the module (https://github.com/ansible-collections/community.general/issues/4174).
