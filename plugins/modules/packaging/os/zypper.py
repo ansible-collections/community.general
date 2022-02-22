@@ -134,7 +134,7 @@ options:
         default: false
         description:
           - Adds C(--clean-deps) option to I(zypper) remove command.
-        version_added: '4.5.0'
+        version_added: '4.6.0'
 notes:
   - When used with a `loop:` each package will be processed individually,
     it is much more efficient to pass the list directly to the `name` option.
