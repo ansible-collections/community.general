@@ -132,7 +132,7 @@ EXAMPLES = '''
 
 - Idempotency is only partially provided since GitLab does
   not expose secret parameters like tokens or passwords.
-  See U(https://gitlab.com/gitlab-org/gitlab-ce/issues/46313)
+  See U(https://gitlab.com/gitlab-org/gitlab/-/issues/22237)
 '''
 
 RETURN = '''
