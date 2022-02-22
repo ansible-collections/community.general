@@ -1,2 +1,0 @@
-bugfixes:
-  - vdo - fix options error (https://github.com/ansible-collections/community.general/pull/4163).
