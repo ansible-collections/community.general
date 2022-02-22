@@ -53,6 +53,12 @@ options:
         Please notice that C(ansible-galaxy) will not install collections with I(type=both), when I(requirements_file)
         contains both roles and collections and I(dest) is specified.
     type: path
+  no_deps:
+    description:
+      - Refrain from installing dependencies.
+    version_added: 4.5.0
+    type: bool
+    default: false
   force:
     description:
       - Force overwriting an existing role or collection.
@@ -178,7 +184,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
     ansible_version = None
     is_ansible29 = None
 
-    output_params = ('type', 'name', 'dest', 'requirements_file', 'force')
+    output_params = ('type', 'name', 'dest', 'requirements_file', 'force', 'no_deps')
     module = dict(
         argument_spec=dict(
             type=dict(type='str', choices=('collection', 'role', 'both'), required=True),
@@ -186,6 +192,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
             requirements_file=dict(type='path'),
             dest=dict(type='path'),
             force=dict(type='bool', default=False),
+            no_deps=dict(type='bool', default=False),
             ack_ansible29=dict(type='bool', default=False),
         ),
         mutually_exclusive=[('name', 'requirements_file')],
@@ -201,6 +208,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
         requirements_file=dict(fmt=('-r', '{0}'),),
         dest=dict(fmt=('-p', '{0}'),),
         force=dict(fmt="--force", style=ArgFormat.BOOLEAN),
+        no_deps=dict(fmt="--no-deps", style=ArgFormat.BOOLEAN),
     )
     force_lang = "en_US.UTF-8"
     check_rc = True
@@ -293,7 +301,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
             self._setup29()
         else:
             self._setup210plus()
-        params = ('type', {'galaxy_cmd': 'install'}, 'force', 'dest', 'requirements_file', 'name')
+        params = ('type', {'galaxy_cmd': 'install'}, 'force', 'no_deps', 'dest', 'requirements_file', 'name')
         self.run_command(params=params)
 
     def process_command_output(self, rc, out, err):
