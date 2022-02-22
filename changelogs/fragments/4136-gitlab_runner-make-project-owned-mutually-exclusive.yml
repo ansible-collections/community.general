@@ -1,2 +1,0 @@
-bugfixes:
-  - 'gitlab_runner - make ``project`` and ``owned`` mutually exclusive (https://github.com/ansible-collections/community.general/pull/4136).'
