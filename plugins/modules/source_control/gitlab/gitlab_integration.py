@@ -362,7 +362,7 @@ class GitLabIntegrations(object):
 
     def __expand_events(self, events):
         try:
-            # See https://gitlab.com/gitlab-org/gitlab-ce/issues/58321 for why it's useful to
+            # See https://gitlab.com/gitlab-org/gitlab/-/issues/27050 for why it's useful to
             # discard unsupported events before comparing
             supported_events = SRV_DEF[self.name]['_events']
         except KeyError:
