@@ -342,7 +342,7 @@ class TestKeycloakUserFederation(ModuleTestCase):
             ]
         }
         return_value_components_get = [
-            []
+            [], []
         ]
         return_value_component_create = [
             {
@@ -457,7 +457,7 @@ class TestKeycloakUserFederation(ModuleTestCase):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
 
-        self.assertEqual(len(mock_get_components.mock_calls), 1)
+        self.assertEqual(len(mock_get_components.mock_calls), 2)
         self.assertEqual(len(mock_get_component.mock_calls), 0)
         self.assertEqual(len(mock_create_component.mock_calls), 2)
         self.assertEqual(len(mock_update_component.mock_calls), 0)
