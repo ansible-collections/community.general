@@ -32,7 +32,7 @@ options:
       - The ID or path of the project (urlencoded or not).
     required: true
     type: str
-  # TODO: Not yet supported (U(https://gitlab.com/gitlab-org/gitlab-ce/issues/41113)).
+  # TODO: Not yet supported (U(https://gitlab.com/gitlab-org/gitlab/-/issues/20425)).
   # active:
   #   description:
   #     - Whether the integration is active or not.
