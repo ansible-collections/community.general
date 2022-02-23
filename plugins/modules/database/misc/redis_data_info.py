@@ -24,7 +24,6 @@ options:
 
 extends_documentation_fragment:
   - community.general.redis
-  - community.general.redis_tls_true.documentation
 
 seealso:
   - module: community.general.redis_data

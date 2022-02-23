@@ -58,7 +58,6 @@ options:
 
 extends_documentation_fragment:
   - community.general.redis.documentation
-  - community.general.redis_tls_true.documentation
 
 seealso:
     - module: community.general.redis_data_incr

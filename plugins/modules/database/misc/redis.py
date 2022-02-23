@@ -22,15 +22,46 @@ options:
             - C(replica) sets a redis instance in replica or master mode. (C(slave) is an alias for C(replica).)
         choices: [ config, flush, replica, slave ]
         type: str
+    login_password:
+        description:
+            - The password used to authenticate with (usually not used)
+        type: str
+    login_host:
+        description:
+            - The host running the database
+        default: localhost
+        type: str
+    login_port:
+        description:
+            - The port to connect to
+        default: 6379
+        type: int
     tls:
-      default: false
-      version_added: 4.6.0
+        description:
+            - Specify whether or not to use TLS for the connection.
+        type: bool
+        default: false
+        version_added: 4.6.0
     login_user:
-      version_added: 4.6.0
+        description:
+            - Specify the user to authenticate with.
+            - Requires L(redis,https://pypi.org/project/redis) >= 3.4.0.
+        type: str
+        version_added: 4.6.0
     validate_certs:
-      version_added: 4.6.0
+        description:
+            - Specify whether or not to validate TLS certificates.
+            - This should only be turned off for personally controlled sites or with
+              C(localhost) as target.
+        type: bool
+        default: true
+        version_added: 4.6.0
     ca_certs:
-      version_added: 4.6.0
+        description:
+            - Path to root certificates file. If not set and I(tls) is
+              set to C(true), certifi ca-certificates will be used.
+        type: str
+        version_added: 4.6.0
     master_host:
         description:
             - The host of the master instance [replica command]
@@ -69,10 +100,6 @@ options:
               to specify it in the usal form of 1KB, 2M, 400MB where the base is 1024.
               Units are case insensitive i.e. 1m = 1mb = 1M = 1MB.
         type: str
-
-extends_documentation_fragment:
-  - community.general.redis.documentation
-  - community.general.redis_tls_false.documentation
 
 notes:
    - Requires the redis-py Python package on the remote host. You can
