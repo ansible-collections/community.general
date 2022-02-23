@@ -213,7 +213,9 @@ class TSSClient(object):
         secret_id = self._term_to_secret_id(term)
         display.vvv(u"Secret Server lookup of Secret with ID %d" % secret_id)
 
-        return self._client.get_secret_json(secret_id, query_params)
+        if query_params:
+            return self._client.get_secret_json(secret_id, query_params)
+        return self._client.get_secret_json(secret_id)
 
     @staticmethod
     def _term_to_secret_id(term):
