@@ -261,6 +261,20 @@ EXAMPLES = r"""
       type: role
       value: Developers
 
+- name: Comment on issue with property to mark it internal
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: comment
+    comment: A comment added by Ansible
+    fields:
+      properties:
+        - key: 'sd.public.comment'
+          value:
+            internal: true
+
 # Assign an existing issue using edit
 - name: Assign an issue using free-form fields
   community.general.jira:
@@ -501,6 +515,10 @@ class JIRA(StateModuleHelper):
         # if comment_visibility is specified restrict visibility
         if self.vars.comment_visibility is not None:
             data['visibility'] = self.vars.comment_visibility
+
+        # Use 'fields' to merge in any additional data
+        if self.vars.fields:
+            data.update(self.vars.fields)
 
         url = self.vars.restbase + '/issue/' + self.vars.issue + '/comment'
         self.vars.meta = self.post(url, data)
