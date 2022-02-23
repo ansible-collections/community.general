@@ -289,7 +289,7 @@ class LookupModule(LookupBase):
         )
         query_params = {}
         if self.get_option("comment"):
-            query_params = {"autocomment":self.get_option("comment")}
+            query_params = {"autocomment": self.get_option("comment")}
 
         try:
             return [tss.get_secret(term, query_params) for term in terms]
