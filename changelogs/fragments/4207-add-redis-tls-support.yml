@@ -1,2 +1,2 @@
 minor_changes:
-  - redis - add auth parameters tls, validate_certs, and ca_certs (https://github.com/ansible-collections/community.general/pull/4207).
+  - redis - add authentication parameters ``login_user``, ``tls``, ``validate_certs``, and ``ca_certs`` (https://github.com/ansible-collections/community.general/pull/4207).
