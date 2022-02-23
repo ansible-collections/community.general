@@ -68,6 +68,7 @@ options:
             - section: tss_lookup
               key: comment
         required: false
+        version_added: 4.6.0
     token:
         description:
           - Existing token for Thycotic authorizer.
