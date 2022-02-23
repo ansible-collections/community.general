@@ -58,6 +58,16 @@ options:
               key: domain
         required: false
         version_added: 3.6.0
+    comment:
+        default: ""
+        description:
+          - Provide an optional comment when viewing a secret.
+        env:
+            - name: TSS_COMMENT
+        ini:
+            - section: tss_lookup
+              key: comment
+        required: false
     token:
         description:
           - Existing token for Thycotic authorizer.
@@ -196,13 +206,13 @@ class TSSClient(object):
         else:
             return TSSClientV0(**server_parameters)
 
-    def get_secret(self, term):
+    def get_secret(self, term, query_params):
         display.debug("tss_lookup term: %s" % term)
 
         secret_id = self._term_to_secret_id(term)
         display.vvv(u"Secret Server lookup of Secret with ID %d" % secret_id)
 
-        return self._client.get_secret_json(secret_id)
+        return self._client.get_secret_json(secret_id, query_params)
 
     @staticmethod
     def _term_to_secret_id(term):
@@ -277,8 +287,11 @@ class LookupModule(LookupBase):
             api_path_uri=self.get_option("api_path_uri"),
             token_path_uri=self.get_option("token_path_uri"),
         )
+        query_params = {}
+        if self.get_option("comment"):
+            query_params = {"autocomment":self.get_option("comment")}
 
         try:
-            return [tss.get_secret(term) for term in terms]
+            return [tss.get_secret(term, query_params) for term in terms]
         except SecretServerError as error:
             raise AnsibleError("Secret Server lookup failure: %s" % error.message)
