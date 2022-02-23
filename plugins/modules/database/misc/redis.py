@@ -22,6 +22,15 @@ options:
             - C(replica) sets a redis instance in replica or master mode. (C(slave) is an alias for C(replica).)
         choices: [ config, flush, replica, slave ]
         type: str
+    tls:
+      default: false
+      version_added: 4.6.0
+    login_user:
+      version_added: 4.6.0
+    validate_certs:
+      version_added: 4.6.0
+    ca_certs:
+      version_added: 4.6.0
     master_host:
         description:
             - The host of the master instance [replica command]
