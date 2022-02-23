@@ -365,7 +365,7 @@ class TestPacman:
                 # for real
                 False,
                 {
-                    "args": ["pacman", "--sync", "--sys-upgrade", "--quiet", "--noconfirm"],
+                    "args": ["pacman", "--sync", "--sysupgrade", "--quiet", "--noconfirm"],
                     "return_value": [0, "stdout", "stderr"],
                 },
                 None,
@@ -377,7 +377,7 @@ class TestPacman:
                     "args": [
                         "pacman",
                         "--sync",
-                        "--sys-upgrade",
+                        "--sysupgrade",
                         "--quiet",
                         "--noconfirm",
                         "--some",

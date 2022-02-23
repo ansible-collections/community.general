@@ -410,7 +410,7 @@ class Pacman(object):
             cmd = [
                 self.pacman_path,
                 "--sync",
-                "--sys-upgrade",
+                "--sysupgrade",
                 "--quiet",
                 "--noconfirm",
             ]
