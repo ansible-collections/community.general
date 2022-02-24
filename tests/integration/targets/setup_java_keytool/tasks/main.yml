@@ -8,6 +8,7 @@
       {{
         ansible_os_family not in ['Darwin', 'FreeBSD']
         and not (ansible_distribution == "CentOS" and ansible_distribution_version is version("7.0", "<"))
+        and not (ansible_distribution == "Archlinux")  # TODO
       }}
 
 - name: Include OS-specific variables
