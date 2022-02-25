@@ -90,7 +90,7 @@ options:
   storage:
     description:
       - target storage
-      - If the disk option is not provided, the container volumes will be created on this storage backend, make sure that this storage backend supports container volumes.
+      - If the C(disk) option is not provided, the container volumes will be created on this storage backend, make sure that this storage backend supports container volumes.
     type: str
     default: 'local'
   cpuunits:
