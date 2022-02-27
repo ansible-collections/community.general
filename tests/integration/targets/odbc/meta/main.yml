@@ -1,3 +1,4 @@
 ---
 dependencies:
+  - setup_pkg_mgr
   - setup_postgresql_db
