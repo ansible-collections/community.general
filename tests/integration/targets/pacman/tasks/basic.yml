@@ -1,0 +1,82 @@
+---
+- vars:
+    package_name: unarj
+  block:
+    - name: Make sure that {{ package_name }} is not installed
+      pacman:
+        name: '{{ package_name }}'
+        state: absent
+
+    - name: Install {{ package_name }} (check mode)
+      pacman:
+        name: '{{ package_name }}'
+        state: present
+      check_mode: true
+      register: install_1
+
+    - name: Install {{ package_name }}
+      pacman:
+        name: '{{ package_name }}'
+        state: present
+      register: install_2
+
+    - name: Install {{ package_name }} (check mode, idempotent)
+      pacman:
+        name: '{{ package_name }}'
+        state: present
+      check_mode: true
+      register: install_3
+
+    - name: Install {{ package_name }} (idempotent)
+      pacman:
+        name: '{{ package_name }}'
+        state: present
+      register: install_4
+
+    - assert:
+        that:
+          - install_1 is changed
+          - install_1.msg == 'Would have installed 1 packages'
+          - install_2 is changed
+          - install_2.msg == 'Installed 1 package(s)'
+          - install_3 is not changed
+          - install_3.msg == 'package(s) already installed'
+          - install_4 is not changed
+          - install_4.msg == 'package(s) already installed'
+
+    - name: Uninstall {{ package_name }} (check mode)
+      pacman:
+        name: '{{ package_name }}'
+        state: absent
+      check_mode: true
+      register: uninstall_1
+
+    - name: Uninstall {{ package_name }}
+      pacman:
+        name: '{{ package_name }}'
+        state: absent
+      register: uninstall_2
+
+    - name: Uninstall {{ package_name }} (check mode, idempotent)
+      pacman:
+        name: '{{ package_name }}'
+        state: absent
+      check_mode: true
+      register: uninstall_3
+
+    - name: Uninstall {{ package_name }} (idempotent)
+      pacman:
+        name: '{{ package_name }}'
+        state: absent
+      register: uninstall_4
+
+    - assert:
+        that:
+          - uninstall_1 is changed
+          - uninstall_1.msg == 'Would have removed 1 packages'
+          - uninstall_2 is changed
+          - uninstall_2.msg == 'Removed 1 package(s)'
+          - uninstall_3 is not changed
+          - uninstall_3.msg == 'package(s) already absent'
+          - uninstall_4 is not changed
+          - uninstall_4.msg == 'package(s) already absent'
