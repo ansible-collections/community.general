@@ -83,7 +83,7 @@ options:
       - Whether or not the file to create should be a sparse file.
       - This option is effective only on newly created files, or when growing a
         file, only for the bytes to append.
-      - This option is not supported on OS or filesystems not supporting sparse files.
+      - This option is not supported on OSes or filesystems not supporting sparse files.
       - I(force=true) and I(sparse=true) are mutually exclusive.
     type: bool
     default: false
