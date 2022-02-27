@@ -412,7 +412,8 @@ class VFAT(Filesystem):
         fssize = None
         for line in out.splitlines()[1:]:
             param, value = line.split(':', 1)
-            if param.strip() == 'Size':
+            # Old versions of fatresize show 'Size', while new versions show 'Cur size'
+            if param.strip() in ['Size', 'Cur size']:
                 fssize = int(value.strip())
                 break
         else:
