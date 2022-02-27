@@ -319,7 +319,7 @@ class Pacman(object):
             cmd = cmd_base + [pacman_verb, "--print-format", "%n %v"] + [p.source for p in pkglist]
             rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
             if rc != 0:
-                self.fail("Failed to list package(s) to install", stdout=stdout, stderr=stderr)
+                self.fail("Failed to list package(s) to install", cmd=cmd, stdout=stdout, stderr=stderr)
 
             name_ver = [l.strip() for l in stdout.splitlines()]
             before = []
