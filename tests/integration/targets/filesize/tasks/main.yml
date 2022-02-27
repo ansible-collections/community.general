@@ -29,7 +29,6 @@
       include_tasks: sparse.yml
       when:
         - not (ansible_os_family == 'Darwin' and ansible_distribution_version is version('11', '<'))
-        - not (ansible_os_family == 'Alpine')  # TODO figure out why it fails
 
     - name: Include tasks to test playing with symlinks
       include_tasks: symlinks.yml
