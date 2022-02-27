@@ -411,6 +411,8 @@ class VFAT(Filesystem):
         dummy, out, dummy = self.module.run_command([cmd, '--info', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
         fssize = None
         for line in out.splitlines()[1:]:
+            if ':' not in line:
+                continue
             param, value = line.split(':', 1)
             # Old versions of fatresize show 'Size', while new versions show 'Cur size'
             if param.strip() in ['Size', 'Cur size']:
