@@ -368,7 +368,7 @@ class Pacman(object):
             cmd = cmd_base + [pacman_verb] + [p.source for p in pkglist]
             rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
             if rc != 0:
-                self.fail("Failed to install package(s)", stdout=stdout, stderr=stderr)
+                self.fail("Failed to install package(s)", cmd=cmd, stdout=stdout, stderr=stderr)
             self.add_exit_infos(stdout=stdout, stderr=stderr)
 
         if pkgs_to_install:
