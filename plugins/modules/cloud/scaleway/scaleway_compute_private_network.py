@@ -66,20 +66,20 @@ options:
 '''
 
 EXAMPLES = '''
-- name: 
+- name:
   community.general.scaleway_compute_private_network:
     project: '{{ scw_project }}'
     state: present
     region: par1
     compute_id: "12345678-f1e6-40ec-83e5-12345d67ed89",
-    private_network_id: "22345678-f1e6-40ec-83e5-12345d67ed89",    
+    private_network_id: "22345678-f1e6-40ec-83e5-12345d67ed89",
 
-- name: 
+- name:
   community.general.scaleway_compute_private_network:
     name: 'foo'
     state: absent
     region: par1
-    private_network_id: "22345678-f1e6-40ec-83e5-12345d67ed89",    
+    private_network_id: "22345678-f1e6-40ec-83e5-12345d67ed89",
   register: nicsvpc_creation_task
 
 '''
@@ -110,6 +110,7 @@ scaleway_compute_private_network:
 from ansible_collections.community.general.plugins.module_utils.scaleway import SCALEWAY_LOCATION, scaleway_argument_spec, Scaleway
 from ansible.module_utils.basic import AnsibleModule
 
+
 def get_nics_info(api, compute_id, private_network_id):
 
     response = api.get('servers/' + compute_id + '/private_nics')
@@ -135,16 +136,16 @@ def present_strategy(api, compute_id, private_network_id):
     if nic is not None:
         return changed, nic
 
-    data = { "private_network_id": private_network_id }
+    data = {"private_network_id": private_network_id}
     changed = True
     if api.module.check_mode:
         return changed, {"status": "a private network would be add to a server"}
-    
+
     response = api.post(path='servers/' + compute_id + '/private_nics', data=data)
-    
+
     if not response.ok:
         api.module.fail_json(msg='Error when adding a private network to a server [{0}: {1}]'.format(response.status_code, response.json))
-        
+
     return changed, response.json
 
 
@@ -166,6 +167,7 @@ def absent_strategy(api, compute_id, private_network_id):
             response.status_code, response.json))
 
     return changed, response.json
+
 
 def core(module):
 
