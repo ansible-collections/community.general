@@ -4,12 +4,10 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 - set_fact:
-    # TODO: re-enable Archlinux!
     has_java_keytool: >-
       {{
         ansible_os_family not in ['Darwin', 'FreeBSD']
         and not (ansible_distribution == "CentOS" and ansible_distribution_version is version("7.0", "<"))
-        and not (ansible_distribution == "Archlinux")
       }}
 
 - name: Include OS-specific variables
