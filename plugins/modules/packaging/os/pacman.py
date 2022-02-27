@@ -405,7 +405,7 @@ class Pacman(object):
 
         rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
         if rc != 0:
-            self.fail("failed to list package(s) to remove", stdout=stdout, stderr=stderr)
+            self.fail("failed to list package(s) to remove", cmd=cmd, stdout=stdout, stderr=stderr)
 
         removed_pkgs = stdout.split()
         self.exit_params["packages"] = removed_pkgs
@@ -424,7 +424,7 @@ class Pacman(object):
 
         rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
         if rc != 0:
-            self.fail("failed to remove package(s)", stdout=stdout, stderr=stderr)
+            self.fail("failed to remove package(s)", cmd=cmd, stdout=stdout, stderr=stderr)
         self.exit_params["packages"] = removed_pkgs
         self.add_exit_infos("Removed %d package(s)" % len(removed_pkgs), stdout=stdout, stderr=stderr)
 
@@ -463,7 +463,7 @@ class Pacman(object):
             if rc == 0:
                 self.add_exit_infos("System upgraded", stdout=stdout, stderr=stderr)
             else:
-                self.fail("Could not upgrade", stdout=stdout, stderr=stderr)
+                self.fail("Could not upgrade", cmd=cmd, stdout=stdout, stderr=stderr)
 
     def update_package_db(self):
         """runs pacman --sync --refresh"""
@@ -489,7 +489,7 @@ class Pacman(object):
         if rc == 0:
             self.add_exit_infos("Updated package db", stdout=stdout, stderr=stderr)
         else:
-            self.fail("could not update package db", stdout=stdout, stderr=stderr)
+            self.fail("could not update package db", cmd=cmd, stdout=stdout, stderr=stderr)
 
     def package_list(self):
         """Takes the input package list and resolves packages groups to their package list using the inventory,
