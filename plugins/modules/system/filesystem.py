@@ -396,7 +396,7 @@ class F2fs(Filesystem):
 class VFAT(Filesystem):
     INFO = 'fatresize'
     GROW = 'fatresize'
-    GROW_MAX_SPACE_FLAGS = ['-s', 'max']
+    GROW_MAX_SPACE_FLAGS = ['-s', 'max', '-v']
 
     def __init__(self, module):
         super(VFAT, self).__init__(module)
