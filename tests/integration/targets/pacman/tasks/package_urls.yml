@@ -6,7 +6,6 @@
     file_pkg_path: /tmp/pkg.zst
     extra_pkg: core/sdparm
     extra_pkg_outfmt: sdparm
-    sorted_pkgs: "['{{reg_pkg}}', '{{url_pkg}}', '{{file_pkg}}']|sort()"
   block:
     - name: Make sure that test packages are not installed
       pacman:
@@ -105,17 +104,17 @@
         that:
           - install_1 is changed
           - install_1.msg == 'Would have installed 3 packages'
-          - install_1.packages|sort() == {{sorted_pkgs}}
+          - install_1.packages|sort() == [reg_pkg, url_pkg, file_pkg]|sort()
           - install_2 is changed
           - install_2.msg == 'Installed 3 package(s)'
-          - install_2.packages|sort() == {{sorted_pkgs}}
+          - install_1.packages|sort() == [reg_pkg, url_pkg, file_pkg]|sort()
           - install_3 is not changed
           - install_3.msg == 'package(s) already installed'
           - install_4 is not changed
           - install_4.msg == 'package(s) already installed'
           - install_5 is changed
           - install_5.msg == 'Installed 1 package(s)'
-          - install_5.packages == ['{{extra_pkg_outfmt}}']
+          - install_5.packages == [extra_pkg_outfmt]
           - uninstall_1 is changed
           - uninstall_1.msg == 'Would have removed 3 packages'
           - uninstall_1.packages | length() == 3  # pkgs have versions here
