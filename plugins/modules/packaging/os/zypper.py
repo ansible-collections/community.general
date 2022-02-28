@@ -128,6 +128,13 @@ options:
         description:
           - Adds C(--replacefiles) option to I(zypper) install/update command.
         version_added: '0.2.0'
+    clean_deps:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Adds C(--clean-deps) option to I(zypper) remove command.
+        version_added: '4.6.0'
 notes:
   - When used with a `loop:` each package will be processed individually,
     it is much more efficient to pass the list directly to the `name` option.
@@ -368,6 +375,9 @@ def get_cmd(m, subcommand):
             cmd.append('--oldpackage')
         if m.params['replacefiles']:
             cmd.append('--replacefiles')
+    if subcommand == 'remove':
+        if m.params['clean_deps']:
+            cmd.append('--clean-deps')
     if subcommand == 'dist-upgrade' and m.params['allow_vendor_change']:
         cmd.append('--allow-vendor-change')
     if m.params['extra_args']:
@@ -518,7 +528,8 @@ def main():
             oldpackage=dict(required=False, default=False, type='bool'),
             extra_args=dict(required=False, default=None),
             allow_vendor_change=dict(required=False, default=False, type='bool'),
-            replacefiles=dict(required=False, default=False, type='bool')
+            replacefiles=dict(required=False, default=False, type='bool'),
+            clean_deps=dict(required=False, default=False, type='bool'),
         ),
         supports_check_mode=True
     )
