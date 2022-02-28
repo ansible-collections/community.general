@@ -1,0 +1,52 @@
+---
+- vars:
+    reg_pkg: ed
+    url_pkg: lemon
+    file_pkg: hdparm
+    file_pkg_path: /tmp/pkg.zst
+  block:
+    - name: Make sure that test pkgs are not installed
+      pacman:
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg}}'
+          - '{{file_pkg}}'
+        state: absent
+
+    - name: Get url for {{url_pkg}}
+      command:
+        cmd: pacman --sync --print-format "%l" {{url_pkg}}
+      register: url_pkg_url
+
+    - name: Get url for {{file_pkg}}
+      command:
+        cmd: pacman --sync --print-format "%l" {{file_pkg}}
+      register: file_pkg_url
+    - name: Download {{file_pkg}} pkg
+      get_url:
+        url: '{{file_pkg_url.stdout}}'
+        dest: '{{file_pkg_path}}'
+
+
+    - name: Install pkgs from mixed sources
+      pacman:
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg_url.stdout}}'
+          - '{{file_pkg_path}}'
+      register: install
+
+    - name: Install pkgs with their regular name - already installed
+      pacman:
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg}}'
+          - '{{file_pkg}}'
+      register: install_1
+
+    - assert:
+        that:
+          - install is changed
+          # Must sort lists since the pacman module is free to install urls before or after regular pkgs
+          - install.packages|sort() == ['{{reg_pkg}}', '{{url_pkg}}', '{{file_pkg}}']|sort()
+          - install_1 is not changed
