@@ -291,6 +291,8 @@ class Pacman(object):
         pkgs_to_install_from_url = []
         for p in pkgs:
             if p.source_is_URL:
+                # URL packages bypass the latest / upgradable_pkgs test
+                # They go through the dry-run to let pacman decide if they will be installed
                 pkgs_to_install_from_url.append(p)
                 continue
             if (
@@ -326,8 +328,9 @@ class Pacman(object):
             after = []
             to_be_installed = []
             for p in name_ver:
-                # With Pacman v6.0.1 - libalpm v13.0.1, --upgrade outputs "loading packages..." on stdout. strip that
-                if "loading packages" in p:
+                # With Pacman v6.0.1 - libalpm v13.0.1, --upgrade outputs "loading packages..." on stdout. strip that.
+                # When installing from URLs, pacman can also output a 'nothing to do' message. strip that too.
+                if "loading packages" in p or 'there is nothing to do' in p:
                     continue
                 name, version = p.split()
                 if name in self.inventory["installed_pkgs"]:
@@ -337,7 +340,6 @@ class Pacman(object):
 
             return (to_be_installed, before, after)
 
-        self.changed = True
         before = []
         after = []
         installed_pkgs = []
@@ -352,6 +354,13 @@ class Pacman(object):
             installed_pkgs.extend(p)
             before.extend(b)
             after.extend(a)
+
+        if len(installed_pkgs) == 0:
+            # This can happen with URL packages if pacman decides there's nothing to do
+            self.add_exit_infos("package(s) already installed")
+            return
+
+        self.changed = True
 
         self.exit_params["diff"] = {
             "before": "\n".join(sorted(before)) + "\n" if before else "",
