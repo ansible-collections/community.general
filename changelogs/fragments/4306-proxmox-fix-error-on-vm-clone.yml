@@ -1,0 +1,2 @@
+bugfixes:
+  - "proxmox_kvm: Fix error in check when creating or cloning"

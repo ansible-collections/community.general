@@ -1205,12 +1205,12 @@ def main():
         proxmox.get_vm(vmid)
 
         # Ensure the choosen VM name doesn't already exist when cloning
-        existing_vmid = proxmox.get_vmid(name, choose_first_if_multiple=True)
+        existing_vmid = proxmox.get_vmid(name, ignore_missing=True, choose_first_if_multiple=True)
         if existing_vmid:
             module.exit_json(changed=False, vmid=existing_vmid, msg="VM with name <%s> already exists" % name)
 
         # Ensure the choosen VM id doesn't already exist when cloning
-        if proxmox.get_vm(newid, ignore_errors=True):
+        if proxmox.get_vm(newid, ignore_missing=True):
             module.exit_json(changed=False, vmid=vmid, msg="vmid %s with VM name %s already exists" % (newid, name))
 
     if delete is not None:
