@@ -190,7 +190,22 @@ from ansible.module_utils.basic import AnsibleModule
 from collections import defaultdict, namedtuple
 
 
-Package = namedtuple("Package", ["name", "source"])
+class Package(object):
+    def __init__(self, name, source, source_is_URL=False):
+        self.name = name
+        self.source = source
+        self.source_is_URL = source_is_URL
+
+    def __eq__(self, o):
+        return self.name == o.name and self.source == o.source and self.source_is_URL == o.source_is_URL
+
+    def __lt__(self, o):
+        return self.name < o.name
+
+    def __repr__(self):
+        return 'Package("%s", "%s", %s)' % (self.name, self.source, self.source_is_URL)
+
+
 VersionTuple = namedtuple("VersionTuple", ["current", "latest"])
 
 
@@ -273,7 +288,13 @@ class Pacman(object):
 
     def install_packages(self, pkgs):
         pkgs_to_install = []
+        pkgs_to_install_from_url = []
         for p in pkgs:
+            if p.source_is_URL:
+                # URL packages bypass the latest / upgradable_pkgs test
+                # They go through the dry-run to let pacman decide if they will be installed
+                pkgs_to_install_from_url.append(p)
+                continue
             if (
                 p.name not in self.inventory["installed_pkgs"]
                 or self.target_state == "latest"
@@ -281,14 +302,12 @@ class Pacman(object):
             ):
                 pkgs_to_install.append(p)
 
-        if len(pkgs_to_install) == 0:
+        if len(pkgs_to_install) == 0 and len(pkgs_to_install_from_url) == 0:
             self.add_exit_infos("package(s) already installed")
             return
 
-        self.changed = True
         cmd_base = [
             self.pacman_path,
-            "--sync",
             "--noconfirm",
             "--noprogressbar",
             "--needed",
@@ -296,45 +315,78 @@ class Pacman(object):
         if self.m.params["extra_args"]:
             cmd_base.extend(self.m.params["extra_args"])
 
-        # Dry run first to gather what will be done
-        cmd = cmd_base + ["--print-format", "%n %v"] + [p.source for p in pkgs_to_install]
-        rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
-        if rc != 0:
-            self.fail("Failed to list package(s) to install", stdout=stdout, stderr=stderr)
+        def _build_install_diff(pacman_verb, pkglist):
+            # Dry run to build the installation diff
 
-        name_ver = [l.strip() for l in stdout.splitlines()]
+            cmd = cmd_base + [pacman_verb, "--print-format", "%n %v"] + [p.source for p in pkglist]
+            rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
+            if rc != 0:
+                self.fail("Failed to list package(s) to install", cmd=cmd, stdout=stdout, stderr=stderr)
+
+            name_ver = [l.strip() for l in stdout.splitlines()]
+            before = []
+            after = []
+            to_be_installed = []
+            for p in name_ver:
+                # With Pacman v6.0.1 - libalpm v13.0.1, --upgrade outputs "loading packages..." on stdout. strip that.
+                # When installing from URLs, pacman can also output a 'nothing to do' message. strip that too.
+                if "loading packages" in p or 'there is nothing to do' in p:
+                    continue
+                name, version = p.split()
+                if name in self.inventory["installed_pkgs"]:
+                    before.append("%s-%s" % (name, self.inventory["installed_pkgs"][name]))
+                after.append("%s-%s" % (name, version))
+                to_be_installed.append(name)
+
+            return (to_be_installed, before, after)
+
         before = []
         after = []
         installed_pkgs = []
-        self.exit_params["packages"] = []
-        for p in name_ver:
-            name, version = p.split()
-            if name in self.inventory["installed_pkgs"]:
-                before.append("%s-%s" % (name, self.inventory["installed_pkgs"][name]))
-            after.append("%s-%s" % (name, version))
-            installed_pkgs.append(name)
+
+        if pkgs_to_install:
+            p, b, a = _build_install_diff("--sync", pkgs_to_install)
+            installed_pkgs.extend(p)
+            before.extend(b)
+            after.extend(a)
+        if pkgs_to_install_from_url:
+            p, b, a = _build_install_diff("--upgrade", pkgs_to_install_from_url)
+            installed_pkgs.extend(p)
+            before.extend(b)
+            after.extend(a)
+
+        if len(installed_pkgs) == 0:
+            # This can happen with URL packages if pacman decides there's nothing to do
+            self.add_exit_infos("package(s) already installed")
+            return
+
+        self.changed = True
 
         self.exit_params["diff"] = {
-            "before": "\n".join(before) + "\n" if before else "",
-            "after": "\n".join(after) + "\n" if after else "",
+            "before": "\n".join(sorted(before)) + "\n" if before else "",
+            "after": "\n".join(sorted(after)) + "\n" if after else "",
         }
 
         if self.m.check_mode:
             self.add_exit_infos("Would have installed %d packages" % len(installed_pkgs))
-            self.exit_params["packages"] = installed_pkgs
+            self.exit_params["packages"] = sorted(installed_pkgs)
             return
 
         # actually do it
-        cmd = cmd_base + [p.source for p in pkgs_to_install]
+        def _install_packages_for_real(pacman_verb, pkglist):
+            cmd = cmd_base + [pacman_verb] + [p.source for p in pkglist]
+            rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
+            if rc != 0:
+                self.fail("Failed to install package(s)", cmd=cmd, stdout=stdout, stderr=stderr)
+            self.add_exit_infos(stdout=stdout, stderr=stderr)
 
-        rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
-        if rc != 0:
-            self.fail("Failed to install package(s)", stdout=stdout, stderr=stderr)
+        if pkgs_to_install:
+            _install_packages_for_real("--sync", pkgs_to_install)
+        if pkgs_to_install_from_url:
+            _install_packages_for_real("--upgrade", pkgs_to_install_from_url)
 
         self.exit_params["packages"] = installed_pkgs
-        self.add_exit_infos(
-            "Installed %d package(s)" % len(installed_pkgs), stdout=stdout, stderr=stderr
-        )
+        self.add_exit_infos("Installed %d package(s)" % len(installed_pkgs))
 
     def remove_packages(self, pkgs):
         force_args = ["--nodeps", "--nodeps"] if self.m.params["force"] else []
@@ -362,7 +414,7 @@ class Pacman(object):
 
         rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
         if rc != 0:
-            self.fail("failed to list package(s) to remove", stdout=stdout, stderr=stderr)
+            self.fail("failed to list package(s) to remove", cmd=cmd, stdout=stdout, stderr=stderr)
 
         removed_pkgs = stdout.split()
         self.exit_params["packages"] = removed_pkgs
@@ -381,7 +433,7 @@ class Pacman(object):
 
         rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
         if rc != 0:
-            self.fail("failed to remove package(s)", stdout=stdout, stderr=stderr)
+            self.fail("failed to remove package(s)", cmd=cmd, stdout=stdout, stderr=stderr)
         self.exit_params["packages"] = removed_pkgs
         self.add_exit_infos("Removed %d package(s)" % len(removed_pkgs), stdout=stdout, stderr=stderr)
 
@@ -420,7 +472,7 @@ class Pacman(object):
             if rc == 0:
                 self.add_exit_infos("System upgraded", stdout=stdout, stderr=stderr)
             else:
-                self.fail("Could not upgrade", stdout=stdout, stderr=stderr)
+                self.fail("Could not upgrade", cmd=cmd, stdout=stdout, stderr=stderr)
 
     def update_package_db(self):
         """runs pacman --sync --refresh"""
@@ -446,7 +498,7 @@ class Pacman(object):
         if rc == 0:
             self.add_exit_infos("Updated package db", stdout=stdout, stderr=stderr)
         else:
-            self.fail("could not update package db", stdout=stdout, stderr=stderr)
+            self.fail("could not update package db", cmd=cmd, stdout=stdout, stderr=stderr)
 
     def package_list(self):
         """Takes the input package list and resolves packages groups to their package list using the inventory,
@@ -459,6 +511,7 @@ class Pacman(object):
             if not pkg:
                 continue
 
+            is_URL = False
             if pkg in self.inventory["available_groups"]:
                 # Expand group members
                 for group_member in self.inventory["available_groups"][pkg]:
@@ -488,8 +541,11 @@ class Pacman(object):
                                 stderr=stderr,
                                 rc=rc,
                             )
+                    # With Pacman v6.0.1 - libalpm v13.0.1, --upgrade outputs "loading packages..." on stdout. strip that
+                    stdout = stdout.replace("loading packages...\n", "")
+                    is_URL = True
                 pkg_name = stdout.strip()
-                pkg_list.append(Package(name=pkg_name, source=pkg))
+                pkg_list.append(Package(name=pkg_name, source=pkg, source_is_URL=is_URL))
 
         return pkg_list
 
