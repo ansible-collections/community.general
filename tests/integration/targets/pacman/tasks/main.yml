@@ -8,3 +8,4 @@
   block:
     # Add more tests here by including more task files:
     - include: 'basic.yml'
+    - include: 'package_urls.yml'
