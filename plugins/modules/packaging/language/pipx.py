@@ -83,10 +83,12 @@ options:
             - Install the project in editable mode.
         type: bool
         default: false
+        version_added: 4.6.0
     pip_args:
         description:
             - Arbitrary arguments to pass directly to C(pip).
         type: str
+        version_added: 4.6.0
 notes:
     - This module does not install the C(pipx) python package, however that can be easily done with the module M(ansible.builtin.pip).
     - This module does not require C(pipx) to be in the shell C(PATH), but it must be loadable by Python as a module.
