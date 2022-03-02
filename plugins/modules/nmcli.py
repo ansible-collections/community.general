@@ -295,6 +295,11 @@ options:
             - A list of DNS search domains.
         elements: str
         type: list
+    dns6_options:
+        description:
+            - A list of DNS options.
+        elements: str
+        type: list
     dns6_ignore_auto:
         description:
             - Ignore automatically configured IPv6 name servers.
@@ -1554,6 +1559,7 @@ class Nmcli(object):
         self.route_metric6 = module.params['route_metric6']
         self.dns6 = module.params['dns6']
         self.dns6_search = module.params['dns6_search']
+        self.dns6_options = module.params['dns6_options']
         self.dns6_ignore_auto = module.params['dns6_ignore_auto']
         self.method6 = module.params['method6']
         self.ip_privacy6 = module.params['ip_privacy6']
@@ -1673,6 +1679,7 @@ class Nmcli(object):
                 'ipv6.addresses': self.enforce_ipv6_cidr_notation(self.ip6),
                 'ipv6.dns': self.dns6,
                 'ipv6.dns-search': self.dns6_search,
+                'ipv6.dns-options': self.dns6_options,
                 'ipv6.ignore-auto-dns': self.dns6_ignore_auto,
                 'ipv6.gateway': self.gw6,
                 'ipv6.ignore-auto-routes': self.gw6_ignore_auto,
@@ -2054,6 +2061,7 @@ class Nmcli(object):
                          'ipv4.routing-rules',
                          'ipv6.dns',
                          'ipv6.dns-search',
+                         'ipv6.dns-options',
                          'ipv6.routes',
                          '802-11-wireless-security.group',
                          '802-11-wireless-security.leap-password-flags',
@@ -2422,6 +2430,7 @@ def main():
             gw6_ignore_auto=dict(type='bool', default=False),
             dns6=dict(type='list', elements='str'),
             dns6_search=dict(type='list', elements='str'),
+            dns6_options=dict(type='list', elements='str'),
             dns6_ignore_auto=dict(type='bool', default=False),
             routes6=dict(type='list', elements='str'),
             routes6_extended=dict(type='list',
