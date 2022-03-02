@@ -301,6 +301,7 @@ options:
             - A list of DNS options.
         elements: str
         type: list
+        version_added: 4.6.0
     dns6_ignore_auto:
         description:
             - Ignore automatically configured IPv6 name servers.
