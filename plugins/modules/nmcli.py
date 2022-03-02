@@ -196,6 +196,7 @@ options:
             - A list of DNS options.
         elements: str
         type: list
+        version_added: 4.6.0
     dns4_ignore_auto:
         description:
             - Ignore automatically configured IPv4 name servers.
