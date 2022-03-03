@@ -158,6 +158,7 @@ options:
      - This is a free-form data structure that can contain arbitrary data. This is passed directly to the JIRA REST API
        (possibly after merging with other required data, as when passed to create). See examples for more information,
        and the JIRA REST API for the structure required for various fields.
+     - When passed to comment, the data structure is merged at the first level. Useful to add JIRA properties for example.
      - Note that JIRA may not allow changing field values on specific transitions or states.
 
   jql:
