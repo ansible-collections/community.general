@@ -156,7 +156,7 @@ options:
     priority:
         description:
           - Integer from 1 (high) to 5 (low) indicating alert severity.
-         type: str
+        type: str
 '''
 
 EXAMPLES = '''
