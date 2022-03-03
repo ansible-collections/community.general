@@ -155,9 +155,8 @@ options:
         version_added: 1.3.0
     priority:
         description:
-         - Integer from 1 (high) to 5 (low) indicating alert severity.
+          - Integer from 1 (high) to 5 (low) indicating alert severity.
          type: str
-         default: no
 '''
 
 EXAMPLES = '''
