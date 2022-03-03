@@ -1,0 +1,2 @@
+minor_changes:
+  - syslog_json - add option to skip logging of ``gather_facts`` playbook tasks; use v2 callback API (https://github.com/ansible-collections/community.general/pull/4223).
