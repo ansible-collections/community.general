@@ -52,7 +52,10 @@ options:
 
     executable:
         description:
-            - Name of binary to use. This can either be C(pacman) or a pacman compatible AUR helper.
+            - Path of the binary to use. This can either be C(pacman) or a pacman compatible AUR helper.
+            - Pacman compatibility is unfortunately ill defined, in particular, this modules makes
+              extensive use of the C(--print-format) directive which is known not to be implemented by
+              some AUR helpers (notably, C(yay)).
             - Beware that AUR helpers might behave unexpectedly and are therefore not recommended.
         default: pacman
         type: str
@@ -575,7 +578,7 @@ class Pacman(object):
 
         installed_groups = defaultdict(set)
         dummy, stdout, dummy = self.m.run_command(
-            [self.pacman_path, "--query", "--group"], check_rc=True
+            [self.pacman_path, "--query", "--groups"], check_rc=True
         )
         # Format of lines:
         #     base-devel file
@@ -600,7 +603,7 @@ class Pacman(object):
 
         available_groups = defaultdict(set)
         dummy, stdout, dummy = self.m.run_command(
-            [self.pacman_path, "--sync", "--group", "--group"], check_rc=True
+            [self.pacman_path, "--sync", "--groups", "--groups"], check_rc=True
         )
         # Format of lines:
         #     vim-plugins vim-airline
