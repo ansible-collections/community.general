@@ -1,0 +1,8 @@
+bugfixes:
+  - pacman - Use ``--groups`` instead of ``--group``
+    (https://github.com/ansible-collections/community.general/pull/4312).
+
+known_issues:
+   - pacman - Binaries specified in the ``executable`` parameter must support
+     ``--print-format`` in order to be used by this module.
+     In particular, AUR helper ``yay`` is known not to currently support it.
