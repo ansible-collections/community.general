@@ -45,7 +45,7 @@ options:
         description:
             - When removing packages, forcefully remove them, without any checks.
               Same as C(extra_args="--nodeps --nodeps").
-              When update_cache, force redownload repo databases.
+              When combined with I(update_cache), force a refresh of all package databases.
               Same as C(update_cache_extra_args="--refresh --refresh").
         default: no
         type: bool
