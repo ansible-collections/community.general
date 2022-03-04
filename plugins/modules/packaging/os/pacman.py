@@ -54,6 +54,7 @@ options:
         description:
             - When removing packages, do not save modified configuration files as C(.pacsave) files.
               (passes C(--nosave) to pacman)
+        version_added: 4.6.0
         default: no
         type: bool
 
