@@ -54,8 +54,8 @@ options:
         description:
             - Path of the binary to use. This can either be C(pacman) or a pacman compatible AUR helper.
             - Pacman compatibility is unfortunately ill defined, in particular, this modules makes
-              extensive use of the ``--print-format`` directive which is known not to be implemented by
-              some AUR helpers. (Notably, ``yay``)
+              extensive use of the C(--print-format) directive which is known not to be implemented by
+              some AUR helpers (notably, C(yay)).
             - Beware that AUR helpers might behave unexpectedly and are therefore not recommended.
         default: pacman
         type: str
