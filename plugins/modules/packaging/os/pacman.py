@@ -397,9 +397,6 @@ class Pacman(object):
         self.add_exit_infos("Installed %d package(s)" % len(installed_pkgs))
 
     def remove_packages(self, pkgs):
-        force_args = ["--nodeps", "--nodeps"] if self.m.params["force"] else []
-        nosave_args = ["--nosave"] if self.m.params["remove_nosave"] else []
-
         # filter out pkgs that are already absent
         pkg_names_to_remove = [p.name for p in pkgs if p.name in self.inventory["installed_pkgs"]]
 
@@ -411,10 +408,8 @@ class Pacman(object):
         self.changed = True
 
         cmd_base = [self.pacman_path, "--remove", "--noconfirm", "--noprogressbar"]
-        if self.m.params["extra_args"]:
-            cmd_base.extend(self.m.params["extra_args"])
-        if force_args:
-            cmd_base.extend(force_args)
+        cmd_base += self.m.params["extra_args"]
+        cmd_base += ["--nodeps", "--nodeps"] if self.m.params["force"] else []
         # nosave_args conflicts with --print-format. Added later.
         # https://github.com/ansible-collections/community.general/issues/4315
 
@@ -439,11 +434,8 @@ class Pacman(object):
             self.add_exit_infos("Would have removed %d packages" % len(removed_pkgs))
             return
 
-        if nosave_args:
-            cmd_base.extend(nosave_args)
-
-        # actually do it
-        cmd = cmd_base + pkg_names_to_remove
+        nosave_args = ["--nosave"] if self.m.params["remove_nosave"] else []
+        cmd = cmd_base + nosave_args + pkg_names_to_remove
 
         rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
         if rc != 0:
