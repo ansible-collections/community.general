@@ -1,7 +1,8 @@
 bugfixes:
   - pacman - when the ``update_cache`` option is combined with another option
     such as ``upgrade``, report ``changed`` based on the actions performed by
-    the latter option. Previously a task combining these options would always
+    the latter option. This was the behavior in community.general 4.4.0 and before.
+    In community.general 4.5.0, a task combining these options would always
     report ``changed``
     (https://github.com/ansible-collections/community.general/pull/4318).
 
