@@ -1,0 +1,12 @@
+bugfixes:
+  - pacman - when the ``update_cache`` option is combined with another option
+    such as ``upgrade``, report ``changed`` based on the actions performed by
+    the latter option. This was the behavior in community.general 4.4.0 and before.
+    In community.general 4.5.0, a task combining these options would always
+    report ``changed``
+    (https://github.com/ansible-collections/community.general/pull/4318).
+
+known_issues:
+   - pacman - ``update_cache`` cannot differentiate between up to date and
+     outdated package lists and will report ``changed`` in both situations
+     (https://github.com/ansible-collections/community.general/pull/4318).
