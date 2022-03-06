@@ -1168,7 +1168,8 @@ files:
   $modules/web_infrastructure/jenkins_script.py:
     maintainers: hogarthj
   $modules/web_infrastructure/jira.py:
-    maintainers: Slezhuk tarka pertoft DWSR
+    maintainers: Slezhuk tarka pertoft
+    ignore: DWSR
     labels: jira
   $modules/web_infrastructure/nginx_status_info.py:
     maintainers: resmo
