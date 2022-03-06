@@ -1528,6 +1528,7 @@ class Nmcli(object):
             'bridge',
             'dummy',
             'ethernet',
+            '802-3-ethernet',
             'generic',
             'gre',
             'infiniband',
@@ -1536,6 +1537,7 @@ class Nmcli(object):
             'team',
             'vlan',
             'wifi',
+            '802-11-wireless',
             'gsm',
             'wireguard',
         )
@@ -1895,6 +1897,12 @@ class Nmcli(object):
         options = {
             'connection.interface-name': self.ifname,
         }
+
+        if not self.type:
+            current_con_type = self.show_connection().get('connection.type')
+            if current_con_type:
+                self.type = current_con_type
+
         options.update(self.connection_options(detect_change=True))
         return self._compare_conn_params(self.show_connection(), options)
 
