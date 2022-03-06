@@ -271,6 +271,12 @@ class Pacman(object):
             if not (self.m.params["name"] or self.m.params["upgrade"]):
                 self.success()
 
+        # Avoid shadowing lack of changes in the following stages
+        # so that update_cache: yes doesn't always return changed
+        # TODO: remove this when update_cache is tweaked to report its real
+        # changed status (i.e. no changed if package lists were up to date)
+        self.changed = False
+
         self.inventory = self._build_inventory()
         if self.m.params["upgrade"]:
             self.upgrade()
