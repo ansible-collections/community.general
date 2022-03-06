@@ -188,6 +188,48 @@ ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 """
 
+TESTCASE_ETHERNET_MOD_IPV4_INT_WITH_ROUTE_AND_METRIC = [
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'routes4': ['192.168.200.0/24 192.168.1.1'],
+        'route_metric4': 10,
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+]
+
+TESTCASE_ETHERNET_MOD_IPV4_INT_WITH_ROUTE_AND_METRIC_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              ethernet_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            manual
+ipv4.addresses:                         192.168.1.10
+ipv4.routes:                            { ip = 192.168.200.0/24, nh = 192.168.1.1 }
+ipv4.route-metric:                      10
+"""
+
+TESTCASE_ETHERNET_MOD_IPV6_INT_WITH_ROUTE_AND_METRIC = [
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'routes6': ['fd2e:446f:d85d:5::/64 2001:beef:cafe:10::2'],
+        'route_metric6': 10,
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+]
+
+TESTCASE_ETHERNET_MOD_IPV6_INT_WITH_ROUTE_AND_METRIC_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              ethernet_non_existant
+connection.autoconnect:                 yes
+ipv6.method:                            manual
+ipv6.addresses:                         2001:beef:cafe:10::1/64
+ipv6.routes:                            { ip = fd2e:446f:d85d:5::/64, nh = 2001:beef:cafe:10::2 }
+ipv6.route-metric                       10
+"""
+
 TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_MULTIPLE_ROUTES = [
     {
         'type': 'ethernet',
@@ -1269,6 +1311,28 @@ def mocked_ethernet_connection_with_ipv6_static_address_static_route_create(mock
                execute_return=None,
                execute_side_effect=(
                    (0, TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
+
+
+@pytest.fixture
+def mocked_ethernet_connection_with_ipv4_static_address_static_route_metric_modify(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_ETHERNET_MOD_IPV4_INT_WITH_ROUTE_AND_METRIC_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
+
+
+@pytest.fixture
+def mocked_ethernet_connection_with_ipv6_static_address_static_route_metric_modify(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_ETHERNET_MOD_IPV6_INT_WITH_ROUTE_AND_METRIC_SHOW_OUTPUT, ""),
                    (0, "", ""),
                ))
 
@@ -2424,6 +2488,36 @@ def test_ethernet_connection_static_unchanged(mocked_ethernet_connection_static_
     assert not results['changed']
 
 
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_MOD_IPV4_INT_WITH_ROUTE_AND_METRIC, indirect=['patch_ansible_module'])
+def test_ethernet_connection_static_ipv4_address_static_route_with_metric_modify(
+        mocked_ethernet_connection_with_ipv4_static_address_static_route_metric_modify, capfd):
+    """
+    Test : Modify ethernet connection with static IPv4 address and static route
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[1]
+
+    assert add_args[0][0] == '/usr/bin/nmcli'
+    assert add_args[0][1] == 'con'
+    assert add_args[0][2] == 'modify'
+    assert add_args[0][3] == 'non_existent_nw_device'
+
+    add_args_text = list(map(to_text, add_args[0]))
+
+    for param in ['ipv4.routes', '192.168.200.0/24 192.168.1.1',
+                  'ipv4.route-metric', '10']:
+        assert param in add_args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+
+    assert results.get('changed') is True
+    assert not results.get('failed')
+
+
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE, indirect=['patch_ansible_module'])
 def test_ethernet_connection_static_ipv6_address_static_route_create(mocked_ethernet_connection_with_ipv6_static_address_static_route_create, capfd):
     """
@@ -2457,6 +2551,36 @@ def test_ethernet_connection_static_ipv6_address_static_route_create(mocked_ethe
     results = json.loads(out)
     assert not results.get('failed')
     assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_MOD_IPV6_INT_WITH_ROUTE_AND_METRIC, indirect=['patch_ansible_module'])
+def test_ethernet_connection_static_ipv6_address_static_route_metric_modify(
+        mocked_ethernet_connection_with_ipv6_static_address_static_route_metric_modify, capfd):
+    """
+    Test : Modify ethernet connection with static IPv6 address and static route
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[1]
+
+    assert add_args[0][0] == '/usr/bin/nmcli'
+    assert add_args[0][1] == 'con'
+    assert add_args[0][2] == 'modify'
+    assert add_args[0][3] == 'non_existent_nw_device'
+
+    add_args_text = list(map(to_text, add_args[0]))
+
+    for param in ['ipv6.routes', 'fd2e:446f:d85d:5::/64 2001:beef:cafe:10::2',
+                  'ipv6.route-metric', '10']:
+        assert param in add_args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+
+    assert results.get('changed') is True
+    assert not results.get('failed')
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_MULTIPLE_ROUTES, indirect=['patch_ansible_module'])
