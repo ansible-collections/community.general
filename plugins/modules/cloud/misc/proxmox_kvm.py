@@ -1210,7 +1210,7 @@ def main():
             module.exit_json(changed=False, vmid=existing_vmid, msg="VM with name <%s> already exists" % name)
 
         # Ensure the choosen VM id doesn't already exist when cloning
-        if proxmox.get_vm(newid, ignore_errors=True):
+        if proxmox.get_vm(newid, ignore_missing=True):
             module.exit_json(changed=False, vmid=vmid, msg="vmid %s with VM name %s already exists" % (newid, name))
 
     if delete is not None:
