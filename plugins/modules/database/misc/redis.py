@@ -13,6 +13,8 @@ module: redis
 short_description: Various redis commands, replica and flush
 description:
    - Unified utility to interact with redis instances.
+extends_documentation_fragment:
+   - community.general.redis
 options:
     command:
         description:
@@ -22,45 +24,14 @@ options:
             - C(replica) sets a redis instance in replica or master mode. (C(slave) is an alias for C(replica).)
         choices: [ config, flush, replica, slave ]
         type: str
-    login_password:
-        description:
-            - The password used to authenticate with (usually not used)
-        type: str
-    login_host:
-        description:
-            - The host running the database
-        default: localhost
-        type: str
-    login_port:
-        description:
-            - The port to connect to
-        default: 6379
-        type: int
     tls:
-        description:
-            - Specify whether or not to use TLS for the connection.
-        type: bool
         default: false
         version_added: 4.6.0
     login_user:
-        description:
-            - Specify the user to authenticate with.
-            - Requires L(redis,https://pypi.org/project/redis) >= 3.4.0.
-        type: str
         version_added: 4.6.0
     validate_certs:
-        description:
-            - Specify whether or not to validate TLS certificates.
-            - This should only be turned off for personally controlled sites or with
-              C(localhost) as target.
-        type: bool
-        default: true
         version_added: 4.6.0
     ca_certs:
-        description:
-            - Path to root certificates file. If not set and I(tls) is
-              set to C(true), certifi ca-certificates will be used.
-        type: str
         version_added: 4.6.0
     master_host:
         description:
