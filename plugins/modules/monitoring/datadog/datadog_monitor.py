@@ -157,6 +157,7 @@ options:
         description:
           - Integer from 1 (high) to 5 (low) indicating alert severity.
         type: str
+        choices: [1, 2, 3, 4, 5]
 '''
 
 EXAMPLES = '''
@@ -243,7 +244,7 @@ def main():
             evaluation_delay=dict(),
             id=dict(),
             include_tags=dict(required=False, default=True, type='bool'),
-            priority=dict(),
+            priority=dict(type='int'),
         )
     )
 
