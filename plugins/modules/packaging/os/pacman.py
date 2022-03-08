@@ -117,6 +117,15 @@ packages:
     type: list
     sample: [ package, other-package ]
 
+cache_updated:
+    description:
+        - The changed status of C(pacman -Sy).
+        - Useful when I(name) or I(upgrade=true) are specified next to I(update_cache=true).
+    returned: success, when I(update_cache=true)
+    type: bool
+    sample: false
+    version_added: 4.6.0
+
 stdout:
     description: Output from pacman.
     returned: success, when needed
@@ -494,6 +503,7 @@ class Pacman(object):
         if self.m.check_mode:
             self.add_exit_infos("Would have updated the package db")
             self.changed = True
+            self.exit_params["cache_updated"] = True
             return
 
         cmd = [
@@ -505,10 +515,24 @@ class Pacman(object):
             cmd += self.m.params["update_cache_extra_args"]
         if self.m.params["force"]:
             cmd += ["--refresh"]
+        else:
+            # Dump package database to get contents before update
+            dummy, pre_state, dummy = self.m.run_command([self.pacman_path, '--sync', '--list'], check_rc=True)
+            pre_state = sorted(pre_state.splitlines())
 
         rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
 
-        self.changed = True
+        if self.m.params["force"]:
+            # Always changed when force=true
+            self.exit_params["cache_updated"] = True
+        else:
+            # Dump package database to get contents after update
+            dummy, post_state, dummy = self.m.run_command([self.pacman_path, '--sync', '--list'], check_rc=True)
+            post_state = sorted(post_state.splitlines())
+            # If contents changed, set changed=true
+            self.exit_params["cache_updated"] = pre_state != post_state
+        if self.exit_params["cache_updated"]:
+            self.changed = True
 
         if rc == 0:
             self.add_exit_infos("Updated package db", stdout=stdout, stderr=stderr)

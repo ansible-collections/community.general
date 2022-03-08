@@ -328,33 +328,60 @@ class TestPacman:
         assert out["changed"]
 
     @pytest.mark.parametrize(
-        "module_args,expected_call",
+        "module_args,expected_calls,changed",
         [
-            ({}, ["pacman", "--sync", "--refresh"]),
-            ({"force": True}, ["pacman", "--sync", "--refresh", "--refresh"]),
             (
-                {"update_cache_extra_args": "--some-extra args"},
-                ["pacman", "--sync", "--refresh", "--some-extra", "args"],  # shlex test
+                {},
+                [
+                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'a\nb\nc', ''),
+                    (["pacman", "--sync", "--refresh"], {'check_rc': False}, 0, 'stdout', 'stderr'),
+                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'b\na\nc', ''),
+                ],
+                False,
+            ),
+            (
+                {"force": True},
+                [
+                    (["pacman", "--sync", "--refresh", "--refresh"], {'check_rc': False}, 0, 'stdout', 'stderr'),
+                ],
+                True,
+            ),
+            (
+                {"update_cache_extra_args": "--some-extra args"},  # shlex test
+                [
+                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'a\nb\nc', ''),
+                    (["pacman", "--sync", "--refresh", "--some-extra", "args"], {'check_rc': False}, 0, 'stdout', 'stderr'),
+                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'a changed\nb\nc', ''),
+                ],
+                True,
             ),
             (
                 {"force": True, "update_cache_extra_args": "--some-extra args"},
-                ["pacman", "--sync", "--refresh", "--some-extra", "args", "--refresh"],
+                [
+                    (["pacman", "--sync", "--refresh", "--some-extra", "args", "--refresh"], {'check_rc': False}, 0, 'stdout', 'stderr'),
+                ],
+                True,
             ),
         ],
     )
-    def test_update_db(self, mock_empty_inventory, module_args, expected_call):
+    def test_update_db(self, mock_empty_inventory, module_args, expected_calls, changed):
         args = {"update_cache": True}
         args.update(module_args)
         set_module_args(args)
 
-        self.mock_run_command.return_value = [0, "stdout", "stderr"]
+        self.mock_run_command.side_effect = [
+            (rc, stdout, stderr) for expected_call, kwargs, rc, stdout, stderr in expected_calls
+        ]
         with pytest.raises(AnsibleExitJson) as e:
             P = pacman.Pacman(pacman.setup_module())
             P.run()
 
-        self.mock_run_command.assert_called_with(mock.ANY, expected_call, check_rc=False)
+        self.mock_run_command.assert_has_calls([
+            mock.call(mock.ANY, expected_call, **kwargs) for expected_call, kwargs, rc, stdout, stderr in expected_calls
+        ])
         out = e.value.args[0]
-        assert out["changed"]
+        assert out["cache_updated"] == changed
+        assert out["changed"] == changed
 
     @pytest.mark.parametrize(
         "check_mode_value, run_command_data, upgrade_extra_args",
