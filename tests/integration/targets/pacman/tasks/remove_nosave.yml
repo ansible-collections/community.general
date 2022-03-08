@@ -1,0 +1,70 @@
+---
+- vars:
+    package_name: xinetd
+    config_file: /etc/xinetd.conf
+  block:
+    - name: Make sure that {{ package_name }} is not installed
+      pacman:
+        name: '{{ package_name }}'
+        state: absent
+    - name: Make sure {{config_file}}.pacsave file doesn't exist
+      file:
+        path: '{{config_file}}.pacsave'
+        state: absent
+
+    - name: Install {{ package_name }}
+      pacman:
+        name: '{{ package_name }}'
+        state: present
+
+    - name: Modify {{config_file}}
+      blockinfile:
+        path: '{{config_file}}'
+        block: |
+          # something something
+          # on 2 lines
+
+    - name: Remove {{ package_name }} - generate pacsave
+      pacman:
+        name: '{{ package_name }}'
+        state: absent
+    - name: Make sure {{config_file}}.pacsave exists
+      stat:
+        path: '{{config_file}}.pacsave'
+      register: pacsave_st_1
+
+    - assert:
+        that:
+          - pacsave_st_1.stat.exists
+
+    - name: Delete {{config_file}}.pacsave
+      file:
+        path: '{{config_file}}.pacsave'
+        state: absent
+
+    - name: Install {{ package_name }}
+      pacman:
+        name: '{{ package_name }}'
+        state: present
+
+    - name: Modify {{config_file}}
+      blockinfile:
+        path: '{{config_file}}'
+        block: |
+          # something something
+          # on 2 lines
+
+    - name: Remove {{ package_name }} - nosave
+      pacman:
+        name: '{{ package_name }}'
+        remove_nosave: yes
+        state: absent
+
+    - name: Make sure {{config_file}}.pacsave does not exist
+      stat:
+        path: '{{config_file}}.pacsave'
+      register: pacsave_st_2
+
+    - assert:
+        that:
+          - not pacsave_st_2.stat.exists
