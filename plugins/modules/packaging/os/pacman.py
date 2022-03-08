@@ -125,6 +125,15 @@ packages:
     elements: str
     sample: [ package, other-package ]
 
+cache_updated:
+    description:
+        - The changed status of C(pacman -Sy).
+        - Useful when I(name) or I(upgrade=true) are specified next to I(update_cache=true).
+    returned: success, when I(update_cache=true)
+    type: bool
+    sample: false
+    version_added: 4.6.0
+
 stdout:
     description:
         - Output from pacman.
@@ -512,6 +521,7 @@ class Pacman(object):
         if self.m.check_mode:
             self.add_exit_infos("Would have updated the package db")
             self.changed = True
+            self.exit_params["cache_updated"] = True
             return
 
         cmd = [
@@ -526,7 +536,13 @@ class Pacman(object):
 
         rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
 
+        # TODO: check whether the cache was actually updated
+        # Right now, this only seems to be possible by adding `--debug` and looking
+        # for `.db: response code` and checking whether the response is 304 (not
+        # updated) or something else (likely updated)
+
         self.changed = True
+        self.exit_params["cache_updated"] = True
 
         if rc == 0:
             self.add_exit_infos("Updated package db", stdout=stdout, stderr=stderr)
