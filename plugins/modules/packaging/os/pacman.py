@@ -43,10 +43,18 @@ options:
 
     force:
         description:
-            - When removing package, force remove package, without any checks.
-              Same as `extra_args="--nodeps --nodeps"`.
-              When update_cache, force redownload repo databases.
-              Same as `update_cache_extra_args="--refresh --refresh"`.
+            - When removing packages, forcefully remove them, without any checks.
+              Same as C(extra_args="--nodeps --nodeps").
+              When combined with I(update_cache), force a refresh of all package databases.
+              Same as C(update_cache_extra_args="--refresh --refresh").
+        default: no
+        type: bool
+
+    remove_nosave:
+        description:
+            - When removing packages, do not save modified configuration files as C(.pacsave) files.
+              (passes C(--nosave) to pacman)
+        version_added: 4.6.0
         default: no
         type: bool
 
@@ -339,7 +347,7 @@ class Pacman(object):
             for p in name_ver:
                 # With Pacman v6.0.1 - libalpm v13.0.1, --upgrade outputs "loading packages..." on stdout. strip that.
                 # When installing from URLs, pacman can also output a 'nothing to do' message. strip that too.
-                if "loading packages" in p or 'there is nothing to do' in p:
+                if "loading packages" in p or "there is nothing to do" in p:
                     continue
                 name, version = p.split()
                 if name in self.inventory["installed_pkgs"]:
@@ -398,8 +406,6 @@ class Pacman(object):
         self.add_exit_infos("Installed %d package(s)" % len(installed_pkgs))
 
     def remove_packages(self, pkgs):
-        force_args = ["--nodeps", "--nodeps"] if self.m.params["force"] else []
-
         # filter out pkgs that are already absent
         pkg_names_to_remove = [p.name for p in pkgs if p.name in self.inventory["installed_pkgs"]]
 
@@ -411,10 +417,10 @@ class Pacman(object):
         self.changed = True
 
         cmd_base = [self.pacman_path, "--remove", "--noconfirm", "--noprogressbar"]
-        if self.m.params["extra_args"]:
-            cmd_base.extend(self.m.params["extra_args"])
-        if force_args:
-            cmd_base.extend(force_args)
+        cmd_base += self.m.params["extra_args"]
+        cmd_base += ["--nodeps", "--nodeps"] if self.m.params["force"] else []
+        # nosave_args conflicts with --print-format. Added later.
+        # https://github.com/ansible-collections/community.general/issues/4315
 
         # This is a bit of a TOCTOU but it is better than parsing the output of
         # pacman -R, which is different depending on the user config (VerbosePkgLists)
@@ -437,8 +443,8 @@ class Pacman(object):
             self.add_exit_infos("Would have removed %d packages" % len(removed_pkgs))
             return
 
-        # actually do it
-        cmd = cmd_base + pkg_names_to_remove
+        nosave_args = ["--nosave"] if self.m.params["remove_nosave"] else []
+        cmd = cmd_base + nosave_args + pkg_names_to_remove
 
         rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
         if rc != 0:
@@ -678,6 +684,7 @@ def setup_module():
                 choices=["present", "installed", "latest", "absent", "removed"],
             ),
             force=dict(type="bool", default=False),
+            remove_nosave=dict(type="bool", default=False),
             executable=dict(type="str", default="pacman"),
             extra_args=dict(type="str", default=""),
             upgrade=dict(type="bool"),
