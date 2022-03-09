@@ -583,7 +583,6 @@ class TestPacman:
         with pytest.raises(AnsibleExitJson) as e:
             P.run()
         out = e.value.args[0]
-        assert "packages" in out
         assert not out["changed"]
         assert "packages" in out
         assert "diff" not in out
