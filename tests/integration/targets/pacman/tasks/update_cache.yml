@@ -19,5 +19,5 @@
     that:
       - update_cache_idem is not changed
       - update_cache_idem.cache_updated == false
-      - update_cache_force is not changed
+      - update_cache_force is changed
       - update_cache_force.cache_updated == true
