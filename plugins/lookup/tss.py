@@ -15,7 +15,7 @@ description:
       Server using token authentication with I(username) and I(password) on
       the REST API at I(base_url).
     - When using self-signed certificates the environment variable
-      I(REQUESTS_CA_BUNDLE) can be set to a file containing the trusted certificates
+      C(REQUESTS_CA_BUNDLE) can be set to a file containing the trusted certificates
       (in .pem format).
     - e.g. I(export REQUESTS_CA_BUNDLE='/etc/ssl/certs/ca-bundle.trust.crt').
 requirements:
