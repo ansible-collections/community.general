@@ -244,6 +244,8 @@ class Pacman(object):
 
         self.pacman_path = self.m.get_bin_path(p["executable"], True)
 
+        self._cached_database = None
+
         # Normalize for old configs
         if p["state"] == "installed":
             self.target_state = "present"
@@ -405,6 +407,7 @@ class Pacman(object):
             if rc != 0:
                 self.fail("Failed to install package(s)", cmd=cmd, stdout=stdout, stderr=stderr)
             self.add_exit_infos(stdout=stdout, stderr=stderr)
+            self._invalidate_database()
 
         if pkgs_to_install:
             _install_packages_for_real("--sync", pkgs_to_install)
@@ -458,6 +461,7 @@ class Pacman(object):
         rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
         if rc != 0:
             self.fail("failed to remove package(s)", cmd=cmd, stdout=stdout, stderr=stderr)
+        self._invalidate_database()
         self.exit_params["packages"] = removed_pkgs
         self.add_exit_infos("Removed %d package(s)" % len(removed_pkgs), stdout=stdout, stderr=stderr)
 
@@ -493,10 +497,22 @@ class Pacman(object):
             if self.m.params["upgrade_extra_args"]:
                 cmd += self.m.params["upgrade_extra_args"]
             rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
+            self._invalidate_database()
             if rc == 0:
                 self.add_exit_infos("System upgraded", stdout=stdout, stderr=stderr)
             else:
                 self.fail("Could not upgrade", cmd=cmd, stdout=stdout, stderr=stderr)
+
+    def _list_database(self):
+        """runs pacman --sync --list with some caching"""
+        if self._cached_database is None:
+            dummy, packages, dummy = self.m.run_command([self.pacman_path, '--sync', '--list'], check_rc=True)
+            self._cached_database = packages.splitlines()
+        return self._cached_database
+
+    def _invalidate_database(self):
+        """invalidates the pacman --sync --list cache"""
+        self._cached_database = None
 
     def update_package_db(self):
         """runs pacman --sync --refresh"""
@@ -517,18 +533,17 @@ class Pacman(object):
             cmd += ["--refresh"]
         else:
             # Dump package database to get contents before update
-            dummy, pre_state, dummy = self.m.run_command([self.pacman_path, '--sync', '--list'], check_rc=True)
-            pre_state = sorted(pre_state.splitlines())
+            pre_state = sorted(self._list_database())
 
         rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
+        self._invalidate_database()
 
         if self.m.params["force"]:
             # Always changed when force=true
             self.exit_params["cache_updated"] = True
         else:
             # Dump package database to get contents after update
-            dummy, post_state, dummy = self.m.run_command([self.pacman_path, '--sync', '--list'], check_rc=True)
-            post_state = sorted(post_state.splitlines())
+            post_state = sorted(self._list_database())
             # If contents changed, set changed=true
             self.exit_params["cache_updated"] = pre_state != post_state
         if self.exit_params["cache_updated"]:
@@ -628,9 +643,9 @@ class Pacman(object):
             installed_groups[group].add(pkgname)
 
         available_pkgs = {}
-        dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--sync", "--list"], check_rc=True)
+        database = self._list_database()
         # Format of a line: "core pacman 6.0.1-2"
-        for l in stdout.splitlines():
+        for l in database:
             l = l.strip()
             if not l:
                 continue

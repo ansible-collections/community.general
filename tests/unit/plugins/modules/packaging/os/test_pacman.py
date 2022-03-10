@@ -362,9 +362,24 @@ class TestPacman:
                 ],
                 True,
             ),
+            (
+                # Test whether pacman --sync --list is not called more than twice
+                {"upgrade": True},
+                [
+                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'core foo 1.0.0-1 [installed]', ''),
+                    (["pacman", "--sync", "--refresh"], {'check_rc': False}, 0, 'stdout', 'stderr'),
+                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'core foo 1.0.0-1 [installed]', ''),
+                    # The following is _build_inventory:
+                    (["pacman", "--query"], {'check_rc': True}, 0, 'foo 1.0.0-1', ''),
+                    (["pacman", "--query", "--groups"], {'check_rc': True}, 0, '', ''),
+                    (["pacman", "--sync", "--groups", "--groups"], {'check_rc': True}, 0, '', ''),
+                    (["pacman", "--query", "--upgrades"], {'check_rc': False}, 0, '', ''),
+                ],
+                False,
+            ),
         ],
     )
-    def test_update_db(self, mock_empty_inventory, module_args, expected_calls, changed):
+    def test_update_db(self, module_args, expected_calls, changed):
         args = {"update_cache": True}
         args.update(module_args)
         set_module_args(args)
