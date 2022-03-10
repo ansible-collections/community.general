@@ -1,0 +1,2 @@
+bugfixes:
+  - terraform - fix ``variable`` handling to allow complex values (https://github.com/ansible-collections/community.general/pull/4281).
