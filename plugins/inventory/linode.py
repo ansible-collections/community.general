@@ -181,6 +181,29 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         for linode_group in self.linode_groups:
             self.inventory.add_group(linode_group)
 
+    def _filter_by_config(self):
+        """Filter instances by user specified configuration."""
+        regions = self.get_option('regions')
+        if regions:
+            self.instances = [
+                instance for instance in self.instances
+                if instance.region.id in regions
+            ]
+
+        types = self.get_option('types')
+        if types:
+            self.instances = [
+                instance for instance in self.instances
+                if instance.type.id in types
+            ]
+
+        tags = self.get_option('tags')
+        if tags:
+            self.instances = [
+                instance for instance in self.instances
+                if any(tag in instance.tags for tag in tags)
+            ]
+
     def _add_instances_to_groups(self):
         """Add instance names to their dynamic inventory groups."""
         for instance in self.instances:
@@ -233,26 +256,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def populate(self):
         strict = self.get_option('strict')
 
-        regions = self.get_option('regions')
-        if regions:
-            self.instances = [
-                instance for instance in self.instances
-                if instance.region.id in regions
-            ]
-
-        types = self.get_option('types')
-        if types:
-            self.instances = [
-                instance for instance in self.instances
-                if instance.type.id in types
-            ]
-
-        tags = self.get_option('tags')
-        if tags:
-            self.instances = [
-                instance for instance in self.instances
-                if any(tag in instance.tags for tag in tags)
-            ]
+        self._filter_by_config()
 
         self._add_groups()
         self._add_instances_to_groups()
