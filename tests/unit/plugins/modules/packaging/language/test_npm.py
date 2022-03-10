@@ -188,3 +188,75 @@ class NPMModuleTestCase(ModuleTestCase):
             call(['/testbin/npm', 'list', '--json', '--long', '--global'], check_rc=False, cwd=None),
             call(['/testbin/npm', 'uninstall', '--global', 'coffee-script'], check_rc=True, cwd=None),
         ])
+
+    def test_present_package_json(self):
+        set_module_args({
+            'global': 'true',
+            'state': 'present'
+        })
+        self.module_main_command.side_effect = [
+            (0, '{}', ''),
+            (0, '{}', ''),
+        ]
+
+        result = self.module_main(AnsibleExitJson)
+
+        self.assertTrue(result['changed'])
+        self.module_main_command.assert_has_calls([
+            call(['/testbin/npm', 'install', '--global'], check_rc=True, cwd=None),
+        ])
+
+    def test_present_package_json_production(self):
+        set_module_args({
+            'production': 'true',
+            'global': 'true',
+            'state': 'present',
+        })
+        self.module_main_command.side_effect = [
+            (0, '{}', ''),
+            (0, '{}', ''),
+        ]
+
+        result = self.module_main(AnsibleExitJson)
+
+        self.assertTrue(result['changed'])
+        self.module_main_command.assert_has_calls([
+            call(['/testbin/npm', 'install', '--global', '--production'], check_rc=True, cwd=None),
+        ])
+
+    def test_present_package_json_ci(self):
+        set_module_args({
+            'ci': 'true',
+            'global': 'true',
+            'state': 'present'
+        })
+        self.module_main_command.side_effect = [
+            (0, '{}', ''),
+            (0, '{}', ''),
+        ]
+
+        result = self.module_main(AnsibleExitJson)
+
+        self.assertTrue(result['changed'])
+        self.module_main_command.assert_has_calls([
+            call(['/testbin/npm', 'ci', '--global'], check_rc=True, cwd=None),
+        ])
+
+    def test_present_package_json_ci_production(self):
+        set_module_args({
+            'ci': 'true',
+            'production': 'true',
+            'global': 'true',
+            'state': 'present'
+        })
+        self.module_main_command.side_effect = [
+            (0, '{}', ''),
+            (0, '{}', ''),
+        ]
+
+        result = self.module_main(AnsibleExitJson)
+
+        self.assertTrue(result['changed'])
+        self.module_main_command.assert_has_calls([
+            call(['/testbin/npm', 'ci', '--global', '--production'], check_rc=True, cwd=None),
+        ])
