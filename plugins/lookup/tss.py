@@ -16,8 +16,8 @@ description:
       the REST API at I(base_url).
     - When using self-signed certificates the environment variable
       I(REQUESTS_CA_BUNDLE) can be set to a file containing the trusted certificates
-      (in .pem format). 
-      e.g. I(export REQUESTS_CA_BUNDLE='/etc/ssl/certs/ca-bundle.trust.crt').
+      (in .pem format).
+    - e.g. I(export REQUESTS_CA_BUNDLE='/etc/ssl/certs/ca-bundle.trust.crt').
 requirements:
     - python-tss-sdk - https://pypi.org/project/python-tss-sdk/
 options:
