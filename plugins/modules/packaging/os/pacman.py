@@ -81,6 +81,8 @@ options:
             - This can be run as part of a package installation or as a separate step.
             - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
             - If not specified, it defaults to C(false).
+            - Please note that this option will only have an influence on the module's C(changed) state
+              if I(name) and I(upgrade) are not specified. This will change in community.general 5.0.0.
         type: bool
         aliases: [ update-cache ]
 
@@ -112,20 +114,28 @@ notes:
 
 RETURN = """
 packages:
-    description: a list of packages that have been changed
-    returned: when upgrade is set to yes
+    description:
+        - A list of packages that have been changed.
+        - Before community.general 4.5.0 this was only returned when I(upgrade=true).
+          In community.general 4.5.0, it was sometimes omitted when the package list is empty,
+          but since community.general 4.6.0 it is always returned when I(name) is specified or
+          I(upgrade=true).
+    returned: success and I(name) is specified or I(upgrade=true)
     type: list
+    elements: str
     sample: [ package, other-package ]
 
 stdout:
-    description: Output from pacman.
+    description:
+        - Output from pacman.
     returned: success, when needed
     type: str
     sample: ":: Synchronizing package databases...  core is up to date :: Starting full system upgrade..."
     version_added: 4.1.0
 
 stderr:
-    description: Error output from pacman.
+    description:
+        - Error output from pacman.
     returned: success, when needed
     type: str
     sample: "warning: libtool: local (2.4.6+44+gb9b44533-14) is newer than core (2.4.6+42+gb88cebd5-15)\nwarning ..."
@@ -158,6 +168,9 @@ EXAMPLES = """
     extra_args: --builddir /var/cache/yay
 
 - name: Upgrade package foo
+  # The 'changed' state of this call will only indicate whether foo was
+  # installed/upgraded, but not on whether the cache was updated. This
+  # will change in community.general 5.0.0!
   community.general.pacman:
     name: foo
     state: latest
@@ -185,6 +198,9 @@ EXAMPLES = """
     upgrade: yes
 
 - name: Run the equivalent of "pacman -Syu" as a separate step
+  # The 'changed' state of this call will only indicate whether
+  # something was upgraded, but not on whether the cache was
+  # updated. This will change in community.general 5.0.0!
   community.general.pacman:
     update_cache: yes
     upgrade: yes
@@ -280,9 +296,8 @@ class Pacman(object):
                 self.success()
 
         # Avoid shadowing lack of changes in the following stages
-        # so that update_cache: yes doesn't always return changed
-        # TODO: remove this when update_cache is tweaked to report its real
-        # changed status (i.e. no changed if package lists were up to date)
+        # so that `update_cache: true` doesn't always return changed
+        # TODO: remove this in community.general 5.0.0
         self.changed = False
 
         self.inventory = self._build_inventory()
@@ -320,6 +335,7 @@ class Pacman(object):
                 pkgs_to_install.append(p)
 
         if len(pkgs_to_install) == 0 and len(pkgs_to_install_from_url) == 0:
+            self.exit_params["packages"] = []
             self.add_exit_infos("package(s) already installed")
             return
 
@@ -374,6 +390,7 @@ class Pacman(object):
 
         if len(installed_pkgs) == 0:
             # This can happen with URL packages if pacman decides there's nothing to do
+            self.exit_params["packages"] = []
             self.add_exit_infos("package(s) already installed")
             return
 
@@ -410,6 +427,7 @@ class Pacman(object):
         pkg_names_to_remove = [p.name for p in pkgs if p.name in self.inventory["installed_pkgs"]]
 
         if len(pkg_names_to_remove) == 0:
+            self.exit_params["packages"] = []
             self.add_exit_infos("package(s) already absent")
             return
 
