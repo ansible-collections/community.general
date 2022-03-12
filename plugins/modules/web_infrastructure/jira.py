@@ -158,6 +158,7 @@ options:
      - This is a free-form data structure that can contain arbitrary data. This is passed directly to the JIRA REST API
        (possibly after merging with other required data, as when passed to create). See examples for more information,
        and the JIRA REST API for the structure required for various fields.
+     - When passed to comment, the data structure is merged at the first level since community.general 4.6.0. Useful to add JIRA properties for example.
      - Note that JIRA may not allow changing field values on specific transitions or states.
 
   jql:
@@ -260,6 +261,20 @@ EXAMPLES = r"""
     comment_visibility:
       type: role
       value: Developers
+
+- name: Comment on issue with property to mark it internal
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: comment
+    comment: A comment added by Ansible
+    fields:
+      properties:
+        - key: 'sd.public.comment'
+          value:
+            internal: true
 
 # Assign an existing issue using edit
 - name: Assign an issue using free-form fields
@@ -501,6 +516,10 @@ class JIRA(StateModuleHelper):
         # if comment_visibility is specified restrict visibility
         if self.vars.comment_visibility is not None:
             data['visibility'] = self.vars.comment_visibility
+
+        # Use 'fields' to merge in any additional data
+        if self.vars.fields:
+            data.update(self.vars.fields)
 
         url = self.vars.restbase + '/issue/' + self.vars.issue + '/comment'
         self.vars.meta = self.post(url, data)
