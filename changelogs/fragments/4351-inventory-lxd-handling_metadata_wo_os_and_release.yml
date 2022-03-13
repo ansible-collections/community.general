@@ -1,0 +1,3 @@
+bugfixes:
+  - lxd inventory plugin - fix handling of metadata to be without os and release. This happens if a empty container is created via API. lxc query -X POST /1.0/containers -d '{"name": "container-name", "source": {"type": "none"}, "config": {"security.privileged": "true"}}' (https://github.com/ansible-collections/community.general/pull/4351)
+    
