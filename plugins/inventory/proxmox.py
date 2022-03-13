@@ -398,17 +398,62 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self._add_host_to_composed_groups(self.get_option('groups'), variables, name, strict=self.strict)
         self._add_host_to_keyed_groups(self.get_option('keyed_groups'), variables, name, strict=self.strict)
 
+    def _handle_item(self, node, ittype, item):
+        '''Handle an item from the list of LXC containers and Qemu VM. The
+        return value will be either None if the item was skipped or the name of
+        the item if it was added to the inventory.'''
+        if item.get('template'):
+            return None
+
+        properties = dict()
+        name, vmid = item['name'], item['vmid']
+
+        # get status, config and snapshots if want_facts == True
+        if self.get_option('want_facts'):
+            self._get_vm_status(properties, node, vmid, ittype, name)
+            self._get_vm_config(properties, node, vmid, ittype, name)
+            self._get_vm_snapshots(properties, node, vmid, ittype, name)
+
+        # ensure the host satisfies filters
+        if not self._can_add_host(name, properties):
+            return None
+
+        # add the host to the inventory
+        self._add_host(name, properties)
+        node_type_group = self._group('%s_%s' % (node, ittype))
+        self.inventory.add_child(self._group('all_' + ittype), name)
+        self.inventory.add_child(node_type_group, name)
+        if item['status'] == 'stopped':
+            self.inventory.add_child(self._group('all_stopped'), name)
+        elif item['status'] == 'running':
+            self.inventory.add_child(self._group('all_running'), name)
+
+        return name
+
+    def _populate_pool_groups(self, added_hosts):
+        '''Generate groups from Proxmox resource pools, ignoring VMs and
+        containers that were skipped.'''
+        for pool in self._get_pools():
+            poolid = pool.get('poolid')
+            if not poolid:
+                continue
+            pool_group = self._group('pool_' + poolid)
+            self.inventory.add_group(pool_group)
+
+            for member in self._get_members_per_pool(poolid):
+                name = member.get('name')
+                if name and name in added_hosts:
+                    self.inventory.add_child(pool_group, name)
+
     def _populate(self):
 
         # create common groups
         self.inventory.add_group(self._group('all_lxc'))
         self.inventory.add_group(self._group('all_qemu'))
+        self.inventory.add_group(self._group('all_running'))
+        self.inventory.add_group(self._group('all_stopped'))
         nodes_group = self._group('nodes')
         self.inventory.add_group(nodes_group)
-        running_group = self._group('all_running')
-        self.inventory.add_group(running_group)
-        stopped_group = self._group('all_stopped')
-        self.inventory.add_group(stopped_group)
 
         # gather vm's on nodes
         self._get_auth()
@@ -438,45 +483,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             lxc_objects = zip(itertools.repeat('lxc'), self._get_lxc_per_node(node['node']))
             qemu_objects = zip(itertools.repeat('qemu'), self._get_qemu_per_node(node['node']))
             for ittype, item in itertools.chain(lxc_objects, qemu_objects):
-                if item.get('template', False):
-                    continue
-
-                properties = dict()
-                name, vmid = item['name'], item['vmid']
-
-                # get status, config and snapshots if want_facts == True
-                if self.get_option('want_facts'):
-                    self._get_vm_status(properties, node['node'], vmid, ittype, name)
-                    self._get_vm_config(properties, node['node'], vmid, ittype, name)
-                    self._get_vm_snapshots(properties, node['node'], vmid, ittype, name)
-
-                # ensure the host satisfies filters
-                if not self._can_add_host(name, properties):
-                    continue
-
-                # add the host itself
-                self._add_host(name, properties)
-                # add host to groups it belongs to
-                node_type_group = self._group('%s_%s' % (node['node'], ittype))
-                self.inventory.add_child(self._group('all_' + ittype), name)
-                self.inventory.add_child(node_type_group, name)
-                if item['status'] == 'stopped':
-                    self.inventory.add_child(stopped_group, name)
-                elif item['status'] == 'running':
-                    self.inventory.add_child(running_group, name)
+                name = self._handle_item(node['node'], ittype, item)
+                if name is not None:
+                    hosts.append(name)
 
         # gather vm's in pools
-        for pool in self._get_pools():
-            poolid = pool.get('poolid')
-            if not poolid:
-                continue
-            pool_group = self._group('pool_' + poolid)
-            self.inventory.add_group(pool_group)
-
-            for member in self._get_members_per_pool(poolid):
-                name = member.get('name')
-                if name and name in hosts and not member.get('template'):
-                    self.inventory.add_child(pool_group, name)
+        self._populate_pool_groups(hosts)
 
     def parse(self, inventory, loader, path, cache=True):
         if not HAS_REQUESTS:
