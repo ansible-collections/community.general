@@ -147,6 +147,7 @@ from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.six.moves.urllib.parse import urlencode
+from ansible.utils.display import Display
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
@@ -158,6 +159,8 @@ try:
     HAS_REQUESTS = True
 except ImportError:
     HAS_REQUESTS = False
+
+display = Display()
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
@@ -378,8 +381,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             try:
                 add_host = self._compose(host_filter, properties)
             except Exception as e:  # pylint: disable=broad-except
+                message = "Could not evaluate host filter %s for host %s - %s" % (host_filter, name, to_native(e))
                 if self.strict:
-                    raise AnsibleError("Could not evaluate host filter %s - %s" % (host_filter, to_native(e)))
+                    raise AnsibleError(message)
+                display.warning(message)
             if not add_host:
                 return False
         return True
