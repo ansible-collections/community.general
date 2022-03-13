@@ -412,6 +412,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         # gather vm's on nodes
         self._get_auth()
+        hosts = []
         for node in self._get_nodes():
             if not node.get('node'):
                 continue
@@ -466,14 +467,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         # gather vm's in pools
         for pool in self._get_pools():
-            if not pool.get('poolid'):
+            poolid = pool.get('poolid')
+            if not poolid:
                 continue
-            pool_group = self._group('pool_' + pool['poolid'])
+            pool_group = self._group('pool_' + poolid)
             self.inventory.add_group(pool_group)
 
-            for member in self._get_members_per_pool(pool['poolid']):
-                if member.get('name') and not member.get('template'):
-                    self.inventory.add_child(pool_group, member['name'])
+            for member in self._get_members_per_pool(poolid):
+                name = member.get('name')
+                if name and name in hosts and not member.get('template'):
+                    self.inventory.add_child(pool_group, name)
 
     def parse(self, inventory, loader, path, cache=True):
         if not HAS_REQUESTS:
