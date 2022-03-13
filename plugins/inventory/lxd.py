@@ -670,8 +670,9 @@ class InventoryModule(BaseInventoryPlugin):
             if v:
                 self.inventory.set_variable(instance_name, 'ansible_lxd_os', v.lower())
             # add release
-            if self._get_data_entry('inventory/{0}/release'.format(instance_name))
-                self.inventory.set_variable(instance_name, 'ansible_lxd_release', self._get_data_entry('inventory/{0}/release'.format(instance_name)).lower())
+            v = self._get_data_entry('inventory/{0}/release'.format(instance_name))
+            if v:
+                self.inventory.set_variable(instance_name, 'ansible_lxd_release', v.lower())
             # add profile
             self.inventory.set_variable(instance_name, 'ansible_lxd_profile', self._get_data_entry('inventory/{0}/profile'.format(instance_name)))
             # add state
