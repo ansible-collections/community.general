@@ -55,6 +55,7 @@ options:
         whole branch must be deleted.
     type: bool
     default: false
+    version_added: 4.6.0
 extends_documentation_fragment:
 - community.general.ldap.documentation
 
