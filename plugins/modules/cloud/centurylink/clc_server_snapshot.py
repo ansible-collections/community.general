@@ -36,7 +36,7 @@ options:
   wait:
     description:
       - Whether to wait for the provisioning tasks to finish before returning.
-    default: True
+    default: 'True'
     required: False
     type: str
 requirements:

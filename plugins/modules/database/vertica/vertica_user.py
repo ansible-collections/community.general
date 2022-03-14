@@ -70,7 +70,7 @@ options:
   port:
     description:
       - Vertica cluster port to connect to.
-    default: 5433
+    default: '5433'
     type: str
   login_user:
     description:

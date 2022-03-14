@@ -48,7 +48,7 @@ options:
     description:
       - Port to configure on the public-facing side of the load balancer pool
     type: str
-    choices: [80, 443]
+    choices: ['80', '443']
   nodes:
     description:
       - A list of nodes that needs to be added to the load balancer pool

@@ -58,6 +58,7 @@ DOCUMENTATION = '''
       group_by:
         description: Keys to group hosts by
         type: list
+        elements: string
         default: [ 'mgmt_classes', 'owners', 'status' ]
       group:
         description: Group to place all hosts into

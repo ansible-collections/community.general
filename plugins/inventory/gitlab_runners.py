@@ -35,7 +35,6 @@ DOCUMENTATION = '''
                 version_added: 1.0.0
             type: str
             required: true
-            default: https://gitlab.com
         api_token:
             description: GitLab token for logging in.
             env:

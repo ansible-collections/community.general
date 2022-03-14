@@ -27,6 +27,7 @@ DOCUMENTATION = '''
         exclude:
             description: list of addresses to exclude
             type: list
+            elements: string
         ports:
             description: Enable/disable scanning for open ports
             type: boolean

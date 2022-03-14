@@ -25,7 +25,7 @@ options:
   port:
     description:
       Database port to connect to.
-    default: 5433
+    default: '5433'
     type: str
   db:
     description:
