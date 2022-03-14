@@ -28,6 +28,7 @@ DOCUMENTATION = r'''
         hostnames:
             description: List of preference about what to use as an hostname.
             type: list
+            elements: string
             default:
                 - public_ipv4
             choices:
@@ -37,6 +38,7 @@ DOCUMENTATION = r'''
         groups:
             description: List of groups.
             type: list
+            elements: string
             choices:
                 - location
                 - offer

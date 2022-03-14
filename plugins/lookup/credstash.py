@@ -17,11 +17,11 @@ DOCUMENTATION = '''
       _terms:
         description: term or list of terms to lookup in the credit store
         type: list
-        required: True
+        elements: string
+        required: true
       table:
         description: name of the credstash table to query
         default: 'credential-store'
-        required: True
       version:
         description: Credstash version
       region:
