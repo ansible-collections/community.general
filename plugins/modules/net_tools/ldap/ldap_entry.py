@@ -131,6 +131,7 @@ class LdapEntry(LdapGeneric):
 
         # Shortcuts
         self.state = self.module.params['state']
+        self.recursive = self.module.params['recursive']
 
         # Add the objectClass into the list of attributes
         self.module.params['attributes']['objectClass'] = (
@@ -139,8 +140,6 @@ class LdapEntry(LdapGeneric):
         # Load attributes
         if self.state == 'present':
             self.attrs = self._load_attrs()
-        else:
-            self.recursive = self.module.params['recursive']
 
     def _load_attrs(self):
         """ Turn attribute's value to array. """
