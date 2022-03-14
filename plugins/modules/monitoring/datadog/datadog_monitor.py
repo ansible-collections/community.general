@@ -84,7 +84,6 @@ options:
         description:
           - Dictionary of scopes to silence, with timestamps or None.
           - Each scope will be muted until the given POSIX timestamp or forever if the value is None.
-        default: ""
     notify_no_data:
         description:
           - Whether this monitor will notify when data stops reporting.

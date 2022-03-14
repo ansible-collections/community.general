@@ -20,6 +20,7 @@ DOCUMENTATION = '''
       _raw:
         description: List of key(s) to retrieve.
         type: list
+        elements: string
       recurse:
         type: boolean
         description: If true, will retrieve all the values that have the given key as prefix.

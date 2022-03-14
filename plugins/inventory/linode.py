@@ -54,15 +54,18 @@ DOCUMENTATION = r'''
           description: Populate inventory with instances in this region.
           default: []
           type: list
+          elements: string
         tags:
           description: Populate inventory only with instances which have at least one of the tags listed here.
           default: []
           type: list
+          elements: string
           version_added: 2.0.0
         types:
           description: Populate inventory with instances with this type.
           default: []
           type: list
+          elements: string
         strict:
           version_added: 2.0.0
         compose:
