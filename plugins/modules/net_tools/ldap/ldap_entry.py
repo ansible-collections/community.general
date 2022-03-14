@@ -182,8 +182,8 @@ class LdapEntry(LdapGeneric):
             except ldap.NOT_ALLOWED_ON_NONLEAF:
                 search = self.connection.search_s(self.dn, ldap.SCOPE_SUBTREE, attrlist=('dn',))
                 search.reverse()
-                for dn, _ in search:
-                    self.connection.delete_s(dn)
+                for entry in search:
+                    self.connection.delete_s(entry[0])
 
         if self._is_entry_present():
             if self.recursive:
