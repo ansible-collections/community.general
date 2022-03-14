@@ -181,20 +181,23 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         for linode_group in self.linode_groups:
             self.inventory.add_group(linode_group)
 
-    def _filter_by_config(self, regions, types, tags):
+    def _filter_by_config(self):
         """Filter instances by user specified configuration."""
+        regions = self.get_option('regions')
         if regions:
             self.instances = [
                 instance for instance in self.instances
                 if instance.region.id in regions
             ]
 
+        types = self.get_option('types')
         if types:
             self.instances = [
                 instance for instance in self.instances
                 if instance.type.id in types
             ]
 
+        tags = self.get_option('tags')
         if tags:
             self.instances = [
                 instance for instance in self.instances
@@ -247,60 +250,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             )
         return data
 
-    def _validate_option(self, name, desired_type, option_value):
-        """Validate user specified configuration data against types."""
-        if isinstance(option_value, string_types) and desired_type == list:
-            option_value = [option_value]
-
-        if option_value is None:
-            option_value = desired_type()
-
-        if not isinstance(option_value, desired_type):
-            raise AnsibleParserError(
-                'The option %s (%s) must be a %s' % (
-                    name, option_value, desired_type
-                )
-            )
-
-        return option_value
-
-    def _get_query_options(self, config_data):
-        """Get user specified query options from the configuration."""
-        options = {
-            'regions': {
-                'type_to_be': list,
-                'value': config_data.get('regions', [])
-            },
-            'types': {
-                'type_to_be': list,
-                'value': config_data.get('types', [])
-            },
-            'tags': {
-                'type_to_be': list,
-                'value': config_data.get('tags', [])
-            },
-        }
-
-        for name in options:
-            options[name]['value'] = self._validate_option(
-                name,
-                options[name]['type_to_be'],
-                options[name]['value']
-            )
-
-        regions = options['regions']['value']
-        types = options['types']['value']
-        tags = options['tags']['value']
-
-        return regions, types, tags
-
     def _cacheable_inventory(self):
         return [i._raw_json for i in self.instances]
 
-    def populate(self, config_data):
+    def populate(self):
         strict = self.get_option('strict')
-        regions, types, tags = self._get_query_options(config_data)
-        self._filter_by_config(regions, types, tags)
+
+        self._filter_by_config()
 
         self._add_groups()
         self._add_instances_to_groups()
@@ -339,8 +295,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if not HAS_LINODE:
             raise AnsibleError('the Linode dynamic inventory plugin requires linode_api4.')
 
-        config_data = self._read_config_data(path)
-        self._consume_options(config_data)
+        self._read_config_data(path)
 
         cache_key = self.get_cache_key(path)
 
@@ -363,4 +318,4 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if update_cache:
             self._cache[cache_key] = self._cacheable_inventory()
 
-        self.populate(config_data)
+        self.populate()
