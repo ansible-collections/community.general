@@ -77,8 +77,8 @@ options:
     description:
       - Network family defined by Infinity, e.g. IPv4, IPv6 and Dual stack
     type: str
-    choices: [ 4, 6, dual ]
-    default: 4
+    choices: [ '4', '6', dual ]
+    default: '4'
 '''
 
 EXAMPLES = r'''

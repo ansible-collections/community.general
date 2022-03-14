@@ -28,7 +28,7 @@ options:
         description:
         - The port on which the iSCSI target process listens.
         type: str
-        default: 3260
+        default: '3260'
     target:
         description:
         - The iSCSI target name.

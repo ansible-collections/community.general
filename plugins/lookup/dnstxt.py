@@ -18,6 +18,7 @@ DOCUMENTATION = '''
         description: domain or list of domains to query TXT records from
         required: True
         type: list
+        elements: string
 '''
 
 EXAMPLES = """

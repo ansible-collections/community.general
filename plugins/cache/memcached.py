@@ -20,6 +20,7 @@ DOCUMENTATION = '''
           - List of connection information for the memcached DBs
         default: ['127.0.0.1:11211']
         type: list
+        elements: string
         env:
           - name: ANSIBLE_CACHE_PLUGIN_CONNECTION
         ini:

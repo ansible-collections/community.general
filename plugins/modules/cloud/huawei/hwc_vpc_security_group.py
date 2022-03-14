@@ -51,7 +51,6 @@ options:
               group.s
         type: str
         required: false
-        default: 0
     vpc_id:
         description:
             - Specifies the resource ID of the VPC to which the security group

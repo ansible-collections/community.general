@@ -23,6 +23,7 @@ DOCUMENTATION = r'''
         regions:
             description: Filter results on a specific Scaleway region.
             type: list
+            elements: string
             default:
                 - ams1
                 - par1
@@ -31,6 +32,7 @@ DOCUMENTATION = r'''
         tags:
             description: Filter results on a specific tag.
             type: list
+            elements: string
         scw_profile:
             description:
             - The config profile to use in config file.
@@ -51,6 +53,7 @@ DOCUMENTATION = r'''
         hostnames:
             description: List of preference about what to use as an hostname.
             type: list
+            elements: string
             default:
                 - public_ipv4
             choices:
