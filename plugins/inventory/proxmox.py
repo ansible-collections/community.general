@@ -376,17 +376,15 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         enabled, any error during host filter compositing will lead to an AnsibleError
         being raised, otherwise the filter will be ignored.
         '''
-        add_host = True
         for host_filter in self.host_filters:
             try:
-                add_host = self._compose(host_filter, properties)
+                if not self._compose(host_filter, properties):
+                    return False
             except Exception as e:  # pylint: disable=broad-except
                 message = "Could not evaluate host filter %s for host %s - %s" % (host_filter, name, to_native(e))
                 if self.strict:
                     raise AnsibleError(message)
                 display.warning(message)
-            if not add_host:
-                return False
         return True
 
     def _add_host(self, name, variables):
