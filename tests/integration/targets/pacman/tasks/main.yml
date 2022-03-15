@@ -10,3 +10,4 @@
     - include: 'basic.yml'
     - include: 'package_urls.yml'
     - include: 'remove_nosave.yml'
+    - include: 'update_cache.yml'

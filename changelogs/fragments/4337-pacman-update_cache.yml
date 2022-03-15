@@ -1,0 +1,4 @@
+minor_changes:
+  - "pacman - now implements proper change detection for ``update_cache=true``. Adds ``cache_updated`` return value to when ``update_cache=true``
+     to report this result independently of the module's overall changed return value
+     (https://github.com/ansible-collections/community.general/pull/4337)."
