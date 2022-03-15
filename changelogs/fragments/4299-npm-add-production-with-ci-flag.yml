@@ -1,2 +1,0 @@
-minor_changes:
-  - npm - add ability to use ``production`` flag when ``ci`` is set (https://github.com/ansible-collections/community.general/pull/4299).

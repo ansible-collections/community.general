@@ -1,2 +1,0 @@
-bugfixes:
-  - proxmox_kvm - fix error when checking whether Proxmox VM exists (https://github.com/ansible-collections/community.general/pull/4287).

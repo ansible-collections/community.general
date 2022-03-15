@@ -1,5 +1,0 @@
----
-bugfixes:
-  - filesize - add support for busybox dd implementation, that is used by default on Alpine linux
-    (https://github.com/ansible-collections/community.general/pull/4288,
-    https://github.com/ansible-collections/community.general/issues/4259).
