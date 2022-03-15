@@ -307,7 +307,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.inventory.set_variable(name, vmtype_key, vmtype)
 
         plaintext_configs = [
-            'tags',
+            'description',
         ]
 
         for config in ret:
@@ -333,11 +333,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     if agent_iface_value:
                         self.inventory.set_variable(name, agent_iface_key, agent_iface_value)
 
-                if not (isinstance(value, int) or ',' not in value):
+                if config not in plaintext_configs and not isinstance(value, int) and all("=" in v for v in value.split(",")):
                     # split off strings with commas to a dict
                     # skip over any keys that cannot be processed
                     try:
-                        value = dict(key.split("=") for key in value.split(","))
+                        value = dict(key.split("=", 1) for key in value.split(","))
                     except Exception:
                         continue
 
