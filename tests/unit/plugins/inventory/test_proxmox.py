@@ -522,7 +522,7 @@ def get_json(url):
         }
 
 
-def get_vm_snapshots(node, vmtype, vmid, name):
+def get_vm_snapshots(node, properties, vmtype, vmid, name):
     return [
         {"description": "",
          "name": "clean",
@@ -537,7 +537,7 @@ def get_vm_snapshots(node, vmtype, vmid, name):
          }]
 
 
-def get_vm_status(node, vmtype, vmid, name):
+def get_vm_status(properties, node, vmtype, vmid, name):
     return True
 
 
@@ -559,6 +559,9 @@ def test_populate(inventory, mocker):
     inventory.proxmox_user = 'root@pam'
     inventory.proxmox_password = 'password'
     inventory.proxmox_url = 'https://localhost:8006'
+    inventory.group_prefix = 'proxmox_'
+    inventory.facts_prefix = 'proxmox_'
+    inventory.strict = False
 
     # bypass authentication and API fetch calls
     inventory._get_auth = mocker.MagicMock(side_effect=get_auth)
@@ -566,6 +569,7 @@ def test_populate(inventory, mocker):
     inventory._get_vm_status = mocker.MagicMock(side_effect=get_vm_status)
     inventory._get_vm_snapshots = mocker.MagicMock(side_effect=get_vm_snapshots)
     inventory.get_option = mocker.MagicMock(side_effect=get_option)
+    inventory._can_add_host = mocker.MagicMock(return_value=True)
     inventory._populate()
 
     # get different hosts
