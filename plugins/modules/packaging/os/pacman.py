@@ -83,6 +83,8 @@ options:
             - If not specified, it defaults to C(false).
             - Please note that this option will only have an influence on the module's C(changed) state
               if I(name) and I(upgrade) are not specified. This will change in community.general 5.0.0.
+              See the examples for how to make the module behave as it will in 5.0.0 right now, or how
+              to keep the current behavior with 5.0.0 and later.
         type: bool
         aliases: [ update-cache ]
 
@@ -210,6 +212,26 @@ EXAMPLES = """
   # The 'changed' state of this call will only indicate whether
   # something was upgraded, but not on whether the cache was
   # updated. This will change in community.general 5.0.0!
+  #
+  # To keep the old behavior, add the following to the task:
+  #
+  #   register: result
+  #   changed_when: result.packages | length > 0
+  #
+  # To already switch to the new behavior now, add:
+  #
+  #   register: result
+  #   changed_when: result is changed or result.cache_updated
+  #
+  # Note that both constructs only work with community.general 4.6.0+.
+  # For compatibility with older versions of community.general, you
+  # have to use
+  #
+  #   changed_when: result.packages | default([]) | length > 0
+  #
+  # respectively
+  #
+  #   changed_when: result is changed or (result.cache_updated | default(false))
   community.general.pacman:
     update_cache: yes
     upgrade: yes
