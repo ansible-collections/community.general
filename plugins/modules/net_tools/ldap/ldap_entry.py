@@ -49,6 +49,13 @@ options:
     choices: [present, absent]
     default: present
     type: str
+  recursive:
+    description:
+      - If I(state=delete), a flag indicating whether a single entry or the
+        whole branch must be deleted.
+    type: bool
+    default: false
+    version_added: 4.6.0
 extends_documentation_fragment:
 - community.general.ldap.documentation
 
@@ -110,6 +117,7 @@ from ansible_collections.community.general.plugins.module_utils.ldap import Ldap
 LDAP_IMP_ERR = None
 try:
     import ldap.modlist
+    import ldap.controls
 
     HAS_LDAP = True
 except ImportError:
@@ -123,6 +131,7 @@ class LdapEntry(LdapGeneric):
 
         # Shortcuts
         self.state = self.module.params['state']
+        self.recursive = self.module.params['recursive']
 
         # Add the objectClass into the list of attributes
         self.module.params['attributes']['objectClass'] = (
@@ -158,12 +167,29 @@ class LdapEntry(LdapGeneric):
         return action
 
     def delete(self):
-        """ If self.dn exists, returns a callable that will delete it. """
+        """ If self.dn exists, returns a callable that will delete either
+        the item itself if the recursive option is not set or the whole branch
+        if it is. """
         def _delete():
             self.connection.delete_s(self.dn)
 
+        def _delete_recursive():
+            """ Attempt recurive deletion using the subtree-delete control.
+            If that fails, do it manually. """
+            try:
+                subtree_delete = ldap.controls.ValueLessRequestControl('1.2.840.113556.1.4.805')
+                self.connection.delete_ext_s(self.dn, serverctrls=[subtree_delete])
+            except ldap.NOT_ALLOWED_ON_NONLEAF:
+                search = self.connection.search_s(self.dn, ldap.SCOPE_SUBTREE, attrlist=('dn',))
+                search.reverse()
+                for entry in search:
+                    self.connection.delete_s(entry[0])
+
         if self._is_entry_present():
-            action = _delete
+            if self.recursive:
+                action = _delete_recursive
+            else:
+                action = _delete
         else:
             action = None
 
@@ -186,6 +212,7 @@ def main():
             attributes=dict(default={}, type='dict'),
             objectClass=dict(type='list', elements='str'),
             state=dict(default='present', choices=['present', 'absent']),
+            recursive=dict(default=False, type='bool'),
         ),
         required_if=[('state', 'present', ['objectClass'])],
         supports_check_mode=True,
