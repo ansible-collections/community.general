@@ -666,9 +666,13 @@ class InventoryModule(BaseInventoryPlugin):
             # add network informations
             self.build_inventory_network(instance_name)
             # add os
-            self.inventory.set_variable(instance_name, 'ansible_lxd_os', self._get_data_entry('inventory/{0}/os'.format(instance_name)).lower())
+            v = self._get_data_entry('inventory/{0}/os'.format(instance_name))
+            if v:
+                self.inventory.set_variable(instance_name, 'ansible_lxd_os', v.lower())
             # add release
-            self.inventory.set_variable(instance_name, 'ansible_lxd_release', self._get_data_entry('inventory/{0}/release'.format(instance_name)).lower())
+            v = self._get_data_entry('inventory/{0}/release'.format(instance_name))
+            if v:
+                self.inventory.set_variable(instance_name, 'ansible_lxd_release', v.lower())
             # add profile
             self.inventory.set_variable(instance_name, 'ansible_lxd_profile', self._get_data_entry('inventory/{0}/profile'.format(instance_name)))
             # add state
