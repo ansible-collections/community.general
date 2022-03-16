@@ -443,7 +443,7 @@ def main():
     for k, v in variables.items():
         variables_args.extend([
             '-var',
-            '{0}={1}'.format(k, json.dumps(v))
+            '{0}={1}'.format(k, v)
         ])
     if variables_files:
         for f in variables_files:
