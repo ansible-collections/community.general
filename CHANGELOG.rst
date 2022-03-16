@@ -6,6 +6,21 @@ Community General Release Notes
 
 This changelog describes changes after version 3.0.0.
 
+v4.6.1
+======
+
+Release Summary
+---------------
+
+Extraordinary bugfix release to fix a breaking change in ``terraform``.
+
+Bugfixes
+--------
+
+- lxd inventory plugin - do not crash if OS and release metadata are not present
+  (https://github.com/ansible-collections/community.general/pull/4351).
+- terraform - revert bugfix https://github.com/ansible-collections/community.general/pull/4281 that tried to fix ``variable`` handling to allow complex values. It turned out that this was breaking several valid use-cases (https://github.com/ansible-collections/community.general/issues/4367, https://github.com/ansible-collections/community.general/pull/4370).
+
 v4.6.0
 ======
 

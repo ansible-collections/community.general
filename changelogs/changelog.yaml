@@ -1585,3 +1585,21 @@ releases:
     - 4352-proxmox-inventory-filters.yml
     - 4355-ldap-recursive-delete.yml
     release_date: '2022-03-15'
+  4.6.1:
+    changes:
+      bugfixes:
+      - 'lxd inventory plugin - do not crash if OS and release metadata are not present
+
+        (https://github.com/ansible-collections/community.general/pull/4351).
+
+        '
+      - terraform - revert bugfix https://github.com/ansible-collections/community.general/pull/4281
+        that tried to fix ``variable`` handling to allow complex values. It turned
+        out that this was breaking several valid use-cases (https://github.com/ansible-collections/community.general/issues/4367,
+        https://github.com/ansible-collections/community.general/pull/4370).
+      release_summary: Extraordinary bugfix release to fix a breaking change in ``terraform``.
+    fragments:
+    - 4.6.1.yml
+    - 4351-inventory-lxd-handling_metadata_wo_os_and_release.yml
+    - 4368-reverts-4281.yml
+    release_date: '2022-03-16'
