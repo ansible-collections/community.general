@@ -1,0 +1,3 @@
+bugfixes:
+  - "terraform - revert bugfix https://github.com/ansible-collections/community.general/pull/4281 that tried to fix ``variable`` handling to allow complex values.
+     It turned out that this was breaking several valid use-cases (https://github.com/ansible-collections/community.general/issues/4367, https://github.com/ansible-collections/community.general/pull/4370)."
