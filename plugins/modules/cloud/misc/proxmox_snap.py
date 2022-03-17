@@ -5,6 +5,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -102,7 +103,9 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib, env_fallback
 from ansible.module_utils.common.text.converters import to_native
-from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec, ProxmoxAnsible, HAS_PROXMOXER, PROXMOXER_IMP_ERR)
+from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec,
+                                                                                ProxmoxAnsible, HAS_PROXMOXER,
+                                                                                PROXMOXER_IMP_ERR)
 
 
 class ProxmoxSnapAnsible(ProxmoxAnsible):
@@ -123,8 +126,9 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
                 return True
             timeout -= 1
             if timeout == 0:
-                self.module.fail_json(msg='Reached timeout while waiting for creating VM snapshot. Last line in task before timeout: %s' %
-                                      self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
+                self.module.fail_json(
+                    msg='Reached timeout while waiting for creating VM snapshot. Last line in task before timeout: %s' %
+                        self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
 
             time.sleep(1)
         return False
@@ -140,8 +144,9 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
                 return True
             timeout -= 1
             if timeout == 0:
-                self.module.fail_json(msg='Reached timeout while waiting for removing VM snapshot. Last line in task before timeout: %s' %
-                                      self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
+                self.module.fail_json(
+                    msg='Reached timeout while waiting for removing VM snapshot. Last line in task before timeout: %s' %
+                        self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
 
             time.sleep(1)
         return False
@@ -157,8 +162,9 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
                 return True
             timeout -= 1
             if timeout == 0:
-                self.module.fail_json(msg='Reached timeout while waiting for rolling back VM snapshot. Last line in task before timeout: %s' %
-                                      self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
+                self.module.fail_json(
+                    msg='Reached timeout while waiting for rolling back VM snapshot. Last line in task before timeout: %s' %
+                        self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
 
             time.sleep(1)
         return False
@@ -215,7 +221,8 @@ def main():
                     module.exit_json(changed=True, msg="Snapshot %s created" % snapname)
 
         except Exception as e:
-            module.fail_json(msg="Creating snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, to_native(e)))
+            module.fail_json(
+                msg="Creating snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, to_native(e)))
 
     elif state == 'absent':
         try:
@@ -236,7 +243,8 @@ def main():
                         module.exit_json(changed=True, msg="Snapshot %s removed" % snapname)
 
         except Exception as e:
-            module.fail_json(msg="Removing snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, to_native(e)))
+            module.fail_json(
+                msg="Removing snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, to_native(e)))
     elif state == 'rollback':
         try:
             snap_exist = False
@@ -256,8 +264,9 @@ def main():
                         module.exit_json(changed=True, msg="Snapshot %s rolled back" % snapname)
 
         except Exception as e:
-            module.fail_json(msg="Rollback of snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, to_native(e)))
+            module.fail_json(
+                msg="Rollback of snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, to_native(e)))
 
 
-if __name__ == '__main__':4
+if __name__ == '__main__':
     main()
