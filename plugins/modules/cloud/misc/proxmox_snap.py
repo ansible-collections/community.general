@@ -13,7 +13,7 @@ module: proxmox_snap
 short_description: Snapshot management of instances in Proxmox VE cluster
 version_added: 2.0.0
 description:
-  - Allows you to create/delete snapshots from instances in Proxmox VE cluster.
+  - Allows you to create/delete/restore snapshots from instances in Proxmox VE cluster.
   - Supports both KVM and LXC, OpenVZ has not been tested, as it is no longer supported on Proxmox VE.
 options:
   hostname:
@@ -54,7 +54,7 @@ options:
     type: int
   snapname:
     description:
-      - Name of the snapshot that has to be created.
+      - Name of the snapshot that has to be created/deleted/restored.
     default: 'ansible_snap'
     type: str
 
