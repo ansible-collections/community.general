@@ -48,7 +48,6 @@ options:
         - The CIDR of the network to retrieve the next network from next available network within the
           specified container. Also, Requested CIDR must be specified and greater than the parent CIDR.
       required: True
-      default: 24
     num:
       description: The number of network addresses to return from network-container
       required: false
