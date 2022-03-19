@@ -122,12 +122,12 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
             status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
             if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
                 return True
-            timeout -= 1
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for creating VM snapshot. Last line in task before timeout: %s' %
                                       self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
 
             time.sleep(1)
+            timeout -= 1
         return False
 
     def snapshot_remove(self, vm, vmid, timeout, snapname, force):
@@ -139,12 +139,12 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
             status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
             if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
                 return True
-            timeout -= 1
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for removing VM snapshot. Last line in task before timeout: %s' %
                                       self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
 
             time.sleep(1)
+            timeout -= 1
         return False
 
     def snapshot_rollback(self, vm, vmid, timeout, snapname):
@@ -156,12 +156,12 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
             status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
             if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
                 return True
-            timeout -= 1
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for rolling back VM snapshot. Last line in task before timeout: %s' %
                                       self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
 
             time.sleep(1)
+            timeout -= 1
         return False
 
 
@@ -249,12 +249,11 @@ def main():
 
             if not snap_exist:
                 module.exit_json(changed=False, msg="Snapshot %s does not exist" % snapname)
-            else:
-                if proxmox.snapshot_rollback(vm, vmid, timeout, snapname):
-                    if module.check_mode:
-                        module.exit_json(changed=False, msg="Snapshot %s would be rolled back" % snapname)
-                    else:
-                        module.exit_json(changed=True, msg="Snapshot %s rolled back" % snapname)
+            if proxmox.snapshot_rollback(vm, vmid, timeout, snapname):
+                if module.check_mode:
+                    module.exit_json(changed=True, msg="Snapshot %s would be rolled back" % snapname)
+                else:
+                    module.exit_json(changed=True, msg="Snapshot %s rolled back" % snapname)
 
         except Exception as e:
             module.fail_json(msg="Rollback of snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, to_native(e)))
