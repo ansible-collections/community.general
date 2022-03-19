@@ -119,8 +119,8 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
         else:
             taskid = self.snapshot(vm, vmid).post(snapname=snapname, description=description, vmstate=int(vmstate))
         while timeout:
-            if (self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['status'] == 'stopped' and
-                    self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):
+            status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
+            if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
                 return True
             timeout -= 1
             if timeout == 0:
@@ -136,8 +136,8 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
 
         taskid = self.snapshot(vm, vmid).delete(snapname, force=int(force))
         while timeout:
-            if (self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['status'] == 'stopped' and
-                    self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):
+            status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
+            if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
                 return True
             timeout -= 1
             if timeout == 0:
@@ -153,8 +153,8 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
 
         taskid = self.snapshot(vm, vmid)(snapname).post("rollback")
         while timeout:
-            if (self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['status'] == 'stopped' and
-                    self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):
+            status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
+            if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
                 return True
             timeout -= 1
             if timeout == 0:
