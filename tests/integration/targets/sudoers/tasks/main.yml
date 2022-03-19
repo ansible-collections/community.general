@@ -102,6 +102,21 @@
     src: "{{ alt_sudoers_path }}/my-sudo-rule-5"
   register: rule_5_contents
 
+- name: Create rule to runas another user
+  community.general.sudoers:
+    name: my-sudo-rule-6
+    state: present
+    user: alice
+    commands: /usr/local/bin/command
+    runas: bob
+    sudoers_path: "{{ alt_sudoers_path }}"
+  register: rule_6
+
+- name: Grab contents of my-sudo-rule-6 (in alternative directory)
+  ansible.builtin.slurp:
+    src: "{{ alt_sudoers_path }}/my-sudo-rule-6"
+  register: rule_6_contents
+
 
 - name: Revoke rule 1
   community.general.sudoers:
@@ -128,11 +143,13 @@
 - name: Check contents
   ansible.builtin.assert:
     that:
-      - "rule_1_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command\n'"
-      - "rule_2_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command1, /usr/local/bin/command2\n'"
-      - "rule_3_contents['content'] | b64decode == 'alice ALL= /usr/local/bin/command\n'"
-      - "rule_4_contents['content'] | b64decode == '%students ALL=NOPASSWD: /usr/local/bin/command\n'"
-      - "rule_5_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command\n'"
+      - "rule_1_contents['content'] | b64decode == 'alice ALL=(root) NOPASSWD: /usr/local/bin/command\n'"
+      - "rule_2_contents['content'] | b64decode == 'alice ALL=(root) NOPASSWD: /usr/local/bin/command1, /usr/local/bin/command2\n'"
+      - "rule_3_contents['content'] | b64decode == 'alice ALL=(root)  /usr/local/bin/command\n'"
+      - "rule_4_contents['content'] | b64decode == '%students ALL=(root) NOPASSWD: /usr/local/bin/command\n'"
+      - "rule_5_contents['content'] | b64decode == 'alice ALL=(root) NOPASSWD: /usr/local/bin/command\n'"
+      - "rule_6_contents['content'] | b64decode == 'alice ALL=(root) NOPASSWD: /usr/local/bin/command\n'"
+      - "rule_6_contents['content'] | b64decode == 'alice ALL=(bob) NOPASSWD: /usr/local/bin/command\n'"
 
 - name: Check stats
   ansible.builtin.assert:
