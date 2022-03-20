@@ -44,8 +44,8 @@ options:
   runas:
     description:
       - Specify the target user the command(s) will run as.
-    default: root
     type: str
+    version_added: 4.7.0
   sudoers_path:
     description:
       - The path which sudoers config files will be managed in.
@@ -154,8 +154,8 @@ class Sudoers(object):
 
         commands_str = ', '.join(self.commands)
         nopasswd_str = 'NOPASSWD:' if self.nopassword else ''
-        runas = self.runas
-        return "{owner} ALL=({runas}) {nopasswd} {commands}\n".format(owner=owner, runas=runas, nopasswd=nopasswd_str, commands=commands_str)
+        runas_str = '(' + self.runas + ')' if self.runas is not None else '' 
+        return "{owner} ALL={runas}{nopasswd} {commands}\n".format(owner=owner, runas=runas_str, nopasswd=nopasswd_str, commands=commands_str)
 
     def run(self):
         if self.state == 'absent' and self.exists():
@@ -185,7 +185,7 @@ def main():
         },
         'runas': {
             'type': 'str',
-            'default': 'root',
+            'default': None,
         },
         'sudoers_path': {
             'type': 'str',
