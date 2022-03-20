@@ -154,7 +154,7 @@ class Sudoers(object):
 
         commands_str = ', '.join(self.commands)
         nopasswd_str = 'NOPASSWD:' if self.nopassword else ''
-        runas_str = '(' + self.runas + ')' if self.runas is not None else '' 
+        runas_str = '(' + self.runas + ')' if self.runas is not None else ''
         return "{owner} ALL={runas}{nopasswd} {commands}\n".format(owner=owner, runas=runas_str, nopasswd=nopasswd_str, commands=commands_str)
 
     def run(self):
