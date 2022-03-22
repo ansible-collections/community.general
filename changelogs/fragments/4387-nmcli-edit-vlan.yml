@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - nmcli - allow editing mtu on interfaces of type vlan
+    (https://github.com/ansible-collections/community.general/issues/4387).

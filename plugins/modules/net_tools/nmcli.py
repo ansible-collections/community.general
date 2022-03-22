@@ -1555,6 +1555,7 @@ class Nmcli(object):
             'dummy',
             'ethernet',
             'team-slave',
+            'vlan',
         )
 
     @property
