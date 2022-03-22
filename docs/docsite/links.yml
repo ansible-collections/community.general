@@ -1,0 +1,23 @@
+---
+edit_on_github:
+  repository: ansible-collections/community.general
+  branch: main
+  path_prefix: ''
+
+extra_links:
+  - description: Submit a bug report
+    url: https://github.com/ansible-collections/community.general/issues/new?assignees=&labels=&template=bug_report.yml
+  - description: Request a feature
+    url: https://github.com/ansible-collections/community.general/issues/new?assignees=&labels=&template=feature_request.yml
+
+communication:
+  matrix_rooms:
+    - topic: General usage and support questions
+      room: '#users:ansible.im'
+  irc_channels:
+    - topic: General usage and support questions
+      network: Libera
+      channel: '#ansible'
+  mailing_lists:
+    - topic: Ansible Project List
+      url: https://groups.google.com/g/ansible-project
