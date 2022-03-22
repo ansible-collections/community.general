@@ -333,6 +333,7 @@ options:
             - defaultClientScopes
         type: list
         elements: str
+        version_added: 4.7.0
 
     optional_client_scopes:
         description:
