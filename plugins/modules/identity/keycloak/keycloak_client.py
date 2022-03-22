@@ -342,6 +342,7 @@ options:
             - optionalClientScopes
         type: list
         elements: str
+        version_added: 4.7.0
 
     protocol_mappers:
         description:
