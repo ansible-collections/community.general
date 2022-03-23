@@ -91,9 +91,15 @@ options:
     routes4:
         description:
             - The list of ipv4 routes.
+            - Use the format '192.0.3.0/24 192.0.2.1'
+        type: list
+        elements: str
+        version_added: 2.0.0
+    routes4_extended:
+        description:
+            - The list of ipv4 routes.
         type: list
         elements: dict
-        version_added: 2.0.0
         suboptions:
             ip:
                 description:
@@ -199,9 +205,15 @@ options:
     routes6:
         description:
             - The list of IPv6 routes.
+            - Use the format C(fd12:3456:789a:1::/64 2001:dead:beef::1).
+        type: list
+        elements: str
+        version_added: 4.4.0
+    routes6_extended:
+        description:
+            - The list of IPv6 routes but with parameters.
         type: list
         elements: dict
-        version_added: 4.4.0
         suboptions:
             ip:
                 description:
@@ -1326,6 +1338,7 @@ class Nmcli(object):
         self.gw4 = module.params['gw4']
         self.gw4_ignore_auto = module.params['gw4_ignore_auto']
         self.routes4 = module.params['routes4']
+        self.routes4_extended = module.params['routes4_extended']
         self.route_metric4 = module.params['route_metric4']
         self.routing_rules4 = module.params['routing_rules4']
         self.never_default4 = module.params['never_default4']
@@ -1338,6 +1351,7 @@ class Nmcli(object):
         self.gw6 = module.params['gw6']
         self.gw6_ignore_auto = module.params['gw6_ignore_auto']
         self.routes6 = module.params['routes6']
+        self.routes6_extended = module.params['routes6_extended']
         self.route_metric6 = module.params['route_metric6']
         self.dns6 = module.params['dns6']
         self.dns6_search = module.params['dns6_search']
@@ -1437,7 +1451,7 @@ class Nmcli(object):
                 'ipv4.ignore-auto-dns': self.dns4_ignore_auto,
                 'ipv4.gateway': self.gw4,
                 'ipv4.ignore-auto-routes': self.gw4_ignore_auto,
-                'ipv4.routes': self.enforce_routes_format(self.routes4),
+                'ipv4.routes': self.enforce_routes_format(self.routes4, self.routes4_extended),
                 'ipv4.route-metric': self.route_metric4,
                 'ipv4.routing-rules': self.routing_rules4,
                 'ipv4.never-default': self.never_default4,
@@ -1449,7 +1463,7 @@ class Nmcli(object):
                 'ipv6.ignore-auto-dns': self.dns6_ignore_auto,
                 'ipv6.gateway': self.gw6,
                 'ipv6.ignore-auto-routes': self.gw6_ignore_auto,
-                'ipv6.routes': self.enforce_routes_format(self.routes6),
+                'ipv6.routes': self.enforce_routes_format(self.routes6, self.routes6_extended),
                 'ipv6.route-metric': self.route_metric6,
                 'ipv6.method': self.ipv6_method,
                 'ipv6.ip6-privacy': self.ip_privacy6,
@@ -1680,10 +1694,13 @@ class Nmcli(object):
             return None
         return [address if '/' in address else address + '/128' for address in ip6_addresses]
 
-    def enforce_routes_format(self, routes):
-        if routes is None:
+    def enforce_routes_format(self, routes, routes_extended):
+        if routes is not None:
+            return routes
+        elif routes_extended is not None:
+            return [self.route_to_string(route) for route in routes_extended]
+        else:
             return None
-        return [self.route_to_string(route) for route in routes]
 
     @staticmethod
     def route_to_string(route):
@@ -1692,10 +1709,10 @@ class Nmcli(object):
         if not route.get('next_hop') is None:
             result_str += ' ' + route['next_hop']
         if not route.get('metric') is None:
-            result_str += ' ' + route['metric']
+            result_str += ' ' + str(route['metric'])
 
         for attribute, value in sorted(route.items()):
-            if attribute not in {'ip', 'next_hop', 'metric'} and value is not None:
+            if attribute not in ('ip', 'next_hop', 'metric') and value is not None:
                 result_str += ' {0}={1}'.format(attribute, str(value).lower())
 
         return result_str
@@ -2035,18 +2052,19 @@ def main():
             ip4=dict(type='list', elements='str'),
             gw4=dict(type='str'),
             gw4_ignore_auto=dict(type='bool', default=False),
-            routes4=dict(type='list',
-                         elements='dict',
-                         options=dict(
-                             ip=dict(type='str', required=True),
-                             next_hop=dict(type='str'),
-                             metric=dict(type='int'),
-                             table=dict(type='int'),
-                             tos=dict(type='int'),
-                             cwnd=dict(type='int'),
-                             mtu=dict(type='int'),
-                             onlink=dict(type='bool')
-                         )),
+            routes4=dict(type='list', elements='str'),
+            routes4_extended=dict(type='list',
+                                  elements='dict',
+                                  options=dict(
+                                      ip=dict(type='str', required=True),
+                                      next_hop=dict(type='str'),
+                                      metric=dict(type='int'),
+                                      table=dict(type='int'),
+                                      tos=dict(type='int'),
+                                      cwnd=dict(type='int'),
+                                      mtu=dict(type='int'),
+                                      onlink=dict(type='bool')
+                                  )),
             route_metric4=dict(type='int'),
             routing_rules4=dict(type='list', elements='str'),
             never_default4=dict(type='bool', default=False),
@@ -2062,17 +2080,18 @@ def main():
             dns6=dict(type='list', elements='str'),
             dns6_search=dict(type='list', elements='str'),
             dns6_ignore_auto=dict(type='bool', default=False),
-            routes6=dict(type='list',
-                         elements='dict',
-                         options=dict(
-                             ip=dict(type='str', required=True),
-                             next_hop=dict(type='str'),
-                             metric=dict(type='int'),
-                             table=dict(type='int'),
-                             cwnd=dict(type='int'),
-                             mtu=dict(type='int'),
-                             onlink=dict(type='bool')
-                         )),
+            routes6=dict(type='list', elements='str'),
+            routes6_extended=dict(type='list',
+                                  elements='dict',
+                                  options=dict(
+                                      ip=dict(type='str', required=True),
+                                      next_hop=dict(type='str'),
+                                      metric=dict(type='int'),
+                                      table=dict(type='int'),
+                                      cwnd=dict(type='int'),
+                                      mtu=dict(type='int'),
+                                      onlink=dict(type='bool')
+                                  )),
             route_metric6=dict(type='int'),
             method6=dict(type='str', choices=['ignore', 'auto', 'dhcp', 'link-local', 'manual', 'shared', 'disabled']),
             ip_privacy6=dict(type='str', choices=['disabled', 'prefer-public-addr', 'prefer-temp-addr', 'unknown']),
@@ -2129,7 +2148,9 @@ def main():
             gsm=dict(type='dict'),
             wireguard=dict(type='dict'),
         ),
-        mutually_exclusive=[['never_default4', 'gw4']],
+        mutually_exclusive=[['never_default4', 'gw4'],
+                            ['routes4_extended', 'routes4'],
+                            ['routes6_extended', 'routes6']],
         required_if=[("type", "wifi", [("ssid")])],
         supports_check_mode=True,
     )
