@@ -323,8 +323,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
                 # Additional field containing parsed tags as list
                 if config == 'tags':
-                    parsed_key = self.to_safe('%s%s' % (key, "_parsed"))
-                    properties[parsed_key] = [tag.strip() for tag in value.split(",")]
+                    stripped_value = value.strip()
+                    if stripped_value:
+                        parsed_key = key + "_parsed"
+                        properties[parsed_key] = [tag.strip() for tag in stripped_value.split(",")]
 
                 # The first field in the agent string tells you whether the agent is enabled
                 # the rest of the comma separated string is extra config for the agent
