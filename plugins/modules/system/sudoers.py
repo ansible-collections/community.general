@@ -41,6 +41,11 @@ options:
       - Whether a password will be required to run the sudo'd command.
     default: true
     type: bool
+  runas:
+    description:
+      - Specify the target user the command(s) will run as.
+    type: str
+    version_added: 4.7.0
   sudoers_path:
     description:
       - The path which sudoers config files will be managed in.
@@ -68,6 +73,14 @@ EXAMPLES = '''
     state: present
     user: backup
     commands: /usr/local/bin/backup
+
+- name: Allow the bob user to run any commands as alice with sudo -u alice
+  community.general.sudoers:
+    name: bob-do-as-alice
+    state: present
+    user: bob
+    runas: alice
+    commands: ANY
 
 - name: >-
     Allow the monitoring group to run sudo /usr/local/bin/gather-app-metrics
@@ -108,6 +121,7 @@ class Sudoers(object):
         self.group = module.params['group']
         self.state = module.params['state']
         self.nopassword = module.params['nopassword']
+        self.runas = module.params['runas']
         self.sudoers_path = module.params['sudoers_path']
         self.file = os.path.join(self.sudoers_path, self.name)
         self.commands = module.params['commands']
@@ -140,7 +154,8 @@ class Sudoers(object):
 
         commands_str = ', '.join(self.commands)
         nopasswd_str = 'NOPASSWD:' if self.nopassword else ''
-        return "{owner} ALL={nopasswd} {commands}\n".format(owner=owner, nopasswd=nopasswd_str, commands=commands_str)
+        runas_str = '({runas})'.format(runas=self.runas) if self.runas is not None else ''
+        return "{owner} ALL={runas}{nopasswd} {commands}\n".format(owner=owner, runas=runas_str, nopasswd=nopasswd_str, commands=commands_str)
 
     def run(self):
         if self.state == 'absent' and self.exists():
@@ -167,6 +182,10 @@ def main():
         'nopassword': {
             'type': 'bool',
             'default': True,
+        },
+        'runas': {
+            'type': 'str',
+            'default': None,
         },
         'sudoers_path': {
             'type': 'str',
