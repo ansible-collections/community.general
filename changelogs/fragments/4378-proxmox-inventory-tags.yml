@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - proxmox inventory plugin - fixed the ``tags_parsed`` field when Proxmox
+    returns a single space for the ``tags`` entry (https://github.com/ansible-collections/community.general/pull/4378).
