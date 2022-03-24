@@ -38,8 +38,10 @@ options:
     version_added: 2.0.0
   server_uri:
     description:
-      - A URI to the LDAP server.
+      - The I(server_uri) parameter may be a comma- or whitespace-separated list of URIs containing only the schema, the host, and the port fields.
       - The default value lets the underlying LDAP client library look for a UNIX domain socket in its default location.
+      - Note that when using multiple URIs you cannot determine to which URI your client gets connected.
+      - For URIs containing additional fields, particularly when using commas, behavior is undefined.
     type: str
     default: ldapi:///
   start_tls:
