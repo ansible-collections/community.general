@@ -103,7 +103,7 @@ author:
 
 EXAMPLES = '''
 - name: Map a client role to a group, authentication with credentials
-  community.general.keycloak_client_rolemappings:
+  community.general.keycloak_client_rolemapping:
     realm: MyCustomRealm
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
@@ -121,7 +121,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Map a client role to a group, authentication with token
-  community.general.keycloak_client_rolemappings:
+  community.general.keycloak_client_rolemapping:
     realm: MyCustomRealm
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
@@ -137,7 +137,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Unmap client role from a group
-  community.general.keycloak_client_rolemappings:
+  community.general.keycloak_client_rolemapping:
     realm: MyCustomRealm
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
