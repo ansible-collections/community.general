@@ -1,4 +1,0 @@
----
-minor_changes:
-  - keycloak_client_rolemapping - Fixed typo in examples.
-    (https://github.com/ansible-collections/community.general/issues/4392)
