@@ -7,8 +7,8 @@
 # Copyright: (c) 2019, Saranya Sridharan
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-- when:
-    - not (ansible_os_family == 'Alpine')  # TODO
+- when: true
+    # - not (ansible_os_family == 'Alpine')  # TODO
   block:
 
   - name: Attempt installation of latest 'psutil' version
@@ -23,7 +23,7 @@
     when: psutil_latest_install is failed
 
   - name: "Checking the empty result"
-    pids: 
+    pids:
       name: "blahblah"
     register: emptypids
 
@@ -31,7 +31,7 @@
     assert:
       that:
       - emptypids is not changed
-      - emptypids.pids == [] 
+      - emptypids.pids == []
 
   - name: "Picking a random process name"
     set_fact:
