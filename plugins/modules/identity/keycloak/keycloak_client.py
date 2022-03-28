@@ -326,6 +326,24 @@ options:
             - authenticationFlowBindingOverrides
         version_added: 3.4.0
 
+    default_client_scopes:
+        description:
+            - List of default client scopes.
+        aliases:
+            - defaultClientScopes
+        type: list
+        elements: str
+        version_added: 4.7.0
+
+    optional_client_scopes:
+        description:
+            - List of optional client scopes.
+        aliases:
+            - optionalClientScopes
+        type: list
+        elements: str
+        version_added: 4.7.0
+
     protocol_mappers:
         description:
             - a list of dicts defining protocol mappers for this client.
@@ -789,6 +807,8 @@ def main():
         authentication_flow_binding_overrides=dict(type='dict', aliases=['authenticationFlowBindingOverrides']),
         protocol_mappers=dict(type='list', elements='dict', options=protmapper_spec, aliases=['protocolMappers']),
         authorization_settings=dict(type='dict', aliases=['authorizationSettings']),
+        default_client_scopes=dict(type='list', elements='str', aliases=['defaultClientScopes']),
+        optional_client_scopes=dict(type='list', elements='str', aliases=['optionalClientScopes']),
     )
 
     argument_spec.update(meta_args)
