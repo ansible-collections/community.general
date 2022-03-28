@@ -1237,7 +1237,7 @@ class KeycloakAPI(object):
             authentication_flow = {}
             # Check if the authentication flow exists on the Keycloak serveraders
             authentications = json.load(open_url(URL_AUTHENTICATION_FLOWS.format(url=self.baseurl, realm=realm), method='GET',
-                                                 headers=self.restheaders, timeout=self.connection_timeout))
+                                                 headers=self.restheaders, timeout=self.connection_timeout, validate_certs=self.validate_certs))
             for authentication in authentications:
                 if authentication["alias"] == alias:
                     authentication_flow = authentication
@@ -1281,14 +1281,16 @@ class KeycloakAPI(object):
                 method='POST',
                 headers=self.restheaders,
                 data=json.dumps(new_name),
-                timeout=self.connection_timeout)
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs)
             flow_list = json.load(
                 open_url(
                     URL_AUTHENTICATION_FLOWS.format(url=self.baseurl,
                                                     realm=realm),
                     method='GET',
                     headers=self.restheaders,
-                    timeout=self.connection_timeout))
+                    timeout=self.connection_timeout,
+                    validate_certs=self.validate_certs))
             for flow in flow_list:
                 if flow["alias"] == config["alias"]:
                     return flow
@@ -1318,7 +1320,8 @@ class KeycloakAPI(object):
                 method='POST',
                 headers=self.restheaders,
                 data=json.dumps(new_flow),
-                timeout=self.connection_timeout)
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs)
             flow_list = json.load(
                 open_url(
                     URL_AUTHENTICATION_FLOWS.format(
@@ -1326,7 +1329,8 @@ class KeycloakAPI(object):
                         realm=realm),
                     method='GET',
                     headers=self.restheaders,
-                    timeout=self.connection_timeout))
+                    timeout=self.connection_timeout,
+                    validate_certs=self.validate_certs))
             for flow in flow_list:
                 if flow["alias"] == config["alias"]:
                     return flow
@@ -1351,7 +1355,8 @@ class KeycloakAPI(object):
                 method='PUT',
                 headers=self.restheaders,
                 data=json.dumps(updatedExec),
-                timeout=self.connection_timeout)
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg="Unable to update executions %s: %s" % (updatedExec, str(e)))
 
@@ -1371,7 +1376,8 @@ class KeycloakAPI(object):
                 method='POST',
                 headers=self.restheaders,
                 data=json.dumps(authenticationConfig),
-                timeout=self.connection_timeout)
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg="Unable to add authenticationConfig %s: %s" % (executionId, str(e)))
 
@@ -1395,7 +1401,8 @@ class KeycloakAPI(object):
                 method='POST',
                 headers=self.restheaders,
                 data=json.dumps(newSubFlow),
-                timeout=self.connection_timeout)
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg="Unable to create new subflow %s: %s" % (subflowName, str(e)))
 
@@ -1418,7 +1425,8 @@ class KeycloakAPI(object):
                 method='POST',
                 headers=self.restheaders,
                 data=json.dumps(newExec),
-                timeout=self.connection_timeout)
+                timeout=self.connection_timeout,
+                validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg="Unable to create new execution %s: %s" % (execution["provider"], str(e)))
 
@@ -1440,7 +1448,8 @@ class KeycloakAPI(object):
                             id=executionId),
                         method='POST',
                         headers=self.restheaders,
-                        timeout=self.connection_timeout)
+                        timeout=self.connection_timeout,
+                        validate_certs=self.validate_certs)
             elif diff < 0:
                 for i in range(-diff):
                     open_url(
@@ -1450,7 +1459,8 @@ class KeycloakAPI(object):
                             id=executionId),
                         method='POST',
                         headers=self.restheaders,
-                        timeout=self.connection_timeout)
+                        timeout=self.connection_timeout,
+                        validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg="Unable to change execution priority %s: %s" % (executionId, str(e)))
 
@@ -1471,7 +1481,8 @@ class KeycloakAPI(object):
                         flowalias=quote(config["alias"])),
                     method='GET',
                     headers=self.restheaders,
-                    timeout=self.connection_timeout))
+                    timeout=self.connection_timeout,
+                    validate_certs=self.validate_certs))
             for execution in executions:
                 if "authenticationConfig" in execution:
                     execConfigId = execution["authenticationConfig"]
@@ -1483,7 +1494,8 @@ class KeycloakAPI(object):
                                 id=execConfigId),
                             method='GET',
                             headers=self.restheaders,
-                            timeout=self.connection_timeout))
+                            timeout=self.connection_timeout,
+                            validate_certs=self.validate_certs))
                     execution["authenticationConfig"] = execConfig
             return executions
         except Exception as e:
