@@ -37,6 +37,8 @@ options:
     - Force service to be created even when host object does not exist to manage it
     required: false
     type: bool
+    default: false
+    version_added: 4.7.0
   state:
     description: State to ensure.
     required: false
