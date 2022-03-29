@@ -193,7 +193,7 @@ def main():
     argument_spec.update(
         krbcanonicalname=dict(type='str', required=True, aliases=['name']),
         force=dict(type='bool', required=False),
-        skip_host_check=dict(type='bool', required=False),
+        skip_host_check=dict(type='bool', default=False, required=False),
         hosts=dict(type='list', required=False, elements='str'),
         state=dict(type='str', required=False, default='present',
                    choices=['present', 'absent']))
