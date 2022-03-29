@@ -112,9 +112,9 @@ class OnePass(object):
         self.cli_path = path
         self.get_version()
         if self.cli_version >= 2:
-          config_path = '~/.config/op/config'
+            config_path = '~/.config/op/config'
         else:
-          config_path = '~/.op/config'
+            config_path = '~/.op/config'
         self.config_file_path = os.path.expanduser(config_path)
         self.logged_in = False
         self.token = None
@@ -125,14 +125,14 @@ class OnePass(object):
         self.master_password = None
 
     def get_version(self):
-      # Get the 1password cli version
-      try:
-          rc, out, err = self._run(['--version'], ignore_errors=True)
-          self.cli_version = int(to_text(out).split('.')[0])
-      except OSError as e:
-          if e.errno == errno.ENOENT:
-              raise AnsibleLookupError("1Password CLI tool '%s' not installed in path on control machine" % self.cli_path)
-          raise e
+        # Get the 1password cli version
+        try:
+            rc, out, err = self._run(['--version'], ignore_errors=True)
+            self.cli_version = int(to_text(out).split('.')[0])
+        except OSError as e:
+            if e.errno == errno.ENOENT:
+                raise AnsibleLookupError("1Password CLI tool '%s' not installed in path on control machine" % self.cli_path)
+            raise e
 
     def get_token(self):
         # If the config file exists, assume an initial signin has taken place and try basic sign in
@@ -314,6 +314,5 @@ class LookupModule(LookupBase):
 
         values = []
         for term in terms:
-            
             values.append(op.get_field(term, field, section, vault))
         return values
