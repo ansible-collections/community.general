@@ -31,7 +31,7 @@ DOCUMENTATION = '''
         description:
           - URL to Proxmox cluster.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_URL) will be used instead.
-          - You can also use templating to specify the value of the url like "{{ lookup('ini', 'url', section='proxmox', file='file.ini') }}"
+          - Since community.general 4.7.0 you can also use templating to specify the value of the C(url).
         default: 'http://localhost:8006'
         type: str
         env:
@@ -41,7 +41,7 @@ DOCUMENTATION = '''
         description:
           - Proxmox authentication user.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_USER) will be used instead.
-          - You can also use templating to specify the value of the user like "{{ lookup('ini', 'user', section='proxmox', file='file.ini') }}"
+          - Since community.general 4.7.0 you can also use templating to specify the value of the C(user).
         required: yes
         type: str
         env:
@@ -51,7 +51,7 @@ DOCUMENTATION = '''
         description:
           - Proxmox authentication password.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_PASSWORD) will be used instead.
-          - You can also use templating to specify the value of the password like "{{ lookup('ini', 'password', section='proxmox', file='file.ini') }}"
+          - Since community.general 4.7.0 you can also use templating to specify the value of the C(password).
         required: yes
         type: str
         env:
@@ -139,6 +139,14 @@ compose:
   my_inv_var_1: "'my_var1_value'"
   my_inv_var_2: >
     "my_var_2_value"
+
+# Specify the url, user and password using templating
+# my.proxmox.yml
+plugin: community.general.proxmox
+url: "{{ lookup('ini', 'url', section='proxmox', file='file.ini') }}
+user: "{{ lookup('env','PM_USER') | default('ansible@pve') }}"
+password: "{{ lookup('community.general.random_string', base64=True) }}"
+
 '''
 
 import itertools
