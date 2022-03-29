@@ -128,7 +128,7 @@ class OnePass(object):
       # Get the 1password cli version
       try:
           rc, out, err = self._run(['--version'], ignore_errors=True)
-          self.cli_version = int(out.decode('utf-8').split('.')[0])
+          self.cli_version = int(to_text(out).split('.')[0])
       except OSError as e:
           if e.errno == errno.ENOENT:
               raise AnsibleLookupError("1Password CLI tool '%s' not installed in path on control machine" % self.cli_path)
