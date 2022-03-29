@@ -90,26 +90,26 @@ options:
         version_added: 3.2.0
     routes4:
         description:
-            - The list of ipv4 routes.
-            - Use the format '192.0.3.0/24 192.0.2.1'
+            - The list of IPv4 routes.
+            - Use the format C(192.0.3.0/24 192.0.2.1).
         type: list
         elements: str
         version_added: 2.0.0
     routes4_extended:
         description:
-            - The list of ipv4 routes.
+            - The list of IPv4 routes.
         type: list
         elements: dict
         suboptions:
             ip:
                 description:
-                    - ip or prefix of route.
-                    - Use the format '192.0.3.0/24'.
+                    - IP or prefix of route.
+                    - Use the format C(192.0.3.0/24).
                 type: str
                 required: true
             next_hop:
                 description:
-                    - Use the format '192.0.2.1'.
+                    - Use the format C(192.0.2.1).
                 type: str
             metric:
                 description:
@@ -118,7 +118,7 @@ options:
             table:
                 description:
                     - The table to add this route to.
-                    - The default depends on ipv4.route-table.
+                    - The default depends on C(ipv4.route-table).
                 type: int
             cwnd:
                 description:
@@ -134,7 +134,7 @@ options:
                 type: bool
             tos:
                 description:
-                    - the Type Of Service.
+                    - The Type Of Service.
                 type: int
     route_metric4:
         description:
@@ -217,13 +217,13 @@ options:
         suboptions:
             ip:
                 description:
-                    - ip or prefix of route.
-                    - Use the format 'fd12:3456:789a:1::/64'.
+                    - IP or prefix of route.
+                    - Use the format C(fd12:3456:789a:1::/64).
                 type: str
                 required: true
             next_hop:
                 description:
-                    - Use the format '2001:dead:beef::1'.
+                    - Use the format C(2001:dead:beef::1).
                 type: str
             metric:
                 description:
@@ -232,7 +232,7 @@ options:
             table:
                 description:
                     - The table to add this route to.
-                    - The default depends on ipv4.route-table.
+                    - The default depends on C(ipv4.route-table).
                 type: int
             cwnd:
                 description:
@@ -1706,9 +1706,9 @@ class Nmcli(object):
     def route_to_string(route):
         result_str = ''
         result_str += route['ip']
-        if not route.get('next_hop') is None:
+        if route.get('next_hop') is not None:
             result_str += ' ' + route['next_hop']
-        if not route.get('metric') is None:
+        if route.get('metric') is not None:
             result_str += ' ' + str(route['metric'])
 
         for attribute, value in sorted(route.items()):
