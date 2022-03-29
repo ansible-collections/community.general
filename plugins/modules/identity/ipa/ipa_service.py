@@ -34,7 +34,8 @@ options:
     type: bool
   skip_host_check:
     description:
-    - Force service to be created even when host object does not exist to manage it
+    - Force service to be created even when host object does not exist to manage it.
+    - This is only used on creation, not for updating existing services.
     required: false
     type: bool
     default: false
