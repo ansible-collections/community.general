@@ -108,7 +108,7 @@ class LookupModule(LookupBase):
         try:
             vault = SecretsVault(**vault_parameters)
             return vault
-        except AnsibleError:
+        except TypeError:
             raise AnsibleError("python-dsv-sdk==0.0.1 must be installed to use this plugin")
 
     def run(self, terms, variables, **kwargs):
