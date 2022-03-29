@@ -389,8 +389,6 @@ stages:
         parameters:
           testFormat: 2.11/linux/{0}
           targets:
-            - name: CentOS 7
-              test: centos7
             - name: Fedora 33
               test: fedora33
             - name: Alpine 3
