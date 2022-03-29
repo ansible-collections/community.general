@@ -69,6 +69,19 @@ stages:
             - test: 3
             - test: 4
             - test: extra
+  - stage: Sanity_2_13
+    displayName: Sanity 2.13
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          nameFormat: Test {0}
+          testFormat: 2.13/sanity/{0}
+          targets:
+            - test: 1
+            - test: 2
+            - test: 3
+            - test: 4
   - stage: Sanity_2_12
     displayName: Sanity 2.12
     dependsOn: []
@@ -138,6 +151,19 @@ stages:
             - test: 3.8
             - test: 3.9
             - test: '3.10'
+  - stage: Units_2_13
+    displayName: Units 2.13
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          nameFormat: Python {0}
+          testFormat: 2.13/units/{0}/1
+          targets:
+            - test: 2.7
+            - test: 3.6
+            - test: 3.8
+            - test: 3.9
   - stage: Units_2_12
     displayName: Units 2.12
     dependsOn: []
@@ -148,12 +174,8 @@ stages:
           testFormat: 2.12/units/{0}/1
           targets:
             - test: 2.6
-            - test: 2.7
             - test: 3.5
-            - test: 3.6
-            - test: 3.7
             - test: 3.8
-            - test: '3.10'
   - stage: Units_2_11
     displayName: Units 2.11
     dependsOn: []
@@ -166,9 +188,6 @@ stages:
             - test: 2.6
             - test: 2.7
             - test: 3.5
-            - test: 3.6
-            - test: 3.7
-            - test: 3.8
             - test: 3.9
   - stage: Units_2_10
     displayName: Units 2.10
@@ -191,11 +210,7 @@ stages:
           testFormat: 2.9/units/{0}/1
           targets:
             - test: 2.6
-            - test: 2.7
             - test: 3.5
-            - test: 3.6
-            - test: 3.7
-            - test: 3.8
 
 ## Remote
   - stage: Remote_devel
@@ -216,6 +231,22 @@ stages:
               test: freebsd/12.3
             - name: FreeBSD 13.0
               test: freebsd/13.0
+          groups:
+            - 1
+            - 2
+            - 3
+  - stage: Remote_2_13
+    displayName: Remote 2.13
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: 2.13/{0}
+          targets:
+            - name: macOS 12.0
+              test: macos/12.0
+            - name: RHEL 8.5
+              test: rhel/8.5
           groups:
             - 1
             - 2
@@ -316,6 +347,22 @@ stages:
             - 1
             - 2
             - 3
+  - stage: Docker_2_13
+    displayName: Docker 2.13
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          testFormat: 2.13/linux/{0}
+          targets:
+            - name: Fedora 35
+              test: fedora35
+            - name: Alpine 3
+              test: alpine3
+          groups:
+            - 1
+            - 2
+            - 3
   - stage: Docker_2_12
     displayName: Docker 2.12
     dependsOn: []
@@ -328,8 +375,6 @@ stages:
               test: centos6
             - name: Fedora 34
               test: fedora34
-            - name: openSUSE 15 py3
-              test: opensuse15
             - name: Ubuntu 20.04
               test: ubuntu2004
           groups:
@@ -344,12 +389,8 @@ stages:
         parameters:
           testFormat: 2.11/linux/{0}
           targets:
-            - name: CentOS 7
-              test: centos7
             - name: Fedora 33
               test: fedora33
-            - name: openSUSE 15 py2
-              test: opensuse15py2
             - name: Alpine 3
               test: alpine3
           groups:
@@ -380,8 +421,6 @@ stages:
           targets:
             - name: Fedora 31
               test: fedora31
-            - name: openSUSE 15 py3
-              test: opensuse15
           groups:
             - 2
             - 3
@@ -417,6 +456,16 @@ stages:
           testFormat: devel/cloud/{0}/1
           targets:
             - test: 2.7
+            - test: '3.10'
+  - stage: Cloud_2_13
+    displayName: Cloud 2.13
+    dependsOn: []
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          nameFormat: Python {0}
+          testFormat: 2.13/cloud/{0}/1
+          targets:
             - test: 3.9
   - stage: Cloud_2_12
     displayName: Cloud 2.12
@@ -466,26 +515,31 @@ stages:
       - Sanity_2_10
       - Sanity_2_11
       - Sanity_2_12
+      - Sanity_2_13
       - Units_devel
       - Units_2_9
       - Units_2_10
       - Units_2_11
       - Units_2_12
+      - Units_2_13
       - Remote_devel
       - Remote_2_9
       - Remote_2_10
       - Remote_2_11
       - Remote_2_12
+      - Remote_2_13
       - Docker_devel
       - Docker_2_9
       - Docker_2_10
       - Docker_2_11
       - Docker_2_12
+      - Docker_2_13
       - Docker_community_devel
       - Cloud_devel
       - Cloud_2_9
       - Cloud_2_10
       - Cloud_2_11
       - Cloud_2_12
+      - Cloud_2_13
     jobs:
       - template: templates/coverage.yml
