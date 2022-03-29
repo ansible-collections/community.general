@@ -105,10 +105,10 @@ display = Display()
 class LookupModule(LookupBase):
     @staticmethod
     def Client(vault_parameters):
-        try: 
+        try:
             vault = SecretsVault(**vault_parameters)
             return vault
-        except:
+        except AnsibleError:
             raise AnsibleError("python-dsv-sdk==0.0.1 must be installed to use this plugin")
 
     def run(self, terms, variables, **kwargs):
