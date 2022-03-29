@@ -31,7 +31,7 @@ DOCUMENTATION = '''
         description:
           - URL to Proxmox cluster.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_URL) will be used instead.
-          - You can also use templating to specify the value of the user like "{{ lookup('ini', 'url', section='proxmox', file='file.ini') }}"
+          - You can also use templating to specify the value of the url like "{{ lookup('ini', 'url', section='proxmox', file='file.ini') }}"
         default: 'http://localhost:8006'
         type: str
         env:
@@ -51,7 +51,7 @@ DOCUMENTATION = '''
         description:
           - Proxmox authentication password.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_PASSWORD) will be used instead.
-          - You can also use templating to specify the value of the user like "{{ lookup('ini', 'password', section='proxmox', file='file.ini') }}"
+          - You can also use templating to specify the value of the password like "{{ lookup('ini', 'password', section='proxmox', file='file.ini') }}"
         required: yes
         type: str
         env:
