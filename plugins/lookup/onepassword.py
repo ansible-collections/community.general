@@ -110,7 +110,12 @@ class OnePass(object):
 
     def __init__(self, path='op'):
         self.cli_path = path
-        self.config_file_path = os.path.expanduser('~/.op/config')
+        self.get_version()
+        if self.cli_version >= 2:
+          config_path = '~/.config/op/config'
+        else:
+          config_path = '~/.op/config'
+        self.config_file_path = os.path.expanduser(config_path)
         self.logged_in = False
         self.token = None
         self.subdomain = None
@@ -118,6 +123,16 @@ class OnePass(object):
         self.username = None
         self.secret_key = None
         self.master_password = None
+
+    def get_version(self):
+      # Get the 1password cli version
+      try:
+          rc, out, err = self._run(['--version'], ignore_errors=True)
+          self.cli_version = int(out.decode('utf-8').split('.')[0])
+      except OSError as e:
+          if e.errno == errno.ENOENT:
+              raise AnsibleLookupError("1Password CLI tool '%s' not installed in path on control machine" % self.cli_path)
+          raise e
 
     def get_token(self):
         # If the config file exists, assume an initial signin has taken place and try basic sign in
@@ -127,10 +142,14 @@ class OnePass(object):
                 raise AnsibleLookupError('Unable to sign in to 1Password. master_password is required.')
 
             try:
-                args = ['signin', '--output=raw']
-
-                if self.subdomain:
-                    args = ['signin', self.subdomain, '--output=raw']
+                if self.cli_version >= 2:
+                    args = ['signin', '--raw']
+                    if self.subdomain:
+                        args += ['--account', self.subdomain]
+                else:
+                    args = ['signin', '--output=raw']
+                    if self.subdomain:
+                        args = ['signin', self.subdomain, '--output=raw']
 
                 rc, out, err = self._run(args, command_input=to_bytes(self.master_password))
                 self.token = out.strip()
@@ -144,7 +163,11 @@ class OnePass(object):
 
     def assert_logged_in(self):
         try:
-            rc, out, err = self._run(['get', 'account'], ignore_errors=True)
+            if self.cli_version >= 2:
+                args = ['account', 'get']
+            else:
+                args = ['get', 'account']
+            rc, out, err = self._run(args, ignore_errors=True)
             if rc == 0:
                 self.logged_in = True
             if not self.logged_in:
@@ -154,8 +177,14 @@ class OnePass(object):
                 raise AnsibleLookupError("1Password CLI tool '%s' not installed in path on control machine" % self.cli_path)
             raise e
 
-    def get_raw(self, item_id, vault=None):
-        args = ["get", "item", item_id]
+    def get_raw(self, item_id, vault=None, field=None):
+        if self.cli_version >= 2:
+            args = ["item", "get", "--format=json", "--no-color"]
+            if field:
+                args += ['--fields', 'label={0}'.format(field)]
+        else:
+            args = ["get", "item"]
+        args += [item_id]
         if vault is not None:
             args += ['--vault={0}'.format(vault)]
         if not self.logged_in:
@@ -164,13 +193,18 @@ class OnePass(object):
         return output
 
     def get_field(self, item_id, field, section=None, vault=None):
-        output = self.get_raw(item_id, vault)
-        return self._parse_field(output, field, section) if output != '' else ''
+        output = self.get_raw(item_id, vault, field)
+        if self.cli_version >= 2:
+            return json.loads(output).get('value')
+        else:
+            return self._parse_field(output, field, section) if output != '' else ''
 
     def full_login(self):
         if None in [self.subdomain, self.username, self.secret_key, self.master_password]:
             raise AnsibleLookupError('Unable to perform initial sign in to 1Password. '
                                      'subdomain, username, secret_key, and master_password are required to perform initial sign in.')
+        if self.cli_version >= 2:
+            raise AnsibleLookupError('Full login not supported with 1password cli v2')
 
         args = [
             'signin',
@@ -280,5 +314,6 @@ class LookupModule(LookupBase):
 
         values = []
         for term in terms:
+            
             values.append(op.get_field(term, field, section, vault))
         return values
