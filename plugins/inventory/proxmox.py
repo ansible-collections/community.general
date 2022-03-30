@@ -143,8 +143,8 @@ compose:
 # Specify the url, user and password using templating
 # my.proxmox.yml
 plugin: community.general.proxmox
-url: "{{ lookup('ini', 'url', section='proxmox', file='file.ini') }}"
-user: "{{ lookup('env','PM_USER') | default('ansible@pve') }}"
+url: "{{ lookup('ansible.builtin.ini', 'url', section='proxmox', file='file.ini') }}"
+user: "{{ lookup('ansible.builtin.env','PM_USER') | default('ansible@pve') }}"
 password: "{{ lookup('community.general.random_string', base64=True) }}"
 
 '''
