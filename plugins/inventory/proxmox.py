@@ -31,7 +31,7 @@ DOCUMENTATION = '''
         description:
           - URL to Proxmox cluster.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_URL) will be used instead.
-          - Since community.general 4.7.0 you can also use templating to specify the value of the C(url).
+          - Since community.general 4.7.0 you can also use templating to specify the value of the I(url).
         default: 'http://localhost:8006'
         type: str
         env:
@@ -41,7 +41,7 @@ DOCUMENTATION = '''
         description:
           - Proxmox authentication user.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_USER) will be used instead.
-          - Since community.general 4.7.0 you can also use templating to specify the value of the C(user).
+          - Since community.general 4.7.0 you can also use templating to specify the value of the I(user).
         required: yes
         type: str
         env:
@@ -51,7 +51,7 @@ DOCUMENTATION = '''
         description:
           - Proxmox authentication password.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_PASSWORD) will be used instead.
-          - Since community.general 4.7.0 you can also use templating to specify the value of the C(password).
+          - Since community.general 4.7.0 you can also use templating to specify the value of the I(password).
         required: yes
         type: str
         env:
