@@ -228,6 +228,7 @@ def main():
             name=dict(required=True),
             query=dict(),
             notification_message=dict(no_log=True),
+            message=dict(no_log=True),
             silenced=dict(type='dict'),
             notify_no_data=dict(default=False, type='bool'),
             no_data_timeframe=dict(),
