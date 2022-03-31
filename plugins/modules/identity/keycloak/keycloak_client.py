@@ -620,7 +620,7 @@ EXAMPLES = '''
     use_template_config: False
     use_template_scope: false
     use_template_mappers: no
-    always_display_in_console: True
+    always_display_in_console: true
     registered_nodes:
       node01.example.com: 1507828202
     registration_access_token: eyJWT_TOKEN
