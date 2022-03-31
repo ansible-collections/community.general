@@ -308,6 +308,7 @@ options:
         aliases:
             - alwaysDisplayInConsole
         type: bool
+        version_added: 4.7.0
 
     surrogate_auth_required:
         description:
