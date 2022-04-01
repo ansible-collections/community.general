@@ -37,25 +37,22 @@
     set_fact:
       random_name: some-random-long-name-{{ 99999999 | random }}
 
-  - name: "finding the 'sleep' binary"
-    command: which sleep
-    register: find_sleep
+  - name: Copy the fake 'sleep' source code
+    copy:
+      src: sleeper.c
+      dest: "{{ remote_tmp_dir }}/sleeper.c"
+      mode: 0644
 
-  - name: "Copying 'sleep' binary"
-    command: cp {{ find_sleep.stdout }} {{ remote_tmp_dir }}/{{ random_name }}
-    # The following does not work on macOS 11.1 (it uses shutil.copystat, and that will die with a PermissionError):
-    # copy:
-    #   src: "{{ find_sleep.stdout }}"
-    #   dest: "{{ remote_tmp_dir }}/{{ random_name }}"
-    #   mode: "0777"
-    #   remote_src: true
+  - name: Compile fake 'sleep' binary
+    command: gcc {{ remote_tmp_dir }}/sleeper.c -o {{ remote_tmp_dir }}/{{ random_name }}
 
   - name: Copy helper script
     copy:
       src: obtainpid.sh
       dest: "{{ remote_tmp_dir }}/obtainpid.sh"
+      mode: 0755
 
-  - name: "Running the copy of 'sleep' binary"
+  - name: "Run the fake 'sleep' binary"
     command: "sh {{ remote_tmp_dir }}/obtainpid.sh '{{ remote_tmp_dir }}/{{ random_name }}' '{{ remote_tmp_dir }}/obtainpid.txt'"
 
     async: 100
