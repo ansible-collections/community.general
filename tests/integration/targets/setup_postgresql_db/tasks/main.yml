@@ -165,8 +165,6 @@
 
   - name: Reinstall internationalization files
     shell: yum -y reinstall glibc-common || yum -y install glibc-common
-    args:
-      warn: false
     when: locale_present is failed
 
   - name: Generate locale (RedHat)
