@@ -228,7 +228,6 @@ def main():
             name=dict(required=True),
             query=dict(),
             notification_message=dict(no_log=True),
-            message=dict(no_log=True),
             silenced=dict(type='dict'),
             notify_no_data=dict(default=False, type='bool'),
             no_data_timeframe=dict(),
@@ -309,6 +308,10 @@ def _post_monitor(module, options):
         if module.params['tags'] is not None:
             kwargs['tags'] = module.params['tags']
         msg = api.Monitor.create(**kwargs)
+
+        if 'message' in msg:
+            msg['message'] = msg['message'].replace('@', '(@)')
+
         if 'errors' in msg:
             module.fail_json(msg=str(msg['errors']))
         else:
@@ -334,6 +337,9 @@ def _update_monitor(module, monitor, options):
         if module.params['tags'] is not None:
             kwargs['tags'] = module.params['tags']
         msg = api.Monitor.update(**kwargs)
+ 
+        if 'message' in msg:
+            msg['message'] = msg['message'].replace('@', '(@)')
 
         if 'errors' in msg:
             module.fail_json(msg=str(msg['errors']))
