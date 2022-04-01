@@ -32,6 +32,14 @@ options:
     - Force principal name even if host is not in DNS.
     required: false
     type: bool
+  skip_host_check:
+    description:
+    - Force service to be created even when host object does not exist to manage it.
+    - This is only used on creation, not for updating existing services.
+    required: false
+    type: bool
+    default: false
+    version_added: 4.7.0
   state:
     description: State to ensure.
     required: false
@@ -111,17 +119,19 @@ class ServiceIPAClient(IPAClient):
         return self._post_json(method='service_remove_host', name=name, item={'host': item})
 
 
-def get_service_dict(force=None, krbcanonicalname=None):
+def get_service_dict(force=None, krbcanonicalname=None, skip_host_check=None):
     data = {}
     if force is not None:
         data['force'] = force
     if krbcanonicalname is not None:
         data['krbcanonicalname'] = krbcanonicalname
+    if skip_host_check is not None:
+        data['skip_host_check'] = skip_host_check
     return data
 
 
 def get_service_diff(client, ipa_host, module_service):
-    non_updateable_keys = ['force', 'krbcanonicalname']
+    non_updateable_keys = ['force', 'krbcanonicalname', 'skip_host_check']
     for key in non_updateable_keys:
         if key in module_service:
             del module_service[key]
@@ -135,7 +145,7 @@ def ensure(module, client):
     hosts = module.params['hosts']
 
     ipa_service = client.service_find(name=name)
-    module_service = get_service_dict(force=module.params['force'])
+    module_service = get_service_dict(force=module.params['force'], skip_host_check=module.params['skip_host_check'])
     changed = False
     if state in ['present', 'enabled', 'disabled']:
         if not ipa_service:
@@ -183,6 +193,7 @@ def main():
     argument_spec.update(
         krbcanonicalname=dict(type='str', required=True, aliases=['name']),
         force=dict(type='bool', required=False),
+        skip_host_check=dict(type='bool', default=False, required=False),
         hosts=dict(type='list', required=False, elements='str'),
         state=dict(type='str', required=False, default='present',
                    choices=['present', 'absent']))
