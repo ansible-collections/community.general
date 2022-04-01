@@ -37,8 +37,6 @@
       command: >-
         dnf update -y
         --setopt=obsoletes=0 {{ _packages | join(' ') }}
-      args:
-        warn: false
       register: update_locked_packages
       changed_when: '"Nothing to do" not in update_locked_packages.stdout'
 
