@@ -44,7 +44,7 @@
       mode: 0644
 
   - name: Compile fake 'sleep' binary
-    command: gcc {{ remote_tmp_dir }}/sleeper.c -o {{ remote_tmp_dir }}/{{ random_name }}
+    command: cc {{ remote_tmp_dir }}/sleeper.c -o {{ remote_tmp_dir }}/{{ random_name }}
 
   - name: Copy helper script
     copy:
