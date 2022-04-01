@@ -268,7 +268,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             try:
                 return iface['address']
             except Exception:
-                return None
+                pass
+
+        return None
 
     def _get_agent_network_interfaces(self, node, vmid, vmtype):
         result = []
