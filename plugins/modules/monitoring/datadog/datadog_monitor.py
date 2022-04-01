@@ -337,7 +337,7 @@ def _update_monitor(module, monitor, options):
         if module.params['tags'] is not None:
             kwargs['tags'] = module.params['tags']
         msg = api.Monitor.update(**kwargs)
- 
+
         if 'message' in msg:
             msg['message'] = msg['message'].replace('@', '(@)')
 
