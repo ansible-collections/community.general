@@ -31,6 +31,7 @@ DOCUMENTATION = '''
         description:
           - URL to Proxmox cluster.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_URL) will be used instead.
+          - Since community.general 4.7.0 you can also use templating to specify the value of the I(url).
         default: 'http://localhost:8006'
         type: str
         env:
@@ -40,6 +41,7 @@ DOCUMENTATION = '''
         description:
           - Proxmox authentication user.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_USER) will be used instead.
+          - Since community.general 4.7.0 you can also use templating to specify the value of the I(user).
         required: yes
         type: str
         env:
@@ -49,6 +51,7 @@ DOCUMENTATION = '''
         description:
           - Proxmox authentication password.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_PASSWORD) will be used instead.
+          - Since community.general 4.7.0 you can also use templating to specify the value of the I(password).
         required: yes
         type: str
         env:
@@ -136,6 +139,14 @@ compose:
   my_inv_var_1: "'my_var1_value'"
   my_inv_var_2: >
     "my_var_2_value"
+
+# Specify the url, user and password using templating
+# my.proxmox.yml
+plugin: community.general.proxmox
+url: "{{ lookup('ansible.builtin.ini', 'url', section='proxmox', file='file.ini') }}"
+user: "{{ lookup('ansible.builtin.env','PM_USER') | default('ansible@pve') }}"
+password: "{{ lookup('community.general.random_string', base64=True) }}"
+
 '''
 
 import itertools
@@ -148,6 +159,7 @@ from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cachea
 from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.utils.display import Display
+from ansible.template import Templar
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
@@ -500,10 +512,24 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         # read config from file, this sets 'options'
         self._read_config_data(path)
 
+        t = Templar(loader=loader)
+
         # read options
-        self.proxmox_url = self.get_option('url').rstrip('/')
-        self.proxmox_user = self.get_option('user')
-        self.proxmox_password = self.get_option('password')
+        proxmox_url = self.get_option('url')
+        if t.is_template(proxmox_url):
+            proxmox_url = t.template(variable=proxmox_url, disable_lookups=False)
+        self.proxmox_url = proxmox_url.rstrip('/')
+
+        proxmox_user = self.get_option('user')
+        if t.is_template(proxmox_user):
+            proxmox_user = t.template(variable=proxmox_user, disable_lookups=False)
+        self.proxmox_user = proxmox_user
+
+        proxmox_password = self.get_option('password')
+        if t.is_template(proxmox_password):
+            proxmox_password = t.template(variable=proxmox_password, disable_lookups=False)
+        self.proxmox_password = proxmox_password
+
         self.cache_key = self.get_cache_key(path)
         self.use_cache = cache and self.get_option('cache')
         self.host_filters = self.get_option('filters')
