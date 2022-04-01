@@ -21,7 +21,6 @@
       - '{{ pkgng_test_outofdate_pkg_tempdir.path }}'
       - '--manifest'
       - '{{ pkgng_test_outofdate_pkg_tempdir.path }}/MANIFEST'
-    warn: no
 
 # pkg switched from .txz to .pkg in version 1.17.0
 # Might as well look for all valid pkg extensions.
