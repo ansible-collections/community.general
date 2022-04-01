@@ -58,7 +58,7 @@
   pause:
     seconds: 1
 
-- name: "Checking the process IDs (PIDs) of sleep binary"
+- name: "Checking the process IDs (PIDs) of fake 'sleep' binary"
   pids:
     name: "{{ random_name }}"
   register: pids
