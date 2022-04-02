@@ -92,6 +92,7 @@ options:
         description:
             - The list of IPv4 routes.
             - Use the format C(192.0.3.0/24 192.0.2.1).
+            - To specify more complex routes, use the I(routes4_extended) option.
         type: list
         elements: str
         version_added: 2.0.0
@@ -206,6 +207,7 @@ options:
         description:
             - The list of IPv6 routes.
             - Use the format C(fd12:3456:789a:1::/64 2001:dead:beef::1).
+            - To specify more complex routes, use the I(routes6_extended) option.
         type: list
         elements: str
         version_added: 4.4.0
@@ -232,7 +234,7 @@ options:
             table:
                 description:
                     - The table to add this route to.
-                    - The default depends on C(ipv4.route-table).
+                    - The default depends on C(ipv6.route-table).
                 type: int
             cwnd:
                 description:
