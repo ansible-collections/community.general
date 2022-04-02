@@ -101,7 +101,7 @@
   register: custom_varcheck3
   failed_when: custom_varcheck3.rc == 0
 
-- name: Esure cronvar tasks did the right thing
+- name: Ensure cronvar tasks did the right thing
   assert:
     that:
       - create_cronvar1 is changed
