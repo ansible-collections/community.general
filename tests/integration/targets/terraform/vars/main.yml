@@ -10,7 +10,7 @@ terraform_arch: linux_amd64
 terraform_url: "https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_{{ terraform_arch }}.zip"
 
 # Controls whether the unarchive task will validate TLS certs of the Terraform binary host
-validate_certs: no
+validate_certs: yes
 
 # Directory where Terraform tests will be created
 terraform_project_dir: "{{ remote_tmp_dir }}/tf_provider_test"
