@@ -294,7 +294,7 @@ class OnePasswordInfo(object):
             except AnsibleModuleError as e:
                 module.fail_json(msg="Failed to perform initial sign in to 1Password: %s" % to_native(e))
         else:
-            module.fail_json(msg="Unable to perform an initial sign in to 1Password. Please run '%s sigin' "
+            module.fail_json(msg="Unable to perform an initial sign in to 1Password. Please run '%s signin' "
                                  "or define credentials in 'auto_login'. See the module documentation for details." % self.cli_path)
 
     def get_token(self):
