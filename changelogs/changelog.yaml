@@ -1603,3 +1603,41 @@ releases:
     - 4351-inventory-lxd-handling_metadata_wo_os_and_release.yml
     - 4368-reverts-4281.yml
     release_date: '2022-03-16'
+  4.7.0:
+    changes:
+      bugfixes:
+      - dsv lookup plugin - raise an Ansible error if the wrong ``python-dsv-sdk``
+        version is installed (https://github.com/ansible-collections/community.general/pull/4422).
+      - keycloak_* - the documented ``validate_certs`` parameter was not taken into
+        account when calling the ``open_url`` function in some cases, thus enforcing
+        certificate validation even when ``validate_certs`` was set to ``false``.
+        (https://github.com/ansible-collections/community.general/pull/4382)
+      - nmcli - fix returning "changed" when routes parameters set, also suggest new
+        routes4 and routes6 format (https://github.com/ansible-collections/community.general/issues/4131).
+      - proxmox inventory plugin - fixed the ``tags_parsed`` field when Proxmox returns
+        a single space for the ``tags`` entry (https://github.com/ansible-collections/community.general/pull/4378).
+      - zypper - fixed bug that caused zypper to always report [ok] and do nothing
+        on ``state=present`` when all packages in ``name`` had a version specification
+        (https://github.com/ansible-collections/community.general/issues/4371, https://github.com/ansible-collections/community.general/pull/4421).
+      minor_changes:
+      - ipa_service - add ``skip_host_check`` parameter. (https://github.com/ansible-collections/community.general/pull/4417).
+      - keycloak_client - add ``always_display_in_console`` parameter (https://github.com/ansible-collections/community.general/issues/4390).
+      - keycloak_client - add ``default_client_scopes`` and ``optional_client_scopes``
+        parameters. (https://github.com/ansible-collections/community.general/pull/4385).
+      - proxmox inventory plugin - add support for templating the ``url``, ``user``,
+        and ``password`` options (https://github.com/ansible-collections/community.general/pull/4418).
+      - sudoers - add support for ``runas`` parameter (https://github.com/ansible-collections/community.general/issues/4379).
+      release_summary: Regular bugfix and feature release.
+    fragments:
+    - 4.7.0.yml
+    - 4131-nmcli_fix_reports_changed_for_routes4_parameter.yml
+    - 4378-proxmox-inventory-tags.yml
+    - 4380-sudoers-runas-parameter.yml
+    - 4382-keycloak-add-missing-validate_certs-parameters.yml
+    - 4385-keycloak-client-default-optional-scopes.yml
+    - 4386-proxmox-support-templating-in-inventory-file.yml
+    - 4417-ipa_service-add-skip_host_check.yml
+    - 4421-zypper_package_version_handling_fix.yml
+    - 4422-warn-user-if-incorrect-SDK-version-is-installed.yaml
+    - 4429-keycloak-client-add-always-display-in-console.yml
+    release_date: '2022-04-05'
