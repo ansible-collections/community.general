@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - nmcli - fix returning "changed" when routes parameters set, also suggest new routes4 and routes6 format
+    (https://github.com/ansible-collections/community.general/issues/4131).
