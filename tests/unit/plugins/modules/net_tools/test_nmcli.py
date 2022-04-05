@@ -169,6 +169,17 @@ TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE = [
         'state': 'present',
         '_ansible_check_mode': False,
     },
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'ethernet_non_existant',
+        'ip6': '2001:beef:cafe:10::1/64',
+        'routes6_extended': [{'ip': 'fd2e:446f:d85d:5::/64',
+                              'next_hop': '2001:beef:cafe:10::2'}],
+        'method6': 'manual',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
 ]
 
 TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE_SHOW_OUTPUT = """\
@@ -197,6 +208,14 @@ TESTCASE_ETHERNET_MOD_IPV4_INT_WITH_ROUTE_AND_METRIC = [
         'state': 'present',
         '_ansible_check_mode': False,
     },
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'routes4_extended': [{'ip': '192.168.200.0/24', 'next_hop': '192.168.1.1'}],
+        'route_metric4': 10,
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
 ]
 
 TESTCASE_ETHERNET_MOD_IPV4_INT_WITH_ROUTE_AND_METRIC_SHOW_OUTPUT = """\
@@ -214,6 +233,14 @@ TESTCASE_ETHERNET_MOD_IPV6_INT_WITH_ROUTE_AND_METRIC = [
         'type': 'ethernet',
         'conn_name': 'non_existent_nw_device',
         'routes6': ['fd2e:446f:d85d:5::/64 2001:beef:cafe:10::2'],
+        'route_metric6': 10,
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'routes6_extended': [{'ip': 'fd2e:446f:d85d:5::/64', 'next_hop': '2001:beef:cafe:10::2'}],
         'route_metric6': 10,
         'state': 'present',
         '_ansible_check_mode': False,
@@ -237,6 +264,17 @@ TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_MULTIPLE_ROUTES = [
         'ifname': 'ethernet_non_existant',
         'ip6': '2001:beef:cafe:10::1/64',
         'routes6': ['fd2e:446f:d85d:5::/64 2001:beef:cafe:10::2', 'fd2e:8890:abcd:25::/64 2001:beef:cafe:10::5'],
+        'method6': 'manual',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'ethernet_non_existant',
+        'ip6': '2001:beef:cafe:10::1/64',
+        'routes6_extended': [{'ip': 'fd2e:446f:d85d:5::/64', 'next_hop': '2001:beef:cafe:10::2'},
+                             {'ip': 'fd2e:8890:abcd:25::/64', 'next_hop': '2001:beef:cafe:10::5'}],
         'method6': 'manual',
         'state': 'present',
         '_ansible_check_mode': False,
@@ -273,6 +311,18 @@ TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE_AND_METRIC = [
         'state': 'present',
         '_ansible_check_mode': False,
     },
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'ethernet_non_existant',
+        'method4': 'disabled',
+        'ip6': '2001:beef:cafe:10::1/64',
+        'routes6_extended': [{'ip': 'fd2e:446f:d85d:5::/64', 'next_hop': '2001:beef:cafe:10::2'}],
+        'route_metric6': 5,
+        'method6': 'manual',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
 ]
 
 TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_ROUTE_AND_METRIC_SHOW_OUTPUT = """\
@@ -300,6 +350,19 @@ TESTCASE_ETHERNET_ADD_IPV6_INT_WITH_MULTIPLE_ROUTES_AND_METRIC = [
         'method4': 'disabled',
         'ip6': '2001:beef:cafe:10::1/64',
         'routes6': ['fd2e:446f:d85d:5::/64 2001:beef:cafe:10::2', 'fd2e:8890:abcd:25::/64 2001:beef:cafe:10::5'],
+        'route_metric6': 5,
+        'method6': 'manual',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'ethernet_non_existant',
+        'method4': 'disabled',
+        'ip6': '2001:beef:cafe:10::1/64',
+        'routes6_extended': [{'ip': 'fd2e:446f:d85d:5::/64', 'next_hop': '2001:beef:cafe:10::2'},
+                             {'ip': 'fd2e:8890:abcd:25::/64', 'next_hop': '2001:beef:cafe:10::5'}],
         'route_metric6': 5,
         'method6': 'manual',
         'state': 'present',
