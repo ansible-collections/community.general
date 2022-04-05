@@ -301,6 +301,15 @@ options:
             - useTemplateMappers
         type: bool
 
+    always_display_in_console:
+        description:
+            - Whether or not to display this client in account console, even if the
+              user does not have an active session.
+        aliases:
+            - alwaysDisplayInConsole
+        type: bool
+        version_added: 4.7.0
+
     surrogate_auth_required:
         description:
             - Whether or not surrogate auth is required.
@@ -611,6 +620,7 @@ EXAMPLES = '''
     use_template_config: False
     use_template_scope: false
     use_template_mappers: no
+    always_display_in_console: true
     registered_nodes:
       node01.example.com: 1507828202
     registration_access_token: eyJWT_TOKEN
@@ -804,6 +814,7 @@ def main():
         use_template_config=dict(type='bool', aliases=['useTemplateConfig']),
         use_template_scope=dict(type='bool', aliases=['useTemplateScope']),
         use_template_mappers=dict(type='bool', aliases=['useTemplateMappers']),
+        always_display_in_console=dict(type='bool', aliases=['alwaysDisplayInConsole']),
         authentication_flow_binding_overrides=dict(type='dict', aliases=['authenticationFlowBindingOverrides']),
         protocol_mappers=dict(type='list', elements='dict', options=protmapper_spec, aliases=['protocolMappers']),
         authorization_settings=dict(type='dict', aliases=['authorizationSettings']),
