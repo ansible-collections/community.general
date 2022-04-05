@@ -124,12 +124,12 @@ options:
     type: list
     elements: path
     version_added: '0.2.0'
-  init_reconfigure:
+  provider_upgrade:
     description:
       - Allows Terraform init to upgrade providers to versions specified in the project's version constraints.
     default: false
     type: bool
-  provider_upgrade:
+  init_reconfigure:
     description:
       - Forces backend reconfiguration during init.
     default: false
