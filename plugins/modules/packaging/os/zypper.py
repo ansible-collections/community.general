@@ -427,7 +427,9 @@ def package_present(m, name, want_latest):
         # if a version is given leave the package in to let zypper handle the version
         # resolution
         packageswithoutversion = [p for p in packages if not p.version]
-        prerun_state = get_installed_state(m, packageswithoutversion)
+        prerun_state = {}
+        if packageswithoutversion:
+            prerun_state = get_installed_state(m, packageswithoutversion)
         # generate lists of packages to install or remove
         packages = [p for p in packages if p.shouldinstall != (p.name in prerun_state)]
 
