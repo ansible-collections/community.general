@@ -102,7 +102,7 @@ class GitLabGroup(object):
 
     # get group id if group exists
     def get_group_id(self, gitlab_group):
-        group_exists = self._gitlab.groups.list(search=gitlab_group)
+        group_exists = self._gitlab.groups.list(search=gitlab_group,all=True)
         if group_exists:
             return group_exists[0].id
 
