@@ -738,9 +738,11 @@ class RedfishUtils(object):
     def manage_chassis_indicator_led(self, command):
         return self.manage_indicator_led(command, self.chassis_uri)
 
-    def manage_indicator_led(self, command, resource_uri):
+    def manage_indicator_led(self, command, resource_uri=None):
         result = {}
         key = 'IndicatorLED'
+        if resource_uri is None:
+            resource_uri = self.chassis_uri
 
         payloads = {'IndicatorLedOn': 'Lit', 'IndicatorLedOff': 'Off', "IndicatorLedBlink": 'Blinking'}
 
