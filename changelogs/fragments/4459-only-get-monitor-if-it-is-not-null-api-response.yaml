@@ -1,0 +1,2 @@
+bugfixes:
+  - dnsmadeeasy dns delete should not break when api response does not contain monitor value(https://github.com/ansible-collections/community.general/issues/3620)
