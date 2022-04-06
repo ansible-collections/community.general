@@ -1,3 +1,4 @@
 ---
-bugfixs:
+---
+bugfixes:
   - datadog_monitor - support new datadog event monitor of type `event-v2 alert`
