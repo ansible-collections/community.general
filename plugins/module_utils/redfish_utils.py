@@ -733,10 +733,10 @@ class RedfishUtils(object):
         return self.aggregate_systems(self.get_volume_inventory)
 
     def manage_system_indicator_led(self, command):
-        return self.manage_power(command, self.systems_uri)
+        return self.manage_indicator_led(command, self.systems_uri)
 
     def manage_chassis_indicator_led(self, command):
-        return self.manage_power(command, self.chassis_uri)
+        return self.manage_indicator_led(command, self.chassis_uri)
 
     def manage_indicator_led(self, command, resource_uri):
         result = {}
