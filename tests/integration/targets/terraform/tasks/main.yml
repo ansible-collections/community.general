@@ -1,14 +1,7 @@
 ---
 
-# Fallback in case existing_terraform_path var is missing. Saves us from checking for `not defined`
-# conditions in multiple tasks below.
 
-- name: Check if existing_terraform_path var is missing
-  set_fact:
-      existing_terraform_path: "{{ existing_terraform_path | default('') }}"
-
-# This block checks and registers Terraform version of the binary found in path. It's 
-# skipped when user sets `existing_terraform_path`.
+# This block checks and registers Terraform version of the binary found in path.
 
 - name: Check for existing Terraform in path
   block:
@@ -27,11 +20,8 @@
       terraform_version_installed: "{{ terraform_version_output.stdout | regex_search('(?!Terraform.*v)([0-9]+\\.[0-9]+\\.[0-9]+)') }}"
     when: terraform_version_output.changed
 
-  when: existing_terraform_path | length == 0
-
-# This block handles taks of installing the Terraform binary. This happens if user does not set
-# `existing_terraform_path` AND if there is no existing terraform in $PATH OR version does not
-# match `terraform_version`
+# This block handles the tasks of installing the Terraform binary. This happens if there is no existing
+# terraform in $PATH OR version does not match `terraform_version`.
 
 - name: Execute Terraform install tasks
   block:
@@ -53,15 +43,14 @@
       remote_src: yes
       validate_certs: "{{ validate_certs }}"
 
-  when: >-
-    (terraform_version_installed is not defined or terraform_version_installed != terraform_version) and existing_terraform_path | length == 0
+  when: terraform_version_installed is not defined or terraform_version_installed != terraform_version
 
 # This sets `terraform_binary_path` to coalesced output of first non-empty string in this order:
-# user-defined path, path from the 'Check if terraform is present in path' task, and lastly, the fallback path.
+# path from the 'Check if terraform is present in path' task, and lastly, the fallback path.
 
 - name: Set path to terraform binary
   set_fact:
-    terraform_binary_path: "{{ existing_terraform_path or terraform_binary_path.stdout or remote_tmp_dir ~ '/terraform' }}"
+    terraform_binary_path: "{{ terraform_binary_path.stdout or remote_tmp_dir ~ '/terraform' }}"
 
 - name: Create terraform project directory
   file:
