@@ -7,7 +7,7 @@ The integration tests can be executed locally:
 
     Example: https://discord.com/api/webhooks/`webhook_id`/`webhook_token`
 
-5. Replace the variables `webhook_id` and `webhook_token` in the var file
+5. Replace the variables `discord_id` and `discord_token` in the var file
 6. Run the integration test
 ````
 ansible-test integration -v --color yes discord --allow-unsupported
