@@ -13,7 +13,7 @@
 - name: Init Terraform configuration with pinned provider version
   community.general.terraform:
     project_path: "{{ terraform_provider_hcl.dest | dirname }}"
-    binary_path: "{{ remote_tmp_dir }}/terraform"
+    binary_path: "{{ terraform_binary_path }}"
     force_init: yes
     provider_upgrade: "{{ terraform_provider_upgrade }}"
     state: present

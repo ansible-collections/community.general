@@ -1,5 +1,9 @@
 ---
 
+# If this is set, this playbook will not download Terraform or check its version. Instead, the binary specified
+# below will be used. Leave at empty string to perform the download of Terraform specified in `terraform_version`.
+existing_terraform_path: ""
+
 # Terraform version that will be downloaded
 terraform_version: 1.1.7
 
