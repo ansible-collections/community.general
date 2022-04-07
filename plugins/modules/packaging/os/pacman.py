@@ -627,7 +627,7 @@ class Pacman(object):
                     rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
                     if rc != 0:
                         if self.target_state == "absent":
-                            continue # Don't bark for unavailable packages when trying to remove them
+                            continue  # Don't bark for unavailable packages when trying to remove them
                         else:
                             self.fail(
                                 msg="Failed to list package %s" % (pkg),
