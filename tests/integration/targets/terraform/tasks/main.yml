@@ -26,14 +26,14 @@
 - name: Execute Terraform install tasks
   block:
 
+  - name: Install Terraform
+    debug:
+      msg: "Installing terraform {{ terraform_version }}, found: {{ terraform_version_installed | default('no terraform binary found') }}."
+
   - name: Ensure unzip is present
     ansible.builtin.package:
       name: unzip
       state: present
-
-  - name: Install Terraform
-    debug:
-      msg: "Installing terraform {{ terraform_version }}, found {{ terraform_version_installed | default('0.0.0') }}"
 
   - name: Install Terraform binary
     unarchive:
@@ -54,7 +54,7 @@
 
 - name: Create terraform project directory
   file:
-    path: "{{terraform_project_dir}}/{{ item['name'] }}"
+    path: "{{ terraform_project_dir }}/{{ item['name'] }}"
     state: directory
     mode: 0755
   loop: "{{ terraform_provider_versions }}"

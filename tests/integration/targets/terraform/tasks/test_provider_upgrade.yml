@@ -20,4 +20,4 @@
   register: terraform_init_result
 
 - assert:
-    that: "{{ terraform_init_result.failed == false }}"
+    that: terraform_init_result is not failed
