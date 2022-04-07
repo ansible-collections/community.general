@@ -610,8 +610,9 @@ class Pacman(object):
                 # Expand group members
                 for group_member in self.inventory["available_groups"][pkg]:
                     pkg_list.append(Package(name=group_member, source=group_member))
-            elif pkg in self.inventory["available_pkgs"]:
-                # just a regular pkg
+            elif pkg in self.inventory["available_pkgs"] or pkg in self.inventory["installed_pkgs"]:
+                # Just a regular pkg, either available in the repositories,
+                # or locally installed, which we need to know for absent state
                 pkg_list.append(Package(name=pkg, source=pkg))
             else:
                 # Last resort, call out to pacman to extract the info,
@@ -626,7 +627,7 @@ class Pacman(object):
                     rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
                     if rc != 0:
                         if self.target_state == "absent":
-                            continue  # Don't bark for unavailable packages when trying to remove them
+                            continue # Don't bark for unavailable packages when trying to remove them
                         else:
                             self.fail(
                                 msg="Failed to list package %s" % (pkg),
