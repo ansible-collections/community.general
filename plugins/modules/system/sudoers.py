@@ -23,7 +23,7 @@ options:
     description:
       - The commands allowed by the sudoers rule.
       - Multiple can be added by passing a list of commands.
-      - Use ALL for all commands
+      - Use C(ALL) for all commands.
     type: list
     elements: str
   group:
