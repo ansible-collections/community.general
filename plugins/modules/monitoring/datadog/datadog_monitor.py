@@ -15,6 +15,7 @@ short_description: Manages Datadog monitors
 description:
   - Manages monitors within Datadog.
   - Options as described on https://docs.datadoghq.com/api/.
+  - The type C(event-v2) was added in community.general 4.8.0.
 author: Sebastian Kornehl (@skornehl)
 requirements: [datadog]
 options:
