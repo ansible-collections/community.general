@@ -113,9 +113,9 @@ from ansible.module_utils.common.text.converters import to_native
 
 
 def get_runtime_status(ignore_selinux_state=False):
-    if ignore_selinux_state is False:
-        return selinux.is_selinux_enabled()
-    return True
+    if ignore_selinux_state is True:
+        return True
+    return selinux.is_selinux_enabled()
 
 
 def semanage_port_get_ports(seport, setype, proto):
