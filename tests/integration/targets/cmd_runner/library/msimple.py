@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# (c) 2021, Alexei Znamensky <russoz@gmail.com>
+# (c) 2022, Alexei Znamensky <russoz@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -42,9 +42,7 @@ EXAMPLES = ""
 RETURN = ""
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import (
-    CmdRunner, fmt_bool, fmt_bool_not, fmt_opt_val, fmt_opt_eq_val, fmt_str
-)
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner
 
 
 def main():
@@ -54,24 +52,25 @@ def main():
             arg_formats=dict(type="dict", required=True),
             arg_order=dict(type="list", required=True),
             arg_values=dict(type="list", required=True),
-            aa=dict(type="raw")
+            aa=dict(type="raw"),
         ),
     )
+    p = module.params
 
     arg_formats = {}
-    for arg, fmt in module.params['arg_formats'].items():
-        func = getattr(sys.modules[__name__], fmt['func'])
+    for arg, fmt in p['arg_formats'].items():
+        func = getattr(sys.modules["ansible_collections.community.general.plugins.module_utils.cmd_runner"], fmt['func'])
         args = fmt.get("args", [])
 
         arg_formats[arg] = func(*args)
 
-    p = module.params
     runner = CmdRunner(module, p['command'], arg_formats=arg_formats)
 
     with runner.context(p['arg_order']) as ctx:
         result = ctx.run(*p['arg_values'])
+    rc, out, err = result
 
-    module.exit_json(result=result)
+    module.exit_json(rc=rc, out=out, err=err)
 
 
 if __name__ == '__main__':
