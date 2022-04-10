@@ -21,6 +21,10 @@ DOCUMENTATION = '''
             description: token that ensures this is a source file for the 'nmap' plugin.
             required: True
             choices: ['nmap', 'community.general.nmap']
+        sudo:
+            description: execute nmap with sudo
+            type: boolean
+            default: False
         address:
             description: Network IP or range of IPs to scan, you can use a simple range (10.2.2.15-25) or CIDR notation.
             required: True
@@ -135,8 +139,15 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if not user_cache_setting or cache_needs_update:
             # setup command
             cmd = [self._nmap]
+
+            if self._options['sudo']:
+                cmd.insert(0, 'sudo')
+
             if not self._options['ports']:
-                cmd.append('-sP')
+                cmd.append('-sV')
+                cmd.append('-p 22')
+                cmd.append('--open')
+                cmd.append('-n')
 
             if self._options['ipv4'] and not self._options['ipv6']:
                 cmd.append('-4')
