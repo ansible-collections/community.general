@@ -78,7 +78,9 @@ DOCUMENTATION = '''
         description:
           - Whether to set C(ansbile_host) for proxmox nodes.
           - When set to C(true) (default), will use the first available interface. This can be different from what you expect.
-        default: true
+          - This currently defaults to C(true), but the default is deprecated since community.general 4.8.0.
+            The default will change to C(false) in community.general 6.0.0. To avoid a deprecation warning, please
+            set this parameter explicitly.
         type: bool
       filters:
         version_added: 4.6.0
@@ -103,6 +105,9 @@ EXAMPLES = '''
 plugin: community.general.proxmox
 user: ansible@pve
 password: secure
+# Note that this can easily give you wrong values as ansible_host. See further below for
+# an example where this is set to `false` and where ansible_host is set with `compose`.
+want_proxmox_nodes_ansible_host: true
 
 # More complete example demonstrating the use of 'want_facts' and the constructed options
 # Note that using facts returned by 'want_facts' in constructed options requires 'want_facts=true'
@@ -123,6 +128,9 @@ groups:
   mailservers: "'mail' in (proxmox_tags_parsed|list)"
 compose:
   ansible_port: 2222
+# Note that this can easily give you wrong values as ansible_host. See further below for
+# an example where this is set to `false` and where ansible_host is set with `compose`.
+want_proxmox_nodes_ansible_host: true
 
 # Using the inventory to allow ansible to connect via the first IP address of the VM / Container
 # (Default is connection by name of QEMU/LXC guests)
@@ -134,6 +142,7 @@ user: ansible@pve
 password: secure
 validate_certs: false
 want_facts: true
+want_proxmox_nodes_ansible_host: false
 compose:
   ansible_host: proxmox_ipconfig0.ip | default(proxmox_net0.ip) | ipaddr('address')
   my_inv_var_1: "'my_var1_value'"
@@ -146,6 +155,9 @@ plugin: community.general.proxmox
 url: "{{ lookup('ansible.builtin.ini', 'url', section='proxmox', file='file.ini') }}"
 user: "{{ lookup('ansible.builtin.env','PM_USER') | default('ansible@pve') }}"
 password: "{{ lookup('community.general.random_string', base64=True) }}"
+# Note that this can easily give you wrong values as ansible_host. See further up for
+# an example where this is set to `false` and where ansible_host is set with `compose`.
+want_proxmox_nodes_ansible_host: true
 
 '''
 
@@ -467,6 +479,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         nodes_group = self._group('nodes')
         self.inventory.add_group(nodes_group)
 
+        want_proxmox_nodes_ansible_host = self.get_option("want_proxmox_nodes_ansible_host")
+        if want_proxmox_nodes_ansible_host is None:
+            display.deprecated(
+                'The want_proxmox_nodes_ansible_host option of the community.general.proxmox inventory plugin'
+                ' currently defaults to `true`, but this default has been deprecated and will change to `false`'
+                ' in community.general 6.0.0. To keep the current behavior and remove this deprecation warning,'
+                ' explicitly set `want_proxmox_nodes_ansible_host` to `true` in your inventory configuration',
+                version='6.0.0', collection_name='community.general')
+            want_proxmox_nodes_ansible_host = True
+
         # gather vm's on nodes
         self._get_auth()
         hosts = []
@@ -482,7 +504,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 continue
 
             # get node IP address
-            if self.get_option("want_proxmox_nodes_ansible_host"):
+            if want_proxmox_nodes_ansible_host:
                 ip = self._get_node_ip(node['node'])
                 self.inventory.set_variable(node['node'], 'ansible_host', ip)
 
