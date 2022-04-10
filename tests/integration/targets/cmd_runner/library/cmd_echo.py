@@ -9,7 +9,7 @@ __metaclass__ = type
 import sys
 
 DOCUMENTATION = '''
-module: msimple
+module: cmd_echo
 author: "Alexei Znamensky (@russoz)"
 short_description: Simple module for testing
 description:
@@ -48,10 +48,9 @@ from ansible_collections.community.general.plugins.module_utils.cmd_runner impor
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            command=dict(type="list", elements="str", required=True),
-            arg_formats=dict(type="dict", required=True),
+            arg_formats=dict(type="dict", default={}),
             arg_order=dict(type="list", required=True),
-            arg_values=dict(type="list", required=True),
+            arg_values=dict(type="dict", default={}),
             aa=dict(type="raw"),
         ),
     )
@@ -64,10 +63,10 @@ def main():
 
         arg_formats[arg] = func(*args)
 
-    runner = CmdRunner(module, p['command'], arg_formats=arg_formats)
+    runner = CmdRunner(module, ['echo', '--'], arg_formats=arg_formats)
 
     with runner.context(p['arg_order']) as ctx:
-        result = ctx.run(*p['arg_values'])
+        result = ctx.run(**p['arg_values'])
     rc, out, err = result
 
     module.exit_json(rc=rc, out=out, err=err)
