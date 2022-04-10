@@ -113,7 +113,7 @@ from ansible.module_utils.common.text.converters import to_native
 
 
 def get_runtime_status(ignore_selinux_state=False):
-    return True if ignore_selinux_state is True else selinux.is_selinux_enabled()
+    return ignore_selinux_state or selinux.is_selinux_enabled()
 
 
 def semanage_port_get_ports(seport, setype, proto):
@@ -161,10 +161,7 @@ def semanage_port_get_type(seport, port, proto):
     key = (int(ports[0]), int(ports[1]), proto)
 
     records = seport.get_all()
-    if key in records:
-        return records[key]
-    else:
-        return None
+    return records.get(key)
 
 
 def semanage_port_add(module, ports, proto, setype, do_reload, serange='s0', sestore=''):
@@ -194,19 +191,23 @@ def semanage_port_add(module, ports, proto, setype, do_reload, serange='s0', ses
     :rtype: bool
     :return: True if the policy was changed, otherwise False
     """
+    change = False
     try:
         seport = seobject.portRecords(sestore)
         seport.set_reload(do_reload)
-        change = False
         ports_by_type = semanage_port_get_ports(seport, setype, proto)
         for port in ports:
-            if port not in ports_by_type:
-                change = True
-                port_type = semanage_port_get_type(seport, port, proto)
-                if port_type is None and not module.check_mode:
-                    seport.add(port, proto, serange, setype)
-                elif port_type is not None and not module.check_mode:
-                    seport.modify(port, proto, serange, setype)
+            if port in ports_by_type:
+                continue
+
+            change = True
+            if module.check_mode:
+                continue
+            port_type = semanage_port_get_type(seport, port, proto)
+            if port_type is None:
+                seport.add(port, proto, serange, setype)
+            else:
+                seport.modify(port, proto, serange, setype)
 
     except (ValueError, IOError, KeyError, OSError, RuntimeError) as e:
         module.fail_json(msg="%s: %s\n" % (e.__class__.__name__, to_native(e)), exception=traceback.format_exc())
@@ -238,10 +239,10 @@ def semanage_port_del(module, ports, proto, setype, do_reload, sestore=''):
     :rtype: bool
     :return: True if the policy was changed, otherwise False
     """
+    change = False
     try:
         seport = seobject.portRecords(sestore)
         seport.set_reload(do_reload)
-        change = False
         ports_by_type = semanage_port_get_ports(seport, setype, proto)
         for port in ports:
             if port in ports_by_type:
