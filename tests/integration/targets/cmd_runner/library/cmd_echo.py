@@ -65,11 +65,13 @@ def main():
 
     runner = CmdRunner(module, ['echo', '--'], arg_formats=arg_formats)
 
+    info = None
     with runner.context(p['arg_order']) as ctx:
         result = ctx.run(**p['arg_values'])
+        info = result.run_info
     rc, out, err = result
 
-    module.exit_json(rc=rc, out=out, err=err)
+    module.exit_json(rc=rc, out=out, err=err, info=info)
 
 
 if __name__ == '__main__':
