@@ -23,10 +23,10 @@ options:
         required: true
     project:
         description:
-         - 'Project of an instance.
-           See U(https://github.com/lxc/lxd/blob/master/doc/projects.md).'
-         type: str
-         required: false
+          - 'Project of an instance.
+            See U(https://github.com/lxc/lxd/blob/master/doc/projects.md).'
+        required: false
+        type: str
     architecture:
         description:
           - 'The architecture for the instance (for example C(x86_64) or C(i686)).
@@ -264,6 +264,7 @@ EXAMPLES = '''
         project: mytestproject
         ignore_volatile_options: true
         state: started
+        source:
           protocol: simplestreams
           type: image
           mode: pull
