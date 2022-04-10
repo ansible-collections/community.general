@@ -1,0 +1,64 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Send basic message
+  community.general.discord:
+    webhook_id: "{{ discord_id }}"
+    webhook_token: "{{ discord_token }}"
+    content: "Messages from ansible-test"
+  register: result
+
+- name: Check result
+  assert:
+    that:
+      - result is changed
+      - result.http_code == 204
+
+- name: Send embeds
+  community.general.discord:
+    webhook_id: "{{ discord_id }}"
+    webhook_token: "{{ discord_token }}"
+    embeds:
+      - title: "Title of embed message 1"
+        description: "Description embed message 1"
+        footer:
+          text: "author ansible-test"
+        image:
+          url: "https://avatars.githubusercontent.com/u/44586252?s=200&v=4"
+      - title: "Title of embed message 2"
+        description: "Description embed message 2"
+        footer:
+          text: "author ansible-test"
+          icon_url: "https://avatars.githubusercontent.com/u/44586252?s=200&v=4"
+        fields:
+          - name: "Field 1"
+            value: 1
+          - name: "Field 2"
+            value: "Text"
+        timestamp: "{{ ansible_date_time.iso8601 }}"
+    username: Ansible Test
+    avatar_url: "https://avatars.githubusercontent.com/u/44586252?s=200&v=4"
+  register: result
+
+- name: Check result
+  assert:
+    that:
+      - result is changed
+      - result.http_code == 204
+
+- name: Use a wrong token
+  community.general.discord:
+    webhook_id: "{{ discord_id }}"
+    webhook_token: "wrong_token"
+    content: "Messages from ansible-test"
+  register: result
+  ignore_errors: true
+
+- name: Check result
+  assert:
+    that:
+      - result is not changed
+      - result.http_code == 401
+      - result.response.message == "Invalid Webhook Token"
