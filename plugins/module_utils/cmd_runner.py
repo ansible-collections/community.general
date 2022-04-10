@@ -118,6 +118,17 @@ def fmt_default_type(_type, option=""):
 
 
 def fmt_unpack(stars):
+    """
+    The format functions must receive one single value to be rendered into a
+    command-line format, but sometimes it makes more sense to unpack collections
+    down to smaller pieces, for clarity and readability.
+
+    Args:
+        stars (int): Unpack with 1 or 2 stars, corresponding to a list or a dict, respectively.
+
+    Returns:
+        function: original function wrapped in the requested unpacking decorator.
+    """
     if stars == 1:
         def deco(f):
             return lambda v: f(*v)
@@ -131,7 +142,14 @@ def fmt_unpack(stars):
 
 
 class CmdRunner:
-    def __init__(self, module, command, arg_formats=None, default_param_order=(), check_rc=False, force_lang="C", path_prefix=None):
+    """
+    Wrapper for ``AnsibleModule.run_command()``.
+
+    It aims to provide a reusable runner with consistent argument formatting
+    and sensible defaults.
+    """
+    def __init__(self, module, command, arg_formats=None, default_param_order=(),
+                 check_rc=False, force_lang="C", path_prefix=None, environ_update=None):
         self.module = module
         self.command = list(command) if is_sequence(command) else [command]
         self.default_param_order = tuple(default_param_order)
@@ -141,6 +159,9 @@ class CmdRunner:
         self.check_rc = check_rc
         self.force_lang = force_lang
         self.path_prefix = path_prefix
+        if environ_update is None:
+            environ_update = {}
+        self.environ_update = environ_update
 
         self.command[0] = module.get_bin_path(command[0], opt_dirs=path_prefix)
 
@@ -157,7 +178,10 @@ class CmdRunner:
         for p in params_order:
             if p not in self.arg_formats:
                 raise MissingArgumentFormat(p, params_order, tuple(self.arg_formats.keys()))
-        return _CmdRunnerContext(runner=self, params_order=params_order, output_process=output_process, ignore_value_none=ignore_value_none, **kwargs)
+        return _CmdRunnerContext(runner=self,
+                                 params_order=params_order,
+                                 output_process=output_process,
+                                 ignore_value_none=ignore_value_none, **kwargs)
 
     def has_arg_format(self, arg):
         return arg in self.arg_formats
@@ -171,13 +195,14 @@ class _CmdRunnerContext:
         self.ignore_value_none = ignore_value_none
         self.run_command_args = dict(kwargs)
 
-        self.env_update = self.run_command_args.get('environ_update', {})
+        self.environ_update = runner.environ_update
+        self.environ_update.update(self.run_command_args.get('environ_update', {}))
         if runner.force_lang:
-            self.env_update.update({
+            self.environ_update.update({
                 'LANGUAGE': runner.force_lang,
                 'LC_ALL': runner.force_lang,
             })
-        self.run_command_args['environ_update'] = self.env_update
+        self.run_command_args['environ_update'] = self.environ_update
 
         if 'check_rc' not in self.run_command_args:
             self.run_command_args['check_rc'] = runner.check_rc
@@ -221,7 +246,7 @@ class _CmdRunnerContext:
             ignore_value_none=self.ignore_value_none,
             run_command_args=self.run_command_args,
             check_rc=self.check_rc,
-            env_update=self.env_update,
+            environ_update=self.environ_update,
             cmd=self.cmd,
             run_args=self.run_args,
             results_rc=self.results_rc,
