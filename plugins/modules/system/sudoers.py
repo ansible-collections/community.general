@@ -23,6 +23,7 @@ options:
     description:
       - The commands allowed by the sudoers rule.
       - Multiple can be added by passing a list of commands.
+      - Use C(ALL) for all commands.
     type: list
     elements: str
   group:
@@ -80,7 +81,7 @@ EXAMPLES = '''
     state: present
     user: bob
     runas: alice
-    commands: ANY
+    commands: ALL
 
 - name: >-
     Allow the monitoring group to run sudo /usr/local/bin/gather-app-metrics
