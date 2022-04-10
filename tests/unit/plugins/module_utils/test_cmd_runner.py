@@ -38,6 +38,7 @@ ARG_FORMATS = dict(
 if tuple(version_info) >= (3, 1):
     from collections import OrderedDict
 
+    # needs OrderedDict to provide a consistent key order
     ARG_FORMATS["simple_default_type__dict"] = (  # type: ignore
         fmt_default_type,
         ("dict",),
