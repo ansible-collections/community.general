@@ -27,6 +27,7 @@ options:
            See U(https://github.com/lxc/lxd/blob/master/doc/projects.md).'
         type: str
         required: false
+        version_added: 4.8.0
     description:
         description:
           - Description of the profile.

@@ -27,6 +27,7 @@ options:
             See U(https://github.com/lxc/lxd/blob/master/doc/projects.md).'
         required: false
         type: str
+        version_added: 4.8.0
     architecture:
         description:
           - 'The architecture for the instance (for example C(x86_64) or C(i686)).
