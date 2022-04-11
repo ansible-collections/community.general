@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - datadog_monitor - support new datadog event monitor of type `event-v2 alert` (https://github.com/ansible-collections/community.general/pull/4457)
