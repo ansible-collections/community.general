@@ -318,6 +318,14 @@ EXAMPLES = '''
       category: Systems
       command: DisableBootOverride
 
+  - name: Set system indicator LED to blink using security token for auth
+    community.general.redfish_command:
+      category: Systems
+      command: IndicatorLedBlink
+      resource_id: 437XR1138R2
+      baseuri: "{{ baseuri }}"
+      auth_token: "{{ result.session.token }}"
+
   - name: Add user
     community.general.redfish_command:
       category: Accounts
@@ -583,7 +591,8 @@ from ansible.module_utils.common.text.converters import to_native
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["PowerOn", "PowerForceOff", "PowerForceRestart", "PowerGracefulRestart",
-                "PowerGracefulShutdown", "PowerReboot", "SetOneTimeBoot", "EnableContinuousBootOverride", "DisableBootOverride"],
+                "PowerGracefulShutdown", "PowerReboot", "SetOneTimeBoot", "EnableContinuousBootOverride", "DisableBootOverride",
+                "IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink"],
     "Chassis": ["IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink"],
     "Accounts": ["AddUser", "EnableUser", "DeleteUser", "DisableUser",
                  "UpdateUserRole", "UpdateUserPassword", "UpdateUserName",
@@ -754,6 +763,8 @@ def main():
             elif command == "DisableBootOverride":
                 boot_opts['override_enabled'] = 'Disabled'
                 result = rf_utils.set_boot_override(boot_opts)
+            elif command.startswith('IndicatorLed'):
+                result = rf_utils.manage_system_indicator_led(command)
 
     elif category == "Chassis":
         result = rf_utils._find_chassis_resource()
@@ -769,7 +780,7 @@ def main():
         else:
             for command in command_list:
                 if command in led_commands:
-                    result = rf_utils.manage_indicator_led(command)
+                    result = rf_utils.manage_chassis_indicator_led(command)
 
     elif category == "Sessions":
         # execute only if we find SessionService resources
