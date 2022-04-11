@@ -1,0 +1,2 @@
+bugfixes:
+  - xbps - fix error message that is reported when installing packages fails (https://github.com/ansible-collections/community.general/pull/4438).
