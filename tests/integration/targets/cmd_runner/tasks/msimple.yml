@@ -6,10 +6,10 @@
   cmd_echo:
     arg_formats:
       aa:
-        func: fmt_opt_eq_val
+        func: as_opt_eq_val
         args: [--answer]
       bb:
-        func: fmt_bool
+        func: as_bool
         args: [--bb-here]
     arg_order: ['aa', 'bb']
     arg_values:
@@ -29,10 +29,10 @@
   cmd_echo:
     arg_formats:
       aa:
-        func: fmt_opt_eq_val
+        func: as_opt_eq_val
         args: [--answer]
       bb:
-        func: fmt_bool
+        func: as_bool
         args: [--bb-here]
     arg_order: ['aa', 'bb']
     arg_values:
@@ -52,7 +52,7 @@
   cmd_echo:
     arg_formats:
       bb:
-        func: fmt_bool
+        func: as_bool
         args: [--bb-here]
     arg_order: ['aa', 'bb']
     arg_values:
@@ -93,7 +93,7 @@
   cmd_echo:
     arg_formats:
       bb:
-        func: fmt_bool
+        func: as_bool
         args: [--bb-here]
     arg_order: ['aa', 'bb']
     aa: 1984

@@ -42,7 +42,7 @@ EXAMPLES = ""
 RETURN = ""
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, fmt
 
 
 def main():
@@ -57,9 +57,10 @@ def main():
     p = module.params
 
     arg_formats = {}
-    for arg, fmt in p['arg_formats'].items():
-        func = getattr(sys.modules["ansible_collections.community.general.plugins.module_utils.cmd_runner"], fmt['func'])
-        args = fmt.get("args", [])
+    for arg, fmt_spec in p['arg_formats'].items():
+        # func = getattr(sys.modules["ansible_collections.community.general.plugins.module_utils.cmd_runner"], fmt_spec['func'])
+        func = getattr(fmt, fmt_spec['func'])
+        args = fmt_spec.get("args", [])
 
         arg_formats[arg] = func(*args)
 

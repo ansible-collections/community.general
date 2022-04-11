@@ -75,70 +75,72 @@ class FormatError(Exception):
         )
 
 
-def fmt_bool(option):
-    return lambda value: [option] if value else []
+class _Format:
+    @staticmethod
+    def as_bool(option):
+        return lambda value: [option] if value else []
 
+    @staticmethod
+    def as_bool_not(option):
+        return lambda value: [] if value else [option]
 
-def fmt_bool_not(option):
-    return lambda value: [] if value else [option]
+    @staticmethod
+    def as_optval(option):
+        return lambda value: ["{0}{1}".format(option, str(value))]
 
+    @staticmethod
+    def as_opt_val(option):
+        return lambda value: [option, str(value)]
 
-def fmt_optval(option):
-    return lambda value: ["{0}{1}".format(option, str(value))]
+    @staticmethod
+    def as_opt_eq_val(option):
+        return lambda value: ["{0}={1}".format(option, value)]
 
+    @staticmethod
+    def as_str():
+        return lambda value: [str(value)]
 
-def fmt_opt_val(option):
-    return lambda value: [option, str(value)]
+    @staticmethod
+    def mapped(_map, default=None, list_around=True):
+        def fmt(value):
+            res = _map.get(value, default)
+            return [str(res)] if list_around else [str(x) for x in res]
+        return fmt
 
+    @staticmethod
+    def as_default_type(_type, option=""):
+        if _type == "dict":
+            return lambda value: ["{0}={1}".format(k, v) for k, v in iteritems(value)]
+        if _type == "list":
+            return lambda value: [str(x) for x in value]
+        if _type == "bool":
+            return _Format.as_bool("--{0}".format(option))
 
-def fmt_opt_eq_val(option):
-    return lambda value: ["{0}={1}".format(option, value)]
+        return _Format.as_opt_val("--{0}".format(option))
 
+    @staticmethod
+    def unpack(stars):
+        """
+        The format functions must receive one single value to be rendered into a
+        command-line format, but sometimes it makes more sense to unpack collections
+        down to smaller pieces, for clarity and readability.
 
-def fmt_str():
-    return lambda value: [str(value)]
+        Args:
+            stars (int): Unpack with 1 or 2 stars, corresponding to a list or a dict, respectively.
 
+        Returns:
+            function: original function wrapped in the requested unpacking decorator.
+        """
+        if stars == 1:
+            def deco(f):
+                return lambda v: f(*v)
+            return deco
+        elif stars == 2:
+            def deco(f):
+                return lambda v: f(**v)
+            return deco
 
-def fmt_mapped(_map, default=None, list_around=True):
-    def fmt(value):
-        res = _map.get(value, default)
-        return [str(res)] if list_around else [str(x) for x in res]
-    return fmt
-
-
-def fmt_default_type(_type, option=""):
-    if _type == "dict":
-        return lambda value: ["{0}={1}".format(k, v) for k, v in iteritems(value)]
-    if _type == "list":
-        return lambda value: [str(x) for x in value]
-    if _type == "bool":
-        return fmt_bool("--{0}".format(option))
-
-    return fmt_opt_val("--{0}".format(option))
-
-
-def fmt_unpack(stars):
-    """
-    The format functions must receive one single value to be rendered into a
-    command-line format, but sometimes it makes more sense to unpack collections
-    down to smaller pieces, for clarity and readability.
-
-    Args:
-        stars (int): Unpack with 1 or 2 stars, corresponding to a list or a dict, respectively.
-
-    Returns:
-        function: original function wrapped in the requested unpacking decorator.
-    """
-    if stars == 1:
-        def deco(f):
-            return lambda v: f(*v)
-        return deco
-    elif stars == 2:
-        def deco(f):
-            return lambda v: f(**v)
-        return deco
-
-    return lambda f: f
+        return lambda f: f
 
 
 class CmdRunner:
@@ -167,7 +169,7 @@ class CmdRunner:
 
         for mod_param_name, spec in iteritems(module.argument_spec):
             if mod_param_name not in self.arg_formats:
-                self.arg_formats[mod_param_name] = fmt_default_type(spec['type'], mod_param_name)
+                self.arg_formats[mod_param_name] = _Format.as_default_type(spec['type'], mod_param_name)
 
     def context(self, params_order=None, output_process=None, ignore_value_none=True, **kwargs):
         if output_process is None:
@@ -260,3 +262,6 @@ class _CmdRunnerContext:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         return False
+
+
+fmt = _Format()
