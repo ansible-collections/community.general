@@ -732,14 +732,22 @@ class RedfishUtils(object):
     def get_multi_volume_inventory(self):
         return self.aggregate_systems(self.get_volume_inventory)
 
-    def manage_indicator_led(self, command):
+    def manage_system_indicator_led(self, command):
+        return self.manage_indicator_led(command, self.systems_uri)
+
+    def manage_chassis_indicator_led(self, command):
+        return self.manage_indicator_led(command, self.chassis_uri)
+
+    def manage_indicator_led(self, command, resource_uri=None):
         result = {}
         key = 'IndicatorLED'
+        if resource_uri is None:
+            resource_uri = self.chassis_uri
 
         payloads = {'IndicatorLedOn': 'Lit', 'IndicatorLedOff': 'Off', "IndicatorLedBlink": 'Blinking'}
 
         result = {}
-        response = self.get_request(self.root_uri + self.chassis_uri)
+        response = self.get_request(self.root_uri + resource_uri)
         if response['ret'] is False:
             return response
         result['ret'] = True
@@ -749,7 +757,7 @@ class RedfishUtils(object):
 
         if command in payloads.keys():
             payload = {'IndicatorLED': payloads[command]}
-            response = self.patch_request(self.root_uri + self.chassis_uri, payload)
+            response = self.patch_request(self.root_uri + resource_uri, payload)
             if response['ret'] is False:
                 return response
         else:
