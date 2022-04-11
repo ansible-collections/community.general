@@ -15,6 +15,7 @@ short_description: Manages Datadog monitors
 description:
   - Manages monitors within Datadog.
   - Options as described on https://docs.datadoghq.com/api/.
+  - The type C(event-v2) was added in community.general 4.8.0.
 author: Sebastian Kornehl (@skornehl)
 requirements: [datadog]
 options:
@@ -56,6 +57,7 @@ options:
             - metric alert
             - service check
             - event alert
+            - event-v2 alert
             - process alert
             - log alert
             - query alert
@@ -222,7 +224,7 @@ def main():
             api_host=dict(),
             app_key=dict(required=True, no_log=True),
             state=dict(required=True, choices=['present', 'absent', 'mute', 'unmute']),
-            type=dict(choices=['metric alert', 'service check', 'event alert', 'process alert',
+            type=dict(choices=['metric alert', 'service check', 'event alert', 'event-v2 alert', 'process alert',
                                'log alert', 'query alert', 'trace-analytics alert',
                                'rum alert', 'composite']),
             name=dict(required=True),
