@@ -230,7 +230,9 @@ def install_packages(module, xbps_path, state, packages):
         module.params['upgrade_xbps'] = False
         install_packages(module, xbps_path, state, packages)
     elif rc != 0 and not (state == 'latest' and rc == 17):
-        module.fail_json(msg="failed to install %s" % (package))
+        module.fail_json(msg="failed to install %s packages(s)"
+                         % (len(toInstall)),
+                         packages=toInstall)
 
     module.exit_json(changed=True, msg="installed %s package(s)"
                      % (len(toInstall)),
