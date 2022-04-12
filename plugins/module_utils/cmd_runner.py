@@ -152,7 +152,8 @@ class CmdRunner:
     """
     def __init__(self, module, command, arg_formats=None, default_param_order=(),
                  check_rc=False, force_lang="C", path_prefix=None, environ_update=None):
-        self.module = module
+        from ansible.module_utils.basic import AnsibleModule
+        self.module: AnsibleModule = module
         self.command = list(command) if is_sequence(command) else [command]
         self.default_param_order = tuple(default_param_order)
         if arg_formats is None:
@@ -165,7 +166,7 @@ class CmdRunner:
             environ_update = {}
         self.environ_update = environ_update
 
-        self.command[0] = module.get_bin_path(command[0], opt_dirs=path_prefix)
+        self.command[0] = module.get_bin_path(command[0], opt_dirs=path_prefix, required=True)
 
         for mod_param_name, spec in iteritems(module.argument_spec):
             if mod_param_name not in self.arg_formats:
@@ -190,7 +191,7 @@ class CmdRunner:
 
 
 class _CmdRunnerContext:
-    def __init__(self, runner, params_order, output_process, ignore_value_none=True, **kwargs):
+    def __init__(self, runner, params_order, output_process, ignore_value_none, **kwargs):
         self.runner = runner
         self.params_order = tuple(params_order)
         self.output_process = output_process
@@ -220,7 +221,7 @@ class _CmdRunnerContext:
         runner = self.runner
         module = self.runner.module
         self.cmd = list(runner.command)
-        self.run_args = dict(kwargs)
+        self.ctx_run_args = dict(kwargs)
 
         named_params = dict(module.params)
         named_params.update(kwargs)
@@ -244,13 +245,13 @@ class _CmdRunnerContext:
     @property
     def run_info(self):
         return dict(
-            params_order=self.params_order,
             ignore_value_none=self.ignore_value_none,
-            run_command_args=self.run_command_args,
             check_rc=self.check_rc,
             environ_update=self.environ_update,
+            params_order=self.params_order,
             cmd=self.cmd,
-            run_args=self.run_args,
+            run_command_args=self.run_command_args,
+            ctx_run_args=self.ctx_run_args,
             results_rc=self.results_rc,
             results_out=self.results_out,
             results_err=self.results_err,
