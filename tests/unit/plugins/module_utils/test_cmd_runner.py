@@ -57,7 +57,7 @@ def test_arg_format(func, fmt_opt, value, expected):
     assert actual == expected, "actual = {0}".format(actual)
 
 
-TC_RUNNER=dict(
+TC_RUNNER = dict(
     # aa_bb=(
     #     # input
     #     dict(
@@ -113,7 +113,7 @@ TC_RUNNER=dict(
             runner_init_args=dict(),
             runner_ctx_args=dict(params_order=['aa', 'bb']),
         ),
-        dict(runner_ctx_run_args=dict(bb=True), rc=0,out="", err=""),
+        dict(runner_ctx_run_args=dict(bb=True), rc=0, out="", err=""),
         dict(
             run_info=dict(
                 cmd=['/mock/bin/testing', '--answer=11', '--bb-here'],
@@ -142,7 +142,7 @@ TC_RUNNER=dict(
     ),
     aa_bb_default_order_params_order=(
         dict(
-            args_bundle = dict(
+            args_bundle=dict(
                 aa=dict(type="int", value=11, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
                 bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
             ),
@@ -160,7 +160,7 @@ TC_RUNNER=dict(
     ),
     aa_bb_process_output=(
         dict(
-            args_bundle = dict(
+            args_bundle=dict(
                 aa=dict(type="int", value=11, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
                 bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
             ),
@@ -203,7 +203,7 @@ def test_runner(runner_input, cmd_execution, expected):
         except KeyError:
             pass
 
-    orig_results = tuple([cmd_execution[x] for x in ('rc', 'out', 'err')])
+    orig_results = tuple(cmd_execution[x] for x in ('rc', 'out', 'err'))
 
     print("arg_spec={0}\nparams={1}\narg_formats={2}\n".format(
         arg_spec,

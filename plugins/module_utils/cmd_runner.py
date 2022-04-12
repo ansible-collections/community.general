@@ -153,7 +153,7 @@ class CmdRunner:
     def __init__(self, module, command, arg_formats=None, default_param_order=(),
                  check_rc=False, force_lang="C", path_prefix=None, environ_update=None):
         from ansible.module_utils.basic import AnsibleModule
-        self.module: AnsibleModule = module
+        self.module = module
         self.command = list(command) if is_sequence(command) else [command]
         self.default_param_order = tuple(default_param_order)
         if arg_formats is None:
