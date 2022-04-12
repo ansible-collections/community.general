@@ -7,10 +7,10 @@ from cmath import exp
 __metaclass__ = type
 
 from sys import version_info
-from unittest.mock import MagicMock, PropertyMock
 
 import pytest
 
+from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, PropertyMock
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, fmt as _fmt
 
 
