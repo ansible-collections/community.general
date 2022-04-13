@@ -172,13 +172,13 @@ class GitLabGroup(object):
 
     # get user id if the user exists
     def get_user_id(self, gitlab_user):
-        user_exists = self._gitlab.users.list(username=gitlab_user)
+        user_exists = self._gitlab.users.list(username=gitlab_user, all=True)
         if user_exists:
             return user_exists[0].id
 
     # get group id if group exists
     def get_group_id(self, gitlab_group):
-        groups = self._gitlab.groups.list(search=gitlab_group)
+        groups = self._gitlab.groups.list(search=gitlab_group, all=True)
         for group in groups:
             if group.full_path == gitlab_group:
                 return group.id

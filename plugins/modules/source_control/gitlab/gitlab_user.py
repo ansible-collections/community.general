@@ -349,7 +349,7 @@ class GitLabUser(object):
     @param sshkey_name Name of the ssh key
     '''
     def ssh_key_exists(self, user, sshkey_name):
-        keyList = map(lambda k: k.title, user.keys.list())
+        keyList = map(lambda k: k.title, user.keys.list(all=True))
 
         return sshkey_name in keyList
 
@@ -519,7 +519,7 @@ class GitLabUser(object):
     @param username Username of the user
     '''
     def find_user(self, username):
-        users = self._gitlab.users.list(search=username)
+        users = self._gitlab.users.list(search=username, all=True)
         for user in users:
             if (user.username == username):
                 return user
