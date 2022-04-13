@@ -1,0 +1,81 @@
+---
+- vars:
+    package_name: ansible-test-foo
+    username: ansible-regular-user
+  block:
+    - name: Install fakeroot
+      pacman:
+        state: present
+        name:
+          - fakeroot
+
+    - name: Create user
+      user:
+        name: '{{ username }}'
+        home: '/home/{{ username }}'
+        create_home: true
+
+    - name: Create directory
+      file:
+        path: '/home/{{ username }}/{{ package_name }}'
+        state: directory
+        owner: '{{ username }}'
+
+    - name: Create PKGBUILD
+      copy:
+        dest: '/home/{{ username }}/{{ package_name }}/PKGBUILD'
+        content: |
+          pkgname=('{{ package_name }}')
+          pkgver=1.0.0
+          pkgrel=1
+          pkgdesc="Test removing a local package not in the repositories"
+          arch=('any')
+          license=('GPL v3+')
+        owner: '{{ username }}'
+
+    - name: Build package
+      command:
+        cmd: su {{ username }} -c "makepkg -srf"
+        chdir: '/home/{{ username }}/{{ package_name }}'
+
+    - name: Install package
+      pacman:
+        state: present
+        name:
+          - '/home/{{ username }}/{{ package_name }}/{{ package_name }}-1.0.0-1-any.pkg.tar.zst'
+
+    - name: Remove package (check mode)
+      pacman:
+        state: absent
+        name:
+          - '{{ package_name }}'
+      check_mode: true
+      register: remove_1
+
+    - name: Remove package
+      pacman:
+        state: absent
+        name:
+          - '{{ package_name }}'
+      register: remove_2
+
+    - name: Remove package (idempotent)
+      pacman:
+        state: absent
+        name:
+          - '{{ package_name }}'
+      register: remove_3
+
+    - name: Check conditions
+      assert:
+        that:
+          - remove_1 is changed
+          - remove_2 is changed
+          - remove_3 is not changed
+
+  always:
+    - name: Remove directory
+      file:
+        path: '{{ remote_tmp_dir }}/{{ package_name }}'
+        state: absent
+      become: true
