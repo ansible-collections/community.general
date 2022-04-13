@@ -1,0 +1,37 @@
+---
+
+# Terraform version that will be downloaded
+terraform_version: 1.1.7
+
+# Architecture of the downloaded Terraform release (needs to match target testing platform)
+
+terraform_arch: "{{ ansible_system | lower }}_{{terraform_arch_map[ansible_architecture] }}"
+
+# URL of where the Terraform binary will be downloaded from
+terraform_url: "https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_{{ terraform_arch }}.zip"
+
+# Controls whether the unarchive task will validate TLS certs of the Terraform binary host
+validate_certs: yes
+
+# Directory where Terraform tests will be created
+terraform_project_dir: "{{ remote_tmp_dir }}/tf_provider_test"
+
+# Controls whether terraform init will use the `-upgrade` flag
+terraform_provider_upgrade: yes
+
+# list of dicts containing Terraform providers that will be tested
+# The null provider is a good candidate, as it's small and has no external dependencies
+terraform_provider_versions: 
+  - name: "null" 
+    source: "hashicorp/null"
+    version: ">=2.0.0, < 3.0.0"
+  - name: "null" 
+    source: "hashicorp/null"
+    version: ">=3.0.0"
+
+# mapping between values returned from ansible_architecture and arch names used by golang builds of Terraform
+# see https://www.terraform.io/downloads
+
+terraform_arch_map:
+  x86_64: amd64
+  arm64: arm64
