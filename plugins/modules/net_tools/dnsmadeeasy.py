@@ -623,7 +623,7 @@ def main():
     # Fetch existing monitor if the A record indicates it should exist and build the new monitor
     current_monitor = dict()
     new_monitor = dict()
-    if current_record and current_record['type'] == 'A':
+    if current_record and current_record['type'] == 'A' and current_record.get('monitor'):
         current_monitor = DME.getMonitor(current_record['id'])
 
     # Build the new monitor
