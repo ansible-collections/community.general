@@ -494,9 +494,9 @@ def main():
         namespace_id = group.id
     else:
         if username:
-            namespace = gitlab_instance.namespaces.list(search=username)[0]
+            namespace = gitlab_instance.namespaces.list(search=username, all=False)[0]
         else:
-            namespace = gitlab_instance.namespaces.list(search=gitlab_instance.user.username)[0]
+            namespace = gitlab_instance.namespaces.list(search=gitlab_instance.user.username, all=False)[0]
         namespace_id = namespace.id
 
     if not namespace_id:

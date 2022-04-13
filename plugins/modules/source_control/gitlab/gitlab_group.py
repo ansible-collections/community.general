@@ -279,7 +279,7 @@ class GitLabGroup(object):
     def delete_group(self):
         group = self.group_object
 
-        if len(group.projects.list()) >= 1:
+        if len(group.projects.list(all=False)) >= 1:
             self._module.fail_json(
                 msg="There are still projects in this group. These needs to be moved or deleted before this group can be removed.")
         else:

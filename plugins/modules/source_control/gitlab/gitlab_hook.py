@@ -268,7 +268,7 @@ class GitLabHook(object):
     @param hook_url Url to call on event
     '''
     def find_hook(self, project, hook_url):
-        hooks = project.hooks.list()
+        hooks = project.hooks.list(all=True)
         for hook in hooks:
             if (hook.url == hook_url):
                 return hook
