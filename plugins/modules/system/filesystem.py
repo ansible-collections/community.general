@@ -59,7 +59,7 @@ options:
   resizefs:
     description:
       - If C(yes), if the block device and filesystem size differ, grow the filesystem into the space.
-      - Supported for C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs), C(ufs) and C(vfat) filesystems.
+      - Supported for C(btrfs), C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs), C(ufs) and C(vfat) filesystems.
         Attempts to resize other filesystem types will fail.
       - XFS Will only grow if mounted. Currently, the module is based on commands
         from C(util-linux) package to perform operations, so resizing of XFS is
@@ -331,6 +331,10 @@ class Reiserfs(Filesystem):
 
 class Btrfs(Filesystem):
     MKFS = 'mkfs.btrfs'
+    INFO = 'btrfs'
+    GROW = 'btrfs'
+    GROW_MAX_SPACE_FLAGS = ['filesystem', 'resize', 'max']
+    GROW_MOUNTPOINT_ONLY = True
 
     def __init__(self, module):
         super(Btrfs, self).__init__(module)
@@ -348,6 +352,19 @@ class Btrfs(Filesystem):
             # assume version is greater or equal to 3.12
             self.MKFS_FORCE_FLAGS = ['-f']
             self.module.warn('Unable to identify mkfs.btrfs version (%r, %r)' % (stdout, stderr))
+
+    def get_fs_size(self, dev):
+        """Return size in bytes of filesystem on device (integer)."""
+        mountpoint = dev.get_mountpoint()
+        if not mountpoint:
+            self.module.fail_json(msg="%s needs to be mounted for %s operations" % (dev, self.fstype))
+
+        dummy, stdout, dummy = self.module.run_command([self.module.get_bin_path(self.INFO),
+                                                        'filesystem', 'usage', '-b', mountpoint], check_rc=True)
+        for line in stdout.splitlines():
+            if "Device size" in line:
+                return int(line.split()[-1])
+        raise ValueError(stdout)
 
 
 class Ocfs2(Filesystem):
