@@ -129,7 +129,7 @@ options:
       - Allows Terraform init to upgrade providers to versions specified in the project's version constraints.
     default: false
     type: bool
-    version_added: 3.8.0
+    version_added: 4.8.0
   init_reconfigure:
     description:
       - Forces backend reconfiguration during init.
