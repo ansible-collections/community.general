@@ -178,12 +178,12 @@ class GitLabProjectMembers(object):
             project_exists = self._gitlab.projects.get(project_name)
             return project_exists.id
         except gitlab.exceptions.GitlabGetError as e:
-            project_exists = self._gitlab.projects.list(search=project_name)
+            project_exists = self._gitlab.projects.list(search=project_name, all=False)
             if project_exists:
                 return project_exists[0].id
 
     def get_user_id(self, gitlab_user):
-        user_exists = self._gitlab.users.list(username=gitlab_user)
+        user_exists = self._gitlab.users.list(username=gitlab_user, all=False)
         if user_exists:
             return user_exists[0].id
 
