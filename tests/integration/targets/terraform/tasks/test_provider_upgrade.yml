@@ -1,0 +1,23 @@
+---
+
+- name: Output terraform provider test project
+  ansible.builtin.template:
+    src: templates/provider_test/main.tf.j2
+    dest: "{{ terraform_project_dir }}/{{ tf_provider['name'] }}/main.tf"
+    force: yes
+  register: terraform_provider_hcl
+
+# The purpose of this task is to init terraform multiple times with different provider module
+# versions, so that we can verify that provider upgrades during init work as intended.
+
+- name: Init Terraform configuration with pinned provider version
+  community.general.terraform:
+    project_path: "{{ terraform_provider_hcl.dest | dirname }}"
+    binary_path: "{{ terraform_binary_path }}"
+    force_init: yes
+    provider_upgrade: "{{ terraform_provider_upgrade }}"
+    state: present
+  register: terraform_init_result
+
+- assert:
+    that: terraform_init_result is not failed
