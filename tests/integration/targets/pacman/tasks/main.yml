@@ -11,3 +11,4 @@
     - include: 'package_urls.yml'
     - include: 'remove_nosave.yml'
     - include: 'update_cache.yml'
+    - include: 'locally_installed_package.yml'
