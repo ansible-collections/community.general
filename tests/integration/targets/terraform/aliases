@@ -1,0 +1,7 @@
+shippable/posix/group1
+skip/windows
+skip/aix
+skip/osx
+skip/macos
+skip/freebsd
+skip/python2
