@@ -124,6 +124,12 @@ options:
     type: list
     elements: path
     version_added: '0.2.0'
+  provider_upgrade:
+    description:
+      - Allows Terraform init to upgrade providers to versions specified in the project's version constraints.
+    default: false
+    type: bool
+    version_added: 4.8.0
   init_reconfigure:
     description:
       - Forces backend reconfiguration during init.
@@ -266,7 +272,7 @@ def _state_args(state_file):
     return []
 
 
-def init_plugins(bin_path, project_path, backend_config, backend_config_files, init_reconfigure, plugin_paths):
+def init_plugins(bin_path, project_path, backend_config, backend_config_files, init_reconfigure, provider_upgrade, plugin_paths):
     command = [bin_path, 'init', '-input=false']
     if backend_config:
         for key, val in backend_config.items():
@@ -279,6 +285,8 @@ def init_plugins(bin_path, project_path, backend_config, backend_config_files, i
             command.extend(['-backend-config', f])
     if init_reconfigure:
         command.extend(['-reconfigure'])
+    if provider_upgrade:
+        command.extend(['-upgrade'])
     if plugin_paths:
         for plugin_path in plugin_paths:
             command.extend(['-plugin-dir', plugin_path])
@@ -384,6 +392,7 @@ def main():
             overwrite_init=dict(type='bool', default=True),
             check_destroy=dict(type='bool', default=False),
             parallelism=dict(type='int'),
+            provider_upgrade=dict(type='bool', default=False),
         ),
         required_if=[('state', 'planned', ['plan_file'])],
         supports_check_mode=True,
@@ -405,6 +414,7 @@ def main():
     init_reconfigure = module.params.get('init_reconfigure')
     overwrite_init = module.params.get('overwrite_init')
     check_destroy = module.params.get('check_destroy')
+    provider_upgrade = module.params.get('provider_upgrade')
 
     if bin_path is not None:
         command = [bin_path]
@@ -422,7 +432,7 @@ def main():
 
     if force_init:
         if overwrite_init or not os.path.isfile(os.path.join(project_path, ".terraform", "terraform.tfstate")):
-            init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure, plugin_paths)
+            init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure, provider_upgrade, plugin_paths)
 
     workspace_ctx = get_workspace_context(command[0], project_path)
     if workspace_ctx["current"] != workspace:
