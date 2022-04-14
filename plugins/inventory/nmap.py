@@ -57,7 +57,7 @@ address: 192.168.0.0/24
 
 # a sudo nmap scan to fully use nmap scan power.
 plugin: community.general.nmap
-sudo: yes
+sudo: true
 strict: False
 address: 192.168.0.0/24
 '''
