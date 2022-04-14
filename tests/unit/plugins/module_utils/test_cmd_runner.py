@@ -158,6 +158,22 @@ TC_RUNNER = dict(
             ),
         ),
     ),
+    aa_bb_dup_in_param_order=(
+        dict(
+            args_bundle=dict(
+                aa=dict(type="int", value=11, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
+            ),
+            runner_init_args=dict(),
+            runner_ctx_args=dict(params_order=['aa', 'bb', 'aa']),
+        ),
+        dict(runner_ctx_run_args=dict(bb=True), rc=0, out="", err=""),
+        dict(
+            run_info=dict(
+                cmd=['/mock/bin/testing', '--answer=11', '--bb-here', '--answer=11'],
+            ),
+        ),
+    ),
     aa_bb_process_output=(
         dict(
             args_bundle=dict(
@@ -176,6 +192,44 @@ TC_RUNNER = dict(
                 cmd=['/mock/bin/testing', '--answer=11', '--bb-here'],
             ),
             results="0-/-ni-/-nu"
+        ),
+    ),
+    aa_bb_ignore_none_with_none=(
+        dict(
+            args_bundle=dict(
+                aa=dict(type="int", value=49, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
+            ),
+            runner_init_args=dict(default_param_order=['bb', 'aa']),
+            runner_ctx_args=dict(
+                params_order=['aa', 'bb'],
+                ignore_value_none=True,  # default
+            ),
+        ),
+        dict(runner_ctx_run_args=dict(bb=None), rc=0, out="ni", err="nu"),
+        dict(
+            run_info=dict(
+                cmd=['/mock/bin/testing', '--answer=49'],
+            ),
+        ),
+    ),
+    aa_bb_ignore_not_none_with_none=(
+        dict(
+            args_bundle=dict(
+                aa=dict(type="int", value=49, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
+            ),
+            runner_init_args=dict(default_param_order=['bb', 'aa']),
+            runner_ctx_args=dict(
+                params_order=['aa', 'bb'],
+                ignore_value_none=False,
+            ),
+        ),
+        dict(runner_ctx_run_args=dict(aa=None, bb=True), rc=0, out="ni", err="nu"),
+        dict(
+            run_info=dict(
+                cmd=['/mock/bin/testing', '--answer=None', '--bb-here'],
+            ),
         ),
     ),
 )
