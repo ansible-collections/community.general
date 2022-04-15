@@ -14,41 +14,41 @@ def _process_as_is(rc, out, err):
 
 
 class MissingArgumentFormat(Exception):
-    def __init__(self, param, params_order, args_formats):
-        self.params_order = params_order
-        self.param = param
+    def __init__(self, arg, args_order, args_formats):
+        self.args_order = args_order
+        self.arg = arg
         self.args_formats = args_formats
 
     def __repr__(self):
         return "<MissingArgumentFormat: {0} order: {1} formats: {2}>".format(
-            self.param,
-            self.params_order,
+            self.arg,
+            self.args_order,
             self.args_formats,
         )
 
     def __str__(self):
         return "Cannot find format for parameter {0} {1} in: {2}".format(
-            self.param,
-            self.params_order,
+            self.arg,
+            self.args_order,
             self.args_formats,
         )
 
 
 class MissingArgumentValue(Exception):
-    def __init__(self, params_order, param):
-        self.params_order = params_order
-        self.param = param
+    def __init__(self, args_order, arg):
+        self.args_order = args_order
+        self.arg = arg
 
     def __repr__(self):
         return "<MissingArgumentValue: {0} order: {1}>".format(
-            self.param,
-            self.params_order,
+            self.arg,
+            self.args_order,
         )
 
     def __str__(self):
         return "Cannot find value for parameter {0} in {1}".format(
-            self.param,
-            self.params_order,
+            self.arg,
+            self.args_order,
         )
 
 
@@ -150,12 +150,12 @@ class CmdRunner:
     It aims to provide a reusable runner with consistent argument formatting
     and sensible defaults.
     """
-    def __init__(self, module, command, arg_formats=None, default_param_order=(),
+    def __init__(self, module, command, arg_formats=None, default_args_order=(),
                  check_rc=False, force_lang="C", path_prefix=None, environ_update=None):
         from ansible.module_utils.basic import AnsibleModule
         self.module = module
         self.command = list(command) if is_sequence(command) else [command]
-        self.default_param_order = tuple(default_param_order)
+        self.default_args_order = tuple(default_args_order)
         if arg_formats is None:
             arg_formats = {}
         self.arg_formats = dict(arg_formats)
@@ -172,17 +172,17 @@ class CmdRunner:
             if mod_param_name not in self.arg_formats:
                 self.arg_formats[mod_param_name] = _Format.as_default_type(spec['type'], mod_param_name)
 
-    def context(self, params_order=None, output_process=None, ignore_value_none=True, **kwargs):
+    def context(self, args_order=None, output_process=None, ignore_value_none=True, **kwargs):
         if output_process is None:
             output_process = _process_as_is
-        if params_order is None:
-            params_order = self.default_param_order
-        params_order = tuple(params_order)
-        for p in params_order:
+        if args_order is None:
+            args_order = self.default_args_order
+        args_order = tuple(args_order)
+        for p in args_order:
             if p not in self.arg_formats:
-                raise MissingArgumentFormat(p, params_order, tuple(self.arg_formats.keys()))
+                raise MissingArgumentFormat(p, args_order, tuple(self.arg_formats.keys()))
         return _CmdRunnerContext(runner=self,
-                                 params_order=params_order,
+                                 args_order=args_order,
                                  output_process=output_process,
                                  ignore_value_none=ignore_value_none, **kwargs)
 
@@ -191,9 +191,9 @@ class CmdRunner:
 
 
 class _CmdRunnerContext:
-    def __init__(self, runner, params_order, output_process, ignore_value_none, **kwargs):
+    def __init__(self, runner, args_order, output_process, ignore_value_none, **kwargs):
         self.runner = runner
-        self.params_order = tuple(params_order)
+        self.args_order = tuple(args_order)
         self.output_process = output_process
         self.ignore_value_none = ignore_value_none
         self.run_command_args = dict(kwargs)
@@ -221,21 +221,21 @@ class _CmdRunnerContext:
         runner = self.runner
         module = self.runner.module
         self.cmd = list(runner.command)
-        self.ctx_run_args = dict(kwargs)
+        self.context_run_args = dict(kwargs)
 
-        named_params = dict(module.params)
-        named_params.update(kwargs)
-        for param_name in self.params_order:
+        named_args = dict(module.params)
+        named_args.update(kwargs)
+        for arg_name in self.args_order:
             value = None
             try:
-                value = named_params[param_name]
+                value = named_args[arg_name]
                 if self.ignore_value_none and value is None:
                     continue
-                self.cmd.extend(runner.arg_formats[param_name](value))
+                self.cmd.extend(runner.arg_formats[arg_name](value))
             except KeyError:
-                raise MissingArgumentValue(self.params_order, param_name)
+                raise MissingArgumentValue(self.args_order, arg_name)
             except Exception as e:
-                raise FormatError(param_name, value, runner.arg_formats[param_name], e)
+                raise FormatError(arg_name, value, runner.arg_formats[arg_name], e)
 
         results = module.run_command(self.cmd, **self.run_command_args)
         self.results_rc, self.results_out, self.results_err = results
@@ -248,10 +248,10 @@ class _CmdRunnerContext:
             ignore_value_none=self.ignore_value_none,
             check_rc=self.check_rc,
             environ_update=self.environ_update,
-            params_order=self.params_order,
+            args_order=self.args_order,
             cmd=self.cmd,
             run_command_args=self.run_command_args,
-            ctx_run_args=self.ctx_run_args,
+            context_run_args=self.context_run_args,
             results_rc=self.results_rc,
             results_out=self.results_out,
             results_err=self.results_err,

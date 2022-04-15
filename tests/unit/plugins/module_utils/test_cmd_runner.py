@@ -74,17 +74,17 @@ TC_RUNNER = dict(
     #             )
     #         ),
     #         runner_init_args = dict(
-    #             # command="testing",
-    #             # default_param_order=(),
-    #             # check_rc=False,
-    #             # force_lang="C",
-    #             # path_prefix=None,
-    #             # environ_update=None,
+    #             command="testing",
+    #             default_args_order=(),
+    #             check_rc=False,
+    #             force_lang="C",
+    #             path_prefix=None,
+    #             environ_update=None,
     #         ),
     #         runner_ctx_args = dict(
-    #             params_order=['aa', 'bb'],
-    #             # output_process=None,
-    #             # ignore_value_none=True,
+    #             args_order=['aa', 'bb'],
+    #             output_process=None,
+    #             ignore_value_none=True,
     #         ),
     #     ),
     #     # command execution
@@ -96,12 +96,12 @@ TC_RUNNER = dict(
     #     ),
     #     # expected
     #     dict(
-    #         #results=(),
+    #         results=(),
     #         run_info=dict(
     #             cmd=['/mock/bin/testing', '--answer=11', '--bb-here'],
     #             environ_update={'LANGUAGE': 'C', 'LC_ALL': 'C'},
     #         ),
-    #         # exc=None,
+    #         exc=None,
     #     ),
     # ),
     aa_bb=(
@@ -111,14 +111,14 @@ TC_RUNNER = dict(
                 bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(),
-            runner_ctx_args=dict(params_order=['aa', 'bb']),
+            runner_ctx_args=dict(args_order=['aa', 'bb']),
         ),
         dict(runner_ctx_run_args=dict(bb=True), rc=0, out="", err=""),
         dict(
             run_info=dict(
                 cmd=['/mock/bin/testing', '--answer=11', '--bb-here'],
                 environ_update={'LANGUAGE': 'C', 'LC_ALL': 'C'},
-                params_order=('aa', 'bb'),
+                args_order=('aa', 'bb'),
             ),
         ),
     ),
@@ -128,7 +128,7 @@ TC_RUNNER = dict(
                 aa=dict(type="int", value=11, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
                 bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
             ),
-            runner_init_args=dict(default_param_order=['bb', 'aa']),
+            runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(),
         ),
         dict(runner_ctx_run_args=dict(bb=True), rc=0, out="", err=""),
@@ -136,36 +136,36 @@ TC_RUNNER = dict(
             run_info=dict(
                 cmd=['/mock/bin/testing', '--bb-here', '--answer=11'],
                 environ_update={'LANGUAGE': 'C', 'LC_ALL': 'C'},
-                params_order=('bb', 'aa'),
+                args_order=('bb', 'aa'),
             ),
         ),
     ),
-    aa_bb_default_order_params_order=(
+    aa_bb_default_order_args_order=(
         dict(
             args_bundle=dict(
                 aa=dict(type="int", value=11, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
                 bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
             ),
-            runner_init_args=dict(default_param_order=['bb', 'aa']),
-            runner_ctx_args=dict(params_order=['aa', 'bb']),
+            runner_init_args=dict(default_args_order=['bb', 'aa']),
+            runner_ctx_args=dict(args_order=['aa', 'bb']),
         ),
         dict(runner_ctx_run_args=dict(bb=True), rc=0, out="", err=""),
         dict(
             run_info=dict(
                 cmd=['/mock/bin/testing', '--answer=11', '--bb-here'],
                 environ_update={'LANGUAGE': 'C', 'LC_ALL': 'C'},
-                params_order=('aa', 'bb'),
+                args_order=('aa', 'bb'),
             ),
         ),
     ),
-    aa_bb_dup_in_param_order=(
+    aa_bb_dup_in_args_order=(
         dict(
             args_bundle=dict(
                 aa=dict(type="int", value=11, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
                 bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(),
-            runner_ctx_args=dict(params_order=['aa', 'bb', 'aa']),
+            runner_ctx_args=dict(args_order=['aa', 'bb', 'aa']),
         ),
         dict(runner_ctx_run_args=dict(bb=True), rc=0, out="", err=""),
         dict(
@@ -180,9 +180,9 @@ TC_RUNNER = dict(
                 aa=dict(type="int", value=11, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
                 bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
             ),
-            runner_init_args=dict(default_param_order=['bb', 'aa']),
+            runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(
-                params_order=['aa', 'bb'],
+                args_order=['aa', 'bb'],
                 output_process=lambda rc, out, err: '-/-'.join([str(rc), out, err])
             ),
         ),
@@ -200,9 +200,9 @@ TC_RUNNER = dict(
                 aa=dict(type="int", value=49, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
                 bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
             ),
-            runner_init_args=dict(default_param_order=['bb', 'aa']),
+            runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(
-                params_order=['aa', 'bb'],
+                args_order=['aa', 'bb'],
                 ignore_value_none=True,  # default
             ),
         ),
@@ -219,9 +219,9 @@ TC_RUNNER = dict(
                 aa=dict(type="int", value=49, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
                 bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
             ),
-            runner_init_args=dict(default_param_order=['bb', 'aa']),
+            runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(
-                params_order=['aa', 'bb'],
+                args_order=['aa', 'bb'],
                 ignore_value_none=False,
             ),
         ),
