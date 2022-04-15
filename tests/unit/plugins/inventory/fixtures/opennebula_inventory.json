@@ -1,0 +1,222 @@
+[
+    {
+        "DEPLOY_ID": "bcfec9d9-c0d0-4523-b5e7-62993947e94c",
+        "ETIME": 0,
+        "GID": 105,
+        "GNAME": "SW",
+        "HISTORY_RECORDS": {},
+        "ID": 451,
+        "LAST_POLL": 0,
+        "LCM_STATE": 3,
+        "MONITORING": {},
+        "NAME": "terraform_demo_00",
+        "RESCHED": 0,
+        "STATE": 3,
+        "STIME": 1649886492,
+        "TEMPLATE": {
+            "NIC": [
+                {
+                    "AR_ID": "0",
+                    "BRIDGE": "mgmt0",
+                    "BRIDGE_TYPE": "linux",
+                    "CLUSTER_ID": "0",
+                    "IP": "192.168.11.248",
+                    "MAC": "02:00:c0:a8:2b:bb",
+                    "MODEL": "virtio",
+                    "NAME": "NIC0",
+                    "NETWORK": "Infrastructure",
+                    "NETWORK_ID": "0",
+                    "NIC_ID": "0",
+                    "SECURITY_GROUPS": "0,101",
+                    "TARGET": "one-453-0",
+                    "VLAN_ID": "12",
+                    "VN_MAD": "802.1Q"
+                }
+            ],
+            "NIC_DEFAULT": {
+                "MODEL": "virtio"
+            },
+            "TEMPLATE_ID": "28",
+            "TM_MAD_SYSTEM": "shared",
+            "VCPU": "4",
+            "VMID": "453"
+        },
+        "USER_TEMPLATE": {
+            "GUEST_OS": "linux",
+            "INPUTS_ORDER": "",
+            "LABELS": "foo,bench",
+            "LOGO": "images/logos/linux.png",
+            "MEMORY_UNIT_COST": "MB",
+            "SCHED_REQUIREMENTS": "ARCH=\"x86_64\"",
+            "TGROUP": "bench_clients"
+        }
+    },
+    {
+        "DEPLOY_ID": "25895435-5e3a-4d50-a025-e03a7a463abd",
+        "ETIME": 0,
+        "GID": 105,
+        "GNAME": "SW",
+        "HISTORY_RECORDS": {},
+        "ID": 451,
+        "LAST_POLL": 0,
+        "LCM_STATE": 3,
+        "MONITORING": {},
+        "NAME": "terraform_demo_01",
+        "RESCHED": 0,
+        "STATE": 3,
+        "STIME": 1649886492,
+        "TEMPLATE": {
+            "NIC": [
+                {
+                    "AR_ID": "0",
+                    "BRIDGE": "mgmt0",
+                    "BRIDGE_TYPE": "linux",
+                    "CLUSTER_ID": "0",
+                    "IP": "192.168.11.241",
+                    "MAC": "02:00:c0:a8:4b:bb",
+                    "MODEL": "virtio",
+                    "NAME": "NIC0",
+                    "NETWORK": "Infrastructure",
+                    "NETWORK_ID": "0",
+                    "NIC_ID": "0",
+                    "SECURITY_GROUPS": "0,101",
+                    "TARGET": "one-451-0",
+                    "VLAN_ID": "12",
+                    "VN_MAD": "802.1Q"
+                }
+            ],
+            "NIC_DEFAULT": {
+                "MODEL": "virtio"
+            },
+            "TEMPLATE_ID": "28",
+            "TM_MAD_SYSTEM": "shared",
+            "VCPU": "4",
+            "VMID": "451"
+        },
+        "USER_TEMPLATE": {
+            "GUEST_OS": "linux",
+            "INPUTS_ORDER": "",
+            "LABELS": "foo,bench",
+            "LOGO": "images/logos/linux.png",
+            "MEMORY_UNIT_COST": "MB",
+            "SCHED_REQUIREMENTS": "ARCH=\"x86_64\"",
+            "TESTATTR": "testvar",
+            "TGROUP": "bench_clients"
+        }
+    },
+    {
+        "DEPLOY_ID": "2b00c379-3601-45ee-acf5-e7b3ff2b7bca",
+        "ETIME": 0,
+        "GID": 105,
+        "GNAME": "SW",
+        "HISTORY_RECORDS": {},
+        "ID": 451,
+        "LAST_POLL": 0,
+        "LCM_STATE": 3,
+        "MONITORING": {},
+        "NAME": "terraform_demo_srv_00",
+        "RESCHED": 0,
+        "STATE": 3,
+        "STIME": 1649886492,
+        "TEMPLATE": {
+            "NIC": [
+                {
+                    "AR_ID": "0",
+                    "BRIDGE": "mgmt0",
+                    "BRIDGE_TYPE": "linux",
+                    "CLUSTER_ID": "0",
+                    "IP": "192.168.11.247",
+                    "MAC": "02:00:c0:a8:0b:cc",
+                    "MODEL": "virtio",
+                    "NAME": "NIC0",
+                    "NETWORK": "Infrastructure",
+                    "NETWORK_ID": "0",
+                    "NIC_ID": "0",
+                    "SECURITY_GROUPS": "0,101",
+                    "TARGET": "one-452-0",
+                    "VLAN_ID": "12",
+                    "VN_MAD": "802.1Q"
+                }
+            ],
+            "NIC_DEFAULT": {
+                "MODEL": "virtio"
+            },
+            "TEMPLATE_ID": "28",
+            "TM_MAD_SYSTEM": "shared",
+            "VCPU": "4",
+            "VMID": "452"
+        },
+        "USER_TEMPLATE": {
+            "GUEST_OS": "linux",
+            "INPUTS_ORDER": "",
+            "LABELS": "serv,bench",
+            "LOGO": "images/logos/linux.png",
+            "MEMORY_UNIT_COST": "MB",
+            "SCHED_REQUIREMENTS": "ARCH=\"x86_64\"",
+            "TGROUP": "bench_server"
+        }
+    },
+    {
+        "DEPLOY_ID": "97037f55-dd2c-4549-8d24-561a6569e870",
+        "ETIME": 0,
+        "GID": 105,
+        "GNAME": "SW",
+        "HISTORY_RECORDS": {},
+        "ID": 311,
+        "LAST_POLL": 0,
+        "LCM_STATE": 3,
+        "MONITORING": {},
+        "NAME": "bs-windows",
+        "RESCHED": 0,
+        "STATE": 3,
+        "STIME": 1648076254,
+        "TEMPLATE": {
+            "NIC": [
+                {
+                    "AR_ID": "0",
+                    "BRIDGE": "mgmt0",
+                    "BRIDGE_TYPE": "linux",
+                    "CLUSTER_ID": "0",
+                    "IP": "192.168.11.209",
+                    "MAC": "02:00:c0:a8:0b:dd",
+                    "MODEL": "virtio",
+                    "NAME": "NIC0",
+                    "NETWORK": "Infrastructure",
+                    "NETWORK_ID": "0",
+                    "NETWORK_UNAME": "admin",
+                    "NIC_ID": "0",
+                    "SECURITY_GROUPS": "0,101",
+                    "TARGET": "one-311-0",
+                    "VLAN_ID": "12",
+                    "VN_MAD": "802.1Q"
+                },
+                [
+                    "TEMPLATE_ID",
+                    "23"
+                ],
+                [
+                    "TM_MAD_SYSTEM",
+                    "shared"
+                ],
+                [
+                    "VCPU",
+                    "4"
+                ],
+                [
+                    "VMID",
+                    "311"
+                ]
+            ]
+        },
+        "UID": 22,
+        "UNAME": "bsanders",
+        "USER_TEMPLATE": {
+            "GUEST_OS": "windows",
+            "INPUTS_ORDER": "",
+            "LABELS": "serv",
+            "HYPERVISOR": "kvm",
+            "SCHED_REQUIREMENTS": "ARCH=\"x86_64\"",
+            "SET_HOSTNAME": "windows"
+        }
+    }
+]
