@@ -48,7 +48,6 @@ options:
     description:
       - The password of the user.
       - GitLab server enforces minimum password length to 8, set this value with 8 or more characters.
-      - Required only if C(state) is set to C(present).
     type: str
   reset_password:
     description:
