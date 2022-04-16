@@ -3,4 +3,3 @@ needs/root
 skip/docker
 skip/osx
 skip/rhel
-disabled  # FIXME
