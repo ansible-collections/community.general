@@ -33,8 +33,6 @@ options:
   update_cache:
     description:
       - update the package database first C(apt-get update).
-      - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
-    aliases: [ 'update-cache' ]
     type: bool
     default: no
 author:
@@ -158,9 +156,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(type='str', default='present', choices=['absent', 'installed', 'present', 'removed']),
-            update_cache=dict(
-                type='bool', default=False, aliases=['update-cache'],
-                deprecated_aliases=[dict(name='update-cache', version='5.0.0', collection_name='community.general')]),
+            update_cache=dict(type='bool', default=False),
             package=dict(type='list', elements='str', required=True, aliases=['name', 'pkg']),
         ),
     )

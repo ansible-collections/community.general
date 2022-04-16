@@ -79,14 +79,11 @@ options:
         description:
             - Whether or not to refresh the master package lists.
             - This can be run as part of a package installation or as a separate step.
-            - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
             - If not specified, it defaults to C(false).
-            - Please note that this option will only have an influence on the module's C(changed) state
-              if I(name) and I(upgrade) are not specified. This will change in community.general 5.0.0.
-              See the examples for how to make the module behave as it will in 5.0.0 right now, or how
-              to keep the current behavior with 5.0.0 and later.
+            - Please note that this option only had an influence on the module's C(changed) state
+              if I(name) and I(upgrade) are not specified before community.general 5.0.0.
+              See the examples for how to keep the old behavior.
         type: bool
-        aliases: [ update-cache ]
 
     update_cache_extra_args:
         description:
@@ -179,9 +176,8 @@ EXAMPLES = """
     extra_args: --builddir /var/cache/yay
 
 - name: Upgrade package foo
-  # The 'changed' state of this call will only indicate whether foo was
-  # installed/upgraded, but not on whether the cache was updated. This
-  # will change in community.general 5.0.0!
+  # The 'changed' state of this call will indicate whether the cache was
+  # updated *or* whether foo was installed/upgraded.
   community.general.pacman:
     name: foo
     state: latest
@@ -209,29 +205,15 @@ EXAMPLES = """
     upgrade: yes
 
 - name: Run the equivalent of "pacman -Syu" as a separate step
-  # The 'changed' state of this call will only indicate whether
-  # something was upgraded, but not on whether the cache was
-  # updated. This will change in community.general 5.0.0!
+  # Since community.general 5.0.0 the 'changed' state of this call
+  # will be 'true' in case the cache was updated, or when a package
+  # was updated.
   #
-  # To keep the old behavior, add the following to the task:
+  # The previous behavior was to only indicate whether something was
+  # upgraded. To keep the old behavior, add the following to the task:
   #
   #   register: result
   #   changed_when: result.packages | length > 0
-  #
-  # To already switch to the new behavior now, add:
-  #
-  #   register: result
-  #   changed_when: result is changed or result.cache_updated
-  #
-  # Note that both constructs only work with community.general 4.6.0+.
-  # For compatibility with older versions of community.general, you
-  # have to use
-  #
-  #   changed_when: result.packages | default([]) | length > 0
-  #
-  # respectively
-  #
-  #   changed_when: result is changed or (result.cache_updated | default(false))
   community.general.pacman:
     update_cache: yes
     upgrade: yes
@@ -327,11 +309,6 @@ class Pacman(object):
 
             if not (self.m.params["name"] or self.m.params["upgrade"]):
                 self.success()
-
-        # Avoid shadowing lack of changes in the following stages
-        # so that `update_cache: true` doesn't always return changed
-        # TODO: remove this in community.general 5.0.0
-        self.changed = False
 
         self.inventory = self._build_inventory()
         if self.m.params["upgrade"]:
@@ -769,17 +746,7 @@ def setup_module():
             extra_args=dict(type="str", default=""),
             upgrade=dict(type="bool"),
             upgrade_extra_args=dict(type="str", default=""),
-            update_cache=dict(
-                type="bool",
-                aliases=["update-cache"],
-                deprecated_aliases=[
-                    dict(
-                        name="update-cache",
-                        version="5.0.0",
-                        collection_name="community.general",
-                    )
-                ],
-            ),
+            update_cache=dict(type="bool"),
             update_cache_extra_args=dict(type="str", default=""),
         ),
         required_one_of=[["name", "update_cache", "upgrade"]],
