@@ -72,8 +72,8 @@ options:
     default: false
     description:
     - Avoid loading any C(.gemrc) file. Ignored for RubyGems prior to 2.5.2.
-    - "The current default value will be deprecated in community.general 4.0.0: if the value is not explicitly specified, a deprecation message will be shown."
-    - From community.general 5.0.0 on, the default will be changed to C(true).
+    - "The current default value will be deprecated in community.general 5.0.0: if the value is not explicitly specified, a deprecation message will be shown."
+    - From community.general 6.0.0 on, the default will be changed to C(true).
     version_added: 3.3.0
   env_shebang:
     description:
