@@ -78,7 +78,7 @@ options:
   disable_facts:
     description:
       - The value C(false) is no longer allowed since community.general 4.0.0.
-      - This option will be deprecated in a future version, and eventually be removed.
+      - This option is deprecated, and will be removed in community.general 6.0.0.
     type: bool
     default: true
     version_added: 2.1.0
