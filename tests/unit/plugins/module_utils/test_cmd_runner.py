@@ -28,7 +28,7 @@ TC_FORMATS = dict(
     simple_opt_eq_val__int=(fmt.as_opt_eq_val, ("--answer",), 42, ["--answer=42"]),
     simple_str=(fmt.as_str, (), "literal_potato", ["literal_potato"]),
     simple_map=(fmt.as_map, ({'a': 1, 'b': 2, 'c': 3},), 'b', ["2"]),
-    simple_default_type__list=(fmt.as_default_type, ("list",), [1, 2, 3, 5, 8], ["1", "2", "3", "5", "8"]),
+    simple_default_type__list=(fmt.as_default_type, ("list",), [1, 2, 3, 5, 8], ["--1", "--2", "--3", "--5", "--8"]),
     simple_default_type__bool_true=(fmt.as_default_type, ("bool", "what"), True, ["--what"]),
     simple_default_type__bool_false=(fmt.as_default_type, ("bool", "what"), False, []),
     simple_default_type__potato=(fmt.as_default_type, ("else", "potato"), "42", ["--potato", "42"]),
@@ -45,7 +45,7 @@ if tuple(version_info) >= (3, 1):
         fmt.as_default_type,
         ("dict",),
         OrderedDict((('a', 1), ('b', 2))),
-        ["a=1", "b=2"]
+        ["--a=1", "--b=2"]
     )
 TC_FORMATS_IDS = sorted(TC_FORMATS.keys())
 

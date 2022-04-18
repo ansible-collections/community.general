@@ -17,7 +17,11 @@ def _process_as_is(rc, out, err):
     return rc, out, err
 
 
-class MissingArgumentFormat(Exception):
+class CmdRunnerException(Exception):
+    pass
+
+
+class MissingArgumentFormat(CmdRunnerException):
     def __init__(self, arg, args_order, args_formats):
         self.args_order = args_order
         self.arg = arg
@@ -38,7 +42,7 @@ class MissingArgumentFormat(Exception):
         )
 
 
-class MissingArgumentValue(Exception):
+class MissingArgumentValue(CmdRunnerException):
     def __init__(self, args_order, arg):
         self.args_order = args_order
         self.arg = arg
@@ -56,7 +60,7 @@ class MissingArgumentValue(Exception):
         )
 
 
-class FormatError(Exception):
+class FormatError(CmdRunnerException):
     def __init__(self, name, value, args_formats, exc):
         self.name = name
         self.value = value
@@ -115,14 +119,14 @@ class _Format:
 
     @staticmethod
     def as_str(ignore_none=None):
-        return _ArgFormat(lambda value: [str(value)], ignore_none=ignore_none)
+        return _ArgFormat(_ensure_list, ignore_none=ignore_none)
 
     @staticmethod
     def as_fixed(args):
         return _ArgFormat(lambda value: _ensure_list(args), ignore_none=False)
 
     @staticmethod
-    def as_function(func, ignore_none=None):
+    def as_func(func, ignore_none=None):
         return _ArgFormat(func, ignore_none=ignore_none)
 
     @staticmethod
@@ -130,15 +134,17 @@ class _Format:
         return _ArgFormat(lambda value: _ensure_list(_map.get(value, default)), ignore_none=ignore_none)
 
     @staticmethod
-    def as_default_type(_type, option="", ignore_none=None):
+    def as_default_type(_type, arg="", ignore_none=None):
+        fmt = _Format
         if _type == "dict":
-            return _ArgFormat(lambda value: ["{0}={1}".format(k, v) for k, v in iteritems(value)], ignore_none=ignore_none)
+            return fmt.as_func(lambda d: ["--{0}={1}".format(*a) for a in iteritems(d)],
+                                   ignore_none=ignore_none)
         if _type == "list":
-            return _ArgFormat(lambda value: [str(x) for x in value], ignore_none=ignore_none)
+            return fmt.as_func(lambda value: ["--{0}".format(x) for x in value], ignore_none=ignore_none)
         if _type == "bool":
-            return _Format.as_bool("--{0}".format(option))
+            return fmt.as_bool("--{0}".format(arg))
 
-        return _Format.as_opt_val("--{0}".format(option), ignore_none=ignore_none)
+        return fmt.as_opt_val("--{0}".format(arg), ignore_none=ignore_none)
 
     @staticmethod
     def unpack(stars):
