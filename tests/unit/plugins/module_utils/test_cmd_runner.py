@@ -3,7 +3,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
-from cmath import exp
 __metaclass__ = type
 
 from sys import version_info
@@ -11,35 +10,35 @@ from sys import version_info
 import pytest
 
 from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, PropertyMock
-from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, fmt as _fmt
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, fmt
 
 
 TC_FORMATS = dict(
-    simple_boolean__true=(_fmt.as_bool, ("--superflag",), True, ["--superflag"]),
-    simple_boolean__false=(_fmt.as_bool, ("--superflag",), False, []),
-    simple_boolean__none=(_fmt.as_bool, ("--superflag",), None, []),
-    simple_boolean_not__true=(_fmt.as_bool_not, ("--superflag",), True, []),
-    simple_boolean_not__false=(_fmt.as_bool_not, ("--superflag",), False, ["--superflag"]),
-    simple_boolean_not__none=(_fmt.as_bool_not, ("--superflag",), None, ["--superflag"]),
-    simple_optval__str=(_fmt.as_optval, ("-t",), "potatoes", ["-tpotatoes"]),
-    simple_optval__int=(_fmt.as_optval, ("-t",), 42, ["-t42"]),
-    simple_opt_val__str=(_fmt.as_opt_val, ("-t",), "potatoes", ["-t", "potatoes"]),
-    simple_opt_val__int=(_fmt.as_opt_val, ("-t",), 42, ["-t", "42"]),
-    simple_opt_eq_val__str=(_fmt.as_opt_eq_val, ("--food",), "potatoes", ["--food=potatoes"]),
-    simple_opt_eq_val__int=(_fmt.as_opt_eq_val, ("--answer",), 42, ["--answer=42"]),
-    simple_str=(_fmt.as_str, (), "literal_potato", ["literal_potato"]),
-    simple_mapped=(_fmt.mapped, ({'a': 1, 'b': 2, 'c': 3},), 'b', ["2"]),
-    simple_default_type__list=(_fmt.as_default_type, ("list",), [1, 2, 3, 5, 8], ["1", "2", "3", "5", "8"]),
-    simple_default_type__bool_true=(_fmt.as_default_type, ("bool", "what"), True, ["--what"]),
-    simple_default_type__bool_false=(_fmt.as_default_type, ("bool", "what"), False, []),
-    simple_default_type__potato=(_fmt.as_default_type, ("else", "potato"), "42", ["--potato", "42"]),
+    simple_boolean__true=(fmt.as_bool, ("--superflag",), True, ["--superflag"]),
+    simple_boolean__false=(fmt.as_bool, ("--superflag",), False, []),
+    simple_boolean__none=(fmt.as_bool, ("--superflag",), None, []),
+    simple_boolean_not__true=(fmt.as_bool_not, ("--superflag",), True, []),
+    simple_boolean_not__false=(fmt.as_bool_not, ("--superflag",), False, ["--superflag"]),
+    simple_boolean_not__none=(fmt.as_bool_not, ("--superflag",), None, ["--superflag"]),
+    simple_optval__str=(fmt.as_optval, ("-t",), "potatoes", ["-tpotatoes"]),
+    simple_optval__int=(fmt.as_optval, ("-t",), 42, ["-t42"]),
+    simple_opt_val__str=(fmt.as_opt_val, ("-t",), "potatoes", ["-t", "potatoes"]),
+    simple_opt_val__int=(fmt.as_opt_val, ("-t",), 42, ["-t", "42"]),
+    simple_opt_eq_val__str=(fmt.as_opt_eq_val, ("--food",), "potatoes", ["--food=potatoes"]),
+    simple_opt_eq_val__int=(fmt.as_opt_eq_val, ("--answer",), 42, ["--answer=42"]),
+    simple_str=(fmt.as_str, (), "literal_potato", ["literal_potato"]),
+    simple_mapped=(fmt.mapped, ({'a': 1, 'b': 2, 'c': 3},), 'b', ["2"]),
+    simple_default_type__list=(fmt.as_default_type, ("list",), [1, 2, 3, 5, 8], ["1", "2", "3", "5", "8"]),
+    simple_default_type__bool_true=(fmt.as_default_type, ("bool", "what"), True, ["--what"]),
+    simple_default_type__bool_false=(fmt.as_default_type, ("bool", "what"), False, []),
+    simple_default_type__potato=(fmt.as_default_type, ("else", "potato"), "42", ["--potato", "42"]),
 )
 if tuple(version_info) >= (3, 1):
     from collections import OrderedDict
 
     # needs OrderedDict to provide a consistent key order
     TC_FORMATS["simple_default_type__dict"] = (  # type: ignore
-        _fmt.as_default_type,
+        fmt.as_default_type,
         ("dict",),
         OrderedDict((('a', 1), ('b', 2))),
         ["a=1", "b=2"]
@@ -51,8 +50,8 @@ TC_FORMATS_IDS = sorted(TC_FORMATS.keys())
                          (TC_FORMATS[tc] for tc in TC_FORMATS_IDS),
                          ids=TC_FORMATS_IDS)
 def test_arg_format(func, fmt_opt, value, expected):
-    fmt = func(*fmt_opt)
-    actual = fmt(value)
+    fmt_func = func(*fmt_opt)
+    actual = fmt_func(value, ctx_ignore_none=True)
     print("formatted string = {0}".format(actual))
     assert actual == expected, "actual = {0}".format(actual)
 
@@ -65,11 +64,11 @@ TC_RUNNER = dict(
     #             aa=dict(
     #                 type="int",
     #                 value=11,
-    #                 fmt=_fmt.as_opt_eq_val,
+    #                 fmt_func=fmt.as_opt_eq_val,
     #                 fmt_arg="--answer",
     #             ),
     #             bb=dict(
-    #                 fmt=_fmt.as_bool,
+    #                 fmt_func=fmt.as_bool,
     #                 fmt_arg="--bb-here",
     #             )
     #         ),
@@ -107,8 +106,8 @@ TC_RUNNER = dict(
     aa_bb=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=11, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
+                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(),
             runner_ctx_args=dict(args_order=['aa', 'bb']),
@@ -125,8 +124,8 @@ TC_RUNNER = dict(
     aa_bb_default_order=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=11, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
+                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(),
@@ -143,8 +142,8 @@ TC_RUNNER = dict(
     aa_bb_default_order_args_order=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=11, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
+                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(args_order=['aa', 'bb']),
@@ -161,8 +160,8 @@ TC_RUNNER = dict(
     aa_bb_dup_in_args_order=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=11, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
+                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(),
             runner_ctx_args=dict(args_order=['aa', 'bb', 'aa']),
@@ -177,8 +176,8 @@ TC_RUNNER = dict(
     aa_bb_process_output=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=11, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
+                aa=dict(type="int", value=11, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(
@@ -197,8 +196,8 @@ TC_RUNNER = dict(
     aa_bb_ignore_none_with_none=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=49, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
+                aa=dict(type="int", value=49, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(
@@ -216,8 +215,8 @@ TC_RUNNER = dict(
     aa_bb_ignore_not_none_with_none=(
         dict(
             args_bundle=dict(
-                aa=dict(type="int", value=49, fmt=_fmt.as_opt_eq_val, fmt_arg="--answer"),
-                bb=dict(fmt=_fmt.as_bool, fmt_arg="--bb-here"),
+                aa=dict(type="int", value=49, fmt_func=fmt.as_opt_eq_val, fmt_arg="--answer"),
+                bb=dict(fmt_func=fmt.as_bool, fmt_arg="--bb-here"),
             ),
             runner_init_args=dict(default_args_order=['bb', 'aa']),
             runner_ctx_args=dict(
@@ -253,7 +252,7 @@ def test_runner(runner_input, cmd_execution, expected):
         except KeyError:
             pass
         try:
-            arg_formats[k] = v['fmt'](v['fmt_arg'])
+            arg_formats[k] = v['fmt_func'](v['fmt_arg'])
         except KeyError:
             pass
 

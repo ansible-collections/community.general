@@ -75,48 +75,69 @@ class FormatError(Exception):
         )
 
 
+class _ArgFormat:
+    def __init__(self, func, ignore_none=None):
+        self.func = func
+        self.ignore_none = ignore_none
+
+    def __call__(self, value, ctx_ignore_none):
+        ignore_none = self.ignore_none if self.ignore_none is not None else ctx_ignore_none
+        if value is None and ignore_none:
+            return []
+        f = self.func
+        return f(value)
+
+
 class _Format:
     @staticmethod
     def as_bool(option):
-        return lambda value: [option] if value else []
+        return _ArgFormat(lambda value: [option] if value else [])
 
     @staticmethod
     def as_bool_not(option):
-        return lambda value: [] if value else [option]
+        return _ArgFormat(lambda value: [] if value else [option], ignore_none=False)
 
     @staticmethod
-    def as_optval(option):
-        return lambda value: ["{0}{1}".format(option, str(value))]
+    def as_optval(option, ignore_none=None):
+        return _ArgFormat(lambda value: ["{0}{1}".format(option, str(value))], ignore_none=ignore_none)
 
     @staticmethod
-    def as_opt_val(option):
-        return lambda value: [option, str(value)]
+    def as_opt_val(option, ignore_none=None):
+        return _ArgFormat(lambda value: [option, str(value)], ignore_none=ignore_none)
 
     @staticmethod
-    def as_opt_eq_val(option):
-        return lambda value: ["{0}={1}".format(option, value)]
+    def as_opt_eq_val(option, ignore_none=None):
+        return _ArgFormat(lambda value: ["{0}={1}".format(option, value)], ignore_none=ignore_none)
 
     @staticmethod
-    def as_str():
-        return lambda value: [str(value)]
+    def as_str(ignore_none=None):
+        return _ArgFormat(lambda value: [str(value)], ignore_none=ignore_none)
 
     @staticmethod
-    def mapped(_map, default=None, list_around=True):
+    def as_fixed(options, ignore_none=None):
+        return _ArgFormat(lambda value: list(options), ignore_none=ignore_none)
+
+    @staticmethod
+    def as_function(func, ignore_none=None):
+        return _ArgFormat(func, ignore_none=ignore_none)
+
+    @staticmethod
+    def mapped(_map, default=None, list_around=True, ignore_none=None):
         def fmt(value):
             res = _map.get(value, default)
             return [str(res)] if list_around else [str(x) for x in res]
-        return fmt
+        return _ArgFormat(fmt, ignore_none=ignore_none)
 
     @staticmethod
-    def as_default_type(_type, option=""):
+    def as_default_type(_type, option="", ignore_none=None):
         if _type == "dict":
-            return lambda value: ["{0}={1}".format(k, v) for k, v in iteritems(value)]
+            return _ArgFormat(lambda value: ["{0}={1}".format(k, v) for k, v in iteritems(value)], ignore_none=ignore_none)
         if _type == "list":
-            return lambda value: [str(x) for x in value]
+            return _ArgFormat(lambda value: [str(x) for x in value], ignore_none=ignore_none)
         if _type == "bool":
             return _Format.as_bool("--{0}".format(option))
 
-        return _Format.as_opt_val("--{0}".format(option))
+        return _Format.as_opt_val("--{0}".format(option), ignore_none=ignore_none)
 
     @staticmethod
     def unpack(stars):
@@ -152,7 +173,6 @@ class CmdRunner:
     """
     def __init__(self, module, command, arg_formats=None, default_args_order=(),
                  check_rc=False, force_lang="C", path_prefix=None, environ_update=None):
-        from ansible.module_utils.basic import AnsibleModule
         self.module = module
         self.command = list(command) if is_sequence(command) else [command]
         self.default_args_order = tuple(default_args_order)
@@ -229,9 +249,7 @@ class _CmdRunnerContext:
             value = None
             try:
                 value = named_args[arg_name]
-                if self.ignore_value_none and value is None:
-                    continue
-                self.cmd.extend(runner.arg_formats[arg_name](value))
+                self.cmd.extend(runner.arg_formats[arg_name](value, ctx_ignore_none=self.ignore_value_none))
             except KeyError:
                 raise MissingArgumentValue(self.args_order, arg_name)
             except Exception as e:
