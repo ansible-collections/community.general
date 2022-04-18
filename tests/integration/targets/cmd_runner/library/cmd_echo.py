@@ -58,7 +58,6 @@ def main():
 
     arg_formats = {}
     for arg, fmt_spec in p['arg_formats'].items():
-        # func = getattr(sys.modules["ansible_collections.community.general.plugins.module_utils.cmd_runner"], fmt_spec['func'])
         func = getattr(fmt, fmt_spec['func'])
         args = fmt_spec.get("args", [])
 
