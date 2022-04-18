@@ -138,7 +138,7 @@ class _Format:
         fmt = _Format
         if _type == "dict":
             return fmt.as_func(lambda d: ["--{0}={1}".format(*a) for a in iteritems(d)],
-                                   ignore_none=ignore_none)
+                               ignore_none=ignore_none)
         if _type == "list":
             return fmt.as_func(lambda value: ["--{0}".format(x) for x in value], ignore_none=ignore_none)
         if _type == "bool":
