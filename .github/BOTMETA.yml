@@ -166,9 +166,9 @@ files:
   $inventories/proxmox.py:
     maintainers: $team_virt ilijamt
   $inventories/xen_orchestra.py:
-    maintainers: shinuza
+    maintainers: ddelnano shinuza
   $inventories/icinga2.py:
-    maintainers: bongoeadgc6
+    maintainers: BongoEADGC6
   $inventories/scaleway.py:
     maintainers: $team_scaleway
     labels: cloud scaleway
@@ -324,6 +324,10 @@ files:
   $modules/cloud/misc/proxmox_kvm.py:
     maintainers: helldorado
     ignore: skvidal
+  $modules/cloud/misc/proxmox_nic.py:
+    maintainers: Kogelvis
+  $modules/cloud/misc/proxmox_tasks_info:
+    maintainers: paginabianca
   $modules/cloud/misc/proxmox_template.py:
     maintainers: UnderGreen
     ignore: skvidal
@@ -538,6 +542,8 @@ files:
     maintainers: adamgoossens
   $modules/identity/keycloak/keycloak_identity_provider.py:
     maintainers: laurpaum
+  $modules/identity/keycloak/keycloak_realm_info.py:
+    maintainers: fynncfchen
   $modules/identity/keycloak/keycloak_realm.py:
     maintainers: kris2kris
   $modules/identity/keycloak/keycloak_role.py:
@@ -726,6 +732,8 @@ files:
     maintainers: mwarkentin
   $modules/packaging/language/bundler.py:
     maintainers: thoiberg
+  $modules/packaging/language/cargo.py:
+    maintainers: radek-sprta
   $modules/packaging/language/composer.py:
     maintainers: dmtrs
     ignore: resmo
@@ -907,6 +915,10 @@ files:
   $modules/remote_management/manageiq/:
     labels: manageiq
     maintainers: $team_manageiq
+  $modules/remote_management/manageiq/manageiq_alert_profiles.py:
+    maintainers: elad661
+  $modules/remote_management/manageiq/manageiq_alerts.py:
+    maintainers: elad661
   $modules/remote_management/manageiq/manageiq_group.py:
     maintainers: evertmulder
   $modules/remote_management/manageiq/manageiq_tenant.py:
@@ -1094,6 +1106,8 @@ files:
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/system/ssh_config.py:
     maintainers: gaqzi Akasurde
+  $modules/system/sudoers.py:
+    maintainers: JonEllis
   $modules/system/svc.py:
     maintainers: bcoca
   $modules/system/syspatch.py:

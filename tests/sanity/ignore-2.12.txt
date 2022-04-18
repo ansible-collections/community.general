@@ -42,8 +42,7 @@ plugins/modules/system/iptables_state.py validate-modules:undocumented-parameter
 plugins/modules/system/osx_defaults.py validate-modules:parameter-state-invalid-choice
 plugins/modules/system/parted.py validate-modules:parameter-state-invalid-choice
 plugins/modules/system/puppet.py use-argspec-type-path
-plugins/modules/system/puppet.py validate-modules:doc-default-does-not-match-spec  # show_diff is not documented
-plugins/modules/system/puppet.py validate-modules:parameter-type-not-in-doc
+plugins/modules/system/puppet.py validate-modules:parameter-invalid  # invalid alias - removed in 7.0.0
 plugins/modules/system/ssh_config.py use-argspec-type-path # Required since module uses other methods to specify path
 plugins/modules/system/xfconf.py validate-modules:parameter-state-invalid-choice  # state get removed in 5.0.0
 plugins/modules/system/xfconf.py validate-modules:return-syntax-error

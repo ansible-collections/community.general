@@ -167,6 +167,25 @@ options:
       - compatibility
       - no_defaults
     version_added: "1.3.0"
+  clone:
+    description:
+      - ID of the container to be cloned.
+      - I(description), I(hostname), and I(pool) will be copied from the cloned container if not specified.
+      - The type of clone created is defined by the I(clone_type) parameter.
+      - This operator is only supported for Proxmox clusters that use LXC containerization (PVE version >= 4).
+    type: int
+    version_added: 4.3.0
+  clone_type:
+    description:
+      - Type of the clone created.
+      - C(full) creates a full clone, and I(storage) must be specified.
+      - C(linked) creates a linked clone, and the cloned container must be a template container.
+      - C(opportunistic) creates a linked clone if the cloned container is a template container, and a full clone if not.
+        I(storage) may be specified, if not it will fall back to the default.
+    type: str
+    choices: ['full', 'linked', 'opportunistic']
+    default: opportunistic
+    version_added: 4.3.0
 author: Sergei Antipov (@UnderGreen)
 extends_documentation_fragment:
   - community.general.proxmox.documentation
@@ -292,6 +311,28 @@ EXAMPLES = r'''
      - nesting=1
      - mount=cifs,nfs
 
+- name: >
+    Create a linked clone of the template container with id 100. The newly created container with be a
+    linked clone, because no storage parameter is defined
+  community.general.proxmox:
+    vmid: 201
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    clone: 100
+    hostname: clone.example.org
+
+- name: Create a full clone of the container with id 100
+  community.general.proxmox:
+    vmid: 201
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    clone: 100
+    hostname: clone.example.org
+    storage: local
 
 - name: Start container
   community.general.proxmox:
@@ -389,6 +430,13 @@ def content_check(proxmox, node, ostemplate, template_store):
     return [True for cnt in proxmox.nodes(node).storage(template_store).content.get() if cnt['volid'] == ostemplate]
 
 
+def is_template_container(proxmox, node, vmid):
+    """Check if the specified container is a template."""
+    proxmox_node = proxmox.nodes(node)
+    config = getattr(proxmox_node, VZ_TYPE)(vmid).config.get()
+    return config['template']
+
+
 def node_check(proxmox, node):
     return [True for nd in proxmox.nodes.get() if nd['node'] == node]
 
@@ -398,8 +446,10 @@ def proxmox_version(proxmox):
     return LooseVersion(apireturn['version'])
 
 
-def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, **kwargs):
+def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, clone, **kwargs):
     proxmox_node = proxmox.nodes(node)
+
+    # Remove all empty kwarg entries
     kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
 
     if VZ_TYPE == 'lxc':
@@ -419,7 +469,49 @@ def create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, sw
         kwargs['cpus'] = cpus
         kwargs['disk'] = disk
 
-    taskid = getattr(proxmox_node, VZ_TYPE).create(vmid=vmid, storage=storage, memory=memory, swap=swap, **kwargs)
+    if clone is not None:
+        if VZ_TYPE != 'lxc':
+            module.fail_json(changed=False, msg="Clone operator is only supported for LXC enabled proxmox clusters.")
+
+        clone_is_template = is_template_container(proxmox, node, clone)
+
+        # By default, create a full copy only when the cloned container is not a template.
+        create_full_copy = not clone_is_template
+
+        # Only accept parameters that are compatible with the clone endpoint.
+        valid_clone_parameters = ['hostname', 'pool', 'description']
+        if module.params['storage'] is not None and clone_is_template:
+            # Cloning a template, so create a full copy instead of a linked copy
+            create_full_copy = True
+        elif module.params['storage'] is None and not clone_is_template:
+            # Not cloning a template, but also no defined storage. This isn't possible.
+            module.fail_json(changed=False, msg="Cloned container is not a template, storage needs to be specified.")
+
+        if module.params['clone_type'] == 'linked':
+            if not clone_is_template:
+                module.fail_json(changed=False, msg="'linked' clone type is specified, but cloned container is not a template container.")
+            # Don't need to do more, by default create_full_copy is set to false already
+        elif module.params['clone_type'] == 'opportunistic':
+            if not clone_is_template:
+                # Cloned container is not a template, so we need our 'storage' parameter
+                valid_clone_parameters.append('storage')
+        elif module.params['clone_type'] == 'full':
+            create_full_copy = True
+            valid_clone_parameters.append('storage')
+
+        clone_parameters = {}
+
+        if create_full_copy:
+            clone_parameters['full'] = '1'
+        else:
+            clone_parameters['full'] = '0'
+        for param in valid_clone_parameters:
+            if module.params[param] is not None:
+                clone_parameters[param] = module.params[param]
+
+        taskid = getattr(proxmox_node, VZ_TYPE)(clone).clone.post(newid=vmid, **clone_parameters)
+    else:
+        taskid = getattr(proxmox_node, VZ_TYPE).create(vmid=vmid, storage=storage, memory=memory, swap=swap, **kwargs)
 
     while timeout:
         if (proxmox_node.tasks(taskid).status.get()['status'] == 'stopped' and
@@ -520,10 +612,19 @@ def main():
             description=dict(type='str'),
             hookscript=dict(type='str'),
             proxmox_default_behavior=dict(type='str', default='no_defaults', choices=['compatibility', 'no_defaults']),
+            clone=dict(type='int'),
+            clone_type=dict(default='opportunistic', choices=['full', 'linked', 'opportunistic']),
         ),
-        required_if=[('state', 'present', ['node', 'hostname', 'ostemplate'])],
-        required_together=[('api_token_id', 'api_token_secret')],
+        required_if=[
+            ('state', 'present', ['node', 'hostname']),
+            ('state', 'present', ('clone', 'ostemplate'), True),  # Require one of clone and ostemplate. Together with mutually_exclusive this ensures that we
+                                                                  # either clone a container or create a new one from a template file.
+        ],
+        required_together=[
+            ('api_token_id', 'api_token_secret')
+        ],
         required_one_of=[('api_password', 'api_token_id')],
+        mutually_exclusive=[('clone', 'ostemplate')],  # Creating a new container is done either by cloning an existing one, or based on a template.
     )
 
     if not HAS_PROXMOXER:
@@ -547,6 +648,7 @@ def main():
     if module.params['ostemplate'] is not None:
         template_store = module.params['ostemplate'].split(":")[0]
     timeout = module.params['timeout']
+    clone = module.params['clone']
 
     if module.params['proxmox_default_behavior'] == 'compatibility':
         old_default_values = dict(
@@ -588,7 +690,8 @@ def main():
     elif not vmid:
         module.exit_json(changed=False, msg="Vmid could not be fetched for the following action: %s" % state)
 
-    if state == 'present':
+    # Create a new container
+    if state == 'present' and clone is None:
         try:
             if get_instance(proxmox, vmid) and not module.params['force']:
                 module.exit_json(changed=False, msg="VM with vmid = %s is already exists" % vmid)
@@ -600,8 +703,11 @@ def main():
             elif not content_check(proxmox, node, module.params['ostemplate'], template_store):
                 module.fail_json(msg="ostemplate '%s' not exists on node %s and storage %s"
                                  % (module.params['ostemplate'], node, template_store))
+        except Exception as e:
+            module.fail_json(msg="Pre-creation checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
 
-            create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout,
+        try:
+            create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, clone,
                             cores=module.params['cores'],
                             pool=module.params['pool'],
                             password=module.params['password'],
@@ -621,9 +727,29 @@ def main():
                             description=module.params['description'],
                             hookscript=module.params['hookscript'])
 
-            module.exit_json(changed=True, msg="deployed VM %s from template %s" % (vmid, module.params['ostemplate']))
+            module.exit_json(changed=True, msg="Deployed VM %s from template %s" % (vmid, module.params['ostemplate']))
         except Exception as e:
-            module.fail_json(msg="creation of %s VM %s failed with exception: %s" % (VZ_TYPE, vmid, e))
+            module.fail_json(msg="Creation of %s VM %s failed with exception: %s" % (VZ_TYPE, vmid, e))
+
+    # Clone a container
+    elif state == 'present' and clone is not None:
+        try:
+            if get_instance(proxmox, vmid) and not module.params['force']:
+                module.exit_json(changed=False, msg="VM with vmid = %s is already exists" % vmid)
+            # If no vmid was passed, there cannot be another VM named 'hostname'
+            if not module.params['vmid'] and get_vmid(proxmox, hostname) and not module.params['force']:
+                module.exit_json(changed=False, msg="VM with hostname %s already exists and has ID number %s" % (hostname, get_vmid(proxmox, hostname)[0]))
+            if not get_instance(proxmox, clone):
+                module.exit_json(changed=False, msg="Container to be cloned does not exist")
+        except Exception as e:
+            module.fail_json(msg="Pre-clone checks of {VZ_TYPE} VM {vmid} failed with exception: {e}".format(VZ_TYPE=VZ_TYPE, vmid=vmid, e=e))
+
+        try:
+            create_instance(module, proxmox, vmid, node, disk, storage, cpus, memory, swap, timeout, clone)
+
+            module.exit_json(changed=True, msg="Cloned VM %s from %s" % (vmid, clone))
+        except Exception as e:
+            module.fail_json(msg="Cloning %s VM %s failed with exception: %s" % (VZ_TYPE, vmid, e))
 
     elif state == 'started':
         try:
