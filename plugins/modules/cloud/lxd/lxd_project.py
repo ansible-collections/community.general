@@ -10,6 +10,7 @@ DOCUMENTATION = '''
 ---
 module: lxd_project
 short_description: Manage LXD projects
+version_added: 4.8.0
 description:
   - Management of LXD projects
 author: "Raymond Chang (@we10710aa)"
@@ -25,11 +26,11 @@ options:
         type: str
     config:
         description:
-          - 'The config for the project (e.g. {"features.profiles": "true"}).
-            See U(https://linuxcontainers.org/lxd/docs/master/projects/)'
+          - 'The config for the project (for example C({"features.profiles": "true"})).
+            See U(https://linuxcontainers.org/lxd/docs/master/projects/).'
           - If the project already exists and its "config" value in metadata
             obtained from
-            GET /1.0/projects/<name>
+            C(GET /1.0/projects/<name>)
             U(https://linuxcontainers.org/lxd/docs/master/api/#/projects/project_get)
             are different, then this module tries to apply the configurations.
         type: dict
@@ -43,7 +44,7 @@ options:
     merge_project:
         description:
             - Merge the configuration of the present project with the new desired configuration,
-              instead of replacing it.
+              instead of replacing it. If configuration is the same after merged, no change will be made.
         required: false
         default: false
         type: bool
