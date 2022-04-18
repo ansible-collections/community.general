@@ -9,6 +9,10 @@ from ansible.module_utils.common.collections import is_sequence
 from ansible.module_utils.six import iteritems
 
 
+def _ensure_list(value):
+    return list(value) if is_sequence(value) else [value]
+
+
 def _process_as_is(rc, out, err):
     return rc, out, err
 
@@ -85,48 +89,45 @@ class _ArgFormat:
         if value is None and ignore_none:
             return []
         f = self.func
-        return f(value)
+        return [str(x) for x in f(value)]
 
 
 class _Format:
     @staticmethod
-    def as_bool(option):
-        return _ArgFormat(lambda value: [option] if value else [])
+    def as_bool(args):
+        return _ArgFormat(lambda value: _ensure_list(args) if value else [])
 
     @staticmethod
-    def as_bool_not(option):
-        return _ArgFormat(lambda value: [] if value else [option], ignore_none=False)
+    def as_bool_not(args):
+        return _ArgFormat(lambda value: [] if value else _ensure_list(args), ignore_none=False)
 
     @staticmethod
-    def as_optval(option, ignore_none=None):
-        return _ArgFormat(lambda value: ["{0}{1}".format(option, str(value))], ignore_none=ignore_none)
+    def as_optval(arg, ignore_none=None):
+        return _ArgFormat(lambda value: ["{0}{1}".format(arg, str(value))], ignore_none=ignore_none)
 
     @staticmethod
-    def as_opt_val(option, ignore_none=None):
-        return _ArgFormat(lambda value: [option, str(value)], ignore_none=ignore_none)
+    def as_opt_val(arg, ignore_none=None):
+        return _ArgFormat(lambda value: [arg, str(value)], ignore_none=ignore_none)
 
     @staticmethod
-    def as_opt_eq_val(option, ignore_none=None):
-        return _ArgFormat(lambda value: ["{0}={1}".format(option, value)], ignore_none=ignore_none)
+    def as_opt_eq_val(arg, ignore_none=None):
+        return _ArgFormat(lambda value: ["{0}={1}".format(arg, value)], ignore_none=ignore_none)
 
     @staticmethod
     def as_str(ignore_none=None):
         return _ArgFormat(lambda value: [str(value)], ignore_none=ignore_none)
 
     @staticmethod
-    def as_fixed(options, ignore_none=None):
-        return _ArgFormat(lambda value: list(options), ignore_none=ignore_none)
+    def as_fixed(args):
+        return _ArgFormat(lambda value: _ensure_list(args), ignore_none=False)
 
     @staticmethod
     def as_function(func, ignore_none=None):
         return _ArgFormat(func, ignore_none=ignore_none)
 
     @staticmethod
-    def mapped(_map, default=None, list_around=True, ignore_none=None):
-        def fmt(value):
-            res = _map.get(value, default)
-            return [str(res)] if list_around else [str(x) for x in res]
-        return _ArgFormat(fmt, ignore_none=ignore_none)
+    def as_map(_map, default=None, ignore_none=None):
+        return _ArgFormat(lambda value: _ensure_list(_map.get(value, default)), ignore_none=ignore_none)
 
     @staticmethod
     def as_default_type(_type, option="", ignore_none=None):
@@ -174,7 +175,7 @@ class CmdRunner:
     def __init__(self, module, command, arg_formats=None, default_args_order=(),
                  check_rc=False, force_lang="C", path_prefix=None, environ_update=None):
         self.module = module
-        self.command = list(command) if is_sequence(command) else [command]
+        self.command = _ensure_list(command)
         self.default_args_order = tuple(default_args_order)
         if arg_formats is None:
             arg_formats = {}
