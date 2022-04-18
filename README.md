@@ -19,6 +19,8 @@ If you encounter abusive behavior violating the [Ansible Code of Conduct](https:
 
 Tested with the current Ansible 2.9, ansible-base 2.10, ansible-core 2.11, ansible-core 2.12 releases and the current development version of ansible-core. Ansible versions before 2.9.10 are not supported.
 
+Parts of this collection do not work with ansible-core before 2.12 (this includes ansible-base and Ansible 2.9) on Python 2.12+.
+
 ## External requirements
 
 Some modules and plugins require external libraries. Please check the requirements for each plugin or module you use in the documentation to find out which requirements are needed.

@@ -56,7 +56,7 @@ FILENAME = '.github/BOTMETA.yml'
 
 LIST_ENTRIES = frozenset(('supershipit', 'maintainers', 'labels', 'keywords', 'notify', 'ignore'))
 
-AUTHOR_REGEX = re.compile(r'^\w.*\(@([\w-]+)\)(?![\w.])$')
+AUTHOR_REGEX = re.compile(r'^\w.*\(@([\w-]+)\)(?![\w.])')
 
 
 def read_authors(filename):

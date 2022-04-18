@@ -68,6 +68,9 @@ def ansible_to_proxmox_bool(value):
 class ProxmoxAnsible(object):
     """Base class for Proxmox modules"""
     def __init__(self, module):
+        if not HAS_PROXMOXER:
+            module.fail_json(msg=missing_required_lib('proxmoxer'), exception=PROXMOXER_IMP_ERR)
+
         self.module = module
         self.proxmox_api = self._connect()
         # Test token validity

@@ -23,7 +23,7 @@ DOCUMENTATION = '''
 EXAMPLES = """
 - name: "'unnest' all elements into single list"
   ansible.builtin.debug:
-    msg: "all in one list {{lookup('community.general.flattened', [1,2,3,[5,6]], [a,b,c], [[5,6,1,3], [34,a,b,c]])}}"
+    msg: "all in one list {{lookup('community.general.flattened', [1,2,3,[5,6]], ['a','b','c'], [[5,6,1,3], [34,'a','b','c']])}}"
 """
 
 RETURN = """
