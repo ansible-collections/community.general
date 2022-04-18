@@ -73,14 +73,16 @@ EXAMPLES = '''
     region: par1
     compute_id: "12345678-f1e6-40ec-83e5-12345d67ed89",
     private_network_id: "22345678-f1e6-40ec-83e5-12345d67ed89",
+  register: nicsvpc_creation_task
 
 - name:
   community.general.scaleway_compute_private_network:
     name: 'foo'
     state: absent
     region: par1
+    compute_id: "12345678-f1e6-40ec-83e5-12345d67ed89",
     private_network_id: "22345678-f1e6-40ec-83e5-12345d67ed89",
-  register: nicsvpc_creation_task
+
 
 '''
 
