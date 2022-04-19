@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak - fix parameters `defaultDefaultClientScopes` and `defaultOptionalClientScopes` (https://github.com/ansible-collections/community.general/pull/4526).
