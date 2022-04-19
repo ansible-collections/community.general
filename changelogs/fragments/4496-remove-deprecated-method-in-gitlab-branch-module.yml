@@ -1,0 +1,2 @@
+bugfixes:
+  - git_branch - remove deprecated and unnecessary branch ``unprotect`` method (https://github.com/ansible-collections/community.general/pull/4496).
