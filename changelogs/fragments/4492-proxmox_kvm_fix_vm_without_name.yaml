@@ -1,0 +1,2 @@
+bugfixes:
+  - proxmox_kvm - fix a bug when getting a state of VM without name will fail (https://github.com/ansible-collections/community.general/pull/4508).
