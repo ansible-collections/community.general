@@ -110,7 +110,6 @@ class GitlabBranch(object):
         return self.project.branches.create({'branch': branch, 'ref': ref_branch})
 
     def delete_branch(self, branch):
-        branch.unprotect()
         return branch.delete()
 
 
