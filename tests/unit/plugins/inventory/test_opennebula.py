@@ -10,10 +10,13 @@ __metaclass__ = type
 
 from collections import OrderedDict
 import json
+from unittest.mock import create_autospec
 
 import pytest
 
 from ansible.inventory.data import InventoryData
+from ansible.parsing.dataloader import DataLoader
+from ansible.template import Templar
 from ansible_collections.community.general.plugins.inventory.opennebula import InventoryModule
 
 
@@ -44,6 +47,7 @@ def get_vm_pool_json():
         data.VM.append(type('pyone.bindings.VMType90Sub', (object,), fake_server)())
 
     return data
+
 
 def get_vm_pool():
     data = type('pyone.bindings.VM_POOLSub', (object,), {'VM': []})()
@@ -206,6 +210,7 @@ def get_vm_pool():
 
     return data
 
+
 options_base_test = {
     'api_url': 'https://opennebula:2633/RPC2',
     'api_username': 'username',
@@ -214,7 +219,7 @@ options_base_test = {
     'hostname': 'v4_first_ip',
     'group_by_labels': True,
     'filter_by_label': None,
-    }
+}
 
 options_constructable_test = options_base_test.copy()
 options_constructable_test.update({
@@ -223,10 +228,11 @@ options_constructable_test.update({
     'groups': {
         'benchmark_clients': "TGROUP.endswith('clients')",
         'lin': 'is_linux == True'
-        },
+    },
     'keyed_groups': [{'key': 'TGROUP', 'prefix': 'tgroup'}],
 
-    })
+})
+
 
 # given a dictionary `opts_dict`, return a function that behaves like ansible's inventory get_options
 def mk_get_options(opts_dict):
@@ -242,58 +248,32 @@ def test_get_connection_info(inventory, mocker):
     assert (auth.username and auth.password)
 
 
-def test_populate_contructable(inventory, mocker):
-    # bypass API fetch call
-    inventory._get_vm_pool = mocker.MagicMock(side_effect=get_vm_pool_json)
-    inventory.get_option = mocker.MagicMock(side_effect=mk_get_options(options_constructable_test))
-    inventory._populate()
-
-    # note the vm_pool (and json data file) has four hosts,
-    # but options_constructable_test asks ansible to filter it out
-    assert len(get_vm_pool_json().VM) == 4
-    assert {vm.NAME for vm in get_vm_pool_json().VM} == {
-            'terraform_demo_00', 'terraform_demo_01', 'terraform_demo_srv_00', 'bs-windows'
-            }
-    assert set(inventory.inventory.hosts) == {'terraform_demo_00', 'terraform_demo_01', 'terraform_demo_srv_00'}
-
-    host_demo00 = inventory.inventory.get_host('terraform_demo_00')
-    host_demo01 = inventory.inventory.get_host('terraform_demo_01')
-    host_demosrv = inventory.inventory.get_host('terraform_demo_srv_00')
-
-#    assert 'benchmark_clients' in inventory.inventory.groups
-#    assert 'lin' in inventory.inventory.groups
-#    assert inventory.inventory.groups['benchmark_clients'] == [host_demo00, host_demo01]
-#    assert inventory.inventory.groups['lin'].hosts == [host_demo00, host_demo01, host_demosrv]
-
-    # test group by label:
-    assert 'bench' in inventory.inventory.groups
-    assert 'foo' in inventory.inventory.groups
-    assert inventory.inventory.groups['bench'].hosts == [host_demo00, host_demo01, host_demosrv]
-    assert inventory.inventory.groups['serv'].hosts == [host_demosrv]
-    assert inventory.inventory.groups['foo'].hosts == [host_demo00, host_demo01]
-
-    # test `compose` transforms GUEST_OS=Linux to is_linux == True
-    assert host_demo00.get_vars()['GUEST_OS'] == 'linux'
-#    assert host_demo00.get_vars()['is_linux'] == True
-
-    # test `keyed_groups`
-#    assert inventory.inventory.groups['tgroup_bench_clients'].hosts == [host_demo00, host_demo01]
-#    assert inventory.inventory.groups['tgroup_bench_server'].hosts == [host_demosrv]
-
-
 def test_populate_constructable_templating(inventory, mocker):
     # bypass API fetch call
     inventory._get_vm_pool = mocker.MagicMock(side_effect=get_vm_pool_json)
     inventory.get_option = mocker.MagicMock(side_effect=mk_get_options(options_constructable_test))
+
+    # the templating engine is needed for the constructable groups/vars
+    # so give that some fake data and instantiate it.
+    fake_config_filepath = '/fake/opennebula.yml'
+    fake_cache = {fake_config_filepath: options_constructable_test.copy()}
+    fake_cache[fake_config_filepath]['plugin'] = 'community.general.opennebula'
+    dataloader = create_autospec(DataLoader, instance=True)
+    dataloader._FILE_CACHE = fake_cache
+    inventory.templar = Templar(loader=dataloader)
+
     inventory._populate()
 
     # note the vm_pool (and json data file) has four hosts,
     # but options_constructable_test asks ansible to filter it out
     assert len(get_vm_pool_json().VM) == 4
-    assert {vm.NAME for vm in get_vm_pool_json().VM} == {
-            'terraform_demo_00', 'terraform_demo_01', 'terraform_demo_srv_00', 'bs-windows'
-            }
-    assert set(inventory.inventory.hosts) == {'terraform_demo_00', 'terraform_demo_01', 'terraform_demo_srv_00'}
+    assert set([vm.NAME for vm in get_vm_pool_json().VM]) == set([
+            'terraform_demo_00',
+	    'terraform_demo_01',
+	    'terraform_demo_srv_00',
+	    'bs-windows',
+    ])
+    assert set(inventory.inventory.hosts) == set(['terraform_demo_00', 'terraform_demo_01', 'terraform_demo_srv_00'])
 
     host_demo00 = inventory.inventory.get_host('terraform_demo_00')
     host_demo01 = inventory.inventory.get_host('terraform_demo_01')
@@ -301,7 +281,8 @@ def test_populate_constructable_templating(inventory, mocker):
 
     assert 'benchmark_clients' in inventory.inventory.groups
     assert 'lin' in inventory.inventory.groups
-    assert inventory.inventory.groups['benchmark_clients'] == [host_demo00, host_demo01]
+    from pprint import pprint; pprint(inventory.inventory.groups)
+    assert inventory.inventory.groups['benchmark_clients'].hosts == [host_demo00, host_demo01]
     assert inventory.inventory.groups['lin'].hosts == [host_demo00, host_demo01, host_demosrv]
 
     # test group by label:
@@ -313,7 +294,7 @@ def test_populate_constructable_templating(inventory, mocker):
 
     # test `compose` transforms GUEST_OS=Linux to is_linux == True
     assert host_demo00.get_vars()['GUEST_OS'] == 'linux'
-    assert host_demo00.get_vars()['is_linux'] == True
+    assert host_demo00.get_vars()['is_linux'] is True
 
     # test `keyed_groups`
     assert inventory.inventory.groups['tgroup_bench_clients'].hosts == [host_demo00, host_demo01]
