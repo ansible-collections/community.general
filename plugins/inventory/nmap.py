@@ -24,6 +24,7 @@ DOCUMENTATION = '''
         sudo:
             description: Set to C(true) to execute a C(sudo nmap) plugin scan.
             version_added: 4.8.0
+            default: false
             type: boolean
         address:
             description: Network IP or range of IPs to scan, you can use a simple range (10.2.2.15-25) or CIDR notation.
