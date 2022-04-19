@@ -207,7 +207,7 @@ def _check_cert_present(module, executable, keystore_path, keystore_pass, alias,
     ]
     test_cmd += _get_keystore_type_keytool_parameters(keystore_type)
 
-    (check_rc, stdout, dummy) = module.run_command(test_cmd, data=keystore_pass, check_rc=False)
+    (check_rc, stdout, dummy) = module.run_command(test_cmd, data="%s\n%s" % ( keystore_pass, keystore_pass ), check_rc=False)
     if check_rc == 0:
         return (True, stdout)
     return (False, '')
