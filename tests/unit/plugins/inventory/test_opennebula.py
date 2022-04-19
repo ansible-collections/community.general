@@ -10,7 +10,6 @@ __metaclass__ = type
 
 from collections import OrderedDict
 import json
-from unittest.mock import create_autospec
 
 import pytest
 
@@ -18,6 +17,7 @@ from ansible.inventory.data import InventoryData
 from ansible.parsing.dataloader import DataLoader
 from ansible.template import Templar
 from ansible_collections.community.general.plugins.inventory.opennebula import InventoryModule
+from ansible_collections.community.general.tests.unit.compat.mock import create_autospec
 
 
 @pytest.fixture
