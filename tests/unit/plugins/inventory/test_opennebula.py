@@ -268,10 +268,10 @@ def test_populate_constructable_templating(inventory, mocker):
     # but options_constructable_test asks ansible to filter it out
     assert len(get_vm_pool_json().VM) == 4
     assert set([vm.NAME for vm in get_vm_pool_json().VM]) == set([
-            'terraform_demo_00',
-	    'terraform_demo_01',
-	    'terraform_demo_srv_00',
-	    'bs-windows',
+        'terraform_demo_00',
+        'terraform_demo_01',
+        'terraform_demo_srv_00',
+        'bs-windows',
     ])
     assert set(inventory.inventory.hosts) == set(['terraform_demo_00', 'terraform_demo_01', 'terraform_demo_srv_00'])
 
@@ -281,7 +281,6 @@ def test_populate_constructable_templating(inventory, mocker):
 
     assert 'benchmark_clients' in inventory.inventory.groups
     assert 'lin' in inventory.inventory.groups
-    from pprint import pprint; pprint(inventory.inventory.groups)
     assert inventory.inventory.groups['benchmark_clients'].hosts == [host_demo00, host_demo01]
     assert inventory.inventory.groups['lin'].hosts == [host_demo00, host_demo01, host_demosrv]
 
