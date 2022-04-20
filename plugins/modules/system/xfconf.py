@@ -57,9 +57,10 @@ options:
         element in the array, then I(force_array=true) must be used to ensure
         that C(xfconf-query) will interpret the value as an array rather than a
         scalar.
+      - Support for C(uchar), C(char), C(uint64), and C(int64) has been added in community.general 4.8.0.
     type: list
     elements: str
-    choices: [ int, uint, bool, float, double, string ]
+    choices: [ string, int, double, bool, uint, uchar, char, uint64, int64, float ]
   state:
     type: str
     description:
@@ -177,15 +178,13 @@ class XFConfProperty(CmdStateModuleHelper):
     facts_params = ('property', 'channel', 'value')
     module = dict(
         argument_spec=dict(
-            state=dict(default="present",
-                       choices=("present", "get", "absent"),
-                       type='str'),
-            channel=dict(required=True, type='str'),
-            property=dict(required=True, type='str'),
-            value_type=dict(required=False, type='list',
-                            elements='str', choices=('int', 'uint', 'bool', 'float', 'double', 'string')),
-            value=dict(required=False, type='list', elements='raw'),
-            force_array=dict(default=False, type='bool', aliases=['array']),
+            state=dict(type='str', choices=("present", "get", "absent"), default="present"),
+            channel=dict(type='str', required=True),
+            property=dict(type='str', required=True),
+            value_type=dict(type='list', elements='str',
+                            choices=('string', 'int', 'double', 'bool', 'uint', 'uchar', 'char', 'uint64', 'int64', 'float')),
+            value=dict(type='list', elements='raw'),
+            force_array=dict(type='bool', default=False, aliases=['array']),
             disable_facts=dict(type='bool', default=True),
         ),
         required_if=[('state', 'present', ['value', 'value_type'])],
