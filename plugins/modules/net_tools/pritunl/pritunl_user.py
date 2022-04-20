@@ -164,6 +164,7 @@ from ansible_collections.community.general.plugins.module_utils.net_tools.pritun
     pritunl_argument_spec,
 )
 
+
 def add_or_update_pritunl_user(module):
     result = {}
 
