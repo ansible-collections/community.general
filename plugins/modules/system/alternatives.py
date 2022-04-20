@@ -41,6 +41,11 @@ options:
       - The priority of the alternative.
     type: int
     default: 50
+  activate:
+    description:
+      - Whether to set this alternative as the currently active selection.
+    type: bool
+    default: true
 requirements: [ update-alternatives ]
 '''
 
@@ -78,6 +83,7 @@ def main():
             path=dict(type='path', required=True),
             link=dict(type='path'),
             priority=dict(type='int', default=50),
+            activate=dict(type='bool', default=True),
         ),
         supports_check_mode=True,
     )
@@ -87,6 +93,7 @@ def main():
     path = params['path']
     link = params['link']
     priority = params['priority']
+    activate = params['activate']
 
     UPDATE_ALTERNATIVES = module.get_bin_path('update-alternatives', True)
 
@@ -126,9 +133,17 @@ def main():
                         link = line.split()[1]
                         break
 
+    changed = False
     if current_path != path:
+
+        # Check mode: expect a change if this alternative is not already
+        # installed, or if it is to be set as the current selection.
         if module.check_mode:
-            module.exit_json(changed=True, current_path=current_path)
+            module.exit_json(
+                changed=(path not in all_alternatives or activate),
+                current_path=current_path,
+            )
+
         try:
             # install the requested path if necessary
             if path not in all_alternatives:
@@ -141,18 +156,20 @@ def main():
                     [UPDATE_ALTERNATIVES, '--install', link, name, path, str(priority)],
                     check_rc=True
                 )
+                changed = True
 
-            # select the requested path
-            module.run_command(
-                [UPDATE_ALTERNATIVES, '--set', name, path],
-                check_rc=True
-            )
+            # set the current selection to this path (if requested)
+            if activate:
+                module.run_command(
+                    [UPDATE_ALTERNATIVES, '--set', name, path],
+                    check_rc=True
+                )
+                changed = True
 
-            module.exit_json(changed=True)
         except subprocess.CalledProcessError as cpe:
             module.fail_json(msg=str(dir(cpe)))
-    else:
-        module.exit_json(changed=False)
+
+    module.exit_json(changed=changed)
 
 
 if __name__ == '__main__':
