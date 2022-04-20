@@ -163,7 +163,6 @@ from ansible_collections.community.general.plugins.module_utils.net_tools.pritun
     post_pritunl_user,
     pritunl_argument_spec,
 )
-record_ids=dict(type='list', elements='str'),
 
 def add_or_update_pritunl_user(module):
     result = {}
