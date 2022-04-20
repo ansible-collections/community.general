@@ -1,0 +1,2 @@
+bugfixes:
+    - pritunl - fixed bug where pritunl plugin api add unneeded data in ``auth_string`` parameter (https://github.com/ansible-collections/community.general/issues/4527).
