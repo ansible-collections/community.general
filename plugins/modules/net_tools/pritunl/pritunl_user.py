@@ -87,7 +87,8 @@ options:
         type: list
         elements: str
         description:
-            - Allowed MAC Addresses for the user I(user_name).
+            - Allowed MAC addresses for the user I(user_name).
+        version_added: 4.8.0
 """
 
 EXAMPLES = """
