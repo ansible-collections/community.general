@@ -52,11 +52,33 @@ DOCUMENTATION = '''
           - Proxmox authentication password.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_PASSWORD) will be used instead.
           - Since community.general 4.7.0 you can also use templating to specify the value of the I(password).
-        required: yes
+          - If you do not specify a password, you must set token_id and token_secret instead.
+        required: no
         type: str
         env:
           - name: PROXMOX_PASSWORD
             version_added: 2.0.0
+      token_id:
+        description:
+          - Proxmox authentication token id.
+          - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_TOKEN_ID) will be used instead.
+          - To use token authentication, you must also specify token_secret. If you do not specify token_id and token_secret, you must set a password instead.
+          - Make sure to grant explicit pve permissions to the token or disable 'privilege separation' to use the users' privileges instead
+        required: no
+        type: str
+        env:
+          - name: PROXMOX_TOKEN_ID
+            version_added: 4.7.1
+      token_secret:
+        description:
+          - Proxmox authentication token secret.
+          - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_TOKEN_SECRET) will be used instead.
+          - To use token authenticaiton, you must also specify token_id. If you do not specify token_id and token_secret, you must set a password instead.
+        required: no
+        type: str
+        env:
+          - name: PROXMOX_TOKEN_SECRET
+            version_added: 4.7.1
       validate_certs:
         description: Verify SSL certificate if using HTTPS.
         type: boolean
@@ -222,15 +244,24 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _get_auth(self):
         credentials = urlencode({'username': self.proxmox_user, 'password': self.proxmox_password, })
 
-        a = self._get_session()
-        ret = a.post('%s/api2/json/access/ticket' % self.proxmox_url, data=credentials)
+        if (self.proxmox_password): 
 
-        json = ret.json()
+            credentials = urlencode({'username': self.proxmox_user, 'password': self.proxmox_password, })
 
-        self.credentials = {
-            'ticket': json['data']['ticket'],
-            'CSRFPreventionToken': json['data']['CSRFPreventionToken'],
-        }
+            a = self._get_session()
+            ret = a.post('%s/api2/json/access/ticket' % self.proxmox_url, data=credentials)
+
+            json = ret.json()
+
+            self.headers = {
+                #only required for POST/PUT/DELETE methods, which we are not using currently
+                #'CSRFPreventionToken': json['data']['CSRFPreventionToken'],
+                'Cookie': 'PVEAuthCookie={0}'.format(json['data']['ticket'])
+            }
+
+        else:
+
+            self.headers = {'Authorization': 'PVEAPIToken={0}!{1}={2}'.format(self.proxmox_user, self.proxmox_token_id, self.proxmox_token_secret)}
 
     def _get_json(self, url, ignore_errors=None):
 
@@ -242,8 +273,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             data = []
             s = self._get_session()
             while True:
-                headers = {'Cookie': 'PVEAuthCookie={0}'.format(self.credentials['ticket'])}
-                ret = s.get(url, headers=headers)
+                ret = s.get(url, headers=self.headers)
                 if ignore_errors and ret.status_code in ignore_errors:
                     break
                 ret.raise_for_status()
@@ -552,6 +582,19 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             proxmox_password = t.template(variable=proxmox_password, disable_lookups=False)
         self.proxmox_password = proxmox_password
 
+        proxmox_token_id = self.get_option('token_id')
+        if t.is_template(proxmox_token_id):
+            proxmox_token_id = t.template(variable=proxmox_token_id, disable_lookups=False)
+        self.proxmox_token_id = proxmox_token_id
+
+        proxmox_token_secret = self.get_option('token_secret')
+        if t.is_template(proxmox_token_secret):
+            proxmox_token_secret = t.template(variable=proxmox_token_secret, disable_lookups=False)
+        self.proxmox_token_secret = proxmox_token_secret
+
+        if not (proxmox_password != None) and not (proxmox_token_id != None and proxmox_token_secret != None):
+            raise AnsibleError('You must specify either a password or both token_id and token_secret.')
+        
         self.cache_key = self.get_cache_key(path)
         self.use_cache = cache and self.get_option('cache')
         self.host_filters = self.get_option('filters')
