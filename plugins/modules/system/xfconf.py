@@ -57,6 +57,7 @@ options:
         element in the array, then I(force_array=true) must be used to ensure
         that C(xfconf-query) will interpret the value as an array rather than a
         scalar.
+      - Support for C(uchar), C(char), C(uint64), and C(int64) has been added in community.general 4.8.0.
     type: list
     elements: str
     choices: [ string, int, double, bool, uint, uchar, char, uint64, int64, float ]
