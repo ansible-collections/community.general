@@ -337,7 +337,6 @@ def pritunl_auth_request(
 
     auth_string = "&".join(
         [api_token, auth_timestamp, auth_nonce, method.upper(), path]
-        + ([data] if data else [])
     )
 
     auth_signature = base64.b64encode(
