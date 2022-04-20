@@ -10,58 +10,74 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: xfconf
 author:
-    - "Joseph Benden (@jbenden)"
-    - "Alexei Znamensky (@russoz)"
+  - "Joseph Benden (@jbenden)"
+  - "Alexei Znamensky (@russoz)"
 short_description: Edit XFCE4 Configurations
 description:
   - This module allows for the manipulation of Xfce 4 Configuration with the help of
     xfconf-query.  Please see the xfconf-query(1) man pages for more details.
+seealso:
+  - name: C(xfconf-query) man page
+    description: Manual page of the C(xfconf-query) tool at the XFCE documentation site.
+    link: 'https://docs.xfce.org/xfce/xfconf/xfconf-query'
+
+  - name: xfconf - Configuration Storage System
+    description: XFCE documentation for the Xfconf configuration system.
+    link: 'https://docs.xfce.org/xfce/xfconf/start'
+
 options:
   channel:
     description:
-    - A Xfconf preference channel is a top-level tree key, inside of the
-      Xfconf repository that corresponds to the location for which all
-      application properties/keys are stored. See man xfconf-query(1)
-    required: yes
+      - A Xfconf preference channel is a top-level tree key, inside of the
+        Xfconf repository that corresponds to the location for which all
+        application properties/keys are stored. See man xfconf-query(1)
+    required: true
     type: str
   property:
     description:
-    - A Xfce preference key is an element in the Xfconf repository
-      that corresponds to an application preference. See man xfconf-query(1)
-    required: yes
+      - A Xfce preference key is an element in the Xfconf repository
+        that corresponds to an application preference. See man xfconf-query(1)
+    required: true
     type: str
   value:
     description:
-    - Preference properties typically have simple values such as strings,
-      integers, or lists of strings and integers. This is ignored if the state
-      is "get". For array mode, use a list of values. See man xfconf-query(1)
+      - Preference properties typically have simple values such as strings,
+        integers, or lists of strings and integers. This is ignored if the state
+        is "get". For array mode, use a list of values. See man xfconf-query(1)
     type: list
     elements: raw
   value_type:
     description:
-    - The type of value being set. This is ignored if the state is "get".
-      For array mode, use a list of types.
+      - The type of value being set. This is ignored if the state is "get".
+      - When providing more than one I(value_type), the length of the list must
+        be equal to the length of I(value).
+      - If only one I(value_type) is provided, but I(value) contains more than
+        on element, that I(value_type) will be applied to all elements of I(value).
+      - If the I(property) being set is an array and it can possibly have ony one
+        element in the array, then I(force_array=true) must be used to ensure
+        that C(xfconf-query) will interpret the value as an array rather than a
+        scalar.
     type: list
     elements: str
     choices: [ int, uint, bool, float, double, string ]
   state:
     type: str
     description:
-    - The action to take upon the property/value.
-    - State C(get) is deprecated and will be removed in community.general 5.0.0. Please use the module M(community.general.xfconf_info) instead.
+      - The action to take upon the property/value.
+      - State C(get) is deprecated and will be removed in community.general 5.0.0. Please use the module M(community.general.xfconf_info) instead.
     choices: [ get, present, absent ]
     default: "present"
   force_array:
     description:
-    - Force array even if only one element
+      - Force array even if only one element
     type: bool
     default: 'no'
     aliases: ['array']
     version_added: 1.0.0
   disable_facts:
     description:
-    - The value C(false) is no longer allowed since community.general 4.0.0.
-    - This option will be deprecated in a future version, and eventually be removed.
+      - The value C(false) is no longer allowed since community.general 4.0.0.
+      - This option will be deprecated in a future version, and eventually be removed.
     type: bool
     default: true
     version_added: 2.1.0
@@ -88,7 +104,7 @@ EXAMPLES = """
     property: /general/workspace_names
     value_type: string
     value: ['Main']
-    force_array: yes
+    force_array: true
 """
 
 RETURN = '''
@@ -104,27 +120,27 @@ RETURN = '''
     sample: "/Xft/DPI"
   value_type:
     description:
-    - The type of the value that was changed (C(none) for C(get) and C(reset)
-      state). Either a single string value or a list of strings for array
-      types.
-    - This is a string or a list of strings.
+      - The type of the value that was changed (C(none) for C(get) and C(reset)
+        state). Either a single string value or a list of strings for array
+        types.
+      - This is a string or a list of strings.
     returned: success
     type: any
     sample: '"int" or ["str", "str", "str"]'
   value:
     description:
-    - The value of the preference key after executing the module. Either a
-      single string value or a list of strings for array types.
-    - This is a string or a list of strings.
+      - The value of the preference key after executing the module. Either a
+        single string value or a list of strings for array types.
+      - This is a string or a list of strings.
     returned: success
     type: any
     sample: '"192" or ["orange", "yellow", "violet"]'
   previous_value:
     description:
-    - The value of the preference key before executing the module (C(none) for
-      C(get) state). Either a single string value or a list of strings for array
-      types.
-    - This is a string or a list of strings.
+      - The value of the preference key before executing the module (C(none) for
+        C(get) state). Either a single string value or a list of strings for array
+        types.
+      - This is a string or a list of strings.
     returned: success
     type: any
     sample: '"96" or ["red", "blue", "green"]'
