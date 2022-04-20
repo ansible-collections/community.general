@@ -86,8 +86,6 @@ options:
     user_mac_addresses:
         type: list
         elements: str
-        required: false
-        default: null
         description:
             - Allowed MAC Addresses for the user I(user_name).
 """
