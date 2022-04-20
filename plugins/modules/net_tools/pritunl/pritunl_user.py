@@ -82,20 +82,30 @@ options:
         default: null
         description:
             - Enable/Disable Gravatar usage for the user I(user_name).
+
+    user_mac_addresses:
+        type: list
+        elements: str
+        required: false
+        default: null
+        description:
+            - Allowed MAC Addresses for the user I(user_name).
 """
 
 EXAMPLES = """
 - name: Create the user Foo with email address foo@bar.com in MyOrg
   community.general.pritunl_user:
     state: present
-    name: MyOrg
+    organization: MyOrg
     user_name: Foo
     user_email: foo@bar.com
+    user_mac_addresses:
+      - "00:00:00:00:00:99"
 
 - name: Disable the user Foo but keep it in Pritunl
   community.general.pritunl_user:
     state: present
-    name: MyOrg
+    organization: MyOrg
     user_name: Foo
     user_email: foo@bar.com
     user_disabled: yes
@@ -103,7 +113,7 @@ EXAMPLES = """
 - name: Make sure the user Foo is not part of MyOrg anymore
   community.general.pritunl_user:
     state: absent
-    name: MyOrg
+    organization: MyOrg
     user_name: Foo
 """
 
@@ -153,7 +163,7 @@ from ansible_collections.community.general.plugins.module_utils.net_tools.pritun
     post_pritunl_user,
     pritunl_argument_spec,
 )
-
+record_ids=dict(type='list', elements='str'),
 
 def add_or_update_pritunl_user(module):
     result = {}
@@ -167,6 +177,7 @@ def add_or_update_pritunl_user(module):
         "groups": module.params.get("user_groups"),
         "disabled": module.params.get("user_disabled"),
         "gravatar": module.params.get("user_gravatar"),
+        "mac_addresses": module.params.get("user_mac_addresses"),
         "type": module.params.get("user_type"),
     }
 
@@ -323,6 +334,7 @@ def main():
             user_groups=dict(required=False, type="list", elements="str", default=None),
             user_disabled=dict(required=False, type="bool", default=None),
             user_gravatar=dict(required=False, type="bool", default=None),
+            user_mac_addresses=dict(required=False, type="list", elements="str", default=None),
         )
     ),
 
