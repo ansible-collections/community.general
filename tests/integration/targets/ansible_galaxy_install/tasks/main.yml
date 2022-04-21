@@ -64,23 +64,12 @@
   register: install_rq0
   ignore_errors: true
 
-- name: Assert requirements file was installed (Ansible >2.9)
+- name: Assert requirements file was installed
   assert:
     that:
     - install_rq0 is changed
     - '"geerlingguy.java" in install_rq0.new_roles'
     - '"geerlingguy.php_roles" in install_rq0.new_collections'
-  when:
-    - (ansible_version.major != 2 or ansible_version.minor != 9)
-
-- name: Assert requirements file was installed (Ansible 2.9)
-  assert:
-    that:
-    - install_rq0 is failed
-    - install_rq0 is not changed
-  when:
-    - ansible_version.major == 2
-    - ansible_version.minor == 9
 
 - name: Install from requirements file (again)
   community.general.ansible_galaxy_install:

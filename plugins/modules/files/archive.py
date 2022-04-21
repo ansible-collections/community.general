@@ -440,14 +440,7 @@ class Archive(object):
             )
 
     def update_permissions(self):
-        try:
-            file_args = self.module.load_file_common_arguments(self.module.params, path=self.destination)
-        except TypeError:
-            # The path argument is only supported in Ansible-base 2.10+. Fall back to
-            # pre-2.10 behavior for older Ansible versions.
-            self.module.params['path'] = self.destination
-            file_args = self.module.load_file_common_arguments(self.module.params)
-
+        file_args = self.module.load_file_common_arguments(self.module.params, path=self.destination)
         self.changed = self.module.set_fs_attributes_if_different(file_args, self.changed)
 
     @property

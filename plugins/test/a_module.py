@@ -22,9 +22,6 @@ def a_module(term):
     try:
         for loader in (action_loader, module_loader):
             data = loader.find_plugin(term)
-            # Ansible 2.9 returns a tuple
-            if isinstance(data, tuple):
-                data = data[0]
             if data is not None:
                 return True
         return False
