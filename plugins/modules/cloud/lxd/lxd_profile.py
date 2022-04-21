@@ -143,6 +143,7 @@ EXAMPLES = '''
     - name: Create a profile
       community.general.lxd_profile:
         name: testprofile
+        project: mytestproject
         state: present
         config: {}
         description: test profile in project mytestproject
