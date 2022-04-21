@@ -1,5 +1,5 @@
 ---
-requires_ansible: '>=2.9.10'
+requires_ansible: '>=2.11.0'
 plugin_routing:
   connection:
     docker:
