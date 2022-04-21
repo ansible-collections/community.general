@@ -61,7 +61,8 @@ DOCUMENTATION = '''
         description:
           - Proxmox authentication token ID.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_TOKEN_ID) will be used instead.
-          - To use token authentication, you must also specify I(token_secret). If you do not specify I(token_id) and I(token_secret), you must set a password instead.
+          - To use token authentication, you must also specify I(token_secret). If you do not specify I(token_id) and I(token_secret),
+            you must set a password instead.
           - Make sure to grant explicit pve permissions to the token or disable 'privilege separation' to use the users' privileges instead.
         version_added: 4.8.0
         type: str
@@ -71,7 +72,8 @@ DOCUMENTATION = '''
         description:
           - Proxmox authentication token secret.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_TOKEN_SECRET) will be used instead.
-          - To use token authenticaiton, you must also specify token_id. If you do not specify token_id and token_secret, you must set a password instead.
+          - To use token authentication, you must also specify I(token_id). If you do not specify I(token_id) and I(token_secret),
+            you must set a password instead.
         version_added: 4.8.0
         type: str
         env:
