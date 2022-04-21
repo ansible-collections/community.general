@@ -52,33 +52,30 @@ DOCUMENTATION = '''
           - Proxmox authentication password.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_PASSWORD) will be used instead.
           - Since community.general 4.7.0 you can also use templating to specify the value of the I(password).
-          - If you do not specify a password, you must set token_id and token_secret instead.
-        required: no
+          - If you do not specify a password, you must set I(token_id) and I(token_secret) instead.
         type: str
         env:
           - name: PROXMOX_PASSWORD
             version_added: 2.0.0
       token_id:
         description:
-          - Proxmox authentication token id.
+          - Proxmox authentication token ID.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_TOKEN_ID) will be used instead.
-          - To use token authentication, you must also specify token_secret. If you do not specify token_id and token_secret, you must set a password instead.
-          - Make sure to grant explicit pve permissions to the token or disable 'privilege separation' to use the users' privileges instead
-        required: no
+          - To use token authentication, you must also specify I(token_secret). If you do not specify I(token_id) and I(token_secret), you must set a password instead.
+          - Make sure to grant explicit pve permissions to the token or disable 'privilege separation' to use the users' privileges instead.
+        version_added: 4.8.0
         type: str
         env:
           - name: PROXMOX_TOKEN_ID
-            version_added: 4.7.1
       token_secret:
         description:
           - Proxmox authentication token secret.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_TOKEN_SECRET) will be used instead.
           - To use token authenticaiton, you must also specify token_id. If you do not specify token_id and token_secret, you must set a password instead.
-        required: no
+        version_added: 4.8.0
         type: str
         env:
           - name: PROXMOX_TOKEN_SECRET
-            version_added: 4.7.1
       validate_certs:
         description: Verify SSL certificate if using HTTPS.
         type: boolean
@@ -244,7 +241,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _get_auth(self):
         credentials = urlencode({'username': self.proxmox_user, 'password': self.proxmox_password, })
 
-        if (self.proxmox_password): 
+        if self.proxmox_password:
 
             credentials = urlencode({'username': self.proxmox_user, 'password': self.proxmox_password, })
 
@@ -592,7 +589,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             proxmox_token_secret = t.template(variable=proxmox_token_secret, disable_lookups=False)
         self.proxmox_token_secret = proxmox_token_secret
 
-        if not (proxmox_password != None) and not (proxmox_token_id != None and proxmox_token_secret != None):
+        if proxmox_password is None and (proxmox_token_id is None or proxmox_token_secret is None):
             raise AnsibleError('You must specify either a password or both token_id and token_secret.')
         
         self.cache_key = self.get_cache_key(path)
