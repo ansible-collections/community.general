@@ -1,1 +1,0 @@
-./system/gconftool2.py

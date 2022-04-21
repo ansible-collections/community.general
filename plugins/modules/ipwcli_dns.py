@@ -1,1 +1,0 @@
-./net_tools/ipwcli_dns.py

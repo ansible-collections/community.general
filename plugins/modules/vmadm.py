@@ -1,1 +1,0 @@
-./cloud/smartos/vmadm.py
