@@ -6,7 +6,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from ansible_collections.community.general.plugins.modules import hana_query
+from ansible_collections.community.general.plugins.modules.database.saphana import hana_query
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
