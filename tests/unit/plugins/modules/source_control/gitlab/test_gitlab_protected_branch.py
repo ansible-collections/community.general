@@ -7,7 +7,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import pytest
-from distutils.version import LooseVersion
+
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 from ansible_collections.community.general.plugins.modules.source_control.gitlab.gitlab_protected_branch import GitlabProtectedBranch
 
