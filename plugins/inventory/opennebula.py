@@ -206,28 +206,40 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
     def _populate(self):
         hostname_preference = self.get_option('hostname')
         group_by_labels = self.get_option('group_by_labels')
+        strict = self.get_option('strict')
 
         # Add a top group 'one'
         self.inventory.add_group(group='all')
 
         filter_by_label = self.get_option('filter_by_label')
-        for server in self._retrieve_servers(filter_by_label):
+        servers = self._retrieve_servers(filter_by_label)
+        for server in servers:
+            hostname = server['name']
             # check for labels
             if group_by_labels and server['LABELS']:
                 for label in server['LABELS']:
                     self.inventory.add_group(group=label)
-                    self.inventory.add_host(host=server['name'], group=label)
+                    self.inventory.add_host(host=hostname, group=label)
 
-            self.inventory.add_host(host=server['name'], group='all')
+            self.inventory.add_host(host=hostname, group='all')
 
             for attribute, value in server.items():
-                self.inventory.set_variable(server['name'], attribute, value)
+                self.inventory.set_variable(hostname, attribute, value)
 
             if hostname_preference != 'name':
-                self.inventory.set_variable(server['name'], 'ansible_host', server[hostname_preference])
+                self.inventory.set_variable(hostname, 'ansible_host', server[hostname_preference])
 
             if server.get('SSH_PORT'):
-                self.inventory.set_variable(server['name'], 'ansible_port', server['SSH_PORT'])
+                self.inventory.set_variable(hostname, 'ansible_port', server['SSH_PORT'])
+
+            # handle construcable implementation: get composed variables if any
+            self._set_composite_vars(self.get_option('compose'), server, hostname, strict=strict)
+
+            # groups based on jinja conditionals get added to specific groups
+            self._add_host_to_composed_groups(self.get_option('groups'), server, hostname, strict=strict)
+
+            # groups based on variables associated with them in the inventory
+            self._add_host_to_keyed_groups(self.get_option('keyed_groups'), server, hostname, strict=strict)
 
     def parse(self, inventory, loader, path, cache=True):
         if not HAS_PYONE:
