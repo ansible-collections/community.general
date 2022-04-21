@@ -128,6 +128,22 @@ password: secure
 # an example where this is set to `false` and where ansible_host is set with `compose`.
 want_proxmox_nodes_ansible_host: true
 
+# Instead of login with password, proxmox supports api token authentication since release 6.2.
+plugin: community.general.proxmox
+user: ci@pve
+token_id: gitlab-1
+token_secret: fa256e9c-26ab-41ec-82da-707a2c079829
+
+# The secret can also be a vault string or passed via the environment variable TOKEN_SECRET.
+token_secret: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          62353634333163633336343265623632626339313032653563653165313262343931643431656138
+          6134333736323265656466646539663134306166666237630a653363623262636663333762316136
+          34616361326263383766366663393837626437316462313332663736623066656237386531663731
+          3037646432383064630a663165303564623338666131353366373630656661333437393937343331
+          32643131386134396336623736393634373936356332623632306561356361323737313663633633
+          6231313333666361656537343562333337323030623732323833
+
 # More complete example demonstrating the use of 'want_facts' and the constructed options
 # Note that using facts returned by 'want_facts' in constructed options requires 'want_facts=true'
 # my.proxmox.yml
