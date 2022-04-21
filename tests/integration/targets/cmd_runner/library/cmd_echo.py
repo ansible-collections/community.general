@@ -26,7 +26,7 @@ options:
     required: true
   arg_order:
     description: ccc
-    type: list
+    type: raw
     required: true
   arg_values:
     description: ddd
@@ -49,7 +49,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             arg_formats=dict(type="dict", default={}),
-            arg_order=dict(type="list", required=True),
+            arg_order=dict(type="raw", required=True),
             arg_values=dict(type="dict", default={}),
             aa=dict(type="raw"),
         ),

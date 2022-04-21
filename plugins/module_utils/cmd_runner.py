@@ -5,6 +5,8 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+from functools import wraps
+
 from ansible.module_utils.common.collections import is_sequence
 from ansible.module_utils.six import iteritems
 
@@ -147,28 +149,18 @@ class _Format:
         return fmt.as_opt_val("--{0}".format(arg), ignore_none=ignore_none)
 
     @staticmethod
-    def unpack(stars):
-        """
-        The format functions must receive one single value to be rendered into a
-        command-line format, but sometimes it makes more sense to unpack collections
-        down to smaller pieces, for clarity and readability.
+    def unpack_args(func):
+        @wraps(func)
+        def wrapper(v):
+            return func(*v)
+        return wrapper
 
-        Args:
-            stars (int): Unpack with 1 or 2 stars, corresponding to a list or a dict, respectively.
-
-        Returns:
-            function: original function wrapped in the requested unpacking decorator.
-        """
-        if stars == 1:
-            def deco(f):
-                return lambda v: f(*v)
-            return deco
-        elif stars == 2:
-            def deco(f):
-                return lambda v: f(**v)
-            return deco
-
-        return lambda f: f
+    @staticmethod
+    def unpack_kwargs(func):
+        @wraps(func)
+        def wrapper(v):
+            return func(**v)
+        return wrapper
 
 
 class CmdRunner:
@@ -178,11 +170,16 @@ class CmdRunner:
     It aims to provide a reusable runner with consistent argument formatting
     and sensible defaults.
     """
+
+    @staticmethod
+    def _prepare_args_order(order):
+        return tuple(order) if is_sequence(order) else tuple(order.split())
+
     def __init__(self, module, command, arg_formats=None, default_args_order=(),
                  check_rc=False, force_lang="C", path_prefix=None, environ_update=None):
         self.module = module
         self.command = _ensure_list(command)
-        self.default_args_order = tuple(default_args_order)
+        self.default_args_order = self._prepare_args_order(default_args_order)
         if arg_formats is None:
             arg_formats = {}
         self.arg_formats = dict(arg_formats)
@@ -204,7 +201,7 @@ class CmdRunner:
             output_process = _process_as_is
         if args_order is None:
             args_order = self.default_args_order
-        args_order = tuple(args_order)
+        args_order = self._prepare_args_order(args_order)
         for p in args_order:
             if p not in self.arg_formats:
                 raise MissingArgumentFormat(p, args_order, tuple(self.arg_formats.keys()))
