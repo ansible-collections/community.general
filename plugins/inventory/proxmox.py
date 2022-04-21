@@ -251,8 +251,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             json = ret.json()
 
             self.headers = {
-                #only required for POST/PUT/DELETE methods, which we are not using currently
-                #'CSRFPreventionToken': json['data']['CSRFPreventionToken'],
+                # only required for POST/PUT/DELETE methods, which we are not using currently
+                # 'CSRFPreventionToken': json['data']['CSRFPreventionToken'],
                 'Cookie': 'PVEAuthCookie={0}'.format(json['data']['ticket'])
             }
 
@@ -591,7 +591,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         if proxmox_password is None and (proxmox_token_id is None or proxmox_token_secret is None):
             raise AnsibleError('You must specify either a password or both token_id and token_secret.')
-        
+
         self.cache_key = self.get_cache_key(path)
         self.use_cache = cache and self.get_option('cache')
         self.host_filters = self.get_option('filters')
