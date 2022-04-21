@@ -9,15 +9,15 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: lxd_project
-short_description: Manage LXD projects
+short_description: Manage LXD projects.
 version_added: 4.8.0
 description:
-  - Management of LXD projects
+  - Management of LXD projects.
 author: "Raymond Chang (@we10710aa)"
 options:
     name:
         description:
-          - Name of a project.
+          - Name of the project.
         required: true
         type: str
     description:
@@ -38,7 +38,7 @@ options:
         description:
           - A new name of a project.
           - If this parameter is specified a project will be renamed to this name.
-            See U(https://linuxcontainers.org/lxd/docs/master/api/#/projects/project_post)
+            See U(https://linuxcontainers.org/lxd/docs/master/api/#/projects/project_post).
         required: false
         type: str
     merge_project:
@@ -86,11 +86,11 @@ options:
     trust_password:
         description:
           - The client trusted password.
-          - You need to set this password on the LXD server before
-            running this module using the following command.
-            lxc config set core.trust_password <some random password>
-            See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/)
-          - If trust_password is set, this module send a request for
+          - 'You need to set this password on the LXD server before
+            running this module using the following command:
+            C(lxc config set core.trust_password <some random password>)
+            See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).'
+          - If I(trust_password) is set, this module send a request for
             authentication before sending any requests.
         required: false
         type: str
@@ -127,7 +127,7 @@ EXAMPLES = '''
 
 RETURN = '''
 old_state:
-  description: The old state of the project
+  description: The old state of the project.
   returned: success
   type: str
   sample: "absent"
@@ -135,13 +135,48 @@ logs:
   description: The logs of requests and responses.
   returned: when ansible-playbook is invoked with -vvvv.
   type: list
-  sample: "(too long to be placed here)"
+  elements: dict
+  contains:
+    type:
+      description: type of actions performed, currently only "sent request".
+      type: str
+      sample: "sent request"
+    request:
+      description: http request sent to lxd server.
+      type: dict
+      contains:
+        method:
+          description: method of http request.
+          type: str
+          sample: "GET"
+        url:
+          description: url path of http request.
+          type: str
+          sample: "/1.0/projects/test-project"
+        json:
+          description: json body of http request.
+          type: str
+          sample: "(too long to be placed here)"
+        timeout:
+          description: timeout of http request, null if unset.
+          type: int
+          sample: null
+    response:
+      description: http response received from lxd server.
+      type: dict
+      contains:
+        json:
+          description: json of http response.
+          type: str
+          sample: "(too long to be placed here)"
 actions:
   description: List of actions performed for the project.
   returned: success
   type: list
-  sample: '["create"]'
+  elements: str
+  sample: ["create"]
 '''
+
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
 from ansible.module_utils.basic import AnsibleModule
 import os
