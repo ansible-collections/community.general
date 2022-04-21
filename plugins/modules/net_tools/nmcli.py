@@ -1295,7 +1295,7 @@ class Nmcli(object):
         self.hellotime = module.params['hellotime']
         self.maxage = module.params['maxage']
         self.ageingtime = module.params['ageingtime']
-        # hairpin should be back to normal in 6.0.0
+        # hairpin should be back to normal in 7.0.0
         self._hairpin = module.params['hairpin']
         self.path_cost = module.params['path_cost']
         self.mac = module.params['mac']
@@ -1351,7 +1351,7 @@ class Nmcli(object):
                 "Set the value explicitly to supress this warning.",
                 version='7.0.0', collection_name='community.general',
             )
-            # Should be False in 6.0.0 but then that should be in argument_specs
+            # Should be False in 7.0.0 but then that should be in argument_specs
             self._hairpin = True
         return self._hairpin
 
