@@ -295,7 +295,7 @@ options:
             - This is only used with 'bridge-slave' - 'hairpin mode' for the slave, which allows frames to be sent back out through the slave the
               frame was received on.
             - The default value is C(true), but that is being deprecated
-              and it will be changed to C(false) in community.general 6.0.0.
+              and it will be changed to C(false) in community.general 7.0.0.
         type: bool
     runner:
         description:
@@ -1346,9 +1346,10 @@ class Nmcli(object):
     @property
     def hairpin(self):
         if self._hairpin is None:
-            self.module.warn(
-                "Parameter 'hairpin' default value will change from true to false in community.general 6.0.0. "
-                "Set the value explicitly to supress this warning."
+            self.module.deprecate(
+                "Parameter 'hairpin' default value will change from true to false in community.general 7.0.0. "
+                "Set the value explicitly to supress this warning.",
+                version='7.0.0', collection_name='community.general',
             )
             # Should be False in 6.0.0 but then that should be in argument_specs
             self._hairpin = True

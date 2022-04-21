@@ -1,2 +1,2 @@
-breaking_changes:
-  - nmcli - deprecate default hairpin mode for a bridge. This so we can change it to 'no' in ansible 6.0.0, as this is also the default in nmcli.
+deprecated_features:
+  - nmcli - deprecate default hairpin mode for a bridge. This so we can change it to ``no`` in community.general 7.0.0, as this is also the default in nmcli.
