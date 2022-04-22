@@ -21,6 +21,13 @@ options:
           - Name of an instance.
         type: str
         required: true
+    project:
+        description:
+          - 'Project of an instance.
+            See U(https://github.com/lxc/lxd/blob/master/doc/projects.md).'
+        required: false
+        type: str
+        version_added: 4.8.0
     architecture:
         description:
           - 'The architecture for the instance (for example C(x86_64) or C(i686)).
@@ -248,6 +255,26 @@ EXAMPLES = '''
         wait_for_ipv4_addresses: true
         timeout: 600
 
+# An example for creating container in project other than default
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Create a started container in project mytestproject
+      community.general.lxd_container:
+        name: mycontainer
+        project: mytestproject
+        ignore_volatile_options: true
+        state: started
+        source:
+          protocol: simplestreams
+          type: image
+          mode: pull
+          server: https://images.linuxcontainers.org
+          alias: ubuntu/20.04/cloud
+        profiles: ["default"]
+        wait_for_ipv4_addresses: true
+        timeout: 600
+
 # An example for deleting a container
 - hosts: localhost
   connection: local
@@ -412,6 +439,7 @@ class LXDContainerManagement(object):
         """
         self.module = module
         self.name = self.module.params['name']
+        self.project = self.module.params['project']
         self._build_config()
 
         self.state = self.module.params['state']
@@ -468,16 +496,16 @@ class LXDContainerManagement(object):
                 self.config[attr] = param_val
 
     def _get_instance_json(self):
-        return self.client.do(
-            'GET', '{0}/{1}'.format(self.api_endpoint, self.name),
-            ok_error_codes=[404]
-        )
+        url = '{0}/{1}'.format(self.api_endpoint, self.name)
+        if self.project:
+            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+        return self.client.do('GET', url, ok_error_codes=[404])
 
     def _get_instance_state_json(self):
-        return self.client.do(
-            'GET', '{0}/{1}/state'.format(self.api_endpoint, self.name),
-            ok_error_codes=[404]
-        )
+        url = '{0}/{1}/state'.format(self.api_endpoint, self.name)
+        if self.project:
+            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+        return self.client.do('GET', url, ok_error_codes=[404])
 
     @staticmethod
     def _instance_json_to_module_state(resp_json):
@@ -486,18 +514,26 @@ class LXDContainerManagement(object):
         return ANSIBLE_LXD_STATES[resp_json['metadata']['status']]
 
     def _change_state(self, action, force_stop=False):
+        url = '{0}/{1}/state'.format(self.api_endpoint, self.name)
+        if self.project:
+            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
         body_json = {'action': action, 'timeout': self.timeout}
         if force_stop:
             body_json['force'] = True
-        return self.client.do('PUT', '{0}/{1}/state'.format(self.api_endpoint, self.name), body_json=body_json)
+        return self.client.do('PUT', url, body_json=body_json)
 
     def _create_instance(self):
+        url = self.api_endpoint
+        url_params = dict()
+        if self.target:
+            url_params['target'] = self.target
+        if self.project:
+            url_params['project'] = self.project
+        if url_params:
+            url = '{0}?{1}'.format(url, urlencode(url_params))
         config = self.config.copy()
         config['name'] = self.name
-        if self.target:
-            self.client.do('POST', '{0}?{1}'.format(self.api_endpoint, urlencode(dict(target=self.target))), config, wait_for_container=self.wait_for_container)
-        else:
-            self.client.do('POST', self.api_endpoint, config, wait_for_container=self.wait_for_container)
+        self.client.do('POST', url, config, wait_for_container=self.wait_for_container)
         self.actions.append('create')
 
     def _start_instance(self):
@@ -513,7 +549,10 @@ class LXDContainerManagement(object):
         self.actions.append('restart')
 
     def _delete_instance(self):
-        self.client.do('DELETE', '{0}/{1}'.format(self.api_endpoint, self.name))
+        url = '{0}/{1}'.format(self.api_endpoint, self.name)
+        if self.project:
+            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+        self.client.do('DELETE', url)
         self.actions.append('delete')
 
     def _freeze_instance(self):
@@ -666,7 +705,10 @@ class LXDContainerManagement(object):
         if self._needs_to_change_instance_config('profiles'):
             body_json['profiles'] = self.config['profiles']
 
-        self.client.do('PUT', '{0}/{1}'.format(self.api_endpoint, self.name), body_json=body_json)
+        url = '{0}/{1}'.format(self.api_endpoint, self.name)
+        if self.project:
+            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+        self.client.do('PUT', url, body_json=body_json)
         self.actions.append('apply_instance_configs')
 
     def run(self):
@@ -714,6 +756,9 @@ def main():
             name=dict(
                 type='str',
                 required=True
+            ),
+            project=dict(
+                type='str',
             ),
             architecture=dict(
                 type='str',
