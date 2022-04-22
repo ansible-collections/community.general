@@ -1,0 +1,2 @@
+bugfixes:
+  - alternatives - add `activate` parameter, which allows user to specify whether the alternative should be set as the active selection for its alternatives group.
