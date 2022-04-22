@@ -21,6 +21,13 @@ options:
           - Name of a profile.
         required: true
         type: str
+    project:
+        description:
+         - 'Project of a profile.
+           See U(https://github.com/lxc/lxd/blob/master/doc/projects.md).'
+        type: str
+        required: false
+        version_added: 4.8.0
     description:
         description:
           - Description of the profile.
@@ -129,6 +136,19 @@ EXAMPLES = '''
             parent: br0
             type: nic
 
+# An example for creating a profile in project mytestproject
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Create a profile
+      community.general.lxd_profile:
+        name: testprofile
+        project: mytestproject
+        state: present
+        config: {}
+        description: test profile in project mytestproject
+        devices: {}
+
 # An example for creating a profile via http connection
 - hosts: localhost
   connection: local
@@ -208,6 +228,7 @@ actions:
 import os
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
+from ansible.module_utils.six.moves.urllib.parse import urlencode
 
 # ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint
 ANSIBLE_LXD_DEFAULT_URL = 'unix:/var/lib/lxd/unix.socket'
@@ -232,6 +253,7 @@ class LXDProfileManagement(object):
         """
         self.module = module
         self.name = self.module.params['name']
+        self.project = self.module.params['project']
         self._build_config()
         self.state = self.module.params['state']
         self.new_name = self.module.params.get('new_name', None)
@@ -272,10 +294,10 @@ class LXDProfileManagement(object):
                 self.config[attr] = param_val
 
     def _get_profile_json(self):
-        return self.client.do(
-            'GET', '/1.0/profiles/{0}'.format(self.name),
-            ok_error_codes=[404]
-        )
+        url = '/1.0/profiles/{0}'.format(self.name)
+        if self.project:
+            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+        return self.client.do('GET', url, ok_error_codes=[404])
 
     @staticmethod
     def _profile_json_to_module_state(resp_json):
@@ -307,14 +329,20 @@ class LXDProfileManagement(object):
                         changed=False)
 
     def _create_profile(self):
+        url = '/1.0/profiles'
+        if self.project:
+            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
         config = self.config.copy()
         config['name'] = self.name
-        self.client.do('POST', '/1.0/profiles', config)
+        self.client.do('POST', url, config)
         self.actions.append('create')
 
     def _rename_profile(self):
+        url = '/1.0/profiles/{0}'.format(self.name)
+        if self.project:
+            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
         config = {'name': self.new_name}
-        self.client.do('POST', '/1.0/profiles/{0}'.format(self.name), config)
+        self.client.do('POST', url, config)
         self.actions.append('rename')
         self.name = self.new_name
 
@@ -421,11 +449,17 @@ class LXDProfileManagement(object):
             config = self._generate_new_config(config)
 
         # upload config to lxd
-        self.client.do('PUT', '/1.0/profiles/{0}'.format(self.name), config)
+        url = '/1.0/profiles/{0}'.format(self.name)
+        if self.project:
+            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+        self.client.do('PUT', url, config)
         self.actions.append('apply_profile_configs')
 
     def _delete_profile(self):
-        self.client.do('DELETE', '/1.0/profiles/{0}'.format(self.name))
+        url = '/1.0/profiles/{0}'.format(self.name)
+        if self.project:
+            url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
+        self.client.do('DELETE', url)
         self.actions.append('delete')
 
     def run(self):
@@ -468,6 +502,9 @@ def main():
             name=dict(
                 type='str',
                 required=True
+            ),
+            project=dict(
+                type='str',
             ),
             new_name=dict(
                 type='str',
