@@ -156,7 +156,7 @@ options:
         aliases:
             - defaultDefaultClientScopes
         type: list
-        elements: dict
+        elements: str
     default_groups:
         description:
             - The realm default groups.
@@ -176,7 +176,7 @@ options:
         aliases:
             - defaultOptionalClientScopes
         type: list
-        elements: dict
+        elements: str
     default_roles:
         description:
             - The realm default roles.
@@ -621,10 +621,10 @@ def main():
         brute_force_protected=dict(type='bool', aliases=['bruteForceProtected']),
         client_authentication_flow=dict(type='str', aliases=['clientAuthenticationFlow']),
         client_scope_mappings=dict(type='dict', aliases=['clientScopeMappings']),
-        default_default_client_scopes=dict(type='list', elements='dict', aliases=['defaultDefaultClientScopes']),
+        default_default_client_scopes=dict(type='list', elements='str', aliases=['defaultDefaultClientScopes']),
         default_groups=dict(type='list', elements='dict', aliases=['defaultGroups']),
         default_locale=dict(type='str', aliases=['defaultLocale']),
-        default_optional_client_scopes=dict(type='list', elements='dict', aliases=['defaultOptionalClientScopes']),
+        default_optional_client_scopes=dict(type='list', elements='str', aliases=['defaultOptionalClientScopes']),
         default_roles=dict(type='list', elements='dict', aliases=['defaultRoles']),
         default_signature_algorithm=dict(type='str', aliases=['defaultSignatureAlgorithm']),
         direct_grant_flow=dict(type='str', aliases=['directGrantFlow']),
