@@ -614,11 +614,11 @@ class ClcServer:
             public_ip_ports=dict(type='list', default=[], elements='dict'),
             configuration_id=dict(),
             os_type=dict(choices=[
-                             'redHat6_64Bit',
-                             'centOS6_64Bit',
-                             'windows2012R2Standard_64Bit',
-                             'ubuntu14_64Bit'
-                         ]),
+                'redHat6_64Bit',
+                'centOS6_64Bit',
+                'windows2012R2Standard_64Bit',
+                'ubuntu14_64Bit'
+            ]),
             wait=dict(type='bool', default=True))
 
         mutually_exclusive = [
