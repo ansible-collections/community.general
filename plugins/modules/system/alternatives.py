@@ -46,6 +46,7 @@ options:
       - Whether to set this alternative as the currently active selection.
     type: bool
     default: true
+    version_added: 4.8.0
 requirements: [ update-alternatives ]
 '''
 

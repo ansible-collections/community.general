@@ -1,2 +1,2 @@
-bugfixes:
-  - alternatives - add `activate` parameter, which allows user to specify whether the alternative should be set as the active selection for its alternatives group.
+minor_changes:
+  - alternatives - add ``activate`` parameter, which allows user to specify whether the alternative should be set as the active selection for its alternatives group (https://github.com/ansible-collections/community.general/issues/4543, https://github.com/ansible-collections/community.general/pull/4557).
