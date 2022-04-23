@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: lxd_project
-short_description: Manage LXD projects.
+short_description: Manage LXD projects
 version_added: 4.8.0
 description:
   - Management of LXD projects.
@@ -59,13 +59,13 @@ options:
         type: str
     url:
         description:
-          - The unix domain socket path or the https URL for the LXD server.
+          - The Unix domain socket path or the https URL for the LXD server.
         required: false
         default: unix:/var/lib/lxd/unix.socket
         type: str
     snap_url:
         description:
-          - The unix domain socket path when LXD is installed by snap package manager.
+          - The Unix domain socket path when LXD is installed by snap package manager.
         required: false
         default: unix:/var/snap/lxd/common/lxd/unix.socket
         type: str
@@ -116,7 +116,7 @@ EXAMPLES = '''
 - hosts: localhost
   connection: local
   tasks:
-    - name: Create a project
+    - name: Rename ansible-test-project to ansible-test-project-new-name
       community.general.lxd_project:
         name: ansible-test-project
         new_name: ansible-test-project-new-name
@@ -138,35 +138,35 @@ logs:
   elements: dict
   contains:
     type:
-      description: type of actions performed, currently only "sent request".
+      description: Type of actions performed, currently only C(sent request).
       type: str
       sample: "sent request"
     request:
-      description: http request sent to lxd server.
+      description: HTTP request sent to LXD server.
       type: dict
       contains:
         method:
-          description: method of http request.
+          description: Method of HTTP request.
           type: str
           sample: "GET"
         url:
-          description: url path of http request.
+          description: URL path of HTTP request.
           type: str
           sample: "/1.0/projects/test-project"
         json:
-          description: json body of http request.
+          description: JSON body of HTTP request.
           type: str
           sample: "(too long to be placed here)"
         timeout:
-          description: timeout of http request, null if unset.
+          description: Timeout of HTTP request, C(null) if unset.
           type: int
           sample: null
     response:
-      description: http response received from lxd server.
+      description: HTTP response received from LXD server.
       type: dict
       contains:
         json:
-          description: json of http response.
+          description: JSON of HTTP response.
           type: str
           sample: "(too long to be placed here)"
 actions:
