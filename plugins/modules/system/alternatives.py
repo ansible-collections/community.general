@@ -41,9 +41,9 @@ options:
       - The priority of the alternative.
     type: int
     default: 50
-  activate:
+  selected:
     description:
-      - Whether to set this alternative as the currently active selection.
+      - Whether to set this alternative as the currently selected alternative.
     type: bool
     default: true
     version_added: 4.8.0
@@ -84,7 +84,7 @@ def main():
             path=dict(type='path', required=True),
             link=dict(type='path'),
             priority=dict(type='int', default=50),
-            activate=dict(type='bool', default=True),
+            selected=dict(type='bool', default=True),
         ),
         supports_check_mode=True,
     )
@@ -94,7 +94,7 @@ def main():
     path = params['path']
     link = params['link']
     priority = params['priority']
-    activate = params['activate']
+    selected = params['selected']
 
     UPDATE_ALTERNATIVES = module.get_bin_path('update-alternatives', True)
 
@@ -141,7 +141,7 @@ def main():
         # installed, or if it is to be set as the current selection.
         if module.check_mode:
             module.exit_json(
-                changed=(path not in all_alternatives or activate),
+                changed=(path not in all_alternatives or selected),
                 current_path=current_path,
             )
 
@@ -160,7 +160,7 @@ def main():
                 changed = True
 
             # set the current selection to this path (if requested)
-            if activate:
+            if selected:
                 module.run_command(
                     [UPDATE_ALTERNATIVES, '--set', name, path],
                     check_rc=True
