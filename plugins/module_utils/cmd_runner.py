@@ -120,7 +120,7 @@ class _Format:
         return _ArgFormat(lambda value: ["{0}={1}".format(arg, value)], ignore_none=ignore_none)
 
     @staticmethod
-    def as_str(ignore_none=None):
+    def as_list(ignore_none=None):
         return _ArgFormat(_ensure_list, ignore_none=ignore_none)
 
     @staticmethod
