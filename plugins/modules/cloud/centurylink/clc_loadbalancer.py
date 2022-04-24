@@ -865,7 +865,7 @@ class ClcLoadBalancer:
         """
         argument_spec = dict(
             name=dict(required=True),
-            description=dict(default=None),
+            description=dict(),
             location=dict(required=True),
             alias=dict(required=True),
             port=dict(choices=[80, 443]),
