@@ -297,9 +297,9 @@ class ClcGroup(object):
         """
         argument_spec = dict(
             name=dict(required=True),
-            description=dict(default=None),
-            parent=dict(default=None),
-            location=dict(default=None),
+            description=dict(),
+            parent=dict(),
+            location=dict(),
             state=dict(default='present', choices=['present', 'absent']),
             wait=dict(type='bool', default=True))
 

@@ -95,8 +95,7 @@ def main():
         argument_spec=dict(
             name=dict(required=True,
                       type='str'),
-            description=dict(default=None,
-                             type='str'),
+            description=dict(type='str'),
             position=dict(default='',
                           type='str'),
             ou=dict(default='',

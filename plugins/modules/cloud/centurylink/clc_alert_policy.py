@@ -228,8 +228,7 @@ class ClcAlertPolicy:
                 choices=[
                     'cpu',
                     'memory',
-                    'disk'],
-                default=None),
+                    'disk']),
             duration=dict(type='str'),
             threshold=dict(type='int'),
             state=dict(default='present', choices=['present', 'absent'])
