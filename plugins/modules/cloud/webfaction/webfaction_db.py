@@ -101,13 +101,13 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True),
-            state=dict(required=False, choices=['present', 'absent'], default='present'),
+            state=dict(choices=['present', 'absent'], default='present'),
             # You can specify an IP address or hostname.
             type=dict(required=True, choices=['mysql', 'postgresql']),
-            password=dict(required=False, default=None, no_log=True),
+            password=dict(no_log=True),
             login_name=dict(required=True),
             login_password=dict(required=True, no_log=True),
-            machine=dict(required=False, default=None),
+            machine=dict(),
         ),
         supports_check_mode=True
     )
