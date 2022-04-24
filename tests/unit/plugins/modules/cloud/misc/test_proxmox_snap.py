@@ -111,4 +111,6 @@ def test_rollback_snapshot_check_mode(connect_mock, capfd, mocker):
 
     out, err = capfd.readouterr()
     assert not err
-    assert not json.loads(out)['changed']
+    output = json.loads(out)
+    assert not output['changed']
+    assert output['msg'] == "Snapshot test does not exist"
