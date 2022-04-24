@@ -1,0 +1,13 @@
+minor_changes:
+  - atomic_container - minor refactoring (https://github.com/ansible-collections/community.general/pull/4566).
+  - proxmox - minor refactoring (https://github.com/ansible-collections/community.general/pull/4566).
+  - packet_device - minor refactoring (https://github.com/ansible-collections/community.general/pull/4566).
+  - packet_sshkey - minor refactoring (https://github.com/ansible-collections/community.general/pull/4566).
+  - packet_volume - minor refactoring (https://github.com/ansible-collections/community.general/pull/4566).
+  - profitbricks - minor refactoring (https://github.com/ansible-collections/community.general/pull/4566).
+  - smartos_image_info - minor refactoring (https://github.com/ansible-collections/community.general/pull/4566).
+  - vmadm - minor refactoring (https://github.com/ansible-collections/community.general/pull/4566).
+  - webfaction_app - minor refactoring (https://github.com/ansible-collections/community.general/pull/4566).
+  - webfaction_db - minor refactoring (https://github.com/ansible-collections/community.general/pull/4566).
+  - nomad_job - minor refactoring (https://github.com/ansible-collections/community.general/pull/4566).
+  - nomad_job_info - minor refactoring (https://github.com/ansible-collections/community.general/pull/4566).
