@@ -52,11 +52,32 @@ DOCUMENTATION = '''
           - Proxmox authentication password.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_PASSWORD) will be used instead.
           - Since community.general 4.7.0 you can also use templating to specify the value of the I(password).
-        required: yes
+          - If you do not specify a password, you must set I(token_id) and I(token_secret) instead.
         type: str
         env:
           - name: PROXMOX_PASSWORD
             version_added: 2.0.0
+      token_id:
+        description:
+          - Proxmox authentication token ID.
+          - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_TOKEN_ID) will be used instead.
+          - To use token authentication, you must also specify I(token_secret). If you do not specify I(token_id) and I(token_secret),
+            you must set a password instead.
+          - Make sure to grant explicit pve permissions to the token or disable 'privilege separation' to use the users' privileges instead.
+        version_added: 4.8.0
+        type: str
+        env:
+          - name: PROXMOX_TOKEN_ID
+      token_secret:
+        description:
+          - Proxmox authentication token secret.
+          - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_TOKEN_SECRET) will be used instead.
+          - To use token authentication, you must also specify I(token_id). If you do not specify I(token_id) and I(token_secret),
+            you must set a password instead.
+        version_added: 4.8.0
+        type: str
+        env:
+          - name: PROXMOX_TOKEN_SECRET
       validate_certs:
         description: Verify SSL certificate if using HTTPS.
         type: boolean
@@ -108,6 +129,22 @@ password: secure
 # Note that this can easily give you wrong values as ansible_host. See further below for
 # an example where this is set to `false` and where ansible_host is set with `compose`.
 want_proxmox_nodes_ansible_host: true
+
+# Instead of login with password, proxmox supports api token authentication since release 6.2.
+plugin: community.general.proxmox
+user: ci@pve
+token_id: gitlab-1
+token_secret: fa256e9c-26ab-41ec-82da-707a2c079829
+
+# The secret can also be a vault string or passed via the environment variable TOKEN_SECRET.
+token_secret: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          62353634333163633336343265623632626339313032653563653165313262343931643431656138
+          6134333736323265656466646539663134306166666237630a653363623262636663333762316136
+          34616361326263383766366663393837626437316462313332663736623066656237386531663731
+          3037646432383064630a663165303564623338666131353366373630656661333437393937343331
+          32643131386134396336623736393634373936356332623632306561356361323737313663633633
+          6231313333666361656537343562333337323030623732323833
 
 # More complete example demonstrating the use of 'want_facts' and the constructed options
 # Note that using facts returned by 'want_facts' in constructed options requires 'want_facts=true'
@@ -222,15 +259,24 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _get_auth(self):
         credentials = urlencode({'username': self.proxmox_user, 'password': self.proxmox_password, })
 
-        a = self._get_session()
-        ret = a.post('%s/api2/json/access/ticket' % self.proxmox_url, data=credentials)
+        if self.proxmox_password:
 
-        json = ret.json()
+            credentials = urlencode({'username': self.proxmox_user, 'password': self.proxmox_password, })
 
-        self.credentials = {
-            'ticket': json['data']['ticket'],
-            'CSRFPreventionToken': json['data']['CSRFPreventionToken'],
-        }
+            a = self._get_session()
+            ret = a.post('%s/api2/json/access/ticket' % self.proxmox_url, data=credentials)
+
+            json = ret.json()
+
+            self.headers = {
+                # only required for POST/PUT/DELETE methods, which we are not using currently
+                # 'CSRFPreventionToken': json['data']['CSRFPreventionToken'],
+                'Cookie': 'PVEAuthCookie={0}'.format(json['data']['ticket'])
+            }
+
+        else:
+
+            self.headers = {'Authorization': 'PVEAPIToken={0}!{1}={2}'.format(self.proxmox_user, self.proxmox_token_id, self.proxmox_token_secret)}
 
     def _get_json(self, url, ignore_errors=None):
 
@@ -242,8 +288,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             data = []
             s = self._get_session()
             while True:
-                headers = {'Cookie': 'PVEAuthCookie={0}'.format(self.credentials['ticket'])}
-                ret = s.get(url, headers=headers)
+                ret = s.get(url, headers=self.headers)
                 if ignore_errors and ret.status_code in ignore_errors:
                     break
                 ret.raise_for_status()
@@ -551,6 +596,19 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if t.is_template(proxmox_password):
             proxmox_password = t.template(variable=proxmox_password, disable_lookups=False)
         self.proxmox_password = proxmox_password
+
+        proxmox_token_id = self.get_option('token_id')
+        if t.is_template(proxmox_token_id):
+            proxmox_token_id = t.template(variable=proxmox_token_id, disable_lookups=False)
+        self.proxmox_token_id = proxmox_token_id
+
+        proxmox_token_secret = self.get_option('token_secret')
+        if t.is_template(proxmox_token_secret):
+            proxmox_token_secret = t.template(variable=proxmox_token_secret, disable_lookups=False)
+        self.proxmox_token_secret = proxmox_token_secret
+
+        if proxmox_password is None and (proxmox_token_id is None or proxmox_token_secret is None):
+            raise AnsibleError('You must specify either a password or both token_id and token_secret.')
 
         self.cache_key = self.get_cache_key(path)
         self.use_cache = cache and self.get_option('cache')
