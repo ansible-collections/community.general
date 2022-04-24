@@ -62,17 +62,19 @@ def test_arg_format(func, fmt_opt, value, expected):
 
 
 TC_RUNNER = dict(
-    # aa_bb=(
+    # SAMPLE
+    #
+    # testcase_name=(
     #     # input
     #     dict(
     #         args_bundle = dict(
-    #             aa=dict(
+    #             param1=dict(
     #                 type="int",
     #                 value=11,
     #                 fmt_func=fmt.as_opt_eq_val,
     #                 fmt_arg="--answer",
     #             ),
-    #             bb=dict(
+    #             param2=dict(
     #                 fmt_func=fmt.as_bool,
     #                 fmt_arg="--bb-here",
     #             )
@@ -108,6 +110,7 @@ TC_RUNNER = dict(
     #         exc=None,
     #     ),
     # ),
+    #
     aa_bb=(
         dict(
             args_bundle=dict(
