@@ -99,7 +99,7 @@ class _ArgFormat(object):
         return [str(x) for x in f(value)]
 
 
-class _Format:
+class _Format(object):
     @staticmethod
     def as_bool(args):
         return _ArgFormat(lambda value: _ensure_list(args) if value else [])
@@ -164,7 +164,7 @@ class _Format:
         return wrapper
 
 
-class CmdRunner:
+class CmdRunner(object):
     """
     Wrapper for ``AnsibleModule.run_command()``.
 
@@ -215,7 +215,7 @@ class CmdRunner:
         return arg in self.arg_formats
 
 
-class _CmdRunnerContext:
+class _CmdRunnerContext(object):
     def __init__(self, runner, args_order, output_process, ignore_value_none, **kwargs):
         self.runner = runner
         self.args_order = tuple(args_order)
