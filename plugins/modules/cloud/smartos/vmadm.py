@@ -684,7 +684,7 @@ def main():
             choices=['present', 'running', 'absent', 'deleted', 'stopped', 'created', 'restarted', 'rebooted']
         ),
         name=dict(
-            default=None, type='str',
+            type='str',
             aliases=['alias']
         ),
         brand=dict(
@@ -709,7 +709,7 @@ def main():
     # Add our 'simple' options to options dict.
     for type in properties:
         for p in properties[type]:
-            option = dict(default=None, type=type)
+            option = dict(type=type)
             options[p] = option
 
     module = AnsibleModule(

@@ -263,9 +263,9 @@ def act_on_volume(target_state, module, packet_conn):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            id=dict(type='str', default=None),
-            description=dict(type="str", default=None),
-            name=dict(type='str', default=None),
+            id=dict(type='str'),
+            description=dict(type="str"),
+            name=dict(type='str'),
             state=dict(choices=VOLUME_STATES, default="present"),
             auth_token=dict(
                 type='str',
@@ -277,7 +277,7 @@ def main():
             facility=dict(type="str"),
             size=dict(type="int"),
             locked=dict(type="bool", default=False),
-            snapshot_policy=dict(type='dict', default=None),
+            snapshot_policy=dict(type='dict'),
             billing_cycle=dict(type='str', choices=BILLING, default="hourly"),
         ),
         supports_check_mode=True,

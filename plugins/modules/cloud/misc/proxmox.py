@@ -564,7 +564,7 @@ def main():
         force=dict(type='bool', default=False),
         purge=dict(type='bool', default=False),
         state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted']),
-        pubkey=dict(type='str', default=None),
+        pubkey=dict(type='str'),
         unprivileged=dict(type='bool', default=False),
         description=dict(type='str'),
         hookscript=dict(type='str'),
