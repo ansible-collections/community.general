@@ -185,7 +185,11 @@ class XFConfProperty(CmdStateModuleHelper):
                             choices=('string', 'int', 'double', 'bool', 'uint', 'uchar', 'char', 'uint64', 'int64', 'float')),
             value=dict(type='list', elements='raw'),
             force_array=dict(type='bool', default=False, aliases=['array']),
-            disable_facts=dict(type='bool', default=True),
+            disable_facts=dict(
+                type='bool', default=True,
+                removed_in_version='8.0.0',
+                removed_from_collection='community.general'
+            ),
         ),
         required_if=[('state', 'present', ['value', 'value_type'])],
         required_together=[('value', 'value_type')],
