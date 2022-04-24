@@ -28,7 +28,7 @@ options:
   state:
     description:
      - Indicate desired state of the instance snapshot.
-     - The C(rollback) value was added in community.general 4.7.0.
+     - The C(rollback) value was added in community.general 4.8.0.
     choices: ['present', 'absent', 'rollback']
     default: present
     type: str
