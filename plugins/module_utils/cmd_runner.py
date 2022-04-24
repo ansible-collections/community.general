@@ -109,11 +109,11 @@ class _Format:
 
     @staticmethod
     def as_optval(arg, ignore_none=None):
-        return _ArgFormat(lambda value: ["{0}{1}".format(arg, str(value))], ignore_none=ignore_none)
+        return _ArgFormat(lambda value: ["{0}{1}".format(arg, value)], ignore_none=ignore_none)
 
     @staticmethod
     def as_opt_val(arg, ignore_none=None):
-        return _ArgFormat(lambda value: [arg, str(value)], ignore_none=ignore_none)
+        return _ArgFormat(lambda value: [arg, value], ignore_none=ignore_none)
 
     @staticmethod
     def as_opt_eq_val(arg, ignore_none=None):
