@@ -30,7 +30,7 @@ class MissingArgumentFormat(CmdRunnerException):
         self.args_formats = args_formats
 
     def __repr__(self):
-        return "<MissingArgumentFormat: {0} order: {1} formats: {2}>".format(
+        return "MissingArgumentFormat({0!r}, {1!r}, {2!r})".format(
             self.arg,
             self.args_order,
             self.args_formats,
@@ -50,9 +50,9 @@ class MissingArgumentValue(CmdRunnerException):
         self.arg = arg
 
     def __repr__(self):
-        return "<MissingArgumentValue: {0} order: {1}>".format(
-            self.arg,
+        return "MissingArgumentValue({0!r}, {1!r})".format(
             self.args_order,
+            self.arg,
         )
 
     def __str__(self):
@@ -71,9 +71,10 @@ class FormatError(CmdRunnerException):
         super(FormatError, self).__init__()
 
     def __repr__(self):
-        return "<FormatError: name: {0} value: {1} exc: {2}>".format(
+        return "FormatError({0!r}, {1!r}, {2!r}, {3!r})".format(
             self.name,
             self.value,
+            self.args_formats,
             self.exc,
         )
 
