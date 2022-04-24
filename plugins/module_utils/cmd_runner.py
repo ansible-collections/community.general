@@ -85,7 +85,7 @@ class FormatError(CmdRunnerException):
         )
 
 
-class _ArgFormat:
+class _ArgFormat(object):
     def __init__(self, func, ignore_none=None):
         self.func = func
         self.ignore_none = ignore_none
