@@ -102,14 +102,14 @@ def run():
             use_ssl=dict(type='bool', default=True),
             timeout=dict(type='int', default=5),
             validate_certs=dict(type='bool', default=True),
-            client_cert=dict(type='path', default=None),
-            client_key=dict(type='path', default=None),
-            namespace=dict(type='str', default=None),
-            name=dict(type='str', default=None),
+            client_cert=dict(type='path'),
+            client_key=dict(type='path'),
+            namespace=dict(type='str'),
+            name=dict(type='str'),
             content_format=dict(choices=['hcl', 'json'], default='hcl'),
-            content=dict(type='str', default=None),
+            content=dict(type='str'),
             force_start=dict(type='bool', default=False),
-            token=dict(type='str', default=None, no_log=True)
+            token=dict(type='str', no_log=True)
         ),
         supports_check_mode=True,
         mutually_exclusive=[

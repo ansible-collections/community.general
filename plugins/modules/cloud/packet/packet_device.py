@@ -630,7 +630,7 @@ def main():
             plan=dict(),
             project_id=dict(required=True),
             state=dict(choices=ALLOWED_STATES, default='present'),
-            user_data=dict(default=None),
+            user_data=dict(),
             wait_for_public_IPv=dict(type='int', choices=[4, 6]),
             wait_timeout=dict(type='int', default=900),
             ipxe_script_url=dict(default=''),

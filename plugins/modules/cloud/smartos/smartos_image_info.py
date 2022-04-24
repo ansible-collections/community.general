@@ -95,7 +95,7 @@ class ImageFacts(object):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            filters=dict(default=None),
+            filters=dict(),
         ),
         supports_check_mode=True,
     )

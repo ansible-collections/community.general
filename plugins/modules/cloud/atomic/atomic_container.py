@@ -182,10 +182,10 @@ def core(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            mode=dict(default=None, choices=['user', 'system']),
+            mode=dict(choices=['user', 'system']),
             name=dict(required=True),
             image=dict(required=True),
-            rootfs=dict(default=None),
+            rootfs=dict(),
             state=dict(default='latest', choices=['present', 'absent', 'latest', 'rollback']),
             backend=dict(required=True, choices=['docker', 'ostree']),
             values=dict(type='list', default=[], elements='str'),

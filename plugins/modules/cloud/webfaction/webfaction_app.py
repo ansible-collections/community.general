@@ -110,14 +110,14 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True),
-            state=dict(required=False, choices=['present', 'absent'], default='present'),
+            state=dict(choices=['present', 'absent'], default='present'),
             type=dict(required=True),
-            autostart=dict(required=False, type='bool', default=False),
-            extra_info=dict(required=False, default=""),
-            port_open=dict(required=False, type='bool', default=False),
+            autostart=dict(type='bool', default=False),
+            extra_info=dict(default=""),
+            port_open=dict(type='bool', default=False),
             login_name=dict(required=True),
             login_password=dict(required=True, no_log=True),
-            machine=dict(required=False, default=None),
+            machine=dict(),
         ),
         supports_check_mode=True
     )
