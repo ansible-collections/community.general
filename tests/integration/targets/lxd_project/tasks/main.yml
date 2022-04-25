@@ -1,0 +1,140 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: Clean up test project
+  lxd_project:
+    name: ansible-test-project
+    state: absent
+
+- name: Clean up test project
+  lxd_project:
+    name: ansible-test-project-renamed
+    state: absent
+
+- name: Create test project
+  lxd_project:
+    name: ansible-test-project
+    config:
+      features.images: "false"
+      features.networks: "true"
+      features.profiles: "true"
+      limits.cpu: "3"
+    state: present
+  register: results
+
+- name: Check project has been created correctly
+  assert:
+    that:
+      - results is changed
+      - results.actions is defined
+      - "'create' in results.actions"
+
+- name: Create test project again with merge_project set to true
+  lxd_project:
+    name: ansible-test-project
+    merge_project: true
+    config:
+      features.images: "false"
+      features.networks: "true"
+      features.profiles: "true"
+      limits.cpu: "3"
+    state: present
+  register: results
+
+- name: Check state is not changed
+  assert:
+    that:
+      - results is not changed
+      - "{{ results.actions | length }} == 0"
+
+- name: Create test project again with merge_project set to false
+  lxd_project:
+    name: ansible-test-project
+    merge_project: false
+    config:
+      features.images: "false"
+      features.networks: "true"
+      features.profiles: "true"
+      limits.cpu: "3"
+    state: present
+  register: results
+
+- name: Check state is not changed
+  assert:
+    that:
+      - results is changed
+      - "'apply_projects_configs' in results.actions"
+
+- name: Update project test => update description
+  lxd_project:
+    name: ansible-test-project
+    merge_project: false
+    description: "ansible test project"
+    config:
+      features.images: "false"
+      features.networks: "true"
+      features.profiles: "true"
+      limits.cpu: "3"
+    state: present
+  register: results
+
+- name: Check state is changed
+  assert:
+    that:
+      - results is changed
+      - "'apply_projects_configs' in results.actions"
+
+- name: Update project test => update project config
+  lxd_project:
+    name: ansible-test-project
+    merge_project: false
+    description: "ansible test project"
+    config:
+      features.images: "false"
+      features.networks: "true"
+      features.profiles: "true"
+      limits.cpu: "4"
+    state: present
+  register: results
+
+- name: Check state is changed
+  assert:
+    that:
+      - results is changed
+      - "'apply_projects_configs' in results.actions"
+
+- name: Rename project test
+  lxd_project:
+    name: ansible-test-project
+    new_name: ansible-test-project-renamed
+    merge_project: true
+    description: "ansible test project"
+    config:
+      features.images: "false"
+      features.networks: "true"
+      features.profiles: "true"
+      limits.cpu: "4"
+    state: present
+  register: results
+
+- name: Check state is changed
+  assert:
+    that:
+      - results is changed
+      - "'rename' in results.actions"
+
+- name: Clean up test project
+  lxd_project:
+    name: ansible-test-project-renamed
+    state: absent
+  register: results
+
+- name: Check project is deleted
+  assert:
+    that:
+      - results is changed
+      - "'delete' in results.actions"
