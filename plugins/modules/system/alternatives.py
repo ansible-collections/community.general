@@ -41,11 +41,15 @@ options:
       - The priority of the alternative.
     type: int
     default: 50
-  selected:
+  state:
     description:
-      - Whether to set this alternative as the currently selected alternative.
-    type: bool
-    default: true
+      - C(present): install the alternative (if not already installed), but do
+        not set it as the currently selected alternative for the group.
+      - C(selected): install the alternative (if not already installed), and
+        set it as the currently selected alternative for the group.
+    choices: [ present, selected ]
+    default: selected
+    type: str
     version_added: 4.8.0
 requirements: [ update-alternatives ]
 '''
@@ -67,13 +71,26 @@ EXAMPLES = r'''
     name: java
     path: /usr/lib/jvm/java-7-openjdk-i386/jre/bin/java
     priority: -10
+
+- name: Install Python 3.5 but do not select it
+  community.general.alternatives:
+    name: python
+    path: /usr/bin/python3.5
+    link: /usr/bin/python
+    state: present
 '''
 
+import enum
 import os
 import re
 import subprocess
 
 from ansible.module_utils.basic import AnsibleModule
+
+
+class AlternativeState(str, enum.Enum):
+    PRESENT = "present"
+    SELECTED = "selected"
 
 
 def main():
@@ -84,17 +101,18 @@ def main():
             path=dict(type='path', required=True),
             link=dict(type='path'),
             priority=dict(type='int', default=50),
-            selected=dict(type='bool', default=True),
-        ),
+            state=dict(type='str', choices=[e.value for e in AlternativeState],
+                       default=AlternativeState.SELECTED),
+            ),
         supports_check_mode=True,
-    )
+        )
 
     params = module.params
     name = params['name']
     path = params['path']
     link = params['link']
     priority = params['priority']
-    selected = params['selected']
+    state = params['state']
 
     UPDATE_ALTERNATIVES = module.get_bin_path('update-alternatives', True)
 
@@ -141,7 +159,10 @@ def main():
         # installed, or if it is to be set as the current selection.
         if module.check_mode:
             module.exit_json(
-                changed=(path not in all_alternatives or selected),
+                changed=(
+                    path not in all_alternatives or
+                    state == AlternativeState.SELECTED
+                ),
                 current_path=current_path,
             )
 
@@ -160,7 +181,7 @@ def main():
                 changed = True
 
             # set the current selection to this path (if requested)
-            if selected:
+            if state == AlternativeState.SELECTED:
                 module.run_command(
                     [UPDATE_ALTERNATIVES, '--set', name, path],
                     check_rc=True
