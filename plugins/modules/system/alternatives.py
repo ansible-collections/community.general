@@ -190,6 +190,20 @@ def main():
 
         except subprocess.CalledProcessError as cpe:
             module.fail_json(msg=str(dir(cpe)))
+    elif current_path == path and state == AlternativeState.PRESENT:
+        # Case where alternative is currently selected, but state is set
+        # to 'present'. In this case, we set to auto mode.
+        if module.check_mode:
+            module.exit_json(changed=True, current_path=current_path)
+
+        changed = True
+        try:
+            module.run_command(
+                [UPDATE_ALTERNATIVES, '--auto', name],
+                check_rc=True,
+            )
+        except subprocess.CalledProcessError as cpe:
+            module.fail_json(msg=str(dir(cpe)))
 
     module.exit_json(changed=changed)
 
