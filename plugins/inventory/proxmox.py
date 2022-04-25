@@ -3,6 +3,7 @@
 # Copyright (c) 2018 Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import (absolute_import, division, print_function)
+
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -206,6 +207,7 @@ from ansible.module_utils.common._collections_compat import MutableMapping
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.six import string_types
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.utils.display import Display
 from ansible.template import Templar
@@ -405,7 +407,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                         agent_iface_key = self.to_safe('%s%s' % (key, "_interfaces"))
                         properties[agent_iface_key] = agent_iface_value
 
-                if config not in plaintext_configs and not isinstance(value, int) and all("=" in v for v in value.split(",")):
+                if config == 'lxc':
+                    out_val = {}
+                    for k, v in value:
+                        if k.startswith('lxc.'):
+                            k = k[len('lxc.'):]
+                        out_val[k] = v
+                    value = out_val
+
+                if config not in plaintext_configs and isinstance(value, string_types) \
+                        and all("=" in v for v in value.split(",")):
                     # split off strings with commas to a dict
                     # skip over any keys that cannot be processed
                     try:
