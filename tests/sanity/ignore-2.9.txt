@@ -7,6 +7,7 @@
 plugins/module_utils/cloud.py pylint:bad-option-value  # a pylint test that is disabled was modified over time
 plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
 plugins/modules/cloud/lxc/lxc_container.py validate-modules:use-run-command-not-popen
+plugins/modules/cloud/lxd/lxd_project.py use-argspec-type-path # expanduser() applied to constants
 plugins/modules/cloud/rackspace/rax.py use-argspec-type-path
 plugins/modules/cloud/rackspace/rax_files_objects.py use-argspec-type-path
 plugins/modules/cloud/rackspace/rax_scaling_group.py use-argspec-type-path  # fix needed, expanduser() applied to dict values
