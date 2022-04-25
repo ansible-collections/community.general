@@ -80,7 +80,6 @@ EXAMPLES = r'''
     state: present
 '''
 
-import enum
 import os
 import re
 import subprocess
@@ -88,9 +87,13 @@ import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
 
-class AlternativeState(str, enum.Enum):
+class AlternativeState:
     PRESENT = "present"
     SELECTED = "selected"
+
+    @classmethod
+    def to_list(cls):
+        return [cls.PRESENT, cls.SELECTED]
 
 
 def main():
@@ -101,8 +104,11 @@ def main():
             path=dict(type='path', required=True),
             link=dict(type='path'),
             priority=dict(type='int', default=50),
-            state=dict(type='str', choices=[e.value for e in AlternativeState],
-                       default=AlternativeState.SELECTED),
+            state=dict(
+                type='str',
+                choices=AlternativeState.to_list(),
+                default=AlternativeState.SELECTED,
+            ),
         ),
         supports_check_mode=True,
     )
