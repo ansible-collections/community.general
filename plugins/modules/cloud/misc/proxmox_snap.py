@@ -13,7 +13,7 @@ module: proxmox_snap
 short_description: Snapshot management of instances in Proxmox VE cluster
 version_added: 2.0.0
 description:
-  - Allows you to create/delete snapshots from instances in Proxmox VE cluster.
+  - Allows you to create/delete/restore snapshots from instances in Proxmox VE cluster.
   - Supports both KVM and LXC, OpenVZ has not been tested, as it is no longer supported on Proxmox VE.
 options:
   hostname:
@@ -28,7 +28,8 @@ options:
   state:
     description:
      - Indicate desired state of the instance snapshot.
-    choices: ['present', 'absent']
+     - The C(rollback) value was added in community.general 4.8.0.
+    choices: ['present', 'absent', 'rollback']
     default: present
     type: str
   force:
@@ -53,7 +54,7 @@ options:
     type: int
   snapname:
     description:
-      - Name of the snapshot that has to be created.
+      - Name of the snapshot that has to be created/deleted/restored.
     default: 'ansible_snap'
     type: str
 
@@ -84,6 +85,15 @@ EXAMPLES = r'''
     vmid: 100
     state: absent
     snapname: pre-updates
+
+- name: Rollback container snapshot
+  community.general.proxmox_snap:
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    vmid: 100
+    state: rollback
+    snapname: pre-updates
 '''
 
 RETURN = r'''#'''
@@ -109,15 +119,15 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
         else:
             taskid = self.snapshot(vm, vmid).post(snapname=snapname, description=description, vmstate=int(vmstate))
         while timeout:
-            if (self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['status'] == 'stopped' and
-                    self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):
+            status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
+            if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
                 return True
-            timeout -= 1
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for creating VM snapshot. Last line in task before timeout: %s' %
                                       self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
 
             time.sleep(1)
+            timeout -= 1
         return False
 
     def snapshot_remove(self, vm, vmid, timeout, snapname, force):
@@ -126,15 +136,32 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
 
         taskid = self.snapshot(vm, vmid).delete(snapname, force=int(force))
         while timeout:
-            if (self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['status'] == 'stopped' and
-                    self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):
+            status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
+            if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
                 return True
-            timeout -= 1
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for removing VM snapshot. Last line in task before timeout: %s' %
                                       self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
 
             time.sleep(1)
+            timeout -= 1
+        return False
+
+    def snapshot_rollback(self, vm, vmid, timeout, snapname):
+        if self.module.check_mode:
+            return True
+
+        taskid = self.snapshot(vm, vmid)(snapname).post("rollback")
+        while timeout:
+            status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
+            if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
+                return True
+            if timeout == 0:
+                self.module.fail_json(msg='Reached timeout while waiting for rolling back VM snapshot. Last line in task before timeout: %s' %
+                                      self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
+
+            time.sleep(1)
+            timeout -= 1
         return False
 
 
@@ -144,7 +171,7 @@ def main():
         vmid=dict(required=False),
         hostname=dict(),
         timeout=dict(type='int', default=30),
-        state=dict(default='present', choices=['present', 'absent']),
+        state=dict(default='present', choices=['present', 'absent', 'rollback']),
         description=dict(type='str'),
         snapname=dict(type='str', default='ansible_snap'),
         force=dict(type='bool', default='no'),
@@ -211,6 +238,25 @@ def main():
 
         except Exception as e:
             module.fail_json(msg="Removing snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, to_native(e)))
+    elif state == 'rollback':
+        try:
+            snap_exist = False
+
+            for i in proxmox.snapshot(vm, vmid).get():
+                if i['name'] == snapname:
+                    snap_exist = True
+                    continue
+
+            if not snap_exist:
+                module.exit_json(changed=False, msg="Snapshot %s does not exist" % snapname)
+            if proxmox.snapshot_rollback(vm, vmid, timeout, snapname):
+                if module.check_mode:
+                    module.exit_json(changed=True, msg="Snapshot %s would be rolled back" % snapname)
+                else:
+                    module.exit_json(changed=True, msg="Snapshot %s rolled back" % snapname)
+
+        except Exception as e:
+            module.fail_json(msg="Rollback of snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, to_native(e)))
 
 
 if __name__ == '__main__':
