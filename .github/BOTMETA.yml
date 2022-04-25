@@ -312,6 +312,8 @@ files:
     ignore: hnakamur
   $modules/cloud/lxd/lxd_profile.py:
     maintainers: conloos
+  $modules/cloud/lxd/lxd_project.py:
+    maintainers: we10710aa
   $modules/cloud/memset/:
     maintainers: glitchcrab
   $modules/cloud/misc/cloud_init_data_facts.py:
