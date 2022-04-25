@@ -1,0 +1,1 @@
+bugfixes: add all=True in self._gitlab.groups.list for method get_group_id(self, gitlab_group) to search within larger group counts (https://github.com/ansible-collections/community.general/issues/4460).
