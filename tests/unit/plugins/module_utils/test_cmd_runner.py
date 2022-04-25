@@ -62,7 +62,7 @@ def test_arg_format(func, fmt_opt, value, expected):
 
 
 TC_RUNNER = dict(
-    # SAMPLE
+    # SAMPLE: This shows all possible elements of a test case. It does not actually run.
     #
     # testcase_name=(
     #     # input
