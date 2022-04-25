@@ -1,0 +1,7 @@
+# (c) 2022, Alexei Znamensky
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: parameterized test cmd_echo
+  ansible.builtin.include_tasks:
+    file: test_cmd_echo.yml
+  loop: "{{ cmd_echo_tests }}"

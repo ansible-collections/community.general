@@ -1,0 +1,2 @@
+minor_changes:
+  - cmd_runner module util - reusable command runner with consistent argument formatting and sensible defaults (https://github.com/ansible-collections/community.general/pull/4476).
