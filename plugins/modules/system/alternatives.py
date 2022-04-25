@@ -43,9 +43,9 @@ options:
     default: 50
   state:
     description:
-      - C(present): install the alternative (if not already installed), but do
+      - C(present) - install the alternative (if not already installed), but do
         not set it as the currently selected alternative for the group.
-      - C(selected): install the alternative (if not already installed), and
+      - C(selected) - install the alternative (if not already installed), and
         set it as the currently selected alternative for the group.
     choices: [ present, selected ]
     default: selected
@@ -103,9 +103,9 @@ def main():
             priority=dict(type='int', default=50),
             state=dict(type='str', choices=[e.value for e in AlternativeState],
                        default=AlternativeState.SELECTED),
-            ),
+        ),
         supports_check_mode=True,
-        )
+    )
 
     params = module.params
     name = params['name']
