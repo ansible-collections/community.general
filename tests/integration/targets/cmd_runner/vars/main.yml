@@ -1,0 +1,84 @@
+# -*- coding: utf-8 -*-
+# (c) 2022, Alexei Znamensky
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+cmd_echo_tests:
+  - name: set aa and bb value
+    arg_formats:
+      aa:
+        func: as_opt_eq_val
+        args: [--answer]
+      bb:
+        func: as_bool
+        args: [--bb-here]
+    arg_order: 'aa bb'
+    arg_values:
+      bb: true
+    aa: 11
+    assertions:
+      - test_result.rc == 0
+      - test_result.out == "-- --answer=11 --bb-here\n"
+      - test_result.err == ""
+
+  - name: default aa value
+    arg_formats:
+      aa:
+        func: as_opt_eq_val
+        args: [--answer]
+      bb:
+        func: as_bool
+        args: [--bb-here]
+    arg_order: ['aa', 'bb']
+    arg_values:
+      aa: 43
+      bb: true
+    assertions:
+      - test_result.rc == 0
+      - test_result.out == "-- --answer=43 --bb-here\n"
+      - test_result.err == ""
+
+  - name: implicit aa format
+    arg_formats:
+      bb:
+        func: as_bool
+        args: [--bb-here]
+    arg_order: ['aa', 'bb']
+    arg_values:
+      bb: true
+    aa: 1984
+    assertions:
+      - test_result.rc == 0
+      - test_result.out == "-- --aa 1984 --bb-here\n"
+      - test_result.err == ""
+
+  - name: missing bb format
+    arg_order: ['aa', 'bb']
+    arg_values:
+      bb: true
+    aa: 1984
+    expect_error: true
+    assertions:
+      - test_result is failed
+      - test_result.rc == 1
+      - '"out" not in test_result'
+      - '"err" not in test_result'
+      - >-
+        "MissingArgumentFormat: Cannot find format for parameter bb"
+        in test_result.module_stderr
+
+  - name: missing bb value
+    arg_formats:
+      bb:
+        func: as_bool
+        args: [--bb-here]
+    arg_order: 'aa bb'
+    aa: 1984
+    expect_error: true
+    assertions:
+      - test_result is failed
+      - test_result.rc == 1
+      - '"out" not in test_result'
+      - '"err" not in test_result'
+      - >-
+        "MissingArgumentValue: Cannot find value for parameter bb"
+        in test_result.module_stderr
