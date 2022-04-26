@@ -562,6 +562,8 @@ files:
     maintainers: phumpal
     labels: airbrake_deployment
     ignore: bpennypacker
+  $modules/monitoring/alerta_customer.py:
+    maintainers: cwollinger
   $modules/monitoring/bigpanda.py:
     maintainers: hkariti
   $modules/monitoring/circonus_annotation.py:
