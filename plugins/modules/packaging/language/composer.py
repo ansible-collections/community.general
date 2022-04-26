@@ -41,82 +41,60 @@ options:
             - Directory of your project (see --working-dir). This is required when
               the command is not run globally.
             - Will be ignored if C(global_command=true).
-            - Alias C(working-dir) has been deprecated and will be removed in community.general 5.0.0.
-        aliases: [ working-dir ]
     global_command:
         description:
             - Runs the specified command globally.
-            - Alias C(global-command) has been deprecated and will be removed in community.general 5.0.0.
         type: bool
         default: false
-        aliases: [ global-command ]
     prefer_source:
         description:
             - Forces installation from package sources when possible (see --prefer-source).
-            - Alias C(prefer-source) has been deprecated and will be removed in community.general 5.0.0.
         default: false
         type: bool
-        aliases: [ prefer-source ]
     prefer_dist:
         description:
             - Forces installation from package dist even for dev versions (see --prefer-dist).
-            - Alias C(prefer-dist) has been deprecated and will be removed in community.general 5.0.0.
         default: false
         type: bool
-        aliases: [ prefer-dist ]
     no_dev:
         description:
             - Disables installation of require-dev packages (see --no-dev).
-            - Alias C(no-dev) has been deprecated and will be removed in community.general 5.0.0.
         default: true
         type: bool
-        aliases: [ no-dev ]
     no_scripts:
         description:
             - Skips the execution of all scripts defined in composer.json (see --no-scripts).
-            - Alias C(no-scripts) has been deprecated and will be removed in community.general 5.0.0.
         default: false
         type: bool
-        aliases: [ no-scripts ]
     no_plugins:
         description:
-            - Disables all plugins ( see --no-plugins ).
-            - Alias C(no-plugins) has been deprecated and will be removed in community.general 5.0.0.
+            - Disables all plugins (see --no-plugins).
         default: false
         type: bool
-        aliases: [ no-plugins ]
     optimize_autoloader:
         description:
             - Optimize autoloader during autoloader dump (see --optimize-autoloader).
             - Convert PSR-0/4 autoloading to classmap to get a faster autoloader.
             - Recommended especially for production, but can take a bit of time to run.
-            - Alias C(optimize-autoloader) has been deprecated and will be removed in community.general 5.0.0.
         default: true
         type: bool
-        aliases: [ optimize-autoloader ]
     classmap_authoritative:
         description:
             - Autoload classes from classmap only.
             - Implicitely enable optimize_autoloader.
             - Recommended especially for production, but can take a bit of time to run.
-            - Alias C(classmap-authoritative) has been deprecated and will be removed in community.general 5.0.0.
         default: false
         type: bool
-        aliases: [ classmap-authoritative ]
     apcu_autoloader:
         description:
             - Uses APCu to cache found/not-found classes
-            - Alias C(apcu-autoloader) has been deprecated and will be removed in community.general 5.0.0.
         default: false
         type: bool
-        aliases: [ apcu-autoloader ]
     ignore_platform_reqs:
         description:
             - Ignore php, hhvm, lib-* and ext-* requirements and force the installation even if the local machine does not fulfill these.
-            - Alias C(ignore-platform-reqs) has been deprecated and will be removed in community.general 5.0.0.
         default: false
         type: bool
-        aliases: [ ignore-platform-reqs ]
     composer_executable:
         type: path
         description:
@@ -207,39 +185,17 @@ def main():
             command=dict(default="install", type="str"),
             arguments=dict(default="", type="str"),
             executable=dict(type="path", aliases=["php_path"]),
-            working_dir=dict(
-                type="path", aliases=["working-dir"],
-                deprecated_aliases=[dict(name='working-dir', version='5.0.0', collection_name='community.general')]),
-            global_command=dict(
-                default=False, type="bool", aliases=["global-command"],
-                deprecated_aliases=[dict(name='global-command', version='5.0.0', collection_name='community.general')]),
-            prefer_source=dict(
-                default=False, type="bool", aliases=["prefer-source"],
-                deprecated_aliases=[dict(name='prefer-source', version='5.0.0', collection_name='community.general')]),
-            prefer_dist=dict(
-                default=False, type="bool", aliases=["prefer-dist"],
-                deprecated_aliases=[dict(name='prefer-dist', version='5.0.0', collection_name='community.general')]),
-            no_dev=dict(
-                default=True, type="bool", aliases=["no-dev"],
-                deprecated_aliases=[dict(name='no-dev', version='5.0.0', collection_name='community.general')]),
-            no_scripts=dict(
-                default=False, type="bool", aliases=["no-scripts"],
-                deprecated_aliases=[dict(name='no-scripts', version='5.0.0', collection_name='community.general')]),
-            no_plugins=dict(
-                default=False, type="bool", aliases=["no-plugins"],
-                deprecated_aliases=[dict(name='no-plugins', version='5.0.0', collection_name='community.general')]),
-            apcu_autoloader=dict(
-                default=False, type="bool", aliases=["apcu-autoloader"],
-                deprecated_aliases=[dict(name='apcu-autoloader', version='5.0.0', collection_name='community.general')]),
-            optimize_autoloader=dict(
-                default=True, type="bool", aliases=["optimize-autoloader"],
-                deprecated_aliases=[dict(name='optimize-autoloader', version='5.0.0', collection_name='community.general')]),
-            classmap_authoritative=dict(
-                default=False, type="bool", aliases=["classmap-authoritative"],
-                deprecated_aliases=[dict(name='classmap-authoritative', version='5.0.0', collection_name='community.general')]),
-            ignore_platform_reqs=dict(
-                default=False, type="bool", aliases=["ignore-platform-reqs"],
-                deprecated_aliases=[dict(name='ignore-platform-reqs', version='5.0.0', collection_name='community.general')]),
+            working_dir=dict(type="path"),
+            global_command=dict(default=False, type="bool"),
+            prefer_source=dict(default=False, type="bool"),
+            prefer_dist=dict(default=False, type="bool"),
+            no_dev=dict(default=True, type="bool"),
+            no_scripts=dict(default=False, type="bool"),
+            no_plugins=dict(default=False, type="bool"),
+            apcu_autoloader=dict(default=False, type="bool"),
+            optimize_autoloader=dict(default=True, type="bool"),
+            classmap_authoritative=dict(default=False, type="bool"),
+            ignore_platform_reqs=dict(default=False, type="bool"),
             composer_executable=dict(type="path"),
         ),
         required_if=[('global_command', False, ['working_dir'])],

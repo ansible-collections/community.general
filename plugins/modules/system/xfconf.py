@@ -30,25 +30,24 @@ options:
     description:
       - A Xfconf preference channel is a top-level tree key, inside of the
         Xfconf repository that corresponds to the location for which all
-        application properties/keys are stored. See man xfconf-query(1)
+        application properties/keys are stored. See man xfconf-query(1).
     required: true
     type: str
   property:
     description:
       - A Xfce preference key is an element in the Xfconf repository
-        that corresponds to an application preference. See man xfconf-query(1)
+        that corresponds to an application preference. See man xfconf-query(1).
     required: true
     type: str
   value:
     description:
       - Preference properties typically have simple values such as strings,
-        integers, or lists of strings and integers. This is ignored if the state
-        is "get". For array mode, use a list of values. See man xfconf-query(1)
+        integers, or lists of strings and integers. See man xfconf-query(1).
     type: list
     elements: raw
   value_type:
     description:
-      - The type of value being set. This is ignored if the state is "get".
+      - The type of value being set.
       - When providing more than one I(value_type), the length of the list must
         be equal to the length of I(value).
       - If only one I(value_type) is provided, but I(value) contains more than
@@ -65,8 +64,8 @@ options:
     type: str
     description:
       - The action to take upon the property/value.
-      - State C(get) is deprecated and will be removed in community.general 5.0.0. Please use the module M(community.general.xfconf_info) instead.
-    choices: [ get, present, absent ]
+      - The state C(get) has been removed in community.general 5.0.0. Please use the module M(community.general.xfconf_info) instead.
+    choices: [ present, absent ]
     default: "present"
   force_array:
     description:
@@ -121,7 +120,7 @@ RETURN = '''
     sample: "/Xft/DPI"
   value_type:
     description:
-      - The type of the value that was changed (C(none) for C(get) and C(reset)
+      - The type of the value that was changed (C(none) for C(reset)
         state). Either a single string value or a list of strings for array
         types.
       - This is a string or a list of strings.
@@ -138,9 +137,8 @@ RETURN = '''
     sample: '"192" or ["orange", "yellow", "violet"]'
   previous_value:
     description:
-      - The value of the preference key before executing the module (C(none) for
-        C(get) state). Either a single string value or a list of strings for array
-        types.
+      - The value of the preference key before executing the module.
+        Either a single string value or a list of strings for array types.
       - This is a string or a list of strings.
     returned: success
     type: any
@@ -178,7 +176,7 @@ class XFConfProperty(CmdStateModuleHelper):
     facts_params = ('property', 'channel', 'value')
     module = dict(
         argument_spec=dict(
-            state=dict(type='str', choices=("present", "get", "absent"), default="present"),
+            state=dict(type='str', choices=("present", "absent"), default="present"),
             channel=dict(type='str', required=True),
             property=dict(type='str', required=True),
             value_type=dict(type='list', elements='str',
@@ -232,14 +230,6 @@ class XFConfProperty(CmdStateModuleHelper):
 
     def _get(self):
         return self.run_command(params=('channel', 'property'))
-
-    def state_get(self):
-        self.vars.value = self.vars.previous_value
-        self.vars.previous_value = None
-        self.module.deprecate(
-            msg="State 'get' is deprecated. Please use the module community.general.xfconf_info instead",
-            version="5.0.0", collection_name="community.general"
-        )
 
     def state_absent(self):
         if not self.module.check_mode:

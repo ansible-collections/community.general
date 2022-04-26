@@ -78,8 +78,6 @@ options:
   otp:
     description:
       - The 6 digit One Time Password for 2-Factor Authentication. Required together with I(username) and I(password).
-      - Alias C(2fa_token) has been deprecated and will be removed in community.general 5.0.0.
-    aliases: ['2fa_token']
     type: int
 notes:
    - "Refer to GitHub's API documentation here: https://developer.github.com/v3/repos/keys/."
@@ -298,9 +296,7 @@ def main():
             force=dict(required=False, type='bool', default=False),
             username=dict(required=False, type='str'),
             password=dict(required=False, type='str', no_log=True),
-            otp=dict(
-                required=False, type='int', aliases=['2fa_token'], no_log=True,
-                deprecated_aliases=[dict(name='2fa_token', version='5.0.0', collection_name='community.general')]),
+            otp=dict(required=False, type='int', no_log=True),
             token=dict(required=False, type='str', no_log=True)
         ),
         mutually_exclusive=[

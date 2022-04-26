@@ -41,11 +41,9 @@ options:
     update_cache:
         description:
             - update the package database first
-            - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
         required: false
         default: false
         type: bool
-        aliases: [update-cache]
 
 author: Kim Nørgaard (@KimNorgaard)
 requirements: [ "Slackware >= 12.2" ]
@@ -178,9 +176,7 @@ def main():
         argument_spec=dict(
             state=dict(default="present", choices=['installed', 'removed', 'absent', 'present', 'latest']),
             name=dict(aliases=["pkg"], required=True, type='list', elements='str'),
-            update_cache=dict(
-                default=False, aliases=["update-cache"], type='bool',
-                deprecated_aliases=[dict(name='update-cache', version='5.0.0', collection_name='community.general')]),
+            update_cache=dict(default=False, type='bool'),
         ),
         supports_check_mode=True)
 

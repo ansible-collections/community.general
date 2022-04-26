@@ -81,9 +81,7 @@ options:
     default: no
     version_added: 3.5.0
 requirements:
-  - "dnsimple >= 1.0.0"
-notes:
-  - "Support for C(dnsimple < 2) is deprecated and will be removed in community.general 5.0.0."
+  - "dnsimple >= 2.0.0"
 author: "Alex Coomans (@drcapulet)"
 '''
 
@@ -151,80 +149,6 @@ import traceback
 import re
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
-
-
-class DNSimpleV1():
-    """class which uses dnsimple-python < 2"""
-
-    def __init__(self, account_email, account_api_token, sandbox, module):
-        """init"""
-        self.module = module
-        self.account_email = account_email
-        self.account_api_token = account_api_token
-        self.sandbox = sandbox
-        self.dnsimple_client()
-
-    def dnsimple_client(self):
-        """creates a dnsimple client object"""
-        if self.account_email and self.account_api_token:
-            self.client = DNSimple(sandbox=self.sandbox, email=self.account_email, api_token=self.account_api_token)
-        else:
-            self.client = DNSimple(sandbox=self.sandbox)
-
-    def get_all_domains(self):
-        """returns a list of all domains"""
-        domain_list = self.client.domains()
-        return [d['domain'] for d in domain_list]
-
-    def get_domain(self, domain):
-        """returns a single domain by name or id"""
-        try:
-            dr = self.client.domain(domain)['domain']
-        except DNSimpleException as e:
-            exception_string = str(e.args[0]['message'])
-            if re.match(r"^Domain .+ not found$", exception_string):
-                dr = None
-            else:
-                raise
-        return dr
-
-    def create_domain(self, domain):
-        """create a single domain"""
-        return self.client.add_domain(domain)['domain']
-
-    def delete_domain(self, domain):
-        """delete a single domain"""
-        self.client.delete(domain)
-
-    def get_records(self, domain, dnsimple_filter=None):
-        """return dns ressource records which match a specified filter"""
-        return [r['record'] for r in self.client.records(str(domain), params=dnsimple_filter)]
-
-    def delete_record(self, domain, rid):
-        """delete a single dns ressource record"""
-        self.client.delete_record(str(domain), rid)
-
-    def update_record(self, domain, rid, ttl=None, priority=None):
-        """update a single dns ressource record"""
-        data = {}
-        if ttl:
-            data['ttl'] = ttl
-        if priority:
-            data['priority'] = priority
-        return self.client.update_record(str(domain), str(rid), data)['record']
-
-    def create_record(self, domain, name, record_type, content, ttl=None, priority=None):
-        """create a single dns ressource record"""
-        data = {
-            'name': name,
-            'type': record_type,
-            'content': content,
-        }
-        if ttl:
-            data['ttl'] = ttl
-        if priority:
-            data['priority'] = priority
-        return self.client.add_record(str(domain), data)['record']
 
 
 class DNSimpleV2():
@@ -336,16 +260,6 @@ try:
 except ImportError:
     DNSIMPLE_IMP_ERR.append(traceback.format_exc())
 
-if not HAS_DNSIMPLE:
-    # try to import dnsimple < 2.0.0
-    try:
-        from dnsimple.dnsimple import __version__ as dnsimple_version
-        from dnsimple import DNSimple
-        from dnsimple.dnsimple import DNSimpleException
-        HAS_DNSIMPLE = True
-    except ImportError:
-        DNSIMPLE_IMP_ERR.append(traceback.format_exc())
-
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib, env_fallback
 
 
@@ -395,15 +309,10 @@ def main():
     DNSIMPLE_MAJOR_VERSION = LooseVersion(dnsimple_version).version[0]
 
     try:
-        if DNSIMPLE_MAJOR_VERSION > 1:
-            ds = DNSimpleV2(account_email, account_api_token, sandbox, module)
-        else:
-            module.deprecate(
-                'Support for python-dnsimple < 2 is deprecated. '
-                'Update python-dnsimple to version >= 2.0.0',
-                version='5.0.0', collection_name='community.general'
-            )
-            ds = DNSimpleV1(account_email, account_api_token, sandbox, module)
+        if DNSIMPLE_MAJOR_VERSION < 2:
+            module.fail_json(
+                msg='Support for python-dnsimple < 2 has been removed in community.general 5.0.0. Update python-dnsimple to version >= 2.0.0.')
+        ds = DNSimpleV2(account_email, account_api_token, sandbox, module)
         # Let's figure out what operation we want to do
         # No domain, return a list
         if not domain:
