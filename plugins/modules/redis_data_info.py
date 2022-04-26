@@ -1,1 +1,0 @@
-database/misc/redis_data_info.py

@@ -1,1 +1,0 @@
-./cloud/smartos/imgadm.py

@@ -1,1 +1,0 @@
-./remote_management/oneview/oneview_san_manager.py

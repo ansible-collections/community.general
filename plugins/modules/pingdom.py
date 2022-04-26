@@ -1,1 +1,0 @@
-./monitoring/pingdom.py

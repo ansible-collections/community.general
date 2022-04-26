@@ -1,1 +1,0 @@
-cloud/misc/proxmox_storage_info.py

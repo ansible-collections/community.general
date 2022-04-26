@@ -1,1 +1,0 @@
-./cloud/scaleway/scaleway_snapshot_info.py

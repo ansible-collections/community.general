@@ -1,1 +1,0 @@
-./packaging/os/zypper_repository.py

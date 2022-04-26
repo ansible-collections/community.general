@@ -1,1 +1,0 @@
-./cloud/rackspace/rax_mon_notification.py
