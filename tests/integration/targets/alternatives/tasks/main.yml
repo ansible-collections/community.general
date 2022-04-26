@@ -49,6 +49,12 @@
   # Test that path is checked: alternatives must fail when path is nonexistent
   - import_tasks: path_is_checked.yml
 
+  # Test operation of the 'state' parameter
+  - block:
+    - include_tasks: remove_links.yml
+    - include_tasks: tests_state.yml
+
+  # Cleanup
   always:
     - include_tasks: remove_links.yml
 
@@ -62,6 +68,7 @@
         path: '/usr/bin/dummy{{ item }}'
         state: absent
       with_sequence: start=1 end=4
+
   # *Disable tests on Fedora 24*
   # Shippable Fedora 24 image provides chkconfig-1.7-2.fc24.x86_64 but not the
   # latest available version (chkconfig-1.8-1.fc24.x86_64). update-alternatives
