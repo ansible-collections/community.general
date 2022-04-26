@@ -25,21 +25,16 @@ pytest.importorskip('redis')
 
 from ansible import constants as C
 from ansible.plugins.loader import cache_loader
-from ansible.release import __version__ as ansible_version
 from ansible_collections.community.general.plugins.cache.redis import CacheModule as RedisCache
 
 
 def test_redis_cachemodule():
     # The _uri option is required for the redis plugin
     connection = '127.0.0.1:6379:1'
-    if ansible_version.startswith('2.9.'):
-        C.CACHE_PLUGIN_CONNECTION = connection
     assert isinstance(cache_loader.get('community.general.redis', **{'_uri': connection}), RedisCache)
 
 
 def test_redis_cachemodule():
     # The _uri option is required for the redis plugin
     connection = '[::1]:6379:1'
-    if ansible_version.startswith('2.9.'):
-        C.CACHE_PLUGIN_CONNECTION = connection
     assert isinstance(cache_loader.get('community.general.redis', **{'_uri': connection}), RedisCache)

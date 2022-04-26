@@ -16,22 +16,6 @@ from collections import defaultdict
 from operator import itemgetter
 
 
-def merge_hash_wrapper(x, y, recursive=False, list_merge='replace'):
-    ''' Wrapper of the function merge_hash from ansible.utils.vars. Only 2 paramaters are allowed
-        for Ansible 2.9 and lower.'''
-
-    if LooseVersion(ansible_version) < LooseVersion('2.10'):
-        if list_merge != 'replace' or recursive:
-            msg = ("Non default options of list_merge(default=replace) or recursive(default=False) "
-                   "are not allowed in Ansible version 2.9 or lower. Ansible version is %s, "
-                   "recursive=%s, and list_merge=%s.")
-            raise AnsibleFilterError(msg % (ansible_version, recursive, list_merge))
-        else:
-            return merge_hash(x, y)
-    else:
-        return merge_hash(x, y, recursive, list_merge)
-
-
 def list_mergeby(x, y, index, recursive=False, list_merge='replace'):
     ''' Merge 2 lists by attribute 'index'. The function merge_hash from ansible.utils.vars is used.
         This function is used by the function lists_mergeby.
@@ -44,7 +28,7 @@ def list_mergeby(x, y, index, recursive=False, list_merge='replace'):
                 msg = "Elements of list arguments for lists_mergeby must be dictionaries. %s is %s"
                 raise AnsibleFilterError(msg % (elem, type(elem)))
             if index in elem.keys():
-                d[elem[index]].update(merge_hash_wrapper(d[elem[index]], elem, recursive, list_merge))
+                d[elem[index]].update(merge_hash(d[elem[index]], elem, recursive, list_merge))
     return sorted(d.values(), key=itemgetter(index))
 
 
