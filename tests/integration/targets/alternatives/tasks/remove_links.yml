@@ -3,5 +3,6 @@
     path: '{{ item }}'
     state: absent
   with_items:
+    - "{{ alternatives_dir }}/dummy"
     - /etc/alternatives/dummy
     - /usr/bin/dummy
