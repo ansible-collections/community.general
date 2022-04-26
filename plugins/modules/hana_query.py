@@ -1,1 +1,0 @@
-./database/saphana/hana_query.py

@@ -1,1 +1,0 @@
-./packaging/os/redhat_subscription.py
