@@ -1,3 +1,0 @@
-minor_changes:
-  - proxmox_snap - add restore snapshot option (https://github.com/ansible-collections/community.general/pull/4377).
-  - proxmox_snap - fixed timeout value to correctly reflect time in seconds. The timeout was off by one second (https://github.com/ansible-collections/community.general/pull/4377).

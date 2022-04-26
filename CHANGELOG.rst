@@ -6,6 +6,92 @@ Community General Release Notes
 
 This changelog describes changes after version 3.0.0.
 
+v4.8.0
+======
+
+Release Summary
+---------------
+
+Regular feature and bugfix release. Please note that this is the last minor 4.x.0 release. Further releases with major version 4 will be bugfix releases 4.8.y.
+
+Minor Changes
+-------------
+
+- alternatives - add ``state`` parameter, which provides control over whether the alternative should be set as the active selection for its alternatives group (https://github.com/ansible-collections/community.general/issues/4543, https://github.com/ansible-collections/community.general/pull/4557).
+- atomic_container - minor refactoring (https://github.com/ansible-collections/community.general/pull/4567).
+- clc_alert_policy - minor refactoring (https://github.com/ansible-collections/community.general/pull/4556).
+- clc_group - minor refactoring (https://github.com/ansible-collections/community.general/pull/4556).
+- clc_loadbalancer - minor refactoring (https://github.com/ansible-collections/community.general/pull/4556).
+- clc_server - minor refactoring (https://github.com/ansible-collections/community.general/pull/4556).
+- cmd_runner module util - reusable command runner with consistent argument formatting and sensible defaults (https://github.com/ansible-collections/community.general/pull/4476).
+- datadog_monitor - support new datadog event monitor of type `event-v2 alert` (https://github.com/ansible-collections/community.general/pull/4457)
+- filesystem - add support for resizing btrfs (https://github.com/ansible-collections/community.general/issues/4465).
+- lxd_container - adds ``project`` option to allow selecting project for LXD instance (https://github.com/ansible-collections/community.general/pull/4479).
+- lxd_profile - adds ``project`` option to allow selecting project for LXD profile (https://github.com/ansible-collections/community.general/pull/4479).
+- nmap inventory plugin - add ``sudo`` option in plugin in order to execute ``sudo nmap`` so that ``nmap`` runs with elevated privileges (https://github.com/ansible-collections/community.general/pull/4506).
+- nomad_job - minor refactoring (https://github.com/ansible-collections/community.general/pull/4567).
+- nomad_job_info - minor refactoring (https://github.com/ansible-collections/community.general/pull/4567).
+- packet_device - minor refactoring (https://github.com/ansible-collections/community.general/pull/4567).
+- packet_sshkey - minor refactoring (https://github.com/ansible-collections/community.general/pull/4567).
+- packet_volume - minor refactoring (https://github.com/ansible-collections/community.general/pull/4567).
+- profitbricks - minor refactoring (https://github.com/ansible-collections/community.general/pull/4567).
+- proxmox - minor refactoring (https://github.com/ansible-collections/community.general/pull/4567).
+- proxmox inventory plugin - add token authentication as an alternative to username/password (https://github.com/ansible-collections/community.general/pull/4540).
+- proxmox inventory plugin - parse LXC configs returned by the proxmox API (https://github.com/ansible-collections/community.general/pull/4472).
+- proxmox_snap - add restore snapshot option (https://github.com/ansible-collections/community.general/pull/4377).
+- proxmox_snap - fixed timeout value to correctly reflect time in seconds. The timeout was off by one second (https://github.com/ansible-collections/community.general/pull/4377).
+- redfish_command - add ``IndicatorLedOn``, ``IndicatorLedOff``, and ``IndicatorLedBlink`` commands to the Systems category for controling system LEDs (https://github.com/ansible-collections/community.general/issues/4084).
+- seport - minor refactoring (https://github.com/ansible-collections/community.general/pull/4471).
+- smartos_image_info - minor refactoring (https://github.com/ansible-collections/community.general/pull/4567).
+- terraform - adds ``terraform_upgrade`` parameter which allows ``terraform init`` to satisfy new provider constraints in an existing Terraform project (https://github.com/ansible-collections/community.general/issues/4333).
+- udm_group - minor refactoring (https://github.com/ansible-collections/community.general/pull/4556).
+- udm_share - minor refactoring (https://github.com/ansible-collections/community.general/pull/4556).
+- vmadm - minor refactoring (https://github.com/ansible-collections/community.general/pull/4567).
+- webfaction_app - minor refactoring (https://github.com/ansible-collections/community.general/pull/4567).
+- webfaction_db - minor refactoring (https://github.com/ansible-collections/community.general/pull/4567).
+- xfconf - added missing value types ``char``, ``uchar``, ``int64`` and ``uint64`` (https://github.com/ansible-collections/community.general/pull/4534).
+
+Deprecated Features
+-------------------
+
+- nmcli - deprecate default hairpin mode for a bridge. This so we can change it to ``false`` in community.general 7.0.0, as this is also the default in ``nmcli`` (https://github.com/ansible-collections/community.general/pull/4334).
+- proxmox inventory plugin - the current default ``true`` of the ``want_proxmox_nodes_ansible_host`` option has been deprecated. The default will change to ``false`` in community.general 6.0.0. To keep the current behavior, explicitly set ``want_proxmox_nodes_ansible_host`` to ``true`` in your inventory configuration. We suggest to already switch to the new behavior by explicitly setting it to ``false``, and by using ``compose:`` to set ``ansible_host`` to the correct value. See the examples in the plugin documentation for details (https://github.com/ansible-collections/community.general/pull/4466).
+
+Bugfixes
+--------
+
+- dnsmadeeasy - fix failure on deleting DNS entries when API response does not contain monitor value (https://github.com/ansible-collections/community.general/issues/3620).
+- git_branch - remove deprecated and unnecessary branch ``unprotect`` method (https://github.com/ansible-collections/community.general/pull/4496).
+- gitlab_group - improve searching for projects inside group on deletion (https://github.com/ansible-collections/community.general/pull/4491).
+- gitlab_group_members - handle more than 20 groups when finding a group (https://github.com/ansible-collections/community.general/pull/4491, https://github.com/ansible-collections/community.general/issues/4460, https://github.com/ansible-collections/community.general/issues/3729).
+- gitlab_hook - handle more than 20 hooks when finding a hook (https://github.com/ansible-collections/community.general/pull/4491).
+- gitlab_project - handle more than 20 namespaces when finding a namespace (https://github.com/ansible-collections/community.general/pull/4491).
+- gitlab_project_members - handle more than 20 projects and users when finding a project resp. user (https://github.com/ansible-collections/community.general/pull/4491).
+- gitlab_user - handle more than 20 users and SSH keys when finding a user resp. SSH key (https://github.com/ansible-collections/community.general/pull/4491).
+- keycloak - fix parameters types for ``defaultDefaultClientScopes`` and ``defaultOptionalClientScopes`` from list of dictionaries to list of strings (https://github.com/ansible-collections/community.general/pull/4526).
+- opennebula inventory plugin - complete the implementation of ``constructable`` for opennebula inventory plugin. Now ``keyed_groups``, ``compose``, ``groups`` actually work (https://github.com/ansible-collections/community.general/issues/4497).
+- pacman - fixed bug where ``absent`` state did not work for locally installed packages (https://github.com/ansible-collections/community.general/pull/4464).
+- pritunl - fixed bug where pritunl plugin api add unneeded data in ``auth_string`` parameter (https://github.com/ansible-collections/community.general/issues/4527).
+- proxmox inventory plugin - fix error when parsing container with LXC configs (https://github.com/ansible-collections/community.general/issues/4472, https://github.com/ansible-collections/community.general/pull/4472).
+- proxmox_kvm - fix a bug when getting a state of VM without name will fail (https://github.com/ansible-collections/community.general/pull/4508).
+- xbps - fix error message that is reported when installing packages fails (https://github.com/ansible-collections/community.general/pull/4438).
+
+New Modules
+-----------
+
+Cloud
+~~~~~
+
+lxd
+^^^
+
+- lxd_project - Manage LXD projects
+
+Monitoring
+~~~~~~~~~~
+
+- alerta_customer - Manage customers in Alerta
+
 v4.7.0
 ======
 
