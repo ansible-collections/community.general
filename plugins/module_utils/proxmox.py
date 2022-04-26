@@ -122,14 +122,7 @@ class ProxmoxAnsible(object):
 
             self.module.fail_json(msg='No VM with name %s found' % name)
         elif len(vms) > 1:
-            if choose_first_if_multiple:
-                self.module.deprecate(
-                    'Multiple VMs with name %s found, choosing the first one. ' % name +
-                    'This will be an error in the future. To ensure the correct VM is used, ' +
-                    'also pass the vmid parameter.',
-                    version='5.0.0', collection_name='community.general')
-            else:
-                self.module.fail_json(msg='Multiple VMs with name %s found, provide vmid instead' % name)
+            self.module.fail_json(msg='Multiple VMs with name %s found, provide vmid instead' % name)
 
         return vms[0]
 

@@ -18,17 +18,8 @@ plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:para
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:undocumented-parameter
 plugins/modules/clustering/consul/consul.py validate-modules:doc-missing-type
 plugins/modules/clustering/consul/consul.py validate-modules:undocumented-parameter
-plugins/modules/packaging/language/composer.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
 plugins/modules/packaging/language/yarn.py use-argspec-type-path
-plugins/modules/packaging/os/apt_rpm.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
-plugins/modules/packaging/os/homebrew.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
-plugins/modules/packaging/os/homebrew_cask.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
-plugins/modules/packaging/os/opkg.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
-plugins/modules/packaging/os/pacman.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
 plugins/modules/packaging/os/redhat_subscription.py validate-modules:return-syntax-error
-plugins/modules/packaging/os/slackpkg.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
-plugins/modules/packaging/os/urpmi.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
-plugins/modules/packaging/os/xbps.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
 plugins/modules/remote_management/hpilo/hpilo_boot.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/hpilo/hpilo_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/hpilo/hponcfg.py validate-modules:parameter-type-not-in-doc
@@ -36,7 +27,6 @@ plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-missing-type                # missing docs on suboptions
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:parameter-type-not-in-doc       # missing docs on suboptions
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:undocumented-parameter          # missing docs on suboptions
-plugins/modules/source_control/github/github_deploy_key.py validate-modules:parameter-invalid
 plugins/modules/system/iptables_state.py validate-modules:undocumented-parameter
 plugins/modules/system/puppet.py use-argspec-type-path
 plugins/modules/system/puppet.py validate-modules:parameter-invalid  # invalid alias - removed in 7.0.0

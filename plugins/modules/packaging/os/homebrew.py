@@ -49,10 +49,8 @@ options:
     update_homebrew:
         description:
             - update homebrew itself first.
-            - Alias C(update-brew) has been deprecated and will be removed in community.general 5.0.0.
         type: bool
         default: no
-        aliases: ['update-brew']
     upgrade_all:
         description:
             - upgrade all homebrew packages.
@@ -892,9 +890,7 @@ def main():
             ),
             update_homebrew=dict(
                 default=False,
-                aliases=["update-brew"],
                 type='bool',
-                deprecated_aliases=[dict(name='update-brew', version='5.0.0', collection_name='community.general')],
             ),
             upgrade_all=dict(
                 default=False,
