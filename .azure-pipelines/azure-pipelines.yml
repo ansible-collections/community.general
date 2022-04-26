@@ -221,6 +221,7 @@ stages:
           groups:
             - 1
             - 2
+            - 3
   - stage: Remote_2_11
     displayName: Remote 2.11
     dependsOn: []
@@ -238,6 +239,7 @@ stages:
           groups:
             - 1
             - 2
+            - 3
 
 ### Docker
   - stage: Docker_devel
@@ -317,6 +319,7 @@ stages:
             - name: Alpine 3
               test: alpine3
           groups:
+            - 1
             - 2
             - 3
 
