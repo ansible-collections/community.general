@@ -261,13 +261,7 @@ class JavaKeystore:
             self.private_key_path = module.params['private_key_path']
 
     def update_permissions(self):
-        try:
-            file_args = self.module.load_file_common_arguments(self.module.params, path=self.keystore_path)
-        except TypeError:
-            # The path argument is only supported in Ansible-base 2.10+. Fall back to
-            # pre-2.10 behavior for older Ansible versions.
-            self.module.params['path'] = self.keystore_path
-            file_args = self.module.load_file_common_arguments(self.module.params)
+        file_args = self.module.load_file_common_arguments(self.module.params, path=self.keystore_path)
         return self.module.set_fs_attributes_if_different(file_args, False)
 
     def read_certificate_fingerprint(self, cert_format='PEM'):

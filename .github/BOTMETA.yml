@@ -135,8 +135,6 @@ files:
   $filters/json_query.py: {}
   $filters/list.py:
     maintainers: vbotka
-  $filters/path_join_shim.py:
-    maintainers: felixfontein
   $filters/random_mac.py: {}
   $filters/time.py:
     maintainers: resmo

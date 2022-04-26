@@ -15,7 +15,7 @@ DOCUMENTATION = '''
     short_description: sends JSON events to syslog
     description:
       - This plugin logs ansible-playbook and ansible runs to a syslog server in JSON format
-      - Before 2.9 only environment variables were available for configuration
+      - Before Ansible 2.9 only environment variables were available for configuration
     options:
       server:
         description: syslog server that will receive the event
