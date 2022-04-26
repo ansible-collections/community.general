@@ -263,13 +263,7 @@ def main():
             cmd = args
         else:
             cmd = args + [new_value]
-        try:  # try using extra parameter from ansible-base 2.10.4 onwards
-            (rc, out, err) = module.run_command(cmd, cwd=dir, ignore_invalid_cwd=False, expand_user_and_vars=False)
-        except TypeError:
-            # @TODO remove try/except when community.general drop support for 2.10.x
-            if not os.path.isdir(dir):
-                module.fail_json(msg="Cannot find directory '{0}'".format(dir))
-            (rc, out, err) = module.run_command(cmd, cwd=dir, expand_user_and_vars=False)
+        (rc, out, err) = module.run_command(cmd, cwd=dir, ignore_invalid_cwd=False, expand_user_and_vars=False)
         if err:
             module.fail_json(rc=rc, msg=err, cmd=cmd)
 

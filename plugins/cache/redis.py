@@ -99,23 +99,13 @@ class CacheModule(BaseCacheModule):
     def __init__(self, *args, **kwargs):
         uri = ''
 
-        try:
-            super(CacheModule, self).__init__(*args, **kwargs)
-            if self.get_option('_uri'):
-                uri = self.get_option('_uri')
-            self._timeout = float(self.get_option('_timeout'))
-            self._prefix = self.get_option('_prefix')
-            self._keys_set = self.get_option('_keyset_name')
-            self._sentinel_service_name = self.get_option('_sentinel_service_name')
-        except KeyError:
-            # TODO: remove once we no longer support Ansible 2.9
-            if not ansible_base_version.startswith('2.9.'):
-                raise AnsibleError("Do not import CacheModules directly. Use ansible.plugins.loader.cache_loader instead.")
-            if C.CACHE_PLUGIN_CONNECTION:
-                uri = C.CACHE_PLUGIN_CONNECTION
-            self._timeout = float(C.CACHE_PLUGIN_TIMEOUT)
-            self._prefix = C.CACHE_PLUGIN_PREFIX
-            self._keys_set = 'ansible_cache_keys'
+        super(CacheModule, self).__init__(*args, **kwargs)
+        if self.get_option('_uri'):
+            uri = self.get_option('_uri')
+        self._timeout = float(self.get_option('_timeout'))
+        self._prefix = self.get_option('_prefix')
+        self._keys_set = self.get_option('_keyset_name')
+        self._sentinel_service_name = self.get_option('_sentinel_service_name')
 
         if not HAS_REDIS:
             raise AnsibleError("The 'redis' python module (version 2.4.5 or newer) is required for the redis fact cache, 'pip install redis'")

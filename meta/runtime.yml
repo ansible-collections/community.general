@@ -1,5 +1,5 @@
 ---
-requires_ansible: '>=2.9.10'
+requires_ansible: '>=2.11.0'
 plugin_routing:
   connection:
     docker:
@@ -624,6 +624,9 @@ plugin_routing:
     path_join:
       # The ansible.builtin.path_join filter has been added in ansible-base 2.10.
       # Since plugin routing is only available since ansible-base 2.10, this
-      # redirect will be used for ansible-base 2.10 or later, and the included
-      # path_join filter will be used for Ansible 2.9 or earlier.
+      # redirect will be used for ansible-base 2.10 or later. This was mostly
+      # relevant before community.general 5.0.0, when community.general also
+      # supported Ansible 2.9. Back then, the included path_join filter was used
+      # for Ansible 2.9 or earlier. Now we only will have the redirect until we
+      # eventually will deprecate and then remove it.
       redirect: ansible.builtin.path_join
