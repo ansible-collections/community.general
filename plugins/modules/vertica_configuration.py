@@ -1,1 +1,0 @@
-./database/vertica/vertica_configuration.py

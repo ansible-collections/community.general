@@ -1,1 +1,0 @@
-./packaging/os/pacman.py

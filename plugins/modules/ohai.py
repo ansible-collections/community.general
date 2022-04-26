@@ -1,1 +1,0 @@
-./system/ohai.py
