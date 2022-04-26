@@ -1,1 +1,0 @@
-system/xfconf_info.py

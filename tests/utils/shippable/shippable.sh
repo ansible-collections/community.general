@@ -101,13 +101,6 @@ fi
 
 # END: HACK
 
-if [ "${script}" != "sanity" ] && [ "${script}" != "units" ]; then
-    # Adds meta/runtime.yml redirects for all modules before running integration tests.
-    # This ensures that ansible-base and ansible-core will use the "real" modules instead of the
-    # symbolic links, which results in coverage to be reported correctly.
-    "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/internal_test_tools/tools/meta_runtime.py" redirect --target both --flatmap
-fi
-
 export PYTHONIOENCODING='utf-8'
 
 if [ "${JOB_TRIGGERED_BY_NAME:-}" == "nightly-trigger" ]; then

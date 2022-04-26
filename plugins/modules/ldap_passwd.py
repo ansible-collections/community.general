@@ -1,1 +1,0 @@
-./net_tools/ldap/ldap_passwd.py

@@ -1,1 +1,0 @@
-./cloud/huawei/hwc_vpc_private_ip.py

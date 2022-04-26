@@ -1,1 +1,0 @@
-./web_infrastructure/django_manage.py

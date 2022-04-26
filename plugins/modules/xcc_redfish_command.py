@@ -1,1 +1,0 @@
-remote_management/lenovoxcc/xcc_redfish_command.py

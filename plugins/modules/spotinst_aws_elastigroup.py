@@ -1,1 +1,0 @@
-./cloud/spotinst/spotinst_aws_elastigroup.py

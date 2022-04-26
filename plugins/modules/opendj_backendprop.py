@@ -1,1 +1,0 @@
-./identity/opendj/opendj_backendprop.py

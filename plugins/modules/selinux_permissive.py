@@ -1,1 +1,0 @@
-./system/selinux_permissive.py

@@ -1,1 +1,0 @@
-./system/solaris_zone.py
