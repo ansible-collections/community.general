@@ -1,0 +1,4 @@
+alerta_url: http://localhost:8080/
+alerta_user: admin@example.com
+alerta_password: password
+alerta_key: demo-key
