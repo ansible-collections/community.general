@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import os
+import os.path
 import sys
 
 
@@ -37,6 +38,11 @@ def main():
 
         if any(path.startswith(skip_directory) for skip_directory in skip_directories):
             continue
+
+        if os.path.islink(path):
+            print('%s: is a symbolic link' % (path, ))
+        elif not os.path.isfile(path):
+            print('%s: is not a regular file' % (path, ))
 
         ext = os.path.splitext(path)[1]
 
