@@ -1,0 +1,2 @@
+deprecated_features:
+  - vmadm - deprecated module parameter ``debug`` that was not used anywhere (https://github.com/ansible-collections/community.general/pull/4580).

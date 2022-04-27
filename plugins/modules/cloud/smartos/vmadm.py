@@ -661,7 +661,7 @@ def main():
             'zfs_root_compression', 'zpool'
         ],
         'bool': [
-            'archive_on_delete', 'autoboot', 'debug', 'delegate_dataset',
+            'archive_on_delete', 'autoboot', 'delegate_dataset',
             'docker', 'firewall_enabled', 'force', 'indestructible_delegated',
             'indestructible_zoneroot', 'maintain_resolvers', 'nowait'
         ],
@@ -704,6 +704,7 @@ def main():
         nics=dict(type='list', elements='dict'),
         resolvers=dict(type='list', elements='str'),
         filesystems=dict(type='list', elements='dict'),
+        debug=dict(type='bool', removed_in_version='6.0.0', removed_from_collection='community.general'),
     )
 
     # Add our 'simple' options to options dict.
