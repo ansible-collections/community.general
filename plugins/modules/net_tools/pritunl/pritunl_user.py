@@ -88,7 +88,7 @@ options:
         elements: str
         description:
             - Allowed MAC addresses for the user I(user_name).
-        version_added: 4.8.0
+        version_added: 5.0.0
 """
 
 EXAMPLES = """
