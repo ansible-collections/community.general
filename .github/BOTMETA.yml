@@ -140,6 +140,8 @@ files:
     maintainers: resmo
   $filters/unicode_normalize.py:
     maintainers: Ajpantuso
+  $filters/to_seconds.yml:
+    maintainers: resmo
   $filters/version_sort.py:
     maintainers: ericzolf
   $inventories/:
