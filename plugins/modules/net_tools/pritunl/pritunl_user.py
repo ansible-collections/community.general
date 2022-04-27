@@ -216,7 +216,7 @@ def add_or_update_pritunl_user(module):
                 user_params[key] = users[0][key]
 
             # 'groups' is a list comparison
-            if key == "groups":
+            if key == "groups" or key == "mac_addresses":
                 if set(users[0][key]) != set(user_params[key]):
                     user_params_changed = True
 
