@@ -550,7 +550,7 @@ def set_vm_state(module, vm_uuid, vm_state):
     (rc, stdout, stderr) = module.run_command(cmd)
 
     match = re.match('^Successfully.*', stderr)
-    return bool(match)
+    return match is not None
 
 
 def create_payload(module, uuid):
