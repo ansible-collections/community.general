@@ -23,20 +23,24 @@ description:
 options:
   host:
     description:
-    - The HP iLO hostname/address that is linked to the physical system.
+        - The HP iLO hostname/address that is linked to the physical system.
+    type: str
     required: true
   login:
     description:
-    - The login name to authenticate to the HP iLO interface.
+      - The login name to authenticate to the HP iLO interface.
+    type: str
     default: Administrator
   password:
     description:
-    - The password to authenticate to the HP iLO interface.
+      - The password to authenticate to the HP iLO interface.
+    type: str
     default: admin
   ssl_version:
     description:
       - Change the ssl_version used.
     default: TLSv1
+    type: str
     choices: [ "SSLv3", "SSLv23", "TLSv1", "TLSv1_1", "TLSv1_2" ]
 requirements:
 - hpilo
