@@ -597,7 +597,7 @@ def vm_state_transition(module, uuid, vm_state):
 
 
 def is_valid_uuid(uuid):
-    return bool(re.match('^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$', uuid, re.IGNORECASE))
+    return re.match('^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$', uuid, re.IGNORECASE) is not None
 
 
 def validate_uuids(module):
