@@ -24,7 +24,6 @@ plugins/modules/clustering/consul/consul.py validate-modules:undocumented-parame
 plugins/modules/clustering/consul/consul_session.py validate-modules:parameter-state-invalid-choice
 plugins/modules/packaging/language/yarn.py use-argspec-type-path
 plugins/modules/packaging/os/redhat_subscription.py validate-modules:return-syntax-error
-plugins/modules/remote_management/hpilo/hponcfg.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/manageiq/manageiq_policies.py validate-modules:parameter-state-invalid-choice
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-choices-do-not-match-spec   # missing docs on suboptions
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-missing-type                # missing docs on suboptions
