@@ -14,30 +14,33 @@ module: hponcfg
 author: Dag Wieers (@dagwieers)
 short_description: Configure HP iLO interface using hponcfg
 description:
-- This modules configures the HP iLO interface using hponcfg.
+ - This modules configures the HP iLO interface using hponcfg.
 options:
   path:
     description:
-    - The XML file as accepted by hponcfg.
+     - The XML file as accepted by hponcfg.
     required: true
     aliases: ['src']
+    type: path
   minfw:
     description:
-    - The minimum firmware level needed.
+     - The minimum firmware level needed.
     required: false
+    type: str
   executable:
     description:
-    - Path to the hponcfg executable (`hponcfg` which uses $PATH).
+     - Path to the hponcfg executable (`hponcfg` which uses $PATH).
     default: hponcfg
+    type: str
   verbose:
     description:
-    - Run hponcfg in verbose mode (-v).
+     - Run hponcfg in verbose mode (-v).
     default: no
     type: bool
 requirements:
-- hponcfg tool
+ - hponcfg tool
 notes:
-- You need a working hponcfg on the target system.
+ - You need a working hponcfg on the target system.
 '''
 
 EXAMPLES = r'''
