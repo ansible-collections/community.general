@@ -1,2 +1,0 @@
-minor_changes:
-    - hponcfg - revamped module using ModuleHelper (https://github.com/ansible-collections/community.general/pull/3840).

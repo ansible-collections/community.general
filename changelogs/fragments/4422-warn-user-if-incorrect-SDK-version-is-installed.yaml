@@ -1,3 +1,0 @@
----
-bugfixes:
-  - dsv lookup plugin - raise an Ansible error if the wrong ``python-dsv-sdk`` version is installed (https://github.com/ansible-collections/community.general/pull/4422).

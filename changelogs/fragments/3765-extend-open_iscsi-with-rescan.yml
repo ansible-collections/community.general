@@ -1,2 +1,0 @@
-minor_changes:
-  - open_iscsi - extended module to allow rescanning of established session for one or all targets (https://github.com/ansible-collections/community.general/issues/3763).

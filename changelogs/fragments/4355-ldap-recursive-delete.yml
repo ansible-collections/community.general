@@ -1,4 +1,0 @@
----
-minor_changes:
-  - ldap_entry - add support for recursive deletion
-    (https://github.com/ansible-collections/community.general/issues/3613).

@@ -1,2 +1,0 @@
-minor_changes:
-    - monit - calling ``run_command`` with arguments as ``list`` instead of ``str`` (https://github.com/ansible-collections/community.general/pull/3821).

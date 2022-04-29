@@ -1,3 +1,0 @@
----
-minor_changes:
-  - keycloak_client - add ``always_display_in_console`` parameter (https://github.com/ansible-collections/community.general/issues/4390).

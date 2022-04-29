@@ -1,7 +1,0 @@
-minor_changes:
-  - clc_alert_policy - minor refactoring (https://github.com/ansible-collections/community.general/pull/4556).
-  - clc_group - minor refactoring (https://github.com/ansible-collections/community.general/pull/4556).
-  - clc_loadbalancer - minor refactoring (https://github.com/ansible-collections/community.general/pull/4556).
-  - clc_server - minor refactoring (https://github.com/ansible-collections/community.general/pull/4556).
-  - udm_group - minor refactoring (https://github.com/ansible-collections/community.general/pull/4556).
-  - udm_share - minor refactoring (https://github.com/ansible-collections/community.general/pull/4556).

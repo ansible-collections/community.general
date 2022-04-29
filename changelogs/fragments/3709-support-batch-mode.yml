@@ -1,2 +1,0 @@
-bugfixes:
-  - counter_enabled callback plugin - fix output to correctly display host and task counters in serial mode (https://github.com/ansible-collections/community.general/pull/3709).

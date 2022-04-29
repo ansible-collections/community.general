@@ -1,2 +1,0 @@
-bugfixes:
-  - github_repo - ``private`` and ``description`` attributes should not be set to default values when the repo already exists (https://github.com/ansible-collections/community.general/pull/2386).

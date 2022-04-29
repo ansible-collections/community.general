@@ -1,3 +1,0 @@
----
-minor_changes:
-  - nmcli - add support for ``eui64`` and ``ipv6privacy`` parameters (https://github.com/ansible-collections/community.general/issues/3357).

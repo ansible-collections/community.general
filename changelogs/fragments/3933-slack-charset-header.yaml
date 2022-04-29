@@ -1,2 +1,0 @@
-bugfixes:
-  - slack - add ``charset`` to HTTP headers to avoid Slack API warning (https://github.com/ansible-collections/community.general/issues/3932).

@@ -1,2 +1,0 @@
-bugfixes:
-  - dnsmadeeasy - fix failure on deleting DNS entries when API response does not contain monitor value (https://github.com/ansible-collections/community.general/issues/3620).

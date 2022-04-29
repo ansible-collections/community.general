@@ -1,4 +1,0 @@
----
-add plugin.filter:
-  - name: counter
-    description: Counts hashable elements in a sequence

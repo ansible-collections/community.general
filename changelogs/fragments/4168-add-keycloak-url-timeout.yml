@@ -1,2 +1,0 @@
-minor_changes:
-  - "keycloak_* modules - added connection timeout parameter when calling server (https://github.com/ansible-collections/community.general/pull/4168)."

@@ -1,2 +1,0 @@
-bugfixes:
-    - interfaces_file - fixed the check for existing option in interface (https://github.com/ansible-collections/community.general/issues/3841).

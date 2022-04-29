@@ -1,9 +1,0 @@
----
-minor_changes:
-  - icinga2 inventory plugin - inventory object names are changable using ``inventory_attr`` in your config file to the host object name, address, or display_name fields
-    (https://github.com/ansible-collections/community.general/issues/3875, https://github.com/ansible-collections/community.general/pull/3906).
-  - icinga2 inventory plugin - added the ``display_name`` field to variables 
-    (https://github.com/ansible-collections/community.general/issues/3875, https://github.com/ansible-collections/community.general/pull/3906).
-bugfixes:
-  - icinga2 inventory plugin - handle 404 error when filter produces no results 
-    (https://github.com/ansible-collections/community.general/issues/3875, https://github.com/ansible-collections/community.general/pull/3906).

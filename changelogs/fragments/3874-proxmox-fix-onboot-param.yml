@@ -1,4 +1,0 @@
----
-bugfixes:
-  - proxmox - fixed ``onboot`` parameter causing module failures when undefined
-    (https://github.com/ansible-collections/community.general/issues/3844).

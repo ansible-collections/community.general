@@ -1,4 +1,0 @@
----
-minor_changes:
-  - ipmi_power - add ``machine`` option to ensure the power state via the remote target
-    address (https://github.com/ansible-collections/community.general/pull/3968).

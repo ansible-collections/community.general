@@ -1,2 +1,0 @@
-minor_changes:
-  - pipx - added options ``editable`` and ``pip_args`` (https://github.com/ansible-collections/community.general/issues/4300).

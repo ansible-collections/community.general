@@ -1,4 +1,0 @@
----
-minor_changes:
-  - proxmox inventory plugin - add support for templating the ``url``, ``user``, and ``password`` options
-    (https://github.com/ansible-collections/community.general/pull/4418).

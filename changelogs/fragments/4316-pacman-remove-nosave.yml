@@ -1,3 +1,0 @@
-minor_changes:
-  - pacman - add ``remove_nosave`` parameter to avoid saving modified configuration files as ``.pacsave`` files.
-    (https://github.com/ansible-collections/community.general/pull/4316, https://github.com/ansible-collections/community.general/issues/4315).

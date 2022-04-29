@@ -1,8 +1,0 @@
----
-bugfixes:
-  - keycloak_user_federation - creating a user federation while specifying an
-    ID (that does not exist yet) no longer fail with a 404 Not Found
-    (https://github.com/ansible-collections/community.general/pull/4212).
-  - keycloak_user_federation - mappers auto-created by keycloak are matched and
-    merged by their name and no longer create duplicated entries
-    (https://github.com/ansible-collections/community.general/pull/4212).

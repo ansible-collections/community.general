@@ -1,2 +1,0 @@
-minor_changes:
-  - scaleway_compute - add possibility to use project identifier (new ``project`` option) instead of deprecated organization identifier (https://github.com/ansible-collections/community.general/pull/3951).

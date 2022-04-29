@@ -1,3 +1,0 @@
-bugfixes:
-  - xattr - fix exception caused by ``_run_xattr()`` raising a ``ValueError``
-    due to a mishandling of base64-encoded value (https://github.com/ansible-collections/community.general/issues/3673).

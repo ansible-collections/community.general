@@ -1,7 +1,0 @@
-bugfixes:
-  - "pacman - make sure that ``packages`` is always returned when ``name`` or ``upgrade`` is specified, also if nothing is done
-     (https://github.com/ansible-collections/community.general/pull/4329)."
-deprecated_features:
-  - "pacman - from community.general 5.0.0 on, the ``changed`` status of ``update_cache`` will no longer be ignored if ``name`` or ``upgrade`` is specified.
-     To keep the old behavior, add something like ``register: result`` and ``changed_when: result.packages | length > 0`` to your task
-     (https://github.com/ansible-collections/community.general/pull/4329)."

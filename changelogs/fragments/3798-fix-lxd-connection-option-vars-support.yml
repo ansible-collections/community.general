@@ -1,4 +1,0 @@
----
-minor_changes:
-  - lxd connection plugin - make sure that ``ansible_lxd_host``, ``ansible_executable``, and
-    ``ansible_lxd_executable`` work (https://github.com/ansible-collections/community.general/pull/3798).

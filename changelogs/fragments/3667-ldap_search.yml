@@ -1,2 +1,0 @@
-bugfixes:
-  - ldap_search - allow it to be used even in check mode (https://github.com/ansible-collections/community.general/issues/3619).

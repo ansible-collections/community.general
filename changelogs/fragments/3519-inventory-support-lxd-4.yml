@@ -1,2 +1,0 @@
-minor_changes:
-  - lxd inventory plugin - support virtual machines (https://github.com/ansible-collections/community.general/pull/3519).
