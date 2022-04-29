@@ -1,2 +1,0 @@
-bugfixes:
-    - nrdp callback plugin - fix error ``string arguments without an encoding`` (https://github.com/ansible-collections/community.general/issues/3903).

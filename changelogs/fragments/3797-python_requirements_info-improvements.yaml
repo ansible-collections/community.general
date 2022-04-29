@@ -1,2 +1,0 @@
-minor_changes:
-    - python_requirements_info - returns python version broken down into its components, and some minor refactoring (https://github.com/ansible-collections/community.general/pull/3797).

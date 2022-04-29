@@ -1,2 +1,0 @@
-bugfixes:
-  - "proxmox_kvm - fix error in check when creating or cloning (https://github.com/ansible-collections/community.general/pull/4306)."

@@ -1,2 +1,0 @@
-minor_changes:
-  - nmcli - adds ``routes6`` and ``route_metric6`` parameters for supporting IPv6 routes (https://github.com/ansible-collections/community.general/issues/4059).

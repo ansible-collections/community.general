@@ -1,2 +1,0 @@
-bugfixes:
-  - ini_file - when removing nothing do not report changed (https://github.com/ansible-collections/community.general/issues/4154).

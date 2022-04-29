@@ -1,4 +1,0 @@
----
-minor_changes:
-  - sudoers - add support for ``runas`` parameter
-    (https://github.com/ansible-collections/community.general/issues/4379).

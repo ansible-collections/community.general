@@ -1,2 +1,0 @@
-bugfixes:
-  - pacman - fixed bug where ``absent`` state did not work for locally installed packages (https://github.com/ansible-collections/community.general/pull/4464).

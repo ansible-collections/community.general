@@ -1,3 +1,0 @@
----
-minor_changes:
-  - filesystem - add support for resizing btrfs (https://github.com/ansible-collections/community.general/issues/4465).

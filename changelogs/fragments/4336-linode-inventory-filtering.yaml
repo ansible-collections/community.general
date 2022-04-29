@@ -1,2 +1,0 @@
-bugfixes:
-  - linode inventory plugin - fix configuration handling relating to inventory filtering (https://github.com/ansible-collections/community.general/pull/4336).

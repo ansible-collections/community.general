@@ -1,4 +1,0 @@
----
-minor_changes:
-  - ipa_service - add ``skip_host_check`` parameter.
-    (https://github.com/ansible-collections/community.general/pull/4417).

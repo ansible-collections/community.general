@@ -1,4 +1,0 @@
----
-bugfixes:
-  - nmcli - fix returning "changed" when no mask set for IPv4 or IPv6 addresses on task rerun
-    (https://github.com/ansible-collections/community.general/issues/3768).
