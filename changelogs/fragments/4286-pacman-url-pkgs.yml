@@ -1,3 +1,0 @@
-bugfixes:
-  - pacman - fix URL based package installation
-    (https://github.com/ansible-collections/community.general/pull/4286, https://github.com/ansible-collections/community.general/issues/4285).
