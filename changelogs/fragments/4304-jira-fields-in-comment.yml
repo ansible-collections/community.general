@@ -1,2 +1,0 @@
-minor_changes:
-  - jira - when creating a comment, ``fields`` now is used for additional data (https://github.com/ansible-collections/community.general/pull/4304).

@@ -1,2 +1,0 @@
-bugfixes:
-    - jira - fixed bug where module returns error related to dictionary key ``body`` (https://github.com/ansible-collections/community.general/issues/3419).

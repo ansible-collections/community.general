@@ -1,4 +1,0 @@
-bugfixes:
-  - |
-    lxd inventory plugin - do not crash if OS and release metadata are not present
-    (https://github.com/ansible-collections/community.general/pull/4351).

@@ -1,4 +1,0 @@
----
-minor_changes:
-  - nmcli - add multiple addresses support for ``ip6`` parameter
-    (https://github.com/ansible-collections/community.general/issues/1088).

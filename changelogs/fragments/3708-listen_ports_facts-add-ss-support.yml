@@ -1,3 +1,0 @@
----
-minor_changes:
-  - listen_ports_facts - add support for ``ss`` command besides ``netstat`` (https://github.com/ansible-collections/community.general/pull/3708).

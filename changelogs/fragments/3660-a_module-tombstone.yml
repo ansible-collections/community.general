@@ -1,2 +1,0 @@
-bugfixes:
-  - "a_module test plugin - fix crash when testing a module name that was tombstoned (https://github.com/ansible-collections/community.general/pull/3660)."

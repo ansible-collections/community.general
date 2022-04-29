@@ -1,4 +1,0 @@
----
-minor_changes:
-  - keycloak_client - add ``default_client_scopes`` and ``optional_client_scopes`` parameters.
-    (https://github.com/ansible-collections/community.general/pull/4385).

@@ -1,6 +1,0 @@
----
-bugfixes:
-  - keycloak_* - the documented ``validate_certs`` parameter was not taken into
-    account when calling the ``open_url`` function in some cases, thus enforcing
-    certificate validation even when ``validate_certs`` was set to ``false``.
-    (https://github.com/ansible-collections/community.general/pull/4382)

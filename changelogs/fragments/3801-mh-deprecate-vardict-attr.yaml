@@ -1,2 +1,0 @@
-deprecated_features:
-    - module_helper module utils - deprecated the attribute ``ModuleHelper.VarDict`` (https://github.com/ansible-collections/community.general/pull/3801).

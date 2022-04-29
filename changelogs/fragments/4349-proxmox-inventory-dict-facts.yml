@@ -1,8 +1,0 @@
----
-bugfixes:
-  - proxmox inventory plugin - fixed the ``description`` field being ignored if
-    it contained a comma
-    (https://github.com/ansible-collections/community.general/issues/4348).
-  - proxmox inventory plugin - always convert strings that follow the
-    ``key=value[,key=value[...]]`` form into dictionaries
-    (https://github.com/ansible-collections/community.general/pull/4349).

@@ -1,2 +1,0 @@
-minor_changes:
-  - redfish_command - add ``GetHostInterfaces`` command to enable reporting Redfish Host Interface information (https://github.com/ansible-collections/community.general/issues/3693).

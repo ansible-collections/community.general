@@ -1,2 +1,0 @@
-minor_changes:
-  - keycloak_user_federation - add sssd user federation support (https://github.com/ansible-collections/community.general/issues/3767).

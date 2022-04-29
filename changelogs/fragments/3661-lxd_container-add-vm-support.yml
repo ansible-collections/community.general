@@ -1,2 +1,0 @@
-minor_changes:
-  - lxd_container - adds ``type`` option which also allows to operate on virtual machines and not just containers (https://github.com/ansible-collections/community.general/pull/3661).

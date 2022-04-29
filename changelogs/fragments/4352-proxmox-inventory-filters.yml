@@ -1,4 +1,0 @@
----
-minor_changes:
-  - proxmox inventory plugin - add support for client-side jinja filters
-    (https://github.com/ansible-collections/community.general/issues/3553).

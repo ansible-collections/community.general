@@ -1,6 +1,0 @@
-deprecated_features:
-  - "proxmox inventory plugin - the current default ``true`` of the ``want_proxmox_nodes_ansible_host`` option has been deprecated.
-     The default will change to ``false`` in community.general 6.0.0. To keep the current behavior, explicitly set
-     ``want_proxmox_nodes_ansible_host`` to ``true`` in your inventory configuration. We suggest to already switch to the new
-     behavior by explicitly setting it to ``false``, and by using ``compose:`` to set ``ansible_host`` to the correct value.
-     See the examples in the plugin documentation for details (https://github.com/ansible-collections/community.general/pull/4466)."

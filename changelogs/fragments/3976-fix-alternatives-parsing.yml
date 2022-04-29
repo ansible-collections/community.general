@@ -1,2 +1,0 @@
-bugfixes:
-  - alternatives - fix output parsing for alternatives groups (https://github.com/ansible-collections/community.general/pull/3976).

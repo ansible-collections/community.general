@@ -1,2 +1,0 @@
-minor_changes:
-  - zypper - add support for ``--clean-deps`` option to remove packages that depend on a package being removed (https://github.com/ansible-collections/community.general/pull/4195).

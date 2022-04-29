@@ -1,2 +1,0 @@
-minor_changes:
-  - proxmox inventory plugin - add token authentication as an alternative to username/password (https://github.com/ansible-collections/community.general/pull/4540).

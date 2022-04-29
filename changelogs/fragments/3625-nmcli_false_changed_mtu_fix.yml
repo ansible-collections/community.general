@@ -1,4 +1,0 @@
----
-bugfixes:
-  - nmcli - fixed falsely reported changed status when ``mtu`` is omitted with ``dummy`` connections
-    (https://github.com/ansible-collections/community.general/issues/3612, https://github.com/ansible-collections/community.general/pull/3625).

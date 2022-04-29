@@ -1,2 +1,0 @@
-bugfixes:
-    - opentelemetry_plugin - honour ``ignore_errors`` when a task has failed instead of reporting an error (https://github.com/ansible-collections/community.general/pull/3837).
