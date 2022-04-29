@@ -45,13 +45,13 @@ options:
      default: present
    ignore_configcheck:
      description:
-        - Ignore configuration checks about inconsistent module configuration. Especially for mpm_* modules.
+        - Deprecated. Ignored.
      type: bool
      default: False
 requirements: ["a2enmod","a2dismod"]
 notes:
   - This does not work on RedHat-based distributions. It does work on Debian- and SuSE-based distributions.
-    Whether it works on others depend on whether the C(a2enmod) and C(a2dismod) tools are available or not.
+    Whether it works on others depend on whether the C(a2enmod), C(a2dismod), and C(a2query) tools are available or not.
 '''
 
 EXAMPLES = '''
@@ -123,68 +123,22 @@ def _run_threaded(module):
 
 
 def _get_ctl_binary(module):
-    for command in ['apache2ctl', 'apachectl']:
-        ctl_binary = module.get_bin_path(command)
-        if ctl_binary is not None:
-            return ctl_binary
+    ctl_binary = module.get_bin_path('a2query')
+    if ctl_binary is not None:
+        return ctl_binary
 
-    module.fail_json(msg="Neither of apache2ctl nor apachctl found. At least one apache control binary is necessary.")
+    module.fail_json(msg="a2query not found. Apache query binary is necessary.")
 
 
 def _module_is_enabled(module):
     control_binary = _get_ctl_binary(module)
-    result, stdout, stderr = module.run_command([control_binary, "-M"])
+    result, stdout, stderr = module.run_command([control_binary, "-m", module.params['name']])
 
-    if result != 0:
+    if result in [0, 1, 32]:
+        return result == 0
+    else:
         error_msg = "Error executing %s: %s" % (control_binary, stderr)
-        if module.params['ignore_configcheck']:
-            if 'AH00534' in stderr and 'mpm_' in module.params['name']:
-                module.warnings.append(
-                    "No MPM module loaded! apache2 reload AND other module actions"
-                    " will fail if no MPM module is loaded immediately."
-                )
-            else:
-                module.warnings.append(error_msg)
-            return False
-        else:
-            module.fail_json(msg=error_msg)
-
-    searchstring = ' ' + module.params['identifier']
-    return searchstring in stdout
-
-
-def create_apache_identifier(name):
-    """
-    By convention if a module is loaded via name, it appears in apache2ctl -M as
-    name_module.
-
-    Some modules don't follow this convention and we use replacements for those."""
-
-    # a2enmod name replacement to apache2ctl -M names
-    text_workarounds = [
-        ('shib', 'mod_shib'),
-        ('shib2', 'mod_shib'),
-        ('evasive', 'evasive20_module'),
-    ]
-
-    # re expressions to extract subparts of names
-    re_workarounds = [
-        ('php', re.compile(r'^(php\d)\.')),
-    ]
-
-    for a2enmod_spelling, module_name in text_workarounds:
-        if a2enmod_spelling in name:
-            return module_name
-
-    for search, reexpr in re_workarounds:
-        if search in name:
-            try:
-                rematch = reexpr.search(name)
-                return rematch.group(1) + '_module'
-            except AttributeError:
-                pass
-
-    return name + '_module'
+        module.fail_json(msg=error_msg)
 
 
 def _set_state(module, state):
@@ -196,58 +150,49 @@ def _set_state(module, state):
     a2mod_binary = {'present': 'a2enmod', 'absent': 'a2dismod'}[state]
     success_msg = "Module %s %s" % (name, state_string)
 
-    if _module_is_enabled(module) != want_enabled:
-        if module.check_mode:
-            module.exit_json(changed=True,
-                             result=success_msg,
-                             warnings=module.warnings)
+    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
 
-        a2mod_binary_path = module.get_bin_path(a2mod_binary)
-        if a2mod_binary_path is None:
-            module.fail_json(msg="%s not found. Perhaps this system does not use %s to manage apache" % (a2mod_binary, a2mod_binary))
-
-        a2mod_binary_cmd = [a2mod_binary_path]
-
-        if not want_enabled and force:
-            # force exists only for a2dismod on debian
-            a2mod_binary_cmd.append('-f')
-
-        result, stdout, stderr = module.run_command(a2mod_binary_cmd + [name])
-
-        if _module_is_enabled(module) == want_enabled:
-            module.exit_json(changed=True,
-                             result=success_msg,
-                             warnings=module.warnings)
-        else:
-            msg = (
-                'Failed to set module {name} to {state}:\n'
-                '{stdout}\n'
-                'Maybe the module identifier ({identifier}) was guessed incorrectly.'
-                'Consider setting the "identifier" option.'
-            ).format(
-                name=name,
-                state=state_string,
-                stdout=stdout,
-                identifier=module.params['identifier']
-            )
-            module.fail_json(msg=msg,
-                             rc=result,
-                             stdout=stdout,
-                             stderr=stderr)
-    else:
-        module.exit_json(changed=False,
+    if module.check_mode:
+        enabled_state = _module_is_enabled(module) 
+        module.exit_json(changed=(enabled_state == want_enabled),
                          result=success_msg,
                          warnings=module.warnings)
+
+    a2mod_binary_path = module.get_bin_path(a2mod_binary)
+    if a2mod_binary_path is None:
+        module.fail_json(msg="%s not found. Perhaps this system does not use %s to manage apache" % (a2mod_binary, a2mod_binary))
+
+    a2mod_binary_cmd = [a2mod_binary_path]
+
+    if not want_enabled and force:
+        # force exists only for a2dismod on debian
+        a2mod_binary_cmd.append('-f')
+
+    result, stdout, stderr = module.run_command(a2mod_binary_cmd + [name])
+
+    if result == 0:
+        module.exit_json(changed=(' already ' not in stdout), result=success_msg, warnings=module.warnings)
+    else:
+        msg = (
+            'Failed to set module {name} to {state}:\n'
+            '{stdout}\n'
+        ).format(
+            name=name,
+            state=state_string,
+            stdout=stdout,
+        )
+        module.fail_json(msg=msg,
+                         rc=result,
+                         stdout=stdout,
+                         stderr=stderr)
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True),
-            identifier=dict(type='str'),
             force=dict(type='bool', default=False),
             state=dict(default='present', choices=['absent', 'present']),
-            ignore_configcheck=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
     )
@@ -257,9 +202,6 @@ def main():
     name = module.params['name']
     if name == 'cgi' and _run_threaded(module):
         module.fail_json(msg="Your MPM seems to be threaded. No automatic actions on module cgi possible.")
-
-    if not module.params['identifier']:
-        module.params['identifier'] = create_apache_identifier(module.params['name'])
 
     if module.params['state'] in ['present', 'absent']:
         _set_state(module, module.params['state'])
