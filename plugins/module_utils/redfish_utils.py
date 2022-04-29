@@ -2236,7 +2236,7 @@ class RedfishUtils(object):
                 payload[param] = options.get(option)
         return payload
 
-    def virtual_media_insert_via_patch(self, options, param_map, uri, data):
+    def virtual_media_insert_via_patch(self, options, param_map, uri, data, image_only):
         # get AllowableValues
         ai = dict((k[:-24],
                    {'AllowableValues': v}) for k, v in data.items()
@@ -2245,6 +2245,9 @@ class RedfishUtils(object):
         payload = self._insert_virt_media_payload(options, param_map, data, ai)
         if 'Inserted' not in payload:
             payload['Inserted'] = True
+        # Some hardware (iLO 4) only supports the Image property on the PATCH operation
+        if image_only:
+            payload = {'Image': payload['Image']}
         # PATCH the resource
         response = self.patch_request(self.root_uri + uri, payload)
         if response['ret'] is False:
@@ -2260,6 +2263,7 @@ class RedfishUtils(object):
             'TransferProtocolType': 'transfer_protocol_type',
             'TransferMethod': 'transfer_method'
         }
+        image_only = False
         image_url = options.get('image_url')
         if not image_url:
             return {'ret': False,
@@ -2273,6 +2277,8 @@ class RedfishUtils(object):
         data = response['data']
         if 'VirtualMedia' not in data:
             return {'ret': False, 'msg': "VirtualMedia resource not found"}
+        if data["FirmwareVersion"].startswith("iLO 4"):
+            image_only = True
         virt_media_uri = data["VirtualMedia"]["@odata.id"]
         response = self.get_request(self.root_uri + virt_media_uri)
         if response['ret'] is False:
@@ -2315,7 +2321,7 @@ class RedfishUtils(object):
                             'msg': "%s action not found and PATCH not allowed"
                             % '#VirtualMedia.InsertMedia'}
             return self.virtual_media_insert_via_patch(options, param_map,
-                                                       uri, data)
+                                                       uri, data, image_only)
 
         # get the action property
         action = data['Actions']['#VirtualMedia.InsertMedia']
