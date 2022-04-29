@@ -603,7 +603,7 @@ def is_valid_uuid(uuid):
 def validate_uuids(module):
     failed = [
         name
-        for name, pvalue in [['uuid', module.params['uuid']], ['image_uuid', module.params['image_uuid']]]
+        for name, pvalue in [(x, module.params[x]) for x in ['uuid', 'image_uuid']]
         if pvalue and pvalue != '*' and not is_valid_uuid(pvalue)
     ]
 
