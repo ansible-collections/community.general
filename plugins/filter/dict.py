@@ -8,11 +8,11 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
   name: dict
-  short_description: Convet a list of tuples into a dictionary
+  short_description: Convert a list of tuples into a dictionary
   version_added: 3.0.0
   author: Felix Fontein (@felixfontein)
   description:
-    - Convet a list of tuples into a dictionary. This is a filter version of the C(dict) function.
+    - Convert a list of tuples into a dictionary. This is a filter version of the C(dict) function.
   options:
     _input:
       description: A list of tuples (with exactly two elements).
