@@ -268,8 +268,6 @@ def remove(module):
     ''' removes a service or a check '''
     service_id = module.params.get('service_id') or module.params.get('service_name')
     check_id = module.params.get('check_id') or module.params.get('check_name')
-    if not (service_id or check_id):
-        module.fail_json(msg='services and checks are removed by id or name. please supply a service id/name or a check id/name')
     if service_id:
         remove_service(module, service_id)
     else:
@@ -360,17 +358,14 @@ def get_consul_api(module):
 
 def get_service_by_id_or_name(consul_api, service_id_or_name):
     ''' iterate the registered services and find one with the given id '''
-    for name, service in consul_api.agent.services().items():
+    for dummy, service in consul_api.agent.services().items():
         if service['ID'] == service_id_or_name or service['Service'] == service_id_or_name:
             return ConsulService(loaded=service)
 
 
 def parse_check(module):
-    if len([p for p in (module.params.get('script'), module.params.get('ttl'), module.params.get('tcp'), module.params.get('http')) if p]) > 1:
-        module.fail_json(
-            msg='checks are either script, tcp, http or ttl driven, supplying more than one does not make sense')
-
-    if module.params.get('check_id') or module.params.get('script') or module.params.get('ttl') or module.params.get('tcp') or module.params.get('http'):
+    # if module.params.get('check_id') or module.params.get('script') or module.params.get('ttl') or module.params.get('tcp') or module.params.get('http'):
+    if any(module.params.get(x) for x in ['check_id', 'script', 'ttl', 'tcp', 'http']):
 
         return ConsulCheck(
             module.params.get('check_id'),
@@ -389,16 +384,13 @@ def parse_check(module):
 
 
 def parse_service(module):
-    if module.params.get('service_name'):
-        return ConsulService(
-            module.params.get('service_id'),
-            module.params.get('service_name'),
-            module.params.get('service_address'),
-            module.params.get('service_port'),
-            module.params.get('tags'),
-        )
-    elif not module.params.get('service_name'):
-        module.fail_json(msg="service_name is required to configure a service.")
+    return ConsulService(
+        module.params.get('service_id'),
+        module.params.get('service_name'),
+        module.params.get('service_address'),
+        module.params.get('service_port'),
+        module.params.get('tags'),
+    )
 
 
 class ConsulService(object):
@@ -488,19 +480,13 @@ class ConsulCheck(object):
         if script:
             self.check = consul.Check.script(script, self.interval)
 
-        if ttl:
+        elif ttl:
             self.check = consul.Check.ttl(self.ttl)
 
-        if http:
-            if interval is None:
-                raise Exception('http check must specify interval')
-
+        elif http:
             self.check = consul.Check.http(http, self.interval, self.timeout)
 
-        if tcp:
-            if interval is None:
-                raise Exception('tcp check must specify interval')
-
+        elif tcp:
             regex = r"(?P<host>.*)(?::)(?P<port>(?:[0-9]+))$"
             match = re.match(regex, tcp)
 
@@ -512,7 +498,7 @@ class ConsulCheck(object):
     def validate_duration(self, name, duration):
         if duration:
             duration_units = ['ns', 'us', 'ms', 's', 'm', 'h']
-            if not any((duration.endswith(suffix) for suffix in duration_units)):
+            if not any(duration.endswith(suffix) for suffix in duration_units):
                 duration = "{0}s".format(duration)
         return duration
 
@@ -589,6 +575,18 @@ def main():
             token=dict(no_log=True)
         ),
         supports_check_mode=False,
+        mutually_exclusive=[
+            ('script', 'ttl', 'tcp', 'http'),
+        ],
+        required_by={
+            'script': 'interval',
+            'http': 'interval',
+            'tcp': 'interval',
+        },
+        required_if=[
+            ('state', 'present', ['service_name']),
+            ('state', 'absent', ['service_id', 'service_name', 'check_id', 'check_name']),
+        ],
     )
 
     test_dependencies(module)
