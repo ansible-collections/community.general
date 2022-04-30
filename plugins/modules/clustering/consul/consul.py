@@ -364,7 +364,6 @@ def get_service_by_id_or_name(consul_api, service_id_or_name):
 
 
 def parse_check(module):
-    # if module.params.get('check_id') or module.params.get('script') or module.params.get('ttl') or module.params.get('tcp') or module.params.get('http'):
     if any(module.params.get(x) for x in ['check_id', 'script', 'ttl', 'tcp', 'http']):
 
         return ConsulCheck(
