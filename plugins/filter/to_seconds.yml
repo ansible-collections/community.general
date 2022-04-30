@@ -1,5 +1,5 @@
 DOCUMENTATION:
-  name: community.general.to_seconds
+  name: to_seconds
   short_description: Converte a date/time string to seconds
   version_added: 0.2.0
   description:
@@ -26,12 +26,12 @@ DOCUMENTATION:
         - Number of days per month.
       default: 30
       type: float
-  authors:
+  author:
     - René Moser (@resmo)
 
 EXAMPLES: |
   - name: Convert a duration into seconds
-    debug:
+    ansible.builtin.debug:
       msg: "{{ '30h 20m 10s 123ms' | community.general.to_seconds }}"
 
 RETURN:
