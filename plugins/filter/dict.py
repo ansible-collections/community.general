@@ -60,6 +60,7 @@ RETURN = '''
     type: boolean
 '''
 
+
 def dict_filter(sequence):
     '''Convert a list of tuples to a dictionary.
 
