@@ -27,7 +27,7 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 - name: Arrange a list of dictionaries as a dictionary of dictionaries
-  ansible.buitin.debug:
+  ansible.builtin.debug:
     msg: "{{ sequence | community.general.groupby_as_dict('key') }}"
   vars:
     sequence:

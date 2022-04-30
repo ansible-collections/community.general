@@ -22,7 +22,7 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 - name: Count occurences
-  ansible.buitin.debug:
+  ansible.builtin.debug:
     msg: >-
       {{ [1, 'a', 2, 2, 'a', 'b', 'a'] | community.general.counter }}
     # Produces: {1: 1, 'a': 3, 2: 2, 'b': 1}

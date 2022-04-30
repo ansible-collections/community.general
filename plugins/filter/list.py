@@ -55,7 +55,7 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 - name: Create a list of dictionaries with map and the community.general.dict filter
-  ansible.buitin.debug:
+  ansible.builtin.debug:
     msg: >-
       {{ list1 | community.general.lists_mergeby(
                     list2,

@@ -53,7 +53,7 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 - name: Create a list of dictionaries with map and the community.general.dict filter
-  ansible.buitin.debug:
+  ansible.builtin.debug:
     msg: >-
       {{ csv_data | community.genera.from_csv(dialect='unix') }}
   vars:

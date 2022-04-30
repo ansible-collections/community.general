@@ -28,7 +28,7 @@ EXAMPLES = '''
     # Result is {1: 2, 'a': 'b'}
 
 - name: Create a list of dictionaries with map and the community.general.dict filter
-  ansible.buitin.debug:
+  ansible.builtin.debug:
     msg: >-
       {{ values | map('zip', ['k1', 'k2', 'k3'])
                 | map('map', 'reverse')

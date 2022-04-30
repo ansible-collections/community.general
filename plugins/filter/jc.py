@@ -60,7 +60,7 @@ EXAMPLES = '''
   register: result
 
 - name: Convert command's result to JSON
-  ansible.buitin.debug:
+  ansible.builtin.debug:
     msg: "{{ result.stdout | community.general.jc('uname') }}"
   # Possible output:
   #

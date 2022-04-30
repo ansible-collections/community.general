@@ -27,7 +27,7 @@ DOCUMENTATION:
 
 EXAMPLES: |
   - name: Convert hash to list of integers
-    ansible.buitin.debug:
+    ansible.builtin.debug:
       msg: "{{ 'o2fXhV' | community.general.hashids_decode }}"
       # Produces: [1, 2, 3]
 
