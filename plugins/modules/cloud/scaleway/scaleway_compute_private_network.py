@@ -71,8 +71,8 @@ EXAMPLES = '''
     project: '{{ scw_project }}'
     state: present
     region: par1
-    compute_id: "12345678-f1e6-40ec-83e5-12345d67ed89",
-    private_network_id: "22345678-f1e6-40ec-83e5-12345d67ed89",
+    compute_id: "12345678-f1e6-40ec-83e5-12345d67ed89"
+    private_network_id: "22345678-f1e6-40ec-83e5-12345d67ed89"
   register: nicsvpc_creation_task
 
 - name:
@@ -80,9 +80,8 @@ EXAMPLES = '''
     project: '{{ scw_project }}'
     state: absent
     region: par1
-    compute_id: "12345678-f1e6-40ec-83e5-12345d67ed89",
-    private_network_id: "22345678-f1e6-40ec-83e5-12345d67ed89",
-
+    compute_id: "12345678-f1e6-40ec-83e5-12345d67ed89"
+    private_network_id: "22345678-f1e6-40ec-83e5-12345d67ed89"
 
 '''
 
