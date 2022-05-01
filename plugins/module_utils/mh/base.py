@@ -24,6 +24,13 @@ class ModuleHelperBase(object):
         if not isinstance(self.module, AnsibleModule):
             self.module = AnsibleModule(**self.module)
 
+    @property
+    def diff_mode(self):
+        return self.module._diff
+
+    def __getattr__(self, attr):
+        return getattr(self.module, attr)
+
     def __init_module__(self):
         pass
 
