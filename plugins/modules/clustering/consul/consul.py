@@ -583,7 +583,7 @@ def main():
         },
         required_if=[
             ('state', 'present', ['service_name']),
-            ('state', 'absent', ['service_id', 'service_name', 'check_id', 'check_name']),
+            ('state', 'absent', ['service_id', 'service_name', 'check_id', 'check_name'], True),
         ],
     )
 
