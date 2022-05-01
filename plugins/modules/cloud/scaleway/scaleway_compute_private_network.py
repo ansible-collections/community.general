@@ -77,7 +77,7 @@ EXAMPLES = '''
 
 - name:
   community.general.scaleway_compute_private_network:
-    name: 'foo'
+    project: '{{ scw_project }}'
     state: absent
     region: par1
     compute_id: "12345678-f1e6-40ec-83e5-12345d67ed89",
