@@ -57,11 +57,13 @@ options:
     type: str
     description:
     - id of the compute instance ( see scaleway_compute )
+    required: true
 
   private_network_id:
     type: str
     description:
     - id of the private network ( see scaleway_private_network )
+    required: true
 
 '''
 
