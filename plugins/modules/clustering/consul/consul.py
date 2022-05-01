@@ -240,7 +240,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def register_with_consul(module):
-    state = module.params.get('state')
+    state = module.params['state']
 
     if state == 'present':
         add(module)
@@ -365,7 +365,6 @@ def get_service_by_id_or_name(consul_api, service_id_or_name):
 
 def parse_check(module):
     if any(module.params.get(x) for x in ['check_id', 'script', 'ttl', 'tcp', 'http']):
-
         return ConsulCheck(
             module.params.get('check_id'),
             module.params.get('check_name'),
@@ -593,8 +592,8 @@ def main():
     try:
         register_with_consul(module)
     except ConnectionError as e:
-        module.fail_json(msg='Could not connect to consul agent at %s:%s, error was %s' % (
-            module.params.get('host'), module.params.get('port'), str(e)))
+        module.fail_json(msg='Could not connect to consul agent at %s:%s, error was: %s' % (
+            module.params['host'], module.params['port'], str(e)))
     except Exception as e:
         module.fail_json(msg=str(e))
 
