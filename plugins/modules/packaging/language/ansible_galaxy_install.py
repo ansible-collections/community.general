@@ -72,6 +72,14 @@ options:
       - This option is completely ignored if using a version of Ansible greater than C(2.9.x).
     type: bool
     default: false
+  ack_min_ansiblecore211:
+    description:
+      - Acknowledge the module is deprecating support for Ansible 2.9 and Ansible Core 2.10.
+      - Support for those versions will be removed in community.general 8.0.0.
+      - This option is completely ignored if using a version of Ansible greater than C(2.9.x).
+      - For the sake of conciseness, setting this parameter to C(true) implies I(ack_ansible29=true).
+    type: bool
+    default: false
 """
 
 EXAMPLES = """
@@ -194,6 +202,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
             force=dict(type='bool', default=False),
             no_deps=dict(type='bool', default=False),
             ack_ansible29=dict(type='bool', default=False),
+            ack_min_ansiblecore211=dict(type='bool', default=False),
         ),
         mutually_exclusive=[('name', 'requirements_file')],
         required_one_of=[('name', 'requirements_file')],
@@ -226,6 +235,13 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
 
     def __init_module__(self):
         self.ansible_version = self._get_ansible_galaxy_version()
+        if self.ansible_version < (2, 11):
+            self.module.deprecate(
+                "Support for Ansible 2.9 and Ansible-base 2.10 is being deprecated. "
+                "Upgrading is strongly recommended, or set 'ack_min_ansiblecore211' to supress this message.",
+                version="8.0.0",
+                collection_name="community.general",
+            )
         self.is_ansible29 = self.ansible_version < (2, 10)
         if self.is_ansible29:
             self._RE_INSTALL_OUTPUT = re.compile(r"^(?:.*Installing '(?P<collection>\w+\.\w+):(?P<cversion>[\d\.]+)'.*"
@@ -281,7 +297,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
         self.vars.set("new_collections", {})
         self.vars.set("new_roles", {})
         self.vars.set("ansible29_change", False, change=True, output=False)
-        if not self.vars.ack_ansible29:
+        if not self.vars.ack_ansible29 and not self.vars.ack_min_ansiblecore211:
             self.module.warn("Ansible 2.9 or older: unable to retrieve lists of roles and collections already installed")
             if self.vars.requirements_file is not None and self.vars.type == 'both':
                 self.module.warn("Ansible 2.9 or older: will install only roles from requirement files")
