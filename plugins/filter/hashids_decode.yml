@@ -1,0 +1,38 @@
+DOCUMENTATION:
+  name: hashids_decode
+  short_description: Decodes a sequence of numbers from a YouTube-like hash
+  version_added: 3.0.0
+  author: Andrew Pantuso (@Ajpantuso)
+  description:
+    - Decodes a sequence of numbers from a YouTube-like hash.
+  options:
+    _input:
+      description: A YouTube-like hash.
+      type: string
+      required: true
+    salt:
+      description:
+        - String to use as salt when hashing.
+      type: str
+      default: excel
+    alphabet:
+      description:
+        - String of 16 or more unique characters to produce a hash.
+      type: list
+      elements: str
+    min_length:
+      description:
+        - Minimum length of hash produced.
+      type: integer
+
+EXAMPLES: |
+  - name: Convert hash to list of integers
+    ansible.builtin.debug:
+      msg: "{{ 'o2fXhV' | community.general.hashids_decode }}"
+      # Produces: [1, 2, 3]
+
+RETURN:
+  _value:
+    description: A list of integers.
+    type: list
+    elements: integer

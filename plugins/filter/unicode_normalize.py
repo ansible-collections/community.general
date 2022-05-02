@@ -6,6 +6,46 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+DOCUMENTATION = '''
+  name: unicode_normalize
+  short_description: Normalizes unicode strings to facilitate comparison of characters with normalized forms
+  version_added: 3.7.0
+  author: Andrew Pantuso (@Ajpantuso)
+  description:
+    - Normalizes unicode strings to facilitate comparison of characters with normalized forms.
+  positional: form
+  options:
+    _input:
+      description: A unicode string.
+      type: string
+      required: true
+    form:
+      description:
+        - The normal form to use.
+        - See U(https://docs.python.org/3/library/unicodedata.html#unicodedata.normalize) for details.
+      type: string
+      default: NFC
+      choices:
+        - NFC
+        - NFD
+        - NFKC
+        - NFKD
+'''
+
+EXAMPLES = '''
+- name: Normalize unicode string
+  ansible.builtin.set_fact:
+    dictionary: "{{ 'ä' | community.general.unicode_normalize('NFKD') }}"
+    # The resulting string has length 2: one letter is 'a', the other
+    # the diacritic combiner.
+'''
+
+RETURN = '''
+  _value:
+    description: The normalized unicode string of the specified normal form.
+    type: string
+'''
+
 from unicodedata import normalize
 
 from ansible.errors import AnsibleFilterError, AnsibleFilterTypeError
