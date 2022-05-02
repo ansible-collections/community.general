@@ -1,0 +1,38 @@
+DOCUMENTATION:
+  name: hashids_encode
+  short_description: Encodes YouTube-like hashes from a sequence of integers
+  version_added: 3.0.0
+  author: Andrew Pantuso (@Ajpantuso)
+  description:
+    - Encodes YouTube-like hashes from a sequence of integers.
+  options:
+    _input:
+      description: A list of integers.
+      type: list
+      elements: integer
+      required: true
+    salt:
+      description:
+        - String to use as salt when hashing.
+      type: str
+      default: excel
+    alphabet:
+      description:
+        - String of 16 or more unique characters to produce a hash.
+      type: list
+      elements: str
+    min_length:
+      description:
+        - Minimum length of hash produced.
+      type: integer
+
+EXAMPLES: |
+  - name: Convert list of integers to hash
+    ansible.builtin.debug:
+      msg: "{{ [1, 2, 3] | community.general.hashids_encode }}"
+      # Produces: 'o2fXhV'
+
+RETURN:
+  _value:
+    description: A YouTube-like hash.
+    type: string
