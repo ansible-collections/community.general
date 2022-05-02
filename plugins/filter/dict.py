@@ -56,7 +56,7 @@ EXAMPLES = '''
 
 RETURN = '''
   _value:
-    description: Whether the module or action plugin denoted by the input exists.
+    description: The dictionary having the provided key-value pairs.
     type: boolean
 '''
 
