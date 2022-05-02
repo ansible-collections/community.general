@@ -21,6 +21,67 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+DOCUMENTATION = '''
+  name: jc
+  short_description: Convert output of many shell commands and file-types to JSON
+  version_added: 1.1.0
+  author: Kelly Brazil (@kellyjonbrazil)
+  description:
+    - Convert output of many shell commands and file-types to JSON.
+    - Uses the L(jc library,https://github.com/kellyjonbrazil/jc).
+  positional: parser
+  options:
+    _input:
+      description: The data to convert.
+      type: string
+      required: true
+    parser:
+      description:
+        - The correct parser for the input data.
+        - For exmaple C(ifconfig).
+        - See U(https://github.com/kellyjonbrazil/jc#parsers) for the latest list of parsers.
+      type: string
+      required: true
+    quiet:
+      description: Set to C(false) to not suppress warnings.
+      type: boolean
+      default: true
+    raw:
+      description: Set to C(true) to return pre-processed JSON.
+      type: boolean
+      default: false
+  requirements:
+    - jc (https://github.com/kellyjonbrazil/jc)
+'''
+
+EXAMPLES = '''
+- name: Run command
+  ansible.builtin.command: uname -a
+  register: result
+
+- name: Convert command's result to JSON
+  ansible.builtin.debug:
+    msg: "{{ result.stdout | community.general.jc('uname') }}"
+  # Possible output:
+  #
+  # "msg": {
+  #   "hardware_platform": "x86_64",
+  #   "kernel_name": "Linux",
+  #   "kernel_release": "4.15.0-112-generic",
+  #   "kernel_version": "#113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020",
+  #   "machine": "x86_64",
+  #   "node_name": "kbrazil-ubuntu",
+  #   "operating_system": "GNU/Linux",
+  #   "processor": "x86_64"
+  # }
+'''
+
+RETURN = '''
+  _value:
+    description: The processed output.
+    type: any
+'''
+
 from ansible.errors import AnsibleError, AnsibleFilterError
 import importlib
 

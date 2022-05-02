@@ -1,9 +1,10 @@
 DOCUMENTATION:
-  name: to_seconds
-  short_description: Converte a duration string to seconds
+  name: to_time_unit
+  short_description: Converte a duration string to the given time unit
   version_added: 0.2.0
   description:
-    - Parse a human readable time duration string and convert to seconds.
+    - Parse a human readable time duration string and convert to the given time unit.
+  positional: unit
   options:
     _input:
       description:
@@ -16,6 +17,50 @@ DOCUMENTATION:
         - Examples are C(1h), C(-5m), and C(3h -5m 6s).
       type: string
       required: true
+    unit:
+      description:
+        - Time unit to convert the duration to.
+      default: ms
+      choices:
+        - millisecond
+        - milliseconds
+        - ms
+        - msec
+        - msecs
+        - msecond
+        - mseconds
+        - s
+        - sec
+        - secs
+        - second
+        - seconds
+        - h
+        - hour
+        - hours
+        - hs
+        - m
+        - min
+        - mins
+        - minute
+        - minutes
+        - ms
+        - d
+        - ds
+        - day
+        - days
+        - w
+        - ws
+        - week
+        - weeks
+        - mo
+        - mos
+        - month
+        - months
+        - y
+        - ys
+        - year
+        - years
+      type: string
     year:
       description:
         - Number of days per year.
@@ -32,9 +77,9 @@ DOCUMENTATION:
 EXAMPLES: |
   - name: Convert a duration into seconds
     ansible.builtin.debug:
-      msg: "{{ '30h 20m 10s 123ms' | community.general.to_seconds }}"
+      msg: "{{ '1053d 17h 53m -10s 391ms' | community.general.to_time_unit('s') }}"
 
 RETURN:
   _value:
-    description: Number of seconds.
+    description: Number of time units.
     type: float

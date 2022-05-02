@@ -5,6 +5,52 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+DOCUMENTATION = '''
+  name: groupby_as_dict
+  short_description: Transform a sequence of dictionaries to a dictionary where the dictionaries are indexed by an attribute
+  version_added: 3.1.0
+  author: Felix Fontein (@felixfontein)
+  description:
+    - Transform a sequence of dictionaries to a dictionary where the dictionaries are indexed by an attribute.
+  positional: attribute
+  options:
+    _input:
+      description: A list of dictionaries
+      type: list
+      elements: dictionary
+      required: true
+    attribute:
+      description: The attribute to use as the key.
+      type: str
+      required: true
+'''
+
+EXAMPLES = '''
+- name: Arrange a list of dictionaries as a dictionary of dictionaries
+  ansible.builtin.debug:
+    msg: "{{ sequence | community.general.groupby_as_dict('key') }}"
+  vars:
+    sequence:
+      - key: value
+        foo: bar
+      - key: other_value
+        baz: bar
+  # Produces the following nested structure:
+  #
+  #  value:
+  #    key: value
+  #    foo: bar
+  #  other_value:
+  #    key: other_value
+  #    baz: bar
+'''
+
+RETURN = '''
+  _value:
+    description: A dictionary containing the dictionaries from the list as values.
+    type: dictionary
+'''
+
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common._collections_compat import Mapping, Sequence
 
