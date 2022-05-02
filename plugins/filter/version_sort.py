@@ -5,6 +5,35 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+DOCUMENTATION = '''
+  name: version_sort
+  short_description: Sort a list according to version order instead of pure alphabetical one
+  version_added: 2.2.0
+  author: Eric L. (@ericzolf)
+  description:
+    - Sort a list according to version order instead of pure alphabetical one.
+  options:
+    _input:
+      description: A list of strings to sort.
+      type: list
+      elements: string
+      required: true
+'''
+
+EXAMPLES = '''
+- name: Convert list of tuples into dictionary
+  ansible.builtin.set_fact:
+    dictionary: "{{ ['2.1', '2.10', '2.9'] | community.general.version_sort }}"
+    # Result is ['2.1', '2.9', '2.10']
+'''
+
+RETURN = '''
+  _value:
+    description: The list of strings sorted by version.
+    type: list
+    elements: string
+'''
+
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 

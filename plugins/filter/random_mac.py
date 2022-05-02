@@ -40,13 +40,19 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 - name: Random MAC given a prefix
-  debug:
+  ansible.builtin.debug:
     msg: "{{ '52:54:00' | community.general.random_mac }}"
     # => '52:54:00:ef:1c:03'
 
 - name: With a seed
-  debug:
+  ansible.builtin.debug:
     msg: "{{ '52:54:00' | community.general.random_mac(seed=inventory_hostname) }}"
+'''
+
+RETURN = '''
+  _value:
+    description: The generated MAC.
+    type: string
 '''
 
 import re

@@ -5,6 +5,35 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+DOCUMENTATION = '''
+  name: counter
+  short_description: Counts hashable elements in a sequence
+  version_added: 4.3.0
+  author: Rémy Keil (@keilr)
+  description:
+    - Counts hashable elements in a sequence.
+  options:
+    _input:
+      description: A sequence.
+      type: list
+      elements: any
+      required: true
+'''
+
+EXAMPLES = '''
+- name: Count occurences
+  ansible.builtin.debug:
+    msg: >-
+      {{ [1, 'a', 2, 2, 'a', 'b', 'a'] | community.general.counter }}
+    # Produces: {1: 1, 'a': 3, 2: 2, 'b': 1}
+'''
+
+RETURN = '''
+  _value:
+    description: A dictionary with the elements of the sequence as keys, and their number of occurance in the sequence as values.
+    type: dictionary
+'''
+
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common._collections_compat import Sequence
 from collections import Counter
