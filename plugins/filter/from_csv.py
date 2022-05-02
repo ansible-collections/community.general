@@ -52,7 +52,7 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
-- name: Create a list of dictionaries with map and the community.general.dict filter
+- name: Parse a CSV file's contents
   ansible.builtin.debug:
     msg: >-
       {{ csv_data | community.genera.from_csv(dialect='unix') }}
