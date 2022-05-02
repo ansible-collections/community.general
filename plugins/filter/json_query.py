@@ -116,7 +116,7 @@ EXAMPLES = '''
 
 RETURN = '''
   _value:
-    description: Whether the module or action plugin denoted by the input exists.
+    description: The result of the query.
     type: any
 '''
 

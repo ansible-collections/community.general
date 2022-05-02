@@ -54,7 +54,7 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
-- name: Create a list of dictionaries with map and the community.general.dict filter
+- name: Merge two lists
   ansible.builtin.debug:
     msg: >-
       {{ list1 | community.general.lists_mergeby(
@@ -92,8 +92,9 @@ EXAMPLES = '''
 
 RETURN = '''
   _value:
-    description: Whether the module or action plugin denoted by the input exists.
-    type: boolean
+    description: The merged list.
+    type: list
+    elements: dictionary
 '''
 
 from ansible.errors import AnsibleFilterError
