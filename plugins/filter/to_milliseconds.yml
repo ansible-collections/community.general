@@ -1,9 +1,9 @@
 DOCUMENTATION:
-  name: to_seconds
-  short_description: Converte a duration string to seconds
+  name: to_milliseconds
+  short_description: Converte a duration string to milliseconds
   version_added: 0.2.0
   description:
-    - Parse a human readable time duration string and convert to seconds.
+    - Parse a human readable time duration string and convert to milliseconds.
   options:
     _input:
       description:
@@ -30,11 +30,11 @@ DOCUMENTATION:
     - René Moser (@resmo)
 
 EXAMPLES: |
-  - name: Convert a duration into seconds
+  - name: Convert a duration into milliseconds
     ansible.builtin.debug:
-      msg: "{{ '30h 20m 10s 123ms' | community.general.to_seconds }}"
+      msg: "{{ '30h 20m 10s 123ms' | community.general.to_milliseconds }}"
 
 RETURN:
   _value:
-    description: Number of seconds.
+    description: Number of milliseconds.
     type: float

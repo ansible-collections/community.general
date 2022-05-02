@@ -126,9 +126,13 @@ files:
     maintainers: giner
   $filters/from_csv.py:
     maintainers: Ajpantuso
-  $filters/groupby:
+  $filters/groupby.py:
     maintainers: felixfontein
-  $filters/hashids:
+  $filters/hashids.py:
+    maintainers: Ajpantuso
+  $filters/hashids_decode.yml:
+    maintainers: Ajpantuso
+  $filters/hashids_encode.yml:
     maintainers: Ajpantuso
   $filters/jc.py:
     maintainers: kellyjonbrazil
@@ -140,7 +144,23 @@ files:
     maintainers: resmo
   $filters/unicode_normalize.py:
     maintainers: Ajpantuso
+  $filters/to_days.yml:
+    maintainers: resmo
+  $filters/to_hours.yml:
+    maintainers: resmo
+  $filters/to_milliseconds.yml:
+    maintainers: resmo
+  $filters/to_minutes.yml:
+    maintainers: resmo
+  $filters/to_months.yml:
+    maintainers: resmo
   $filters/to_seconds.yml:
+    maintainers: resmo
+  $filters/to_time_unit.yml:
+    maintainers: resmo
+  $filters/to_weeks.yml:
+    maintainers: resmo
+  $filters/to_years.yml:
     maintainers: resmo
   $filters/version_sort.py:
     maintainers: ericzolf
