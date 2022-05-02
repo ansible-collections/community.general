@@ -1,0 +1,5 @@
+bugfixes:
+  - redfish_command The iLO4 Redfish implementation only supports the 'image_url' parameter in
+    the underlying API call to VirtualMediaInsert. Any values set (or the defaults) for
+    'write_protected' or 'inserted' will be ignored. Setting 'password', 'transfer_method',
+    'transfer_protocol_type', or 'username' will result in an error.
