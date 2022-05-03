@@ -188,7 +188,12 @@ class RedfishUtils(object):
                 body = error.read().decode('utf-8')
                 data = json.loads(body)
                 ext_info = data['error']['@Message.ExtendedInfo']
-                msg = ext_info[0]['Message']
+                # if the ExtendedInfo contains a user friendly message send it
+                # otherwise try to send the entire contents of ExtendedInfo
+                try:
+                    msg = ext_info[0]['Message']
+                except:
+                    msg = str(data['error']['@Message.ExtendedInfo'])
             except Exception:
                 pass
         return msg
