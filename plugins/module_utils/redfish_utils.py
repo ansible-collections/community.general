@@ -192,7 +192,7 @@ class RedfishUtils(object):
                 # otherwise try to send the entire contents of ExtendedInfo
                 try:
                     msg = ext_info[0]['Message']
-                except:
+                except Exception:
                     msg = str(data['error']['@Message.ExtendedInfo'])
             except Exception:
                 pass
