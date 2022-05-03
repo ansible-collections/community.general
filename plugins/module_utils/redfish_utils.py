@@ -2252,7 +2252,9 @@ class RedfishUtils(object):
             payload['Inserted'] = True
         # Some hardware (iLO 4) only supports the Image property on the PATCH operation
         if image_only:
-            payload = {'Image': payload['Image']}
+            # Delete WriteProtected and Inserted from the payload as they have defaults set
+            del payload['Inserted']
+            del payload['WriteProtected']
         # PATCH the resource
         response = self.patch_request(self.root_uri + uri, payload)
         if response['ret'] is False:
