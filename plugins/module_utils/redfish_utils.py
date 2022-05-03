@@ -2279,12 +2279,6 @@ class RedfishUtils(object):
             return {'ret': False, 'msg': "VirtualMedia resource not found"}
         if data["FirmwareVersion"].startswith("iLO 4"):
             image_only = True
-            for k, v in options.items():
-                if k in ['password', 'transfer_method', 'transfer_protocol_type', 'username']:
-                    if v is not None:
-                        return {'ret': False,
-                                'msg': "%s is not a valid option in virtual_media for iLO4 based systems"
-                                % k}
         virt_media_uri = data["VirtualMedia"]["@odata.id"]
         response = self.get_request(self.root_uri + virt_media_uri)
         if response['ret'] is False:
