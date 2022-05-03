@@ -2250,11 +2250,13 @@ class RedfishUtils(object):
         payload = self._insert_virt_media_payload(options, param_map, data, ai)
         if 'Inserted' not in payload:
             payload['Inserted'] = True
-        # Some hardware (iLO 4) only supports the Image property on the PATCH operation
+
+        # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
+        # Inserted and WriteProtected are not writable
         if image_only:
-            # Delete WriteProtected and Inserted from the payload as they have defaults set
             del payload['Inserted']
             del payload['WriteProtected']
+
         # PATCH the resource
         response = self.patch_request(self.root_uri + uri, payload)
         if response['ret'] is False:
@@ -2284,8 +2286,12 @@ class RedfishUtils(object):
         data = response['data']
         if 'VirtualMedia' not in data:
             return {'ret': False, 'msg': "VirtualMedia resource not found"}
+
+        # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
+        # Inserted and WriteProtected are not writable
         if data["FirmwareVersion"].startswith("iLO 4"):
             image_only = True
+
         virt_media_uri = data["VirtualMedia"]["@odata.id"]
         response = self.get_request(self.root_uri + virt_media_uri)
         if response['ret'] is False:
