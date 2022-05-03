@@ -70,6 +70,8 @@ options:
     description:
       - Acknowledge using Ansible 2.9 with its limitations, and prevents the module from generating warnings about them.
       - This option is completely ignored if using a version of Ansible greater than C(2.9.x).
+      - Note that this option will be removed without any further deprecation warning once support
+        for Ansible 2.9 is removed from this module.
     type: bool
     default: false
   ack_min_ansiblecore211:
