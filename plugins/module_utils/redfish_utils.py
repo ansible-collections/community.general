@@ -2236,7 +2236,7 @@ class RedfishUtils(object):
                 payload[param] = options.get(option)
         return payload
 
-    def virtual_media_insert_via_patch(self, options, param_map, uri, data, image_only):
+    def virtual_media_insert_via_patch(self, options, param_map, uri, data, image_only=False):
         # get AllowableValues
         ai = dict((k[:-24],
                    {'AllowableValues': v}) for k, v in data.items()
