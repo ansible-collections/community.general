@@ -1,7 +1,7 @@
 bugfixes:
   - redfish_command - the iLO4 Redfish implementation only supports the ``image_url`` parameter in
-    the underlying API call to ``VirtualMediaInsert``. Any values set (or the defaults) for
-    ``write_protected`` or ``inserted`` will be ignored.
+    the underlying API calls to ``VirtualMediaInsert`` and ``VirtualMediaEject``. Any values set
+    (or the defaults) for ``write_protected`` or ``inserted`` will be ignored.
     (https://github.com/ansible-collections/community.general/pull/4596).
 minor_changes:
   - redfish_* The contents of ``@Message.ExtendedInfo`` will be returned as a string in the event
