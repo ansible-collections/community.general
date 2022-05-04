@@ -4,6 +4,13 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+- name: test zero is 0
+  assert:
+    that:
+      - "('0' | community.general.to_milliseconds) == 0"
+      - "('0' | community.general.to_seconds) == 0"
+      - "('0' | community.general.to_minutes) == 0"
+
 - name: test to_milliseconds filter
   assert:
     that:
