@@ -335,7 +335,7 @@ class LookupModule(LookupBase):
         if qtype.upper() == 'DLV':
             display.deprecated('The DLV record type has been decommissioned in 2017 and support for'
                                ' it will be removed from community.general 6.0.0',
-                               version='6.0.0', removed_from_collection='community.general')
+                               version='6.0.0', collection_name='community.general')
 
         if qtype.upper() == 'PTR':
             try:
