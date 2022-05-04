@@ -95,7 +95,7 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(self.opentelemetry.ansible_version, None)
 
     def test_finish_task_include_with_ansible_version(self):
-        task_fields = {'args': { '_ansible_version' : '1.2.3'}}
+        task_fields = {'args': {'_ansible_version': '1.2.3'}}
         result = TaskResult(host=None, task=self.mock_task, return_data={}, task_fields=task_fields)
         tasks_data = OrderedDict()
         tasks_data['myuuid'] = self.my_task
