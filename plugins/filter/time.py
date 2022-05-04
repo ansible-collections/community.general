@@ -46,6 +46,11 @@ def multiply(factors):
 
 def to_time_unit(human_time, unit='ms', **kwargs):
     ''' Return a time unit from a human readable string '''
+
+    # No need to handle 0
+    if human_time == "0":
+        return 0
+
     unit_to_short_form = UNIT_TO_SHORT_FORM
     unit_factors = UNIT_FACTORS
 
