@@ -1,0 +1,2 @@
+minor_changes:
+  - to_time_unit filter plugins - the time filters has been extended to also allow ``0`` as input (https://github.com/ansible-collections/community.general/pull/4612).
