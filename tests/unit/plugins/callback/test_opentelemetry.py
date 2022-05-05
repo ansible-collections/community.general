@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # (C) 2021, Victor Martinez <VictorMartinezRubio@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -91,6 +92,21 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(host_data.uuid, 'include')
         self.assertEqual(host_data.name, 'include')
         self.assertEqual(host_data.status, 'ok')
+        self.assertEqual(self.opentelemetry.ansible_version, None)
+
+    def test_finish_task_include_with_ansible_version(self):
+        task_fields = {'args': {'_ansible_version': '1.2.3'}}
+        result = TaskResult(host=None, task=self.mock_task, return_data={}, task_fields=task_fields)
+        tasks_data = OrderedDict()
+        tasks_data['myuuid'] = self.my_task
+
+        self.opentelemetry.finish_task(
+            tasks_data,
+            'ok',
+            result
+        )
+
+        self.assertEqual(self.opentelemetry.ansible_version, '1.2.3')
 
     def test_get_error_message(self):
         test_cases = (
