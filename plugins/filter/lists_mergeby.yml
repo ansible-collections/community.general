@@ -1,0 +1,88 @@
+DOCUMENTATION:
+  name: lists_mergeby
+  short_description: Merge two or more lists of dictionaries by a given attribute
+  version_added: 2.0.0
+  author: Vladimir Botka (@vbotka)
+  description:
+    - Merge two or more lists by attribute I(index). Optional parameters 'recursive' and 'list_merge'
+      control the merging of the lists in values. The function merge_hash from ansible.utils.vars
+      is used. To learn details on how to use the parameters 'recursive' and 'list_merge' see
+      Ansible User's Guide chapter "Using filters to manipulate data" section "Combining
+      hashes/dictionaries".
+  positional: another_list, index
+  options:
+    _input:
+      description: A list of dictionaries.
+      type: list
+      elements: dictionary
+      required: true
+    another_list:
+      description: Another list of dictionaries. This parameter can be specified multiple times.
+      type: list
+      elements: dictionary
+    index:
+      description:
+        - The dictionary key that must be present in every dictionary in every list that is used to
+          merge the lists.
+      type: string
+      required: true
+    recursive:
+      description:
+        - Should the combine recursively merge nested dictionaries (hashes).
+        - "B(Note:) It does not depend on the value of the C(hash_behaviour) setting in C(ansible.cfg)."
+      type: boolean
+      default: false
+    list_merge:
+      description:
+        - Modifies the behaviour when the dictionaries (hashes) to merge contain arrays/lists.
+      type: string
+      default: replace
+      choices:
+        - replace
+        - keep
+        - append
+        - prepend
+        - append_rp
+        - prepend_rp
+
+EXAMPLES: |
+  - name: Merge two lists
+    ansible.builtin.debug:
+      msg: >-
+        {{ list1 | community.general.lists_mergeby(
+                      list2,
+                      'index',
+                      recursive=True,
+                      list_merge='append'
+                   ) }}"
+    vars:
+      list1:
+        - index: a
+          value: 123
+        - index: b
+          value: 42
+      list2:
+        - index: a
+          foo: bar
+        - index: c
+          foo: baz
+    # Produces the following list of dictionaries:
+    #   {
+    #     "index": "a",
+    #     "foo": "bar",
+    #     "value": 123
+    #   },
+    #   {
+    #     "index": "b",
+    #     "value": 42
+    #   },
+    #   {
+    #     "index": "c",
+    #     "foo": "baz"
+    #   }
+
+RETURN:
+  _value:
+    description: The merged list.
+    type: list
+    elements: dictionary
