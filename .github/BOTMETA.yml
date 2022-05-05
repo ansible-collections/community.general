@@ -126,6 +126,8 @@ files:
     maintainers: Ajpantuso
   $filters/groupby.py:
     maintainers: felixfontein
+  $filters/groupby_as_dict.yml:
+    maintainers: felixfontein
   $filters/hashids.py:
     maintainers: Ajpantuso
   $filters/hashids_decode.yml:
@@ -136,6 +138,8 @@ files:
     maintainers: kellyjonbrazil
   $filters/json_query.py: {}
   $filters/list.py:
+    maintainers: vbotka
+  $filters/lists_mergeby.yml:
     maintainers: vbotka
   $filters/path_join_shim.py:
     maintainers: felixfontein
