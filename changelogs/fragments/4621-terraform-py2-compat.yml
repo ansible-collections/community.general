@@ -1,0 +1,2 @@
+bugfixes:
+  - terraform - fix list init to support both PY2 and PY3 (https://github.com/ansible-collections/community.general/issues/4531).
