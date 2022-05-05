@@ -188,7 +188,12 @@ class RedfishUtils(object):
                 body = error.read().decode('utf-8')
                 data = json.loads(body)
                 ext_info = data['error']['@Message.ExtendedInfo']
-                msg = ext_info[0]['Message']
+                # if the ExtendedInfo contains a user friendly message send it
+                # otherwise try to send the entire contents of ExtendedInfo
+                try:
+                    msg = ext_info[0]['Message']
+                except Exception:
+                    msg = str(data['error']['@Message.ExtendedInfo'])
             except Exception:
                 pass
         return msg
@@ -2236,7 +2241,7 @@ class RedfishUtils(object):
                 payload[param] = options.get(option)
         return payload
 
-    def virtual_media_insert_via_patch(self, options, param_map, uri, data):
+    def virtual_media_insert_via_patch(self, options, param_map, uri, data, image_only=False):
         # get AllowableValues
         ai = dict((k[:-24],
                    {'AllowableValues': v}) for k, v in data.items()
@@ -2245,6 +2250,13 @@ class RedfishUtils(object):
         payload = self._insert_virt_media_payload(options, param_map, data, ai)
         if 'Inserted' not in payload:
             payload['Inserted'] = True
+
+        # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
+        # Inserted and WriteProtected are not writable
+        if image_only:
+            del payload['Inserted']
+            del payload['WriteProtected']
+
         # PATCH the resource
         response = self.patch_request(self.root_uri + uri, payload)
         if response['ret'] is False:
@@ -2260,6 +2272,7 @@ class RedfishUtils(object):
             'TransferProtocolType': 'transfer_protocol_type',
             'TransferMethod': 'transfer_method'
         }
+        image_only = False
         image_url = options.get('image_url')
         if not image_url:
             return {'ret': False,
@@ -2273,6 +2286,12 @@ class RedfishUtils(object):
         data = response['data']
         if 'VirtualMedia' not in data:
             return {'ret': False, 'msg': "VirtualMedia resource not found"}
+
+        # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
+        # Inserted and WriteProtected are not writable
+        if data["FirmwareVersion"].startswith("iLO 4"):
+            image_only = True
+
         virt_media_uri = data["VirtualMedia"]["@odata.id"]
         response = self.get_request(self.root_uri + virt_media_uri)
         if response['ret'] is False:
@@ -2315,7 +2334,7 @@ class RedfishUtils(object):
                             'msg': "%s action not found and PATCH not allowed"
                             % '#VirtualMedia.InsertMedia'}
             return self.virtual_media_insert_via_patch(options, param_map,
-                                                       uri, data)
+                                                       uri, data, image_only)
 
         # get the action property
         action = data['Actions']['#VirtualMedia.InsertMedia']
@@ -2334,12 +2353,18 @@ class RedfishUtils(object):
             return response
         return {'ret': True, 'changed': True, 'msg': "VirtualMedia inserted"}
 
-    def virtual_media_eject_via_patch(self, uri):
+    def virtual_media_eject_via_patch(self, uri, image_only=False):
         # construct payload
         payload = {
             'Inserted': False,
             'Image': None
         }
+
+        # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
+        # Inserted is not writable
+        if image_only:
+            del payload['Inserted']
+
         # PATCH resource
         response = self.patch_request(self.root_uri + uri, payload)
         if response['ret'] is False:
@@ -2360,6 +2385,13 @@ class RedfishUtils(object):
         data = response['data']
         if 'VirtualMedia' not in data:
             return {'ret': False, 'msg': "VirtualMedia resource not found"}
+
+        # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
+        # Inserted is not writable
+        image_only = False
+        if data["FirmwareVersion"].startswith("iLO 4"):
+            image_only = True
+
         virt_media_uri = data["VirtualMedia"]["@odata.id"]
         response = self.get_request(self.root_uri + virt_media_uri)
         if response['ret'] is False:
@@ -2384,7 +2416,7 @@ class RedfishUtils(object):
                         return {'ret': False,
                                 'msg': "%s action not found and PATCH not allowed"
                                        % '#VirtualMedia.EjectMedia'}
-                return self.virtual_media_eject_via_patch(uri)
+                return self.virtual_media_eject_via_patch(uri, image_only)
             else:
                 # POST to the EjectMedia Action
                 action = data['Actions']['#VirtualMedia.EjectMedia']
