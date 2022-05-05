@@ -1,0 +1,2 @@
+deprecated_features:
+  - "dig lookup plugin - the ``DLV`` record type has been decommissioned in 2017 and support for it will be removed from community.general 6.0.0 (https://github.com/ansible-collections/community.general/pull/4618)."
