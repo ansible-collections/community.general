@@ -1,0 +1,2 @@
+minor_changes:
+  - vmadm - minor refactoring and improvement on the module (https://github.com/ansible-collections/community.general/pull/4581).
