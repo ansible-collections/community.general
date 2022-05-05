@@ -1,0 +1,2 @@
+bugfixes:
+  - opentelemetry callback plugin - fix task message attribute that is reported failed regardless of the task result (https://github.com/ansible-collections/community.general/pull/4624).
