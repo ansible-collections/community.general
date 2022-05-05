@@ -411,7 +411,7 @@ class ConsulService(object):
         self.address = address
         self.port = port
         self.tags = tags
-        self.checks = []
+        self._checks = []
         if loaded:
             self.id = loaded['ID']
             self.name = loaded['Service']
@@ -424,8 +424,8 @@ class ConsulService(object):
         if self.port:
             optional['port'] = self.port
 
-        if len(self.checks) > 0:
-            optional['check'] = self.checks[0].check
+        if len(self._checks) > 0:
+            optional['check'] = self._checks[0].check
 
         consul_api.agent.service.register(
             self.name,
@@ -435,13 +435,13 @@ class ConsulService(object):
             **optional)
 
     def add_check(self, check):
-        self.checks.append(check)
+        self._checks.append(check)
 
     def checks(self):
-        return self.checks
+        return self._checks
 
     def has_checks(self):
-        return len(self.checks) > 0
+        return len(self._checks) > 0
 
     def __eq__(self, other):
         return (isinstance(other, self.__class__) and
@@ -459,8 +459,8 @@ class ConsulService(object):
             data['port'] = self.port
         if self.tags and len(self.tags) > 0:
             data['tags'] = self.tags
-        if len(self.checks) > 0:
-            data['check'] = self.checks[0].to_dict()
+        if len(self._checks) > 0:
+            data['check'] = self._checks[0].to_dict()
         return data
 
 
