@@ -126,7 +126,7 @@ files:
     maintainers: giner
   $filters/from_csv.py:
     maintainers: Ajpantuso
-  $filters/groupby.py:
+  $filters/groupby_as_dict.py:
     maintainers: felixfontein
   $filters/hashids.py:
     maintainers: Ajpantuso
@@ -137,7 +137,7 @@ files:
   $filters/jc.py:
     maintainers: kellyjonbrazil
   $filters/json_query.py: {}
-  $filters/list.py:
+  $filters/lists_mergeby.py:
     maintainers: vbotka
   $filters/random_mac.py: {}
   $filters/time.py:
