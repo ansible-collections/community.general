@@ -258,8 +258,9 @@ class OpenTelemetrySource(object):
             else:
                 res = host_data.result._result
                 rc = res.get('rc', 0)
-                message = self.get_error_message(res)
-                enriched_error_message = self.enrich_error_message(res)
+                if host_data.status == 'failed':
+                    message = self.get_error_message(res)
+                    enriched_error_message = self.enrich_error_message(res)
 
             if host_data.status == 'failed':
                 status = Status(status_code=StatusCode.ERROR, description=message)
