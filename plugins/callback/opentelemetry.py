@@ -197,7 +197,7 @@ class OpenTelemetrySource(object):
 
         task = tasks_data[task_uuid]
 
-        if self.ansible_version is None and result._task_fields['args'].get('_ansible_version'):
+        if self.ansible_version is None and hasattr(result, '_task_fields') and result._task_fields['args'].get('_ansible_version'):
             self.ansible_version = result._task_fields['args'].get('_ansible_version')
 
         task.add_host(HostData(host_uuid, host_name, status, result))

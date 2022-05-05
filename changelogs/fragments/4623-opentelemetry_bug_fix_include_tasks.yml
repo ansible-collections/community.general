@@ -1,0 +1,2 @@
+bugfixes:
+  - opentelemetry callback plugin - fix warning for the include_tasks (https://github.com/ansible-collections/community.general/pull/4623).
