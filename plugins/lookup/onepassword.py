@@ -105,15 +105,10 @@ from ansible.plugins.lookup import LookupBase
 from ansible.errors import AnsibleLookupError
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 
+from ansible_collections.community.general.plugins.module_utils.onepassword import OnePasswordConfig
+
 
 class OnePass:
-
-    _config_file_paths = (
-        "~/.op/config",
-        "~/.config/op/config ",
-        "~/.config/.op/config ",
-    )
-
     def __init__(self, path='op'):
         self.cli_path = path
         self.logged_in = False
@@ -123,27 +118,12 @@ class OnePass:
         self.username = None
         self.secret_key = None
         self.master_password = None
-        self._config_file_path = ""
 
-        self._config_file_paths = [
-            "~/.op/config",
-            "~/.config/op/config"
-        ]
-
-    @property
-    def config_file_path(self):
-        if self._config_file_path:
-            return self._config_file_path
-
-        for path in self._config_file_paths:
-            realpath = os.path.expanduser(path)
-            if os.path.exists(realpath):
-                self._config_file_path = realpath
-                return self._config_file_path
+        self._config = OnePasswordConfig()
 
     def get_token(self):
         # If the config file exists, assume an initial signin has taken place and try basic sign in
-        if os.path.isfile(self.config_file_path):
+        if os.path.isfile(self._config.config_file_path):
 
             if not self.master_password:
                 raise AnsibleLookupError('Unable to sign in to 1Password. master_password is required.')
