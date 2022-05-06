@@ -45,8 +45,8 @@ DOCUMENTATION = '''
         description: Vault containing the item to retrieve (case-insensitive). If absent will search all vaults.
     notes:
       - This lookup will use an existing 1Password session if one exists. If not, and you have already
-        performed an initial sign in (meaning C(~/.op/config exists)), then only the C(master_password) is required.
-        You may optionally specify C(subdomain) in this scenario, otherwise the last used subdomain will be used by C(op).
+        performed an initial sign in (meaning C(~/.op/config), C(~/.config/op/config) or C(~/.config/.op/config) exists), then only the
+        C(master_password) is required. You may optionally specify C(subdomain) in this scenario, otherwise the last used subdomain will be used by C(op).
       - This lookup can perform an initial login by providing C(subdomain), C(username), C(secret_key), and C(master_password).
       - Due to the B(very) sensitive nature of these credentials, it is B(highly) recommended that you only pass in the minimal credentials
         needed at any given time. Also, store these credentials in an Ansible Vault using a key that is equal to or greater in strength
@@ -106,11 +106,16 @@ from ansible.errors import AnsibleLookupError
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 
 
-class OnePass(object):
+class OnePass:
+
+    _config_file_paths = (
+        "~/.op/config",
+        "~/.config/op/config ",
+        "~/.config/.op/config ",
+    )
 
     def __init__(self, path='op'):
         self.cli_path = path
-        self.config_file_path = os.path.expanduser('~/.op/config')
         self.logged_in = False
         self.token = None
         self.subdomain = None
@@ -118,6 +123,23 @@ class OnePass(object):
         self.username = None
         self.secret_key = None
         self.master_password = None
+        self._config_file_path = ""
+
+        self._config_file_paths = [
+            "~/.op/config",
+            "~/.config/op/config"
+        ]
+
+    @property
+    def config_file_path(self):
+        if self._config_file_path:
+            return self._config_file_path
+
+        for path in self._config_file_paths:
+            realpath = os.path.expanduser(path)
+            if os.path.exists(realpath):
+                self._config_file_path = realpath
+                return self._config_file_path
 
     def get_token(self):
         # If the config file exists, assume an initial signin has taken place and try basic sign in
@@ -281,4 +303,5 @@ class LookupModule(LookupBase):
         values = []
         for term in terms:
             values.append(op.get_field(term, field, section, vault))
+
         return values
