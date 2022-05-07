@@ -305,72 +305,165 @@ class XCCRedfishUtils(RedfishUtils):
                     continue
             if 'RDOC' in uri:
                 continue
+            if 'Remote' in uri:
+                continue
             # if ejected, 'Inserted' should be False and 'ImageName' cleared
             if (not data.get('Inserted', False) and
                     not data.get('ImageName')):
                 return uri, data
         return None, None
 
+    def virtual_media_insert(self, options):
+        param_map = {
+            'Inserted': 'inserted',
+            'WriteProtected': 'write_protected',
+            'UserName': 'username',
+            'Password': 'password',
+            'TransferProtocolType': 'transfer_protocol_type',
+            'TransferMethod': 'transfer_method'
+        }
+        image_url = options.get('image_url')
+        if not image_url:
+            return {'ret': False,
+                    'msg': "image_url option required for VirtualMediaInsert"}
+        media_types = options.get('media_types')
+
+        # locate and read the VirtualMedia resources
+        responses = []
+        responses.append(self.get_request(self.root_uri + self.systems_uri))
+        responses.append(self.get_request(self.root_uri + self.manager_uri))
+        for response in responses:
+          if response['ret'] is False:
+              return response
+          data = response['data']
+          if 'VirtualMedia' not in data:
+                continue
+          virt_media_uri = data["VirtualMedia"]["@odata.id"]
+          response = self.get_request(self.root_uri + virt_media_uri)
+          if response['ret'] is False:
+              return response
+          data = response['data']
+          virt_media_list = []
+          for member in data[u'Members']:
+              virt_media_list.append(member[u'@odata.id'])
+          resources, headers = self._read_virt_media_resources(virt_media_list)
+
+          # see if image already inserted; if so, nothing to do
+          if self._virt_media_image_inserted(resources, image_url):
+              return {'ret': True, 'changed': False,
+                      'msg': "VirtualMedia '%s' already inserted" % image_url}
+
+          # find an empty slot to insert the media
+          # try first with strict media_type matching
+          uri, data = self._find_empty_virt_media_slot(
+              resources, media_types, media_match_strict=True)
+          if not uri:
+              # if not found, try without strict media_type matching
+              uri, data = self._find_empty_virt_media_slot(
+                  resources, media_types, media_match_strict=False)
+          if not uri:
+              return {'ret': False,
+                      'msg': "Unable to find an available VirtualMedia resource "
+                            "%s" % ('supporting ' + str(media_types)
+                                    if media_types else '')}
+
+          # confirm InsertMedia action found
+          if ('Actions' not in data or
+                  '#VirtualMedia.InsertMedia' not in data['Actions']):
+              # try to insert via PATCH if no InsertMedia action found
+              h = headers[uri]
+              if 'allow' in h:
+                  methods = [m.strip() for m in h.get('allow').split(',')]
+                  if 'PATCH' not in methods:
+                      # if Allow header present and PATCH missing, return error
+                      return {'ret': False,
+                              'msg': "%s action not found and PATCH not allowed"
+                              % '#VirtualMedia.InsertMedia'}
+              return self.virtual_media_insert_via_patch(options, param_map,
+                                                        uri, data)
+
+          # get the action property
+          action = data['Actions']['#VirtualMedia.InsertMedia']
+          if 'target' not in action:
+              return {'ret': False,
+                      'msg': "target URI missing from Action "
+                            "#VirtualMedia.InsertMedia"}
+          action_uri = action['target']
+          # get ActionInfo or AllowableValues
+          ai = self._get_all_action_info_values(action)
+          # construct payload
+          payload = self._insert_virt_media_payload(options, param_map, data, ai)
+          # POST to action
+          response = self.post_request(self.root_uri + action_uri, payload)
+          if response['ret'] is False:
+              return response
+          return {'ret': True, 'changed': True, 'msg': "VirtualMedia inserted"}
+        return {'ret': False, 'msg': "VirtualMedia resource not found"}
+        
     def virtual_media_eject_one(self, image_url):
         # locate and read the VirtualMedia resources
-        response = self.get_request(self.root_uri + self.manager_uri)
-        if response['ret'] is False:
-            return response
-        data = response['data']
-        if 'VirtualMedia' not in data:
-            return {'ret': False, 'msg': "VirtualMedia resource not found"}
-        virt_media_uri = data["VirtualMedia"]["@odata.id"]
-        response = self.get_request(self.root_uri + virt_media_uri)
-        if response['ret'] is False:
-            return response
-        data = response['data']
-        virt_media_list = []
-        for member in data[u'Members']:
-            virt_media_list.append(member[u'@odata.id'])
-        resources, headers = self._read_virt_media_resources(virt_media_list)
+        responses = []
+        responses.append(self.get_request(self.root_uri + self.systems_uri))
+        responses.append(self.get_request(self.root_uri + self.manager_uri))
+        for response in responses:
+          if response['ret'] is False:
+              return response
+          data = response['data']
+          if 'VirtualMedia' not in data:
+              continue
+          virt_media_uri = data["VirtualMedia"]["@odata.id"]
+          response = self.get_request(self.root_uri + virt_media_uri)
+          if response['ret'] is False:
+              return response
+          data = response['data']
+          virt_media_list = []
+          for member in data[u'Members']:
+              virt_media_list.append(member[u'@odata.id'])
+          resources, headers = self._read_virt_media_resources(virt_media_list)
 
-        # find the VirtualMedia resource to eject
-        uri, data, eject = self._find_virt_media_to_eject(resources, image_url)
-        if uri and eject:
-            if ('Actions' not in data or
-                    '#VirtualMedia.EjectMedia' not in data['Actions']):
-                # try to eject via PATCH if no EjectMedia action found
-                h = headers[uri]
-                if 'allow' in h:
-                    methods = [m.strip() for m in h.get('allow').split(',')]
-                    if 'PATCH' not in methods:
-                        # if Allow header present and PATCH missing, return error
-                        return {'ret': False,
-                                'msg': "%s action not found and PATCH not allowed"
-                                       % '#VirtualMedia.EjectMedia'}
-                return self.virtual_media_eject_via_patch(uri)
-            else:
-                # POST to the EjectMedia Action
-                action = data['Actions']['#VirtualMedia.EjectMedia']
-                if 'target' not in action:
-                    return {'ret': False,
-                            'msg': "target URI property missing from Action "
-                                   "#VirtualMedia.EjectMedia"}
-                action_uri = action['target']
-                # empty payload for Eject action
-                payload = {}
-                # POST to action
-                response = self.post_request(self.root_uri + action_uri,
-                                             payload)
-                if response['ret'] is False:
-                    return response
-                return {'ret': True, 'changed': True,
-                        'msg': "VirtualMedia ejected"}
-        elif uri and not eject:
-            # already ejected: return success but changed=False
-            return {'ret': True, 'changed': False,
-                    'msg': "VirtualMedia image '%s' already ejected" %
-                           image_url}
-        else:
+          # find the VirtualMedia resource to eject
+          uri, data, eject = self._find_virt_media_to_eject(resources, image_url)
+          if uri and eject:
+              if ('Actions' not in data or
+                      '#VirtualMedia.EjectMedia' not in data['Actions']):
+                  # try to eject via PATCH if no EjectMedia action found
+                  h = headers[uri]
+                  if 'allow' in h:
+                      methods = [m.strip() for m in h.get('allow').split(',')]
+                      if 'PATCH' not in methods:
+                          # if Allow header present and PATCH missing, return error
+                          return {'ret': False,
+                                  'msg': "%s action not found and PATCH not allowed"
+                                        % '#VirtualMedia.EjectMedia'}
+                  return self.virtual_media_eject_via_patch(uri)
+              else:
+                  # POST to the EjectMedia Action
+                  action = data['Actions']['#VirtualMedia.EjectMedia']
+                  if 'target' not in action:
+                      return {'ret': False,
+                              'msg': "target URI property missing from Action "
+                                    "#VirtualMedia.EjectMedia"}
+                  action_uri = action['target']
+                  # empty payload for Eject action
+                  payload = {}
+                  # POST to action
+                  response = self.post_request(self.root_uri + action_uri,
+                                              payload)
+                  if response['ret'] is False:
+                      return response
+                  return {'ret': True, 'changed': True,
+                          'msg': "VirtualMedia ejected"}
+          elif uri and not eject:
+              # already ejected: return success but changed=False
+              return {'ret': True, 'changed': False,
+                      'msg': "VirtualMedia image '%s' already ejected" %
+                            image_url}
+          else:
             # return failure (no resources matching image_url found)
             return {'ret': False, 'changed': False,
                     'msg': "No VirtualMedia resource found with image '%s' "
                            "inserted" % image_url}
+        return {'ret': False, 'msg': "VirtualMedia resource not found"}
 
     def virtual_media_eject(self, options):
         if options:
@@ -380,38 +473,43 @@ class XCCRedfishUtils(RedfishUtils):
 
         # eject all inserted media when no image_url specified
         # read all the VirtualMedia resources
-        response = self.get_request(self.root_uri + self.manager_uri)
-        if response['ret'] is False:
-            return response
-        data = response['data']
-        if 'VirtualMedia' not in data:
-            return {'ret': False, 'msg': "VirtualMedia resource not found"}
-        virt_media_uri = data["VirtualMedia"]["@odata.id"]
-        response = self.get_request(self.root_uri + virt_media_uri)
-        if response['ret'] is False:
-            return response
-        data = response['data']
-        virt_media_list = []
-        for member in data[u'Members']:
-            virt_media_list.append(member[u'@odata.id'])
-        resources, headers = self._read_virt_media_resources(virt_media_list)
+        responses = []
+        responses.append(self.get_request(self.root_uri + self.systems_uri))
+        responses.append(self.get_request(self.root_uri + self.manager_uri))
+        for response in responses:
+          if response['ret'] is False:
+              return response
+          data = response['data']
+          if 'VirtualMedia' not in data:
+              continue
+          virt_media_uri = data["VirtualMedia"]["@odata.id"]
+          response = self.get_request(self.root_uri + virt_media_uri)
+          if response['ret'] is False:
+              return response
+          data = response['data']
+          virt_media_list = []
+          for member in data[u'Members']:
+              virt_media_list.append(member[u'@odata.id'])
+          resources, headers = self._read_virt_media_resources(virt_media_list)
 
-        # eject all inserted media one by one
-        ejected_media_list = []
-        for uri, data in resources.items():
-            if data.get('Image') and data.get('Inserted', True):
-                returndict = self.virtual_media_eject_one(data.get('Image'))
-                if not returndict['ret']:
-                    return returndict
-                ejected_media_list.append(data.get('Image'))
+          # eject all inserted media one by one
+          ejected_media_list = []
+          for uri, data in resources.items():
+              if data.get('Image') and data.get('Inserted', True):
+                  returndict = self.virtual_media_eject_one(data.get('Image'))
+                  if not returndict['ret']:
+                      return returndict
+                  ejected_media_list.append(data.get('Image'))
 
-        if len(ejected_media_list) == 0:
-            # no media inserted: return success but changed=False
-            return {'ret': True, 'changed': False,
-                    'msg': "No VirtualMedia image inserted"}
-        else:
-            return {'ret': True, 'changed': True,
-                    'msg': "VirtualMedia %s ejected" % str(ejected_media_list)}
+          if len(ejected_media_list) == 0:
+              # no media inserted: return success but changed=False
+              return {'ret': True, 'changed': False,
+                      'msg': "No VirtualMedia image inserted"}
+          else:
+              return {'ret': True, 'changed': True,
+                      'msg': "VirtualMedia %s ejected" % str(ejected_media_list)}
+        
+        return {'ret': False, 'msg': "VirtualMedia resource not found"}
 
     def raw_get_resource(self, resource_uri):
         if resource_uri is None:
@@ -641,9 +739,12 @@ def main():
     # Organize by Categories / Commands
     if category == "Manager":
         # execute only if we find a Manager service resource
-        result = rf_utils._find_managers_resource()
-        if result['ret'] is False:
-            module.fail_json(msg=to_native(result['msg']))
+        results = []
+        results.append(rf_utils._find_managers_resource())
+        results.append(rf_utils._find_systems_resource())
+        for result in results:
+          if result['ret'] is False:
+              module.fail_json(msg=to_native(result['msg']))
 
         for command in command_list:
             if command == 'VirtualMediaInsert':
