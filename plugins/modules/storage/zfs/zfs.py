@@ -130,18 +130,15 @@ class Zfs(object):
 
     def exists(self):
         cmd = [self.zfs_cmd, 'list', '-t', 'all', self.name]
-        (rc, out, err) = self.module.run_command(' '.join(cmd))
-        if rc == 0:
-            return True
-        else:
-            return False
+        rc, dummy, dummy = self.module.run_command(cmd)
+        return rc == 0
 
     def create(self):
         if self.module.check_mode:
             self.changed = True
             return
         properties = self.properties
-        origin = self.module.params.get('origin', None)
+        origin = self.module.params.get('origin')
         cmd = [self.zfs_cmd]
 
         if "@" in self.name:
@@ -167,31 +164,23 @@ class Zfs(object):
         if origin and action == 'clone':
             cmd.append(origin)
         cmd.append(self.name)
-        (rc, out, err) = self.module.run_command(' '.join(cmd))
-        if rc == 0:
-            self.changed = True
-        else:
-            self.module.fail_json(msg=err)
+        self.module.run_command(cmd, check_rc=True)
+        self.changed = True
 
     def destroy(self):
         if self.module.check_mode:
             self.changed = True
             return
         cmd = [self.zfs_cmd, 'destroy', '-R', self.name]
-        (rc, out, err) = self.module.run_command(' '.join(cmd))
-        if rc == 0:
-            self.changed = True
-        else:
-            self.module.fail_json(msg=err)
+        self.module.run_command(cmd, check_rc=True)
+        self.changed = True
 
     def set_property(self, prop, value):
         if self.module.check_mode:
             self.changed = True
             return
         cmd = [self.zfs_cmd, 'set', prop + '=' + str(value), self.name]
-        (rc, out, err) = self.module.run_command(cmd)
-        if rc != 0:
-            self.module.fail_json(msg=err)
+        self.module.run_command(cmd, check_rc=True)
 
     def set_properties_if_changed(self):
         diff = {'before': {'extra_zfs_properties': {}}, 'after': {'extra_zfs_properties': {}}}
@@ -220,14 +209,14 @@ class Zfs(object):
         if self.enhanced_sharing:
             cmd += ['-e']
         cmd += ['all', self.name]
-        rc, out, err = self.module.run_command(" ".join(cmd))
+        rc, out, err = self.module.run_command(cmd)
         properties = dict()
         for line in out.splitlines():
             prop, value, source = line.split('\t')
             # include source '-' so that creation-only properties are not removed
             # to avoids errors when the dataset already exists and the property is not changed
             # this scenario is most likely when the same playbook is run more than once
-            if source == 'local' or source == 'received' or source == '-':
+            if source in ('local', 'received', '-'):
                 properties[prop] = value
         # Add alias for enhanced sharing properties
         if self.enhanced_sharing:
@@ -242,7 +231,7 @@ def main():
         argument_spec=dict(
             name=dict(type='str', required=True),
             state=dict(type='str', required=True, choices=['absent', 'present']),
-            origin=dict(type='str', default=None),
+            origin=dict(type='str'),
             extra_zfs_properties=dict(type='dict', default={}),
         ),
         supports_check_mode=True,
