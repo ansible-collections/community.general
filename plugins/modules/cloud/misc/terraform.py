@@ -332,7 +332,7 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
     if plan_path is None:
         f, plan_path = tempfile.mkstemp(suffix='.tfplan')
 
-    local_command = command.copy()
+    local_command = command[:]
 
     plan_command = [command[0], 'plan']
 
