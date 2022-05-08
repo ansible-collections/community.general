@@ -1,0 +1,2 @@
+bugfixes:
+  - terraform - fix list initialization to support both Python 2 and Python 3 (https://github.com/ansible-collections/community.general/issues/4531).
