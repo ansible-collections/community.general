@@ -1,0 +1,2 @@
+minor_changes:
+  - zfs - minor refactoring in the code (https://github.com/ansible-collections/community.general/pull/4650).
