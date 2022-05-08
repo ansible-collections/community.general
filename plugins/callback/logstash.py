@@ -45,7 +45,7 @@ DOCUMENTATION = r'''
             version_added: 1.0.0
         default: ansible
       pre_command:
-        description: Executes command before run and result put to ansible_pre_command_output field.
+        description: Executes command before run and its result is added to the C(ansible_pre_command_output) logstash field.
         version_added: 2.0.0
         ini:
           - section: callback_logstash
