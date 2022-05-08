@@ -14,6 +14,9 @@ from ansible_collections.community.general.plugins.module_utils.mh.deco import m
 class ModuleHelperBase(object):
     module = None
     ModuleHelperException = _MHE
+    _delegated_to_module = (
+        'check_mode', 'get_bin_path', 'warn', 'deprecate',
+    )
 
     def __init__(self, module=None):
         self._changed = False
@@ -29,7 +32,9 @@ class ModuleHelperBase(object):
         return self.module._diff
 
     def __getattr__(self, attr):
-        return getattr(self.module, attr)
+        if attr in self._delegated_to_module:
+            return getattr(self.module, attr)
+        return getattr(object, attr)
 
     def __init_module__(self):
         pass
