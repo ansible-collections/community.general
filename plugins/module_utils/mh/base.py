@@ -34,7 +34,7 @@ class ModuleHelperBase(object):
     def __getattr__(self, attr):
         if attr in self._delegated_to_module:
             return getattr(self.module, attr)
-        return getattr(object, attr)
+        raise AttributeError("ModuleHelperBase has no attribute '%s'" % (attr, ))
 
     def __init_module__(self):
         pass
