@@ -1,0 +1,2 @@
+minor_changes:
+  - ModuleHelper module utils - ``ModuleHelperBase` now delegates the attributes ``check_mode``, ``get_bin_path``, ``warn``, and ``deprecate`` to the underlying ``AnsibleModule`` instance (https://github.com/ansible-collections/community.general/pull/4600).
