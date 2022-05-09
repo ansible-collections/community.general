@@ -56,6 +56,22 @@ options:
       - A list of slaves
       - Each slave needs a name, a link and a path parameter
     type: list
+    elements: dict
+    suboptions:
+      name:
+        description:
+          - The generic name of the slave.
+        type: str
+        required: true
+      path:
+        description:
+          - The path to the real executable that the slave should point to.
+        type: path
+        required: true
+      link:
+        description:
+          - The path to the symbolic link that should point to the real slave executable.
+        type: path
     version_added: 2.5.0
 requirements: [ update-alternatives ]
 '''
@@ -125,7 +141,7 @@ def main():
                 choices=AlternativeState.to_list(),
                 default=AlternativeState.SELECTED,
             ),
-            slaves=dict(type='list'),
+            slaves=dict(type='list', elements='dict'),
         ),
         supports_check_mode=True,
     )
