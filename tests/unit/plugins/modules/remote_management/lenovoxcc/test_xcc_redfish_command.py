@@ -75,7 +75,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
 
         with patch.object(module.XCCRedfishUtils, '_find_managers_resource') as mock__find_managers_resource:
             mock__find_managers_resource.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
-            
+
             with patch.object(module.XCCRedfishUtils, '_find_systems_resource') as mock__find_systems_resource:
                 mock__find_systems_resource.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
 
@@ -100,7 +100,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
 
         with patch.object(module.XCCRedfishUtils, '_find_managers_resource') as mock__find_managers_resource:
             mock__find_managers_resource.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
-            
+
             with patch.object(module.XCCRedfishUtils, '_find_systems_resource') as mock__find_systems_resource:
                 mock__find_systems_resource.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
 
