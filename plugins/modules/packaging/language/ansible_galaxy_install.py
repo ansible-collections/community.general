@@ -76,7 +76,7 @@ options:
     default: false
   ack_min_ansiblecore211:
     description:
-      - Acknowledge the module is deprecating support for Ansible 2.9 and Ansible Core 2.10.
+      - Acknowledge the module is deprecating support for Ansible 2.9 and ansible-base 2.10.
       - Support for those versions will be removed in community.general 8.0.0.
         At the same time, this option will be removed without any deprecation warning!
       - This option is completely ignored if using a version of Ansible greater than C(2.9.x).
