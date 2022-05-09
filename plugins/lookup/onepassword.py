@@ -108,7 +108,7 @@ from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible_collections.community.general.plugins.module_utils.onepassword import OnePasswordConfig
 
 
-class OnePass:
+class OnePass(object):
     def __init__(self, path='op'):
         self.cli_path = path
         self.logged_in = False

@@ -7,7 +7,7 @@ __metaclass__ = type
 import os
 
 
-class OnePasswordConfig:
+class OnePasswordConfig(object):
     _config_file_paths = (
         "~/.op/config",
         "~/.config/op/config",

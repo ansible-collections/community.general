@@ -177,7 +177,7 @@ class AnsibleModuleError(Exception):
         return self.results
 
 
-class OnePasswordInfo:
+class OnePasswordInfo(object):
 
     def __init__(self):
         self.cli_path = module.params.get('cli_path')
