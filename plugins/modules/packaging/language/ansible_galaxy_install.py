@@ -238,7 +238,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
 
     def __init_module__(self):
         self.ansible_version = self._get_ansible_galaxy_version()
-        if self.ansible_version < (2, 11):
+        if self.ansible_version < (2, 11) and not self.vars.ack_min_ansiblecore211:
             self.module.deprecate(
                 "Support for Ansible 2.9 and Ansible-base 2.10 is being deprecated. "
                 "At the same time support for them is ended, also the ack_ansible29 option will be removed. "
