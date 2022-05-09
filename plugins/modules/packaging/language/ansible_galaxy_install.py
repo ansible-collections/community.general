@@ -301,7 +301,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
         self.vars.set("new_collections", {})
         self.vars.set("new_roles", {})
         self.vars.set("ansible29_change", False, change=True, output=False)
-        if not self.vars.ack_ansible29 and not self.vars.ack_min_ansiblecore211:
+        if not (self.vars.ack_ansible29 or self.vars.ack_min_ansiblecore211):
             self.module.warn("Ansible 2.9 or older: unable to retrieve lists of roles and collections already installed")
             if self.vars.requirements_file is not None and self.vars.type == 'both':
                 self.module.warn("Ansible 2.9 or older: will install only roles from requirement files")
