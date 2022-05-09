@@ -79,7 +79,7 @@ options:
       - Acknowledge the module is deprecating support for Ansible 2.9 and ansible-base 2.10.
       - Support for those versions will be removed in community.general 8.0.0.
         At the same time, this option will be removed without any deprecation warning!
-      - This option is completely ignored if using a version of Ansible greater than C(2.9.x).
+      - This option is completely ignored if using a version of ansible-core/ansible-base/Ansible greater than C(2.11).
       - For the sake of conciseness, setting this parameter to C(true) implies I(ack_ansible29=true).
     type: bool
     default: false
