@@ -1,0 +1,2 @@
+bugfixes:
+  - xcc_redfish_command - for compatibility with the virtual media resource location on managers or systems. (https://github.com/ansible-collections/community.general/pull/4651).
