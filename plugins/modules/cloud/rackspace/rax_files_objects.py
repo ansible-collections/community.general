@@ -347,6 +347,10 @@ def delete(module, cf, container, src, dest):
     comma-separated list to src OR dest (but not both).  Omitting file name(s)
     assumes the entire container is to be deleted.
     """
+    if src and dest:
+        module.fail_json(msg="Error: ambiguous instructions; files to be deleted "
+                             "have been specified on both src and dest args")
+
     c = _get_container(module, cf, container)
 
     objs = dest or src
@@ -384,6 +388,10 @@ def get_meta(module, cf, container, src, dest):
     """ Get metadata for a single file, comma-separated list, or entire
     container
     """
+    if src and dest:
+        module.fail_json(msg="Error: ambiguous instructions; files to be deleted "
+                             "have been specified on both src and dest args")
+
     c = _get_container(module, cf, container)
 
     objs = dest or src
@@ -412,6 +420,9 @@ def put_meta(module, cf, container, src, dest, meta, clear_meta):
     Passing a true value to clear_meta clears the metadata stored in Cloud
     Files before setting the new metadata to the value of "meta".
     """
+    if src and dest:
+        module.fail_json(msg="Error: ambiguous instructions; files to set meta"
+                             " have been specified on both src and dest args")
     objs = dest or src
     objs = map(str.strip, objs.split(','))
 
@@ -435,6 +446,10 @@ def delete_meta(module, cf, container, src, dest, meta):
     all objects specified by src or dest (but not both), if any; otherwise it
     deletes keys on all objects in the container
     """
+    if src and dest:
+        module.fail_json(msg="Error: ambiguous instructions; meta keys to be "
+                             "deleted have been specified on both src and dest"
+                             " args")
     objs = dest or src
     objs = map(str.strip, objs.split(','))
 
@@ -508,9 +523,6 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_together=rax_required_together(),
-        mutually_exclusive=[
-            ('src', 'dest'),
-        ],
     )
 
     if not HAS_PYRAX:
