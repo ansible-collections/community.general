@@ -311,7 +311,7 @@ def download(module, cf, container, src, dest, structure):
     # Accept a single object name or a comma-separated list of objs
     # If not specified, get the entire container
     if src:
-        objs = map(str.strip, objs.split(','))
+        objs = map(str.strip, src.split(','))
     else:
         objs = c.get_object_names()
 
