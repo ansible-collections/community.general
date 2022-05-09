@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - pritunl_user - add ``mac_addresses`` parameter (https://github.com/ansible-collections/community.general/pull/4535).
