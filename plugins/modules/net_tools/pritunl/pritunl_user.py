@@ -82,20 +82,29 @@ options:
         default: null
         description:
             - Enable/Disable Gravatar usage for the user I(user_name).
+
+    user_mac_addresses:
+        type: list
+        elements: str
+        description:
+            - Allowed MAC addresses for the user I(user_name).
+        version_added: 5.0.0
 """
 
 EXAMPLES = """
 - name: Create the user Foo with email address foo@bar.com in MyOrg
   community.general.pritunl_user:
     state: present
-    name: MyOrg
+    organization: MyOrg
     user_name: Foo
     user_email: foo@bar.com
+    user_mac_addresses:
+      - "00:00:00:00:00:99"
 
 - name: Disable the user Foo but keep it in Pritunl
   community.general.pritunl_user:
     state: present
-    name: MyOrg
+    organization: MyOrg
     user_name: Foo
     user_email: foo@bar.com
     user_disabled: yes
@@ -103,7 +112,7 @@ EXAMPLES = """
 - name: Make sure the user Foo is not part of MyOrg anymore
   community.general.pritunl_user:
     state: absent
-    name: MyOrg
+    organization: MyOrg
     user_name: Foo
 """
 
@@ -167,6 +176,7 @@ def add_or_update_pritunl_user(module):
         "groups": module.params.get("user_groups"),
         "disabled": module.params.get("user_disabled"),
         "gravatar": module.params.get("user_gravatar"),
+        "mac_addresses": module.params.get("user_mac_addresses"),
         "type": module.params.get("user_type"),
     }
 
@@ -204,8 +214,8 @@ def add_or_update_pritunl_user(module):
             if user_params[key] is None:
                 user_params[key] = users[0][key]
 
-            # 'groups' is a list comparison
-            if key == "groups":
+            # 'groups' and 'mac_addresses' are list comparison
+            if key == "groups" or key == "mac_addresses":
                 if set(users[0][key]) != set(user_params[key]):
                     user_params_changed = True
 
@@ -323,6 +333,7 @@ def main():
             user_groups=dict(required=False, type="list", elements="str", default=None),
             user_disabled=dict(required=False, type="bool", default=None),
             user_gravatar=dict(required=False, type="bool", default=None),
+            user_mac_addresses=dict(required=False, type="list", elements="str", default=None),
         )
     ),
 
