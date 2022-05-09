@@ -39,6 +39,8 @@ options:
   record_value:
     description:
     - Manage DNS record name with this value.
+    - Mutually exclusive with I(record_values), and exactly one of I(record_value) and I(record_values) has to be specified.
+    - Use I(record_values) if you need to specify multiple values.
     - In the case of 'A' or 'AAAA' record types, this will be the IP address.
     - In the case of 'A6' record type, this will be the A6 Record data.
     - In the case of 'CNAME' record type, this will be the hostname.
@@ -47,12 +49,25 @@ options:
     - In the case of 'TXT' record type, this will be a text.
     - In the case of 'SRV' record type, this will be a service record.
     - In the case of 'MX' record type, this will be a mail exchanger record.
-    required: true
     type: str
+  record_values:
+    description:
+    - Manage DNS record name with this value.
+    - Mutually exclusive with I(record_values), and exactly one of I(record_value) and I(record_values) has to be specified.
+    - In the case of 'A' or 'AAAA' record types, this will be the IP address.
+    - In the case of 'A6' record type, this will be the A6 Record data.
+    - In the case of 'CNAME' record type, this will be the hostname.
+    - In the case of 'DNAME' record type, this will be the DNAME target.
+    - In the case of 'PTR' record type, this will be the hostname.
+    - In the case of 'TXT' record type, this will be a text.
+    - In the case of 'SRV' record type, this will be a service record.
+    - In the case of 'MX' record type, this will be a mail exchanger record.
+    type: list
+    elements: str
   record_ttl:
     description:
     - Set the TTL for the record.
-    - Applies only when adding a new or changing the value of record_value.
+    - Applies only when adding a new or changing the value of I(record_value) or I(record_values).
     required: false
     type: int
   state:
@@ -77,12 +92,12 @@ EXAMPLES = r'''
     record_type: 'AAAA'
     record_value: '::1'
 
-- name: Ensure that dns record exists with a TTL
+- name: Ensure that dns records exists with a TTL
   community.general.ipa_dnsrecord:
     name: host02
     zone_name: example.com
     record_type: 'AAAA'
-    record_value: '::1'
+    record_values: '::1,fe80::1'
     record_ttl: 300
     ipa_host: ipa.example.com
     ipa_pass: topsecret
@@ -118,7 +133,7 @@ EXAMPLES = r'''
     record_type: 'SRV'
     record_value: '10 50 88 ipa.example.com'
 
-- name: Ensure an MX record is present
+- name: Ensure an MX records are present
   community.general.ipa_dnsrecord:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
@@ -126,7 +141,9 @@ EXAMPLES = r'''
     zone_name: example.com
     record_name: '@'
     record_type: 'MX'
-    record_value: '1 mailserver.example.com'
+    record_values:
+      - '1 mailserver-01.example.com'
+      - '2 mailserver-02.example.com'
 
 - name: Ensure that dns record is removed
   community.general.ipa_dnsrecord:
@@ -166,29 +183,31 @@ class DNSRecordIPAClient(IPAClient):
 
     def dnsrecord_add(self, zone_name=None, record_name=None, details=None):
         item = dict(idnsname=record_name)
-        if details['record_type'] == 'A':
-            item.update(a_part_ip_address=details['record_value'])
-        elif details['record_type'] == 'AAAA':
-            item.update(aaaa_part_ip_address=details['record_value'])
-        elif details['record_type'] == 'A6':
-            item.update(a6_part_data=details['record_value'])
-        elif details['record_type'] == 'CNAME':
-            item.update(cname_part_hostname=details['record_value'])
-        elif details['record_type'] == 'DNAME':
-            item.update(dname_part_target=details['record_value'])
-        elif details['record_type'] == 'PTR':
-            item.update(ptr_part_hostname=details['record_value'])
-        elif details['record_type'] == 'TXT':
-            item.update(txtrecord=details['record_value'])
-        elif details['record_type'] == 'SRV':
-            item.update(srvrecord=details['record_value'])
-        elif details['record_type'] == 'MX':
-            item.update(mxrecord=details['record_value'])
 
         if details.get('record_ttl'):
             item.update(dnsttl=details['record_ttl'])
 
-        return self._post_json(method='dnsrecord_add', name=zone_name, item=item)
+        for value in details['record_values']:
+            if details['record_type'] == 'A':
+                item.update(a_part_ip_address=value)
+            elif details['record_type'] == 'AAAA':
+                item.update(aaaa_part_ip_address=value)
+            elif details['record_type'] == 'A6':
+                item.update(a6_part_data=value)
+            elif details['record_type'] == 'CNAME':
+                item.update(cname_part_hostname=value)
+            elif details['record_type'] == 'DNAME':
+                item.update(dname_part_target=value)
+            elif details['record_type'] == 'PTR':
+                item.update(ptr_part_hostname=value)
+            elif details['record_type'] == 'TXT':
+                item.update(txtrecord=value)
+            elif details['record_type'] == 'SRV':
+                item.update(srvrecord=value)
+            elif details['record_type'] == 'MX':
+                item.update(mxrecord=value)
+
+            self._post_json(method='dnsrecord_add', name=zone_name, item=item)
 
     def dnsrecord_mod(self, zone_name=None, record_name=None, details=None):
         item = get_dnsrecord_dict(details)
@@ -205,24 +224,24 @@ class DNSRecordIPAClient(IPAClient):
 
 def get_dnsrecord_dict(details=None):
     module_dnsrecord = dict()
-    if details['record_type'] == 'A' and details['record_value']:
-        module_dnsrecord.update(arecord=details['record_value'])
-    elif details['record_type'] == 'AAAA' and details['record_value']:
-        module_dnsrecord.update(aaaarecord=details['record_value'])
-    elif details['record_type'] == 'A6' and details['record_value']:
-        module_dnsrecord.update(a6record=details['record_value'])
-    elif details['record_type'] == 'CNAME' and details['record_value']:
-        module_dnsrecord.update(cnamerecord=details['record_value'])
-    elif details['record_type'] == 'DNAME' and details['record_value']:
-        module_dnsrecord.update(dnamerecord=details['record_value'])
-    elif details['record_type'] == 'PTR' and details['record_value']:
-        module_dnsrecord.update(ptrrecord=details['record_value'])
-    elif details['record_type'] == 'TXT' and details['record_value']:
-        module_dnsrecord.update(txtrecord=details['record_value'])
-    elif details['record_type'] == 'SRV' and details['record_value']:
-        module_dnsrecord.update(srvrecord=details['record_value'])
-    elif details['record_type'] == 'MX' and details['record_value']:
-        module_dnsrecord.update(mxrecord=details['record_value'])
+    if details['record_type'] == 'A' and details['record_values']:
+        module_dnsrecord.update(arecord=details['record_values'])
+    elif details['record_type'] == 'AAAA' and details['record_values']:
+        module_dnsrecord.update(aaaarecord=details['record_values'])
+    elif details['record_type'] == 'A6' and details['record_values']:
+        module_dnsrecord.update(a6record=details['record_values'])
+    elif details['record_type'] == 'CNAME' and details['record_values']:
+        module_dnsrecord.update(cnamerecord=details['record_values'])
+    elif details['record_type'] == 'DNAME' and details['record_values']:
+        module_dnsrecord.update(dnamerecord=details['record_values'])
+    elif details['record_type'] == 'PTR' and details['record_values']:
+        module_dnsrecord.update(ptrrecord=details['record_values'])
+    elif details['record_type'] == 'TXT' and details['record_values']:
+        module_dnsrecord.update(txtrecord=details['record_values'])
+    elif details['record_type'] == 'SRV' and details['record_values']:
+        module_dnsrecord.update(srvrecord=details['record_values'])
+    elif details['record_type'] == 'MX' and details['record_values']:
+        module_dnsrecord.update(mxrecord=details['record_values'])
 
     if details.get('record_ttl'):
         module_dnsrecord.update(dnsttl=details['record_ttl'])
@@ -243,9 +262,13 @@ def ensure(module, client):
 
     ipa_dnsrecord = client.dnsrecord_find(zone_name, record_name)
 
+    record_values = module.params['record_values']
+    if module.params['record_value'] is not None:
+        record_values = [module.params['record_value']]
+
     module_dnsrecord = dict(
         record_type=module.params['record_type'],
-        record_value=module.params['record_value'],
+        record_values=record_values,
         record_ttl=to_native(record_ttl, nonstring='passthru'),
     )
 
@@ -287,13 +310,16 @@ def main():
         zone_name=dict(type='str', required=True),
         record_name=dict(type='str', aliases=['name'], required=True),
         record_type=dict(type='str', default='A', choices=record_types),
-        record_value=dict(type='str', required=True),
+        record_value=dict(type='str'),
+        record_values=dict(type='list', elements='str'),
         state=dict(type='str', default='present', choices=['present', 'absent']),
         record_ttl=dict(type='int', required=False),
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
+        mutually_exclusive=[['record_value', 'record_values']],
+        required_one_of=[['record_value', 'record_values']],
         supports_check_mode=True
     )
 
