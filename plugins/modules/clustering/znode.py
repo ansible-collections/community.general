@@ -48,6 +48,11 @@ options:
             - Recursively delete node and all its children.
         type: bool
         default: 'no'
+    usessl:
+        description:
+            - Using ssl or not (true or false).
+        type: bool
+        default: 'no'
 requirements:
     - kazoo >= 2.1
     - python >= 2.6
@@ -121,7 +126,8 @@ def main():
             op=dict(choices=['get', 'wait', 'list']),
             state=dict(choices=['present', 'absent']),
             timeout=dict(default=300, type='int'),
-            recursive=dict(default=False, type='bool')
+            recursive=dict(default=False, type='bool'),
+            usessl=dict(default=False, type='bool')
         ),
         supports_check_mode=False
     )
@@ -175,7 +181,7 @@ def check_params(params):
 class KazooCommandProxy():
     def __init__(self, module):
         self.module = module
-        self.zk = KazooClient(module.params['hosts'])
+        self.zk = KazooClient(module.params['hosts'], use_ssl=module.params['usessl'])
 
     def absent(self):
         return self._absent(self.module.params['name'])
