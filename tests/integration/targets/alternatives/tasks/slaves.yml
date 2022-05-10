@@ -1,0 +1,35 @@
+- name: Try with slaves
+  alternatives:
+    name: dummymain
+    path: '/usr/bin/dummy1'
+    link: '/usr/bin/dummymain'
+    slaves:
+      - name: dummyslave
+        path: '/usr/bin/dummy2'
+        link: '/usr/bin/dummyslave'
+  ignore_errors: True
+  register: alternative
+
+- name: check expected command was executed
+  assert:
+    that:
+      - 'alternative is successful'
+      - 'alternative is changed'
+
+- name: Execute the current dummymain command
+  shell: dummymain
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy1"
+
+- name: Execute the current dummyslave command
+  shell: dummyslave
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy2"
