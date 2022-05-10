@@ -53,8 +53,8 @@ options:
     version_added: 4.8.0
   slaves:
     description:
-      - A list of slaves
-      - Each slave needs a name, a link and a path parameter
+      - A list of slaves.
+      - Each slave needs a name, a link and a path parameter.
     type: list
     elements: dict
     suboptions:
@@ -72,7 +72,7 @@ options:
         description:
           - The path to the symbolic link that should point to the real slave executable.
         type: path
-    version_added: 2.5.0
+    version_added: 5.0.0
 requirements: [ update-alternatives ]
 '''
 
@@ -102,7 +102,7 @@ EXAMPLES = r'''
     state: present
 
 - name: keytool is a slave of java
-  alternatives:
+  community.general.alternatives:
     name: java
     link: /usr/bin/java
     path: /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java
@@ -141,7 +141,11 @@ def main():
                 choices=AlternativeState.to_list(),
                 default=AlternativeState.SELECTED,
             ),
-            slaves=dict(type='list', elements='dict'),
+            slaves=dict(type='list', elements='dict', options=dict(
+                name=dict(type='str', required=True),
+                path=dict(type='path', required=True),
+                link=dict(type='path'),
+            )),
         ),
         supports_check_mode=True,
     )
@@ -215,7 +219,7 @@ def main():
 
                 cmd = [UPDATE_ALTERNATIVES, '--install', link, name, path, str(priority)]
                 if params['slaves']:
-                    slaves = map(lambda slave: ['--slave', slave['link'], slave['name'], slave['path']], params['slaves'])
+                    slaves = [['--slave', slave['link'], slave['name'], slave['path']] for slave in params['slaves']]
                     cmd += [item for sublist in slaves for item in sublist]
 
                 module.run_command(
