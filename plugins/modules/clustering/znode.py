@@ -48,7 +48,7 @@ options:
             - Recursively delete node and all its children.
         type: bool
         default: 'no'
-    usessl:
+    use_tls:
         description:
             - Using ssl or not (true or false).
         type: bool
