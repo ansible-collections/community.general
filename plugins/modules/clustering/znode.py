@@ -50,7 +50,7 @@ options:
         default: 'no'
     use_tls:
         description:
-            - Using ssl or not (true or false).
+            - Using TLS/SSL or not.
         type: bool
         default: 'no'
 requirements:
