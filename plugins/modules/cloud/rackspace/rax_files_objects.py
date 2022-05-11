@@ -13,14 +13,14 @@ DOCUMENTATION = '''
 module: rax_files_objects
 short_description: Upload, download, and delete objects in Rackspace Cloud Files
 description:
-  - Upload, download, and delete objects in Rackspace Cloud Files
+  - Upload, download, and delete objects in Rackspace Cloud Files.
 options:
   clear_meta:
     description:
       - Optionally clear existing metadata when applying metadata to existing objects.
-        Selecting this option is only appropriate when setting type=meta
+        Selecting this option is only appropriate when setting I(type=meta).
     type: bool
-    default: 'no'
+    default: false
   container:
     type: str
     description:
@@ -29,24 +29,23 @@ options:
   dest:
     type: str
     description:
-      - The destination of a "get" operation; i.e. a local directory, "/home/user/myfolder".
+      - The destination of a C(get) operation; i.e. a local directory, C(/home/user/myfolder).
         Used to specify the destination of an operation on a remote object; i.e. a file name,
-        "file1", or a comma-separated list of remote objects, "file1,file2,file17"
+        C(file1), or a comma-separated list of remote objects, C(file1,file2,file17).
   expires:
     type: int
     description:
-      - Used to set an expiration on a file or folder uploaded to Cloud Files.
-        Requires an integer, specifying expiration in seconds
+      - Used to set an expiration in seconds on an uploaded file or folder.
   meta:
     type: dict
     description:
-      - A hash of items to set as metadata values on an uploaded file or folder
+      - Items to set as metadata values on an uploaded file or folder.
   method:
     type: str
     description:
-      - The method of operation to be performed.  For example, put to upload files
-        to Cloud Files, get to download files from Cloud Files or delete to delete
-        remote objects in Cloud Files
+      - >
+        The method of operation to be performed: C(put) to upload files, C(get) to download files or
+        C(delete) to remove remote objects in Cloud Files.
     choices:
       - get
       - put
@@ -56,8 +55,8 @@ options:
     type: str
     description:
       - Source from which to upload files.  Used to specify a remote object as a source for
-        an operation, i.e. a file name, "file1", or a comma-separated list of remote objects,
-        "file1,file2,file17".  src and dest are mutually exclusive on remote-only object operations
+        an operation, i.e. a file name, C(file1), or a comma-separated list of remote objects,
+        C(file1,file2,file17). Parameters I(src) and I(dest) are mutually exclusive on remote-only object operations
   structure:
     description:
       - Used to specify whether to maintain nested directory structure when downloading objects
@@ -239,13 +238,12 @@ def _upload_folder(cf, folder, container, ttl=None, headers=None):
     """ Uploads a folder to Cloud Files.
     """
     total_bytes = 0
-    for root, dirs, files in os.walk(folder):
+    for root, dummy, files in os.walk(folder):
         for fname in files:
             full_path = os.path.join(root, fname)
             obj_name = os.path.relpath(full_path, folder)
             obj_size = os.path.getsize(full_path)
-            cf.upload_file(container, full_path,
-                           obj_name=obj_name, return_none=True, ttl=ttl, headers=headers)
+            cf.upload_file(container, full_path, obj_name=obj_name, return_none=True, ttl=ttl, headers=headers)
             total_bytes += obj_size
     return total_bytes
 
@@ -270,21 +268,15 @@ def upload(module, cf, container, src, dest, meta, expires):
 
     cont_obj = None
     total_bytes = 0
-    if dest and not is_dir:
-        try:
+    try:
+        if dest and not is_dir:
             cont_obj = c.upload_file(src, obj_name=dest, ttl=expires, headers=meta)
-        except Exception as e:
-            module.fail_json(msg=e.message)
-    elif is_dir:
-        try:
+        elif is_dir:
             total_bytes = _upload_folder(cf, src, c, ttl=expires, headers=meta)
-        except Exception as e:
-            module.fail_json(msg=e.message)
-    else:
-        try:
+        else:
             cont_obj = c.upload_file(src, ttl=expires, headers=meta)
-        except Exception as e:
-            module.fail_json(msg=e.message)
+    except Exception as e:
+        module.fail_json(msg=e.message)
 
     EXIT_DICT['success'] = True
     EXIT_DICT['container'] = c.name
@@ -319,8 +311,7 @@ def download(module, cf, container, src, dest, structure):
     # Accept a single object name or a comma-separated list of objs
     # If not specified, get the entire container
     if src:
-        objs = src.split(',')
-        objs = map(str.strip, objs)
+        objs = map(str.strip, src.split(','))
     else:
         objs = c.get_object_names()
 
@@ -330,14 +321,10 @@ def download(module, cf, container, src, dest, structure):
     if not is_dir:
         module.fail_json(msg='dest must be a directory')
 
-    results = []
-    for obj in objs:
-        try:
-            c.download_object(obj, dest, structure=structure)
-        except Exception as e:
-            module.fail_json(msg=e.message)
-        else:
-            results.append(obj)
+    try:
+        results = [c.download_object(obj, dest, structure=structure) for obj in objs]
+    except Exception as e:
+        module.fail_json(msg=e.message)
 
     len_results = len(results)
     len_objs = len(objs)
@@ -360,33 +347,24 @@ def delete(module, cf, container, src, dest):
     comma-separated list to src OR dest (but not both).  Omitting file name(s)
     assumes the entire container is to be deleted.
     """
-    objs = None
     if src and dest:
         module.fail_json(msg="Error: ambiguous instructions; files to be deleted "
                              "have been specified on both src and dest args")
-    elif dest:
-        objs = dest
-    else:
-        objs = src
 
     c = _get_container(module, cf, container)
 
+    objs = dest or src
     if objs:
-        objs = objs.split(',')
-        objs = map(str.strip, objs)
+        objs = map(str.strip, objs.split(','))
     else:
         objs = c.get_object_names()
 
     num_objs = len(objs)
 
-    results = []
-    for obj in objs:
-        try:
-            result = c.delete_object(obj)
-        except Exception as e:
-            module.fail_json(msg=e.message)
-        else:
-            results.append(result)
+    try:
+        results = [c.delete_object(obj) for obj in objs]
+    except Exception as e:
+        module.fail_json(msg=e.message)
 
     num_deleted = results.count(True)
 
@@ -410,34 +388,25 @@ def get_meta(module, cf, container, src, dest):
     """ Get metadata for a single file, comma-separated list, or entire
     container
     """
-    c = _get_container(module, cf, container)
-
-    objs = None
     if src and dest:
         module.fail_json(msg="Error: ambiguous instructions; files to be deleted "
                              "have been specified on both src and dest args")
-    elif dest:
-        objs = dest
-    else:
-        objs = src
 
+    c = _get_container(module, cf, container)
+
+    objs = dest or src
     if objs:
-        objs = objs.split(',')
-        objs = map(str.strip, objs)
+        objs = map(str.strip, objs.split(','))
     else:
         objs = c.get_object_names()
 
-    results = dict()
-    for obj in objs:
-        try:
+    try:
+        results = dict()
+        for obj in objs:
             meta = c.get_object(obj).get_metadata()
-        except Exception as e:
-            module.fail_json(msg=e.message)
-        else:
-            results[obj] = dict()
-            for k, v in meta.items():
-                meta_key = k.split(META_PREFIX)[-1]
-                results[obj][meta_key] = v
+            results[obj] = dict((k.split(META_PREFIX)[-1], v) for k, v in meta.items())
+    except Exception as e:
+        module.fail_json(msg=e.message)
 
     EXIT_DICT['container'] = c.name
     if results:
@@ -451,28 +420,18 @@ def put_meta(module, cf, container, src, dest, meta, clear_meta):
     Passing a true value to clear_meta clears the metadata stored in Cloud
     Files before setting the new metadata to the value of "meta".
     """
-    objs = None
     if src and dest:
         module.fail_json(msg="Error: ambiguous instructions; files to set meta"
                              " have been specified on both src and dest args")
-    elif dest:
-        objs = dest
-    else:
-        objs = src
-
-    objs = objs.split(',')
-    objs = map(str.strip, objs)
+    objs = dest or src
+    objs = map(str.strip, objs.split(','))
 
     c = _get_container(module, cf, container)
 
-    results = []
-    for obj in objs:
-        try:
-            result = c.get_object(obj).set_metadata(meta, clear=clear_meta)
-        except Exception as e:
-            module.fail_json(msg=e.message)
-        else:
-            results.append(result)
+    try:
+        results = [c.get_object(obj).set_metadata(meta, clear=clear_meta) for obj in objs]
+    except Exception as e:
+        module.fail_json(msg=e.message)
 
     EXIT_DICT['container'] = c.name
     EXIT_DICT['success'] = True
@@ -487,43 +446,24 @@ def delete_meta(module, cf, container, src, dest, meta):
     all objects specified by src or dest (but not both), if any; otherwise it
     deletes keys on all objects in the container
     """
-    objs = None
     if src and dest:
         module.fail_json(msg="Error: ambiguous instructions; meta keys to be "
                              "deleted have been specified on both src and dest"
                              " args")
-    elif dest:
-        objs = dest
-    else:
-        objs = src
-
-    objs = objs.split(',')
-    objs = map(str.strip, objs)
+    objs = dest or src
+    objs = map(str.strip, objs.split(','))
 
     c = _get_container(module, cf, container)
 
-    results = []  # Num of metadata keys removed, not objects affected
-    for obj in objs:
-        if meta:
-            for k, v in meta.items():
-                try:
-                    result = c.get_object(obj).remove_metadata_key(k)
-                except Exception as e:
-                    module.fail_json(msg=e.message)
-                else:
-                    results.append(result)
-        else:
-            try:
-                o = c.get_object(obj)
-            except pyrax.exc.NoSuchObject as e:
-                module.fail_json(msg=e.message)
-
-            for k, v in o.get_metadata().items():
-                try:
-                    result = o.remove_metadata_key(k)
-                except Exception as e:
-                    module.fail_json(msg=e.message)
-                results.append(result)
+    try:
+        for obj in objs:
+            o = c.get_object(obj)
+            results = [
+                o.remove_metadata_key(k)
+                for k in (meta or o.get_metadata())
+            ]
+    except Exception as e:
+        module.fail_json(msg=e.message)
 
     EXIT_DICT['container'] = c.name
     EXIT_DICT['success'] = True
@@ -544,13 +484,13 @@ def cloudfiles(module, container, src, dest, method, typ, meta, clear_meta,
                              'incorrectly capitalized region name.')
 
     if typ == "file":
+        if method == 'get':
+            download(module, cf, container, src, dest, structure)
+
         if method == 'put':
             upload(module, cf, container, src, dest, meta, expires)
 
-        elif method == 'get':
-            download(module, cf, container, src, dest, structure)
-
-        elif method == 'delete':
+        if method == 'delete':
             delete(module, cf, container, src, dest)
 
     else:
@@ -582,7 +522,7 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
-        required_together=rax_required_together()
+        required_together=rax_required_together(),
     )
 
     if not HAS_PYRAX:
