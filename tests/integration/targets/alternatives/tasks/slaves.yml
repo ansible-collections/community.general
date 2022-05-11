@@ -12,7 +12,6 @@
 - name: Check expected command was executed
   assert:
     that:
-      - 'alternative is successful'
       - 'alternative is changed'
 
 - name: Execute the current dummymain command
