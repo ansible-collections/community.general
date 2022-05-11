@@ -430,10 +430,8 @@ def get_vm_prop(module, uuid, prop):
             msg='Invalid JSON returned by vmadm for uuid lookup of {0}'.format(prop),
             details=to_native(e), exception=traceback.format_exc())
 
-    if len(stdout_json) > 0 and prop in stdout_json[0]:
-        return stdout_json[0][prop]
-    else:
-        return None
+    if stdout_json:
+        return stdout_json[0].get(prop)
 
 
 def get_vm_uuid(module, alias):
@@ -450,18 +448,15 @@ def get_vm_uuid(module, alias):
     # If no VM was found matching the given alias, we get back an empty array.
     # That is not an error condition as we might be explicitly checking it's
     # absence.
-    if stdout.strip() == '[]':
-        return None
-    else:
-        try:
-            stdout_json = json.loads(stdout)
-        except Exception as e:
-            module.fail_json(
-                msg='Invalid JSON returned by vmadm for uuid lookup of {0}'.format(alias),
-                details=to_native(e), exception=traceback.format_exc())
+    try:
+        stdout_json = json.loads(stdout)
+    except Exception as e:
+        module.fail_json(
+            msg='Invalid JSON returned by vmadm for uuid lookup of {0}'.format(alias),
+            details=to_native(e), exception=traceback.format_exc())
 
-        if len(stdout_json) > 0 and 'uuid' in stdout_json[0]:
-            return stdout_json[0]['uuid']
+    if stdout_json:
+        return stdout_json[0].get('uuid')
 
 
 def get_all_vm_uuids(module):
@@ -484,7 +479,7 @@ def get_all_vm_uuids(module):
 def new_vm(module, uuid, vm_state):
     payload_file = create_payload(module, uuid)
 
-    (rc, stdout, stderr) = vmadm_create_vm(module, payload_file)
+    (rc, dummy, stderr) = vmadm_create_vm(module, payload_file)
 
     if rc != 0:
         changed = False
@@ -519,7 +514,6 @@ def new_vm(module, uuid, vm_state):
 
 def vmadm_create_vm(module, payload_file):
     # Create a new VM using the provided payload.
-    cmd = '{0} create -f {1}'.format(module.vmadm, payload_file)
     cmd = [module.vmadm, 'create', '-f', payload_file]
 
     return module.run_command(cmd)
@@ -547,7 +541,7 @@ def set_vm_state(module, vm_uuid, vm_state):
 
     cmd = [module.vmadm, command] + force + [vm_uuid]
 
-    (rc, stdout, stderr) = module.run_command(cmd)
+    (dummy, dummy, stderr) = module.run_command(cmd)
 
     match = re.match('^Successfully.*', stderr)
     return match is not None
@@ -632,7 +626,7 @@ def manage_all_vms(module, vm_state):
                 if (not current_vm_state) or (get_vm_prop(module, uuid, 'state') != state):
                     any_changed = True
             else:
-                any_changed = (vm_state_transition(module, uuid, vm_state) | any_changed)
+                any_changed = vm_state_transition(module, uuid, vm_state) or any_changed
 
     return any_changed
 
@@ -774,14 +768,9 @@ def main():
     elif module.check_mode:
         # Shortcut for check mode, if there is no VM yet, it will need to be created.
         # Or, if the VM is not in the desired state yet, it needs to transition.
-        if (not current_vm_state) or (get_vm_prop(module, uuid, 'state') != state):
-            result['changed'] = True
-        else:
-            result['changed'] = False
-
-        module.exit_json(**result)
-    # No VM was found that matched the given ID (alias or uuid), so we create it.
+        result['changed'] = (not current_vm_state) or (get_vm_prop(module, uuid, 'state') != state)
     elif not current_vm_state:
+        # No VM was found that matched the given ID (alias or uuid), so we create it.
         result['changed'], result['uuid'] = new_vm(module, uuid, vm_state)
     else:
         # VM was found, operate on its state directly.
