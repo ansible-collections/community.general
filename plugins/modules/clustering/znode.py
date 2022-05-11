@@ -52,7 +52,8 @@ options:
         description:
             - Using TLS/SSL or not.
         type: bool
-        default: 'no'
+        default: false
+        version_added: 5.0.0
 requirements:
     - kazoo >= 2.1
     - python >= 2.6
