@@ -7,17 +7,16 @@
       - name: dummyslave
         path: '/usr/bin/dummy2'
         link: '/usr/bin/dummyslave'
-  ignore_errors: True
   register: alternative
 
-- name: check expected command was executed
+- name: Check expected command was executed
   assert:
     that:
       - 'alternative is successful'
       - 'alternative is changed'
 
 - name: Execute the current dummymain command
-  shell: dummymain
+  command: dummymain
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -26,7 +25,7 @@
       - cmd.stdout == "dummy1"
 
 - name: Execute the current dummyslave command
-  shell: dummyslave
+  command: dummyslave
   register: cmd
 
 - name: Ensure that the expected command was executed
