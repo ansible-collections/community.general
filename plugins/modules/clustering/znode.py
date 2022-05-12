@@ -128,7 +128,7 @@ def main():
             state=dict(choices=['present', 'absent']),
             timeout=dict(default=300, type='int'),
             recursive=dict(default=False, type='bool'),
-            usessl=dict(default=False, type='bool'),
+            use_tls=dict(default=False, type='bool'),
         ),
         supports_check_mode=False
     )
