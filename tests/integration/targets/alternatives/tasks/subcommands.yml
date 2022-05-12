@@ -1,12 +1,12 @@
-- name: Try with slaves
+- name: Try with subcommands
   alternatives:
     name: dummymain
     path: '/usr/bin/dummy1'
     link: '/usr/bin/dummymain'
-    slaves:
-      - name: dummyslave
+    subcommands:
+      - name: dummysubcmd
         path: '/usr/bin/dummy2'
-        link: '/usr/bin/dummyslave'
+        link: '/usr/bin/dummysubcmd'
   register: alternative
 
 - name: Check expected command was executed
@@ -23,8 +23,8 @@
     that:
       - cmd.stdout == "dummy1"
 
-- name: Execute the current dummyslave command
-  command: dummyslave
+- name: Execute the current dummysubcmd command
+  command: dummysubcmd
   register: cmd
 
 - name: Ensure that the expected command was executed
