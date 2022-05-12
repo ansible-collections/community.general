@@ -1,0 +1,2 @@
+bugfixes:
+  - gconftool2 - properly escape values when passing them to ``gconftool-2`` (https://github.com/ansible-collections/community.general/pull/4647).
