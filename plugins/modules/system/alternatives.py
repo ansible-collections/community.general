@@ -295,15 +295,15 @@ class AlternativesModule(object):
 
         match = current_mode_regex.search(display_output)
         if not match:
-            self.module.debug("No current path found in output")
+            self.module.debug("No current mode found in output")
             return
         self.current_mode = match.group(1)
 
         match = current_path_regex.search(display_output)
         if not match:
             self.module.debug("No current path found in output")
-            return
-        self.current_path = match.group(1)
+        else:
+            self.current_path = match.group(1)
 
         match = current_link_regex.search(display_output)
         if not match:
