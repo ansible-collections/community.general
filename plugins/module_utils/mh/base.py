@@ -32,9 +32,7 @@ class ModuleHelperBase(object):
         return self.module._diff
 
     def do_raise(self, *args, **kwargs):
-        exc_class = _MHE
-        kwargs = dict((k, v) for k, v in kwargs.items() if k != 'exception_class')
-        raise exc_class(*args, **kwargs)
+        raise _MHE(*args, **kwargs)
 
     def __getattr__(self, attr):
         if attr in self._delegated_to_module:
