@@ -18,7 +18,7 @@ description:
     - Manages symbolic links using the 'update-alternatives' tool.
     - Useful when multiple programs are installed but provide similar functionality (e.g. different editors).
 author:
-    - Marius Rieder (@Jiuka)
+    - Marius Rieder (@jiuka)
     - David Wittman (@DavidWittman)
     - Gabe Mulley (@mulby)
 options:
@@ -49,33 +49,32 @@ options:
         not set it as the currently selected alternative for the group.
       - C(selected) - install the alternative (if not already installed), and
         set it as the currently selected alternative for the group.
-      - C(absent) - removes the alternative.
-        version_added: 5.0.0
+      - C(absent) - removes the alternative. (Added in version 5.0.0)
     choices: [ present, selected, absent ]
     default: selected
     type: str
     version_added: 4.8.0
   subcommands:
     description:
-      - A list of slaves.
-      - Each slave needs a name, a link and a path parameter.
+      - A list of subcommands.
+      - Each subcommand needs a name, a link and a path parameter.
     type: list
     elements: dict
     aliases: ['slaves']
     suboptions:
       name:
         description:
-          - The generic name of the slave.
+          - The generic name of the subcommand.
         type: str
         required: true
       path:
         description:
-          - The path to the real executable that the slave should point to.
+          - The path to the real executable that the subcommand should point to.
         type: path
         required: true
       link:
         description:
-          - The path to the symbolic link that should point to the real slave executable.
+          - The path to the symbolic link that should point to the real subcommand executable.
         type: path
     version_added: 5.0.0
 requirements: [ update-alternatives ]
@@ -106,12 +105,12 @@ EXAMPLES = r'''
     link: /usr/bin/python
     state: present
 
-- name: keytool is a slave of java
+- name: keytool is a subcommand of java
   community.general.alternatives:
     name: java
     link: /usr/bin/java
     path: /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java
-    slaves:
+    subcommands:
       - name: keytool
         link: /usr/bin/keytool
         path: /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool
@@ -155,10 +154,10 @@ class AlternativesModule(object):
 
         if self.module._diff and self.path in self.current_alternatives:
             self.result['diff']['before'].update(dict(
-                path = self.path,
-                priority = self.current_alternatives[self.path].get('priority'),
-                link = self.current_link,
-                subcommands = self.current_alternatives[self.path].get('subcommands')
+                path=self.path,
+                priority=self.current_alternatives[self.path].get('priority'),
+                link=self.current_link,
+                subcommands=self.current_alternatives[self.path].get('subcommands')
             ))
 
         if self.present:
@@ -166,8 +165,8 @@ class AlternativesModule(object):
             if (
                 self.path not in self.current_alternatives or
                 self.current_alternatives[self.path].get('priority') != self.priority or
-                not all([s in self.subcommands for s in self.current_alternatives[self.path].get('subcommands') ]) or
-                not all([s in self.current_alternatives[self.path].get('subcommands') for s in self.subcommands ])
+                not all(s in self.subcommands for s in self.current_alternatives[self.path].get('subcommands')) or
+                not all(s in self.current_alternatives[self.path].get('subcommands') for s in self.subcommands)
             ):
                 self.install()
 
@@ -184,8 +183,9 @@ class AlternativesModule(object):
 
         self.module.exit_json(**self.result)
 
-    
     def install(self):
+        if not os.path.exists(self.path):
+            self.module.fail_json(msg="Specified path %s does not exist" % self.path)
         if not self.link:
             self.module.fail_json(msg='Needed to install the alternative, but unable to do so as we are missing the link')
 
@@ -197,46 +197,46 @@ class AlternativesModule(object):
 
         self.result['changed'] = True
         self.result['msg'] = "Install alternative '%s' for '%s'" % (self.path, self.name)
-        
+
         if not self.module.check_mode:
             self.module.run_command(cmd, check_rc=True)
 
         if self.module._diff:
             self.result['diff']['after'] = dict(
-                path = self.path,
-                priority = self.priority,
-                link = self.link,
-                subcommands = self.subcommands
+                path=self.path,
+                priority=self.priority,
+                link=self.link,
+                subcommands=self.subcommands
             )
-    
+
     def remove(self):
         cmd = [self.UPDATE_ALTERNATIVES, '--remove', self.name, self.path]
         self.result['changed'] = True
         self.result['msg'] = "Remove alternative '%s' from '%s'" % (self.path, self.name)
-        
+
         if not self.module.check_mode:
             self.module.run_command(cmd, check_rc=True)
 
         if self.module._diff:
-            self.result['diff']['after'] = dict(state = AlternativeState.ABSENT)
-    
+            self.result['diff']['after'] = dict(state=AlternativeState.ABSENT)
+
     def set(self):
         cmd = [self.UPDATE_ALTERNATIVES, '--set', self.name, self.path]
         self.result['changed'] = True
         self.result['msg'] = "Set alternative '%s' for '%s'" % (self.path, self.name)
-        
+
         if not self.module.check_mode:
             self.module.run_command(cmd, check_rc=True)
 
         if self.module._diff:
             self.result['diff']['before']['state'] = AlternativeState.PRESENT
             self.result['diff']['after']['state'] = AlternativeState.SELECTED
-    
+
     def auto(self):
         cmd = [self.UPDATE_ALTERNATIVES, '--auto', self.name]
         self.result['msg'] = "Set alternative to auto for '%s'" % (self.name)
         self.result['changed'] = True
-        
+
         if not self.module.check_mode:
             self.module.run_command(cmd, check_rc=True)
 
@@ -246,29 +246,29 @@ class AlternativesModule(object):
 
     @property
     def name(self):
-      return self.module.params.get('name')
+        return self.module.params.get('name')
 
     @property
     def path(self):
-      return self.module.params.get('path')
+        return self.module.params.get('path')
 
     @property
     def link(self):
-      return self.module.params.get('link') or self.current_link
+        return self.module.params.get('link') or self.current_link
 
     @property
     def priority(self):
-      return self.module.params.get('priority')
+        return self.module.params.get('priority')
 
     @property
     def subcommands(self):
-      return self.module.params.get('subcommands')
+        return self.module.params.get('subcommands')
 
     @property
     def UPDATE_ALTERNATIVES(self):
-      if self._UPDATE_ALTERNATIVES is None:
-          self._UPDATE_ALTERNATIVES = self.module.get_bin_path('update-alternatives', True)
-      return self._UPDATE_ALTERNATIVES
+        if self._UPDATE_ALTERNATIVES is None:
+            self._UPDATE_ALTERNATIVES = self.module.get_bin_path('update-alternatives', True)
+        return self._UPDATE_ALTERNATIVES
 
     def parse(self):
         self.current_mode = None
@@ -291,7 +291,7 @@ class AlternativesModule(object):
         subcmd_path_link_regex = re.compile(r'^\s*slave (\S+) is (.*)$', re.MULTILINE)
 
         alternative_regex = re.compile(r'^(\/.*)\s-\s(?:family\s\S+\s)?priority\s(\d+)((?:\s+slave.*)*)', re.MULTILINE)
-        subcmd_regex = re.compile('^\s+slave (.*): (.*)$', re.MULTILINE)
+        subcmd_regex = re.compile(r'^\s+slave (.*): (.*)$', re.MULTILINE)
 
         match = current_mode_regex.search(display_output)
         if not match:
@@ -313,15 +313,15 @@ class AlternativesModule(object):
 
         subcmd_path_map = dict(subcmd_path_link_regex.findall(display_output))
         if not subcmd_path_map:
-            subcmd_path_map = {s['name']: s['link'] for s in self.subcommands}
+            subcmd_path_map = dict((s['name'], s['link']) for s in self.subcommands)
 
         for path, prio, subcmd in alternative_regex.findall(display_output):
             self.current_alternatives[path] = dict(
-                priority = int(prio),
-                subcommands = [dict(
-                    name = name,
-                    path = path,
-                    link = subcmd_path_map.get(name)
+                priority=int(prio),
+                subcommands=[dict(
+                    name=name,
+                    path=path,
+                    link=subcmd_path_map.get(name)
                 ) for name, path in subcmd_regex.findall(subcmd) if path != '(null)']
             )
 
@@ -349,6 +349,7 @@ def main():
     )
 
     AlternativesModule(module)
+
 
 if __name__ == '__main__':
     main()
