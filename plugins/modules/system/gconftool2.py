@@ -99,45 +99,41 @@ class GConf2Preference(object):
 
     def call(self, call_type, fail_onerr=True):
         """ Helper function to perform gconftool-2 operations """
-        config_source = ''
-        direct = ''
+        config_source = []
+        direct = []
         changed = False
         out = ''
 
         # If the configuration source is different from the default, create
         # the argument
         if self.config_source is not None and len(self.config_source) > 0:
-            config_source = "--config-source " + self.config_source
+            config_source = ["--config-source", self.config_source]
 
         # If direct is true, create the argument
         if self.direct:
-            direct = "--direct"
+            direct = ["--direct"]
 
         # Execute the call
-        cmd = "gconftool-2 "
+        cmd = ["gconftool-2"]
         try:
             # If the call is "get", then we don't need as many parameters and
             # we can ignore some
             if call_type == 'get':
-                cmd += "--get {0}".format(self.key)
+                cmd.extend(["--get", self.key])
             # Otherwise, we will use all relevant parameters
             elif call_type == 'set':
-                cmd += "{0} {1} --type {2} --{3} {4} \"{5}\"".format(direct,
-                                                                     config_source,
-                                                                     self.value_type,
-                                                                     call_type,
-                                                                     self.key,
-                                                                     self.value)
+                cmd.extend(direct)
+                cmd.extend(config_source)
+                cmd.extend(["--type", self.value_type, "--{3}".format(call_type), self.key, self.value])
             elif call_type == 'unset':
-                cmd += "--unset {0}".format(self.key)
+                cmd.extend(["--unset", self.key])
 
             # Start external command
-            rc, out, err = self.ansible.run_command(cmd, use_unsafe_shell=True)
+            rc, out, err = self.ansible.run_command(cmd)
 
-            if len(err) > 0:
-                if fail_onerr:
-                    self.ansible.fail_json(msg='gconftool-2 failed with '
-                                               'error: %s' % (str(err)))
+            if err and fail_onerr:
+                self.ansible.fail_json(msg='gconftool-2 failed with '
+                                           'error: %s' % (str(err)))
             else:
                 changed = True
 
