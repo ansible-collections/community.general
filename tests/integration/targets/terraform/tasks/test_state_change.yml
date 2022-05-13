@@ -40,7 +40,7 @@
     variables:
       test_string: "{{ terraform_test_string }}"
   register: terraform_apply_test_result
-  loop: [0,1]
+  loop: [0, 1]
 
 # Loop over a couple iterations of terraform destroy, and ensure that only
 # the first iteration generates a diff/returns changed: true
@@ -55,7 +55,7 @@
     variables:
       test_string: "{{ terraform_test_string }}"
   register: terraform_destroy_test_result
-  loop: [0,1]
+  loop: [0, 1]
 
 - name: Plan/Apply generates proper changed states
   assert:
