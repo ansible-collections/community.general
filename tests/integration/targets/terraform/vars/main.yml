@@ -14,7 +14,7 @@ terraform_url: "https://releases.hashicorp.com/terraform/{{ terraform_version }}
 validate_certs: yes
 
 # Directory where Terraform tests will be created
-terraform_project_dir: "{{ remote_tmp_dir }}/tf_provider_test"
+terraform_project_dir: "{{ remote_tmp_dir }}/tf_tests"
 
 # Controls whether terraform init will use the `-upgrade` flag
 terraform_provider_upgrade: yes
@@ -28,6 +28,12 @@ terraform_provider_versions:
   - name: "null" 
     source: "hashicorp/null"
     version: ">=3.0.0"
+
+# List of Terraform tests included. This will be used to generate project directories.
+
+terraform_tests:
+  - state_change
+  - provider_upgrade
 
 # mapping between values returned from ansible_architecture and arch names used by golang builds of Terraform
 # see https://www.terraform.io/downloads

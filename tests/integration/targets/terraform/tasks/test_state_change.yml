@@ -1,0 +1,71 @@
+---
+# This test file contains tests ensuring that proper values are return when running
+# various terraform operations
+
+- name: Output terraform plan test project
+  ansible.builtin.template:
+    src: templates/state_change/main.tf.j2
+    dest: "{{ terraform_project_dir }}/state_change/main.tf"
+    force: yes
+  register: terraform_plan_test_hcl
+
+- name: Generate terraform test string
+  set_fact:
+    terraform_test_string: "{{ ansible_date_time.iso8601_micro | to_uuid }}"
+
+# Generate a terraform plan file to check for proper return values
+
+- name: Run terraform plan with value
+  community.general.terraform:
+    project_path: "{{ terraform_plan_test_hcl.dest | dirname }}"
+    binary_path: "{{ terraform_binary_path }}"
+    force_init: yes
+    provider_upgrade: "{{ terraform_provider_upgrade }}"
+    state: planned
+    plan_file: "{{ terraform_plan_test_hcl.dest | dirname }}/plan.tfplan"
+    variables: 
+      test_string: "{{ terraform_test_string }}"
+  register: terraform_plan_test_result
+
+# Loop over a couple iterations of terraform apply, and ensure that only
+# the first iteration generates a diff/returns changed: true
+
+- name: Run terraform apply with values
+  community.general.terraform:
+    project_path: "{{ terraform_plan_test_hcl.dest | dirname }}"
+    binary_path: "{{ terraform_binary_path }}"
+    force_init: yes
+    provider_upgrade: "{{ terraform_provider_upgrade }}"
+    state: present
+    variables:
+      test_string: "{{ terraform_test_string }}"
+  register: terraform_apply_test_result
+  loop: [0,1]
+
+# Loop over a couple iterations of terraform destroy, and ensure that only
+# the first iteration generates a diff/returns changed: true
+
+- name: Run terraform destroy with values
+  community.general.terraform:
+    project_path: "{{ terraform_plan_test_hcl.dest | dirname }}"
+    binary_path: "{{ terraform_binary_path }}"
+    force_init: yes
+    provider_upgrade: "{{ terraform_provider_upgrade }}"
+    state: absent
+    variables:
+      test_string: "{{ terraform_test_string }}"
+  register: terraform_destroy_test_result
+  loop: [0,1]
+
+- name: Plan/Apply generates proper changed states
+  assert:
+    that:
+      - terraform_plan_test_result is not failed
+      - terraform_plan_test_result is changed
+      # first terraform apply should generate changed: true
+      - terraform_apply_test_result.results.0 is changed
+      # only the first apply should generate changed: true
+      - terraform_apply_test_result.results.1 is not changed
+      - terraform_destroy_test_result.results.0 is changed
+      - terraform_destroy_test_result.results.1 is not changed
+

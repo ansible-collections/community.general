@@ -2,8 +2,8 @@
 
 - name: Output terraform provider test project
   ansible.builtin.template:
-    src: templates/provider_test/main.tf.j2
-    dest: "{{ terraform_project_dir }}/{{ tf_provider['name'] }}/main.tf"
+    src: templates/provider_upgrade/main.tf.j2
+    dest: "{{ terraform_project_dir }}/provider_upgrade/main.tf"
     force: yes
   register: terraform_provider_hcl
 
@@ -19,5 +19,6 @@
     state: present
   register: terraform_init_result
 
-- assert:
+- name: Terraform provider upgrades work
+  assert:
     that: terraform_init_result is not failed

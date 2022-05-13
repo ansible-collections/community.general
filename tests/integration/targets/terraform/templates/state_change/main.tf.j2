@@ -1,0 +1,11 @@
+provider "null" {}
+
+variable "test_string" {
+  type = string
+}
+
+resource "null_resource" "test" {
+  triggers = {
+    test = var.test_string
+  }
+}
