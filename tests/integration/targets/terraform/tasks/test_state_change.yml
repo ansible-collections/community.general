@@ -1,12 +1,12 @@
 ---
-# This test file contains tests ensuring that proper values are return when running
-# various terraform operations
+# This test file contains tests ensuring that proper values are return when
+# running various terraform operations
 
 - name: Output terraform plan test project
   ansible.builtin.template:
     src: templates/state_change/main.tf.j2
     dest: "{{ terraform_project_dir }}/state_change/main.tf"
-    force: yes
+    force: true
   register: terraform_plan_test_hcl
 
 - name: Generate terraform test string
@@ -19,11 +19,11 @@
   community.general.terraform:
     project_path: "{{ terraform_plan_test_hcl.dest | dirname }}"
     binary_path: "{{ terraform_binary_path }}"
-    force_init: yes
+    force_init: true
     provider_upgrade: "{{ terraform_provider_upgrade }}"
     state: planned
     plan_file: "{{ terraform_plan_test_hcl.dest | dirname }}/plan.tfplan"
-    variables: 
+    variables:
       test_string: "{{ terraform_test_string }}"
   register: terraform_plan_test_result
 
@@ -34,7 +34,7 @@
   community.general.terraform:
     project_path: "{{ terraform_plan_test_hcl.dest | dirname }}"
     binary_path: "{{ terraform_binary_path }}"
-    force_init: yes
+    force_init: true
     provider_upgrade: "{{ terraform_provider_upgrade }}"
     state: present
     variables:
@@ -49,7 +49,7 @@
   community.general.terraform:
     project_path: "{{ terraform_plan_test_hcl.dest | dirname }}"
     binary_path: "{{ terraform_binary_path }}"
-    force_init: yes
+    force_init: true
     provider_upgrade: "{{ terraform_provider_upgrade }}"
     state: absent
     variables:
@@ -68,4 +68,3 @@
       - terraform_apply_test_result.results.1 is not changed
       - terraform_destroy_test_result.results.0 is changed
       - terraform_destroy_test_result.results.1 is not changed
-
