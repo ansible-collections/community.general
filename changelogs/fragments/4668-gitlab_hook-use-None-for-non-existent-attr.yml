@@ -1,0 +1,2 @@
+bugfixes:
+  - gitlab_hook - use None for non-existent attribute, e.g. 'token'
