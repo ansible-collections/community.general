@@ -49,7 +49,7 @@ options:
         not set it as the currently selected alternative for the group.
       - C(selected) - install the alternative (if not already installed), and
         set it as the currently selected alternative for the group.
-      - C(absent) - removes the alternative. (Added in version 5.0.0)
+      - C(absent) - remove the alternative. Added in community.general 5.0.0.
     choices: [ present, selected, absent ]
     default: selected
     type: str
