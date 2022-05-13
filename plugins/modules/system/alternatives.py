@@ -188,7 +188,7 @@ class AlternativesModule(object):
             if self.mode_selected and self.current_path != self.path:
                 self.set()
 
-            #Check if we need to reset to auto
+            # Check if we need to reset to auto
             if self.mode_auto and self.current_mode == 'manual':
                 self.auto()
         else:
