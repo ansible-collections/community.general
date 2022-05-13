@@ -148,8 +148,6 @@ options:
       - Restrict concurrent operations when Terraform applies the plan.
     type: int
     version_added: '3.8.0'
-notes:
-   - To just run a `terraform plan`, use check mode.
 requirements: [ "terraform" ]
 author: "Ryan Scott Brown (@ryansb)"
 '''
@@ -504,6 +502,9 @@ def main():
         # checks out to decide if changes were made during execution
         if ' 0 added, 0 changed' not in out and not state == "absent" or ' 0 destroyed' not in out:
             changed = True
+    # If a plan file was generated, and terraform apply is needed, set changed: true regardless of other options
+    elif needs_application and state == 'planned':
+        changed = True
 
     outputs_command = [command[0], 'output', '-no-color', '-json'] + _state_args(state_file)
     rc, outputs_text, outputs_err = module.run_command(outputs_command, cwd=project_path)
