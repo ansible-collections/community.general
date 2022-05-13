@@ -49,7 +49,9 @@ options:
         not set it as the currently selected alternative for the group.
       - C(selected) - install the alternative (if not already installed), and
         set it as the currently selected alternative for the group.
-      - C(absent) - remove the alternative. Added in community.general 5.0.0.
+      - C(auto) - install the alternative (if not already installed), and
+        set the group to auto mode. (Added in version 5.0.0)
+      - C(absent) - removes the alternative. (Added in version 5.0.0)
     choices: [ present, selected, absent ]
     default: selected
     type: str
@@ -105,6 +107,13 @@ EXAMPLES = r'''
     link: /usr/bin/python
     state: present
 
+- name: Install Python 3.5 and reset selection to auto
+  community.general.alternatives:
+    name: python
+    path: /usr/bin/python3.5
+    link: /usr/bin/python
+    state: auto
+
 - name: keytool is a subcommand of java
   community.general.alternatives:
     name: java
@@ -127,10 +136,11 @@ class AlternativeState:
     PRESENT = "present"
     SELECTED = "selected"
     ABSENT = "absent"
+    AUTO = "auto"
 
     @classmethod
     def to_list(cls):
-        return [cls.PRESENT, cls.SELECTED, cls.ABSENT]
+        return [cls.PRESENT, cls.SELECTED, cls.ABSENT, cls.AUTO]
 
 
 class AlternativesModule(object):
@@ -142,12 +152,16 @@ class AlternativesModule(object):
         self.run()
 
     @property
-    def present(self):
-        return self.module.params.get('state') in [AlternativeState.PRESENT, AlternativeState.SELECTED]
+    def mode_present(self):
+        return self.module.params.get('state') in [AlternativeState.PRESENT, AlternativeState.SELECTED, AlternativeState.AUTO]
 
     @property
-    def selected(self):
+    def mode_selected(self):
         return self.module.params.get('state') == AlternativeState.SELECTED
+
+    @property
+    def mode_auto(self):
+        return self.module.params.get('state') == AlternativeState.AUTO
 
     def run(self):
         self.parse()
@@ -160,7 +174,7 @@ class AlternativesModule(object):
                 subcommands=self.current_alternatives[self.path].get('subcommands')
             ))
 
-        if self.present:
+        if self.mode_present:
             # Check if we need to (re)install
             if (
                 self.path not in self.current_alternatives or
@@ -170,12 +184,13 @@ class AlternativesModule(object):
             ):
                 self.install()
 
-            if self.selected and self.current_path != self.path:
+            # Check if we need to set the preference
+            if self.mode_selected and self.current_path != self.path:
                 self.set()
 
-            if not self.selected and self.current_path == self.path and self.current_mode == 'manual':
+            #Check if we need to reset to auto
+            if self.mode_auto and self.current_mode == 'manual':
                 self.auto()
-
         else:
             # Check if we need to uninstall
             if self.path in self.current_alternatives:
