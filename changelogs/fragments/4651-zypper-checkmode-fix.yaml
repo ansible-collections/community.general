@@ -1,0 +1,2 @@
+bugfixes:
+  - zypper - fix undefined variable first run, when running in check_mode
