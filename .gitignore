@@ -1,6 +1,6 @@
 
-# Created by https://www.toptal.com/developers/gitignore/api/vim,git,macos,linux,pydev,emacs,dotenv,python,windows,webstorm,pycharm+all
-# Edit at https://www.toptal.com/developers/gitignore?templates=vim,git,macos,linux,pydev,emacs,dotenv,python,windows,webstorm,pycharm+all
+# Created by https://www.toptal.com/developers/gitignore/api/vim,git,macos,linux,pydev,emacs,dotenv,python,windows,webstorm,pycharm+all,jupyternotebooks
+# Edit at https://www.toptal.com/developers/gitignore?templates=vim,git,macos,linux,pydev,emacs,dotenv,python,windows,webstorm,pycharm+all,jupyternotebooks
 
 ### dotenv ###
 .env
@@ -70,6 +70,20 @@ flycheck_*.el
 *_BASE_*.txt
 *_LOCAL_*.txt
 *_REMOTE_*.txt
+
+### JupyterNotebooks ###
+# gitignore template for Jupyter Notebooks
+# website: http://jupyter.org/
+
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Remove previous ipynb_checkpoints
+#   git rm -r .ipynb_checkpoints/
 
 ### Linux ###
 
@@ -287,11 +301,8 @@ docs/_build/
 target/
 
 # Jupyter Notebook
-.ipynb_checkpoints
 
 # IPython
-profile_default/
-ipython_config.py
 
 # pyenv
 #   For a library or package, you might want to ignore these files since the code is
@@ -494,4 +505,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/vim,git,macos,linux,pydev,emacs,dotenv,python,windows,webstorm,pycharm+all
+# End of https://www.toptal.com/developers/gitignore/api/vim,git,macos,linux,pydev,emacs,dotenv,python,windows,webstorm,pycharm+all,jupyternotebooks
