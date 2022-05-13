@@ -443,4 +443,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# MacOS Stuff
+.DS_Store
+
 # End of https://www.toptal.com/developers/gitignore/api/git,linux,pydev,python,windows,pycharm+all,jupyternotebook,vim,webstorm,emacs,dotenv
