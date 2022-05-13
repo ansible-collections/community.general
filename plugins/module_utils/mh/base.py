@@ -31,6 +31,9 @@ class ModuleHelperBase(object):
     def diff_mode(self):
         return self.module._diff
 
+    def do_raise(self, *args, **kwargs):
+        raise _MHE(*args, **kwargs)
+
     def __getattr__(self, attr):
         if attr in self._delegated_to_module:
             return getattr(self.module, attr)

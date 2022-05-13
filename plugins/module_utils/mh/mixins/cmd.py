@@ -128,8 +128,7 @@ class CmdMixin(object):
         for param in param_list:
             if isinstance(param, dict):
                 if len(param) != 1:
-                    raise self.ModuleHelperException("run_command parameter as a dict must "
-                                                     "contain only one key: {0}".format(param))
+                    self.do_raise("run_command parameter as a dict must contain only one key: {0}".format(param))
                 _param = list(param.keys())[0]
                 fmt = find_format(_param)
                 value = param[_param]
@@ -141,9 +140,9 @@ class CmdMixin(object):
                     fmt = find_format(param)
                     value = extra_params[param]
                 else:
-                    raise self.ModuleHelperException('Cannot determine value for parameter: {0}'.format(param))
+                    self.do_raise('Cannot determine value for parameter: {0}'.format(param))
             else:
-                raise self.ModuleHelperException("run_command parameter must be either a str or a dict: {0}".format(param))
+                self.do_raise("run_command parameter must be either a str or a dict: {0}".format(param))
             cmd_args = add_arg_formatted_param(cmd_args, fmt, value)
 
         return cmd_args
