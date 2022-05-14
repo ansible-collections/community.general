@@ -31,3 +31,48 @@
   assert:
     that:
       - cmd.stdout == "dummy2"
+
+- name: Subcommands ar not removed if not specified
+  alternatives:
+    name: dummymain
+    path: '/usr/bin/dummy1'
+    link: '/usr/bin/dummymain'
+  register: alternative
+
+- name: Check expected command was executed
+  assert:
+    that:
+      - 'alternative is not changed'
+
+- name: Execute the current dummysubcmd command
+  command: dummysubcmd
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy2"
+
+- name: Subcommands ar not removed if not specified
+  alternatives:
+    name: dummymain
+    path: '/usr/bin/dummy1'
+    link: '/usr/bin/dummymain'
+    subcommands: []
+  register: alternative
+
+- name: Check expected command was executed
+  assert:
+    that:
+      - 'alternative is changed'
+
+- name: Execute the current dummysubcmd command
+  command: dummysubcmd
+  register: cmd
+  ignore_errors: True
+
+- name: Ensure that the subcommand is gone
+  assert:
+    that:
+      - cmd.rc == 2
+      - '"No such file" in cmd.msg'

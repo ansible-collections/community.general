@@ -181,8 +181,10 @@ class AlternativesModule(object):
             if (
                 self.path not in self.current_alternatives or
                 self.current_alternatives[self.path].get('priority') != self.priority or
-                not all(s in self.subcommands for s in self.current_alternatives[self.path].get('subcommands')) or
-                not all(s in self.current_alternatives[self.path].get('subcommands') for s in self.subcommands)
+                (self.subcommands is not None and (
+                    not all(s in self.subcommands for s in self.current_alternatives[self.path].get('subcommands')) or
+                    not all(s in self.current_alternatives[self.path].get('subcommands') for s in self.subcommands)
+                ))
             ):
                 self.install()
 
@@ -209,8 +211,11 @@ class AlternativesModule(object):
 
         cmd = [self.UPDATE_ALTERNATIVES, '--install', self.link, self.name, self.path, str(self.priority)]
 
-        if self.subcommands:
+        if self.subcommands is not None:
             subcommands = [['--slave', subcmd['link'], subcmd['name'], subcmd['path']] for subcmd in self.subcommands]
+            cmd += [item for sublist in subcommands for item in sublist]
+        elif self.path in self.current_alternatives and self.current_alternatives[self.path].get('subcommands'):
+            subcommands = [['--slave', subcmd['link'], subcmd['name'], subcmd['path']] for subcmd in self.current_alternatives[self.path].get('subcommands')]
             cmd += [item for sublist in subcommands for item in sublist]
 
         self.result['changed'] = True
@@ -330,7 +335,7 @@ class AlternativesModule(object):
             self.current_link = match.group(1)
 
         subcmd_path_map = dict(subcmd_path_link_regex.findall(display_output))
-        if not subcmd_path_map:
+        if not subcmd_path_map and self.subcommands:
             subcmd_path_map = dict((s['name'], s['link']) for s in self.subcommands)
 
         for path, prio, subcmd in alternative_regex.findall(display_output):
@@ -357,7 +362,7 @@ def main():
                 choices=AlternativeState.to_list(),
                 default=AlternativeState.SELECTED,
             ),
-            subcommands=dict(type='list', elements='dict', aliases=['slaves'], default=[], options=dict(
+            subcommands=dict(type='list', elements='dict', aliases=['slaves'], options=dict(
                 name=dict(type='str', required=True),
                 path=dict(type='path', required=True),
                 link=dict(type='path'),
