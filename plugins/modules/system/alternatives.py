@@ -50,9 +50,9 @@ options:
       - C(selected) - install the alternative (if not already installed), and
         set it as the currently selected alternative for the group.
       - C(auto) - install the alternative (if not already installed), and
-        set the group to auto mode. (Added in version 5.0.0)
-      - C(absent) - removes the alternative. (Added in version 5.0.0)
-    choices: [ present, selected, absent ]
+        set the group to auto mode. Added in community.general 5.0.0.
+      - C(absent) - removes the alternative. Added in community.general 5.0.0.
+    choices: [ present, selected, auto, absent ]
     default: selected
     type: str
     version_added: 4.8.0
