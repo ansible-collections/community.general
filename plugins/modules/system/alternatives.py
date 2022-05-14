@@ -149,6 +149,7 @@ class AlternativesModule(object):
     def __init__(self, module):
         self.module = module
         self.result = dict(changed=False, diff=dict(before=dict(), after=dict()))
+        self.module.run_command_environ_update = {'LC_ALL': 'C'}
         self.messages = []
         self.run()
 
@@ -295,7 +296,7 @@ class AlternativesModule(object):
 
         # Run `update-alternatives --display <name>` to find existing alternatives
         (rc, display_output, dummy) = self.module.run_command(
-            ['env', 'LC_ALL=C', self.UPDATE_ALTERNATIVES, '--display', self.name]
+            [self.UPDATE_ALTERNATIVES, '--display', self.name]
         )
 
         if rc != 0:
