@@ -149,6 +149,7 @@ class AlternativesModule(object):
     def __init__(self, module):
         self.module = module
         self.result = dict(changed=False, diff=dict(before=dict(), after=dict()))
+        self.messages = []
         self.run()
 
     @property
@@ -196,6 +197,7 @@ class AlternativesModule(object):
             if self.path in self.current_alternatives:
                 self.remove()
 
+        self.result['msg'] = ' '.join(self.messages)
         self.module.exit_json(**self.result)
 
     def install(self):
@@ -211,7 +213,7 @@ class AlternativesModule(object):
             cmd += [item for sublist in subcommands for item in sublist]
 
         self.result['changed'] = True
-        self.result['msg'] = "Install alternative '%s' for '%s'" % (self.path, self.name)
+        self.messages.append("Install alternative '%s' for '%s'." % (self.path, self.name))
 
         if not self.module.check_mode:
             self.module.run_command(cmd, check_rc=True)
@@ -227,7 +229,7 @@ class AlternativesModule(object):
     def remove(self):
         cmd = [self.UPDATE_ALTERNATIVES, '--remove', self.name, self.path]
         self.result['changed'] = True
-        self.result['msg'] = "Remove alternative '%s' from '%s'" % (self.path, self.name)
+        self.messages.append("Remove alternative '%s' from '%s'." % (self.path, self.name))
 
         if not self.module.check_mode:
             self.module.run_command(cmd, check_rc=True)
@@ -238,7 +240,7 @@ class AlternativesModule(object):
     def set(self):
         cmd = [self.UPDATE_ALTERNATIVES, '--set', self.name, self.path]
         self.result['changed'] = True
-        self.result['msg'] = "Set alternative '%s' for '%s'" % (self.path, self.name)
+        self.messages.append("Set alternative '%s' for '%s'." % (self.path, self.name))
 
         if not self.module.check_mode:
             self.module.run_command(cmd, check_rc=True)
@@ -249,7 +251,7 @@ class AlternativesModule(object):
 
     def auto(self):
         cmd = [self.UPDATE_ALTERNATIVES, '--auto', self.name]
-        self.result['msg'] = "Set alternative to auto for '%s'" % (self.name)
+        self.messages.append("Set alternative to auto for '%s'." % (self.name))
         self.result['changed'] = True
 
         if not self.module.check_mode:
