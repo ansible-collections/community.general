@@ -168,14 +168,6 @@ class AlternativesModule(object):
     def run(self):
         self.parse()
 
-        if self.module._diff and self.path in self.current_alternatives:
-            self.result['diff']['before'].update(dict(
-                path=self.path,
-                priority=self.current_alternatives[self.path].get('priority'),
-                link=self.current_link,
-                subcommands=self.current_alternatives[self.path].get('subcommands')
-            ))
-
         if self.mode_present:
             # Check if we need to (re)install
             if (
@@ -252,7 +244,6 @@ class AlternativesModule(object):
             self.module.run_command(cmd, check_rc=True)
 
         if self.module._diff:
-            self.result['diff']['before']['state'] = AlternativeState.PRESENT
             self.result['diff']['after']['state'] = AlternativeState.SELECTED
 
     def auto(self):
@@ -264,7 +255,6 @@ class AlternativesModule(object):
             self.module.run_command(cmd, check_rc=True)
 
         if self.module._diff:
-            self.result['diff']['before']['state'] = AlternativeState.SELECTED
             self.result['diff']['after']['state'] = AlternativeState.PRESENT
 
     @property
@@ -347,6 +337,24 @@ class AlternativesModule(object):
                     link=subcmd_path_map.get(name)
                 ) for name, spath in subcmd_regex.findall(subcmd) if spath != '(null)']
             )
+
+        if self.module._diff:
+            if self.path in self.current_alternatives:
+              self.result['diff']['before'].update(dict(
+                  state=AlternativeState.PRESENT,
+                  path=self.path,
+                  priority=self.current_alternatives[self.path].get('priority'),
+                  link=self.current_link,
+                  subcommands=self.current_alternatives[self.path].get('subcommands')
+              ))
+              if self.current_mode == 'manual' and self.current_path != self.path:
+                  self.result['diff']['before'].update(dict(
+                      state=AlternativeState.SELECTED
+                  ))
+            else:
+              self.result['diff']['before'].update(dict(
+                  state=AlternativeState.ABSENT
+              ))
 
 
 def main():
