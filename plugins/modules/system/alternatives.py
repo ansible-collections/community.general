@@ -218,6 +218,7 @@ class AlternativesModule(object):
 
         if self.module._diff:
             self.result['diff']['after'] = dict(
+                state=AlternativeState.PRESENT,
                 path=self.path,
                 priority=self.priority,
                 link=self.link,
@@ -340,21 +341,21 @@ class AlternativesModule(object):
 
         if self.module._diff:
             if self.path in self.current_alternatives:
-              self.result['diff']['before'].update(dict(
-                  state=AlternativeState.PRESENT,
-                  path=self.path,
-                  priority=self.current_alternatives[self.path].get('priority'),
-                  link=self.current_link,
-                  subcommands=self.current_alternatives[self.path].get('subcommands')
-              ))
-              if self.current_mode == 'manual' and self.current_path != self.path:
-                  self.result['diff']['before'].update(dict(
-                      state=AlternativeState.SELECTED
-                  ))
+                self.result['diff']['before'].update(dict(
+                    state=AlternativeState.PRESENT,
+                    path=self.path,
+                    priority=self.current_alternatives[self.path].get('priority'),
+                    link=self.current_link,
+                    subcommands=self.current_alternatives[self.path].get('subcommands')
+                ))
+                if self.current_mode == 'manual' and self.current_path != self.path:
+                    self.result['diff']['before'].update(dict(
+                        state=AlternativeState.SELECTED
+                    ))
             else:
-              self.result['diff']['before'].update(dict(
-                  state=AlternativeState.ABSENT
-              ))
+                self.result['diff']['before'].update(dict(
+                    state=AlternativeState.ABSENT
+                ))
 
 
 def main():
