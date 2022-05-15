@@ -343,9 +343,9 @@ class AlternativesModule(object):
                 priority=int(prio),
                 subcommands=[dict(
                     name=name,
-                    path=path,
+                    path=spath,
                     link=subcmd_path_map.get(name)
-                ) for name, path in subcmd_regex.findall(subcmd) if path != '(null)']
+                ) for name, spath in subcmd_regex.findall(subcmd) if spath != '(null)']
             )
 
 
