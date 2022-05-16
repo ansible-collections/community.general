@@ -6,6 +6,20 @@ Community General Release Notes
 
 This changelog describes changes after version 1.0.0.
 
+v2.5.9
+======
+
+Release Summary
+---------------
+
+Final maintenance release of community.general major version 2.
+
+
+Major Changes
+-------------
+
+- The community.general 2.x.y release stream is now effectively **End of Life**. No more releases will be made, and regular CI runs will stop.
+
 v2.5.8
 ======
 

@@ -2216,3 +2216,15 @@ releases:
     - 2.5.8.yml
     - eol.yml
     release_date: '2022-01-31'
+  2.5.9:
+    changes:
+      major_changes:
+      - The community.general 2.x.y release stream is now effectively **End of Life**.
+        No more releases will be made, and regular CI runs will stop.
+      release_summary: 'Final maintenance release of community.general major version
+        2.
+
+        '
+    fragments:
+    - 2.5.9.yml
+    release_date: '2022-05-16'
