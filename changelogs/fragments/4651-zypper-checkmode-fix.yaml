@@ -1,0 +1,2 @@
+bugfixes:
+  - zypper - fix undefined variable when running in check mode (https://github.com/ansible-collections/community.general/pull/4667).
