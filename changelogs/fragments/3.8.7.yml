@@ -1,3 +1,0 @@
-release_summary: Regular maintenance release.
-major_changes:
-  - The community.general 3.x.y release stream will from now on only receive major bugfixes and security fixes. There will be no more regular bugfix releases, or regular bugfixes backported to the ``stable-3`` branch.
