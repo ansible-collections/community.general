@@ -5,6 +5,20 @@ Community General Release Notes
 .. contents:: Topics
 
 
+v1.3.14
+=======
+
+Release Summary
+---------------
+
+Final maintenance release of community.general major version 1.
+
+
+Major Changes
+-------------
+
+- The community.general 1.x.y release stream is now effectively **End of Life**. No more releases will be made, and regular CI runs will stop.
+
 v1.3.13
 =======
 

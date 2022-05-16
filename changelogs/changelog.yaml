@@ -1805,6 +1805,18 @@ releases:
     - 1.3.13.yml
     - eol.yml
     release_date: '2022-01-31'
+  1.3.14:
+    changes:
+      major_changes:
+      - The community.general 1.x.y release stream is now effectively **End of Life**.
+        No more releases will be made, and regular CI runs will stop.
+      release_summary: 'Final maintenance release of community.general major version
+        1.
+
+        '
+    fragments:
+    - 1.3.14.yml
+    release_date: '2022-05-16'
   1.3.2:
     changes:
       bugfixes:
