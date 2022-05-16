@@ -1,2 +1,0 @@
-bugfixes:
-  - Include ``PSF-license.txt`` file for ``plugins/module_utils/_version.py``.
