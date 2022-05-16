@@ -32,7 +32,7 @@
     that:
       - cmd.stdout == "dummy2"
 
-- name: Subcommands ar not removed if not specified
+- name: Subcommands are not removed if not specified
   alternatives:
     name: dummymain
     path: '/usr/bin/dummy1'
@@ -53,7 +53,7 @@
     that:
       - cmd.stdout == "dummy2"
 
-- name: Subcommands ar not removed if not specified
+- name: Subcommands are removed if set to an empty list
   alternatives:
     name: dummymain
     path: '/usr/bin/dummy1'
