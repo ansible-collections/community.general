@@ -206,9 +206,6 @@ class AlternativesModule(object):
         if self.subcommands is not None:
             subcommands = [['--slave', subcmd['link'], subcmd['name'], subcmd['path']] for subcmd in self.subcommands]
             cmd += [item for sublist in subcommands for item in sublist]
-        elif self.path in self.current_alternatives and self.current_alternatives[self.path].get('subcommands'):
-            subcommands = [['--slave', subcmd['link'], subcmd['name'], subcmd['path']] for subcmd in self.current_alternatives[self.path].get('subcommands')]
-            cmd += [item for sublist in subcommands for item in sublist]
 
         self.result['changed'] = True
         self.messages.append("Install alternative '%s' for '%s'." % (self.path, self.name))
@@ -222,8 +219,11 @@ class AlternativesModule(object):
                 path=self.path,
                 priority=self.priority,
                 link=self.link,
-                subcommands=self.subcommands
             )
+            if self.subcommands:
+                self.result['diff']['after'].update(dict(
+                    subcommands=self.subcommands
+                ))
 
     def remove(self):
         cmd = [self.UPDATE_ALTERNATIVES, '--remove', self.name, self.path]
@@ -276,7 +276,11 @@ class AlternativesModule(object):
 
     @property
     def subcommands(self):
-        return self.module.params.get('subcommands')
+        if self.module.params.get('subcommands') is not None:
+            return self.module.params.get('subcommands')
+        elif self.path in self.current_alternatives and self.current_alternatives[self.path].get('subcommands'):
+            return self.current_alternatives[self.path].get('subcommands')
+        return None
 
     @property
     def UPDATE_ALTERNATIVES(self):
@@ -346,8 +350,11 @@ class AlternativesModule(object):
                     path=self.path,
                     priority=self.current_alternatives[self.path].get('priority'),
                     link=self.current_link,
-                    subcommands=self.current_alternatives[self.path].get('subcommands')
                 ))
+                if self.current_alternatives[self.path].get('subcommands'):
+                    self.result['diff']['before'].update(dict(
+                        subcommands=self.current_alternatives[self.path].get('subcommands')
+                    ))
                 if self.current_mode == 'manual' and self.current_path != self.path:
                     self.result['diff']['before'].update(dict(
                         state=AlternativeState.SELECTED
