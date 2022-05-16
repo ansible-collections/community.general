@@ -173,7 +173,7 @@ class AlternativesModule(object):
             if (
                 self.path not in self.current_alternatives or
                 self.current_alternatives[self.path].get('priority') != self.priority or
-                (self.subcommands is not None and (
+                (self.module.params.get('subcommands') is not None and (
                     not all(s in self.subcommands for s in self.current_alternatives[self.path].get('subcommands')) or
                     not all(s in self.current_alternatives[self.path].get('subcommands') for s in self.subcommands)
                 ))
