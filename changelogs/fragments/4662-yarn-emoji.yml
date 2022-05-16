@@ -1,2 +1,2 @@
-bugfixes:
+breaking_changes:
   - yarn - remove unsupported and unnecessary ``--no-emoji`` flag (https://github.com/ansible-collections/community.general/pull/4662).
