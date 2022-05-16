@@ -323,6 +323,8 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
         if packages is None:
             firstrun = True
             packages = {}
+        else:
+            firstrun = False
         solvable_list = dom.getElementsByTagName('solvable')
         for solvable in solvable_list:
             name = solvable.getAttribute('name')
