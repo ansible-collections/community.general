@@ -1,6 +1,6 @@
 # Community General Collection
 
-[![Build Status](https://dev.azure.com/ansible/community.general/_apis/build/status/CI?branchName=main)](https://dev.azure.com/ansible/community.general/_build?definitionId=31)
+[![Build Status](https://dev.azure.com/ansible/community.general/_apis/build/status/CI?branchName=stable-5)](https://dev.azure.com/ansible/community.general/_build?definitionId=31)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
 
 This repository contains the `community.general` Ansible Collection. The collection is a part of the Ansible package and includes many modules and plugins supported by Ansible community which are not part of more specialized community collections.
@@ -110,7 +110,7 @@ See the [Releasing guidelines](https://github.com/ansible/community-docs/blob/ma
 
 ## Release notes
 
-See the [changelog](https://github.com/ansible-collections/community.general/blob/main/CHANGELOG.rst).
+See the [changelog](https://github.com/ansible-collections/community.general/blob/stable-5/CHANGELOG.rst).
 
 ## Roadmap
 
