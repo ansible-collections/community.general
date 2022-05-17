@@ -1,2 +1,0 @@
-bugfixes:
-  - gitlab_hook - avoid errors during idempotency check when an attribute does not exist (https://github.com/ansible-collections/community.general/pull/4668).
