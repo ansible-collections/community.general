@@ -1,0 +1,2 @@
+bugfixes:
+  - xcc_redfish_command - for compatibility due to redfish spec changes the virtualMedia resource location from Manager to System(https://github.com/ansible-collections/community.general/pull/4682).
