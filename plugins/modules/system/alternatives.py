@@ -170,12 +170,13 @@ class AlternativesModule(object):
 
         if self.mode_present:
             # Check if we need to (re)install
+            subcommands_parameter = self.module.params['subcommands']
             if (
                 self.path not in self.current_alternatives or
                 self.current_alternatives[self.path].get('priority') != self.priority or
-                (self.module.params.get('subcommands') is not None and (
-                    not all(s in self.subcommands for s in self.current_alternatives[self.path].get('subcommands')) or
-                    not all(s in self.current_alternatives[self.path].get('subcommands') for s in self.subcommands)
+                (subcommands_parameter is not None and (
+                    not all(s in subcommands_parameter for s in self.current_alternatives[self.path].get('subcommands')) or
+                    not all(s in self.current_alternatives[self.path].get('subcommands') for s in subcommands_parameter)
                 ))
             ):
                 self.install()
