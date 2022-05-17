@@ -24,6 +24,7 @@ schedules:
     always: true
     branches:
       include:
+        - stable-5
         - stable-4
   - cron: 0 11 * * 0
     displayName: Weekly (old stable branches)
