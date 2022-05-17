@@ -257,7 +257,7 @@ class GitLabHook(object):
 
         for arg_key, arg_value in arguments.items():
             if arguments[arg_key] is not None:
-                if getattr(hook, arg_key) != arguments[arg_key]:
+                if getattr(hook, arg_key, None) != arguments[arg_key]:
                     setattr(hook, arg_key, arguments[arg_key])
                     changed = True
 
