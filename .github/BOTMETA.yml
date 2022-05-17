@@ -539,6 +539,8 @@ files:
     maintainers: Tomorrow9
   $modules/files/iso_extract.py:
     maintainers: dagwieers jhoekx ribbons
+  $modules/files/json_file.py:
+    maintainers: indelog
   $modules/files/read_csv.py:
     maintainers: dagwieers
   $modules/files/sapcar_extract.py:

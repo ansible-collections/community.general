@@ -578,6 +578,8 @@ plugin_routing:
       redirect: community.general.web_infrastructure.jenkins_script
     jira:
       redirect: community.general.web_infrastructure.jira
+    json_file:
+      redirect: community.general.files.json_file
     katello:
       tombstone:
         removal_version: 2.0.0
