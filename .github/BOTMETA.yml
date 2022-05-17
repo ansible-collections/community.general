@@ -303,6 +303,8 @@ files:
   $module_utils/utm_utils.py:
     maintainers: $team_e_spirit
     labels: utm_utils
+  $module_utils/data_merge_utils.py:
+    maintainers: indelog
   $module_utils/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
