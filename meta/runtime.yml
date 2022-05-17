@@ -1529,6 +1529,8 @@ plugin_routing:
       redirect: community.general.cloud.misc.terraform
     timezone:
       redirect: community.general.system.timezone
+    toml_file:
+      redirect: community.general.files.toml_file
     twilio:
       redirect: community.general.notification.twilio
     typetalk:

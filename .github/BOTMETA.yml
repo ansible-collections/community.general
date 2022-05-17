@@ -545,6 +545,8 @@ files:
     maintainers: dagwieers
   $modules/files/sapcar_extract.py:
     maintainers: RainerLeber
+  $modules/files/toml_file.py:
+    maintainers: indelog
   $modules/files/xattr.py:
     maintainers: bcoca
     labels: xattr
