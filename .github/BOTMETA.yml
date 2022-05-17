@@ -276,6 +276,8 @@ files:
     labels: cloud memset
   $module_utils/mh/:
     maintainers: russoz
+  $module_utils/mh/module_helper_dest_file.py:
+    maintainers: indelog
     labels: module_helper
   $module_utils/module_helper.py:
     maintainers: russoz
