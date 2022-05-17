@@ -552,6 +552,8 @@ files:
     maintainers: dagwieers magnus919 tbielawa cmprescott sm4rk0
     labels: m:xml xml
     ignore: magnus919
+  $modules/files/yaml_file.py:
+    maintainers: indelog
   $modules/identity/ipa/:
     maintainers: $team_ipa
   $modules/identity/ipa/ipa_pwpolicy.py:

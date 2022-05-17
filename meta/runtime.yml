@@ -1635,6 +1635,8 @@ plugin_routing:
       redirect: community.general.system.xfs_quota
     xml:
       redirect: community.general.files.xml
+    yaml_file:
+      redirect: community.general.files.yaml_file
     yarn:
       redirect: community.general.packaging.language.yarn
     yum_versionlock:
