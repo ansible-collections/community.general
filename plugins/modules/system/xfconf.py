@@ -77,7 +77,7 @@ options:
   disable_facts:
     description:
       - The value C(false) is no longer allowed since community.general 4.0.0.
-      - This option will be deprecated in a future version, and eventually be removed.
+      - This option is deprecated, and will be removed in community.general 8.0.0.
     type: bool
     default: true
     version_added: 2.1.0
@@ -183,7 +183,11 @@ class XFConfProperty(CmdStateModuleHelper):
                             choices=('string', 'int', 'double', 'bool', 'uint', 'uchar', 'char', 'uint64', 'int64', 'float')),
             value=dict(type='list', elements='raw'),
             force_array=dict(type='bool', default=False, aliases=['array']),
-            disable_facts=dict(type='bool', default=True),
+            disable_facts=dict(
+                type='bool', default=True,
+                removed_in_version='8.0.0',
+                removed_from_collection='community.general'
+            ),
         ),
         required_if=[('state', 'present', ['value', 'value_type'])],
         required_together=[('value', 'value_type')],
