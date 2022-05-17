@@ -1,2 +1,0 @@
-minor_changes:
-  - ModuleHelper module utils - ``ModuleHelperBase`` now has a convenience method ``do_raise`` (https://github.com/ansible-collections/community.general/pull/4660).

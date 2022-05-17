@@ -1,5 +1,80 @@
 ancestor: 4.0.0
 releases:
+  5.0.0:
+    changes:
+      breaking_changes:
+      - lists_mergeby and groupby_as_dict filter plugins - adjust filter plugin filename.
+        This change is not visible to end-users, it only affects possible other collections
+        importing Python paths (https://github.com/ansible-collections/community.general/pull/4625).
+      - yarn - remove unsupported and unnecessary ``--no-emoji`` flag (https://github.com/ansible-collections/community.general/pull/4662).
+      bugfixes:
+      - consul - fixed bug where class ``ConsulService`` was overwriting the field
+        ``checks``, preventing the addition of checks to a service (https://github.com/ansible-collections/community.general/pull/4590).
+      - gconftool2 - properly escape values when passing them to ``gconftool-2`` (https://github.com/ansible-collections/community.general/pull/4647).
+      - gitlab_hook - avoid errors during idempotency check when an attribute does
+        not exist (https://github.com/ansible-collections/community.general/pull/4668).
+      - onepassword - search all valid configuration locations and use the first found
+        (https://github.com/ansible-collections/community.general/pull/4640).
+      - opentelemetry callback plugin - fix task message attribute that is reported
+        failed regardless of the task result (https://github.com/ansible-collections/community.general/pull/4624).
+      - opentelemetry callback plugin - fix warning for the include_tasks (https://github.com/ansible-collections/community.general/pull/4623).
+      - redfish_command - the iLO4 Redfish implementation only supports the ``image_url``
+        parameter in the underlying API calls to ``VirtualMediaInsert`` and ``VirtualMediaEject``.
+        Any values set (or the defaults) for ``write_protected`` or ``inserted`` will
+        be ignored (https://github.com/ansible-collections/community.general/pull/4596).
+      - terraform - fix list initialization to support both Python 2 and Python 3
+        (https://github.com/ansible-collections/community.general/issues/4531).
+      - zypper - fix undefined variable when running in check mode (https://github.com/ansible-collections/community.general/pull/4667).
+      deprecated_features:
+      - ansible_galaxy_install - deprecated support for ``ansible`` 2.9 and ``ansible-base``
+        2.10 (https://github.com/ansible-collections/community.general/pull/4601).
+      - dig lookup plugin - the ``DLV`` record type has been decommissioned in 2017
+        and support for it will be removed from community.general 6.0.0 (https://github.com/ansible-collections/community.general/pull/4618).
+      minor_changes:
+      - ModuleHelper module utils - ``ModuleHelperBase` now delegates the attributes
+        ``check_mode``, ``get_bin_path``, ``warn``, and ``deprecate`` to the underlying
+        ``AnsibleModule`` instance (https://github.com/ansible-collections/community.general/pull/4600).
+      - ModuleHelper module utils - ``ModuleHelperBase`` now has a convenience method
+        ``do_raise`` (https://github.com/ansible-collections/community.general/pull/4660).
+      - ipa_dnsrecord - add new argument ``record_values``, mutually exclusive to
+        ``record_value``, which supports multiple values for one record (https://github.com/ansible-collections/community.general/pull/4578).
+      - pritunl_user - add ``mac_addresses`` parameter (https://github.com/ansible-collections/community.general/pull/4535).
+      - rax_files_objects - minor refactoring improving code quality (https://github.com/ansible-collections/community.general/pull/4649).
+      - redfish_* modules - the contents of ``@Message.ExtendedInfo`` will be returned
+        as a string in the event that ``@Message.ExtendedInfo.Messages`` does not
+        exist. This is likely more useful than the standard HTTP error (https://github.com/ansible-collections/community.general/pull/4596).
+      - to_time_unit filter plugins - the time filters has been extended to also allow
+        ``0`` as input (https://github.com/ansible-collections/community.general/pull/4612).
+      - vmadm - minor refactoring and improvement on the module (https://github.com/ansible-collections/community.general/pull/4581).
+      - vmadm - minor refactoring and improvement on the module (https://github.com/ansible-collections/community.general/pull/4648).
+      - zfs - minor refactoring in the code (https://github.com/ansible-collections/community.general/pull/4650).
+      release_summary: This is release 5.0.0 of ``community.general``, released on
+        2022-05-17.
+    fragments:
+    - 4065-onepassword-config.yml
+    - 4535-pritunl-add-mac_addresses-parameter.yml
+    - 4578-ipa_dnsrecord-add_multiple_record_support.yml
+    - 4581-vmadm-improvements.yaml
+    - 4590-consul-fix-service-checks.yaml
+    - 4595-fix-VirtualMediaInsert-iLO4.yml
+    - 4600-mh-delegate.yaml
+    - 4601-ansible-galaxy-install-deprecate-ansible29-and-210.yaml
+    - 4612-time_filter_zero.yml
+    - 4618-dig-dlv.yml
+    - 4621-terraform-py2-compat.yml
+    - 4623-opentelemetry_bug_fix_include_tasks.yml
+    - 4624-opentelemetry_bug_fix_hardcoded_value.yml
+    - 4625-fix-filter-filenames.yml
+    - 4647-gconftool2-command-arg.yaml
+    - 4648-vmadm-improvements-2.yaml
+    - 4649-rax-files-objects-improvements.yaml
+    - 4650-zfs-improvements.yaml
+    - 4651-zypper-checkmode-fix.yaml
+    - 4660-mh-added-do-raise.yaml
+    - 4662-yarn-emoji.yml
+    - 4668-gitlab_hook-use-None-for-non-existent-attr.yml
+    - 5.0.0.yml
+    release_date: '2022-05-17'
   5.0.0-a1:
     changes:
       breaking_changes:

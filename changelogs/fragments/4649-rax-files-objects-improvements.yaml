@@ -1,2 +1,0 @@
-minor_changes:
-  - rax_files_objects - minor refactoring improving code quality (https://github.com/ansible-collections/community.general/pull/4649).
