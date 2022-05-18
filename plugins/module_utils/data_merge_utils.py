@@ -12,8 +12,6 @@ from enum import Enum
 from functools import wraps
 from collections.abc import Callable
 from typing import Union
-from ansible_collections.community.general.plugins.module_utils.mh.deco\
-    import basic_annotation_type_checking
 
 
 class MergeType(Enum):
@@ -78,27 +76,23 @@ class DataMergeUtils:
             return func(self, current, expected)
         return wrapped
 
-    @basic_annotation_type_checking
     def __init__(self, merge_type: MergeType,
                  list_diff_type: ListDiffType = ListDiffType.VALUE) -> None:
         self.__merge_type = merge_type
         self.__list_diff_type = list_diff_type
 
-    @basic_annotation_type_checking
     def set_merge_type(self, merge_type: MergeType) -> None:
         self.__merge_type = merge_type
 
     def get_merge_type(self) -> MergeType:
         return self.__merge_type
 
-    @basic_annotation_type_checking
     def set_list_diff_type(self, diff_type: ListDiffType) -> None:
         self.__list_diff_type = diff_type
 
     def get_list_diff_type(self) -> ListDiffType:
         return self.__list_diff_type
 
-    @basic_annotation_type_checking
     @__check_identic
     def get_new_merged_data(self, current: Union[dict, list], expected:
                             Union[dict, list]) -> Union[dict, list]:
@@ -117,7 +111,6 @@ class DataMergeUtils:
             return self.get_new_merged_list(current, expected)
         return self.get_new_merged_dict(current, expected)
 
-    @basic_annotation_type_checking
     @__check_identic
     def get_new_merged_dict(self, current: dict, expected: dict) -> dict:
         """
@@ -141,7 +134,6 @@ class DataMergeUtils:
                     raise TypeError("Unexpected MergeType")
         return merged
 
-    @basic_annotation_type_checking
     @__check_identic
     def get_new_merged_list(self, current: list, expected: list) -> list:
         """
