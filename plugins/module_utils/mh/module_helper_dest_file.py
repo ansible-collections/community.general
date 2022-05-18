@@ -21,7 +21,7 @@ from typing import Callable, Union
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper import ModuleHelper
 from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException
-from ansible_collections.community.general.plugins.module_utils.mh.deco import(
+from ansible_collections.community.general.plugins.module_utils.mh.deco import (
     cause_changes,
     check_mode_skip)
 
