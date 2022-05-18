@@ -537,7 +537,8 @@ class YamlFile(DestFileModuleHelper):
             width=self.vars['width'])
 
 
-def main() -> None: YamlFile().execute()
+def main() -> None:
+    YamlFile().execute()
 
 
 if __name__ == '__main__':
