@@ -72,14 +72,16 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 'transfer_protocol_type': 'NFS'
             }
         })
-        with patch.object(module.XCCRedfishUtils, '_find_managers_resource') as mock__find_managers_resource:
-            mock__find_managers_resource.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
+        with patch.object(module.XCCRedfishUtils, '_find_systems_resource') as mock__find_systems_resource:
+            mock__find_systems_resource.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
+            with patch.object(module.XCCRedfishUtils, '_find_managers_resource') as mock__find_managers_resource:
+                mock__find_managers_resource.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
 
-            with patch.object(module.XCCRedfishUtils, 'virtual_media_insert') as mock_virtual_media_insert:
-                mock_virtual_media_insert.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
+                with patch.object(module.XCCRedfishUtils, 'virtual_media_insert') as mock_virtual_media_insert:
+                    mock_virtual_media_insert.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
 
-                with self.assertRaises(AnsibleExitJson) as result:
-                    module.main()
+                    with self.assertRaises(AnsibleExitJson) as result:
+                        module.main()
 
     def test_module_command_VirtualMediaEject_pass(self):
         set_module_args({
@@ -93,14 +95,16 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 'image_url': "nfs://10.245.52.18:/home/nfs/bootable-sr635-20210111-autorun.iso",
             }
         })
-        with patch.object(module.XCCRedfishUtils, '_find_managers_resource') as mock__find_managers_resource:
-            mock__find_managers_resource.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
+        with patch.object(module.XCCRedfishUtils, '_find_systems_resource') as mock__find_systems_resource:
+            mock__find_systems_resource.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
+            with patch.object(module.XCCRedfishUtils, '_find_managers_resource') as mock__find_managers_resource:
+                mock__find_managers_resource.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
 
-            with patch.object(module.XCCRedfishUtils, 'virtual_media_eject') as mock_virtual_media_eject:
-                mock_virtual_media_eject.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
+                with patch.object(module.XCCRedfishUtils, 'virtual_media_eject') as mock_virtual_media_eject:
+                    mock_virtual_media_eject.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
 
-                with self.assertRaises(AnsibleExitJson) as result:
-                    module.main()
+                    with self.assertRaises(AnsibleExitJson) as result:
+                        module.main()
 
     def test_module_command_VirtualMediaEject_fail_when_required_args_missing(self):
         with self.assertRaises(AnsibleFailJson):
