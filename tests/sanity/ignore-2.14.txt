@@ -1,4 +1,5 @@
 .azure-pipelines/scripts/publish-codecov.py replace-urlopen
+plugins/modules/cloud/univention/udm_user.py import-3.11  # Uses deprecated stdlib library 'crypt'
 plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
 plugins/modules/cloud/lxc/lxc_container.py validate-modules:use-run-command-not-popen
 plugins/modules/cloud/lxd/lxd_project.py use-argspec-type-path # expanduser() applied to constants
@@ -26,6 +27,7 @@ plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:undocumented-parameter          # missing docs on suboptions
 plugins/modules/remote_management/manageiq/manageiq_tags.py validate-modules:parameter-state-invalid-choice
 plugins/modules/system/gconftool2.py validate-modules:parameter-state-invalid-choice
+plugins/modules/system/homectl.py import-3.11  # Uses deprecated stdlib library 'crypt'
 plugins/modules/system/iptables_state.py validate-modules:undocumented-parameter
 plugins/modules/system/osx_defaults.py validate-modules:parameter-state-invalid-choice
 plugins/modules/system/parted.py validate-modules:parameter-state-invalid-choice
