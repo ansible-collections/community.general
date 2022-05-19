@@ -46,11 +46,15 @@ options:
   state:
     description:
       - If set to C(present), that ensure the values are present in the TOML
-        file.
+        file. If the TOML file contain datas that are not present in the
+        expected values, they will not be modified (this only ensure
+        that the expected datas are presents).
       - If set to C(absent), that ensure the values are absent in the TOML
         file.
       - If set to C(identic), that ensure the values in the TOML are identic to
-        those provided in arguments.
+        those provided in arguments. If the TOML file contain datas that are
+        not present in the expected values they will be removed (this ensure
+        that the datas in the file are exactly the same as the expected datas).
     type: str
     choices: [ present, absent, identic ]
     default: present
