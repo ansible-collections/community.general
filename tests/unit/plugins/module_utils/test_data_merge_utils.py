@@ -11,7 +11,7 @@ __metaclass__ = type
 import pytest
 
 from ansible_collections.community.general.plugins.module_utils.\
-    data_merge_utils import (DataMergeUtils, ListDiffType, MergeType)
+    data_merge_utils import DataMergeUtils
 
 LIST_CURRENT = ['A', 'B', 'C', ['DA', 'DB'],
                 ['EA', 'EB'], 'F', ['GA', 'GB', 'GC']]
@@ -126,40 +126,40 @@ DICT_EXPECTED_ABSENT = {
 DATA_MERGE_TEST_CASE_LIST = [
     {
         'id': 'value_present',
-        'merge_type': MergeType.PRESENT,
-        'list_diff_type': ListDiffType.VALUE,
+        'merge_type': 'present',
+        'list_diff_type': 'value',
         'data_current': LIST_CURRENT,
         'data_modif': LIST_MODIF_VALUE,
         'data_expected': LIST_EXPECTED_VALUE_PRESENT,
     },
     {
         'id': 'value_absent',
-        'merge_type': MergeType.ABSENT,
-        'list_diff_type': ListDiffType.VALUE,
+        'merge_type': 'absent',
+        'list_diff_type': 'value',
         'data_current': LIST_CURRENT,
         'data_modif': LIST_MODIF_VALUE,
         'data_expected': LIST_EXPECTED_VALUE_ABSENT,
     },
     {
         'id': 'index_present',
-        'merge_type': MergeType.PRESENT,
-        'list_diff_type': ListDiffType.INDEX,
+        'merge_type': 'present',
+        'list_diff_type': 'index',
         'data_current': LIST_CURRENT,
         'data_modif': LIST_MODIF_INDEX,
         'data_expected': LIST_EXPECTED_INDEX_PRESENT,
     },
     {
         'id': 'index_absent',
-        'merge_type': MergeType.ABSENT,
-        'list_diff_type': ListDiffType.INDEX,
+        'merge_type': 'absent',
+        'list_diff_type': 'index',
         'data_current': LIST_CURRENT,
         'data_modif': LIST_MODIF_INDEX,
         'data_expected': LIST_EXPECTED_INDEX_ABSENT,
     },
     {
         'id': 'identic',
-        'merge_type': MergeType.IDENTIC,
-        'list_diff_type': ListDiffType.VALUE,
+        'merge_type': 'identic',
+        'list_diff_type': 'value',
         'data_current': LIST_CURRENT,
         'data_modif': LIST_MODIF_IDENTIC,
         'data_expected': LIST_MODIF_IDENTIC,
@@ -171,17 +171,17 @@ DATA_MERGE_TEST_CASE_LIST_IDS = (item['id']
 DATA_MERGE_TEST_CASE_DICT = [
     {
         'id': 'present',
-        'merge_type': MergeType.PRESENT,
+        'merge_type': 'present',
         'data_expected': DICT_EXPECTED_PRESENT,
     },
     {
         'id': 'absent',
-        'merge_type': MergeType.ABSENT,
+        'merge_type': 'absent',
         'data_expected': DICT_EXPECTED_ABSENT,
     },
     {
         'id': 'identic',
-        'merge_type': MergeType.IDENTIC,
+        'merge_type': 'identic',
         'data_expected': DICT_MODIF,
     },
 ]
@@ -191,12 +191,12 @@ DATA_MERGE_TEST_CASE_DICT_IDS = (item['id']
 DATA_MERGE_TEST_CASE_MIXED = [
     {
         'id': 'present',
-        'merge_type': MergeType.PRESENT,
+        'merge_type': 'present',
         'data_expected': LIST_CURRENT,
     },
     {
         'id': 'absent',
-        'merge_type': MergeType.ABSENT,
+        'merge_type': 'absent',
         'data_expected': DICT_CURRENT,
     },
 ]

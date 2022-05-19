@@ -21,10 +21,10 @@ from ansible_collections.community.general.tests.unit.plugins.module_utils\
         DICT_EXPECTED_PRESENT,
         DICT_EXPECTED_ABSENT)
 
-DEFAULT_MODULE_ARGS = {
-    key: val.get('default')
+DEFAULT_MODULE_ARGS = dict([
+    [key, val.get('default')]
     for key, val in TomlFile.module['argument_spec'].items()
-    if val.get('default') is not None}
+    if val.get('default') is not None])
 
 FAKE_PATH = '/path/to/fake/file.toml'
 TOML_CURRENT = toml.dumps(DICT_CURRENT)

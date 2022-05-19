@@ -46,7 +46,8 @@ class CantCreateBackup(ModuleHelperException):
     pass
 
 
-def check_if_dest_exists(dest: str) -> bool:
+def check_if_dest_exists(dest):
+    # type: (str) -> bool
     try:
         os.stat(dest)
     except FileNotFoundError:
@@ -56,27 +57,29 @@ def check_if_dest_exists(dest: str) -> bool:
     return True
 
 
-def check_if_parent_is_writable(dest: str) -> bool:
+def check_if_parent_is_writable(dest):
+    # type: (str) -> bool
     if os.access(os.path.dirname(dest), os.W_OK):
         return True
     return False
 
 
-def check_if_dest_is_readable(dest: str) -> bool:
+def check_if_dest_is_readable(dest):
+    # type: (str) -> bool
     if os.access(dest, os.R_OK):
         return True
     return False
 
 
-def check_if_dest_is_regular_file(dest: str) -> bool:
+def check_if_dest_is_regular_file(dest):
+    # type: (str) -> bool
     if os.path.isfile(dest):
         return True
     return False
 
 
-def dest_file_sanity_check(dest: str,
-                           create: bool = False,
-                           backup: bool = False) -> bool:
+def dest_file_sanity_check(dest, create=False, backup=False):
+    # type: (str, bool, bool) -> bool
     """
     Ensure that the destination exist and is readable or if not exists and
     'create' is True, ensure that the parent of the destination is writable. If
@@ -87,34 +90,38 @@ def dest_file_sanity_check(dest: str,
     exists = check_if_dest_exists(dest)
     writable_parent = check_if_parent_is_writable(dest)
     if not create and not exists:
-        raise DestNotExists(msg=f"{dest} does not not exist !")
+        msg = "{} does not not exist !".format(dest)
+        raise DestNotExists(msg)
     elif create and not exists and not writable_parent:
-        raise ParentNotWriteable(msg=f"Can't create {dest}, " +
-                                 "parent directory is not writable !")
+        msg = "Can't create {}, ".format(dest)
+        msg += "parent directory is not writable !"
+        raise ParentNotWriteable(msg)
     elif exists and not check_if_dest_is_readable(dest):
-        raise DestNotReadable(msg=f"Destination {dest} is not readable !")
+        msg = "Destination {} is not readable !".format(dest)
+        raise DestNotReadable(msg)
     elif exists and not check_if_dest_is_regular_file(dest):
-        raise DestNotRegularFile(
-            msg=f"Destination {dest} is not a regular file !")
+        msg = "Destination {} is not a regular file !".format(dest)
+        raise DestNotRegularFile(msg)
     elif exists and backup and not writable_parent:
-        raise CantCreateBackup(msg=f"Can't create backup file for {dest} " +
-                               "because parrent dir is not writable !")
+        msg = "Can't create backup file for {} ".format(dest)
+        msg += "because parrent dir is not writable !"
+        raise CantCreateBackup(msg)
     return (not exists and create)
 
 
 class DestFileModuleHelper(ModuleHelper):
 
     def __init__(self,
-                 module: Union[dict, AnsibleModule, None] = None,
-                 var_dest_file: str = 'path',
-                 var_result_data: str = 'result') -> None:
+                 module=None, var_dest_file='path', var_result_data='result'):
+        # type: (Union[dict, AnsibleModule, None], str, str) -> None
         self._tmpfile = None
         self._created = False
         self.var_dest_file = var_dest_file
         self.var_result_data = var_result_data
         super().__init__(module)
 
-    def __init_module__(self) -> None:
+    def __init_module__(self):
+        # type: () -> None
         self._created = dest_file_sanity_check(
             self.vars[self.var_dest_file],
             self.vars['create'],
@@ -129,20 +136,23 @@ class DestFileModuleHelper(ModuleHelper):
         """
         pass
 
-    def __quit_module__(self) -> None:
+    def __quit_module__(self):
+        # type: () -> None
         if self.has_changed():
             self.__update_dest_file__()
         self.vars.set('created', self._created)
 
     @cause_changes(on_success=True)
     @check_mode_skip
-    def __update_dest_file__(self) -> None:
+    def __update_dest_file__(self):
+        # type: () -> None
         self.__write_temp__()
         self.__make_backup__()
         self.__move_temp__()
 
     @abstractmethod
-    def __write_temp__(self, *args, **kwargs) -> None:
+    def __write_temp__(self, *args, **kwargs):
+        # type: () -> None
         """
         Implement it in the module to describe how the destination must be
         written in the tempfile.
@@ -164,13 +174,15 @@ class DestFileModuleHelper(ModuleHelper):
         """
         pass
 
-    def __make_backup__(self) -> None:
+    def __make_backup__(self):
+        # type: () -> None
         if self.vars.get('backup') and not self._created:
             self.vars.set(
                 'backup_file',
                 self.module.backup_local(self.vars.get(self.var_dest_file)))
 
-    def __move_temp__(self) -> None:
+    def __move_temp__(self):
+        # type: () -> None
         try:
             self.module.atomic_move(self._tmpfile, self.vars['path'])
         except Exception as ex:
@@ -179,7 +191,8 @@ class DestFileModuleHelper(ModuleHelper):
             raise ex
 
     @staticmethod
-    def write_tempfile(func: Callable) -> Callable:
+    def write_tempfile(func):
+        # type: (Callable) -> Callable
         """
         Decorator to create tempfile to write destination content and set
         `self.__tempfile`.

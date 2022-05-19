@@ -17,8 +17,6 @@ from ansible_collections.community.general.plugins.module_utils.mh.module_helper
 )
 from ansible_collections.community.general.plugins.module_utils.data_merge_utils import (
     DataMergeUtils,
-    MergeType,
-    ListDiffType,
 )
 
 
@@ -89,10 +87,10 @@ options:
         breaks in the diff will in the other you only gets values).
       - If set to C(true), it checks the difference by only comparing the
         values of elements in the json file and in the expected datas. In this
-        case, change indentation or sort keys will not be considered as a change
-        on the file will the values are the sames (just like any other
-        difference in json file unrelated to values of elements like line breaks
-        or comments).
+        case, change indentation or sort keys will not be considered as a
+        change on the file will the values are the sames (just like any other
+        difference in json file unrelated to values of elements like line
+        breaks or comments).
       - If set to C(false), it checks the difference by comparing the lines
         output with the actual lines in the json file. In this case, all the
         change on the indentation or on the sort keys will be considered as a
@@ -479,17 +477,17 @@ class JsonFile(DestFileModuleHelper):
         supports_check_mode=True,
     )
 
-    def __load_result_data__(self) -> dict:
+    def __load_result_data__(self):
+        # type: () -> dict
         content = []
         try:
             with open(self.vars.path, 'r') as file:
                 content = file.readlines()
         except FileNotFoundError:
             pass
-        except json.JSONDecodeError as ex:
+        except json.JSONDecodeError:
             raise ModuleHelperException(
-                msg=f'Failed to decode json in {self.vars["path"]}',
-                exception=ex)
+                'Failed to decode json in {}'.format(self.vars["path"]))
         if ''.join(content).strip() == '':
             content = ['{}']
         if self.vars['diff_on_value']:
@@ -498,19 +496,22 @@ class JsonFile(DestFileModuleHelper):
         else:
             self.vars.set(self.var_result_data, content, diff=True)
 
-    def __run__(self) -> None:
-        merge_util = DataMergeUtils(MergeType(self.vars.state),
-                                    ListDiffType(self.vars.list_diff_type))
+    def __run__(self):
+        # type: () -> None
+        merge_util = DataMergeUtils(self.vars['state'],
+                                    self.vars['list_diff_type'])
         self._set_result(merge_util.get_new_merged_data(
             self._get_current(), self.vars.value))
 
-    def _get_current(self) -> None:
+    def _get_current(self):
+        # type: () -> None
         if self.vars['diff_on_value']:
             return self.vars[self.var_result_data]
         else:
             return json.loads(''.join(self.vars[self.var_result_data]))
 
-    def _set_result(self, result: dict) -> None:
+    def _set_result(self, result):
+        # type: (dict) -> None
         if self.vars['diff_on_value']:
             self.vars.set(self.var_result_data, result)
         else:
@@ -518,21 +519,24 @@ class JsonFile(DestFileModuleHelper):
                           self._json_dumps(result).splitlines(keepends=True))
 
     @DestFileModuleHelper.write_tempfile    # provide kwargs['fd']
-    def __write_temp__(self, *args, **kwargs) -> None:
+    def __write_temp__(self, *args, **kwargs):
+        # type: () -> None
         if self.vars['diff_on_value']:
             json_string = self._json_dumps(self.vars[self.var_result_data])
         else:
             json_string = ''.join(self.vars[self.var_result_data])
         os.write(kwargs['fd'], bytes(json_string, 'utf-8'))
 
-    def _json_dumps(self, json_str: str) -> dict:
+    def _json_dumps(self, json_str):
+        # type: (str) -> dict
         indent = None if self.vars['indent'] == 0 else self.vars['indent']
         return json.dumps(json_str,
                           indent=indent,
                           sort_keys=self.vars['sort_keys'])
 
 
-def main() -> None:
+def main():
+    # type: () -> None
     JsonFile().execute()
 
 

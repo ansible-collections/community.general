@@ -352,7 +352,7 @@ class TestDestFileModuleHelper():
         )
 
         @DestFileModuleHelper.write_tempfile
-        def __write_temp__(self, *args, **kwargs) -> None:
+        def __write_temp__(self, *args, **kwargs):
             """impement abstract DestFileModuleHelper.__write_temp__"""
             pass
 
