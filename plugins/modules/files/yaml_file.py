@@ -31,7 +31,7 @@ options:
       - Absolute path of the YAML file.
     type: path
     required: true
-    alias: [ dest ]
+    aliases: [ dest ]
   state:
     description:
       - If set to C(present), that ensure the values are present in the YAML
@@ -101,7 +101,7 @@ options:
     description:
       - Set the indentation for elements in the YAML file.
     type: int
-    default: 4
+    default: 2
   sort_keys:
     description:
       - If set to C(true), the values in the will sorted by their keys.
@@ -461,7 +461,7 @@ class YamlFile(DestFileModuleHelper):
                 ],
             ),
             value=dict(type=check_type_dict_or_list, required=True),
-            create=dict(type='bool', defaut=False),
+            create=dict(type='bool', default=False),
             backup=dict(type='bool', default=False),
             diff_on_value=dict(type='bool', default=True),
             indent=dict(type='int', default=2),

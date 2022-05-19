@@ -30,7 +30,7 @@ options:
       - Absolute path of the TOML file.
     type: path
     required: true
-    alias: [ dest ]
+    aliases: [ dest ]
   state:
     description:
       - If set to C(present), that ensure the values are present in the TOML
@@ -354,7 +354,7 @@ class TomlFile(DestFileModuleHelper):
                 ],
             ),
             value=dict(type='dict', required=True),
-            create=dict(type='bool', defaut=False),
+            create=dict(type='bool', default=False),
             diff_on_value=dict(type='bool', default=True),
             backup=dict(type='bool', default=False),
         ),

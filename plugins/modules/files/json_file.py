@@ -30,7 +30,7 @@ options:
       - Absolute path of the JSON file.
     type: path
     required: true
-    alias: [ dest ]
+    aliases: [ dest ]
   state:
     description:
       - If set to C(present), that ensure the values are present in the JSON
