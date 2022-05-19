@@ -11,19 +11,21 @@ import pytest
 import os
 import json
 
+from ansible_collections.community.general.tests.unit.plugins.modules.conftest import patch_ansible_module
 from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException
 
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
-        check_if_dest_exists,
-        check_if_parent_is_writable,
-        check_if_dest_is_readable,
-        check_if_dest_is_regular_file,
-        DestNotExists,
-        DestNotReadable,
-        DestNotRegularFile,
-        ParentNotWriteable,
-        CantCreateBackup,
-        DestFileModuleHelper)
+    dest_file_sanity_check,
+    check_if_dest_exists,
+    check_if_parent_is_writable,
+    check_if_dest_is_readable,
+    check_if_dest_is_regular_file,
+    DestNotExists,
+    DestNotReadable,
+    DestNotRegularFile,
+    ParentNotWriteable,
+    CantCreateBackup,
+    DestFileModuleHelper)
 
 
 MODULE_PATH = 'ansible_collections.community.general.plugins.module_utils.' +\
@@ -149,8 +151,8 @@ class TestDestFileSanityCheck():
         os.path.isfile.assert_called_once_with(FAKE_DEST)
 
     @ pytest.mark.parametrize(
-        'create, backup, exists, writable_parent,' +
-        'readable, regular_file, expect_raise',
+        'create, backup, exists, writable_parent,'
+        + 'readable, regular_file, expect_raise',
         (elem.values() for elem in FILE_SANITY_CHECK_TEST_CASE.values()),
         ids=(FILE_SANITY_CHECK_TEST_CASE.keys()))
     def test_check(self, create, backup, exists, writable_parent,

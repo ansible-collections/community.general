@@ -326,8 +326,7 @@ from ansible_collections.community.general.plugins.module_utils.mh.module_helper
     DestFileModuleHelper,
     ModuleHelperException,
 )
-from ansible_collections.community.general.plugins.module_utils.data_merge_utils import DataMergeUtils,
-
+from ansible_collections.community.general.plugins.module_utils.data_merge_utils import DataMergeUtils
 
 
 class TomlFile(DestFileModuleHelper):
