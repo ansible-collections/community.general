@@ -111,8 +111,7 @@ def dest_file_sanity_check(dest, create=False, backup=False):
 
 class DestFileModuleHelper(ModuleHelper):
 
-    def __init__(self,
-                 module=None, var_dest_file='path', var_result_data='result'):
+    def __init__(self, module=None, var_dest_file='path', var_result_data='result'):
         # type: (Union[dict, AnsibleModule, None], str, str) -> None
         self._tmpfile = None
         self._created = False
@@ -177,9 +176,7 @@ class DestFileModuleHelper(ModuleHelper):
     def __make_backup__(self):
         # type: () -> None
         if self.vars.get('backup') and not self._created:
-            self.vars.set(
-                'backup_file',
-                self.module.backup_local(self.vars.get(self.var_dest_file)))
+            self.vars.set('backup_file', self.module.backup_local(self.vars.get(self.var_dest_file)))
 
     def __move_temp__(self):
         # type: () -> None
@@ -201,8 +198,7 @@ class DestFileModuleHelper(ModuleHelper):
         """
         @wraps(func)
         def wrapped(self, *args, **kwargs):
-            kwargs['fd'], self._tmpfile = tempfile.mkstemp(
-                dir=self.module.tmpdir)
+            kwargs['fd'], self._tmpfile = tempfile.mkstemp(dir=self.module.tmpdir)
             self.module.add_cleanup_file(self._tmpfile)
             res = func(self, *args, **kwargs)
             os.close(kwargs['fd'])

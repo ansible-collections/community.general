@@ -11,14 +11,9 @@ import pytest
 import os
 import json
 
-from ansible_collections.community.general.tests.unit.plugins.modules\
-    .conftest import patch_ansible_module
-from ansible_collections.community.general.plugins.module_utils.mh\
-    .exceptions import ModuleHelperException
+from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException
 
-from ansible_collections.community.general.plugins.module_utils.mh.\
-    module_helper_dest_file import (
-        dest_file_sanity_check,
+from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
         check_if_dest_exists,
         check_if_parent_is_writable,
         check_if_dest_is_readable,
@@ -370,20 +365,15 @@ class TestDestFileModuleHelper():
     @pytest.mark.usefixtures('patch_ansible_module')
     def test_fake_dest_file_module(self, test_case, capfd, mocker):
 
-        mock_tempfile_mkstemp = mocker.patch(
-            'tempfile.mkstemp', return_value=(1234, FAKE_TEMP_FILE))
+        mock_tempfile_mkstemp = mocker.patch('tempfile.mkstemp', return_value=(1234, FAKE_TEMP_FILE))
         mock_os_close = mocker.patch('os.close')
-        mock_dest_file_sanity_check = mocker.patch(
-            MODULE_PATH.format('dest_file_sanity_check'))
+        mock_dest_file_sanity_check = mocker.patch(MODULE_PATH.format('dest_file_sanity_check'))
         mock_atomic_move = mocker.patch(
-            'ansible_collections.community.general.plugins.module_utils' +
-            '.mh.module_helper.AnsibleModule.atomic_move')
+            'ansible_collections.community.general.plugins.module_utils.mh.module_helper.AnsibleModule.atomic_move')
         mock_cleanup = mocker.patch(
-            'ansible_collections.community.general.plugins.module_utils' +
-            '.mh.module_helper.AnsibleModule.cleanup')
+            'ansible_collections.community.general.plugins.module_utils.mh.module_helper.AnsibleModule.cleanup')
         mock_backup_local = mocker.patch(
-            'ansible_collections.community.general.plugins.module_utils' +
-            '.mh.module_helper.AnsibleModule.backup_local',
+            'ansible_collections.community.general.plugins.module_utils.mh.module_helper.AnsibleModule.backup_local',
             return_value=FAKE_DEST_BACKUP)
 
         if test_case['sanity_check_raise']:
@@ -399,13 +389,11 @@ class TestDestFileModuleHelper():
             module.run()
         result = json.loads(capfd.readouterr().out)
 
-        mock_dest_file_sanity_check.assert_called_once_with(
-            module.vars['path'], module.vars['create'], module.vars['backup'])
+        mock_dest_file_sanity_check.assert_called_once_with(module.vars['path'], module.vars['create'], module.vars['backup'])
         if test_case['sanity_check_raise'] or test_case['atomic_move_raise']:
             assert(result['failed'])
         if result['failed']:
-            assert(test_case['sanity_check_raise']
-                   or test_case['atomic_move_raise'])
+            assert(test_case['sanity_check_raise'] or test_case['atomic_move_raise'])
             if test_case['atomic_move_raise']:
                 if module.vars.get('backup_file'):
                     mock_backup_local.assert_called_once()
@@ -420,8 +408,7 @@ class TestDestFileModuleHelper():
                 mock_tempfile_mkstemp.assert_called_once()
                 mock_cleanup.assert_called_with(FAKE_TEMP_FILE)
                 mock_os_close.assert_called_once_with(1234)
-                mock_atomic_move.assert_called_once_with(FAKE_TEMP_FILE,
-                                                         module.vars['path'])
+                mock_atomic_move.assert_called_once_with(FAKE_TEMP_FILE, module.vars['path'])
             else:
                 mock_tempfile_mkstemp.assert_not_called()
                 mock_cleanup.assert_not_called()

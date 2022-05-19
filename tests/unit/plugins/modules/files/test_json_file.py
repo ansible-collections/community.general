@@ -11,14 +11,12 @@ import json
 
 from unittest.mock import mock_open
 
-from ansible_collections.community.general.plugins.modules.files\
-    .json_file import JsonFile
-from ansible_collections.community.general.tests.unit.plugins.module_utils\
-    .test_data_merge_utils import (
-        DICT_CURRENT,
-        DICT_MODIF,
-        DICT_EXPECTED_PRESENT,
-        DICT_EXPECTED_ABSENT)
+from ansible_collections.community.general.plugins.modules.files.json_file import JsonFile
+from ansible_collections.community.general.tests.unit.plugins.module_utils.test_data_merge_utils import (
+    DICT_CURRENT,
+    DICT_MODIF,
+    DICT_EXPECTED_PRESENT,
+    DICT_EXPECTED_ABSENT)
 
 DEFAULT_MODULE_ARGS = dict([
     [key, val.get('default')]
@@ -142,8 +140,7 @@ TEST_CASES_EXEC_IDS = [item[1]['id'] for item in TEST_CASE_EXEC]
                          indirect=['patch_ansible_module'])
 @pytest.mark.usefixtures('patch_ansible_module')
 def test_execute(testcase, capfd, mocker):
-    mocker.patch('ansible_collections.community.general.plugins.module_utils' +
-                 '.mh.module_helper_dest_file.dest_file_sanity_check',
+    mocker.patch('ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file.dest_file_sanity_check',
                  return_value=False)
     mocker.patch('builtins.open', mock_open(read_data=testcase['read_data']))
     mocker.patch('os.write')

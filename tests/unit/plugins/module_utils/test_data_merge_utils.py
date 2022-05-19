@@ -10,8 +10,7 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils.\
-    data_merge_utils import DataMergeUtils
+from ansible_collections.community.general.plugins.module_utils.data_merge_utils import DataMergeUtils
 
 LIST_CURRENT = ['A', 'B', 'C', ['DA', 'DB'],
                 ['EA', 'EB'], 'F', ['GA', 'GB', 'GC']]
@@ -207,11 +206,8 @@ DATA_MERGE_TEST_CASE_MIXED_IDS = (item['id']
 @pytest.mark.parametrize('testcase', DATA_MERGE_TEST_CASE_LIST,
                          ids=DATA_MERGE_TEST_CASE_LIST_IDS)
 def test_merge_list(testcase):
-    data_merge_utils = DataMergeUtils(
-        merge_type=testcase['merge_type'],
-        list_diff_type=testcase['list_diff_type'])
-    list_merged = data_merge_utils.get_new_merged_list(
-        testcase['data_current'], testcase['data_modif'])
+    data_merge_utils = DataMergeUtils(merge_type=testcase['merge_type'], list_diff_type=testcase['list_diff_type'])
+    list_merged = data_merge_utils.get_new_merged_list(testcase['data_current'], testcase['data_modif'])
     assert(list_merged == testcase['data_expected'])
 
 
@@ -219,8 +215,7 @@ def test_merge_list(testcase):
                          ids=DATA_MERGE_TEST_CASE_DICT_IDS)
 def test_merge_dict(testcase):
     data_merge_utils = DataMergeUtils(merge_type=testcase['merge_type'])
-    dict_merged = data_merge_utils.get_new_merged_dict(
-        DICT_CURRENT, DICT_MODIF)
+    dict_merged = data_merge_utils.get_new_merged_dict(DICT_CURRENT, DICT_MODIF)
     assert(dict_merged == testcase['data_expected'])
 
 
@@ -228,6 +223,5 @@ def test_merge_dict(testcase):
                          ids=DATA_MERGE_TEST_CASE_MIXED_IDS)
 def test_merge_mixed(testcase):
     data_merge_utils = DataMergeUtils(merge_type=testcase['merge_type'])
-    list_merged = data_merge_utils.get_new_merged_data(
-        DICT_CURRENT, LIST_CURRENT)
+    list_merged = data_merge_utils.get_new_merged_data(DICT_CURRENT, LIST_CURRENT)
     assert(list_merged == testcase['data_expected'])

@@ -34,8 +34,7 @@ class DataMergeUtils:
             return func(self, current, expected)
         return wrapped
 
-    def __init__(self, merge_type,
-                 list_diff_type='value'):
+    def __init__(self, merge_type, list_diff_type='value'):
         # type: (str, str) -> None
         self.merge_type = merge_type
         self._list_diff_type = list_diff_type
@@ -63,9 +62,7 @@ class DataMergeUtils:
                     value will be kept in the result.
         """
         if value not in ['identic', 'present', 'absent']:
-            raise ValueError(
-                '`merge_type` can be only one of `identic`, `present`' +
-                'or `absent`')
+            raise ValueError('`merge_type` can be only one of `identic`, `present` or `absent`')
         self._merge_type = value
 
     @property
@@ -98,8 +95,7 @@ class DataMergeUtils:
                     present in the result.
         """
         if value not in ['value', 'index']:
-            raise ValueError(
-                '`list_diff_type` can be only one of `value` or `index`')
+            raise ValueError('`list_diff_type` can be only one of `value` or `index`')
         self._list_diff_type = value
 
     @_check_identic
@@ -128,10 +124,8 @@ class DataMergeUtils:
         """
         merged = deepcopy(current)
         for key in expected.keys():
-            if (isinstance(expected.get(key), (dict, list))
-                    and isinstance(current.get(key), (dict, list))):
-                merged[key] = self.get_new_merged_data(
-                    merged[key], expected[key])
+            if (isinstance(expected.get(key), (dict, list)) and isinstance(current.get(key), (dict, list))):
+                merged[key] = self.get_new_merged_data(merged[key], expected[key])
             else:
                 if self._merge_type == 'present':
                     if expected[key] is None:
@@ -152,11 +146,9 @@ class DataMergeUtils:
         `self.list_diff_type`.
         """
         if self._list_diff_type == 'value':
-            return self._get_new_merged_list_with_value_diff(
-                current, expected)
+            return self._get_new_merged_list_with_value_diff(current, expected)
         if self._list_diff_type == 'index':
-            return self._get_new_merged_list_with_index_diff(
-                current, expected)
+            return self._get_new_merged_list_with_index_diff(current, expected)
         raise TypeError("Unexpected list_diff_type")
 
     def _get_new_merged_list_with_value_diff(self, current, expected):

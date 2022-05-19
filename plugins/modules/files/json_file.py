@@ -435,16 +435,14 @@ RETURN = r'''
     type: dict
 '''
 
-from ansible_collections.community.general.plugins.module_utils.data_merge_utils import (
-    DataMergeUtils,
-)
+import os
+import json
+from ansible_collections.community.general.plugins.module_utils.data_merge_utils import DataMergeUtils
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
     DestFileModuleHelper,
     ModuleHelperException,
 )
 from ansible_collections.community.general.plugins.module_utils.common.validation import check_type_dict_or_list
-import os
-import json
 
 
 class JsonFile(DestFileModuleHelper):
@@ -488,22 +486,19 @@ class JsonFile(DestFileModuleHelper):
         except FileNotFoundError:
             pass
         except json.JSONDecodeError:
-            raise ModuleHelperException(
-                'Failed to decode JSON in {}'.format(self.vars["path"]))
+            msg = 'Failed to decode JSON in {}'.format(self.vars["path"])
+            raise ModuleHelperException(msg)
         if ''.join(content).strip() == '':
             content = ['{}']
         if self.vars['diff_on_value']:
-            self.vars.set(self.var_result_data,
-                          json.loads(''.join(content)), diff=True)
+            self.vars.set(self.var_result_data, json.loads(''.join(content)), diff=True)
         else:
             self.vars.set(self.var_result_data, content, diff=True)
 
     def __run__(self):
         # type: () -> None
-        merge_util = DataMergeUtils(self.vars['state'],
-                                    self.vars['list_diff_type'])
-        self._set_result(merge_util.get_new_merged_data(
-            self._get_current(), self.vars.value))
+        merge_util = DataMergeUtils(self.vars['state'], self.vars['list_diff_type'])
+        self._set_result(merge_util.get_new_merged_data(self._get_current(), self.vars.value))
 
     def _get_current(self):
         # type: () -> None
@@ -517,8 +512,7 @@ class JsonFile(DestFileModuleHelper):
         if self.vars['diff_on_value']:
             self.vars.set(self.var_result_data, result)
         else:
-            self.vars.set(self.var_result_data,
-                          self._json_dumps(result).splitlines(keepends=True))
+            self.vars.set(self.var_result_data, self._json_dumps(result).splitlines(keepends=True))
 
     @DestFileModuleHelper.write_tempfile    # provide kwargs['fd']
     def __write_temp__(self, *args, **kwargs):
@@ -532,9 +526,7 @@ class JsonFile(DestFileModuleHelper):
     def _json_dumps(self, json_str):
         # type: (str) -> dict
         indent = None if self.vars['indent'] == 0 else self.vars['indent']
-        return json.dumps(json_str,
-                          indent=indent,
-                          sort_keys=self.vars['sort_keys'])
+        return json.dumps(json_str, indent=indent, sort_keys=self.vars['sort_keys'])
 
 
 def main():

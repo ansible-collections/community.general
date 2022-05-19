@@ -27,11 +27,9 @@ def check_type_dict_or_list(value):
     try:
         if isinstance(value, (list, dict)):
             return value
-        elif (isinstance(value, string_types) and
-              (value.startswith("{") or '=' in value)):
+        elif (isinstance(value, string_types) and (value.startswith("{") or '=' in value)):
             return check_type_dict(value)
         else:
             return check_type_list(value)
     except TypeError:
-        raise TypeError(
-            '%s cannot be converted to dict or a list' % type(value))
+        raise TypeError('%s cannot be converted to dict or a list' % type(value))

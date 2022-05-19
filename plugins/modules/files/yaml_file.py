@@ -487,22 +487,18 @@ class YamlFile(DestFileModuleHelper):
         except FileNotFoundError:
             pass
         except yaml.scanner.ScannerError:
-            raise ModuleHelperException(
-                'Failed to decode YAML in {}'.format(self.vars["path"]))
+            raise ModuleHelperException('Failed to decode YAML in {}'.format(self.vars["path"]))
         if ''.join(content).strip() == '':
             content = ['{}']
         if self.vars['diff_on_value']:
-            self.vars.set(self.var_result_data,
-                          yaml.safe_load(''.join(content)), diff=True)
+            self.vars.set(self.var_result_data, yaml.safe_load(''.join(content)), diff=True)
         else:
             self.vars.set(self.var_result_data, content, diff=True)
 
     def __run__(self):
         # type: () -> None
-        merge_util = DataMergeUtils(self.vars['state'],
-                                    self.vars['list_diff_type'])
-        self._set_result(merge_util.get_new_merged_data(
-            self._get_current(), self.vars.value))
+        merge_util = DataMergeUtils(self.vars['state'], self.vars['list_diff_type'])
+        self._set_result(merge_util.get_new_merged_data(self._get_current(), self.vars.value))
 
     def _get_current(self):
         # type: () -> None
@@ -516,8 +512,7 @@ class YamlFile(DestFileModuleHelper):
         if self.vars['diff_on_value']:
             self.vars.set(self.var_result_data, result)
         else:
-            self.vars.set(self.var_result_data,
-                          self._yaml_dumps(result).splitlines(keepends=True))
+            self.vars.set(self.var_result_data, self._yaml_dumps(result).splitlines(keepends=True))
 
     @DestFileModuleHelper.write_tempfile    # provide kwargs['fd']
     def __write_temp__(self, *args, **kwargs):
