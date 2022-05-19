@@ -405,7 +405,6 @@ EXAMPLES = r'''
 # There is not diff in the values but the file format is changed (intent 4
 # There is a change.
 # Get the following content in /my/dest/file.json :
-to 2).
 #{
 #  "A": 1,
 #  "B": 2,

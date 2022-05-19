@@ -179,7 +179,7 @@ EXAMPLES = r'''
 # A = 1
 #
 # [C]
-E = [ 4, 5, 6,]
+# E = [ 4, 5, 6,]
 
 - name: "Ensure values are identic in the TOML file files."
   community.general.toml:

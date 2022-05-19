@@ -169,19 +169,18 @@ EXAMPLES = r'''
 # The values are kept in all samples.
 
 - name: "Ensure values are present in the YAML."
-  namespace.collection.module
-    community.general.yaml_file:
-      path: "/my/dest/file.yaml"
-      value:
-        B: 3
-        C:
-         F: 8
-      state: "present"
+  community.general.yaml_file:
+    path: "/my/dest/file.yaml"
+    value:
+      B: 3
+      C:
+       F: 8
+    state: "present"
 # {'B': 3} and {'C':{'F': 8}} are not present in the original values, they will
 # be added.
 # There is a change.
 # Get the following content in /my/dest/file.yaml :
----
+# ---
 # A: 1
 # B: 3
 # C:
@@ -204,7 +203,7 @@ EXAMPLES = r'''
 # is no change.
 # There is no change.
 # Get the following content in /my/dest/file.yaml :
----
+# ---
 # A: 1
 # B: 2
 # C:
@@ -340,17 +339,16 @@ EXAMPLES = r'''
 #   - 6
 
 - name: "Ensure values are absent depending their index in a list."
-  namespace.collection.module
-    community.general.yaml_file:
-      path: "/my/dest/file.yaml"
-      list_diff_type: index
-      value:
-        C:
-         E:
-          -
-          - 7
-          - 6
-      state: "absent"
+  community.general.yaml_file:
+    path: "/my/dest/file.yaml"
+    list_diff_type: index
+    value:
+      C:
+       E:
+        -
+        - 7
+        - 6
+    state: "absent"
 # In the original datas, the second value of C.E list is not 7 so it will be
 # keept, but the third value is 6, so it will be removed.
 # Note, if you do not want to change the value in on some check you can set it
@@ -367,13 +365,12 @@ EXAMPLES = r'''
 #   - 5
 
 - name: "Ensure values are present in the YAML diff, check only on values."
-  namespace.collection.module
-    community.general.yaml_file:
-      path: "/my/dest/file.yaml"
-      indent: 4
-      value:
-        A: 1
-      state: "present"
+  community.general.yaml_file:
+    path: "/my/dest/file.yaml"
+    indent: 4
+    value:
+      A: 1
+    state: "present"
 # We will change the indent but when the change are only detected on the values
 # the YAML file will not be update ("A": 1 is already in the originals values).
 # There is no change.
@@ -389,16 +386,15 @@ EXAMPLES = r'''
 #   - 6
 
 - name: "Ensure values are present in the YAML diff, also check file format."
-  namespace.collection.module
-    community.general.yaml_file:
-      path: "/my/dest/file.yaml"
-      indent: 2
-      diff_on_value: false
-      value:
-        A: 1
-      state: "present"
+  community.general.yaml_file:
+    path: "/my/dest/file.yaml"
+    indent: 2
+    diff_on_value: false
+    value:
+      A: 1
+    state: "present"
 # There is not diff in the values but the file format is changed (intent 4
-to 2).
+# to 2).
 # There is a change.
 # Get the following content in /my/dest/file.yaml :
 # ---
