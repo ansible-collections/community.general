@@ -7,18 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-import yaml
-import os
-
-from ansible_collections.community.general.plugins.module_utils.common.validation import check_type_dict_or_list
-from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
-    DestFileModuleHelper,
-    ModuleHelperException,
-)
-from ansible_collections.community.general.plugins.module_utils.data_merge_utils import (
-    DataMergeUtils,
-)
-
 
 DOCUMENTATION = r'''
 ---
@@ -436,6 +424,18 @@ RETURN = r'''
     returned: success
     type: dict
 '''
+
+import yaml
+import os
+
+from ansible_collections.community.general.plugins.module_utils.common.validation import check_type_dict_or_list
+from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
+    DestFileModuleHelper,
+    ModuleHelperException,
+)
+from ansible_collections.community.general.plugins.module_utils.data_merge_utils import (
+    DataMergeUtils,
+)
 
 
 class YamlFile(DestFileModuleHelper):

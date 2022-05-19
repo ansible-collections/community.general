@@ -5,16 +5,6 @@
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-from ansible_collections.community.general.plugins.module_utils.data_merge_utils import (
-    DataMergeUtils,
-)
-from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
-    DestFileModuleHelper,
-    ModuleHelperException,
-)
-from ansible_collections.community.general.plugins.module_utils.common.validation import check_type_dict_or_list
-import os
-import json
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -444,6 +434,17 @@ RETURN = r'''
     returned: success
     type: dict
 '''
+
+from ansible_collections.community.general.plugins.module_utils.data_merge_utils import (
+    DataMergeUtils,
+)
+from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
+    DestFileModuleHelper,
+    ModuleHelperException,
+)
+from ansible_collections.community.general.plugins.module_utils.common.validation import check_type_dict_or_list
+import os
+import json
 
 
 class JsonFile(DestFileModuleHelper):

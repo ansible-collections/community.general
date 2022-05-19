@@ -7,18 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-import toml
-import os
-
-from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
-    DestFileModuleHelper,
-    ModuleHelperException,
-)
-from ansible_collections.community.general.plugins.module_utils.data_merge_utils import (
-    DataMergeUtils,
-)
-
-
 DOCUMENTATION = r'''
 ---
 module: toml_file
@@ -329,6 +317,18 @@ RETURN = r'''
     returned: success
     type: dict
 '''
+
+
+import toml
+import os
+
+from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
+    DestFileModuleHelper,
+    ModuleHelperException,
+)
+from ansible_collections.community.general.plugins.module_utils.data_merge_utils import (
+    DataMergeUtils,
+)
 
 
 class TomlFile(DestFileModuleHelper):
