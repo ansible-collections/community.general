@@ -1,24 +1,21 @@
-#!/usr/bin/env python3
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Copyright: (c) 2022, DEMAREST Maxime <maxime@indelog.fr>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-__metaclass__ = type
-
-import json
-import os
-
-from ansible_collections.community.general.plugins.module_utils.common.validation import check_type_dict_or_list
+from ansible_collections.community.general.plugins.module_utils.data_merge_utils import (
+    DataMergeUtils,
+)
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
     DestFileModuleHelper,
     ModuleHelperException,
 )
-from ansible_collections.community.general.plugins.module_utils.data_merge_utils import (
-    DataMergeUtils,
-)
-
+from ansible_collections.community.general.plugins.module_utils.common.validation import check_type_dict_or_list
+import os
+import json
+__metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
