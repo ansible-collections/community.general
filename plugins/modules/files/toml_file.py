@@ -110,6 +110,7 @@ options:
     default: no
 requirements:
   - python3-toml
+version_added: 5.1.0
 author:
     - DEMAREST Maxime (@indelog) <maxime@indelog.fr>
 '''

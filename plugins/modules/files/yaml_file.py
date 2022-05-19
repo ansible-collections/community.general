@@ -150,6 +150,7 @@ options:
     default: 0
 requirements:
   - python3-yaml
+version_added: 5.1.0
 author:
     - DEMAREST Maxime (@indelog) <maxime@indelog.fr>
 '''

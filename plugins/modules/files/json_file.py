@@ -121,6 +121,7 @@ options:
         See U(https://docs.python.org/3/library/json.html#basic-usage).
     type: bool
     default: false
+version_added: 5.1.0
 author:
     - DEMAREST Maxime (@indelog) <maxime@indelog.fr>
 '''
