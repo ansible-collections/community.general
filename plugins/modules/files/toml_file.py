@@ -22,34 +22,34 @@ from ansible_collections.community.general.plugins.module_utils.data_merge_utils
 DOCUMENTATION = r'''
 ---
 module: toml_file
-short_description: Managage (add, remove, update) elements in a toml file.
+short_description: Managage (add, remove, update) elements in a TOML file.
 description:
-  - This module ensures that a set of values is present or absent in a toml
+  - This module ensures that a set of values is present or absent in a TOML
     file.
   - The check can be done in all childrens of an object.
   - It also makes sure a value is present or absent in a list or in a
     specific index of the list.
-  - In background, this module use the python toml lib
+  - In background, this module use the python TOML lib
     U(https://pypi.org/project/toml/).
 notes:
   - Take note of the following warning before using this module, B(if you have
-    some comments in your toml file, this module will not preserve them !) So
+    some comments in your TOML file, this module will not preserve them !) So
     don't use it if it's important for you to keep these comments.
   - This module supports C(--check) and C(--diff) flags.
 options:
   path:
     description:
-      - Absolute path of the toml file.
+      - Absolute path of the TOML file.
     type: path
     required: true
     alias: [ dest ]
   state:
     description:
-      - If set to C(present), that ensure the values are present in the toml
+      - If set to C(present), that ensure the values are present in the TOML
         file.
-      - If set to C(absent), that ensure the values are absent in the toml
+      - If set to C(absent), that ensure the values are absent in the TOML
         file.
-      - If set to C(identic), that ensure the values in the toml are identic to
+      - If set to C(identic), that ensure the values in the TOML are identic to
         those provided in arguments.
     type: str
     choices: [ present, absent, identic ]
@@ -68,30 +68,30 @@ options:
     default: value
   value:
     description:
-      - The values that you want to compare with the one present in the toml
+      - The values that you want to compare with the one present in the TOML
         file.
     type: dict
     required: true
   create:
     description:
-      - If set to C(no), the module will fail if the toml file not exists.
-        Else, the toml file will be created.
+      - If set to C(no), the module will fail if the TOML file not exists.
+        Else, the TOML file will be created.
     type: bool
     default: false
   diff_on_value:
     description:
       - This describes how check the if it has a difference between the datas
-        present in the toml file and the expected values. This will also
+        present in the TOML file and the expected values. This will also
         impact the output in diff mode (in a case you get indents or lines
         breaks in the diff will in the other you only gets values).
       - If set to C(true), it checks the difference by only comparing the
-        values of elements in the toml file and in the expected datas. In this
+        values of elements in the TOML file and in the expected datas. In this
         case, change indentation or sort keys will not be considered as a
         change on the file will the values are the sames (just like any other
-        difference in toml file unrelated to values of elements like line
+        difference in TOML file unrelated to values of elements like line
         breaks or comments).
       - If set to C(false), it checks the difference by comparing the lines
-        output with the actual lines in the toml file. In this case, all the
+        output with the actual lines in the TOML file. In this case, all the
         change on the indentation or on the sort keys will be considered as a
         change on the file even if it has no difference on the values (if a
         comment, or an empty line break is present in the file, a change will
@@ -120,7 +120,7 @@ EXAMPLES = r'''
 # E = [ 4, 5, 6,]
 # The values are kept in all samples.
 
-- name: "Ensure values are present in the toml."
+- name: "Ensure values are present in the TOML."
   community.general.toml_file:
     path: "/my/dest/file.toml"
     value:
@@ -140,7 +140,7 @@ EXAMPLES = r'''
 # E = [ 4, 5, 6,]
 # F = 8
 
-- name: "Ensure values are absent in the toml file files."
+- name: "Ensure values are absent in the TOML file files."
   community.general.toml_file:
     path: "/my/dest/file.toml"
     value:
@@ -159,7 +159,7 @@ EXAMPLES = r'''
 # D = 3
 # E = [ 4, 5, 6,]
 
-- name: "Ensure values are absent in the toml file files."
+- name: "Ensure values are absent in the TOML file files."
   community.general.toml_file:
     path: "/my/dest/file.toml"
     value:
@@ -176,7 +176,7 @@ EXAMPLES = r'''
 # [C]
 E = [ 4, 5, 6,]
 
-- name: "Ensure values are identic in the toml file files."
+- name: "Ensure values are identic in the TOML file files."
   community.general.toml:
     path: "/my/dest/file.toml"
     value:
@@ -299,12 +299,12 @@ E = [ 4, 5, 6,]
 RETURN = r'''
   changed:
     description:
-      - Indicate whether the toml file is changed or not.
+      - Indicate whether the TOML file is changed or not.
     returned: always
     type: bool
   created:
     description:
-      - Indicate if the file toml is created or not.
+      - Indicate if the file TOML is created or not.
     returned: success
     type: bool
   diff:
@@ -320,7 +320,7 @@ RETURN = r'''
     type: bool
   result:
     description:
-      - Contain the values that are finally present in the toml file.
+      - Contain the values that are finally present in the TOML file.
     returned: success
     type: dict
 '''
@@ -365,7 +365,7 @@ class TomlFile(DestFileModuleHelper):
         except FileNotFoundError:
             pass
         except toml.TomlDecodeError:
-            msg = 'Failed to decode json in {}'.format(self.vars["path"])
+            msg = 'Failed to decode TOML in {}'.format(self.vars["path"])
             raise ModuleHelperException(msg)
         if ''.join(content).strip() == '':
             content = ['']
