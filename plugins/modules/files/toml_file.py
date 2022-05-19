@@ -111,7 +111,7 @@ options:
 requirements:
   - python3-toml
 author:
-    - DEMAREST Maxime (Indelog) <maxime@indelog.fr>
+    - DEMAREST Maxime (@indelog) <maxime@indelog.fr>
 '''
 
 EXAMPLES = r'''

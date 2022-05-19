@@ -122,7 +122,7 @@ options:
     type: bool
     default: false
 author:
-    - DEMAREST Maxime (Indelog) <maxime@indelog.fr>
+    - DEMAREST Maxime (@indelog) <maxime@indelog.fr>
 '''
 
 EXAMPLES = r'''
