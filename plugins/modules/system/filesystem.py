@@ -428,7 +428,10 @@ class VFAT(Filesystem):
         dummy, out, dummy = self.module.run_command([cmd, '--info', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
         fssize = None
         for line in out.splitlines()[1:]:
-            param, value = line.split(':', 1)
+            parts = line.split(':', 1)
+            if len(parts) < 2:
+                continue
+            param, value = parts
             if param.strip() == 'Size':
                 fssize = int(value.strip())
                 break
