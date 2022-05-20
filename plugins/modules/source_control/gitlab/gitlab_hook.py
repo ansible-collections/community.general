@@ -257,7 +257,7 @@ class GitLabHook(object):
 
         for arg_key, arg_value in arguments.items():
             if arguments[arg_key] is not None:
-                if getattr(hook, arg_key) != arguments[arg_key]:
+                if getattr(hook, arg_key, None) != arguments[arg_key]:
                     setattr(hook, arg_key, arguments[arg_key])
                     changed = True
 
@@ -268,7 +268,7 @@ class GitLabHook(object):
     @param hook_url Url to call on event
     '''
     def find_hook(self, project, hook_url):
-        hooks = project.hooks.list()
+        hooks = project.hooks.list(all=True)
         for hook in hooks:
             if (hook.url == hook_url):
                 return hook

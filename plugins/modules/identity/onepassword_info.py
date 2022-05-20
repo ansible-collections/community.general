@@ -166,6 +166,8 @@ from subprocess import Popen, PIPE
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible.module_utils.basic import AnsibleModule
 
+from ansible_collections.community.general.plugins.module_utils.onepassword import OnePasswordConfig
+
 
 class AnsibleModuleError(Exception):
     def __init__(self, results):
@@ -179,13 +181,14 @@ class OnePasswordInfo(object):
 
     def __init__(self):
         self.cli_path = module.params.get('cli_path')
-        self.config_file_path = '~/.op/config'
         self.auto_login = module.params.get('auto_login')
         self.logged_in = False
         self.token = None
 
         terms = module.params.get('search_terms')
         self.terms = self.parse_search_terms(terms)
+
+        self._config = OnePasswordConfig()
 
     def _run(self, args, expected_rc=0, command_input=None, ignore_errors=False):
         if self.token:
@@ -294,12 +297,12 @@ class OnePasswordInfo(object):
             except AnsibleModuleError as e:
                 module.fail_json(msg="Failed to perform initial sign in to 1Password: %s" % to_native(e))
         else:
-            module.fail_json(msg="Unable to perform an initial sign in to 1Password. Please run '%s sigin' "
+            module.fail_json(msg="Unable to perform an initial sign in to 1Password. Please run '%s signin' "
                                  "or define credentials in 'auto_login'. See the module documentation for details." % self.cli_path)
 
     def get_token(self):
         # If the config file exists, assume an initial signin has taken place and try basic sign in
-        if os.path.isfile(self.config_file_path):
+        if os.path.isfile(self._config.config_file_path):
 
             if self.auto_login is not None:
 

@@ -1187,7 +1187,7 @@ def main():
                 module.fail_json(msg="Can't get the next vmid for VM {0} automatically. Ensure your cluster state is good".format(name))
         else:
             clone_target = clone or name
-            vmid = proxmox.get_vmid(clone_target, ignore_missing=True, choose_first_if_multiple=True)
+            vmid = proxmox.get_vmid(clone_target, ignore_missing=True)
 
     if clone is not None:
         # If newid is not defined then retrieve the next free id from ProxmoxAPI
@@ -1205,12 +1205,12 @@ def main():
         proxmox.get_vm(vmid)
 
         # Ensure the choosen VM name doesn't already exist when cloning
-        existing_vmid = proxmox.get_vmid(name, choose_first_if_multiple=True)
+        existing_vmid = proxmox.get_vmid(name, ignore_missing=True)
         if existing_vmid:
             module.exit_json(changed=False, vmid=existing_vmid, msg="VM with name <%s> already exists" % name)
 
         # Ensure the choosen VM id doesn't already exist when cloning
-        if proxmox.get_vm(newid, ignore_errors=True):
+        if proxmox.get_vm(newid, ignore_missing=True):
             module.exit_json(changed=False, vmid=vmid, msg="vmid %s with VM name %s already exists" % (newid, name))
 
     if delete is not None:
@@ -1231,8 +1231,8 @@ def main():
         try:
             if proxmox.get_vm(vmid, ignore_missing=True) and not (update or clone):
                 module.exit_json(changed=False, vmid=vmid, msg="VM with vmid <%s> already exists" % vmid)
-            elif proxmox.get_vmid(name, ignore_missing=True, choose_first_if_multiple=True) and not (update or clone):
-                module.exit_json(changed=False, vmid=proxmox.get_vmid(name, choose_first_if_multiple=True), msg="VM with name <%s> already exists" % name)
+            elif proxmox.get_vmid(name, ignore_missing=True) and not (update or clone):
+                module.exit_json(changed=False, vmid=proxmox.get_vmid(name), msg="VM with name <%s> already exists" % name)
             elif not (node, name):
                 module.fail_json(msg='node, name is mandatory for creating/updating vm')
             elif not proxmox.get_node(node):
@@ -1397,7 +1397,7 @@ def main():
             module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
         vm = proxmox.get_vm(vmid)
         if not name:
-            name = vm['name']
+            name = vm.get('name', '(unnamed)')
         current = proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).status.current.get()['status']
         status['status'] = current
         if status:

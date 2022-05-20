@@ -1,3 +1,0 @@
----
-minor_changes:
-  - pacman - add ``stdout`` and ``stderr`` as return values (https://github.com/ansible-collections/community.general/pull/3758).

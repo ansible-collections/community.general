@@ -1,0 +1,14 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- when: ansible_os_family == 'Archlinux'
+  block:
+    # Add more tests here by including more task files:
+    - include: 'basic.yml'
+    - include: 'package_urls.yml'
+    - include: 'remove_nosave.yml'
+    - include: 'update_cache.yml'
+    - include: 'locally_installed_package.yml'

@@ -20,6 +20,7 @@ DOCUMENTATION = '''
           - List of connection information for the memcached DBs
         default: ['127.0.0.1:11211']
         type: list
+        elements: string
         env:
           - name: ANSIBLE_CACHE_PLUGIN_CONNECTION
         ini:
@@ -175,20 +176,11 @@ class CacheModule(BaseCacheModule):
     def __init__(self, *args, **kwargs):
         connection = ['127.0.0.1:11211']
 
-        try:
-            super(CacheModule, self).__init__(*args, **kwargs)
-            if self.get_option('_uri'):
-                connection = self.get_option('_uri')
-            self._timeout = self.get_option('_timeout')
-            self._prefix = self.get_option('_prefix')
-        except KeyError:
-            # TODO: remove once we no longer support Ansible 2.9
-            if not ansible_base_version.startswith('2.9.'):
-                raise AnsibleError("Do not import CacheModules directly. Use ansible.plugins.loader.cache_loader instead.")
-            if C.CACHE_PLUGIN_CONNECTION:
-                connection = C.CACHE_PLUGIN_CONNECTION.split(',')
-            self._timeout = C.CACHE_PLUGIN_TIMEOUT
-            self._prefix = C.CACHE_PLUGIN_PREFIX
+        super(CacheModule, self).__init__(*args, **kwargs)
+        if self.get_option('_uri'):
+            connection = self.get_option('_uri')
+        self._timeout = self.get_option('_timeout')
+        self._prefix = self.get_option('_prefix')
 
         if not HAS_MEMCACHE:
             raise AnsibleError("python-memcached is required for the memcached fact cache")

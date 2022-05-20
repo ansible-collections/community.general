@@ -57,14 +57,19 @@ EXAMPLES = """
 """
 
 RETURN = """
-  password:
-    description:
-      - The actual value stored
-  passprops:
-    description: properties assigned to the entry
-    type: dictionary
-  passwordchangeinprocess:
-    description: did the password change?
+_result:
+  description: A list containing one dictionary.
+  type: list
+  elements: dictionary
+  contains:
+    password:
+      description:
+        - The actual value stored
+    passprops:
+      description: properties assigned to the entry
+      type: dictionary
+    passwordchangeinprocess:
+      description: did the password change?
 """
 
 import os

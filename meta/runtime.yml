@@ -1,5 +1,5 @@
 ---
-requires_ansible: '>=2.9.10'
+requires_ansible: '>=2.11.0'
 plugin_routing:
   connection:
     docker:
@@ -18,10 +18,160 @@ plugin_routing:
     nios_next_network:
       redirect: infoblox.nios_modules.nios_next_network
   modules:
+    aerospike_migrations:
+      redirect: community.general.database.aerospike.aerospike_migrations
+    airbrake_deployment:
+      redirect: community.general.monitoring.airbrake_deployment
+    aix_devices:
+      redirect: community.general.system.aix_devices
+    aix_filesystem:
+      redirect: community.general.system.aix_filesystem
+    aix_inittab:
+      redirect: community.general.system.aix_inittab
+    aix_lvg:
+      redirect: community.general.system.aix_lvg
+    aix_lvol:
+      redirect: community.general.system.aix_lvol
+    alerta_customer:
+      redirect: community.general.monitoring.alerta_customer
+    ali_instance:
+      redirect: community.general.cloud.alicloud.ali_instance
     ali_instance_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.ali_instance_info instead.
+    ali_instance_info:
+      redirect: community.general.cloud.alicloud.ali_instance_info
+    alternatives:
+      redirect: community.general.system.alternatives
+    ansible_galaxy_install:
+      redirect: community.general.packaging.language.ansible_galaxy_install
+    apache2_mod_proxy:
+      redirect: community.general.web_infrastructure.apache2_mod_proxy
+    apache2_module:
+      redirect: community.general.web_infrastructure.apache2_module
+    apk:
+      redirect: community.general.packaging.os.apk
+    apt_repo:
+      redirect: community.general.packaging.os.apt_repo
+    apt_rpm:
+      redirect: community.general.packaging.os.apt_rpm
+    archive:
+      redirect: community.general.files.archive
+    atomic_container:
+      redirect: community.general.cloud.atomic.atomic_container
+    atomic_host:
+      redirect: community.general.cloud.atomic.atomic_host
+    atomic_image:
+      redirect: community.general.cloud.atomic.atomic_image
+    awall:
+      redirect: community.general.system.awall
+    beadm:
+      redirect: community.general.system.beadm
+    bearychat:
+      redirect: community.general.notification.bearychat
+    bigpanda:
+      redirect: community.general.monitoring.bigpanda
+    bitbucket_access_key:
+      redirect: community.general.source_control.bitbucket.bitbucket_access_key
+    bitbucket_pipeline_key_pair:
+      redirect: community.general.source_control.bitbucket.bitbucket_pipeline_key_pair
+    bitbucket_pipeline_known_host:
+      redirect: community.general.source_control.bitbucket.bitbucket_pipeline_known_host
+    bitbucket_pipeline_variable:
+      redirect: community.general.source_control.bitbucket.bitbucket_pipeline_variable
+    bower:
+      redirect: community.general.packaging.language.bower
+    bundler:
+      redirect: community.general.packaging.language.bundler
+    bzr:
+      redirect: community.general.source_control.bzr
+    campfire:
+      redirect: community.general.notification.campfire
+    capabilities:
+      redirect: community.general.system.capabilities
+    cargo:
+      redirect: community.general.packaging.language.cargo
+    catapult:
+      redirect: community.general.notification.catapult
+    circonus_annotation:
+      redirect: community.general.monitoring.circonus_annotation
+    cisco_spark:
+      redirect: community.general.notification.cisco_spark
+    cisco_webex:
+      redirect: community.general.notification.cisco_webex
+    clc_aa_policy:
+      redirect: community.general.cloud.centurylink.clc_aa_policy
+    clc_alert_policy:
+      redirect: community.general.cloud.centurylink.clc_alert_policy
+    clc_blueprint_package:
+      redirect: community.general.cloud.centurylink.clc_blueprint_package
+    clc_firewall_policy:
+      redirect: community.general.cloud.centurylink.clc_firewall_policy
+    clc_group:
+      redirect: community.general.cloud.centurylink.clc_group
+    clc_loadbalancer:
+      redirect: community.general.cloud.centurylink.clc_loadbalancer
+    clc_modify_server:
+      redirect: community.general.cloud.centurylink.clc_modify_server
+    clc_publicip:
+      redirect: community.general.cloud.centurylink.clc_publicip
+    clc_server:
+      redirect: community.general.cloud.centurylink.clc_server
+    clc_server_snapshot:
+      redirect: community.general.cloud.centurylink.clc_server_snapshot
+    cloud_init_data_facts:
+      redirect: community.general.cloud.misc.cloud_init_data_facts
+    cloudflare_dns:
+      redirect: community.general.net_tools.cloudflare_dns
+    cobbler_sync:
+      redirect: community.general.remote_management.cobbler.cobbler_sync
+    cobbler_system:
+      redirect: community.general.remote_management.cobbler.cobbler_system
+    composer:
+      redirect: community.general.packaging.language.composer
+    consul:
+      redirect: community.general.clustering.consul.consul
+    consul_acl:
+      redirect: community.general.clustering.consul.consul_acl
+    consul_kv:
+      redirect: community.general.clustering.consul.consul_kv
+    consul_session:
+      redirect: community.general.clustering.consul.consul_session
+    copr:
+      redirect: community.general.packaging.os.copr
+    cpanm:
+      redirect: community.general.packaging.language.cpanm
+    cronvar:
+      redirect: community.general.system.cronvar
+    crypttab:
+      redirect: community.general.system.crypttab
+    datadog_downtime:
+      redirect: community.general.monitoring.datadog.datadog_downtime
+    datadog_event:
+      redirect: community.general.monitoring.datadog.datadog_event
+    datadog_monitor:
+      redirect: community.general.monitoring.datadog.datadog_monitor
+    dconf:
+      redirect: community.general.system.dconf
+    deploy_helper:
+      redirect: community.general.web_infrastructure.deploy_helper
+    dimensiondata_network:
+      redirect: community.general.cloud.dimensiondata.dimensiondata_network
+    dimensiondata_vlan:
+      redirect: community.general.cloud.dimensiondata.dimensiondata_vlan
+    discord:
+      redirect: community.general.notification.discord
+    django_manage:
+      redirect: community.general.web_infrastructure.django_manage
+    dnf_versionlock:
+      redirect: community.general.packaging.os.dnf_versionlock
+    dnsimple:
+      redirect: community.general.net_tools.dnsimple
+    dnsimple_info:
+      redirect: community.general.net_tools.dnsimple_info
+    dnsmadeeasy:
+      redirect: community.general.net_tools.dnsmadeeasy
     docker_compose:
       redirect: community.docker.docker_compose
     docker_config:
@@ -76,10 +226,36 @@ plugin_routing:
       redirect: community.docker.docker_volume
     docker_volume_info:
       redirect: community.docker.docker_volume_info
+    dpkg_divert:
+      redirect: community.general.system.dpkg_divert
+    easy_install:
+      redirect: community.general.packaging.language.easy_install
+    ejabberd_user:
+      redirect: community.general.web_infrastructure.ejabberd_user
+    elasticsearch_plugin:
+      redirect: community.general.database.misc.elasticsearch_plugin
+    emc_vnx_sg_member:
+      redirect: community.general.storage.emc.emc_vnx_sg_member
+    etcd3:
+      redirect: community.general.clustering.etcd3
+    facter:
+      redirect: community.general.system.facter
+    filesize:
+      redirect: community.general.files.filesize
+    filesystem:
+      redirect: community.general.system.filesystem
+    flatpak:
+      redirect: community.general.packaging.os.flatpak
+    flatpak_remote:
+      redirect: community.general.packaging.os.flatpak_remote
+    flowdock:
+      redirect: community.general.notification.flowdock
     foreman:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use the modules from the theforeman.foreman collection instead.
+    gandi_livedns:
+      redirect: community.general.net_tools.gandi_livedns
     gc_storage:
       redirect: community.google.gc_storage
     gcdns_record:
@@ -114,6 +290,8 @@ plugin_routing:
       redirect: community.google.gce_snapshot
     gce_tag:
       redirect: community.google.gce_tag
+    gconftool2:
+      redirect: community.general.system.gconftool2
     gcp_backend_service:
       tombstone:
         removal_version: 2.0.0
@@ -149,11 +327,63 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: Use google.cloud.gcp_spanner_database and/or google.cloud.gcp_spanner_instance
           instead.
+    gem:
+      redirect: community.general.packaging.language.gem
+    git_config:
+      redirect: community.general.source_control.git_config
+    github_deploy_key:
+      redirect: community.general.source_control.github.github_deploy_key
     github_hooks:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use community.general.github_webhook and community.general.github_webhook_info
           instead.
+    github_issue:
+      redirect: community.general.source_control.github.github_issue
+    github_key:
+      redirect: community.general.source_control.github.github_key
+    github_release:
+      redirect: community.general.source_control.github.github_release
+    github_repo:
+      redirect: community.general.source_control.github.github_repo
+    github_webhook:
+      redirect: community.general.source_control.github.github_webhook
+    github_webhook_info:
+      redirect: community.general.source_control.github.github_webhook_info
+    gitlab_branch:
+      redirect: community.general.source_control.gitlab.gitlab_branch
+    gitlab_deploy_key:
+      redirect: community.general.source_control.gitlab.gitlab_deploy_key
+    gitlab_group:
+      redirect: community.general.source_control.gitlab.gitlab_group
+    gitlab_group_members:
+      redirect: community.general.source_control.gitlab.gitlab_group_members
+    gitlab_group_variable:
+      redirect: community.general.source_control.gitlab.gitlab_group_variable
+    gitlab_hook:
+      redirect: community.general.source_control.gitlab.gitlab_hook
+    gitlab_project:
+      redirect: community.general.source_control.gitlab.gitlab_project
+    gitlab_project_members:
+      redirect: community.general.source_control.gitlab.gitlab_project_members
+    gitlab_project_variable:
+      redirect: community.general.source_control.gitlab.gitlab_project_variable
+    gitlab_protected_branch:
+      redirect: community.general.source_control.gitlab.gitlab_protected_branch
+    gitlab_runner:
+      redirect: community.general.source_control.gitlab.gitlab_runner
+    gitlab_user:
+      redirect: community.general.source_control.gitlab.gitlab_user
+    grove:
+      redirect: community.general.notification.grove
+    gunicorn:
+      redirect: community.general.web_infrastructure.gunicorn
+    hana_query:
+      redirect: community.general.database.saphana.hana_query
+    haproxy:
+      redirect: community.general.net_tools.haproxy
+    heroku_collaborator:
+      redirect: community.general.cloud.heroku.heroku_collaborator
     hetzner_failover_ip:
       redirect: community.hrobot.failover_ip
     hetzner_failover_ip_info:
@@ -162,26 +392,222 @@ plugin_routing:
       redirect: community.hrobot.firewall
     hetzner_firewall_info:
       redirect: community.hrobot.firewall_info
+    hg:
+      redirect: community.general.source_control.hg
+    hipchat:
+      redirect: community.general.notification.hipchat
+    homebrew:
+      redirect: community.general.packaging.os.homebrew
+    homebrew_cask:
+      redirect: community.general.packaging.os.homebrew_cask
+    homebrew_tap:
+      redirect: community.general.packaging.os.homebrew_tap
+    homectl:
+      redirect: community.general.system.homectl
+    honeybadger_deployment:
+      redirect: community.general.monitoring.honeybadger_deployment
+    hpilo_boot:
+      redirect: community.general.remote_management.hpilo.hpilo_boot
     hpilo_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.hpilo_info instead.
+    hpilo_info:
+      redirect: community.general.remote_management.hpilo.hpilo_info
+    hponcfg:
+      redirect: community.general.remote_management.hpilo.hponcfg
+    htpasswd:
+      redirect: community.general.web_infrastructure.htpasswd
+    hwc_ecs_instance:
+      redirect: community.general.cloud.huawei.hwc_ecs_instance
+    hwc_evs_disk:
+      redirect: community.general.cloud.huawei.hwc_evs_disk
+    hwc_network_vpc:
+      redirect: community.general.cloud.huawei.hwc_network_vpc
+    hwc_smn_topic:
+      redirect: community.general.cloud.huawei.hwc_smn_topic
+    hwc_vpc_eip:
+      redirect: community.general.cloud.huawei.hwc_vpc_eip
+    hwc_vpc_peering_connect:
+      redirect: community.general.cloud.huawei.hwc_vpc_peering_connect
+    hwc_vpc_port:
+      redirect: community.general.cloud.huawei.hwc_vpc_port
+    hwc_vpc_private_ip:
+      redirect: community.general.cloud.huawei.hwc_vpc_private_ip
+    hwc_vpc_route:
+      redirect: community.general.cloud.huawei.hwc_vpc_route
+    hwc_vpc_security_group:
+      redirect: community.general.cloud.huawei.hwc_vpc_security_group
+    hwc_vpc_security_group_rule:
+      redirect: community.general.cloud.huawei.hwc_vpc_security_group_rule
+    hwc_vpc_subnet:
+      redirect: community.general.cloud.huawei.hwc_vpc_subnet
+    ibm_sa_domain:
+      redirect: community.general.storage.ibm.ibm_sa_domain
+    ibm_sa_host:
+      redirect: community.general.storage.ibm.ibm_sa_host
+    ibm_sa_host_ports:
+      redirect: community.general.storage.ibm.ibm_sa_host_ports
+    ibm_sa_pool:
+      redirect: community.general.storage.ibm.ibm_sa_pool
+    ibm_sa_vol:
+      redirect: community.general.storage.ibm.ibm_sa_vol
+    ibm_sa_vol_map:
+      redirect: community.general.storage.ibm.ibm_sa_vol_map
+    icinga2_feature:
+      redirect: community.general.monitoring.icinga2_feature
+    icinga2_host:
+      redirect: community.general.monitoring.icinga2_host
     idrac_firmware:
       redirect: dellemc.openmanage.idrac_firmware
+    idrac_redfish_command:
+      redirect: community.general.remote_management.redfish.idrac_redfish_command
+    idrac_redfish_config:
+      redirect: community.general.remote_management.redfish.idrac_redfish_config
     idrac_redfish_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.idrac_redfish_info instead.
+    idrac_redfish_info:
+      redirect: community.general.remote_management.redfish.idrac_redfish_info
     idrac_server_config_profile:
       redirect: dellemc.openmanage.idrac_server_config_profile
+    ilo_redfish_config:
+      redirect: community.general.remote_management.redfish.ilo_redfish_config
+    ilo_redfish_info:
+      redirect: community.general.remote_management.redfish.ilo_redfish_info
+    imc_rest:
+      redirect: community.general.remote_management.imc.imc_rest
+    imgadm:
+      redirect: community.general.cloud.smartos.imgadm
+    infinity:
+      redirect: community.general.net_tools.infinity.infinity
+    influxdb_database:
+      redirect: community.general.database.influxdb.influxdb_database
+    influxdb_query:
+      redirect: community.general.database.influxdb.influxdb_query
+    influxdb_retention_policy:
+      redirect: community.general.database.influxdb.influxdb_retention_policy
+    influxdb_user:
+      redirect: community.general.database.influxdb.influxdb_user
+    influxdb_write:
+      redirect: community.general.database.influxdb.influxdb_write
+    ini_file:
+      redirect: community.general.files.ini_file
+    installp:
+      redirect: community.general.packaging.os.installp
+    interfaces_file:
+      redirect: community.general.system.interfaces_file
+    ip_netns:
+      redirect: community.general.net_tools.ip_netns
+    ipa_config:
+      redirect: community.general.identity.ipa.ipa_config
+    ipa_dnsrecord:
+      redirect: community.general.identity.ipa.ipa_dnsrecord
+    ipa_dnszone:
+      redirect: community.general.identity.ipa.ipa_dnszone
+    ipa_group:
+      redirect: community.general.identity.ipa.ipa_group
+    ipa_hbacrule:
+      redirect: community.general.identity.ipa.ipa_hbacrule
+    ipa_host:
+      redirect: community.general.identity.ipa.ipa_host
+    ipa_hostgroup:
+      redirect: community.general.identity.ipa.ipa_hostgroup
+    ipa_otpconfig:
+      redirect: community.general.identity.ipa.ipa_otpconfig
+    ipa_otptoken:
+      redirect: community.general.identity.ipa.ipa_otptoken
+    ipa_pwpolicy:
+      redirect: community.general.identity.ipa.ipa_pwpolicy
+    ipa_role:
+      redirect: community.general.identity.ipa.ipa_role
+    ipa_service:
+      redirect: community.general.identity.ipa.ipa_service
+    ipa_subca:
+      redirect: community.general.identity.ipa.ipa_subca
+    ipa_sudocmd:
+      redirect: community.general.identity.ipa.ipa_sudocmd
+    ipa_sudocmdgroup:
+      redirect: community.general.identity.ipa.ipa_sudocmdgroup
+    ipa_sudorule:
+      redirect: community.general.identity.ipa.ipa_sudorule
+    ipa_user:
+      redirect: community.general.identity.ipa.ipa_user
+    ipa_vault:
+      redirect: community.general.identity.ipa.ipa_vault
+    ipify_facts:
+      redirect: community.general.net_tools.ipify_facts
+    ipinfoio_facts:
+      redirect: community.general.net_tools.ipinfoio_facts
+    ipmi_boot:
+      redirect: community.general.remote_management.ipmi.ipmi_boot
+    ipmi_power:
+      redirect: community.general.remote_management.ipmi.ipmi_power
+    iptables_state:
+      redirect: community.general.system.iptables_state
+    ipwcli_dns:
+      redirect: community.general.net_tools.ipwcli_dns
+    irc:
+      redirect: community.general.notification.irc
+    iso_create:
+      redirect: community.general.files.iso_create
+    iso_extract:
+      redirect: community.general.files.iso_extract
+    jabber:
+      redirect: community.general.notification.jabber
+    java_cert:
+      redirect: community.general.system.java_cert
+    java_keystore:
+      redirect: community.general.system.java_keystore
+    jboss:
+      redirect: community.general.web_infrastructure.jboss
+    jenkins_build:
+      redirect: community.general.web_infrastructure.jenkins_build
+    jenkins_job:
+      redirect: community.general.web_infrastructure.jenkins_job
     jenkins_job_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.jenkins_job_info instead.
+    jenkins_job_info:
+      redirect: community.general.web_infrastructure.jenkins_job_info
+    jenkins_plugin:
+      redirect: community.general.web_infrastructure.jenkins_plugin
+    jenkins_script:
+      redirect: community.general.web_infrastructure.jenkins_script
+    jira:
+      redirect: community.general.web_infrastructure.jira
     katello:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use the modules from the theforeman.foreman collection instead.
+    kernel_blacklist:
+      redirect: community.general.system.kernel_blacklist
+    keycloak_authentication:
+      redirect: community.general.identity.keycloak.keycloak_authentication
+    keycloak_client:
+      redirect: community.general.identity.keycloak.keycloak_client
+    keycloak_client_rolemapping:
+      redirect: community.general.identity.keycloak.keycloak_client_rolemapping
+    keycloak_clientscope:
+      redirect: community.general.identity.keycloak.keycloak_clientscope
+    keycloak_clienttemplate:
+      redirect: community.general.identity.keycloak.keycloak_clienttemplate
+    keycloak_group:
+      redirect: community.general.identity.keycloak.keycloak_group
+    keycloak_identity_provider:
+      redirect: community.general.identity.keycloak.keycloak_identity_provider
+    keycloak_realm:
+      redirect: community.general.identity.keycloak.keycloak_realm
+    keycloak_realm_info:
+      redirect: community.general.identity.keycloak.keycloak_realm_info
+    keycloak_role:
+      redirect: community.general.identity.keycloak.keycloak_role
+    keycloak_user_federation:
+      redirect: community.general.identity.keycloak.keycloak_user_federation
+    kibana_plugin:
+      redirect: community.general.database.misc.kibana_plugin
     kubevirt_cdi_upload:
       redirect: community.kubevirt.kubevirt_cdi_upload
     kubevirt_preset:
@@ -194,10 +620,40 @@ plugin_routing:
       redirect: community.kubevirt.kubevirt_template
     kubevirt_vm:
       redirect: community.kubevirt.kubevirt_vm
+    launchd:
+      redirect: community.general.system.launchd
+    layman:
+      redirect: community.general.packaging.os.layman
+    lbu:
+      redirect: community.general.system.lbu
     ldap_attr:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.ldap_attrs instead.
+    ldap_attrs:
+      redirect: community.general.net_tools.ldap.ldap_attrs
+    ldap_entry:
+      redirect: community.general.net_tools.ldap.ldap_entry
+    ldap_passwd:
+      redirect: community.general.net_tools.ldap.ldap_passwd
+    ldap_search:
+      redirect: community.general.net_tools.ldap.ldap_search
+    librato_annotation:
+      redirect: community.general.monitoring.librato_annotation
+    linode:
+      redirect: community.general.cloud.linode.linode
+    linode_v4:
+      redirect: community.general.cloud.linode.linode_v4
+    listen_ports_facts:
+      redirect: community.general.system.listen_ports_facts
+    lldp:
+      redirect: community.general.net_tools.lldp
+    locale_gen:
+      redirect: community.general.system.locale_gen
+    logentries:
+      redirect: community.general.monitoring.logentries
+    logentries_msg:
+      redirect: community.general.notification.logentries_msg
     logicmonitor:
       tombstone:
         removal_version: 1.0.0
@@ -208,14 +664,86 @@ plugin_routing:
         removal_version: 1.0.0
         warning_text: The logicmonitor_facts module is no longer maintained and the
           API used has been disabled in 2017.
+    logstash_plugin:
+      redirect: community.general.monitoring.logstash_plugin
+    lvg:
+      redirect: community.general.system.lvg
+    lvol:
+      redirect: community.general.system.lvol
+    lxc_container:
+      redirect: community.general.cloud.lxc.lxc_container
+    lxca_cmms:
+      redirect: community.general.remote_management.lxca.lxca_cmms
+    lxca_nodes:
+      redirect: community.general.remote_management.lxca.lxca_nodes
+    lxd_container:
+      redirect: community.general.cloud.lxd.lxd_container
+    lxd_profile:
+      redirect: community.general.cloud.lxd.lxd_profile
+    lxd_project:
+      redirect: community.general.cloud.lxd.lxd_project
+    macports:
+      redirect: community.general.packaging.os.macports
+    mail:
+      redirect: community.general.notification.mail
+    make:
+      redirect: community.general.system.make
+    manageiq_alert_profiles:
+      redirect: community.general.remote_management.manageiq.manageiq_alert_profiles
+    manageiq_alerts:
+      redirect: community.general.remote_management.manageiq.manageiq_alerts
+    manageiq_group:
+      redirect: community.general.remote_management.manageiq.manageiq_group
+    manageiq_policies:
+      redirect: community.general.remote_management.manageiq.manageiq_policies
+    manageiq_provider:
+      redirect: community.general.remote_management.manageiq.manageiq_provider
+    manageiq_tags:
+      redirect: community.general.remote_management.manageiq.manageiq_tags
+    manageiq_tenant:
+      redirect: community.general.remote_management.manageiq.manageiq_tenant
+    manageiq_user:
+      redirect: community.general.remote_management.manageiq.manageiq_user
+    mas:
+      redirect: community.general.packaging.os.mas
+    matrix:
+      redirect: community.general.notification.matrix
+    mattermost:
+      redirect: community.general.notification.mattermost
+    maven_artifact:
+      redirect: community.general.packaging.language.maven_artifact
+    memset_dns_reload:
+      redirect: community.general.cloud.memset.memset_dns_reload
     memset_memstore_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.memset_memstore_info instead.
+    memset_memstore_info:
+      redirect: community.general.cloud.memset.memset_memstore_info
     memset_server_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.memset_server_info instead.
+    memset_server_info:
+      redirect: community.general.cloud.memset.memset_server_info
+    memset_zone:
+      redirect: community.general.cloud.memset.memset_zone
+    memset_zone_domain:
+      redirect: community.general.cloud.memset.memset_zone_domain
+    memset_zone_record:
+      redirect: community.general.cloud.memset.memset_zone_record
+    mksysb:
+      redirect: community.general.system.mksysb
+    modprobe:
+      redirect: community.general.system.modprobe
+    monit:
+      redirect: community.general.monitoring.monit
+    mqtt:
+      redirect: community.general.notification.mqtt
+    mssql_db:
+      redirect: community.general.database.mssql.mssql_db
+    mssql_script:
+      redirect: community.general.database.mssql.mssql_script
     na_cdot_aggregate:
       tombstone:
         removal_version: 2.0.0
@@ -252,10 +780,22 @@ plugin_routing:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use netapp.ontap.na_ontap_info instead.
+    nagios:
+      redirect: community.general.monitoring.nagios
+    netcup_dns:
+      redirect: community.general.net_tools.netcup_dns
+    newrelic_deployment:
+      redirect: community.general.monitoring.newrelic_deployment
+    nexmo:
+      redirect: community.general.notification.nexmo
     nginx_status_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.nginx_status_info instead.
+    nginx_status_info:
+      redirect: community.general.web_infrastructure.nginx_status_info
+    nictagadm:
+      redirect: community.general.cloud.smartos.nictagadm
     nios_a_record:
       redirect: infoblox.nios_modules.nios_a_record
     nios_aaaa_record:
@@ -288,57 +828,157 @@ plugin_routing:
       redirect: infoblox.nios_modules.nios_txt_record
     nios_zone:
       redirect: infoblox.nios_modules.nios_zone
+    nmcli:
+      redirect: community.general.net_tools.nmcli
+    nomad_job:
+      redirect: community.general.clustering.nomad.nomad_job
+    nomad_job_info:
+      redirect: community.general.clustering.nomad.nomad_job_info
+    nosh:
+      redirect: community.general.system.nosh
+    notification.cisco_spark:
+      redirect: community.general.notification.cisco_webex
+    npm:
+      redirect: community.general.packaging.language.npm
+    nsupdate:
+      redirect: community.general.net_tools.nsupdate
+    oci_vcn:
+      redirect: community.general.cloud.oracle.oci_vcn
+    odbc:
+      redirect: community.general.database.misc.odbc
+    office_365_connector_card:
+      redirect: community.general.notification.office_365_connector_card
+    ohai:
+      redirect: community.general.system.ohai
+    omapi_host:
+      redirect: community.general.net_tools.omapi_host
     ome_device_info:
       redirect: dellemc.openmanage.ome_device_info
+    one_host:
+      redirect: community.general.cloud.opennebula.one_host
+    one_image:
+      redirect: community.general.cloud.opennebula.one_image
     one_image_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.one_image_info instead.
+    one_image_info:
+      redirect: community.general.cloud.opennebula.one_image_info
+    one_service:
+      redirect: community.general.cloud.opennebula.one_service
+    one_template:
+      redirect: community.general.cloud.opennebula.one_template
+    one_vm:
+      redirect: community.general.cloud.opennebula.one_vm
+    oneandone_firewall_policy:
+      redirect: community.general.cloud.oneandone.oneandone_firewall_policy
+    oneandone_load_balancer:
+      redirect: community.general.cloud.oneandone.oneandone_load_balancer
+    oneandone_monitoring_policy:
+      redirect: community.general.cloud.oneandone.oneandone_monitoring_policy
+    oneandone_private_network:
+      redirect: community.general.cloud.oneandone.oneandone_private_network
+    oneandone_public_ip:
+      redirect: community.general.cloud.oneandone.oneandone_public_ip
+    oneandone_server:
+      redirect: community.general.cloud.oneandone.oneandone_server
     onepassword_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.onepassword_info instead.
+    onepassword_info:
+      redirect: community.general.identity.onepassword_info
     oneview_datacenter_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_datacenter_info instead.
+    oneview_datacenter_info:
+      redirect: community.general.remote_management.oneview.oneview_datacenter_info
     oneview_enclosure_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_enclosure_info instead.
+    oneview_enclosure_info:
+      redirect: community.general.remote_management.oneview.oneview_enclosure_info
+    oneview_ethernet_network:
+      redirect: community.general.remote_management.oneview.oneview_ethernet_network
     oneview_ethernet_network_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_ethernet_network_info instead.
+    oneview_ethernet_network_info:
+      redirect: community.general.remote_management.oneview.oneview_ethernet_network_info
+    oneview_fc_network:
+      redirect: community.general.remote_management.oneview.oneview_fc_network
     oneview_fc_network_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_fc_network_info instead.
+    oneview_fc_network_info:
+      redirect: community.general.remote_management.oneview.oneview_fc_network_info
+    oneview_fcoe_network:
+      redirect: community.general.remote_management.oneview.oneview_fcoe_network
     oneview_fcoe_network_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_fcoe_network_info instead.
+    oneview_fcoe_network_info:
+      redirect: community.general.remote_management.oneview.oneview_fcoe_network_info
+    oneview_logical_interconnect_group:
+      redirect: community.general.remote_management.oneview.oneview_logical_interconnect_group
     oneview_logical_interconnect_group_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_logical_interconnect_group_info
           instead.
+    oneview_logical_interconnect_group_info:
+      redirect: community.general.remote_management.oneview.oneview_logical_interconnect_group_info
+    oneview_network_set:
+      redirect: community.general.remote_management.oneview.oneview_network_set
     oneview_network_set_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_network_set_info instead.
+    oneview_network_set_info:
+      redirect: community.general.remote_management.oneview.oneview_network_set_info
+    oneview_san_manager:
+      redirect: community.general.remote_management.oneview.oneview_san_manager
     oneview_san_manager_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_san_manager_info instead.
+    oneview_san_manager_info:
+      redirect: community.general.remote_management.oneview.oneview_san_manager_info
     online_server_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.online_server_info instead.
+    online_server_info:
+      redirect: community.general.cloud.online.online_server_info
     online_user_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.online_user_info instead.
+    online_user_info:
+      redirect: community.general.cloud.online.online_user_info
+    open_iscsi:
+      redirect: community.general.system.open_iscsi
+    openbsd_pkg:
+      redirect: community.general.packaging.os.openbsd_pkg
+    opendj_backendprop:
+      redirect: community.general.identity.opendj.opendj_backendprop
+    openwrt_init:
+      redirect: community.general.system.openwrt_init
+    opkg:
+      redirect: community.general.packaging.os.opkg
+    osx_defaults:
+      redirect: community.general.system.osx_defaults
+    ovh_ip_failover:
+      redirect: community.general.cloud.ovh.ovh_ip_failover
+    ovh_ip_loadbalancing_backend:
+      redirect: community.general.cloud.ovh.ovh_ip_loadbalancing_backend
+    ovh_monthly_billing:
+      redirect: community.general.cloud.ovh.ovh_monthly_billing
     ovirt:
       tombstone:
         removal_version: 3.0.0
@@ -439,6 +1079,64 @@ plugin_routing:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_vmpool_info instead.
+    pacemaker_cluster:
+      redirect: community.general.clustering.pacemaker_cluster
+    packet_device:
+      redirect: community.general.cloud.packet.packet_device
+    packet_ip_subnet:
+      redirect: community.general.cloud.packet.packet_ip_subnet
+    packet_project:
+      redirect: community.general.cloud.packet.packet_project
+    packet_sshkey:
+      redirect: community.general.cloud.packet.packet_sshkey
+    packet_volume:
+      redirect: community.general.cloud.packet.packet_volume
+    packet_volume_attachment:
+      redirect: community.general.cloud.packet.packet_volume_attachment
+    pacman:
+      redirect: community.general.packaging.os.pacman
+    pacman_key:
+      redirect: community.general.packaging.os.pacman_key
+    pagerduty:
+      redirect: community.general.monitoring.pagerduty
+    pagerduty_alert:
+      redirect: community.general.monitoring.pagerduty_alert
+    pagerduty_change:
+      redirect: community.general.monitoring.pagerduty_change
+    pagerduty_user:
+      redirect: community.general.monitoring.pagerduty_user
+    pam_limits:
+      redirect: community.general.system.pam_limits
+    pamd:
+      redirect: community.general.system.pamd
+    parted:
+      redirect: community.general.system.parted
+    pear:
+      redirect: community.general.packaging.language.pear
+    pids:
+      redirect: community.general.system.pids
+    pingdom:
+      redirect: community.general.monitoring.pingdom
+    pip_package_info:
+      redirect: community.general.packaging.language.pip_package_info
+    pipx:
+      redirect: community.general.packaging.language.pipx
+    pkg5:
+      redirect: community.general.packaging.os.pkg5
+    pkg5_publisher:
+      redirect: community.general.packaging.os.pkg5_publisher
+    pkgin:
+      redirect: community.general.packaging.os.pkgin
+    pkgng:
+      redirect: community.general.packaging.os.pkgng
+    pkgutil:
+      redirect: community.general.packaging.os.pkgutil
+    pmem:
+      redirect: community.general.storage.pmem.pmem
+    portage:
+      redirect: community.general.packaging.os.portage
+    portinstall:
+      redirect: community.general.packaging.os.portinstall
     postgresql_copy:
       redirect: community.postgresql.postgresql_copy
     postgresql_db:
@@ -483,6 +1181,50 @@ plugin_routing:
       redirect: community.postgresql.postgresql_user
     postgresql_user_obj_stat_info:
       redirect: community.postgresql.postgresql_user_obj_stat_info
+    pritunl_org:
+      redirect: community.general.net_tools.pritunl.pritunl_org
+    pritunl_org_info:
+      redirect: community.general.net_tools.pritunl.pritunl_org_info
+    pritunl_user:
+      redirect: community.general.net_tools.pritunl.pritunl_user
+    pritunl_user_info:
+      redirect: community.general.net_tools.pritunl.pritunl_user_info
+    profitbricks:
+      redirect: community.general.cloud.profitbricks.profitbricks
+    profitbricks_datacenter:
+      redirect: community.general.cloud.profitbricks.profitbricks_datacenter
+    profitbricks_nic:
+      redirect: community.general.cloud.profitbricks.profitbricks_nic
+    profitbricks_volume:
+      redirect: community.general.cloud.profitbricks.profitbricks_volume
+    profitbricks_volume_attachments:
+      redirect: community.general.cloud.profitbricks.profitbricks_volume_attachments
+    proxmox:
+      redirect: community.general.cloud.misc.proxmox
+    proxmox_domain_info:
+      redirect: community.general.cloud.misc.proxmox_domain_info
+    proxmox_group_info:
+      redirect: community.general.cloud.misc.proxmox_group_info
+    proxmox_kvm:
+      redirect: community.general.cloud.misc.proxmox_kvm
+    proxmox_nic:
+      redirect: community.general.cloud.misc.proxmox_nic
+    proxmox_snap:
+      redirect: community.general.cloud.misc.proxmox_snap
+    proxmox_storage_info:
+      redirect: community.general.cloud.misc.proxmox_storage_info
+    proxmox_tasks_info:
+      redirect: community.general.cloud.misc.proxmox_tasks_info
+    proxmox_template:
+      redirect: community.general.cloud.misc.proxmox_template
+    proxmox_user_info:
+      redirect: community.general.cloud.misc.proxmox_user_info
+    pubnub_blocks:
+      redirect: community.general.cloud.pubnub.pubnub_blocks
+    pulp_repo:
+      redirect: community.general.packaging.os.pulp_repo
+    puppet:
+      redirect: community.general.system.puppet
     purefa_facts:
       tombstone:
         removal_version: 3.0.0
@@ -491,42 +1233,210 @@ plugin_routing:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use purestorage.flashblade.purefb_info instead.
+    pushbullet:
+      redirect: community.general.notification.pushbullet
+    pushover:
+      redirect: community.general.notification.pushover
     python_requirements_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.python_requirements_info instead.
+    python_requirements_info:
+      redirect: community.general.system.python_requirements_info
+    rax:
+      redirect: community.general.cloud.rackspace.rax
+    rax_cbs:
+      redirect: community.general.cloud.rackspace.rax_cbs
+    rax_cbs_attachments:
+      redirect: community.general.cloud.rackspace.rax_cbs_attachments
+    rax_cdb:
+      redirect: community.general.cloud.rackspace.rax_cdb
+    rax_cdb_database:
+      redirect: community.general.cloud.rackspace.rax_cdb_database
+    rax_cdb_user:
+      redirect: community.general.cloud.rackspace.rax_cdb_user
+    rax_clb:
+      redirect: community.general.cloud.rackspace.rax_clb
+    rax_clb_nodes:
+      redirect: community.general.cloud.rackspace.rax_clb_nodes
+    rax_clb_ssl:
+      redirect: community.general.cloud.rackspace.rax_clb_ssl
+    rax_dns:
+      redirect: community.general.cloud.rackspace.rax_dns
+    rax_dns_record:
+      redirect: community.general.cloud.rackspace.rax_dns_record
+    rax_facts:
+      redirect: community.general.cloud.rackspace.rax_facts
+    rax_files:
+      redirect: community.general.cloud.rackspace.rax_files
+    rax_files_objects:
+      redirect: community.general.cloud.rackspace.rax_files_objects
+    rax_identity:
+      redirect: community.general.cloud.rackspace.rax_identity
+    rax_keypair:
+      redirect: community.general.cloud.rackspace.rax_keypair
+    rax_meta:
+      redirect: community.general.cloud.rackspace.rax_meta
+    rax_mon_alarm:
+      redirect: community.general.cloud.rackspace.rax_mon_alarm
+    rax_mon_check:
+      redirect: community.general.cloud.rackspace.rax_mon_check
+    rax_mon_entity:
+      redirect: community.general.cloud.rackspace.rax_mon_entity
+    rax_mon_notification:
+      redirect: community.general.cloud.rackspace.rax_mon_notification
+    rax_mon_notification_plan:
+      redirect: community.general.cloud.rackspace.rax_mon_notification_plan
+    rax_network:
+      redirect: community.general.cloud.rackspace.rax_network
+    rax_queue:
+      redirect: community.general.cloud.rackspace.rax_queue
+    rax_scaling_group:
+      redirect: community.general.cloud.rackspace.rax_scaling_group
+    rax_scaling_policy:
+      redirect: community.general.cloud.rackspace.rax_scaling_policy
+    read_csv:
+      redirect: community.general.files.read_csv
+    redfish_command:
+      redirect: community.general.remote_management.redfish.redfish_command
+    redfish_config:
+      redirect: community.general.remote_management.redfish.redfish_config
     redfish_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.redfish_info instead.
+    redfish_info:
+      redirect: community.general.remote_management.redfish.redfish_info
+    redhat_subscription:
+      redirect: community.general.packaging.os.redhat_subscription
+    redis:
+      redirect: community.general.database.misc.redis
+    redis_data:
+      redirect: community.general.database.misc.redis_data
+    redis_data_incr:
+      redirect: community.general.database.misc.redis_data_incr
+    redis_data_info:
+      redirect: community.general.database.misc.redis_data_info
+    redis_info:
+      redirect: community.general.database.misc.redis_info
+    rhevm:
+      redirect: community.general.cloud.misc.rhevm
+    rhn_channel:
+      redirect: community.general.packaging.os.rhn_channel
+    rhn_register:
+      redirect: community.general.packaging.os.rhn_register
+    rhsm_release:
+      redirect: community.general.packaging.os.rhsm_release
+    rhsm_repository:
+      redirect: community.general.packaging.os.rhsm_repository
+    riak:
+      redirect: community.general.database.misc.riak
+    rocketchat:
+      redirect: community.general.notification.rocketchat
+    rollbar_deployment:
+      redirect: community.general.monitoring.rollbar_deployment
+    rpm_ostree_pkg:
+      redirect: community.general.packaging.os.rpm_ostree_pkg
+    rundeck_acl_policy:
+      redirect: community.general.web_infrastructure.rundeck_acl_policy
+    rundeck_job_executions_info:
+      redirect: community.general.web_infrastructure.rundeck_job_executions_info
+    rundeck_job_run:
+      redirect: community.general.web_infrastructure.rundeck_job_run
+    rundeck_project:
+      redirect: community.general.web_infrastructure.rundeck_project
+    runit:
+      redirect: community.general.system.runit
+    sap_task_list_execute:
+      redirect: community.general.system.sap_task_list_execute
+    sapcar_extract:
+      redirect: community.general.files.sapcar_extract
+    say:
+      redirect: community.general.notification.say
+    scaleway_compute:
+      redirect: community.general.cloud.scaleway.scaleway_compute
+    scaleway_database_backup:
+      redirect: community.general.cloud.scaleway.scaleway_database_backup
     scaleway_image_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_image_info instead.
+    scaleway_image_info:
+      redirect: community.general.cloud.scaleway.scaleway_image_info
+    scaleway_ip:
+      redirect: community.general.cloud.scaleway.scaleway_ip
     scaleway_ip_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_ip_info instead.
+    scaleway_ip_info:
+      redirect: community.general.cloud.scaleway.scaleway_ip_info
+    scaleway_lb:
+      redirect: community.general.cloud.scaleway.scaleway_lb
     scaleway_organization_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_organization_info instead.
+    scaleway_organization_info:
+      redirect: community.general.cloud.scaleway.scaleway_organization_info
+    scaleway_private_network:
+      redirect: community.general.cloud.scaleway.scaleway_private_network
+    scaleway_security_group:
+      redirect: community.general.cloud.scaleway.scaleway_security_group
     scaleway_security_group_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_security_group_info instead.
+    scaleway_security_group_info:
+      redirect: community.general.cloud.scaleway.scaleway_security_group_info
+    scaleway_security_group_rule:
+      redirect: community.general.cloud.scaleway.scaleway_security_group_rule
     scaleway_server_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_server_info instead.
+    scaleway_server_info:
+      redirect: community.general.cloud.scaleway.scaleway_server_info
     scaleway_snapshot_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_snapshot_info instead.
+    scaleway_snapshot_info:
+      redirect: community.general.cloud.scaleway.scaleway_snapshot_info
+    scaleway_sshkey:
+      redirect: community.general.cloud.scaleway.scaleway_sshkey
+    scaleway_user_data:
+      redirect: community.general.cloud.scaleway.scaleway_user_data
+    scaleway_volume:
+      redirect: community.general.cloud.scaleway.scaleway_volume
     scaleway_volume_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_volume_info instead.
+    scaleway_volume_info:
+      redirect: community.general.cloud.scaleway.scaleway_volume_info
+    sefcontext:
+      redirect: community.general.system.sefcontext
+    selinux_permissive:
+      redirect: community.general.system.selinux_permissive
+    selogin:
+      redirect: community.general.system.selogin
+    sendgrid:
+      redirect: community.general.notification.sendgrid
+    sensu_check:
+      redirect: community.general.monitoring.sensu.sensu_check
+    sensu_client:
+      redirect: community.general.monitoring.sensu.sensu_client
+    sensu_handler:
+      redirect: community.general.monitoring.sensu.sensu_handler
+    sensu_silence:
+      redirect: community.general.monitoring.sensu.sensu_silence
+    sensu_subscription:
+      redirect: community.general.monitoring.sensu.sensu_subscription
+    seport:
+      redirect: community.general.system.seport
+    serverless:
+      redirect: community.general.cloud.misc.serverless
     sf_account_manager:
       tombstone:
         removal_version: 2.0.0
@@ -547,18 +1457,200 @@ plugin_routing:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use netapp.elementsw.na_elementsw_volume instead.
+    shutdown:
+      redirect: community.general.system.shutdown
+    sl_vm:
+      redirect: community.general.cloud.softlayer.sl_vm
+    slack:
+      redirect: community.general.notification.slack
+    slackpkg:
+      redirect: community.general.packaging.os.slackpkg
     smartos_image_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.smartos_image_info instead.
+    smartos_image_info:
+      redirect: community.general.cloud.smartos.smartos_image_info
+    snap:
+      redirect: community.general.packaging.os.snap
+    snap_alias:
+      redirect: community.general.packaging.os.snap_alias
+    snmp_facts:
+      redirect: community.general.net_tools.snmp_facts
+    solaris_zone:
+      redirect: community.general.system.solaris_zone
+    sorcery:
+      redirect: community.general.packaging.os.sorcery
+    spectrum_device:
+      redirect: community.general.monitoring.spectrum_device
+    spectrum_model_attrs:
+      redirect: community.general.monitoring.spectrum_model_attrs
+    spotinst_aws_elastigroup:
+      redirect: community.general.cloud.spotinst.spotinst_aws_elastigroup
+    ss_3par_cpg:
+      redirect: community.general.storage.hpe3par.ss_3par_cpg
+    ssh_config:
+      redirect: community.general.system.ssh_config
+    stackdriver:
+      redirect: community.general.monitoring.stackdriver
+    stacki_host:
+      redirect: community.general.remote_management.stacki.stacki_host
+    statsd:
+      redirect: community.general.monitoring.statsd
+    statusio_maintenance:
+      redirect: community.general.monitoring.statusio_maintenance
+    sudoers:
+      redirect: community.general.system.sudoers
+    supervisorctl:
+      redirect: community.general.web_infrastructure.supervisorctl
+    svc:
+      redirect: community.general.system.svc
+    svr4pkg:
+      redirect: community.general.packaging.os.svr4pkg
+    swdepot:
+      redirect: community.general.packaging.os.swdepot
+    swupd:
+      redirect: community.general.packaging.os.swupd
+    syslogger:
+      redirect: community.general.notification.syslogger
+    syspatch:
+      redirect: community.general.system.syspatch
+    sysrc:
+      redirect: community.general.system.sysrc
+    sysupgrade:
+      redirect: community.general.system.sysupgrade
+    taiga_issue:
+      redirect: community.general.web_infrastructure.taiga_issue
+    telegram:
+      redirect: community.general.notification.telegram
+    terraform:
+      redirect: community.general.cloud.misc.terraform
+    timezone:
+      redirect: community.general.system.timezone
+    twilio:
+      redirect: community.general.notification.twilio
+    typetalk:
+      redirect: community.general.notification.typetalk
+    udm_dns_record:
+      redirect: community.general.cloud.univention.udm_dns_record
+    udm_dns_zone:
+      redirect: community.general.cloud.univention.udm_dns_zone
+    udm_group:
+      redirect: community.general.cloud.univention.udm_group
+    udm_share:
+      redirect: community.general.cloud.univention.udm_share
+    udm_user:
+      redirect: community.general.cloud.univention.udm_user
+    ufw:
+      redirect: community.general.system.ufw
+    uptimerobot:
+      redirect: community.general.monitoring.uptimerobot
+    urpmi:
+      redirect: community.general.packaging.os.urpmi
+    utm_aaa_group:
+      redirect: community.general.web_infrastructure.sophos_utm.utm_aaa_group
+    utm_aaa_group_info:
+      redirect: community.general.web_infrastructure.sophos_utm.utm_aaa_group_info
+    utm_ca_host_key_cert:
+      redirect: community.general.web_infrastructure.sophos_utm.utm_ca_host_key_cert
+    utm_ca_host_key_cert_info:
+      redirect: community.general.web_infrastructure.sophos_utm.utm_ca_host_key_cert_info
+    utm_dns_host:
+      redirect: community.general.web_infrastructure.sophos_utm.utm_dns_host
+    utm_network_interface_address:
+      redirect: community.general.web_infrastructure.sophos_utm.utm_network_interface_address
+    utm_network_interface_address_info:
+      redirect: community.general.web_infrastructure.sophos_utm.utm_network_interface_address_info
+    utm_proxy_auth_profile:
+      redirect: community.general.web_infrastructure.sophos_utm.utm_proxy_auth_profile
+    utm_proxy_exception:
+      redirect: community.general.web_infrastructure.sophos_utm.utm_proxy_exception
+    utm_proxy_frontend:
+      redirect: community.general.web_infrastructure.sophos_utm.utm_proxy_frontend
+    utm_proxy_frontend_info:
+      redirect: community.general.web_infrastructure.sophos_utm.utm_proxy_frontend_info
+    utm_proxy_location:
+      redirect: community.general.web_infrastructure.sophos_utm.utm_proxy_location
+    utm_proxy_location_info:
+      redirect: community.general.web_infrastructure.sophos_utm.utm_proxy_location_info
+    vdo:
+      redirect: community.general.system.vdo
+    vertica_configuration:
+      redirect: community.general.database.vertica.vertica_configuration
     vertica_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.vertica_info instead.
+    vertica_info:
+      redirect: community.general.database.vertica.vertica_info
+    vertica_role:
+      redirect: community.general.database.vertica.vertica_role
+    vertica_schema:
+      redirect: community.general.database.vertica.vertica_schema
+    vertica_user:
+      redirect: community.general.database.vertica.vertica_user
+    vexata_eg:
+      redirect: community.general.storage.vexata.vexata_eg
+    vexata_volume:
+      redirect: community.general.storage.vexata.vexata_volume
+    vmadm:
+      redirect: community.general.cloud.smartos.vmadm
+    wakeonlan:
+      redirect: community.general.remote_management.wakeonlan
+    webfaction_app:
+      redirect: community.general.cloud.webfaction.webfaction_app
+    webfaction_db:
+      redirect: community.general.cloud.webfaction.webfaction_db
+    webfaction_domain:
+      redirect: community.general.cloud.webfaction.webfaction_domain
+    webfaction_mailbox:
+      redirect: community.general.cloud.webfaction.webfaction_mailbox
+    webfaction_site:
+      redirect: community.general.cloud.webfaction.webfaction_site
+    xattr:
+      redirect: community.general.files.xattr
+    xbps:
+      redirect: community.general.packaging.os.xbps
+    xcc_redfish_command:
+      redirect: community.general.remote_management.lenovoxcc.xcc_redfish_command
+    xenserver_facts:
+      redirect: community.general.cloud.misc.xenserver_facts
+    xenserver_guest:
+      redirect: community.general.cloud.xenserver.xenserver_guest
     xenserver_guest_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.xenserver_guest_info instead.
+    xenserver_guest_info:
+      redirect: community.general.cloud.xenserver.xenserver_guest_info
+    xenserver_guest_powerstate:
+      redirect: community.general.cloud.xenserver.xenserver_guest_powerstate
+    xfconf:
+      redirect: community.general.system.xfconf
+    xfconf_info:
+      redirect: community.general.system.xfconf_info
+    xfs_quota:
+      redirect: community.general.system.xfs_quota
+    xml:
+      redirect: community.general.files.xml
+    yarn:
+      redirect: community.general.packaging.language.yarn
+    yum_versionlock:
+      redirect: community.general.packaging.os.yum_versionlock
+    zfs:
+      redirect: community.general.storage.zfs.zfs
+    zfs_delegate_admin:
+      redirect: community.general.storage.zfs.zfs_delegate_admin
+    zfs_facts:
+      redirect: community.general.storage.zfs.zfs_facts
+    znode:
+      redirect: community.general.clustering.znode
+    zpool_facts:
+      redirect: community.general.storage.zfs.zpool_facts
+    zypper:
+      redirect: community.general.packaging.os.zypper
+    zypper_repository:
+      redirect: community.general.packaging.os.zypper_repository
   doc_fragments:
     _gcp:
       redirect: community.google._gcp
@@ -608,6 +1700,8 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: Use the 'default' callback plugin with 'display_skipped_hosts
           = no' option.
+    osx_say:
+      redirect: community.general.say
     stderr:
       tombstone:
         removal_version: 2.0.0
@@ -624,6 +1718,14 @@ plugin_routing:
     path_join:
       # The ansible.builtin.path_join filter has been added in ansible-base 2.10.
       # Since plugin routing is only available since ansible-base 2.10, this
-      # redirect will be used for ansible-base 2.10 or later, and the included
-      # path_join filter will be used for Ansible 2.9 or earlier.
+      # redirect will be used for ansible-base 2.10 or later. This was mostly
+      # relevant before community.general 5.0.0, when community.general also
+      # supported Ansible 2.9. Back then, the included path_join filter was used
+      # for Ansible 2.9 or earlier. Now we only will have the redirect until we
+      # eventually will deprecate and then remove it.
       redirect: ansible.builtin.path_join
+  action:
+    iptables_state:
+      redirect: community.general.system.iptables_state
+    shutdown:
+      redirect: community.general.system.shutdown

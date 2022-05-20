@@ -1,1 +1,0 @@
-./cloud/huawei/hwc_smn_topic.py

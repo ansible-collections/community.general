@@ -83,7 +83,7 @@ options:
       - Whether or not the file to create should be a sparse file.
       - This option is effective only on newly created files, or when growing a
         file, only for the bytes to append.
-      - This option is not supported on OpenBSD, Solaris and AIX.
+      - This option is not supported on OSes or filesystems not supporting sparse files.
       - I(force=true) and I(sparse=true) are mutually exclusive.
     type: bool
     default: false
@@ -129,6 +129,10 @@ seealso:
   - name: dd(1) manpage for NetBSD
     description: Manual page of the NetBSD's dd implementation.
     link: https://man.netbsd.org/dd.1
+
+  - name: busybox(1) manpage for Linux
+    description: Manual page of the GNU/Linux's busybox, that provides its own dd implementation.
+    link: https://www.unix.com/man-page/linux/1/busybox
 '''
 
 EXAMPLES = r'''
@@ -377,12 +381,10 @@ def complete_dd_cmdline(args, dd_cmd):
         return list()
 
     bs = args['size_spec']['blocksize']
-    conv = list()
 
     # For sparse files (create, truncate, grow): write count=0 block.
     if args['sparse']:
         seek = args['size_spec']['blocks']
-        conv += ['sparse']
     elif args['force'] or not os.path.exists(args['path']):     # Create file
         seek = 0
     elif args['size_diff'] < 0:                                 # Truncate file
@@ -394,8 +396,6 @@ def complete_dd_cmdline(args, dd_cmd):
 
     count = args['size_spec']['blocks'] - seek
     dd_cmd += ['bs=%s' % str(bs), 'seek=%s' % str(seek), 'count=%s' % str(count)]
-    if conv:
-        dd_cmd += ['conv=%s' % ','.join(conv)]
 
     return dd_cmd
 

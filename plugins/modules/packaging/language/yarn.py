@@ -147,7 +147,7 @@ invocation:
             }
         }
 out:
-    description: Output generated from Yarn with emojis removed.
+    description: Output generated from Yarn.
     returned: always
     type: str
     sample: "yarn add v0.16.1[1/4] Resolving packages...[2/4] Fetching packages...[3/4] Linking dependencies...[4/4]
@@ -204,9 +204,6 @@ class Yarn(object):
             if self.registry:
                 cmd.append('--registry')
                 cmd.append(self.registry)
-
-            # always run Yarn without emojis when called via Ansible
-            cmd.append('--no-emoji')
 
             # If path is specified, cd into that path and run the command.
             cwd = None

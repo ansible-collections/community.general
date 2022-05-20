@@ -15,6 +15,7 @@
   when:
   - not (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int == 14)
   - not (ansible_os_family == "Suse" and ansible_distribution_major_version|int != 42 and ansible_python.version.major != 3)
+  - not (ansible_distribution == "CentOS" and ansible_distribution_major_version|int == 8)  # TODO: cannot start service
   - not (ansible_distribution == 'Archlinux')  # TODO: package seems to be broken, cannot be downloaded from mirrors?
   - not (ansible_distribution == 'Alpine')  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
   block:

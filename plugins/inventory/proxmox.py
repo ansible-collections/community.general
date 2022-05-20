@@ -3,6 +3,7 @@
 # Copyright (c) 2018 Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import (absolute_import, division, print_function)
+
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -31,6 +32,7 @@ DOCUMENTATION = '''
         description:
           - URL to Proxmox cluster.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_URL) will be used instead.
+          - Since community.general 4.7.0 you can also use templating to specify the value of the I(url).
         default: 'http://localhost:8006'
         type: str
         env:
@@ -40,6 +42,7 @@ DOCUMENTATION = '''
         description:
           - Proxmox authentication user.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_USER) will be used instead.
+          - Since community.general 4.7.0 you can also use templating to specify the value of the I(user).
         required: yes
         type: str
         env:
@@ -49,11 +52,33 @@ DOCUMENTATION = '''
         description:
           - Proxmox authentication password.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_PASSWORD) will be used instead.
-        required: yes
+          - Since community.general 4.7.0 you can also use templating to specify the value of the I(password).
+          - If you do not specify a password, you must set I(token_id) and I(token_secret) instead.
         type: str
         env:
           - name: PROXMOX_PASSWORD
             version_added: 2.0.0
+      token_id:
+        description:
+          - Proxmox authentication token ID.
+          - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_TOKEN_ID) will be used instead.
+          - To use token authentication, you must also specify I(token_secret). If you do not specify I(token_id) and I(token_secret),
+            you must set a password instead.
+          - Make sure to grant explicit pve permissions to the token or disable 'privilege separation' to use the users' privileges instead.
+        version_added: 4.8.0
+        type: str
+        env:
+          - name: PROXMOX_TOKEN_ID
+      token_secret:
+        description:
+          - Proxmox authentication token secret.
+          - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_TOKEN_SECRET) will be used instead.
+          - To use token authentication, you must also specify I(token_id). If you do not specify I(token_id) and I(token_secret),
+            you must set a password instead.
+        version_added: 4.8.0
+        type: str
+        env:
+          - name: PROXMOX_TOKEN_SECRET
       validate_certs:
         description: Verify SSL certificate if using HTTPS.
         type: boolean
@@ -75,8 +100,16 @@ DOCUMENTATION = '''
         description:
           - Whether to set C(ansbile_host) for proxmox nodes.
           - When set to C(true) (default), will use the first available interface. This can be different from what you expect.
-        default: true
+          - This currently defaults to C(true), but the default is deprecated since community.general 4.8.0.
+            The default will change to C(false) in community.general 6.0.0. To avoid a deprecation warning, please
+            set this parameter explicitly.
         type: bool
+      filters:
+        version_added: 4.6.0
+        description: A list of Jinja templates that allow filtering hosts.
+        type: list
+        elements: str
+        default: []
       strict:
         version_added: 2.5.0
       compose:
@@ -94,6 +127,25 @@ EXAMPLES = '''
 plugin: community.general.proxmox
 user: ansible@pve
 password: secure
+# Note that this can easily give you wrong values as ansible_host. See further below for
+# an example where this is set to `false` and where ansible_host is set with `compose`.
+want_proxmox_nodes_ansible_host: true
+
+# Instead of login with password, proxmox supports api token authentication since release 6.2.
+plugin: community.general.proxmox
+user: ci@pve
+token_id: gitlab-1
+token_secret: fa256e9c-26ab-41ec-82da-707a2c079829
+
+# The secret can also be a vault string or passed via the environment variable TOKEN_SECRET.
+token_secret: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          62353634333163633336343265623632626339313032653563653165313262343931643431656138
+          6134333736323265656466646539663134306166666237630a653363623262636663333762316136
+          34616361326263383766366663393837626437316462313332663736623066656237386531663731
+          3037646432383064630a663165303564623338666131353366373630656661333437393937343331
+          32643131386134396336623736393634373936356332623632306561356361323737313663633633
+          6231313333666361656537343562333337323030623732323833
 
 # More complete example demonstrating the use of 'want_facts' and the constructed options
 # Note that using facts returned by 'want_facts' in constructed options requires 'want_facts=true'
@@ -114,6 +166,9 @@ groups:
   mailservers: "'mail' in (proxmox_tags_parsed|list)"
 compose:
   ansible_port: 2222
+# Note that this can easily give you wrong values as ansible_host. See further below for
+# an example where this is set to `false` and where ansible_host is set with `compose`.
+want_proxmox_nodes_ansible_host: true
 
 # Using the inventory to allow ansible to connect via the first IP address of the VM / Container
 # (Default is connection by name of QEMU/LXC guests)
@@ -125,20 +180,37 @@ user: ansible@pve
 password: secure
 validate_certs: false
 want_facts: true
+want_proxmox_nodes_ansible_host: false
 compose:
   ansible_host: proxmox_ipconfig0.ip | default(proxmox_net0.ip) | ipaddr('address')
   my_inv_var_1: "'my_var1_value'"
   my_inv_var_2: >
     "my_var_2_value"
+
+# Specify the url, user and password using templating
+# my.proxmox.yml
+plugin: community.general.proxmox
+url: "{{ lookup('ansible.builtin.ini', 'url', section='proxmox', file='file.ini') }}"
+user: "{{ lookup('ansible.builtin.env','PM_USER') | default('ansible@pve') }}"
+password: "{{ lookup('community.general.random_string', base64=True) }}"
+# Note that this can easily give you wrong values as ansible_host. See further up for
+# an example where this is set to `false` and where ansible_host is set with `compose`.
+want_proxmox_nodes_ansible_host: true
+
 '''
 
+import itertools
 import re
 
 from ansible.module_utils.common._collections_compat import MutableMapping
 
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
+from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.six import string_types
 from ansible.module_utils.six.moves.urllib.parse import urlencode
+from ansible.utils.display import Display
+from ansible.template import Templar
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
@@ -150,6 +222,8 @@ try:
     HAS_REQUESTS = True
 except ImportError:
     HAS_REQUESTS = False
+
+display = Display()
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
@@ -187,15 +261,24 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _get_auth(self):
         credentials = urlencode({'username': self.proxmox_user, 'password': self.proxmox_password, })
 
-        a = self._get_session()
-        ret = a.post('%s/api2/json/access/ticket' % self.proxmox_url, data=credentials)
+        if self.proxmox_password:
 
-        json = ret.json()
+            credentials = urlencode({'username': self.proxmox_user, 'password': self.proxmox_password, })
 
-        self.credentials = {
-            'ticket': json['data']['ticket'],
-            'CSRFPreventionToken': json['data']['CSRFPreventionToken'],
-        }
+            a = self._get_session()
+            ret = a.post('%s/api2/json/access/ticket' % self.proxmox_url, data=credentials)
+
+            json = ret.json()
+
+            self.headers = {
+                # only required for POST/PUT/DELETE methods, which we are not using currently
+                # 'CSRFPreventionToken': json['data']['CSRFPreventionToken'],
+                'Cookie': 'PVEAuthCookie={0}'.format(json['data']['ticket'])
+            }
+
+        else:
+
+            self.headers = {'Authorization': 'PVEAPIToken={0}!{1}={2}'.format(self.proxmox_user, self.proxmox_token_id, self.proxmox_token_secret)}
 
     def _get_json(self, url, ignore_errors=None):
 
@@ -207,8 +290,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             data = []
             s = self._get_session()
             while True:
-                headers = {'Cookie': 'PVEAuthCookie={0}'.format(self.credentials['ticket'])}
-                ret = s.get(url, headers=headers)
+                ret = s.get(url, headers=self.headers)
                 if ignore_errors and ret.status_code in ignore_errors:
                     break
                 ret.raise_for_status()
@@ -291,28 +373,19 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         return result
 
-    def _get_vm_config(self, node, vmid, vmtype, name):
+    def _get_vm_config(self, properties, node, vmid, vmtype, name):
         ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/config" % (self.proxmox_url, node, vmtype, vmid))
 
-        node_key = 'node'
-        node_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), node_key.lower()))
-        self.inventory.set_variable(name, node_key, node)
-
-        vmid_key = 'vmid'
-        vmid_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), vmid_key.lower()))
-        self.inventory.set_variable(name, vmid_key, vmid)
-
-        vmtype_key = 'vmtype'
-        vmtype_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), vmtype_key.lower()))
-        self.inventory.set_variable(name, vmtype_key, vmtype)
+        properties[self._fact('node')] = node
+        properties[self._fact('vmid')] = vmid
+        properties[self._fact('vmtype')] = vmtype
 
         plaintext_configs = [
-            'tags',
+            'description',
         ]
 
         for config in ret:
-            key = config
-            key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), key.lower()))
+            key = self._fact(config)
             value = ret[config]
             try:
                 # fixup disk images as they have no key
@@ -321,46 +394,48 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
                 # Additional field containing parsed tags as list
                 if config == 'tags':
-                    parsed_key = self.to_safe('%s%s' % (key, "_parsed"))
-                    parsed_value = [tag.strip() for tag in value.split(",")]
-                    self.inventory.set_variable(name, parsed_key, parsed_value)
+                    stripped_value = value.strip()
+                    if stripped_value:
+                        parsed_key = key + "_parsed"
+                        properties[parsed_key] = [tag.strip() for tag in stripped_value.split(",")]
 
                 # The first field in the agent string tells you whether the agent is enabled
                 # the rest of the comma separated string is extra config for the agent
                 if config == 'agent' and int(value.split(',')[0]):
-                    agent_iface_key = self.to_safe('%s%s' % (key, "_interfaces"))
                     agent_iface_value = self._get_agent_network_interfaces(node, vmid, vmtype)
                     if agent_iface_value:
-                        self.inventory.set_variable(name, agent_iface_key, agent_iface_value)
+                        agent_iface_key = self.to_safe('%s%s' % (key, "_interfaces"))
+                        properties[agent_iface_key] = agent_iface_value
 
-                if not (isinstance(value, int) or ',' not in value):
+                if config == 'lxc':
+                    out_val = {}
+                    for k, v in value:
+                        if k.startswith('lxc.'):
+                            k = k[len('lxc.'):]
+                        out_val[k] = v
+                    value = out_val
+
+                if config not in plaintext_configs and isinstance(value, string_types) \
+                        and all("=" in v for v in value.split(",")):
                     # split off strings with commas to a dict
                     # skip over any keys that cannot be processed
                     try:
-                        value = dict(key.split("=") for key in value.split(","))
+                        value = dict(key.split("=", 1) for key in value.split(","))
                     except Exception:
                         continue
 
-                self.inventory.set_variable(name, key, value)
+                properties[key] = value
             except NameError:
                 return None
 
-    def _get_vm_status(self, node, vmid, vmtype, name):
+    def _get_vm_status(self, properties, node, vmid, vmtype, name):
         ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/status/current" % (self.proxmox_url, node, vmtype, vmid))
+        properties[self._fact('status')] = ret['status']
 
-        status = ret['status']
-        status_key = 'status'
-        status_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), status_key.lower()))
-        self.inventory.set_variable(name, status_key, status)
-
-    def _get_vm_snapshots(self, node, vmid, vmtype, name):
+    def _get_vm_snapshots(self, properties, node, vmid, vmtype, name):
         ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/snapshot" % (self.proxmox_url, node, vmtype, vmid))
-
-        snapshots_key = 'snapshots'
-        snapshots_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), snapshots_key.lower()))
-
         snapshots = [snapshot['name'] for snapshot in ret if snapshot['name'] != 'current']
-        self.inventory.set_variable(name, snapshots_key, snapshots)
+        properties[self._fact('snapshots')] = snapshots
 
     def to_safe(self, word):
         '''Converts 'bad' characters in a string to underscores so they can be used as Ansible groups
@@ -370,109 +445,140 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         regex = r"[^A-Za-z0-9\_]"
         return re.sub(regex, "_", word.replace(" ", ""))
 
-    def _apply_constructable(self, name, variables):
-        strict = self.get_option('strict')
-        self._add_host_to_composed_groups(self.get_option('groups'), variables, name, strict=strict)
-        self._add_host_to_keyed_groups(self.get_option('keyed_groups'), variables, name, strict=strict)
-        self._set_composite_vars(self.get_option('compose'), variables, name, strict=strict)
+    def _fact(self, name):
+        '''Generate a fact's full name from the common prefix and a name.'''
+        return self.to_safe('%s%s' % (self.facts_prefix, name.lower()))
+
+    def _group(self, name):
+        '''Generate a group's full name from the common prefix and a name.'''
+        return self.to_safe('%s%s' % (self.group_prefix, name.lower()))
+
+    def _can_add_host(self, name, properties):
+        '''Ensure that a host satisfies all defined hosts filters. If strict mode is
+        enabled, any error during host filter compositing will lead to an AnsibleError
+        being raised, otherwise the filter will be ignored.
+        '''
+        for host_filter in self.host_filters:
+            try:
+                if not self._compose(host_filter, properties):
+                    return False
+            except Exception as e:  # pylint: disable=broad-except
+                message = "Could not evaluate host filter %s for host %s - %s" % (host_filter, name, to_native(e))
+                if self.strict:
+                    raise AnsibleError(message)
+                display.warning(message)
+        return True
+
+    def _add_host(self, name, variables):
+        self.inventory.add_host(name)
+        for k, v in variables.items():
+            self.inventory.set_variable(name, k, v)
+        variables = self.inventory.get_host(name).get_vars()
+        self._set_composite_vars(self.get_option('compose'), variables, name, strict=self.strict)
+        self._add_host_to_composed_groups(self.get_option('groups'), variables, name, strict=self.strict)
+        self._add_host_to_keyed_groups(self.get_option('keyed_groups'), variables, name, strict=self.strict)
+
+    def _handle_item(self, node, ittype, item):
+        '''Handle an item from the list of LXC containers and Qemu VM. The
+        return value will be either None if the item was skipped or the name of
+        the item if it was added to the inventory.'''
+        if item.get('template'):
+            return None
+
+        properties = dict()
+        name, vmid = item['name'], item['vmid']
+
+        # get status, config and snapshots if want_facts == True
+        if self.get_option('want_facts'):
+            self._get_vm_status(properties, node, vmid, ittype, name)
+            self._get_vm_config(properties, node, vmid, ittype, name)
+            self._get_vm_snapshots(properties, node, vmid, ittype, name)
+
+        # ensure the host satisfies filters
+        if not self._can_add_host(name, properties):
+            return None
+
+        # add the host to the inventory
+        self._add_host(name, properties)
+        node_type_group = self._group('%s_%s' % (node, ittype))
+        self.inventory.add_child(self._group('all_' + ittype), name)
+        self.inventory.add_child(node_type_group, name)
+        if item['status'] == 'stopped':
+            self.inventory.add_child(self._group('all_stopped'), name)
+        elif item['status'] == 'running':
+            self.inventory.add_child(self._group('all_running'), name)
+
+        return name
+
+    def _populate_pool_groups(self, added_hosts):
+        '''Generate groups from Proxmox resource pools, ignoring VMs and
+        containers that were skipped.'''
+        for pool in self._get_pools():
+            poolid = pool.get('poolid')
+            if not poolid:
+                continue
+            pool_group = self._group('pool_' + poolid)
+            self.inventory.add_group(pool_group)
+
+            for member in self._get_members_per_pool(poolid):
+                name = member.get('name')
+                if name and name in added_hosts:
+                    self.inventory.add_child(pool_group, name)
 
     def _populate(self):
 
-        self._get_auth()
+        # create common groups
+        self.inventory.add_group(self._group('all_lxc'))
+        self.inventory.add_group(self._group('all_qemu'))
+        self.inventory.add_group(self._group('all_running'))
+        self.inventory.add_group(self._group('all_stopped'))
+        nodes_group = self._group('nodes')
+        self.inventory.add_group(nodes_group)
+
+        want_proxmox_nodes_ansible_host = self.get_option("want_proxmox_nodes_ansible_host")
+        if want_proxmox_nodes_ansible_host is None:
+            display.deprecated(
+                'The want_proxmox_nodes_ansible_host option of the community.general.proxmox inventory plugin'
+                ' currently defaults to `true`, but this default has been deprecated and will change to `false`'
+                ' in community.general 6.0.0. To keep the current behavior and remove this deprecation warning,'
+                ' explicitly set `want_proxmox_nodes_ansible_host` to `true` in your inventory configuration',
+                version='6.0.0', collection_name='community.general')
+            want_proxmox_nodes_ansible_host = True
 
         # gather vm's on nodes
+        self._get_auth()
+        hosts = []
         for node in self._get_nodes():
-            # FIXME: this can probably be cleaner
-            # create groups
-            lxc_group = 'all_lxc'
-            lxc_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), lxc_group.lower()))
-            self.inventory.add_group(lxc_group)
-            qemu_group = 'all_qemu'
-            qemu_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), qemu_group.lower()))
-            self.inventory.add_group(qemu_group)
-            nodes_group = 'nodes'
-            nodes_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), nodes_group.lower()))
-            self.inventory.add_group(nodes_group)
-            running_group = 'all_running'
-            running_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), running_group.lower()))
-            self.inventory.add_group(running_group)
-            stopped_group = 'all_stopped'
-            stopped_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), stopped_group.lower()))
-            self.inventory.add_group(stopped_group)
+            if not node.get('node'):
+                continue
 
-            if node.get('node'):
-                self.inventory.add_host(node['node'])
+            self.inventory.add_host(node['node'])
+            if node['type'] == 'node':
+                self.inventory.add_child(nodes_group, node['node'])
 
-                if node['type'] == 'node':
-                    self.inventory.add_child(nodes_group, node['node'])
+            if node['status'] == 'offline':
+                continue
 
-                if node['status'] == 'offline':
-                    continue
+            # get node IP address
+            if want_proxmox_nodes_ansible_host:
+                ip = self._get_node_ip(node['node'])
+                self.inventory.set_variable(node['node'], 'ansible_host', ip)
 
-                # get node IP address
-                if self.get_option("want_proxmox_nodes_ansible_host"):
-                    ip = self._get_node_ip(node['node'])
-                    self.inventory.set_variable(node['node'], 'ansible_host', ip)
+            # add LXC/Qemu groups for the node
+            for ittype in ('lxc', 'qemu'):
+                node_type_group = self._group('%s_%s' % (node['node'], ittype))
+                self.inventory.add_group(node_type_group)
 
-                # get LXC containers for this node
-                node_lxc_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), ('%s_lxc' % node['node']).lower()))
-                self.inventory.add_group(node_lxc_group)
-                for lxc in self._get_lxc_per_node(node['node']):
-                    self.inventory.add_host(lxc['name'])
-                    self.inventory.add_child(lxc_group, lxc['name'])
-                    self.inventory.add_child(node_lxc_group, lxc['name'])
-
-                    # get LXC status when want_facts == True
-                    if self.get_option('want_facts'):
-                        self._get_vm_status(node['node'], lxc['vmid'], 'lxc', lxc['name'])
-                        if lxc['status'] == 'stopped':
-                            self.inventory.add_child(stopped_group, lxc['name'])
-                        elif lxc['status'] == 'running':
-                            self.inventory.add_child(running_group, lxc['name'])
-
-                    # get LXC config and snapshots for facts
-                    if self.get_option('want_facts'):
-                        self._get_vm_config(node['node'], lxc['vmid'], 'lxc', lxc['name'])
-                        self._get_vm_snapshots(node['node'], lxc['vmid'], 'lxc', lxc['name'])
-
-                    self._apply_constructable(lxc["name"], self.inventory.get_host(lxc['name']).get_vars())
-
-                # get QEMU vm's for this node
-                node_qemu_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), ('%s_qemu' % node['node']).lower()))
-                self.inventory.add_group(node_qemu_group)
-                for qemu in self._get_qemu_per_node(node['node']):
-                    if qemu.get('template'):
-                        continue
-
-                    self.inventory.add_host(qemu['name'])
-                    self.inventory.add_child(qemu_group, qemu['name'])
-                    self.inventory.add_child(node_qemu_group, qemu['name'])
-
-                    # get QEMU status
-                    self._get_vm_status(node['node'], qemu['vmid'], 'qemu', qemu['name'])
-                    if qemu['status'] == 'stopped':
-                        self.inventory.add_child(stopped_group, qemu['name'])
-                    elif qemu['status'] == 'running':
-                        self.inventory.add_child(running_group, qemu['name'])
-
-                    # get QEMU config and snapshots for facts
-                    if self.get_option('want_facts'):
-                        self._get_vm_config(node['node'], qemu['vmid'], 'qemu', qemu['name'])
-                        self._get_vm_snapshots(node['node'], qemu['vmid'], 'qemu', qemu['name'])
-
-                    self._apply_constructable(qemu["name"], self.inventory.get_host(qemu['name']).get_vars())
+            # get LXC containers and Qemu VMs for this node
+            lxc_objects = zip(itertools.repeat('lxc'), self._get_lxc_per_node(node['node']))
+            qemu_objects = zip(itertools.repeat('qemu'), self._get_qemu_per_node(node['node']))
+            for ittype, item in itertools.chain(lxc_objects, qemu_objects):
+                name = self._handle_item(node['node'], ittype, item)
+                if name is not None:
+                    hosts.append(name)
 
         # gather vm's in pools
-        for pool in self._get_pools():
-            if pool.get('poolid'):
-                pool_group = 'pool_' + pool['poolid']
-                pool_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), pool_group.lower()))
-                self.inventory.add_group(pool_group)
-
-                for member in self._get_members_per_pool(pool['poolid']):
-                    if member.get('name'):
-                        if not member.get('template'):
-                            self.inventory.add_child(pool_group, member['name'])
+        self._populate_pool_groups(hosts)
 
     def parse(self, inventory, loader, path, cache=True):
         if not HAS_REQUESTS:
@@ -484,12 +590,43 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         # read config from file, this sets 'options'
         self._read_config_data(path)
 
-        # get connection host
-        self.proxmox_url = self.get_option('url').rstrip('/')
-        self.proxmox_user = self.get_option('user')
-        self.proxmox_password = self.get_option('password')
+        t = Templar(loader=loader)
+
+        # read options
+        proxmox_url = self.get_option('url')
+        if t.is_template(proxmox_url):
+            proxmox_url = t.template(variable=proxmox_url, disable_lookups=False)
+        self.proxmox_url = proxmox_url.rstrip('/')
+
+        proxmox_user = self.get_option('user')
+        if t.is_template(proxmox_user):
+            proxmox_user = t.template(variable=proxmox_user, disable_lookups=False)
+        self.proxmox_user = proxmox_user
+
+        proxmox_password = self.get_option('password')
+        if t.is_template(proxmox_password):
+            proxmox_password = t.template(variable=proxmox_password, disable_lookups=False)
+        self.proxmox_password = proxmox_password
+
+        proxmox_token_id = self.get_option('token_id')
+        if t.is_template(proxmox_token_id):
+            proxmox_token_id = t.template(variable=proxmox_token_id, disable_lookups=False)
+        self.proxmox_token_id = proxmox_token_id
+
+        proxmox_token_secret = self.get_option('token_secret')
+        if t.is_template(proxmox_token_secret):
+            proxmox_token_secret = t.template(variable=proxmox_token_secret, disable_lookups=False)
+        self.proxmox_token_secret = proxmox_token_secret
+
+        if proxmox_password is None and (proxmox_token_id is None or proxmox_token_secret is None):
+            raise AnsibleError('You must specify either a password or both token_id and token_secret.')
+
         self.cache_key = self.get_cache_key(path)
         self.use_cache = cache and self.get_option('cache')
+        self.host_filters = self.get_option('filters')
+        self.group_prefix = self.get_option('group_prefix')
+        self.facts_prefix = self.get_option('facts_prefix')
+        self.strict = self.get_option('strict')
 
         # actually populate inventory
         self._populate()

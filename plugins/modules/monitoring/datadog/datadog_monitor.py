@@ -15,6 +15,7 @@ short_description: Manages Datadog monitors
 description:
   - Manages monitors within Datadog.
   - Options as described on https://docs.datadoghq.com/api/.
+  - The type C(event-v2) was added in community.general 4.8.0.
 author: Sebastian Kornehl (@skornehl)
 requirements: [datadog]
 options:
@@ -56,6 +57,7 @@ options:
             - metric alert
             - service check
             - event alert
+            - event-v2 alert
             - process alert
             - log alert
             - query alert
@@ -84,7 +86,6 @@ options:
         description:
           - Dictionary of scopes to silence, with timestamps or None.
           - Each scope will be muted until the given POSIX timestamp or forever if the value is None.
-        default: ""
     notify_no_data:
         description:
           - Whether this monitor will notify when data stops reporting.
@@ -153,6 +154,11 @@ options:
         type: bool
         default: yes
         version_added: 1.3.0
+    priority:
+        description:
+          - Integer from 1 (high) to 5 (low) indicating alert severity.
+        type: int
+        version_added: 4.6.0
 '''
 
 EXAMPLES = '''
@@ -218,7 +224,7 @@ def main():
             api_host=dict(),
             app_key=dict(required=True, no_log=True),
             state=dict(required=True, choices=['present', 'absent', 'mute', 'unmute']),
-            type=dict(choices=['metric alert', 'service check', 'event alert', 'process alert',
+            type=dict(choices=['metric alert', 'service check', 'event alert', 'event-v2 alert', 'process alert',
                                'log alert', 'query alert', 'trace-analytics alert',
                                'rum alert', 'composite']),
             name=dict(required=True),
@@ -239,6 +245,7 @@ def main():
             evaluation_delay=dict(),
             id=dict(),
             include_tags=dict(required=False, default=True, type='bool'),
+            priority=dict(type='int'),
         )
     )
 
@@ -298,6 +305,7 @@ def _post_monitor(module, options):
                       name=_fix_template_vars(module.params['name']),
                       message=_fix_template_vars(module.params['notification_message']),
                       escalation_message=_fix_template_vars(module.params['escalation_message']),
+                      priority=module.params['priority'],
                       options=options)
         if module.params['tags'] is not None:
             kwargs['tags'] = module.params['tags']
@@ -322,6 +330,7 @@ def _update_monitor(module, monitor, options):
                       name=_fix_template_vars(module.params['name']),
                       message=_fix_template_vars(module.params['notification_message']),
                       escalation_message=_fix_template_vars(module.params['escalation_message']),
+                      priority=module.params['priority'],
                       options=options)
         if module.params['tags'] is not None:
             kwargs['tags'] = module.params['tags']

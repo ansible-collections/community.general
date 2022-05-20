@@ -1,2 +1,0 @@
-minor_changes:
-  - mattermost - add the possibility to send attachments instead of text messages (https://github.com/ansible-collections/community.general/pull/3946).

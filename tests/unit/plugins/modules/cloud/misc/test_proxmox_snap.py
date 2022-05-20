@@ -91,3 +91,26 @@ def test_remove_snapshot_check_mode(connect_mock, capfd, mocker):
     out, err = capfd.readouterr()
     assert not err
     assert not json.loads(out)['changed']
+
+
+@patch('ansible_collections.community.general.plugins.module_utils.proxmox.ProxmoxAnsible._connect')
+def test_rollback_snapshot_check_mode(connect_mock, capfd, mocker):
+    set_module_args({"hostname": "test-lxc",
+                     "api_user": "root@pam",
+                     "api_password": "secret",
+                     "api_host": "127.0.0.1",
+                     "state": "rollback",
+                     "snapname": "test",
+                     "timeout": "1",
+                     "force": True,
+                     "_ansible_check_mode": True})
+    proxmox_utils.HAS_PROXMOXER = True
+    connect_mock.side_effect = lambda: fake_api(mocker)
+    with pytest.raises(SystemExit) as results:
+        proxmox_snap.main()
+
+    out, err = capfd.readouterr()
+    assert not err
+    output = json.loads(out)
+    assert not output['changed']
+    assert output['msg'] == "Snapshot test does not exist"

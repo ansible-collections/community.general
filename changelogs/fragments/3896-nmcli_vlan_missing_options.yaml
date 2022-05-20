@@ -1,2 +1,0 @@
-bugfixes:
-    - nmcli - pass ``flags``, ``ingress``, ``egress`` params to ``nmcli`` (https://github.com/ansible-collections/community.general/issues/1086).

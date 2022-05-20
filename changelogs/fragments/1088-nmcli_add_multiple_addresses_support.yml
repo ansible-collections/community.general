@@ -1,4 +1,0 @@
----
-minor_changes:
-  - nmcli - add multiple addresses support for ``ip4`` parameter
-    (https://github.com/ansible-collections/community.general/issues/1088, https://github.com/ansible-collections/community.general/pull/3738).

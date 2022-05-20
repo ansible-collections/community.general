@@ -1,1 +1,0 @@
-./notification/typetalk.py

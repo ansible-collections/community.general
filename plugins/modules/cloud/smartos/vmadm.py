@@ -415,7 +415,7 @@ from ansible.module_utils.common.text.converters import to_native
 def get_vm_prop(module, uuid, prop):
     # Lookup a property for the given VM.
     # Returns the property, or None if not found.
-    cmd = '{0} lookup -j -o {1} uuid={2}'.format(module.vmadm, prop, uuid)
+    cmd = [module.vmadm, 'lookup', '-j', '-o', prop, 'uuid={0}'.format(uuid)]
 
     (rc, stdout, stderr) = module.run_command(cmd)
 
@@ -430,16 +430,14 @@ def get_vm_prop(module, uuid, prop):
             msg='Invalid JSON returned by vmadm for uuid lookup of {0}'.format(prop),
             details=to_native(e), exception=traceback.format_exc())
 
-    if len(stdout_json) > 0 and prop in stdout_json[0]:
-        return stdout_json[0][prop]
-    else:
-        return None
+    if stdout_json:
+        return stdout_json[0].get(prop)
 
 
 def get_vm_uuid(module, alias):
     # Lookup the uuid that goes with the given alias.
     # Returns the uuid or '' if not found.
-    cmd = '{0} lookup -j -o uuid alias={1}'.format(module.vmadm, alias)
+    cmd = [module.vmadm, 'lookup', '-j', '-o', 'uuid', 'alias={1}'.format(alias)]
 
     (rc, stdout, stderr) = module.run_command(cmd)
 
@@ -450,23 +448,20 @@ def get_vm_uuid(module, alias):
     # If no VM was found matching the given alias, we get back an empty array.
     # That is not an error condition as we might be explicitly checking it's
     # absence.
-    if stdout.strip() == '[]':
-        return None
-    else:
-        try:
-            stdout_json = json.loads(stdout)
-        except Exception as e:
-            module.fail_json(
-                msg='Invalid JSON returned by vmadm for uuid lookup of {0}'.format(alias),
-                details=to_native(e), exception=traceback.format_exc())
+    try:
+        stdout_json = json.loads(stdout)
+    except Exception as e:
+        module.fail_json(
+            msg='Invalid JSON returned by vmadm for uuid lookup of {0}'.format(alias),
+            details=to_native(e), exception=traceback.format_exc())
 
-        if len(stdout_json) > 0 and 'uuid' in stdout_json[0]:
-            return stdout_json[0]['uuid']
+    if stdout_json:
+        return stdout_json[0].get('uuid')
 
 
 def get_all_vm_uuids(module):
     # Retrieve the UUIDs for all VMs.
-    cmd = '{0} lookup -j -o uuid'.format(module.vmadm)
+    cmd = [module.vmadm, 'lookup', '-j', '-o', 'uuid']
 
     (rc, stdout, stderr) = module.run_command(cmd)
 
@@ -484,7 +479,7 @@ def get_all_vm_uuids(module):
 def new_vm(module, uuid, vm_state):
     payload_file = create_payload(module, uuid)
 
-    (rc, stdout, stderr) = vmadm_create_vm(module, payload_file)
+    (rc, dummy, stderr) = vmadm_create_vm(module, payload_file)
 
     if rc != 0:
         changed = False
@@ -519,7 +514,7 @@ def new_vm(module, uuid, vm_state):
 
 def vmadm_create_vm(module, payload_file):
     # Create a new VM using the provided payload.
-    cmd = '{0} create -f {1}'.format(module.vmadm, payload_file)
+    cmd = [module.vmadm, 'create', '-f', payload_file]
 
     return module.run_command(cmd)
 
@@ -541,20 +536,15 @@ def set_vm_state(module, vm_uuid, vm_state):
         'rebooted': ['reboot', False]
     }
 
-    if p['force'] and cmds[vm_state][1]:
-        force = '-F'
-    else:
-        force = ''
+    command, forceable = cmds[vm_state]
+    force = ['-F'] if p['force'] and forceable else []
 
-    cmd = 'vmadm {0} {1} {2}'.format(cmds[vm_state][0], force, vm_uuid)
+    cmd = [module.vmadm, command] + force + [vm_uuid]
 
-    (rc, stdout, stderr) = module.run_command(cmd)
+    (dummy, dummy, stderr) = module.run_command(cmd)
 
     match = re.match('^Successfully.*', stderr)
-    if match:
-        return True
-    else:
-        return False
+    return match is not None
 
 
 def create_payload(module, uuid):
@@ -601,23 +591,17 @@ def vm_state_transition(module, uuid, vm_state):
 
 
 def is_valid_uuid(uuid):
-    if re.match('^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$', uuid, re.IGNORECASE):
-        return True
-    else:
-        return False
+    return re.match('^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$', uuid, re.IGNORECASE) is not None
 
 
 def validate_uuids(module):
-    # Perform basic UUID validation.
-    failed = []
+    failed = [
+        name
+        for name, pvalue in [(x, module.params[x]) for x in ['uuid', 'image_uuid']]
+        if pvalue and pvalue != '*' and not is_valid_uuid(pvalue)
+    ]
 
-    for u in [['uuid', module.params['uuid']],
-              ['image_uuid', module.params['image_uuid']]]:
-        if u[1] and u[1] != '*':
-            if not is_valid_uuid(u[1]):
-                failed.append(u[0])
-
-    if len(failed) > 0:
+    if failed:
         module.fail_json(msg='No valid UUID(s) found for: {0}'.format(", ".join(failed)))
 
 
@@ -642,7 +626,7 @@ def manage_all_vms(module, vm_state):
                 if (not current_vm_state) or (get_vm_prop(module, uuid, 'state') != state):
                     any_changed = True
             else:
-                any_changed = (vm_state_transition(module, uuid, vm_state) | any_changed)
+                any_changed = vm_state_transition(module, uuid, vm_state) or any_changed
 
     return any_changed
 
@@ -661,7 +645,7 @@ def main():
             'zfs_root_compression', 'zpool'
         ],
         'bool': [
-            'archive_on_delete', 'autoboot', 'debug', 'delegate_dataset',
+            'archive_on_delete', 'autoboot', 'delegate_dataset',
             'docker', 'firewall_enabled', 'force', 'indestructible_delegated',
             'indestructible_zoneroot', 'maintain_resolvers', 'nowait'
         ],
@@ -684,7 +668,7 @@ def main():
             choices=['present', 'running', 'absent', 'deleted', 'stopped', 'created', 'restarted', 'rebooted']
         ),
         name=dict(
-            default=None, type='str',
+            type='str',
             aliases=['alias']
         ),
         brand=dict(
@@ -704,12 +688,13 @@ def main():
         nics=dict(type='list', elements='dict'),
         resolvers=dict(type='list', elements='str'),
         filesystems=dict(type='list', elements='dict'),
+        debug=dict(type='bool', removed_in_version='6.0.0', removed_from_collection='community.general'),
     )
 
     # Add our 'simple' options to options dict.
     for type in properties:
         for p in properties[type]:
-            option = dict(default=None, type=type)
+            option = dict(type=type)
             options[p] = option
 
     module = AnsibleModule(
@@ -783,14 +768,9 @@ def main():
     elif module.check_mode:
         # Shortcut for check mode, if there is no VM yet, it will need to be created.
         # Or, if the VM is not in the desired state yet, it needs to transition.
-        if (not current_vm_state) or (get_vm_prop(module, uuid, 'state') != state):
-            result['changed'] = True
-        else:
-            result['changed'] = False
-
-        module.exit_json(**result)
-    # No VM was found that matched the given ID (alias or uuid), so we create it.
+        result['changed'] = (not current_vm_state) or (get_vm_prop(module, uuid, 'state') != state)
     elif not current_vm_state:
+        # No VM was found that matched the given ID (alias or uuid), so we create it.
         result['changed'], result['uuid'] = new_vm(module, uuid, vm_state)
     else:
         # VM was found, operate on its state directly.

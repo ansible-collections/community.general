@@ -1,1 +1,0 @@
-./remote_management/oneview/oneview_enclosure_info.py

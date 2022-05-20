@@ -1,0 +1,38 @@
+.azure-pipelines/scripts/publish-codecov.py replace-urlopen
+plugins/modules/cloud/univention/udm_user.py import-3.11  # Uses deprecated stdlib library 'crypt'
+plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
+plugins/modules/cloud/lxc/lxc_container.py validate-modules:use-run-command-not-popen
+plugins/modules/cloud/lxd/lxd_project.py use-argspec-type-path # expanduser() applied to constants
+plugins/modules/cloud/misc/rhevm.py validate-modules:parameter-state-invalid-choice
+plugins/modules/cloud/rackspace/rax.py use-argspec-type-path # fix needed
+plugins/modules/cloud/rackspace/rax_files.py validate-modules:parameter-state-invalid-choice
+plugins/modules/cloud/rackspace/rax_files_objects.py use-argspec-type-path
+plugins/modules/cloud/rackspace/rax_scaling_group.py use-argspec-type-path  # fix needed, expanduser() applied to dict values
+plugins/modules/cloud/scaleway/scaleway_organization_info.py validate-modules:return-syntax-error
+plugins/modules/cloud/smartos/vmadm.py validate-modules:parameter-type-not-in-doc
+plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-list-no-elements
+plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-type-not-in-doc
+plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:undocumented-parameter
+plugins/modules/cloud/univention/udm_share.py validate-modules:parameter-list-no-elements
+plugins/modules/cloud/univention/udm_user.py validate-modules:parameter-list-no-elements
+plugins/modules/clustering/consul/consul.py validate-modules:doc-missing-type
+plugins/modules/clustering/consul/consul.py validate-modules:undocumented-parameter
+plugins/modules/clustering/consul/consul_session.py validate-modules:parameter-state-invalid-choice
+plugins/modules/packaging/language/yarn.py use-argspec-type-path
+plugins/modules/packaging/os/redhat_subscription.py validate-modules:return-syntax-error
+plugins/modules/remote_management/manageiq/manageiq_policies.py validate-modules:parameter-state-invalid-choice
+plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-choices-do-not-match-spec   # missing docs on suboptions
+plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-missing-type                # missing docs on suboptions
+plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:parameter-type-not-in-doc       # missing docs on suboptions
+plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:undocumented-parameter          # missing docs on suboptions
+plugins/modules/remote_management/manageiq/manageiq_tags.py validate-modules:parameter-state-invalid-choice
+plugins/modules/system/gconftool2.py validate-modules:parameter-state-invalid-choice
+plugins/modules/system/homectl.py import-3.11  # Uses deprecated stdlib library 'crypt'
+plugins/modules/system/iptables_state.py validate-modules:undocumented-parameter
+plugins/modules/system/osx_defaults.py validate-modules:parameter-state-invalid-choice
+plugins/modules/system/parted.py validate-modules:parameter-state-invalid-choice
+plugins/modules/system/puppet.py use-argspec-type-path
+plugins/modules/system/puppet.py validate-modules:parameter-invalid  # invalid alias - removed in 7.0.0
+plugins/modules/system/ssh_config.py use-argspec-type-path # Required since module uses other methods to specify path
+plugins/modules/system/xfconf.py validate-modules:return-syntax-error
+plugins/modules/web_infrastructure/jenkins_plugin.py use-argspec-type-path

@@ -69,11 +69,11 @@ options:
     version_added: 3.3.0
   norc:
     type: bool
-    default: false
     description:
     - Avoid loading any C(.gemrc) file. Ignored for RubyGems prior to 2.5.2.
-    - "The current default value will be deprecated in community.general 4.0.0: if the value is not explicitly specified, a deprecation message will be shown."
-    - From community.general 5.0.0 on, the default will be changed to C(true).
+    - The current default value C(false) has been deprecated in community.general 5.0.0.
+      Explicitly specify the value to prevent the deprecation warning to be shown."
+    - From community.general 6.0.0 on, the default will be changed to C(true).
     version_added: 3.3.0
   env_shebang:
     description:
@@ -297,7 +297,7 @@ def main():
             user_install=dict(required=False, default=True, type='bool'),
             install_dir=dict(required=False, type='path'),
             bindir=dict(type='path'),
-            norc=dict(default=False, type='bool'),
+            norc=dict(type='bool'),
             pre_release=dict(required=False, default=False, type='bool'),
             include_doc=dict(required=False, default=False, type='bool'),
             env_shebang=dict(required=False, default=False, type='bool'),
@@ -315,6 +315,12 @@ def main():
         module.fail_json(msg="Cannot maintain state=latest when installing from local source")
     if module.params['user_install'] and module.params['install_dir']:
         module.fail_json(msg="install_dir requires user_install=false")
+    if module.params['norc'] is None:
+        module.deprecate(
+            'The default of the norc option has been deprecated. It will be changed to `true`'
+            ' in community.general 6.0.0. Specify an explicit value to get rid of this message',
+            version='6.0.0', collection_name='community.general')
+        module.params['norc'] = False
 
     if not module.params['gem_source']:
         module.params['gem_source'] = module.params['name']

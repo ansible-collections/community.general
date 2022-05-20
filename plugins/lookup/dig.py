@@ -27,13 +27,15 @@ DOCUMENTATION = '''
         This needs to be passed-in as an additional parameter to the lookup
     options:
       _terms:
-        description: domain(s) to query
+        description: Domain(s) to query.
       qtype:
-        description: record type to query
+        description:
+            - Record type to query.
+            - C(DLV) is deprecated and will be removed in community.general 6.0.0.
         default: 'A'
         choices: [A, ALL, AAAA, CNAME, DNAME, DLV, DNSKEY, DS, HINFO, LOC, MX, NAPTR, NS, NSEC3PARAM, PTR, RP, RRSIG, SOA, SPF, SRV, SSHFP, TLSA, TXT]
       flat:
-        description: If 0 each record is returned as a dictionary, otherwise a string
+        description: If 0 each record is returned as a dictionary, otherwise a string.
         default: 1
       retry_servfail:
         description: Retry a nameserver if it returns SERVFAIL.
@@ -163,6 +165,7 @@ RETURN = """
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.module_utils.common.text.converters import to_native
+from ansible.utils.display import Display
 import socket
 
 try:
@@ -176,6 +179,9 @@ try:
     HAVE_DNS = True
 except ImportError:
     HAVE_DNS = False
+
+
+display = Display()
 
 
 def make_rdata_dict(rdata):
@@ -325,6 +331,11 @@ class LookupModule(LookupBase):
         # print "--- domain = {0} qtype={1} rdclass={2}".format(domain, qtype, rdclass)
 
         ret = []
+
+        if qtype.upper() == 'DLV':
+            display.deprecated('The DLV record type has been decommissioned in 2017 and support for'
+                               ' it will be removed from community.general 6.0.0',
+                               version='6.0.0', collection_name='community.general')
 
         if qtype.upper() == 'PTR':
             try:

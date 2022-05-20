@@ -1,1 +1,0 @@
-./packaging/os/dnf_versionlock.py

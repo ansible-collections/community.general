@@ -1,2 +1,0 @@
-minor_changes:
-  - gitlab - add more token authentication support with the new options ``api_oauth_token`` and ``api_job_token`` (https://github.com/ansible-collections/community.general/issues/705).

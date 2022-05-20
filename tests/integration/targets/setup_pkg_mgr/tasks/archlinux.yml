@@ -1,0 +1,19 @@
+---
+# Since Arch Linux is a rolling distribution, it regularly needs its packages upgraded, otherwise some tests might
+# stop working due to conflicts during package installation. Since there is no good way to do this on container
+# startup time, we use the setup_pkg_mgr setup role to do this once per CI run (hopefully). In case the Arch Linux
+# tests are run outside of a container, we're using a date-based tag (see below) to avoid this running more than
+# once per day.
+
+- name: Create tag
+  copy:
+    dest: /tmp/.ansible_archlinux_sysupgrade_tag
+    content: |
+      Last ArchLinux system upgrade by integration tests was done on {{ ansible_facts.date_time.date }}.
+  register: archlinux_upgrade_tag
+
+- name: Upgrade all packages
+  pacman:
+    update_cache: true
+    upgrade: true
+  when: archlinux_upgrade_tag is changed

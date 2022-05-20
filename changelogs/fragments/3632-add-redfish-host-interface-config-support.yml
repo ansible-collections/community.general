@@ -1,2 +1,0 @@
-minor_changes:
-  - redfish_command - add ``SetHostInterface`` command to enable configuring the Redfish Host Interface (https://github.com/ansible-collections/community.general/issues/3632).

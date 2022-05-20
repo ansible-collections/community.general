@@ -1,0 +1,13 @@
+---
+- name: test cmd_echo [{{ item.name }}]
+  cmd_echo:
+    arg_formats: "{{ item.arg_formats|default(omit) }}"
+    arg_order: "{{ item.arg_order }}"
+    arg_values: "{{ item.arg_values|default(omit) }}"
+    aa: "{{ item.aa|default(omit) }}"
+  register: test_result
+  ignore_errors: "{{ item.expect_error|default(omit) }}"
+
+- name: check results [{{ item.name }}]
+  assert:
+    that: "{{ item.assertions }}"

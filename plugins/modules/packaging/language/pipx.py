@@ -78,6 +78,17 @@ options:
               If not specified, the module will use C(python -m pipx) to run the tool,
               using the same Python interpreter as ansible itself.
         type: path
+    editable:
+        description:
+            - Install the project in editable mode.
+        type: bool
+        default: false
+        version_added: 4.6.0
+    pip_args:
+        description:
+            - Arbitrary arguments to pass directly to C(pip).
+        type: str
+        version_added: 4.6.0
 notes:
     - This module does not install the C(pipx) python package, however that can be easily done with the module M(ansible.builtin.pip).
     - This module does not require C(pipx) to be in the shell C(PATH), but it must be loadable by Python as a module.
@@ -153,7 +164,9 @@ class PipX(CmdStateModuleHelper):
             include_injected=dict(type='bool', default=False),
             index_url=dict(type='str'),
             python=dict(type='str'),
-            executable=dict(type='path')
+            executable=dict(type='path'),
+            editable=dict(type='bool', default=False),
+            pip_args=dict(type='str'),
         ),
         required_if=[
             ('state', 'present', ['name']),
@@ -174,6 +187,8 @@ class PipX(CmdStateModuleHelper):
         index_url=dict(fmt=('--index-url', '{0}'),),
         python=dict(fmt=('--python', '{0}'),),
         _list=dict(fmt=('list', '--include-injected', '--json'), style=ArgFormat.BOOLEAN),
+        editable=dict(fmt="--editable", style=ArgFormat.BOOLEAN),
+        pip_args=dict(fmt=('--pip-args', '{0}'),),
     )
     check_rc = True
     run_command_fixed_options = dict(
@@ -224,8 +239,9 @@ class PipX(CmdStateModuleHelper):
         if not self.vars.application or self.vars.force:
             self.changed = True
             if not self.module.check_mode:
-                self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'python',
-                                         {'name_source': [self.vars.name, self.vars.source]}])
+                self.run_command(params=[
+                    'state', 'index_url', 'install_deps', 'force', 'python', 'editable', 'pip_args',
+                    {'name_source': [self.vars.name, self.vars.source]}])
 
     state_present = state_install
 
@@ -236,7 +252,7 @@ class PipX(CmdStateModuleHelper):
         if self.vars.force:
             self.changed = True
         if not self.module.check_mode:
-            self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'name'])
+            self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'editable', 'pip_args', 'name'])
 
     def state_uninstall(self):
         if self.vars.application and not self.module.check_mode:
@@ -259,7 +275,7 @@ class PipX(CmdStateModuleHelper):
         if self.vars.force:
             self.changed = True
         if not self.module.check_mode:
-            self.run_command(params=['state', 'index_url', 'force', 'name', 'inject_packages'])
+            self.run_command(params=['state', 'index_url', 'force', 'editable', 'pip_args', 'name', 'inject_packages'])
 
     def state_uninstall_all(self):
         if not self.module.check_mode:

@@ -66,8 +66,8 @@ options:
     description:
       - Whether the firewall policy is enabled or disabled
     type: str
-    choices: [True, False]
-    default: True
+    choices: ['True', 'False']
+    default: 'True'
 requirements:
     - python = 2.7
     - requests >= 2.5.0

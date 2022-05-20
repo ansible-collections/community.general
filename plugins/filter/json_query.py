@@ -19,6 +19,107 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+DOCUMENTATION = '''
+  name: json_query
+  short_description: Select a single element or a data subset from a complex data structure
+  description:
+    - This filter lets you query a complex JSON structure and iterate over it using a loop structure.
+  positional: expr
+  options:
+    _input:
+      description:
+        - The JSON data to query.
+      type: any
+      required: true
+    expr:
+      description:
+        - The query expression.
+        - See U(http://jmespath.org/examples.html) for examples.
+      type: string
+      required: true
+  requirements:
+    - jmespath
+'''
+
+EXAMPLES = '''
+- name: Define data to work on in the examples below
+  ansible.builtin.set_fact:
+    domain_definition:
+      domain:
+        cluster:
+          - name: cluster1
+          - name: cluster2
+        server:
+          - name: server11
+            cluster: cluster1
+            port: '8080'
+          - name: server12
+            cluster: cluster1
+            port: '8090'
+          - name: server21
+            cluster: cluster2
+            port: '9080'
+          - name: server22
+            cluster: cluster2
+            port: '9090'
+        library:
+          - name: lib1
+            target: cluster1
+          - name: lib2
+            target: cluster2
+
+- name: Display all cluster names
+  ansible.builtin.debug:
+    var: item
+  loop: "{{ domain_definition | community.general.json_query('domain.cluster[*].name') }}"
+
+- name: Display all server names
+  ansible.builtin.debug:
+    var: item
+  loop: "{{ domain_definition | community.general.json_query('domain.server[*].name') }}"
+
+- name: Display all ports from cluster1
+  ansible.builtin.debug:
+    var: item
+  loop: "{{ domain_definition | community.general.json_query(server_name_cluster1_query) }}"
+  vars:
+    server_name_cluster1_query: "domain.server[?cluster=='cluster1'].port"
+
+- name: Display all ports from cluster1 as a string
+  ansible.builtin.debug:
+    msg: "{{ domain_definition | community.general.json_query('domain.server[?cluster==`cluster1`].port') | join(', ') }}"
+
+- name: Display all ports from cluster1
+  ansible.builtin.debug:
+    var: item
+  loop: "{{ domain_definition | community.general.json_query('domain.server[?cluster==''cluster1''].port') }}"
+
+- name: Display all server ports and names from cluster1
+  ansible.builtin.debug:
+    var: item
+  loop: "{{ domain_definition | community.general.json_query(server_name_cluster1_query) }}"
+  vars:
+    server_name_cluster1_query: "domain.server[?cluster=='cluster2'].{name: name, port: port}"
+
+- name: Display all ports from cluster1
+  ansible.builtin.debug:
+    msg: "{{ domain_definition | to_json | from_json | community.general.json_query(server_name_query) }}"
+  vars:
+    server_name_query: "domain.server[?starts_with(name,'server1')].port"
+
+- name: Display all ports from cluster1
+  ansible.builtin.debug:
+    msg: "{{ domain_definition | to_json | from_json | community.general.json_query(server_name_query) }}"
+  vars:
+    server_name_query: "domain.server[?contains(name,'server1')].port"
+'''
+
+RETURN = '''
+  _value:
+    description: The result of the query.
+    type: any
+'''
+
 from ansible.errors import AnsibleError, AnsibleFilterError
 
 try:

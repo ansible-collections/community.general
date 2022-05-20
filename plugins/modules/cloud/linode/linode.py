@@ -90,11 +90,6 @@ options:
     description:
     - Set threshold for average IO ops/sec over 2 hour period.
     type: int
-  backupsenabled:
-    description:
-    - Deprecated parameter, it will be removed in community.general C(5.0.0).
-    - To enable backups pass values to either I(backupweeklyday) or I(backupwindow).
-    type: int
   backupweeklyday:
     description:
     - Day of the week to take backups.
@@ -594,7 +589,6 @@ def main():
             alert_cpu_threshold=dict(type='int'),
             alert_diskio_enabled=dict(type='bool'),
             alert_diskio_threshold=dict(type='int'),
-            backupsenabled=dict(type='int', removed_in_version='5.0.0', removed_from_collection='community.general'),
             backupweeklyday=dict(type='int'),
             backupwindow=dict(type='int'),
             displaygroup=dict(type='str', default=''),

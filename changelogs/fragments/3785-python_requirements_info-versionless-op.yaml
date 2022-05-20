@@ -1,2 +1,0 @@
-bugfixes:
-    - python_requirements_info - fails if version operator used without version (https://github.com/ansible-collections/community.general/pull/3785).

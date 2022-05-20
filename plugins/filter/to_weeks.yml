@@ -1,0 +1,40 @@
+DOCUMENTATION:
+  name: to_weeks
+  short_description: Converte a duration string to weeks
+  version_added: 0.2.0
+  description:
+    - Parse a human readable time duration string and convert to weeks.
+  options:
+    _input:
+      description:
+        - The time string to convert.
+        - Can use the units C(y) and C(year) for a year, C(mo) and C(month) for a month, C(w) and C(week) for a week,
+          C(d) and C(day) for a day, C(h) and C(hour) for a hour, C(m), C(min) and C(minute) for minutes, C(s), C(sec)
+          and C(second) for seconds, C(ms), C(msec), C(msecond) and C(millisecond) for milliseconds. The suffix C(s)
+          can be added to a unit as well, so C(seconds) is the same as C(second).
+        - Valid strings are space separated combinations of an integer with an optional minus sign and a unit.
+        - Examples are C(1h), C(-5m), and C(3h -5m 6s).
+      type: string
+      required: true
+    year:
+      description:
+        - Number of days per year.
+      default: 365
+      type: float
+    month:
+      description:
+        - Number of days per month.
+      default: 30
+      type: float
+  author:
+    - René Moser (@resmo)
+
+EXAMPLES: |
+  - name: Convert a duration into weeks
+    ansible.builtin.debug:
+      msg: "{{ '1y 7m 5d 30h' | community.general.to_weeks }}"
+
+RETURN:
+  _value:
+    description: Number of weeks.
+    type: float

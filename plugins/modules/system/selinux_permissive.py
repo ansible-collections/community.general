@@ -20,7 +20,6 @@ options:
         - The domain that will be added or removed from the list of permissive domains.
     type: str
     required: true
-    default: ''
     aliases: [ name ]
   permissive:
     description:

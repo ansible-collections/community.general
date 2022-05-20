@@ -49,6 +49,12 @@
     state: present
   when: ansible_distribution == 'Archlinux'
 
+- name: make sure tzdata is installed on Alpine
+  package:
+    name: tzdata
+    state: present
+  when: ansible_distribution == 'Alpine'
+
 - name: make sure the dbus service is started under systemd
   systemd:
     name: dbus

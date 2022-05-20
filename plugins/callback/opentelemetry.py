@@ -197,7 +197,7 @@ class OpenTelemetrySource(object):
 
         task = tasks_data[task_uuid]
 
-        if self.ansible_version is None and result._task_fields['args'].get('_ansible_version'):
+        if self.ansible_version is None and hasattr(result, '_task_fields') and result._task_fields['args'].get('_ansible_version'):
             self.ansible_version = result._task_fields['args'].get('_ansible_version')
 
         task.add_host(HostData(host_uuid, host_name, status, result))
@@ -258,8 +258,9 @@ class OpenTelemetrySource(object):
             else:
                 res = host_data.result._result
                 rc = res.get('rc', 0)
-                message = self.get_error_message(res)
-                enriched_error_message = self.enrich_error_message(res)
+                if host_data.status == 'failed':
+                    message = self.get_error_message(res)
+                    enriched_error_message = self.enrich_error_message(res)
 
             if host_data.status == 'failed':
                 status = Status(status_code=StatusCode.ERROR, description=message)

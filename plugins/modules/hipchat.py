@@ -1,1 +1,0 @@
-./notification/hipchat.py

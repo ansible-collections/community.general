@@ -1,1 +1,0 @@
-cloud/misc/proxmox_domain_info.py

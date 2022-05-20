@@ -42,8 +42,6 @@ options:
         description:
             - Whether or not to refresh the master package lists. This can be
               run as part of a package installation or as a separate step.
-            - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
-        aliases: ['update-cache']
         type: bool
         default: yes
     upgrade:
@@ -230,7 +228,9 @@ def install_packages(module, xbps_path, state, packages):
         module.params['upgrade_xbps'] = False
         install_packages(module, xbps_path, state, packages)
     elif rc != 0 and not (state == 'latest' and rc == 17):
-        module.fail_json(msg="failed to install %s" % (package))
+        module.fail_json(msg="failed to install %s packages(s)"
+                         % (len(toInstall)),
+                         packages=toInstall)
 
     module.exit_json(changed=True, msg="installed %s package(s)"
                      % (len(toInstall)),
@@ -284,10 +284,8 @@ def main():
                                                    'removed']),
             recurse=dict(default=False, type='bool'),
             upgrade=dict(default=False, type='bool'),
-            update_cache=dict(
-                default=True, aliases=['update-cache'], type='bool',
-                deprecated_aliases=[dict(name='update-cache', version='5.0.0', collection_name='community.general')]),
-            upgrade_xbps=dict(default=True, type='bool')
+            update_cache=dict(default=True, type='bool'),
+            upgrade_xbps=dict(default=True, type='bool'),
         ),
         required_one_of=[['name', 'update_cache', 'upgrade']],
         supports_check_mode=True)

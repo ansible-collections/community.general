@@ -128,6 +128,13 @@ options:
         description:
           - Adds C(--replacefiles) option to I(zypper) install/update command.
         version_added: '0.2.0'
+    clean_deps:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Adds C(--clean-deps) option to I(zypper) remove command.
+        version_added: '4.6.0'
 notes:
   - When used with a `loop:` each package will be processed individually,
     it is much more efficient to pass the list directly to the `name` option.
@@ -316,6 +323,8 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
         if packages is None:
             firstrun = True
             packages = {}
+        else:
+            firstrun = False
         solvable_list = dom.getElementsByTagName('solvable')
         for solvable in solvable_list:
             name = solvable.getAttribute('name')
@@ -368,6 +377,9 @@ def get_cmd(m, subcommand):
             cmd.append('--oldpackage')
         if m.params['replacefiles']:
             cmd.append('--replacefiles')
+    if subcommand == 'remove':
+        if m.params['clean_deps']:
+            cmd.append('--clean-deps')
     if subcommand == 'dist-upgrade' and m.params['allow_vendor_change']:
         cmd.append('--allow-vendor-change')
     if m.params['extra_args']:
@@ -417,7 +429,9 @@ def package_present(m, name, want_latest):
         # if a version is given leave the package in to let zypper handle the version
         # resolution
         packageswithoutversion = [p for p in packages if not p.version]
-        prerun_state = get_installed_state(m, packageswithoutversion)
+        prerun_state = {}
+        if packageswithoutversion:
+            prerun_state = get_installed_state(m, packageswithoutversion)
         # generate lists of packages to install or remove
         packages = [p for p in packages if p.shouldinstall != (p.name in prerun_state)]
 
@@ -518,7 +532,8 @@ def main():
             oldpackage=dict(required=False, default=False, type='bool'),
             extra_args=dict(required=False, default=None),
             allow_vendor_change=dict(required=False, default=False, type='bool'),
-            replacefiles=dict(required=False, default=False, type='bool')
+            replacefiles=dict(required=False, default=False, type='bool'),
+            clean_deps=dict(required=False, default=False, type='bool'),
         ),
         supports_check_mode=True
     )

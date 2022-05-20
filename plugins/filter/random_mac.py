@@ -20,6 +20,41 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+DOCUMENTATION = '''
+  name: random_mac
+  short_description: Generate a random MAC address
+  description:
+    - Generates random networking interfaces MAC addresses for a given prefix.
+  options:
+    _input:
+      description: A string prefix to use as a basis for the random MAC generated.
+      type: string
+      required: true
+    seed:
+      description:
+        - A randomization seed to initialize the process, used to get repeatable results.
+        - If no seed is provided, a system random source such as C(/dev/urandom) is used.
+      required: false
+      type: string
+'''
+
+EXAMPLES = '''
+- name: Random MAC given a prefix
+  ansible.builtin.debug:
+    msg: "{{ '52:54:00' | community.general.random_mac }}"
+    # => '52:54:00:ef:1c:03'
+
+- name: With a seed
+  ansible.builtin.debug:
+    msg: "{{ '52:54:00' | community.general.random_mac(seed=inventory_hostname) }}"
+'''
+
+RETURN = '''
+  _value:
+    description: The generated MAC.
+    type: string
+'''
+
 import re
 from random import Random, SystemRandom
 

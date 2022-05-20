@@ -325,36 +325,79 @@ class TestPacman:
             P.run()
         self.mock_run_command.call_count == 0
         out = e.value.args[0]
+        assert "packages" not in out
         assert out["changed"]
 
     @pytest.mark.parametrize(
-        "module_args,expected_call",
+        "module_args,expected_calls,changed",
         [
-            ({}, ["pacman", "--sync", "--refresh"]),
-            ({"force": True}, ["pacman", "--sync", "--refresh", "--refresh"]),
             (
-                {"update_cache_extra_args": "--some-extra args"},
-                ["pacman", "--sync", "--refresh", "--some-extra", "args"],  # shlex test
+                {},
+                [
+                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'a\nb\nc', ''),
+                    (["pacman", "--sync", "--refresh"], {'check_rc': False}, 0, 'stdout', 'stderr'),
+                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'b\na\nc', ''),
+                ],
+                False,
+            ),
+            (
+                {"force": True},
+                [
+                    (["pacman", "--sync", "--refresh", "--refresh"], {'check_rc': False}, 0, 'stdout', 'stderr'),
+                ],
+                True,
+            ),
+            (
+                {"update_cache_extra_args": "--some-extra args"},  # shlex test
+                [
+                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'a\nb\nc', ''),
+                    (["pacman", "--sync", "--refresh", "--some-extra", "args"], {'check_rc': False}, 0, 'stdout', 'stderr'),
+                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'a changed\nb\nc', ''),
+                ],
+                True,
             ),
             (
                 {"force": True, "update_cache_extra_args": "--some-extra args"},
-                ["pacman", "--sync", "--refresh", "--some-extra", "args", "--refresh"],
+                [
+                    (["pacman", "--sync", "--refresh", "--some-extra", "args", "--refresh"], {'check_rc': False}, 0, 'stdout', 'stderr'),
+                ],
+                True,
+            ),
+            (
+                # Test whether pacman --sync --list is not called more than twice
+                {"upgrade": True},
+                [
+                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'core foo 1.0.0-1 [installed]', ''),
+                    (["pacman", "--sync", "--refresh"], {'check_rc': False}, 0, 'stdout', 'stderr'),
+                    (["pacman", "--sync", "--list"], {'check_rc': True}, 0, 'core foo 1.0.0-1 [installed]', ''),
+                    # The following is _build_inventory:
+                    (["pacman", "--query"], {'check_rc': True}, 0, 'foo 1.0.0-1', ''),
+                    (["pacman", "--query", "--groups"], {'check_rc': True}, 0, '', ''),
+                    (["pacman", "--sync", "--groups", "--groups"], {'check_rc': True}, 0, '', ''),
+                    (["pacman", "--query", "--upgrades"], {'check_rc': False}, 0, '', ''),
+                ],
+                False,
             ),
         ],
     )
-    def test_update_db(self, mock_empty_inventory, module_args, expected_call):
+    def test_update_db(self, module_args, expected_calls, changed):
         args = {"update_cache": True}
         args.update(module_args)
         set_module_args(args)
 
-        self.mock_run_command.return_value = [0, "stdout", "stderr"]
+        self.mock_run_command.side_effect = [
+            (rc, stdout, stderr) for expected_call, kwargs, rc, stdout, stderr in expected_calls
+        ]
         with pytest.raises(AnsibleExitJson) as e:
             P = pacman.Pacman(pacman.setup_module())
             P.run()
 
-        self.mock_run_command.assert_called_with(mock.ANY, expected_call, check_rc=False)
+        self.mock_run_command.assert_has_calls([
+            mock.call(mock.ANY, expected_call, **kwargs) for expected_call, kwargs, rc, stdout, stderr in expected_calls
+        ])
         out = e.value.args[0]
-        assert out["changed"]
+        assert out["cache_updated"] == changed
+        assert out["changed"] == changed
 
     @pytest.mark.parametrize(
         "check_mode_value, run_command_data, upgrade_extra_args",
@@ -475,7 +518,13 @@ class TestPacman:
                 # catch all -> call to pacman to resolve (--sync and --upgrade)
                 "present",
                 ["somepackage-12.3-x86_64.pkg.tar.zst"],
-                [Package(name="somepackage", source="somepackage-12.3-x86_64.pkg.tar.zst")],
+                [
+                    Package(
+                        name="somepackage",
+                        source="somepackage-12.3-x86_64.pkg.tar.zst",
+                        source_is_URL=True,
+                    )
+                ],
                 {
                     "calls": [
                         mock.call(
@@ -576,18 +625,19 @@ class TestPacman:
         with pytest.raises(AnsibleExitJson) as e:
             P.run()
         out = e.value.args[0]
-        assert "packages" not in out
         assert not out["changed"]
+        assert "packages" in out
         assert "diff" not in out
         self.mock_run_command.call_count == 0
 
     @pytest.mark.parametrize(
-        "module_args, expected_packages, run_command_data, raises",
+        "module_args, expected_packages, package_list_out, run_command_data, raises",
         [
             (
                 # remove pkg: Check mode -- call to print format but that's it
                 {"_ansible_check_mode": True, "name": ["grep"], "state": "absent"},
                 ["grep-version"],
+                [Package("grep", "grep")],
                 {
                     "calls": [
                         mock.call(
@@ -612,6 +662,7 @@ class TestPacman:
                 # remove pkg for real now -- with 2 packages
                 {"name": ["grep", "gawk"], "state": "absent"},
                 ["grep-version", "gawk-anotherversion"],
+                [Package("grep", "grep"), Package("gawk", "gawk")],
                 {
                     "calls": [
                         mock.call(
@@ -650,6 +701,7 @@ class TestPacman:
                     "extra_args": "--some --extra arg",
                 },
                 ["grep-version"],
+                [Package("grep", "grep")],
                 {
                     "calls": [
                         mock.call(
@@ -698,6 +750,7 @@ class TestPacman:
                 # remove pkg -- Failure to list
                 {"name": ["grep"], "state": "absent"},
                 ["grep-3.7-1"],
+                [Package("grep", "grep")],
                 {
                     "calls": [
                         mock.call(
@@ -724,6 +777,7 @@ class TestPacman:
                 # remove pkg -- Failure to remove
                 {"name": ["grep"], "state": "absent"},
                 ["grep-3.7-1"],
+                [Package("grep", "grep")],
                 {
                     "calls": [
                         mock.call(
@@ -756,16 +810,17 @@ class TestPacman:
                 # install pkg: Check mode
                 {"_ansible_check_mode": True, "name": ["sudo"], "state": "present"},
                 ["sudo"],
+                [Package("sudo", "sudo")],
                 {
                     "calls": [
                         mock.call(
                             mock.ANY,
                             [
                                 "pacman",
-                                "--sync",
                                 "--noconfirm",
                                 "--noprogressbar",
                                 "--needed",
+                                "--sync",
                                 "--print-format",
                                 "%n %v",
                                 "sudo",
@@ -778,19 +833,37 @@ class TestPacman:
                 AnsibleExitJson,
             ),
             (
-                # install 2 pkgs, one already present
-                {"name": ["sudo", "grep"], "state": "present"},
-                ["sudo"],
+                # Install pkgs: one regular, one already installed, one file URL and one https URL
+                {
+                    "name": [
+                        "sudo",
+                        "grep",
+                        "./somepackage-12.3-x86_64.pkg.tar.zst",
+                        "http://example.com/otherpkg-1.2-x86_64.pkg.tar.zst",
+                    ],
+                    "state": "present",
+                },
+                ["sudo", "somepackage", "otherpkg"],
+                [
+                    Package("sudo", "sudo"),
+                    Package("grep", "grep"),
+                    Package("somepackage", "./somepackage-12.3-x86_64.pkg.tar.zst", source_is_URL=True),
+                    Package(
+                        "otherpkg",
+                        "http://example.com/otherpkg-1.2-x86_64.pkg.tar.zst",
+                        source_is_URL=True,
+                    ),
+                ],
                 {
                     "calls": [
                         mock.call(
                             mock.ANY,
                             [
                                 "pacman",
-                                "--sync",
                                 "--noconfirm",
                                 "--noprogressbar",
                                 "--needed",
+                                "--sync",
                                 "--print-format",
                                 "%n %v",
                                 "sudo",
@@ -801,16 +874,49 @@ class TestPacman:
                             mock.ANY,
                             [
                                 "pacman",
-                                "--sync",
                                 "--noconfirm",
                                 "--noprogressbar",
                                 "--needed",
+                                "--upgrade",
+                                "--print-format",
+                                "%n %v",
+                                "./somepackage-12.3-x86_64.pkg.tar.zst",
+                                "http://example.com/otherpkg-1.2-x86_64.pkg.tar.zst",
+                            ],
+                            check_rc=False,
+                        ),
+                        mock.call(
+                            mock.ANY,
+                            [
+                                "pacman",
+                                "--noconfirm",
+                                "--noprogressbar",
+                                "--needed",
+                                "--sync",
                                 "sudo",
                             ],
                             check_rc=False,
                         ),
+                        mock.call(
+                            mock.ANY,
+                            [
+                                "pacman",
+                                "--noconfirm",
+                                "--noprogressbar",
+                                "--needed",
+                                "--upgrade",
+                                "./somepackage-12.3-x86_64.pkg.tar.zst",
+                                "http://example.com/otherpkg-1.2-x86_64.pkg.tar.zst",
+                            ],
+                            check_rc=False,
+                        ),
                     ],
-                    "side_effect": [(0, "sudo version", ""), (0, "", "")],
+                    "side_effect": [
+                        (0, "sudo version", ""),
+                        (0, "somepackage 12.3\notherpkg 1.2", ""),
+                        (0, "", ""),
+                        (0, "", ""),
+                    ],
                 },
                 AnsibleExitJson,
             ),
@@ -818,19 +924,20 @@ class TestPacman:
                 # install pkg, extra_args
                 {"name": ["sudo"], "state": "present", "extra_args": "--some --thing else"},
                 ["sudo"],
+                [Package("sudo", "sudo")],
                 {
                     "calls": [
                         mock.call(
                             mock.ANY,
                             [
                                 "pacman",
-                                "--sync",
                                 "--noconfirm",
                                 "--noprogressbar",
                                 "--needed",
                                 "--some",
                                 "--thing",
                                 "else",
+                                "--sync",
                                 "--print-format",
                                 "%n %v",
                                 "sudo",
@@ -841,13 +948,13 @@ class TestPacman:
                             mock.ANY,
                             [
                                 "pacman",
-                                "--sync",
                                 "--noconfirm",
                                 "--noprogressbar",
                                 "--needed",
                                 "--some",
                                 "--thing",
                                 "else",
+                                "--sync",
                                 "sudo",
                             ],
                             check_rc=False,
@@ -861,16 +968,17 @@ class TestPacman:
                 # latest pkg: Check mode
                 {"_ansible_check_mode": True, "name": ["sqlite"], "state": "latest"},
                 ["sqlite"],
+                [Package("sqlite", "sqlite")],
                 {
                     "calls": [
                         mock.call(
                             mock.ANY,
                             [
                                 "pacman",
-                                "--sync",
                                 "--noconfirm",
                                 "--noprogressbar",
                                 "--needed",
+                                "--sync",
                                 "--print-format",
                                 "%n %v",
                                 "sqlite",
@@ -886,16 +994,17 @@ class TestPacman:
                 # latest pkg -- one already latest
                 {"name": ["sqlite", "grep"], "state": "latest"},
                 ["sqlite"],
+                [Package("sqlite", "sqlite")],
                 {
                     "calls": [
                         mock.call(
                             mock.ANY,
                             [
                                 "pacman",
-                                "--sync",
                                 "--noconfirm",
                                 "--noprogressbar",
                                 "--needed",
+                                "--sync",
                                 "--print-format",
                                 "%n %v",
                                 "sqlite",
@@ -906,10 +1015,10 @@ class TestPacman:
                             mock.ANY,
                             [
                                 "pacman",
-                                "--sync",
                                 "--noconfirm",
                                 "--noprogressbar",
                                 "--needed",
+                                "--sync",
                                 "sqlite",
                             ],
                             check_rc=False,
@@ -924,13 +1033,16 @@ class TestPacman:
     def test_op_packages(
         self,
         mock_valid_inventory,
+        mock_package_list,
         module_args,
         expected_packages,
+        package_list_out,
         run_command_data,
         raises,
     ):
         set_module_args(module_args)
         self.mock_run_command.side_effect = run_command_data["side_effect"]
+        mock_package_list.return_value = package_list_out
 
         P = pacman.Pacman(pacman.setup_module())
         with pytest.raises(raises) as e:
@@ -941,6 +1053,7 @@ class TestPacman:
         if raises == AnsibleExitJson:
             assert out["packages"] == expected_packages
             assert out["changed"]
+            assert "packages" in out
             assert "diff" in out
         else:
             assert out["stdout"] == "stdout"

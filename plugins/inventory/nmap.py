@@ -21,12 +21,18 @@ DOCUMENTATION = '''
             description: token that ensures this is a source file for the 'nmap' plugin.
             required: True
             choices: ['nmap', 'community.general.nmap']
+        sudo:
+            description: Set to C(true) to execute a C(sudo nmap) plugin scan.
+            version_added: 4.8.0
+            default: false
+            type: boolean
         address:
             description: Network IP or range of IPs to scan, you can use a simple range (10.2.2.15-25) or CIDR notation.
             required: True
         exclude:
             description: list of addresses to exclude
             type: list
+            elements: string
         ports:
             description: Enable/disable scanning for open ports
             type: boolean
@@ -46,6 +52,13 @@ DOCUMENTATION = '''
 EXAMPLES = '''
 # inventory.config file in YAML format
 plugin: community.general.nmap
+strict: False
+address: 192.168.0.0/24
+
+
+# a sudo nmap scan to fully use nmap scan power.
+plugin: community.general.nmap
+sudo: true
 strict: False
 address: 192.168.0.0/24
 '''
@@ -134,6 +147,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if not user_cache_setting or cache_needs_update:
             # setup command
             cmd = [self._nmap]
+
+            if self._options['sudo']:
+                cmd.insert(0, 'sudo')
+
             if not self._options['ports']:
                 cmd.append('-sP')
 

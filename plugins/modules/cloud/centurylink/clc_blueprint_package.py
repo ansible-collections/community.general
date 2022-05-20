@@ -42,7 +42,7 @@ options:
     description:
       - Whether to wait for the tasks to finish before returning.
     type: str
-    default: True
+    default: 'True'
     required: False
 requirements:
     - python = 2.7

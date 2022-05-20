@@ -1,2 +1,0 @@
-minor_changes:
-  - linode inventory plugin - add support for caching inventory results (https://github.com/ansible-collections/community.general/pull/4179).
