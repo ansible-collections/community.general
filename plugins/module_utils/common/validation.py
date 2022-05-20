@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Copyright: (c) 2022, DEMAREST Maxime <maxime@indelog.fr>
 # GNU General Public License v3.0+
