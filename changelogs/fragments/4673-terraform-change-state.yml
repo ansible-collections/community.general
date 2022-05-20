@@ -1,2 +1,2 @@
-minor_changes:
-  - "terraform - module will now always return ``changed: true`` when ``state: planned`` and the plan file indicates that apply is needed (https://github.com/ansible-collections/community.general/pull/4673)."
+breaking_changes:
+  - "terraform - module will now always return ``changed: true`` when ``state: planned``, and the plan file indicates that apply is needed. Previously, the module never returned ``changed: true`` during ``terraform plan`` operations, even if ``terraform apply`` was needed (https://github.com/ansible-collections/community.general/pull/4673)."
