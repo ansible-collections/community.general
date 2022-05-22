@@ -3,4 +3,5 @@ shippable/posix/group1
 skip/osx
 skip/macos
 skip/rhel8.0
+skip/rhel9.0
 skip/freebsd
