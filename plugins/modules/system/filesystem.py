@@ -268,7 +268,7 @@ class Ext(Filesystem):
             if None not in (block_size, block_count):
                 break
         else:
-            raise ValueError(out)
+            raise ValueError(repr(out))
 
         return block_size * block_count
 
@@ -319,7 +319,7 @@ class XFS(Filesystem):
             if None not in (block_size, block_count):
                 break
         else:
-            raise ValueError(out)
+            raise ValueError(repr(out))
 
         return block_size * block_count
 
@@ -364,7 +364,7 @@ class Btrfs(Filesystem):
         for line in stdout.splitlines():
             if "Device size" in line:
                 return int(line.split()[-1])
-        raise ValueError(stdout)
+        raise ValueError(repr(stdout))
 
 
 class Ocfs2(Filesystem):
@@ -405,7 +405,7 @@ class F2fs(Filesystem):
             if None not in (sector_size, sector_count):
                 break
         else:
-            raise ValueError(out)
+            raise ValueError(repr(out))
 
         return sector_size * sector_count
 
@@ -428,12 +428,15 @@ class VFAT(Filesystem):
         dummy, out, dummy = self.module.run_command([cmd, '--info', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
         fssize = None
         for line in out.splitlines()[1:]:
-            param, value = line.split(':', 1)
-            if param.strip() == 'Size':
+            parts = line.split(':', 1)
+            if len(parts) < 2:
+                continue
+            param, value = parts
+            if param.strip() in ('Size', 'Cur size'):
                 fssize = int(value.strip())
                 break
         else:
-            raise ValueError(out)
+            raise ValueError(repr(out))
 
         return fssize
 
@@ -477,7 +480,7 @@ class UFS(Filesystem):
             if None not in (fragmentsize, providersize):
                 break
         else:
-            raise ValueError(out)
+            raise ValueError(repr(out))
 
         return fragmentsize * providersize
 

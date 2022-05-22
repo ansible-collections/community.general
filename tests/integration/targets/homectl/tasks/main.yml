@@ -174,3 +174,4 @@
   when:
     - systemd_version.rc == 0 and (systemd_version.stdout | regex_search('[0-9][0-9][0-9]') | int >= 245) and homectl_version.rc == 0
     - ansible_distribution != 'Archlinux'  # TODO!
+    - ansible_distribution != 'Fedora' or ansible_distribution_major_version|int < 36 # TODO!
