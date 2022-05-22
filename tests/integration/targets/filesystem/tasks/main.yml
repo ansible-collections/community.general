@@ -58,6 +58,9 @@
     - 'not (item.0.key == "vfat" and ansible_distribution == "Debian")'  # TODO: figure out why it fails, fix it!
     # vfat resizing fails on ArchLinux
     - 'not (item.0.key == "vfat" and ansible_distribution == "Archlinux")'  # TODO: figure out why it fails, fix it!
+    # vfat resizing fails on Ubuntu 22.04
+    - 'not (item.0.key == "vfat" and ansible_distribution == "Ubuntu" and (ansible_facts.distribution_major_version | int == 22))'
+      # TODO: figure out why it fails, fix it!
     # btrfs-progs cannot be installed on ArchLinux
     - 'not (item.0.key == "btrfs" and ansible_distribution == "Archlinux")'  # TODO: figure out why it fails, fix it!
 

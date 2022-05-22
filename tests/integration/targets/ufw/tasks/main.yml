@@ -8,7 +8,9 @@
 - name: Install EPEL repository (RHEL only)
   include_role:
     name: setup_epel
-  when: ansible_distribution == 'RedHat'
+  when:
+    - ansible_distribution in ['RedHat', 'CentOS']
+    - ansible_distribution_major_version is version('9', '<')
 - name: Install iptables (SuSE only)
   package:
     name: iptables
