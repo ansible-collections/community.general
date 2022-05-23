@@ -31,9 +31,9 @@ DOCUMENTATION = '''
       qtype:
         description:
             - Record type to query.
-            - C(DLV) is deprecated and will be removed in community.general 6.0.0.
+            - C(DLV) has been removed in community.general 6.0.0.
         default: 'A'
-        choices: [A, ALL, AAAA, CNAME, DNAME, DLV, DNSKEY, DS, HINFO, LOC, MX, NAPTR, NS, NSEC3PARAM, PTR, RP, RRSIG, SOA, SPF, SRV, SSHFP, TLSA, TXT]
+        choices: [A, ALL, AAAA, CNAME, DNAME, DNSKEY, DS, HINFO, LOC, MX, NAPTR, NS, NSEC3PARAM, PTR, RP, RRSIG, SOA, SPF, SRV, SSHFP, TLSA, TXT]
       flat:
         description: If 0 each record is returned as a dictionary, otherwise a string.
         default: 1
@@ -109,9 +109,6 @@ RETURN = """
        DNAME:
            description:
                - target
-       DLV:
-            description:
-                - algorithm, digest_type, key_tag, digest
        DNSKEY:
             description:
                 - flags, algorithm, protocol, key
@@ -174,7 +171,7 @@ try:
     import dns.resolver
     import dns.reversename
     import dns.rdataclass
-    from dns.rdatatype import (A, AAAA, CNAME, DLV, DNAME, DNSKEY, DS, HINFO, LOC,
+    from dns.rdatatype import (A, AAAA, CNAME, DNAME, DNSKEY, DS, HINFO, LOC,
                                MX, NAPTR, NS, NSEC3PARAM, PTR, RP, SOA, SPF, SRV, SSHFP, TLSA, TXT)
     HAVE_DNS = True
 except ImportError:
@@ -196,7 +193,6 @@ def make_rdata_dict(rdata):
         AAAA: ['address'],
         CNAME: ['target'],
         DNAME: ['target'],
-        DLV: ['algorithm', 'digest_type', 'key_tag', 'digest'],
         DNSKEY: ['flags', 'algorithm', 'protocol', 'key'],
         DS: ['algorithm', 'digest_type', 'key_tag', 'digest'],
         HINFO: ['cpu', 'os'],
@@ -226,8 +222,6 @@ def make_rdata_dict(rdata):
             if isinstance(val, dns.name.Name):
                 val = dns.name.Name.to_text(val)
 
-            if rdata.rdtype == DLV and f == 'digest':
-                val = dns.rdata._hexify(rdata.digest).replace(' ', '')
             if rdata.rdtype == DS and f == 'digest':
                 val = dns.rdata._hexify(rdata.digest).replace(' ', '')
             if rdata.rdtype == DNSKEY and f == 'key':
@@ -331,11 +325,6 @@ class LookupModule(LookupBase):
         # print "--- domain = {0} qtype={1} rdclass={2}".format(domain, qtype, rdclass)
 
         ret = []
-
-        if qtype.upper() == 'DLV':
-            display.deprecated('The DLV record type has been decommissioned in 2017 and support for'
-                               ' it will be removed from community.general 6.0.0',
-                               version='6.0.0', collection_name='community.general')
 
         if qtype.upper() == 'PTR':
             try:
