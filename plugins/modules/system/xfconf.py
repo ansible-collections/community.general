@@ -146,7 +146,7 @@ RETURN = '''
 '''
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    CmdStateModuleHelper, ArgFormat, ModuleHelperException
+    CmdStateModuleHelper, ArgFormat
 )
 
 
@@ -216,7 +216,7 @@ class XFConfProperty(CmdStateModuleHelper):
         self.vars.meta('value').set(initial_value=self.vars.previous_value)
 
         if self.module.params['disable_facts'] is False:
-            raise ModuleHelperException('Returning results as facts has been removed. Stop using disable_facts=false.')
+            self.do_raise('Returning results as facts has been removed. Stop using disable_facts=false.')
 
     def process_command_output(self, rc, out, err):
         if err.rstrip() == self.does_not:

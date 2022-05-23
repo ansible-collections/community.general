@@ -134,7 +134,7 @@ EXAMPLES = '''
 import json
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    CmdStateModuleHelper, ArgFormat, ModuleHelperException
+    CmdStateModuleHelper, ArgFormat
 )
 from ansible.module_utils.facts.compat import ansible_facts
 
@@ -153,9 +153,8 @@ class PipX(CmdStateModuleHelper):
     module = dict(
         argument_spec=dict(
             state=dict(type='str', default='install',
-                       choices=[
-                           'present', 'absent', 'install', 'uninstall', 'uninstall_all',
-                           'inject', 'upgrade', 'upgrade_all', 'reinstall', 'reinstall_all']),
+                       choices=['present', 'absent', 'install', 'uninstall', 'uninstall_all',
+                                'inject', 'upgrade', 'upgrade_all', 'reinstall', 'reinstall_all']),
             name=dict(type='str'),
             source=dict(type='str'),
             install_deps=dict(type='bool', default=False),
@@ -247,8 +246,7 @@ class PipX(CmdStateModuleHelper):
 
     def state_upgrade(self):
         if not self.vars.application:
-            raise ModuleHelperException(
-                "Trying to upgrade a non-existent application: {0}".format(self.vars.name))
+            self.do_raise("Trying to upgrade a non-existent application: {0}".format(self.vars.name))
         if self.vars.force:
             self.changed = True
         if not self.module.check_mode:
@@ -262,16 +260,14 @@ class PipX(CmdStateModuleHelper):
 
     def state_reinstall(self):
         if not self.vars.application:
-            raise ModuleHelperException(
-                "Trying to reinstall a non-existent application: {0}".format(self.vars.name))
+            self.do_raise("Trying to reinstall a non-existent application: {0}".format(self.vars.name))
         self.changed = True
         if not self.module.check_mode:
             self.run_command(params=['state', 'name', 'python'])
 
     def state_inject(self):
         if not self.vars.application:
-            raise ModuleHelperException(
-                "Trying to inject packages into a non-existent application: {0}".format(self.vars.name))
+            self.do_raise("Trying to inject packages into a non-existent application: {0}".format(self.vars.name))
         if self.vars.force:
             self.changed = True
         if not self.module.check_mode:
