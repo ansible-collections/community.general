@@ -333,7 +333,7 @@ def add_service(module, service):
                      service_id=result.id,
                      service_name=result.name,
                      service_port=result.port,
-                     checks=[check.to_dict() for check in service.checks],
+                     checks=[check.to_dict() for check in service.checks()],
                      tags=result.tags)
 
 

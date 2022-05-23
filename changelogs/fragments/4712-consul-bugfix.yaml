@@ -1,0 +1,2 @@
+bugfixes:
+  - consul - fixed bug introduced in PR 4590 (https://github.com/ansible-collections/community.general/issues/4680).
