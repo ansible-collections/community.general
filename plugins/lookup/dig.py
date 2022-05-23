@@ -31,7 +31,7 @@ DOCUMENTATION = '''
       qtype:
         description:
             - Record type to query.
-            - C(DLV) is deprecated and will be removed in community.general 6.0.0.
+            - C(DLV) has been removed in community.general 6.0.0.
         default: 'A'
         choices: [A, ALL, AAAA, CNAME, DNAME, DNSKEY, DS, HINFO, LOC, MX, NAPTR, NS, NSEC3PARAM, PTR, RP, RRSIG, SOA, SPF, SRV, SSHFP, TLSA, TXT]
       flat:
@@ -325,11 +325,6 @@ class LookupModule(LookupBase):
         # print "--- domain = {0} qtype={1} rdclass={2}".format(domain, qtype, rdclass)
 
         ret = []
-
-        if qtype.upper() == 'DLV':
-            display.deprecated('The DLV record type has been decommissioned in 2017 and support for'
-                               ' it will be removed from community.general 6.0.0',
-                               version='6.0.0', collection_name='community.general')
 
         if qtype.upper() == 'PTR':
             try:
