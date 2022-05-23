@@ -134,7 +134,7 @@ EXAMPLES = '''
 import os
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    ModuleHelper, CmdMixin, ArgFormat, ModuleHelperException
+    ModuleHelper, CmdMixin, ArgFormat
 )
 
 
@@ -171,10 +171,10 @@ class CPANMinus(CmdMixin, ModuleHelper):
         v = self.vars
         if v.mode == "compatibility":
             if v.name_check:
-                raise ModuleHelperException("Parameter name_check can only be used with mode=new")
+                self.do_raise("Parameter name_check can only be used with mode=new")
         else:
             if v.name and v.from_path:
-                raise ModuleHelperException("Parameters 'name' and 'from_path' are mutually exclusive when 'mode=new'")
+                self.do_raise("Parameters 'name' and 'from_path' are mutually exclusive when 'mode=new'")
 
         self.command = self.module.get_bin_path(v.executable if v.executable else self.command)
         self.vars.set("binary", self.command)
@@ -190,17 +190,16 @@ class CPANMinus(CmdMixin, ModuleHelper):
 
         return rc == 0
 
-    @staticmethod
-    def sanitize_pkg_spec_version(pkg_spec, version):
+    def sanitize_pkg_spec_version(self, pkg_spec, version):
         if version is None:
             return pkg_spec
         if pkg_spec.endswith('.tar.gz'):
-            raise ModuleHelperException(msg="parameter 'version' must not be used when installing from a file")
+            self.do_raise(msg="parameter 'version' must not be used when installing from a file")
         if os.path.isdir(pkg_spec):
-            raise ModuleHelperException(msg="parameter 'version' must not be used when installing from a directory")
+            self.do_raise(msg="parameter 'version' must not be used when installing from a directory")
         if pkg_spec.endswith('.git'):
             if version.startswith('~'):
-                raise ModuleHelperException(msg="operator '~' not allowed in version parameter when installing from git repository")
+                self.do_raise(msg="operator '~' not allowed in version parameter when installing from git repository")
             version = version if version.startswith('@') else '@' + version
         elif version[0] not in ('@', '~'):
             version = '~' + version
@@ -228,7 +227,7 @@ class CPANMinus(CmdMixin, ModuleHelper):
 
     def process_command_output(self, rc, out, err):
         if self.vars.mode == "compatibility" and rc != 0:
-            raise ModuleHelperException(msg=err, cmd=self.vars.cmd_args)
+            self.do_raise(msg=err, cmd=self.vars.cmd_args)
         return 'is up to date' not in err and 'is up to date' not in out
 
 

@@ -99,7 +99,7 @@ msg:
 import os
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    CmdModuleHelper, ArgFormat, ModuleHelperException
+    CmdModuleHelper, ArgFormat
 )
 
 
@@ -136,7 +136,7 @@ class MkSysB(CmdModuleHelper):
 
     def __init_module__(self):
         if not os.path.isdir(self.vars.storage_path):
-            raise ModuleHelperException("Storage path %s is not valid." % self.vars.storage_path)
+            self.do_raise("Storage path %s is not valid." % self.vars.storage_path)
 
     def __run__(self):
         if not self.module.check_mode:
@@ -149,7 +149,7 @@ class MkSysB(CmdModuleHelper):
 
     def process_command_output(self, rc, out, err):
         if rc != 0:
-            raise ModuleHelperException("mksysb failed.")
+            self.do_raise("mksysb failed.")
         self.vars.msg = out
 
 
