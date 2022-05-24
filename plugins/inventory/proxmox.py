@@ -431,6 +431,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _get_vm_status(self, properties, node, vmid, vmtype, name):
         ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/status/current" % (self.proxmox_url, node, vmtype, vmid))
         properties[self._fact('status')] = ret['status']
+        properties[self._fact('qmpstatus')] = ret['qmpstatus']
 
     def _get_vm_snapshots(self, properties, node, vmid, vmtype, name):
         ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/snapshot" % (self.proxmox_url, node, vmtype, vmid))
@@ -489,7 +490,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         name, vmid = item['name'], item['vmid']
 
         # get status, config and snapshots if want_facts == True
-        if self.get_option('want_facts'):
+        want_facts = self.get_option('want_facts')
+        if want_facts:
             self._get_vm_status(properties, node, vmid, ittype, name)
             self._get_vm_config(properties, node, vmid, ittype, name)
             self._get_vm_snapshots(properties, node, vmid, ittype, name)
@@ -506,7 +508,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if item['status'] == 'stopped':
             self.inventory.add_child(self._group('all_stopped'), name)
         elif item['status'] == 'running':
-            self.inventory.add_child(self._group('all_running'), name)
+            item_status = 'running'
+            # get more details about the status of the qemu VM if want_facts == True 
+            if want_facts:
+                item_status = properties.get(self._fact('qmpstatus'), item_status)
+            self.inventory.add_child(self._group(f'all_{item_status}'), name)
 
         return name
 
@@ -528,10 +534,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _populate(self):
 
         # create common groups
-        self.inventory.add_group(self._group('all_lxc'))
-        self.inventory.add_group(self._group('all_qemu'))
-        self.inventory.add_group(self._group('all_running'))
-        self.inventory.add_group(self._group('all_stopped'))
+        default_groups = ['lxc', 'qemu', 'running', 'stopped', 'prelaunch', 'paused']
+        for group in default_groups:
+            self.inventory.add_group(self._group(f'all_{group}'))
+
         nodes_group = self._group('nodes')
         self.inventory.add_group(nodes_group)
 
