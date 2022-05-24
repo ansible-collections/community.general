@@ -512,7 +512,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             # get more details about the status of the qemu VM if want_facts == True
             if want_facts:
                 item_status = properties.get(self._fact('qmpstatus'), item_status)
-            self.inventory.add_child(self._group(f'all_{item_status}'), name)
+            self.inventory.add_child(self._group('all_%s' % (item_status)), name)
 
         return name
 
@@ -536,7 +536,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         # create common groups
         default_groups = ['lxc', 'qemu', 'running', 'stopped', 'prelaunch', 'paused']
         for group in default_groups:
-            self.inventory.add_group(self._group(f'all_{group}'))
+            self.inventory.add_group(self._group('all_%s' % (group)))
 
         nodes_group = self._group('nodes')
         self.inventory.add_group(nodes_group)
