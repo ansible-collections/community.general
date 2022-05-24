@@ -131,7 +131,7 @@ options:
   update_protocol:
     required: false
     description:
-      - protocol for the update.
+      - Protocol for the update.
     type: str
     version_added: '0.2.0'
   update_targets:
