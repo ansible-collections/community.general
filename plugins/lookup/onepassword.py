@@ -96,31 +96,147 @@ RETURN = """
     elements: str
 """
 
+import abc
 import errno
 import json
 import os
-
-from subprocess import Popen, PIPE
+import subprocess
 
 from ansible.plugins.lookup import LookupBase
 from ansible.errors import AnsibleLookupError
+from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_bytes, to_text
+from ansible.module_utils.six import with_metaclass
 
 from ansible_collections.community.general.plugins.module_utils.onepassword import OnePasswordConfig
 
 
+class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
+    bin = "op"
+
+    def __init__(self, subdomain, domain, master_password, secret_key, vault):
+        self.subdomain = subdomain
+        self.domain = domain
+        self.master_password = master_password
+        self.secret_key = secret_key
+        self.vault = vault
+
+        self._path = None
+        self._version = None
+
+    @abc.abstractmethod
+    def get_account(self):
+        pass
+
+    @abc.abstractmethod
+    def get_item(self, item_id):
+        pass
+
+    @abc.abstractmethod
+    def signin(self):
+        pass
+
+    @abc.abstractmethod
+    def _parse_field(self, data_json, field_name, section_title):
+        pass
+
+    @property
+    def path(self):
+        if self._path is None:
+            self._path = get_bin_path(self.bin)
+
+        return self._path
+
+    @property
+    def version(self):
+        if self._version is None:
+            self._version = self.get_current_version()
+
+        return self._version
+
+    @classmethod
+    def get_current_version(cls):
+        """Standalone method to get the op CLI version. Useful when determing which class to load
+        based on the current version."""
+        try:
+            bin_path = get_bin_path(cls.bin)
+        except ValueError:
+            raise AnsibleLookupError("Unable to locate '%s' command line tool" % cls.bin)
+
+        try:
+            b_out = subprocess.check_output([bin_path, "--version"], stderr=subprocess.PIPE)
+        except subprocess.CalledProcessError as cpe:
+            raise AnsibleLookupError("Unable to get the op version: %s" % cpe)
+
+        return to_text(b_out).strip()
+
+    def _run(self, args, expected_rc=0, command_input=None, ignore_errors=False):
+        command = [self.path] + args
+        p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        out, err = p.communicate(input=command_input)
+        rc = p.wait()
+        if not ignore_errors and rc != expected_rc:
+            raise AnsibleLookupError(to_text(err))
+
+        return rc, out, err
+
+
+class OnePassCLIv1(OnePassCLIBase):
+    supports_version = "1"
+
+    def get_account(self):
+        pass
+
+    def get_item(self, item_id):
+        pass
+
+    def signin(self):
+        pass
+
+    def _parse_field(self, data_json, field_name, section_title):
+        pass
+
+
+class OnePassCLIv2(OnePassCLIBase):
+    supports_version = "2"
+
+    def get_account(self):
+        pass
+
+    def get_item(self, item_id):
+        pass
+
+    def signin(self):
+        pass
+
+    def _parse_field(self, data_json, field_name, section_title):
+        pass
+
+
 class OnePass(object):
-    def __init__(self, path='op'):
-        self.cli_path = path
+    def __init__(self, subdomain, domain, username, secret_key, master_password):
+        self.subdomain = subdomain
+        self.domain = domain
+        self.username = username
+        self.secret_key = secret_key
+        self.master_password = master_password
+
         self.logged_in = False
         self.token = None
-        self.subdomain = None
-        self.domain = None
-        self.username = None
-        self.secret_key = None
-        self.master_password = None
 
         self._config = OnePasswordConfig()
+        self._cli = self._get_cli_class()
+
+    def _get_cli_class(self):
+        version = OnePassCLIBase.get_current_version()
+        for cls in OnePassCLIBase.__subclasses__():
+            if cls.supports_version == version.split(".")[0]:
+                try:
+                    return cls(self.subdomain, self.domain, self.username, self.secret_key, self.master_password)
+                except TypeError as e:
+                    raise AnsibleLookupError(e)
+
+        raise AnsibleLookupError("op version %s is unsupported" % version)
 
     def get_token(self):
         # If the config file exists, assume an initial signin has taken place and try basic sign in
@@ -185,15 +301,6 @@ class OnePass(object):
 
         rc, out, err = self._run(args, command_input=to_bytes(self.master_password))
         self.token = out.strip()
-
-    def _run(self, args, expected_rc=0, command_input=None, ignore_errors=False):
-        command = [self.cli_path] + args
-        p = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE)
-        out, err = p.communicate(input=command_input)
-        rc = p.wait()
-        if not ignore_errors and rc != expected_rc:
-            raise AnsibleLookupError(to_text(err))
-        return rc, out, err
 
     def _parse_field(self, data_json, field_name, section_title=None):
         """
@@ -268,18 +375,17 @@ class OnePass(object):
 class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
-        op = OnePass()
+        field = kwargs.get("field", "password")
+        section = kwargs.get("section", "")
+        vault = kwargs.get("vault", "")
+        subdomain = kwargs.get("subdomain")
+        domain = kwargs.get("domain", "1password.com")
+        username = kwargs.get("username", "")
+        secret_key = kwargs.get("secret_key", "")
+        master_password = kwargs.get("master_password", kwargs.get("vault_password", ""))
 
-        field = kwargs.get('field', 'password')
-        section = kwargs.get('section')
-        vault = kwargs.get('vault')
-        op.subdomain = kwargs.get('subdomain')
-        op.domain = kwargs.get('domain', '1password.com')
-        op.username = kwargs.get('username')
-        op.secret_key = kwargs.get('secret_key')
-        op.master_password = kwargs.get('master_password', kwargs.get('vault_password'))
-
-        op.assert_logged_in()
+        op = OnePass(subdomain, domain, username, secret_key, master_password)
+        # op.assert_logged_in()
 
         values = []
         for term in terms:
