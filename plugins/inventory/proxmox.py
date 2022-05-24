@@ -509,7 +509,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self.inventory.add_child(self._group('all_stopped'), name)
         elif item['status'] == 'running':
             item_status = 'running'
-            # get more details about the status of the qemu VM if want_facts == True 
+            # get more details about the status of the qemu VM if want_facts == True
             if want_facts:
                 item_status = properties.get(self._fact('qmpstatus'), item_status)
             self.inventory.add_child(self._group(f'all_{item_status}'), name)
