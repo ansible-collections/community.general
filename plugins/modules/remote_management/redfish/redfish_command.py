@@ -80,7 +80,7 @@ options:
   bootdevice:
     required: false
     description:
-      - Bootdevice when setting boot configuration.
+      - Boot device when setting boot configuration.
     type: str
   timeout:
     description:
