@@ -51,7 +51,7 @@ options:
     version_added: 2.3.0
   timeout:
     description:
-      - Timeout in seconds for URL requests to OOB controller.
+      - Timeout in seconds for HTTP requests to OOB controller.
     default: 10
     type: int
 
