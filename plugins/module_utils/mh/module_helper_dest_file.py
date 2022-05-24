@@ -57,7 +57,7 @@ def check_if_dest_exists(dest):
     return True
 
 
-def check_if_parent_is_writable(dest):
+def check_if_parent_is_writeable(dest):
     # type: (str) -> bool
     if os.access(os.path.dirname(dest), os.W_OK):
         return True
@@ -67,6 +67,13 @@ def check_if_parent_is_writable(dest):
 def check_if_dest_is_readable(dest):
     # type: (str) -> bool
     if os.access(dest, os.R_OK):
+        return True
+    return False
+
+
+def check_if_dest_is_writeable(dest):
+    # type: (str) -> bool
+    if os.access(dest, os.W_OK):
         return True
     return False
 
@@ -82,30 +89,25 @@ def dest_file_sanity_check(dest, create=False, backup=False):
     # type: (str, bool, bool) -> bool
     """
     Ensure that the destination exist and is readable or if not exists and
-    'create' is True, ensure that the parent of the destination is writable. If
+    'create' is True, ensure that the parent of the destination is writeable. If
     'backup' is True, also ensure that the backup file can be created.
 
     Return `True` if the file will be created else `False`.
     """
     exists = check_if_dest_exists(dest)
-    writable_parent = check_if_parent_is_writable(dest)
+    writeable_parent = check_if_parent_is_writeable(dest)
     if not create and not exists:
-        msg = "{} does not not exist !".format(dest)
-        raise DestNotExists(msg)
-    elif create and not exists and not writable_parent:
-        msg = "Can't create {}, ".format(dest)
-        msg += "parent directory is not writable !"
-        raise ParentNotWriteable(msg)
-    elif exists and not check_if_dest_is_readable(dest):
-        msg = "Destination {} is not readable !".format(dest)
-        raise DestNotReadable(msg)
-    elif exists and not check_if_dest_is_regular_file(dest):
-        msg = "Destination {} is not a regular file !".format(dest)
-        raise DestNotRegularFile(msg)
-    elif exists and backup and not writable_parent:
-        msg = "Can't create backup file for {} ".format(dest)
-        msg += "because parrent dir is not writable !"
-        raise CantCreateBackup(msg)
+        raise DestNotExists(msg="{0} does not not exist !".format(dest))
+    if create and not exists and not writeable_parent:
+        raise ParentNotWriteable(msg="Can't create {0}, parent directory is not writeable !".format(dest))
+    if exists and not check_if_dest_is_readable(dest):
+        raise DestNotReadable(msg="Destination {0} is not readable !".format(dest))
+    if exists and not check_if_dest_is_writeable(dest):
+        raise DestNotReadable(msg="Destination {0} is not writeable !".format(dest))
+    if exists and not check_if_dest_is_regular_file(dest):
+        raise DestNotRegularFile(msg="Destination {0} is not a regular file !".format(dest))
+    if exists and backup and not writeable_parent:
+        raise CantCreateBackup(msg="Can't create backup file for {0} because parrent dir is not writeable !".format(dest))
     return (not exists and create)
 
 
