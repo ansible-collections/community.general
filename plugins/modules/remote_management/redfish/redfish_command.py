@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: redfish_command
-short_description: Manages Out-Of-Band controllers using Redfish APIs.
+short_description: Manages Out-Of-Band controllers using Redfish APIs
 description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to
     perform an action.
