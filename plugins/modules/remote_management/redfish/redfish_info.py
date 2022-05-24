@@ -21,37 +21,37 @@ options:
   category:
     required: false
     description:
-      - List of categories to execute on OOB controller
+      - List of categories to execute on OOB controller.
     default: ['Systems']
     type: list
     elements: str
   command:
     required: false
     description:
-      - List of commands to execute on OOB controller
+      - List of commands to execute on OOB controller.
     type: list
     elements: str
   baseuri:
     required: true
     description:
-      - Base URI of OOB controller
+      - Base URI of OOB controller.
     type: str
   username:
     description:
-      - User for authentication with OOB controller
+      - Username for authenticating to OOB controller.
     type: str
   password:
     description:
-      - Password for authentication with OOB controller
+      - Password for authenticating to OOB controller.
     type: str
   auth_token:
     description:
-      - Security token for authentication with OOB controller
+      - Security token for authenticating to OOB controller.
     type: str
     version_added: 2.3.0
   timeout:
     description:
-      - Timeout in seconds for URL requests to OOB controller
+      - Timeout in seconds for HTTP requests to OOB controller.
     default: 10
     type: int
 
