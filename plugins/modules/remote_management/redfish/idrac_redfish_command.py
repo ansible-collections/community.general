@@ -14,40 +14,40 @@ short_description: Manages Out-Of-Band controllers using iDRAC OEM Redfish APIs
 description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to
     perform an action.
-  - For use with Dell iDRAC operations that require Redfish OEM extensions
+  - For use with Dell iDRAC operations that require Redfish OEM extensions.
 options:
   category:
     required: true
     description:
-      - Category to execute on OOB controller.
+      - Category to execute on iDRAC.
     type: str
   command:
     required: true
     description:
-      - List of commands to execute on OOB controller.
+      - List of commands to execute on iDRAC.
     type: list
     elements: str
   baseuri:
     required: true
     description:
-      - Base URI of OOB controller.
+      - Base URI of iDRAC.
     type: str
   username:
     description:
-      - Username for authenticating to OOB controller.
+      - Username for authenticating to iDRAC.
     type: str
   password:
     description:
-      - Password for authenticating to OOB controller.
+      - Password for authenticating to iDRAC.
     type: str
   auth_token:
     description:
-      - Security token for authenticating to OOB controller.
+      - Security token for authenticating to iDRAC.
     type: str
     version_added: 2.3.0
   timeout:
     description:
-      - Timeout in seconds for URL requests to OOB controller.
+      - Timeout in seconds for URL requests to iDRAC.
     default: 10
     type: int
   resource_id:
