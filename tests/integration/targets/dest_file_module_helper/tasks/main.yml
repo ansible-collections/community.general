@@ -1,0 +1,353 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# (c) 2022 DEMAREST Maxime <maxime@indelog.fr>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: set dest_dir and dest_file
+  set_fact:
+    dest_dir: "{{ remote_tmp_dir }}/destdir/"
+    dest_file: "{{ remote_tmp_dir }}/destdir/destfile.txt"
+
+
+- name: 001 fail when dest_file not exists
+  block:
+    - name: 001 create writeable and readable dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0777"
+        state: "directory"
+    - name: 001 run fail when dest_file not exists with create false
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "This is dummy content."
+        create: false
+      ignore_errors: true
+      register: last_result
+    - name: 001 assert fail when dest_file not exists
+      ansible.builtin.assert:
+        that:
+          - last_result.failed == true
+          - last_result.changed == false
+          - last_result.msg == "{{ dest_file }} does not not exist !"
+    - name: 001 clean dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: "absent"
+
+- name: 002 fail when dest_file not exists and create on non writeable parent
+  block:
+    - name: 002 create readonly dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0555"
+        state: "directory"
+    - name: 002 run fail when dest_file not exists and create on non writeable parent
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content A"
+        create: true
+      ignore_errors: true
+      register: last_result
+    - name: 002 assert fail when dest_file not exists and create on non writeable parent
+      ansible.builtin.assert:
+        that:
+          - last_result.failed == true
+          - last_result.changed == false
+          - last_result.msg == "Can't create {{ dest_file }}, parent directory is not writeable !"
+    - name: 002 clean dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: "absent"
+
+- name: 003 fail when dest_file exist but is not readable
+  block:
+    - name: 003 create readable and writable dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0777"
+        state: "directory"
+    - name: 003 create non readable dest_file
+      ansible.builtin.file:
+        path: "{{ dest_file }}"
+        mode: "0000"
+        state: "touch"
+    - name: 003 run fail when dest_file exists but is not readable
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content A"
+      ignore_errors: true
+      register: last_result
+    - name: 003 assert fail when dest_file exists but is not readable
+      ansible.builtin.assert:
+        that:
+          - last_result.failed == true
+          - last_result.changed == false
+          - last_result.msg == "Destination {{ dest_file }} is not readable !"
+    - name: 003 clean dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: "absent"
+
+- name: 004 fail when dest_file exist but is not writeable
+  block:
+    - name: 004 create readable and writable dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0777"
+        state: "directory"
+    - name: 004 create non writeable dest_file
+      ansible.builtin.file:
+        path: "{{ dest_file }}"
+        mode: "0444"
+        state: "touch"
+    - name: 004 run fail when dest_file exists but is not writeable
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content A"
+      ignore_errors: true
+      register: last_result
+    - name: 004 assert fail when dest_file exists but is not writeable
+      ansible.builtin.assert:
+        that:
+          - last_result.failed == true
+          - last_result.changed == false
+          - last_result.msg == "Destination {{ dest_file }} is not writeable !"
+    - name: 004 clean dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: "absent"
+
+- name: 005 fail when dest_file exists but is not regular file
+  block:
+    - name: 005 create readable and writable dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0777"
+        state: "directory"
+    - name: 005 create dest_file as dir
+      ansible.builtin.file:
+        path: "{{ dest_file }}"
+        mode: "0777"
+        state: "directory"
+    - name: 005 run fail when dest_file exists but is not regular file
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content A"
+      ignore_errors: true
+      register: last_result
+    - name: 005 assert fail when dest_file exists but is not regular file
+      ansible.builtin.assert:
+        that:
+          - last_result.failed == true
+          - last_result.changed == false
+          - last_result.msg == "Destination {{ dest_file }} is not a regular file !"
+    - name: 005 clean dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: "absent"
+
+- name: 006 when backup dest_file but parent dir is not writable
+  block:
+    - name: 006 create readable and writable dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0777"
+        state: "directory"
+    - name: 006 create readable and writeable dest_file
+      ansible.builtin.file:
+        path: "{{ dest_file }}"
+        mode: "0777"
+        state: "touch"
+    - name: 006 make partent dir not writeable
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0555"
+        state: "directory"
+    - name: 006 run fail when backup dest_file but parent dir is not writable
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content A"
+        backup: true
+      ignore_errors: true
+      register: last_result
+    - name: 006 assert fail when backup dest_file but parent dir is not writable
+      ansible.builtin.assert:
+        that:
+          - last_result.failed == true
+          - last_result.changed == false
+          - last_result.msg == "Can't create backup file for {{ dest_file }} because parrent dir is not writeable !"
+    - name: 006 make dest_dir writrable before remove it
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0777"
+        state: "directory"
+    - name: 006 clean dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: "absent"
+
+- name: 007 can create when not exist
+  block:
+    - name: 007 create readable and writable dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0777"
+        state: "directory"
+    - name: 007 run can create when not exist
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content A"
+      register: last_result
+    - name: 007 assert can create when not exist
+      ansible.builtin.assert:
+        that:
+          - last_result.failed == false
+          - last_result.changed == true
+          - last_result.result == "Content A"
+    - name: 007 clean dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: "absent"
+
+- name: 008 no change with same value
+  block:
+    - name: 008 create readable and writable dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0777"
+        state: "directory"
+    - name: 008 run no change with same value (first run for create file)
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content A"
+    - name: 008 run no change with same value (second run with same value)
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content A"
+      register: last_result
+    - name: 008 assert no change with same value
+      ansible.builtin.assert:
+        that:
+          - last_result.failed == false
+          - last_result.changed == false
+          - last_result.result == "Content A"
+    - name: 008 clean dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: "absent"
+
+- name: 009 change with different value
+  block:
+    - name: 009 create readable and writable dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0777"
+        state: "directory"
+    - name: 009 run change with different value (first run for create file)
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content A"
+    - name: 009 run change with different value (second run with different) value)
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content B"
+      register: last_result
+    - name: 009 assert no change with same value
+      ansible.builtin.assert:
+        that:
+          - last_result.failed == false
+          - last_result.changed == true
+          - last_result.result == "Content B"
+    - name: 009 clean dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: "absent"
+
+- name: 010 create backup file when dest_file exists
+  block:
+    - name: 010 create readable and writable dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0777"
+        state: "directory"
+    - name: 010 run create backup file when dest_file exists (first run for create file)
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content A"
+    - name: 010 run create backup file when dest_file exists (second run with different value)
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content B"
+        backup: true
+      register: last_result
+    - name: 010 run get the content of the backup file
+      ansible.builtin.command:
+        cmd: "/usr/bin/cat {{ last_result.backup_file }}"
+      register: last_result
+    - name: 010 assert no change with same value
+      ansible.builtin.assert:
+        that:
+          - last_result.stdout == "Content A"
+    - name: 010 clean dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: "absent"
+
+- name: 011 can run with backup option when dest_file need to be created
+  block:
+    - name: 011 create readable and writable dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0777"
+        state: "directory"
+    - name: 011 run can run with backup option when dest_file need to be created
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content A"
+        backup: true
+      register: last_result
+    - name: 011 assert can run with backup option when dest_file need to be created
+      ansible.builtin.assert:
+        that:
+          - last_result.backup_file is not defined
+    - name: 011 clean dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: "absent"
+
+- name: 012 dest_file will not be effectively created when check mode enabled
+  block:
+    - name: 012 create readable and writable dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0777"
+        state: "directory"
+    - name: 012 run can run with backup option when dest_file need to be created
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content A"
+      check_mode: true
+      register: last_result
+    - name: 012 assert can run with backup option when dest_file need to be created
+      ansible.builtin.assert:
+        that:
+          - last_result.failed == false
+          - last_result.changed == true
+          - last_result.result == "Content A"
+    - name: 012 run verify is dest_file is absent
+      ansible.builtin.file:
+        path: "{{ dest_file }}"
+        state: "absent"
+      register: last_result
+    - name: 012 assert verify is dest_file is absent
+      ansible.builtin.assert:
+        that:
+          - last_result.changed == false
+    - name: 012 clean dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: "absent"
