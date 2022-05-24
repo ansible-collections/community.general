@@ -195,7 +195,7 @@ def main():
         project=dict(required=True),
         region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
         compute_id=dict(required=True),
-        private_network_id=dict(require=True)
+        private_network_id=dict(required=True)
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
