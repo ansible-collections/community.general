@@ -28,8 +28,7 @@ from ansible_collections.community.general.plugins.module_utils.mh.module_helper
     DestFileModuleHelper)
 
 
-MODULE_PATH = 'ansible_collections.community.general.plugins.module_utils.' +\
-              'mh.module_helper_dest_file.{}'
+MODULE_PATH = 'ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file.{}'
 
 FAKE_DEST = '/this/is/a/fake/dest'
 FAKE_TEMP_FILE = '/fake/temp/file'
@@ -116,7 +115,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
 
 class TestDestFileSanityCheck():
 
-    @ pytest.mark.parametrize(
+    @pytest.mark.parametrize(
         'exists,os_stat_side_effect', (
             (False, FileNotFoundError),
             (True, PermissionError),
@@ -132,42 +131,35 @@ class TestDestFileSanityCheck():
         assert(check_if_dest_exists(FAKE_DEST) == exists)
         os.stat.assert_called_once_with(FAKE_DEST)
 
-    @ pytest.mark.parametrize('expected', ((True), (False)))
+    @pytest.mark.parametrize('expected', ((True), (False)))
     def test_if_parent_not_writeable(self, expected, mocker):
         mocker.patch('os.access', return_value=expected)
         assert(check_if_parent_is_writable(FAKE_DEST) == expected)
         os.access.assert_called_once_with(os.path.dirname(FAKE_DEST), os.W_OK)
 
-    @ pytest.mark.parametrize('expected', ((True), (False)))
+    @pytest.mark.parametrize('expected', ((True), (False)))
     def test_check_if_dest_is_readable(self, expected, mocker):
         mocker.patch('os.access', return_value=expected)
         assert(check_if_dest_is_readable(FAKE_DEST) == expected)
         os.access.assert_called_once_with(FAKE_DEST, os.R_OK)
 
-    @ pytest.mark.parametrize('expected', ((True), (False)))
+    @pytest.mark.parametrize('expected', ((True), (False)))
     def test_check_if_dest_is_regular_file(self, expected, mocker):
         mocker.patch('os.path.isfile', return_value=expected)
         assert(check_if_dest_is_regular_file(FAKE_DEST) == expected)
         os.path.isfile.assert_called_once_with(FAKE_DEST)
 
-    @ pytest.mark.parametrize(
-        'create, backup, exists, writable_parent,'
-        + 'readable, regular_file, expect_raise',
+    @pytest.mark.parametrize(
+        'create, backup, exists, writable_parent, readable, regular_file, expect_raise',
         (elem.values() for elem in FILE_SANITY_CHECK_TEST_CASE.values()),
         ids=(FILE_SANITY_CHECK_TEST_CASE.keys()))
-    def test_check(self, create, backup, exists, writable_parent,
-                   readable, regular_file, expect_raise, mocker):
-        mocker.patch(MODULE_PATH.format('check_if_dest_exists'),
-                     return_value=exists)
-        mocker.patch(MODULE_PATH.format('check_if_parent_is_writable'),
-                     return_value=writable_parent)
-        mocker.patch(MODULE_PATH.format('check_if_dest_is_readable'),
-                     return_value=readable)
-        mocker.patch(MODULE_PATH.format('check_if_dest_is_regular_file'),
-                     return_value=regular_file)
+    def test_check(self, create, backup, exists, writable_parent, readable, regular_file, expect_raise, mocker):
+        mocker.patch(MODULE_PATH.format('check_if_dest_exists'), return_value=exists)
+        mocker.patch(MODULE_PATH.format('check_if_parent_is_writable'), return_value=writable_parent)
+        mocker.patch(MODULE_PATH.format('check_if_dest_is_readable'), return_value=readable)
+        mocker.patch(MODULE_PATH.format('check_if_dest_is_regular_file'), return_value=regular_file)
         if expect_raise is None:
-            file_will_be_created = dest_file_sanity_check(
-                FAKE_DEST, create, backup)
+            file_will_be_created = dest_file_sanity_check(FAKE_DEST, create, backup)
             assert((create and not exists) == file_will_be_created)
         else:
             with pytest.raises(expect_raise):
