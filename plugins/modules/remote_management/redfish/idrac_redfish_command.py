@@ -47,7 +47,7 @@ options:
     version_added: 2.3.0
   timeout:
     description:
-      - Timeout in seconds for URL requests to iDRAC.
+      - Timeout in seconds for HTTP requests to iDRAC.
     default: 10
     type: int
   resource_id:
