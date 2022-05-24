@@ -119,25 +119,25 @@ options:
   resource_id:
     required: false
     description:
-      - The ID of the System, Manager or Chassis to modify.
+      - ID of the System, Manager or Chassis to modify.
     type: str
     version_added: '0.2.0'
   update_image_uri:
     required: false
     description:
-      - The URI of the image for the update.
+      - URI of the image for the update.
     type: str
     version_added: '0.2.0'
   update_protocol:
     required: false
     description:
-      - The protocol for the update.
+      - protocol for the update.
     type: str
     version_added: '0.2.0'
   update_targets:
     required: false
     description:
-      - The list of target resource URIs to apply the update to.
+      - List of target resource URIs to apply the update to.
     type: list
     elements: str
     version_added: '0.2.0'
