@@ -174,7 +174,7 @@ options:
       image_url:
         required: false
         description:
-          - The URL od the image the insert or eject
+          - The URL of the image to insert or eject
         type: str
       inserted:
         required: false
