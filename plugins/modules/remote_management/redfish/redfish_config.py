@@ -35,7 +35,7 @@ options:
     type: str
   username:
     description:
-      - User for authenticating to OOB controller.
+      - Username for authenticating to OOB controller.
     type: str
   password:
     description:
