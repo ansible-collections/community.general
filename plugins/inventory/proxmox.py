@@ -508,11 +508,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         if item['status'] == 'stopped':
             self.inventory.add_child(self._group('all_stopped'), name)
         elif item['status'] == 'running':
-            item_status = 'running'
-            # get more details about the status of the qemu VM if want_facts == True
-            if want_facts:
-                item_status = properties.get(self._fact('qmpstatus'), item_status)
-            self.inventory.add_child(self._group('all_%s' % (item_status)), name)
+            self.inventory.add_child(self._group('all_%s' % (item['status'])), name)
+            if want_facts and ittype == 'qemu':
+                # get more details about the status of the qemu VM if want_facts == True
+                item_status = properties.get(self._fact('qmpstatus'), item['status'])
+                self.inventory.add_child(self._group('all_qemu_%s' % (item_status)), name)
 
         return name
 
@@ -534,7 +534,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _populate(self):
 
         # create common groups
-        default_groups = ['lxc', 'qemu', 'running', 'stopped', 'prelaunch', 'paused']
+        default_groups = ['lxc', 'qemu', 'running', 'stopped',
+                          'qemu_running', 'qemu_stopped', 'qemu_prelaunch', 'qemu_paused']
         for group in default_groups:
             self.inventory.add_group(self._group('all_%s' % (group)))
 
