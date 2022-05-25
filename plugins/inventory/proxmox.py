@@ -92,7 +92,13 @@ DOCUMENTATION = '''
         default: proxmox_
         type: str
       want_facts:
-        description: Gather LXC/QEMU configuration facts.
+        description:
+          - Gather LXC/QEMU configuration facts.
+          - When I(want_facts) is set to C(true) more details about QEMU VM status are possible, besides the running and stopped.
+            Currently if the VM is running and it's suspended, the status will be running and the machine will be in C(running) group,
+            but it's actual state will be paused. This introduces multiple groups [prefixed with I(facts_prefix)] C(qemu_running),
+            C(qemu_stopped), C(qemu_prelaunch) and C(qemu_paused). In this case the machine will be present in both
+            C(running) and C(qemu_paused).
         default: no
         type: bool
       want_proxmox_nodes_ansible_host:
