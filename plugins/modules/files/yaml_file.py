@@ -486,12 +486,10 @@ class YamlFile(DestFileModuleHelper):
                 content = file.readlines()
         except FileNotFoundError:
             pass
-        except yaml.scanner.ScannerError:
-            raise ModuleHelperException('Failed to decode YAML in {}'.format(self.vars["path"]))
         if ''.join(content).strip() == '':
             content = ['{}']
         if self.vars['diff_on_value']:
-            self.vars.set(self.var_result_data, yaml.safe_load(''.join(content)), diff=True)
+            self.vars.set(self.var_result_data, self._yaml_loads(content), diff=True)
         else:
             self.vars.set(self.var_result_data, content, diff=True)
 
@@ -505,7 +503,14 @@ class YamlFile(DestFileModuleHelper):
         if self.vars['diff_on_value']:
             return self.vars[self.var_result_data]
         else:
-            return yaml.safe_load(''.join(self.vars[self.var_result_data]))
+            return self._yaml_loads(self.vars[self.var_result_data])
+
+    def _yaml_loads(self, yaml_str):
+        # type: (str) -> str
+        try:
+            return yaml.safe_load(''.join(yaml_str))
+        except yaml.scanner.ScannerError:
+            raise ModuleHelperException('Failed to decode YAML in {0}'.format(self.vars["path"]))
 
     def _set_result(self, result):
         # type: (dict) -> None
