@@ -477,6 +477,10 @@ class JsonFile(DestFileModuleHelper):
         supports_check_mode=True,
     )
 
+    def __init__(self, module=None, var_dest_file='path', var_result_data='result'):
+        self._current_content_end_with_line_break = False
+        super().__init__(module, var_dest_file, var_result_data)
+
     def __load_result_data__(self):
         # type: () -> dict
         content = []
@@ -485,40 +489,51 @@ class JsonFile(DestFileModuleHelper):
                 content = file.readlines()
         except FileNotFoundError:
             pass
-        except json.JSONDecodeError:
-            msg = 'Failed to decode JSON in {}'.format(self.vars["path"])
-            raise ModuleHelperException(msg)
         if ''.join(content).strip() == '':
-            content = ['{}']
+            content = ['{}\n']
+        if content[-1][-1].endswith('\n'):
+            self._current_content_end_with_line_break = True
         if self.vars['diff_on_value']:
-            self.vars.set(self.var_result_data, json.loads(''.join(content)), diff=True)
+            self.vars.set(self.var_result_data, self._json_loads(content), diff=True)
         else:
             self.vars.set(self.var_result_data, content, diff=True)
 
     def __run__(self):
         # type: () -> None
         merge_util = DataMergeUtils(self.vars['state'], self.vars['list_diff_type'])
-        self._set_result(merge_util.get_new_merged_data(self._get_current(), self.vars.value))
+        self._set_result(merge_util.get_new_merged_data(self._get_current(), self.vars['value']))
 
     def _get_current(self):
-        # type: () -> None
+        # type: () -> dict
         if self.vars['diff_on_value']:
             return self.vars[self.var_result_data]
         else:
-            return json.loads(''.join(self.vars[self.var_result_data]))
+            return self._json_loads(self.vars[self.var_result_data])
+
+    def _json_loads(self, json_str):
+        # type: (str) -> str
+        try:
+            return json.loads(''.join(json_str))
+        except json.JSONDecodeError:
+            raise ModuleHelperException(msg='Failed to decode JSON in {0}'.format(self.vars["path"]))
 
     def _set_result(self, result):
         # type: (dict) -> None
         if self.vars['diff_on_value']:
             self.vars.set(self.var_result_data, result)
         else:
-            self.vars.set(self.var_result_data, self._json_dumps(result).splitlines(keepends=True))
+            dest_file_lines = self._json_dumps(result).splitlines(keepends=True)
+            if self._current_content_end_with_line_break:
+                dest_file_lines[-1] += '\n'
+            self.vars.set(self.var_result_data, dest_file_lines)
 
     @DestFileModuleHelper.write_tempfile    # provide kwargs['fd']
     def __write_temp__(self, *args, **kwargs):
         # type: () -> None
         if self.vars['diff_on_value']:
             json_string = self._json_dumps(self.vars[self.var_result_data])
+            if self._current_content_end_with_line_break:
+                json_string += '\n'
         else:
             json_string = ''.join(self.vars[self.var_result_data])
         os.write(kwargs['fd'], bytes(json_string, 'utf-8'))
