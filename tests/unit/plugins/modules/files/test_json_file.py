@@ -29,6 +29,8 @@ JSON_CURRENT = json.dumps(
     indent=DEFAULT_MODULE_ARGS['indent'],
     sort_keys=DEFAULT_MODULE_ARGS['sort_keys'])
 
+JSON_CURRENT_ENDING_WITH_LINE_BREAK = JSON_CURRENT + '\n'
+
 
 TEST_CASE_EXEC = [
     [
@@ -68,10 +70,9 @@ TEST_CASE_EXEC = [
         },
     ],
     [
-        {'path': FAKE_PATH, 'value': DICT_CURRENT,
-         'indent': 16, 'diff_on_value': False},
+        {'path': FAKE_PATH, 'value': DICT_CURRENT, 'indent': 16, 'diff_on_value': False},
         {
-            'id': 'test_diff_on_value_reformat_on_indent',
+            'id': 'test_no_diff_on_value_reformat_on_indent',
             'expected_value': json.dumps(
                 DICT_CURRENT,
                 indent=16,
@@ -82,16 +83,24 @@ TEST_CASE_EXEC = [
         },
     ],
     [
-        {'path': FAKE_PATH, 'value': DICT_CURRENT,
-            'sort_keys': True, 'diff_on_value': False},
+        {'path': FAKE_PATH, 'value': DICT_CURRENT, 'sort_keys': True, 'diff_on_value': False},
         {
-            'id': 'test_diff_on_value_reformat_on_sort',
+            'id': 'test_no_diff_on_value_reformat_on_sort',
             'expected_value': json.dumps(
                 DICT_CURRENT,
                 indent=DEFAULT_MODULE_ARGS['indent'],
                 sort_keys=True).splitlines(keepends=True),
             'read_data': JSON_CURRENT,
             'expected_changed': True,
+        },
+    ],
+    [
+        {'path': FAKE_PATH, 'value': DICT_CURRENT, 'diff_on_value': False},
+        {
+            'id': 'test_no_diff_on_value_current_file_end_with_line_break',
+            'expected_value': JSON_CURRENT_ENDING_WITH_LINE_BREAK.splitlines(keepends=True),
+            'read_data': JSON_CURRENT_ENDING_WITH_LINE_BREAK,
+            'expected_changed': False,
         },
     ],
     [
@@ -107,7 +116,7 @@ TEST_CASE_EXEC = [
         {'path': FAKE_PATH, 'value': DICT_CURRENT, 'diff_on_value': False},
         {
             'id': 'empty_file_no_diff_on_value',
-            'expected_value': JSON_CURRENT.splitlines(keepends=True),
+            'expected_value': JSON_CURRENT_ENDING_WITH_LINE_BREAK.splitlines(keepends=True),
             'read_data': None,
             'expected_changed': True,
         },
@@ -125,7 +134,7 @@ TEST_CASE_EXEC = [
         {'path': FAKE_PATH, 'value': DICT_CURRENT, 'diff_on_value': False},
         {
             'id': 'blank_file_no_diff_on_value',
-            'expected_value': JSON_CURRENT.splitlines(keepends=True),
+            'expected_value': JSON_CURRENT_ENDING_WITH_LINE_BREAK.splitlines(keepends=True),
             'read_data': '\n\t\n   ',
             'expected_changed': True,
         },
