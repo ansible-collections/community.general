@@ -10,7 +10,6 @@ __metaclass__ = type
 import sys
 from copy import deepcopy
 from functools import wraps
-from collections.abc import Callable
 if sys.version_info.major > 2:
     from typing import Union
 
@@ -20,8 +19,8 @@ class DataMergeUtils:
     Utils for merging list or dict.
     """
 
+    # pylint: disable=no-self-use
     def _check_identic(func):
-        # type: (Callable) -> Callable
         """
         Decorator to check if `self.merge_type` is `identic` and if is the case
         return the `expected` data in all case.
