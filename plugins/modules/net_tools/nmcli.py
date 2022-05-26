@@ -157,8 +157,8 @@ options:
         version_added: 2.0.0
     dns4:
         description:
-            - A list of up to 3 dns servers.
-            - IPv4 format e.g. to add two IPv4 DNS server addresses, use C(192.0.2.53 198.51.100.53).
+            - A list of up to 3 DNS servers.
+            - IPv4 format e.g. to add two IPv4 DNS server addresses, use C(192.0.2.53) C(198.51.100.53).
         elements: str
         type: list
     dns4_search:
@@ -255,8 +255,8 @@ options:
         version_added: 4.4.0
     dns6:
         description:
-            - A list of up to 3 dns servers.
-            - IPv6 format e.g. to add two IPv6 DNS server addresses, use C(2001:4860:4860::8888 2001:4860:4860::8844).
+            - A list of up to 3 DNS servers.
+            - IPv6 format e.g. to add two IPv6 DNS server addresses, use C(2001:4860:4860::8888) C(2001:4860:4860::8844).
         elements: str
         type: list
     dns6_search:
