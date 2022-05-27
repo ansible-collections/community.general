@@ -1,0 +1,2 @@
+minor_changes:
+  - cmd_runner module util - added parameter ``skip_if_check_mode`` to ``CmdRunner.context()``, so that the command is not executed when ``check_mode=True`` (https://github.com/ansible-collections/community.general/pull/4736).
