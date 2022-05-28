@@ -17,8 +17,7 @@ description:
 options:
   key:
     description:
-    - >
-      The key name for an element in the GConf database.
+    - The key name for an element in the GConf database.
     type: str
     required: true
 notes:
