@@ -160,7 +160,7 @@ class Zfs(object):
                 elif prop == 'volblocksize':
                     cmd += ['-b', value]
                 else:
-                    cmd += ['-o', '%s="%s"' % (prop, value)]
+                    cmd += ['-o', '%s=%s' % (prop, value)]
         if origin and action == 'clone':
             cmd.append(origin)
         cmd.append(self.name)
