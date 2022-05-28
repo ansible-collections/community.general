@@ -20,6 +20,7 @@ options:
     - >
       The key name for an element in the GConf database.
     type: str
+    required: true
 notes:
   - See man gconftool-2(1) for more details.
 seealso:
@@ -52,7 +53,7 @@ class GConftoolInfo(ModuleHelper):
     output_params = ['key']
     module = dict(
         argument_spec=dict(
-            key=dict(type='str', required=True),
+            key=dict(type='str', required=True, no_log=False),
         ),
         supports_check_mode=True,
     )
