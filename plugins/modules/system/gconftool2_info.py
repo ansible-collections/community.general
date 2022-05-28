@@ -61,6 +61,8 @@ class GConftoolInfo(ModuleHelper):
         self.runner = gconftool2_runner(self.module, check_rc=True)
 
     def process_command_output(self, rc, out, err):
+        if err and not out:
+            return None
         return out.rstrip()
 
     def __run__(self):
