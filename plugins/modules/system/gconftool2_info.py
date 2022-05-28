@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# (c) 2021, Alexei Znamensky <russoz@gmail.com>
+# (c) 2022, Alexei Znamensky <russoz@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -60,14 +60,10 @@ class GConftoolInfo(ModuleHelper):
     def __init_module__(self):
         self.runner = gconftool2_runner(self.module, check_rc=True)
 
-    def process_command_output(self, rc, out, err):
-        if err and not out:
-            return None
-        return out.rstrip()
-
     def __run__(self):
-        with self.runner.context(args_order=["get", "key"], output_process=self.process_command_output) as ctx:
-            self.vars.value = ctx.run(get=True)
+        with self.runner.context(args_order=["get", "key"]) as ctx:
+            rc, out, err = ctx.run(get=True)
+            self.vars.value = None if err and not out else out.rstrip()
 
 
 def main():
