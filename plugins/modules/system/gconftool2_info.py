@@ -116,7 +116,7 @@ RETURN = '''
     - Tmp
 '''
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import CmdModuleHelper, ArgFormat
+from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 from ansible_collections.community.general.plugins.module_utils.gconftool2 import gconftool2_runner
 
 
