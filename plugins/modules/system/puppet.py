@@ -261,7 +261,7 @@ def main():
         if p['show_diff']:
             cmd += " --show_diff"
         if p['confdir']:
-            cmd += " --confdir '%s'" % p['confdir']
+            cmd += " --confdir %s" % shlex_quote(p['confdir'])
         if p['environment']:
             cmd += " --environment '%s'" % p['environment']
         if p['tags']:
