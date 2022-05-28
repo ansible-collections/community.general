@@ -101,7 +101,7 @@ cmd_echo_tests:
       - test_result.out == "-- --answer=11 --bb-here\n"
       - test_result.err == ""
 
-  - name: set aa and bb value with check_mode and skip_if_check on
+  - name: set aa and bb value with check_mode and check_mode_skip on
     arg_formats:
       aa:
         func: as_opt_eq_val
@@ -112,7 +112,7 @@ cmd_echo_tests:
     arg_order: 'aa bb'
     arg_values:
       bb: true
-    skip_if_check: true
+    check_mode_skip: true
     aa: 11
     check_mode: true
     expect_error: true  # because if result contains rc != 0, ansible assumes error

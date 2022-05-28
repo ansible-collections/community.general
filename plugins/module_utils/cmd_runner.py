@@ -197,7 +197,7 @@ class CmdRunner(object):
             if mod_param_name not in self.arg_formats:
                 self.arg_formats[mod_param_name] = _Format.as_default_type(spec['type'], mod_param_name)
 
-    def context(self, args_order=None, output_process=None, ignore_value_none=True, skip_if_check_mode=False, **kwargs):
+    def context(self, args_order=None, output_process=None, ignore_value_none=True, check_mode_skip=False, check_mode_return=None, **kwargs):
         if output_process is None:
             output_process = _process_as_is
         if args_order is None:
@@ -210,19 +210,21 @@ class CmdRunner(object):
                                  args_order=args_order,
                                  output_process=output_process,
                                  ignore_value_none=ignore_value_none,
-                                 skip_if_check_mode=skip_if_check_mode, **kwargs)
+                                 check_mode_skip=check_mode_skip,
+                                 check_mode_return=check_mode_return, **kwargs)
 
     def has_arg_format(self, arg):
         return arg in self.arg_formats
 
 
 class _CmdRunnerContext(object):
-    def __init__(self, runner, args_order, output_process, ignore_value_none, skip_if_check_mode, **kwargs):
+    def __init__(self, runner, args_order, output_process, ignore_value_none, check_mode_skip, check_mode_return, **kwargs):
         self.runner = runner
         self.args_order = tuple(args_order)
         self.output_process = output_process
         self.ignore_value_none = ignore_value_none
-        self.skip_if_check_mode = skip_if_check_mode
+        self.check_mode_skip = check_mode_skip
+        self.check_mode_return = check_mode_return
         self.run_command_args = dict(kwargs)
 
         self.environ_update = runner.environ_update
@@ -262,8 +264,8 @@ class _CmdRunnerContext(object):
             except Exception as e:
                 raise FormatError(arg_name, value, runner.arg_formats[arg_name], e)
 
-        if self.skip_if_check_mode and module.check_mode:
-            return
+        if self.check_mode_skip and module.check_mode:
+            return self.check_mode_return
         results = module.run_command(self.cmd, **self.run_command_args)
         self.results_rc, self.results_out, self.results_err = results
         self.results_processed = self.output_process(*results)

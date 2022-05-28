@@ -23,7 +23,7 @@ def main():
             arg_formats=dict(type="dict", default={}),
             arg_order=dict(type="raw", required=True),
             arg_values=dict(type="dict", default={}),
-            skip_if_check=dict(type="bool", default=False),
+            check_mode_skip=dict(type="bool", default=False),
             aa=dict(type="raw"),
         ),
         supports_check_mode=True,
@@ -41,7 +41,7 @@ def main():
 
     runner = CmdRunner(module, ['echo', '--'], arg_formats=arg_formats)
 
-    with runner.context(p['arg_order'], skip_if_check_mode=p['skip_if_check']) as ctx:
+    with runner.context(p['arg_order'], check_mode_skip=p['check_mode_skip']) as ctx:
         result = ctx.run(**p['arg_values'])
         info = ctx.run_info
     check = "check"
