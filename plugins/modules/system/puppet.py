@@ -55,6 +55,7 @@ options:
     description:
       - Path to the directory containing the puppet.conf file.
     type: str
+    version_added: 5.1.0
   logdest:
     description:
     - Where the puppet logs should go, if puppet apply is being used.
