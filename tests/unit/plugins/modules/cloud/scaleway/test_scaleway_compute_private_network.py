@@ -94,7 +94,7 @@ def test_scaleway_add_nic(capfd):
         mock_scw_post.assert_any_call(path=url, data={"private_network_id": pnid})
     mock_scw_get.assert_any_call(url)
 
-    out, err = capfd.readouterr() 
+    out, err = capfd.readouterr()
     del os.environ['SCW_API_TOKEN']
     assert not err
     assert json.loads(out)['changed']
