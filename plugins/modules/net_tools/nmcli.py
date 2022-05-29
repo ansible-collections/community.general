@@ -951,7 +951,7 @@ options:
                 description:
                     - The Pre-shared key encoded.
                     - You can encode using this linux command: C(echo "0s"$(base64 <<<'[YOUR PRE-SHARED KEY]' | rev | cut -c5- | rev))
-                    - This is only used when C(ipsec-enabled = yes)
+                    - This is only used when I(ipsec-enabled=true).
                 type: str
 '''
 
