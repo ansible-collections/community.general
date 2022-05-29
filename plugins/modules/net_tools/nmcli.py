@@ -910,6 +910,7 @@ options:
             - The configuration to a VPN connection (PPTP and L2TP).
             - In order to use L2TP you need to be sure that C(network-manager-l2tp) - and C(network-manager-l2tp-gnome) if host has UI - are installed on the host
         type: dict
+        version_added: 5.1.0
         suboptions:
             permissions:
                 description: User that will have persmission to use the connection
