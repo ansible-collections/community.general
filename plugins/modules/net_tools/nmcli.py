@@ -939,7 +939,7 @@ options:
                 choices: [ 0, 1, 2 , 4 ]
                 default: 0
             user:
-                description: Username provided by VPN administrator
+                description: Username provided by VPN administrator.
                 type: str
                 required: true
             ipsec-enabled:
