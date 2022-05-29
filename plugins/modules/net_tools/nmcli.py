@@ -908,7 +908,7 @@ options:
     vpn:
         description:
             - Configuration of a VPN connection (PPTP and L2TP).
-            - In order to use L2TP you need to be sure that C(network-manager-l2tp) - and C(network-manager-l2tp-gnome) 
+            - In order to use L2TP you need to be sure that C(network-manager-l2tp) - and C(network-manager-l2tp-gnome)
                 if host has UI - are installed on the host.
         type: dict
         version_added: 5.1.0
@@ -923,7 +923,7 @@ options:
                 required: true
                 choices: [ pptp, l2tp ]
             gateway:
-                description: The gateway to connection. It can be an IP address (for example C(192.0.2.1)) 
+                description: The gateway to connection. It can be an IP address (for example C(192.0.2.1))
                     or a FQDN address (for example C(vpn.example.com)).
                 type: str
                 required: true
