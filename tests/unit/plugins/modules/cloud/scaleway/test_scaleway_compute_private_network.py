@@ -95,9 +95,9 @@ def test_scaleway_add_nic(capfd):
     mock_scw_get.assert_any_call(url)
 
     out, err = capfd.readouterr() 
+    del os.environ['SCW_API_TOKEN']
     assert not err
     assert json.loads(out)['changed']
-
 
 
 def test_scaleway_add_existing_nic(capfd):
@@ -120,6 +120,7 @@ def test_scaleway_add_existing_nic(capfd):
     mock_scw_get.assert_any_call(url)
 
     out, err = capfd.readouterr()
+    del os.environ['SCW_API_TOKEN']
     assert not err
     assert json.loads(out)['changed']
 
@@ -144,6 +145,7 @@ def test_scaleway_remove_existing_nic(capfd):
     mock_scw_get.assert_any_call(url)
 
     out, err = capfd.readouterr()
+    del os.environ['SCW_API_TOKEN']
     assert not err
     assert json.loads(out)['changed']
 
@@ -168,6 +170,6 @@ def test_scaleway_remove_absent_nic(capfd):
     mock_scw_get.assert_any_call(url)
 
     out, err = capfd.readouterr()
+    del os.environ['SCW_API_TOKEN']
     assert not err
     assert json.loads(out)['changed']
-
