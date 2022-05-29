@@ -73,7 +73,7 @@ def test_scaleway_private_network_without_arguments(capfd):
 def test_scaleway_add_nic(capfd):
     os.environ['SCW_API_TOKEN'] = 'notrealtoken'
     pnid = 'b589b4cd-ef5g-678h-90i1-jk2345678l90'
-    cid = 'c004b4cd-ef5g-678h-90i1-jk2345678l90'    
+    cid = 'c004b4cd-ef5g-678h-90i1-jk2345678l90'
     url = 'servers/' + cid + '/private_nics'
 
     set_module_args({"project": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
