@@ -1,4 +1,3 @@
-
 # Copyright: (c) 2019, Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import (absolute_import, division, print_function)
@@ -95,8 +94,10 @@ def test_scaleway_add_nic(capfd):
         mock_scw_post.assert_any_call(path=url, data={"private_network_id": pnid})
     mock_scw_get.assert_any_call(url)
 
-    out, err = capfd.readouterr()
-    del os.environ['SCW_API_TOKEN']
+    out, err = capfd.readouterr() 
+    assert not err
+    assert json.loads(out)['changed']
+
 
 
 def test_scaleway_add_existing_nic(capfd):
@@ -119,7 +120,8 @@ def test_scaleway_add_existing_nic(capfd):
     mock_scw_get.assert_any_call(url)
 
     out, err = capfd.readouterr()
-    del os.environ['SCW_API_TOKEN']
+    assert not err
+    assert json.loads(out)['changed']
 
 
 def test_scaleway_remove_existing_nic(capfd):
@@ -142,7 +144,8 @@ def test_scaleway_remove_existing_nic(capfd):
     mock_scw_get.assert_any_call(url)
 
     out, err = capfd.readouterr()
-    del os.environ['SCW_API_TOKEN']
+    assert not err
+    assert json.loads(out)['changed']
 
 
 def test_scaleway_remove_absent_nic(capfd):
@@ -165,4 +168,6 @@ def test_scaleway_remove_absent_nic(capfd):
     mock_scw_get.assert_any_call(url)
 
     out, err = capfd.readouterr()
-    del os.environ['SCW_API_TOKEN']
+    assert not err
+    assert json.loads(out)['changed']
+
