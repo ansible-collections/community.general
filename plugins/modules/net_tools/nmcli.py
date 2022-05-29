@@ -913,7 +913,7 @@ options:
         version_added: 5.1.0
         suboptions:
             permissions:
-                description: User that will have persmission to use the connection
+                description: User that will have permission to use the connection.
                 type: str
                 required: true
             service-type:
