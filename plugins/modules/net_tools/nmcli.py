@@ -945,7 +945,7 @@ options:
             ipsec-enabled:
                 description:
                     - Enable or disable IPSec tunnel to L2TP host.
-                    - This option is need when C(service-type) is C(l2tp)
+                    - This option is need when C(service-type) is C(l2tp).
                 type: bool
                 choices: [ yes, no ]
             ipsec-psk:
