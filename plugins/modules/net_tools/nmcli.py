@@ -907,7 +907,7 @@ options:
                 choices: [ 0, 1, 2 ]
     vpn:
         description:
-            - The configuration to a VPN connection (PPTP and L2TP).
+            - Configuration of a VPN connection (PPTP and L2TP).
             - In order to use L2TP you need to be sure that C(network-manager-l2tp) - and C(network-manager-l2tp-gnome) if host has UI - are installed on the host.
         type: dict
         version_added: 5.1.0
