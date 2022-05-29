@@ -908,7 +908,8 @@ options:
     vpn:
         description:
             - Configuration of a VPN connection (PPTP and L2TP).
-            - In order to use L2TP you need to be sure that C(network-manager-l2tp) - and C(network-manager-l2tp-gnome) if host has UI - are installed on the host.
+            - In order to use L2TP you need to be sure that C(network-manager-l2tp) - and C(network-manager-l2tp-gnome) 
+                if host has UI - are installed on the host.
         type: dict
         version_added: 5.1.0
         suboptions:
@@ -922,7 +923,8 @@ options:
                 required: true
                 choices: [ pptp, l2tp ]
             gateway:
-                description: The gateway to connection. It can be an IP address (for example C(192.0.2.1)) or a FQDN address (for example C(vpn.example.com)).
+                description: The gateway to connection. It can be an IP address (for example C(192.0.2.1)) 
+                    or a FQDN address (for example C(vpn.example.com)).
                 type: str
                 required: true
             password-flags:
@@ -950,8 +952,10 @@ options:
                 choices: [ yes, no ]
             ipsec-psk:
                 description:
-                    - The Pre-shared key encoded.
-                    - You can encode using this linux command: C(echo "0s"$(base64 <<<'[YOUR PRE-SHARED KEY]' | rev | cut -c5- | rev))
+                    - The pre-shared key in base64 encoding.
+                    - >
+                      You can encode using this linux command: C(echo "0s"$(base64 <<<'[YOUR PRE-SHARED KEY]' | rev | cut -c5- | rev))
+                      or just using this Ansible jinja2 expression: C("0s{{ ('[YOUR PRE-SHARED KEY]' | b64encode) }}").
                     - This is only used when I(ipsec-enabled=true).
                 type: str
 '''
@@ -1339,22 +1343,21 @@ EXAMPLES = r'''
 
 - name: Create a VPN L2TP connection for ansible_user to connect on vpn.example.com authenticating with user 'brittany' and pre-shared key as 'Brittany123'
   block:
-    - name: Encript pre-shared key
-      shell: echo "0s"$(base64 <<<'Brittany123' | rev | cut -c5- | rev)
-      register: psk
+    - ansible.builtin.set_fact:
+      psk: "0s{{ ('Brittany123' | b64encode) }}"
 
     - name: Create the connection
       community.general.nmcli:
         type: vpn
         conn_name: my-vpn-connection
         vpn:
-            permissions: {{ ansible_user }},
-            service-type: l2tp,
-            gateway: vpn.example.com,
-            password-flags: 2,
-            user: brittany,
-            ipsec-enabled: true,
-            ipsec-psk: {{ psk.stdout }}
+            permissions: "{{ ansible_user }}"
+            service-type: l2tp
+            gateway: vpn.example.com
+            password-flags: 2
+            user: brittany
+            ipsec-enabled: true
+            ipsec-psk: "{{ psk }}"
         autoconnect: false
         state: present
 
@@ -1681,7 +1684,7 @@ class Nmcli(object):
 
                         if isinstance(value, bool):
                             value = self.bool_to_string(value)
-                        
+
                         vpn_data_values += '%s=%s' % (name, value)
                     options.update({
                         'vpn.data': vpn_data_values,
