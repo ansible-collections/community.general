@@ -922,7 +922,7 @@ options:
                 required: true
                 choices: [ pptp, l2tp ]
             gateway:
-                description: The gateway to connection. It can be an IP (for example C(192.0.2.1)) or a FQDN address (for example C(vpn.example.com))
+                description: The gateway to connection. It can be an IP address (for example C(192.0.2.1)) or a FQDN address (for example C(vpn.example.com)).
                 type: str
                 required: true
             password-flags:
