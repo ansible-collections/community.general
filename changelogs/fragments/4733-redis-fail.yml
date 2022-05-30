@@ -1,0 +1,2 @@
+bugfixes:
+  - "redis* modules - fix call to ``module.fail_json`` when failing because of missing Python libraries (https://github.com/ansible-collections/community.general/pull/4733)."
