@@ -1,0 +1,42 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# (c) 2022 DEMAREST Maxime <maxime@indelog.fr>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "{{ case.id }} - copy current sample file"
+  ansible.builtin.copy:
+    src: "{{ case.current_file }}"
+    dest: "{{ dest_file }}"
+  when: case.current_file
+
+
+- name: "{{ case.id }} - run module"
+  community.general.yaml_file: "{{ case.module_params|combine({'path': dest_file}) }}"
+  ignore_errors: true
+  register: last_result
+  diff: true
+
+- name: "{{ case.id }} - run asserts"
+  ansible.builtin.assert:
+    that: "{{ case.assert }}"
+
+- name: "{{ case.id }} - check expected dest_file content"
+  ansible.builtin.copy:
+    src: "{{ case.expected_file }}"
+    dest: "{{ dest_file }}"
+  register: last_result
+  diff: true
+
+- name: "{{ case.id }} - assert dest_file and expected_file are identic"
+  ansible.builtin.assert:
+    that:
+      - last_result.changed == false
+
+- name: "{{ case.id }} - clean current sample file"
+  ansible.builtin.file:
+    path: "{{ dest_file }}"
+    state: "absent"

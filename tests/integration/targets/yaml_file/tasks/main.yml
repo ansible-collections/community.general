@@ -1,0 +1,426 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# (c) 2022 DEMAREST Maxime <maxime@indelog.fr>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: set dest_file
+  ansible.builtin.set_fact:
+    dest_file: "{{ remote_tmp_dir }}/file.yaml"
+
+- name: set test_case
+  set_fact:
+    test_cases:
+      - id: 010 fail when destination does not contain valid yaml
+        current_file: invalid.yaml
+        expected_file: invalid.yaml
+        module_params:
+          value:
+            A: 1
+        assert:
+          - "last_result.failed == true"
+          - "last_result.changed == false"
+          - "last_result.msg == 'Failed to decode YAML in {{ dest_file }}'"
+      - id: 020 can work when create dest
+        current_file: false
+        expected_file: sample.yaml
+        module_params:
+          create: true
+          value:
+            B: 2
+            A: 1
+            C:
+              CB: 4
+              CA: 3
+              CC:
+                - 5
+                - 6
+                - 7
+        assert:
+          - "last_result.failed == false"
+          - "last_result.created == true"
+          - "last_result.changed == true"
+      - id: 030 can switch dict to list
+        current_file: sample.yaml
+        expected_file: sample_list.yaml
+        module_params:
+          state: "present"
+          list_diff_type: "value"
+          diff_on_value: true
+          indent: 2
+          sort_keys: false
+          value:
+            - 1
+            - 2
+            - 3
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+      - id: 040 can switch list to dict
+        current_file: sample_list.yaml
+        expected_file: sample.yaml
+        module_params:
+          state: "present"
+          list_diff_type: "value"
+          diff_on_value: true
+          indent: 2
+          sort_keys: false
+          value:
+            B: 2
+            A: 1
+            C:
+              CB: 4
+              CA: 3
+              CC:
+                - 5
+                - 6
+                - 7
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+      - id: 110 on present, test no change
+        current_file: sample.yaml
+        expected_file: sample.yaml
+        module_params:
+          state: "present"
+          list_diff_type: "value"
+          diff_on_value: true
+          indent: 2
+          sort_keys: false
+          value:
+            A: 1
+            C:
+              CB: 4
+              CC:
+                - 6
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == false"
+      - id: 120 on present, test change
+        current_file: sample.yaml
+        expected_file: expected_120.yaml
+        module_params:
+          state: "present"
+          list_diff_type: "value"
+          diff_on_value: true
+          indent: 2
+          sort_keys: false
+          value:
+            A: 11
+            C:
+              CB: 14
+              CC:
+                - 8
+            D:
+              DA: 21
+              DB:
+                - 22
+                - 23
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+      - id: 130 on present, test no change with list_diff_type index
+        current_file: sample.yaml
+        expected_file: sample.yaml
+        module_params:
+          state: "present"
+          list_diff_type: "index"
+          diff_on_value: true
+          indent: 2
+          sort_keys: false
+          value:
+            A: 1
+            C:
+              CB: 4
+              CC:
+                -
+                - 6
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == false"
+      - id: 140 on present, test change with list_diff_type index
+        current_file: sample.yaml
+        expected_file: expected_140.yaml
+        module_params:
+          state: "present"
+          list_diff_type: "index"
+          diff_on_value: true
+          indent: 2
+          sort_keys: false
+          value:
+            A: 1
+            C:
+              CC:
+                -
+                - 5
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+      - id: 210 on absent, test no change
+        current_file: sample.yaml
+        expected_file: sample.yaml
+        module_params:
+          state: "absent"
+          list_diff_type: "value"
+          diff_on_value: true
+          indent: 2
+          sort_keys: false
+          value:
+            A: 11
+            C:
+              CB: 14
+              CC:
+                - 8
+            D:
+              DA: 21
+              DB:
+                - 22
+                - 23
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == false"
+      - id: 220 on absent, test change
+        current_file: sample.yaml
+        expected_file: expected_220.yaml
+        module_params:
+          state: "absent"
+          list_diff_type: "value"
+          diff_on_value: true
+          indent: 2
+          sort_keys: false
+          value:
+            A: 1
+            C:
+              CB: 4
+              CC:
+                - 6
+            D:
+              DA: 21
+              DB:
+                - 22
+                - 23
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+      - id: 230 on abent, test no change with list_diff_type index
+        current_file: sample.yaml
+        expected_file: sample.yaml
+        module_params:
+          state: "absent"
+          list_diff_type: "index"
+          diff_on_value: true
+          indent: 2
+          sort_keys: false
+          value:
+            A: 11
+            C:
+              CB: 14
+              CC:
+                - 6
+            D:
+              DA: 21
+              DB:
+                - 22
+                - 23
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == false"
+      - id: 240 on absent, test change with list_diff_type index
+        current_file: sample.yaml
+        expected_file: expected_240.yaml
+        module_params:
+          state: "absent"
+          list_diff_type: "index"
+          diff_on_value: true
+          indent: 2
+          sort_keys: false
+          value:
+            A: 1
+            C:
+              CB: 4
+              CC:
+                -
+                - 6
+            D:
+              DA: 21
+              DB:
+                - 22
+                - 23
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+      - id: 310 on indentic, test no change
+        current_file: sample.yaml
+        expected_file: sample.yaml
+        module_params:
+          state: "identic"
+          list_diff_type: "value"
+          diff_on_value: true
+          indent: 2
+          sort_keys: false
+          value:
+            B: 2
+            A: 1
+            C:
+              CB: 4
+              CA: 3
+              CC:
+                - 5
+                - 6
+                - 7
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == false"
+      - id: 320 on indentic, test change
+        current_file: sample.yaml
+        expected_file: expected_320.yaml
+        module_params:
+          state: "identic"
+          list_diff_type: "value"
+          diff_on_value: true
+          indent: 2
+          sort_keys: false
+          value:
+            Z: 9
+            Y: 8
+            X: 7
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+      - id: 410 modify indent and sort_keys, no change when diff_on_value
+        current_file: sample.yaml
+        expected_file: sample.yaml
+        module_params:
+          state: "identic"
+          list_diff_type: "value"
+          diff_on_value: true
+          indent: 4
+          sort_keys: true
+          value:
+            B: 2
+            A: 1
+            C:
+              CB: 4
+              CA: 3
+              CC:
+                - 5
+                - 6
+                - 7
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == false"
+      - id: 420 modify indent and sort_keys, change when no diff_on_value
+        current_file: sample.yaml
+        expected_file: expected_420.yaml
+        module_params:
+          state: "identic"
+          list_diff_type: "value"
+          diff_on_value: false
+          indent: 4
+          sort_keys: true
+          value:
+            B: 2
+            A: 1
+            C:
+              CB: 4
+              CA: 3
+              CC:
+                - 5
+                - 6
+                - 7
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+      - id: 510 whit explicit_end
+        current_file: sample.yaml
+        expected_file: expected_510.yaml
+        module_params:
+          state: "identic"
+          list_diff_type: "value"
+          diff_on_value: false
+          explicit_end: true
+          value:
+            B: 2
+            A: 1
+            C:
+              CB: 4
+              CA: 3
+              CC:
+                - 5
+                - 6
+                - 7
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+      - id: 520 whit cannonical
+        current_file: sample.yaml
+        expected_file: expected_520.yaml
+        module_params:
+          state: "identic"
+          list_diff_type: "value"
+          diff_on_value: false
+          canonical: true
+          value:
+            B: 2
+            A: 1
+            C:
+              CB: 4
+              CA: 3
+              CC:
+                - 5
+                - 6
+                - 7
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+      - id: 530 whit default_flow_style false
+        current_file: sample.yaml
+        expected_file: expected_530.yaml
+        module_params:
+          state: "identic"
+          list_diff_type: "value"
+          diff_on_value: false
+          default_flow_style: false
+          value:
+            B: 2
+            A: 1
+            C:
+              CB: 4
+              CA: 3
+              CC:
+                - 5
+                - 6
+                - 7
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+      - id: 540 whit default_flow_style true
+        current_file: sample.yaml
+        expected_file: expected_540.yaml
+        module_params:
+          state: "identic"
+          list_diff_type: "value"
+          diff_on_value: false
+          default_flow_style: true
+          value:
+            B: 2
+            A: 1
+            C:
+              CB: 4
+              CA: 3
+              CC:
+                - 5
+                - 6
+                - 7
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+
+- name: loop on test_cases
+  include_tasks: run_test_cases.yml
+  loop: "{{ test_cases }}"
+  loop_control:
+    loop_var: case

@@ -1,0 +1,20 @@
+---
+!!map {
+  ? !!str "B"
+  : !!int "2",
+  ? !!str "A"
+  : !!int "1",
+  ? !!str "C"
+  : !!map {
+    ? !!str "CB"
+    : !!int "4",
+    ? !!str "CA"
+    : !!int "3",
+    ? !!str "CC"
+    : !!seq [
+      !!int "5",
+      !!int "6",
+      !!int "7",
+    ],
+  },
+}
