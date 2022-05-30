@@ -367,13 +367,10 @@ class TomlFile(DestFileModuleHelper):
                 content = file.readlines()
         except FileNotFoundError:
             pass
-        except toml.TomlDecodeError:
-            msg = 'Failed to decode TOML in {}'.format(self.vars["path"])
-            raise ModuleHelperException(msg)
         if ''.join(content).strip() == '':
             content = ['']
         if self.vars['diff_on_value']:
-            self.vars.set(self.var_result_data, toml.loads(''.join(content)), diff=True)
+            self.vars.set(self.var_result_data, self._toml_loads(content), diff=True)
         else:
             self.vars.set(self.var_result_data, content, diff=True)
 
@@ -387,7 +384,14 @@ class TomlFile(DestFileModuleHelper):
         if self.vars['diff_on_value']:
             return self.vars[self.var_result_data]
         else:
-            return toml.loads(''.join(self.vars[self.var_result_data]))
+            return self._toml_loads(self.vars[self.var_result_data])
+
+    def _toml_loads(self, toml_str):
+        # type: (str) -> str
+        try:
+            return toml.loads(''.join(toml_str))
+        except toml.TomlDecodeError:
+            raise ModuleHelperException(msg='Failed to decode TOML in {0}'.format(self.vars["path"]))
 
     def _set_result(self, result):
         # type: (dict) -> None
