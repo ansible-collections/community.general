@@ -163,7 +163,7 @@ options:
         aliases:
             - defaultGroups
         type: list
-        elements: dict
+        elements: str
     default_locale:
         description:
             - The realm default locale.
@@ -183,7 +183,7 @@ options:
         aliases:
             - defaultRoles
         type: list
-        elements: dict
+        elements: str
     default_signature_algorithm:
         description:
             - The realm default signature algorithm.
@@ -622,10 +622,10 @@ def main():
         client_authentication_flow=dict(type='str', aliases=['clientAuthenticationFlow']),
         client_scope_mappings=dict(type='dict', aliases=['clientScopeMappings']),
         default_default_client_scopes=dict(type='list', elements='str', aliases=['defaultDefaultClientScopes']),
-        default_groups=dict(type='list', elements='dict', aliases=['defaultGroups']),
+        default_groups=dict(type='list', elements='str', aliases=['defaultGroups']),
         default_locale=dict(type='str', aliases=['defaultLocale']),
         default_optional_client_scopes=dict(type='list', elements='str', aliases=['defaultOptionalClientScopes']),
-        default_roles=dict(type='list', elements='dict', aliases=['defaultRoles']),
+        default_roles=dict(type='list', elements='str', aliases=['defaultRoles']),
         default_signature_algorithm=dict(type='str', aliases=['defaultSignatureAlgorithm']),
         direct_grant_flow=dict(type='str', aliases=['directGrantFlow']),
         display_name=dict(type='str', aliases=['displayName']),
