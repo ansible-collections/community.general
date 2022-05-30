@@ -1931,7 +1931,7 @@ class Nmcli(object):
 
         # VPN doesn't need an interface but if sended it must be a valid interface.
         if self.type == 'vpn' and self.ifname is None:
-            options.__delitem__('connection.interface-name')
+            del options['connection.interface-name']
 
         options.update(self.connection_options())
 
