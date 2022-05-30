@@ -425,9 +425,19 @@ RETURN = r'''
     type: dict
 '''
 
-import yaml
 import os
+import traceback
 
+try:
+    import yaml
+except ImportError:
+    HAS_YAML = False
+    YAML_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_YAML = True
+
+
+from ansible.module_utils.basic import missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.common.validation import check_type_dict_or_list
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
     DestFileModuleHelper,
@@ -544,7 +554,11 @@ class YamlFile(DestFileModuleHelper):
 
 def main():
     # type: () -> None
-    YamlFile().execute()
+    module = YamlFile()
+    if not HAS_YAML:
+        module.module.fail_json(msg=missing_required_lib('yaml'), exception=YAML_IMPORT_ERROR)
+    else:
+        module.execute()
 
 
 if __name__ == '__main__':

@@ -318,10 +318,18 @@ RETURN = r'''
     type: dict
 '''
 
-
-import toml
+import traceback
 import os
 
+try:
+    import toml
+except ImportError:
+    HAS_TOML = False
+    TOML_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_TOML = True
+
+from ansible.module_utils.basic import missing_required_lib
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
     DestFileModuleHelper,
     ModuleHelperException,
@@ -416,7 +424,11 @@ class TomlFile(DestFileModuleHelper):
 
 def main():
     # type: () -> None
-    TomlFile().execute()
+    module = TomlFile()
+    if not HAS_TOML:
+        module.module.fail_json(msg=missing_required_lib('toml'), exception=TOML_IMPORT_ERROR)
+    else:
+        module.execute()
 
 
 if __name__ == '__main__':
