@@ -755,3 +755,39 @@ releases:
         name: counter
         namespace: null
     release_date: '2022-04-29'
+  5.0.1:
+    changes:
+      bugfixes:
+      - consul - fixed bug introduced in PR 4590 (https://github.com/ansible-collections/community.general/issues/4680).
+      - filesystem - handle ``fatresize --info`` output lines without ``:`` (https://github.com/ansible-collections/community.general/pull/4700).
+      - filesystem - improve error messages when output cannot be parsed by including
+        newlines in escaped form (https://github.com/ansible-collections/community.general/pull/4700).
+      - keycloak_realm - fix default groups and roles (https://github.com/ansible-collections/community.general/issues/4241).
+      - redis* modules - fix call to ``module.fail_json`` when failing because of
+        missing Python libraries (https://github.com/ansible-collections/community.general/pull/4733).
+      - xcc_redfish_command - for compatibility due to Redfish spec changes the virtualMedia
+        resource location changed from Manager to System (https://github.com/ansible-collections/community.general/pull/4682).
+      - zfs - fix wrong quoting of properties (https://github.com/ansible-collections/community.general/issues/4707,
+        https://github.com/ansible-collections/community.general/pull/4726).
+      minor_changes:
+      - cpanm - using ``do_raise()`` to raise exceptions in ``ModuleHelper`` derived
+        modules (https://github.com/ansible-collections/community.general/pull/4674).
+      - mksysb - using ``do_raise()`` to raise exceptions in ``ModuleHelper`` derived
+        modules (https://github.com/ansible-collections/community.general/pull/4674).
+      - pipx - using ``do_raise()`` to raise exceptions in ``ModuleHelper`` derived
+        modules (https://github.com/ansible-collections/community.general/pull/4674).
+      - snap - using ``do_raise()`` to raise exceptions in ``ModuleHelper`` derived
+        modules (https://github.com/ansible-collections/community.general/pull/4674).
+      - xfconf - using ``do_raise()`` to raise exceptions in ``ModuleHelper`` derived
+        modules (https://github.com/ansible-collections/community.general/pull/4674).
+      release_summary: Regular bugfix release for inclusion in Ansible 6.0.0.
+    fragments:
+    - 4674-use-mh-raise.yaml
+    - 4682-compatibility-virtualmedia-resource-location.yaml
+    - 4700-code-changes.yml
+    - 4712-consul-bugfix.yaml
+    - 4719-fix-keycloak-realm.yaml
+    - 4726-zfs.yml
+    - 4733-redis-fail.yml
+    - 5.0.1.yml
+    release_date: '2022-05-30'
