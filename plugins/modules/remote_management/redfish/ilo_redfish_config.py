@@ -82,6 +82,17 @@ EXAMPLES = '''
       password: Testpass123
       attribute_name: TimeZone
       attribute_value: Chennai
+
+  - name: Set NTP Servers
+    community.general.ilo_redfish_config:
+      category: Manager
+      command: SetNTPServers
+      baseuri: 15.X.X.X
+      username: Admin
+      password: Testpass123
+      attribute_name: StaticNTPServers
+      attribute_value: X.X.X.X
+
 '''
 
 RETURN = '''
