@@ -37,7 +37,7 @@ def fail_imports(module, needs_certifi=True):
         errors.append(missing_required_lib('certifi'))
         traceback.append(CERTIFI_IMPORT_ERROR)
     if errors:
-        module.fail_json(errors=errors, traceback='\n'.join(traceback))
+        module.fail_json(msg='\n'.join(errors), traceback='\n'.join(traceback))
 
 
 def redis_auth_argument_spec(tls_default=True):
