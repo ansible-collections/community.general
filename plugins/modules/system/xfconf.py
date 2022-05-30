@@ -209,13 +209,13 @@ class XFConfProperty(CmdStateModuleHelper):
         self.update_vars(meta={"output": True, "fact": True}, **kwargs)
 
     def __init_module__(self):
-        self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.module.params['property'],
-                                                                                 self.module.params['channel'])
+        self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.vars.property,
+                                                                                 self.vars.channel)
         self.vars.set('previous_value', self._get(), fact=True)
         self.vars.set('type', self.vars.value_type, fact=True)
         self.vars.meta('value').set(initial_value=self.vars.previous_value)
 
-        if self.module.params['disable_facts'] is False:
+        if self.vars.disable_facts is False:
             self.do_raise('Returning results as facts has been removed. Stop using disable_facts=false.')
 
     def process_command_output(self, rc, out, err):
@@ -236,7 +236,7 @@ class XFConfProperty(CmdStateModuleHelper):
         return self.run_command(params=('channel', 'property'))
 
     def state_absent(self):
-        if not self.module.check_mode:
+        if not self.check_mode:
             self.run_command(params=('channel', 'property', {'reset': True}))
         self.vars.value = None
 
@@ -270,7 +270,7 @@ class XFConfProperty(CmdStateModuleHelper):
             params.append('is_array')
         params.append({'values_and_types': (self.vars.value, value_type)})
 
-        if not self.module.check_mode:
+        if not self.check_mode:
             self.run_command(params=params)
 
         if not self.vars.is_array:

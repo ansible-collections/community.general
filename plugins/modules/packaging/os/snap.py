@@ -275,7 +275,7 @@ class Snap(CmdStateModuleHelper):
         self.changed = True
         self.vars.snaps_installed = actionable_snaps
 
-        if self.module.check_mode:
+        if self.check_mode:
             return
 
         params = ['state', 'classic', 'channel']  # get base cmd parts
@@ -352,7 +352,7 @@ class Snap(CmdStateModuleHelper):
             if options_changed:
                 self.changed = True
 
-                if not self.module.check_mode:
+                if not self.check_mode:
                     params = [{'state': 'set'}, {'name': snap_name}, {'options': options_changed}]
 
                     rc, out, err = self.run_command(params=params)
@@ -375,7 +375,7 @@ class Snap(CmdStateModuleHelper):
             return
         self.changed = True
         self.vars[actionable_var] = actionable_snaps
-        if self.module.check_mode:
+        if self.check_mode:
             return
         if params is None:
             params = ['state']

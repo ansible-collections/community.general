@@ -154,20 +154,20 @@ class SnapAlias(CmdStateModuleHelper):
         for alias in self.vars.alias:
             if not self._has_alias(self.vars.name, alias):
                 self.changed = True
-                if not self.module.check_mode:
+                if not self.check_mode:
                     self.run_command(params=['state', 'name', {'_alias': alias}])
 
     def state_absent(self):
         if not self.vars.alias:
             if self._has_alias(self.vars.name):
                 self.changed = True
-                if not self.module.check_mode:
+                if not self.check_mode:
                     self.run_command(params=['state', 'name'])
         else:
             for alias in self.vars.alias:
                 if self._has_alias(self.vars.name, alias):
                     self.changed = True
-                    if not self.module.check_mode:
+                    if not self.check_mode:
                         self.run_command(params=['state', {'_alias': alias}])
 
 

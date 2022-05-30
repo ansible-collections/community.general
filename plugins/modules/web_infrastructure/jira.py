@@ -410,7 +410,9 @@ import random
 import string
 import traceback
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper, cause_changes
+from ansible_collections.community.general.plugins.module_utils.module_helper import (
+    StateModuleHelper, cause_changes, ModuleHelperException
+)
 from ansible.module_utils.six.moves.urllib.request import pathname2url
 from ansible.module_utils.common.text.converters import to_text, to_bytes, to_native
 from ansible.module_utils.urls import fetch_url
@@ -720,17 +722,17 @@ class JIRA(StateModuleHelper):
                     url=url,
                     method=method,
                 )
-                self.module.fail_json(msg=to_native(msg), exception=traceback.format_exc())
+                raise ModuleHelperException(msg=to_native(msg), exception=traceback.format_exc())
             if error:
                 msg = []
                 for key in ('errorMessages', 'errors'):
                     if error.get(key):
                         msg.append(to_native(error[key]))
                 if msg:
-                    self.module.fail_json(msg=', '.join(msg))
-                self.module.fail_json(msg=to_native(error))
+                    raise ModuleHelperException(msg=', '.join(msg))
+                raise ModuleHelperException(msg=to_native(error))
             # Fallback print body, if it cant be decoded
-            self.module.fail_json(msg=to_native(info['body']))
+            raise ModuleHelperException(msg=to_native(info['body']))
 
         body = response.read()
 

@@ -25,7 +25,6 @@ EXAMPLES = ""
 RETURN = ""
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
-from ansible_collections.community.general.plugins.module_utils.mh.mixins.deprecate_attrs import DeprecateAttrsMixin
 
 
 class MSimpleDA(ModuleHelper):

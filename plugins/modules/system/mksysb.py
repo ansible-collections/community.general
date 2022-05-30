@@ -139,7 +139,7 @@ class MkSysB(CmdModuleHelper):
             self.do_raise("Storage path %s is not valid." % self.vars.storage_path)
 
     def __run__(self):
-        if not self.module.check_mode:
+        if not self.check_mode:
             self.run_command(params=[
                 'create_map_files', 'use_snapshot', 'exclude_files', 'exclude_wpar_files', 'software_packing',
                 'extended_attrs', 'backup_crypt_files', 'backup_dmapi_fs', 'new_image_data',
