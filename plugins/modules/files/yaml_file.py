@@ -468,7 +468,7 @@ class YamlFile(DestFileModuleHelper):
             explicit_start=dict(type='bool', default=True),
             explicit_end=dict(type='bool', default=False),
             sort_keys=dict(type='bool', default=False),
-            default_flow_style=dict(type='bool', default=False),
+            default_flow_style=dict(type='bool'),
             canonical=dict(type='bool', default=False),
             width=dict(type='int', default=0),
         ),
@@ -510,7 +510,7 @@ class YamlFile(DestFileModuleHelper):
         try:
             return yaml.safe_load(''.join(yaml_str))
         except yaml.scanner.ScannerError:
-            raise ModuleHelperException('Failed to decode YAML in {0}'.format(self.vars["path"]))
+            raise ModuleHelperException(msg='Failed to decode YAML in {0}'.format(self.vars["path"]))
 
     def _set_result(self, result):
         # type: (dict) -> None
