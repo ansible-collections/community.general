@@ -7,6 +7,9 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+from typing import Union
+from ansible.module_utils.basic import AnsibleModule
+
 DOCUMENTATION = r'''
 ---
 module: json_file
@@ -478,6 +481,7 @@ class JsonFile(DestFileModuleHelper):
     )
 
     def __init__(self, module=None, var_dest_file='path', var_result_data='result'):
+        # type: (Union[dict, AnsibleModule, None], str, str) -> None
         self._current_content_end_with_line_break = False
         super().__init__(module, var_dest_file, var_result_data)
 

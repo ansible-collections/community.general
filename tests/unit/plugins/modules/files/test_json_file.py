@@ -28,7 +28,6 @@ JSON_CURRENT = json.dumps(
     DICT_CURRENT,
     indent=DEFAULT_MODULE_ARGS['indent'],
     sort_keys=DEFAULT_MODULE_ARGS['sort_keys'])
-
 JSON_CURRENT_ENDING_WITH_LINE_BREAK = JSON_CURRENT + '\n'
 
 
