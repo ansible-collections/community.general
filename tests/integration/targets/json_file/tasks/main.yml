@@ -19,10 +19,6 @@
         expected_file: has_no_valid_json.txt
         module_params:
           state: "present"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 1
         assert:
@@ -34,10 +30,7 @@
         expected_file: sample.json
         module_params:
           state: "present"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
+          create: true
           value:
             B: 2
             A: 1
@@ -57,10 +50,6 @@
         expected_file: sample_list.json
         module_params:
           state: "present"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             - 1
             - 2
@@ -73,10 +62,6 @@
         expected_file: sample.json
         module_params:
           state: "present"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             B: 2
             A: 1
@@ -95,10 +80,6 @@
         expected_file: sample.json
         module_params:
           state: "present"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 1
             C:
@@ -113,10 +94,6 @@
         expected_file: expected_120.json
         module_params:
           state: "present"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 11
             C:
@@ -137,9 +114,6 @@
         module_params:
           state: "present"
           list_diff_type: "index"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 1
             C:
@@ -156,9 +130,6 @@
         module_params:
           state: "present"
           list_diff_type: "index"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 1
             C:
@@ -173,10 +144,6 @@
         expected_file: sample.json
         module_params:
           state: "absent"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 11
             C:
@@ -196,10 +163,6 @@
         expected_file: expected_220.json
         module_params:
           state: "absent"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 1
             C:
@@ -220,9 +183,6 @@
         module_params:
           state: "absent"
           list_diff_type: "index"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 11
             C:
@@ -243,9 +203,6 @@
         module_params:
           state: "absent"
           list_diff_type: "index"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 1
             C:
@@ -266,10 +223,6 @@
         expected_file: sample.json
         module_params:
           state: "identic"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             B: 2
             A: 1
@@ -288,10 +241,6 @@
         expected_file: expected_320.json
         module_params:
           state: "identic"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             Z: 9
             Y: 8
@@ -304,8 +253,6 @@
         expected_file: sample.json
         module_params:
           state: "identic"
-          list_diff_type: "value"
-          diff_on_value: true
           indent: 4
           sort_keys: true
           value:
@@ -326,7 +273,6 @@
         expected_file: expected_420.json
         module_params:
           state: "identic"
-          list_diff_type: "value"
           diff_on_value: false
           indent: 4
           sort_keys: true
@@ -348,10 +294,7 @@
         expected_file: expected_510.json
         module_params:
           state: "identic"
-          list_diff_type: "value"
           diff_on_value: false
-          indent: 2
-          sort_keys: false
           value: "Z"
         assert:
           - "last_result.failed == false"
@@ -361,10 +304,7 @@
         expected_file: expected_520.json
         module_params:
           state: "identic"
-          list_diff_type: "value"
           diff_on_value: false
-          indent: 2
-          sort_keys: false
           value: '{"Z": 1}'
         assert:
           - "last_result.failed == false"
@@ -374,10 +314,6 @@
         expected_file: sample.json
         module_params:
           state: "identic"
-          list_diff_type: "value"
-          diff_on_value: false
-          indent: 2
-          sort_keys: false
           value: '{"Z": 1'
         assert:
           - "last_result.failed == true"

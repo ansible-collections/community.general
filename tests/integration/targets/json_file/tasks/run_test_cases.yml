@@ -14,15 +14,7 @@
   when: case.current_file
 
 - name: "{{ case.id }} - run module"
-  community.general.json_file:
-    path: "{{ dest_file }}"
-    state: "{{ case.module_params.state }}"
-    list_diff_type: "{{ case.module_params.list_diff_type }}"
-    diff_on_value: "{{ case.module_params.diff_on_value }}"
-    indent: "{{ case.module_params.indent }}"
-    sort_keys: "{{ case.module_params.sort_keys }}"
-    value: "{{ case.module_params.value }}"
-    create: true
+  community.general.json_file: "{{ case.module_params|combine({'path': dest_file}) }}"
   ignore_errors: true
   register: last_result
   diff: true

@@ -474,7 +474,7 @@ class JsonFile(DestFileModuleHelper):
             create=dict(type='bool', default=False),
             diff_on_value=dict(type='bool', default=True),
             backup=dict(type='bool', default=False),
-            indent=dict(type='int', default=4),
+            indent=dict(type='int', default=2),
             sort_keys=dict(type='bool', default=False),
         ),
         supports_check_mode=True,

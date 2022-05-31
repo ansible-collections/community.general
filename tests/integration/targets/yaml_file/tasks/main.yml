@@ -48,10 +48,6 @@
         expected_file: sample_list.yaml
         module_params:
           state: "present"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             - 1
             - 2
@@ -64,10 +60,6 @@
         expected_file: sample.yaml
         module_params:
           state: "present"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             B: 2
             A: 1
@@ -86,10 +78,6 @@
         expected_file: sample.yaml
         module_params:
           state: "present"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 1
             C:
@@ -104,10 +92,6 @@
         expected_file: expected_120.yaml
         module_params:
           state: "present"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 11
             C:
@@ -128,9 +112,6 @@
         module_params:
           state: "present"
           list_diff_type: "index"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 1
             C:
@@ -147,9 +128,6 @@
         module_params:
           state: "present"
           list_diff_type: "index"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 1
             C:
@@ -164,10 +142,6 @@
         expected_file: sample.yaml
         module_params:
           state: "absent"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 11
             C:
@@ -187,10 +161,6 @@
         expected_file: expected_220.yaml
         module_params:
           state: "absent"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 1
             C:
@@ -211,9 +181,6 @@
         module_params:
           state: "absent"
           list_diff_type: "index"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 11
             C:
@@ -234,9 +201,6 @@
         module_params:
           state: "absent"
           list_diff_type: "index"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             A: 1
             C:
@@ -257,10 +221,7 @@
         expected_file: sample.yaml
         module_params:
           state: "identic"
-          list_diff_type: "value"
           diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             B: 2
             A: 1
@@ -279,10 +240,6 @@
         expected_file: expected_320.yaml
         module_params:
           state: "identic"
-          list_diff_type: "value"
-          diff_on_value: true
-          indent: 2
-          sort_keys: false
           value:
             Z: 9
             Y: 8
@@ -295,8 +252,6 @@
         expected_file: sample.yaml
         module_params:
           state: "identic"
-          list_diff_type: "value"
-          diff_on_value: true
           indent: 4
           sort_keys: true
           value:
@@ -317,7 +272,6 @@
         expected_file: expected_420.yaml
         module_params:
           state: "identic"
-          list_diff_type: "value"
           diff_on_value: false
           indent: 4
           sort_keys: true
@@ -339,7 +293,6 @@
         expected_file: expected_510.yaml
         module_params:
           state: "identic"
-          list_diff_type: "value"
           diff_on_value: false
           explicit_end: true
           value:
@@ -360,7 +313,6 @@
         expected_file: expected_520.yaml
         module_params:
           state: "identic"
-          list_diff_type: "value"
           diff_on_value: false
           canonical: true
           value:
@@ -381,7 +333,6 @@
         expected_file: expected_530.yaml
         module_params:
           state: "identic"
-          list_diff_type: "value"
           diff_on_value: false
           default_flow_style: false
           value:
@@ -402,7 +353,6 @@
         expected_file: expected_540.yaml
         module_params:
           state: "identic"
-          list_diff_type: "value"
           diff_on_value: false
           default_flow_style: true
           value:
@@ -423,7 +373,6 @@
         expected_file: expected_610.yaml
         module_params:
           state: "identic"
-          list_diff_type: "value"
           diff_on_value: false
           value: "Z"
         assert:
@@ -434,7 +383,6 @@
         expected_file: expected_620.yaml
         module_params:
           state: "identic"
-          list_diff_type: "value"
           diff_on_value: false
           value: '{"Z": 1}'
         assert:
@@ -445,7 +393,6 @@
         expected_file: sample.yaml
         module_params:
           state: "identic"
-          list_diff_type: "value"
           diff_on_value: false
           value: '{"Z": 1'
         assert:
