@@ -7,9 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from typing import Union
-from ansible.module_utils.basic import AnsibleModule
-
 DOCUMENTATION = r'''
 ---
 module: json_file
@@ -438,8 +435,11 @@ RETURN = r'''
     type: dict
 '''
 
-import os
+
 import json
+import os
+from typing import Union
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.data_merge_utils import DataMergeUtils
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
     DestFileModuleHelper,

@@ -411,14 +411,12 @@ else:
 
 
 from ansible.module_utils.basic import missing_required_lib
-from ansible_collections.community.general.plugins.module_utils.common.validation import check_type_dict_or_list
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
     DestFileModuleHelper,
     ModuleHelperException,
 )
-from ansible_collections.community.general.plugins.module_utils.data_merge_utils import (
-    DataMergeUtils,
-)
+from ansible_collections.community.general.plugins.module_utils.data_merge_utils import DataMergeUtils
+from ansible_collections.community.general.plugins.module_utils.common.validation import check_type_dict_or_list
 
 
 class YamlFile(DestFileModuleHelper):
