@@ -536,7 +536,6 @@ class JsonFile(DestFileModuleHelper):
                 dest_file_lines[-1] += '\n'
             self.vars.set(self.var_result_data, dest_file_lines)
 
-    @DestFileModuleHelper.write_tempfile    # provide kwargs['fd']
     def __write_temp__(self, *args, **kwargs):
         # type: () -> None
         if self.vars['diff_on_value']:
@@ -545,7 +544,7 @@ class JsonFile(DestFileModuleHelper):
                 json_string += '\n'
         else:
             json_string = ''.join(self.vars[self.var_result_data])
-        os.write(kwargs['fd'], bytes(json_string, 'utf-8'))
+        self._tmpfile = self._write_in_tempfile(json_string)
 
     def _json_dumps(self, json_str):
         # type: (str) -> dict

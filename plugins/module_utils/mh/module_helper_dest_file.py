@@ -15,8 +15,7 @@ import os
 import tempfile
 
 from abc import abstractmethod
-from functools import wraps
-from typing import Callable, Union
+from typing import Union
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper import ModuleHelper
@@ -162,20 +161,14 @@ class DestFileModuleHelper(ModuleHelper):
         Implement it in the module to describe how the destination must be
         written in the tempfile.
 
-        This function must set `self.__tmpfile` with the created tempfile.
+        You must set self_tmpfile with the name of created temps file.
 
-        If cat you use the wrapper `DestFileModuleHelper.write_tempfile`
-        decorator you car automaticall create the temp file(with the file
-        descriptor set in `kwargs['fd']) and set self.__tempfile.
+        You can use `self._write_in_tmpfile()` to help you to write content in
+        temp file like this :
 
-        Example:
-            class MyModule(DestFileModuleHelper)
-                ...
-
-                @DestFileModuleHelper.write_tempfile decorator
-                def __write_temp(self, *args, **kwargs):
-                    temp_file_descriptor = kwargs['fd']
-                    ...
+        ```
+        self._tmpfile = self._write_in_tempfile('my file content')
+        ```
         """
         pass
 
@@ -193,20 +186,16 @@ class DestFileModuleHelper(ModuleHelper):
                 self.module.add_cleanup_file(self.vars.backup_file)
             raise ex
 
-    @staticmethod
-    def write_tempfile(func):
-        # type: (Callable) -> Callable
+    def _write_in_tempfile(self, content):
         """
-        Decorator to create tempfile to write destination content and set
-        `self.__tempfile`.
+        Helper that can be used to create a temp file and write a content
+        into it. It add the created temps file in module cleanup file stack.
 
-        Return Callable with file descriptor in `kwargs['fd']`.
+        Return the name of the temp file.
         """
-        @wraps(func)
-        def wrapped(self, *args, **kwargs):
-            kwargs['fd'], self._tmpfile = tempfile.mkstemp(dir=self.module.tmpdir)
-            self.module.add_cleanup_file(self._tmpfile)
-            res = func(self, *args, **kwargs)
-            os.close(kwargs['fd'])
-            return res
-        return wrapped
+        # type: (str) -> str
+        fd, tf = tempfile.mkstemp(dir=self.module.tmpdir)
+        self.module.add_cleanup_file(tf)
+        os.write(fd, bytes(content, 'utf-8'))
+        os.close(fd)
+        return tf

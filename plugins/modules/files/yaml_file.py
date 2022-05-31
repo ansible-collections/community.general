@@ -506,14 +506,13 @@ class YamlFile(DestFileModuleHelper):
             self.vars.set(self.var_result_data,
                           self._yaml_dumps(result).splitlines(keepends=True))
 
-    @DestFileModuleHelper.write_tempfile    # provide kwargs['fd']
     def __write_temp__(self, *args, **kwargs):
         # type: () -> None
         if self.vars['diff_on_value']:
             yaml_string = self._yaml_dumps(self.vars[self.var_result_data])
         else:
-            yaml_string = ''.join(self.vars[self.var_result_data])
-        os.write(kwargs['fd'], bytes(yaml_string, 'utf-8'))
+            yaml_string += ''.join(self.vars[self.var_result_data])
+        self._tmpfile = self._write_in_tempfile(yaml_string)
 
     def _yaml_dumps(self, yaml_str):
         # type: (str) -> dict

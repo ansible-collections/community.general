@@ -408,14 +408,13 @@ class TomlFile(DestFileModuleHelper):
         else:
             self.vars.set(self.var_result_data, self._toml_dumps(result).splitlines(keepends=True))
 
-    @ DestFileModuleHelper.write_tempfile    # provide kwargs['fd']
     def __write_temp__(self, *args, **kwargs):
         # type: () -> None
         if self.vars['diff_on_value']:
             toml_string = self._toml_dumps(self.vars[self.var_result_data])
         else:
-            toml_string = ''.join(self.vars[self.var_result_data])
-        os.write(kwargs['fd'], bytes(toml_string, 'utf-8'))
+            toml_string += ''.join(self.vars[self.var_result_data])
+        self._tmpfile = self._write_in_tempfile(toml_string)
 
     def _toml_dumps(self, toml_str):
         # type: (str) -> dict

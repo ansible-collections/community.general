@@ -360,10 +360,8 @@ class TestDestFileModuleHelper():
             ),
         )
 
-        @DestFileModuleHelper.write_tempfile
         def __write_temp__(self, *args, **kwargs):
-            """impement abstract DestFileModuleHelper.__write_temp__"""
-            pass
+            self._tmpfile = self._write_in_tempfile(self.vars['value'])
 
         def __load_result_data__(self):
             """impement abstract DestFileModuleHelper.__load_result_data__"""
@@ -380,6 +378,7 @@ class TestDestFileModuleHelper():
     def test_fake_dest_file_module(self, test_case, capfd, mocker):
 
         mock_tempfile_mkstemp = mocker.patch('tempfile.mkstemp', return_value=(1234, FAKE_TEMP_FILE))
+        mock_os_write = mocker.patch('os.write')
         mock_os_close = mocker.patch('os.close')
         mock_dest_file_sanity_check = mocker.patch(MODULE_PATH.format('dest_file_sanity_check'))
         mock_atomic_move = mocker.patch(
@@ -421,11 +420,13 @@ class TestDestFileModuleHelper():
             if module.has_changed() and not test_case['check_mode']:
                 mock_tempfile_mkstemp.assert_called_once()
                 mock_cleanup.assert_called_with(FAKE_TEMP_FILE)
+                mock_os_write.assert_called_once_with(1234, bytes(FAKE_DATA_CHANGED, 'utf-8'))
                 mock_os_close.assert_called_once_with(1234)
                 mock_atomic_move.assert_called_once_with(FAKE_TEMP_FILE, module.vars['path'])
             else:
                 mock_tempfile_mkstemp.assert_not_called()
                 mock_cleanup.assert_not_called()
+                mock_os_write.assert_not_called()
                 mock_os_close.assert_not_called()
                 mock_atomic_move.assert_not_called()
             assert(result.get('backup_file') == test_case['backup_file'])
