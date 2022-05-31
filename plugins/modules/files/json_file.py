@@ -101,7 +101,7 @@ options:
       - Set the indentation for elements in the JSON file.
         See U(https://docs.python.org/3/library/json.html#basic-usage).
     type: int
-    default: 4
+    default: 2
   sort_keys:
     description:
       - If set to C(true), the values in the will sorted by their keys.
@@ -437,7 +437,6 @@ RETURN = r'''
 
 
 import json
-import os
 from typing import Union
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.data_merge_utils import DataMergeUtils
