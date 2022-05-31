@@ -138,6 +138,24 @@ TEST_CASE_EXEC = [
             'expected_changed': True,
         },
     ],
+    [
+        {'path': FAKE_PATH, 'value': 'Z'},
+        {
+            'id': 'test_scalar_value',
+            'expected_value': ['Z'],
+            'read_data': JSON_CURRENT,
+            'expected_changed': True,
+        },
+    ],
+    [
+        {'path': FAKE_PATH, 'value': '{"Z": 1}', 'state': 'identic'},
+        {
+            'id': 'test_json_string_value',
+            'expected_value': {'Z': 1},
+            'read_data': JSON_CURRENT,
+            'expected_changed': True,
+        },
+    ],
 ]
 TEST_CASES_EXEC_IDS = [item[1]['id'] for item in TEST_CASE_EXEC]
 

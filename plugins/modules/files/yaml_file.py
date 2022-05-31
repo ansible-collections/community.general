@@ -62,8 +62,8 @@ options:
   value:
     description:
       - The values that you want to compare with the one present in the YAML
-        file.
-    type: dict
+        file. Can be a dict or a list.
+    type: raw
     required: true
   create:
     description:
@@ -119,11 +119,17 @@ options:
     default: false
   default_flow_style:
     description:
-      - If C(true) then the YAML will be in flow inline form.
-      - If C(false) then the YAML will be in indented block form.
+      - If C(null) Mappings blocks will be separated by lines breaks and indents
+        and sequences blocks will be wrapped by square brackets and separated by
+        commas.
+      - If C(true) Mappings blocks and sequences blocks will be separated by lines
+        breaks and indents.
+      - If C(false) Mappings blocks will be wrapped by curly braces and separated
+        by commas and sequences blocks will be wrapped by square brackets and
+        separated by commas.
       - This option is mutually exclusive with C(canonical).
     type: bool
-    default: false
+    default: null
   canonical:
     description:
       - If C(true) then the YAML will be in canonical form.
@@ -150,10 +156,7 @@ EXAMPLES = r'''
 # B: 2
 # C:
 #   D: 3
-#   E:
-#   - 4
-#   - 5
-#   - 6
+#   E: [4, 5, 6]
 # The values are kept in all samples.
 
 - name: "Ensure values are present in the YAML."
@@ -173,10 +176,7 @@ EXAMPLES = r'''
 # B: 3
 # C:
 #   D: 3
-#   E:
-#   - 4
-#   - 5
-#   - 6
+#   E: [4, 5, 6]
 #   F: 8
 
 - name: "Ensure values are absent in the YAML file files."
@@ -196,10 +196,7 @@ EXAMPLES = r'''
 # B: 2
 # C:
 #   D: 3
-#   E:
-#   - 4
-#   - 5
-#   - 6
+#   E: [4, 5, 6]
 - name: "Ensure values are absent in the YAML file files."
   community.general.yaml_file:
     path: "/my/dest/file.yaml"
@@ -215,10 +212,7 @@ EXAMPLES = r'''
 # ---
 # A: 1
 # C:
-#   E:
-#   - 4
-#   - 5
-#   - 6
+#   E: [4, 5, 6]
 - name: "Ensure values are identic in the YAML file files."
   community.general.yaml_file:
     path: "/my/dest/file.yaml"
@@ -242,8 +236,7 @@ EXAMPLES = r'''
     path: "/my/dest/file.yaml"
     value:
       C:
-       E:
-       - 5
+       E: [5]
     state: "present"
 # In the original values, 5 is already present in C.D.
 # There is no change.
@@ -253,10 +246,7 @@ EXAMPLES = r'''
 # B: 2
 # C:
 #   D: 3
-#   E:
-#   - 4
-#   - 5
-#   - 6
+#   E: [4, 5, 6]
 
 - name: "Ensure values are present in a list."
   community.general.yaml_file:
@@ -274,11 +264,7 @@ EXAMPLES = r'''
 # B: 2
 # C:
 #   D: 3
-#   E:
-#   - 4
-#   - 5
-#   - 6
-#   - 7
+#   E: [4, 5, 6, 7]
 
 - name: "Ensure values are absent in a list."
   community.general.yaml_file:
@@ -296,9 +282,7 @@ EXAMPLES = r'''
 # B: 2
 # C:
 #   D: 3
-#   E:
-#   - 4
-#   - 6
+#   E: [4, 6]
 
 - name: "Ensure values are present depending their index in a list."
   community.general.yaml_file:
@@ -321,10 +305,7 @@ EXAMPLES = r'''
 # B: 2
 # C:
 #   D: 3
-#   E:
-#   - 4
-#   - 7
-#   - 6
+#   E: [4, 7, 6]
 
 - name: "Ensure values are absent depending their index in a list."
   community.general.yaml_file:
@@ -348,9 +329,7 @@ EXAMPLES = r'''
 # B: 2
 # C:
 #   D: 3
-#   E:
-#   - 4
-#   - 5
+#   E: [4, 5]
 
 - name: "Ensure values are present in the YAML diff, check only on values."
   community.general.yaml_file:
@@ -368,10 +347,7 @@ EXAMPLES = r'''
 # B: 2
 # C:
 #   D: 3
-#   E:
-#   - 4
-#   - 5
-#   - 6
+#   E: [4, 5, 6]
 
 - name: "Ensure values are present in the YAML diff, also check file format."
   community.general.yaml_file:
@@ -390,10 +366,7 @@ EXAMPLES = r'''
 # B: 2
 # C:
 #     D: 3
-#     E:
-#     - 4
-#     - 5
-#     - 6
+#     E: [4, 5, 6]
 '''
 
 RETURN = r'''
@@ -470,7 +443,7 @@ class YamlFile(DestFileModuleHelper):
                         'index',
                 ],
             ),
-            value=dict(type=check_type_dict_or_list, required=True),
+            value=dict(type='raw', required=True),
             create=dict(type='bool', default=False),
             backup=dict(type='bool', default=False),
             diff_on_value=dict(type='bool', default=True),
@@ -487,6 +460,11 @@ class YamlFile(DestFileModuleHelper):
         ],
         supports_check_mode=True,
     )
+
+    def __init_module__(self):
+        # type: () -> None
+        self.vars.set('value', check_type_dict_or_list(self.vars['value']))
+        super().__init_module__()
 
     def __load_result_data__(self):
         # type: () -> dict

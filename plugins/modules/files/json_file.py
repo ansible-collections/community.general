@@ -64,8 +64,8 @@ options:
   value:
     description:
       - The values that you want to compare with the one present in the JSON
-        file.
-    type: dict
+        file. Can be a dict or a list.
+    type: raw
     required: true
   create:
     description:
@@ -470,7 +470,7 @@ class JsonFile(DestFileModuleHelper):
                         'index',
                 ],
             ),
-            value=dict(type=check_type_dict_or_list, required=True),
+            value=dict(type='raw', required=True),
             create=dict(type='bool', default=False),
             diff_on_value=dict(type='bool', default=True),
             backup=dict(type='bool', default=False),
@@ -484,6 +484,11 @@ class JsonFile(DestFileModuleHelper):
         # type: (Union[dict, AnsibleModule, None], str, str) -> None
         self._current_content_end_with_line_break = False
         super().__init__(module, var_dest_file, var_result_data)
+
+    def __init_module__(self):
+        # type: () -> None
+        self.vars.set('value', check_type_dict_or_list(self.vars['value']))
+        super().__init_module__()
 
     def __load_result_data__(self):
         # type: () -> dict
