@@ -96,9 +96,13 @@ DOCUMENTATION = '''
           - Gather LXC/QEMU configuration facts.
           - When I(want_facts) is set to C(true) more details about QEMU VM status are possible, besides the running and stopped states.
             Currently if the VM is running and it is suspended, the status will be running and the machine will be in C(running) group,
-            but it's actual state will be paused. This introduces multiple groups [prefixed with I(group_prefix)] C(qemu_running),
-            C(qemu_stopped), C(qemu_prelaunch) and C(qemu_paused). In this case the machine will be present in both
-            C(running) and C(qemu_paused).
+            but it's actual state will be paused. This introduces multiple groups [prefixed with I(group_prefix)] C(prelaunch) and C(paused).
+        default: no
+        type: bool
+      qemu_extended_statuses:
+        description:
+          - Requires I(want_facts) to be set to C(true) to function. This will allow you to differentiate betweend C(paused) and C(prelaunch)
+            statuses of the QEMU VM's.
         default: no
         type: bool
       want_proxmox_nodes_ansible_host:
@@ -511,14 +515,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         node_type_group = self._group('%s_%s' % (node, ittype))
         self.inventory.add_child(self._group('all_' + ittype), name)
         self.inventory.add_child(node_type_group, name)
-        if item['status'] == 'stopped':
-            self.inventory.add_child(self._group('all_stopped'), name)
-        elif item['status'] == 'running':
-            self.inventory.add_child(self._group('all_%s' % (item['status'])), name)
-            if want_facts and ittype == 'qemu':
-                # get more details about the status of the qemu VM if want_facts == True
-                item_status = properties.get(self._fact('qmpstatus'), item['status'])
-                self.inventory.add_child(self._group('all_qemu_%s' % (item_status)), name)
+
+        item_status = item['status']
+        if item_status == 'running':
+            if want_facts and ittype == 'qemu' and self.get_option('qemu_extended_statuses'):
+                # get more details about the status of the qemu VM
+                item_status = properties.get(self._fact('qmpstatus'), item_status)
+        self.inventory.add_child(self._group('all_%s' % (item_status)), name)
 
         return name
 
@@ -540,8 +543,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _populate(self):
 
         # create common groups
-        default_groups = ['lxc', 'qemu', 'running', 'stopped',
-                          'qemu_running', 'qemu_stopped', 'qemu_prelaunch', 'qemu_paused']
+        default_groups = ['lxc', 'qemu', 'running', 'stopped', 'prelaunch', 'paused']
         for group in default_groups:
             self.inventory.add_group(self._group('all_%s' % (group)))
 
@@ -633,6 +635,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         if proxmox_password is None and (proxmox_token_id is None or proxmox_token_secret is None):
             raise AnsibleError('You must specify either a password or both token_id and token_secret.')
+
+        if self.get_option('qemu_extended_statuses') and not self.get_option('want_facts'):
+            raise AnsibleError('You must set want_facts to True if you want to use qemu_extended_statuses.')
 
         self.cache_key = self.get_cache_key(path)
         self.use_cache = cache and self.get_option('cache')
