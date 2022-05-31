@@ -56,13 +56,13 @@ options:
   compute_id:
     type: str
     description:
-    - ID of the compute instance (see M(community.general.scaleway_compute))
+    - ID of the compute instance (see M(community.general.scaleway_compute)).
     required: true
 
   private_network_id:
     type: str
     description:
-    - ID of the private network (see M(community.general.scaleway_private_network))
+    - ID of the private network (see M(community.general.scaleway_private_network)).
     required: true
 
 '''
