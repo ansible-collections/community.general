@@ -15,8 +15,8 @@
   set_fact:
     test_cases:
       - id: 010 fail when destination does not contain valid yaml
-        current_file: invalid.yaml
-        expected_file: invalid.yaml
+        current_file: invalid.txt
+        expected_file: invalid.txt
         module_params:
           value:
             A: 1
@@ -418,6 +418,40 @@
         assert:
           - "last_result.failed == false"
           - "last_result.changed == true"
+      - id: 610 with scalar value
+        current_file: sample.yaml
+        expected_file: expected_610.yaml
+        module_params:
+          state: "identic"
+          list_diff_type: "value"
+          diff_on_value: false
+          value: "Z"
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+      - id: 620 with json string
+        current_file: sample.yaml
+        expected_file: expected_620.yaml
+        module_params:
+          state: "identic"
+          list_diff_type: "value"
+          diff_on_value: false
+          value: '{"Z": 1}'
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+      - id: 630 fail with bad value
+        current_file: sample.yaml
+        expected_file: sample.yaml
+        module_params:
+          state: "identic"
+          list_diff_type: "value"
+          diff_on_value: false
+          value: '{"Z": 1'
+        assert:
+          - "last_result.failed == true"
+          - "last_result.changed == false"
+          - "last_result.msg == \"Module failed with exception: <class 'str'> cannot be converted to dict or a list\""
 
 - name: loop on test_cases
   include_tasks: run_test_cases.yml

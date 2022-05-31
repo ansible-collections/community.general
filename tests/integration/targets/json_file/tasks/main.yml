@@ -51,6 +51,7 @@
         assert:
           - "last_result.failed == false"
           - "last_result.changed == true"
+          - "last_result.created == true"
       - id: 030 can switch dict to list
         current_file: sample.json
         expected_file: sample_list.json
@@ -342,6 +343,46 @@
         assert:
           - "last_result.failed == false"
           - "last_result.changed == true"
+      - id: 510 with scalar value
+        current_file: sample.json
+        expected_file: expected_510.json
+        module_params:
+          state: "identic"
+          list_diff_type: "value"
+          diff_on_value: false
+          indent: 2
+          sort_keys: false
+          value: "Z"
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+      - id: 520 with json string
+        current_file: sample.json
+        expected_file: expected_520.json
+        module_params:
+          state: "identic"
+          list_diff_type: "value"
+          diff_on_value: false
+          indent: 2
+          sort_keys: false
+          value: '{"Z": 1}'
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
+      - id: 530 fail with bad value
+        current_file: sample.json
+        expected_file: sample.json
+        module_params:
+          state: "identic"
+          list_diff_type: "value"
+          diff_on_value: false
+          indent: 2
+          sort_keys: false
+          value: '{"Z": 1'
+        assert:
+          - "last_result.failed == true"
+          - "last_result.changed == false"
+          - "last_result.msg == \"Module failed with exception: <class 'str'> cannot be converted to dict or a list\""
 
 - name: loop on test_cases
   include_tasks: run_test_cases.yml
