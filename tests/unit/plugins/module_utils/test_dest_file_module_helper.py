@@ -17,11 +17,12 @@ from ansible_collections.community.general.plugins.module_utils.mh.exceptions im
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
     dest_file_sanity_check,
     check_if_dest_exists,
-    check_if_parent_is_writable,
+    check_if_parent_is_writeable,
     check_if_dest_is_readable,
     check_if_dest_is_regular_file,
     DestNotExists,
     DestNotReadable,
+    DestNotWriteable,
     DestNotRegularFile,
     ParentNotWriteable,
     CantCreateBackup,
@@ -44,6 +45,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'exists': False,
         'writable_parent': False,
         'readable': False,
+        'writeable': False,
         'regular_file': False,
         'expect_raise': DestNotExists,
     },
@@ -53,6 +55,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'exists': False,
         'writable_parent': False,
         'readable': False,
+        'writeable': False,
         'regular_file': False,
         'expect_raise': ParentNotWriteable,
     },
@@ -61,6 +64,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'backup': False,
         'exists': False,
         'writable_parent': True,
+        'writeable': False,
         'readable': False,
         'regular_file': False,
         'expect_raise': None,
@@ -71,8 +75,19 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'exists': True,
         'writable_parent': False,
         'readable': False,
+        'writeable': False,
         'regular_file': False,
         'expect_raise': DestNotReadable,
+    },
+    'dest_exists_not_writeable': {
+        'create': False,
+        'backup': False,
+        'exists': True,
+        'writable_parent': False,
+        'readable': True,
+        'writeable': False,
+        'regular_file': False,
+        'expect_raise': DestNotWriteable,
     },
     'dest_exists_readable_not_regular_file': {
         'create': False,
@@ -80,6 +95,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'exists': True,
         'writable_parent': False,
         'readable': True,
+        'writeable': True,
         'regular_file': False,
         'expect_raise': DestNotRegularFile,
     },
@@ -89,6 +105,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'exists': False,
         'writable_parent': True,
         'readable': False,
+        'writeable': True,
         'regular_file': False,
         'expect_raise': None,
     },
@@ -98,6 +115,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'exists': True,
         'writable_parent': False,
         'readable': True,
+        'writeable': True,
         'regular_file': True,
         'expect_raise': CantCreateBackup,
     },
@@ -107,6 +125,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'exists': True,
         'writable_parent': True,
         'readable': True,
+        'writeable': True,
         'regular_file': True,
         'expect_raise': None,
     },
@@ -134,7 +153,7 @@ class TestDestFileSanityCheck():
     @pytest.mark.parametrize('expected', ((True), (False)))
     def test_if_parent_not_writeable(self, expected, mocker):
         mocker.patch('os.access', return_value=expected)
-        assert(check_if_parent_is_writable(FAKE_DEST) == expected)
+        assert(check_if_parent_is_writeable(FAKE_DEST) == expected)
         os.access.assert_called_once_with(os.path.dirname(FAKE_DEST), os.W_OK)
 
     @pytest.mark.parametrize('expected', ((True), (False)))
@@ -150,13 +169,14 @@ class TestDestFileSanityCheck():
         os.path.isfile.assert_called_once_with(FAKE_DEST)
 
     @pytest.mark.parametrize(
-        'create, backup, exists, writable_parent, readable, regular_file, expect_raise',
+        'create, backup, exists, writable_parent, readable, writeable, regular_file, expect_raise',
         (elem.values() for elem in FILE_SANITY_CHECK_TEST_CASE.values()),
         ids=(FILE_SANITY_CHECK_TEST_CASE.keys()))
-    def test_check(self, create, backup, exists, writable_parent, readable, regular_file, expect_raise, mocker):
+    def test_check(self, create, backup, exists, writable_parent, readable, writeable, regular_file, expect_raise, mocker):
         mocker.patch(MODULE_PATH.format('check_if_dest_exists'), return_value=exists)
-        mocker.patch(MODULE_PATH.format('check_if_parent_is_writable'), return_value=writable_parent)
+        mocker.patch(MODULE_PATH.format('check_if_parent_is_writeable'), return_value=writable_parent)
         mocker.patch(MODULE_PATH.format('check_if_dest_is_readable'), return_value=readable)
+        mocker.patch(MODULE_PATH.format('check_if_dest_is_writeable'), return_value=writeable)
         mocker.patch(MODULE_PATH.format('check_if_dest_is_regular_file'), return_value=regular_file)
         if expect_raise is None:
             file_will_be_created = dest_file_sanity_check(FAKE_DEST, create, backup)

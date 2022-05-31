@@ -38,6 +38,10 @@ class DestNotReadable(ModuleHelperException):
     pass
 
 
+class DestNotWriteable(ModuleHelperException):
+    pass
+
+
 class DestNotRegularFile(ModuleHelperException):
     pass
 
@@ -103,7 +107,7 @@ def dest_file_sanity_check(dest, create=False, backup=False):
     if exists and not check_if_dest_is_readable(dest):
         raise DestNotReadable(msg="Destination {0} is not readable !".format(dest))
     if exists and not check_if_dest_is_writeable(dest):
-        raise DestNotReadable(msg="Destination {0} is not writeable !".format(dest))
+        raise DestNotWriteable(msg="Destination {0} is not writeable !".format(dest))
     if exists and not check_if_dest_is_regular_file(dest):
         raise DestNotRegularFile(msg="Destination {0} is not a regular file !".format(dest))
     if exists and backup and not writeable_parent:
