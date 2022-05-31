@@ -73,6 +73,26 @@
         assert:
           - "last_result.failed == false"
           - "last_result.changed == true"
+      - id: 050 not add ansible managed
+        current_file: false
+        expected_file: expected_050.yaml
+        module_params:
+          state: "present"
+          create: true
+          add_ansible_managed: false
+          value:
+            B: 2
+            A: 1
+            C:
+              CB: 4
+              CA: 3
+              CC:
+                - 5
+                - 6
+                - 7
+        assert:
+          - "last_result.failed == false"
+          - "last_result.changed == true"
       - id: 110 on present, test no change
         current_file: sample.yaml
         expected_file: sample.yaml
