@@ -197,7 +197,10 @@ TEST_CASES_EXEC_IDS = [item[1]['id'] for item in TEST_CASE_EXEC]
 def test_execute(testcase, capfd, mocker):
     mocker.patch('ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file.dest_file_sanity_check',
                  return_value=False)
-    mocker.patch('builtins.open', mock_open(read_data=testcase['read_data']))
+    if testcase['read_data'] is None:
+        mocker.patch('builtins.open', mock_open())
+    else:
+        mocker.patch('builtins.open', mock_open(read_data=testcase['read_data']))
     mocker.patch('os.write')
     mocker.patch('os.close')
     mocker.patch('tempfile.mkstemp', return_value=(1234, '/fake/temp/file'))
