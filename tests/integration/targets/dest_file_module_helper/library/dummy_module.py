@@ -60,7 +60,6 @@ class DummyModule(DestFileModuleHelper):
 
     def __write_temp__(self, *args, **kwargs):
         """impement abstract DestFileModuleHelper.__write_temp__"""
-        # type: () -> None
         self._tmpfile = self._write_in_tempfile(self.vars[self.var_result_data])
 
     def __load_result_data__(self):
@@ -78,7 +77,6 @@ class DummyModule(DestFileModuleHelper):
 
 
 def main():
-    # type: () -> None
     DummyModule().execute()
 
 

@@ -186,12 +186,13 @@ class DestFileModuleHelper(ModuleHelper):
             raise ex
 
     def _write_in_tempfile(self, content):
+        # type: (str) -> str
         """
         Helper that can be used to create a temp file and write a content
         into it. It add the created temps file in module cleanup file stack.
+
         Return the name of the temp file.
         """
-        # type: (str) -> str
         fd, tf = tempfile.mkstemp(dir=self.module.tmpdir)
         self.module.add_cleanup_file(tf)
         os.write(fd, bytes(content, 'utf-8'))
