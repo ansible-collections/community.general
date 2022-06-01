@@ -16,20 +16,6 @@ class DataMergeUtils:
     Utils for merging list or dict.
     """
 
-    # pylint: disable=no-self-use
-    def _check_identic(func):
-        """
-        Decorator to check if `self.merge_type` is `identic` and if is the case
-        return the `expected` data in all case.
-        """
-        @wraps(func)
-        def wrapped(self, current, expected):
-            # type: (list | dict, list | dict)
-            if self.merge_type == 'identic':
-                return deepcopy(expected)
-            return func(self, current, expected)
-        return wrapped
-
     def __init__(self, merge_type, list_diff_type='value'):
         # type: (str, str) -> None
         self.merge_type = merge_type
@@ -94,13 +80,14 @@ class DataMergeUtils:
             raise ValueError('`list_diff_type` can be only one of `value` or `index`')
         self._list_diff_type = value
 
-    @_check_identic
     def get_new_merged_data(self, current, expected):
         # type: (dict | list, dict | list) -> dict | list
         """
         Getting the merge of two element if it can't be sure that they have the
         same type.
         """
+        if self.merge_type == 'identic':
+            return deepcopy(expected)
         if not isinstance(current, type(expected)):
             if self._merge_type == 'present':
                 return deepcopy(expected)
@@ -112,12 +99,13 @@ class DataMergeUtils:
             return self.get_new_merged_list(current, expected)
         return self.get_new_merged_dict(current, expected)
 
-    @_check_identic
     def get_new_merged_dict(self, current, expected):
         # type: (dict, dict) -> dict
         """
         Getting the merge of two dict depending the `self.list_diff_type`.
         """
+        if self.merge_type == 'identic':
+            return deepcopy(expected)
         merged = deepcopy(current)
         for key in expected.keys():
             if (isinstance(expected.get(key), (dict, list)) and isinstance(current.get(key), (dict, list))):
@@ -134,13 +122,14 @@ class DataMergeUtils:
                     raise TypeError("Unexpected merge_type")
         return merged
 
-    @_check_identic
     def get_new_merged_list(self, current, expected):
         # type (list, list) -> list
         """
         Getting the merge of two list depending the `self.merge_type` and the
         `self.list_diff_type`.
         """
+        if self.merge_type == 'identic':
+            return deepcopy(expected)
         if self._list_diff_type == 'value':
             return self._get_new_merged_list_with_value_diff(current, expected)
         if self._list_diff_type == 'index':
