@@ -7,11 +7,8 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-import sys
 from copy import deepcopy
 from functools import wraps
-if sys.version_info.major > 2:
-    from typing import Union
 
 
 class DataMergeUtils:
@@ -27,7 +24,7 @@ class DataMergeUtils:
         """
         @wraps(func)
         def wrapped(self, current, expected):
-            # type: (Union[list, dict], Union[list, dict])
+            # type: (list | dict, list | dict)
             if self.merge_type == 'identic':
                 return deepcopy(expected)
             return func(self, current, expected)
@@ -99,7 +96,7 @@ class DataMergeUtils:
 
     @_check_identic
     def get_new_merged_data(self, current, expected):
-        # type: (Union[dict, list], Union[dict, list]) -> Union[dict, list]
+        # type: (dict | list, dict | list) -> dict | list
         """
         Getting the merge of two element if it can't be sure that they have the
         same type.

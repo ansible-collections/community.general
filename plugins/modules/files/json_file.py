@@ -437,7 +437,6 @@ RETURN = r'''
 
 
 import json
-from typing import Union
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.data_merge_utils import DataMergeUtils
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file import (
@@ -480,7 +479,7 @@ class JsonFile(DestFileModuleHelper):
     )
 
     def __init__(self, module=None, var_dest_file='path', var_result_data='result'):
-        # type: (Union[dict, AnsibleModule, None], str, str) -> None
+        # type: (dict | AnsibleModule | None, str, str) -> None
         self._current_content_end_with_line_break = False
         super().__init__(module, var_dest_file, var_result_data)
 

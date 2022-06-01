@@ -6,9 +6,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-import sys
-if sys.version_info.major > 2:
-    from typing import Union
 
 from ansible.module_utils.common.validation import (
     check_type_dict,
@@ -18,7 +15,7 @@ from ansible.module_utils.common.validation import (
 
 
 def check_type_dict_or_list(value):
-    # type: (Union[dict, list, string_types]) -> dict
+    # type: (dict | list | string_types) -> dict
     """
     Verify that value is a dict or string that can be convertied to a dict or
     a list.

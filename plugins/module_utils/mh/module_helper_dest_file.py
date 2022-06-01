@@ -15,7 +15,6 @@ import os
 import tempfile
 
 from abc import abstractmethod
-from typing import Union
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper import ModuleHelper
@@ -117,7 +116,7 @@ def dest_file_sanity_check(dest, create=False, backup=False):
 class DestFileModuleHelper(ModuleHelper):
 
     def __init__(self, module=None, var_dest_file='path', var_result_data='result'):
-        # type: (Union[dict, AnsibleModule, None], str, str) -> None
+        # type: (dict | AnsibleModule | None, str, str) -> None
         self._tmpfile = None
         self._created = False
         self.var_dest_file = var_dest_file
@@ -190,7 +189,6 @@ class DestFileModuleHelper(ModuleHelper):
         """
         Helper that can be used to create a temp file and write a content
         into it. It add the created temps file in module cleanup file stack.
-
         Return the name of the temp file.
         """
         # type: (str) -> str
