@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c), Google Inc, 2017
-# Simplified BSD License (see licenses/simplified_bsd.txt or
+# Simplified BSD License (see simplified_bsd.txt or
 # https://opensource.org/licenses/BSD-2-Clause)
 
 from __future__ import (absolute_import, division, print_function)
