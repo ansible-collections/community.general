@@ -11,7 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: yaml_file
-short_description: Managage (add, remove, update) elements in a YAML file.
+short_description: Managage (add, remove, update) elements in a YAML file
 description:
   - This module ensures that a set of values is present or absent in a yaml
     file.
@@ -22,8 +22,8 @@ description:
     U(https://pyyaml.org/wiki/PyYAMLDocumentation).
 notes:
   - Take note of the following warning before using this module, B(if you have
-    some comments in your YAML file, this module will not preserve them !) So
-    don't use it if it's important for you to keep these comments.
+    some comments in your YAML file, this module will not preserve them!) So
+    do not use it if it is important for you to keep these comments.
   - This module supports C(--check) and C(--diff) flags.
 options:
   path:
@@ -51,8 +51,8 @@ options:
     description:
       - This describes how the list are compared.
       - If set to C(value), it checks if a value is present in the list
-        elements.  With this, you can't check a list element in another list
-        element.  Only the first level of a list can be checked.
+        elements. With this, you cannot check a list element in another list
+        element. Only the first level of a list can be checked.
       - If set to C(index), the value in a list are compared by their index.
         With this, you can check an element in another list, but you make sure
         that the expected value is at this position in the list.
@@ -67,13 +67,13 @@ options:
     required: true
   create:
     description:
-      - If set to C(no), the module will fail if the YAML file not exists.
+      - If set to C(no), the module will fail if the YAML file does not exist.
         Else, the YAML file will be created.
     type: bool
     default: false
   diff_on_value:
     description:
-      - This describes how check the if it has a difference between the datas
+      - This describes how check if it has a difference between the datas
         present in the YAML file and the expected values. This will also
         impact the output in diff mode (in a case you get indents or lines
         breaks in the diff will in the other you only gets values).
@@ -114,7 +114,7 @@ options:
     default: true
   explicit_end:
     description:
-      - If C(true) then add C(...) at the document begin.
+      - If C(true) then add C(...) at the document ending.
     type: bool
     default: false
   default_flow_style:
