@@ -358,6 +358,7 @@ class TestDestFileModuleHelper():
                 backup=dict(type='bool', default=True),
                 value=dict(type='str', required=True),
             ),
+            add_file_common_args=True,
         )
 
         def __write_temp__(self, *args, **kwargs):
@@ -388,6 +389,9 @@ class TestDestFileModuleHelper():
         mock_backup_local = mocker.patch(
             'ansible_collections.community.general.plugins.module_utils.mh.module_helper.AnsibleModule.backup_local',
             return_value=FAKE_DEST_BACKUP)
+        mock_set_fs_attributes_if_different = mocker.patch(
+            'ansible_collections.community.general.plugins.module_utils.mh.module_helper.AnsibleModule.set_fs_attributes_if_different',
+            side_effect=lambda file_args, changed, diff: changed)
 
         if test_case['sanity_check_raise']:
             mock_dest_file_sanity_check.side_effect = ModuleHelperException
@@ -402,7 +406,7 @@ class TestDestFileModuleHelper():
             module.run()
         result = json.loads(capfd.readouterr().out)
 
-        mock_dest_file_sanity_check.assert_called_once_with(module.vars['path'], module.vars['create'], module.vars['backup'])
+        mock_dest_file_sanity_check.assert_called_once_with(module.vars['path'], module.vars['allow_creation'], module.vars['backup'])
         if test_case['sanity_check_raise'] or test_case['atomic_move_raise']:
             assert(result['failed'])
         if result['failed']:
@@ -417,6 +421,7 @@ class TestDestFileModuleHelper():
                         mock_cleanup.assert_called_with(FAKE_DEST_BACKUP)
                 mock_cleanup.assert_any_call(FAKE_TEMP_FILE)
         else:
+            assert(module.file_args is not None)
             if module.has_changed() and not test_case['check_mode']:
                 mock_tempfile_mkstemp.assert_called_once()
                 mock_cleanup.assert_called_with(FAKE_TEMP_FILE)
@@ -429,6 +434,7 @@ class TestDestFileModuleHelper():
                 mock_os_write.assert_not_called()
                 mock_os_close.assert_not_called()
                 mock_atomic_move.assert_not_called()
+            mock_set_fs_attributes_if_different.assert_called_once_with(module.file_args, module.changed, diff={'before': {}, 'after': {}})
             assert(result.get('backup_file') == test_case['backup_file'])
             assert(result['result'] == module.vars['value'])
             assert(result['created'] == (not test_case['exists']))

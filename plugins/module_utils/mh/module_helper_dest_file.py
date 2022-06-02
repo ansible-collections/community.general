@@ -119,6 +119,7 @@ class DestFileModuleHelper(ModuleHelper):
         # type: (dict | AnsibleModule | None, str, str) -> None
         self._tmpfile = None
         self._created = False
+        self.file_args = None
         self.var_dest_file = var_dest_file
         self.var_result_data = var_result_data
         super().__init__(module)
@@ -129,6 +130,7 @@ class DestFileModuleHelper(ModuleHelper):
             self.vars[self.var_dest_file],
             self.vars['allow_creation'],
             self.vars['backup'])
+        self.file_args = self.module.load_file_common_arguments(self.module.params)
         self.__load_result_data__()
 
     @abstractmethod
@@ -144,6 +146,17 @@ class DestFileModuleHelper(ModuleHelper):
         if self.has_changed():
             self.__update_dest_file__()
         self.vars.set('created', self._created)
+        self._update_file_args()
+
+    def _update_file_args(self):
+        attr_changes = {'before': {}, 'after': {}}
+        self.changed = self.module.set_fs_attributes_if_different(self.file_args, self.changed, diff=attr_changes)
+        for key, val in attr_changes['after'].items():
+            if key == 'dest' or key == 'path':
+                continue
+            if val is not None:
+                self.vars.meta(key).set(diff=True, change=True, output=True)
+                self.vars.set(key, val)
 
     @cause_changes(on_success=True)
     @check_mode_skip

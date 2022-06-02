@@ -12,6 +12,7 @@ DOCUMENTATION = r'''
 ---
 module: yaml_file
 short_description: Managage (add, remove, update) elements in a YAML file
+extends_documentation_fragment: files
 description:
   - This module ensures that a set of values is present or absent in a yaml
     file.
@@ -465,6 +466,7 @@ class YamlFile(DestFileModuleHelper):
             ['canonical', 'default_flow_style'],
         ],
         supports_check_mode=True,
+        add_file_common_args=True,
     )
 
     def __init_module__(self):

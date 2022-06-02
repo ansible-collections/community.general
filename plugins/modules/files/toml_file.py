@@ -10,6 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: toml_file
+extends_documentation_fragment: files
 short_description: Managage (add, remove, update) elements in a TOML file
 description:
   - This module ensures that a set of values is present or absent in a TOML
@@ -373,6 +374,7 @@ class TomlFile(DestFileModuleHelper):
             add_ansible_managed=dict(type='bool', default=True),
         ),
         supports_check_mode=True,
+        add_file_common_args=True,
     )
 
     def __load_result_data__(self):

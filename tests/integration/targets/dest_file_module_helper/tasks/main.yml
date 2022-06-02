@@ -401,3 +401,32 @@
       ansible.builtin.file:
         path: "{{ dest_dir }}"
         state: "absent"
+
+- name: 013 set fs attribute
+  block:
+    - name: 013 create readable and writable dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0777"
+        state: "directory"
+    - name: 013 create dest file with write attribute
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content A"
+        mode: "0755"
+    - name: 013 remove write attribute to dest file
+      dummy_module:
+        path: "{{ dest_file }}"
+        value: "Content A"
+        mode: "0644"
+      register: last_result
+    - name: 013 assert no change with same value
+      ansible.builtin.assert:
+        that:
+          - last_result.failed == false
+          - last_result.changed == true
+          - last_result.mode == '0644'
+    - name: 013 clean dest_dir
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        state: "absent"

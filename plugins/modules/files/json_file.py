@@ -11,6 +11,7 @@ DOCUMENTATION = r'''
 ---
 module: json_file
 short_description: Managage (add, remove, update) elements in a JSON file
+extends_documentation_fragment: files
 description:
   - This module ensures that a set of values is present or absent in a JSON
     file.
@@ -476,6 +477,7 @@ class JsonFile(DestFileModuleHelper):
             sort_keys=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
+        add_file_common_args=True,
     )
 
     def __init__(self, module=None, var_dest_file='path', var_result_data='result'):

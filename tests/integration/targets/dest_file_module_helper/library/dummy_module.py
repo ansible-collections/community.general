@@ -56,6 +56,7 @@ class DummyModule(DestFileModuleHelper):
             value=dict(type='str', required=True),
         ),
         supports_check_mode=True,
+        add_file_common_args=True,
     )
 
     def __write_temp__(self, *args, **kwargs):
