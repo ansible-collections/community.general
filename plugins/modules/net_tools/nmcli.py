@@ -931,10 +931,10 @@ options:
                 description:
                     - NMSettingSecretFlags indicating how to handle the I(password) property.
                     - 'Following choices are allowed:
-                      C(0) B(NONE): The system is responsible for providing and storing this secret (default),
+                      C(0) B(NONE): The system is responsible for providing and storing this secret (default);
                       C(1) B(AGENT_OWNED): A user secret agent is responsible for providing and storing this secret; when it is required agents will be
-                           asked to retrieve it
-                      C(2) B(NOT_SAVED): This secret should not be saved, but should be requested from the user each time it is needed
+                           asked to retrieve it;
+                      C(2) B(NOT_SAVED): This secret should not be saved, but should be requested from the user each time it is needed;
                       C(4) B(NOT_REQUIRED): In situations where it cannot be automatically determined that the secret is required
                            (some VPNs and PPP providers do not require all secrets) this flag indicates that the specific secret is not required.'
                 type: int
