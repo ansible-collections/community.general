@@ -11,7 +11,7 @@ from copy import deepcopy
 from functools import wraps
 
 
-class DataMergeUtils:
+class DataMergeUtils(object):
     """
     Utils for merging list or dict.
     """
