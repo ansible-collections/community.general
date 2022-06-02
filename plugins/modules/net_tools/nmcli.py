@@ -1343,7 +1343,7 @@ EXAMPLES = r'''
 - name: Create a VPN L2TP connection for ansible_user to connect on vpn.example.com authenticating with user 'brittany' and pre-shared key as 'Brittany123'
   block:
     - ansible.builtin.set_fact:
-        psk: "0s{{ ('Brittany123' | ansible.builtin.b64encode) }}"
+        psk: "0s{{ 'Brittany123' | ansible.builtin.b64encode }}"
 
     - name: Create the connection
       community.general.nmcli:
