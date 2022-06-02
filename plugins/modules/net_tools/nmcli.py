@@ -1356,7 +1356,7 @@ EXAMPLES = r'''
             password-flags: 2
             user: brittany
             ipsec-enabled: true
-            ipsec-psk: "{{ psk }}"
+            ipsec-psk: "0s{{ 'Brittany123' | ansible.builtin.b64encode }}"
         autoconnect: false
         state: present
 
