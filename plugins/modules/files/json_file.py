@@ -483,7 +483,7 @@ class JsonFile(DestFileModuleHelper):
     def __init__(self, module=None, var_dest_file='path', var_result_data='result'):
         # type: (dict | AnsibleModule | None, str, str) -> None
         self._current_content_end_with_line_break = False
-        super().__init__(module, var_dest_file, var_result_data)
+        super(JsonFile, self).__init__(module, var_dest_file, var_result_data)
 
     def __init_module__(self):
         # type: () -> None

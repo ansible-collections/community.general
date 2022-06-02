@@ -122,7 +122,7 @@ class DestFileModuleHelper(ModuleHelper):
         self.file_args = None
         self.var_dest_file = var_dest_file
         self.var_result_data = var_result_data
-        super().__init__(module)
+        super(DestFileModuleHelper, self).__init__(module)
 
     def __init_module__(self):
         # type: () -> None
