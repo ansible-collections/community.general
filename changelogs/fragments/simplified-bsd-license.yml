@@ -1,0 +1,2 @@
+bugfixes:
+  - Include ``simplified_bsd.txt`` license file for various module utils, the ``lxca_common`` docs fragment, and the ``utm_utils`` unit tests.
