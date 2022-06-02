@@ -23,7 +23,7 @@
       dummy_module:
         path: "{{ dest_file }}"
         value: "This is dummy content."
-        create: false
+        allow_creation: false
       ignore_errors: true
       register: last_result
     - name: 001 assert fail when dest_file not exists
@@ -52,7 +52,7 @@
       dummy_module:
         path: "{{ dest_file }}"
         value: "Content A"
-        create: true
+        allow_creation: true
       ignore_errors: true
       become: "{{(ansible_user_uid == 0) | ternary(true, false)}}"
       become_user: 'nobody'

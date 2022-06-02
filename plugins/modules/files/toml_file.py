@@ -64,7 +64,7 @@ options:
         file.
     type: dict
     required: true
-  create:
+  allow_creation:
     description:
       - If set to C(no), the module will fail if the TOML file does not exist.
         Else, the TOML file will be created.
@@ -367,7 +367,7 @@ class TomlFile(DestFileModuleHelper):
                 ],
             ),
             value=dict(type='dict', required=True),
-            create=dict(type='bool', default=False),
+            allow_creation=dict(type='bool', default=False),
             diff_on_value=dict(type='bool', default=True),
             backup=dict(type='bool', default=False),
             add_ansible_managed=dict(type='bool', default=True),

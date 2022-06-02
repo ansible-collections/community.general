@@ -127,7 +127,7 @@ class DestFileModuleHelper(ModuleHelper):
         # type: () -> None
         self._created = dest_file_sanity_check(
             self.vars[self.var_dest_file],
-            self.vars['create'],
+            self.vars['allow_creation'],
             self.vars['backup'])
         self.__load_result_data__()
 

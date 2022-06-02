@@ -64,7 +64,7 @@ options:
         file. Can be a dict or a list.
     type: raw
     required: true
-  create:
+  allow_creation:
     description:
       - If set to C(no), the module will fail if the JSON file does not exists.
         Else, the JSON file will be created.
@@ -469,7 +469,7 @@ class JsonFile(DestFileModuleHelper):
                 ],
             ),
             value=dict(type='raw', required=True),
-            create=dict(type='bool', default=False),
+            allow_creation=dict(type='bool', default=False),
             diff_on_value=dict(type='bool', default=True),
             backup=dict(type='bool', default=False),
             indent=dict(type='int', default=2),

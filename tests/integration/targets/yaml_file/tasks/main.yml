@@ -28,7 +28,7 @@
         current_file: false
         expected_file: sample.yaml
         module_params:
-          create: true
+          allow_creation: true
           value:
             B: 2
             A: 1
@@ -78,7 +78,7 @@
         expected_file: expected_050.yaml
         module_params:
           state: "present"
-          create: true
+          allow_creation: true
           add_ansible_managed: false
           value:
             B: 2

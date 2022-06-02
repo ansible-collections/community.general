@@ -65,7 +65,7 @@ options:
         file. Can be a dict or a list.
     type: raw
     required: true
-  create:
+  allow_creation:
     description:
       - If set to C(no), the module will fail if the YAML file does not exist.
         Else, the YAML file will be created.
@@ -449,7 +449,7 @@ class YamlFile(DestFileModuleHelper):
                 ],
             ),
             value=dict(type='raw', required=True),
-            create=dict(type='bool', default=False),
+            allow_creation=dict(type='bool', default=False),
             backup=dict(type='bool', default=False),
             diff_on_value=dict(type='bool', default=True),
             indent=dict(type='int', default=2),

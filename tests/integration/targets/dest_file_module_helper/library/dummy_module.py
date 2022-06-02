@@ -51,7 +51,7 @@ class DummyModule(DestFileModuleHelper):
     module = dict(
         argument_spec=dict(
             path=dict(type='path', required=True, aliases=['dest']),
-            create=dict(type='bool', default=True),
+            allow_creation=dict(type='bool', default=True),
             backup=dict(type='bool', default=True),
             value=dict(type='str', required=True),
         ),

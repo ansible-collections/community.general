@@ -30,7 +30,7 @@
         expected_file: sample.json
         module_params:
           state: "present"
-          create: true
+          allow_creation: true
           value:
             B: 2
             A: 1

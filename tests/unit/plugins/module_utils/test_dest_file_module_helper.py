@@ -40,7 +40,7 @@ FAKE_DATA_CHANGED = 'fake data changed'
 
 FILE_SANITY_CHECK_TEST_CASE = {
     'dest_not_exists_no_create': {
-        'create': False,
+        'allow_creation': False,
         'backup': False,
         'exists': False,
         'writable_parent': False,
@@ -50,7 +50,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'expect_raise': DestNotExists,
     },
     'dest_not_exists_create_parent_not_writable': {
-        'create': True,
+        'allow_creation': True,
         'backup': False,
         'exists': False,
         'writable_parent': False,
@@ -60,7 +60,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'expect_raise': ParentNotWriteable,
     },
     'dest_not_exists_create_parent_writable': {
-        'create': True,
+        'allow_creation': True,
         'backup': False,
         'exists': False,
         'writable_parent': True,
@@ -70,7 +70,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'expect_raise': None,
     },
     'dest_exists_not_readable': {
-        'create': False,
+        'allow_creation': False,
         'backup': False,
         'exists': True,
         'writable_parent': False,
@@ -80,7 +80,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'expect_raise': DestNotReadable,
     },
     'dest_exists_not_writeable': {
-        'create': False,
+        'allow_creation': False,
         'backup': False,
         'exists': True,
         'writable_parent': False,
@@ -90,7 +90,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'expect_raise': DestNotWriteable,
     },
     'dest_exists_readable_not_regular_file': {
-        'create': False,
+        'allow_creation': False,
         'backup': False,
         'exists': True,
         'writable_parent': False,
@@ -100,7 +100,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'expect_raise': DestNotRegularFile,
     },
     'dest_not_exists_create_backup': {
-        'create': True,
+        'allow_creation': True,
         'backup': True,
         'exists': False,
         'writable_parent': True,
@@ -110,7 +110,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'expect_raise': None,
     },
     'dest_exists_backup_parent_not_writable': {
-        'create': False,
+        'allow_creation': False,
         'backup': True,
         'exists': True,
         'writable_parent': False,
@@ -120,7 +120,7 @@ FILE_SANITY_CHECK_TEST_CASE = {
         'expect_raise': CantCreateBackup,
     },
     'dest_exists_backup_parent_writable': {
-        'create': False,
+        'allow_creation': False,
         'backup': True,
         'exists': True,
         'writable_parent': True,
@@ -169,28 +169,28 @@ class TestDestFileSanityCheck():
         os.path.isfile.assert_called_once_with(FAKE_DEST)
 
     @pytest.mark.parametrize(
-        'create, backup, exists, writable_parent, readable, writeable, regular_file, expect_raise',
+        'allow_creation, backup, exists, writable_parent, readable, writeable, regular_file, expect_raise',
         (elem.values() for elem in FILE_SANITY_CHECK_TEST_CASE.values()),
         ids=(FILE_SANITY_CHECK_TEST_CASE.keys()))
-    def test_check(self, create, backup, exists, writable_parent, readable, writeable, regular_file, expect_raise, mocker):
+    def test_check(self, allow_creation, backup, exists, writable_parent, readable, writeable, regular_file, expect_raise, mocker):
         mocker.patch(MODULE_PATH.format('check_if_dest_exists'), return_value=exists)
         mocker.patch(MODULE_PATH.format('check_if_parent_is_writeable'), return_value=writable_parent)
         mocker.patch(MODULE_PATH.format('check_if_dest_is_readable'), return_value=readable)
         mocker.patch(MODULE_PATH.format('check_if_dest_is_writeable'), return_value=writeable)
         mocker.patch(MODULE_PATH.format('check_if_dest_is_regular_file'), return_value=regular_file)
         if expect_raise is None:
-            file_will_be_created = dest_file_sanity_check(FAKE_DEST, create, backup)
-            assert((create and not exists) == file_will_be_created)
+            file_will_be_created = dest_file_sanity_check(FAKE_DEST, allow_creation, backup)
+            assert((allow_creation and not exists) == file_will_be_created)
         else:
             with pytest.raises(expect_raise):
-                dest_file_sanity_check(FAKE_DEST, create, backup)
+                dest_file_sanity_check(FAKE_DEST, allow_creation, backup)
 
 
 TEST_CASE_DEST_FILE_MODULE = [
     [
         {
             'path': FAKE_DEST,
-            'create': True,
+            'allow_creation': True,
             'backup': False,
             'value': FAKE_DATA_CHANGED,
         },
@@ -207,7 +207,7 @@ TEST_CASE_DEST_FILE_MODULE = [
     [
         {
             'path': FAKE_DEST,
-            'create': True,
+            'allow_creation': True,
             'backup': True,
             'value': FAKE_DATA_CHANGED,
         },
@@ -224,7 +224,7 @@ TEST_CASE_DEST_FILE_MODULE = [
     [
         {
             'path': FAKE_DEST,
-            'create': False,
+            'allow_creation': False,
             'backup': True,
             'value': FAKE_DATA_CURRENT,
         },
@@ -241,7 +241,7 @@ TEST_CASE_DEST_FILE_MODULE = [
     [
         {
             'path': FAKE_DEST,
-            'create': False,
+            'allow_creation': False,
             'backup': False,
             'value': FAKE_DATA_CHANGED,
         },
@@ -258,7 +258,7 @@ TEST_CASE_DEST_FILE_MODULE = [
     [
         {
             'path': FAKE_DEST,
-            'create': False,
+            'allow_creation': False,
             'backup': True,
             'value': FAKE_DATA_CHANGED,
         },
@@ -275,7 +275,7 @@ TEST_CASE_DEST_FILE_MODULE = [
     [
         {
             'path': FAKE_DEST,
-            'create': False,
+            'allow_creation': False,
             'backup': False,
             'value': FAKE_DATA_CHANGED,
         },
@@ -292,7 +292,7 @@ TEST_CASE_DEST_FILE_MODULE = [
     [
         {
             'path': FAKE_DEST,
-            'create': False,
+            'allow_creation': False,
             'backup': False,
             'value': FAKE_DATA_CHANGED,
         },
@@ -309,7 +309,7 @@ TEST_CASE_DEST_FILE_MODULE = [
     [
         {
             'path': FAKE_DEST,
-            'create': False,
+            'allow_creation': False,
             'backup': False,
             'value': FAKE_DATA_CHANGED,
         },
@@ -326,7 +326,7 @@ TEST_CASE_DEST_FILE_MODULE = [
     [
         {
             'path': FAKE_DEST,
-            'create': False,
+            'allow_creation': False,
             'backup': True,
             'value': FAKE_DATA_CHANGED,
         },
@@ -354,7 +354,7 @@ class TestDestFileModuleHelper():
         module = dict(
             argument_spec=dict(
                 path=dict(type='path', required=True, aliases=['dest']),
-                create=dict(type='bool', default=True),
+                allow_creation=dict(type='bool', default=True),
                 backup=dict(type='bool', default=True),
                 value=dict(type='str', required=True),
             ),
