@@ -6,7 +6,7 @@
 # own license to the complete work.
 #
 # Copyright (C) 2017 Lenovo, Inc.
-# Simplified BSD License (see licenses/simplified_bsd.txt or https://opensource.org/licenses/BSD-2-Clause)
+# Simplified BSD License (see simplified_bsd.txt or https://opensource.org/licenses/BSD-2-Clause)
 #
 # Contains LXCA common class
 # Lenovo xClarity Administrator (LXCA)
