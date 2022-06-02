@@ -55,7 +55,8 @@ options:
             - Type C(generic) is added in Ansible 2.5.
             - Type C(infiniband) is added in community.general 2.0.0.
             - Type C(gsm) is added in community.general 3.7.0.
-            - Type C(wireguard) is added in community.general 4.3.0
+            - Type C(wireguard) is added in community.general 4.3.0.
+            - Type C(vpn) is added in community.general 5.1.0.
         type: str
         choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi, gsm,
             wireguard, vpn ]
