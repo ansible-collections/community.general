@@ -96,7 +96,7 @@ DOCUMENTATION = '''
           - Gather LXC/QEMU configuration facts.
           - When I(want_facts) is set to C(true) more details about QEMU VM status are possible, besides the running and stopped states.
             Currently if the VM is running and it is suspended, the status will be running and the machine will be in C(running) group,
-            but it's actual state will be paused. This introduces multiple groups [prefixed with I(group_prefix)] C(prelaunch) and C(paused).
+            but its actual state will be paused. This introduces multiple groups [prefixed with I(group_prefix)] C(prelaunch) and C(paused).
         default: no
         type: bool
       qemu_extended_statuses:
@@ -521,7 +521,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if want_facts and ittype == 'qemu' and self.get_option('qemu_extended_statuses'):
                 # get more details about the status of the qemu VM
                 item_status = properties.get(self._fact('qmpstatus'), item_status)
-        self.inventory.add_child(self._group('all_%s' % (item_status)), name)
+        self.inventory.add_child(self._group('all_%s' % (item_status, )), name)
 
         return name
 
