@@ -73,6 +73,7 @@
       ansible.builtin.file:
         path: "{{ remote_tmp_dir }}"
         mode: "0700"
+  when: ansible_distribution not in ('RedHat', 'Darwin', 'FreeBSD')
 
 - name: 003 fail when dest_file exist but is not readable
   block:
@@ -114,6 +115,7 @@
       ansible.builtin.file:
         path: "{{ remote_tmp_dir }}"
         mode: "0700"
+  when: ansible_distribution not in ('RedHat', 'Darwin', 'FreeBSD')
 
 - name: 004 fail when dest_file exist but is not writeable
   block:
@@ -155,6 +157,7 @@
       ansible.builtin.file:
         path: "{{ remote_tmp_dir }}"
         mode: "0700"
+  when: ansible_distribution not in ('RedHat', 'Darwin', 'FreeBSD')
 
 - name: 005 fail when dest_file exists but is not regular file
   block:
@@ -236,6 +239,7 @@
       ansible.builtin.file:
         path: "{{ remote_tmp_dir }}"
         mode: "0700"
+  when: ansible_distribution not in ('RedHat', 'Darwin', 'FreeBSD')
 
 - name: 007 can create when not exist
   block:
