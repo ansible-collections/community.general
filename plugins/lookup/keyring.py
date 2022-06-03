@@ -18,7 +18,7 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = """
-- name : output secrets to screen (BAD IDEA)
+- name: output secrets to screen (BAD IDEA)
   ansible.builtin.debug:
     msg: "Password: {{item}}"
   with_community.general.keyring:
