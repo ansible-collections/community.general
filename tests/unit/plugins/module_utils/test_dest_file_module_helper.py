@@ -28,6 +28,10 @@ from ansible_collections.community.general.plugins.module_utils.mh.module_helper
     CantCreateBackup,
     DestFileModuleHelper)
 
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
 
 MODULE_PATH = 'ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file.{}'
 
