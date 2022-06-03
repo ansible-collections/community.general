@@ -59,9 +59,6 @@
       become_method: 'su'
       become_flags: '-s /bin/sh'
       register: last_result
-    - name: DEBUG
-      debug:
-        var: last_result
     - name: 002 assert fail when dest_file not exists and create on non writeable parent
       ansible.builtin.assert:
         that:
