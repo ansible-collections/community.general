@@ -550,6 +550,8 @@ def get_option(option):
         return True
     elif option == 'want_proxmox_nodes_ansible_host':
         return True
+    elif option == 'qemu_extended_statuses':
+        return True
     else:
         return False
 
@@ -610,3 +612,7 @@ def test_populate(inventory, mocker):
 
     # check that offline node is in inventory
     assert inventory.inventory.get_host('testnode2')
+
+    # make sure that ['prelaunch', 'paused'] are in the group list
+    for group in ['paused', 'prelaunch']:
+        assert ('%sall_%s' % (inventory.group_prefix, group)) in inventory.inventory.groups

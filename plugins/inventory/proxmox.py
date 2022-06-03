@@ -543,7 +543,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _populate(self):
 
         # create common groups
-        default_groups = ['lxc', 'qemu', 'running', 'stopped', 'prelaunch', 'paused']
+        default_groups = ['lxc', 'qemu', 'running', 'stopped']
+
+        if self.get_option('qemu_extended_statuses'):
+            default_groups.extend(['prelaunch', 'paused'])
+
         for group in default_groups:
             self.inventory.add_group(self._group('all_%s' % (group)))
 
