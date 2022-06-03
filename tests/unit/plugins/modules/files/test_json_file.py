@@ -75,8 +75,7 @@ TEST_CASE_EXEC = [
             'expected_value': json.dumps(
                 DICT_CURRENT,
                 indent=16,
-                sort_keys=DEFAULT_MODULE_ARGS['sort_keys']).splitlines(
-                keepends=True),
+                sort_keys=DEFAULT_MODULE_ARGS['sort_keys']).splitlines(True),
             'read_data': JSON_CURRENT,
             'expected_changed': True,
         },
@@ -88,7 +87,7 @@ TEST_CASE_EXEC = [
             'expected_value': json.dumps(
                 DICT_CURRENT,
                 indent=DEFAULT_MODULE_ARGS['indent'],
-                sort_keys=True).splitlines(keepends=True),
+                sort_keys=True).splitlines(True),
             'read_data': JSON_CURRENT,
             'expected_changed': True,
         },
@@ -97,7 +96,7 @@ TEST_CASE_EXEC = [
         {'path': FAKE_PATH, 'value': DICT_CURRENT, 'diff_on_value': False},
         {
             'id': 'test_no_diff_on_value_current_file_end_with_line_break',
-            'expected_value': JSON_CURRENT_ENDING_WITH_LINE_BREAK.splitlines(keepends=True),
+            'expected_value': JSON_CURRENT_ENDING_WITH_LINE_BREAK.splitlines(True),
             'read_data': JSON_CURRENT_ENDING_WITH_LINE_BREAK,
             'expected_changed': False,
         },
@@ -115,7 +114,7 @@ TEST_CASE_EXEC = [
         {'path': FAKE_PATH, 'value': DICT_CURRENT, 'diff_on_value': False},
         {
             'id': 'empty_file_no_diff_on_value',
-            'expected_value': JSON_CURRENT_ENDING_WITH_LINE_BREAK.splitlines(keepends=True),
+            'expected_value': JSON_CURRENT_ENDING_WITH_LINE_BREAK.splitlines(True),
             'read_data': None,
             'expected_changed': True,
         },
@@ -133,7 +132,7 @@ TEST_CASE_EXEC = [
         {'path': FAKE_PATH, 'value': DICT_CURRENT, 'diff_on_value': False},
         {
             'id': 'blank_file_no_diff_on_value',
-            'expected_value': JSON_CURRENT_ENDING_WITH_LINE_BREAK.splitlines(keepends=True),
+            'expected_value': JSON_CURRENT_ENDING_WITH_LINE_BREAK.splitlines(True),
             'read_data': '\n\t\n   ',
             'expected_changed': True,
         },

@@ -77,7 +77,7 @@ TEST_CASE_EXEC = [
         {'path': FAKE_PATH, 'value': DICT_CURRENT, 'diff_on_value': False},
         {
             'id': 'empty_file_no_diff_on_value',
-            'expected_value': TOML_CURRENT.splitlines(keepends=True),
+            'expected_value': TOML_CURRENT.splitlines(True),
             'read_data': None,
             'expected_changed': True,
         },
@@ -95,7 +95,7 @@ TEST_CASE_EXEC = [
         {'path': FAKE_PATH, 'value': DICT_CURRENT, 'diff_on_value': False},
         {
             'id': 'blank_file_no_diff_on_value',
-            'expected_value': TOML_CURRENT.splitlines(keepends=True),
+            'expected_value': TOML_CURRENT.splitlines(True),
             'read_data': '\n\t\n   ',
             'expected_changed': True,
         },

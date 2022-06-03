@@ -531,7 +531,7 @@ class JsonFile(DestFileModuleHelper):
         if self.vars['diff_on_value']:
             self.vars.set(self.var_result_data, result)
         else:
-            dest_file_lines = self._json_dumps(result).splitlines(keepends=True)
+            dest_file_lines = self._json_dumps(result).splitlines(True)
             if self._current_content_end_with_line_break:
                 dest_file_lines[-1] += '\n'
             self.vars.set(self.var_result_data, dest_file_lines)

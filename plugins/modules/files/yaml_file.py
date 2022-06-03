@@ -514,7 +514,7 @@ class YamlFile(DestFileModuleHelper):
             self.vars.set(self.var_result_data, result)
         else:
             self.vars.set(self.var_result_data,
-                          self._yaml_dumps(result).splitlines(keepends=True))
+                          self._yaml_dumps(result).splitlines(True))
 
     def __write_temp__(self, *args, **kwargs):
         # type: () -> None
