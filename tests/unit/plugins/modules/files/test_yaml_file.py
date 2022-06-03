@@ -197,7 +197,7 @@ TEST_CASES_EXEC_IDS = [item[1]['id'] for item in TEST_CASE_EXEC]
 def test_execute(testcase, capfd, mocker):
     mocker.patch(
         'ansible_collections.community.general.plugins.module_utils.mh.module_helper.AnsibleModule.set_fs_attributes_if_different',
-        side_effect=lambda file_args, changed: changed)
+        side_effect=lambda file_args, changed, diff: changed)
     mocker.patch('ansible_collections.community.general.plugins.module_utils.mh.module_helper_dest_file.dest_file_sanity_check',
                  return_value=False)
     if testcase['read_data'] is None:
