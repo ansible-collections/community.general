@@ -9,7 +9,7 @@ __metaclass__ = type
 import pytest
 import json
 
-from unittest.mock import mock_open
+from mock import mock_open
 
 from ansible_collections.community.general.plugins.modules.files.json_file import JsonFile
 from ansible_collections.community.general.tests.unit.plugins.module_utils.test_data_merge_utils import (

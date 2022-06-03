@@ -10,7 +10,7 @@ import pytest
 import json
 import yaml
 
-from unittest.mock import mock_open
+from mock import mock_open
 
 from ansible_collections.community.general.plugins.modules.files.yaml_file import YamlFile
 from ansible_collections.community.general.tests.unit.plugins.module_utils.test_data_merge_utils import (
