@@ -6,36 +6,8 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-import sys
 
-DOCUMENTATION = '''
-module: cmd_echo
-author: "Alexei Znamensky (@russoz)"
-short_description: Simple module for testing
-description:
-  - Simple module test description.
-options:
-  command:
-    description: aaa
-    type: list
-    elements: str
-    required: true
-  arg_formats:
-    description: bbb
-    type: dict
-    required: true
-  arg_order:
-    description: ccc
-    type: raw
-    required: true
-  arg_values:
-    description: ddd
-    type: list
-    required: true
-  aa:
-    description: eee
-    type: raw
-'''
+DOCUMENTATION = ""
 
 EXAMPLES = ""
 
@@ -51,10 +23,14 @@ def main():
             arg_formats=dict(type="dict", default={}),
             arg_order=dict(type="raw", required=True),
             arg_values=dict(type="dict", default={}),
+            check_mode_skip=dict(type="bool", default=False),
             aa=dict(type="raw"),
         ),
+        supports_check_mode=True,
     )
     p = module.params
+
+    info = None
 
     arg_formats = {}
     for arg, fmt_spec in p['arg_formats'].items():
@@ -65,11 +41,11 @@ def main():
 
     runner = CmdRunner(module, ['echo', '--'], arg_formats=arg_formats)
 
-    info = None
-    with runner.context(p['arg_order']) as ctx:
+    with runner.context(p['arg_order'], check_mode_skip=p['check_mode_skip']) as ctx:
         result = ctx.run(**p['arg_values'])
         info = ctx.run_info
-    rc, out, err = result
+    check = "check"
+    rc, out, err = result if result is not None else (None, None, None)
 
     module.exit_json(rc=rc, out=out, err=err, info=info)
 
