@@ -158,7 +158,7 @@ options:
     dns4:
         description:
             - A list of up to 3 DNS servers.
-            - IPv4 format e.g. to add two IPv4 DNS server addresses, use C(192.0.2.53) C(198.51.100.53).
+            - The entries must be IPv4 addresses, for example C(192.0.2.53).
         elements: str
         type: list
     dns4_search:
