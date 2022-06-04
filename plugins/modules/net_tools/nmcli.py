@@ -256,7 +256,7 @@ options:
     dns6:
         description:
             - A list of up to 3 DNS servers.
-            - IPv6 format e.g. to add two IPv6 DNS server addresses, use C(2001:4860:4860::8888) C(2001:4860:4860::8844).
+            - The entries must be IPv6 addresses, for example C(2001:4860:4860::8888).
         elements: str
         type: list
     dns6_search:
