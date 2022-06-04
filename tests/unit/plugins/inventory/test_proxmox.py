@@ -541,17 +541,11 @@ def get_vm_status(properties, node, vmtype, vmid, name):
     return True
 
 
-def get_option(option):
-    if option == 'group_prefix':
-        return 'proxmox_'
-    if option == 'facts_prefix':
-        return 'proxmox_'
-    elif option == 'want_facts':
-        return True
-    elif option == 'want_proxmox_nodes_ansible_host':
-        return True
-    else:
-        return False
+def get_option(opts):
+    def fn(option):
+        default = opts.get('default', False)
+        return opts.get(option, default)
+    return fn
 
 
 def test_populate(inventory, mocker):
@@ -563,12 +557,20 @@ def test_populate(inventory, mocker):
     inventory.facts_prefix = 'proxmox_'
     inventory.strict = False
 
+    opts = {
+        'group_prefix': 'proxmox_',
+        'facts_prefix': 'proxmox_',
+        'want_facts': True,
+        'want_proxmox_nodes_ansible_host': True,
+        'qemu_extended_statuses': True
+    }
+
     # bypass authentication and API fetch calls
     inventory._get_auth = mocker.MagicMock(side_effect=get_auth)
     inventory._get_json = mocker.MagicMock(side_effect=get_json)
     inventory._get_vm_status = mocker.MagicMock(side_effect=get_vm_status)
     inventory._get_vm_snapshots = mocker.MagicMock(side_effect=get_vm_snapshots)
-    inventory.get_option = mocker.MagicMock(side_effect=get_option)
+    inventory.get_option = mocker.MagicMock(side_effect=get_option(opts))
     inventory._can_add_host = mocker.MagicMock(return_value=True)
     inventory._populate()
 
@@ -610,3 +612,38 @@ def test_populate(inventory, mocker):
 
     # check that offline node is in inventory
     assert inventory.inventory.get_host('testnode2')
+
+    # make sure that ['prelaunch', 'paused'] are in the group list
+    for group in ['paused', 'prelaunch']:
+        assert ('%sall_%s' % (inventory.group_prefix, group)) in inventory.inventory.groups
+
+
+def test_populate_missing_qemu_extended_groups(inventory, mocker):
+    # module settings
+    inventory.proxmox_user = 'root@pam'
+    inventory.proxmox_password = 'password'
+    inventory.proxmox_url = 'https://localhost:8006'
+    inventory.group_prefix = 'proxmox_'
+    inventory.facts_prefix = 'proxmox_'
+    inventory.strict = False
+
+    opts = {
+        'group_prefix': 'proxmox_',
+        'facts_prefix': 'proxmox_',
+        'want_facts': True,
+        'want_proxmox_nodes_ansible_host': True,
+        'qemu_extended_statuses': False
+    }
+
+    # bypass authentication and API fetch calls
+    inventory._get_auth = mocker.MagicMock(side_effect=get_auth)
+    inventory._get_json = mocker.MagicMock(side_effect=get_json)
+    inventory._get_vm_status = mocker.MagicMock(side_effect=get_vm_status)
+    inventory._get_vm_snapshots = mocker.MagicMock(side_effect=get_vm_snapshots)
+    inventory.get_option = mocker.MagicMock(side_effect=get_option(opts))
+    inventory._can_add_host = mocker.MagicMock(return_value=True)
+    inventory._populate()
+
+    # make sure that ['prelaunch', 'paused'] are not in the group list
+    for group in ['paused', 'prelaunch']:
+        assert ('%sall_%s' % (inventory.group_prefix, group)) not in inventory.inventory.groups
