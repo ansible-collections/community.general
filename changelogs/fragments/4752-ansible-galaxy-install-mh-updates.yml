@@ -1,0 +1,2 @@
+minor_changes:
+  - ansible_galaxy_install - minor refactoring using latest ``ModuleHelper`` updates (https://github.com/ansible-collections/community.general/pull/4752).
