@@ -145,31 +145,15 @@ RETURN = '''
     sample: '"96" or ["red", "blue", "green"]'
 '''
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    CmdStateModuleHelper, ArgFormat
-)
-
-
-def fix_bool(value):
-    vl = value.lower()
-    return vl if vl in ("true", "false") else value
-
-
-@ArgFormat.stars_deco(1)
-def values_fmt(values, value_types):
-    result = []
-    for value, value_type in zip(values, value_types):
-        if value_type == 'bool':
-            value = fix_bool(value)
-        result.extend(['--type', '{0}'.format(value_type), '--set', '{0}'.format(value)])
-    return result
+from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner
 
 
 class XFConfException(Exception):
     pass
 
 
-class XFConfProperty(CmdStateModuleHelper):
+class XFConfProperty(StateModuleHelper):
     change_params = 'value',
     diff_params = 'value',
     output_params = ('property', 'channel', 'value')
@@ -195,27 +179,19 @@ class XFConfProperty(CmdStateModuleHelper):
     )
 
     default_state = 'present'
-    command = 'xfconf-query'
-    command_args_formats = dict(
-        channel=dict(fmt=('--channel', '{0}'),),
-        property=dict(fmt=('--property', '{0}'),),
-        is_array=dict(fmt="--force-array", style=ArgFormat.BOOLEAN),
-        reset=dict(fmt="--reset", style=ArgFormat.BOOLEAN),
-        create=dict(fmt="--create", style=ArgFormat.BOOLEAN),
-        values_and_types=dict(fmt=values_fmt)
-    )
 
     def update_xfconf_output(self, **kwargs):
         self.update_vars(meta={"output": True, "fact": True}, **kwargs)
 
     def __init_module__(self):
-        self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.module.params['property'],
-                                                                                 self.module.params['channel'])
+        self.runner = xfconf_runner(self.module)
+        self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.vars.property,
+                                                                                 self.vars.channel)
         self.vars.set('previous_value', self._get(), fact=True)
         self.vars.set('type', self.vars.value_type, fact=True)
         self.vars.meta('value').set(initial_value=self.vars.previous_value)
 
-        if self.module.params['disable_facts'] is False:
+        if self.vars.disable_facts is False:
             self.do_raise('Returning results as facts has been removed. Stop using disable_facts=false.')
 
     def process_command_output(self, rc, out, err):
@@ -233,11 +209,12 @@ class XFConfProperty(CmdStateModuleHelper):
         return result
 
     def _get(self):
-        return self.run_command(params=('channel', 'property'))
+        with self.runner.context('channel property', output_process=self.process_command_output) as ctx:
+            return ctx.run()
 
     def state_absent(self):
-        if not self.module.check_mode:
-            self.run_command(params=('channel', 'property', {'reset': True}))
+        with self.runner.context('channel property reset', check_mode_skip=True) as ctx:
+            ctx.run(reset=True)
         self.vars.value = None
 
     def state_present(self):
@@ -256,22 +233,14 @@ class XFConfProperty(CmdStateModuleHelper):
             # or complain if lists' lengths are different
             raise XFConfException('Number of elements in "value" and "value_type" must be the same')
 
-        # fix boolean values
-        self.vars.value = [fix_bool(v[0]) if v[1] == 'bool' else v[0] for v in zip(self.vars.value, value_type)]
-
         # calculates if it is an array
         self.vars.is_array = \
             bool(self.vars.force_array) or \
             isinstance(self.vars.previous_value, list) or \
             values_len > 1
 
-        params = ['channel', 'property', {'create': True}]
-        if self.vars.is_array:
-            params.append('is_array')
-        params.append({'values_and_types': (self.vars.value, value_type)})
-
-        if not self.module.check_mode:
-            self.run_command(params=params)
+        with self.runner.context('channel property create force_array values_and_types', check_mode_skip=True) as ctx:
+            ctx.run(create=True, force_array=self.vars.is_array, values_and_types=(self.vars.value, value_type))
 
         if not self.vars.is_array:
             self.vars.value = self.vars.value[0]
