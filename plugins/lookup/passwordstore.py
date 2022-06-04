@@ -274,7 +274,8 @@ class LookupModule(LookupBase):
             if os.path.isdir(self.paramvals['directory']):
                 self.env['PASSWORD_STORE_DIR'] = self.paramvals['directory']
             else:
-                raise AnsibleError('Passwordstore directory \'{0}\' does not exist'.format(self.paramvals['directory']))
+                if self.backend == 'pass':
+                    raise AnsibleError('Passwordstore directory \'{0}\' does not exist'.format(self.paramvals['directory']))
 
             # Set PASSWORD_STORE_UMASK if umask is set
             if 'umask' in self.paramvals:
@@ -302,9 +303,13 @@ class LookupModule(LookupBase):
                     if ':' in line:
                         name, value = line.split(':', 1)
                         self.passdict[name.strip()] = value.strip()
-            if os.path.isfile(os.path.join(self.paramvals['directory'], self.passname + ".gpg")):
-                # Only accept password as found, if there a .gpg file for it (might be a tree node otherwise)
+            if self.backend == 'pass':
+                if os.path.isfile(os.path.join(self.paramvals['directory'], self.passname + ".gpg")):
+                    # Only accept password as found, if there a .gpg file for it (might be a tree node otherwise)
+                    return True
+            else:
                 return True
+
         except (subprocess.CalledProcessError) as e:
             # 'not in password store' is the expected error if a password wasn't found
             if 'not in the password store' not in e.output:
@@ -379,6 +384,16 @@ class LookupModule(LookupBase):
         else:
             yield
 
+    def setup_backend(self):
+        try:
+            pass_version = to_text(
+                check_output2(['pass', '--version']))
+        except (subprocess.CalledProcessError) as e:
+            raise AnsibleError(e)
+        self.backend = 'pass'
+        if 'gopass' in pass_version:
+            self.backend = 'gopass'
+
     def setup(self, variables):
         self.locked = None
         timeout = self.get_option('locktimeout')
@@ -403,6 +418,7 @@ class LookupModule(LookupBase):
 
     def run(self, terms, variables, **kwargs):
         self.setup(variables)
+        self.setup_backend()
         result = []
 
         for term in terms:
