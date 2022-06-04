@@ -74,7 +74,7 @@ RETURN = '''
   properties:
     description:
         - List of available properties for a specific channel.
-        - Returned by passed only the I(channel) parameter to the module.
+        - Returned by passing only the I(channel) parameter to the module.
     returned: success
     type: list
     elements: str
