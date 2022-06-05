@@ -1341,7 +1341,9 @@ EXAMPLES = r'''
     autoconnect: true
     state: present
 
-- name: Create a VPN L2TP connection for ansible_user to connect on vpn.example.com authenticating with user 'brittany' and pre-shared key as 'Brittany123'
+- name: >-
+    Create a VPN L2TP connection for ansible_user to connect on vpn.example.com
+    authenticating with user 'brittany' and pre-shared key as 'Brittany123'
   community.general.nmcli:
     type: vpn
     conn_name: my-vpn-connection
