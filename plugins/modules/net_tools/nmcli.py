@@ -2126,6 +2126,10 @@ class Nmcli(object):
             'connection.interface-name': self.ifname,
         }
 
+        # VPN doesn't need an interface but if sended it must be a valid interface.
+        if self.type == 'vpn' and self.ifname is None:
+            del options['connection.interface-name']
+
         if not self.type:
             current_con_type = self.show_connection().get('connection.type')
             if current_con_type:
