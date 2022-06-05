@@ -955,7 +955,7 @@ options:
                 description:
                     - The pre-shared key in base64 encoding.
                     - >
-                      You can encode using this Ansible jinja2 expression: C("0s{{ '[YOUR PRE-SHARED KEY]' | b64encode }}").
+                      You can encode using this Ansible jinja2 expression: C("0s{{ '[YOUR PRE-SHARED KEY]' | ansible.builtin.b64encode }}").
                     - This is only used when I(ipsec-enabled=true).
                 type: str
 '''
