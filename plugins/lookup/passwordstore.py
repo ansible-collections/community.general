@@ -288,8 +288,11 @@ class LookupModule(LookupBase):
 
     def check_pass(self):
         try:
+            pass_show = ["pass", "show", self.passname]
+            if self.backend == 'gopass':
+                pass_show = ["pass", "show", "--password", self.passname]
             self.passoutput = to_text(
-                check_output2(["pass", "show", self.passname], env=self.env),
+                check_output2(pass_show, env=self.env),
                 errors='surrogate_or_strict'
             ).splitlines()
             self.password = self.passoutput[0]
