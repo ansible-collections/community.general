@@ -1,10 +1,14 @@
 ---
 # Initialise environment
 
-- name: Register sudoers.d directory
+- name: Register variables
   set_fact:
     sudoers_path: /etc/sudoers.d
     alt_sudoers_path: /etc/sudoers_alt
+
+- name: Install sudo package
+  ansible.builtin.apt:
+    name: sudo
 
 - name: Ensure sudoers directory exists
   ansible.builtin.file:
@@ -28,6 +32,11 @@
     user: alice
     commands: /usr/local/bin/command
   register: rule_1
+
+- name: Stat my-sudo-rule-1 file
+  ansible.builtin.stat:
+    path: "{{ sudoers_path }}/my-sudo-rule-1"
+  register: rule_1_stat
 
 - name: Grab contents of my-sudo-rule-1
   ansible.builtin.slurp:
@@ -130,7 +139,26 @@
   register: revoke_rule_1_stat
 
 
+- name: Attempt command without full path to executable
+  community.general.sudoers:
+    name: edge-case-1
+    state: present
+    user: alice
+    commands: systemctl
+  ignore_errors: true
+  register: edge_case_1
+
+
 # Run assertions
+
+- name: Check rule 1 file stat
+  ansible.builtin.assert:
+    that:
+      - rule_1_stat.stat.exists
+      - rule_1_stat.stat.isreg
+      - rule_1_stat.stat.mode == '0440'
+      - rule_1_stat.stat.pw_name == 'root'
+      - rule_1_stat.stat.gr_name == 'root'
 
 - name: Check changed status
   ansible.builtin.assert:
@@ -150,7 +178,12 @@
       - "rule_5_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command\n'"
       - "rule_6_contents['content'] | b64decode == 'alice ALL=(bob)NOPASSWD: /usr/local/bin/command\n'"
 
-- name: Check stats
+- name: Check revocation stat
   ansible.builtin.assert:
     that:
       - not revoke_rule_1_stat.stat.exists
+
+- name: Check edge case responses
+  ansible.builtin.assert:
+    that:
+      - edge_case_1 is failed

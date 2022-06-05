@@ -109,6 +109,7 @@ EXAMPLES = '''
 '''
 
 import os
+import subprocess
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
@@ -134,6 +135,8 @@ class Sudoers(object):
         with open(self.file, 'w') as f:
             f.write(self.content())
 
+        os.chmod(self.file, 0o440)
+
     def delete(self):
         if self.check_mode:
             return
@@ -158,10 +161,23 @@ class Sudoers(object):
         runas_str = '({runas})'.format(runas=self.runas) if self.runas is not None else ''
         return "{owner} ALL={runas}{nopasswd} {commands}\n".format(owner=owner, runas=runas_str, nopasswd=nopasswd_str, commands=commands_str)
 
+    def validate(self):
+        # fork to visudo
+        content = bytes(self.content(), 'utf-8')
+        check_command = ['visudo', '-c', '-f', '-']
+
+        check = subprocess.Popen(check_command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = check.communicate(input=content)
+
+        if check.returncode != 0:
+            raise Exception('Failed to validate sudoers rule:\n{stdout}'.format(stdout=stdout))
+
     def run(self):
         if self.state == 'absent' and self.exists():
             self.delete()
             return True
+
+        self.validate()
 
         if self.exists() and self.matches():
             return False
