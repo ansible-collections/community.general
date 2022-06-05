@@ -294,4 +294,12 @@ class _CmdRunnerContext(object):
         return False
 
 
-fmt = _Format()
+cmd_runner_fmt = _Format()
+
+#
+# The fmt form is deprecated and will be removed in community.general 7.0.0
+# Please use:
+#   cmd_runner_fmt
+# Or, to retain the same effect, use:
+#   from ansible_collections.community.general.plugins.module_utils.cmd_runner import cmd_runner_fmt as fmt
+fmt = cmd_runner_fmt
