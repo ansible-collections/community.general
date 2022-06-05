@@ -1342,24 +1342,19 @@ EXAMPLES = r'''
     state: present
 
 - name: Create a VPN L2TP connection for ansible_user to connect on vpn.example.com authenticating with user 'brittany' and pre-shared key as 'Brittany123'
-  block:
-    - ansible.builtin.set_fact:
-        psk: "0s{{ 'Brittany123' | ansible.builtin.b64encode }}"
-
-    - name: Create the connection
-      community.general.nmcli:
-        type: vpn
-        conn_name: my-vpn-connection
-        vpn:
-            permissions: "{{ ansible_user }}"
-            service-type: l2tp
-            gateway: vpn.example.com
-            password-flags: 2
-            user: brittany
-            ipsec-enabled: true
-            ipsec-psk: "0s{{ 'Brittany123' | ansible.builtin.b64encode }}"
-        autoconnect: false
-        state: present
+  community.general.nmcli:
+    type: vpn
+    conn_name: my-vpn-connection
+    vpn:
+        permissions: "{{ ansible_user }}"
+        service-type: l2tp
+        gateway: vpn.example.com
+        password-flags: 2
+        user: brittany
+        ipsec-enabled: true
+        ipsec-psk: "0s{{ 'Brittany123' | ansible.builtin.b64encode }}"
+    autoconnect: false
+    state: present
 
 '''
 
