@@ -2098,6 +2098,9 @@ class Nmcli(object):
                     current_value = current_value.strip('"')
                 if key == self.mtu_setting and self.mtu is None:
                     self.mtu = 0
+                if key == 'vpn.data':
+                    current_value = list(map(str.strip, current_value.split(',')))
+                    value = list(map(str.strip, value.split(',')))
             else:
                 # parameter does not exist
                 current_value = None

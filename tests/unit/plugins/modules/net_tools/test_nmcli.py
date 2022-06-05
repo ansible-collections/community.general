@@ -1243,8 +1243,9 @@ ipv4.method:                            auto
 ipv6.method:                            auto
 vpn-type:                               pptp
 vpn.service-type:                       org.freedesktop.NetworkManager.pptp
-vpn.data:                               gateway=vpn.example.com, password-flags=2, user=brittany
+vpn.data:                               password-flags=2, gateway=vpn.example.com, user=brittany
 """
+
 
 def mocker_set(mocker,
                connection_exists=False,
@@ -1620,6 +1621,7 @@ def mocked_vpn_l2tp_connection_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
                execute_return=(0, TESTCASE_VPN_L2TP_SHOW_OUTPUT, ""))
+
 
 @pytest.fixture
 def mocked_vpn_pptp_connection_unchanged(mocker):
@@ -3538,6 +3540,7 @@ def test_wireguard_mod(mocked_generic_connection_modify, capfd):
     assert not results.get('failed')
     assert results['changed']
 
+
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_VPN_L2TP, indirect=['patch_ansible_module'])
 def test_vpn_l2tp_connection_unchanged(mocked_vpn_l2tp_connection_unchanged, capfd):
     """
@@ -3545,24 +3548,26 @@ def test_vpn_l2tp_connection_unchanged(mocked_vpn_l2tp_connection_unchanged, cap
     """
     with pytest.raises(SystemExit):
         nmcli.main()
-    
+
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert not results.get('failed')
     assert not results['changed']
 
+
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_VPN_PPTP, indirect=['patch_ansible_module'])
 def test_vpn_pptp_connection_unchanged(mocked_vpn_pptp_connection_unchanged, capfd):
     """
-    Test : L2TP VPN connection unchanged
+    Test : PPTP VPN connection unchanged
     """
     with pytest.raises(SystemExit):
         nmcli.main()
-    
+
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert not results.get('failed')
     assert not results['changed']
+
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_VPN_L2TP, indirect=['patch_ansible_module'])
 def test_create_vpn_l2tp(mocked_generic_connection_create, capfd):
@@ -3589,15 +3594,20 @@ def test_create_vpn_l2tp(mocked_generic_connection_create, capfd):
 
     for param in ['connection.autoconnect', 'no',
                   'connection.permissions', 'brittany',
-                  'vpn.data', 'gateway=vpn.example.com, password-flags=2, user=brittany, ipsec-enabled=true, ipsec-psk=QnJpdHRhbnkxMjM=',
-                  'vpn-type', 'l2tp',
+                  'vpn.data', 'vpn-type', 'l2tp',
                   ]:
         assert param in add_args_text
+
+    vpn_data_index = add_args_text.index('vpn.data') + 1
+    args_vpn_data = add_args_text[vpn_data_index]
+    for vpn_data in ['gateway=vpn.example.com', 'password-flags=2', 'user=brittany', 'ipsec-enabled=true', 'ipsec-psk=QnJpdHRhbnkxMjM=']:
+        assert vpn_data in args_vpn_data
 
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert not results.get('failed')
     assert results['changed']
+
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_VPN_PPTP, indirect=['patch_ansible_module'])
 def test_create_vpn_pptp(mocked_generic_connection_create, capfd):
@@ -3624,10 +3634,14 @@ def test_create_vpn_pptp(mocked_generic_connection_create, capfd):
 
     for param in ['connection.autoconnect', 'no',
                   'connection.permissions', 'brittany',
-                  'vpn.data', 'gateway=vpn.example.com, password-flags=2, user=brittany',
-                  'vpn-type', 'pptp',
+                  'vpn.data', 'vpn-type', 'pptp',
                   ]:
         assert param in add_args_text
+
+    vpn_data_index = add_args_text.index('vpn.data') + 1
+    args_vpn_data = add_args_text[vpn_data_index]
+    for vpn_data in ['password-flags=2', 'gateway=vpn.example.com', 'user=brittany']:
+        assert vpn_data in args_vpn_data
 
     out, err = capfd.readouterr()
     results = json.loads(out)
