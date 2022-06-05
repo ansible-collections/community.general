@@ -185,7 +185,7 @@ def core(module):
         changed, summary = absent_strategy(api=api, compute_id=compute_id, private_network_id=pn_id)
     else:
         changed, summary = present_strategy(api=api, compute_id=compute_id, private_network_id=pn_id)
-    module.exit_json(changed=changed, scaleway_private_network=summary)
+    module.exit_json(changed=changed, scaleway_compute_private_network=summary)
 
 
 def main():
