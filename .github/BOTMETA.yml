@@ -618,7 +618,7 @@ files:
   $modules/monitoring/nagios.py:
     maintainers: tbielawa tgoetheyn
   $modules/monitoring/newrelic_deployment.py:
-    maintainers: mcodd
+    ignore: mcodd
   $modules/monitoring/pagerduty.py:
     maintainers: suprememoocow thaumos
     labels: pagerduty
@@ -710,7 +710,7 @@ files:
   $modules/notification/discord.py:
     maintainers: cwollinger
   $modules/notification/flowdock.py:
-    maintainers: mcodd
+    ignore: mcodd
   $modules/notification/grove.py:
     maintainers: zimbatm
   $modules/notification/hipchat.py:
