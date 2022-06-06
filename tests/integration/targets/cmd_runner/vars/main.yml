@@ -82,3 +82,41 @@ cmd_echo_tests:
       - >-
         "MissingArgumentValue: Cannot find value for parameter bb"
         in test_result.module_stderr
+
+  - name: set aa and bb value with check_mode on
+    arg_formats:
+      aa:
+        func: as_opt_eq_val
+        args: [--answer]
+      bb:
+        func: as_bool
+        args: [--bb-here]
+    arg_order: 'aa bb'
+    arg_values:
+      bb: true
+    aa: 11
+    check_mode: true
+    assertions:
+      - test_result.rc == 0
+      - test_result.out == "-- --answer=11 --bb-here\n"
+      - test_result.err == ""
+
+  - name: set aa and bb value with check_mode and check_mode_skip on
+    arg_formats:
+      aa:
+        func: as_opt_eq_val
+        args: [--answer]
+      bb:
+        func: as_bool
+        args: [--bb-here]
+    arg_order: 'aa bb'
+    arg_values:
+      bb: true
+    check_mode_skip: true
+    aa: 11
+    check_mode: true
+    expect_error: true  # because if result contains rc != 0, ansible assumes error
+    assertions:
+      - test_result.rc == None
+      - test_result.out == None
+      - test_result.err == None
