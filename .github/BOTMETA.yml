@@ -254,6 +254,9 @@ files:
     maintainers: amigus endlesstrax
   $module_utils/:
     labels: module_utils
+  $module_utils/gconftool2.py:
+    maintainers: russoz
+    labels: gconftool2
   $module_utils/gitlab.py:
     notify: jlozadad
     maintainers: $team_gitlab
@@ -1051,6 +1054,9 @@ files:
     labels: filesystem
   $modules/system/gconftool2.py:
     maintainers: Akasurde kevensen
+    labels: gconftool2
+  $modules/system/gconftool2_info.py:
+    maintainers: russoz
     labels: gconftool2
   $modules/system/homectl.py:
     maintainers: jameslivulpi
