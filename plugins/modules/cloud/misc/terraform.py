@@ -450,14 +450,53 @@ def main():
         command.append('-parallelism=%d' % module.params.get('parallelism'))
 
     variables_args = []
-    for k, v in variables.items():
-        variables_args.extend([
-            '-var',
-            '{0}={1}'.format(k, v)
-        ])
+    def process_args (variables, top):
+      lowlevel_out = []
+      for k,v in variables.items():
+        if top:
+          if (isinstance(v, dict)):
+            variables_arg.extend([
+              "-var",
+              k + "={" + print_vars (v, False) + "}"
+            ])
+            print(variables_arg)
+          if (isinstance(v, list)):
+            l_out = []
+            for item in v:
+              l_out.append("{" + print_vars (item, False) + "}")                    
+            variables_arg.extend([
+              "-var",
+              k + "=[" + ",".join(l_out) + "]"
+            ])
+          if (isinstance(v, int) or isinstance(v, float)):
+            variables_arg.extend([
+              "-var",
+              '"{0}"={1}'.format(k, v)
+            ])
+          if (isinstance(v, str)):
+            variables_arg.extend([
+              "-var",
+              '"{0}"=\"{1}\"'.format(k, v)
+            ])
+        else:
+          if (isinstance(v, dict)):
+            lowlevel_out.append(k + "={" + print_vars (v, False) + "}")
+          if (isinstance(v, list)):
+            lowlevel_out.append(k + "=[" + print_vars (v, False) + "]")
+          if (isinstance(v, int) or isinstance(v, float)):
+            lowlevel_out.append('"{0}"={1}'.format(k, v))
+          if (isinstance(v, str)):
+            lowlevel_out.append('"{0}"=\"{1}\"'.format(k, v))
+      if top:
+        return (variables_arg)
+      else:
+        return ",".join(lowlevel_out)
+
+    process_args (variables, True)
+
     if variables_files:
-        for f in variables_files:
-            variables_args.extend(['-var-file', f])
+      for f in variables_files:
+          variables_args.extend(['-var-file', f])
 
     preflight_validation(command[0], project_path, checked_version, variables_args)
 
