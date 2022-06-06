@@ -1027,7 +1027,7 @@ files:
   $modules/system/alternatives.py:
     maintainers: mulby
     labels: alternatives
-    ignore: DavidWittman
+    ignore: DavidWittman jiuka
   $modules/system/aix_lvol.py:
     maintainers: adejoux
   $modules/system/awall.py:

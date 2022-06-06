@@ -49,6 +49,9 @@
   # Test that path is checked: alternatives must fail when path is nonexistent
   - import_tasks: path_is_checked.yml
 
+  # Test that subcommands commands work
+  - import_tasks: subcommands.yml
+
   # Test operation of the 'state' parameter
   - block:
     - include_tasks: remove_links.yml

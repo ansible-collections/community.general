@@ -1,0 +1,3 @@
+minor_changes:
+  - alternatives - add ``subcommands`` parameter (https://github.com/ansible-collections/community.general/pull/4654).
+  - alternatives - add ``state=absent`` to be able to remove an alternative (https://github.com/ansible-collections/community.general/pull/4654).
