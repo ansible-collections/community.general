@@ -98,6 +98,12 @@ TESTCASE_CONNECTION = [
         'state': 'absent',
         '_ansible_check_mode': True,
     },
+    {
+        'type': 'vpn',
+        'conn_name': 'non_existent_nw_device',
+        'state': 'absent',
+        '_ansible_check_mode': True,
+    },
 ]
 
 TESTCASE_GENERIC = [
@@ -1177,6 +1183,69 @@ wireguard.ip4-auto-default-route:       -1 (default)
 wireguard.ip6-auto-default-route:       -1 (default)
 """
 
+TESTCASE_VPN_L2TP = [
+    {
+        'type': 'vpn',
+        'conn_name': 'vpn_l2tp',
+        'vpn': {
+            'permissions': 'brittany',
+            'service-type': 'l2tp',
+            'gateway': 'vpn.example.com',
+            'password-flags': '2',
+            'user': 'brittany',
+            'ipsec-enabled': 'true',
+            'ipsec-psk': 'QnJpdHRhbnkxMjM=',
+        },
+        'autoconnect': 'false',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+]
+
+TESTCASE_VPN_L2TP_SHOW_OUTPUT = """\
+connection.id:                          vpn_l2tp
+connection.type:                        vpn
+connection.autoconnect:                 no
+connection.permissions:                 brittany
+ipv4.method:                            auto
+ipv6.method:                            auto
+vpn-type:                               l2tp
+vpn.service-type:                       org.freedesktop.NetworkManager.l2tp
+vpn.data:                               gateway=vpn.example.com, password-flags=2, user=brittany, ipsec-enabled=true, ipsec-psk=QnJpdHRhbnkxMjM=
+vpn.secrets:                            ipsec-psk = QnJpdHRhbnkxMjM=
+vpn.persistent:                         no
+vpn.timeout:                            0
+"""
+
+TESTCASE_VPN_PPTP = [
+    {
+        'type': 'vpn',
+        'conn_name': 'vpn_pptp',
+        'vpn': {
+            'permissions': 'brittany',
+            'service-type': 'pptp',
+            'gateway': 'vpn.example.com',
+            'password-flags': '2',
+            'user': 'brittany',
+        },
+        'autoconnect': 'false',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+]
+
+TESTCASE_VPN_PPTP_SHOW_OUTPUT = """\
+connection.id:                          vpn_pptp
+connection.type:                        vpn
+connection.autoconnect:                 no
+connection.permissions:                 brittany
+ipv4.method:                            auto
+ipv6.method:                            auto
+vpn-type:                               pptp
+vpn.service-type:                       org.freedesktop.NetworkManager.pptp
+vpn.data:                               password-flags=2, gateway=vpn.example.com, user=brittany
+"""
+
 
 def mocker_set(mocker,
                connection_exists=False,
@@ -1545,6 +1614,20 @@ def mocked_wireguard_connection_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
                execute_return=(0, TESTCASE_WIREGUARD_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_vpn_l2tp_connection_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_VPN_L2TP_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_vpn_pptp_connection_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_VPN_PPTP_SHOW_OUTPUT, ""))
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_BOND, indirect=['patch_ansible_module'])
@@ -3451,6 +3534,114 @@ def test_wireguard_mod(mocked_generic_connection_modify, capfd):
     args_text = list(map(to_text, args[0]))
     for param in ['wireguard.listen-port', '51820']:
         assert param in args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_VPN_L2TP, indirect=['patch_ansible_module'])
+def test_vpn_l2tp_connection_unchanged(mocked_vpn_l2tp_connection_unchanged, capfd):
+    """
+    Test : L2TP VPN connection unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_VPN_PPTP, indirect=['patch_ansible_module'])
+def test_vpn_pptp_connection_unchanged(mocked_vpn_pptp_connection_unchanged, capfd):
+    """
+    Test : PPTP VPN connection unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_VPN_L2TP, indirect=['patch_ansible_module'])
+def test_create_vpn_l2tp(mocked_generic_connection_create, capfd):
+    """
+    Test : Create L2TP VPN connection
+    """
+
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[0]
+
+    assert add_args[0][0] == '/usr/bin/nmcli'
+    assert add_args[0][1] == 'con'
+    assert add_args[0][2] == 'add'
+    assert add_args[0][3] == 'type'
+    assert add_args[0][4] == 'vpn'
+    assert add_args[0][5] == 'con-name'
+    assert add_args[0][6] == 'vpn_l2tp'
+
+    add_args_text = list(map(to_text, add_args[0]))
+
+    for param in ['connection.autoconnect', 'no',
+                  'connection.permissions', 'brittany',
+                  'vpn.data', 'vpn-type', 'l2tp',
+                  ]:
+        assert param in add_args_text
+
+    vpn_data_index = add_args_text.index('vpn.data') + 1
+    args_vpn_data = add_args_text[vpn_data_index]
+    for vpn_data in ['gateway=vpn.example.com', 'password-flags=2', 'user=brittany', 'ipsec-enabled=true', 'ipsec-psk=QnJpdHRhbnkxMjM=']:
+        assert vpn_data in args_vpn_data
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_VPN_PPTP, indirect=['patch_ansible_module'])
+def test_create_vpn_pptp(mocked_generic_connection_create, capfd):
+    """
+    Test : Create PPTP VPN connection
+    """
+
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[0]
+
+    assert add_args[0][0] == '/usr/bin/nmcli'
+    assert add_args[0][1] == 'con'
+    assert add_args[0][2] == 'add'
+    assert add_args[0][3] == 'type'
+    assert add_args[0][4] == 'vpn'
+    assert add_args[0][5] == 'con-name'
+    assert add_args[0][6] == 'vpn_pptp'
+
+    add_args_text = list(map(to_text, add_args[0]))
+
+    for param in ['connection.autoconnect', 'no',
+                  'connection.permissions', 'brittany',
+                  'vpn.data', 'vpn-type', 'pptp',
+                  ]:
+        assert param in add_args_text
+
+    vpn_data_index = add_args_text.index('vpn.data') + 1
+    args_vpn_data = add_args_text[vpn_data_index]
+    for vpn_data in ['password-flags=2', 'gateway=vpn.example.com', 'user=brittany']:
+        assert vpn_data in args_vpn_data
 
     out, err = capfd.readouterr()
     results = json.loads(out)
