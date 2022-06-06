@@ -120,10 +120,6 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner
 
 
-class XFConfException(Exception):
-    pass
-
-
 class XFConfInfo(ModuleHelper):
     module = dict(
         argument_spec=dict(
