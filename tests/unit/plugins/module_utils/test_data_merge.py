@@ -10,7 +10,7 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils.data_merge_utils import DataMergeUtils
+from ansible_collections.community.general.plugins.module_utils.data_merge import DataMerge
 
 LIST_CURRENT = ['A', 'B', 'C', ['DA', 'DB'],
                 ['EA', 'EB'], 'F', ['GA', 'GB', 'GC']]
@@ -34,7 +34,7 @@ LIST_EXPECTED_INDEX_ABSENT = ['B', ['DA', 'DB'], ['EB'], ['GA', 'GC']]
 LIST_MODIF_IDENTIC = ['Z', 'X', ['YZ', 'YX']]
 
 # NOTE : The fact B is before A and F is before E is wanted.
-#        It permit to test sort function on module that use `DataMergeUtils`.
+#        It permit to test sort function on module that use `DataMerge`.
 DICT_CURRENT = {
     'B': '2',
     'A': '1',
@@ -210,7 +210,7 @@ DATA_MERGE_TEST_CASE_MIXED_IDS = (item['id']
                          ],
                          ids=['expected_is_not_a_list', 'current_is_not_a_list'])
 def test_merge_list_raise_with_bad_params(testcase):
-    data_merge_utils = DataMergeUtils(merge_type='identic')
+    data_merge_utils = DataMerge(merge_type='identic')
     with pytest.raises(ValueError):
         data_merge_utils.get_new_merged_list(testcase['current'], testcase['expected'])
 
@@ -218,7 +218,7 @@ def test_merge_list_raise_with_bad_params(testcase):
 @pytest.mark.parametrize('testcase', DATA_MERGE_TEST_CASE_LIST,
                          ids=DATA_MERGE_TEST_CASE_LIST_IDS)
 def test_merge_list(testcase):
-    data_merge_utils = DataMergeUtils(merge_type=testcase['merge_type'], list_diff_type=testcase['list_diff_type'])
+    data_merge_utils = DataMerge(merge_type=testcase['merge_type'], list_diff_type=testcase['list_diff_type'])
     list_merged = data_merge_utils.get_new_merged_list(testcase['data_current'], testcase['data_modif'])
     assert(list_merged == testcase['data_expected'])
 
@@ -230,7 +230,7 @@ def test_merge_list(testcase):
                          ],
                          ids=['expected_is_not_a_dict', 'current_is_not_a_dict'])
 def test_merge_dict_raise_with_bad_params(testcase):
-    data_merge_utils = DataMergeUtils(merge_type='identic')
+    data_merge_utils = DataMerge(merge_type='identic')
     with pytest.raises(ValueError):
         data_merge_utils.get_new_merged_dict(testcase['current'], testcase['expected'])
 
@@ -238,7 +238,7 @@ def test_merge_dict_raise_with_bad_params(testcase):
 @pytest.mark.parametrize('testcase', DATA_MERGE_TEST_CASE_DICT,
                          ids=DATA_MERGE_TEST_CASE_DICT_IDS)
 def test_merge_dict(testcase):
-    data_merge_utils = DataMergeUtils(merge_type=testcase['merge_type'])
+    data_merge_utils = DataMerge(merge_type=testcase['merge_type'])
     dict_merged = data_merge_utils.get_new_merged_dict(DICT_CURRENT, DICT_MODIF)
     assert(dict_merged == testcase['data_expected'])
 
@@ -255,7 +255,7 @@ def test_merge_dict(testcase):
                               'expected_is_not_a_list',
                               'current_is_not_a_list'])
 def test_merge_data_raise_with_bad_params(testcase):
-    data_merge_utils = DataMergeUtils(merge_type='identic')
+    data_merge_utils = DataMerge(merge_type='identic')
     with pytest.raises(ValueError):
         data_merge_utils.get_new_merged_data(testcase['current'], testcase['expected'])
 
@@ -263,6 +263,6 @@ def test_merge_data_raise_with_bad_params(testcase):
 @pytest.mark.parametrize('testcase', DATA_MERGE_TEST_CASE_MIXED,
                          ids=DATA_MERGE_TEST_CASE_MIXED_IDS)
 def test_merge_mixed(testcase):
-    data_merge_utils = DataMergeUtils(merge_type=testcase['merge_type'])
+    data_merge_utils = DataMerge(merge_type=testcase['merge_type'])
     list_merged = data_merge_utils.get_new_merged_data(DICT_CURRENT, LIST_CURRENT)
     assert(list_merged == testcase['data_expected'])
