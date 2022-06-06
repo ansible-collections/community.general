@@ -360,7 +360,7 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
         return plan_path, False, out, err, plan_command if state == 'planned' else command
     elif rc == 1:
         # failure to plan
-        module.fail_json(msg='Terraform plan could not be created\r\nSTDOUT: {0}\r\n\r\nSTDERR: {1}'.format(out, err))
+        module.fail_json(msg='Terraform plan could not be created\r\nSTDOUT: {0}\r\n\r\nSTDERR: {1}\r\n COMMAND:{2}'.format(out, err, variables_args))
     elif rc == 2:
         # changes, but successful
         return plan_path, True, out, err, plan_command if state == 'planned' else command
@@ -449,50 +449,67 @@ def main():
     if state == 'present' and module.params.get('parallelism') is not None:
         command.append('-parallelism=%d' % module.params.get('parallelism'))
 
-    variables_args = []
     def process_args (variables, top):
+      variables_args = []
       lowlevel_out = []
       for k,v in variables.items():
         if top:
           if (isinstance(v, dict)):
-            variables_arg.extend([
+            variables_args.extend([
               "-var",
-              k + "={" + print_vars (v, False) + "}"
+              k + '={' + process_args (v, False) + '}'
             ])
-            print(variables_arg)
+            print(variables_args)
           if (isinstance(v, list)):
             l_out = []
             for item in v:
-              l_out.append("{" + print_vars (item, False) + "}")                    
-            variables_arg.extend([
+              l_out.append("{" + process_args (item, False) + "}")                    
+            variables_args.extend([
               "-var",
-              k + "=[" + ",".join(l_out) + "]"
+              k + '=[' + ",".join(l_out) + ']'
             ])
-          if (isinstance(v, int) or isinstance(v, float)):
-            variables_arg.extend([
+          if ((isinstance(v, int) or isinstance(v, float)) and not isinstance(v, bool)):
+            variables_args.extend([
               "-var",
-              '"{0}"={1}'.format(k, v)
+              '{0}={1}'.format(k, v)
             ])
           if (isinstance(v, str)):
-            variables_arg.extend([
+            variables_args.extend([
               "-var",
-              '"{0}"=\"{1}\"'.format(k, v)
+              '{0}={1}'.format(k, v)
             ])
+          if (isinstance(v, bool)):
+            if v:
+              variables_args.extend([
+                "-var",
+                '{0}=true'.format(k)
+              ])
+            else:
+              variables_args.extend([
+                "-var",
+                '{0}=false'.format(k)
+              ])
+
         else:
           if (isinstance(v, dict)):
-            lowlevel_out.append(k + "={" + print_vars (v, False) + "}")
+            lowlevel_out.append(k + '={' + process_args (v, False) + '}')
           if (isinstance(v, list)):
-            lowlevel_out.append(k + "=[" + print_vars (v, False) + "]")
-          if (isinstance(v, int) or isinstance(v, float)):
-            lowlevel_out.append('"{0}"={1}'.format(k, v))
+            lowlevel_out.append(k + '=[' + process_args (v, False) + ']')
+          if ((isinstance(v, int) or isinstance(v, float)) and not isinstance(v, bool)):
+            lowlevel_out.append('{0}={1}'.format(k, v))
           if (isinstance(v, str)):
-            lowlevel_out.append('"{0}"=\"{1}\"'.format(k, v))
+            lowlevel_out.append('{0}="{1}"'.format(k, v))
+          if (isinstance(v, bool)):
+            if v:
+              lowlevel_out.append('{0}=true'.format(k))
+            else:
+              lowlevel_out.append('{0}=false'.format(k))
       if top:
-        return (variables_arg)
+        return (variables_args)
       else:
         return ",".join(lowlevel_out)
 
-    process_args (variables, True)
+    variables_args = process_args (variables, True)
 
     if variables_files:
       for f in variables_files:
