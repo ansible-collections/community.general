@@ -3,6 +3,7 @@
 
 # Copyright: (c) 2014, Gabe Mulley <gabe.mulley@gmail.com>
 # Copyright: (c) 2015, David Wittman <dwittman@gmail.com>
+# Copyright: (c) 2022, Marius Rieder <marius.rieder@scs.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -17,6 +18,7 @@ description:
     - Manages symbolic links using the 'update-alternatives' tool.
     - Useful when multiple programs are installed but provide similar functionality (e.g. different editors).
 author:
+    - Marius Rieder (@jiuka)
     - David Wittman (@DavidWittman)
     - Gabe Mulley (@mulby)
 options:
@@ -47,10 +49,36 @@ options:
         not set it as the currently selected alternative for the group.
       - C(selected) - install the alternative (if not already installed), and
         set it as the currently selected alternative for the group.
-    choices: [ present, selected ]
+      - C(auto) - install the alternative (if not already installed), and
+        set the group to auto mode. Added in community.general 5.1.0.
+      - C(absent) - removes the alternative. Added in community.general 5.1.0.
+    choices: [ present, selected, auto, absent ]
     default: selected
     type: str
     version_added: 4.8.0
+  subcommands:
+    description:
+      - A list of subcommands.
+      - Each subcommand needs a name, a link and a path parameter.
+    type: list
+    elements: dict
+    aliases: ['slaves']
+    suboptions:
+      name:
+        description:
+          - The generic name of the subcommand.
+        type: str
+        required: true
+      path:
+        description:
+          - The path to the real executable that the subcommand should point to.
+        type: path
+        required: true
+      link:
+        description:
+          - The path to the symbolic link that should point to the real subcommand executable.
+        type: path
+    version_added: 5.1.0
 requirements: [ update-alternatives ]
 '''
 
@@ -78,6 +106,23 @@ EXAMPLES = r'''
     path: /usr/bin/python3.5
     link: /usr/bin/python
     state: present
+
+- name: Install Python 3.5 and reset selection to auto
+  community.general.alternatives:
+    name: python
+    path: /usr/bin/python3.5
+    link: /usr/bin/python
+    state: auto
+
+- name: keytool is a subcommand of java
+  community.general.alternatives:
+    name: java
+    link: /usr/bin/java
+    path: /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java
+    subcommands:
+      - name: keytool
+        link: /usr/bin/keytool
+        path: /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/keytool
 '''
 
 import os
@@ -90,10 +135,235 @@ from ansible.module_utils.basic import AnsibleModule
 class AlternativeState:
     PRESENT = "present"
     SELECTED = "selected"
+    ABSENT = "absent"
+    AUTO = "auto"
 
     @classmethod
     def to_list(cls):
-        return [cls.PRESENT, cls.SELECTED]
+        return [cls.PRESENT, cls.SELECTED, cls.ABSENT, cls.AUTO]
+
+
+class AlternativesModule(object):
+    _UPDATE_ALTERNATIVES = None
+
+    def __init__(self, module):
+        self.module = module
+        self.result = dict(changed=False, diff=dict(before=dict(), after=dict()))
+        self.module.run_command_environ_update = {'LC_ALL': 'C'}
+        self.messages = []
+        self.run()
+
+    @property
+    def mode_present(self):
+        return self.module.params.get('state') in [AlternativeState.PRESENT, AlternativeState.SELECTED, AlternativeState.AUTO]
+
+    @property
+    def mode_selected(self):
+        return self.module.params.get('state') == AlternativeState.SELECTED
+
+    @property
+    def mode_auto(self):
+        return self.module.params.get('state') == AlternativeState.AUTO
+
+    def run(self):
+        self.parse()
+
+        if self.mode_present:
+            # Check if we need to (re)install
+            subcommands_parameter = self.module.params['subcommands']
+            if (
+                self.path not in self.current_alternatives or
+                self.current_alternatives[self.path].get('priority') != self.priority or
+                (subcommands_parameter is not None and (
+                    not all(s in subcommands_parameter for s in self.current_alternatives[self.path].get('subcommands')) or
+                    not all(s in self.current_alternatives[self.path].get('subcommands') for s in subcommands_parameter)
+                ))
+            ):
+                self.install()
+
+            # Check if we need to set the preference
+            if self.mode_selected and self.current_path != self.path:
+                self.set()
+
+            # Check if we need to reset to auto
+            if self.mode_auto and self.current_mode == 'manual':
+                self.auto()
+        else:
+            # Check if we need to uninstall
+            if self.path in self.current_alternatives:
+                self.remove()
+
+        self.result['msg'] = ' '.join(self.messages)
+        self.module.exit_json(**self.result)
+
+    def install(self):
+        if not os.path.exists(self.path):
+            self.module.fail_json(msg="Specified path %s does not exist" % self.path)
+        if not self.link:
+            self.module.fail_json(msg='Needed to install the alternative, but unable to do so as we are missing the link')
+
+        cmd = [self.UPDATE_ALTERNATIVES, '--install', self.link, self.name, self.path, str(self.priority)]
+
+        if self.subcommands is not None:
+            subcommands = [['--slave', subcmd['link'], subcmd['name'], subcmd['path']] for subcmd in self.subcommands]
+            cmd += [item for sublist in subcommands for item in sublist]
+
+        self.result['changed'] = True
+        self.messages.append("Install alternative '%s' for '%s'." % (self.path, self.name))
+
+        if not self.module.check_mode:
+            self.module.run_command(cmd, check_rc=True)
+
+        if self.module._diff:
+            self.result['diff']['after'] = dict(
+                state=AlternativeState.PRESENT,
+                path=self.path,
+                priority=self.priority,
+                link=self.link,
+            )
+            if self.subcommands:
+                self.result['diff']['after'].update(dict(
+                    subcommands=self.subcommands
+                ))
+
+    def remove(self):
+        cmd = [self.UPDATE_ALTERNATIVES, '--remove', self.name, self.path]
+        self.result['changed'] = True
+        self.messages.append("Remove alternative '%s' from '%s'." % (self.path, self.name))
+
+        if not self.module.check_mode:
+            self.module.run_command(cmd, check_rc=True)
+
+        if self.module._diff:
+            self.result['diff']['after'] = dict(state=AlternativeState.ABSENT)
+
+    def set(self):
+        cmd = [self.UPDATE_ALTERNATIVES, '--set', self.name, self.path]
+        self.result['changed'] = True
+        self.messages.append("Set alternative '%s' for '%s'." % (self.path, self.name))
+
+        if not self.module.check_mode:
+            self.module.run_command(cmd, check_rc=True)
+
+        if self.module._diff:
+            self.result['diff']['after']['state'] = AlternativeState.SELECTED
+
+    def auto(self):
+        cmd = [self.UPDATE_ALTERNATIVES, '--auto', self.name]
+        self.messages.append("Set alternative to auto for '%s'." % (self.name))
+        self.result['changed'] = True
+
+        if not self.module.check_mode:
+            self.module.run_command(cmd, check_rc=True)
+
+        if self.module._diff:
+            self.result['diff']['after']['state'] = AlternativeState.PRESENT
+
+    @property
+    def name(self):
+        return self.module.params.get('name')
+
+    @property
+    def path(self):
+        return self.module.params.get('path')
+
+    @property
+    def link(self):
+        return self.module.params.get('link') or self.current_link
+
+    @property
+    def priority(self):
+        return self.module.params.get('priority')
+
+    @property
+    def subcommands(self):
+        if self.module.params.get('subcommands') is not None:
+            return self.module.params.get('subcommands')
+        elif self.path in self.current_alternatives and self.current_alternatives[self.path].get('subcommands'):
+            return self.current_alternatives[self.path].get('subcommands')
+        return None
+
+    @property
+    def UPDATE_ALTERNATIVES(self):
+        if self._UPDATE_ALTERNATIVES is None:
+            self._UPDATE_ALTERNATIVES = self.module.get_bin_path('update-alternatives', True)
+        return self._UPDATE_ALTERNATIVES
+
+    def parse(self):
+        self.current_mode = None
+        self.current_path = None
+        self.current_link = None
+        self.current_alternatives = {}
+
+        # Run `update-alternatives --display <name>` to find existing alternatives
+        (rc, display_output, dummy) = self.module.run_command(
+            [self.UPDATE_ALTERNATIVES, '--display', self.name]
+        )
+
+        if rc != 0:
+            self.module.debug("No current alternative found. '%s' exited with %s" % (self.UPDATE_ALTERNATIVES, rc))
+            return
+
+        current_mode_regex = re.compile(r'\s-\s(?:status\sis\s)?(\w*)(?:\smode|.)$', re.MULTILINE)
+        current_path_regex = re.compile(r'^\s*link currently points to (.*)$', re.MULTILINE)
+        current_link_regex = re.compile(r'^\s*link \w+ is (.*)$', re.MULTILINE)
+        subcmd_path_link_regex = re.compile(r'^\s*slave (\S+) is (.*)$', re.MULTILINE)
+
+        alternative_regex = re.compile(r'^(\/.*)\s-\s(?:family\s\S+\s)?priority\s(\d+)((?:\s+slave.*)*)', re.MULTILINE)
+        subcmd_regex = re.compile(r'^\s+slave (.*): (.*)$', re.MULTILINE)
+
+        match = current_mode_regex.search(display_output)
+        if not match:
+            self.module.debug("No current mode found in output")
+            return
+        self.current_mode = match.group(1)
+
+        match = current_path_regex.search(display_output)
+        if not match:
+            self.module.debug("No current path found in output")
+        else:
+            self.current_path = match.group(1)
+
+        match = current_link_regex.search(display_output)
+        if not match:
+            self.module.debug("No current link found in output")
+        else:
+            self.current_link = match.group(1)
+
+        subcmd_path_map = dict(subcmd_path_link_regex.findall(display_output))
+        if not subcmd_path_map and self.subcommands:
+            subcmd_path_map = dict((s['name'], s['link']) for s in self.subcommands)
+
+        for path, prio, subcmd in alternative_regex.findall(display_output):
+            self.current_alternatives[path] = dict(
+                priority=int(prio),
+                subcommands=[dict(
+                    name=name,
+                    path=spath,
+                    link=subcmd_path_map.get(name)
+                ) for name, spath in subcmd_regex.findall(subcmd) if spath != '(null)']
+            )
+
+        if self.module._diff:
+            if self.path in self.current_alternatives:
+                self.result['diff']['before'].update(dict(
+                    state=AlternativeState.PRESENT,
+                    path=self.path,
+                    priority=self.current_alternatives[self.path].get('priority'),
+                    link=self.current_link,
+                ))
+                if self.current_alternatives[self.path].get('subcommands'):
+                    self.result['diff']['before'].update(dict(
+                        subcommands=self.current_alternatives[self.path].get('subcommands')
+                    ))
+                if self.current_mode == 'manual' and self.current_path != self.path:
+                    self.result['diff']['before'].update(dict(
+                        state=AlternativeState.SELECTED
+                    ))
+            else:
+                self.result['diff']['before'].update(dict(
+                    state=AlternativeState.ABSENT
+                ))
 
 
 def main():
@@ -109,109 +379,16 @@ def main():
                 choices=AlternativeState.to_list(),
                 default=AlternativeState.SELECTED,
             ),
+            subcommands=dict(type='list', elements='dict', aliases=['slaves'], options=dict(
+                name=dict(type='str', required=True),
+                path=dict(type='path', required=True),
+                link=dict(type='path'),
+            )),
         ),
         supports_check_mode=True,
     )
 
-    params = module.params
-    name = params['name']
-    path = params['path']
-    link = params['link']
-    priority = params['priority']
-    state = params['state']
-
-    UPDATE_ALTERNATIVES = module.get_bin_path('update-alternatives', True)
-
-    current_path = None
-    all_alternatives = []
-
-    # Run `update-alternatives --display <name>` to find existing alternatives
-    (rc, display_output, dummy) = module.run_command(
-        ['env', 'LC_ALL=C', UPDATE_ALTERNATIVES, '--display', name]
-    )
-
-    if rc == 0:
-        # Alternatives already exist for this link group
-        # Parse the output to determine the current path of the symlink and
-        # available alternatives
-        current_path_regex = re.compile(r'^\s*link currently points to (.*)$',
-                                        re.MULTILINE)
-        alternative_regex = re.compile(r'^(\/.*)\s-\s(?:family\s\S+\s)?priority', re.MULTILINE)
-
-        match = current_path_regex.search(display_output)
-        if match:
-            current_path = match.group(1)
-        all_alternatives = alternative_regex.findall(display_output)
-
-        if not link:
-            # Read the current symlink target from `update-alternatives --query`
-            # in case we need to install the new alternative before setting it.
-            #
-            # This is only compatible on Debian-based systems, as the other
-            # alternatives don't have --query available
-            rc, query_output, dummy = module.run_command(
-                ['env', 'LC_ALL=C', UPDATE_ALTERNATIVES, '--query', name]
-            )
-            if rc == 0:
-                for line in query_output.splitlines():
-                    if line.startswith('Link:'):
-                        link = line.split()[1]
-                        break
-
-    changed = False
-    if current_path != path:
-
-        # Check mode: expect a change if this alternative is not already
-        # installed, or if it is to be set as the current selection.
-        if module.check_mode:
-            module.exit_json(
-                changed=(
-                    path not in all_alternatives or
-                    state == AlternativeState.SELECTED
-                ),
-                current_path=current_path,
-            )
-
-        try:
-            # install the requested path if necessary
-            if path not in all_alternatives:
-                if not os.path.exists(path):
-                    module.fail_json(msg="Specified path %s does not exist" % path)
-                if not link:
-                    module.fail_json(msg="Needed to install the alternative, but unable to do so as we are missing the link")
-
-                module.run_command(
-                    [UPDATE_ALTERNATIVES, '--install', link, name, path, str(priority)],
-                    check_rc=True
-                )
-                changed = True
-
-            # set the current selection to this path (if requested)
-            if state == AlternativeState.SELECTED:
-                module.run_command(
-                    [UPDATE_ALTERNATIVES, '--set', name, path],
-                    check_rc=True
-                )
-                changed = True
-
-        except subprocess.CalledProcessError as cpe:
-            module.fail_json(msg=str(dir(cpe)))
-    elif current_path == path and state == AlternativeState.PRESENT:
-        # Case where alternative is currently selected, but state is set
-        # to 'present'. In this case, we set to auto mode.
-        if module.check_mode:
-            module.exit_json(changed=True, current_path=current_path)
-
-        changed = True
-        try:
-            module.run_command(
-                [UPDATE_ALTERNATIVES, '--auto', name],
-                check_rc=True,
-            )
-        except subprocess.CalledProcessError as cpe:
-            module.fail_json(msg=str(dir(cpe)))
-
-    module.exit_json(changed=changed)
+    AlternativesModule(module)
 
 
 if __name__ == '__main__':

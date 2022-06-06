@@ -48,6 +48,4 @@
   when: ansible_os_family == 'RedHat' and not with_alternatives and item == 1
 
 - name: check that alternative has been updated
-  command: "grep -Pzq '/bin/dummy{{ item }}\\n' '{{ alternatives_dir }}/dummy'"
-  # priority doesn't seem updated
-  #command: "grep -Pzq '/bin/dummy{{ item }}\\n50' '{{ alternatives_dir }}/dummy'"
+  command: "grep -Pzq '/bin/dummy{{ item }}\\n50' '{{ alternatives_dir }}/dummy'"
