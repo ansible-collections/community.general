@@ -6,6 +6,20 @@ Community General Release Notes
 
 This changelog describes changes after version 2.0.0.
 
+v3.8.8
+======
+
+Release Summary
+---------------
+
+Maintenance and bugfix release.
+
+Bugfixes
+--------
+
+- Include ``simplified_bsd.txt`` license file for various module utils, the ``lxca_common`` docs fragment, and the ``utm_utils`` unit tests.
+- consul - fixed bug introduced in PR 4590 (https://github.com/ansible-collections/community.general/issues/4680).
+
 v3.8.7
 ======
 

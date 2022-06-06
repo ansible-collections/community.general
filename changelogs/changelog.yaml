@@ -2177,3 +2177,15 @@ releases:
     - 4647-gconftool2-command-arg.yaml
     - psf-license.yml
     release_date: '2022-05-16'
+  3.8.8:
+    changes:
+      bugfixes:
+      - Include ``simplified_bsd.txt`` license file for various module utils, the
+        ``lxca_common`` docs fragment, and the ``utm_utils`` unit tests.
+      - consul - fixed bug introduced in PR 4590 (https://github.com/ansible-collections/community.general/issues/4680).
+      release_summary: Maintenance and bugfix release.
+    fragments:
+    - 3.8.8.yml
+    - 4712-consul-bugfix.yaml
+    - simplified-bsd-license.yml
+    release_date: '2022-06-06'
