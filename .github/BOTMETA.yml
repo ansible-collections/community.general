@@ -307,6 +307,9 @@ files:
   $module_utils/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
+  $module_utils/xfconf.py:
+    maintainers: russoz
+    labels: xfconf
   $modules/cloud/alicloud/:
     maintainers: xiaozhu36
   $modules/cloud/atomic/atomic_container.py:
@@ -618,7 +621,7 @@ files:
   $modules/monitoring/nagios.py:
     maintainers: tbielawa tgoetheyn
   $modules/monitoring/newrelic_deployment.py:
-    maintainers: mcodd
+    ignore: mcodd
   $modules/monitoring/pagerduty.py:
     maintainers: suprememoocow thaumos
     labels: pagerduty
@@ -710,7 +713,7 @@ files:
   $modules/notification/discord.py:
     maintainers: cwollinger
   $modules/notification/flowdock.py:
-    maintainers: mcodd
+    ignore: mcodd
   $modules/notification/grove.py:
     maintainers: zimbatm
   $modules/notification/hipchat.py:
@@ -1027,7 +1030,7 @@ files:
   $modules/system/alternatives.py:
     maintainers: mulby
     labels: alternatives
-    ignore: DavidWittman
+    ignore: DavidWittman jiuka
   $modules/system/aix_lvol.py:
     maintainers: adejoux
   $modules/system/awall.py:
