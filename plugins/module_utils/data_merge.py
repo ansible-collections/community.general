@@ -10,7 +10,7 @@ __metaclass__ = type
 from copy import deepcopy
 
 
-class DataMergeUtils(object):
+class DataMerge(object):
     """
     Utils for merging list or dict.
     """
