@@ -307,6 +307,9 @@ files:
   $module_utils/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
+  $module_utils/xfconf.py:
+    maintainers: russoz
+    labels: xfconf
   $modules/cloud/alicloud/:
     maintainers: xiaozhu36
   $modules/cloud/atomic/atomic_container.py:
