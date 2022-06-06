@@ -791,3 +791,13 @@ releases:
     - 4733-redis-fail.yml
     - 5.0.1.yml
     release_date: '2022-05-30'
+  5.0.2:
+    changes:
+      bugfixes:
+      - Include ``simplified_bsd.txt`` license file for various module utils, the
+        ``lxca_common`` docs fragment, and the ``utm_utils`` unit tests.
+      release_summary: Maintenance and bugfix release for Ansible 6.0.0.
+    fragments:
+    - 5.0.2.yml
+    - simplified-bsd-license.yml
+    release_date: '2022-06-06'

@@ -6,6 +6,19 @@ Community General Release Notes
 
 This changelog describes changes after version 4.0.0.
 
+v5.0.2
+======
+
+Release Summary
+---------------
+
+Maintenance and bugfix release for Ansible 6.0.0.
+
+Bugfixes
+--------
+
+- Include ``simplified_bsd.txt`` license file for various module utils, the ``lxca_common`` docs fragment, and the ``utm_utils`` unit tests.
+
 v5.0.1
 ======
 
