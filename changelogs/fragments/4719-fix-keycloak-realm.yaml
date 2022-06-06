@@ -1,2 +1,0 @@
-bugfixes:
-  - "keycloak_realm - fix default groups and roles (https://github.com/ansible-collections/community.general/issues/4241)."

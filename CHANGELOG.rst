@@ -6,6 +6,26 @@ Community General Release Notes
 
 This changelog describes changes after version 3.0.0.
 
+v4.8.2
+======
+
+Release Summary
+---------------
+
+Regular maintenance and bugfix release.
+
+Bugfixes
+--------
+
+- Include ``simplified_bsd.txt`` license file for various module utils, the ``lxca_common`` docs fragment, and the ``utm_utils`` unit tests.
+- consul - fixed bug introduced in PR 4590 (https://github.com/ansible-collections/community.general/issues/4680).
+- filesystem - handle ``fatresize --info`` output lines without ``:`` (https://github.com/ansible-collections/community.general/pull/4700).
+- filesystem - improve error messages when output cannot be parsed by including newlines in escaped form (https://github.com/ansible-collections/community.general/pull/4700).
+- gitlab_hook - avoid errors during idempotency check when an attribute does not exist (https://github.com/ansible-collections/community.general/pull/4668).
+- keycloak_realm - fix default groups and roles (https://github.com/ansible-collections/community.general/issues/4241).
+- redis* modules - fix call to ``module.fail_json`` when failing because of missing Python libraries (https://github.com/ansible-collections/community.general/pull/4733).
+- xcc_redfish_command - for compatibility due to Redfish spec changes the virtualMedia resource location changed from Manager to System (https://github.com/ansible-collections/community.general/pull/4682).
+
 v4.8.1
 ======
 
