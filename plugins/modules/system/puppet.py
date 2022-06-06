@@ -51,6 +51,11 @@ options:
     description:
       - Puppet environment to be used.
     type: str
+  confdir:
+    description:
+      - Path to the directory containing the puppet.conf file.
+    type: str
+    version_added: 5.1.0
   logdest:
     description:
     - Where the puppet logs should go, if puppet apply is being used.
@@ -179,6 +184,7 @@ def main():
             puppetmaster=dict(type='str'),
             modulepath=dict(type='str'),
             manifest=dict(type='str'),
+            confdir=dict(type='str'),
             noop=dict(type='bool'),
             logdest=dict(type='str', default='stdout', choices=['all', 'stdout', 'syslog']),
             # The following is not related to Ansible's diff; see https://github.com/ansible-collections/community.general/pull/3980#issuecomment-1005666154
@@ -255,6 +261,8 @@ def main():
             cmd += " --server %s" % shlex_quote(p['puppetmaster'])
         if p['show_diff']:
             cmd += " --show_diff"
+        if p['confdir']:
+            cmd += " --confdir %s" % shlex_quote(p['confdir'])
         if p['environment']:
             cmd += " --environment '%s'" % p['environment']
         if p['tags']:
