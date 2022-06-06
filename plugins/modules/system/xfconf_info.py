@@ -74,7 +74,7 @@ RETURN = '''
   properties:
     description:
         - List of available properties for a specific channel.
-        - Returned by passed only the I(channel) parameter to the module.
+        - Returned by passing only the I(channel) parameter to the module.
     returned: success
     type: list
     elements: str
@@ -116,14 +116,15 @@ RETURN = '''
     - Tmp
 '''
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import CmdModuleHelper, ArgFormat
+from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
+from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner
 
 
 class XFConfException(Exception):
     pass
 
 
-class XFConfInfo(CmdModuleHelper):
+class XFConfInfo(ModuleHelper):
     module = dict(
         argument_spec=dict(
             channel=dict(type='str'),
@@ -135,16 +136,9 @@ class XFConfInfo(CmdModuleHelper):
         supports_check_mode=True,
     )
 
-    command = 'xfconf-query'
-    command_args_formats = dict(
-        channel=dict(fmt=['--channel', '{0}']),
-        property=dict(fmt=['--property', '{0}']),
-        _list_arg=dict(fmt="--list", style=ArgFormat.BOOLEAN),
-    )
-    check_rc = True
-
     def __init_module__(self):
-        self.vars.set("_list_arg", False, output=False)
+        self.runner = xfconf_runner(self.module, check_rc=True)
+        self.vars.set("list_arg", False, output=False)
         self.vars.set("is_array", False)
 
     def process_command_output(self, rc, out, err):
@@ -167,7 +161,7 @@ class XFConfInfo(CmdModuleHelper):
         return lines
 
     def __run__(self):
-        self.vars._list_arg = not (bool(self.vars.channel) and bool(self.vars.property))
+        self.vars.list_arg = not (bool(self.vars.channel) and bool(self.vars.property))
         output = 'value'
         proc = self.process_command_output
         if self.vars.channel is None:
@@ -176,15 +170,15 @@ class XFConfInfo(CmdModuleHelper):
         elif self.vars.property is None:
             output = 'properties'
             proc = self._process_list_properties
-        result = self.run_command(params=('_list_arg', 'channel', 'property'), process_output=proc)
-        if not self.vars._list_arg and self.vars.is_array:
+        with self.runner.context('list_arg channel property', output_process=proc) as ctx:
+            result = ctx.run(**self.vars)
+        if not self.vars.list_arg and self.vars.is_array:
             output = "value_array"
         self.vars.set(output, result)
 
 
 def main():
-    xfconf = XFConfInfo()
-    xfconf.run()
+    XFConfInfo.execute()
 
 
 if __name__ == '__main__':
