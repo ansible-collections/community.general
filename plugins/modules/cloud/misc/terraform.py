@@ -82,6 +82,13 @@ options:
     description:
       - A group of key-values to override template variables or those in
         variables files.
+      - Support complex variable structures to reflect terraform variable syntax:
+        - Terraform Objects are mapped to Ansible Dicts
+        - Terraform Lists are Ansible Lists
+        - Terraform Numbers can be Ansible Ints or Floats
+        - Terraform Bool can be Ansible Bools
+      - Note: passwords passed as variables will be visible in the log output. 
+        For production usecases consider 'no_log' set to 'true'
     type: dict
   targets:
     description:
@@ -187,6 +194,25 @@ EXAMPLES = """
     plugin_paths:
       - /path/to/plugins_dir_1
       - /path/to/plugins_dir_2
+
+- name: Complex variables example
+  community.general.terraform:
+    project_path: '{{ project_dir }}'
+    state: present
+    variables:
+      vm_name: "{{ inventory_hostname }}"
+      vm_vcpus: 2
+      vm_mem: 2048
+      vm_additional_disks:
+        - label: "Third Disk"
+          size: 40
+          thin_provisioned: true
+          unit_number: 2
+        - label: "Fourth Disk"
+          size: 22
+          thin_provisioned: true
+          unit_number: 3
+    force_init: true
 
 ### Example directory structure for plugin_paths example
 # $ tree /path/to/plugins_dir_1
