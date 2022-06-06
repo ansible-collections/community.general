@@ -203,6 +203,18 @@ DATA_MERGE_TEST_CASE_MIXED_IDS = (item['id']
                                   for item in DATA_MERGE_TEST_CASE_MIXED)
 
 
+@pytest.mark.parametrize('testcase',
+                         [
+                             {'current': ['data'], 'expected': 'data'},
+                             {'current': 'data', 'expected': ['data']},
+                         ],
+                         ids=['expected_is_not_a_list', 'current_is_not_a_list'])
+def test_merge_list_raise_with_bad_params(testcase):
+    data_merge_utils = DataMergeUtils(merge_type='identic')
+    with pytest.raises(ValueError):
+        data_merge_utils.get_new_merged_list(testcase['current'], testcase['expected'])
+
+
 @pytest.mark.parametrize('testcase', DATA_MERGE_TEST_CASE_LIST,
                          ids=DATA_MERGE_TEST_CASE_LIST_IDS)
 def test_merge_list(testcase):
@@ -211,12 +223,41 @@ def test_merge_list(testcase):
     assert(list_merged == testcase['data_expected'])
 
 
+@pytest.mark.parametrize('testcase',
+                         [
+                             {'current': {'A': 1}, 'expected': 'A'},
+                             {'current': 'A', 'expected': {'A': 1}},
+                         ],
+                         ids=['expected_is_not_a_dict', 'current_is_not_a_dict'])
+def test_merge_dict_raise_with_bad_params(testcase):
+    data_merge_utils = DataMergeUtils(merge_type='identic')
+    with pytest.raises(ValueError):
+        data_merge_utils.get_new_merged_dict(testcase['current'], testcase['expected'])
+
+
 @pytest.mark.parametrize('testcase', DATA_MERGE_TEST_CASE_DICT,
                          ids=DATA_MERGE_TEST_CASE_DICT_IDS)
 def test_merge_dict(testcase):
     data_merge_utils = DataMergeUtils(merge_type=testcase['merge_type'])
     dict_merged = data_merge_utils.get_new_merged_dict(DICT_CURRENT, DICT_MODIF)
     assert(dict_merged == testcase['data_expected'])
+
+
+@pytest.mark.parametrize('testcase',
+                         [
+                             {'current': {'A': 1}, 'expected': 'A'},
+                             {'current': 'A', 'expected': {'A': 1}},
+                             {'current': ['A'], 'expected': 'A'},
+                             {'current': 'A', 'expected': ['A']},
+                         ],
+                         ids=['expected_is_not_a_dict',
+                              'current_is_not_a_dict',
+                              'expected_is_not_a_list',
+                              'current_is_not_a_list'])
+def test_merge_data_raise_with_bad_params(testcase):
+    data_merge_utils = DataMergeUtils(merge_type='identic')
+    with pytest.raises(ValueError):
+        data_merge_utils.get_new_merged_data(testcase['current'], testcase['expected'])
 
 
 @pytest.mark.parametrize('testcase', DATA_MERGE_TEST_CASE_MIXED,
