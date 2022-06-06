@@ -9,8 +9,6 @@ __metaclass__ = type
 
 from copy import deepcopy
 
-from ansible.module_utils.common._collections_compat import Mapping, Sequence
-
 
 class DataMergeUtils(object):
     """
@@ -87,6 +85,8 @@ class DataMergeUtils(object):
         Getting the merge of two element if it can't be sure that they have the
         same type.
         """
+        if not isinstance(current, (dict, list)) or not isinstance(expected, (dict, list)):
+            raise ValueError('Only dict or list can be merged, {0} and {1} given.'.format(type(current), type(expected)))
         if self.merge_type == 'identic':
             return deepcopy(expected)
         if not isinstance(current, type(expected)):
@@ -104,6 +104,8 @@ class DataMergeUtils(object):
         """
         Getting the merge of two dict depending the `self.list_diff_type`.
         """
+        if not isinstance(current, dict) or not isinstance(expected, dict):
+            raise ValueError('Only two dict can be merged, {0} and {1} given.'.format(type(current), type(expected)))
         if self.merge_type == 'identic':
             return deepcopy(expected)
         merged = deepcopy(current)
@@ -118,6 +120,8 @@ class DataMergeUtils(object):
                 elif self._merge_type == 'absent':
                     if merged.get(key) == expected[key]:
                         merged.pop(key)
+                else:
+                    raise TypeError("Unexpected merge_type")
         return merged
 
     def get_new_merged_list(self, current, expected):
@@ -126,6 +130,8 @@ class DataMergeUtils(object):
         Getting the merge of two list depending the `self.merge_type` and the
         `self.list_diff_type`.
         """
+        if not isinstance(current, list) or not isinstance(expected, list):
+            raise ValueError('Only two list can be merged, {0} and {1} given.'.format(type(current), type(expected)))
         if self.merge_type == 'identic':
             return deepcopy(expected)
         if self._list_diff_type == 'value':
