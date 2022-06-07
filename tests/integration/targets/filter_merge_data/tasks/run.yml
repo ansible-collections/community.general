@@ -1,0 +1,10 @@
+---
+
+- name: "{{ case.id }} - get result"
+  ansible.builtin.set_fact:
+    result: "{{ case.current|community.general.merge_data(case.expected, state=case.state, list_diff_type=case.list_diff_type) }}"
+
+- name: "{{ case.id }} - check result"
+  ansible.builtin.assert:
+    that: "{{ result == case.result }}"
+    fail_msg: "'current': {{ case.current }}, 'expected': {{ case.expected }}, 'expected_result': {{ case.result }}, 'result': {{ result }}"
