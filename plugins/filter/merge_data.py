@@ -21,53 +21,53 @@ description:
   - For the list, you have two type of diff. You can check if the expected
     datas are present in a list on the current datas or you can
     check a value at the specific index of the list.
- positional: expected, state, list_diff_type
- options:
-   expected:
-     type: dict|list
-     required: true
-      description:
-        - The datas that you want to diff with the current and you need to
-          ensure that are in corresponding C(state).
-   state:
-     type: string
-     required: true
-     choices:
-       - present
-       - absent
-       - identic
-      description:
-        - If set to C(present), that ensure the expected values are present in
-          the result. If an element of dict is absent from current data but
-          present in expected it will be added in the result and if a dict
-          element is is present in both current and expected, the element value
-          will be set to same as in expected datas.
-        - If set to C(absent), that ensure the expected values are absent in
-          the result. If an element of dict is prensent in expected and
-          current datas but with different value it will not be removed. It
-          only be removed if the element in current and expected data share the
-          same value.
-        - If set to C(identic), that ensure the result is identical to the
-          expected datas.
-    list_diff_type:
-      type: string
-      required: false
-      default: value
-      choices:
-        - value
-        - index
-      description:
-        - This describes how the lists are compared.
-        - If set to C(value), it checks if the expected value is present in the
-          list. With this, you cannot do recursive check, the presence of the
-          expected value is only done on the first level, but you not need to
-          take care of the position of the expected data in the list.
-        - If set to C(index), it checks if the expected value is present a
-          specific index in the Current datas. With this, you can do
-          recursive check, but you need to take care of the position of the
-          expected date in the list. If you need to ignore value a previous
-          position in list index when you only want operate on specific position
-          set the values that you want ignore to C(null) (see examples).
+positional: expected, state, list_diff_type
+options:
+  expected:
+    type: dict|list
+    required: true
+    description:
+      - The datas that you want to diff with the current and you need to
+        ensure that are in corresponding C(state).
+  state:
+    type: string
+    required: true
+    choices:
+      - present
+      - absent
+      - identic
+    description:
+      - If set to C(present), that ensure the expected values are present in
+        the result. If an element of dict is absent from current data but
+        present in expected it will be added in the result and if a dict
+        element is is present in both current and expected, the element value
+        will be set to same as in expected datas.
+      - If set to C(absent), that ensure the expected values are absent in
+        the result. If an element of dict is prensent in expected and
+        current datas but with different value it will not be removed. It
+        only be removed if the element in current and expected data share the
+        same value.
+      - If set to C(identic), that ensure the result is identical to the
+        expected datas.
+  list_diff_type:
+    type: string
+    required: false
+    default: value
+    choices:
+      - value
+      - index
+    description:
+      - This describes how the lists are compared.
+      - If set to C(value), it checks if the expected value is present in the
+        list. With this, you cannot do recursive check, the presence of the
+        expected value is only done on the first level, but you not need to
+        take care of the position of the expected data in the list.
+      - If set to C(index), it checks if the expected value is present a
+        specific index in the Current datas. With this, you can do
+        recursive check, but you need to take care of the position of the
+        expected date in the list. If you need to ignore value a previous
+        position in list index when you only want operate on specific position
+        set the values that you want ignore to C(null) (see examples).
  '''
 
 EXAMPLES = '''
