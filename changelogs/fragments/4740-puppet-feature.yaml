@@ -1,2 +1,0 @@
-minor_changes:
-- puppet - adds ``confdir`` parameter to configure a custom confir location (https://github.com/ansible-collections/community.general/pull/4740).
