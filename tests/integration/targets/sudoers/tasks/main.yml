@@ -7,7 +7,7 @@
     alt_sudoers_path: /etc/sudoers_alt
 
 - name: Install sudo package
-  ansible.builtin.apt:
+  ansible.builtin.package:
     name: sudo
 
 - name: Ensure sudoers directory exists
