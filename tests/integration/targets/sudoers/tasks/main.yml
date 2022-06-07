@@ -9,6 +9,7 @@
 - name: Install sudo package
   ansible.builtin.package:
     name: sudo
+  when: ansible_os_family != 'Darwin'
 
 - name: Ensure sudoers directory exists
   ansible.builtin.file:
