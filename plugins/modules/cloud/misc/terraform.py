@@ -80,9 +80,15 @@ options:
     aliases: [ 'variables_file' ]
   variables:
     description:
-      - A group of key-values to override template variables or those in
-        variables files.
+      - A group of key-values to override template variables or those in variables files.
+      - Support complex variable structures to reflect terraform variable syntax.
+      - Terraform Objects are mapped to Ansible Dicts.
+      - Terraform Lists are Ansible Lists.
+      - Terraform Numbers can be Ansible Ints or Floats.
+      - Terraform Bool can be Ansible Bools.
+      - B(Note) passwords passed as variables will be visible in the log output. For production usecases consider C(no_log) set to C(true).
     type: dict
+    default: {}
   targets:
     description:
       - A list of specific resources to target in this plan/application. The
@@ -187,6 +193,25 @@ EXAMPLES = """
     plugin_paths:
       - /path/to/plugins_dir_1
       - /path/to/plugins_dir_2
+
+- name: Complex variables example
+  community.general.terraform:
+    project_path: '{{ project_dir }}'
+    state: present
+    variables:
+      vm_name: "{{ inventory_hostname }}"
+      vm_vcpus: 2
+      vm_mem: 2048
+      vm_additional_disks:
+        - label: "Third Disk"
+          size: 40
+          thin_provisioned: true
+          unit_number: 2
+        - label: "Fourth Disk"
+          size: 22
+          thin_provisioned: true
+          unit_number: 3
+    force_init: true
 
 ### Example directory structure for plugin_paths example
 # $ tree /path/to/plugins_dir_1
@@ -449,12 +474,67 @@ def main():
     if state == 'present' and module.params.get('parallelism') is not None:
         command.append('-parallelism=%d' % module.params.get('parallelism'))
 
-    variables_args = []
-    for k, v in variables.items():
-        variables_args.extend([
-            '-var',
-            '{0}={1}'.format(k, v)
-        ])
+    def process_args(variables, top):
+        variables_args = []
+        lowlevel_out = []
+        for k, v in variables.items():
+            if top:
+                if (isinstance(v, dict)):
+                    variables_args.extend([
+                        "-var",
+                        k + '={' + process_args(v, False) + '}'
+                    ])
+                if (isinstance(v, list)):
+                    l_out = []
+                    for item in v:
+                        l_out.append("{" + process_args(item, False) + "}")
+                    variables_args.extend([
+                        "-var",
+                        k + '=[' + ",".join(l_out) + ']'
+                    ])
+                if ((isinstance(v, int) or isinstance(v, float)) and not isinstance(v, bool)):
+                    variables_args.extend([
+                        "-var",
+                        '{0}={1}'.format(k, v)
+                    ])
+                if (isinstance(v, str)):
+                    variables_args.extend([
+                        "-var",
+                        '{0}={1}'.format(k, v)
+                    ])
+                if (isinstance(v, bool)):
+                    if v:
+                        variables_args.extend([
+                            "-var",
+                            '{0}=true'.format(k)
+                        ])
+                    else:
+                        variables_args.extend([
+                            "-var",
+                            '{0}=false'.format(k)
+                        ])
+
+            else:
+                if (isinstance(v, dict)):
+                    lowlevel_out.append(k + '={' + process_args(v, False) + '}')
+                if (isinstance(v, list)):
+                    lowlevel_out.append(k + '=[' + process_args(v, False) + ']')
+                if ((isinstance(v, int) or isinstance(v, float)) and not isinstance(v, bool)):
+                    lowlevel_out.append('{0}={1}'.format(k, v))
+                if (isinstance(v, str)):
+                    lowlevel_out.append('{0}="{1}"'.format(k, v))
+                if (isinstance(v, bool)):
+                    if v:
+                        lowlevel_out.append('{0}=true'.format(k))
+                    else:
+                        lowlevel_out.append('{0}=false'.format(k))
+        if top:
+            return (variables_args)
+        else:
+            return ",".join(lowlevel_out)
+
+    variables_args = process_args(variables, True)
+
     if variables_files:
         for f in variables_files:
             variables_args.extend(['-var-file', f])
