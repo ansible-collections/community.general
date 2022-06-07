@@ -139,6 +139,8 @@ files:
   $filters/json_query.py: {}
   $filters/lists_mergeby.py:
     maintainers: vbotka
+  $filters/merge_data.py:
+    maintainers: indelog
   $filters/random_mac.py: {}
   $filters/time.py:
     maintainers: resmo
