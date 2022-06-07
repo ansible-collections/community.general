@@ -163,6 +163,22 @@ DATA_MERGE_TEST_CASE_LIST = [
         'data_modif': LIST_MODIF_IDENTIC,
         'data_expected': LIST_MODIF_IDENTIC,
     },
+    {
+        'id': 'present_ignore_null',
+        'merge_type': 'present',
+        'list_diff_type': 'index',
+        'data_current': ['A', 'B', 'C'],
+        'data_modif': [None, 'Z'],
+        'data_expected': ['A', 'Z', 'C'],
+    },
+    {
+        'id': 'absent_ignore_null',
+        'merge_type': 'absent',
+        'list_diff_type': 'index',
+        'data_current': ['A', 'B', 'C'],
+        'data_modif': [None, 'B'],
+        'data_expected': ['A', 'C'],
+    },
 ]
 DATA_MERGE_TEST_CASE_LIST_IDS = (item['id']
                                  for item in DATA_MERGE_TEST_CASE_LIST)
@@ -191,12 +207,34 @@ DATA_MERGE_TEST_CASE_MIXED = [
     {
         'id': 'present',
         'merge_type': 'present',
+        'list_diff_type': 'value',
+        'data_current': DICT_CURRENT,
+        'data_modif': LIST_CURRENT,
         'data_expected': LIST_CURRENT,
     },
     {
         'id': 'absent',
         'merge_type': 'absent',
+        'list_diff_type': 'value',
+        'data_current': DICT_CURRENT,
+        'data_modif': LIST_CURRENT,
         'data_expected': DICT_CURRENT,
+    },
+    {
+        'id': 'full_dict',
+        'merge_type': 'present',
+        'list_diff_type': 'value',
+        'data_current': DICT_CURRENT,
+        'data_modif': DICT_MODIF,
+        'data_expected': DICT_EXPECTED_PRESENT,
+    },
+    {
+        'id': 'full_list_index_present_ignore_null',
+        'merge_type': 'present',
+        'list_diff_type': 'index',
+        'data_current': ['A', 'B', 'C'],
+        'data_modif': [None, 'Z'],
+        'data_expected': ['A', 'Z', 'C'],
     },
 ]
 DATA_MERGE_TEST_CASE_MIXED_IDS = (item['id']
@@ -263,6 +301,6 @@ def test_merge_data_raise_with_bad_params(testcase):
 @pytest.mark.parametrize('testcase', DATA_MERGE_TEST_CASE_MIXED,
                          ids=DATA_MERGE_TEST_CASE_MIXED_IDS)
 def test_merge_mixed(testcase):
-    data_merge_utils = DataMerge(merge_type=testcase['merge_type'])
-    list_merged = data_merge_utils.get_new_merged_data(DICT_CURRENT, LIST_CURRENT)
+    data_merge_utils = DataMerge(merge_type=testcase['merge_type'], list_diff_type=testcase['list_diff_type'])
+    list_merged = data_merge_utils.get_new_merged_data(testcase['data_current'], testcase['data_modif'])
     assert(list_merged == testcase['data_expected'])
