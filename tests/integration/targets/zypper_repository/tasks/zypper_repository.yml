@@ -207,22 +207,25 @@
     that:
       - remove_repo is changed
 
-- name: add new repository via url to .repo file
-  community.general.zypper_repository:
-    repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
-    state: present
-  register: added_by_repo_file
+# For now, the URL does not work for 15.4
+- when: ansible_distribution_version is version('15.4', '<')
+  block:
+  - name: add new repository via url to .repo file
+    community.general.zypper_repository:
+      repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+      state: present
+    register: added_by_repo_file
 
-- name: get repository details from zypper
-  command: zypper lr systemsmanagement_Uyuni_Stable
-  register: get_repository_details_from_zypper
+  - name: get repository details from zypper
+    command: zypper lr systemsmanagement_Uyuni_Stable
+    register: get_repository_details_from_zypper
 
-- name: verify adding via .repo file was successful
-  assert:
-    that:
-      - "added_by_repo_file is changed"
-      - "get_repository_details_from_zypper.rc == 0"
-      - "'/systemsmanagement:/Uyuni:/Stable/' in get_repository_details_from_zypper.stdout"
+  - name: verify adding via .repo file was successful
+    assert:
+      that:
+        - "added_by_repo_file is changed"
+        - "get_repository_details_from_zypper.rc == 0"
+        - "'/systemsmanagement:/Uyuni:/Stable/' in get_repository_details_from_zypper.stdout"
 
 - name: add same repository via url to .repo file again to verify idempotency
   community.general.zypper_repository:
