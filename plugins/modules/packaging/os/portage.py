@@ -228,9 +228,22 @@ EXAMPLES = '''
 
 import os
 import re
+import sys
+import traceback
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.common.respawn import has_respawned, respawn_module
 from ansible.module_utils.common.text.converters import to_native
+
+
+try:
+    from portage.dbapi import vartree
+    from portage.exception import InvalidAtom
+    HAS_PORTAGE = True
+    PORTAGE_IMPORT_ERROR = None
+except ImportError:
+    HAS_PORTAGE = False
+    PORTAGE_IMPORT_ERROR = traceback.format_exc()
 
 
 def query_package(module, package, action):
@@ -240,10 +253,12 @@ def query_package(module, package, action):
 
 
 def query_atom(module, atom, action):
-    cmd = '%s list %s' % (module.equery_path, atom)
-
-    rc, out, err = module.run_command(cmd)
-    return rc == 0
+    vdb = vartree.vardbapi()
+    try:
+        exists = vdb.match(atom)
+    except InvalidAtom:
+        return False
+    return bool(exists)
 
 
 def query_set(module, set, action):
@@ -506,8 +521,14 @@ def main():
         supports_check_mode=True,
     )
 
+    if not HAS_PORTAGE:
+        if sys.executable != '/usr/bin/python' and not has_respawned():
+            respawn_module('/usr/bin/python')
+        else:
+            module.fail_json(msg=missing_required_lib('portage'),
+                             exception=PORTAGE_IMPORT_ERROR)
+
     module.emerge_path = module.get_bin_path('emerge', required=True)
-    module.equery_path = module.get_bin_path('equery', required=True)
 
     p = module.params
 
