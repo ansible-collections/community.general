@@ -42,6 +42,12 @@ options:
     type: bool
     default: false
 
+  backtrack:
+    description:
+      - Set backtrack value (C(--backtrack)).
+    type: int
+    version_added: 5.8.0
+
   deep:
     description:
       - Consider the entire dependency tree of packages (--deep)
@@ -351,6 +357,7 @@ def emerge_packages(module, packages):
     emerge_flags = {
         'jobs': '--jobs',
         'loadavg': '--load-average',
+        'backtrack': '--backtrack',
     }
 
     for flag, arg in emerge_flags.items():
@@ -490,6 +497,7 @@ def main():
                 choices=portage_present_states + portage_absent_states,
             ),
             update=dict(default=False, type='bool'),
+            backtrack=dict(default=None, type='int'),
             deep=dict(default=False, type='bool'),
             newuse=dict(default=False, type='bool'),
             changed_use=dict(default=False, type='bool'),
