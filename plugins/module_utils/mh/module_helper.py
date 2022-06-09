@@ -15,6 +15,7 @@ from ansible_collections.community.general.plugins.module_utils.mh.mixins.state 
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.deps import DependencyMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.vars import VarsMixin, VarDict as _VD
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.deprecate_attrs import DeprecateAttrsMixin
+from ansible_collections.community.general.plugins.module_utils.mh.mixins.dest import DestFileMixin
 
 
 class ModuleHelper(DeprecateAttrsMixin, VarsMixin, DependencyMixin, ModuleHelperBase):
@@ -88,4 +89,8 @@ class CmdModuleHelper(CmdMixin, ModuleHelper):
 
 
 class CmdStateModuleHelper(CmdMixin, StateMixin, ModuleHelper):
+    pass
+
+
+class DestFileModuleHelper(DestFileMixin, ModuleHelper):
     pass

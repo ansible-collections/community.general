@@ -1,0 +1,251 @@
+---
+test_cases_dest_file_module_helper:
+
+  - id: "(010) fail to create when the creation is not allowed"
+    parent_mode: "0777"
+    dest_mode: "0666"
+    dest_content: false
+    final_content: false
+    module_params:
+      path: "{{ dest_file }}"
+      allow_creation: false
+      mode: "0666"
+    asserts:
+      - "module_res.failed is true"
+      - "module_res.changed is false"
+      - "module_res.created is false"
+      - "module_res.msg == '{{ dest_file }} does not exists !'"
+    check_mode: false
+    need_to_ignore: false
+
+  - id: "(020) fail to create the destination file when parent is not writeable"
+    parent_mode: "0555"
+    dest_mode: "0666"
+    dest_content: false
+    final_content: false
+    module_params:
+      path: "{{ dest_file }}"
+      allow_creation: true
+      mode: "0666"
+    asserts:
+      - "module_res.failed is true"
+      - "module_res.changed is false"
+      - "module_res.created is false"
+      - "module_res.msg == 'Can not create dest file {{ dest_file }} !'"
+    check_mode: false
+    need_to_ignore: "{{ ansible_user_uid == 0 and ansible_distribution in ('RedHat', 'Darwin', 'FreeBSD') }}"
+
+  - id: "(030) can create the destination file"
+    parent_mode: "0777"
+    dest_mode: "0666"
+    dest_content: false
+    final_content: |
+      one line
+    module_params:
+      path: "{{ dest_file }}"
+      allow_creation: true
+      value: 'one line'
+      mode: "0666"
+    asserts:
+      - "module_res.failed is false"
+      - "module_res.changed is true"
+      - "module_res.created is true"
+      - "module_res.result == ['one line']"
+    check_mode: false
+    need_to_ignore: false
+
+  - id: "(110) when the destination file is not regular file"
+    parent_mode: "0777"
+    dest_mode: "0666"
+    dest_content: false
+    final_content: false
+    module_params:
+      path: "{{ dest_dir }}"
+      value: 'two line'
+      mode: "0666"
+    asserts:
+      - "module_res.failed is true"
+      - "module_res.changed is false"
+      - "module_res.created is false"
+      - "module_res.msg == '{{ dest_dir }} is not a regular file !'"
+    check_mode: false
+    need_to_ignore: false
+
+  - id: "(120) when the destination file is not readable"
+    parent_mode: "0777"
+    dest_mode: "0222"
+    dest_content: |
+      one line
+    final_content: false
+    module_params:
+      path: "{{ dest_file }}"
+      value: 'two line'
+      mode: "0666"
+    asserts:
+      - "module_res.failed is true"
+      - "module_res.changed is false"
+      - "module_res.created is false"
+      - "module_res.msg == 'Can not read dest file {{ dest_file }} !'"
+    check_mode: false
+    need_to_ignore: "{{ ansible_user_uid == 0 and ansible_distribution in ('RedHat', 'Darwin', 'FreeBSD') }}"
+
+  - id: "(130) when destination file is not writeable"
+    parent_mode: "0777"
+    dest_mode: "0444"
+    dest_content: |
+      one line
+    final_content: false
+    module_params:
+      path: "{{ dest_file }}"
+      value: 'two line'
+      mode: "0666"
+    asserts:
+      - "module_res.failed is true"
+      - "module_res.changed is false"
+      - "module_res.created is false"
+      - "module_res.msg == 'Can not write dest file {{ dest_file }} !'"
+    check_mode: false
+    need_to_ignore: "{{ ansible_user_uid == 0 and ansible_distribution in ('RedHat', 'Darwin', 'FreeBSD') }}"
+
+  - id: "(140) not modifying the destination file"
+    parent_mode: "0777"
+    dest_mode: "0666"
+    dest_content: |
+      one line
+    final_content: |
+      one line
+    module_params:
+      path: "{{ dest_file }}"
+      value: 'one line'
+      mode: "0666"
+    asserts:
+      - "module_res.failed is false"
+      - "module_res.changed is false"
+      - "module_res.created is false"
+      - "module_res.result == ['one line']"
+    check_mode: false
+    need_to_ignore: false
+
+  - id: "(150) modifying the destination file"
+    parent_mode: "0777"
+    dest_mode: "0666"
+    dest_content: |
+      one line
+    final_content: |
+      one line
+      two line
+    module_params:
+      path: "{{ dest_file }}"
+      value: 'two line'
+      mode: "0666"
+    asserts:
+      - "module_res.failed is false"
+      - "module_res.changed is true"
+      - "module_res.created is false"
+      - "module_res.result == ['one line', 'two line']"
+    check_mode: false
+    need_to_ignore: false
+
+  - id: "(210) backup fail parent when not writeable"
+    parent_mode: "0555"
+    dest_mode: "0666"
+    dest_content: |
+      one line
+    final_content: false
+    module_params:
+      path: "{{ dest_file }}"
+      backup: true
+      value: 'two line'
+      mode: "0666"
+    asserts:
+      - "module_res.failed is true"
+      - "module_res.changed is false"
+      - "module_res.created is false"
+      - "module_res.msg == 'Can not create backup for {{ dest_file }} !'"
+    check_mode: false
+    need_to_ignore: "{{ ansible_user_uid == 0 and ansible_distribution in ('RedHat', 'Darwin', 'FreeBSD') }}"
+
+  - id: "(220) backup not ran when destination file just created"
+    parent_mode: "0777"
+    dest_mode: "0666"
+    dest_content: false
+    final_content: |
+      one line
+    module_params:
+      path: "{{ dest_file }}"
+      allow_creation: true
+      backup: true
+      value: 'one line'
+      mode: "0666"
+    asserts:
+      - "module_res.failed is false"
+      - "module_res.changed is true"
+      - "module_res.created is true"
+      - "module_res.result == ['one line']"
+    check_mode: false
+    need_to_ignore: false
+
+  - id: "(230) can backup the destination file"
+    parent_mode: "0777"
+    dest_mode: "0666"
+    dest_content: |
+      one line
+    final_content: |
+      one line
+      two line
+    module_params:
+      path: "{{ dest_file }}"
+      backup: true
+      value: 'two line'
+      mode: "0666"
+    asserts:
+      - "module_res.failed is false"
+      - "module_res.changed is true"
+      - "module_res.created is false"
+      - "module_res.result == ['one line', 'two line']"
+      - "module_res.backup_file is defined"
+    check_mode: false
+    need_to_ignore: false
+
+  - id: "(310) change dest mode"
+    parent_mode: "0777"
+    dest_mode: "0666"
+    dest_content: |
+      one line
+    final_content: |
+      one line
+      two line
+    module_params:
+      path: "{{ dest_file }}"
+      allow_creation: true
+      value: 'two line'
+      mode: "0644"
+    asserts:
+      - "module_res.failed is false"
+      - "module_res.changed is true"
+      - "module_res.created is false"
+      - "module_res.result == ['one line', 'two line']"
+      - "module_res.mode == '0644'"
+    check_mode: false
+    need_to_ignore: false
+
+  - id: "(410) verify that no real update on destination file is done when check_mode"
+    parent_mode: "0777"
+    dest_mode: "0666"
+    dest_content: |
+      one line
+    final_content: |
+      one line
+    module_params:
+      path: "{{ dest_file }}"
+      value: 'two line'
+      mode: "0644"
+    asserts:
+      - "module_res.failed is false"
+      - "module_res.changed is true"
+      - "module_res.created is false"
+      - "module_res.result == ['one line', 'two line']"
+      - "module_res.mode == '0644'"
+      - "module_res.backup_file is not defined"
+    check_mode: true
+    need_to_ignore: false

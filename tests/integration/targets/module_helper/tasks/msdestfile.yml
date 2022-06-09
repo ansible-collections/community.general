@@ -1,0 +1,22 @@
+---
+# (c) 2022, DEMAREST Maxime <maxime@indelog.fr>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "<mdestfile> set dest_dir and dest_file for dest file module helper"
+  set_fact:
+    dest_dir: "{{ remote_tmp_dir }}/destdir/"
+    dest_file: "{{ remote_tmp_dir }}/destdir/destfile.txt"
+
+- name: "<mdestfile> ensure that remote_tmp_dir is readable by non privilegied user when run by root"
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir }}"
+    mode: "0755"
+
+- name: "<mdestfile> run test cases for dest file module helper"
+  include_tasks: msdestfile-run.yml
+  loop: "{{ test_cases_dest_file_module_helper }}"
+  loop_control:
+    loop_var: case
+  # Some cases require to be ran with non root privileges bu on some platform
+  # we do not have suitable version of su. In this case the test is ignored.
+  when: "{{ not case.need_to_ignore }}"

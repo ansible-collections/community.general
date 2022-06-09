@@ -1,0 +1,78 @@
+---
+# (c) 2022 DEMAREST Maxime <maxime@indelog.fr>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "<mdestfile> {{ case.id }} - create dest_dir"
+  ansible.builtin.file:
+    path: "{{ dest_dir }}"
+    state: "directory"
+
+- name: "<mdestfile> {{ case.id }} - create current dest_file"
+  ansible.builtin.copy:
+    dest: "{{ dest_file }}"
+    content: "{{ case.dest_content }}"
+    mode: "{{ case.dest_mode }}"
+  when: case.dest_content
+
+- name: "<mdestfile> {{ case.id }} - update dest dir mode after dest_file creation"
+  ansible.builtin.file:
+    path: "{{ dest_dir }}"
+    state: "directory"
+    mode: "{{ case.parent_mode }}"
+
+- name: "<mdestfile> {{ case.id }} - run module"
+  mdestfile: "{{ case.module_params }}"
+  ignore_errors: true
+  become: "{{ ansible_user_uid == 0 }}"
+  become_user: 'nobody'
+  become_method: 'su'
+  become_flags: '-s /bin/sh'
+  diff: true
+  check_mode: "{{ case.check_mode }}"
+  register: module_res
+
+- name: "<mdestfile> {{ case.id }} - run asserts"
+  ansible.builtin.assert:
+    that: "{{ case.asserts }}"
+
+- name: "<mdestfile> {{ case.id }} - test final dest"
+  block:
+    - name: "<mdestfile> {{ case.id }} - check final dest state"
+      ansible.builtin.copy:
+        dest: "{{ dest_file }}"
+        content: "{{ case.final_content }}"
+        mode: "{{ case.check_mode | ternary(case.dest_mode, case.module_params.mode) }}"
+      diff: true
+      register: final_res
+    - name: "<mdestfile> {{ case.id }} - assert final dest state"
+      ansible.builtin.assert:
+        that:
+          - "{{ final_res.changed == false }}"
+  when: "{{ case.final_content is not false }}"
+
+- name: "<mdestfile> {{ case.id }} - test backup file"
+  block:
+    - name: "<mdestfile> {{ case.id }} - check backup state"
+      ansible.builtin.copy:
+        dest: "{{ module_res.backup_file }}"
+        content: "{{ case.dest_content }}"
+        mode: "{{ case.dest_mode }}"
+      diff: true
+      register: backup_res
+    - name: "<mdestfile> {{ case.id }} - assert backup state"
+      ansible.builtin.assert:
+        that:
+          - "{{ backup_res.changed == false }}"
+  when: "{{ module_res.backup_file is defined }}"
+
+- name: "<mdestfile> {{ case.id }} - clean dest_dir"
+  block:
+    - name: "<mdestfile> {{ case.id }} - ensure can remove dest_dir"
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0777"
+    - name: "<mdestfile> {{ case.id }} - remove dest_dir"
+      ansible.builtin.file:
+        path: "{{ dest_dir }}"
+        mode: "0777"
+        state: "absent"
