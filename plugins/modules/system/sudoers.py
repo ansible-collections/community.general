@@ -116,8 +116,6 @@ from ansible.module_utils.common.text.converters import to_native
 
 class Sudoers(object):
 
-    FILE_MODE = 0o440
-
     def __init__(self, module):
         self.module = module
 
@@ -139,8 +137,6 @@ class Sudoers(object):
         with open(self.file, 'w') as f:
             f.write(self.content())
 
-        os.chmod(self.file, self.FILE_MODE)
-
     def delete(self):
         if self.check_mode:
             return
@@ -152,12 +148,7 @@ class Sudoers(object):
 
     def matches(self):
         with open(self.file, 'r') as f:
-            content_matches = f.read() == self.content()
-
-        current_mode = oct(os.stat(self.file).st_mode & 0o777)
-        mode_matches = current_mode == oct(self.FILE_MODE)
-
-        return content_matches and mode_matches
+            return f.read() == self.content()
 
     def content(self):
         if self.user:
