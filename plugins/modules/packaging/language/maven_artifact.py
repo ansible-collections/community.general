@@ -150,6 +150,12 @@ options:
         default: 'md5'
         choices: ['md5', 'sha1']
         version_added: 3.2.0
+    unredirected_headers:
+        type: list
+        default: []
+        description:
+            A list of headers that should not be included in the redirection. This headers are sent to the fetch_url module.
+            Useful if the redirection URL does not need to have sensitive headers in the request.
     directory_mode:
         type: str
         description:
@@ -509,7 +515,7 @@ class MavenDownloader:
         self.module.params['url_password'] = self.module.params.get('password', '')
         self.module.params['http_agent'] = self.user_agent
 
-        response, info = fetch_url(self.module, url_to_use, timeout=req_timeout, headers=self.headers)
+        response, info = fetch_url(self.module, url_to_use, timeout=req_timeout, headers=self.headers, unredirected_headers=self.module.params.get('unredirected_headers', []))
         if info['status'] == 200:
             return response
         if force:
@@ -614,6 +620,7 @@ def main():
             keep_name=dict(required=False, default=False, type='bool'),
             verify_checksum=dict(required=False, default='download', choices=['never', 'download', 'change', 'always']),
             checksum_alg=dict(required=False, default='md5', choices=['md5', 'sha1']),
+            unredirected_headers=dict(type='list', elements='str', required=False, default=[]),
             directory_mode=dict(type='str'),
         ),
         add_file_common_args=True,
