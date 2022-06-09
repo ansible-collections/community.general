@@ -118,8 +118,6 @@ class Sudoers(object):
     FILE_MODE = 0o440
 
     def __init__(self, module):
-        self.module = module
-
         self.check_mode = module.check_mode
         self.name = module.params['name']
         self.user = module.params['user']
