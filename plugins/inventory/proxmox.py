@@ -443,7 +443,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _get_vm_status(self, properties, node, vmid, vmtype, name):
         ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/status/current" % (self.proxmox_url, node, vmtype, vmid))
         properties[self._fact('status')] = ret['status']
-        if vmtype == 'qemu':
+        if want_facts and vmtype == 'qemu':
             properties[self._fact('qmpstatus')] = ret['qmpstatus']
 
     def _get_vm_snapshots(self, properties, node, vmid, vmtype, name):
