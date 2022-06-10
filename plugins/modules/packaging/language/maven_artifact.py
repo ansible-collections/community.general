@@ -153,6 +153,7 @@ options:
     unredirected_headers:
         type: list
         default: []
+        elements: str
         description:
             A list of headers that should not be included in the redirection. This headers are sent to the fetch_url module.
             Useful if the redirection URL does not need to have sensitive headers in the request.
@@ -515,7 +516,13 @@ class MavenDownloader:
         self.module.params['url_password'] = self.module.params.get('password', '')
         self.module.params['http_agent'] = self.user_agent
 
-        response, info = fetch_url(self.module, url_to_use, timeout=req_timeout, headers=self.headers, unredirected_headers=self.module.params.get('unredirected_headers', []))
+        response, info = fetch_url(
+            self.module,
+            url_to_use,
+            timeout=req_timeout,
+            headers=self.headers,
+            unredirected_headers=self.module.params.get('unredirected_headers', [])
+        )
         if info['status'] == 200:
             return response
         if force:
