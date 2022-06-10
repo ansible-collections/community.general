@@ -154,8 +154,10 @@ options:
         type: list
         default: []
         elements: str
+        version_added: 5.2.0
         description:
-            A list of headers that should not be included in the redirection. This headers are sent to the fetch_url module.
+            A list of headers that should not be included in the redirection. This headers are sent to the fetch_url
+            ``fetch_url`` function.
             Useful if the redirection URL does not need to have sensitive headers in the request.
     directory_mode:
         type: str
