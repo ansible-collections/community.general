@@ -657,7 +657,6 @@ def test_populate(inventory, mocker):
     # bypass authentication and API fetch calls
     inventory._get_auth = mocker.MagicMock(side_effect=get_auth)
     inventory._get_json = mocker.MagicMock(side_effect=get_json)
-    inventory._get_vm_status = mocker.MagicMock(side_effect=get_json)
     inventory._get_vm_snapshots = mocker.MagicMock(side_effect=get_vm_snapshots)
     inventory.get_option = mocker.MagicMock(side_effect=get_option(opts))
     inventory._can_add_host = mocker.MagicMock(return_value=True)
@@ -727,7 +726,6 @@ def test_populate_missing_qemu_extended_groups(inventory, mocker):
     # bypass authentication and API fetch calls
     inventory._get_auth = mocker.MagicMock(side_effect=get_auth)
     inventory._get_json = mocker.MagicMock(side_effect=get_json)
-    inventory._get_vm_status = mocker.MagicMock(side_effect=get_json)
     inventory._get_vm_snapshots = mocker.MagicMock(side_effect=get_vm_snapshots)
     inventory.get_option = mocker.MagicMock(side_effect=get_option(opts))
     inventory._can_add_host = mocker.MagicMock(return_value=True)
