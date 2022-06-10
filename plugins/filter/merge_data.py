@@ -24,11 +24,12 @@ description:
 positional: expected, state, list_diff_type
 options:
   expected:
-    type: dict|list
+    type: raw
     required: true
     description:
       - The datas that you want to diff with the current and you need to
-        ensure that are in corresponding C(state).
+        ensure that are in corresponding C(state). This can be a C(dict) or
+        a C(list).
   state:
     type: string
     required: true
