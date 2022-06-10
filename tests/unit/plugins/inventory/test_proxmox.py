@@ -713,6 +713,7 @@ def test_populate(inventory, mocker):
     group_paused = inventory.inventory.groups['proxmox_all_paused']
     assert group_paused.hosts == [host_qemu_multi_nic]
 
+
 def test_populate_missing_qemu_extended_groups(inventory, mocker):
     # module settings
     inventory.proxmox_user = 'root@pam'
