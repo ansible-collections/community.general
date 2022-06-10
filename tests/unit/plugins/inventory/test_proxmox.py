@@ -539,9 +539,9 @@ def get_json(url):
             "status": "running",
             "cpus": "1",
             "ha": {
-              "group": null,
-              "state": "started",
-              "managed": 1
+                "group": 'null',
+                "state": "started",
+                "managed": 1
             },
             "maxdisk": 3348329267200,
             "netout": 1947793356037,
