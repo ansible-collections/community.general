@@ -9,7 +9,7 @@ DOCUMENTATION = '''
 name: merge_data
 short_description: Merge dict or lists by ensuring the comparing datas are
                    presents, absents or identics.
-version_added: 5.0.2
+version_added: 5.2.0
 author: DEMAREST Maxime (@indelog)
 description:
   - Merge two datas, current and expected in form of dict or list.
