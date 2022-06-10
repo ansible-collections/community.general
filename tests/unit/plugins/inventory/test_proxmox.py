@@ -705,6 +705,13 @@ def test_populate(inventory, mocker):
     for group in ['paused', 'prelaunch']:
         assert ('%sall_%s' % (inventory.group_prefix, group)) in inventory.inventory.groups
 
+    # check if qemu-windows is in the prelaunch group
+    group_prelaunch = inventory.inventory.groups['proxmox_all_prelaunch']
+    assert group_prelaunch.hosts == [host_qemu_windows]
+
+    # check if qemu-multi-nic is in the paused group
+    group_paused = inventory.inventory.groups['proxmox_all_paused']
+    assert group_paused.hosts == [host_qemu_multi_nic]
 
 def test_populate_missing_qemu_extended_groups(inventory, mocker):
     # module settings
