@@ -151,8 +151,8 @@ class Sudoers(object):
         with open(self.file, 'r') as f:
             content_matches = f.read() == self.content()
 
-        current_mode = oct(os.stat(self.file).st_mode & 0o777)
-        mode_matches = current_mode == oct(self.FILE_MODE)
+        current_mode = os.stat(self.file).st_mode & 0o777
+        mode_matches = current_mode == self.FILE_MODE
 
         return content_matches and mode_matches
 
