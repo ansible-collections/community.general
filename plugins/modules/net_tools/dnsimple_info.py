@@ -228,22 +228,20 @@ dnsimple_record_info:
 import traceback
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.basic import missing_required_lib
-import json
 
 try:
     from requests import Request, Session
+    HAS_REQUESTS_LIBRARY = True
 except ImportError:
-    HAS_ANOTHER_LIBRARY = False
-    ANOTHER_LIBRARY_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_ANOTHER_LIBRARY = True
+    HAS_REQUESTS_LIBRARY = False
+    REQUESTS_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 
 
 def build_url(account, key, is_sandbox):
     headers = {'Accept': 'application/json',
-               'Authorization': 'Bearer ' + key}
-    url = 'https://api{sandbox}.dnsimple.com/'.format(
-        sandbox=".sandbox" if is_sandbox else "") + 'v2/' + account
+               'Authorization': 'Bearer {0}'.format(key)}
+    url = 'https://api{sandbox}.dnsimple.com/v2/{account}'.format(
+        sandbox='.sandbox' if is_sandbox else '', account=account)
     req = Request(url=url, headers=headers)
     prepped_request = req.prepare()
     return prepped_request
@@ -252,52 +250,53 @@ def build_url(account, key, is_sandbox):
 def iterate_data(module, request_object):
     base_url = request_object.url
     response = Session().send(request_object)
-    if 'pagination' in response.json():
-        data = response.json()["data"]
-        pages = response.json()["pagination"]["total_pages"]
-        if int(pages) > 1:
-            for page in range(1, pages):
-                page = page + 1
-                request_object.url = base_url + '&page=' + str(page)
-                new_results = Session().send(request_object)
-                data = data + new_results.json()["data"]
-        return(data)
-    else:
+    if 'pagination' not in response.json():
         module.fail_json('API Call failed, check ID, key and sandbox values')
+
+    data = response.json()['data']
+    total_pages = int(response.json()['pagination']['total_pages'])
+    page = 1
+    while page < total_pages:
+        page = page + 1
+        request_object.url = '{url}&page={page}'.format(url=base_url, page=page)
+        new_results = Session().send(request_object)
+        data = data + new_results.json()['data']
+
+    return data
 
 
 def record_info(dnsimple_mod, req_obj):
-    req_obj.url, req_obj.method = req_obj.url + '/zones/' + dnsimple_mod.params["name"] + '/records?name=' + dnsimple_mod.params["record"], 'GET'
+    req_obj.url, req_obj.method = '{url}/zones/{name}/records/?name={record}'.format(
+        url=req_obj.url,
+        name=dnsimple_mod.params['name'],
+        record=dnsimple_mod.params['record']), 'GET'
     return iterate_data(dnsimple_mod, req_obj)
 
 
 def domain_info(dnsimple_mod, req_obj):
-    req_obj.url, req_obj.method = req_obj.url + '/zones/' + dnsimple_mod.params["name"] + '/records?per_page=100', 'GET'
+    req_obj.url, req_obj.method = '{url}/zones/{name}/records?per_page=100'.format(url=req_obj.url,  name=dnsimple_mod.params['name']), 'GET'
     return iterate_data(dnsimple_mod, req_obj)
 
 
 def account_info(dnsimple_mod, req_obj):
-    req_obj.url, req_obj.method = req_obj.url + '/zones/?per_page=100', 'GET'
+    req_obj.url, req_obj.method = '{url}/zones/?per_page=100'.format(url=req_obj.url), 'GET'
     return iterate_data(dnsimple_mod, req_obj)
 
 
 def main():
-    # define available arguments/parameters a user can pass to the module
-    fields = {
-        "account_id": {"required": True, "type": "str"},
-        "api_key": {"required": True, "type": "str", "no_log": True},
-        "name": {"required": False, "type": "str"},
-        "record": {"required": False, "type": "str"},
-        "sandbox": {"required": False, "type": "bool", "default": False}
-    }
-
     result = {
         'changed': False
     }
 
     module = AnsibleModule(
-        argument_spec=fields,
-        supports_check_mode=True
+        argument_spec={
+            'account_id': {'required': True, 'type': 'str'},
+            'api_key': {'required': True, 'type': 'str', 'no_log': True},
+            'name': {'type': 'str'},
+            'record': {'type': 'str'},
+            'sandbox': {'type': 'bool', 'default': False}
+        },
+        supports_check_mode=True,
     )
 
     params = module.params
@@ -305,30 +304,26 @@ def main():
                     params['api_key'],
                     params['sandbox'])
 
-    if not HAS_ANOTHER_LIBRARY:
+    if not HAS_REQUESTS_LIBRARY:
         # Needs: from ansible.module_utils.basic import missing_required_lib
         module.exit_json(
-            msg=missing_required_lib('another_library'),
-            exception=ANOTHER_LIBRARY_IMPORT_ERROR)
+            msg=missing_required_lib('requests'),
+            exception=REQUESTS_LIBRARY_IMPORT_ERROR)
 
-    # At minimum we need account and key
-    if params['account_id'] and params['api_key']:
-        # If we have a record return info on that record
-        if params['name'] and params['record']:
-            result['dnsimple_record_info'] = record_info(module, req)
-            module.exit_json(**result)
+    # If we have a record return info on that record
+    if params['name'] and params['record']:
+        result['dnsimple_record_info'] = record_info(module, req)
+        module.exit_json(**result)
 
-            # If we have the account only and domain, return records for the domain
-        elif params['name']:
-            result['dnsimple_records_info'] = domain_info(module, req)
-            module.exit_json(**result)
+        # If we have the account only and domain, return records for the domain
+    elif params['name']:
+        result['dnsimple_records_info'] = domain_info(module, req)
+        module.exit_json(**result)
 
-            # If we have the account only, return domains
-        else:
-            result['dnsimple_domain_info'] = account_info(module, req)
-            module.exit_json(**result)
+        # If we have the account only, return domains
     else:
-        module.fail_json(msg="Need at least account_id and api_key")
+        result['dnsimple_domain_info'] = account_info(module, req)
+        module.exit_json(**result)
 
 
 if __name__ == '__main__':
