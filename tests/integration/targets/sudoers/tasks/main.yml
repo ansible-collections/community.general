@@ -135,6 +135,8 @@
   register: revoke_rule_1_stat
 
 
+# Validation testing
+
 - name: Attempt command without full path to executable
   community.general.sudoers:
     name: edge-case-1
@@ -143,6 +145,42 @@
     commands: systemctl
   ignore_errors: true
   register: edge_case_1
+
+
+- name: Attempt command without full path to executable, but disabling validation
+  community.general.sudoers:
+    name: edge-case-2
+    state: present
+    user: alice
+    commands: systemctl
+    validation: absent
+  register: edge_case_2
+
+- name: find visudo
+  command:
+    cmd: which visudo
+  ignore_errors: true
+  register: which_visudo
+
+- name: Check that visudo was found
+  ansible.builtin.assert:
+    that:
+      - which_visudo.rc == 0
+
+- name: Remove visudo
+  file:
+    path: "{{ which_visudo.stdout }}"
+    state: absent
+
+- name: Attempt command without full path to executable, but enforcing validation with no visudo present
+  community.general.sudoers:
+    name: edge-case-3
+    state: present
+    user: alice
+    commands: systemctl
+    validation: required
+  ignore_errors: true
+  register: edge_case_3
 
 
 # Run assertions
@@ -174,3 +212,5 @@
   ansible.builtin.assert:
     that:
       - edge_case_1 is failed
+      - edge_case_2 is not failed
+      - edge_case_3 is failed
