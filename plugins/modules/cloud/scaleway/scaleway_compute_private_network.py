@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 ---
 module: scaleway_compute_private_network
 short_description: Scaleway compute - private network management
-version_added: 5.1.0
+version_added: 5.2.0
 author: Pascal MANGIN (@pastral)
 description:
     - This module add or remove a private network to a compute instance
