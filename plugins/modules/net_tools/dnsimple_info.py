@@ -240,8 +240,8 @@ except ImportError:
 def build_url(account, key, is_sandbox):
     headers = {'Accept': 'application/json',
                'Authorization': 'Bearer {0}'.format(key)}
-    url = 'https://api{sandbox}.dnsimple.com/v2/{account}'.format(
-        sandbox='.sandbox' if is_sandbox else '', account=account)
+    sandbox = '.sandbox' if is_sandbox else ''
+    url = 'https://api{sandbox}.dnsimple.com/v2/{account}'.format(sandbox=sandbox, account=account)
     req = Request(url=url, headers=headers)
     prepped_request = req.prepare()
     return prepped_request
@@ -274,7 +274,7 @@ def record_info(dnsimple_mod, req_obj):
 
 
 def domain_info(dnsimple_mod, req_obj):
-    req_obj.url, req_obj.method = '{url}/zones/{name}/records?per_page=100'.format(url=req_obj.url,  name=dnsimple_mod.params['name']), 'GET'
+    req_obj.url, req_obj.method = '{url}/zones/{name}/records?per_page=100'.format(url=req_obj.url, name=dnsimple_mod.params['name']), 'GET'
     return iterate_data(dnsimple_mod, req_obj)
 
 
@@ -297,12 +297,13 @@ def main():
             'sandbox': {'type': 'bool', 'default': False}
         },
         supports_check_mode=True,
+        required_by={
+            'record': 'name',
+        }
     )
 
     params = module.params
-    req = build_url(params['account_id'],
-                    params['api_key'],
-                    params['sandbox'])
+    req = build_url(params['account_id'], params['api_key'], params['sandbox'])
 
     if not HAS_REQUESTS_LIBRARY:
         # Needs: from ansible.module_utils.basic import missing_required_lib
@@ -310,8 +311,11 @@ def main():
             msg=missing_required_lib('requests'),
             exception=REQUESTS_LIBRARY_IMPORT_ERROR)
 
+    if not(params['account_id'] and params['api_key']):
+        module.fail_json(msg="Need at least account_id and api_key")
+
     # If we have a record return info on that record
-    if params['name'] and params['record']:
+    if params['record']:
         result['dnsimple_record_info'] = record_info(module, req)
         module.exit_json(**result)
 
