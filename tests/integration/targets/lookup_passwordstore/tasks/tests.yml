@@ -213,7 +213,7 @@
   assert:
     that:
       - eval_error is failed
-      - "\"passname folder not found\" in eval_error.msg"
+      - '"passname folder not found" in eval_error.msg'
 
 - name: Change passwordstore location explicitly
   set_fact:
@@ -237,7 +237,8 @@
   assert:
     that:
       - eval_error is failed
-      - "\"Passwordstore directory 'somenonexistentplace' does not exist\" in eval_error.msg"
+      - >-
+        "Passwordstore directory 'somenonexistentplace' does not exist" in eval_error.msg
 
 - name: Test pass compatibility shim detection
   block:
