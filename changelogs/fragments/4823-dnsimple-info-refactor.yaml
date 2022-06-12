@@ -1,0 +1,4 @@
+bugfixes:
+  - dnsimple_info - checking for existing dependency ``requests`` (https://github.com/ansible-collections/community.general/pull/4823).
+minor_changes:
+  - dnsimple_info - minor refactoring (https://github.com/ansible-collections/community.general/pull/4823).
