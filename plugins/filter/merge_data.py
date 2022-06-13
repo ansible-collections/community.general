@@ -276,7 +276,7 @@ from ansible.errors import AnsibleFilterError
 from ansible_collections.community.general.plugins.module_utils.data_merge import DataMerge
 
 
-def merge_data(current, expected, *, state, list_diff_type='value'):
+def merge_data(current, expected, state, list_diff_type='value'):
     # type: (list | dict, list | dict, str, str) -> list | dict
     data_merge = DataMerge(state, list_diff_type)
     try:
