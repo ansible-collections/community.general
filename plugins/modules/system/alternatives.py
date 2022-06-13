@@ -40,9 +40,8 @@ options:
     type: path
   priority:
     description:
-      - The priority of the alternative.
+      - The priority of the alternative. If no priority is given for creation C(50) is used as a fallback.
     type: int
-    default: 50
   state:
     description:
       - C(present) - install the alternative (if not already installed), but do
@@ -171,9 +170,10 @@ class AlternativesModule(object):
         if self.mode_present:
             # Check if we need to (re)install
             subcommands_parameter = self.module.params['subcommands']
+            priority_parameter = self.module.params['priority']
             if (
                 self.path not in self.current_alternatives or
-                self.current_alternatives[self.path].get('priority') != self.priority or
+                (priority_parameter is not None and self.current_alternatives[self.path].get('priority') != priority_parameter) or
                 (subcommands_parameter is not None and (
                     not all(s in subcommands_parameter for s in self.current_alternatives[self.path].get('subcommands')) or
                     not all(s in self.current_alternatives[self.path].get('subcommands') for s in subcommands_parameter)
@@ -273,7 +273,9 @@ class AlternativesModule(object):
 
     @property
     def priority(self):
-        return self.module.params.get('priority')
+        if self.module.params.get('priority') is not None:
+            return self.module.params.get('priority')
+        return self.current_alternatives.get(self.path, {}).get('priority', 50)
 
     @property
     def subcommands(self):
@@ -373,7 +375,7 @@ def main():
             name=dict(type='str', required=True),
             path=dict(type='path', required=True),
             link=dict(type='path'),
-            priority=dict(type='int', default=50),
+            priority=dict(type='int'),
             state=dict(
                 type='str',
                 choices=AlternativeState.to_list(),
