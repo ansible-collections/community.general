@@ -173,7 +173,7 @@ class AlternativesModule(object):
             priority_parameter = self.module.params['priority']
             if (
                 self.path not in self.current_alternatives or
-                (priority_parameter and self.current_alternatives[self.path].get('priority') != priority_parameter) or
+                (priority_parameter is not None and self.current_alternatives[self.path].get('priority') != priority_parameter) or
                 (subcommands_parameter is not None and (
                     not all(s in subcommands_parameter for s in self.current_alternatives[self.path].get('subcommands')) or
                     not all(s in self.current_alternatives[self.path].get('subcommands') for s in subcommands_parameter)
@@ -273,7 +273,9 @@ class AlternativesModule(object):
 
     @property
     def priority(self):
-        return self.module.params.get('priority') or self.current_alternatives.get(self.path, {}).get('priority') or 50
+        if self.module.params.get('priority') is not None:
+            return self.module.params.get('priority')
+        return self.current_alternatives.get(self.path, {}).get('priority', 50)
 
     @property
     def subcommands(self):
