@@ -86,7 +86,7 @@ options:
       - Terraform Lists are Ansible Lists.
       - Terraform Numbers can be Ansible Ints or Floats.
       - Terraform Bool can be Ansible Bools.
-      - B(Note) passwords passed as variables will be visible in the log output. For production usecases consider C(no_log) set to C(true).
+      - "B(Note) passwords passed as variables will be visible in the log output. Make sure to use C(no_log: true) in production!"
     type: dict
     default: {}
   targets:
