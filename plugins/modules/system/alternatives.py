@@ -40,7 +40,7 @@ options:
     type: path
   priority:
     description:
-      - The priority of the alternative. If no priority is given for creation 50 is used as a fallback.
+      - The priority of the alternative. If no priority is given for creation C(50) is used as a fallback.
     type: int
   state:
     description:
