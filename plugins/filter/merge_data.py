@@ -7,9 +7,9 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 name: merge_data
-short_description: Compare one data structure with an other I(expected) and
-                   ensure that these are presents or absents in the result
-                   depending the I(state).
+short_description: Compare one data structure provided in I(_input) with an
+                   other provided in I(expected) and ensure that these data are
+                   presents or absents in the result depending the I(state).
 version_added: 5.2.0
 author: DEMAREST Maxime (@indelog)
 description:
@@ -20,7 +20,7 @@ options:
   _input:
     description:
       - The current data structure that you want to compare with I(expected).
-      - This can be one of a dictionary or a list that can contain them self
+      - This can be one of a dictionary or a list that can contain itself
         other dictionaries and lists.
     type: raw
     required: true
@@ -118,7 +118,7 @@ EXAMPLES = r'''
 #       }
 #   }
 
-- name: Ensure that the expecte data will be absent with lists merged by index.
+- name: Ensure that the expected data will be absent with lists merged by index.
   ansible.builtin.debug:
     msg: "{{ current|community.general.merge_data(expected, state='absent', list_diff_type='index') }}"
   vars:
