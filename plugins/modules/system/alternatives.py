@@ -204,7 +204,7 @@ class AlternativesModule(object):
 
         cmd = [self.UPDATE_ALTERNATIVES, '--install', self.link, self.name, self.path, str(self.priority)]
 
-        if self.subcommands is not None:
+        if self.module.params['subcommands'] is not None:
             subcommands = [['--slave', subcmd['link'], subcmd['name'], subcmd['path']] for subcmd in self.subcommands]
             cmd += [item for sublist in subcommands for item in sublist]
 
