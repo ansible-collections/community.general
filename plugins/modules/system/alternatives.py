@@ -77,6 +77,7 @@ options:
         description:
           - The path to the symbolic link that should point to the real subcommand executable.
         type: path
+        required: true
     version_added: 5.1.0
 requirements: [ update-alternatives ]
 '''
@@ -384,7 +385,7 @@ def main():
             subcommands=dict(type='list', elements='dict', aliases=['slaves'], options=dict(
                 name=dict(type='str', required=True),
                 path=dict(type='path', required=True),
-                link=dict(type='path'),
+                link=dict(type='path', required=True),
             )),
         ),
         supports_check_mode=True,
