@@ -180,8 +180,7 @@ DATA_MERGE_TEST_CASE_LIST = [
         'data_expected': ['A', 'C'],
     },
 ]
-DATA_MERGE_TEST_CASE_LIST_IDS = (item['id']
-                                 for item in DATA_MERGE_TEST_CASE_LIST)
+DATA_MERGE_TEST_CASE_LIST_IDS = [item['id'] for item in DATA_MERGE_TEST_CASE_LIST]
 
 DATA_MERGE_TEST_CASE_DICT = [
     {
@@ -200,8 +199,7 @@ DATA_MERGE_TEST_CASE_DICT = [
         'data_expected': DICT_MODIF,
     },
 ]
-DATA_MERGE_TEST_CASE_DICT_IDS = (item['id']
-                                 for item in DATA_MERGE_TEST_CASE_DICT)
+DATA_MERGE_TEST_CASE_DICT_IDS = [item['id'] for item in DATA_MERGE_TEST_CASE_DICT]
 
 DATA_MERGE_TEST_CASE_MIXED = [
     {
@@ -237,8 +235,7 @@ DATA_MERGE_TEST_CASE_MIXED = [
         'data_expected': ['A', 'Z', 'C'],
     },
 ]
-DATA_MERGE_TEST_CASE_MIXED_IDS = (item['id']
-                                  for item in DATA_MERGE_TEST_CASE_MIXED)
+DATA_MERGE_TEST_CASE_MIXED_IDS = [item['id'] for item in DATA_MERGE_TEST_CASE_MIXED]
 
 
 @pytest.mark.parametrize('testcase',
