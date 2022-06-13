@@ -1742,7 +1742,10 @@ class Nmcli(object):
 
     @staticmethod
     def list_to_string(lst):
-        return ",".join(lst or [""])
+        if lst is None:
+            return None
+        else:
+            return ",".join(lst)
 
     @staticmethod
     def settings_type(setting):
