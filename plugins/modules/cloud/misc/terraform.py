@@ -478,7 +478,7 @@ def main():
         lowlevel_out = []
         for k, v in variables.items():
             if top:
-                if (isinstance(v, dict)):
+                if isinstance(v, dict):
                     variables_args.extend([
                         "-var",
                         k + '={' + process_args(v, False) + '}'
