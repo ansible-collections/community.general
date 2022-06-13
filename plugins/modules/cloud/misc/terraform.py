@@ -82,7 +82,7 @@ options:
     description:
       - A group of key-values to override template variables or those in variables files.
       - Support complex variable structures to reflect terraform variable syntax.
-      - Terraform Objects are mapped to Ansible Dicts.
+      - Terraform objects are mapped to Ansible dictionaries.
       - Terraform Lists are Ansible Lists.
       - Terraform Numbers can be Ansible Ints or Floats.
       - Terraform Bool can be Ansible Bools.
