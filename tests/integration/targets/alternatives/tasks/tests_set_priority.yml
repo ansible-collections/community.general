@@ -40,7 +40,10 @@
     link: /usr/bin/dummy
   register: alternative
 
-- name: check no change was triggerd without priority
+- name: check no change was triggered without priority
   assert:
     that:
       - 'alternative is not changed'
+
+- name: check that alternative priority has not been changed
+  command: "grep -Pzq '/bin/dummy{{ item }}\\n{{ 70 + item|int }}' '{{ alternatives_dir }}/dummy'"
