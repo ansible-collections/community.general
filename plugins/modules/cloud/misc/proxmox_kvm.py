@@ -83,7 +83,7 @@ options:
     version_added: 1.3.0
   clone:
     description:
-      - Name of VM to be cloned. If C(vmid) is setted, C(clone) can take arbitrary value but required for initiating the clone.
+      - Name of VM to be cloned. If I(vmid) is set, I(clone) can take an arbitrary value but is required for initiating the clone.
     type: str
   cores:
     description:
