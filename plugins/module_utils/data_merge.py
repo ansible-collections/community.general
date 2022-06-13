@@ -12,7 +12,12 @@ from copy import deepcopy
 
 class DataMerge(object):
     """
-    Utils for merging list or dict.
+    Utils for merging list or dict with two data set with several type of
+    merging.
+    The two data set are called :
+    - `current` that is you current data,
+    - `expected` that is that you expect to be present, absent or identic in
+      the final result, depending to the `merge_type`.
     """
 
     def __init__(self, merge_type, list_diff_type='value'):
@@ -23,24 +28,24 @@ class DataMerge(object):
     @property
     def merge_type(self):
         """
-        Describe the mean of merging data.
+        Get the way that the data are merged.
         """
         return self._merge_type
 
     @merge_type.setter
     def merge_type(self, value):
         """
-        Set the mean of merging data.
+        Set the way that the data are merged.
         Can be one of :
-        - identic : Ensure that the result is identical to the expected data.
-        - present : Ensure that an element in expected data must be present in
-                    the result.  If an element in expected data as different
-                    value or in not present in the base data, it will be set or
-                    added in the result.
-        - absent  : Ensure that an element is absent in the final result. For
-                    the dict, if a key is present in the current dict and in
-                    the expected dict but has different value, the current
-                    value will be kept in the result.
+        - identic : The result will be same as `expected`` data.
+        - present : If a value of an element is present in both,
+                    `current` and `expected`, that the final value of the
+                    element will be set to same as in `expected`. If an element
+                    is absent in the `current` but present `expected` it will
+                    be added. Others elements remain as they where in `current`.
+        - absent  : If an element share the same key/value pair in `current`
+                    and `expected`, it will not be present in the final result.
+                    Others elements remain as they where in `current`.
         """
         if value not in ['identic', 'present', 'absent']:
             raise ValueError('`merge_type` can be only one of `identic`, `present` or `absent`')
@@ -49,31 +54,28 @@ class DataMerge(object):
     @property
     def list_diff_type(self):
         """
-        Descibe the mean of merging data for a list.
+        Get the way that the list are compared for merging.
         """
         return self._list_diff_type
 
     @list_diff_type.setter
     def list_diff_type(self, value):
         """
-        Descibe the mean of merging data for a list.
-        Can be one of :
-        - value :   Comparing elements in the list by their values. Search if
-                    an element in expect list is present or absent, depending
-                    on the MergType, to the current list.  If it not the case
-                    it will be added of removed. This not check list
-                    recursively, only the first level is checked.
-        - index :   Comparing elements in the list by their index. If
-                    `self.merge_type` is `present`, it will check if the value
-                    of all elements, in the current list as the same value as
-                    the element in the expected list with the same index, and
-                    if it not the case, the value of the element in the
-                    expected list will be set at this index position in the
-                    result list. If `self.merge_type` is `absent`, it will
-                    check if the value of an element in the current list as the
-                    same value as the element with the same index in the
-                    expected list and if it's the case, the element will not be
-                    present in the result.
+        Set the way that lists are compared for merging.
+        They are two :
+        - value : This will search if an element in a list is present or absent
+                  in another. This do no recursive search in lists, only the
+                  firts level is checked (can not compare lists childs of a
+                  list).
+        - index : This compare lists by differentiating the value of their
+                  elements by their index position. In this case it behaves
+                  like as it should differentiate two dict which all keys are
+                  lists index number. This can be used to do recursive search
+                  in lists as long as you can make sure that the values that
+                  you want to compare occupy the same position in the both
+                  lists.  If you need to compare only a specific position in
+                  the list and ignore others who are before, you can set the
+                  value of these elements to `None` in `expected`.
         """
         if value not in ['value', 'index']:
             raise ValueError('`list_diff_type` can be only one of `value` or `index`')
@@ -82,8 +84,8 @@ class DataMerge(object):
     def get_new_merged_data(self, current, expected):
         # type: (dict | list, dict | list) -> dict | list
         """
-        Getting the merge of two element if it can't be sure that they have the
-        same type.
+        Get the result of the merging of the two elements that you can not
+        ensure their type (may be list or dict).
         """
         if not isinstance(current, (dict, list)) or not isinstance(expected, (dict, list)):
             raise ValueError('Only dict or list can be merged, {0} and {1} given.'.format(type(current), type(expected)))
@@ -102,7 +104,7 @@ class DataMerge(object):
     def get_new_merged_dict(self, current, expected):
         # type: (dict, dict) -> dict
         """
-        Getting the merge of two dict depending the `self.list_diff_type`.
+        Get the result of the merging of the two dict.
         """
         if not isinstance(current, dict) or not isinstance(expected, dict):
             raise ValueError('Only two dict can be merged, {0} and {1} given.'.format(type(current), type(expected)))
@@ -127,8 +129,7 @@ class DataMerge(object):
     def get_new_merged_list(self, current, expected):
         # type (list, list) -> list
         """
-        Getting the merge of two list depending the `self.merge_type` and the
-        `self.list_diff_type`.
+        Get the result of the merging of the two list.
         """
         if not isinstance(current, list) or not isinstance(expected, list):
             raise ValueError('Only two list can be merged, {0} and {1} given.'.format(type(current), type(expected)))
