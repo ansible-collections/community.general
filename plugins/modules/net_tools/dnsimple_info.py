@@ -299,10 +299,7 @@ def main():
         supports_check_mode=True,
         required_by={
             'record': 'name',
-        }
-        required_one_of=[
-            ('api_key', 'account_id'),
-        ],
+        },
     )
 
     params = module.params
