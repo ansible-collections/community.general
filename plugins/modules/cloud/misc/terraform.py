@@ -473,7 +473,7 @@ def main():
     if state == 'present' and module.params.get('parallelism') is not None:
         command.append('-parallelism=%d' % module.params.get('parallelism'))
 
-    def process_args(variables, top):
+    def process_args(variables, top=True):
         variables_args = []
         lowlevel_out = []
         for k, v in variables.items():
