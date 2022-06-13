@@ -88,7 +88,6 @@ options:
       - Terraform Bool can be Ansible Bools.
       - "B(Note) passwords passed as variables will be visible in the log output. Make sure to use C(no_log: true) in production!"
     type: dict
-    default: {}
   targets:
     description:
       - A list of specific resources to target in this plan/application. The
