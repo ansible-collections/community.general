@@ -455,6 +455,17 @@ ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
 """
 
+TESTCASE_GENERIC_ZONE_ONLY = [
+    {
+        'type': 'generic',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'generic_non_existant',
+        'state': 'present',
+        'zone': 'public',
+        '_ansible_check_mode': False,
+    }
+]
+
 TESTCASE_BOND = [
     {
         'type': 'bond',
@@ -1886,6 +1897,30 @@ def test_generic_connection_zone_unchanged(mocked_generic_connection_zone_unchan
     results = json.loads(out)
     assert not results.get('failed')
     assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_ZONE_ONLY, indirect=['patch_ansible_module'])
+def test_generic_connection_modify_zone_only(mocked_generic_connection_modify, capfd):
+    """
+    Test : Generic connection modified with zone only
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert 'connection.zone' in args[0]
+    assert 'ipv4.addresses' not in args[0]
+    assert 'ipv4.gateway' not in args[0]
+    assert 'ipv6.addresses' not in args[0]
+    assert 'ipv6.gateway' not in args[0]
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_CONNECTION, indirect=['patch_ansible_module'])
