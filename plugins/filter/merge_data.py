@@ -5,73 +5,29 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 name: merge_data
-short_description: Merge dict or lists by ensuring the comparing datas are
-                   presents, absents or identics.
+short_description: Compare one data structure with an other I(expected) and
+                   ensure that these are presents or absents in the result
+                   depending the I(state).
 version_added: 5.2.0
 author: DEMAREST Maxime (@indelog)
 description:
-  - Merge two datas, current and expected in form of dict or list.
-  - You can have mixed data like dict->list or list->dict. If the two type
-    are different, the expected datas are always returned.
-  - You have 3 type of merging. You can ensure that the expected data
-    will be present or absent to the result or ensure that the result is
-    identical to the expected datas.
-  - For the list, you have two type of diff. You can check if the expected
-    datas are present in a list on the current datas or you can
-    check a value at the specific index of the list.
-positional: expected, state, list_diff_type
+  - Compare data structure provided in I(_input) with data structure provided
+    in I(expected).
+positional: expected
 options:
-  expected:
+  _input:
+    description:
+      - The current data structure that you want to compare with I(expected).
+      - This can be one of a dictionary or a list that can contain them self
+        other dictionaries and lists.
     type: raw
     required: true
-    description:
-      - The datas that you want to diff with the current and you need to
-        ensure that are in corresponding C(state). This can be a C(dict) or
-        a C(list).
-  state:
-    type: string
-    required: true
-    choices:
-      - present
-      - absent
-      - identic
-    description:
-      - If set to C(present), that ensure the expected values are present in
-        the result. If an element of dict is absent from current data but
-        present in expected it will be added in the result and if a dict
-        element is is present in both current and expected, the element value
-        will be set to same as in expected datas.
-      - If set to C(absent), that ensure the expected values are absent in
-        the result. If an element of dict is prensent in expected and
-        current datas but with different value it will not be removed. It
-        only be removed if the element in current and expected data share the
-        same value.
-      - If set to C(identic), that ensure the result is identical to the
-        expected datas.
-  list_diff_type:
-    type: string
-    required: false
-    default: value
-    choices:
-      - value
-      - index
-    description:
-      - This describes how the lists are compared.
-      - If set to C(value), it checks if the expected value is present in the
-        list. With this, you cannot do recursive check, the presence of the
-        expected value is only done on the first level, but you not need to
-        take care of the position of the expected data in the list.
-      - If set to C(index), it checks if the expected value is present a
-        specific index in the Current datas. With this, you can do
-        recursive check, but you need to take care of the position of the
-        expected date in the list. If you need to ignore value a previous
-        position in list index when you only want operate on specific position
-        set the values that you want ignore to C(null) (see examples).
+extends_documentation_fragment: community.general.merge_data
  '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Ensure that the expected data will be present with lists merged by values.
   ansible.builtin.debug:
     msg: "{{ current|community.general.merge_data(expected, state='present') }}"
@@ -191,7 +147,7 @@ EXAMPLES = '''
 #       }
 #   }
 
-- name: Ensure that the result will be identic to the expected datas.
+- name: Ensure that the result will be identic to the expected data.
   ansible.builtin.debug:
     msg: "{{ current|community.general.merge_data(expected, state='identic') }}"
   vars:
@@ -219,7 +175,7 @@ EXAMPLES = '''
 #       "Z": 9
 #   }
 
-- name: With mixed datas current=dict expected=list.
+- name: With mixed data current=dict expected=list.
   ansible.builtin.debug:
     msg: "{{ current|community.general.merge_data(expected, state='present') }}"
   vars:
@@ -247,7 +203,7 @@ EXAMPLES = '''
 #       "Z": 9
 #   }
 
-- name: With mixed datas current=list expected=dict.
+- name: With mixed data current=list expected=dict.
   ansible.builtin.debug:
     msg: "{{ current|community.general.merge_data(expected, state='present') }}"
   vars:
@@ -306,17 +262,21 @@ EXAMPLES = '''
 #   ]
 '''
 
-RETURN = '''
+RETURN = r'''
   _result:
-    description: Merged datas.
-    type: list | dict
+    description:
+      - Data structure with elements of I(expected) merged with compared data
+        according to the I(state).
+      - This can be a list or a dictionary depending that the type of
+        I(expected).
+    type: raw
 '''
 
 from ansible.errors import AnsibleFilterError
 from ansible_collections.community.general.plugins.module_utils.data_merge import DataMerge
 
 
-def merge_data(current, expected, state, list_diff_type='value'):
+def merge_data(current, expected, *, state, list_diff_type='value'):
     # type: (list | dict, list | dict, str, str) -> list | dict
     data_merge = DataMerge(state, list_diff_type)
     try:
