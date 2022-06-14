@@ -261,6 +261,7 @@ import os
 import json
 import tempfile
 from ansible.module_utils.six.moves import shlex_quote
+from ansible.module_utils.six import integer_types
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -491,7 +492,7 @@ def main():
                         "-var",
                         k + '=[' + ",".join(l_out) + ']'
                     ])
-                if ((isinstance(v, int) or isinstance(v, float)) and not isinstance(v, bool)):
+                if (isinstance(v, (integer_types, float)) and not isinstance(v, bool)):
                     variables_args.extend([
                         "-var",
                         '{0}={1}'.format(k, v)
@@ -518,15 +519,8 @@ def main():
                     lowlevel_out.append('%s={%s}' % (k, process_args(v, False)))
                 if (isinstance(v, list)):
                     lowlevel_out.append(k + '=[' + process_args(v, False) + ']')
-                if ((isinstance(v, int) or isinstance(v, float)) and not isinstance(v, bool)):
-                    lowlevel_out.append('{0}={1}'.format(k, v))
-                if (isinstance(v, str)):
-                    lowlevel_out.append('{0}="{1}"'.format(k, v))
-                if (isinstance(v, bool)):
-                    if v:
-                        lowlevel_out.append('{0}=true'.format(k))
-                    else:
-                        lowlevel_out.append('{0}=false'.format(k))
+                if isinstance(v, (integer_types, float, str)):
+                    lowlevel_out.append('{0}={1}'.format(k, json.dumps(v)))
         if top:
             return (variables_args)
         else:
