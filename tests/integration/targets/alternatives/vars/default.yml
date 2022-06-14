@@ -1,2 +1,3 @@
 ---
 alternatives_dir: /var/lib/alternatives/
+alternatives_command: update-alternatives

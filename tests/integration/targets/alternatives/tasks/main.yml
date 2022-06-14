@@ -66,6 +66,8 @@
         state: absent
       with_items:
         - '{{ alternatives_dir }}/dummy'
+        - '{{ alternatives_dir }}/dummymain'
+        - '{{ alternatives_dir }}/dummysubcmd'
 
     - file:
         path: '/usr/bin/dummy{{ item }}'
