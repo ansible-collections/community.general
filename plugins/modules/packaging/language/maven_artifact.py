@@ -152,13 +152,14 @@ options:
         version_added: 3.2.0
     unredirected_headers:
         type: list
-        default: []
+        default: ['Authorization', 'Cookie']
         elements: str
         version_added: 5.2.0
         description:
             A list of headers that should not be included in the redirection. This headers are sent to the fetch_url
             ``fetch_url`` function.
             Useful if the redirection URL does not need to have sensitive headers in the request.
+            Only used if the fetch_url function supports it. Otherwise, this field will be ignored.
     directory_mode:
         type: str
         description:
@@ -240,6 +241,7 @@ import traceback
 import re
 
 from ansible.module_utils.ansible_release import __version__ as ansible_version
+from pkg_resources import parse_version
 from re import match
 
 LXML_ETREE_IMP_ERR = None
@@ -518,13 +520,21 @@ class MavenDownloader:
         self.module.params['url_password'] = self.module.params.get('password', '')
         self.module.params['http_agent'] = self.user_agent
 
-        response, info = fetch_url(
-            self.module,
-            url_to_use,
-            timeout=req_timeout,
-            headers=self.headers,
-            unredirected_headers=self.module.params.get('unredirected_headers', [])
-        )
+        if parse_version(ansible_version) <= parse_version("2.11.*"):
+            response, info = fetch_url(
+                self.module,
+                url_to_use,
+                timeout=req_timeout,
+                headers=self.headers
+            )
+        else:
+            response, info = fetch_url(
+                self.module,
+                url_to_use,
+                timeout=req_timeout,
+                headers=self.headers,
+                unredirected_headers=self.module.params['unredirected_headers']
+            )
         if info['status'] == 200:
             return response
         if force:
@@ -629,7 +639,7 @@ def main():
             keep_name=dict(required=False, default=False, type='bool'),
             verify_checksum=dict(required=False, default='download', choices=['never', 'download', 'change', 'always']),
             checksum_alg=dict(required=False, default='md5', choices=['md5', 'sha1']),
-            unredirected_headers=dict(type='list', elements='str', required=False, default=[]),
+            unredirected_headers=dict(type='list', elements='str', required=False, default=['Authorization', 'Cookie']),
             directory_mode=dict(type='str'),
         ),
         add_file_common_args=True,
