@@ -515,7 +515,7 @@ def main():
 
             else:
                 if (isinstance(v, dict)):
-                    lowlevel_out.append(k + '={' + process_args(v, False) + '}')
+                    lowlevel_out.append('%s={%s}' % (k, process_args(v, False)))
                 if (isinstance(v, list)):
                     lowlevel_out.append(k + '=[' + process_args(v, False) + ']')
                 if ((isinstance(v, int) or isinstance(v, float)) and not isinstance(v, bool)):
