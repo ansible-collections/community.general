@@ -77,6 +77,7 @@ options:
         description:
           - The path to the symbolic link that should point to the real subcommand executable.
         type: path
+        required: true
     version_added: 5.1.0
 requirements: [ update-alternatives ]
 '''
@@ -204,7 +205,7 @@ class AlternativesModule(object):
 
         cmd = [self.UPDATE_ALTERNATIVES, '--install', self.link, self.name, self.path, str(self.priority)]
 
-        if self.subcommands is not None:
+        if self.module.params['subcommands'] is not None:
             subcommands = [['--slave', subcmd['link'], subcmd['name'], subcmd['path']] for subcmd in self.subcommands]
             cmd += [item for sublist in subcommands for item in sublist]
 
@@ -384,7 +385,7 @@ def main():
             subcommands=dict(type='list', elements='dict', aliases=['slaves'], options=dict(
                 name=dict(type='str', required=True),
                 path=dict(type='path', required=True),
-                link=dict(type='path'),
+                link=dict(type='path', required=True),
             )),
         ),
         supports_check_mode=True,
