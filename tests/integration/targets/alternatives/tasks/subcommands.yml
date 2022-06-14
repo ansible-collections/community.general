@@ -32,6 +32,15 @@
     that:
       - cmd.stdout == "dummy2"
 
+- name: Get dummymain alternatives output
+  command:
+    argv: '{{ alternatives_command }} --display dummymain'
+  register: result
+
+- name: Print result
+  debug:
+    var: result.stdout_lines
+
 - name: Subcommands are not removed if not specified
   alternatives:
     name: dummymain
@@ -76,3 +85,12 @@
     that:
       - cmd.rc == 2
       - '"No such file" in cmd.msg'
+
+- name: Get dummymain alternatives output
+  command:
+    argv: '{{ alternatives_command }} --display dummymain'
+  register: result
+
+- name: Print result
+  debug:
+    var: result.stdout_lines
