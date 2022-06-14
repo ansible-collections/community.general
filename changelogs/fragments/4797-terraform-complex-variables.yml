@@ -1,0 +1,2 @@
+minor_changes:
+  - terrform - adds capability to handle complex variable structures for ``variables`` parameter in the module. 
