@@ -9,6 +9,10 @@ PATH="${PWD}/bin:${PATH}"
 
 mkdir "${agent_temp_directory}/coverage/"
 
+if [[ "$(ansible --version)" =~ \ 2\.9\. ]]; then
+    exit
+fi
+
 options=(--venv --venv-system-site-packages --color -v)
 
 ansible-test coverage combine --group-by command --export "${agent_temp_directory}/coverage/" "${options[@]}"

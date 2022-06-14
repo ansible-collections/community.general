@@ -5,6 +5,10 @@ set -o pipefail -eu
 
 PATH="${PWD}/bin:${PATH}"
 
+if [[ "$(ansible --version)" =~ \ 2\.9\. ]]; then
+    exit
+fi
+
 if ! ansible-test --help >/dev/null 2>&1; then
     # Install the devel version of ansible-test for generating code coverage reports.
     # This is only used by Ansible Collections, which are typically tested against multiple Ansible versions (in separate jobs).
