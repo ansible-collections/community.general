@@ -468,7 +468,7 @@ class Rhsm(RegistrationBase):
             items = ["--all"]
 
         if items:
-            args = [SUBMAN_CMD, 'unsubscribe'] + items
+            args = [SUBMAN_CMD, 'remove'] + items
             rc, stderr, stdout = self.module.run_command(args, check_rc=True)
         return serials
 
