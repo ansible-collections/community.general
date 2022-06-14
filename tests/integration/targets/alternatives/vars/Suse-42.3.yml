@@ -1,3 +1,2 @@
 ---
 alternatives_dir: /var/lib/rpm/alternatives/
-alternatives_command: update-alternatives
