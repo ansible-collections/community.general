@@ -206,6 +206,7 @@
   ansible.builtin.assert:
     that:
       - edge_case_1 is failed
+      - "'Failed to validate sudoers rule' in edge_case_1.msg"
       - edge_case_2 is not failed
       - edge_case_3 is failed
-      - edge_case_3.msg.starts_with('Failed to validate sudoers rule:')
+      - "'Failed to find required executable' in edge_case_3.msg"
