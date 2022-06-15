@@ -19,6 +19,44 @@
     - "~/.gnupg"
     - "~/.password-store"
 
+- name: Get path of pass executable
+  command: which pass
+  register: result
+
+- name: Store path of pass executable
+  set_fact:
+     passpath: "{{ result.stdout }}"
+
+- name: Move original pass into place if there was a leftover
+  command:
+    argv:
+      - mv
+      - "{{ passpath }}.testorig"
+      - "{{ passpath }}"
+  args:
+    removes: "{{ passpath }}.testorig"
+
+# having gopass is not required for this test, but we store
+# its path in case it is installed, so we can restore it
+- name: Try to find gopass in path
+  command: which gopass
+  register: result
+  ignore_errors: yes
+
+- name: Store path of gopass executable
+  set_fact:
+     gopasspath: "{{ (result.rc == 0) |
+       ternary(result.stdout, (passpath | dirname, 'gopass') | path_join) }}"
+
+- name: Move original gopass into place if there was a leftover
+  command:
+    argv:
+      - mv
+      - "{{ gopasspath }}.testorig"
+      - "{{ gopasspath }}"
+  args:
+    removes: "{{ gopasspath }}.testorig"
+
 # How to generate a new GPG key:
 #   gpg2 --batch --gen-key input  # See templates/input
 #   gpg2 --list-secret-keys --keyid-format LONG
@@ -151,3 +189,163 @@
   assert:
     that:
       - readyamlpass == 'testpassword\nrandom additional line'
+
+- name: Create a password in a folder
+  set_fact:
+    newpass: "{{ lookup('community.general.passwordstore', 'folder/test-pass length=8 create=yes') }}"
+
+- name: Fetch password from folder
+  set_fact:
+    readpass: "{{ lookup('community.general.passwordstore', 'folder/test-pass') }}"
+
+- name: Verify password from folder
+  assert:
+    that:
+      - readpass == newpass
+
+- name: Try to read folder as passname
+  set_fact:
+    newpass: "{{ lookup('community.general.passwordstore', 'folder') }}"
+  ignore_errors: true
+  register: eval_error
+
+- name: Make sure reading folder as passname failed
+  assert:
+    that:
+      - eval_error is failed
+      - '"passname folder not found" in eval_error.msg'
+
+- name: Change passwordstore location explicitly
+  set_fact:
+    passwordstore: "{{ lookup('env','HOME') }}/.password-store"
+
+- name: Make sure password store still works with explicit location set
+  set_fact:
+    newpass: "{{ lookup('community.general.passwordstore', 'test-pass') }}"
+
+- name: Change passwordstore location to a non-existent place
+  set_fact:
+    passwordstore: "somenonexistentplace"
+
+- name: Try reading from non-existent passwordstore location
+  set_fact:
+    newpass: "{{ lookup('community.general.passwordstore', 'test-pass') }}"
+  ignore_errors: true
+  register: eval_error
+
+- name: Make sure reading from non-existent passwordstore location failed
+  assert:
+    that:
+      - eval_error is failed
+      - >-
+        "Passwordstore directory 'somenonexistentplace' does not exist" in eval_error.msg
+
+- name: Test pass compatibility shim detection
+  block:
+  - name: Move original pass out of the way
+    command:
+      argv:
+        - mv
+        - "{{ passpath }}"
+        - "{{ passpath }}.testorig"
+    args:
+      creates: "{{ passpath }}.testorig"
+
+  - name: Create dummy pass script
+    ansible.builtin.copy:
+      content: |
+        #!/bin/sh
+        echo "shim_ok"
+      dest: "{{ passpath }}"
+      mode: '0755'
+
+  - name: Try reading from non-existent passwordstore location with different pass utility
+    set_fact:
+      newpass: "{{ lookup('community.general.passwordstore', 'test-pass') }}"
+    environment:
+      PATH: "/tmp"
+
+  - name: Verify password received from shim
+    assert:
+      that:
+        - newpass == "shim_ok"
+
+  - name: Try to read folder as passname with a different pass utility
+    set_fact:
+      newpass: "{{ lookup('community.general.passwordstore', 'folder') }}"
+
+  - name: Verify password received from shim
+    assert:
+      that:
+        - newpass == "shim_ok"
+
+  always:
+  - name: Move original pass back into place
+    command:
+      argv:
+        - mv
+        - "{{ passpath }}.testorig"
+        - "{{ passpath }}"
+    args:
+      removes: "{{ passpath }}.testorig"
+
+- name: Very basic gopass compatibility test
+  vars:
+    passwordstore_backend: "gopass"
+  block:
+  - name: check if gopass executable exists
+    stat:
+      path: "{{ gopasspath }}"
+    register: gopass_check
+
+  - name: Move original gopass out of the way
+    command:
+      argv:
+        - mv
+        - "{{ gopasspath }}"
+        - "{{ gopasspath }}.testorig"
+    args:
+      creates: "{{ gopasspath }}.testorig"
+    when: gopass_check.stat.exists == true
+
+  - name: Create mocked gopass script
+    ansible.builtin.copy:
+      content: |
+        #!/bin/sh
+        if [ "$GOPASS_NO_REMINDER" != "YES" ]; then
+          exit 1
+        fi
+        if [ "$1" = "--version" ]; then
+          exit 2
+        fi
+        if [ "$1" = "show" ] && [ "$2" != "--password" ]; then
+          exit 3
+        fi
+        echo "gopass_ok"
+      dest: "{{ gopasspath }}"
+      mode: '0755'
+
+  - name: Try to read folder as passname using gopass
+    set_fact:
+      newpass: "{{ lookup('community.general.passwordstore', 'folder') }}"
+
+  - name: Verify password received from gopass
+    assert:
+      that:
+        - newpass == "gopass_ok"
+
+  always:
+  - name: Remove mocked gopass
+    ansible.builtin.file:
+      path: "{{ gopasspath }}"
+      state: absent
+
+  - name: Move original gopass back into place
+    command:
+      argv:
+        - mv
+        - "{{ gopasspath }}.testorig"
+        - "{{ gopasspath }}"
+    args:
+      removes: "{{ gopasspath }}.testorig"
+    when: gopass_check.stat.exists == true
