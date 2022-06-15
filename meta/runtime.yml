@@ -1357,6 +1357,8 @@ plugin_routing:
       redirect: community.general.notification.say
     scaleway_compute:
       redirect: community.general.cloud.scaleway.scaleway_compute
+    scaleway_compute_private_network:
+      redirect: community.general.cloud.scaleway.scaleway_compute_private_network
     scaleway_database_backup:
       redirect: community.general.cloud.scaleway.scaleway_database_backup
     scaleway_image_facts:

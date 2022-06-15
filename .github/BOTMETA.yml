@@ -440,6 +440,8 @@ files:
     maintainers: claco
   $modules/cloud/scaleway/:
     maintainers: $team_scaleway
+  $modules/cloud/scaleway/scaleway_compute_private_network.py:
+    maintainers: pastral
   $modules/cloud/scaleway/scaleway_database_backup.py:
     maintainers: guillaume_ro_fr
   $modules/cloud/scaleway/scaleway_image_info.py:
