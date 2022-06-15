@@ -154,6 +154,7 @@
     user: alice
     commands: systemctl
     validation: absent
+    sudoers_path: "{{ alt_sudoers_path }}"
   register: edge_case_2
 
 - name: find visudo
