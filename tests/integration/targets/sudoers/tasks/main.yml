@@ -159,18 +159,12 @@
 - name: find visudo
   command:
     cmd: which visudo
-  ignore_errors: true
   register: which_visudo
 
-- name: Check that visudo was found
-  ansible.builtin.assert:
-    that:
-      - which_visudo.rc == 0
-
-- name: Remove visudo
+- name: Prevent visudo being executed
   file:
     path: "{{ which_visudo.stdout }}"
-    state: absent
+    mode: '-x'
 
 - name: Attempt command without full path to executable, but enforcing validation with no visudo present
   community.general.sudoers:
