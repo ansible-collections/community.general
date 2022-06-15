@@ -1,2 +1,4 @@
 bugfixes:
   - "Include ``PSF-license.txt`` file for ``plugins/module_utils/_mount.py``."
+minor_changes:
+  - "Move all additional licenses to ``licenses/``. Only ``COPYING`` (GPLv3) stays in the collection root."
