@@ -73,6 +73,7 @@ options:
     type: str
     default: detect
     choices: [ absent, detect, required ]
+    version_added: 5.2.0
 '''
 
 EXAMPLES = '''
