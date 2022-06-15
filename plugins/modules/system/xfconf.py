@@ -209,11 +209,11 @@ class XFConfProperty(StateModuleHelper):
         return result
 
     def _get(self):
-        with self.runner.context('channel property', output_process=self.process_command_output) as ctx:
+        with self.runner('channel property', output_process=self.process_command_output) as ctx:
             return ctx.run()
 
     def state_absent(self):
-        with self.runner.context('channel property reset', check_mode_skip=True) as ctx:
+        with self.runner('channel property reset', check_mode_skip=True) as ctx:
             ctx.run(reset=True)
         self.vars.value = None
 
@@ -239,7 +239,7 @@ class XFConfProperty(StateModuleHelper):
             isinstance(self.vars.previous_value, list) or \
             values_len > 1
 
-        with self.runner.context('channel property create force_array values_and_types', check_mode_skip=True) as ctx:
+        with self.runner('channel property create force_array values_and_types', check_mode_skip=True) as ctx:
             ctx.run(create=True, force_array=self.vars.is_array, values_and_types=(self.vars.value, value_type))
 
         if not self.vars.is_array:

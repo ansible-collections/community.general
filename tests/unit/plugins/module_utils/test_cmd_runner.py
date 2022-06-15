@@ -246,7 +246,7 @@ TC_RUNNER_IDS = sorted(TC_RUNNER.keys())
 @pytest.mark.parametrize('runner_input, cmd_execution, expected',
                          (TC_RUNNER[tc] for tc in TC_RUNNER_IDS),
                          ids=TC_RUNNER_IDS)
-def test_runner(runner_input, cmd_execution, expected):
+def test_runner_context(runner_input, cmd_execution, expected):
     arg_spec = {}
     params = {}
     arg_formats = {}
@@ -302,5 +302,68 @@ def test_runner(runner_input, cmd_execution, expected):
 
     else:
         with runner.context(**runner_input['runner_ctx_args']) as ctx:
+            results = ctx.run(**cmd_execution['runner_ctx_run_args'])
+            _assert_run(runner_input, cmd_execution, expected, ctx, results)
+
+
+@pytest.mark.parametrize('runner_input, cmd_execution, expected',
+                         (TC_RUNNER[tc] for tc in TC_RUNNER_IDS),
+                         ids=TC_RUNNER_IDS)
+def test_runner_callable(runner_input, cmd_execution, expected):
+    arg_spec = {}
+    params = {}
+    arg_formats = {}
+    for k, v in runner_input['args_bundle'].items():
+        try:
+            arg_spec[k] = {'type': v['type']}
+        except KeyError:
+            pass
+        try:
+            params[k] = v['value']
+        except KeyError:
+            pass
+        try:
+            arg_formats[k] = v['fmt_func'](v['fmt_arg'])
+        except KeyError:
+            pass
+
+    orig_results = tuple(cmd_execution[x] for x in ('rc', 'out', 'err'))
+
+    print("arg_spec={0}\nparams={1}\narg_formats={2}\n".format(
+        arg_spec,
+        params,
+        arg_formats,
+    ))
+
+    module = MagicMock()
+    type(module).argument_spec = PropertyMock(return_value=arg_spec)
+    type(module).params = PropertyMock(return_value=params)
+    module.get_bin_path.return_value = '/mock/bin/testing'
+    module.run_command.return_value = orig_results
+
+    runner = CmdRunner(
+        module=module,
+        command="testing",
+        arg_formats=arg_formats,
+        **runner_input['runner_init_args']
+    )
+
+    def _assert_run_info(actual, expected):
+        reduced = dict((k, actual[k]) for k in expected.keys())
+        assert reduced == expected, "{0}".format(reduced)
+
+    def _assert_run(runner_input, cmd_execution, expected, ctx, results):
+        _assert_run_info(ctx.run_info, expected['run_info'])
+        assert results == expected.get('results', orig_results)
+
+    exc = expected.get("exc")
+    if exc:
+        with pytest.raises(exc):
+            with runner(**runner_input['runner_ctx_args']) as ctx:
+                results = ctx.run(**cmd_execution['runner_ctx_run_args'])
+                _assert_run(runner_input, cmd_execution, expected, ctx, results)
+
+    else:
+        with runner(**runner_input['runner_ctx_args']) as ctx:
             results = ctx.run(**cmd_execution['runner_ctx_run_args'])
             _assert_run(runner_input, cmd_execution, expected, ctx, results)
