@@ -459,7 +459,7 @@ class KeycloakAPI(object):
             self.module.fail_json(msg="Could not fetch rolemappings for client %s in realm %s: %s"
                                       % (cid, realm, str(e)))
 
-    def get_client_role_id_by_name(self, cid, name, realm="master"):
+    def get_client_role_by_name(self, cid, name, realm="master"):
         """ Get the role ID of a client.
 
         :param cid: ID of the client from which to obtain the rolemappings.
