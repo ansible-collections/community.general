@@ -297,12 +297,12 @@ def main():
                 if role_id is not None:
                     role['id'] = role_id
                 else:
-                    module.fail_json(msg='Could not fetch role %s:' % (role['name']))
+                    module.fail_json(msg='Could not fetch role %s for client_id %s' % (role['name'], client_id))
             # Fetch missing role_name
             else:
                 role['name'] = kc.get_client_user_rolemapping_by_id(uid, cid, role['id'], realm=realm)['name']
                 if role['name'] is None:
-                    module.fail_json(msg='Could not fetch role %s' % (role['id']))
+                    module.fail_json(msg='Could not fetch role %s for client_id %s' % (role['id'], client_id))
 
     # Get effective client-level role mappings
     available_roles_before = kc.get_client_user_available_rolemappings(uid, cid, realm=realm)
