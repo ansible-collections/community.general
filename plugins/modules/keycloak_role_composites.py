@@ -214,7 +214,7 @@ def main():
     meta_args = dict(
         state=dict(default='present', choices=['present', 'absent']),
         realm=dict(default='master'),
-        composite_role=dict(type='dict'),
+        composite_role=dict(type='dict', options=roles_spec),
         client_id=dict(type='str'),
         cid=dict(type='str'),
         role_client_id=dict(type='str'),
