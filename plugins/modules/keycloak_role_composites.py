@@ -265,47 +265,47 @@ def main():
         if role_cid is None:
             module.fail_json(msg='Could not fetch role client %s:' % role_client_id)
 
-    if composite_role['name'] is None and composite_role['id'] is None:
+    if composite_role.get('name') is None and composite_role.get('id') is None:
         module.fail_json(msg='Either the `name` or `id` has to be specified on composite_role.')
 
     # Fetch missing role_id
-    if composite_role['id'] is None:
-        composite_role_id = kc.get_client_role_by_name(cid, composite_role['name'], realm=realm)
+    if composite_role.get('id') is None:
+        composite_role_id = kc.get_client_role_by_name(cid, composite_role.get('name'), realm=realm)
         if composite_role_id is not None:
             composite_role['id'] = composite_role_id
         else:
-            module.fail_json(msg='Could not fetch role %s for client_id %s' % (composite_role['name'], client_id))
+            module.fail_json(msg='Could not fetch role %s for client_id %s' % (composite_role.get('name'), client_id))
     # Fetch missing role_name
     else:
-        composite_role['name'] = kc.get_role_by_id(composite_role['id'], realm=realm)['name']
-        if composite_role['name'] is None:
-            module.fail_json(msg='Could not fetch role for id %s' % (composite_role['id']))
+        composite_role['name'] = kc.get_role_by_id(composite_role.get('id'), realm=realm).get('name')
+        if composite_role.get('name') is None:
+            module.fail_json(msg='Could not fetch role for id %s' % (composite_role.get('id')))
 
     if roles is None:
         module.exit_json(msg="Nothing to do (no roles specified).")
     else:
         for role_index, role in enumerate(roles, start=0):
-            if role['name'] is None and role['id'] is None:
+            if role.get('name') is None and role.get('id') is None:
                 module.fail_json(msg='Either the `name` or `id` has to be specified on each role.')
             # Fetch missing role_id
-            if role['id'] is None:
+            if role.get('id') is None:
                 if role_cid is None:
-                    role_id = kc.get_realm_role(role['name'], realm=realm)
+                    role_id = kc.get_realm_role(role.get('name'), realm=realm)
                 else:
-                    role_id = kc.get_client_role_by_name(role_cid, role['name'], realm=realm)
+                    role_id = kc.get_client_role_by_name(role_cid, role.get('name'), realm=realm)
                 if role_id is not None:
                     role['id'] = role_id
                 else:
-                    module.fail_json(msg='Could not fetch role %s for client_id %s' % (role['name'], role_client_id))
+                    module.fail_json(msg='Could not fetch role %s for client_id %s' % (role.get('name'), role_client_id))
             # Fetch missing role_name
             else:
-                role['name'] = kc.get_role_by_id(role['id'], realm=realm)['name']
-                if role['name'] is None:
-                    module.fail_json(msg='Could not fetch role for id %s' % (role['id']))
+                role['name'] = kc.get_role_by_id(role.get('id'), realm=realm)['name']
+                if role.get('name') is None:
+                    module.fail_json(msg='Could not fetch role for id %s' % (role.get('id')))
 
     # Get effective client-level role mappings
     available_roles_before = kc.get_client_roles_by_id(role_cid, realm=realm)
-    assigned_roles_before = kc.get_client_roles_by_id_composite_rolemappings(rid=composite_role['id'], cid=role_cid, realm=realm)
+    assigned_roles_before = kc.get_client_roles_by_id_composite_rolemappings(rid=composite_role.get('id'), cid=role_cid, realm=realm)
 
     result['existing'] = assigned_roles_before
     result['proposed'] = roles
@@ -315,18 +315,18 @@ def main():
         # Fetch roles to assign if state present
         if state == 'present':
             for available_role in available_roles_before:
-                if role['name'] == available_role['name']:
+                if role['name'] == available_role.get('name'):
                     update_roles.append({
-                        'id': role['id'],
-                        'name': role['name'],
+                        'id': role.get('id'),
+                        'name': role.get('name'),
                     })
         # Fetch roles to remove if state absent
         else:
             for assigned_role in assigned_roles_before:
-                if role['name'] == assigned_role['name']:
+                if role['name'] == assigned_role.get('name'):
                     update_roles.append({
-                        'id': role['id'],
-                        'name': role['name'],
+                        'id': role.get('id'),
+                        'name': role.get('name'),
                     })
 
     if len(update_roles):
@@ -337,7 +337,7 @@ def main():
                 result['diff'] = dict(before=assigned_roles_before, after=update_roles)
             if module.check_mode:
                 module.exit_json(**result)
-            kc.add_client_roles_by_id_composite_rolemapping(composite_role['id'], update_roles, realm=realm)
+            kc.add_client_roles_by_id_composite_rolemapping(composite_role.get('id'), update_roles, realm=realm)
             result['msg'] = 'Roles %s assigned to user for username %s.' % (update_roles, username)
             assigned_roles_after = kc.get_client_user_composite_rolemappings(uid, cid, realm=realm)
             result['end_state'] = assigned_roles_after
@@ -351,13 +351,13 @@ def main():
                 module.exit_json(**result)
             kc.delete_user_rolemapping(uid, cid, update_roles, realm=realm)
             result['msg'] = 'Roles %s removed from user for username %s.' % (update_roles, username)
-            assigned_roles_after = kc.get_client_roles_by_id_composite_rolemappings(rid=composite_role['id'], cid=role_cid, realm=realm)
+            assigned_roles_after = kc.get_client_roles_by_id_composite_rolemappings(rid=composite_role.get('id'), cid=role_cid, realm=realm)
             result['end_state'] = assigned_roles_after
             module.exit_json(**result)
     # Do nothing
     else:
         result['changed'] = False
-        result['msg'] = 'Nothing to do, roles %s are correctly mapped to composite role %s.' % (roles, composite_role['name'])
+        result['msg'] = 'Nothing to do, roles %s are correctly mapped to composite role %s.' % (roles, composite_role.get('name'))
         module.exit_json(**result)
 
 
