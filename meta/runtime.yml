@@ -1679,6 +1679,13 @@ plugin_routing:
         warning_text: You are using an internal name to access the community.general.keycloak_role
           modules. This has never been supported or documented, and will stop working
           in community.general 9.0.0.
+    identity.keycloak.keycloak_role_composites:
+      redirect: community.general.keycloak_role_composites
+      deprecation:
+        removal_version: 9.0.0
+        warning_text: You are using an internal name to access the community.general.keycloak_role_composites
+          modules. This has never been supported or documented, and will stop working
+          in community.general 9.0.0.
     identity.keycloak.keycloak_user_federation:
       redirect: community.general.keycloak_user_federation
       deprecation:
