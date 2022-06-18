@@ -71,7 +71,6 @@ DOCUMENTATION = '''
         alter the prompt behaviour to ask directly for the user credentials, if the user is allowed to perform the
         action (take a look at the examples section). If such a rule is not present the plugin only work if it is used
         in context with the root user, because then no further prompt will be shown by machinectl.
-)
 '''
 
 EXAMPLES = r'''
