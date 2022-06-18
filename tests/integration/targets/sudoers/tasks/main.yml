@@ -179,4 +179,4 @@
   ansible.builtin.assert:
     that:
       - not revoke_rule_1_stat.stat.exists
-      - non revoke_non_existing_rule_stat.stat.exists
+      - not revoke_non_existing_rule_stat.stat.exists
