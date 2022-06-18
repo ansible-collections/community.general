@@ -67,20 +67,26 @@ DOCUMENTATION = '''
               - section: machinectl_become_plugin
                 key: password
     notes:
-      - This plugin requires a polkit rule which will alter the behaviour of machinectl to ask directly for the user
-        credentials if the user is allowed to perform the action
-      - >
-        An example for such a polkit role would be C(
-        polkit.addRule(function(action, subject) {
-          if(action.id == "org.freedesktop.machine1.host-shell" && subject.isInGroup("wheel")) {
-              return polkit.Result.AUTH_SELF_KEEP;
-          }
-        });)
+      - This plugin only works correctly with a polkit rule which will alter the behaviour of machinectl. This rule must
+        alter the prompt behaviour to ask directly for the user credentials, if the user is allowed to perform the
+        action (take a look at the examples section). If such a rule is not present the plugin only work if it is used
+        in context with the root user, because then no further prompt will be shown by machinectl.
+)
+'''
+
+EXAMPLES = r'''
+60-machinectl-fast-user-auth.rules: |
+    polkit.addRule(function(action, subject) {
+        if(action.id == "org.freedesktop.machine1.host-shell" && subject.isInGroup("wheel")) {
+            return polkit.Result.AUTH_SELF_KEEP;
+        }
+    });
 '''
 
 from re import compile as re_compile
 
 from ansible.plugins.become import BecomeBase
+from ansible.module_utils._text import to_bytes
 
 
 class BecomeModule(BecomeBase):
@@ -94,7 +100,7 @@ class BecomeModule(BecomeBase):
     @staticmethod
     def remove_ansi_codes(line):
         # taken from https://stackoverflow.com/a/38662876/9531111
-        ansi_escape = re_compile(rb'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
+        ansi_escape = re_compile(to_bytes(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]'))
         return ansi_escape.sub(b"", line)
 
     def build_become_command(self, cmd, shell):
