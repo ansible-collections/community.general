@@ -62,6 +62,7 @@ options:
     description:
       - Determine if developers can create projects in the group.
     choices: ["developer", "maintainer", "noone"]
+    default: "maintainer"
     type: str
     version_added: 3.7.0
   auto_devops_enabled:
@@ -73,6 +74,7 @@ options:
     description:
       - Allowed to create subgroups.
     choices: ["maintainer", "owner"]
+    default: "maintainer"
     type: str
     version_added: 3.7.0
   require_two_factor_authentication:
@@ -314,9 +316,9 @@ def main():
         state=dict(type='str', default="present", choices=["absent", "present"]),
         parent=dict(type='str'),
         visibility=dict(type='str', default="private", choices=["internal", "private", "public"]),
-        project_creation_level=dict(type='str', choices=['developer', 'maintainer', 'noone']),
+        project_creation_level=dict(type='str', default='maintainer', choices=['developer', 'maintainer', 'noone']),
         auto_devops_enabled=dict(type='bool'),
-        subgroup_creation_level=dict(type='str', choices=['maintainer', 'owner']),
+        subgroup_creation_level=dict(type='str', default='maintainer', choices=['maintainer', 'owner']),
         require_two_factor_authentication=dict(type='bool'),
         avatar_path=dict(type='path'),
     ))
