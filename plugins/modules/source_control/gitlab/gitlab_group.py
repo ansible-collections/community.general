@@ -62,7 +62,6 @@ options:
     description:
       - Determine if developers can create projects in the group.
     choices: ["developer", "maintainer", "noone"]
-    default: "maintainer"
     type: str
     version_added: 3.7.0
   auto_devops_enabled:
@@ -74,7 +73,6 @@ options:
     description:
       - Allowed to create subgroups.
     choices: ["maintainer", "owner"]
-    default: "maintainer"
     type: str
     version_added: 3.7.0
   require_two_factor_authentication:
@@ -199,23 +197,27 @@ class GitLabGroup(object):
     def create_or_update_group(self, name, parent, options):
         changed = False
 
+        # Same payload for update or create, only parent_id is needed on creation
+        payload = {
+            'name': name,
+            'path': options['path'],
+            'visibility': options['visibility'],
+            'project_creation_level': options['project_creation_level'],
+            'auto_devops_enabled': options['auto_devops_enabled'],
+        }
+        if options.get('project_creation_level'):
+            payload['project_creation_level'] = options['project_creation_level']
+        if options.get('subgroup_creation_level'):
+            payload['subgroup_creation_level'] = options['subgroup_creation_level']
+        if options.get('description'):
+            payload['description'] = options['description']
+        if options.get('require_two_factor_authentication'):
+            payload['require_two_factor_authentication'] = options['require_two_factor_authentication']
+
         # Because we have already call userExists in main()
         if self.group_object is None:
             parent_id = self.get_group_id(parent)
-
-            payload = {
-                'name': name,
-                'path': options['path'],
-                'parent_id': parent_id,
-                'visibility': options['visibility'],
-                'project_creation_level': options['project_creation_level'],
-                'auto_devops_enabled': options['auto_devops_enabled'],
-                'subgroup_creation_level': options['subgroup_creation_level'],
-            }
-            if options.get('description'):
-                payload['description'] = options['description']
-            if options.get('require_two_factor_authentication'):
-                payload['require_two_factor_authentication'] = options['require_two_factor_authentication']
+            payload['parent_id'] = parent_id
             group = self.create_group(payload)
 
             # add avatar to group
@@ -226,15 +228,7 @@ class GitLabGroup(object):
                     self._module.fail_json(msg='Cannot open {0}: {1}'.format(options['avatar_path'], e))
             changed = True
         else:
-            changed, group = self.update_group(self.group_object, {
-                'name': name,
-                'description': options['description'],
-                'visibility': options['visibility'],
-                'project_creation_level': options['project_creation_level'],
-                'auto_devops_enabled': options['auto_devops_enabled'],
-                'subgroup_creation_level': options['subgroup_creation_level'],
-                'require_two_factor_authentication': options['require_two_factor_authentication'],
-            })
+            changed, group = self.update_group(self.group_object, payload)
 
         self.group_object = group
         if changed:
@@ -248,6 +242,7 @@ class GitLabGroup(object):
             return True
         else:
             return False
+
 
     '''
     @param arguments Attributes of the group
@@ -316,9 +311,9 @@ def main():
         state=dict(type='str', default="present", choices=["absent", "present"]),
         parent=dict(type='str'),
         visibility=dict(type='str', default="private", choices=["internal", "private", "public"]),
-        project_creation_level=dict(type='str', default='maintainer', choices=['developer', 'maintainer', 'noone']),
+        project_creation_level=dict(type='str', choices=['developer', 'maintainer', 'noone']),
         auto_devops_enabled=dict(type='bool'),
-        subgroup_creation_level=dict(type='str', default='maintainer', choices=['maintainer', 'owner']),
+        subgroup_creation_level=dict(type='str', choices=['maintainer', 'owner']),
         require_two_factor_authentication=dict(type='bool'),
         avatar_path=dict(type='path'),
     ))
