@@ -243,7 +243,6 @@ class GitLabGroup(object):
         else:
             return False
 
-
     '''
     @param arguments Attributes of the group
     '''
