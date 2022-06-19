@@ -168,9 +168,12 @@ class Sudoers(object):
         return "{owner} ALL={runas}{nopasswd} {commands}\n".format(owner=owner, runas=runas_str, nopasswd=nopasswd_str, commands=commands_str)
 
     def run(self):
-        if self.state == 'absent' and self.exists():
-            self.delete()
-            return True
+        if self.state == 'absent':
+            if self.exists():
+                self.delete()
+                return True
+            else:
+                return False
 
         if self.exists() and self.matches():
             return False

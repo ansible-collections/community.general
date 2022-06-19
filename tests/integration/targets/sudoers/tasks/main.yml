@@ -135,6 +135,18 @@
   register: revoke_rule_1_stat
 
 
+- name: Revoke non-existing rule
+  community.general.sudoers:
+    name: non-existing-rule
+    state: absent
+  register: revoke_non_existing_rule
+
+- name: Stat non-existing rule
+  ansible.builtin.stat:
+    path: "{{ sudoers_path }}/non-existing-rule"
+  register: revoke_non_existing_rule_stat
+
+
 # Run assertions
 
 - name: Check rule 1 file stat
@@ -151,6 +163,7 @@
       - rule_1_again is not changed
       - rule_5 is changed
       - revoke_rule_1 is changed
+      - revoke_non_existing_rule is not changed
 
 - name: Check contents
   ansible.builtin.assert:
@@ -166,3 +179,4 @@
   ansible.builtin.assert:
     that:
       - not revoke_rule_1_stat.stat.exists
+      - not revoke_non_existing_rule_stat.stat.exists
