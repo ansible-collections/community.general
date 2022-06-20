@@ -1,2 +1,0 @@
-minor_changes:
-  - ModuleHelper module utils - improved ``ModuleHelperException``, using ``to_native()`` for the exception message (https://github.com/ansible-collections/community.general/pull/4755).

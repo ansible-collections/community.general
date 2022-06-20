@@ -1,2 +1,0 @@
-bugfixes:
-  - "sudoers - fix incorrect handling of ``state: absent`` (https://github.com/ansible-collections/community.general/issues/4852)."
