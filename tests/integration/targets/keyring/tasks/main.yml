@@ -1,0 +1,95 @@
+---
+- name: Ensure required packages for headless keyring access are installed (RPM)
+  ansible.builtin.package:
+      name: gnome-keyring
+  become: true
+  when: "'localhost' not in inventory_hostname"
+
+- name: Ensure keyring is installed (RPM)
+  ansible.builtin.dnf:
+    name: python3-keyring
+    state: present
+  become: true
+  when: ansible_facts['os_family'] == 'RedHat'
+
+- name: Ensure keyring is installed (pip)
+  ansible.builtin.pip:
+    name: keyring
+    state: present
+  become: true
+  when: ansible_facts['os_family'] != 'RedHat'
+
+# Set password for new account
+# Expected result: success
+- name: Set password for test/test1
+  community.general.keyring:
+    service: test
+    username: test1
+    user_password: "{{ user_password }}"
+    keyring_password: "{{ keyring_password }}"
+  register: set_password
+
+- name: Assert that the password has been set
+  ansible.builtin.assert:
+    that:
+      - set_password.msg == "Passphrase has been updated for test@test1"
+
+# Print out password to confirm it has been set
+# Expected result: success
+- name: Retrieve password for test/test1
+  community.general.keyring_info:
+    service: test
+    username: test1
+    keyring_password: "{{ keyring_password }}"
+  register: test_set_password
+
+- name: Assert that the password exists
+  ansible.builtin.assert:
+    that:
+      - test_set_password.passphrase == user_password
+
+# Attempt to set password again
+# Expected result: success - nothing should happen
+- name: Attempt to re-set password for test/test1
+  community.general.keyring:
+    service: test
+    username: test1
+    user_password: "{{ user_password }}"
+    keyring_password: "{{ keyring_password }}"
+  register: second_set_password
+
+- name: Assert that the password has not been changed
+  ansible.builtin.assert:
+    that:
+      - second_set_password.msg == "Passphrase already set for test@test1"
+
+# Delete account
+# Expected result: success
+- name: Delete password for test/test1
+  community.general.keyring:
+    service: test
+    username: test1
+    user_password: "{{ user_password }}"
+    keyring_password: "{{ keyring_password }}"
+    state: absent
+  register: del_password
+
+- name: Assert that the password has been deleted
+  ansible.builtin.assert:
+    that:
+      - del_password.msg == "Passphrase has been removed for test@test1"
+
+# Attempt to get deleted account (to confirm it has been deleted).
+# Don't use `no_log` as run completes due to failed task.
+# Expected result: fail
+- name: Retrieve password for test/test1
+  community.general.keyring_info:
+    service: test
+    username: test1
+    keyring_password: "{{ keyring_password }}"
+  register: test_del_password
+
+- name: Assert that the password no longer exists
+  ansible.builtin.assert:
+    that:
+      - test_del_password.passphrase is not defined
