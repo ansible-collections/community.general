@@ -1070,6 +1070,10 @@ files:
     labels: interfaces_file
   $modules/system/iptables_state.py:
     maintainers: quidame
+  $modules/system/keyring.py:
+    maintainers: ahussey-redhat
+  $modules/system/keyring_info.py:
+    maintainers: ahussey-redhat
   $modules/system/shutdown.py:
     maintainers: nitzmahone samdoran aminvakil
   $modules/system/java_cert.py:
