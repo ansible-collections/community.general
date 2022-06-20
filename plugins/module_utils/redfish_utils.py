@@ -2187,9 +2187,8 @@ class RedfishUtils(object):
             else:
                 if media_match_strict:
                     continue
-            # if ejected, 'Inserted' should be False and 'ImageName' cleared
-            if (not data.get('Inserted', False) and
-                    not data.get('ImageName')):
+            # if ejected, 'Inserted' should be False
+            if (not data.get('Inserted', False)):
                 return uri, data
         return None, None
 
@@ -2225,7 +2224,7 @@ class RedfishUtils(object):
         return resources, headers
 
     @staticmethod
-    def _insert_virt_media_payload(options, param_map, data, ai):
+    def _insert_virt_media_payload(options, param_map, data, ai, image_only=False):
         payload = {
             'Image': options.get('image_url')
         }
@@ -2239,6 +2238,12 @@ class RedfishUtils(object):
                                        options.get(option), option,
                                        allowable)}
                 payload[param] = options.get(option)
+
+        # Some hardware (such as iLO 4 or Supermicro) only supports the Image property
+        # Inserted and WriteProtected are not writable
+        if image_only:
+            del payload['Inserted']
+            del payload['WriteProtected']
         return payload
 
     def virtual_media_insert_via_patch(self, options, param_map, uri, data, image_only=False):
@@ -2247,15 +2252,9 @@ class RedfishUtils(object):
                    {'AllowableValues': v}) for k, v in data.items()
                   if k.endswith('@Redfish.AllowableValues'))
         # construct payload
-        payload = self._insert_virt_media_payload(options, param_map, data, ai)
-        if 'Inserted' not in payload:
+        payload = self._insert_virt_media_payload(options, param_map, data, ai, image_only)
+        if 'Inserted' not in payload and not image_only:
             payload['Inserted'] = True
-
-        # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
-        # Inserted and WriteProtected are not writable
-        if image_only:
-            del payload['Inserted']
-            del payload['WriteProtected']
 
         # PATCH the resource
         response = self.patch_request(self.root_uri + uri, payload)
@@ -2290,6 +2289,13 @@ class RedfishUtils(object):
         # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
         # Inserted and WriteProtected are not writable
         if data["FirmwareVersion"].startswith("iLO 4"):
+            image_only = True
+
+        # Supermicro does also not support Inserted and WriteProtected
+        # Supermicro uses as firmware version only a number so we can't check for it because we
+        # can't be sure that this firmware version is nut used by another vendor
+        # Tested with Supermicro Firmware 01.74.02
+        if 'Supermicro' in data['Oem']:
             image_only = True
 
         virt_media_uri = data["VirtualMedia"]["@odata.id"]
@@ -2346,7 +2352,7 @@ class RedfishUtils(object):
         # get ActionInfo or AllowableValues
         ai = self._get_all_action_info_values(action)
         # construct payload
-        payload = self._insert_virt_media_payload(options, param_map, data, ai)
+        payload = self._insert_virt_media_payload(options, param_map, data, ai, image_only)
         # POST to action
         response = self.post_request(self.root_uri + action_uri, payload)
         if response['ret'] is False:
@@ -2390,6 +2396,9 @@ class RedfishUtils(object):
         # Inserted is not writable
         image_only = False
         if data["FirmwareVersion"].startswith("iLO 4"):
+            image_only = True
+
+        if 'Supermicro' in data['Oem']:
             image_only = True
 
         virt_media_uri = data["VirtualMedia"]["@odata.id"]
