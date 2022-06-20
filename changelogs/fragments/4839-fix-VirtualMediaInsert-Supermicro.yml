@@ -1,0 +1,8 @@
+bugfixes:
+  - redfish_command - fix the check if a virtual media is unmounted to just check for ``instered= false``
+    caused by Supermicro hardware that does not clear the ``ImageName``
+    (https://github.com/ansible-collections/community.general/pull/4839).
+  - redfish_command - the Supermicro Redfish implementation only supports the ``image_url`` parameter in
+    the underlying API calls to ``VirtualMediaInsert`` and ``VirtualMediaEject``. Any values set
+    (or the defaults) for ``write_protected`` or ``inserted`` will be ignored
+    (https://github.com/ansible-collections/community.general/pull/4839).
