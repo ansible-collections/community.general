@@ -91,6 +91,9 @@ from ansible.plugins.become import BecomeBase
 from ansible.module_utils._text import to_bytes
 
 
+ansi_color_codes = re_compile(to_bytes(r'\x1B\[[0-9;]+m'))
+
+
 class BecomeModule(BecomeBase):
 
     name = 'community.general.machinectl'
@@ -101,9 +104,7 @@ class BecomeModule(BecomeBase):
 
     @staticmethod
     def remove_ansi_codes(line):
-        # taken from https://stackoverflow.com/a/38662876/9531111
-        ansi_escape = re_compile(to_bytes(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]'))
-        return ansi_escape.sub(b"", line)
+        return ansi_color_codes.sub(b"", line)
 
     def build_become_command(self, cmd, shell):
         super(BecomeModule, self).build_become_command(cmd, shell)
