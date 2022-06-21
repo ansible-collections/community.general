@@ -34,6 +34,11 @@
     commands: /usr/local/bin/command
   register: rule_1
 
+- name: Stat my-sudo-rule-1 file
+  ansible.builtin.stat:
+    path: "{{ sudoers_path }}/my-sudo-rule-1"
+  register: rule_1_stat
+
 - name: Grab contents of my-sudo-rule-1
   ansible.builtin.slurp:
     src: "{{ sudoers_path }}/my-sudo-rule-1"
@@ -179,9 +184,28 @@
   ignore_errors: true
   when: ansible_os_family != 'Darwin'
   register: edge_case_3
+  
+  
+- name: Revoke non-existing rule
+  community.general.sudoers:
+    name: non-existing-rule
+    state: absent
+  register: revoke_non_existing_rule
+
+- name: Stat non-existing rule
+  ansible.builtin.stat:
+    path: "{{ sudoers_path }}/non-existing-rule"
+  register: revoke_non_existing_rule_stat
 
 
 # Run assertions
+
+- name: Check rule 1 file stat
+  ansible.builtin.assert:
+    that:
+      - rule_1_stat.stat.exists
+      - rule_1_stat.stat.isreg
+      - rule_1_stat.stat.mode == '0440'
 
 - name: Check changed status
   ansible.builtin.assert:
@@ -190,6 +214,7 @@
       - rule_1_again is not changed
       - rule_5 is changed
       - revoke_rule_1 is changed
+      - revoke_non_existing_rule is not changed
 
 - name: Check contents
   ansible.builtin.assert:
@@ -205,7 +230,8 @@
   ansible.builtin.assert:
     that:
       - not revoke_rule_1_stat.stat.exists
-
+      - not revoke_non_existing_rule_stat.stat.exists
+      
 - name: Check edge case responses
   ansible.builtin.assert:
     that:
@@ -219,3 +245,4 @@
       - edge_case_3 is failed
       - "'Failed to find required executable' in edge_case_3.msg"
   when: ansible_os_family != 'Darwin'
+

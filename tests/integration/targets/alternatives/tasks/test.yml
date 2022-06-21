@@ -49,5 +49,3 @@
 
 - name: check that alternative has been updated
   command: "grep -Pzq '/bin/dummy{{ item }}\\n' '{{ alternatives_dir }}/dummy'"
-  # priority doesn't seem updated
-  #command: "grep -Pzq '/bin/dummy{{ item }}\\n50' '{{ alternatives_dir }}/dummy'"

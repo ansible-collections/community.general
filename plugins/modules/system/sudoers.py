@@ -124,6 +124,8 @@ from ansible.module_utils.common.text.converters import to_native
 
 class Sudoers(object):
 
+    FILE_MODE = 0o440
+
     def __init__(self, module):
         self.module = module
 
@@ -146,6 +148,8 @@ class Sudoers(object):
         with open(self.file, 'w') as f:
             f.write(self.content())
 
+        os.chmod(self.file, self.FILE_MODE)
+
     def delete(self):
         if self.check_mode:
             return
@@ -157,7 +161,12 @@ class Sudoers(object):
 
     def matches(self):
         with open(self.file, 'r') as f:
-            return f.read() == self.content()
+            content_matches = f.read() == self.content()
+
+        current_mode = os.stat(self.file).st_mode & 0o777
+        mode_matches = current_mode == self.FILE_MODE
+
+        return content_matches and mode_matches
 
     def content(self):
         if self.user:
@@ -185,9 +194,12 @@ class Sudoers(object):
             raise Exception('Failed to validate sudoers rule:\n{stdout}'.format(stdout=stdout))
 
     def run(self):
-        if self.state == 'absent' and self.exists():
-            self.delete()
-            return True
+        if self.state == 'absent':
+            if self.exists():
+                self.delete()
+                return True
+            else:
+                return False
 
         self.validate()
 

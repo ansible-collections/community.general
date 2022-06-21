@@ -608,6 +608,10 @@ plugin_routing:
       redirect: community.general.identity.keycloak.keycloak_role
     keycloak_user_federation:
       redirect: community.general.identity.keycloak.keycloak_user_federation
+    keyring:
+      redirect: community.general.system.keyring
+    keyring_info:
+      redirect: community.general.system.keyring_info
     kibana_plugin:
       redirect: community.general.database.misc.kibana_plugin
     kubevirt_cdi_upload:
@@ -1357,6 +1361,8 @@ plugin_routing:
       redirect: community.general.notification.say
     scaleway_compute:
       redirect: community.general.cloud.scaleway.scaleway_compute
+    scaleway_compute_private_network:
+      redirect: community.general.cloud.scaleway.scaleway_compute_private_network
     scaleway_database_backup:
       redirect: community.general.cloud.scaleway.scaleway_database_backup
     scaleway_image_facts:
