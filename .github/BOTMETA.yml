@@ -214,7 +214,7 @@ files:
   $lookups/dnstxt.py:
     maintainers: jpmens
   $lookups/dsv.py:
-    maintainers: amigus endlesstrax
+    maintainers: amigus endlesstrax delineaKrehl tylerezimmerman
   $lookups/etcd3.py:
     maintainers: eric-belhomme
   $lookups/etcd.py:
@@ -251,7 +251,7 @@ files:
     maintainers: RevBits
   $lookups/shelvefile.py: {}
   $lookups/tss.py:
-    maintainers: amigus endlesstrax
+    maintainers: amigus endlesstrax delineaKrehl tylerezimmerman
   $module_utils/:
     labels: module_utils
   $module_utils/gconftool2.py:
