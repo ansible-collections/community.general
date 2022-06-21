@@ -1,10 +1,15 @@
 ---
 # Initialise environment
 
-- name: Register sudoers.d directory
+- name: Register variables
   set_fact:
     sudoers_path: /etc/sudoers.d
     alt_sudoers_path: /etc/sudoers_alt
+
+- name: Install sudo package
+  ansible.builtin.package:
+    name: sudo
+  when: ansible_os_family != 'Darwin'
 
 - name: Ensure sudoers directory exists
   ansible.builtin.file:
@@ -135,6 +140,52 @@
   register: revoke_rule_1_stat
 
 
+# Validation testing
+
+- name: Attempt command without full path to executable
+  community.general.sudoers:
+    name: edge-case-1
+    state: present
+    user: alice
+    commands: systemctl
+  ignore_errors: true
+  register: edge_case_1
+
+
+- name: Attempt command without full path to executable, but disabling validation
+  community.general.sudoers:
+    name: edge-case-2
+    state: present
+    user: alice
+    commands: systemctl
+    validation: absent
+    sudoers_path: "{{ alt_sudoers_path }}"
+  register: edge_case_2
+
+- name: find visudo
+  command:
+    cmd: which visudo
+  register: which_visudo
+  when: ansible_os_family != 'Darwin'
+
+- name: Prevent visudo being executed
+  file:
+    path: "{{ which_visudo.stdout }}"
+    mode: '-x'
+  when: ansible_os_family != 'Darwin'
+
+- name: Attempt command without full path to executable, but enforcing validation with no visudo present
+  community.general.sudoers:
+    name: edge-case-3
+    state: present
+    user: alice
+    commands: systemctl
+    validation: required
+  ignore_errors: true
+  when: ansible_os_family != 'Darwin'
+  register: edge_case_3
+  
+  
 - name: Revoke non-existing rule
   community.general.sudoers:
     name: non-existing-rule
@@ -175,8 +226,22 @@
       - "rule_5_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command\n'"
       - "rule_6_contents['content'] | b64decode == 'alice ALL=(bob)NOPASSWD: /usr/local/bin/command\n'"
 
-- name: Check stats
+- name: Check revocation stat
   ansible.builtin.assert:
     that:
       - not revoke_rule_1_stat.stat.exists
       - not revoke_non_existing_rule_stat.stat.exists
+      
+- name: Check edge case responses
+  ansible.builtin.assert:
+    that:
+      - edge_case_1 is failed
+      - "'Failed to validate sudoers rule' in edge_case_1.msg"
+      - edge_case_2 is not failed
+
+- name: Check missing validation edge case
+  ansible.builtin.assert:
+    that:
+      - edge_case_3 is failed
+      - "'Failed to find required executable' in edge_case_3.msg"
+  when: ansible_os_family != 'Darwin'
