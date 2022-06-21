@@ -65,6 +65,15 @@ options:
       - The name of the user for the sudoers rule.
       - This option cannot be used in conjunction with I(group).
     type: str
+  validation:
+    description:
+      - If C(absent), the sudoers rule will be added without validation.
+      - If C(detect) and visudo is available, then the sudoers rule will be validated by visudo.
+      - If C(required), visudo must be available to validate the sudoers rule.
+    type: str
+    default: detect
+    choices: [ absent, detect, required ]
+    version_added: 5.2.0
 '''
 
 EXAMPLES = '''
@@ -118,6 +127,8 @@ class Sudoers(object):
     FILE_MODE = 0o440
 
     def __init__(self, module):
+        self.module = module
+
         self.check_mode = module.check_mode
         self.name = module.params['name']
         self.user = module.params['user']
@@ -128,6 +139,7 @@ class Sudoers(object):
         self.sudoers_path = module.params['sudoers_path']
         self.file = os.path.join(self.sudoers_path, self.name)
         self.commands = module.params['commands']
+        self.validation = module.params['validation']
 
     def write(self):
         if self.check_mode:
@@ -167,6 +179,20 @@ class Sudoers(object):
         runas_str = '({runas})'.format(runas=self.runas) if self.runas is not None else ''
         return "{owner} ALL={runas}{nopasswd} {commands}\n".format(owner=owner, runas=runas_str, nopasswd=nopasswd_str, commands=commands_str)
 
+    def validate(self):
+        if self.validation == 'absent':
+            return
+
+        visudo_path = self.module.get_bin_path('visudo', required=self.validation == 'required')
+        if visudo_path is None:
+            return
+
+        check_command = [visudo_path, '-c', '-f', '-']
+        rc, stdout, stderr = self.module.run_command(check_command, data=self.content())
+
+        if rc != 0:
+            raise Exception('Failed to validate sudoers rule:\n{stdout}'.format(stdout=stdout))
+
     def run(self):
         if self.state == 'absent':
             if self.exists():
@@ -174,6 +200,8 @@ class Sudoers(object):
                 return True
             else:
                 return False
+
+        self.validate()
 
         if self.exists() and self.matches():
             return False
@@ -209,6 +237,10 @@ def main():
             'choices': ['present', 'absent'],
         },
         'user': {},
+        'validation': {
+            'default': 'detect',
+            'choices': ['absent', 'detect', 'required']
+        },
     }
 
     module = AnsibleModule(
