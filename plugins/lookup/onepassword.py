@@ -97,7 +97,6 @@ RETURN = """
 """
 
 import abc
-import errno
 import json
 import os
 import subprocess
@@ -125,6 +124,24 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
         self._version = None
 
     @abc.abstractmethod
+    def _parse_field(self, data_json, field_name, section_title):
+        pass
+
+    def _run(self, args, expected_rc=0, command_input=None, ignore_errors=False):
+        command = [self.path] + args
+        p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        out, err = p.communicate(input=command_input)
+        rc = p.wait()
+        if not ignore_errors and rc != expected_rc:
+            raise AnsibleLookupError(to_text(err))
+
+        return rc, out, err
+
+    @abc.abstractmethod
+    def assert_logged_in(self, subdomain=None, domain="1password.com"):
+        pass
+
+    @abc.abstractmethod
     def get_account(self):
         pass
 
@@ -133,11 +150,11 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
         pass
 
     @abc.abstractmethod
-    def signin(self):
+    def get_raw(self, item_id, vault, token):
         pass
 
     @abc.abstractmethod
-    def _parse_field(self, data_json, field_name, section_title):
+    def signin(self):
         pass
 
     @property
@@ -170,139 +187,11 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
 
         return to_text(b_out).strip()
 
-    def _run(self, args, expected_rc=0, command_input=None, ignore_errors=False):
-        command = [self.path] + args
-        p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-        out, err = p.communicate(input=command_input)
-        rc = p.wait()
-        if not ignore_errors and rc != expected_rc:
-            raise AnsibleLookupError(to_text(err))
-
-        return rc, out, err
-
 
 class OnePassCLIv1(OnePassCLIBase):
     supports_version = "1"
 
-    def get_account(self):
-        pass
-
-    def get_item(self, item_id):
-        pass
-
-    def signin(self):
-        pass
-
     def _parse_field(self, data_json, field_name, section_title):
-        pass
-
-
-class OnePassCLIv2(OnePassCLIBase):
-    supports_version = "2"
-
-    def get_account(self):
-        pass
-
-    def get_item(self, item_id):
-        pass
-
-    def signin(self):
-        pass
-
-    def _parse_field(self, data_json, field_name, section_title):
-        pass
-
-
-class OnePass(object):
-    def __init__(self, subdomain, domain, username, secret_key, master_password):
-        self.subdomain = subdomain
-        self.domain = domain
-        self.username = username
-        self.secret_key = secret_key
-        self.master_password = master_password
-
-        self.logged_in = False
-        self.token = None
-
-        self._config = OnePasswordConfig()
-        self._cli = self._get_cli_class()
-
-    def _get_cli_class(self):
-        version = OnePassCLIBase.get_current_version()
-        for cls in OnePassCLIBase.__subclasses__():
-            if cls.supports_version == version.split(".")[0]:
-                try:
-                    return cls(self.subdomain, self.domain, self.username, self.secret_key, self.master_password)
-                except TypeError as e:
-                    raise AnsibleLookupError(e)
-
-        raise AnsibleLookupError("op version %s is unsupported" % version)
-
-    def get_token(self):
-        # If the config file exists, assume an initial signin has taken place and try basic sign in
-        if os.path.isfile(self._config.config_file_path):
-
-            if not self.master_password:
-                raise AnsibleLookupError('Unable to sign in to 1Password. master_password is required.')
-
-            try:
-                args = ['signin', '--output=raw']
-
-                if self.subdomain:
-                    args = ['signin', self.subdomain, '--output=raw']
-
-                rc, out, err = self._run(args, command_input=to_bytes(self.master_password))
-                self.token = out.strip()
-
-            except AnsibleLookupError:
-                self.full_login()
-
-        else:
-            # Attempt a full sign in since there appears to be no existing sign in
-            self.full_login()
-
-    def assert_logged_in(self):
-        try:
-            rc, out, err = self._run(['get', 'account'], ignore_errors=True)
-            if rc == 0:
-                self.logged_in = True
-            if not self.logged_in:
-                self.get_token()
-        except OSError as e:
-            if e.errno == errno.ENOENT:
-                raise AnsibleLookupError("1Password CLI tool '%s' not installed in path on control machine" % self.cli_path)
-            raise e
-
-    def get_raw(self, item_id, vault=None):
-        args = ["get", "item", item_id]
-        if vault is not None:
-            args += ['--vault={0}'.format(vault)]
-        if not self.logged_in:
-            args += [to_bytes('--session=') + self.token]
-        rc, output, dummy = self._run(args)
-        return output
-
-    def get_field(self, item_id, field, section=None, vault=None):
-        output = self.get_raw(item_id, vault)
-        return self._parse_field(output, field, section) if output != '' else ''
-
-    def full_login(self):
-        if None in [self.subdomain, self.username, self.secret_key, self.master_password]:
-            raise AnsibleLookupError('Unable to perform initial sign in to 1Password. '
-                                     'subdomain, username, secret_key, and master_password are required to perform initial sign in.')
-
-        args = [
-            'signin',
-            '{0}.{1}'.format(self.subdomain, self.domain),
-            to_bytes(self.username),
-            to_bytes(self.secret_key),
-            '--output=raw',
-        ]
-
-        rc, out, err = self._run(args, command_input=to_bytes(self.master_password))
-        self.token = out.strip()
-
-    def _parse_field(self, data_json, field_name, section_title=None):
         """
         Retrieves the desired field from the `op` response payload
 
@@ -356,36 +245,298 @@ class OnePass(object):
             # check the details dictionary for `field_name` and return it immediately if it exists
             # when the entry is a "password" instead of a "login" item, the password field is a key
             # in the `details` dictionary:
-            if field_name in data['details']:
-                return data['details'][field_name]
+            if field_name in data["details"]:
+                return data["details"][field_name]
 
             # when the field is not found above, iterate through the fields list in the object details
-            for field_data in data['details'].get('fields', []):
-                if field_data.get('name', '').lower() == field_name.lower():
-                    return field_data.get('value', '')
-        for section_data in data['details'].get('sections', []):
-            if section_title is not None and section_title.lower() != section_data['title'].lower():
+            for field_data in data["details"].get("fields", []):
+                if field_data.get("name", "").lower() == field_name.lower():
+                    return field_data.get("value", "")
+
+        for section_data in data["details"].get("sections", []):
+            if section_title is not None and section_title.lower() != section_data["title"].lower():
                 continue
-            for field_data in section_data.get('fields', []):
-                if field_data.get('t', '').lower() == field_name.lower():
-                    return field_data.get('v', '')
-        return ''
+
+            for field_data in section_data.get("fields", []):
+                if field_data.get("t", "").lower() == field_name.lower():
+                    return field_data.get("v", "")
+
+        return ""
+
+    def assert_logged_in(self, subdomain=None, domain="1password.com"):
+        args = ["get", "account"]
+        if subdomain:
+            account = "{subdomain}.{domain}".format(subdomain=subdomain, domain=domain)
+            args.extend(["--account", account])
+
+        return self._run(args, ignore_errors=True)
+
+    def get_account(self):
+        pass
+
+    def get_item(self, item_id):
+        pass
+
+    def get_raw(self, item_id, vault=None, token=None):
+        args = ["get", "item", item_id]
+        if vault is not None:
+            args += ["--vault={0}".format(vault)]
+        if token is not None:
+            args += [to_bytes("--session=") + token]  # FIXME: Why is only this bytes?
+
+        return self._run(args)
+
+    def signin(self):
+        pass
+
+
+class OnePassCLIv2(OnePassCLIBase):
+    """
+    CLIv2 Syntax Reference: https://developer.1password.com/docs/cli/upgrade#step-2-update-your-scripts
+    """
+    supports_version = "2"
+
+    def _parse_field(self, data_json, field_name, section_title=None):
+        """
+        Schema reference: https://developer.1password.com/docs/cli/item-template-json
+
+        Example Data:
+
+            # Password item
+            {
+              "id": "ywvdbojsguzgrgnokmcxtydgdv",
+              "title": "Authy Backup",
+              "version": 1,
+              "vault": {
+                "id": "bcqxysvcnejjrwzoqrwzcqjqxc",
+                "name": "Personal"
+              },
+              "category": "PASSWORD",
+              "last_edited_by": "7FUPZ8ZNE02KSHMAIMKHIVUE17",
+              "created_at": "2015-01-18T13:13:38Z",
+              "updated_at": "2016-02-20T16:23:54Z",
+              "additional_information": "Jan 18, 2015, 08:13:38",
+              "fields": [
+                {
+                  "id": "password",
+                  "type": "CONCEALED",
+                  "purpose": "PASSWORD",
+                  "label": "password",
+                  "value": "OctoberPoppyNuttyDraperySabbath",
+                  "reference": "op://Personal/Authy Backup/password",
+                  "password_details": {
+                    "strength": "FANTASTIC"
+                  }
+                },
+                {
+                  "id": "notesPlain",
+                  "type": "STRING",
+                  "purpose": "NOTES",
+                  "label": "notesPlain",
+                  "value": "Backup password to restore Authy",
+                  "reference": "op://Personal/Authy Backup/notesPlain"
+                }
+              ]
+            }
+
+            # Login item
+            {
+              "id": "awk4s2u44fhnrgppszcsvc663i",
+              "title": "Dummy Login",
+              "version": 2,
+              "vault": {
+                "id": "stpebbaccrq72xulgouxsk4p7y",
+                "name": "Personal"
+              },
+              "category": "LOGIN",
+              "last_edited_by": "LSGPJERUYBH7BFPHMZ2KKGL6AU",
+              "created_at": "2018-04-25T21:55:19Z",
+              "updated_at": "2018-04-25T21:56:06Z",
+              "additional_information": "agent.smith",
+              "urls": [
+                {
+                  "primary": true,
+                  "href": "https://acme.com"
+                }
+              ],
+              "sections": [
+                {
+                  "id": "linked items",
+                  "label": "Related Items"
+                }
+              ],
+              "fields": [
+                {
+                  "id": "username",
+                  "type": "STRING",
+                  "purpose": "USERNAME",
+                  "label": "username",
+                  "value": "agent.smith",
+                  "reference": "op://Personal/Dummy Login/username"
+                },
+                {
+                  "id": "password",
+                  "type": "CONCEALED",
+                  "purpose": "PASSWORD",
+                  "label": "password",
+                  "value": "Q7vFwTJcqwxKmTU]Dzx7NW*wrNPXmj",
+                  "entropy": 159.6083697084228,
+                  "reference": "op://Personal/Dummy Login/password",
+                  "password_details": {
+                    "entropy": 159,
+                    "generated": true,
+                    "strength": "FANTASTIC"
+                  }
+                },
+                {
+                  "id": "notesPlain",
+                  "type": "STRING",
+                  "purpose": "NOTES",
+                  "label": "notesPlain",
+                  "reference": "op://Personal/Dummy Login/notesPlain"
+                }
+              ]
+            }
+        """
+        data = json.loads(data_json)
+        section = section_title or "fields"
+        for field in data.get(section):
+            # If the field name exists in the section, return that value
+            if field.get(field_name):
+                return field.get(field_name)
+
+            # If the field name doesn't exist in the section, match on the value of "id" and return "value"
+            if field.get("id") == field_name:
+                return field["value"]
+
+        return ""
+
+    def assert_logged_in(self, subdomain=None, domain="1password.com"):
+        args = ["account", "get"]
+        if subdomain:
+            account = "{subdomain}.{domain}".format(subdomain=subdomain, domain=domain)
+            args.extend(["--account", account])
+
+        return self._run(args, ignore_errors=True)
+
+    def get_account(self):
+        pass
+
+    def get_item(self, item_id):
+        pass
+
+    def get_raw(self, item_id, vault=None, token=None):
+        args = ["item", "get", item_id, "--format", "json"]
+        if vault is not None:
+            args += ["--vault={0}".format(vault)]
+        if token is not None:
+            args += [to_bytes("--session=") + token]  # FIXME: Why is only this bytes?
+
+        return self._run(args)
+
+    def signin(self):
+        pass
+
+
+class OnePass(object):
+    def __init__(self, subdomain, domain, username, secret_key, master_password):
+        self.subdomain = subdomain
+        self.domain = domain
+        self.username = username
+        self.secret_key = secret_key
+        self.master_password = master_password
+
+        self.logged_in = False
+        self.token = None
+
+        self._config = OnePasswordConfig()
+        self._cli = self._get_cli_class()
+
+    def _get_cli_class(self):
+        # TODO: When we get a new op version, warn but use the latest class
+        version = OnePassCLIBase.get_current_version()
+        for cls in OnePassCLIBase.__subclasses__():
+            if cls.supports_version == version.split(".")[0]:
+                try:
+                    return cls(self.subdomain, self.domain, self.username, self.secret_key, self.master_password)
+                except TypeError as e:
+                    raise AnsibleLookupError(e)
+
+        raise AnsibleLookupError("op version %s is unsupported" % version)
+
+    def get_token(self):
+        # If the config file exists, assume an initial signin has taken place and try basic sign in
+        if os.path.isfile(self._config.config_file_path):
+
+            if not self.master_password:
+                raise AnsibleLookupError('Unable to sign in to 1Password. master_password is required.')
+
+            try:
+                args = ['signin', '--output=raw']
+
+                if self.subdomain:
+                    args = ['signin', self.subdomain, '--output=raw']
+
+                rc, out, err = self._run(args, command_input=to_bytes(self.master_password))
+                self.token = out.strip()
+
+            except AnsibleLookupError:
+                self.full_login()
+
+        else:
+            # Attempt a full sign in since there appears to be no existing sign in
+            self.full_login()
+
+    def assert_logged_in(self):
+        rc, out, err = self._cli.assert_logged_in(self.subdomain, self.domain)
+        if rc == 0:
+            self.logged_in = True
+        else:
+            # FIXME: This is not working currently
+            self.get_token()
+
+    def get_raw(self, item_id, vault=None):
+        rc, out, err = self._cli.get_raw(item_id, vault, self.token)
+        return out
+
+    def get_field(self, item_id, field, section=None, vault=None):
+        output = self.get_raw(item_id, vault)
+        if output:
+            return self._cli._parse_field(output, field, section)
+
+        return ""
+
+    def full_login(self):
+        if None in [self.subdomain, self.username, self.secret_key, self.master_password]:
+            raise AnsibleLookupError('Unable to perform initial sign in to 1Password. '
+                                     'subdomain, username, secret_key, and master_password are required to perform initial sign in.')
+
+        args = [
+            'signin',
+            '{0}.{1}'.format(self.subdomain, self.domain),
+            to_bytes(self.username),
+            to_bytes(self.secret_key),
+            '--output=raw',
+        ]
+
+        rc, out, err = self._run(args, command_input=to_bytes(self.master_password))
+        self.token = out.strip()
 
 
 class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
         field = kwargs.get("field", "password")
-        section = kwargs.get("section", "")
-        vault = kwargs.get("vault", "")
+        section = kwargs.get("section")
+        vault = kwargs.get("vault")
         subdomain = kwargs.get("subdomain")
         domain = kwargs.get("domain", "1password.com")
-        username = kwargs.get("username", "")
-        secret_key = kwargs.get("secret_key", "")
+        username = kwargs.get("username")
+        secret_key = kwargs.get("secret_key")
         master_password = kwargs.get("master_password", kwargs.get("vault_password", ""))
 
         op = OnePass(subdomain, domain, username, secret_key, master_password)
-        # op.assert_logged_in()
+        op.assert_logged_in()
 
         values = []
         for term in terms:

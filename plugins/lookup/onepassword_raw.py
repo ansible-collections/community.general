@@ -76,18 +76,19 @@ from ansible.plugins.lookup import LookupBase
 class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
-        op = OnePass()
+        vault = kwargs.get("vault")
+        subdomain = kwargs.get("subdomain")
+        domain = kwargs.get("domain", "1password.com")
+        username = kwargs.get("username")
+        secret_key = kwargs.get("secret_key")
+        master_password = kwargs.get("master_password", kwargs.get("vault_password", ""))
 
-        vault = kwargs.get('vault')
-        op.subdomain = kwargs.get('subdomain')
-        op.username = kwargs.get('username')
-        op.secret_key = kwargs.get('secret_key')
-        op.master_password = kwargs.get('master_password', kwargs.get('vault_password'))
-
+        op = OnePass(subdomain, domain, username, secret_key, master_password)
         op.assert_logged_in()
 
         values = []
         for term in terms:
             data = json.loads(op.get_raw(term, vault))
             values.append(data)
+
         return values
