@@ -7,7 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from copy import deepcopy
+from copy import copy
 
 
 class DataMerge(object):
@@ -145,7 +145,7 @@ class DataMerge(object):
         """
         Set how merge the list.
         There is two-ways to do this :
-        - value : With this, if and element is present only in `expected`
+        - value : With this, if an element is present only in `expected`
                   and `merge_type='present'` it will be added in the result, or
                   if and element is present in both list, `current` and
                   `expected` and `merge_type='absent'` it will no be present in
@@ -277,12 +277,12 @@ class DataMerge(object):
         if not isinstance(current, (dict, list)) or not isinstance(expected, (dict, list)):
             raise ValueError('Only dict or list can be merged, {0} and {1} given.'.format(type(current), type(expected)))
         if self.merge_type == 'identic':
-            return deepcopy(expected)
+            return copy(expected)
         if not isinstance(current, type(expected)):
             if self._merge_type == 'present':
-                return deepcopy(expected)
+                return copy(expected)
             if self._merge_type == 'absent':
-                return deepcopy(current)
+                return copy(current)
 
         if isinstance(current, list):
             return self.get_new_merged_list(current, expected)
@@ -296,8 +296,8 @@ class DataMerge(object):
         if not isinstance(current, dict) or not isinstance(expected, dict):
             raise ValueError('Only two dict can be merged, {0} and {1} given.'.format(type(current), type(expected)))
         if self.merge_type == 'identic':
-            return deepcopy(expected)
-        merged = deepcopy(current)
+            return copy(expected)
+        merged = copy(current)
         for key in expected.keys():
             if (isinstance(expected.get(key), (dict, list)) and isinstance(current.get(key), (dict, list))):
                 merged[key] = self.get_new_merged_data(merged[key], expected[key])
@@ -321,7 +321,7 @@ class DataMerge(object):
         if not isinstance(current, list) or not isinstance(expected, list):
             raise ValueError('Only two list can be merged, {0} and {1} given.'.format(type(current), type(expected)))
         if self.merge_type == 'identic':
-            return deepcopy(expected)
+            return copy(expected)
         if self._list_diff_type == 'value':
             return self._get_new_merged_list_with_value_diff(current, expected)
         if self._list_diff_type == 'index':
