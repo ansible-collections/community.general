@@ -29,10 +29,11 @@ dnsimple >= 2 ; python_version >= '3.6'
 dataclasses ; python_version == '3.6'
 
 # requirement for the opentelemetry callback plugin
-# WARNING: these libraries depend on grpcio, which takes 7 minutes (!) to build in CI on Python 3.10
-opentelemetry-api ; python_version >= '3.6' and python_version < '3.10'
-opentelemetry-exporter-otlp ; python_version >= '3.6' and python_version < '3.10'
-opentelemetry-sdk ; python_version >= '3.6' and python_version < '3.10'
+# WARNING: these libraries rely on Protobuf for Python, which regularly stops installing.
+#          That's why they are disabled for now.
+# opentelemetry-api ; python_version >= '3.6' and python_version < '3.10'
+# opentelemetry-exporter-otlp ; python_version >= '3.6' and python_version < '3.10'
+# opentelemetry-sdk ; python_version >= '3.6' and python_version < '3.10'
 
 # requirement for the elastic callback plugin
 elastic-apm ; python_version >= '3.6'
