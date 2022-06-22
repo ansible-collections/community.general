@@ -28,14 +28,14 @@ author:
 options:
     state:
         description:
-          - The action to take with the supplied key and value. If the state is 'present' and `value` is set, the key
-            contents will be set to the value supplied and `changed` will be set to `true` only if the value was
-            different to the current contents. If the state is 'present' and `value` is not set, the existing value
-            associated to the key will be returned. The state 'absent' will remove the key/value pair,
-            again 'changed' will be set to true only if the key actually existed
+          - The action to take with the supplied key and value. If the state is C(present) and I(value) is set, the key
+            contents will be set to the value supplied and C(changed) will be set to C(true) only if the value was
+            different to the current contents. If the state is C(present) and I(value) is not set, the existing value
+            associated to the key will be returned. The state C(absent) will remove the key/value pair,
+            again C(changed) will be set to true only if the key actually existed
             prior to the removal. An attempt can be made to obtain or free the
-            lock associated with a key/value pair with the states 'acquire' or
-            'release' respectively. a valid session must be supplied to make the
+            lock associated with a key/value pair with the states C(acquire) or
+            C(release) respectively. a valid session must be supplied to make the
             attempt changed will be true if the attempt is successful, false
             otherwise.
         type: str
