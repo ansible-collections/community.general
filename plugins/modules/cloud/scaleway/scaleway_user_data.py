@@ -35,7 +35,7 @@ options:
   user_data:
     type: dict
     description:
-    - User defined data. Typically used with `cloud-init`.
+    - User defined data. Typically used with C(cloud-init).
     - Pass your cloud-init script here as a string
     required: false
 
