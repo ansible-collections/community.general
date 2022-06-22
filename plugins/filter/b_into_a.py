@@ -273,24 +273,23 @@ RETURN = r'''
 '''
 
 from ansible.errors import AnsibleFilterError
-from ansible_collections.community.general.plugins.module_utils.data_merge import DataMerge
+from ansible_collections.community.general.plugins.module_utils.vars import BintoA
 
 
-def merge_data(current, expected, state, list_diff_type='value'):
+def b_into_a(a, b, present, merge_seq_by_index=False, keep_empty=False):
     # type: (list | dict, list | dict, str, str) -> list | dict
-    data_merge = DataMerge(state, list_diff_type)
     try:
-        return data_merge.get_new_merged_data(current, expected)
-    except ValueError as e:
+        return BintoA(a, b, present, merge_seq_by_index, keep_empty).get()
+    except TypeError as e:
         raise AnsibleFilterError(e)
 
 
 class FilterModule(object):
     """
-    Ansible data merge filter
+    Ansible b_into_a filter
     """
 
     def filters(self):
         return {
-            'merge_data': merge_data,
+            'b_into_a': b_into_a,
         }
