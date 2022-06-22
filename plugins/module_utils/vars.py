@@ -11,7 +11,7 @@ from ansible.module_utils.common._collections_compat import Mapping, Sequence
 from ansible.module_utils.six import string_types
 
 
-class GetNewStructWithElementsOf_b_in_a(object):
+class BintoA(object):
 
     def __init__(self, a, b, present=True, merge_seq_by_index=False, keep_empty=False):
         if self._both_are_mappings(a, b):

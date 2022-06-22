@@ -10,27 +10,27 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils.data_merge import GetNewStructWithElementsOf_b_in_a
+from ansible_collections.community.general.plugins.module_utils.vars import BintoA
 
-LIST_A = ['A', 'B', 'C', ['DA', 'DB'], ['EA', 'EB'], 'F', ['GA', 'GB', 'GC']]
+BintoA_LIST_A = ['A', 'B', 'C', ['DA', 'DB'], ['EA', 'EB'], 'F', ['GA', 'GB', 'GC']]
 
-LIST_B_TEST_NOT_MERGE_BY_INDEX = ['A', 'C', 'Z', ['DA', 'DB'], ['EA', 'EB', 'EZ'], 'X']
-LIST_RES_PRESENT_NOT_MERGE_BY_INDEX = [
+BintoA_LIST_B_TEST_NOT_MERGE_BY_INDEX = ['A', 'C', 'Z', ['DA', 'DB'], ['EA', 'EB', 'EZ'], 'X']
+BintoA_LIST_RES_PRESENT_NOT_MERGE_BY_INDEX = [
     'A', 'B', 'C', [
         'DA', 'DB'], [
             'EA', 'EB'], 'F', ['GA', 'GB', 'GC'], 'Z', [
                 'EA', 'EB', 'EZ'], 'X']
-LIST_RES_ABSENT_NOT_MERGE_BY_INDEX = ['B', ['EA', 'EB'], 'F', ['GA', 'GB', 'GC']]
+BintoA_LIST_RES_ABSENT_NOT_MERGE_BY_INDEX = ['B', ['EA', 'EB'], 'F', ['GA', 'GB', 'GC']]
 
-LIST_B_TEST_MERGE_BY_INDEX = ['A', 'Z', 'C', ['DZ'], ['EA', 'EZ', 'EX'], 'F', [None, 'GB', 'GZ']]
-LIST_RES_PRESENT_MERGE_BY_INDEX = [
+BintoA_LIST_B_TEST_MERGE_BY_INDEX = ['A', 'Z', 'C', ['DZ'], ['EA', 'EZ', 'EX'], 'F', [None, 'GB', 'GZ']]
+BintoA_LIST_RES_PRESENT_MERGE_BY_INDEX = [
     'A', 'Z', 'C', [
         'DZ', 'DB'], [
             'EA', 'EZ', 'EX'], 'F', ['GA', 'GB', 'GZ']]
-LIST_RES_ABSENT_MERGE_BY_INDEX = ['B', ['DA', 'DB'], ['EB'], ['GA', 'GC']]
+BintoA_LIST_RES_ABSENT_MERGE_BY_INDEX = ['B', ['DA', 'DB'], ['EB'], ['GA', 'GC']]
 
 # NOTE : Keep elements in this dict unsorted ('B' element is before 'A').
-DICT_A = {
+BintoA_DICT_A = {
     'B': '2',
     'A': '1',
     'C': {
@@ -46,7 +46,7 @@ DICT_A = {
     'E': '3',
 }
 
-DICT_B_TEST_PRESENT = {
+BintoA_DICT_B_TEST_PRESENT = {
     'B': '9',
     'E': '3',
     'C': {
@@ -66,7 +66,7 @@ DICT_B_TEST_PRESENT = {
     }
 }
 
-DICT_B_TEST_ABSENT = {
+BintoA_DICT_B_TEST_ABSENT = {
     'A': '1',
     'C': {
         'CA': [
@@ -84,7 +84,7 @@ DICT_B_TEST_ABSENT = {
     },
 }
 
-DICT_RES_PRESENT = {
+BintoA_DICT_RES_PRESENT = {
     'A': '1',
     'B': '9',
     'C': {
@@ -107,7 +107,7 @@ DICT_RES_PRESENT = {
     }
 }
 
-DICT_RES_ABSENT = {
+BintoA_DICT_RES_ABSENT = {
     'B': '2',
     'C': {
         'CA': [
@@ -120,60 +120,60 @@ DICT_RES_ABSENT = {
     'E': '3',
 }
 
-TEST_CASES_B_IN_A = [
+BintoA_TEST_CASES_B_IN_A = [
     {
         'id': '010_full_list_present_no_index',
         'present': True,
         'merge_seq_by_index': False,
         'keep_empty': False,
-        'val_a': LIST_A,
-        'val_b': LIST_B_TEST_NOT_MERGE_BY_INDEX,
-        'val_res': LIST_RES_PRESENT_NOT_MERGE_BY_INDEX,
+        'val_a': BintoA_LIST_A,
+        'val_b': BintoA_LIST_B_TEST_NOT_MERGE_BY_INDEX,
+        'val_res': BintoA_LIST_RES_PRESENT_NOT_MERGE_BY_INDEX,
     },
     {
         'id': '020_full_list_present_index',
         'present': True,
         'merge_seq_by_index': True,
         'keep_empty': False,
-        'val_a': LIST_A,
-        'val_b': LIST_B_TEST_MERGE_BY_INDEX,
-        'val_res': LIST_RES_PRESENT_MERGE_BY_INDEX,
+        'val_a': BintoA_LIST_A,
+        'val_b': BintoA_LIST_B_TEST_MERGE_BY_INDEX,
+        'val_res': BintoA_LIST_RES_PRESENT_MERGE_BY_INDEX,
     },
     {
         'id': '030_full_list_absent_no_index',
         'present': False,
         'merge_seq_by_index': False,
         'keep_empty': False,
-        'val_a': LIST_A,
-        'val_b': LIST_B_TEST_NOT_MERGE_BY_INDEX,
-        'val_res': LIST_RES_ABSENT_NOT_MERGE_BY_INDEX,
+        'val_a': BintoA_LIST_A,
+        'val_b': BintoA_LIST_B_TEST_NOT_MERGE_BY_INDEX,
+        'val_res': BintoA_LIST_RES_ABSENT_NOT_MERGE_BY_INDEX,
     },
     {
         'id': '040_full_list_absent_index',
         'present': False,
         'merge_seq_by_index': True,
         'keep_empty': False,
-        'val_a': LIST_A,
-        'val_b': LIST_B_TEST_MERGE_BY_INDEX,
-        'val_res': LIST_RES_ABSENT_MERGE_BY_INDEX,
+        'val_a': BintoA_LIST_A,
+        'val_b': BintoA_LIST_B_TEST_MERGE_BY_INDEX,
+        'val_res': BintoA_LIST_RES_ABSENT_MERGE_BY_INDEX,
     },
     {
         'id': '110_full_dict_present',
         'present': True,
         'merge_seq_by_index': False,
         'keep_empty': False,
-        'val_a': DICT_A,
-        'val_b': DICT_B_TEST_PRESENT,
-        'val_res': DICT_RES_PRESENT,
+        'val_a': BintoA_DICT_A,
+        'val_b': BintoA_DICT_B_TEST_PRESENT,
+        'val_res': BintoA_DICT_RES_PRESENT,
     },
     {
         'id': '120_full_dict_absent',
         'present': False,
         'merge_seq_by_index': False,
         'keep_empty': False,
-        'val_a': DICT_A,
-        'val_b': DICT_B_TEST_ABSENT,
-        'val_res': DICT_RES_ABSENT,
+        'val_a': BintoA_DICT_A,
+        'val_b': BintoA_DICT_B_TEST_ABSENT,
+        'val_res': BintoA_DICT_RES_ABSENT,
     },
     {
         'id': '210_keep_empty',
@@ -185,9 +185,9 @@ TEST_CASES_B_IN_A = [
         'val_res': {'A': [], 'B': {}},
     },
 ]
-TEST_CASE_B_TO_A_IDS = [item['id'] for item in TEST_CASES_B_IN_A]
+BintoA_TEST_CASE_B_TO_A_IDS = [item['id'] for item in BintoA_TEST_CASES_B_IN_A]
 
-TEST_CASES_B_IN_A_VALUE_ERROR = [
+BintoA_TEST_CASES_B_IN_A_VALUE_ERROR = [
     {
         'id': '010_not_same_type',
         'val_a': ['A'],
@@ -204,22 +204,22 @@ TEST_CASES_B_IN_A_VALUE_ERROR = [
         'val_b': ['A', 'B', 'C'],
     },
 ]
-TEST_CASE_B_TO_A_VALUE_ERROR_IDS = [item['id'] for item in TEST_CASES_B_IN_A_VALUE_ERROR]
+BintoA_TEST_CASE_B_TO_A_VALUE_ERROR_IDS = [item['id'] for item in BintoA_TEST_CASES_B_IN_A_VALUE_ERROR]
 
 
-@pytest.mark.parametrize('testcase', TEST_CASES_B_IN_A, ids=TEST_CASE_B_TO_A_IDS)
-def test_GetNewStructWithElementsOf_b_in_a(testcase):
-    res = GetNewStructWithElementsOf_b_in_a(testcase['val_a'],
-                                            testcase['val_b'],
-                                            testcase['present'],
-                                            testcase['merge_seq_by_index'],
-                                            testcase['keep_empty']).get()
+@pytest.mark.parametrize('testcase', BintoA_TEST_CASES_B_IN_A, ids=BintoA_TEST_CASE_B_TO_A_IDS)
+def test_AinB(testcase):
+    res = BintoA(testcase['val_a'],
+                 testcase['val_b'],
+                 testcase['present'],
+                 testcase['merge_seq_by_index'],
+                 testcase['keep_empty']).get()
     assert(res == testcase['val_res'])
 
 
 @pytest.mark.parametrize('testcase',
-                         TEST_CASES_B_IN_A_VALUE_ERROR,
-                         ids=TEST_CASE_B_TO_A_VALUE_ERROR_IDS)
-def test_GetNewStructWithElementsOf_b_in_a_value_error(testcase):
+                         BintoA_TEST_CASES_B_IN_A_VALUE_ERROR,
+                         ids=BintoA_TEST_CASE_B_TO_A_VALUE_ERROR_IDS)
+def test_AinB_TypeError(testcase):
     with pytest.raises(TypeError):
-        GetNewStructWithElementsOf_b_in_a(testcase['val_a'], testcase['val_b'])
+        BintoA(testcase['val_a'], testcase['val_b'])
