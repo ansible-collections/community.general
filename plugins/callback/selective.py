@@ -14,9 +14,9 @@ DOCUMENTATION = '''
       - set as main display callback
     short_description: only print certain tasks
     description:
-      - This callback only prints tasks that have been tagged with `print_action` or that have failed.
+      - This callback only prints tasks that have been tagged with C(print_action) or that have failed.
         This allows operators to focus on the tasks that provide value only.
-      - Tasks that are not printed are placed with a '.'.
+      - Tasks that are not printed are placed with a C(.).
       - If you increase verbosity all tasks are printed.
     options:
       nocolor:
