@@ -129,7 +129,7 @@ state:
     type: str
     sample: "reloaded"
 status:
-    description: a dictionary with the key=value pairs returned by `system-control show-json` or C(None) if the service is not loaded
+    description: A dictionary with the key=value pairs returned by C(system-control show-json) or C(None) if the service is not loaded
     returned: success
     type: complex
     contains:
