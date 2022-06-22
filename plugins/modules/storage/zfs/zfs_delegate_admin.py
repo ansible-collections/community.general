@@ -17,7 +17,7 @@ description:
   - See the C(zfs allow) section of C(zfs(1M)) for detailed explanations of options.
   - This module attempts to adhere to the behavior of the command line tool as much as possible.
 requirements:
-  - "A ZFS/OpenZFS implementation that supports delegation with `zfs allow`, including: Solaris >= 10, illumos (all
+  - "A ZFS/OpenZFS implementation that supports delegation with C(zfs allow), including: Solaris >= 10, illumos (all
     versions), FreeBSD >= 8.0R, ZFS on Linux >= 0.7.0."
 options:
   name:
