@@ -14,7 +14,10 @@ jobs:
     uses: ansible-community/github-docs-build/.github/workflows/_shared-docs-build-pr.yml@main
     with:
       init-fail-on-error: true
-      ansible-ref: stable-2.13
+      # We need to use devel instead of stable-2.13 since stable-2.13's ansible-doc does not list
+      # modules. devel's ansible-doc does (thanks to the sidecar docs PR).
+      ansible-ref: devel
+      # ansible-ref: stable-2.13
       provide-link-targets: |
         ansible_collections.ansible.builtin.dict2items_filter
         ansible_collections.ansible.builtin.path_join_filter
