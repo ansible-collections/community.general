@@ -6,4 +6,12 @@ on:
   pull_request_target:
     types: [opened, synchronize, reopened, closed]
 
-jobs: {}
+jobs:
+  build-docs:
+    permissions:
+      contents: read
+    name: Build Ansible Docs
+    steps:
+      - name: Do nothing
+        run:
+          echo hi
