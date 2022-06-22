@@ -12,7 +12,7 @@ DOCUMENTATION = '''
     type: notification
     short_description: write playbook output to log file
     description:
-      - This callback writes playbook output to a file per host in the `/var/log/ansible/hosts` directory
+      - This callback writes playbook output to a file per host in the C(/var/log/ansible/hosts) directory
     requirements:
      - Whitelist in configuration
      - A writeable /var/log/ansible/hosts directory by the user executing Ansible on the controller
