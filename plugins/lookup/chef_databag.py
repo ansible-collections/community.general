@@ -16,7 +16,7 @@ DOCUMENTATION = '''
          The lookup order mirrors the one from Chef, all folders in the base path are walked back looking for the following configuration
          file in order : .chef/knife.rb, ~/.chef/knife.rb, /etc/chef/client.rb"
     requirements:
-        - "pychef (python library https://pychef.readthedocs.io `pip install pychef`)"
+        - "pychef (L(Python library, https://pychef.readthedocs.io), C(pip install pychef))"
     options:
         name:
           description:
