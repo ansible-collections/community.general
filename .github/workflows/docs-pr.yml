@@ -17,6 +17,14 @@ jobs:
       ansible-ref: stable-2.13
       provide-link-targets: |
         ansible_collections.ansible.builtin.dict2items_filter
+        ansible_collections.ansible.builtin.path_join_filter
+        ansible_collections.community.kubevirt.kubevirt_cdi_upload_module
+        ansible_collections.community.kubevirt.kubevirt_inventory
+        ansible_collections.community.kubevirt.kubevirt_preset_module
+        ansible_collections.community.kubevirt.kubevirt_pvc_module
+        ansible_collections.community.kubevirt.kubevirt_rs_module
+        ansible_collections.community.kubevirt.kubevirt_template_module
+        ansible_collections.community.kubevirt.kubevirt_vm_module
         ansible_collections.infoblox.nios_modules.nios_a_record_module
         ansible_collections.infoblox.nios_modules.nios_aaaa_record_module
         ansible_collections.infoblox.nios_modules.nios_cname_record_module
@@ -36,7 +44,6 @@ jobs:
         ansible_collections.infoblox.nios_modules.nios_srv_record_module
         ansible_collections.infoblox.nios_modules.nios_txt_record_module
         ansible_collections.infoblox.nios_modules.nios_zone_module
-        ansible_collections.ansible.builtin.path_join_filter
 
   comment:
     permissions:
