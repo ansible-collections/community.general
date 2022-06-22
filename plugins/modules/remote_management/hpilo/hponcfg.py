@@ -27,7 +27,7 @@ options:
     required: false
   executable:
     description:
-    - Path to the hponcfg executable (`hponcfg` which uses $PATH).
+    - Path to the hponcfg executable (C(hponcfg) which uses $PATH).
     default: hponcfg
   verbose:
     description:
