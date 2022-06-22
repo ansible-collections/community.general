@@ -11,8 +11,66 @@ jobs:
     permissions:
       contents: read
     name: Build Ansible Docs
+    uses: ansible-community/github-docs-build/.github/workflows/_shared-docs-build-pr.yml@main
+    with:
+      init-fail-on-error: true
+      ansible-ref: stable-2.13
+      provide-link-targets: |
+        ansible_collections.ansible.builtin.dict2items_filter
+        ansible_collections.infoblox.nios_modules.nios_a_record_module
+        ansible_collections.infoblox.nios_modules.nios_aaaa_record_module
+        ansible_collections.infoblox.nios_modules.nios_cname_record_module
+        ansible_collections.infoblox.nios_modules.nios_dns_view_module
+        ansible_collections.infoblox.nios_modules.nios_fixed_address_module
+        ansible_collections.infoblox.nios_modules.nios_host_record_module
+        ansible_collections.infoblox.nios_modules.nios_lookup_lookup
+        ansible_collections.infoblox.nios_modules.nios_member_module
+        ansible_collections.infoblox.nios_modules.nios_mx_record_module
+        ansible_collections.infoblox.nios_modules.nios_naptr_record_module
+        ansible_collections.infoblox.nios_modules.nios_network_module
+        ansible_collections.infoblox.nios_modules.nios_network_view_module
+        ansible_collections.infoblox.nios_modules.nios_next_ip_lookup
+        ansible_collections.infoblox.nios_modules.nios_next_network_lookup
+        ansible_collections.infoblox.nios_modules.nios_nsgroup_module
+        ansible_collections.infoblox.nios_modules.nios_ptr_record_module
+        ansible_collections.infoblox.nios_modules.nios_srv_record_module
+        ansible_collections.infoblox.nios_modules.nios_txt_record_module
+        ansible_collections.infoblox.nios_modules.nios_zone_module
+        ansible_collections.ansible.builtin.path_join_filter
+
+  comment:
+    permissions:
+      pull-requests: write
     runs-on: ubuntu-latest
+    needs: build-docs
+    name: PR comments
     steps:
-      - name: Do nothing
-        run:
-          echo hi
+      - name: PR comment
+        uses: ansible-community/github-docs-build/actions/ansible-docs-build-comment@main
+        with:
+          body-includes: '## Docs Build'
+          reactions: heart
+          action: ${{ needs.build-docs.outputs.changed != 'true' && 'remove' || '' }}
+          on-closed-body: |
+            ## Docs Build 📝
+
+            This PR is closed and any previously published docsite has been unpublished.
+          on-merged-body: |
+            ## Docs Build 📝
+
+            Thank you for contribution!✨
+
+            This PR has been merged and your docs changes will be incorporated when they are next published.
+          body: |
+            ## Docs Build 📝
+
+            Thank you for contribution!✨
+
+            The docsite for **this PR** is available for download as an artifact from this run:
+            ${{ needs.build-docs.outputs.artifact-url }}
+
+            File changes:
+
+            ${{ needs.build-docs.outputs.diff-files-rendered }}
+
+            ${{ needs.build-docs.outputs.diff-rendered }}
