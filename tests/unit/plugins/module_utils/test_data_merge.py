@@ -10,32 +10,27 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils.data_merge import DataMerge
+from ansible_collections.community.general.plugins.module_utils.data_merge import GetNewStructWithElementsOf_b_in_a
 
-LIST_CURRENT = ['A', 'B', 'C', ['DA', 'DB'],
-                ['EA', 'EB'], 'F', ['GA', 'GB', 'GC']]
+LIST_A = ['A', 'B', 'C', ['DA', 'DB'], ['EA', 'EB'], 'F', ['GA', 'GB', 'GC']]
 
-LIST_MODIF_VALUE = ['A', 'C', 'Z', ['DA', 'DB'], ['EA', 'EB', 'EZ'], 'X']
-LIST_EXPECTED_VALUE_PRESENT = [
+LIST_B_TEST_NOT_MERGE_BY_INDEX = ['A', 'C', 'Z', ['DA', 'DB'], ['EA', 'EB', 'EZ'], 'X']
+LIST_RES_PRESENT_NOT_MERGE_BY_INDEX = [
     'A', 'B', 'C', [
         'DA', 'DB'], [
             'EA', 'EB'], 'F', ['GA', 'GB', 'GC'], 'Z', [
                 'EA', 'EB', 'EZ'], 'X']
-LIST_EXPECTED_VALUE_ABSENT = ['B', ['EA', 'EB'], 'F', ['GA', 'GB', 'GC']]
+LIST_RES_ABSENT_NOT_MERGE_BY_INDEX = ['B', ['EA', 'EB'], 'F', ['GA', 'GB', 'GC']]
 
-LIST_MODIF_INDEX = ['A', 'Z', 'C', ['DZ'],
-                    ['EA', 'EZ', 'EX'], 'F', [None, 'GB', 'GZ']]
-LIST_EXPECTED_INDEX_PRESENT = [
+LIST_B_TEST_MERGE_BY_INDEX = ['A', 'Z', 'C', ['DZ'], ['EA', 'EZ', 'EX'], 'F', [None, 'GB', 'GZ']]
+LIST_RES_PRESENT_MERGE_BY_INDEX = [
     'A', 'Z', 'C', [
         'DZ', 'DB'], [
             'EA', 'EZ', 'EX'], 'F', ['GA', 'GB', 'GZ']]
-LIST_EXPECTED_INDEX_ABSENT = ['B', ['DA', 'DB'], ['EB'], ['GA', 'GC']]
+LIST_RES_ABSENT_MERGE_BY_INDEX = ['B', ['DA', 'DB'], ['EB'], ['GA', 'GC']]
 
-LIST_MODIF_IDENTIC = ['Z', 'X', ['YZ', 'YX']]
-
-# NOTE : The fact B is before A and F is before E is wanted.
-#        It permit to test sort function on module that use `DataMerge`.
-DICT_CURRENT = {
+# NOTE : Keep elements in this dict unsorted ('B' element is before 'A').
+DICT_A = {
     'B': '2',
     'A': '1',
     'C': {
@@ -51,7 +46,7 @@ DICT_CURRENT = {
     'E': '3',
 }
 
-DICT_MODIF = {
+DICT_B_TEST_PRESENT = {
     'B': '9',
     'E': '3',
     'C': {
@@ -71,12 +66,16 @@ DICT_MODIF = {
     }
 }
 
-DICT_MODIF_NOT_IN_CURRENT = {
-    'A': '9',
+DICT_B_TEST_ABSENT = {
+    'A': '1',
     'C': {
         'CA': [
+            {'C': '3', 'D': '4'},
             {'Z': '9', 'Y': '8'},
         ],
+        'CB': 9,
+        'CD': {'DA': '1', 'DB': '2'},
+        'CZ': 8,
     },
     'Z': '8',
     'Y': {
@@ -85,7 +84,7 @@ DICT_MODIF_NOT_IN_CURRENT = {
     },
 }
 
-DICT_EXPECTED_PRESENT = {
+DICT_RES_PRESENT = {
     'A': '1',
     'B': '9',
     'C': {
@@ -108,8 +107,7 @@ DICT_EXPECTED_PRESENT = {
     }
 }
 
-DICT_EXPECTED_ABSENT = {
-    'A': '1',
+DICT_RES_ABSENT = {
     'B': '2',
     'C': {
         'CA': [
@@ -117,187 +115,111 @@ DICT_EXPECTED_ABSENT = {
         ],
         'CB': '1',
         'CC': '2',
-        'CD': {'DB': '2'},
     },
     'F': '4',
+    'E': '3',
 }
 
-DATA_MERGE_TEST_CASE_LIST = [
+TEST_CASES_B_IN_A = [
     {
-        'id': 'value_present',
-        'merge_type': 'present',
-        'list_diff_type': 'value',
-        'data_current': LIST_CURRENT,
-        'data_modif': LIST_MODIF_VALUE,
-        'data_expected': LIST_EXPECTED_VALUE_PRESENT,
+        'id': '010_full_list_present_no_index',
+        'present': True,
+        'merge_seq_by_index': False,
+        'keep_empty': False,
+        'val_a': LIST_A,
+        'val_b': LIST_B_TEST_NOT_MERGE_BY_INDEX,
+        'val_res': LIST_RES_PRESENT_NOT_MERGE_BY_INDEX,
     },
     {
-        'id': 'value_absent',
-        'merge_type': 'absent',
-        'list_diff_type': 'value',
-        'data_current': LIST_CURRENT,
-        'data_modif': LIST_MODIF_VALUE,
-        'data_expected': LIST_EXPECTED_VALUE_ABSENT,
+        'id': '020_full_list_present_index',
+        'present': True,
+        'merge_seq_by_index': True,
+        'keep_empty': False,
+        'val_a': LIST_A,
+        'val_b': LIST_B_TEST_MERGE_BY_INDEX,
+        'val_res': LIST_RES_PRESENT_MERGE_BY_INDEX,
     },
     {
-        'id': 'index_present',
-        'merge_type': 'present',
-        'list_diff_type': 'index',
-        'data_current': LIST_CURRENT,
-        'data_modif': LIST_MODIF_INDEX,
-        'data_expected': LIST_EXPECTED_INDEX_PRESENT,
+        'id': '030_full_list_absent_no_index',
+        'present': False,
+        'merge_seq_by_index': False,
+        'keep_empty': False,
+        'val_a': LIST_A,
+        'val_b': LIST_B_TEST_NOT_MERGE_BY_INDEX,
+        'val_res': LIST_RES_ABSENT_NOT_MERGE_BY_INDEX,
     },
     {
-        'id': 'index_absent',
-        'merge_type': 'absent',
-        'list_diff_type': 'index',
-        'data_current': LIST_CURRENT,
-        'data_modif': LIST_MODIF_INDEX,
-        'data_expected': LIST_EXPECTED_INDEX_ABSENT,
+        'id': '040_full_list_absent_index',
+        'present': False,
+        'merge_seq_by_index': True,
+        'keep_empty': False,
+        'val_a': LIST_A,
+        'val_b': LIST_B_TEST_MERGE_BY_INDEX,
+        'val_res': LIST_RES_ABSENT_MERGE_BY_INDEX,
     },
     {
-        'id': 'identic',
-        'merge_type': 'identic',
-        'list_diff_type': 'value',
-        'data_current': LIST_CURRENT,
-        'data_modif': LIST_MODIF_IDENTIC,
-        'data_expected': LIST_MODIF_IDENTIC,
+        'id': '110_full_dict_present',
+        'present': True,
+        'merge_seq_by_index': False,
+        'keep_empty': False,
+        'val_a': DICT_A,
+        'val_b': DICT_B_TEST_PRESENT,
+        'val_res': DICT_RES_PRESENT,
     },
     {
-        'id': 'present_ignore_null',
-        'merge_type': 'present',
-        'list_diff_type': 'index',
-        'data_current': ['A', 'B', 'C'],
-        'data_modif': [None, 'Z'],
-        'data_expected': ['A', 'Z', 'C'],
+        'id': '120_full_dict_absent',
+        'present': False,
+        'merge_seq_by_index': False,
+        'keep_empty': False,
+        'val_a': DICT_A,
+        'val_b': DICT_B_TEST_ABSENT,
+        'val_res': DICT_RES_ABSENT,
     },
     {
-        'id': 'absent_ignore_null',
-        'merge_type': 'absent',
-        'list_diff_type': 'index',
-        'data_current': ['A', 'B', 'C'],
-        'data_modif': [None, 'B'],
-        'data_expected': ['A', 'C'],
+        'id': '210_keep_empty',
+        'present': False,
+        'merge_seq_by_index': False,
+        'keep_empty': True,
+        'val_a': {'A': ['AA', 'BB'], 'B': {'BA': '1', 'BB': '2'}},
+        'val_b': {'A': ['AA', 'BB'], 'B': {'BA': '1', 'BB': '2'}},
+        'val_res': {'A': [], 'B': {}},
     },
 ]
-DATA_MERGE_TEST_CASE_LIST_IDS = [item['id'] for item in DATA_MERGE_TEST_CASE_LIST]
+TEST_CASE_B_TO_A_IDS = [item['id'] for item in TEST_CASES_B_IN_A]
 
-DATA_MERGE_TEST_CASE_DICT = [
+TEST_CASES_B_IN_A_VALUE_ERROR = [
     {
-        'id': 'present',
-        'merge_type': 'present',
-        'data_expected': DICT_EXPECTED_PRESENT,
+        'id': '010_not_same_type',
+        'val_a': ['A'],
+        'val_b': {'A': '1'},
     },
     {
-        'id': 'absent',
-        'merge_type': 'absent',
-        'data_expected': DICT_EXPECTED_ABSENT,
+        'id': '020_not_mapping_or_seq',
+        'val_a': ['A'],
+        'val_b': {'A': '1'},
     },
     {
-        'id': 'identic',
-        'merge_type': 'identic',
-        'data_expected': DICT_MODIF,
+        'id': '030_refuse_string',
+        'val_a': 'ABC',
+        'val_b': ['A', 'B', 'C'],
     },
 ]
-DATA_MERGE_TEST_CASE_DICT_IDS = [item['id'] for item in DATA_MERGE_TEST_CASE_DICT]
+TEST_CASE_B_TO_A_VALUE_ERROR_IDS = [item['id'] for item in TEST_CASES_B_IN_A_VALUE_ERROR]
 
-DATA_MERGE_TEST_CASE_MIXED = [
-    {
-        'id': 'present',
-        'merge_type': 'present',
-        'list_diff_type': 'value',
-        'data_current': DICT_CURRENT,
-        'data_modif': LIST_CURRENT,
-        'data_expected': LIST_CURRENT,
-    },
-    {
-        'id': 'absent',
-        'merge_type': 'absent',
-        'list_diff_type': 'value',
-        'data_current': DICT_CURRENT,
-        'data_modif': LIST_CURRENT,
-        'data_expected': DICT_CURRENT,
-    },
-    {
-        'id': 'full_dict',
-        'merge_type': 'present',
-        'list_diff_type': 'value',
-        'data_current': DICT_CURRENT,
-        'data_modif': DICT_MODIF,
-        'data_expected': DICT_EXPECTED_PRESENT,
-    },
-    {
-        'id': 'full_list_index_present_ignore_null',
-        'merge_type': 'present',
-        'list_diff_type': 'index',
-        'data_current': ['A', 'B', 'C'],
-        'data_modif': [None, 'Z'],
-        'data_expected': ['A', 'Z', 'C'],
-    },
-]
-DATA_MERGE_TEST_CASE_MIXED_IDS = [item['id'] for item in DATA_MERGE_TEST_CASE_MIXED]
+
+@pytest.mark.parametrize('testcase', TEST_CASES_B_IN_A, ids=TEST_CASE_B_TO_A_IDS)
+def test_GetNewStructWithElementsOf_b_in_a(testcase):
+    res = GetNewStructWithElementsOf_b_in_a(testcase['val_a'],
+                                            testcase['val_b'],
+                                            testcase['present'],
+                                            testcase['merge_seq_by_index'],
+                                            testcase['keep_empty']).get()
+    assert(res == testcase['val_res'])
 
 
 @pytest.mark.parametrize('testcase',
-                         [
-                             {'current': ['data'], 'expected': 'data'},
-                             {'current': 'data', 'expected': ['data']},
-                         ],
-                         ids=['expected_is_not_a_list', 'current_is_not_a_list'])
-def test_merge_list_raise_with_bad_params(testcase):
-    data_merge_utils = DataMerge(merge_type='identic')
-    with pytest.raises(ValueError):
-        data_merge_utils.get_new_merged_list(testcase['current'], testcase['expected'])
-
-
-@pytest.mark.parametrize('testcase', DATA_MERGE_TEST_CASE_LIST,
-                         ids=DATA_MERGE_TEST_CASE_LIST_IDS)
-def test_merge_list(testcase):
-    data_merge_utils = DataMerge(merge_type=testcase['merge_type'], list_diff_type=testcase['list_diff_type'])
-    list_merged = data_merge_utils.get_new_merged_list(testcase['data_current'], testcase['data_modif'])
-    assert(list_merged == testcase['data_expected'])
-
-
-@pytest.mark.parametrize('testcase',
-                         [
-                             {'current': {'A': 1}, 'expected': 'A'},
-                             {'current': 'A', 'expected': {'A': 1}},
-                         ],
-                         ids=['expected_is_not_a_dict', 'current_is_not_a_dict'])
-def test_merge_dict_raise_with_bad_params(testcase):
-    data_merge_utils = DataMerge(merge_type='identic')
-    with pytest.raises(ValueError):
-        data_merge_utils.get_new_merged_dict(testcase['current'], testcase['expected'])
-
-
-@pytest.mark.parametrize('testcase', DATA_MERGE_TEST_CASE_DICT,
-                         ids=DATA_MERGE_TEST_CASE_DICT_IDS)
-def test_merge_dict(testcase):
-    data_merge_utils = DataMerge(merge_type=testcase['merge_type'])
-    dict_merged = data_merge_utils.get_new_merged_dict(DICT_CURRENT, DICT_MODIF)
-    assert(dict_merged == testcase['data_expected'])
-
-
-@pytest.mark.parametrize('testcase',
-                         [
-                             {'current': {'A': 1}, 'expected': 'A'},
-                             {'current': 'A', 'expected': {'A': 1}},
-                             {'current': ['A'], 'expected': 'A'},
-                             {'current': 'A', 'expected': ['A']},
-                         ],
-                         ids=['expected_is_not_a_dict',
-                              'current_is_not_a_dict',
-                              'expected_is_not_a_list',
-                              'current_is_not_a_list'])
-def test_merge_data_raise_with_bad_params(testcase):
-    data_merge_utils = DataMerge(merge_type='identic')
-    with pytest.raises(ValueError):
-        data_merge_utils.get_new_merged_data(testcase['current'], testcase['expected'])
-
-
-@pytest.mark.parametrize('testcase', DATA_MERGE_TEST_CASE_MIXED,
-                         ids=DATA_MERGE_TEST_CASE_MIXED_IDS)
-def test_merge_mixed(testcase):
-    data_merge_utils = DataMerge(merge_type=testcase['merge_type'], list_diff_type=testcase['list_diff_type'])
-    list_merged = data_merge_utils.get_new_merged_data(testcase['data_current'], testcase['data_modif'])
-    assert(list_merged == testcase['data_expected'])
+                         TEST_CASES_B_IN_A_VALUE_ERROR,
+                         ids=TEST_CASE_B_TO_A_VALUE_ERROR_IDS)
+def test_GetNewStructWithElementsOf_b_in_a_value_error(testcase):
+    with pytest.raises(TypeError):
+        GetNewStructWithElementsOf_b_in_a(testcase['val_a'], testcase['val_b'])
