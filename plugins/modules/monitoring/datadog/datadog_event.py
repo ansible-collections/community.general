@@ -20,7 +20,7 @@ description:
 - "Allows to post events to Datadog (www.datadoghq.com) service."
 - "Uses http://docs.datadoghq.com/api/#events API."
 author:
-- "Artūras `arturaz` Šlajus (@arturaz)"
+- "Artūras 'arturaz' Šlajus (@arturaz)"
 - "Naoya Nakazawa (@n0ts)"
 options:
     api_key:

@@ -191,10 +191,10 @@ notes:
     2.1, the later requires python to be installed in the instance which can
     be done with the command module.
   - You can copy a file from the host to the instance
-    with the Ansible M(ansible.builtin.copy) and M(ansible.builtin.template) module and the `lxd` connection plugin.
+    with the Ansible M(ansible.builtin.copy) and M(ansible.builtin.template) module and the C(community.general.lxd) connection plugin.
     See the example below.
   - You can copy a file in the created instance to the localhost
-    with `command=lxc file pull instance_name/dir/filename filename`.
+    with C(command=lxc file pull instance_name/dir/filename filename).
     See the first example below.
 '''
 

@@ -186,7 +186,7 @@ options:
   validate_certs:
     required: false
     description:
-      - Require valid SSL certificates (set to `false` if you'd like to use self-signed certificates)
+      - Require valid SSL certificates (set to C(false) if you'd like to use self-signed certificates)
     default: true
     type: bool
 
