@@ -36,7 +36,7 @@ options:
     force:
         description:
             - Discards uncommitted changes. Runs C(hg update -C).  Prior to
-              1.9, the default was `yes`.
+              1.9, the default was C(yes).
         type: bool
         default: 'no'
     purge:

@@ -107,7 +107,7 @@ state:
   returned: always
 command:
   type: str
-  description: Full `serverless` command run by this module, in case you want to re-run the command outside the module.
+  description: Full C(serverless) command run by this module, in case you want to re-run the command outside the module.
   returned: always
   sample: serverless deploy --stage production
 '''

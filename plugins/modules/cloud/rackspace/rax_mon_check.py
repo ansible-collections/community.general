@@ -75,15 +75,15 @@ options:
   target_hostname:
     type: str
     description:
-    - One of `target_hostname` and `target_alias` is required for remote.* checks,
+    - One of I(target_hostname) and I(target_alias) is required for remote.* checks,
       but prohibited for agent.* checks. The hostname this check should target.
       Must be a valid IPv4, IPv6, or FQDN.
   target_alias:
     type: str
     description:
-    - One of `target_alias` and `target_hostname` is required for remote.* checks,
+    - One of I(target_alias) and I(target_hostname) is required for remote.* checks,
       but prohibited for agent.* checks. Use the corresponding key in the entity's
-      `ip_addresses` hash to resolve an IP address to target.
+      I(ip_addresses) hash to resolve an IP address to target.
   details:
     type: dict
     description:

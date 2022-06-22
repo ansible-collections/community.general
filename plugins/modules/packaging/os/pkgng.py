@@ -102,8 +102,8 @@ options:
 author: "bleader (@bleader)"
 notes:
   - When using pkgsite, be careful that already in cache packages won't be downloaded again.
-  - When used with a `loop:` each package will be processed individually,
-    it is much more efficient to pass the list directly to the `name` option.
+  - When used with a C(loop:) each package will be processed individually,
+    it is much more efficient to pass the list directly to the I(name) option.
 '''
 
 EXAMPLES = '''

@@ -99,7 +99,7 @@ options:
   weight:
     description:
       - The value passed in argument.
-      - If the value ends with the `%` sign, then the new weight will be
+      - If the value ends with the C(%) sign, then the new weight will be
         relative to the initially configured weight.
       - Relative weights are only permitted between 0 and 100% and absolute
         weights are permitted between 0 and 256.

@@ -62,8 +62,8 @@ options:
     type: bool
     default: no
 notes:
-  - '"name" and "upgrade" are mutually exclusive.'
-  - When used with a `loop:` each package will be processed individually, it is much more efficient to pass the list directly to the `name` option.
+  - 'I(name) and I(upgrade) are mutually exclusive.'
+  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly to the I(name) option.
 '''
 
 EXAMPLES = '''

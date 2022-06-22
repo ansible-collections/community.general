@@ -67,7 +67,7 @@ options:
   state_file:
     description:
       - The path to an existing Terraform state file to use when building plan.
-        If this is not specified, the default `terraform.tfstate` will be used.
+        If this is not specified, the default C(terraform.tfstate) will be used.
       - This option is ignored when plan is specified.
     type: path
   variables_files:
@@ -103,7 +103,7 @@ options:
   force_init:
     description:
       - To avoid duplicating infra, if a state file can't be found this will
-        force a `terraform init`. Generally, this should be turned off unless
+        force a C(terraform init). Generally, this should be turned off unless
         you intend to provision an entirely new Terraform deployment.
     default: false
     type: bool
@@ -149,7 +149,7 @@ options:
     type: int
     version_added: '3.8.0'
 notes:
-   - To just run a `terraform plan`, use check mode.
+   - To just run a C(terraform plan), use check mode.
 requirements: [ "terraform" ]
 author: "Ryan Scott Brown (@ryansb)"
 '''
@@ -205,7 +205,7 @@ EXAMPLES = """
 RETURN = """
 outputs:
   type: complex
-  description: A dictionary of all the TF outputs by their assigned name. Use `.outputs.MyOutputName.value` to access the value.
+  description: A dictionary of all the TF outputs by their assigned name. Use C(.outputs.MyOutputName.value) to access the value.
   returned: on success
   sample: '{"bukkit_arn": {"sensitive": false, "type": "string", "value": "arn:aws:s3:::tf-test-bukkit"}'
   contains:
@@ -223,12 +223,12 @@ outputs:
       description: The value of the output as interpolated by Terraform
 stdout:
   type: str
-  description: Full `terraform` command stdout, in case you want to display it or examine the event log
+  description: Full C(terraform) command stdout, in case you want to display it or examine the event log
   returned: always
   sample: ''
 command:
   type: str
-  description: Full `terraform` command built by this module, in case you want to re-run the command outside the module or debug a problem.
+  description: Full C(terraform) command built by this module, in case you want to re-run the command outside the module or debug a problem.
   returned: always
   sample: terraform apply ...
 """

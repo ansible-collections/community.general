@@ -119,7 +119,7 @@ options:
   repoview:
     description:
       - Whether to generate repoview files for a published repository. Setting
-        this to "yes" automatically activates `generate_sqlite`.
+        this to "yes" automatically activates C(generate_sqlite).
     required: false
     type: bool
     default: no

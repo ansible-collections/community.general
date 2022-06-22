@@ -35,7 +35,7 @@ options:
         elements: str
     path:
         description:
-            - "A ':' separated list of paths to search for 'brew' executable.
+            - "A C(:) separated list of paths to search for C(brew) executable.
               Since a package (I(formula) in homebrew parlance) location is prefixed relative to the actual path of I(brew) command,
               providing an alternative I(brew) path enables managing different set of packages in an alternative location in the system."
         default: '/usr/local/bin:/opt/homebrew/bin'
@@ -70,8 +70,8 @@ options:
         elements: str
         version_added: '0.2.0'
 notes:
-  - When used with a `loop:` each package will be processed individually,
-    it is much more efficient to pass the list directly to the `name` option.
+  - When used with a C(loop:) each package will be processed individually,
+    it is much more efficient to pass the list directly to the I(name) option.
 '''
 
 EXAMPLES = '''

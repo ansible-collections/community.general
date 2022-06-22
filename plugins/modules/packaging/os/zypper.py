@@ -136,8 +136,8 @@ options:
           - Adds C(--clean-deps) option to I(zypper) remove command.
         version_added: '4.6.0'
 notes:
-  - When used with a `loop:` each package will be processed individually,
-    it is much more efficient to pass the list directly to the `name` option.
+  - When used with a C(loop:) each package will be processed individually,
+    it is much more efficient to pass the list directly to the I(name) option.
 # informational: requirements for nodes
 requirements:
     - "zypper >= 1.0  # included in openSUSE >= 11.1 or SUSE Linux Enterprise Server/Desktop >= 11.0"
