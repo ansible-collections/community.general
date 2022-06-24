@@ -15,12 +15,7 @@ import socket
 from ansible.module_utils.urls import fetch_file, open_url
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
 
-try:
-    # Python3
-    from urllib.parse import urlparse, urlunparse
-except ImportError:
-    # Python2
-    from urlparse import urlparse, urlunparse
+from ansible.module_utils.six.moves.urllib.parse import urlparse, urlunparse
 
 try:
     import ipaddress
@@ -37,7 +32,7 @@ except ImportError:
     DNS_AVAILABLE = False
 
 
-class DnsCacheBypass:
+class DnsCacheBypass(object):
     """Class to provide a context manager to bypass DNS cache for a given host.
 
     This is used in circumstances where a hostname changes its IP address.  It bypasses

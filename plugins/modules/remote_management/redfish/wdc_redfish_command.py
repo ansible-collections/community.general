@@ -11,15 +11,16 @@ DOCUMENTATION = '''
 ---
 module: wdc_redfish_command
 short_description: Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish APIs
+version_added: 5.3.0
 description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to
     perform an action.
-  - Manages OOB controller firmware ex. Firmware Activate, Update and Activate
+  - Manages OOB controller firmware. For example, Firmware Activate, Update and Activate.
 options:
   category:
     required: true
     description:
-      - Category to execute on OOB controller
+      - Category to execute on OOB controller.
     type: str
   command:
     required: true
@@ -29,7 +30,7 @@ options:
     elements: str
   baseuri:
     description:
-      - Base URI of OOB controller.  Must include this or ioms
+      - Base URI of OOB controller.  Must include this or I(ioms).
     type: str
   ioms:
     description:
@@ -189,7 +190,7 @@ def main():
     )
 
     if not dns_available():
-        module.fail_json(msg="The dnspython library is not installed")
+        module.fail_json(msg=missing_required_lib('dnspython'))
 
     category = module.params['category']
     command_list = module.params['command']
@@ -214,7 +215,7 @@ def main():
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, list(CATEGORY_COMMANDS_ALL.keys()))))
+        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, sorted(CATEGORY_COMMANDS_ALL.keys()))))
 
     # Check that all commands are valid
     for cmd in command_list:
