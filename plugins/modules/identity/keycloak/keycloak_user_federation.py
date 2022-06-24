@@ -128,7 +128,7 @@ options:
 
             vendor:
                 description:
-                    - LDAP vendor (provider).
+                    - LDAP vendor (provider). Use short name. For instance, write rhds for "Red Hat Directory Server".
                 type: str
 
             usernameLDAPAttribute:
