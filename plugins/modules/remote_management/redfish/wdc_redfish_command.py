@@ -77,11 +77,9 @@ options:
 requirements:
   - dnspython (2.1.0 for Python 3, 1.16.0 for Python 2)
 notes:
-  - In the inventory, you can specify baseuri or ioms.
+  - In the inventory, you can specify baseuri or ioms.  See the EXAMPLES section.
   - ioms is a list of FQDNs for the enclosure's IOMs.
-  - See sample below.  This can be in your hosts file such as /etc/ansible/hosts.
-  - my_enclosure ioms='["oobm-11-22-33-44-55-66.wdc.com", "oobm-22-33-44-55-66-77.wdc.com"]'
-  - my_enclosure2 baseuri="oobm-00-11-22-33-44-55.wdc.com"
+
 
 author: Mike Moerk (@mikemoerk)
 '''
@@ -94,6 +92,25 @@ EXAMPLES = '''
     ioms: "{{ ioms }}"
     username: "{{ username }}"
     password: "{{ password }}"
+
+- name: Firmware Activate with individual IOMs specified
+  community.general.wdc_redfish_command:
+    category: Update
+    command: FWActivate
+    ioms:
+      - iom1.wdc.com
+      - iom2.wdc.com
+    username: "{{ username }}"
+    password: "{{ password }}"
+
+- name: Firmware Activate with baseuri specified
+  community.general.wdc_redfish_command:
+    category: Update
+    command: FWActivate
+    baseuri: "iom1.wdc.com"
+    username: "{{ username }}"
+    password: "{{ password }}"
+
 
 - name: Update and Activate (orchestrates firmware update and activation with a single command)
   community.general.wdc_redfish_command:
@@ -123,7 +140,7 @@ try:
 except ImportError:
     DNS_AVAILABLE = False
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
 CATEGORY_COMMANDS_ALL = {
