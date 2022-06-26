@@ -482,17 +482,17 @@ def main():
                     ret_out.append('{0}={{{1}}}'.format(k, process_complex_args(v)))
                 if isinstance(v, list):
                     ret_out.append("{0}=[{1}]".format(k, process_complex_args(v)))
-                if isinstance(v, (integer_types, float, str)):
+                if isinstance(v, (integer_types, float, str, bool)):
                     ret_out.append('{0}={1}'.format(k, json.dumps(v)))
         if isinstance(vars, list):
             l_out = []
             for item in vars:
                 if isinstance(item, dict):
                     l_out.append("{{{0}}}".format(process_complex_args(item)))
-                elif isinstance(item, (str, integer_types, float)):
+                elif isinstance(item, (str, integer_types, float, bool)):
                     l_out.append(json.dumps(item))
                 else:
-                    module.fail_json(msg="List can contain, dictionaries, strings, integer_types and float.")
+                    module.fail_json(msg="List can contain, dictionaries, strings, integer_types, boolean and float.")
             ret_out.append("[{0}]".format(",".join(l_out)))
         return ",".join(ret_out)
 
