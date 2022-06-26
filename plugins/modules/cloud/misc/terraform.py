@@ -67,7 +67,7 @@ options:
   state_file:
     description:
       - The path to an existing Terraform state file to use when building plan.
-        If this is not specified, the default C(terraform.tfstate) will be used.
+        If this is not specified, the default `terraform.tfstate` will be used.
       - This option is ignored when plan is specified.
     type: path
   variables_files:
@@ -108,7 +108,7 @@ options:
   force_init:
     description:
       - To avoid duplicating infra, if a state file can't be found this will
-        force a C(terraform init). Generally, this should be turned off unless
+        force a `terraform init`. Generally, this should be turned off unless
         you intend to provision an entirely new Terraform deployment.
     default: false
     type: bool
@@ -154,7 +154,7 @@ options:
     type: int
     version_added: '3.8.0'
 notes:
-   - To just run a C(terraform plan), use check mode.
+   - To just run a `terraform plan`, use check mode.
 requirements: [ "terraform" ]
 author: "Ryan Scott Brown (@ryansb)"
 '''
@@ -229,7 +229,7 @@ EXAMPLES = """
 RETURN = """
 outputs:
   type: complex
-  description: A dictionary of all the TF outputs by their assigned name. Use C(.outputs.MyOutputName.value) to access the value.
+  description: A dictionary of all the TF outputs by their assigned name. Use `.outputs.MyOutputName.value` to access the value.
   returned: on success
   sample: '{"bukkit_arn": {"sensitive": false, "type": "string", "value": "arn:aws:s3:::tf-test-bukkit"}'
   contains:
@@ -247,12 +247,12 @@ outputs:
       description: The value of the output as interpolated by Terraform
 stdout:
   type: str
-  description: Full C(terraform) command stdout, in case you want to display it or examine the event log
+  description: Full `terraform` command stdout, in case you want to display it or examine the event log
   returned: always
   sample: ''
 command:
   type: str
-  description: Full C(terraform) command built by this module, in case you want to re-run the command outside the module or debug a problem.
+  description: Full `terraform` command built by this module, in case you want to re-run the command outside the module or debug a problem.
   returned: always
   sample: terraform apply ...
 """
@@ -474,59 +474,40 @@ def main():
     if state == 'present' and module.params.get('parallelism') is not None:
         command.append('-parallelism=%d' % module.params.get('parallelism'))
 
-    def process_args(variables, top=True):
-        variables_args = []
-        lowlevel_out = []
-        for k, v in variables.items():
-            if top:
+    def process_complex_args(vars):
+        ret_out = []
+        if isinstance(vars, dict):
+            for k, v in vars.items():
                 if isinstance(v, dict):
-                    variables_args.extend([
-                        "-var",
-                        k + '={' + process_args(v, False) + '}'
-                    ])
-                if (isinstance(v, list)):
-                    l_out = []
-                    for item in v:
-                        l_out.append("{" + process_args(item, False) + "}")
-                    variables_args.extend([
-                        "-var",
-                        k + '=[' + ",".join(l_out) + ']'
-                    ])
-                if (isinstance(v, (integer_types, float)) and not isinstance(v, bool)):
-                    variables_args.extend([
-                        "-var",
-                        '{0}={1}'.format(k, v)
-                    ])
-                if (isinstance(v, str)):
-                    variables_args.extend([
-                        "-var",
-                        '{0}={1}'.format(k, v)
-                    ])
-                if (isinstance(v, bool)):
-                    if v:
-                        variables_args.extend([
-                            "-var",
-                            '{0}=true'.format(k)
-                        ])
-                    else:
-                        variables_args.extend([
-                            "-var",
-                            '{0}=false'.format(k)
-                        ])
-
-            else:
-                if (isinstance(v, dict)):
-                    lowlevel_out.append('%s={%s}' % (k, process_args(v, False)))
-                if (isinstance(v, list)):
-                    lowlevel_out.append(k + '=[' + process_args(v, False) + ']')
+                    ret_out.append('{0}={{{1}}}'.format(k, process_complex_args(v)))
+                if isinstance(v, list):
+                    ret_out.append("{0}=[{1}]".format(k, process_complex_args(v)))
                 if isinstance(v, (integer_types, float, str)):
-                    lowlevel_out.append('{0}={1}'.format(k, json.dumps(v)))
-        if top:
-            return (variables_args)
-        else:
-            return ",".join(lowlevel_out)
+                    ret_out.append('{0}={1}'.format(k, json.dumps(v)))
+        if isinstance(vars, list):
+            l_out = []
+            for item in vars:
+                if isinstance(item, dict):
+                    l_out.append("{{{0}}}".format(process_complex_args(item)))
+                elif isinstance(item, (str, integer_types, float)):
+                    l_out.append(json.dumps(item))
+                else:
+                    module.fail_json(msg="List can contain, dictionaries, strings, integer_types and float.")
+            ret_out.append("[{0}]".format(",".join(l_out)))
+        return ",".join(ret_out)
 
-    variables_args = process_args(variables, True)
+    variables_args = []
+    for k, v in variables.items():
+        if isinstance(v, (dict, list)):
+            variables_args.extend([
+                '-var',
+                '{0}={1}'.format(k, process_complex_args(v))
+            ])
+        else:
+            variables_args.extend([
+                '-var',
+                '{0}={1}'.format(k, v)
+            ])
 
     if variables_files:
         for f in variables_files:
