@@ -82,10 +82,10 @@ options:
     description:
       - A group of key-values to override template variables or those in variables files.
       - Support complex variable structures to reflect terraform variable syntax.
-      - Terraform objects are mapped to Ansible dictionaries.
-      - Terraform Lists are Ansible Lists.
-      - Terraform Numbers can be Ansible Ints or Floats.
-      - Terraform Bool can be Ansible Bools.
+      - Ansible dictionaries are mapped to terraform objects.
+      - Ansible lists are mapped to terraform lists.
+      - Ansible integers or floats are mapped to terraform numbers.
+      - Ansible booleans are mapped to terraform booleans.
       - "B(Note) passwords passed as variables will be visible in the log output. Make sure to use C(no_log: true) in production!"
     type: dict
   targets:
