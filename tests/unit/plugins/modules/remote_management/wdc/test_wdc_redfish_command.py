@@ -14,7 +14,6 @@ from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible.module_utils import basic
 import ansible_collections.community.general.plugins.modules.remote_management.redfish.wdc_redfish_command as module
-from ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils import DnsCacheBypass
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args, exit_json, fail_json
 
@@ -277,21 +276,19 @@ class TestWdcRedfishCommand(unittest.TestCase):
             else:
                 return mock_get_request_enclosure_single_tenant(*args, **kwargs)
 
-        with patch.object(DnsCacheBypass, '_resolve') as mock__resolve:
-            mock__resolve.return_value = ("127.0.0.1",)
-            with patch.multiple(module.WdcRedfishUtils,
-                                _firmware_activate_uri=mock_fw_activate_url,
-                                _update_uri=mock_update_url,
-                                _find_updateservice_resource=empty_return,
-                                _find_updateservice_additional_uris=empty_return,
-                                get_request=mock_get_request,
-                                post_request=mock_post_request):
-                with patch.object(module, 'dns_available') as mock_dns_available:
-                    mock_dns_available.return_value = True
-                    with self.assertRaises(AnsibleExitJson) as cm:
-                        module.main()
-                    self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE,
-                                     cm.exception.args[0]['msg'])
+        with patch.multiple(module.WdcRedfishUtils,
+                            _firmware_activate_uri=mock_fw_activate_url,
+                            _update_uri=mock_update_url,
+                            _find_updateservice_resource=empty_return,
+                            _find_updateservice_additional_uris=empty_return,
+                            get_request=mock_get_request,
+                            post_request=mock_post_request):
+            with patch.object(module, 'dns_available') as mock_dns_available:
+                mock_dns_available.return_value = True
+                with self.assertRaises(AnsibleExitJson) as cm:
+                    module.main()
+                self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE,
+                                 cm.exception.args[0]['msg'])
 
     def test_module_fw_activate_pass(self):
         """Test the FW Activate command in a passing scenario."""
@@ -315,22 +312,20 @@ class TestWdcRedfishCommand(unittest.TestCase):
             module_args.update(uri_specifier)
             set_module_args(module_args)
 
-            with patch.object(DnsCacheBypass, '_resolve') as mock__resolve:
-                mock__resolve.return_value = ("127.0.0.1",)
-                with patch.multiple(module.WdcRedfishUtils,
-                                    _firmware_activate_uri=mock_fw_activate_url,
-                                    _update_uri=mock_update_url,
-                                    _find_updateservice_resource=empty_return,
-                                    _find_updateservice_additional_uris=empty_return,
-                                    get_request=mock_get_request_enclosure_single_tenant,
-                                    post_request=mock_post_request):
-                    with patch.object(module, 'dns_available') as mock_dns_available:
-                        mock_dns_available.return_value = True
-                        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                            module.main()
-                            self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE,
-                                             ansible_exit_json.exception.args[0]['msg'])
-                            self.assertTrue(ansible_exit_json["changed"])
+            with patch.multiple(module.WdcRedfishUtils,
+                                _firmware_activate_uri=mock_fw_activate_url,
+                                _update_uri=mock_update_url,
+                                _find_updateservice_resource=empty_return,
+                                _find_updateservice_additional_uris=empty_return,
+                                get_request=mock_get_request_enclosure_single_tenant,
+                                post_request=mock_post_request):
+                with patch.object(module, 'dns_available') as mock_dns_available:
+                    mock_dns_available.return_value = True
+                    with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+                        module.main()
+                        self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE,
+                                         ansible_exit_json.exception.args[0]['msg'])
+                        self.assertTrue(ansible_exit_json["changed"])
 
     def test_module_fw_activate_service_does_not_support_fw_activate(self):
         """Test FW Activate when it is not supported."""
@@ -349,20 +344,18 @@ class TestWdcRedfishCommand(unittest.TestCase):
                 "data": {}  # No Actions
             }
 
-        with patch.object(DnsCacheBypass, '_resolve') as mock__resolve:
-            mock__resolve.return_value = ("127.0.0.1",)
-            with patch.multiple(module.WdcRedfishUtils,
-                                _firmware_activate_uri=mocked_url_response,
-                                _update_uri=mock_update_url,
-                                _find_updateservice_resource=empty_return,
-                                _find_updateservice_additional_uris=empty_return,
-                                get_request=mock_update_uri_response):
-                with patch.object(module, 'dns_available') as mock_dns_available:
-                    mock_dns_available.return_value = True
-                    with self.assertRaises(AnsibleFailJson) as cm:
-                        module.main()
-                    self.assertEqual(expected_error_message,
-                                     cm.exception.args[0]['msg'])
+        with patch.multiple(module.WdcRedfishUtils,
+                            _firmware_activate_uri=mocked_url_response,
+                            _update_uri=mock_update_url,
+                            _find_updateservice_resource=empty_return,
+                            _find_updateservice_additional_uris=empty_return,
+                            get_request=mock_update_uri_response):
+            with patch.object(module, 'dns_available') as mock_dns_available:
+                mock_dns_available.return_value = True
+                with self.assertRaises(AnsibleFailJson) as cm:
+                    module.main()
+                self.assertEqual(expected_error_message,
+                                 cm.exception.args[0]['msg'])
 
     def test_module_update_and_activate_image_uri_not_http(self):
         """Test Update and Activate when URI is not http(s)"""
@@ -377,17 +370,15 @@ class TestWdcRedfishCommand(unittest.TestCase):
         })
         with patch.object(module, 'dns_available') as mock_dns_available:
             mock_dns_available.return_value = True
-            with patch.object(DnsCacheBypass, '_resolve') as mock__resolve:
-                mock__resolve.return_value = ("127.0.0.1",)
-                with patch.multiple(module.WdcRedfishUtils,
-                                    _firmware_activate_uri=mocked_url_response,
-                                    _update_uri=mock_update_url,
-                                    _find_updateservice_resource=empty_return,
-                                    _find_updateservice_additional_uris=empty_return):
-                    with self.assertRaises(AnsibleFailJson) as cm:
-                        module.main()
-                    self.assertEqual(expected_error_message,
-                                     cm.exception.args[0]['msg'])
+            with patch.multiple(module.WdcRedfishUtils,
+                                _firmware_activate_uri=mocked_url_response,
+                                _update_uri=mock_update_url,
+                                _find_updateservice_resource=empty_return,
+                                _find_updateservice_additional_uris=empty_return):
+                with self.assertRaises(AnsibleFailJson) as cm:
+                    module.main()
+                self.assertEqual(expected_error_message,
+                                 cm.exception.args[0]['msg'])
 
     def test_module_update_and_activate_target_not_ready_for_fw_update(self):
         """Test Update and Activate when target is not in the correct state."""
@@ -415,17 +406,15 @@ class TestWdcRedfishCommand(unittest.TestCase):
             }
             with patch.object(module, 'dns_available') as mock_dns_available:
                 mock_dns_available.return_value = True
-                with patch.object(DnsCacheBypass, '_resolve') as mock__resolve:
-                    mock__resolve.return_value = ("127.0.0.1",)
-                    with patch.multiple(module.WdcRedfishUtils,
-                                        _firmware_activate_uri=mocked_url_response,
-                                        _update_uri=mock_update_url,
-                                        _find_updateservice_resource=empty_return,
-                                        _find_updateservice_additional_uris=empty_return):
-                        with self.assertRaises(AnsibleFailJson) as cm:
-                            module.main()
-                        self.assertEqual(expected_error_message,
-                                         cm.exception.args[0]['msg'])
+                with patch.multiple(module.WdcRedfishUtils,
+                                    _firmware_activate_uri=mocked_url_response,
+                                    _update_uri=mock_update_url,
+                                    _find_updateservice_resource=empty_return,
+                                    _find_updateservice_additional_uris=empty_return):
+                    with self.assertRaises(AnsibleFailJson) as cm:
+                        module.main()
+                    self.assertEqual(expected_error_message,
+                                     cm.exception.args[0]['msg'])
 
     def test_module_update_and_activate_bundle_not_a_tarfile(self):
         """Test Update and Activate when bundle is not a tarfile"""
@@ -447,18 +436,16 @@ class TestWdcRedfishCommand(unittest.TestCase):
             mock_fetch_file.return_value = mock_filename
             with patch.object(module, 'dns_available') as mock_dns_available:
                 mock_dns_available.return_value = True
-                with patch.object(DnsCacheBypass, '_resolve') as mock__resolve:
-                    mock__resolve.return_value = ("127.0.0.1",)
-                    with patch.multiple(module.WdcRedfishUtils,
-                                        get_simple_update_status=mock_get_simple_update_status_ready_for_fw_update,
-                                        _firmware_activate_uri=mocked_url_response,
-                                        _update_uri=mock_update_url,
-                                        _find_updateservice_resource=empty_return,
-                                        _find_updateservice_additional_uris=empty_return):
-                        with self.assertRaises(AnsibleFailJson) as cm:
-                            module.main()
-                        self.assertEqual(expected_error_message,
-                                         cm.exception.args[0]['msg'])
+                with patch.multiple(module.WdcRedfishUtils,
+                                    get_simple_update_status=mock_get_simple_update_status_ready_for_fw_update,
+                                    _firmware_activate_uri=mocked_url_response,
+                                    _update_uri=mock_update_url,
+                                    _find_updateservice_resource=empty_return,
+                                    _find_updateservice_additional_uris=empty_return):
+                    with self.assertRaises(AnsibleFailJson) as cm:
+                        module.main()
+                    self.assertEqual(expected_error_message,
+                                     cm.exception.args[0]['msg'])
 
     def test_module_update_and_activate_bundle_contains_no_firmware_version(self):
         """Test Update and Activate when bundle contains no firmware version"""
@@ -483,18 +470,16 @@ class TestWdcRedfishCommand(unittest.TestCase):
             mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
             with patch.object(module, 'dns_available') as mock_dns_available:
                 mock_dns_available.return_value = True
-                with patch.object(DnsCacheBypass, '_resolve') as mock__resolve:
-                    mock__resolve.return_value = ("127.0.0.1",)
-                    with patch.multiple(module.WdcRedfishUtils,
-                                        get_simple_update_status=mock_get_simple_update_status_ready_for_fw_update,
-                                        _firmware_activate_uri=mocked_url_response,
-                                        _update_uri=mock_update_url,
-                                        _find_updateservice_resource=empty_return,
-                                        _find_updateservice_additional_uris=empty_return):
-                        with self.assertRaises(AnsibleFailJson) as cm:
-                            module.main()
-                        self.assertEqual(expected_error_message,
-                                         cm.exception.args[0]['msg'])
+                with patch.multiple(module.WdcRedfishUtils,
+                                    get_simple_update_status=mock_get_simple_update_status_ready_for_fw_update,
+                                    _firmware_activate_uri=mocked_url_response,
+                                    _update_uri=mock_update_url,
+                                    _find_updateservice_resource=empty_return,
+                                    _find_updateservice_additional_uris=empty_return):
+                    with self.assertRaises(AnsibleFailJson) as cm:
+                        module.main()
+                    self.assertEqual(expected_error_message,
+                                     cm.exception.args[0]['msg'])
 
     def test_module_update_and_activate_version_already_installed(self):
         """Test Update and Activate when the bundle version is already installed"""
@@ -517,24 +502,22 @@ class TestWdcRedfishCommand(unittest.TestCase):
                                                  is_multi_tenant=False)
         with patch('ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file') as mock_fetch_file:
             mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
-            with patch.object(DnsCacheBypass, '_resolve') as mock__resolve:
-                mock__resolve.return_value = ("127.0.0.1",)
-                with patch.multiple(module.WdcRedfishUtils,
-                                    get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3,
-                                    get_simple_update_status=mock_get_simple_update_status_ready_for_fw_update,
-                                    _firmware_activate_uri=mocked_url_response,
-                                    _update_uri=mock_update_url,
-                                    _find_updateservice_resource=empty_return,
-                                    _find_updateservice_additional_uris=empty_return,
-                                    get_request=mock_get_request_enclosure_single_tenant):
-                    with patch.object(module, 'dns_available') as mock_dns_available:
-                        mock_dns_available.return_value = True
-                        with self.assertRaises(AnsibleExitJson) as result:
-                            module.main()
-                        exc = result.exception.args[0]
-                        self.assertEqual(expected_error_message,
-                                         exc["msg"])
-                        self.assertFalse(exc["changed"])
+            with patch.multiple(module.WdcRedfishUtils,
+                                get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3,
+                                get_simple_update_status=mock_get_simple_update_status_ready_for_fw_update,
+                                _firmware_activate_uri=mocked_url_response,
+                                _update_uri=mock_update_url,
+                                _find_updateservice_resource=empty_return,
+                                _find_updateservice_additional_uris=empty_return,
+                                get_request=mock_get_request_enclosure_single_tenant):
+                with patch.object(module, 'dns_available') as mock_dns_available:
+                    mock_dns_available.return_value = True
+                    with self.assertRaises(AnsibleExitJson) as result:
+                        module.main()
+                    exc = result.exception.args[0]
+                    self.assertEqual(expected_error_message,
+                                     exc["msg"])
+                    self.assertFalse(exc["changed"])
 
     def test_module_update_and_activate_version_already_installed_multi_tenant(self):
         """Test Update and Activate on multi-tenant when version is already installed"""
@@ -557,24 +540,22 @@ class TestWdcRedfishCommand(unittest.TestCase):
                                                  is_multi_tenant=True)
         with patch('ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file') as mock_fetch_file:
             mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
-            with patch.object(DnsCacheBypass, '_resolve') as mock__resolve:
-                mock__resolve.return_value = ("127.0.0.1",)
-                with patch.multiple(module.WdcRedfishUtils,
-                                    get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3,
-                                    get_simple_update_status=mock_get_simple_update_status_ready_for_fw_update,
-                                    _firmware_activate_uri=mocked_url_response,
-                                    _update_uri=mock_update_url,
-                                    _find_updateservice_resource=empty_return,
-                                    _find_updateservice_additional_uris=empty_return,
-                                    get_request=mock_get_request_enclosure_multi_tenant):
-                    with patch.object(module, 'dns_available') as mock_dns_available:
-                        mock_dns_available.return_value = True
-                        with self.assertRaises(AnsibleExitJson) as result:
-                            module.main()
-                        exc = result.exception.args[0]
-                        self.assertEqual(expected_error_message,
-                                         exc["msg"])
-                        self.assertFalse(exc["changed"])
+            with patch.multiple(module.WdcRedfishUtils,
+                                get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3,
+                                get_simple_update_status=mock_get_simple_update_status_ready_for_fw_update,
+                                _firmware_activate_uri=mocked_url_response,
+                                _update_uri=mock_update_url,
+                                _find_updateservice_resource=empty_return,
+                                _find_updateservice_additional_uris=empty_return,
+                                get_request=mock_get_request_enclosure_multi_tenant):
+                with patch.object(module, 'dns_available') as mock_dns_available:
+                    mock_dns_available.return_value = True
+                    with self.assertRaises(AnsibleExitJson) as result:
+                        module.main()
+                    exc = result.exception.args[0]
+                    self.assertEqual(expected_error_message,
+                                     exc["msg"])
+                    self.assertFalse(exc["changed"])
 
     def test_module_update_and_activate_pass(self):
         """Test Update and Activate (happy path)"""
@@ -598,24 +579,22 @@ class TestWdcRedfishCommand(unittest.TestCase):
 
         with patch('ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file') as mock_fetch_file:
             mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
-            with patch.object(DnsCacheBypass, '_resolve') as mock__resolve:
-                mock__resolve.return_value = ("127.0.0.1",)
-                with patch.multiple(module.WdcRedfishUtils,
-                                    get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3,
-                                    simple_update=mock_simple_update,
-                                    _simple_update_status_uri=mocked_url_response,
-                                    _find_updateservice_resource=empty_return,
-                                    _find_updateservice_additional_uris=empty_return,
-                                    get_request=mock_get_request_enclosure_single_tenant,
-                                    post_request=mock_post_request):
-                    with patch.object(module, 'dns_available') as mock_dns_available:
-                        mock_dns_available.return_value = True
-                        with patch.object(module.WdcRedfishUtils, 'get_simple_update_status') as mock_get_simple_update_status:
-                            mock_get_simple_update_status.side_effect = MOCK_SIMPLE_UPDATE_STATUS_LIST
-                            with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                                module.main()
-                                self.assertTrue(ansible_exit_json["changed"])
-                                self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, ansible_exit_json["msg"])
+            with patch.multiple(module.WdcRedfishUtils,
+                                get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3,
+                                simple_update=mock_simple_update,
+                                _simple_update_status_uri=mocked_url_response,
+                                _find_updateservice_resource=empty_return,
+                                _find_updateservice_additional_uris=empty_return,
+                                get_request=mock_get_request_enclosure_single_tenant,
+                                post_request=mock_post_request):
+                with patch.object(module, 'dns_available') as mock_dns_available:
+                    mock_dns_available.return_value = True
+                    with patch.object(module.WdcRedfishUtils, 'get_simple_update_status') as mock_get_simple_update_status:
+                        mock_get_simple_update_status.side_effect = MOCK_SIMPLE_UPDATE_STATUS_LIST
+                        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+                            module.main()
+                            self.assertTrue(ansible_exit_json["changed"])
+                            self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, ansible_exit_json["msg"])
 
     def test_module_update_and_activate_pass_multi_tenant(self):
         """Test Update and Activate with multi-tenant (happy path)"""
@@ -638,24 +617,22 @@ class TestWdcRedfishCommand(unittest.TestCase):
 
         with patch('ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file') as mock_fetch_file:
             mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
-            with patch.object(DnsCacheBypass, '_resolve') as mock__resolve:
-                mock__resolve.return_value = ("127.0.0.1",)
-                with patch.multiple(module.WdcRedfishUtils,
-                                    get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3,
-                                    simple_update=mock_simple_update,
-                                    _simple_update_status_uri=mocked_url_response,
-                                    _find_updateservice_resource=empty_return,
-                                    _find_updateservice_additional_uris=empty_return,
-                                    get_request=mock_get_request_enclosure_multi_tenant,
-                                    post_request=mock_post_request):
-                    with patch.object(module, 'dns_available') as mock_dns_available:
-                        mock_dns_available.return_value = True
-                        with patch.object(module.WdcRedfishUtils, 'get_simple_update_status') as mock_get_simple_update_status:
-                            mock_get_simple_update_status.side_effect = MOCK_SIMPLE_UPDATE_STATUS_LIST
-                            with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-                                module.main()
-                                self.assertTrue(ansible_exit_json["changed"])
-                                self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, ansible_exit_json["msg"])
+            with patch.multiple(module.WdcRedfishUtils,
+                                get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3,
+                                simple_update=mock_simple_update,
+                                _simple_update_status_uri=mocked_url_response,
+                                _find_updateservice_resource=empty_return,
+                                _find_updateservice_additional_uris=empty_return,
+                                get_request=mock_get_request_enclosure_multi_tenant,
+                                post_request=mock_post_request):
+                with patch.object(module, 'dns_available') as mock_dns_available:
+                    mock_dns_available.return_value = True
+                    with patch.object(module.WdcRedfishUtils, 'get_simple_update_status') as mock_get_simple_update_status:
+                        mock_get_simple_update_status.side_effect = MOCK_SIMPLE_UPDATE_STATUS_LIST
+                        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+                            module.main()
+                            self.assertTrue(ansible_exit_json["changed"])
+                            self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE, ansible_exit_json["msg"])
 
     def test_module_fw_update_multi_tenant_firmware_single_tenant_enclosure(self):
         """Test Update and Activate using multi-tenant bundle on single-tenant enclosure"""
@@ -678,23 +655,21 @@ class TestWdcRedfishCommand(unittest.TestCase):
                                                  is_multi_tenant=True)
         with patch('ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file') as mock_fetch_file:
             mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
-            with patch.object(DnsCacheBypass, '_resolve') as mock__resolve:
-                mock__resolve.return_value = ("127.0.0.1",)
-                with patch.multiple(module.WdcRedfishUtils,
-                                    get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3(),
-                                    get_simple_update_status=mock_get_simple_update_status_ready_for_fw_update,
-                                    _firmware_activate_uri=mocked_url_response,
-                                    _update_uri=mock_update_url,
-                                    _find_updateservice_resource=empty_return,
-                                    _find_updateservice_additional_uris=empty_return,
-                                    get_request=mock_get_request_enclosure_single_tenant):
-                    with patch.object(module, 'dns_available') as mock_dns_available:
-                        mock_dns_available.return_value = True
-                        with self.assertRaises(AnsibleFailJson) as result:
-                            module.main()
-                        exc = result.exception.args[0]
-                        self.assertEqual(expected_error_message,
-                                         exc["msg"])
+            with patch.multiple(module.WdcRedfishUtils,
+                                get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3(),
+                                get_simple_update_status=mock_get_simple_update_status_ready_for_fw_update,
+                                _firmware_activate_uri=mocked_url_response,
+                                _update_uri=mock_update_url,
+                                _find_updateservice_resource=empty_return,
+                                _find_updateservice_additional_uris=empty_return,
+                                get_request=mock_get_request_enclosure_single_tenant):
+                with patch.object(module, 'dns_available') as mock_dns_available:
+                    mock_dns_available.return_value = True
+                    with self.assertRaises(AnsibleFailJson) as result:
+                        module.main()
+                    exc = result.exception.args[0]
+                    self.assertEqual(expected_error_message,
+                                     exc["msg"])
 
     def test_module_fw_update_single_tentant_firmware_multi_tenant_enclosure(self):
         """Test Update and Activate using singe-tenant bundle on multi-tenant enclosure"""
@@ -717,23 +692,21 @@ class TestWdcRedfishCommand(unittest.TestCase):
                                                  is_multi_tenant=False)
         with patch('ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.fetch_file') as mock_fetch_file:
             mock_fetch_file.return_value = os.path.join(self.tempdir, tar_name)
-            with patch.object(DnsCacheBypass, '_resolve') as mock__resolve:
-                mock__resolve.return_value = ("127.0.0.1",)
-                with patch.multiple(module.WdcRedfishUtils,
-                                    get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3(),
-                                    get_simple_update_status=mock_get_simple_update_status_ready_for_fw_update,
-                                    _firmware_activate_uri=mocked_url_response,
-                                    _update_uri=mock_update_url,
-                                    _find_updateservice_resource=empty_return,
-                                    _find_updateservice_additional_uris=empty_return,
-                                    get_request=mock_get_request_enclosure_multi_tenant):
-                    with patch.object(module, 'dns_available') as mock_dns_available:
-                        mock_dns_available.return_value = True
-                        with self.assertRaises(AnsibleFailJson) as result:
-                            module.main()
-                        exc = result.exception.args[0]
-                        self.assertEqual(expected_error_message,
-                                         exc["msg"])
+            with patch.multiple(module.WdcRedfishUtils,
+                                get_firmware_inventory=mock_get_firmware_inventory_version_1_2_3(),
+                                get_simple_update_status=mock_get_simple_update_status_ready_for_fw_update,
+                                _firmware_activate_uri=mocked_url_response,
+                                _update_uri=mock_update_url,
+                                _find_updateservice_resource=empty_return,
+                                _find_updateservice_additional_uris=empty_return,
+                                get_request=mock_get_request_enclosure_multi_tenant):
+                with patch.object(module, 'dns_available') as mock_dns_available:
+                    mock_dns_available.return_value = True
+                    with self.assertRaises(AnsibleFailJson) as result:
+                        module.main()
+                    exc = result.exception.args[0]
+                    self.assertEqual(expected_error_message,
+                                     exc["msg"])
 
     def generate_temp_bundlefile(self,
                                  mock_firmware_version,

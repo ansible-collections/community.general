@@ -32,117 +32,6 @@ except ImportError:
     DNS_AVAILABLE = False
 
 
-class DnsCacheBypass(object):
-    """Class to provide a context manager to bypass DNS cache for a given host.
-
-    This is used in circumstances where a hostname changes its IP address.  It bypasses
-    the host's DNS cache and queries the DNS server directly.
-
-    Example usage:
-    with DnsCacheBypass("http://www.example.com"):
-      response = self.get_request("http://www.example.com/foo")
-    """
-    original_getaddrinfo = None
-
-    def __init__(self, root_url):
-        DnsCacheBypass.dns_cache = {}
-        if DnsCacheBypass.original_getaddrinfo is None:
-            DnsCacheBypass.original_getaddrinfo = socket.getaddrinfo
-
-        # Query the DNS server for the given URL
-        parsed_root_url = urlparse(root_url)
-        netloc = parsed_root_url.netloc
-        try:
-            dns_answer = self._resolve(netloc)
-        except NXDOMAIN:
-            # DNS lookup failed.  Cannot update DNS cache.
-            return
-        ip = str(dns_answer[0]).strip()
-        try:
-            ip = unicode(ip)  # For Python2
-        except NameError:
-            pass
-        # Cache the IP address we got from the DNS server
-        self.add_custom_dns(domain=parsed_root_url.hostname,
-                            ip=ip)
-
-        # Override getaddrinfo to use our cache
-        socket.getaddrinfo = DnsCacheBypass.custom_getaddrinfo
-
-    @staticmethod
-    def _resolve(netloc):
-        try:
-            # Python3
-            dns_answer = resolver.resolve(netloc)
-        except AttributeError:
-            # Python2
-            dns_answer = resolver.query(netloc)
-        return dns_answer
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, type, value, traceback):
-        # Restore getaddrinfo to its normal state
-        socket.getaddrinfo = DnsCacheBypass.original_getaddrinfo
-
-    @staticmethod
-    def replace_addrinfo_port(addrinfo,
-                              port):
-        """Given an addrinfo, replace the port number with the specified value.
-
-        :param tuple addrinfo: A 5-tuple as returned by getaddrinfo
-        :param int port: The port number to put into the addrinfo.
-        """
-        addrinfo_list = list(addrinfo)
-        sockaddr_list = list(addrinfo[4])
-        sockaddr_list[1] = port
-        addrinfo_list[4] = tuple(sockaddr_list)
-        return tuple(addrinfo_list)
-
-    @staticmethod
-    def custom_getaddrinfo(*args):
-        """Obtain cached DNS entry if there is one, or use the standard getaddrinfo."""
-        requested_host = args[0]
-        requested_port = args[1]
-        try:
-            result = DnsCacheBypass.dns_cache[requested_host]
-            return [DnsCacheBypass.replace_addrinfo_port(addrinfo, requested_port) for addrinfo in result]
-        except KeyError:
-            result = DnsCacheBypass.original_getaddrinfo(*args)
-            return result
-
-    def add_custom_dns(self, domain, ip):
-        """Add a DNS entry to the cache.
-
-        :param str domain: The domain of the DNS entry
-        :param str ip: The IP address to store
-        """
-        # See documentation for socket.getaddrinfo for parameter info
-        if self.is_ipv4(ip):
-            value = (socket.AF_INET,
-                     socket.SOCK_STREAM,
-                     socket.IPPROTO_TCP,
-                     '',
-                     (ip, None))  # Set port to None - will be replaced with requested port
-        else:  # ipv6
-            value = (socket.AF_INET6, 0, 0, '', (ip, None, 0, 0))
-        DnsCacheBypass.dns_cache[domain] = [value]
-
-    @staticmethod
-    def is_ipv4(ip):
-        """Is the given IP address an IPv4 address?
-
-        :param str ip: The IP address to check
-        :rtype: bool
-        """
-        if IPADDRESS_AVAILABLE:
-            return ipaddress.ip_address(ip).version == 4
-        else:
-            # Quick and dirty check if we don't have ipaddress module available
-            return ":" not in ip
-
-
 class WdcRedfishUtils(RedfishUtils):
     """Extension to RedfishUtils to support WDC enclosures."""
     # Status codes returned by WDC FW Update Status
@@ -181,18 +70,16 @@ class WdcRedfishUtils(RedfishUtils):
         """
         for root_uri in root_uris:
             uri = root_uri + "/redfish/v1"
-            with DnsCacheBypass(root_uri):
-                response = self.get_request(uri)
-                if response['ret']:
-                    self.root_uri = root_uri
+            response = self.get_request(uri)
+            if response['ret']:
+                self.root_uri = root_uri
 
     def _find_updateservice_resource(self):
         """Find the update service resource as well as additional WDC-specific resources."""
-        with DnsCacheBypass(self.root_uri):
-            response = super(WdcRedfishUtils, self)._find_updateservice_resource()
-            if not response['ret']:
-                return response
-            return self._find_updateservice_additional_uris()
+        response = super(WdcRedfishUtils, self)._find_updateservice_resource()
+        if not response['ret']:
+            return response
+        return self._find_updateservice_additional_uris()
 
     def _is_enclosure_multi_tenant(self):
         """Determine if the enclosure is multi-tenant.
@@ -201,8 +88,7 @@ class WdcRedfishUtils(RedfishUtils):
 
         :return: True/False if the enclosure is multi-tenant or not; None if unable to determine.
         """
-        with DnsCacheBypass(self.root_uri):
-            response = self.get_request(self.root_uri + self.service_root + "Chassis/Enclosure")
+        response = self.get_request(self.root_uri + self.service_root + "Chassis/Enclosure")
         if response['ret'] is False:
             return None
         pattern = r".*-[A,B]"
@@ -211,8 +97,7 @@ class WdcRedfishUtils(RedfishUtils):
 
     def _find_updateservice_additional_uris(self):
         """Find & set WDC-specific update service URIs"""
-        with DnsCacheBypass(self.root_uri):
-            response = self.get_request(self.root_uri + self._update_uri())
+        response = self.get_request(self.root_uri + self._update_uri())
         if response['ret'] is False:
             return response
         data = response['data']
@@ -254,8 +139,7 @@ class WdcRedfishUtils(RedfishUtils):
     def get_simple_update_status(self):
         """Issue Redfish HTTP GET to return the simple update status"""
         result = {}
-        with DnsCacheBypass(self.root_uri):
-            response = self.get_request(self.root_uri + self._simple_update_status_uri())
+        response = self.get_request(self.root_uri + self._simple_update_status_uri())
         if response['ret'] is False:
             return response
         result['ret'] = True
@@ -273,16 +157,15 @@ class WdcRedfishUtils(RedfishUtils):
             if creds.get('password'):
                 payload["Password"] = creds.get('password')
 
-        with DnsCacheBypass(self.root_uri):
-            # Make sure the service supports FWActivate
-            response = self.get_request(self.root_uri + self._update_uri())
-            if response['ret'] is False:
-                return response
-            data = response['data']
-            if 'Actions' not in data:
-                return {'ret': False, 'msg': 'Service does not support FWActivate'}
+        # Make sure the service supports FWActivate
+        response = self.get_request(self.root_uri + self._update_uri())
+        if response['ret'] is False:
+            return response
+        data = response['data']
+        if 'Actions' not in data:
+            return {'ret': False, 'msg': 'Service does not support FWActivate'}
 
-            response = self.post_request(self.root_uri + self._firmware_activate_uri(), payload)
+        response = self.post_request(self.root_uri + self._firmware_activate_uri(), payload)
         if response['ret'] is False:
             return response
         return {'ret': True, 'changed': True,
@@ -403,8 +286,7 @@ class WdcRedfishUtils(RedfishUtils):
             }
 
         # Version number installed on IOMs
-        with DnsCacheBypass(self.root_uri):
-            firmware_inventory = self.get_firmware_inventory()
+        firmware_inventory = self.get_firmware_inventory()
         if not firmware_inventory["ret"]:
             return firmware_inventory
         firmware_inventory_dict = {}
@@ -446,8 +328,7 @@ class WdcRedfishUtils(RedfishUtils):
             if retry_number != 0:
                 time.sleep(retry_interval_seconds)
             retry_number += 1
-            with DnsCacheBypass(self.root_uri):
-                result = self.simple_update(update_opts)
+            result = self.simple_update(update_opts)
             if result['ret'] is not True:
                 # Sometimes a timeout error is returned even though the update actually was requested.
                 # Check the update status to see if the update is in progress.
@@ -521,8 +402,7 @@ class WdcRedfishUtils(RedfishUtils):
         which_iom_is_this = None
         for iom_letter in ['A', 'B']:
             iom_uri = "Chassis/IOModule{0}FRU".format(iom_letter)
-            with DnsCacheBypass(self.root_uri):
-                response = self.get_request(self.root_uri + self.service_root + iom_uri)
+            response = self.get_request(self.root_uri + self.service_root + iom_uri)
             if response['ret'] is False:
                 continue
             data = response['data']
