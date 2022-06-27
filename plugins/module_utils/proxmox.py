@@ -32,6 +32,7 @@ def proxmox_auth_argument_spec():
                       fallback=(env_fallback, ['PROXMOX_HOST'])
                       ),
         api_user=dict(type='str',
+                      default='root@pam',
                       fallback=(env_fallback, ['PROXMOX_USER'])
                       ),
         api_password=dict(type='str',
@@ -92,10 +93,9 @@ class ProxmoxAnsible(object):
 
         if api_host:
             api_host = [api_host]
-
             auth_args['backend'] = 'https'
-            auth_args['user'] = api_user
 
+            auth_args['user'] = api_user
             if api_password:
                 auth_args['password'] = api_password
             elif api_token_id and api_token_secret:
@@ -107,9 +107,7 @@ class ProxmoxAnsible(object):
             auth_args['verify_ssl'] = validate_certs
         else:
             api_host = []
-
             auth_args['backend'] = 'local'
-            auth_args['user'] = 'root@pam'
 
         try:
             return ProxmoxAPI(*api_host, **auth_args)

@@ -15,12 +15,11 @@ options:
     description:
       - Specify the target host of the Proxmox VE cluster.
     type: str
-    required: true
   api_user:
     description:
       - Specify the user to authenticate with.
     type: str
-    required: true
+    default: root@pam
   api_password:
     description:
       - Specify the password to authenticate with.
