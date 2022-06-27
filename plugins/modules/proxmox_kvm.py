@@ -922,6 +922,7 @@ msg:
   sample: "VM kropta with vmid = 110 is running"
 """
 
+import json
 import re
 import time
 from ansible.module_utils.six.moves.urllib.parse import quote
@@ -1156,6 +1157,10 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             taskid = proxmox_node.qemu(vmid).clone.post(newid=newid, name=name, **clone_params)
         else:
             taskid = proxmox_node.qemu.create(vmid=vmid, name=name, memory=memory, cpu=cpu, cores=cores, sockets=sockets, **kwargs)
+
+            # FIXME: Workaround for https://forum.proxmox.com/threads/api-bug-pvesh-create-nodes-node-qemu-output-format-json-response-format-broken.111469/.
+            if 'errors' in taskid:
+                taskid = json.loads(taskid['errors'].splitlines()[-1])
 
         if not self.wait_for_task(node, taskid):
             self.module.fail_json(msg='Reached timeout while waiting for creating VM. Last line in task before timeout: %s' %
