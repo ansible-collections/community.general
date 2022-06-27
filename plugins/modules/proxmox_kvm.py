@@ -992,16 +992,18 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
             kwargs['tags'] = ",".join(kwargs['tags'])
 
         # -args and skiplock require root@pam user - but can not use api tokens
-        if self.module.params['api_user'] == "root@pam" and self.module.params['args'] is None:
-            if not update and self.module.params['proxmox_default_behavior'] == 'compatibility':
-                kwargs['args'] = vm_args
-        elif self.module.params['api_user'] == "root@pam" and self.module.params['args'] is not None:
-            kwargs['args'] = self.module.params['args']
-        elif self.module.params['api_user'] != "root@pam" and self.module.params['args'] is not None:
-            self.module.fail_json(msg='args parameter require root@pam user. ')
+        if self.user_is_root_pam:
+            if self.module.params['args'] is None:
+                if not update and self.module.params['proxmox_default_behavior'] == 'compatibility':
+                    kwargs['args'] = vm_args
+            else:
+                kwargs['args'] = self.module.params['args']
+        else:
+            if self.module.params['args'] is not None:
+                self.module.fail_json(msg='args parameter require root@pam user. ')
 
-        if self.module.params['api_user'] != "root@pam" and self.module.params['skiplock'] is not None:
-            self.module.fail_json(msg='skiplock parameter require root@pam user. ')
+            if self.module.params['skiplock'] is not None:
+                self.module.fail_json(msg='skiplock parameter require root@pam user. ')
 
         if update:
             if proxmox_node.qemu(vmid).config.set(name=name, memory=memory, cpu=cpu, cores=cores, sockets=sockets, **kwargs) is None:

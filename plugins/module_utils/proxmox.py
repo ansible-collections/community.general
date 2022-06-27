@@ -95,6 +95,8 @@ class ProxmoxAnsible(object):
             api_host = [api_host]
             auth_args['backend'] = 'https'
 
+            self.user_is_root_pam = api_user == "root@pam"
+
             auth_args['user'] = api_user
             if api_password:
                 auth_args['password'] = api_password
@@ -108,6 +110,7 @@ class ProxmoxAnsible(object):
         else:
             api_host = []
             auth_args['backend'] = 'local'
+            self.user_is_root_pam = True
 
         try:
             return ProxmoxAPI(*api_host, **auth_args)
