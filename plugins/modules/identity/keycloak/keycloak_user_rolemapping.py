@@ -128,6 +128,24 @@ EXAMPLES = '''
         id: role_id2
   delegate_to: localhost
 
+- name: Map a client role to a service account user for a client, authentication with credentials
+  community.general.keycloak_user_rolemapping:
+    realm: MyCustomRealm
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    auth_username: USERNAME
+    auth_password: PASSWORD
+    state: present
+    client_id: client1
+    service_account_user_client_id: clientIdOfServiceAccount
+    roles:
+      - name: role_name1
+        id: role_id1
+      - name: role_name2
+        id: role_id2
+  delegate_to: localhost
+
 - name: Map a client role to a user, authentication with token
   community.general.keycloak_user_rolemapping:
     realm: MyCustomRealm
