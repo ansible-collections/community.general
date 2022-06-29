@@ -172,7 +172,7 @@ EXAMPLES = '''
     auth_password: PASSWORD
     state: absent
     client_id: client1
-    username: user1
+    uid: 70e3ae72-96b6-11e6-9056-9737fd4d0764
     roles:
       - name: role_name1
         id: role_id1
