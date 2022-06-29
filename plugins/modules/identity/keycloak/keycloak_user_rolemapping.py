@@ -54,7 +54,7 @@ options:
         type: str
         description:
             - Username of the user to be mapped.
-            - This parameter is required (can be replaced by uid for less API call).
+            - This parameter is not required (can be replaced by uid for less API call).
 
     uid:
         type: str
@@ -106,7 +106,7 @@ extends_documentation_fragment:
 
 
 author:
-    - @bratwurzt
+    - Dušan Marković (@bratwurzt)
 '''
 
 EXAMPLES = '''
@@ -179,7 +179,6 @@ EXAMPLES = '''
       - name: role_name2
         id: role_id2
   delegate_to: localhost
-
 '''
 
 RETURN = '''
