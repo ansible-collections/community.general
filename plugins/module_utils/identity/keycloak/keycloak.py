@@ -718,7 +718,7 @@ class KeycloakAPI(object):
             return json.loads(to_native(open_url(available_rolemappings_url, method="GET", headers=self.restheaders, timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
         except Exception as e:
-            self.module.fail_json(msg="Could not fetch available rolemappings for user %s, realm %s: %s"
+            self.module.fail_json(msg="Could not fetch available rolemappings for user %s of realm %s: %s"
                                       % (uid, realm, str(e)))
 
     def get_realm_user_composite_rolemappings(self, uid, realm="master"):
@@ -794,10 +794,10 @@ class KeycloakAPI(object):
                                           % (uid, realm, json.dumps(role_rep), str(e)))
         else:
             user_client_rolemappings_url = URL_CLIENT_USER_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=uid, client=cid)
-            try:
+        try:
                 open_url(user_client_rolemappings_url, method="POST", headers=self.restheaders, data=json.dumps(role_rep),
-                         validate_certs=self.validate_certs, timeout=self.connection_timeout)
-            except Exception as e:
+                     validate_certs=self.validate_certs, timeout=self.connection_timeout)
+        except Exception as e:
                 self.module.fail_json(msg="Could not map roles to userId %s for client %s, realm %s and roles %s: %s"
                                           % (cid, uid, realm, json.dumps(role_rep), str(e)))
 
@@ -816,8 +816,8 @@ class KeycloakAPI(object):
             open_url(user_realm_rolemappings_url, method="DELETE", headers=self.restheaders, data=json.dumps(role_rep),
                      validate_certs=self.validate_certs, timeout=self.connection_timeout)
         except Exception as e:
-            self.module.fail_json(msg="Could not remove roles %s from userId %s, realm %s: %s"
-                                      % (json.dumps(role_rep), uid, realm, str(e)))
+                self.module.fail_json(msg="Could not remove roles %s from userId %s, realm %s: %s"
+                                          % (json.dumps(role_rep), uid, realm, str(e)))
         else:
             user_client_rolemappings_url = URL_CLIENT_USER_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=uid, client=cid)
             try:
