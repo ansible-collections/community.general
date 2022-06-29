@@ -106,7 +106,7 @@ extends_documentation_fragment:
 
 
 author:
-    - Dušan Marković
+    - bratwurzt
 '''
 
 EXAMPLES = '''
@@ -280,8 +280,6 @@ def main():
     roles = module.params.get('roles')
 
     # Check the parameters
-    if cid is None and client_id is None:
-        module.fail_json(msg='Either the `client_id` or `cid` has to be specified.')
     if uid is None and username is None and service_account_user_client_id is None:
         module.fail_json(msg='Either the `username`, `uid` or `service_account_user_client_id` has to be specified.')
 
@@ -294,12 +292,13 @@ def main():
             module.fail_json(msg='Could not fetch user for username %s:' % username)
     else:
         if uid is None and username is None:
-            user_rep = kc.get_service_account_user_by_client_id(service_account_user_client_id, realm=realm)
+            user_rep = kc.get_service_account_user_by_client_id(client_id=service_account_user_client_id, realm=realm)
             if user_rep is not None:
                 uid = user_rep['id']
             else:
                 module.fail_json(msg='Could not fetch service-account-user for client_id %s:' % username)
-    if cid is None:
+
+    if cid is None and client_id is not None:
         cid = kc.get_client_id(client_id=client_id, realm=realm)
         if cid is None:
             module.fail_json(msg='Could not fetch client %s:' % client_id)
@@ -311,18 +310,28 @@ def main():
                 module.fail_json(msg='Either the `name` or `id` has to be specified on each role.')
             # Fetch missing role_id
             if role.get('id') is None:
-                role_id = kc.get_client_role_by_name(cid=cid, name=role.get('name'), realm=realm)
+                if cid is None:
+                    role_id = kc.get_realm_role(name=role.get('name'), realm=realm)['id']
+                else:
+                    role_id = kc.get_client_role_id_by_name(cid=cid, name=role.get('name'), realm=realm)
                 if role_id is not None:
                     role['id'] = role_id
                 else:
-                    module.fail_json(msg='Could not fetch role %s for client_id %s' % (role.get('name'), client_id))
+                    module.fail_json(msg='Could not fetch role %s for client_id %s or realm %s' % (role.get('name'), client_id, realm))
             # Fetch missing role_name
+            else:
+                if cid is None:
+                    role['name'] = kc.get_realm_user_rolemapping_by_id(uid=uid, rid=role.get('id'), realm=realm)['name']
             else:
                 role['name'] = kc.get_client_user_rolemapping_by_id(uid=uid, cid=cid, rid=role.get('id'), realm=realm)['name']
                 if role.get('name') is None:
-                    module.fail_json(msg='Could not fetch role %s for client_id %s' % (role.get('id'), client_id))
+                    module.fail_json(msg='Could not fetch role %s for client_id %s or realm %s' % (role.get('id'), client_id, realm))
 
-    # Get effective client-level role mappings
+    # Get effective role mappings
+    if cid is None:
+        available_roles_before = kc.get_realm_user_available_rolemappings(uid=uid, realm=realm)
+        assigned_roles_before = kc.get_realm_user_composite_rolemappings(uid=uid, realm=realm)
+    else:
     available_roles_before = kc.get_client_user_available_rolemappings(uid=uid, cid=cid, realm=realm)
     assigned_roles_before = kc.get_client_user_composite_rolemappings(uid=uid, cid=cid, realm=realm)
 
@@ -357,7 +366,10 @@ def main():
             if module.check_mode:
                 module.exit_json(**result)
             kc.add_user_rolemapping(uid=uid, cid=cid, role_rep=update_roles, realm=realm)
-            result['msg'] = 'Roles %s assigned to user for username %s.' % (update_roles, username)
+            result['msg'] = 'Roles %s assigned to userId %s.' % (update_roles, uid)
+            if cid is None:
+                assigned_roles_after = kc.get_realm_user_composite_rolemappings(uid=uid, realm=realm)
+            else:
             assigned_roles_after = kc.get_client_user_composite_rolemappings(uid=uid, cid=cid, realm=realm)
             result['end_state'] = assigned_roles_after
             module.exit_json(**result)
@@ -368,8 +380,11 @@ def main():
                 result['diff'] = dict(before=assigned_roles_before, after=update_roles)
             if module.check_mode:
                 module.exit_json(**result)
-            kc.delete_user_rolemapping(uid=uid, cid=cid, realm=realm)
-            result['msg'] = 'Roles %s removed from user for username %s.' % (update_roles, username)
+            kc.delete_user_rolemapping(uid=uid, cid=cid, role_rep=update_roles, realm=realm)
+            result['msg'] = 'Roles %s removed from userId %s.' % (update_roles, uid)
+            if cid is None:
+                assigned_roles_after = kc.get_realm_user_composite_rolemappings(uid=uid, realm=realm)
+            else:
             assigned_roles_after = kc.get_client_user_composite_rolemappings(uid=uid, cid=cid, realm=realm)
             result['end_state'] = assigned_roles_after
             module.exit_json(**result)
