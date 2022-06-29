@@ -57,7 +57,7 @@ def patch_keycloak_api(get_group_by_name=None, get_client_id=None, get_client_ro
                                                   side_effect=delete_group_rolemapping) as mock_delete_group_rolemapping:
                                     yield mock_get_group_by_name, mock_get_client_id, mock_get_client_role_id_by_name, mock_add_group_rolemapping, \
                                         mock_get_client_group_rolemapping_by_id, mock_get_client_group_available_rolemappings, \
-                                          mock_get_client_group_composite_rolemappings, mock_delete_group_rolemapping
+                                        mock_get_client_group_composite_rolemappings, mock_delete_group_rolemapping
 
 
 def get_response(object_with_future_response, method, get_id_call_count):

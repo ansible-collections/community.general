@@ -633,7 +633,6 @@ class KeycloakAPI(object):
             self.module.fail_json(msg="Could not delete available rolemappings for client %s in group %s, realm %s: %s"
                                       % (cid, gid, realm, str(e)))
 
-
     def get_client_user_rolemapping_by_id(self, uid, cid, rid, realm='master'):
         """ Obtain client representation by id
 
@@ -756,7 +755,6 @@ class KeycloakAPI(object):
             self.module.fail_json(msg='Could not obtain the user for realm %s and username %s: %s'
                                       % (realm, username, str(e)))
 
-
     def get_service_account_user_by_client_id(self, client_id, realm="master"):
         """ Fetch a keycloak service account user within a realm based on its client_id.
 
@@ -777,7 +775,6 @@ class KeycloakAPI(object):
             self.module.fail_json(msg='Could not obtain the service-account-user for realm %s and client_id %s: %s'
                                       % (realm, client_id, str(e)))
 
-
     def add_user_rolemapping(self, uid, cid, role_rep, realm="master"):
         """ Assign a realm or client role to a specified user on the Keycloak server.
 
@@ -797,12 +794,12 @@ class KeycloakAPI(object):
                                           % (uid, realm, json.dumps(role_rep), str(e)))
         else:
             user_client_rolemappings_url = URL_CLIENT_USER_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=uid, client=cid)
-        try:
+            try:
                 open_url(user_client_rolemappings_url, method="POST", headers=self.restheaders, data=json.dumps(role_rep),
-                     validate_certs=self.validate_certs, timeout=self.connection_timeout)
-        except Exception as e:
+                         validate_certs=self.validate_certs, timeout=self.connection_timeout)
+            except Exception as e:
                 self.module.fail_json(msg="Could not map roles to userId %s for client %s, realm %s and roles %s: %s"
-                                          % (cid, uid, realm, json.dumps(role_rep), str(e)))
+                                              % (cid, uid, realm, json.dumps(role_rep), str(e)))
 
     def delete_user_rolemapping(self, uid, cid, role_rep, realm="master"):
         """ Delete the rolemapping of a client in a specified user on the Keycloak server.
@@ -816,10 +813,10 @@ class KeycloakAPI(object):
         if cid is None:
             user_realm_rolemappings_url = URL_REALM_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=uid)
         try:
-                open_url(user_realm_rolemappings_url, method="DELETE", headers=self.restheaders, data=json.dumps(role_rep),
+            open_url(user_realm_rolemappings_url, method="DELETE", headers=self.restheaders, data=json.dumps(role_rep),
                      validate_certs=self.validate_certs, timeout=self.connection_timeout)
         except Exception as e:
-                self.module.fail_json(msg="Could not remove roles %s from userId %s, realm %s: %s"
+            self.module.fail_json(msg="Could not remove roles %s from userId %s, realm %s: %s"
                                           % (json.dumps(role_rep), uid, realm, str(e)))
         else:
             user_client_rolemappings_url = URL_CLIENT_USER_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=uid, client=cid)

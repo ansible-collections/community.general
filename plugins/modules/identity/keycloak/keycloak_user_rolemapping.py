@@ -68,7 +68,7 @@ options:
         description:
             - client_id of the service-account-user to be mapped.
             - This parameter is not required for updating or deleting the rolemapping but
-              providing it will reduce the number of API calls required.    
+              providing it will reduce the number of API calls required.
 
     client_id:
         type: str
@@ -321,8 +321,8 @@ def main():
             else:
                 if cid is None:
                     role['name'] = kc.get_realm_user_rolemapping_by_id(uid=uid, rid=role.get('id'), realm=realm)['name']
-            else:
-                role['name'] = kc.get_client_user_rolemapping_by_id(uid=uid, cid=cid, rid=role.get('id'), realm=realm)['name']
+                else:
+                    role['name'] = kc.get_client_user_rolemapping_by_id(uid=uid, cid=cid, rid=role.get('id'), realm=realm)['name']
                 if role.get('name') is None:
                     module.fail_json(msg='Could not fetch role %s for client_id %s or realm %s' % (role.get('id'), client_id, realm))
 
@@ -331,8 +331,8 @@ def main():
         available_roles_before = kc.get_realm_user_available_rolemappings(uid=uid, realm=realm)
         assigned_roles_before = kc.get_realm_user_composite_rolemappings(uid=uid, realm=realm)
     else:
-    available_roles_before = kc.get_client_user_available_rolemappings(uid=uid, cid=cid, realm=realm)
-    assigned_roles_before = kc.get_client_user_composite_rolemappings(uid=uid, cid=cid, realm=realm)
+        available_roles_before = kc.get_client_user_available_rolemappings(uid=uid, cid=cid, realm=realm)
+        assigned_roles_before = kc.get_client_user_composite_rolemappings(uid=uid, cid=cid, realm=realm)
 
     result['existing'] = assigned_roles_before
     result['proposed'] = roles
@@ -369,7 +369,7 @@ def main():
             if cid is None:
                 assigned_roles_after = kc.get_realm_user_composite_rolemappings(uid=uid, realm=realm)
             else:
-            assigned_roles_after = kc.get_client_user_composite_rolemappings(uid=uid, cid=cid, realm=realm)
+                assigned_roles_after = kc.get_client_user_composite_rolemappings(uid=uid, cid=cid, realm=realm)
             result['end_state'] = assigned_roles_after
             module.exit_json(**result)
         else:
@@ -384,7 +384,7 @@ def main():
             if cid is None:
                 assigned_roles_after = kc.get_realm_user_composite_rolemappings(uid=uid, realm=realm)
             else:
-            assigned_roles_after = kc.get_client_user_composite_rolemappings(uid=uid, cid=cid, realm=realm)
+                assigned_roles_after = kc.get_client_user_composite_rolemappings(uid=uid, cid=cid, realm=realm)
             result['end_state'] = assigned_roles_after
             module.exit_json(**result)
     # Do nothing
