@@ -50,10 +50,10 @@ options:
             - They Keycloak realm under which this role_representation resides.
         default: 'master'
 
-    username:
+    target_username:
         type: str
         description:
-            - Username of the user to be mapped.
+            - Username of the user roles are mapped to.
             - This parameter is not required (can be replaced by uid for less API call).
 
     uid:
