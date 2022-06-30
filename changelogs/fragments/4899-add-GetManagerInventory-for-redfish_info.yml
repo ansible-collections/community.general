@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_info - add ``GetManagerInventory`` to report list of Manager inventory information (https://github.com/ansible-collections/community.general/issues/4899).
