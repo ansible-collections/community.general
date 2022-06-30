@@ -416,10 +416,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 # In some (newer versions of proxmox) instances it can be 'enabled=1'.
                 if config == 'agent':
                     agent_enabled = 0
-                    if value.split(',')[0].isnumeric():
+                    try:
                         agent_enabled = int(value.split(',')[0])
-                    if value.split(',') == "enabled=1":
-                        agent_enabled = 1
+                    except ValueError:
+                        if  value.split(',') == "enabled=1":
+                            agent_enabled = 1
                     if agent_enabled:
                         agent_iface_value = self._get_agent_network_interfaces(node, vmid, vmtype)
                         if agent_iface_value:
