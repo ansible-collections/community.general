@@ -1,0 +1,10 @@
+---
+
+- name: "{{ case.id }} - get result"
+  ansible.builtin.set_fact:
+    result: "{{ case.original|community.general.intersect_data_with(case.modifications, present=case.present, list_as_dict=case.list_as_dict, keep_empty=case.keep_empty, remove_null=case.remove_null) }}"
+
+- name: "{{ case.id }} - check result"
+  ansible.builtin.assert:
+    that: "{{ result == case.expected }}"
+    fail_msg: "'original': {{ case.original }}, 'modifications': {{ case.modifications }}, 'expected': {{ case.expected }}, 'result': {{ result }}"

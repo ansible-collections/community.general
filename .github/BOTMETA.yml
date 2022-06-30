@@ -107,6 +107,8 @@ files:
     maintainers: $team_ansible_core
   $doc_fragments/:
     labels: docs_fragments
+  $doc_fragments/data_intersection.py:
+    maintainers: indelog
   $doc_fragments/hpe3par.py:
     maintainers: farhan7500 gautamphegde
     labels: hpe3par
@@ -139,7 +141,7 @@ files:
   $filters/json_query.py: {}
   $filters/lists_mergeby.py:
     maintainers: vbotka
-  $filters/merge_data.py:
+  $filters/intersect_data_with.py:
     maintainers: indelog
   $filters/random_mac.py: {}
   $filters/time.py:
