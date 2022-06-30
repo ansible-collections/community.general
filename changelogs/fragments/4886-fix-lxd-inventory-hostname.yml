@@ -1,0 +1,2 @@
+bugfixes:
+  - "lxd - fix incorrect inventory_hostname in remote_addr (https://github.com/ansible-collections/community.general/issues/4886)"
