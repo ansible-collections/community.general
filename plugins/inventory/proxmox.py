@@ -424,7 +424,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                         agent_iface_value = self._get_agent_network_interfaces(node, vmid, vmtype)
                         if agent_iface_value:
                             agent_iface_key = self.to_safe('%s%s' % (key, "_interfaces"))
-                            print ("%s: %s" % (agent_iface_key, agent_iface_value))
                             properties[agent_iface_key] = agent_iface_value
 
                 if config == 'lxc':
