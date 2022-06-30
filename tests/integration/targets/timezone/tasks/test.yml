@@ -287,7 +287,7 @@
 
 - name:
   set_fact:
-    hwclock_supported: '{{ hwclock_test is successful or timedatectl_test is successful }}'
+    hwclock_supported: '{{ hwclock_test is successful or (timedatectl_test is successful and "RTC time: n/a" not in timedatectl_test.stdout) }}'
 ##
 ## test set hwclock, idempotency and checkmode
 ##
