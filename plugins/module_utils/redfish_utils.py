@@ -3029,3 +3029,26 @@ class RedfishUtils(object):
         if not result["entries"]:
             return {'ret': False, 'msg': "No HostInterface objects found"}
         return result
+
+    def get_manager_inventory(self, manager_uri):
+        result = {}
+        inventory = {}
+        # Get these entries, but does not fail if not found
+        properties = ['FirmwareVersion', 'ManagerType', 'Manufacturer', 'Model',
+                      'PartNumber', 'PowerState', 'SerialNumber', 'Status', 'UUID']
+
+        response = self.get_request(self.root_uri + manager_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+
+        for property in properties:
+            if property in data:
+                inventory[property] = data[property]
+
+        result["entries"] = inventory
+        return result
+
+    def get_multi_manager_inventory(self):
+        return self.aggregate_managers(self.get_manager_inventory)
