@@ -1888,14 +1888,13 @@ class RedfishUtils(object):
                         for property in properties:
                             if property in data:
                                 chassis_power_result[property] = data[property]
-                else:
-                    return {'ret': False, 'msg': 'Key PowerControl not found.'}
                 chassis_power_results.append(chassis_power_result)
-            else:
-                return {'ret': False, 'msg': 'Key Power not found.'}
 
-        result['entries'] = chassis_power_results
-        return result
+        if len(chassis_power_results) > 0:
+            result['entries'] = chassis_power_results
+            return result
+        else:
+            return {'ret': False, 'msg': 'Power information not found.'}
 
     def get_chassis_thermals(self):
         result = {}
