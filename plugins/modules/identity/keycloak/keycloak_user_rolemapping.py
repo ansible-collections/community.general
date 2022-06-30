@@ -256,7 +256,8 @@ def main():
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
-                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password'], ['uid', 'target_username', 'service_account_user_client_id']]),
+                           required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password'],
+                                             ['uid', 'target_username', 'service_account_user_client_id']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
     result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
