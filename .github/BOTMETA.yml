@@ -311,6 +311,8 @@ files:
   $module_utils/wdc_redfish_utils.py:
     maintainers: $team_wdc
     labels: wdc_redfish_utils
+  $module_utils/vars.py:
+    maintainers: indelog
   $module_utils/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
