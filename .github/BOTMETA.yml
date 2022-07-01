@@ -112,6 +112,9 @@ files:
     maintainers: $team_ansible_core
   $doc_fragments/:
     labels: docs_fragments
+  $doc_fragments/dest_file_module.py:
+    maintainers: indelog
+    labels: module_helper
   $doc_fragments/hpe3par.py:
     maintainers: farhan7500 gautamphegde
     labels: hpe3par
@@ -286,6 +289,9 @@ files:
     labels: cloud memset
   $module_utils/mh/:
     maintainers: russoz
+    labels: module_helper
+  $module_utils/mh/mixins/dest.py:
+    maintainers: indelog
     labels: module_helper
   $module_utils/module_helper.py:
     maintainers: russoz
