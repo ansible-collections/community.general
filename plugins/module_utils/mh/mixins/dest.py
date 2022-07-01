@@ -50,7 +50,7 @@ class DestFileChecks(object):
         pass
 
     def __init__(self, dest):
-        # type: (str, bool, bool, bool, bool) -> None
+        # type: (str) -> None
         """
         Does the following checks on the file that given by `dest` full path :
 
@@ -60,7 +60,6 @@ class DestFileChecks(object):
         - is writable
         - is regular file
         """
-
         self._dest = dest
 
         self._def_exists()  # Must be done in first (required by other)
@@ -71,8 +70,8 @@ class DestFileChecks(object):
 
     @property
     def exists(self):
-        """`True` if the destination file exists."""
         # type: () -> bool
+        """`True` if the destination file exists."""
         return self._exists
 
     @property
@@ -129,6 +128,7 @@ class DestFileChecks(object):
         }
 
     def check(self, create=False, backup=False):
+        # type: (bool, bool) -> None
         """
         Ensuring some facts about the destination file full path and raise an
         explicit error if something was wrong.
