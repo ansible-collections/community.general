@@ -17,6 +17,8 @@
   loop: "{{ test_cases_dest_file_module_helper }}"
   loop_control:
     loop_var: case
-  # Some cases require to be ran with non root privileges bu on some platform
-  # we do not have suitable version of su. In this case the test is ignored.
-  when: "{{ not case.need_to_ignore }}"
+  # Some cases requires to using `su` to become non-privileged user (that is
+  # needed to test some behaviours when destination file has unexpected rights)
+  # but, some platform does not provide suitable version of `su` and the test
+  # case can not be run on those.
+  when: not(ansible_user_uid == 0 and case.need_to_become_with_su and ansible_distribution in('RedHat', 'Darwin', 'FreeBSD'))

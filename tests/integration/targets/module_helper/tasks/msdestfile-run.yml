@@ -23,7 +23,7 @@
 - name: "<mdestfile> {{ case.id }} - run module"
   mdestfile: "{{ case.module_params }}"
   ignore_errors: true
-  become: "{{ ansible_user_uid == 0 }}"
+  become: "{{ ansible_user_uid == 0 and case.need_to_become_with_su }}"
   become_user: 'nobody'
   become_method: 'su'
   become_flags: '-s /bin/sh'
@@ -48,7 +48,7 @@
       ansible.builtin.assert:
         that:
           - "{{ final_res.changed == false }}"
-  when: "{{ case.final_content is not false }}"
+  when: case.final_content is not false
 
 - name: "<mdestfile> {{ case.id }} - test backup file"
   block:
@@ -63,7 +63,7 @@
       ansible.builtin.assert:
         that:
           - "{{ backup_res.changed == false }}"
-  when: "{{ module_res.backup_file is defined }}"
+  when: module_res.backup_file is defined
 
 - name: "<mdestfile> {{ case.id }} - clean dest_dir"
   block:
