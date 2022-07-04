@@ -122,6 +122,7 @@ class LookupModule(LookupBase):
                 "tenant": self.get_option("tenant"),
                 "client_id": self.get_option("client_id"),
                 "client_secret": self.get_option("client_secret"),
+                "tld": self.get_option("tld"),
                 "url_template": self.get_option("url_template"),
             }
         )
