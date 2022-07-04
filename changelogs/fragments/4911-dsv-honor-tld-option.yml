@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - dsv lookup plugin - do not ignore the ``tld`` parameter (https://github.com/ansible-collections/community.general/pull/4911).
