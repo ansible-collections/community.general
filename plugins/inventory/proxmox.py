@@ -419,7 +419,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     try:
                         agent_enabled = int(value.split(',')[0])
                     except ValueError:
-                        if value.split(',') == "enabled=1":
+                        if value.split(',')[0] == "enabled=1":
                             agent_enabled = 1
                     if agent_enabled:
                         agent_iface_value = self._get_agent_network_interfaces(node, vmid, vmtype)
