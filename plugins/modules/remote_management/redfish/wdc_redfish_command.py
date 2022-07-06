@@ -25,7 +25,7 @@ options:
   command:
     required: true
     description:
-      - List of commands to execute on OOB controller
+      - List of commands to execute on OOB controller.
     type: list
     elements: str
   baseuri:
@@ -34,12 +34,12 @@ options:
     type: str
   ioms:
     description:
-      - List of IOM FQDNs for the enclosure.  Must include this or baseuri
+      - List of IOM FQDNs for the enclosure.  Must include this or I(baseuri).
     type: list
     elements: str
   username:
     description:
-      - User for authentication with OOB controller
+      - User for authentication with OOB controller.
     type: str
   password:
     description:
@@ -237,7 +237,7 @@ def main():
 
         if result['ret'] is False:
             module.fail_json(msg=to_native(result['msg']))
-        if result['ret'] is True:
+        else:
             del result['ret']
             changed = result.get('changed', True)
             session = result.get('session', dict())
