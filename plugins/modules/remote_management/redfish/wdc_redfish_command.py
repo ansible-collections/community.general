@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2022 Western Digital Corporation
-# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: wdc_redfish_command
-short_description: Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish APIs
+short_description: Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish APIs.
 version_added: 5.3.0
 description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to
@@ -43,37 +43,37 @@ options:
     type: str
   password:
     description:
-      - Password for authentication with OOB controller
+      - Password for authentication with OOB controller.
     type: str
   auth_token:
     description:
-      - Security token for authentication with OOB controller
+      - Security token for authentication with OOB controller.
     type: str
   timeout:
     description:
-      - Timeout in seconds for URL requests to OOB controller
+      - Timeout in seconds for URL requests to OOB controller.
     default: 10
     type: int
   update_image_uri:
     required: false
     description:
-      - The URI of the image for the update
+      - The URI of the image for the update.
     type: str
   update_creds:
     required: false
     description:
-      - The credentials for retrieving the update image
+      - The credentials for retrieving the update image.
     type: dict
     suboptions:
       username:
         required: false
         description:
-          - The username for retrieving the update image
+          - The username for retrieving the update image.
         type: str
       password:
         required: false
         description:
-          - The password for retrieving the update image
+          - The password for retrieving the update image.
         type: str
 requirements:
   - dnspython (2.1.0 for Python 3, 1.16.0 for Python 2)
@@ -135,7 +135,7 @@ msg:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils import WdcRedfishUtils
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 CATEGORY_COMMANDS_ALL = {

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2022 Western Digital Corporation
-# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -10,18 +10,11 @@ import datetime
 import re
 import time
 import tarfile
-import socket
 
-from ansible.module_utils.urls import fetch_file, open_url
+from ansible.module_utils.urls import fetch_file
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
 
 from ansible.module_utils.six.moves.urllib.parse import urlparse, urlunparse
-
-try:
-    import ipaddress
-    IPADDRESS_AVAILABLE = True
-except ImportError:
-    IPADDRESS_AVAILABLE = False
 
 
 class WdcRedfishUtils(RedfishUtils):

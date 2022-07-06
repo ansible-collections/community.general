@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2022 Western Digital Corporation
-# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -10,7 +10,8 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: wdc_redfish_info
-short_description: Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish APIs
+short_description: Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish APIs.
+version_added: 5.3.0
 description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to
     get information back.
@@ -18,62 +19,67 @@ options:
   category:
     required: true
     description:
-      - Category to execute on OOB controller
+      - Category to execute on OOB controller.
     type: str
   command:
     required: true
     description:
-      - List of commands to execute on OOB controller
+      - List of commands to execute on OOB controller.
     type: list
     elements: str
   baseuri:
     description:
-      - Base URI of OOB controller.  Must include this or ioms
+      - Base URI of OOB controller.  Must include this or I(ioms).
     type: str
   ioms:
     description:
-      - List of IOM FQDNs for the enclosure.  Must include this or baseuri
+      - List of IOM FQDNs for the enclosure.  Must include this or I(baseuri).
     type: list
     elements: str
   username:
     description:
-      - User for authentication with OOB controller
+      - User for authentication with OOB controller.
     type: str
   password:
     description:
-      - Password for authentication with OOB controller
+      - Password for authentication with OOB controller.
     type: str
   auth_token:
     description:
-      - Security token for authentication with OOB controller
+      - Security token for authentication with OOB controller.
     type: str
   timeout:
     description:
-      - Timeout in seconds for URL requests to OOB controller
+      - Timeout in seconds for URL requests to OOB controller.
     default: 10
     type: int
 
-requirements:
-  - dnspython (2.1.0 for Python 3, 1.16.0 for Python 2)
-
 notes:
-  - In the inventory, you can specify baseuri or ioms.
+  - In the inventory, you can specify baseuri or ioms.  See the EXAMPLES section.
   - ioms is a list of FQDNs for the enclosure's IOMs.
-  - See sample below.  This can be in your hosts file such as /etc/ansible/hosts.
-  - my_enclosure ioms='["oobm-11-22-33-44-55-66.wdc.com", "oobm-22-33-44-55-66-77.wdc.com"]'
-  - my_enclosure2 baseuri="oobm-00-11-22-33-44-55.wdc.com"
 
 author: Mike Moerk (@mikemoerk)
 '''
 
 EXAMPLES = '''
-- name: Get Simple Update Status
+- name: Get Simple Update Status with individual IOMs specified
   community.general.wdc_redfish_info:
     category: Update
     command: SimpleUpdateStatus
-    ioms: "{{ ioms }}"
+    ioms:
+      - iom1.wdc.com
+      - iom2.wdc.com
     username: "{{ username }}"
     password: "{{ password }}"
+
+- name: Get Simple Update Status with baseuri specified
+  community.general.wdc_redfish_info:
+    category: Update
+    command: SimpleUpdateStatus
+    baseuri: "iom1.wdc.com"
+    username: "{{ username }}"
+    password: "{{ password }}"
+
 '''
 
 RETURN = '''
@@ -156,7 +162,7 @@ def main():
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, list(CATEGORY_COMMANDS_ALL.keys()))))
+        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, sorted(CATEGORY_COMMANDS_ALL.keys()))))
 
     # Check that all commands are valid
     for cmd in command_list:
@@ -188,7 +194,7 @@ def main():
                 result = rf_utils.get_simple_update_status()
                 if result['ret'] is False:
                     module.fail_json(msg=to_native(result['msg']))
-                if result['ret'] is True:
+                else:
                     del result['ret']
                     module.exit_json(changed=False, redfish_facts=result)
 
