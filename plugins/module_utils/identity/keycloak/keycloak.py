@@ -578,6 +578,22 @@ class KeycloakAPI(object):
             self.module.fail_json(msg="Could not assign roles to composite role %s and realm %s: %s"
                                       % (rid, realm, str(e)))
 
+    def delete_client_roles_by_id_composite_rolemapping(self, rid, roles_rep, realm="master"):
+        """ Delete the rolemapping of a composite role on the Keycloak server.
+
+        :param rid: ID of the composite role.
+        :param roles_rep: Representation of the roles to remove from rolemapping.
+        :param realm: Realm from which to obtain the rolemappings.
+        :return: None.
+        """
+        available_rolemappings_url = URL_ROLES_BY_ID_COMPOSITES.format(url=self.baseurl, realm=realm, id=rid)
+        try:
+            open_url(available_rolemappings_url, method="DELETE", headers=self.restheaders, data=json.dumps(roles_rep),
+                     validate_certs=self.validate_certs, timeout=self.connection_timeout)
+        except Exception as e:
+            self.module.fail_json(msg="Could not remove role %s from composite role %s and realm %s: %s"
+                                      % (json.dumps(roles_rep), rid, realm, str(e)))
+
     def add_group_rolemapping(self, gid, cid, role_rep, realm="master"):
         """ Fetch the composite role of a client in a specified goup on the Keycloak server.
 

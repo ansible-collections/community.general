@@ -349,7 +349,7 @@ def main():
                 result['diff'] = dict(before=assigned_roles_before, after=update_roles)
             if module.check_mode:
                 module.exit_json(**result)
-            kc.delete_user_rolemapping(uid=uid, cid=cid, role_rep=update_roles, realm=realm)
+            kc.delete_client_roles_by_id_composite_rolemapping(rid=composite_role.get('id'), role_rep=update_roles, realm=realm)
             result['msg'] = 'Roles %s assigned to composite_role with id %s.' % (update_roles, composite_role.get('id'))
             assigned_roles_after = kc.get_client_roles_by_id_composite_rolemappings(rid=composite_role.get('id'), cid=role_cid, realm=realm)
             result['end_state'] = assigned_roles_after
