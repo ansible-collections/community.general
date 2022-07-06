@@ -113,19 +113,9 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils import WdcRedfishUtils
 
-try:
-    from dns import resolver
-    DNS_AVAILABLE = True
-except ImportError:
-    DNS_AVAILABLE = False
-
 CATEGORY_COMMANDS_ALL = {
     "Update": ["SimpleUpdateStatus"]
 }
-
-
-def dns_available():
-    return DNS_AVAILABLE
 
 
 def main():
@@ -153,9 +143,6 @@ def main():
         supports_check_mode=True
     )
 
-    if not dns_available():
-        module.fail_json(msg="The dnspython library is not installed")
-
     category = module.params['category']
     command_list = module.params['command']
 
@@ -166,6 +153,16 @@ def main():
 
     # timeout
     timeout = module.params['timeout']
+
+    # Check that Category is valid
+    if category not in CATEGORY_COMMANDS_ALL:
+        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, list(CATEGORY_COMMANDS_ALL.keys()))))
+
+    # Check that all commands are valid
+    for cmd in command_list:
+        # Fail if even one command given is invalid
+        if cmd not in CATEGORY_COMMANDS_ALL[category]:
+            module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, CATEGORY_COMMANDS_ALL[category])))
 
     # Build root URI(s)
     if module.params.get("baseuri") is not None:
@@ -178,16 +175,6 @@ def main():
                                resource_id=None,
                                data_modification=False
                                )
-
-    # Check that Category is valid
-    if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, list(CATEGORY_COMMANDS_ALL.keys()))))
-
-    # Check that all commands are valid
-    for cmd in command_list:
-        # Fail if even one command given is invalid
-        if cmd not in CATEGORY_COMMANDS_ALL[category]:
-            module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, CATEGORY_COMMANDS_ALL[category])))
 
     # Organize by Categories / Commands
 

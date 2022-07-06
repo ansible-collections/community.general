@@ -24,14 +24,6 @@ except ImportError:
     IPADDRESS_AVAILABLE = False
 
 
-try:
-    from dns import resolver
-    from dns.resolver import NXDOMAIN
-    DNS_AVAILABLE = True
-except ImportError:
-    DNS_AVAILABLE = False
-
-
 class WdcRedfishUtils(RedfishUtils):
     """Extension to RedfishUtils to support WDC enclosures."""
     # Status codes returned by WDC FW Update Status

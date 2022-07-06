@@ -85,12 +85,10 @@ class TestWdcRedfishInfo(unittest.TestCase):
                             _find_updateservice_resource=empty_return,
                             _find_updateservice_additional_uris=empty_return,
                             get_request=mock_simple_update_status):
-            with patch.object(module, 'dns_available') as mock_dns_available:
-                mock_dns_available.return_value = True
-                with self.assertRaises(AnsibleExitJson) as exit_json:
-                    module.main()
-                    self.assertEqual(mock_simple_update_status,
-                                     exit_json["redfish_facts"]["entries"])
+            with self.assertRaises(AnsibleExitJson) as exit_json:
+                module.main()
+                self.assertEqual(mock_simple_update_status,
+                                 exit_json["redfish_facts"]["entries"])
 
     def test_module_simple_update_status_updateservice_resource_not_found(self):
         set_module_args({
@@ -105,12 +103,10 @@ class TestWdcRedfishInfo(unittest.TestCase):
                 "ret": True,
                 "data": {}  # Missing UpdateService property
             }
-            with patch.object(module, 'dns_available') as mock_dns_available:
-                mock_dns_available.return_value = True
-                with self.assertRaises(AnsibleFailJson) as exit_json:
-                    module.main()
-                    self.assertEqual("UpdateService resource not found",
-                                     exit_json["msg"])
+            with self.assertRaises(AnsibleFailJson) as exit_json:
+                module.main()
+                self.assertEqual("UpdateService resource not found",
+                                 exit_json["msg"])
 
     def test_module_simple_update_status_service_does_not_support_simple_update(self):
         set_module_args({
@@ -139,12 +135,10 @@ class TestWdcRedfishInfo(unittest.TestCase):
 
         with patch.object(module.WdcRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.side_effect = mock_get_request_function
-            with patch.object(module, 'dns_available') as mock_dns_available:
-                mock_dns_available.return_value = True
-                with self.assertRaises(AnsibleFailJson) as exit_json:
-                    module.main()
-                    self.assertEqual("UpdateService resource not found",
-                                     exit_json["msg"])
+            with self.assertRaises(AnsibleFailJson) as exit_json:
+                module.main()
+                self.assertEqual("UpdateService resource not found",
+                                 exit_json["msg"])
 
     def test_module_simple_update_status_service_does_not_support_fw_activate(self):
         set_module_args({
@@ -177,9 +171,7 @@ class TestWdcRedfishInfo(unittest.TestCase):
 
         with patch.object(module.WdcRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.side_effect = mock_get_request_function
-            with patch.object(module, 'dns_available') as mock_dns_available:
-                mock_dns_available.return_value = True
-                with self.assertRaises(AnsibleFailJson) as exit_json:
-                    module.main()
-                    self.assertEqual("Service does not support FWActivate",
-                                     exit_json["msg"])
+            with self.assertRaises(AnsibleFailJson) as exit_json:
+                module.main()
+                self.assertEqual("Service does not support FWActivate",
+                                 exit_json["msg"])

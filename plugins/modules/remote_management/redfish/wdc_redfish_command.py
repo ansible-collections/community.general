@@ -135,12 +135,6 @@ msg:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils import WdcRedfishUtils
-try:
-    from dns import resolver
-    DNS_AVAILABLE = True
-except ImportError:
-    DNS_AVAILABLE = False
-
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
@@ -150,10 +144,6 @@ CATEGORY_COMMANDS_ALL = {
         "UpdateAndActivate"
     ]
 }
-
-
-def dns_available():
-    return DNS_AVAILABLE
 
 
 def main():
@@ -189,9 +179,6 @@ def main():
         supports_check_mode=True
     )
 
-    if not dns_available():
-        module.fail_json(msg=missing_required_lib('dnspython'))
-
     category = module.params['category']
     command_list = module.params['command']
 
@@ -203,16 +190,6 @@ def main():
     # timeout
     timeout = module.params['timeout']
 
-    # Build root URI(s)
-    if module.params.get("baseuri") is not None:
-        root_uris = ["https://" + module.params['baseuri']]
-    else:
-        root_uris = [
-            "https://" + iom for iom in module.params['ioms']
-        ]
-    rf_utils = WdcRedfishUtils(creds, root_uris, timeout, module,
-                               resource_id=None, data_modification=True)
-
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
         module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, sorted(CATEGORY_COMMANDS_ALL.keys()))))
@@ -222,6 +199,16 @@ def main():
         # Fail if even one command given is invalid
         if cmd not in CATEGORY_COMMANDS_ALL[category]:
             module.fail_json(msg=to_native("Invalid Command '%s'. Valid Commands = %s" % (cmd, CATEGORY_COMMANDS_ALL[category])))
+
+    # Build root URI(s)
+    if module.params.get("baseuri") is not None:
+        root_uris = ["https://" + module.params['baseuri']]
+    else:
+        root_uris = [
+            "https://" + iom for iom in module.params['ioms']
+        ]
+    rf_utils = WdcRedfishUtils(creds, root_uris, timeout, module,
+                               resource_id=None, data_modification=True)
 
     # Organize by Categories / Commands
 
