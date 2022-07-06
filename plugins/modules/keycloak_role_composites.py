@@ -35,9 +35,9 @@ description:
 options:
     state:
         description:
-            - State of the user_rolemapping.
-            - On C(present), the user_rolemapping will be created if it does not yet exist, or updated with the parameters you provide.
-            - On C(absent), the user_rolemapping will be removed if it exists.
+            - State of the composite_rolemapping.
+            - On C(present), the composite_rolemapping will be created if it does not yet exist, or updated with the parameters you provide.
+            - On C(absent), the composite_rolemapping will be removed if it exists.
         default: 'present'
         type: str
         choices:
@@ -55,6 +55,18 @@ options:
         description:
             - Role representation of composite role
             - This parameter is required
+        suboptions:
+            name:
+                type: str
+                description:
+                    - Name of the role_representation.
+                    - This parameter is required only when creating or updating the role_representation.
+            id:
+                type: str
+                description:
+                    - The unique identifier for this role_representation.
+                    - This parameter is not required for updating or deleting a role_representation but
+                      providing it will reduce the number of API calls required.
 
     client_id:
         type: str
