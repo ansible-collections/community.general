@@ -24,6 +24,10 @@ DOCUMENTATION = '''
           - Hide the arguments for a task.
         env:
           - name: ANSIBLE_OPENTELEMETRY_HIDE_TASK_ARGUMENTS
+        ini:
+          - section: callback_opentelemetry
+            key: hide_task_arguments
+            version_added: 5.3.0
       enable_from_environment:
         type: str
         description:
@@ -34,6 +38,10 @@ DOCUMENTATION = '''
             and if set to true this plugin will be enabled.
         env:
           - name: ANSIBLE_OPENTELEMETRY_ENABLE_FROM_ENVIRONMENT
+        ini:
+          - section: callback_opentelemetry
+            key: enable_from_environment
+            version_added: 5.3.0
         version_added: 3.8.0
       otel_service_name:
         default: ansible
@@ -42,6 +50,10 @@ DOCUMENTATION = '''
           - The service name resource attribute.
         env:
           - name: OTEL_SERVICE_NAME
+        ini:
+          - section: callback_opentelemetry
+            key: otel_service_name
+            version_added: 5.3.0
       traceparent:
         default: None
         type: str
@@ -61,11 +73,14 @@ examples: |
   Enable the plugin in ansible.cfg:
     [defaults]
     callbacks_enabled = community.general.opentelemetry
+    [callback_opentelemetry]
+    enable_from_environment = ANSIBLE_OPENTELEMETRY_ENABLED
 
   Set the environment variable:
     export OTEL_EXPORTER_OTLP_ENDPOINT=<your endpoint (OTLP/HTTP)>
     export OTEL_EXPORTER_OTLP_HEADERS="authorization=Bearer your_otel_token"
     export OTEL_SERVICE_NAME=your_service_name
+    export ANSIBLE_OPENTELEMETRY_ENABLED=true
 '''
 
 import getpass
