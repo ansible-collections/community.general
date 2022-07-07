@@ -1,0 +1,2 @@
+bugfixes:
+  - rax_clb_nodes - fix code to be compatible with Python 3 (https://github.com/ansible-collections/community.general/pull/4933).
