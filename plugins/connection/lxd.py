@@ -18,6 +18,7 @@ DOCUMENTATION = '''
             - Container identifier.
         default: inventory_hostname
         vars:
+            - name: inventory_hostname
             - name: ansible_host
             - name: ansible_lxd_host
       executable:
@@ -61,7 +62,6 @@ class Connection(ConnectionBase):
     def __init__(self, play_context, new_stdin, *args, **kwargs):
         super(Connection, self).__init__(play_context, new_stdin, *args, **kwargs)
 
-        self._host = self._play_context.remote_addr
         try:
             self._lxc_cmd = get_bin_path("lxc")
         except ValueError:
@@ -75,14 +75,14 @@ class Connection(ConnectionBase):
         super(Connection, self)._connect()
 
         if not self._connected:
-            self._display.vvv(u"ESTABLISH LXD CONNECTION FOR USER: root", host=self._host)
+            self._display.vvv(u"ESTABLISH LXD CONNECTION FOR USER: root", host=self.get_option('remote_addr'))
             self._connected = True
 
     def exec_command(self, cmd, in_data=None, sudoable=True):
         """ execute a command on the lxd host """
         super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
-        self._display.vvv(u"EXEC {0}".format(cmd), host=self._host)
+        self._display.vvv(u"EXEC {0}".format(cmd), host=self.get_option('remote_addr'))
 
         local_cmd = [self._lxc_cmd]
         if self.get_option("project"):
@@ -104,10 +104,10 @@ class Connection(ConnectionBase):
         stderr = to_text(stderr)
 
         if stderr == "error: Container is not running.\n":
-            raise AnsibleConnectionFailure("container not running: %s" % self._host)
+            raise AnsibleConnectionFailure("container not running: %s" % self.get_option('remote_addr'))
 
         if stderr == "error: not found\n":
-            raise AnsibleConnectionFailure("container not found: %s" % self._host)
+            raise AnsibleConnectionFailure("container not found: %s" % self.get_option('remote_addr'))
 
         return process.returncode, stdout, stderr
 
@@ -115,7 +115,7 @@ class Connection(ConnectionBase):
         """ put a file from local to lxd """
         super(Connection, self).put_file(in_path, out_path)
 
-        self._display.vvv(u"PUT {0} TO {1}".format(in_path, out_path), host=self._host)
+        self._display.vvv(u"PUT {0} TO {1}".format(in_path, out_path), host=self.get_option('remote_addr'))
 
         if not os.path.isfile(to_bytes(in_path, errors='surrogate_or_strict')):
             raise AnsibleFileNotFound("input path is not a file: %s" % in_path)
@@ -138,7 +138,7 @@ class Connection(ConnectionBase):
         """ fetch a file from lxd to local """
         super(Connection, self).fetch_file(in_path, out_path)
 
-        self._display.vvv(u"FETCH {0} TO {1}".format(in_path, out_path), host=self._host)
+        self._display.vvv(u"FETCH {0} TO {1}".format(in_path, out_path), host=self.get_option('remote_addr'))
 
         local_cmd = [self._lxc_cmd]
         if self.get_option("project"):
