@@ -252,7 +252,8 @@ def main():
                 'weight': weight,
             }
 
-            for name, value in mutable.items():
+            for name in list(mutable):
+                value = mutable[name]
                 if value is None or value == getattr(node, name):
                     mutable.pop(name)
 
