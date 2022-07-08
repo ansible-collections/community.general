@@ -105,7 +105,7 @@
     - iso_result is changed
     - iso_file.stat.exists == True
 
-- name: Create iso file with Rock Ridge extention
+- name: Create iso file with Rock Ridge extension
   iso_create:
     src_files:
       - "{{ remote_tmp_dir }}/test1.cfg"
@@ -124,7 +124,7 @@
     - iso_result is changed
     - iso_file.stat.exists == True
 
-- name: Create iso file with Joliet extention
+- name: Create iso file with Joliet extension
   iso_create:
     src_files:
       - "{{ remote_tmp_dir }}/test1.cfg"

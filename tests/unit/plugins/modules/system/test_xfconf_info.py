@@ -16,7 +16,7 @@ TESTED_MODULE = xfconf_info.__name__
 @pytest.fixture
 def patch_xfconf_info(mocker):
     """
-    Function used for mocking some parts of redhat_subscribtion module
+    Function used for mocking some parts of redhat_subscription module
     """
     mocker.patch('ansible_collections.community.general.plugins.module_utils.mh.module_helper.AnsibleModule.get_bin_path',
                  return_value='/testbin/xfconf-query')

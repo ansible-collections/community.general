@@ -37,7 +37,7 @@ class TestSlackModule(ModuleTestCase):
         with self.assertRaises(AnsibleFailJson):
             self.module.main()
 
-    def test_sucessful_message(self):
+    def test_successful_message(self):
         """tests sending a message. This is example 1 from the docs"""
         set_module_args({
             'token': 'XXXX/YYYY/ZZZZ',

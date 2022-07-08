@@ -63,7 +63,7 @@ options:
         type: str
     replace:
         description:
-        - Force replace the existant vault on IPA server.
+        - Force replace the existent vault on IPA server.
         type: bool
         default: False
         choices: ["True", "False"]

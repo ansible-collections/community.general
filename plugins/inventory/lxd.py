@@ -522,7 +522,7 @@ class InventoryModule(BaseInventoryPlugin):
         """Helper to save data
 
         Helper to save the data in self.data
-        Detect if data is allready in branch and use dict_merge() to prevent that branch is overwritten.
+        Detect if data is already in branch and use dict_merge() to prevent that branch is overwritten.
 
         Args:
             str(instance_name): name of instance

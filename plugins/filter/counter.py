@@ -21,7 +21,7 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
-- name: Count occurences
+- name: Count occurrences
   ansible.builtin.debug:
     msg: >-
       {{ [1, 'a', 2, 2, 'a', 'b', 'a'] | community.general.counter }}
@@ -30,7 +30,7 @@ EXAMPLES = '''
 
 RETURN = '''
   _value:
-    description: A dictionary with the elements of the sequence as keys, and their number of occurance in the sequence as values.
+    description: A dictionary with the elements of the sequence as keys, and their number of occurrences in the sequence as values.
     type: dictionary
 '''
 

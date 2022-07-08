@@ -83,12 +83,12 @@ class OpenNebulaModule:
         if self.module.params.get("api_username"):
             username = self.module.params.get("api_username")
         else:
-            self.fail("Either api_username or the environment vairable ONE_USERNAME must be provided")
+            self.fail("Either api_username or the environment variable ONE_USERNAME must be provided")
 
         if self.module.params.get("api_password"):
             password = self.module.params.get("api_password")
         else:
-            self.fail("Either api_password or the environment vairable ONE_PASSWORD must be provided")
+            self.fail("Either api_password or the environment variable ONE_PASSWORD must be provided")
 
         session = "%s:%s" % (username, password)
 

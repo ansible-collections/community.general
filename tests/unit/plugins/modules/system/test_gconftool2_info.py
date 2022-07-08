@@ -17,7 +17,7 @@ TESTED_MODULE = gconftool2_info.__name__
 @pytest.fixture
 def patch_gconftool2_info(mocker):
     """
-    Function used for mocking some parts of redhat_subscribtion module
+    Function used for mocking some parts of redhat_subscription module
     """
     mocker.patch('ansible_collections.community.general.plugins.module_utils.mh.module_helper.AnsibleModule.get_bin_path',
                  return_value='/testbin/gconftool-2')

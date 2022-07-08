@@ -45,7 +45,7 @@ EXAMPLES = r'''
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the TOTP syncronization window is set to 86400 seconds
+- name: Ensure the TOTP synchronization window is set to 86400 seconds
   community.general.ipa_otpconfig:
     ipatokentotpsyncwindow: '86400'
     ipa_host: localhost
@@ -59,7 +59,7 @@ EXAMPLES = r'''
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the HOTP syncronization window is set to 100 hops
+- name: Ensure the HOTP synchronization window is set to 100 hops
   community.general.ipa_otpconfig:
     ipatokenhotpsyncwindow: '100'
     ipa_host: localhost

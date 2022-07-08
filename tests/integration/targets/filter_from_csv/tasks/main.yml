@@ -14,7 +14,7 @@
       - "valid_comma_separated_spaces | community.general.from_csv(skipinitialspace=True)  ==  expected_result"
       - "valid_comma_separated_spaces | community.general.from_csv  !=  expected_result"
 
-- name: Parse valid csv input with no headers with/without specifiying fieldnames
+- name: Parse valid csv input with no headers with/without specifying fieldnames
   assert:
     that:
       - "valid_comma_separated_no_headers | community.general.from_csv(fieldnames=['id','name','role'])  ==  expected_result"
