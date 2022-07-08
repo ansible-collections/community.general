@@ -691,7 +691,7 @@ def check_and_create_resource(
     :param model: Model used to create a resource.
     :param exclude_attributes: The attributes which should not be used to distinguish the resource. e.g. display_name,
      dns_label.
-    :param dead_states: List of states which can't transition to any of the usable states of the resource. This deafults
+    :param dead_states: List of states which can't transition to any of the usable states of the resource. This defaults
     to ["TERMINATING", "TERMINATED", "FAULTY", "FAILED", "DELETING", "DELETED", "UNKNOWN_ENUM_VALUE"]
     :param default_attribute_values: A dictionary containing default values for attributes.
     :return: A dictionary containing the resource & the "changed" status. e.g. {"vcn":{x:y}, "changed":True}
@@ -1189,7 +1189,7 @@ def are_dicts_equal(
 
 
 def should_dict_attr_be_excluded(map_option_name, option_key, exclude_list):
-    """An entry for the Exclude list for excluding a map's key is specifed as a dict with the map option name as the
+    """An entry for the Exclude list for excluding a map's key is specified as a dict with the map option name as the
     key, and the value as a list of keys to be excluded within that map. For example, if the keys "k1" and "k2" of a map
     option named "m1" needs to be excluded, the exclude list must have an entry {'m1': ['k1','k2']} """
     for exclude_item in exclude_list:

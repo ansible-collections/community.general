@@ -107,7 +107,7 @@ def test_validate_config(inventory):
     }
     with pytest.raises(AnsibleError) as error_message:
         inventory._validate_config(config)
-        assert "config missing client_secret, a required paramter" in error_message
+        assert "config missing client_secret, a required parameter" in error_message
 
     config = {
         "client_secret": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
@@ -116,7 +116,7 @@ def test_validate_config(inventory):
     }
     with pytest.raises(AnsibleError) as error_message:
         inventory._validate_config(config)
-        assert "config missing client_id, a required paramter" in error_message
+        assert "config missing client_id, a required parameter" in error_message
 
 
 def test_populate(inventory):

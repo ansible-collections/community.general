@@ -3,7 +3,7 @@
 ## Tests structure
 
 - `input` directory contains interfaces configuration files
-- `test_interfaces_file.py` runs each hardcoded test agains all configurations in `input` directory and compares results with golden outputs in `golden_output`
+- `test_interfaces_file.py` runs each hardcoded test against all configurations in `input` directory and compares results with golden outputs in `golden_output`
 
 ## Running unit tests with docker
 
