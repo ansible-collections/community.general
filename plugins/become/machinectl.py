@@ -66,14 +66,45 @@ DOCUMENTATION = '''
             ini:
               - section: machinectl_become_plugin
                 key: password
+    notes:
+      - When not using this plugin with user C(root), it only works correctly with a polkit rule which will alter
+        the behaviour of machinectl. This rule must alter the prompt behaviour to ask directly for the user credentials,
+        if the user is allowed to perform the action (take a look at the examples section).
+        If such a rule is not present the plugin only work if it is used in context with the root user,
+        because then no further prompt will be shown by machinectl.
 '''
 
+EXAMPLES = r'''
+# A polkit rule needed to use the module with a non-root user.
+# See the Notes section for details.
+60-machinectl-fast-user-auth.rules: |
+    polkit.addRule(function(action, subject) {
+        if(action.id == "org.freedesktop.machine1.host-shell" && subject.isInGroup("wheel")) {
+            return polkit.Result.AUTH_SELF_KEEP;
+        }
+    });
+'''
+
+from re import compile as re_compile
+
 from ansible.plugins.become import BecomeBase
+from ansible.module_utils._text import to_bytes
+
+
+ansi_color_codes = re_compile(to_bytes(r'\x1B\[[0-9;]+m'))
 
 
 class BecomeModule(BecomeBase):
 
     name = 'community.general.machinectl'
+
+    prompt = 'Password: '
+    fail = ('==== AUTHENTICATION FAILED ====',)
+    success = ('==== AUTHENTICATION COMPLETE ====',)
+
+    @staticmethod
+    def remove_ansi_codes(line):
+        return ansi_color_codes.sub(b"", line)
 
     def build_become_command(self, cmd, shell):
         super(BecomeModule, self).build_become_command(cmd, shell)
@@ -86,3 +117,15 @@ class BecomeModule(BecomeBase):
         flags = self.get_option('become_flags')
         user = self.get_option('become_user')
         return '%s -q shell %s %s@ %s' % (become, flags, user, cmd)
+
+    def check_success(self, b_output):
+        b_output = self.remove_ansi_codes(b_output)
+        return super().check_success(b_output)
+
+    def check_incorrect_password(self, b_output):
+        b_output = self.remove_ansi_codes(b_output)
+        return super().check_incorrect_password(b_output)
+
+    def check_missing_password(self, b_output):
+        b_output = self.remove_ansi_codes(b_output)
+        return super().check_missing_password(b_output)
