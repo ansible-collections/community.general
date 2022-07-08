@@ -38,7 +38,7 @@ DOCUMENTATION = '''
     parser:
       description:
         - The correct parser for the input data.
-        - For exmaple C(ifconfig).
+        - For example C(ifconfig).
         - See U(https://github.com/kellyjonbrazil/jc#parsers) for the latest list of parsers.
       type: string
       required: true

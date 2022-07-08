@@ -39,7 +39,7 @@ def XenAPI():
     """Imports and returns fake XenAPI module."""
 
     # Import of fake XenAPI module is wrapped by fixture so that it does not
-    # affect other unit tests which could potentialy also use XenAPI module.
+    # affect other unit tests which could potentially also use XenAPI module.
 
     # First we use importlib.import_module() to import the module and assign
     # it to a local symbol.
