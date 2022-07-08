@@ -99,7 +99,7 @@ options:
           - The size of namespace. This option supports the suffixes C(k) or C(K) or C(KB) for KiB,
             C(m) or C(M) or C(MB) for MiB, C(g) or C(G) or C(GB) for GiB and C(t) or C(T) or C(TB) for TiB.
           - This option is required if multiple namespaces are configured.
-          - If this option is not set, all of the avaiable space of a region is configured.
+          - If this option is not set, all of the available space of a region is configured.
         type: str
         required: false
   namespace_append:

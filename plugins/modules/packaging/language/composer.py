@@ -81,7 +81,7 @@ options:
     classmap_authoritative:
         description:
             - Autoload classes from classmap only.
-            - Implicitely enable optimize_autoloader.
+            - Implicitly enable optimize_autoloader.
             - Recommended especially for production, but can take a bit of time to run.
         default: false
         type: bool

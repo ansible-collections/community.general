@@ -64,7 +64,7 @@ msg:
 
 realm_info:
     description:
-        - Representation of the realm public infomation.
+        - Representation of the realm public information.
     returned: always
     type: dict
     contains:

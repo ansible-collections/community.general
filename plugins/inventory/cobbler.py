@@ -213,7 +213,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                         self.inventory.add_child(parent_group_name, group_name)
             else:
                 self.display.vvvv('Processing profile %s without parent\n' % profile['name'])
-                # Create a heirarchy of profile names
+                # Create a hierarchy of profile names
                 profile_elements = profile['name'].split('-')
                 i = 0
                 while i < len(profile_elements) - 1:

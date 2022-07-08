@@ -351,7 +351,7 @@ def wait_to_finish(target, pending, refresh, timeout, min_interval=1, delay=3):
 
             if pending and status not in pending:
                 raise HwcModuleException(
-                    "unexpect status(%s) occured" % status)
+                    "unexpect status(%s) occurred" % status)
 
         if not is_last_time:
             wait *= 2

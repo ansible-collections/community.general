@@ -3309,7 +3309,7 @@ def test_gsm_connection_unchanged(mocked_gsm_connection_unchanged, capfd):
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_STATIC_MULTIPLE_IP4_ADDRESSES, indirect=['patch_ansible_module'])
-def test_create_ethernet_with_mulitple_ip4_addresses_static(mocked_generic_connection_create, capfd):
+def test_create_ethernet_with_multiple_ip4_addresses_static(mocked_generic_connection_create, capfd):
     """
     Test : Create ethernet connection with static IP configuration
     """
@@ -3349,7 +3349,7 @@ def test_create_ethernet_with_mulitple_ip4_addresses_static(mocked_generic_conne
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_STATIC_MULTIPLE_IP6_ADDRESSES, indirect=['patch_ansible_module'])
-def test_create_ethernet_with_mulitple_ip6_addresses_static(mocked_generic_connection_create, capfd):
+def test_create_ethernet_with_multiple_ip6_addresses_static(mocked_generic_connection_create, capfd):
     """
     Test : Create ethernet connection with multiple IPv6 addresses configuration
     """
@@ -3389,7 +3389,7 @@ def test_create_ethernet_with_mulitple_ip6_addresses_static(mocked_generic_conne
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_STATIC_MULTIPLE_IP4_ADDRESSES, indirect=['patch_ansible_module'])
-def test_ethernet_connection_static_with_mulitple_ip4_addresses_unchanged(mocked_ethernet_connection_static_multiple_ip4_addresses_unchanged, capfd):
+def test_ethernet_connection_static_with_multiple_ip4_addresses_unchanged(mocked_ethernet_connection_static_multiple_ip4_addresses_unchanged, capfd):
     """
     Test : Ethernet connection with static IP configuration unchanged
     """
@@ -3403,7 +3403,7 @@ def test_ethernet_connection_static_with_mulitple_ip4_addresses_unchanged(mocked
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_STATIC_MULTIPLE_IP6_ADDRESSES, indirect=['patch_ansible_module'])
-def test_ethernet_connection_static_with_mulitple_ip6_addresses_unchanged(mocked_ethernet_connection_static_multiple_ip6_addresses_unchanged, capfd):
+def test_ethernet_connection_static_with_multiple_ip6_addresses_unchanged(mocked_ethernet_connection_static_multiple_ip6_addresses_unchanged, capfd):
     """
     Test : Ethernet connection with multiple IPv6 addresses configuration unchanged
     """
@@ -3485,7 +3485,7 @@ def test_create_ethernet_addr_gen_mode_and_ip6_privacy_static(mocked_generic_con
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_STATIC_IP6_PRIVACY_AND_ADDR_GEN_MODE, indirect=['patch_ansible_module'])
-def test_ethernet_connection_static_with_mulitple_ip4_addresses_unchanged(mocked_ethernet_connection_static_ip6_privacy_and_addr_gen_mode_unchange, capfd):
+def test_ethernet_connection_static_with_multiple_ip4_addresses_unchanged(mocked_ethernet_connection_static_ip6_privacy_and_addr_gen_mode_unchange, capfd):
     """
     Test : Ethernet connection with static IP configuration unchanged
     """

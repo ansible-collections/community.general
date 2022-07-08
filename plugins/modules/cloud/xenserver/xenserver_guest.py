@@ -1207,7 +1207,7 @@ class XenServerVM(XenServerObject):
                 if (self.module.params['home_server'] and
                         (not self.vm_params['affinity'] or self.module.params['home_server'] != self.vm_params['affinity']['name_label'])):
 
-                    # Check existance only. Ignore return value.
+                    # Check existence only. Ignore return value.
                     get_object_ref(self.module, self.module.params['home_server'], uuid=None, obj_type="home server", fail=True,
                                    msg_prefix="VM check home_server: ")
 
@@ -1371,7 +1371,7 @@ class XenServerVM(XenServerObject):
                         disk_sr = disk_params.get('sr')
 
                         if disk_sr_uuid is not None or disk_sr is not None:
-                            # Check existance only. Ignore return value.
+                            # Check existence only. Ignore return value.
                             get_object_ref(self.module, disk_sr, disk_sr_uuid, obj_type="SR", fail=True,
                                            msg_prefix="VM check disks[%s]: " % position)
                         elif self.default_sr_ref == 'OpaqueRef:NULL':
@@ -1448,7 +1448,7 @@ class XenServerVM(XenServerObject):
 
                 if cdrom_type == "iso":
                     # Check if ISO exists.
-                    # Check existance only. Ignore return value.
+                    # Check existence only. Ignore return value.
                     get_object_ref(self.module, cdrom_iso_name, uuid=None, obj_type="ISO image", fail=True,
                                    msg_prefix="VM check cdrom.iso_name: ")
 
@@ -1496,7 +1496,7 @@ class XenServerVM(XenServerObject):
                         self.module.fail_json(msg="VM check networks[%s]: network name cannot be an empty string!" % position)
 
                     if network_name:
-                        # Check existance only. Ignore return value.
+                        # Check existence only. Ignore return value.
                         get_object_ref(self.module, network_name, uuid=None, obj_type="network", fail=True,
                                        msg_prefix="VM check networks[%s]: " % position)
 

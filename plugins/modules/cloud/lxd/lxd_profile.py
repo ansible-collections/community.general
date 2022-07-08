@@ -360,7 +360,7 @@ class LXDProfileManagement(object):
         )
 
     def _merge_dicts(self, source, destination):
-        """Merge Dictionarys
+        """Merge Dictionaries
 
         Get a list of filehandle numbers from logger to be handed to
         DaemonContext.files_preserve

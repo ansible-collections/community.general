@@ -66,7 +66,7 @@
 
 
 - name: Run tests
-  # Skip tests on Fedora 31 and 32 because dbus fails to start unless the container is run in priveleged mode.
+  # Skip tests on Fedora 31 and 32 because dbus fails to start unless the container is run in privileged mode.
   # Even then, it starts unreliably. This may be due to the move to cgroup v2 in Fedora 31 and 32.
   # https://www.redhat.com/sysadmin/fedora-31-control-group-v2
   when:

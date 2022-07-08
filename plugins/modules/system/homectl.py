@@ -57,7 +57,7 @@ options:
     realname:
         description:
             - The user's real ('human') name.
-            - This can also be used to add a comment to maintain compatability with C(useradd).
+            - This can also be used to add a comment to maintain compatibility with C(useradd).
         aliases: [ 'comment' ]
         type: str
     realm:

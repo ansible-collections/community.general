@@ -279,7 +279,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
     # handling multiple instances of option=value when state is 'present' with/without exclusive is a bit complex
     #
     # 1. edit all lines where we have a option=value pair with a matching value in values[]
-    # 2. edit all the remaing lines where we have a matching option
+    # 2. edit all the remaining lines where we have a matching option
     # 3. delete remaining lines where we have a matching option
     # 4. insert missing option line(s) at the end of the section
 

@@ -790,7 +790,7 @@ class AIXTimezone(Timezone):
     inspects C(/etc/environment) to determine the current timezone.
 
     While AIX time zones can be set using two formats (POSIX and
-    Olson) the prefered method is Olson.
+    Olson) the preferred method is Olson.
     See the following article for more information:
     https://developer.ibm.com/articles/au-aix-posix/
 

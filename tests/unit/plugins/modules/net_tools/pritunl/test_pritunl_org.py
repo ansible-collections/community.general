@@ -109,7 +109,7 @@ class TestPritunlOrg(ModuleTestCase):
         idempotent_exc = idempotent_result.exception.args[0]
 
         # Ensure both calls resulted in the same returned value
-        # except for changed which sould be false the second time
+        # except for changed which should be false the second time
         for k, v in iteritems(idempotent_exc):
             if k == "changed":
                 self.assertFalse(idempotent_exc[k])
@@ -158,7 +158,7 @@ class TestPritunlOrg(ModuleTestCase):
         idempotent_exc = idempotent_result.exception.args[0]
 
         # Ensure both calls resulted in the same returned value
-        # except for changed which sould be false the second time
+        # except for changed which should be false the second time
         self.assertFalse(idempotent_exc["changed"])
         self.assertEqual(idempotent_exc["response"], delete_exc["response"])
 

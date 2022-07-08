@@ -305,7 +305,7 @@ class GitLabUser(object):
             # note: as we unfortunately have some uncheckable parameters
             #   where it is not possible to determine if the update
             #   changed something or not, we must assume here that a
-            #   changed happend and that an user object update is needed
+            #   changed happened and that an user object update is needed
             potentionally_changed = True
 
         # Assign ssh keys

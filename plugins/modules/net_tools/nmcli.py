@@ -1501,7 +1501,7 @@ class Nmcli(object):
         if self._hairpin is None:
             self.module.deprecate(
                 "Parameter 'hairpin' default value will change from true to false in community.general 7.0.0. "
-                "Set the value explicitly to supress this warning.",
+                "Set the value explicitly to suppress this warning.",
                 version='7.0.0', collection_name='community.general',
             )
             # Should be False in 7.0.0 but then that should be in argument_specs
