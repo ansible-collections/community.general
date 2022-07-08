@@ -207,7 +207,7 @@ def main():
         changed = True
     else:
         changed = False
-        out = "allready unpacked"
+        out = "already unpacked"
 
     if remove:
         os.remove(path)
