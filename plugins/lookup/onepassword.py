@@ -113,9 +113,10 @@ from ansible_collections.community.general.plugins.module_utils.onepassword impo
 class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
     bin = "op"
 
-    def __init__(self, subdomain, domain, master_password, secret_key, vault):
+    def __init__(self, subdomain, domain, username, secret_key, master_password, vault):
         self.subdomain = subdomain
         self.domain = domain
+        self.username = username
         self.master_password = master_password
         self.secret_key = secret_key
         self.vault = vault
@@ -535,7 +536,7 @@ class LookupModule(LookupBase):
         secret_key = kwargs.get("secret_key")
         master_password = kwargs.get("master_password", kwargs.get("vault_password", ""))
 
-        op = OnePass(subdomain, domain, username, secret_key, master_password)
+        op = OnePass(subdomain, domain, username, secret_key, master_password, vault)
         op.assert_logged_in()
 
         values = []
