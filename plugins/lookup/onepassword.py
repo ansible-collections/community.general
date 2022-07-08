@@ -113,13 +113,12 @@ from ansible_collections.community.general.plugins.module_utils.onepassword impo
 class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
     bin = "op"
 
-    def __init__(self, subdomain, domain, username, secret_key, master_password, vault):
+    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None):
         self.subdomain = subdomain
         self.domain = domain
         self.username = username
         self.master_password = master_password
         self.secret_key = secret_key
-        self.vault = vault
 
         self._path = None
         self._version = None
@@ -127,6 +126,11 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
     @abc.abstractmethod
     def _parse_field(self, data_json, field_name, section_title):
         pass
+
+    def _check_required_params(self, required_params):
+        if not all(getattr(self, param, None) for param in required_params):
+            msg = "Unable to sign in to 1Password. Missing required parameters: %s." % ", ".join(required_params)
+            raise AnsibleLookupError(msg)
 
     def _run(self, args, expected_rc=0, command_input=None, ignore_errors=False, environment_update=None):
         command = [self.path] + args
@@ -151,7 +155,11 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
         return rc, out, err
 
     @abc.abstractmethod
-    def assert_logged_in(self, subdomain=None, domain="1password.com"):
+    def assert_logged_in(self):
+        pass
+
+    @abc.abstractmethod
+    def full_signin(self):
         pass
 
     @abc.abstractmethod
@@ -186,7 +194,7 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
 
     @classmethod
     def get_current_version(cls):
-        """Standalone method to get the op CLI version. Useful when determing which class to load
+        """Standalone method to get the op CLI version. Useful when determining which class to load
         based on the current version."""
         try:
             bin_path = get_bin_path(cls.bin)
@@ -202,6 +210,7 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
 
 
 class OnePassCLIv1(OnePassCLIBase):
+    # TODO: Should supports_version be a tuple?
     supports_version = "1"
 
     def _parse_field(self, data_json, field_name, section_title):
@@ -276,13 +285,32 @@ class OnePassCLIv1(OnePassCLIBase):
 
         return ""
 
-    def assert_logged_in(self, subdomain=None, domain="1password.com"):
+    def assert_logged_in(self):
         args = ["get", "account"]
-        if subdomain:
-            account = "{subdomain}.{domain}".format(subdomain=subdomain, domain=domain)
+        if self.subdomain:
+            account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
             args.extend(["--account", account])
 
         return self._run(args, ignore_errors=True)
+
+    def full_signin(self):
+        required_params = [
+            "subdomain",
+            "username",
+            "secret_key",
+            "master_password",
+        ]
+        self._check_required_params(required_params)
+
+        args = [
+            "signin",
+            "{0}.{1}".format(self.subdomain, self.domain),
+            to_bytes(self.username),
+            to_bytes(self.secret_key),
+            "--raw",
+        ]
+
+        return self._run(args, command_input=to_bytes(self.master_password))
 
     def get_account(self):
         pass
@@ -300,7 +328,14 @@ class OnePassCLIv1(OnePassCLIBase):
         return self._run(args)
 
     def signin(self):
-        pass
+        self._check_required_params(['master_password'])
+
+        args = ["signin", "--raw"]
+
+        if self.subdomain:
+            args.append(self.subdomain)
+
+        return self._run(args, command_input=to_bytes(self.master_password))
 
 
 class OnePassCLIv2(OnePassCLIBase):
@@ -424,13 +459,32 @@ class OnePassCLIv2(OnePassCLIBase):
 
         return ""
 
-    def assert_logged_in(self, subdomain=None, domain="1password.com"):
-        args = ["account", "get"]
-        if subdomain:
-            account = "{subdomain}.{domain}".format(subdomain=subdomain, domain=domain)
+    def assert_logged_in(self):
+        args = ["whoami"]
+        if self.subdomain:
+            account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
             args.extend(["--account", account])
 
         return self._run(args, ignore_errors=True)
+
+    def full_signin(self):
+        required_params = [
+            "subdomain",
+            "username",
+            "secret_key",
+            "master_password",
+        ]
+        self._check_required_params(required_params)
+
+        args = [
+            "account", "add", "--raw",
+            "--address", "{0}.{1}".format(self.subdomain, self.domain),
+            "--email", to_bytes(self.username),
+            "--signin",
+        ]
+
+        environment_update = {"OP_SECRET_KEY": self.secret_key}
+        return self._run(args, command_input=to_bytes(self.master_password), environment_update=environment_update)
 
     def get_account(self):
         pass
@@ -448,11 +502,18 @@ class OnePassCLIv2(OnePassCLIBase):
         return self._run(args)
 
     def signin(self):
-        pass
+        self._check_required_params(['master_password'])
+
+        args = ["signin", "--raw"]
+
+        if self.subdomain:
+            args.extend(["--account", self.subdomain])
+
+        return self._run(args, command_input=to_bytes(self.master_password))
 
 
 class OnePass(object):
-    def __init__(self, subdomain, domain, username, secret_key, master_password):
+    def __init__(self, subdomain=None, domain="1password.com", username=None, secret_key=None, master_password=None):
         self.subdomain = subdomain
         self.domain = domain
         self.username = username
@@ -477,36 +538,37 @@ class OnePass(object):
 
         raise AnsibleLookupError("op version %s is unsupported" % version)
 
-    def get_token(self):
-        # If the config file exists, assume an initial signin has taken place and try basic sign in
+    def set_token(self):
         if os.path.isfile(self._config.config_file_path):
-
-            if not self.master_password:
-                raise AnsibleLookupError('Unable to sign in to 1Password. master_password is required.')
-
+            # If the config file exists, assume an initial sign in has taken place and try basic sign in
             try:
-                args = ['signin', '--output=raw']
+                # FIXME: If there are no accounts configured, op >= 2 interactively prompts to add an account.
+                rc, out, err = self._cli.signin()
+            except AnsibleLookupError as exc:
+                test_strings = (
+                    "missing required parameters",
+                    "unauthorized",
+                )
+                if any(string in exc.message. lower() for string in test_strings):
+                    # A required parameter is missing, or a bad master password was supplied
+                    # so don't both attempting a full sign in
+                    raise
 
-                if self.subdomain:
-                    args = ['signin', self.subdomain, '--output=raw']
+                rc, out, err = self._cli.full_signin()
 
-                rc, out, err = self._run(args, command_input=to_bytes(self.master_password))
-                self.token = out.strip()
-
-            except AnsibleLookupError:
-                self.full_login()
+            self.token = out.strip()
 
         else:
             # Attempt a full sign in since there appears to be no existing sign in
-            self.full_login()
+            rc, out, err = self._cli.full_signin()
+            self.token = out.strip()
 
     def assert_logged_in(self):
-        rc, out, err = self._cli.assert_logged_in(self.subdomain, self.domain)
+        rc, out, err = self._cli.assert_logged_in()
         if rc == 0:
             self.logged_in = True
         else:
-            # FIXME: This is not working currently
-            self.get_token()
+            self.set_token()
 
     def get_raw(self, item_id, vault=None):
         rc, out, err = self._cli.get_raw(item_id, vault, self.token)
@@ -518,22 +580,6 @@ class OnePass(object):
             return self._cli._parse_field(output, field, section)
 
         return ""
-
-    def full_login(self):
-        if None in [self.subdomain, self.username, self.secret_key, self.master_password]:
-            raise AnsibleLookupError('Unable to perform initial sign in to 1Password. '
-                                     'subdomain, username, secret_key, and master_password are required to perform initial sign in.')
-
-        args = [
-            'signin',
-            '{0}.{1}'.format(self.subdomain, self.domain),
-            to_bytes(self.username),
-            to_bytes(self.secret_key),
-            '--output=raw',
-        ]
-
-        rc, out, err = self._run(args, command_input=to_bytes(self.master_password))
-        self.token = out.strip()
 
 
 class LookupModule(LookupBase):
@@ -548,7 +594,7 @@ class LookupModule(LookupBase):
         secret_key = kwargs.get("secret_key")
         master_password = kwargs.get("master_password", kwargs.get("vault_password", ""))
 
-        op = OnePass(subdomain, domain, username, secret_key, master_password, vault)
+        op = OnePass(subdomain, domain, username, secret_key, master_password)
         op.assert_logged_in()
 
         values = []
