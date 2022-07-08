@@ -74,7 +74,7 @@ ilo_redfish_info:
             type: dict
             contains:
                 ret:
-                    description: Check variable to see if the information was succesfully retrived.
+                    description: Check variable to see if the information was successfully retrieved.
                     type: bool
                 msg:
                     description: Information of all active iLO sessions.
