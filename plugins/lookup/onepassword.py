@@ -128,11 +128,23 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
     def _parse_field(self, data_json, field_name, section_title):
         pass
 
-    def _run(self, args, expected_rc=0, command_input=None, ignore_errors=False):
+    def _run(self, args, expected_rc=0, command_input=None, ignore_errors=False, environment_update=None):
         command = [self.path] + args
-        p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        call_kwargs = {
+            "stdout": subprocess.PIPE,
+            "stderr": subprocess.PIPE,
+            "stdin": subprocess.PIPE,
+        }
+
+        if environment_update:
+            env = os.environ.copy()
+            env.update(environment_update)
+            call_kwargs["env"] = env
+
+        p = subprocess.Popen(command, **call_kwargs)
         out, err = p.communicate(input=command_input)
         rc = p.wait()
+
         if not ignore_errors and rc != expected_rc:
             raise AnsibleLookupError(to_text(err))
 
