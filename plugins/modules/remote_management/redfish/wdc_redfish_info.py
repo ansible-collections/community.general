@@ -71,6 +71,11 @@ EXAMPLES = '''
       - iom2.wdc.com
     username: "{{ username }}"
     password: "{{ password }}"
+  register: result
+
+- name: Print fetched information
+  ansible.builtin.debug:
+    msg: "{{ result.redfish_facts.simple_update_status.entries | to_nice_json }}"
 
 - name: Get Simple Update Status with baseuri specified
   community.general.wdc_redfish_info:
@@ -80,6 +85,9 @@ EXAMPLES = '''
     username: "{{ username }}"
     password: "{{ password }}"
 
+- name: Print fetched information
+  ansible.builtin.debug:
+    msg: "{{ result.redfish_facts.simple_update_status.entries | to_nice_json }}"
 '''
 
 RETURN = '''
@@ -125,6 +133,7 @@ CATEGORY_COMMANDS_ALL = {
 
 
 def main():
+    result = {}
     module = AnsibleModule(
         argument_spec=dict(
             category=dict(required=True),
@@ -191,11 +200,12 @@ def main():
             module.fail_json(msg=resource['msg'])
         for command in command_list:
             if command == "SimpleUpdateStatus":
-                result = rf_utils.get_simple_update_status()
-                if result['ret'] is False:
+                simple_update_status_result = rf_utils.get_simple_update_status()
+                if simple_update_status_result['ret'] is False:
                     module.fail_json(msg=to_native(result['msg']))
                 else:
-                    del result['ret']
+                    del simple_update_status_result['ret']
+                    result["simple_update_status"] = simple_update_status_result
                     module.exit_json(changed=False, redfish_facts=result)
 
 

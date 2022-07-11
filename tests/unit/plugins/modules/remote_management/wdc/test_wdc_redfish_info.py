@@ -11,10 +11,56 @@ import ansible_collections.community.general.plugins.modules.remote_management.r
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args, exit_json, fail_json
 
+MOCK_SUCCESSFUL_RESPONSE_WITH_ACTIONS = {
+    "ret": True,
+    "data": {
+        "Actions": {}
+    }
+}
+
+MOCK_SUCCESSFUL_HTTP_EMPTY_RESPONSE = {
+    "ret": True,
+    "data": {
+    }
+}
+
+MOCK_SUCCESSFUL_RESPONSE_WITH_UPDATE_SERVICE_RESOURCE = {
+    "ret": True,
+    "data": {
+        "UpdateService": {
+            "@odata.id": "/UpdateService"
+        }
+    }
+}
+
+MOCK_SUCCESSFUL_RESPONSE_WITH_SIMPLE_UPDATE_BUT_NO_FW_ACTIVATE = {
+    "ret": True,
+    "data": {
+        "Actions": {
+            "#UpdateService.SimpleUpdate": {
+                "target": "mocked value"
+            },
+            "Oem": {
+                "WDC": {}  # No #UpdateService.FWActivate
+            }
+        }
+    }
+}
+
 
 def get_bin_path(self, arg, required=False):
     """Mock AnsibleModule.get_bin_path"""
     return arg
+
+
+def get_redfish_facts(ansible_exit_json):
+    """From an AnsibleExitJson exception, get the redfish facts dict."""
+    return ansible_exit_json.exception.args[0]["redfish_facts"]
+
+
+def get_exception_message(ansible_exit_json):
+    """From an AnsibleExitJson exception, get the message string."""
+    return ansible_exit_json.exception.args[0]["msg"]
 
 
 class TestWdcRedfishInfo(unittest.TestCase):
@@ -85,10 +131,11 @@ class TestWdcRedfishInfo(unittest.TestCase):
                             _find_updateservice_resource=empty_return,
                             _find_updateservice_additional_uris=empty_return,
                             get_request=mock_simple_update_status):
-            with self.assertRaises(AnsibleExitJson) as exit_json:
+            with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
                 module.main()
-                self.assertEqual(mock_simple_update_status,
-                                 exit_json["redfish_facts"]["entries"])
+            redfish_facts = get_redfish_facts(ansible_exit_json)
+            self.assertEqual(mock_simple_update_status()["data"],
+                             redfish_facts["simple_update_status"]["entries"])
 
     def test_module_simple_update_status_updateservice_resource_not_found(self):
         set_module_args({
@@ -103,10 +150,10 @@ class TestWdcRedfishInfo(unittest.TestCase):
                 "ret": True,
                 "data": {}  # Missing UpdateService property
             }
-            with self.assertRaises(AnsibleFailJson) as exit_json:
+            with self.assertRaises(AnsibleFailJson) as ansible_exit_json:
                 module.main()
-                self.assertEqual("UpdateService resource not found",
-                                 exit_json["msg"])
+            self.assertEqual("UpdateService resource not found",
+                             get_exception_message(ansible_exit_json))
 
     def test_module_simple_update_status_service_does_not_support_simple_update(self):
         set_module_args({
@@ -135,10 +182,10 @@ class TestWdcRedfishInfo(unittest.TestCase):
 
         with patch.object(module.WdcRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.side_effect = mock_get_request_function
-            with self.assertRaises(AnsibleFailJson) as exit_json:
+            with self.assertRaises(AnsibleFailJson) as ansible_exit_json:
                 module.main()
-                self.assertEqual("UpdateService resource not found",
-                                 exit_json["msg"])
+            self.assertEqual("UpdateService resource not found",
+                             get_exception_message(ansible_exit_json))
 
     def test_module_simple_update_status_service_does_not_support_fw_activate(self):
         set_module_args({
@@ -150,28 +197,18 @@ class TestWdcRedfishInfo(unittest.TestCase):
         })
 
         def mock_get_request_function(uri):
-            mock_url_string = "mockURL"
-            if mock_url_string in uri:
-                return {
-                    "ret": True,
-                    "data": {
-                        "Actions": {
-                            "#UpdateService.SimpleUpdate": "mocked value",
-                            "Oem": {
-                                "WDC": {}  # No #UpdateService.FWActivate
-                            }
-                        }
-                    }
-                }
+            if uri.endswith("/redfish/v1") or uri.endswith("/redfish/v1/"):
+                return MOCK_SUCCESSFUL_RESPONSE_WITH_UPDATE_SERVICE_RESOURCE
+            elif uri.endswith("/mockedUrl"):
+                return MOCK_SUCCESSFUL_HTTP_EMPTY_RESPONSE
+            elif uri.endswith("/UpdateService"):
+                return MOCK_SUCCESSFUL_RESPONSE_WITH_SIMPLE_UPDATE_BUT_NO_FW_ACTIVATE
             else:
-                return {
-                    "ret": True,
-                    "data": mock_url_string
-                }
+                raise RuntimeError("Illegal call to get_request in test: " + uri)
 
-        with patch.object(module.WdcRedfishUtils, 'get_request') as mock_get_request:
+        with patch("ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils.get_request") as mock_get_request:
             mock_get_request.side_effect = mock_get_request_function
-            with self.assertRaises(AnsibleFailJson) as exit_json:
+            with self.assertRaises(AnsibleFailJson) as ansible_exit_json:
                 module.main()
-                self.assertEqual("Service does not support FWActivate",
-                                 exit_json["msg"])
+            self.assertEqual("Service does not support FWActivate",
+                             get_exception_message(ansible_exit_json))
