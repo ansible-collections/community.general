@@ -131,8 +131,8 @@ EXAMPLES = '''
     auth_password: PASSWORD
     state: present
     composite_role:
-      name: composite_role_name
       id: composite_role_id
+      name: composite_role_name
     client_id: client1
     role_client_id: client2
     roles:
@@ -152,8 +152,8 @@ EXAMPLES = '''
     auth_password: PASSWORD
     state: present
     composite_role:
-      name: composite_role_name
       id: composite_role_id
+      name: composite_role_name
     roles:
       - name: role_of_realm_name1
         id: role_id1
