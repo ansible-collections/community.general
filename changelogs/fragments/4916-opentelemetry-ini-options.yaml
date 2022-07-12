@@ -1,2 +1,0 @@
-minor_changes:
-  - opentelemetry callback plugin - allow configuring opentelementry callback via config file (https://github.com/ansible-collections/community.general/pull/4916).
