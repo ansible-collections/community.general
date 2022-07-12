@@ -6,5 +6,8 @@ set -eux
 
 # Run connection tests with both the default and C locale.
 
-                ansible-playbook test_connection.yml -i "${INVENTORY}" "$@"
-LC_ALL=C LANG=C ansible-playbook test_connection.yml -i "${INVENTORY}" "$@"
+ansible-playbook test_connection.yml -i "${INVENTORY}" "$@"
+
+if ansible --version | grep ansible | grep -E ' 2\.(9|10|11|12|13)\.'; then
+    LC_ALL=C LANG=C ansible-playbook test_connection.yml -i "${INVENTORY}" "$@"
+fi
