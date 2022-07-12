@@ -14,6 +14,11 @@ from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException
 from ansible_collections.community.general.plugins.module_utils.mh.deco import cause_changes, check_mode_skip
 
+# Python 2 Compatibility
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
 
 class DestFileChecks(object):
     """

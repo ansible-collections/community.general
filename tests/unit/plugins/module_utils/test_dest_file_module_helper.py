@@ -343,7 +343,16 @@ def _mock_os_for_dest_file(request, mocker):
     mocker.patch('os.access', side_effect=mock_)
     mocker.patch('os.path.isfile', return_value=request.param['is_regular'])
     if request.param['exists']:
-        mocker.patch('os.stat', return_value={'st_size': 0})
+        mocker.patch('os.stat', return_value={'st_mode': 0,
+                                              'st_ino': 0,
+                                              'st_dev': 0,
+                                              'st_nlink': 0,
+                                              'st_uid': 0,
+                                              'st_gid': 0,
+                                              'st_size': 0,
+                                              'st_atime': 0,
+                                              'st_mtime': 0,
+                                              'st_ctime': 0})
     else:
         mocker.patch('os.stat', side_effect=FileNotFoundError)
 
