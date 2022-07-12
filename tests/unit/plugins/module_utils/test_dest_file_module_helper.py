@@ -14,6 +14,11 @@ from ansible_collections.community.general.tests.unit.compat.builtins import BUI
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.dest import DestFileChecks
 from ansible_collections.community.general.tests.integration.targets.module_helper.library.mdestfile import MDestFile
 
+# Python 2 Compatibility
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
 
 DUMMY_DEST = '/dummy/dest/file'
 DUMMY_DEST_PARENT = os.path.dirname(DUMMY_DEST)
