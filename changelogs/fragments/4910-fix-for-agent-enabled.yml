@@ -1,0 +1,2 @@
+bugfixes:
+  - proxmox inventory plugin - fix crash when ``enabled=1`` is used in agent config string (https://github.com/ansible-collections/community.general/pull/4910).
