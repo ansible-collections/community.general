@@ -84,6 +84,7 @@ EXAMPLES = '''
     baseuri: "iom1.wdc.com"
     username: "{{ username }}"
     password: "{{ password }}"
+  register: result
 
 - name: Print fetched information
   ansible.builtin.debug:
