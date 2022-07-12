@@ -127,7 +127,8 @@ class ProxmoxAnsible(object):
         return vms[0]
 
     def get_vm(self, vmid, ignore_missing=False):
-        vms = [vm for vm in self.proxmox_api.cluster.resources.get(type='vm') if vm['vmid'] == int(vmid)]
+        vmid = int(vmid) if vmid is not None else None
+        vms = [vm for vm in self.proxmox_api.cluster.resources.get(type='vm') if vmid and vm['vmid'] == vmid]
 
         if vms:
             return vms[0]
