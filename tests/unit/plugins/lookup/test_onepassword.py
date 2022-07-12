@@ -102,6 +102,7 @@ def fake_opv1(mocker):
 
     return op
 
+
 @pytest.fixture
 def fake_opv2(mocker):
     mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePassCLIBase.get_current_version", return_value="2.14.7")
