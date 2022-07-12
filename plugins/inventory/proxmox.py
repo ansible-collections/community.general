@@ -412,12 +412,20 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                         properties[parsed_key] = [tag.strip() for tag in stripped_value.split(",")]
 
                 # The first field in the agent string tells you whether the agent is enabled
-                # the rest of the comma separated string is extra config for the agent
-                if config == 'agent' and int(value.split(',')[0]):
-                    agent_iface_value = self._get_agent_network_interfaces(node, vmid, vmtype)
-                    if agent_iface_value:
-                        agent_iface_key = self.to_safe('%s%s' % (key, "_interfaces"))
-                        properties[agent_iface_key] = agent_iface_value
+                # the rest of the comma separated string is extra config for the agent.
+                # In some (newer versions of proxmox) instances it can be 'enabled=1'.
+                if config == 'agent':
+                    agent_enabled = 0
+                    try:
+                        agent_enabled = int(value.split(',')[0])
+                    except ValueError:
+                        if value.split(',')[0] == "enabled=1":
+                            agent_enabled = 1
+                    if agent_enabled:
+                        agent_iface_value = self._get_agent_network_interfaces(node, vmid, vmtype)
+                        if agent_iface_value:
+                            agent_iface_key = self.to_safe('%s%s' % (key, "_interfaces"))
+                            properties[agent_iface_key] = agent_iface_value
 
                 if config == 'lxc':
                     out_val = {}
