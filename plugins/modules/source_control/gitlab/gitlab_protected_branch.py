@@ -36,7 +36,7 @@ options:
   name:
     description:
       - The name of the branch that needs to be protected.
-      - Can make use a wildcard charachter for like C(production/*) or just have C(main) or C(develop) as value.
+      - Can make use a wildcard character for like C(production/*) or just have C(main) or C(develop) as value.
     required: true
     type: str
   merge_access_levels:

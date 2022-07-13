@@ -303,7 +303,7 @@ class LXDProjectManagement(object):
         )
 
     def _merge_dicts(self, source, destination):
-        """ Return a new dict taht merge two dict,
+        """ Return a new dict that merge two dict,
         with values in source dict overwrite destination dict
 
         Args:
