@@ -20,6 +20,7 @@ try:
 except NameError:
     FileNotFoundError = IOError
 
+MIXIDEST_PATH = 'ansible_collections.community.general.plugins.module_utils.mh.mixins.dest'
 DUMMY_DEST = '/dummy/dest/file'
 DUMMY_DEST_PARENT = os.path.dirname(DUMMY_DEST)
 DUMMY_BACKUP = DUMMY_DEST + '_backup'
@@ -340,21 +341,21 @@ def _mock_os_for_dest_file(request, mocker):
             return request.param['has_writeable_parent']
         else:
             raise ValueError('Unexpected case : path="{0}", mode="{1}"'.format(path, mode))
-    mocker.patch('os.access', side_effect=mock_)
-    mocker.patch('os.path.isfile', return_value=request.param['is_regular'])
+    mocker.patch(MIXIDEST_PATH + '.local_os_access', side_effect=mock_)
+    mocker.patch(MIXIDEST_PATH + '.local_os_path_is_file', return_value=request.param['is_regular'])
     if request.param['exists']:
-        mocker.patch('os.stat', return_value={'st_mode': 0,
-                                              'st_ino': 0,
-                                              'st_dev': 0,
-                                              'st_nlink': 0,
-                                              'st_uid': 0,
-                                              'st_gid': 0,
-                                              'st_size': 0,
-                                              'st_atime': 0,
-                                              'st_mtime': 0,
-                                              'st_ctime': 0})
+        mocker.patch(MIXIDEST_PATH + '.local_os_stat', return_value={'st_mode': 0,
+                                                                     'st_ino': 0,
+                                                                     'st_dev': 0,
+                                                                     'st_nlink': 0,
+                                                                     'st_uid': 0,
+                                                                     'st_gid': 0,
+                                                                     'st_size': 0,
+                                                                     'st_atime': 0,
+                                                                     'st_mtime': 0,
+                                                                     'st_ctime': 0})
     else:
-        mocker.patch('os.stat', side_effect=FileNotFoundError)
+        mocker.patch(MIXIDEST_PATH + '.local_os_stat', side_effect=FileNotFoundError)
 
 
 @pytest.mark.parametrize('expected,_mock_os_for_dest_file',

@@ -8,13 +8,17 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 import os
+# use local_* to write more reliable mock for os in units test
+from os import stat as local_os_stat
+from os import access as local_os_access
+from os.path import isfile as local_os_path_is_file
 import tempfile
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException
 from ansible_collections.community.general.plugins.module_utils.mh.deco import cause_changes, check_mode_skip
 
-# Python 2 Compatibility
+# Python 2 compatibility
 try:
     FileNotFoundError
 except NameError:
@@ -169,30 +173,30 @@ class DestFileChecks(object):
 
     def _def_exists(self):
         try:
-            os.stat(self._dest)
+            local_os_stat(self._dest)
         except FileNotFoundError:
             self._exists = False
         else:
             self._exists = True
 
     def _def_writeable_parent(self):
-        self._writeable_parent = os.access(os.path.dirname(self._dest), os.W_OK)
+        self._writeable_parent = local_os_access(os.path.dirname(self._dest), os.W_OK)
 
     def _def_readable(self):
         if self._exists:
-            self._readable = os.access(self._dest, os.R_OK)
+            self._readable = local_os_access(self._dest, os.R_OK)
         else:
             self._readable = False
 
     def _def_writeable(self):
         if self._exists:
-            self._writeable = os.access(self._dest, os.W_OK)
+            self._writeable = local_os_access(self._dest, os.W_OK)
         else:
             self._writeable = self._writeable_parent
 
     def _def_regular(self):
         if self._exists:
-            self._regular = os.path.isfile(self._dest)
+            self._regular = local_os_path_is_file(self._dest)
         else:
             self._regular = False
 
