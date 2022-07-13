@@ -12,6 +12,10 @@
     path: "{{ remote_tmp_dir }}"
     mode: "0755"
 
+- name: "<mdestfile> get info for distribution for debuging"
+  ansible.builtin.debug:
+    msg: "ansible_distribution : {{ ansible_distribution }} ansible_distribution_version : {{ ansible_distribution_version }} ansible_distribution_release : {{ ansible_distribution_release }}"
+
 - name: "<mdestfile> run test cases for dest file module helper"
   include_tasks: msdestfile-run.yml
   loop: "{{ test_cases_dest_file_module_helper }}"
