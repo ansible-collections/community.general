@@ -511,7 +511,9 @@ def repo_refresh(m):
 
 
 def transactional_updates():
-    return os.path.exists('/var/lib/misc/transactional-update.state')
+    return os.path.exists('/var/lib/misc/transactional-update.state') or \
+           os.path.exists('/sbin/transactional-update') or \
+           os.path.exists('/bin/tukit')
 
 # ===========================================
 # Main control flow
