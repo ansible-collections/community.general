@@ -155,41 +155,57 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.basic import AnsibleModule
 
 
+def split_pid_name(input):
+    try:
+        pid, name = input.split("/")
+    except ValueError:
+        return 0, ""
+    else:
+        return pid, name
+
+
 def netStatParse(raw):
+    """
+    The netstat result can be either split in 6,7 or 8 elements depending on the values of state, process and name.
+    For UDP the state is always empty. For UDP and TCP the process can be empty.
+    So these cases have to be checked.
+    """
     results = list()
     for line in raw.splitlines():
-        listening_search = re.search('[^ ]+:[0-9]+', line)
-        if listening_search:
-            splitted = line.split()
-            conns = re.search('([^ ]+):([0-9]+)', splitted[3])
-            pidstr = ''
-            if 'tcp' in splitted[0]:
-                protocol = 'tcp'
-                pidstr = splitted[6]
-            elif 'udp' in splitted[0]:
-                protocol = 'udp'
-                pidstr = splitted[5]
-            pids = re.search(r'(([0-9]+)/(.*)|-)', pidstr)
-            if conns and pids:
-                address = conns.group(1)
-                port = conns.group(2)
-                if (pids.group(2)):
-                    pid = pids.group(2)
-                else:
-                    pid = 0
-                if (pids.group(3)):
-                    name = pids.group(3)
-                else:
-                    name = ''
-                result = {
-                    'pid': int(pid),
-                    'address': address,
-                    'port': int(port),
-                    'protocol': protocol,
-                    'name': name,
-                }
-                if result not in results:
-                    results.append(result)
+        if line.startswith(("tcp", "udp")):
+            # set variables to default state, in case they are not specified
+            state = ""
+            pid_and_name = ""
+            process = ""
+            protocol, recv_q, send_q, local_address,foreign_address, *rest = line.split()
+            local_address, port = local_address.rsplit(":", maxsplit=1)
+
+            if protocol.startswith("tcp"):
+                if len(rest) == 3:
+                    state, pid_and_name, process = rest
+                if len(rest) == 2:
+                    state, pid_and_name = rest
+
+            if protocol.startswith("udp"):
+                if len(rest) == 2:
+                    pid_and_name, process = rest
+                if len(rest) == 1:
+                    pid_and_name = rest[0]
+
+            pid, name = split_pid_name(pid_and_name)
+            name = name.rstrip(":")
+            result = {
+                'protocol': protocol,
+                'state': state,
+                'local address': local_address,
+                'foreign address': foreign_address,
+                'port': int(port),
+                'name': name,
+                'pid': int(pid),
+                'process': process
+            }
+            if result not in results:
+                results.append(result)
             else:
                 raise EnvironmentError('Could not get process information for the listening ports.')
     return results
@@ -237,14 +253,17 @@ def ss_parse(raw):
 
         address = conns.group(1)
         port = conns.group(2)
+        result = {
+            'protocol': protocol,
+            'state': state,
+            'local address': address,
+            'foreign address': peer_addr_port,
+            'port': int(port),
+            'name': name,
+            'pid': int(pid),
+            'process': process
+        }
         for name, pid in pids:
-            result = {
-                'pid': int(pid),
-                'address': address,
-                'port': int(port),
-                'protocol': protocol,
-                'name': name
-            }
             results.append(result)
     return results
 
@@ -254,7 +273,7 @@ def main():
         'netstat': {
             'args': [
                 '-p',
-                '-l',
+                '-a',
                 '-u',
                 '-n',
                 '-t',
@@ -264,7 +283,7 @@ def main():
         'ss': {
             'args': [
                 '-p',
-                '-l',
+                '-a',
                 '-u',
                 '-n',
                 '-t',
