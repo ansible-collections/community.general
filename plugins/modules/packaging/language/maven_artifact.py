@@ -159,7 +159,7 @@ options:
             A list of headers that should not be included in the redirection. This headers are sent to the fetch_url
             ``fetch_url`` function.
             Useful if the redirection URL does not need to have sensitive headers in the request.
-            Only used if the fetch_url function supports it. Otherwise, this field will be ignored.
+            Requires Ansible version >=2.12
     directory_mode:
         type: str
         description:
@@ -240,8 +240,8 @@ import tempfile
 import traceback
 import re
 
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible.module_utils.ansible_release import __version__ as ansible_version
-from pkg_resources import parse_version
 from re import match
 
 LXML_ETREE_IMP_ERR = None
@@ -520,21 +520,18 @@ class MavenDownloader:
         self.module.params['url_password'] = self.module.params.get('password', '')
         self.module.params['http_agent'] = self.user_agent
 
-        if parse_version(ansible_version) <= parse_version("2.11.*"):
-            response, info = fetch_url(
-                self.module,
-                url_to_use,
-                timeout=req_timeout,
-                headers=self.headers
-            )
-        else:
-            response, info = fetch_url(
-                self.module,
-                url_to_use,
-                timeout=req_timeout,
-                headers=self.headers,
-                unredirected_headers=self.module.params['unredirected_headers']
-            )
+        kwargs = {}
+        if self.module.params['unredirected_headers']:
+            kwargs['unredirected_headers'] = self.module.params['unredirected_headers']
+
+        response, info = fetch_url(
+            self.module,
+            url_to_use,
+            timeout=req_timeout,
+            headers=self.headers,
+            **kwargs
+        )
+
         if info['status'] == 200:
             return response
         if force:
@@ -645,6 +642,9 @@ def main():
         add_file_common_args=True,
         mutually_exclusive=([('version', 'version_by_spec')])
     )
+
+    if LooseVersion(ansible_version) < LooseVersion("2.12") and module.params['unredirected_headers']:
+        module.fail_json(msg="Unredirected Headers parameter provided, but Ansible version does not support it. Minimum version is 2.12")
 
     if not HAS_LXML_ETREE:
         module.fail_json(msg=missing_required_lib('lxml'), exception=LXML_ETREE_IMP_ERR)
