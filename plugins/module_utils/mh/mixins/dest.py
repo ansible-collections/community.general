@@ -24,6 +24,7 @@ try:
 except NameError:
     FileNotFoundError = IOError
 
+
 class DestFileChecks(object):
     """
     Standard checks for working with destionations files on managed nodes.
