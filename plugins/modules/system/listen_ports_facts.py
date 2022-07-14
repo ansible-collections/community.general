@@ -155,9 +155,9 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.basic import AnsibleModule
 
 
-def split_pid_name(input):
+def split_pid_name(pid_name):
     try:
-        pid, name = input.split("/")
+        pid, name = pid_name.split("/")
     except ValueError:
         return 0, ""
     else:
@@ -194,7 +194,7 @@ def netStatParse(raw):
                 if len(rest) == 1:
                     pid_and_name = rest[0]
 
-            pid, name = split_pid_name(pid_and_name)
+            pid, name = split_pid_name(pid_name=pid_and_name)
             name = name.rstrip(":")
             result = {
                 'protocol': protocol,
