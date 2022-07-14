@@ -20,7 +20,7 @@ from ansible_collections.community.general.plugins.module_utils.mh.exceptions im
 from ansible_collections.community.general.plugins.module_utils.mh.deco import cause_changes, check_mode_skip
 
 # Python 2 compatibility
-if sys.version_info.major == 2:
+if sys.version_info[0] == 2:
     ERR_FILE_NOT_FOUND_STAT = OSError
     ERR_FILE_NOT_FOUND_OPEN = IOError
 else:
