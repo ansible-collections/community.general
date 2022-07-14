@@ -123,14 +123,22 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
         self._path = None
         self._version = None
 
+    def _check_required_params(self, required_params):
+        set_attrs = dict((param, getattr(self, param, None)) for param in required_params if getattr(self, param, None))
+        missing = set(required_params).difference(set_attrs)
+        if missing:
+            prefix = "Unable to sign in to 1Password. Missing required parameter"
+            plural = ""
+            suffix = ": {params}.".format(params=", ".join(missing))
+            if len(missing) > 1:
+                plural = "s"
+
+            msg = "{prefix}{plural}{suffix}".format(prefix=prefix, plural=plural, suffix=suffix)
+            raise AnsibleLookupError(msg)
+
     @abc.abstractmethod
     def _parse_field(self, data_json, field_name, section_title):
         pass
-
-    def _check_required_params(self, required_params):
-        if not all(getattr(self, param, None) for param in required_params):
-            msg = "Unable to sign in to 1Password. Missing required parameters: %s." % ", ".join(required_params)
-            raise AnsibleLookupError(msg)
 
     def _run(self, args, expected_rc=0, command_input=None, ignore_errors=False, environment_update=None):
         command = [self.path] + args
