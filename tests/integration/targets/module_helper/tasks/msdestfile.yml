@@ -38,4 +38,4 @@
   # needed to test some behaviours when destination file has unexpected rights)
   # but, some platform does not provide suitable version of `su` and the test
   # case can not be run on those.
-  when: not(case.need_to_become_with_su) or ansible_user_uid > 0 or (check_nobody_user.changed == true and check_su_vesion.failed == false and get_sh_path.failed == false and not(ansible_distribution == 'RedHat' and ansible_distribution_version == '7.9'))
+  when: (not(case.need_to_become_with_su) or ansible_user_uid > 0 or (check_nobody_user.changed == true and check_su_vesion.failed == false and get_sh_path.failed == false)) and not(ansible_distribution == 'RedHat' and ansible_distribution_version == '7.9')
