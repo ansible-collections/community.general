@@ -239,19 +239,18 @@ def ss_parse(raw):
         except ValueError:
             # unexpected stdout from ss
             raise EnvironmentError(
-                'Expected `ss` table layout "Netid, State, Recv-Q, Send-Q, Local Address:Port, Peer Address:Port" and optionally "Process", \
-                    but got something else: {0}'.format(line)
+                'Expected `ss` table layout "Netid, State, Recv-Q, Send-Q, Local Address:Port, Peer Address:Port" and \
+                 optionally "Process", but got something else: {0}'.format(line)
             )
 
         conns = regex_conns.search(local_addr_port)
-        pids = regex_pid.findall(process)
-        if conns is None and pids is None:
-            continue
-
-        if pids is None:
+        try:
+            name, pid = regex_pid.findall(process)[0]
+        except IndexError:
             # likely unprivileged user, so add empty name & pid
             # as we do in netstat logic to be consistent with output
-            pids = [(str(), 0)]
+            pid = 0
+            name = ""
 
         address = conns.group(1)
         port = conns.group(2)
@@ -263,10 +262,8 @@ def ss_parse(raw):
             'port': int(port),
             'name': name,
             'pid': int(pid),
-            'process': process
         }
-        for name, pid in pids:
-            results.append(result)
+        results.append(result)
     return results
 
 
