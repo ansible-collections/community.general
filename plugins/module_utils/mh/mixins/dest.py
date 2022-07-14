@@ -8,6 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 import os
+import sys
 # use local_* to write more reliable mock for os in units test
 from os import stat as local_os_stat
 from os import access as local_os_access
@@ -19,10 +20,12 @@ from ansible_collections.community.general.plugins.module_utils.mh.exceptions im
 from ansible_collections.community.general.plugins.module_utils.mh.deco import cause_changes, check_mode_skip
 
 # Python 2 compatibility
-try:
-    FileNotFoundError
-except NameError:
-    FileNotFoundError = OSError
+if sys.version_info.major == 2:
+    ERR_FILE_NOT_FOUND_STAT = OSError
+    ERR_FILE_NOT_FOUND_OPEN = IOError
+else:
+    ERR_FILE_NOT_FOUND_STAT = FileNotFoundError
+    ERR_FILE_NOT_FOUND_OPEN = FileNotFoundError
 
 
 class DestFileChecks(object):
@@ -175,7 +178,7 @@ class DestFileChecks(object):
     def _def_exists(self):
         try:
             local_os_stat(self._dest)
-        except FileNotFoundError:
+        except ERR_FILE_NOT_FOUND_STAT:
             self._exists = False
         else:
             self._exists = True
@@ -265,7 +268,7 @@ class DestFileMixin(object):
         try:
             with open(self.vars['path'], 'rb') as file:
                 self.raw_content = file.read()
-        except FileNotFoundError:
+        except ERR_FILE_NOT_FOUND_OPEN:
             pass
 
     def __process_data__(self):

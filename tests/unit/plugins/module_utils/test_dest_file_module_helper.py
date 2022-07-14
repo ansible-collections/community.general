@@ -11,14 +11,8 @@ import pytest
 import os
 from ansible_collections.community.general.tests.unit.plugins.modules.conftest import patch_ansible_module
 from ansible_collections.community.general.tests.unit.compat.builtins import BUILTINS
-from ansible_collections.community.general.plugins.module_utils.mh.mixins.dest import DestFileChecks
+from ansible_collections.community.general.plugins.module_utils.mh.mixins.dest import DestFileChecks, ERR_FILE_NOT_FOUND_STAT, ERR_FILE_NOT_FOUND_OPEN
 from ansible_collections.community.general.tests.integration.targets.module_helper.library.mdestfile import MDestFile
-
-# Python 2 Compatibility
-try:
-    FileNotFoundError
-except NameError:
-    FileNotFoundError = OSError
 
 MIXIDEST_PATH = 'ansible_collections.community.general.plugins.module_utils.mh.mixins.dest'
 DUMMY_DEST = '/dummy/dest/file'
@@ -355,7 +349,7 @@ def _mock_os_for_dest_file(request, mocker):
                                                                      'st_mtime': 0,
                                                                      'st_ctime': 0})
     else:
-        mocker.patch(MIXIDEST_PATH + '.local_os_stat', side_effect=FileNotFoundError)
+        mocker.patch(MIXIDEST_PATH + '.local_os_stat', side_effect=ERR_FILE_NOT_FOUND_STAT)
 
 
 @pytest.mark.parametrize('expected,_mock_os_for_dest_file',
@@ -409,7 +403,7 @@ def test_110_dest_file_mixin_init_module(mocker):
 @pytest.mark.usefixtures('patch_ansible_module')
 def test_120_dest_file_mixin_read_dest(raw_content, mocker):
     if raw_content is None:
-        mocker.patch(BUILTINS + '.open', side_effect=FileNotFoundError)
+        mocker.patch(BUILTINS + '.open', side_effect=ERR_FILE_NOT_FOUND_OPEN)
     else:
         mocker.patch(BUILTINS + '.open', mocker.mock_open(read_data=raw_content))
     dummy = MDestFile()
