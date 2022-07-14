@@ -470,12 +470,27 @@ class OnePassCLIv2(OnePassCLIBase):
         return ""
 
     def assert_logged_in(self):
-        args = ["whoami"]
+        args = ["account", "list"]
         if self.subdomain:
             account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
             args.extend(["--account", account])
 
-        return self._run(args, ignore_errors=True)
+        rc, out, err = self._run(args)
+
+        if out:
+            # Running 'op account get' if there are no accounts configured on the system drops into
+            # an interactive prompt. Only run 'op account get' after first listing accounts to see
+            # if there are any previously configured accounts.
+            args = ["account", "get"]
+            if self.subdomain:
+                account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
+                args.extend(["--account", account])
+
+            rc, out, err = self._run(args)
+
+            return not bool(rc)
+
+        return False
 
     def full_signin(self):
         required_params = [
