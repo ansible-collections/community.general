@@ -7,14 +7,22 @@
     dest_dir: "{{ remote_tmp_dir }}/destdir/"
     dest_file: "{{ remote_tmp_dir }}/destdir/destfile.txt"
 
+- name: "<mdestfile> chek the presence of 'nobody' user"
+  ansible.builtin.user:
+    name: 'nobody'
+    state: 'absent'
+  check_mode: true
+  register: check_nobody_user
+
+- name: "<mdestfile> check if have suitable version of su"
+  ansible.builtin.command: 'su -s /bin/sh -c "echo toto"'
+  register: check_su_vesion
+  ignore_errors: true
+
 - name: "<mdestfile> ensure that remote_tmp_dir is readable by non privilegied user when run by root"
   ansible.builtin.file:
     path: "{{ remote_tmp_dir }}"
     mode: "0755"
-
-- name: "<mdestfile> get info for distribution for debuging"
-  ansible.builtin.debug:
-    msg: "ansible_distribution : {{ ansible_distribution }} ansible_distribution_version : {{ ansible_distribution_version }} ansible_distribution_release : {{ ansible_distribution_release }}"
 
 - name: "<mdestfile> run test cases for dest file module helper"
   include_tasks: msdestfile-run.yml
@@ -25,4 +33,4 @@
   # needed to test some behaviours when destination file has unexpected rights)
   # but, some platform does not provide suitable version of `su` and the test
   # case can not be run on those.
-  when: not(ansible_user_uid == 0 and case.need_to_become_with_su and ansible_distribution in('RedHat', 'Darwin', 'FreeBSD'))
+  when: not(case.need_to_become_with_su) or ansible_user_uid > 0 or (check_nobody_user.changed == true and check_su_vesion.failed == false)

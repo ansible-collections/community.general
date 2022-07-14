@@ -163,7 +163,7 @@ test_cases_dest_file_module_helper:
       - "module_res.created is false"
       - "module_res.msg == 'Can not create backup for {{ dest_file }} !'"
     check_mode: false
-    need_to_become_with_su: true 
+    need_to_become_with_su: true
 
   - id: "(220) backup not ran when destination file just created"
     parent_mode: "0777"
