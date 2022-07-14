@@ -299,7 +299,9 @@ class OnePassCLIv1(OnePassCLIBase):
             account = "{subdomain}.{domain}".format(subdomain=self.subdomain, domain=self.domain)
             args.extend(["--account", account])
 
-        return self._run(args, ignore_errors=True)
+        rc, out, err = self._run(args, ignore_errors=True)
+
+        return not bool(rc)
 
     def full_signin(self):
         required_params = [
@@ -572,9 +574,9 @@ class OnePass(object):
             self.token = out.strip()
 
     def assert_logged_in(self):
-        rc, out, err = self._cli.assert_logged_in()
-        if rc == 0:
-            self.logged_in = True
+        logged_in = self._cli.assert_logged_in()
+        if logged_in:
+            self.logged_in = logged_in
         else:
             self.set_token()
 
