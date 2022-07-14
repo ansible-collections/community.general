@@ -180,7 +180,7 @@ def netStatParse(raw):
             formatted_line = line.split()
             protocol, recv_q, send_q, local_address, foreign_address, rest = \
                 formatted_line[0], formatted_line[1], formatted_line[2], formatted_line[3], formatted_line[4], formatted_line[5:]
-            local_address, port = local_address.rsplit(":", maxsplit=1)
+            local_address, port = local_address.rsplit(":", 1)
 
             if protocol.startswith("tcp"):
                 if len(rest) == 3:
