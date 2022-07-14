@@ -539,7 +539,7 @@ class OnePass(object):
         raise AnsibleLookupError("op version %s is unsupported" % version)
 
     def set_token(self):
-        if os.path.isfile(self._config.config_file_path):
+        if self._config.config_file_path and os.path.isfile(self._config.config_file_path):
             # If the config file exists, assume an initial sign in has taken place and try basic sign in
             try:
                 # FIXME: If there are no accounts configured, op >= 2 interactively prompts to add an account.
