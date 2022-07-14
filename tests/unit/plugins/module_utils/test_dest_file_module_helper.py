@@ -18,7 +18,7 @@ from ansible_collections.community.general.tests.integration.targets.module_help
 try:
     FileNotFoundError
 except NameError:
-    FileNotFoundError = IOError
+    FileNotFoundError = OSError
 
 MIXIDEST_PATH = 'ansible_collections.community.general.plugins.module_utils.mh.mixins.dest'
 DUMMY_DEST = '/dummy/dest/file'

@@ -22,7 +22,7 @@ from ansible_collections.community.general.plugins.module_utils.mh.deco import c
 try:
     FileNotFoundError
 except NameError:
-    FileNotFoundError = IOError
+    FileNotFoundError = OSError
 
 
 class DestFileChecks(object):
