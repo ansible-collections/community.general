@@ -18,6 +18,17 @@ description:
   - This is designed to easily update configurations structures provided by
     format like JSON, YAML or TOML by ensuring the presence or the absence of
     some values in keys/items to the result.
+  - Original and modifications must contain items that be assimilable to
+    dictionaries or lists and can themselves contains values that also be
+    assimilable to a dictionary or a list.
+  - Original data acts as basis for the new one.
+  - Modifications are used to add, update or remove keys/items from
+    original data.
+  - The intersection between original and modifications is done by
+    iterating over all keys/items in original and for each which is also
+    exists in modification for a same path in the structure, compares their values.
+  - When the compared values are in both side assimilable to dictionaries,
+    do a recursive intersection.
 positional: expected
 options:
   _input:
