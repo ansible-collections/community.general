@@ -11,9 +11,9 @@ test_cases_dest_file_module_helper:
       allow_creation: false
       mode: "0666"
     asserts:
-      - "module_res.failed is true"
-      - "module_res.changed is false"
-      - "module_res.created is false"
+      - "module_res.failed"
+      - "not(module_res.changed)"
+      - "not(module_res.created)"
       - "module_res.msg == '{{ dest_file }} does not exists !'"
     check_mode: false
     need_to_become_with_su: false
@@ -28,9 +28,9 @@ test_cases_dest_file_module_helper:
       allow_creation: true
       mode: "0666"
     asserts:
-      - "module_res.failed is true"
-      - "module_res.changed is false"
-      - "module_res.created is false"
+      - "module_res.failed"
+      - "not(module_res.changed)"
+      - "not(module_res.created)"
       - "module_res.msg == 'Can not create dest file {{ dest_file }} !'"
     check_mode: false
     need_to_become_with_su: true
@@ -47,9 +47,9 @@ test_cases_dest_file_module_helper:
       value: 'one line'
       mode: "0666"
     asserts:
-      - "module_res.failed is false"
-      - "module_res.changed is true"
-      - "module_res.created is true"
+      - "not(module_res.failed)"
+      - "module_res.changed"
+      - "module_res.created"
       - "module_res.result == ['one line']"
     check_mode: false
     need_to_become_with_su: false
@@ -64,9 +64,9 @@ test_cases_dest_file_module_helper:
       value: 'two line'
       mode: "0666"
     asserts:
-      - "module_res.failed is true"
-      - "module_res.changed is false"
-      - "module_res.created is false"
+      - "module_res.failed"
+      - "not(module_res.changed)"
+      - "not(module_res.created)"
       - "module_res.msg == '{{ dest_dir }} is not a regular file !'"
     check_mode: false
     need_to_become_with_su: false
@@ -82,9 +82,9 @@ test_cases_dest_file_module_helper:
       value: 'two line'
       mode: "0666"
     asserts:
-      - "module_res.failed is true"
-      - "module_res.changed is false"
-      - "module_res.created is false"
+      - "module_res.failed"
+      - "not(module_res.changed)"
+      - "not(module_res.created)"
       - "module_res.msg == 'Can not read dest file {{ dest_file }} !'"
     check_mode: false
     need_to_become_with_su: true
@@ -100,9 +100,9 @@ test_cases_dest_file_module_helper:
       value: 'two line'
       mode: "0666"
     asserts:
-      - "module_res.failed is true"
-      - "module_res.changed is false"
-      - "module_res.created is false"
+      - "module_res.failed"
+      - "not(module_res.changed)"
+      - "not(module_res.created)"
       - "module_res.msg == 'Can not write dest file {{ dest_file }} !'"
     check_mode: false
     need_to_become_with_su: true
@@ -119,9 +119,9 @@ test_cases_dest_file_module_helper:
       value: 'one line'
       mode: "0666"
     asserts:
-      - "module_res.failed is false"
-      - "module_res.changed is false"
-      - "module_res.created is false"
+      - "not(module_res.failed)"
+      - "not(module_res.changed)"
+      - "not(module_res.created)"
       - "module_res.result == ['one line']"
     check_mode: false
     need_to_become_with_su: false
@@ -139,9 +139,9 @@ test_cases_dest_file_module_helper:
       value: 'two line'
       mode: "0666"
     asserts:
-      - "module_res.failed is false"
-      - "module_res.changed is true"
-      - "module_res.created is false"
+      - "not(module_res.failed)"
+      - "module_res.changed"
+      - "not(module_res.created)"
       - "module_res.result == ['one line', 'two line']"
     check_mode: false
     need_to_become_with_su: false
@@ -158,9 +158,9 @@ test_cases_dest_file_module_helper:
       value: 'two line'
       mode: "0666"
     asserts:
-      - "module_res.failed is true"
-      - "module_res.changed is false"
-      - "module_res.created is false"
+      - "module_res.failed"
+      - "not(module_res.changed)"
+      - "not(module_res.created)"
       - "module_res.msg == 'Can not create backup for {{ dest_file }} !'"
     check_mode: false
     need_to_become_with_su: true
@@ -178,9 +178,9 @@ test_cases_dest_file_module_helper:
       value: 'one line'
       mode: "0666"
     asserts:
-      - "module_res.failed is false"
-      - "module_res.changed is true"
-      - "module_res.created is true"
+      - "not(module_res.failed)"
+      - "module_res.changed"
+      - "module_res.created"
       - "module_res.result == ['one line']"
     check_mode: false
     need_to_become_with_su: false
@@ -199,9 +199,9 @@ test_cases_dest_file_module_helper:
       value: 'two line'
       mode: "0666"
     asserts:
-      - "module_res.failed is false"
-      - "module_res.changed is true"
-      - "module_res.created is false"
+      - "not(module_res.failed)"
+      - "module_res.changed"
+      - "not(module_res.created)"
       - "module_res.result == ['one line', 'two line']"
       - "module_res.backup_file is defined"
     check_mode: false
@@ -221,9 +221,9 @@ test_cases_dest_file_module_helper:
       value: 'two line'
       mode: "0644"
     asserts:
-      - "module_res.failed is false"
-      - "module_res.changed is true"
-      - "module_res.created is false"
+      - "not(module_res.failed)"
+      - "module_res.changed"
+      - "not(module_res.created)"
       - "module_res.result == ['one line', 'two line']"
       - "module_res.mode == '0644'"
     check_mode: false
@@ -241,9 +241,9 @@ test_cases_dest_file_module_helper:
       value: 'two line'
       mode: "0644"
     asserts:
-      - "module_res.failed is false"
-      - "module_res.changed is true"
-      - "module_res.created is false"
+      - "not(module_res.failed)"
+      - "module_res.changed"
+      - "not(module_res.created)"
       - "module_res.result == ['one line', 'two line']"
       - "module_res.mode == '0644'"
       - "module_res.backup_file is not defined"
