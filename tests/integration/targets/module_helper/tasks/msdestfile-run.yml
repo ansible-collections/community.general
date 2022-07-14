@@ -47,8 +47,8 @@
     - name: "<mdestfile> {{ case.id }} - assert final dest state"
       ansible.builtin.assert:
         that:
-          - "{{ final_res.changed == false }}"
-  when: case.final_content is not false
+          - "{{ not(final_res.changed) }}"
+  when: not(case.final_content)
 
 - name: "<mdestfile> {{ case.id }} - test backup file"
   block:
