@@ -26,7 +26,7 @@
   become: "{{ ansible_user_uid == 0 and case.need_to_become_with_su }}"
   become_user: 'nobody'
   become_method: 'su'
-  become_flags: '-s /bin/sh'
+  become_flags: '-s {{ get_sh_path.stdout }}'
   diff: true
   check_mode: "{{ case.check_mode }}"
   register: module_res

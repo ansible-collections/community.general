@@ -19,6 +19,11 @@
   register: check_su_vesion
   ignore_errors: true
 
+- name: "<mdestfile> get path for sh interpreter"
+  ansible.builtin.command: 'which sh'
+  register: get_sh_path
+  ignore_errors: true
+
 - name: "<mdestfile> ensure that remote_tmp_dir is readable by non privilegied user when run by root"
   ansible.builtin.file:
     path: "{{ remote_tmp_dir }}"
@@ -33,4 +38,4 @@
   # needed to test some behaviours when destination file has unexpected rights)
   # but, some platform does not provide suitable version of `su` and the test
   # case can not be run on those.
-  when: not(case.need_to_become_with_su) or ansible_user_uid > 0 or (check_nobody_user.changed == true and check_su_vesion.failed == false)
+  when: not(case.need_to_become_with_su) or ansible_user_uid > 0 or (check_nobody_user.changed == true and check_su_vesion.failed == false and get_sh_path.failed == false)
