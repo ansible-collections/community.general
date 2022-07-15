@@ -360,31 +360,11 @@ class Pacman(object):
         self.fail("This is a bug")
 
     def install_packages(self, pkgs):
-        def _get_reasons(pkglist):
-            cmd = [self.pacman_path, "--query", "--info"] + pkglist
-            rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
-            if rc != 0:
-                self.fail("Failed to get reasons", cmd=cmd, stdout=stdout, stderr=stderr)
-            else:
-                reasons = {}
-                for i, package in enumerate(stdout.split("\n\n")):
-                    for line in package.splitlines():
-                        if line.startswith("Install Reason"):
-                            if "dependency" in line:
-                                reasons[pkglist[i]] = "dependency"
-                            else:
-                                reasons[pkglist[i]] = "explicit"
-                return reasons
-
         pkgs_to_install = []
         pkgs_to_install_from_url = []
-        installed_pkgs = []
         pkgs_to_set_reason = []
-        current_reasons = {}
         for p in pkgs:
-            if p.name in self.inventory["installed_pkgs"]:
-                installed_pkgs.append(p.name)
-            else:
+            if self.m.params["reason"] and (not p.name in self.inventory["pkg_reasons"] or (self.m.params["reason_for"] == "all" and self.inventory["pkg_reasons"][p.name] != self.m.params["reason"])):
                 pkgs_to_set_reason.append(p.name)
             if p.source_is_URL:
                 # URL packages bypass the latest / upgradable_pkgs test
@@ -397,14 +377,6 @@ class Pacman(object):
                 and p.name in self.inventory["upgradable_pkgs"]
             ):
                 pkgs_to_install.append(p)
-
-        if self.m.params["reason"]:
-            current_reasons = _get_reasons(installed_pkgs)
-            for name in installed_pkgs:
-                if self.m.params["reason_for"] == "all" and current_reasons[name] != self.m.params["reason"]:
-                    pkgs_to_set_reason.append(name)
-        else:
-            pkgs_to_set_reason = []
 
         if len(pkgs_to_install) == 0 and len(pkgs_to_install_from_url) == 0 and len(pkgs_to_set_reason) == 0:
             self.exit_params["packages"] = []
@@ -439,11 +411,11 @@ class Pacman(object):
                     continue
                 name, version = p.split()
                 if name in self.inventory["installed_pkgs"]:
-                    before.append("%s-%s-%s" % (name, self.inventory["installed_pkgs"][name], current_reasons[name]))
+                    before.append("%s-%s-%s" % (name, self.inventory["installed_pkgs"][name], self.inventory["pkg_reasons"][name]))
                 if name in pkgs_to_set_reason:
                     after.append("%s-%s-%s" % (name, version, self.m.params["reason"]))
-                elif name in current_reasons:
-                    after.append("%s-%s-%s" % (name, version, current_reasons[name]))
+                elif name in self.inventory["pkg_reasons"]:
+                    after.append("%s-%s-%s" % (name, version, self.inventory["pkg_reasons"][name]))
                 else:
                     after.append("%s-%s" % (name, version))
                 to_be_installed.append(name)
@@ -711,6 +683,7 @@ class Pacman(object):
             "available_pkgs": {pkgname: version},
             "available_groups": {groupname: set(pkgnames)},
             "upgradable_pkgs": {pkgname: (current_version,latest_version)},
+            "pkg_reasons": {pkgname: reason},
         }
 
         Fails the module if a package requested for install cannot be found
@@ -803,12 +776,31 @@ class Pacman(object):
                 rc=rc,
             )
 
+        pkg_reasons = {}
+        dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--query", "--explicit"], check_rc=True)
+        # Format of a line: "pacman 6.0.1-2"
+        for l in stdout.splitlines():
+            l = l.strip()
+            if not l:
+                continue
+            pkg = l.split()[0]
+            installed_pkgs[pkg] = "explicit"
+        dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--query", "--deps"], check_rc=True)
+        # Format of a line: "pacman 6.0.1-2"
+        for l in stdout.splitlines():
+            l = l.strip()
+            if not l:
+                continue
+            pkg = l.split()[0]
+            installed_pkgs[pkg] = "dependency"
+
         return dict(
             installed_pkgs=installed_pkgs,
             installed_groups=installed_groups,
             available_pkgs=available_pkgs,
             available_groups=available_groups,
             upgradable_pkgs=upgradable_pkgs,
+            pkg_reasons=pkg_reasons,
         )
 
 
