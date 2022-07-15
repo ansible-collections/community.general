@@ -157,9 +157,10 @@ options:
         version_added: 5.2.0
         description:
             A list of headers that should not be included in the redirection. This headers are sent to the fetch_url
-            ``fetch_url`` function.
+            C(fetch_url) function.
+            The default value will be applied only on ansible-core version 2.12 or later.
             Useful if the redirection URL does not need to have sensitive headers in the request.
-            Requires Ansible version >=2.12
+            Requires ansible-core version 2.12 or later.
     directory_mode:
         type: str
         description:
@@ -636,7 +637,7 @@ def main():
             keep_name=dict(required=False, default=False, type='bool'),
             verify_checksum=dict(required=False, default='download', choices=['never', 'download', 'change', 'always']),
             checksum_alg=dict(required=False, default='md5', choices=['md5', 'sha1']),
-            unredirected_headers=dict(type='list', elements='str', required=False, default=['Authorization', 'Cookie']),
+            unredirected_headers=dict(type='list', elements='str', required=False),
             directory_mode=dict(type='str'),
         ),
         add_file_common_args=True,
@@ -644,7 +645,11 @@ def main():
     )
 
     if LooseVersion(ansible_version) < LooseVersion("2.12") and module.params['unredirected_headers']:
-        module.fail_json(msg="Unredirected Headers parameter provided, but Ansible version does not support it. Minimum version is 2.12")
+        module.fail_json(msg="Unredirected Headers parameter provided, but your ansible-core version does not support it. Minimum version is 2.12")
+
+    if LooseVersion(ansible_version) >= LooseVersion("2.12") and module.params['unredirected_headers'] is None:
+        # if the user did not supply unredirected params, we use the default, ONLY on ansible core 2.12 and above
+        module.params['unredirected_headers'] = ['Authorization', 'Cookie']
 
     if not HAS_LXML_ETREE:
         module.fail_json(msg=missing_required_lib('lxml'), exception=LXML_ETREE_IMP_ERR)
