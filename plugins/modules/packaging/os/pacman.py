@@ -380,6 +380,7 @@ class Pacman(object):
         pkgs_to_install_from_url = []
         installed_pkgs = []
         pkgs_to_set_reason = []
+        current_reasons = {}
         for p in pkgs:
             if p.name in self.inventory["installed_pkgs"]:
                 installed_pkgs.append(p.name)
