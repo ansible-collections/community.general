@@ -110,6 +110,7 @@ options:
         default:
         choices: [ dependency, explicit ]
         type: str
+        version_added: 5.4.0
 
     reason_for:
         description:
@@ -118,6 +119,7 @@ options:
         default: new
         choices: [ all, new ]
         type: str
+        version_added: 5.4.0
 
 notes:
   - When used with a C(loop:) each package will be processed individually,
