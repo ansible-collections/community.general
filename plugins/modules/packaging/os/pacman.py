@@ -358,35 +358,31 @@ class Pacman(object):
         self.fail("This is a bug")
 
     def install_packages(self, pkgs):
-        def _get_reason(name):
-            cmd = [
-                self.pacman_path,
-                "--query",
-                "--info",
-                name
-            ]
+        def _get_reasons(pkglist):
+            cmd = [self.pacman_path, "--query", "--info"] + pkglist
             rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
             if rc != 0:
-                self.fail("Failed to get reason", cmd=cmd, stdout=stdout, stderr=stderr)
+                self.fail("Failed to get reasons", cmd=cmd, stdout=stdout, stderr=stderr)
             else:
-                for line in stdout.splitlines():
-                    if line.startswith("Install Reason"):
-                        if "dependency" in line:
-                            return "dependency"
-                        else:
-                            return "explicit"
+                reasons = {}
+                for i, package in enumerate(stdout.split("\n\n")):
+                    for line in package.splitlines():
+                        if line.startswith("Install Reason"):
+                            if "dependency" in line:
+                                reasons[pkglist[i]] = "dependency"
+                            else:
+                                reasons[pkglist[i]] = "explicit"
+                return reasons
 
-        current_reasons = {}
         pkgs_to_install = []
         pkgs_to_install_from_url = []
+        installed_pkgs = []
         pkgs_to_set_reason = []
         for p in pkgs:
             if p.name in self.inventory["installed_pkgs"]:
-                current_reasons[p.name] = _get_reason(p.name)
-                if self.m.params["reason_for"] == "all" and current_reasons[p.name] != self.m.params["reason"]:
-                    pkgs_to_set_reason.append(p.source)
+                installed_pkgs.append(p.name)
             else:
-                pkgs_to_set_reason.append(p.source)
+                pkgs_to_set_reason.append(p.name)
             if p.source_is_URL:
                 # URL packages bypass the latest / upgradable_pkgs test
                 # They go through the dry-run to let pacman decide if they will be installed
@@ -398,6 +394,11 @@ class Pacman(object):
                 and p.name in self.inventory["upgradable_pkgs"]
             ):
                 pkgs_to_install.append(p)
+
+        current_reasons = _get_reasons(installed_pkgs)
+        for name in installed_pkgs:
+            if self.m.params["reason_for"] == "all" and current_reasons[name] != self.m.params["reason"]:
+                pkgs_to_set_reason.append(name)
 
         if len(pkgs_to_install) == 0 and len(pkgs_to_install_from_url) == 0 and len(pkgs_to_set_reason) == 0:
             self.exit_params["packages"] = []
