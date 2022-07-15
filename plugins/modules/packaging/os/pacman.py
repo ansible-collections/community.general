@@ -364,7 +364,11 @@ class Pacman(object):
         pkgs_to_install_from_url = []
         pkgs_to_set_reason = []
         for p in pkgs:
-            if self.m.params["reason"] and (not p.name in self.inventory["pkg_reasons"] or (self.m.params["reason_for"] == "all" and self.inventory["pkg_reasons"][p.name] != self.m.params["reason"])):
+            if self.m.params["reason"] and (
+                p.name not in self.inventory["pkg_reasons"]
+                or self.m.params["reason_for"] == "all"
+                and self.inventory["pkg_reasons"][p.name] != self.m.params["reason"]
+            ):
                 pkgs_to_set_reason.append(p.name)
             if p.source_is_URL:
                 # URL packages bypass the latest / upgradable_pkgs test
@@ -784,7 +788,7 @@ class Pacman(object):
             if not l:
                 continue
             pkg = l.split()[0]
-            installed_pkgs[pkg] = "explicit"
+            pkg_reasons[pkg] = "explicit"
         dummy, stdout, dummy = self.m.run_command([self.pacman_path, "--query", "--deps"], check_rc=True)
         # Format of a line: "pacman 6.0.1-2"
         for l in stdout.splitlines():
@@ -792,7 +796,7 @@ class Pacman(object):
             if not l:
                 continue
             pkg = l.split()[0]
-            installed_pkgs[pkg] = "dependency"
+            pkg_reasons[pkg] = "dependency"
 
         return dict(
             installed_pkgs=installed_pkgs,
