@@ -106,14 +106,15 @@ options:
 
     reason:
         description:
-            - The reason to set for the packages
+            - The install reason to set for the packages
         default: explicit
         choices: [ dependency, explicit ]
         type: str
 
     reason_for:
         descripton:
-            - Set the reason for all or only for new packages
+            - Set the install reason for C(all) packages or only for C(new) packages
+            - In case of C(state=latest) already installed packages which will be updated to a newer version are not counted as C(new)
         default: new
         choices: [ all, new ]
         type: str
