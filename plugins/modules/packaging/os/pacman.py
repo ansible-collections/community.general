@@ -104,6 +104,20 @@ options:
         default:
         type: str
 
+    reason:
+        description:
+            - The reason to set for the packages
+        default: explicit
+        choices: [ dependency, explicit ]
+        type: str
+
+    reason_for:
+        descripton:
+            - Set the reason for all or only for new packages
+        default: new
+        choices: [ all, new ]
+        type: str
+
 notes:
   - When used with a C(loop:) each package will be processed individually,
     it is much more efficient to pass the list directly to the I(name) option.
@@ -223,6 +237,20 @@ EXAMPLES = """
     name: baz
     state: absent
     force: yes
+
+- name: Install foo as dependency and leave reason untouched if already installed
+  community.general.pacman:
+    name: foo
+    state: present
+    reason: dependency
+    reason_for: new
+
+- name: Run the equivalent of "pacman -S --asexplicit", mark foo as explicit and install it if not present
+  community.general.pacman:
+    name: foo
+    state: present
+    reason: explicit
+    reason_for: all
 """
 
 import shlex
@@ -329,9 +357,30 @@ class Pacman(object):
         self.fail("This is a bug")
 
     def install_packages(self, pkgs):
+        def _get_reason(name):
+            cmd = [self.pacman_path, "--query", "--info"] + [name]
+            rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
+            if rc != 0:
+                self.fail("Failed to get reason", cmd=cmd, stdout=stdout, stderr=stderr)
+            else:
+                for line in stdout.splitlines():
+                    if line.startswith("Install Reason"):
+                        if "dependency" in line:
+                            return "dependency"
+                        else:
+                            return "explicit"
+
+        current_reasons = {}
         pkgs_to_install = []
         pkgs_to_install_from_url = []
+        pkgs_to_set_reason = []
         for p in pkgs:
+            if p.name in self.inventory["installed_pkgs"]:
+                current_reasons[p.name] = _get_reason(p.name)
+                if self.m.params["reason_for"] == "all" and current_reasons[p.name] != self.m.params["reason"]:
+                    pkgs_to_set_reason.append(p.name)
+            else:
+                pkgs_to_set_reason.append(p.name)
             if p.source_is_URL:
                 # URL packages bypass the latest / upgradable_pkgs test
                 # They go through the dry-run to let pacman decide if they will be installed
@@ -344,7 +393,7 @@ class Pacman(object):
             ):
                 pkgs_to_install.append(p)
 
-        if len(pkgs_to_install) == 0 and len(pkgs_to_install_from_url) == 0:
+        if len(pkgs_to_install) == 0 and len(pkgs_to_install_from_url) == 0 and len(pkgs_to_set_reason) == 0:
             self.exit_params["packages"] = []
             self.add_exit_infos("package(s) already installed")
             return
@@ -377,8 +426,13 @@ class Pacman(object):
                     continue
                 name, version = p.split()
                 if name in self.inventory["installed_pkgs"]:
-                    before.append("%s-%s" % (name, self.inventory["installed_pkgs"][name]))
-                after.append("%s-%s" % (name, version))
+                    before.append("%s-%s-%s" % (name, self.inventory["installed_pkgs"][name], current_reasons[name]))
+                    if self.m.params["reason_for"] == "new":
+                        after.append("%s-%s-%s" % (name, version, current_reasons[name]))
+                    else:
+                        after.append("%s-%s-%s" % (name, version, self.m.params["reason"]))
+                else:
+                    after.append("%s-%s-%s" % (name, version, self.m.params["reason"]))
                 to_be_installed.append(name)
 
             return (to_be_installed, before, after)
@@ -398,7 +452,7 @@ class Pacman(object):
             before.extend(b)
             after.extend(a)
 
-        if len(installed_pkgs) == 0:
+        if len(installed_pkgs) == 0 and len(pkgs_to_set_reason) == 0:
             # This can happen with URL packages if pacman decides there's nothing to do
             self.exit_params["packages"] = []
             self.add_exit_infos("package(s) already installed")
@@ -429,6 +483,20 @@ class Pacman(object):
             _install_packages_for_real("--sync", pkgs_to_install)
         if pkgs_to_install_from_url:
             _install_packages_for_real("--upgrade", pkgs_to_install_from_url)
+
+        # set reason
+        if pkgs_to_set_reason:
+            cmd = [self.pacman_path, "--noconfirm", "--database"]
+            if self.m.params["reason"] == "dependency":
+                cmd.append("--asdeps")
+            else:
+                cmd.append("--asexplicit")
+            cmd.extend(pkgs_to_set_reason)
+
+            rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
+            if rc != 0:
+                self.fail("Failed to install package(s)", cmd=cmd, stdout=stdout, stderr=stderr)
+            self.add_exit_infos(stdout=stdout, stderr=stderr)
 
         self.exit_params["packages"] = installed_pkgs
         self.add_exit_infos("Installed %d package(s)" % len(installed_pkgs))
@@ -748,6 +816,8 @@ def setup_module():
             upgrade_extra_args=dict(type="str", default=""),
             update_cache=dict(type="bool"),
             update_cache_extra_args=dict(type="str", default=""),
+            reason=dict(type="str", default="explicit", choices=["explicit", "dependency"]),
+            reason_for=dict(type="str", default="new", choices=["new", "all"]),
         ),
         required_one_of=[["name", "update_cache", "upgrade"]],
         mutually_exclusive=[["name", "upgrade"]],
