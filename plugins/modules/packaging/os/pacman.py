@@ -359,7 +359,12 @@ class Pacman(object):
 
     def install_packages(self, pkgs):
         def _get_reason(name):
-            cmd = [self.pacman_path, "--query", "--info"] + [name]
+            cmd = [
+                self.pacman_path,
+                "--query",
+                "--info",
+                name
+            ]
             rc, stdout, stderr = self.m.run_command(cmd, check_rc=False)
             if rc != 0:
                 self.fail("Failed to get reason", cmd=cmd, stdout=stdout, stderr=stderr)
@@ -379,9 +384,9 @@ class Pacman(object):
             if p.name in self.inventory["installed_pkgs"]:
                 current_reasons[p.name] = _get_reason(p.name)
                 if self.m.params["reason_for"] == "all" and current_reasons[p.name] != self.m.params["reason"]:
-                    pkgs_to_set_reason.append(p.name)
+                    pkgs_to_set_reason.append(p.source)
             else:
-                pkgs_to_set_reason.append(p.name)
+                pkgs_to_set_reason.append(p.source)
             if p.source_is_URL:
                 # URL packages bypass the latest / upgradable_pkgs test
                 # They go through the dry-run to let pacman decide if they will be installed
