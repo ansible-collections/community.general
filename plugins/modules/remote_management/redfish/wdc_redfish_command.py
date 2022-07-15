@@ -10,8 +10,8 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: wdc_redfish_command
-short_description: Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish APIs.
-version_added: 5.3.0
+short_description: Manages WDC UltraStar Data102 Out-Of-Band controllers using Redfish APIs
+version_added: 5.4.0
 description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to
     perform an action.
