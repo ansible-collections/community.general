@@ -112,7 +112,7 @@ options:
         type: str
 
     reason_for:
-        descripton:
+        description:
             - Set the install reason for C(all) packages or only for C(new) packages
             - In case of C(state=latest) already installed packages which will be updated to a newer version are not counted as C(new)
         default: new
