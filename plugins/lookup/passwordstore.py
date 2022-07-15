@@ -26,8 +26,8 @@ DOCUMENTATION = '''
           - 'The value is decided by checking the following in order:'
           - If set, this value is used.
           - If C(directory) is set, that value will be used.
-          - If the I(backend) is C(pass), C(~/.password-store) is used.
-          - If the I(backend) is C(gopass), the C(path) field in C(~/.config/gopass/config.yml) is used,
+          - If I(backend=pass), then C(~/.password-store) is used.
+          - If I(backend=gopass), then the C(path) field in C(~/.config/gopass/config.yml) is used,
             falling back to C(~/.local/share/gopass/stores/root) if not defined.
       directory:
         description: The directory of the password store.
