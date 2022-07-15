@@ -107,7 +107,7 @@ options:
     reason:
         description:
             - The install reason to set for the packages
-        default: explicit
+        default:
         choices: [ dependency, explicit ]
         type: str
 
@@ -395,10 +395,13 @@ class Pacman(object):
             ):
                 pkgs_to_install.append(p)
 
-        current_reasons = _get_reasons(installed_pkgs)
-        for name in installed_pkgs:
-            if self.m.params["reason_for"] == "all" and current_reasons[name] != self.m.params["reason"]:
-                pkgs_to_set_reason.append(name)
+        if self.m.params["reason"]:
+            current_reasons = _get_reasons(installed_pkgs)
+            for name in installed_pkgs:
+                if self.m.params["reason_for"] == "all" and current_reasons[name] != self.m.params["reason"]:
+                    pkgs_to_set_reason.append(name)
+        else:
+            pkgs_to_set_reason = []
 
         if len(pkgs_to_install) == 0 and len(pkgs_to_install_from_url) == 0 and len(pkgs_to_set_reason) == 0:
             self.exit_params["packages"] = []
@@ -434,12 +437,12 @@ class Pacman(object):
                 name, version = p.split()
                 if name in self.inventory["installed_pkgs"]:
                     before.append("%s-%s-%s" % (name, self.inventory["installed_pkgs"][name], current_reasons[name]))
-                    if self.m.params["reason_for"] == "new":
-                        after.append("%s-%s-%s" % (name, version, current_reasons[name]))
-                    else:
-                        after.append("%s-%s-%s" % (name, version, self.m.params["reason"]))
-                else:
+                if name in pkgs_to_set_reason:
                     after.append("%s-%s-%s" % (name, version, self.m.params["reason"]))
+                elif name in current_reasons:
+                    after.append("%s-%s-%s" % (name, version, current_reasons[name]))
+                else:
+                    after.append("%s-%s" % (name, version))
                 to_be_installed.append(name)
 
             return (to_be_installed, before, after)
@@ -823,7 +826,7 @@ def setup_module():
             upgrade_extra_args=dict(type="str", default=""),
             update_cache=dict(type="bool"),
             update_cache_extra_args=dict(type="str", default=""),
-            reason=dict(type="str", default="explicit", choices=["explicit", "dependency"]),
+            reason=dict(type="str", choices=["explicit", "dependency"]),
             reason_for=dict(type="str", default="new", choices=["new", "all"]),
         ),
         required_one_of=[["name", "update_cache", "upgrade"]],
