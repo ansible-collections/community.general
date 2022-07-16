@@ -1605,6 +1605,10 @@ plugin_routing:
       redirect: community.general.cloud.smartos.vmadm
     wakeonlan:
       redirect: community.general.remote_management.wakeonlan
+    wdc_redfish_command:
+      redirect: community.general.remote_management.redfish.wdc_redfish_command
+    wdc_redfish_info:
+      redirect: community.general.remote_management.redfish.wdc_redfish_info
     webfaction_app:
       redirect: community.general.cloud.webfaction.webfaction_app
     webfaction_db:
