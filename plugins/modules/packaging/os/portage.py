@@ -166,6 +166,12 @@ options:
       - --load-average setting values
     type: float
 
+  withbdeps:
+    description:
+      - Specifies that build time dependencies should be installed.
+    type: bool
+    version_added: 5.8.0
+
   quietbuild:
     description:
       - Redirect all build output to logs alone, and do not display it
@@ -358,6 +364,7 @@ def emerge_packages(module, packages):
         'jobs': '--jobs',
         'loadavg': '--load-average',
         'backtrack': '--backtrack',
+        'withbdeps': '--with-bdeps',
     }
 
     for flag, arg in emerge_flags.items():
@@ -373,7 +380,10 @@ def emerge_packages(module, packages):
             continue
 
         """Add the --flag=value pair."""
-        args.extend((arg, to_native(flag_val)))
+        if isinstance(p[flag], bool):
+            args.extend((arg, to_native('y' if flag_val else 'n')))
+        else:
+            args.extend((arg, to_native(flag_val)))
 
     cmd, (rc, out, err) = run_emerge(module, packages, *args)
     if rc != 0:
@@ -516,6 +526,7 @@ def main():
             keepgoing=dict(default=False, type='bool'),
             jobs=dict(default=None, type='int'),
             loadavg=dict(default=None, type='float'),
+            withbdeps=dict(default=None, type='bool'),
             quietbuild=dict(default=False, type='bool'),
             quietfail=dict(default=False, type='bool'),
         ),
