@@ -22,13 +22,13 @@ description:
     dictionaries or lists and can themselves contains values that also be
     assimilable to a dictionary or a list.
   - Original data acts as basis for the new one.
-  - Modifications are used to add, update or remove keys/items from
-    original data.
-  - The intersection between original and modifications is done by
-    iterating over all keys/items in original and for each which is also
-    exists in modification for a same path in the structure, compares their values.
-  - When the compared values are in both side assimilable to dictionaries,
-    do a recursive intersection.
+  - Modifications are used to add, update or remove keys/items from original
+    data.
+  - The intersection between original and modifications is done by iterating
+    over all keys/items in original and for each which is also exists in
+    modification for a same path in the structure, compares their values.
+  - When the compared values are in both side assimilable to dictionaries, do a
+    recursive intersection.
 positional: expected
 options:
   _input:
@@ -48,89 +48,116 @@ seealso:
  '''
 
 EXAMPLES = r'''
-- name: "update original data with modifications"
+- name: Update original data with modifications
   ansible.builtin.set_fact:
-    result: "{{ original|community.general.intersect_data_with(modifications, present=true) }}"
+    result: >
+      {{ original | community.general.intersect_data_with(
+            modifications, present=true) }}
   vars:
     original: {A: {AA: '1'}, B: ['2', '3'], C: '4'}
     modifications: {A: {AB: '9'}, B: ['8', '2'], C: '7'}
 # "result": {"A": {"AA": "1", "AB": "9"}, "B": ["2", "3", "8"], "C": "7"}}
 
-- name: "ensure that items/values in modifications are not in result"
+- name: Ensure that items/values in modifications are not in result
   ansible.builtin.set_fact:
-    result: "{{ original|community.general.intersect_data_with(modifications, present=false) }}"
+    result: >
+      {{ original | community.general.intersect_data_with(
+            modifications, present=false) }}
   vars:
     original: {A: {AA: '1', AB: '2'}, B: ['3', '4'], C: '5'}
     modifications: {A: {AA: '1'}, B: ['3', '9'], C: '8'}
 # "result": {A: {AB: '2'}, B: ['4'], C: '5'}}
 
-- name: "ensuring the presence of values in list in result"
+- name: En:suring the presence of values in list in result
   ansible.builtin.set_fact:
-    result: "{{ original|community.general.intersect_data_with(modifications, present=true) }}"
+    result: >
+      {{ original | community.general.intersect_data_with(
+           modifications, present=true) }}
   vars:
     original: ['A', 'B', {C: '1', D: '2'}, {E: '3'}]
     modifications: ['Z', 'B', {C: '1'}, {E: '3'}]
 # "result": ['A', 'B', {C: '1', D: '2'}, {E: '3'}, 'Z', {C: '1'}]
 
-- name: "ensuring the absence of values in list in result"
+- name: Ensuring the absence of values in list in result
   ansible.builtin.set_fact:
-    result: "{{ original|community.general.intersect_data_with(modifications, present=false) }}"
+    result: >
+      {{ original | community.general.intersect_data_with(
+            modifications, present=false) }}"
   vars:
     original: ['A', 'B', {C: '1', D: '2'}, {E: '3'}]
     modifications: ['Z', 'B', {C: '1'}, {E: '3'}]
 # "result": ['A', {C: '1', D: '2'}]
 
-- name: "effect of using list_as_dict when intersecting list with presence of items in modifications"
+- name: Effect of using list_as_dict when intersecting list with presence of
+        items in modifications
   ansible.builtin.set_fact:
-    result: "{{ original|community.general.intersect_data_with(modifications, present=true, list_as_dict=true) }}"
+    result: >
+      {{ original | community.general.intersect_data_with(
+            modifications, present=true, list_as_dict=true) }}
   vars:
     original: ['A', 'B', {C: '1', D: '2'}, {E: '3'}]
     modifications: ['Z', 'B', {C: '9', D: '2'}, {E: '3'}]
 # "result": ['Z', 'B', {C: '9', D: '2'}, {E: '3'}]
 
-- name: "effect of using list_as_dict when intersecting list with absence of items in modifications"
+- name: Effect of using list_as_dict when intersecting list with absence of
+        items in modifications
   ansible.builtin.set_fact:
-    result: "{{ original|community.general.intersect_data_with(modifications, present=false, list_as_dict=true) }}"
+    result: >
+      {{ original | community.general.intersect_data_with(
+            modifications, present=false, list_as_dict=true) }}
   vars:
     original: ['A', 'B', {C: '1', D: '2'}, {E: '3'}]
     modifications: ['Z', 'B', {C: '9', D: '2'}, {E: '3'}]
 # "result": ['A', {C: '1'}]
 
-- name: "by default, items that be emptied after the intersection are removed"
+- name: By default, items that be emptied after the intersection are removed
   ansible.builtin.set_fact:
-    result: "{{ original|community.general.intersect_data_with(modifications, present=false) }}"
+    result: >
+      {{ original | community.general.intersect_data_with(
+            modifications, present=false) }}
   vars:
     original: {A: {AA: '1'}, B: ['2', '3'], C: '4'}
     modifications: {A: {AA: '1'}, B: ['2', '3']}
 # "result": {C: '4'}
 
-- name: "when using keep_empty, emptied data still be present in result"
+- name: When using keep_empty, emptied data still be present in result
   ansible.builtin.set_fact:
-    result: "{{ original|community.general.intersect_data_with(modifications, present=false, keep_empty=true) }}"
+    result: >
+      {{ original | community.general.intersect_data_with(
+            modifications, present=false, keep_empty=true) }}
   vars:
     original: {A: {AA: '1'}, B: ['2', '3'], C: '4'}
     modifications: {A: {AA: '1'}, B: ['2', '3']}
 # "result": {A: {}, B: [], C: '4'}
 
-- name: "use `null` to ignore some items in list and avoid to update it by using list_as_dict"
+- name: Use `null` to ignore some items in list and avoid to update it by using
+        list_as_dict
   ansible.builtin.set_fact:
-    result: "{{ original|community.general.intersect_data_with(modifications, dict_as_list=true) }}"
+    result: >
+      {{ original | community.general.intersect_data_with(
+            modifications, dict_as_list=true) }}
   vars:
     original: ['A', 'B', 'C', {DA: '1', DB: '2'}, 'E']
     modifications: [null, null, 'Z', {DA: '1', DB: null}, 'E']
 # "result": ['A', 'B', 'Z', {DA: '1', DB: '2'}, 'E']
 
-- name: "use `null` to ignore some items in list and avoid to remove it by using list_as_dict"
+- name: Use `null` to ignore some items in list and avoid to remove it by using
+        list_as_dict
   ansible.builtin.set_fact:
-    result: "{{ original|community.general.intersect_data_with(modifications, present=false, dict_as_list=true) }}"
+    result: >
+      {{ original | community.general.intersect_data_with(
+            modifications, present=false, dict_as_list=true) }}
   vars:
     original: ['A', 'B', 'C', {DA: '1', DB: '2'}, 'E']
     modifications: [null, null, 'Z', {DA: '1', DB: null}, 'E']
 # "result": ['A', 'B', 'C', {DB: '2'}]
 
-- name: "use remove null to ensuring that some items are absent to the result regardless of their original value "
+- name: Use remove null to ensuring that some items are absent to the result
+        regardless of their original value
   ansible.builtin.set_fact:
-    result: "{{ original|community.general.intersect_data_with(modifications, list_as_dict=true, remove_null=true) }}"
+    result: >
+      {{ original | community.general.intersect_data_with(
+            modifications, list_as_dict=true, remove_null=true) }}
   vars:
     original: {A: '1', B: '2', C: {CA: '3', CB: '4'}, D: ['DA', 'DB']}
     changes: {B: null, C: {CB: null}, D: null}
@@ -140,8 +167,8 @@ EXAMPLES = r'''
 RETURN = r'''
   _result:
     description: A new data structure which is an intersection of original data
-                 with modifications and which the format can be a dictionary or a
-                 list depending on the format or original data.
+                 with modifications and which the format can be a dictionary or
+                 a list depending on the format or original data.
     type: raw
 '''
 
