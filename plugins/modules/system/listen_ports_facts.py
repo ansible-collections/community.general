@@ -155,7 +155,7 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.basic import AnsibleModule
 
 
-def split_pid_name(pid_name: str):
+def split_pid_name(pid_name):
     """
     Split the entry PID/Program name into the PID (int) and the name (str)
     :param pid_name:  PID/Program String seperated with a dash. E.g 51/sshd: returns pid = 51 and name = sshd
@@ -171,12 +171,12 @@ def split_pid_name(pid_name: str):
         return int(pid), name
 
 
-def netStatParse(raw:str):
+def netStatParse(raw):
     """
     The netstat result can be either split in 6,7 or 8 elements depending on the values of state, process and name.
     For UDP the state is always empty. For UDP and TCP the process can be empty.
     So these cases have to be checked.
-    :param raw: Netstat raw output. First line explains the format, each following line contains a connection.
+    :param raw: Netstat raw output String. First line explains the format, each following line contains a connection.
     :return: List of dicts, each dict contains protocol, state, local address, foreign address, port, name, pid for one
      connection.
     """
@@ -225,7 +225,7 @@ def ss_parse(raw):
     """
     The ss_parse result can be either split in 6 or 7 elements depending on the process column,
     e.g. due to unprivileged user.
-    :param raw: ss raw output. First line explains the format, each following line contains a connection.
+    :param raw: ss raw output String. First line explains the format, each following line contains a connection.
     :return: List of dicts, each dict contains protocol, state, local address, foreign address, port, name, pid for one
      connection.
     """
