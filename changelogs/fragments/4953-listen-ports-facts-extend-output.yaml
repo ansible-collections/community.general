@@ -1,3 +1,2 @@
 minor_changes:
-  - Add -a option to netstat and ss. This shows both listening and non-listening (for TCP this means established connections) sockets.
-  - Refactor netStatParse to be better readable. Add docstrings.
+  - listen_ports_acts - add ``-a`` option to ``netstat`` and ``ss``. This shows both listening and non-listening (for TCP this means established connections) sockets (https://github.com/ansible-collections/community.general/issues/4762, https://github.com/ansible-collections/community.general/pull/4953).
