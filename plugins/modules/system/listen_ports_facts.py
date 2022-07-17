@@ -155,20 +155,30 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.basic import AnsibleModule
 
 
-def split_pid_name(pid_name):
+def split_pid_name(pid_name: str):
+    """
+    Split the entry PID/Program name into the PID (int) and the name (str)
+    :param pid_name:  PID/Program String seperated with a dash. E.g 51/sshd: returns pid = 51 and name = sshd
+    :return: PID (int) and the program name (str)
+    """
     try:
-        pid, name = pid_name.split("/")
+        pid, name = pid_name.split("/", 1)
     except ValueError:
+        # likely unprivileged user, so add empty name & pid
         return 0, ""
     else:
-        return pid, name
+        name = name.rstrip(":")
+        return int(pid), name
 
 
-def netStatParse(raw):
+def netStatParse(raw:str):
     """
     The netstat result can be either split in 6,7 or 8 elements depending on the values of state, process and name.
     For UDP the state is always empty. For UDP and TCP the process can be empty.
     So these cases have to be checked.
+    :param raw: Netstat raw output. First line explains the format, each following line contains a connection.
+    :return: List of dicts, each dict contains protocol, state, local address, foreign address, port, name, pid for one
+     connection.
     """
     results = list()
     for line in raw.splitlines():
@@ -195,7 +205,6 @@ def netStatParse(raw):
                     pid_and_name = rest[0]
 
             pid, name = split_pid_name(pid_name=pid_and_name)
-            name = name.rstrip(":")
             result = {
                 'protocol': protocol,
                 'state': state,
@@ -204,7 +213,6 @@ def netStatParse(raw):
                 'port': int(port),
                 'name': name,
                 'pid': int(pid),
-                'process': process
             }
             if result not in results:
                 results.append(result)
@@ -214,6 +222,13 @@ def netStatParse(raw):
 
 
 def ss_parse(raw):
+    """
+    The ss_parse result can be either split in 6 or 7 elements depending on the process column,
+    e.g. due to unprivileged user.
+    :param raw: ss raw output. First line explains the format, each following line contains a connection.
+    :return: List of dicts, each dict contains protocol, state, local address, foreign address, port, name, pid for one
+     connection.
+    """
     results = list()
     regex_conns = re.compile(pattern=r'\[?(.+?)\]?:([0-9]+)$')
     regex_pid = re.compile(pattern=r'"(.*?)",pid=(\d+)')
@@ -243,7 +258,6 @@ def ss_parse(raw):
                  optionally "Process", but got something else: {0}'.format(line)
             )
 
-        conns = regex_conns.search(local_addr_port)
         try:
             name, pid = regex_pid.findall(process)[0]
         except IndexError:
@@ -252,6 +266,7 @@ def ss_parse(raw):
             pid = 0
             name = ""
 
+        conns = regex_conns.search(local_addr_port)
         address = conns.group(1)
         port = conns.group(2)
         result = {
