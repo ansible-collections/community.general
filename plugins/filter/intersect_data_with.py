@@ -43,7 +43,7 @@ options:
     required: true
 extends_documentation_fragment: community.general.data_intersection
 seealso:
-  - module: ansible.utils.update_fact module
+  - module: ansible.utils.update_fact
     description: Do something similar in another way.
  '''
 
