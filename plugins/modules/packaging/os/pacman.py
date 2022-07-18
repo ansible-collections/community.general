@@ -107,7 +107,6 @@ options:
     reason:
         description:
             - The install reason to set for the packages
-        default:
         choices: [ dependency, explicit ]
         type: str
         version_added: 5.4.0
