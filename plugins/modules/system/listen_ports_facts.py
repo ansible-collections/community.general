@@ -34,9 +34,8 @@ options:
     version_added: 4.1.0
   include_non_listening:
     description:
-        - Show both listening and non-listening (for TCP this means established connections) sockets.
-        - Adds the return values 'state' and 'foreign_address' to return dict
-        - Corresponds to using '--all' with netstat
+        - Show both listening and non-listening sockets (for TCP this means established connections).
+        - Adds the return values I(state) and I(foreign_address) to the returned facts.
     default: 'no'
     choices: ['yes', 'no']
     type: str
