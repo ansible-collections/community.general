@@ -291,27 +291,29 @@ def ss_parse(raw):
                  optionally "Process", but got something else: {0}'.format(line)
             )
 
-        try:
-            name, pid = regex_pid.findall(process)[0]
-        except IndexError:
+        conns = regex_conns.search(local_addr_port)
+        pids = regex_pid.findall(process)
+        if conns is None and pids is None:
+            continue
+
+        if pids is None:
             # likely unprivileged user, so add empty name & pid
             # as we do in netstat logic to be consistent with output
-            pid = 0
-            name = ""
+            pids = [(str(), 0)]
 
-        conns = regex_conns.search(local_addr_port)
         address = conns.group(1)
         port = conns.group(2)
-        result = {
-            'protocol': protocol,
-            'state': state,
-            'local_address': address,
-            'foreign_address': peer_addr_port,
-            'port': int(port),
-            'name': name,
-            'pid': int(pid),
-        }
-        results.append(result)
+        for name, pid in pids:
+            result = {
+                'protocol': protocol,
+                'state': state,
+                'local_address': address,
+                'foreign_address': peer_addr_port,
+                'port': int(port),
+                'name': name,
+                'pid': int(pid),
+            }
+            results.append(result)
     return results
 
 
@@ -397,7 +399,7 @@ def main():
 
             for connection in results:
                 # only display state and foreign_address for include_non_listening.
-                if module.params['include_non_listening'] == "yes":
+                if module.params['include_non_listening'] == "no":
                     connection.pop('state', None)
                     connection.pop('foreign_address', None)
                 connection['stime'] = getPidSTime(connection['pid'])
