@@ -32,6 +32,14 @@ options:
       - netstat
       - ss
     version_added: 4.1.0
+  include_non_listening:
+    description:
+        - Show both listening and non-listening (for TCP this means established connections) sockets.
+        - Adds the return values 'state' and 'foreign_address' to return dict
+        - Corresponds to using '--all' with netstat
+    default: 'no'
+    choices: ['yes', 'no']
+    type: str
 '''
 
 EXAMPLES = r'''
@@ -59,6 +67,11 @@ EXAMPLES = r'''
 - name: List all ports
   ansible.builtin.debug:
     msg: "{{ (ansible_facts.tcp_listen + ansible_facts.udp_listen) | map(attribute='port') | unique | sort | list }}"
+
+- name: Gather facts on all ports and override which command to use
+  community.general.listen_ports_facts:
+    command: 'netstat'
+    include_non_listening: 'yes'
 '''
 
 RETURN = r'''
@@ -72,11 +85,21 @@ ansible_facts:
       returned: if TCP servers were found
       type: list
       contains:
-        address:
+        local_address:
           description: The address the server is listening on.
           returned: always
           type: str
           sample: "0.0.0.0"
+        foreign_address:
+          description: Address of the remote end of the socket.
+          returned: if 'include_non_listening' is set
+          type: str
+          sample: "10.80.0.1"
+        state:
+          description: The state of the socket.
+          returned: if 'include_non_listening' is set
+          type: str
+          sample: "ESTABLISHED"
         name:
           description: The name of the listening process.
           returned: if user permissions allow
@@ -112,11 +135,21 @@ ansible_facts:
       returned: if UDP servers were found
       type: list
       contains:
-        address:
+        local_address:
           description: The address the server is listening on.
           returned: always
           type: str
           sample: "0.0.0.0"
+        foreign_address:
+          description: Address of the remote end of the socket.
+          returned: if 'include_non_listening' is set
+          type: str
+          sample: "10.80.0.1"
+        state:
+          description: The state of the socket.
+          returned: if 'include_non_listening' is set
+          type: str
+          sample: "ESTABLISHED"
         name:
           description: The name of the listening process.
           returned: if user permissions allow
@@ -208,8 +241,8 @@ def netStatParse(raw):
             result = {
                 'protocol': protocol,
                 'state': state,
-                'local address': local_address,
-                'foreign address': foreign_address,
+                'local_address': local_address,
+                'foreign_address': foreign_address,
                 'port': int(port),
                 'name': name,
                 'pid': int(pid),
@@ -272,8 +305,8 @@ def ss_parse(raw):
         result = {
             'protocol': protocol,
             'state': state,
-            'local address': address,
-            'foreign address': peer_addr_port,
+            'local_address': address,
+            'foreign_address': peer_addr_port,
             'port': int(port),
             'name': name,
             'pid': int(pid),
@@ -283,34 +316,30 @@ def ss_parse(raw):
 
 
 def main():
+    command_args = ['-p', '-l', '-u', '-n', '-t']
     commands_map = {
         'netstat': {
-            'args': [
-                '-p',
-                '-a',
-                '-u',
-                '-n',
-                '-t',
-            ],
+            'args': [],
             'parse_func': netStatParse
         },
         'ss': {
-            'args': [
-                '-p',
-                '-a',
-                '-u',
-                '-n',
-                '-t',
-            ],
+            'args': [],
             'parse_func': ss_parse
         },
     }
     module = AnsibleModule(
         argument_spec=dict(
-            command=dict(type='str', choices=list(sorted(commands_map)))
+            command=dict(type='str', choices=list(sorted(commands_map))),
+            include_non_listening=dict(required=False, default='no', choices=['yes', 'no'], type='str')
         ),
         supports_check_mode=True,
     )
+
+    if module.params['include_non_listening'] == "yes":
+        command_args = ['-p', '-u', '-n', '-t', '-a']
+
+    commands_map['netstat']['args'] = command_args
+    commands_map['ss']['args'] = command_args
 
     if platform.system() != 'Linux':
         module.fail_json(msg='This module requires Linux.')
@@ -366,13 +395,17 @@ def main():
             parse_func = commands_map[command]['parse_func']
             results = parse_func(stdout)
 
-            for p in results:
-                p['stime'] = getPidSTime(p['pid'])
-                p['user'] = getPidUser(p['pid'])
-                if p['protocol'].startswith('tcp'):
-                    result['ansible_facts']['tcp_listen'].append(p)
-                elif p['protocol'].startswith('udp'):
-                    result['ansible_facts']['udp_listen'].append(p)
+            for connection in results:
+                # only display state and foreign_address for include_non_listening.
+                if module.params['include_non_listening'] == "yes":
+                    connection.pop('state', None)
+                    connection.pop('foreign_address', None)
+                connection['stime'] = getPidSTime(connection['pid'])
+                connection['user'] = getPidUser(connection['pid'])
+                if connection['protocol'].startswith('tcp'):
+                    result['ansible_facts']['tcp_listen'].append(connection)
+                elif connection['protocol'].startswith('udp'):
+                    result['ansible_facts']['udp_listen'].append(connection)
     except (KeyError, EnvironmentError) as e:
         module.fail_json(msg=to_native(e))
 
