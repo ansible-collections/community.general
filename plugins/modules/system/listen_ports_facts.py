@@ -92,12 +92,12 @@ ansible_facts:
           sample: "0.0.0.0"
         foreign_address:
           description: Address of the remote end of the socket.
-          returned: if 'include_non_listening' is set
+          returned: if ``include_non_listening`` is set
           type: str
           sample: "10.80.0.1"
         state:
           description: The state of the socket.
-          returned: if 'include_non_listening' is set
+          returned: if ``include_non_listening`` is set
           type: str
           sample: "ESTABLISHED"
         name:
@@ -142,14 +142,14 @@ ansible_facts:
           sample: "0.0.0.0"
         foreign_address:
           description: Address of the remote end of the socket.
-          returned: if 'include_non_listening' is set
+          returned: if ``include_non_listening`` is set
           type: str
           sample: "10.80.0.1"
         state:
-          description: The state of the socket.
-          returned: if 'include_non_listening' is set
+          description: The state of the socket. UDP is a connectionless protocol. Shows UCONN or ESTAB.
+          returned: if ``include_non_listening`` is set
           type: str
-          sample: "ESTABLISHED"
+          sample: "UCONN"
         name:
           description: The name of the listening process.
           returned: if user permissions allow
