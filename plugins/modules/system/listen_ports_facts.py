@@ -35,7 +35,7 @@ options:
   include_non_listening:
     description:
         - Show both listening and non-listening sockets (for TCP this means established connections).
-        - Adds the return values I(state) and I(foreign_address) to the returned facts.
+        - Adds the return values C(state) and C(foreign_address) to the returned facts.
     default: 'no'
     choices: ['yes', 'no']
     type: str
@@ -90,7 +90,7 @@ ansible_facts:
           type: str
           sample: "0.0.0.0"
         foreign_address:
-          description: Address of the remote end of the socket.
+          description: The address of the remote end of the socket.
           returned: if ``include_non_listening`` is set
           type: str
           sample: "10.80.0.1"
@@ -140,7 +140,7 @@ ansible_facts:
           type: str
           sample: "0.0.0.0"
         foreign_address:
-          description: Address of the remote end of the socket.
+          description: The address of the remote end of the socket.
           returned: if ``include_non_listening`` is set
           type: str
           sample: "10.80.0.1"
