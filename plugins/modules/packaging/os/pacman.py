@@ -453,9 +453,11 @@ class Pacman(object):
             "after": "\n".join(sorted(after)) + "\n" if after else "",
         }
 
+        changed_reason_pkgs = [p for p in pkgs_to_set_reason if p not in installed_pkgs]
+
         if self.m.check_mode:
-            self.add_exit_infos("Would have installed %d packages" % len(installed_pkgs))
-            self.exit_params["packages"] = sorted(installed_pkgs)
+            self.add_exit_infos("Would have installed %d packages" % (len(installed_pkgs) + len(changed_reason_pkgs)))
+            self.exit_params["packages"] = sorted(installed_pkgs + changed_reason_pkgs)
             return
 
         # actually do it
@@ -486,8 +488,8 @@ class Pacman(object):
                 self.fail("Failed to install package(s)", cmd=cmd, stdout=stdout, stderr=stderr)
             self.add_exit_infos(stdout=stdout, stderr=stderr)
 
-        self.exit_params["packages"] = installed_pkgs
-        self.add_exit_infos("Installed %d package(s)" % len(installed_pkgs))
+        self.exit_params["packages"] = installed_pkgs + changed_reason_pkgs
+        self.add_exit_infos("Installed %d package(s)" % (len(installed_pkgs) + len(changed_reason_pkgs)))
 
     def remove_packages(self, pkgs):
         # filter out pkgs that are already absent
