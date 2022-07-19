@@ -67,6 +67,7 @@
 - name: Gather listening ports facts explicitly via ss and include_non_listening
   listen_ports_facts:
     command: 'ss'
+    include_non_listening: 'yes'
   when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7
 
 - name: check for ansible_facts.udp_listen exists
