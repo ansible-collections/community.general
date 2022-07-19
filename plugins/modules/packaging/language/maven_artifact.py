@@ -152,15 +152,14 @@ options:
         version_added: 3.2.0
     unredirected_headers:
         type: list
-        default: ['Authorization', 'Cookie']
         elements: str
         version_added: 5.2.0
         description:
-            A list of headers that should not be included in the redirection. This headers are sent to the fetch_url
+            - A list of headers that should not be included in the redirection. This headers are sent to the fetch_url
             C(fetch_url) function.
-            The default value will be applied only on ansible-core version 2.12 or later.
-            Useful if the redirection URL does not need to have sensitive headers in the request.
-            Requires ansible-core version 2.12 or later.
+            - On ansible-core version 2.12 or later, the default of this option is C([Authorization, Cookie]).
+            - Useful if the redirection URL does not need to have sensitive headers in the request.
+            - Requires ansible-core version 2.12 or later.
     directory_mode:
         type: str
         description:
