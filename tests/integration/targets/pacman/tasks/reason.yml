@@ -36,8 +36,8 @@
           - '{{reg_pkg}}'
           - '{{url_pkg_url.stdout}}'
           - '{{file_pkg_path}}'
-      reason: dependency
-      check_mode: True
+        reason: dependency
+        check_mode: True
       register: install_1
 
     - name: Install packages from mixed sources as explicit
@@ -46,7 +46,7 @@
           - '{{reg_pkg}}'
           - '{{url_pkg_url.stdout}}'
           - '{{file_pkg_path}}'
-      reason: explicit
+        reason: explicit
       register: install_2
 
     - name: Install packages from mixed sources with new packages being installed as dependency - (idempotency)
