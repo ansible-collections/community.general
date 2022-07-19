@@ -1,0 +1,3 @@
+minor_changes:
+  - adds support for unredirected_headers to fetch_url function. This parameter is supported on ansible-core 2.12 and above. As we are ignoring such parameter for ansible-core version 2.11 and below, this does not present any breaking changes.
+  - the default value for unredirected_headers for ansible-core 2.12 and above is 'Authorizing' and 'Cookie' (https://github.com/ansible-collections/community.general/pull/4812)

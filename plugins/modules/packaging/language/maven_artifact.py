@@ -155,8 +155,7 @@ options:
         elements: str
         version_added: 5.2.0
         description:
-            - A list of headers that should not be included in the redirection. This headers are sent to the fetch_url
-            C(fetch_url) function.
+            - A list of headers that should not be included in the redirection. This headers are sent to the fetch_url C(fetch_url) function.
             - On ansible-core version 2.12 or later, the default of this option is C([Authorization, Cookie]).
             - Useful if the redirection URL does not need to have sensitive headers in the request.
             - Requires ansible-core version 2.12 or later.
