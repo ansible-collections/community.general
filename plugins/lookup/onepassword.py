@@ -171,14 +171,6 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
         pass
 
     @abc.abstractmethod
-    def get_account(self):
-        pass
-
-    @abc.abstractmethod
-    def get_item(self, item_id):
-        pass
-
-    @abc.abstractmethod
     def get_raw(self, item_id, vault, token):
         pass
 
@@ -321,12 +313,6 @@ class OnePassCLIv1(OnePassCLIBase):
         ]
 
         return self._run(args, command_input=to_bytes(self.master_password))
-
-    def get_account(self):
-        pass
-
-    def get_item(self, item_id):
-        pass
 
     def get_raw(self, item_id, vault=None, token=None):
         args = ["get", "item", item_id]
@@ -510,12 +496,6 @@ class OnePassCLIv2(OnePassCLIBase):
 
         environment_update = {"OP_SECRET_KEY": self.secret_key}
         return self._run(args, command_input=to_bytes(self.master_password), environment_update=environment_update)
-
-    def get_account(self):
-        pass
-
-    def get_item(self, item_id):
-        pass
 
     def get_raw(self, item_id, vault=None, token=None):
         args = ["item", "get", item_id, "--format", "json"]
