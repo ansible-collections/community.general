@@ -318,6 +318,7 @@ class OnePassCLIv1(OnePassCLIBase):
         args = ["get", "item", item_id]
         if vault is not None:
             args += ["--vault={0}".format(vault)]
+
         if token is not None:
             args += [to_bytes("--session=") + token]  # FIXME: Why is only this bytes?
 
@@ -327,7 +328,6 @@ class OnePassCLIv1(OnePassCLIBase):
         self._check_required_params(['master_password'])
 
         args = ["signin", "--raw"]
-
         if self.subdomain:
             args.append(self.subdomain)
 
@@ -547,16 +547,15 @@ class OnePass(object):
         if self._config.config_file_path and os.path.isfile(self._config.config_file_path):
             # If the config file exists, assume an initial sign in has taken place and try basic sign in
             try:
-                # FIXME: If there are no accounts configured, op >= 2 interactively prompts to add an account.
                 rc, out, err = self._cli.signin()
             except AnsibleLookupError as exc:
                 test_strings = (
                     "missing required parameters",
                     "unauthorized",
                 )
-                if any(string in exc.message. lower() for string in test_strings):
+                if any(string in exc.message.lower() for string in test_strings):
                     # A required parameter is missing, or a bad master password was supplied
-                    # so don't both attempting a full sign in
+                    # so don't bother attempting a full signin
                     raise
 
                 rc, out, err = self._cli.full_signin()
@@ -564,7 +563,7 @@ class OnePass(object):
             self.token = out.strip()
 
         else:
-            # Attempt a full sign in since there appears to be no existing sign in
+            # Attempt a full signin since there appears to be no existing signin
             rc, out, err = self._cli.full_signin()
             self.token = out.strip()
 
@@ -572,6 +571,7 @@ class OnePass(object):
         logged_in = self._cli.assert_logged_in()
         if logged_in:
             self.logged_in = logged_in
+            pass
         else:
             self.set_token()
 
