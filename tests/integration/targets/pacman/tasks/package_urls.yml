@@ -1,10 +1,11 @@
 ---
 - vars:
+    port: 8000
     reg_pkg: ed
     url_pkg: lemon
     url_pkg_filename: url.pkg.zst
     url_pkg_path: '/tmp/{{url_pkg_filename}}'
-    url_pkg_url: 'http://127.0.0.1:8080/{{url_pkg_filename}}'
+    url_pkg_url: 'http://127.0.0.1:{{port}}/{{url_pkg_filename}}'
     file_pkg: hdparm
     file_pkg_path: /tmp/file.pkg.zst
     extra_pkg: core/sdparm
@@ -29,7 +30,7 @@
         dest: '{{url_pkg_path}}'
     - name: Host {{url_pkg}}
       shell:
-        cmd: python -m http.server --directory /tmp/ 8080 &
+        cmd: 'python -m http.server --directory /tmp/ {{port}} &'
 
     - name: Get URL for {{file_pkg}}
       command:
