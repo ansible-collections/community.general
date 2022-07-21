@@ -1,6 +1,6 @@
 ---
 - vars:
-    port: 8000
+    port: 53280
     reg_pkg: ed
     url_pkg: lemon
     url_pkg_filename: url.pkg.zst
