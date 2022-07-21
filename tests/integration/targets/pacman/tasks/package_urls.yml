@@ -31,7 +31,7 @@
     - name: Download {{url_pkg}} pkg sig
       get_url:
         url: '{{url_pkg_stdout.stdout}}.sig'
-        dest: '{{url_pkg_path}}.sig'
+        dest: '{{url_pkg_path}}/{{url_pkg_filename}}.sig'
     - name: Host {{url_pkg}}
       shell:
         cmd: 'python -m http.server --directory {{url_pkg_path}} {{http_port}} >/dev/null 2>&1 &'
