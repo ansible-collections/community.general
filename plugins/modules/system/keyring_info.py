@@ -122,7 +122,7 @@ def run_module():
         pass
     except AttributeError:
         pass
-    
+
     if passphrase is None:
         passphrase = _alternate_retrieval_method(module)
 
