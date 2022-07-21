@@ -2,6 +2,9 @@
 - vars:
     reg_pkg: ed
     url_pkg: lemon
+    url_pkg_filename: url.pkg.zst
+    url_pkg_path: '/tmp/{{url_pkg_filename}}'
+    url_pkg_url: 'http://127.0.0.1/{{url_pkg_filename}}'
     file_pkg: hdparm
     file_pkg_path: /tmp/pkg.zst
     extra_pkg: core/sdparm
@@ -19,7 +22,14 @@
     - name: Get URL for {{url_pkg}}
       command:
         cmd: pacman --sync --print-format "%l" {{url_pkg}}
-      register: url_pkg_url
+      register: url_pkg_stdout
+    - name: Download {{url_pkg}} pkg
+      get_url:
+        url: '{{url_pkg_stdout.stdout}}'
+        dest: '{{url_pkg_path}}'
+    - name: Host {{url_pkg}}
+      shell:
+        cmd: python -m http.server --directory /tmp/ 80 &
 
     - name: Get URL for {{file_pkg}}
       command:
@@ -34,7 +44,7 @@
       pacman:
         name:
           - '{{reg_pkg}}'
-          - '{{url_pkg_url.stdout}}'
+          - '{{url_pkg_url}}'
           - '{{file_pkg_path}}'
       check_mode: True
       register: install_1
@@ -43,7 +53,7 @@
       pacman:
         name:
           - '{{reg_pkg}}'
-          - '{{url_pkg_url.stdout}}'
+          - '{{url_pkg_url}}'
           - '{{file_pkg_path}}'
       register: install_2
 
@@ -51,7 +61,7 @@
       pacman:
         name:
           - '{{reg_pkg}}'
-          - '{{url_pkg_url.stdout}}'
+          - '{{url_pkg_url}}'
           - '{{file_pkg_path}}'
       register: install_3
 
@@ -67,7 +77,7 @@
       pacman:
         name:
           - '{{reg_pkg}}'
-          - '{{url_pkg_url.stdout}}'
+          - '{{url_pkg_url}}'
           - '{{file_pkg_path}}'
           - '{{extra_pkg}}'
       register: install_5
@@ -77,7 +87,7 @@
         state: absent
         name:
           - '{{reg_pkg}}'
-          - '{{url_pkg_url.stdout}}'
+          - '{{url_pkg_url}}'
           - '{{file_pkg_path}}'
       check_mode: True
       register: uninstall_1
@@ -87,7 +97,7 @@
         state: absent
         name:
           - '{{reg_pkg}}'
-          - '{{url_pkg_url.stdout}}'
+          - '{{url_pkg_url}}'
           - '{{file_pkg_path}}'
       register: uninstall_2
 
@@ -96,7 +106,7 @@
         state: absent
         name:
           - '{{reg_pkg}}'
-          - '{{url_pkg_url.stdout}}'
+          - '{{url_pkg_url}}'
           - '{{file_pkg_path}}'
       register: uninstall_3
 
