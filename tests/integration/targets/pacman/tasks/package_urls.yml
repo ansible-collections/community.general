@@ -6,7 +6,7 @@
     url_pkg_path: '/tmp/{{url_pkg_filename}}'
     url_pkg_url: 'http://127.0.0.1/{{url_pkg_filename}}'
     file_pkg: hdparm
-    file_pkg_path: /tmp/pkg.zst
+    file_pkg_path: /tmp/file.pkg.zst
     extra_pkg: core/sdparm
     extra_pkg_outfmt: sdparm
   block:
