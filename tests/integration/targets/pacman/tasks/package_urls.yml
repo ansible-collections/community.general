@@ -175,8 +175,8 @@
           - install_1.msg == 'Would have installed 3 packages'
           - install_1.packages|sort() == [reg_pkg, url_pkg, file_pkg]|sort()
           - install_1c is changed
-          - install_1c.msg == 'Would have installed 3 packages'
-          - install_1c.packages|sort() == [reg_pkg, url_pkg, file_pkg]|sort()
+          - install_1c.msg == 'Would have installed 1 packages'
+          - install_1c.packages|sort() == [url_pkg]
           - install_2 is changed
           - install_2.msg == 'Installed 3 package(s)'
           - install_2.packages|sort() == [reg_pkg, url_pkg, file_pkg]|sort()
