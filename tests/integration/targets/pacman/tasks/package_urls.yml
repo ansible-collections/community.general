@@ -107,7 +107,7 @@
           - install_1.packages|sort() == [reg_pkg, url_pkg, file_pkg]|sort()
           - install_2 is changed
           - install_2.msg == 'Installed 3 package(s)'
-          - install_1.packages|sort() == [reg_pkg, url_pkg, file_pkg]|sort()
+          - install_2.packages|sort() == [reg_pkg, url_pkg, file_pkg]|sort()
           - install_3 is not changed
           - install_3.msg == 'package(s) already installed'
           - install_4 is not changed
