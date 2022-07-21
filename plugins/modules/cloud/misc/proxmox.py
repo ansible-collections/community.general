@@ -743,6 +743,8 @@ def main():
             module.fail_json(msg="restarting of VM %s failed with exception: %s" % (vmid, e))
 
     elif state == 'absent':
+        if not vmid:
+            module.exit_json(changed=False, msg='VM with hostname = %s is already absent' % hostname)
         try:
             vm = proxmox.get_vm(vmid, ignore_missing=True)
             if not vm:
