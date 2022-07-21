@@ -19,6 +19,10 @@
           - '{{file_pkg}}'
           - '{{extra_pkg}}'
         state: absent
+    - name: Make sure that url package is not cached
+      file:
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
+        state: absent
 
     - name: Get URL for {{url_pkg}}
       command:
@@ -67,7 +71,7 @@
       register: install_1c
     - name: Delete cached {{url_pkg}}
       file:
-        path: '{{url_pkg_filename}}'
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
         state: absent
 
     - name: Install packages from mixed sources
@@ -79,7 +83,7 @@
       register: install_2
     - name: Delete cached {{url_pkg}}
       file:
-        path: '{{url_pkg_filename}}'
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
         state: absent
 
     - name: Install packages from mixed sources - (idempotency)
@@ -96,7 +100,7 @@
       register: install_3c
     - name: Delete cached {{url_pkg}}
       file:
-        path: '{{url_pkg_filename}}'
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
         state: absent
 
     - name: Install packages with their regular names (idempotency)
@@ -108,7 +112,7 @@
       register: install_4
     - name: Delete cached {{url_pkg}}
       file:
-        path: '{{url_pkg_filename}}'
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
         state: absent
 
     - name: Install new package with already installed packages from mixed sources
@@ -121,7 +125,7 @@
       register: install_5
     - name: Delete cached {{url_pkg}}
       file:
-        path: '{{url_pkg_filename}}'
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
         state: absent
 
     - name: Uninstall packages - mixed sources (check mode)
@@ -142,7 +146,7 @@
       register: uninstall_1c
     - name: Delete cached {{url_pkg}}
       file:
-        path: '{{url_pkg_filename}}'
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
         state: absent
 
     - name: Uninstall packages - mixed sources
@@ -155,7 +159,7 @@
       register: uninstall_2
     - name: Delete cached {{url_pkg}}
       file:
-        path: '{{url_pkg_filename}}'
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
         state: absent
 
     - name: Uninstall packages - mixed sources (idempotency)
