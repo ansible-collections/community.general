@@ -4,8 +4,8 @@
     reg_pkg: ed
     url_pkg: lemon
     url_pkg_filename: url.pkg.zst
-    url_pkg_path: '/tmp/{{url_pkg_filename}}'
-    url_pkg_url: 'http://127.0.0.1:{{http_port}}/{{url_pkg_filename}}'
+    url_pkg_path: '/tmp/'
+    url_pkg_url: 'http://localhost:{{http_port}}/{{url_pkg_filename}}'
     file_pkg: hdparm
     file_pkg_path: /tmp/file.pkg.zst
     extra_pkg: core/sdparm
@@ -27,14 +27,19 @@
     - name: Download {{url_pkg}} pkg
       get_url:
         url: '{{url_pkg_stdout.stdout}}'
-        dest: '{{url_pkg_path}}'
+        dest: '{{url_pkg_path}}/{{url_pkg_filename}}'
     - name: Download {{url_pkg}} pkg sig
       get_url:
         url: '{{url_pkg_stdout.stdout}}.sig'
         dest: '{{url_pkg_path}}.sig'
     - name: Host {{url_pkg}}
       shell:
-        cmd: 'python -m http.server --directory /tmp/ {{http_port}} &'
+        cmd: 'python -m http.server --directory {{url_pkg_path}} {{http_port}} >/dev/null 2>&1 &'
+    - name: Wait for http.server to come up online
+      wait_for:
+        host: 'localhost'
+        port: '{{http_port}}'
+        state: started
 
     - name: Get URL for {{file_pkg}}
       command:
