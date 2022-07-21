@@ -1370,6 +1370,8 @@ def main():
 
     elif state == 'absent':
         status = {}
+        if not vmid:
+            module.exit_json(changed=False, msg='VM with name = %s is already absent' % name)
         try:
             vm = proxmox.get_vm(vmid, ignore_missing=True)
             if not vm:
