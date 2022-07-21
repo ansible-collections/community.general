@@ -56,6 +56,10 @@
           - '{{url_pkg_url}}'
           - '{{file_pkg_path}}'
       register: install_2
+    - name: Delete cached {{url_pkg}}
+      file:
+        path: '{{url_pkg_filename}}'
+        state: absent
 
     - name: Install packages from mixed sources - (idempotency)
       pacman:
@@ -72,6 +76,10 @@
           - '{{url_pkg}}'
           - '{{file_pkg}}'
       register: install_4
+    - name: Delete cached {{url_pkg}}
+      file:
+        path: '{{url_pkg_filename}}'
+        state: absent
 
     - name: Install new package with already installed packages from mixed sources
       pacman:
@@ -81,6 +89,10 @@
           - '{{file_pkg_path}}'
           - '{{extra_pkg}}'
       register: install_5
+    - name: Delete cached {{url_pkg}}
+      file:
+        path: '{{url_pkg_filename}}'
+        state: absent
 
     - name: Uninstall packages - mixed sources (check mode)
       pacman:
@@ -100,6 +112,10 @@
           - '{{url_pkg_url}}'
           - '{{file_pkg_path}}'
       register: uninstall_2
+    - name: Delete cached {{url_pkg}}
+      file:
+        path: '{{url_pkg_filename}}'
+        state: absent
 
     - name: Uninstall packages - mixed sources (idempotency)
       pacman:
