@@ -111,9 +111,11 @@ def fake_op(mocker):
 
     return _fake_op
 
+
 @pytest.fixture
 def opv1(fake_op):
     return fake_op("1.17.2")
+
 
 @pytest.fixture
 def opv2(fake_op):
@@ -132,9 +134,11 @@ def test_op_correct_cli_class(fake_op, version, version_class):
     assert op._cli.version == version
     assert isinstance(op._cli, version_class)
 
+
 def test_op_unsupported_cli_version(fake_op):
     with pytest.raises(AnsibleLookupError, match="is unsupported"):
         fake_op("99.77.77")
+
 
 def test_op_set_token_with_config(opv2, mocker):
     token = "F5417F77529B41B595D7F9D6F76EC057"
@@ -144,6 +148,7 @@ def test_op_set_token_with_config(opv2, mocker):
     opv2.set_token()
 
     assert opv2.token == token
+
 
 @pytest.mark.parametrize(
     "message",
@@ -162,6 +167,7 @@ def test_op_set_token_with_config_missing_args(opv2, mocker, message):
 
     opv2._cli.full_signin.assert_not_called()
 
+
 def test_op_set_token_with_config_full_signin(opv2, mocker):
     mocker.patch("os.path.isfile", return_value=True)
     mocker.patch.object(opv2._cli, "signin", return_value=(99, "", ""), side_effect=AnsibleLookupError("Raised intentionally"))
@@ -170,6 +176,7 @@ def test_op_set_token_with_config_full_signin(opv2, mocker):
     opv2.set_token()
 
     opv2._cli.full_signin.assert_called()
+
 
 def test_op_set_token_without_config(opv2, mocker):
     token = "B988E8A2680A4A348962751A96861FA1"
@@ -182,7 +189,8 @@ def test_op_set_token_without_config(opv2, mocker):
     opv2._cli.signin.assert_not_called()
     assert opv2.token == token
 
-@pytest.mark.parametrize("login_status",(False, True))
+
+@pytest.mark.parametrize("login_status", (False, True))
 def test_op_assert_logged_in(mocker, login_status, opv2):
     mocker.patch.object(opv2._cli, "assert_logged_in", return_value=login_status)
     mocker.patch.object(opv2, "set_token")
@@ -195,6 +203,7 @@ def test_op_assert_logged_in(mocker, login_status, opv2):
     if not login_status:
         opv2.set_token.assert_called_once()
 
+
 def test_op_get_raw(mocker, opv2):
     mocker.patch.object(opv2._cli, "get_raw", return_value=[99, "RAW OUTPUT", ""])
 
@@ -202,6 +211,7 @@ def test_op_get_raw(mocker, opv2):
 
     assert result == "RAW OUTPUT"
     opv2._cli.get_raw.assert_called_once()
+
 
 @pytest.mark.parametrize(
     ("output", "expected"),
