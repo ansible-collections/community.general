@@ -201,6 +201,9 @@
           - uninstall_1 is changed
           - uninstall_1.msg == 'Would have removed 3 packages'
           - uninstall_1.packages | length() == 3  # pkgs have versions here
+          - uninstall_1c is changed
+          - uninstall_1c.msg == 'Would have removed 3 packages'
+          - uninstall_1c.packages | length() == 1  # pkgs have versions here
           - uninstall_2 is changed
           - uninstall_2.msg == 'Removed 3 package(s)'
           - uninstall_2.packages | length() == 3
