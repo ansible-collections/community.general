@@ -1,0 +1,4 @@
+minor_changes:
+  - pacman - improved integrity tests for url packages (https://github.com/ansible-collections/community.general/pull/4968).
+bug_fixes:
+  - pacman - fixed typo in integrity test
