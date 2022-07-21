@@ -229,12 +229,16 @@ def netStatParse(raw):
             address, port = address.rsplit(":", 1)
 
             if protocol.startswith("tcp"):
+                # nestat distinguishes between tcp6 and tcp
+                protocol = "tcp"
                 if len(rest) == 3:
                     state, pid_and_name, process = rest
                 if len(rest) == 2:
                     state, pid_and_name = rest
 
             if protocol.startswith("udp"):
+                # safety measure, similar to tcp6
+                protocol = "udp"
                 if len(rest) == 2:
                     pid_and_name, process = rest
                 if len(rest) == 1:
