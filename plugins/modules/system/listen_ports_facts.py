@@ -39,6 +39,7 @@ options:
     default: 'no'
     choices: ['yes', 'no']
     type: str
+    version_added: 5.4.0
 '''
 
 EXAMPLES = r'''
@@ -84,21 +85,23 @@ ansible_facts:
       returned: if TCP servers were found
       type: list
       contains:
-        local_address:
+        address:
           description: The address the server is listening on.
           returned: always
           type: str
           sample: "0.0.0.0"
         foreign_address:
           description: The address of the remote end of the socket.
-          returned: if ``include_non_listening`` is set
+          returned: if I(include_non_listening) is set to yes
           type: str
           sample: "10.80.0.1"
+          version_added: 5.4.0
         state:
           description: The state of the socket.
-          returned: if ``include_non_listening`` is set
+          returned: if I(include_non_listening) is set to yes
           type: str
           sample: "ESTABLISHED"
+          version_added: 5.4.0
         name:
           description: The name of the listening process.
           returned: if user permissions allow
@@ -134,21 +137,23 @@ ansible_facts:
       returned: if UDP servers were found
       type: list
       contains:
-        local_address:
+        address:
           description: The address the server is listening on.
           returned: always
           type: str
           sample: "0.0.0.0"
         foreign_address:
           description: The address of the remote end of the socket.
-          returned: if ``include_non_listening`` is set
+          returned: if I(include_non_listening) is set to yes
           type: str
           sample: "10.80.0.1"
+          version_added: 5.4.0
         state:
           description: The state of the socket. UDP is a connectionless protocol. Shows UCONN or ESTAB.
-          returned: if ``include_non_listening`` is set
+          returned: if I(include_non_listening) is set to yes
           type: str
           sample: "UCONN"
+          version_added: 5.4.0
         name:
           description: The name of the listening process.
           returned: if user permissions allow
@@ -220,9 +225,9 @@ def netStatParse(raw):
             pid_and_name = ""
             process = ""
             formatted_line = line.split()
-            protocol, recv_q, send_q, local_address, foreign_address, rest = \
+            protocol, recv_q, send_q, address, foreign_address, rest = \
                 formatted_line[0], formatted_line[1], formatted_line[2], formatted_line[3], formatted_line[4], formatted_line[5:]
-            local_address, port = local_address.rsplit(":", 1)
+            address, port = address.rsplit(":", 1)
 
             if protocol.startswith("tcp"):
                 if len(rest) == 3:
@@ -240,7 +245,7 @@ def netStatParse(raw):
             result = {
                 'protocol': protocol,
                 'state': state,
-                'local_address': local_address,
+                'address': address,
                 'foreign_address': foreign_address,
                 'port': int(port),
                 'name': name,
@@ -306,7 +311,7 @@ def ss_parse(raw):
             result = {
                 'protocol': protocol,
                 'state': state,
-                'local_address': address,
+                'address': address,
                 'foreign_address': peer_addr_port,
                 'port': int(port),
                 'name': name,
