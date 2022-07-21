@@ -28,6 +28,10 @@
       get_url:
         url: '{{url_pkg_stdout.stdout}}'
         dest: '{{url_pkg_path}}'
+    - name: Download {{url_pkg}} pkg sig
+      get_url:
+        url: '{{url_pkg_stdout.stdout}}.sig'
+        dest: '{{url_pkg_path}}.sig'
     - name: Host {{url_pkg}}
       shell:
         cmd: 'python -m http.server --directory /tmp/ {{http_port}} &'
