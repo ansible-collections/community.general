@@ -613,8 +613,9 @@ class Pacman(object):
                                 stderr=stderr,
                                 rc=rc,
                             )
-                    # With Pacman v6.0.1 - libalpm v13.0.1, --upgrade outputs "loading packages..." on stdout. strip that
-                    stdout = stdout.replace("loading packages...\n", "")
+                    # With Pacman v6.0.1 - libalpm v13.0.1, --upgrade outputs " filename_without_extension downloading..." if the URL is unseen.
+                    # In all cases, pacman outputs "loading packages..." on stdout. strip both
+                    stdout = stdout.splitlines()[-1]
                     is_URL = True
                 pkg_name = stdout.strip()
                 pkg_list.append(Package(name=pkg_name, source=pkg, source_is_URL=is_URL))
