@@ -36,9 +36,8 @@ options:
     description:
         - Show both listening and non-listening sockets (for TCP this means established connections).
         - Adds the return values C(state) and C(foreign_address) to the returned facts.
+    type: bool
     default: 'no'
-    choices: ['yes', 'no']
-    type: str
     version_added: 5.4.0
 '''
 
@@ -336,12 +335,12 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             command=dict(type='str', choices=list(sorted(commands_map))),
-            include_non_listening=dict(required=False, default='no', choices=['yes', 'no'], type='str')
+            include_non_listening=dict(default=False, type='bool'),
         ),
         supports_check_mode=True,
     )
 
-    if module.params['include_non_listening'] == "yes":
+    if module.params['include_non_listening']:
         command_args = ['-p', '-u', '-n', '-t', '-a']
 
     commands_map['netstat']['args'] = command_args
@@ -403,7 +402,7 @@ def main():
 
             for connection in results:
                 # only display state and foreign_address for include_non_listening.
-                if module.params['include_non_listening'] == "no":
+                if not module.params['include_non_listening']:
                     connection.pop('state', None)
                     connection.pop('foreign_address', None)
                 connection['stime'] = getPidSTime(connection['pid'])
