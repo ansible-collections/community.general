@@ -4,97 +4,104 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import json
 import pytest
 
 
 from ansible.errors import AnsibleLookupError
 from ansible_collections.community.general.plugins.lookup.onepassword import (
-    OnePass as OnePassLookupModule,
+    LookupModule,
     OnePassCLIv1,
     OnePassCLIv2,
 )
 
 
 # Intentionally excludes metadata leaf nodes that would exist in real output if not relevant.
-MOCK_ENTRIES = [
-    {
-        'vault_name': 'Acme "Quot\'d" Servers',
-        'queries': [
-            '0123456789',
-            'Mock "Quot\'d" Server'
-        ],
-        'output': {
-            'uuid': '0123456789',
-            'vaultUuid': '2468',
-            'overview': {
-                'title': 'Mock "Quot\'d" Server'
-            },
-            'details': {
-                'sections': [{
-                    'title': '',
-                    'fields': [
-                        {'t': 'username', 'v': 'jamesbond'},
-                        {'t': 'password', 'v': 't0pS3cret'},
-                        {'t': 'notes', 'v': 'Test note with\nmultiple lines and trailing space.\n\n'},
-                        {'t': 'tricksy "quot\'d" field\\', 'v': '"quot\'d" value'}
+MOCK_ENTRIES = {
+    OnePassCLIv1: [
+        {
+            'vault_name': 'Acme "Quot\'d" Servers',
+            'queries': [
+                '0123456789',
+                'Mock "Quot\'d" Server'
+            ],
+            'expected': ['t0pS3cret', 't0pS3cret'],
+            'output': {
+                'uuid': '0123456789',
+                'vaultUuid': '2468',
+                'overview': {
+                    'title': 'Mock "Quot\'d" Server'
+                },
+                'details': {
+                    'sections': [{
+                        'title': '',
+                        'fields': [
+                            {'t': 'username', 'v': 'jamesbond'},
+                            {'t': 'password', 'v': 't0pS3cret'},
+                            {'t': 'notes', 'v': 'Test note with\nmultiple lines and trailing space.\n\n'},
+                            {'t': 'tricksy "quot\'d" field\\', 'v': '"quot\'d" value'}
+                        ]
+                    }]
+                }
+            }
+        },
+        {
+            'vault_name': 'Acme Logins',
+            'queries': [
+                '9876543210',
+                'Mock Website',
+                'acme.com'
+            ],
+            'expected': ['t0pS3cret', 't0pS3cret', 't0pS3cret'],
+            'output': {
+                'uuid': '9876543210',
+                'vaultUuid': '1357',
+                'overview': {
+                    'title': 'Mock Website',
+                    'URLs': [
+                        {'l': 'website', 'u': 'https://acme.com/login'}
                     ]
-                }]
+                },
+                'details': {
+                    'sections': [{
+                        'title': '',
+                        'fields': [
+                            {'t': 'password', 'v': 't0pS3cret'}
+                        ]
+                    }]
+                }
             }
-        }
-    },
-    {
-        'vault_name': 'Acme Logins',
-        'queries': [
-            '9876543210',
-            'Mock Website',
-            'acme.com'
-        ],
-        'output': {
-            'uuid': '9876543210',
-            'vaultUuid': '1357',
-            'overview': {
-                'title': 'Mock Website',
-                'URLs': [
-                    {'l': 'website', 'u': 'https://acme.com/login'}
-                ]
-            },
-            'details': {
-                'sections': [{
-                    'title': '',
+        },
+        {
+            'vault_name': 'Acme Logins',
+            'queries': [
+                '864201357'
+            ],
+            'expected': ['vauxhall'],
+            'output': {
+                'uuid': '864201357',
+                'vaultUuid': '1357',
+                'overview': {
+                    'title': 'Mock Something'
+                },
+                'details': {
                     'fields': [
-                        {'t': 'password', 'v': 't0pS3cret'}
+                        {
+                            'value': 'jbond@mi6.gov.uk',
+                            'name': 'emailAddress'
+                        },
+                        {
+                            'name': 'password',
+                            'value': 'vauxhall'
+                        },
+                        {},
                     ]
-                }]
+                }
             }
-        }
-    },
-    {
-        'vault_name': 'Acme Logins',
-        'queries': [
-            '864201357'
-        ],
-        'output': {
-            'uuid': '864201357',
-            'vaultUuid': '1357',
-            'overview': {
-                'title': 'Mock Something'
-            },
-            'details': {
-                'fields': [
-                    {
-                        'value': 'jbond@mi6.gov.uk',
-                        'name': 'emailAddress'
-                    },
-                    {
-                        'name': 'password',
-                        'value': 'vauxhall'
-                    },
-                    {},
-                ]
-            }
-        }
-    },
-]
+        },
+    ],
+    # OnePassCLIv2: [],
+}
 
 
 @pytest.mark.parametrize(
@@ -203,3 +210,16 @@ def test_op_get_field(mocker, opv2, output, expected):
     result = opv2.get_field("some item", "some field")
 
     assert result == expected
+
+
+@pytest.mark.parametrize(
+    ("cli_class", "vault", "queries", "output", "expected"),
+    ((_cli_class, item["vault_name"], item["queries"], item["output"], item["expected"]) for _cli_class in MOCK_ENTRIES for item in MOCK_ENTRIES[_cli_class]),
+)
+def test_op_lookup(mocker, cli_class, vault, queries, output, expected):
+    mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePass._get_cli_class", cli_class)
+    mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePass.assert_logged_in", return_value=True)
+    mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePassCLIBase._run", return_value=(0, json.dumps(output), ""))
+
+    result = LookupModule().run(queries, vault=vault)
+    assert expected == result
