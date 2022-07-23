@@ -47,6 +47,7 @@
     pip:
       name: "{{ item }}"
       virtualenv: "{{ process_venv }}"
+      extra_args: "-c {{ remote_constraints }}"
     loop:
       - setuptools==44
       - python-daemon
