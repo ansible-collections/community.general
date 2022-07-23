@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2018, Florian Paul Hoberg <florian.hoberg@credativ.de>
+# Copyright: (c) 2018, Florian Paul Azim Hoberg <florian.hoberg@credativ.de>
 #
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -35,7 +35,7 @@ requirements:
 - yum
 - yum-versionlock
 author:
-    - Florian Paul Hoberg (@florianpaulhoberg)
+    - Florian Paul Azim Hoberg (@gyptazy)
     - Amin Vakil (@aminvakil)
 '''
 

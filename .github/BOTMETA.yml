@@ -926,7 +926,7 @@ files:
   $modules/packaging/os/xbps.py:
     maintainers: dinoocch the-maldridge
   $modules/packaging/os/yum_versionlock.py:
-    maintainers: florianpaulhoberg aminvakil
+    maintainers: gyptazy aminvakil
   $modules/packaging/os/zypper.py:
     maintainers: $team_suse
     labels: zypper
