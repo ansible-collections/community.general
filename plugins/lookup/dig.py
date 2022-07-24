@@ -42,6 +42,15 @@ DOCUMENTATION = '''
         default: false
         type: bool
         version_added: 3.6.0
+      fail_on_error:
+        description:
+          - Abort execution on lookup errors.
+          - The default for this option will likely change to C(true) in the future.
+            The current default, C(false), is used for backwards compatibility, and will result in empty strings
+            or the string C(NXDOMAIN) in the result in case of errors.
+        default: false
+        type: bool
+        version_added: 5.4.0
     notes:
       - ALL is not a record per-se, merely the listed fields are available for any record results you retrieve in the form of a dictionary.
       - While the 'dig' lookup plugin supports anything which dnspython supports out of the box, only a subset can be converted into a dictionary.
@@ -273,6 +282,7 @@ class LookupModule(LookupBase):
         domain = None
         qtype = 'A'
         flat = True
+        fail_on_error = False
         rdclass = dns.rdataclass.from_text('IN')
 
         for t in terms:
@@ -311,6 +321,8 @@ class LookupModule(LookupBase):
                         raise AnsibleError("dns lookup illegal CLASS: %s" % to_native(e))
                 elif opt == 'retry_servfail':
                     myres.retry_servfail = bool(arg)
+                elif opt == 'fail_on_error':
+                    fail_on_error = bool(arg)
 
                 continue
 
@@ -353,16 +365,24 @@ class LookupModule(LookupBase):
                         rd['class'] = dns.rdataclass.to_text(rdata.rdclass)
 
                         ret.append(rd)
-                    except Exception as e:
-                        ret.append(str(e))
+                    except Exception as err:
+                        if fail_on_error:
+                            raise AnsibleError("Lookup failed: %s" % str(err))
+                        ret.append(str(err))
 
-        except dns.resolver.NXDOMAIN:
+        except dns.resolver.NXDOMAIN as err:
+            if fail_on_error:
+                raise AnsibleError("Lookup failed: %s" % str(err))
             ret.append('NXDOMAIN')
-        except dns.resolver.NoAnswer:
+        except dns.resolver.NoAnswer as err:
+            if fail_on_error:
+                raise AnsibleError("Lookup failed: %s" % str(err))
             ret.append("")
-        except dns.resolver.Timeout:
+        except dns.resolver.Timeout as err:
+            if fail_on_error:
+                raise AnsibleError("Lookup failed: %s" % str(err))
             ret.append('')
-        except dns.exception.DNSException as e:
-            raise AnsibleError("dns.resolver unhandled exception %s" % to_native(e))
+        except dns.exception.DNSException as err:
+            raise AnsibleError("dns.resolver unhandled exception %s" % to_native(err))
 
         return ret

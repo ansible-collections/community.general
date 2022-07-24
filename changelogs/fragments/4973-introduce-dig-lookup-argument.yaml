@@ -1,0 +1,2 @@
+minor_changes:
+  - dig lookup plugin - add option ``fail_on_error`` to allow stopping execution on lookup failures (https://github.com/ansible-collections/community.general/pull/4973).
