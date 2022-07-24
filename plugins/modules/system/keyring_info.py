@@ -122,7 +122,9 @@ def run_module():
         pass
     except AttributeError:
         pass
-    passphrase = _alternate_retrieval_method(module)
+
+    if passphrase is None:
+        passphrase = _alternate_retrieval_method(module)
 
     if passphrase is not None:
         result["msg"] = "Successfully retrieved password for %s@%s" % (
