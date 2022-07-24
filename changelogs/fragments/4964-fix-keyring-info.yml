@@ -1,0 +1,2 @@
+bugfixes:
+  - "keyring_info - fix the result from the keyring library never getting returned (https://github.com/ansible-collections/community.general/pull/4964)."
