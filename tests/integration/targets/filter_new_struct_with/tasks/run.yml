@@ -1,0 +1,12 @@
+---
+# (c) 2022 DEMAREST Maxime <maxime@indelog.fr>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: "{{ case.id }} - get result"
+  ansible.builtin.set_fact:
+    result: "{{ case.base|community.general.new_struct_with(case.changes, present=case.present, list_as_dict=case.list_as_dict, keep_empty=case.keep_empty, remove_null=case.remove_null) }}"
+
+- name: "{{ case.id }} - check result"
+  ansible.builtin.assert:
+    that: "{{ result == case.expected }}"
+    fail_msg: "'base': {{ case.base }}, 'changes': {{ case.changes }}, 'expected': {{ case.expected }}, 'result': {{ result }}"
