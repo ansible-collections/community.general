@@ -123,7 +123,7 @@ EXAMPLES = r'''
     changes: {A: {AA: '1'}, B: ['2', '3']}
 # "result": {A: {}, B: [], C: '4'}
 
-- name: `null` value can be used to ignore some items in list to avoid updating
+- name: Use `null` value to ignore some items in list to avoid updating
         them when using `dict_as_list=true`
   ansible.builtin.set_fact:
     result: >
@@ -133,7 +133,7 @@ EXAMPLES = r'''
     changes: [null, null, 'Z', {DA: '1', DB: null}, 'E']
 # "result": ['A', 'B', 'Z', {DA: '1', DB: '2'}, 'E']
 
-- name: `null` value can be used to ignore some items in list to avoid remove
+- name: Use `null` value can to ignore some items in list to avoid remove
         them when using `dict_as_list=true` and `present=false`
   ansible.builtin.set_fact:
     result: >
