@@ -38,7 +38,9 @@
         dest: '{{url_pkg_path}}/{{url_pkg_filename}}.sig'
     - name: Host {{url_pkg}}
       shell:
-        cmd: 'python -m http.server --directory {{url_pkg_path}} {{http_port}} >/dev/null 2>&1 &'
+        cmd: 'python -m http.server --directory {{url_pkg_path}} {{http_port}} >/dev/null 2>&1'
+      async: 90
+      poll: 0
     - name: Wait for http.server to come up online
       wait_for:
         host: 'localhost'
