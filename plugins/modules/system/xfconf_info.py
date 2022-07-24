@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: xfconf_info
 author:
-    - "Alexei Znamensky (@russoz)"
+  - "Alexei Znamensky (@russoz)"
 short_description: Retrieve XFCE4 configurations
 version_added: 3.5.0
 description:
@@ -61,8 +61,8 @@ EXAMPLES = """
 RETURN = '''
   channels:
     description:
-        - List of available channels.
-        - Returned when the module receives no parameter at all.
+      - List of available channels.
+      - Returned when the module receives no parameter at all.
     returned: success
     type: list
     elements: str
@@ -73,55 +73,51 @@ RETURN = '''
     - xfwm4
   properties:
     description:
-        - List of available properties for a specific channel.
-        - Returned by passing only the I(channel) parameter to the module.
+      - List of available properties for a specific channel.
+      - Returned by passing only the I(channel) parameter to the module.
     returned: success
     type: list
     elements: str
     sample:
-        - /Gdk/WindowScalingFactor
-        - /Gtk/ButtonImages
-        - /Gtk/CursorThemeSize
-        - /Gtk/DecorationLayout
-        - /Gtk/FontName
-        - /Gtk/MenuImages
-        - /Gtk/MonospaceFontName
-        - /Net/DoubleClickTime
-        - /Net/IconThemeName
-        - /Net/ThemeName
-        - /Xft/Antialias
-        - /Xft/Hinting
-        - /Xft/HintStyle
-        - /Xft/RGBA
+      - /Gdk/WindowScalingFactor
+      - /Gtk/ButtonImages
+      - /Gtk/CursorThemeSize
+      - /Gtk/DecorationLayout
+      - /Gtk/FontName
+      - /Gtk/MenuImages
+      - /Gtk/MonospaceFontName
+      - /Net/DoubleClickTime
+      - /Net/IconThemeName
+      - /Net/ThemeName
+      - /Xft/Antialias
+      - /Xft/Hinting
+      - /Xft/HintStyle
+      - /Xft/RGBA
   is_array:
     description:
-    - Flag indicating whether the property is an array or not.
+      - Flag indicating whether the property is an array or not.
     returned: success
     type: bool
   value:
     description:
-    - The value of the property. Empty if the property is of array type.
+      - The value of the property. Empty if the property is of array type.
     returned: success
     type: str
     sample: Monospace 10
   value_array:
     description:
-    - The array value of the property. Empty if the property is not of array type.
+      - The array value of the property. Empty if the property is not of array type.
     returned: success
     type: list
     elements: str
     sample:
-    - Main
-    - Work
-    - Tmp
+      - Main
+      - Work
+      - Tmp
 '''
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner
-
-
-class XFConfException(Exception):
-    pass
 
 
 class XFConfInfo(ModuleHelper):
@@ -170,8 +166,10 @@ class XFConfInfo(ModuleHelper):
         elif self.vars.property is None:
             output = 'properties'
             proc = self._process_list_properties
+
         with self.runner.context('list_arg channel property', output_process=proc) as ctx:
             result = ctx.run(**self.vars)
+
         if not self.vars.list_arg and self.vars.is_array:
             output = "value_array"
         self.vars.set(output, result)
