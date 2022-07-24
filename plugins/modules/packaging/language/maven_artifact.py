@@ -150,6 +150,15 @@ options:
         default: 'md5'
         choices: ['md5', 'sha1']
         version_added: 3.2.0
+    unredirected_headers:
+        type: list
+        elements: str
+        version_added: 5.2.0
+        description:
+            - A list of headers that should not be included in the redirection. This headers are sent to the fetch_url C(fetch_url) function.
+            - On ansible-core version 2.12 or later, the default of this option is C([Authorization, Cookie]).
+            - Useful if the redirection URL does not need to have sensitive headers in the request.
+            - Requires ansible-core version 2.12 or later.
     directory_mode:
         type: str
         description:
@@ -230,6 +239,7 @@ import tempfile
 import traceback
 import re
 
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible.module_utils.ansible_release import __version__ as ansible_version
 from re import match
 
@@ -509,7 +519,18 @@ class MavenDownloader:
         self.module.params['url_password'] = self.module.params.get('password', '')
         self.module.params['http_agent'] = self.user_agent
 
-        response, info = fetch_url(self.module, url_to_use, timeout=req_timeout, headers=self.headers)
+        kwargs = {}
+        if self.module.params['unredirected_headers']:
+            kwargs['unredirected_headers'] = self.module.params['unredirected_headers']
+
+        response, info = fetch_url(
+            self.module,
+            url_to_use,
+            timeout=req_timeout,
+            headers=self.headers,
+            **kwargs
+        )
+
         if info['status'] == 200:
             return response
         if force:
@@ -614,11 +635,19 @@ def main():
             keep_name=dict(required=False, default=False, type='bool'),
             verify_checksum=dict(required=False, default='download', choices=['never', 'download', 'change', 'always']),
             checksum_alg=dict(required=False, default='md5', choices=['md5', 'sha1']),
+            unredirected_headers=dict(type='list', elements='str', required=False),
             directory_mode=dict(type='str'),
         ),
         add_file_common_args=True,
         mutually_exclusive=([('version', 'version_by_spec')])
     )
+
+    if LooseVersion(ansible_version) < LooseVersion("2.12") and module.params['unredirected_headers']:
+        module.fail_json(msg="Unredirected Headers parameter provided, but your ansible-core version does not support it. Minimum version is 2.12")
+
+    if LooseVersion(ansible_version) >= LooseVersion("2.12") and module.params['unredirected_headers'] is None:
+        # if the user did not supply unredirected params, we use the default, ONLY on ansible core 2.12 and above
+        module.params['unredirected_headers'] = ['Authorization', 'Cookie']
 
     if not HAS_LXML_ETREE:
         module.fail_json(msg=missing_required_lib('lxml'), exception=LXML_ETREE_IMP_ERR)
