@@ -37,7 +37,7 @@ options:
         - Show both listening and non-listening sockets (for TCP this means established connections).
         - Adds the return values C(state) and C(foreign_address) to the returned facts.
     type: bool
-    default: 'no'
+    default: false
     version_added: 5.4.0
 '''
 
@@ -91,13 +91,13 @@ ansible_facts:
           sample: "0.0.0.0"
         foreign_address:
           description: The address of the remote end of the socket.
-          returned: if I(include_non_listening) is set to yes
+          returned: if I(include_non_listening=true)
           type: str
           sample: "10.80.0.1"
           version_added: 5.4.0
         state:
           description: The state of the socket.
-          returned: if I(include_non_listening) is set to yes
+          returned: if I(include_non_listening=true)
           type: str
           sample: "ESTABLISHED"
           version_added: 5.4.0
@@ -143,13 +143,13 @@ ansible_facts:
           sample: "0.0.0.0"
         foreign_address:
           description: The address of the remote end of the socket.
-          returned: if I(include_non_listening) is set to yes
+          returned: if I(include_non_listening=true)
           type: str
           sample: "10.80.0.1"
           version_added: 5.4.0
         state:
           description: The state of the socket. UDP is a connectionless protocol. Shows UCONN or ESTAB.
-          returned: if I(include_non_listening) is set to yes
+          returned: if I(include_non_listening=true)
           type: str
           sample: "UCONN"
           version_added: 5.4.0
