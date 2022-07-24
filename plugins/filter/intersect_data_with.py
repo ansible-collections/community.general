@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = r'''
+---
 name: intersect_data_with
 short_description: Intersecting an original data structure with modifications
                    to create a new one.
@@ -29,7 +30,7 @@ description:
     modification for a same path in the structure, compares their values.
   - When the compared values are in both side assimilable to dictionaries, do a
     recursive intersection.
-positional: expected
+positional: modifications
 options:
   _input:
     description:
