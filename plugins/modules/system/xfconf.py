@@ -149,10 +149,6 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner
 
 
-class XFConfException(Exception):
-    pass
-
-
 class XFConfProperty(StateModuleHelper):
     change_params = 'value',
     diff_params = 'value',
@@ -198,7 +194,7 @@ class XFConfProperty(StateModuleHelper):
         if err.rstrip() == self.does_not:
             return None
         if rc or len(err):
-            raise XFConfException('xfconf-query failed with error (rc={0}): {1}'.format(rc, err))
+            self.do_raise('xfconf-query failed with error (rc={0}): {1}'.format(rc, err))
 
         result = out.rstrip()
         if "Value is an array with" in result:
@@ -231,7 +227,7 @@ class XFConfProperty(StateModuleHelper):
             value_type = value_type * values_len
         elif types_len != values_len:
             # or complain if lists' lengths are different
-            raise XFConfException('Number of elements in "value" and "value_type" must be the same')
+            self.do_raise('Number of elements in "value" and "value_type" must be the same')
 
         # calculates if it is an array
         self.vars.is_array = \
