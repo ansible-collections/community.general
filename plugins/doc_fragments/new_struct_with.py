@@ -14,60 +14,56 @@ options:
     type: raw
     required: true
     description:
-      - A structure assimilable to a dictionary or a list that acts to
-        add, update or remove keys/items from B(base) data.
-      - It must be a similar type of structure that the B(base) data (both
-        are lists or dictionaries).
+      - A structure assimilable to a dictionary or a list that acting to
+        add, update or remove keys/items from the B(base) data.
+      - Must have the same type as B(base) (both are lists or dictionaries).
       - Keys/items that composing it be present or absent in the result
-        depending on the used parameters.
-  present:
+        depending on used parameters.
+  present
     type: bool
     required: false
     default: true
     description:
-      - Indicate if keys/items in I(changes) must be present or not in the
-        result depending on their path in the structure.
-      - C(true) mean I(changes), acts to updating or adding keys/items from the
-        B(base) data to make the result.
-      - C(false) mean I(changes), acts to removing keys/items from the B(base)
-        data to make the result.
+      - Indicate how keys/items in I(changes) are used to update them in
+        B(base) data.
+      - If C(yes), acts to adds/updates them.
+      - If C(no), acts to remove them.
   list_as_dict:
     type: bool
     required: false
     default: false
     description:
-      - There are two way to merge list.
-      - When C(false), simply check if an item in a list from I(changes) side is
-        also present or absent in the corresponding list from original side.
-        With this, it is not possible to merge lists recursively but, you not
-        need to take care about the position of the item in both list.
-      - When C(true), acts as if lists are dictionaries with their index number
-        as key. With this, values in both lists are compared depending on their
-        position and, it becomes possible to recursively merge their items as
-        long as it is possibles to be sure of the position of the values.
+      - There is two way to operate on lists.
+      - If C(no), simply checks the presence of an item in both lists.
+        Depending on the state of I(present), items in list on C(changes) side
+        be added or removed from items on B(base) data side. This limit the
+        comparison on the first level of the list (it is not possible to recursively
+        comparison items whit this) but you not need to take care about the position
+        of items.
+      - If C(yes), lists are treated as dictionaries by using items index
+        number as key. This permits to comparison items depending on their
+        position and operate recursively on them as long as it is possibles to
+        be sure of the values position.
   keep_empty:
     type: bool
     required: false
     default: false
     description:
-      - Defines if emptied lists or dictionary be kept in result after the data
-        updating.
-      - This has no effect when I(present) is C(true).
-      - When C(false), when list or dictionary keys/items that be emptied, they
-        not be keept in the result.
-      - When C(true), when list or dictionary keys/items that be emptied, they
-        be keept in the result.
+      - Defines if emptied lists or dictionary must be kept in the result.
+      - This has no effect when I(present) is C(yes).
+      - If C(no), does not keeps them.
+      - If C(yes), keeps them.
   remove_null:
     type: bool
     required: false
     default: false
     description:
       - Defines how to treat C(null) value in I(changes).
-      - When C(false), C(null) value are simply ignored. This can be useful
-        when lists are merged as dictionaries with using I(list_as_dict) and
-        only an item at a specific position must be updated without taking care
-        of value of items that are before.
-      - When C(true), all keys in C(changes) that have C(null) value be removed
-        from base to make the result. This can be used to ensure that a key in
-        B(base) data be removed without taking care of its actual value.
+      - If C(no), C(null) value are simply ignored. This can be useful when
+        lists are compared as dictionaries by setting I(list_as_dict) to C(yes)
+        and need to comparing only items at a specifics positions without
+        taking care of items that are before.
+      - If C(true), all keys in C(changes) with C(null) value acts to remove
+        the corresponding key in B(base) data. This permit to ensure that a key
+        in B(base) data be removed without taking care of its actual value.
 '''

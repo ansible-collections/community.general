@@ -8,34 +8,32 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 name: new_struct_with
-short_description: From a data structure used to update an other, get a new
-                   one.
+short_description: Get a new data structure data structure starting from two
+                   other, one as a base and the second acting as changes.
 version_added: 5.3.0
 author: DEMAREST Maxime (@indelog)
 description:
-  - Starting from two similar data structure, first one provided by I(_input)
-    and called B(base) that acting as the source of data, second provided by
-    I(changes) and called B(changes) that acting as update to be applied to
-    B(base), creates a new one as result.
-  - Basics, this is designed to work on configurations structures provided by
-    format like JSON, YAML or TOML by ensuring the presence or the absence of
-    some values in keys/items to the result.
+  - Get a new data structure starting from two similar other, one called
+    B(base) provided by I(_input) that acts as data source and the second
+    called C(changes) that acts to add, update or remove keys/items from
+    B(base).
+  - Basically, this is designed for working on configurations structures provided
+    by format like JSON, YAML or TOML to ensuring the presence or the absence
+    of some values in keys/items inside.
   - I(_input) and I(changes) must be both assimilable to dictionaries or lists
     and have same type (both are list or both are dictionary).
-  - The update of items in B(base) with items in I(changes) is done by
-    comparing the values of all keys/items in I(_input) ans I(changes) that
-    have same path in the structure. If compared values in both side are
-    assimilable to dictionaries, operate recursively on they.
+  - Updating B(base) keys/items with I(changes) keys/items is done by comparing
+    their values for a same path in the structure. If the compared values are
+    both assimilable to dictionaries, recursively operate on them.
 positional: changes
 options:
   _input:
     description:
-      - A structure assimilable to a dictionary or a list that acts to
-        source of data for the new one.
-      - Its type must be a similar to I(changes) (both are lists or
-        dictionaries).
-      - All of its items that not be updated or removed by keys/items in
-        I(changes) be present as they are in the result.
+      - A data structure assimilable to a dictionary or a list acting as data
+        source to make new one.
+      - Must have the same type as I(changes) (both are lists or dictionaries).
+      - All of its keys/items which are not be updated or removed by keys/items
+        in I(changes) will be present as they are in the result.
     type: raw
     required: true
 extends_documentation_fragment: community.general.new_struct_with
@@ -159,8 +157,8 @@ EXAMPLES = r'''
 RETURN = r'''
   _result:
     description: A new structure that contains keys/items provided in I(_input)
-                 updated with keys/items provided in I(changes) depending on
-                 that the used parameters.
+                 updated with keys/items provided in I(changes) depending to
+                 used parameters.
     type: raw
 '''
 
