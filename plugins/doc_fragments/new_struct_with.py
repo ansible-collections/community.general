@@ -19,7 +19,7 @@ options:
       - Must have the same type as B(base) (both are lists or dictionaries).
       - Keys/items that composing it be present or absent in the result
         depending on used parameters.
-  present
+  present:
     type: bool
     required: false
     default: true
