@@ -8,9 +8,9 @@ DOCUMENTATION = """
     name: sudosu
     short_description: Run tasks using sudo su -
     description:
-        - This become plugins allows your remote/login user to execute commands as another user via the C(sudo) and C(su) utilities combined.
+      - This become plugin allows your remote/login user to execute commands as another user via the C(sudo) and C(su) utilities combined.
     author:
-    - Dag Wieers (@dagwieers)
+      - Dag Wieers (@dagwieers)
     version_added: 2.4.0
     options:
         become_user:
