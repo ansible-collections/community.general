@@ -61,6 +61,12 @@ options:
       - Upgrade all installed packages to their latest version.
     type: bool
     default: no
+  world:
+    description:
+      - Use a custom world file when checking for explicitly installed packages.
+    type: str
+    default: /etc/apk/world
+    version_added: 5.4.0
 notes:
   - 'I(name) and I(upgrade) are mutually exclusive.'
   - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly to the I(name) option.
@@ -134,6 +140,12 @@ EXAMPLES = '''
     name: foo
     state: latest
     no_cache: yes
+
+- name: Install package checking a custom world
+  community.general.apk:
+    name: foo
+    state: latest
+    world: /etc/apk/world.custom
 '''
 
 RETURN = '''
@@ -171,11 +183,11 @@ def update_package_db(module, exit):
         return True
 
 
-def query_toplevel(module, name):
-    # /etc/apk/world contains a list of top-level packages separated by ' ' or \n
+def query_toplevel(module, name, world):
+    # world contains a list of top-level packages separated by ' ' or \n
     # packages may contain repository (@) or version (=<>~) separator characters or start with negation !
     regex = re.compile(r'^' + re.escape(name) + r'([@=<>~].+)?$')
-    with open('/etc/apk/world') as f:
+    with open(world) as f:
         content = f.read().split()
         for p in content:
             if regex.search(p):
@@ -237,7 +249,7 @@ def upgrade_packages(module, available):
     module.exit_json(changed=True, msg="upgraded packages", stdout=stdout, stderr=stderr, packages=packagelist)
 
 
-def install_packages(module, names, state):
+def install_packages(module, names, state, world):
     upgrade = False
     to_install = []
     to_upgrade = []
@@ -250,7 +262,7 @@ def install_packages(module, names, state):
                 if state == 'latest' and not query_latest(module, dependency):
                     to_upgrade.append(dependency)
         else:
-            if not query_toplevel(module, name):
+            if not query_toplevel(module, name, world):
                 to_install.append(name)
             elif state == 'latest' and not query_latest(module, name):
                 to_upgrade.append(name)
@@ -313,6 +325,7 @@ def main():
             update_cache=dict(default=False, type='bool'),
             upgrade=dict(default=False, type='bool'),
             available=dict(default=False, type='bool'),
+            world=dict(default='/etc/apk/world', type='str'),
         ),
         required_one_of=[['name', 'update_cache', 'upgrade']],
         mutually_exclusive=[['name', 'upgrade']],
@@ -348,7 +361,7 @@ def main():
         upgrade_packages(module, p['available'])
 
     if p['state'] in ['present', 'latest']:
-        install_packages(module, p['name'], p['state'])
+        install_packages(module, p['name'], p['state'], p['world'])
     elif p['state'] == 'absent':
         remove_packages(module, p['name'])
 
