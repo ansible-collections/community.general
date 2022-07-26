@@ -884,7 +884,7 @@ class TestPacman:
                     ],
                     "state": "present",
                 },
-                ["sudo", "somepackage", "otherpkg"],
+                ["otherpkg", "somepackage", "sudo"],
                 [
                     Package("sudo", "sudo"),
                     Package("grep", "grep"),
