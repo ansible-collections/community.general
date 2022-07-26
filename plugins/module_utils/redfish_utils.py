@@ -229,6 +229,7 @@ class RedfishUtils(object):
             return {'ret': False, 'msg': "SessionService resource not found"}
         else:
             session_service = data["SessionService"]["@odata.id"]
+            self.session_service_uri = session_service
             response = self.get_request(self.root_uri + session_service)
             if response['ret'] is False:
                 return response
@@ -3051,3 +3052,63 @@ class RedfishUtils(object):
 
     def get_multi_manager_inventory(self):
         return self.aggregate_managers(self.get_manager_inventory)
+
+    def set_sessionservice(self, sessionservice_config):
+        result = {}
+        response = self.get_request(self.root_uri + self.session_service_uri)
+        if response['ret'] is False:
+            return response
+        current_sessionservice_config= response['data']
+        payload = {}
+        for property in sessionservice_config.keys():
+            value = sessionservice_config[property]
+            if property not in current_sessionservice_config:
+                return {'ret': False, 'msg': "Property %s in sessionservice_config is invalid" % property}
+            if isinstance(value, dict):
+                if isinstance(current_sessionservice_config[property], dict):
+                    payload[property] = value
+                elif isinstance(current_sessionservice_config[property], list):
+                    payload[property] = list()
+                    payload[property].append(value)
+                else:
+                    return {'ret': False, 'msg': "Value of property %s in sessionservice_config is invalid" % property}
+            else:
+                payload[property] = value
+
+        need_change = False
+        for property in payload.keys():
+            set_value = payload[property]
+            cur_value = current_sessionservice_config[property]
+            if not isinstance(set_value, dict) and not isinstance(set_value, list):
+                if set_value != cur_value:
+                    need_change = True
+            if isinstance(set_value, dict):
+                for subprop in payload[property].keys():
+                    if subprop not in current_sessionservice_config[property]:
+                        need_change = True
+                        break
+                    sub_set_value = payload[property][subprop]
+                    sub_cur_value = current_sessionservice_config[property][subprop]
+                    if sub_set_value != sub_cur_value:
+                        need_change = True
+            if isinstance(set_value, list):
+                if len(set_value) != len(cur_value):
+                    need_change = True
+                    continue
+                for i in range(len(set_value)):
+                    for subprop in payload[property][i].keys():
+                        if subprop not in current_sessionservice_config[property][i]:
+                            need_change = True
+                            break
+                        sub_set_value = payload[property][i][subprop]
+                        sub_cur_value = current_sessionservice_config[property][i][subprop]
+                        if sub_set_value != sub_cur_value:
+                            need_change = True
+        if not need_change:
+            return {'ret': True, 'changed': False, 'msg': "SessionService already configured"}
+
+        response = self.patch_request(self.root_uri + self.session_service_uri, payload)
+        if response['ret'] is False:
+            return response
+        return {'ret': True, 'changed': True, 'msg': "Modified SessionService"}
+
