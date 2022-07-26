@@ -3058,7 +3058,7 @@ class RedfishUtils(object):
         response = self.get_request(self.root_uri + self.session_service_uri)
         if response['ret'] is False:
             return response
-        current_sessionservice_config= response['data']
+        current_sessionservice_config = response['data']
         payload = {}
         for property in sessionservice_config.keys():
             value = sessionservice_config[property]
@@ -3111,4 +3111,3 @@ class RedfishUtils(object):
         if response['ret'] is False:
             return response
         return {'ret': True, 'changed': True, 'msg': "Modified SessionService"}
-
