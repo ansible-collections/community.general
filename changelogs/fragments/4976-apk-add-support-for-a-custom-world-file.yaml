@@ -1,0 +1,2 @@
+minor_changes:
+  - apk - add ``world`` parameter for supporting a custom world file (https://github.com/ansible-collections/community.general/pull/4976).
