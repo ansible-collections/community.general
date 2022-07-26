@@ -488,7 +488,7 @@ class Pacman(object):
                 self.fail("Failed to install package(s)", cmd=cmd, stdout=stdout, stderr=stderr)
             self.add_exit_infos(stdout=stdout, stderr=stderr)
 
-        self.exit_params["packages"] = installed_pkgs + changed_reason_pkgs
+        self.exit_params["packages"] = sorted(installed_pkgs + changed_reason_pkgs)
         self.add_exit_infos("Installed %d package(s)" % (len(installed_pkgs) + len(changed_reason_pkgs)))
 
     def remove_packages(self, pkgs):
