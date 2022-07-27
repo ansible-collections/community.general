@@ -1,0 +1,2 @@
+bugfixes:
+  - "xfconf - fix setting of boolean values (https://github.com/ansible-collections/community.general/issues/4999, https://github.com/ansible-collections/community.general/pull/5007)."
