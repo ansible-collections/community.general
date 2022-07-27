@@ -14,7 +14,7 @@ def _values_fmt(values, value_types):
     result = []
     for value, value_type in zip(values, value_types):
         if value_type == 'bool':
-            value = boolean(value)
+            value = 'true' if boolean(value) else 'false'
         result.extend(['--type', '{0}'.format(value_type), '--set', '{0}'.format(value)])
     return result
 
