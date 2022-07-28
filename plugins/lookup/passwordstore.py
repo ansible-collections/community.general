@@ -331,7 +331,6 @@ class LookupModule(LookupBase):
         try:
             self.passoutput = to_text(
                 check_output2([self.pass_cmd, 'show'] +
-                              (['--password'] if self.backend == 'gopass' else []) +
                               [self.passname], env=self.env),
                 errors='surrogate_or_strict'
             ).splitlines()
