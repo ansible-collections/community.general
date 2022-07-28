@@ -1,0 +1,2 @@
+trivial:
+ - lastpass - use config manager API in tests; improve documentation.
