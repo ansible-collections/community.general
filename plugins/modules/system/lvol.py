@@ -499,7 +499,7 @@ def main():
 
         elif size_opt == 'l':
             # Resize LV based on % value
-            tool = None
+            cmd = None
             size_free = this_vg['free']
             if size_whole == 'VG' or size_whole == 'PVS':
                 size_requested = size_percent * this_vg['size'] / 100
@@ -517,6 +517,7 @@ def main():
             if this_lv['size'] < size_requested:
                 if (size_free > 0) and (size_free >= (size_requested - this_lv['size'])):
                     tool = module.get_bin_path("lvextend", required=True)
+                    cmd = tool
                 else:
                     module.fail_json(
                         msg="Logical Volume %s could not be extended. Not enough free space left (%s%s required / %s%s available)" %
@@ -529,15 +530,17 @@ def main():
                     module.fail_json(msg="Sorry, no shrinking of %s without force=yes" % (this_lv['name']))
                 else:
                     tool = module.get_bin_path("lvreduce", required=True)
-                    tool = '%s %s' % (tool, '--force')
+                    cmd = '%s %s' % (tool, '--force')
 
-            if tool:
+            if cmd:
                 if resizefs:
-                    tool = '%s %s' % (tool, '--resizefs')
+                    cmd = '%s %s' % (cmd, '--resizefs')
                 if size_operator:
-                    cmd = "%s %s -%s %s%s%s %s/%s %s" % (tool, test_opt, size_opt, size_operator, size, size_unit, vg, this_lv['name'], pvs)
+                    cmd = "%s %s -%s %s%s%s %s/%s" % (cmd, test_opt, size_opt, size_operator, size, size_unit, vg, this_lv['name'])
                 else:
-                    cmd = "%s %s -%s %s%s %s/%s %s" % (tool, test_opt, size_opt, size, size_unit, vg, this_lv['name'], pvs)
+                    cmd = "%s %s -%s %s%s %s/%s" % (cmd, test_opt, size_opt, size, size_unit, vg, this_lv['name'])
+                if tool.endswith('lvextend'):
+                    cmd = '%s %s' % (cmd, pvs)
                 rc, out, err = module.run_command(cmd)
                 if "Reached maximum COW size" in out:
                     module.fail_json(msg="Unable to resize %s to %s%s" % (lv, size, size_unit), rc=rc, err=err, out=out)
@@ -553,9 +556,10 @@ def main():
 
         else:
             # resize LV based on absolute values
-            tool = None
+            cmd = None
             if float(size) > this_lv['size'] or size_operator == '+':
                 tool = module.get_bin_path("lvextend", required=True)
+                cmd = tool
             elif shrink and float(size) < this_lv['size'] or size_operator == '-':
                 if float(size) == 0:
                     module.fail_json(msg="Sorry, no shrinking of %s to 0 permitted." % (this_lv['name']))
@@ -563,15 +567,17 @@ def main():
                     module.fail_json(msg="Sorry, no shrinking of %s without force=yes." % (this_lv['name']))
                 else:
                     tool = module.get_bin_path("lvreduce", required=True)
-                    tool = '%s %s' % (tool, '--force')
+                    cmd = '%s %s' % (tool, '--force')
 
-            if tool:
+            if cmd:
                 if resizefs:
-                    tool = '%s %s' % (tool, '--resizefs')
+                    cmd = '%s %s' % (cmd, '--resizefs')
                 if size_operator:
-                    cmd = "%s %s -%s %s%s%s %s/%s %s" % (tool, test_opt, size_opt, size_operator, size, size_unit, vg, this_lv['name'], pvs)
+                    cmd = "%s %s -%s %s%s%s %s/%s" % (cmd, test_opt, size_opt, size_operator, size, size_unit, vg, this_lv['name'])
                 else:
-                    cmd = "%s %s -%s %s%s %s/%s %s" % (tool, test_opt, size_opt, size, size_unit, vg, this_lv['name'], pvs)
+                    cmd = "%s %s -%s %s%s %s/%s" % (cmd, test_opt, size_opt, size, size_unit, vg, this_lv['name'])
+                if tool.endswith('lvextend'):
+                    cmd = '%s %s' % (cmd, pvs)
                 rc, out, err = module.run_command(cmd)
                 if "Reached maximum COW size" in out:
                     module.fail_json(msg="Unable to resize %s to %s%s" % (lv, size, size_unit), rc=rc, err=err, out=out)
