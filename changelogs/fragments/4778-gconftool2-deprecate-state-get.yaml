@@ -1,0 +1,2 @@
+deprecated_features:
+  - gconftool2 - deprecates ``state=get`` in favor of using the module ``gconftool2_info`` (https://github.com/ansible-collections/community.general/pull/4778).
