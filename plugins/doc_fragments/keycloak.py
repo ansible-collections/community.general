@@ -73,4 +73,5 @@ options:
             - Configures the HTTP User-Agent Header
         type: str
         default: Ansible
+        version_added: 5.4.0
 '''
