@@ -1,2 +1,2 @@
 bugfixes:
-  - passwordstore - fix password store path detection for gopass (https://github.com/ansible-collections/community.general/pull/4955).
+  - passwordstore lookup plugin - fix password store path detection for gopass (https://github.com/ansible-collections/community.general/pull/4955).
