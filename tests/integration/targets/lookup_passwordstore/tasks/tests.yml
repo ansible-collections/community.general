@@ -318,9 +318,6 @@
         if [ "$1" = "--version" ]; then
           exit 2
         fi
-        if [ "$1" = "show" ] && [ "$2" != "--password" ]; then
-          exit 3
-        fi
         echo "gopass_ok"
       dest: "{{ gopasspath }}"
       mode: '0755'
