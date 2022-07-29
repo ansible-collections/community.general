@@ -124,6 +124,7 @@ def get_token(module_params):
     """
     token = module_params.get('token')
     base_url = module_params.get('auth_keycloak_url')
+    http_agent = module_params.get('http_agent')
 
     if not base_url.lower().startswith(('http', 'https')):
         raise KeycloakError("auth_url '%s' should either start with 'http' or 'https'." % base_url)
@@ -138,7 +139,7 @@ def get_token(module_params):
         client_secret = module_params.get('auth_client_secret')
         connection_timeout = module_params.get('connection_timeout')
         auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
-        http_agent = module_params.get('http_agent')
+        
         temp_payload = {
             'grant_type': 'password',
             'client_id': client_id,
