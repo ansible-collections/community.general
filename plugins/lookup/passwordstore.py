@@ -261,11 +261,11 @@ class LookupModule(LookupBase):
     def is_real_pass(self):
         if self.realpass is None:
             try:
-                self.passoutput = to_text(
+                passoutput = to_text(
                     check_output2([self.pass_cmd, "--version"], env=self.env),
                     errors='surrogate_or_strict'
                 )
-                self.realpass = 'pass: the standard unix password manager' in self.passoutput
+                self.realpass = 'pass: the standard unix password manager' in passoutput
             except (subprocess.CalledProcessError) as e:
                 raise AnsibleError(e)
 
@@ -331,7 +331,6 @@ class LookupModule(LookupBase):
         try:
             self.passoutput = to_text(
                 check_output2([self.pass_cmd, 'show'] +
-                              (['--password'] if self.backend == 'gopass' else []) +
                               [self.passname], env=self.env),
                 errors='surrogate_or_strict'
             ).splitlines()
