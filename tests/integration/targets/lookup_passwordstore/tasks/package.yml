@@ -48,6 +48,7 @@
         name:
           - gnupg2
           - pass
+          - gopass
         state: present
         update_homebrew: no
       become: yes
