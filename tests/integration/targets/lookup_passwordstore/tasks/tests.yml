@@ -72,7 +72,7 @@
   command: "pass init ansible-test"
 
 - name: "Initialise gopass passwordstore"
-  command: "gopass init"
+  command: "gopass init ansible-test"
   args:
     creates: "{{ lookup('env','HOME') }}/.local/share/gopass/stores/root"
 
