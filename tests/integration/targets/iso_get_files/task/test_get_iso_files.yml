@@ -1,0 +1,18 @@
+- name: iso_get_files
+  hosts: localhost
+  gather_facts: no
+  vars:
+    test_files_dir: "/Users/zouy/Documents"
+  tasks:
+    - name: "Get files from ISO"
+      community.general.iso_get_files:
+        iso: "{{ test_files_dir }}/test.iso"
+        get_files:
+          - file_in_iso: "/1.txt"
+            file_local: "/tmp/aaa/1.txt.org"
+          - file_in_iso: "/delete/1.txt"
+            file_local: "/tmp/aaa/2.txt"
+      register: iso_get_files
+
+    - name: "Display the ISO customized result"
+      debug: var=iso_get_files
