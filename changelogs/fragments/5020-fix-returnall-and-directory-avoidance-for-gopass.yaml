@@ -1,2 +1,2 @@
 bugfixes:
-  - passwordstore - fix returnall and directory avoidance for gopass (https://github.com/ansible-collections/community.general/pull/5020).
+  - passwordstore lookup plugin - fix ``returnall`` and directory avoidance for gopass (https://github.com/ansible-collections/community.general/pull/5020).
