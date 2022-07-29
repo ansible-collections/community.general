@@ -122,7 +122,7 @@ class GConf2Preference(object):
             if call_type == 'get':
                 self.ansible.deprecate(
                     msg="State 'get' is deprecated. Please use the module community.general.gconftool2_info instead",
-                    version="7.0.0", collection_name="community.general"
+                    version="8.0.0", collection_name="community.general"
                 )
                 cmd.extend(["--get", self.key])
             # Otherwise, we will use all relevant parameters
