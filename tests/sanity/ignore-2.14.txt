@@ -9,7 +9,7 @@ plugins/modules/cloud/rackspace/rax_files.py validate-modules:parameter-state-in
 plugins/modules/cloud/rackspace/rax_files_objects.py use-argspec-type-path
 plugins/modules/cloud/rackspace/rax_scaling_group.py use-argspec-type-path  # fix needed, expanduser() applied to dict values
 plugins/modules/cloud/scaleway/scaleway_organization_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/smartos/vmadm.py validate-modules:parameter-type-not-in-doc
+plugins/modules/cloud/smartos/vmadm.py validate-modules:parameter-type-not-in-doc         # unused param - removed in 6.0.0
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:undocumented-parameter
