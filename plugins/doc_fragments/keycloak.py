@@ -70,7 +70,7 @@ options:
         version_added: 4.5.0
     http_agent:
         description:
-            - Configures the HTTP User-Agent Header
+            - Configures the HTTP User-Agent header.
         type: str
         default: Ansible
         version_added: 5.4.0
