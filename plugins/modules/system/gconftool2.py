@@ -38,7 +38,7 @@ options:
     type: str
     description:
     - The action to take upon the key/value.
-    - State C(get) is deprecated and will be removed in community.general 7.0.0. Please use the module M(community.general.gconftool2_info) instead.
+    - State C(get) is deprecated and will be removed in community.general 8.0.0. Please use the module M(community.general.gconftool2_info) instead.
     required: yes
     choices: [ absent, get, present ]
   config_source:
