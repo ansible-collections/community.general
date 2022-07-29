@@ -104,6 +104,7 @@ def keycloak_argument_spec():
         validate_certs=dict(type='bool', default=True),
         connection_timeout=dict(type='int', default=10),
         token=dict(type='str', no_log=True),
+        http_agent=dict(type='str', default='Ansible'),
     )
 
 
@@ -137,6 +138,7 @@ def get_token(module_params):
         client_secret = module_params.get('auth_client_secret')
         connection_timeout = module_params.get('connection_timeout')
         auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
+        http_agent = module_params.get('http_agent')
         temp_payload = {
             'grant_type': 'password',
             'client_id': client_id,
@@ -149,7 +151,7 @@ def get_token(module_params):
             (k, v) for k, v in temp_payload.items() if v is not None)
         try:
             r = json.loads(to_native(open_url(auth_url, method='POST',
-                                              validate_certs=validate_certs, timeout=connection_timeout,
+                                              validate_certs=validate_certs, http_agent=http_agent, timeout=connection_timeout,
                                               data=urlencode(payload)).read()))
         except ValueError as e:
             raise KeycloakError(
@@ -166,7 +168,8 @@ def get_token(module_params):
                 'Could not obtain access token from %s' % auth_url)
     return {
         'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'User-Agent': http_agent,
     }
 
 
