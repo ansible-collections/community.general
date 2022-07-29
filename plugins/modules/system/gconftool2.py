@@ -21,14 +21,14 @@ options:
     type: str
     description:
     - A GConf preference key is an element in the GConf repository
-      that corresponds to an application preference. See man gconftool-2(1)
+      that corresponds to an application preference. See man gconftool-2(1).
     required: yes
   value:
     type: str
     description:
     - Preference keys typically have simple values such as strings,
       integers, or lists of strings and integers. This is ignored if the state
-      is "get". See man gconftool-2(1)
+      is "get". See man gconftool-2(1).
   value_type:
     type: str
     description:
@@ -38,18 +38,19 @@ options:
     type: str
     description:
     - The action to take upon the key/value.
+    - State C(get) is deprecated and will be removed in community.general 8.0.0. Please use the module M(community.general.gconftool2_info) instead.
     required: yes
     choices: [ absent, get, present ]
   config_source:
     type: str
     description:
     - Specify a configuration source to use rather than the default path.
-      See man gconftool-2(1)
+      See man gconftool-2(1).
   direct:
     description:
     - Access the config database directly, bypassing server.  If direct is
       specified then the config_source must be specified as well.
-      See man gconftool-2(1)
+      See man gconftool-2(1).
     type: bool
     default: 'no'
 '''
@@ -119,6 +120,10 @@ class GConf2Preference(object):
             # If the call is "get", then we don't need as many parameters and
             # we can ignore some
             if call_type == 'get':
+                self.ansible.deprecate(
+                    msg="State 'get' is deprecated. Please use the module community.general.gconftool2_info instead",
+                    version="8.0.0", collection_name="community.general"
+                )
                 cmd.extend(["--get", self.key])
             # Otherwise, we will use all relevant parameters
             elif call_type == 'set':
