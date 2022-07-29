@@ -347,7 +347,7 @@ class LookupModule(LookupBase):
                         self.passdict[name.strip()] = value.strip()
             if (os.path.isfile(os.path.join(self.paramvals['directory'], self.passname + ".gpg"))
                 or not (self.backend == 'gopass' or self.is_real_pass())):
-                # Only accept password as found if there is a .gpg file for it (might be a tree node otherwise)
+                # In pass and gopass, only accept password as found if there is a .gpg file for it (might be a tree node otherwise)
                 return True
         except (subprocess.CalledProcessError) as e:
             # 'not in password store' is the expected error if a password wasn't found
