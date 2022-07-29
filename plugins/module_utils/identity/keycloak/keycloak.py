@@ -139,7 +139,6 @@ def get_token(module_params):
         client_secret = module_params.get('auth_client_secret')
         connection_timeout = module_params.get('connection_timeout')
         auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
-        
         temp_payload = {
             'grant_type': 'password',
             'client_id': client_id,
@@ -247,7 +246,8 @@ class KeycloakAPI(object):
         realm_info_url = URL_REALM_INFO.format(url=self.baseurl, realm=realm)
 
         try:
-            return json.loads(to_native(open_url(realm_info_url, method='GET', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(realm_info_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
 
         except HTTPError as e:
@@ -344,7 +344,8 @@ class KeycloakAPI(object):
             clientlist_url += '?clientId=%s' % filter
 
         try:
-            return json.loads(to_native(open_url(clientlist_url, http_agent=self.http_agent, method='GET', headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(clientlist_url, http_agent=self.http_agent, method='GET', headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
         except ValueError as e:
             self.module.fail_json(msg='API returned incorrect JSON when trying to obtain list of clients for realm %s: %s'
@@ -375,7 +376,8 @@ class KeycloakAPI(object):
         client_url = URL_CLIENT.format(url=self.baseurl, realm=realm, id=id)
 
         try:
-            return json.loads(to_native(open_url(client_url, method='GET',  http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(client_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
 
         except HTTPError as e:
@@ -460,7 +462,8 @@ class KeycloakAPI(object):
         """
         client_roles_url = URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid)
         try:
-            return json.loads(to_native(open_url(client_roles_url, method="GET", http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(client_roles_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
         except Exception as e:
             self.module.fail_json(msg="Could not fetch rolemappings for client %s in realm %s: %s"
@@ -492,7 +495,8 @@ class KeycloakAPI(object):
         """
         rolemappings_url = URL_CLIENT_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
-            rolemappings = json.loads(to_native(open_url(rolemappings_url, method="GET", http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            rolemappings = json.loads(to_native(open_url(rolemappings_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                         timeout=self.connection_timeout,
                                                          validate_certs=self.validate_certs).read()))
             for role in rolemappings:
                 if rid == role['id']:
@@ -512,7 +516,8 @@ class KeycloakAPI(object):
         """
         available_rolemappings_url = URL_CLIENT_ROLEMAPPINGS_AVAILABLE.format(url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
-            return json.loads(to_native(open_url(available_rolemappings_url, method="GET", http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(available_rolemappings_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
         except Exception as e:
             self.module.fail_json(msg="Could not fetch available rolemappings for client %s in group %s, realm %s: %s"
@@ -528,7 +533,8 @@ class KeycloakAPI(object):
         """
         available_rolemappings_url = URL_CLIENT_ROLEMAPPINGS_COMPOSITE.format(url=self.baseurl, realm=realm, id=gid, client=cid)
         try:
-            return json.loads(to_native(open_url(available_rolemappings_url, method="GET", http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(available_rolemappings_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
         except Exception as e:
             self.module.fail_json(msg="Could not fetch available rolemappings for client %s in group %s, realm %s: %s"
@@ -690,7 +696,8 @@ class KeycloakAPI(object):
         """
         clientscopes_url = URL_CLIENTSCOPES.format(url=self.baseurl, realm=realm)
         try:
-            return json.loads(to_native(open_url(clientscopes_url, method="GET", http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(clientscopes_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
         except Exception as e:
             self.module.fail_json(msg="Could not fetch list of clientscopes in realm %s: %s"
@@ -707,7 +714,8 @@ class KeycloakAPI(object):
         """
         clientscope_url = URL_CLIENTSCOPE.format(url=self.baseurl, realm=realm, id=cid)
         try:
-            return json.loads(to_native(open_url(clientscope_url, method="GET", http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(clientscope_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
 
         except HTTPError as e:
@@ -823,7 +831,8 @@ class KeycloakAPI(object):
         """
         protocolmappers_url = URL_CLIENTSCOPE_PROTOCOLMAPPERS.format(id=cid, url=self.baseurl, realm=realm)
         try:
-            return json.loads(to_native(open_url(protocolmappers_url, method="GET", http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(protocolmappers_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
         except Exception as e:
             self.module.fail_json(msg="Could not fetch list of protocolmappers in realm %s: %s"
@@ -842,7 +851,8 @@ class KeycloakAPI(object):
         """
         protocolmapper_url = URL_CLIENTSCOPE_PROTOCOLMAPPER.format(url=self.baseurl, realm=realm, id=cid, mapper_id=pid)
         try:
-            return json.loads(to_native(open_url(protocolmapper_url, method="GET", http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(protocolmapper_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
 
         except HTTPError as e:
@@ -922,7 +932,8 @@ class KeycloakAPI(object):
         """
         groups_url = URL_GROUPS.format(url=self.baseurl, realm=realm)
         try:
-            return json.loads(to_native(open_url(groups_url, method="GET", http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(groups_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
         except Exception as e:
             self.module.fail_json(msg="Could not fetch list of groups in realm %s: %s"
@@ -939,7 +950,8 @@ class KeycloakAPI(object):
         """
         groups_url = URL_GROUP.format(url=self.baseurl, realm=realm, groupid=gid)
         try:
-            return json.loads(to_native(open_url(groups_url, method="GET", http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(groups_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
 
         except HTTPError as e:
@@ -1050,7 +1062,8 @@ class KeycloakAPI(object):
         """
         rolelist_url = URL_REALM_ROLES.format(url=self.baseurl, realm=realm)
         try:
-            return json.loads(to_native(open_url(rolelist_url, method='GET', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(rolelist_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
         except ValueError as e:
             self.module.fail_json(msg='API returned incorrect JSON when trying to obtain list of roles for realm %s: %s'
@@ -1135,7 +1148,8 @@ class KeycloakAPI(object):
                                       % (clientid, realm))
         rolelist_url = URL_CLIENT_ROLES.format(url=self.baseurl, realm=realm, id=cid)
         try:
-            return json.loads(to_native(open_url(rolelist_url, method='GET', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(rolelist_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
         except ValueError as e:
             self.module.fail_json(msg='API returned incorrect JSON when trying to obtain list of roles for client %s in realm %s: %s'
@@ -1241,7 +1255,8 @@ class KeycloakAPI(object):
             authentication_flow = {}
             # Check if the authentication flow exists on the Keycloak serveraders
             authentications = json.load(open_url(URL_AUTHENTICATION_FLOWS.format(url=self.baseurl, realm=realm), method='GET',
-                                                 http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout, validate_certs=self.validate_certs))
+                                                 http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout, validate_certs=self.validate_certs))
             for authentication in authentications:
                 if authentication["alias"] == alias:
                     authentication_flow = authentication
@@ -1591,7 +1606,8 @@ class KeycloakAPI(object):
         """
         mappers_url = URL_IDENTITY_PROVIDER_MAPPERS.format(url=self.baseurl, realm=realm, alias=alias)
         try:
-            return json.loads(to_native(open_url(mappers_url, method='GET', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(mappers_url, method='GET', http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
         except ValueError as e:
             self.module.fail_json(msg='API returned incorrect JSON when trying to obtain list of identity provider mappers for idp %s in realm %s: %s'
@@ -1609,7 +1625,8 @@ class KeycloakAPI(object):
         """
         mapper_url = URL_IDENTITY_PROVIDER_MAPPER.format(url=self.baseurl, realm=realm, alias=alias, id=mid)
         try:
-            return json.loads(to_native(open_url(mapper_url, method="GET", http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+            return json.loads(to_native(open_url(mapper_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
                                                  validate_certs=self.validate_certs).read()))
         except HTTPError as e:
             if e.code == 404:
