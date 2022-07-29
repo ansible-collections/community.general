@@ -1,0 +1,31 @@
+- name: iso_customize
+  hosts: localhost
+  gather_facts: no
+  vars:
+    test_files_dir: "/Users/zouy/Documents"
+  tasks:
+    - name: "Customize ISO file"
+      community.general.iso_customize:
+        src_iso: "{{ test_files_dir }}/test.iso"
+        dest_iso: "{{ test_files_dir }}//test_customized.iso"
+        delete_files:
+          - "/1.txt"
+          - "/delete/1.txt"
+        add_files:
+          - src_file: "/{{ test_files_dir }}/ks.cfg"
+            dest_file: "/ks.cfg"
+          - src_file: "/{{ test_files_dir }}/ubuntu.seed"
+            dest_file: "/preseed/ubuntu.seed"
+          - src_file: "/{{ test_files_dir }}/grub.cfg"
+            dest_file: "/boot/grub/grub.cfg"
+        modify_files:
+          - file: "/boot/grub/grub.cfg"
+            regexp: "timeout=30"
+            replace: "default=0\nset timeout=5"
+          - file: "/boot/grub/grub.cfg"
+            regexp: "/casper/vmlinuz file=/cdrom/preseed/ubuntu.seed maybe-ubiquity quiet splash ---"
+            replace: '/casper/vmlinuz file=/cdrom/preseed/ubuntu.seed boot=casper debug-ubiquity automatic-ubiquity quiet splash noprompt ---'
+      register: customize_iso_result
+
+    - name: "Display the ISO customized result"
+      debug: var=customize_iso_result

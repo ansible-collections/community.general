@@ -192,18 +192,74 @@ def modify_local_file(local_file, regexp, replace):
     return 0, ""
 
 
-# The file will be replaced if it exists in ISO
+# The upper dir exist, we only add subdirectoy
+def iso_add_dir(opened_iso, dir_path):
+    parent_dir, check_dirname = dir_path.rsplit("/", 1)
+    if not parent_dir.strip():
+        parent_dir = "/"
+    check_dirname = check_dirname.strip()
+
+    for dirname, dirlist, filelist in opened_iso.walk(iso_path=parent_dir.upper()):
+        if dirname == parent_dir.upper():
+            if check_dirname.upper() in dirlist:
+                return 0, ""
+
+            if parent_dir == "/":
+                current_dirpath = "/{}".format(check_dirname)
+            else:
+                current_dirpath = "{}/{}".format(parent_dir, check_dirname)
+
+            try:
+                opened_iso.add_directory(current_dirpath.upper(), rr_name=check_dirname)
+                break
+            except Exception as err:
+                msg = "Failed to create dir {} with error: {}".format(
+                    current_dirpath, to_native(err))
+                return -1, msg
+
+    return 0, ""
+
+
+def iso_add_dirs(opened_iso, dir_path):
+    dirnames = dir_path.strip().split("/")
+
+    current_dirpath = "/"
+    for item in dirnames:
+        if not item.strip():
+            continue
+        if current_dirpath == "/":
+            current_dirpath = "/{}".format(item)
+        else:
+            current_dirpath = "{}/{}".format(current_dirpath, item)
+
+        ret, ret_msg = iso_add_dir(opened_iso, current_dirpath)
+        if ret != 0:
+            return ret, ret_msg
+
+    return 0, ""
+
+
 def iso_add_file(opened_iso, src_file, dest_file):
     dest_file = dest_file.strip()
+    if dest_file[0] != "/":
+        dest_file = "/{}".format(dest_file)
+
     file_local = src_file.strip()
 
+    file_dir = os.path.dirname(dest_file).strip()
     file_name = os.path.basename(dest_file)
     if '.' not in file_name:
         file_in_iso_path = dest_file.upper() + '.;1'
     else:
         file_in_iso_path = dest_file.upper() + ';1'
 
+    if file_dir and file_dir != "/":
+        ret, ret_msg = iso_add_dirs(opened_iso, file_dir)
+        if ret != 0:
+            module_iso_customize.fail_json(msg=ret_msg)
+
     try:
+        # The file will be replaced if it exists in ISO
         opened_iso.add_file(file_local, iso_path=file_in_iso_path,
                             rr_name=file_name.lower())
     except Exception as err:
@@ -215,6 +271,9 @@ def iso_add_file(opened_iso, src_file, dest_file):
 
 
 def iso_delete_file(opened_iso, dest_file):
+    dest_file = dest_file.strip()
+    if dest_file[0] != "/":
+        dest_file = "/{}".format(dest_file)
     file_name = os.path.basename(dest_file)
 
     try:
