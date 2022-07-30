@@ -1,0 +1,2 @@
+bugfixes:
+  - lvol - Remove pvs from argument list of lvreduce. (https://github.com/ansible-collections/community.general/issues/3320).
