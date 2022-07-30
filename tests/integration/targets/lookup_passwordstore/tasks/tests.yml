@@ -69,12 +69,12 @@
   shell: echo "D3E1CC8934E97270CEB066023AF1BD3619AB496A:6:" | {{ gpg2_bin }} --import-ownertrust
 
 - name: "Initialise pass passwordstore"
-  command: "pass init ansible-test"
+  command: pass init ansible-test
 
 - name: "Initialise gopass passwordstore"
-  command: "gopass init ansible-test"
+  command: gopass init --path {{ lookup('env','HOME') }}/.gopass-store ansible-test
   args:
-    creates: "{{ lookup('env','HOME') }}/.local/share/gopass/stores/root"
+    creates: "{{ lookup('env','HOME') }}/.gopass-store"
 
 # these tests should apply to all backends
 - name: Password tests
