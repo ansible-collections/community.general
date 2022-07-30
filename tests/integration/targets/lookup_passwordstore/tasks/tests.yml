@@ -55,6 +55,18 @@
   args:
     removes: "{{ gopasspath }}.testorig"
 
+- name: Get versions of tools
+  command: "{{ item }} --version"
+  register: versions
+  loop:
+  - "{{ gpg2_bin }}"
+  - pass
+  - gopass
+
+- name: Output versions of tools
+  debug:
+    msg: "{{ versions.results | map(attribute='stdout_lines') }}"
+
 # How to generate a new GPG key:
 #   gpg2 --batch --gen-key input  # See templates/input
 #   gpg2 --list-secret-keys --keyid-format LONG
