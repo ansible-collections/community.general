@@ -58,14 +58,23 @@
   listen_ports_facts:
   when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
 
-- name: Gather listening ports facts explicitly via netstat
+- name: check that the include_non_listening parameters ('state' and 'foreign_address') are not active in default setting
+  assert:
+    that:
+      - ansible_facts.tcp_listen | selectattr('state', 'defined') | list | length == 0
+      - ansible_facts.tcp_listen | selectattr('foreign_address', 'defined') | list | length == 0
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+
+- name: Gather listening ports facts explicitly via netstat and include_non_listening
   listen_ports_facts:
     command: 'netstat'
+    include_non_listening: 'yes'
   when: (ansible_os_family == "RedHat" and ansible_distribution_major_version|int < 7) or ansible_os_family == "Debian"
 
-- name: Gather listening ports facts explicitly via ss
+- name: Gather listening ports facts explicitly via ss and include_non_listening
   listen_ports_facts:
     command: 'ss'
+    include_non_listening: 'yes'
   when: ansible_os_family == "RedHat" and ansible_distribution_major_version|int >= 7
 
 - name: check for ansible_facts.udp_listen exists
@@ -76,6 +85,13 @@
 - name: check for ansible_facts.tcp_listen exists
   assert:
     that: ansible_facts.tcp_listen is defined
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+
+- name: check that the include_non_listening parameter 'state' and 'foreign_address' exists
+  assert:
+    that:
+      - ansible_facts.tcp_listen | selectattr('state', 'defined') | list | length > 0
+      - ansible_facts.tcp_listen | selectattr('foreign_address', 'defined') | list | length > 0
   when: ansible_os_family == "RedHat" or ansible_os_family == "Debian"
 
 - name: check TCP 5556 is in listening ports

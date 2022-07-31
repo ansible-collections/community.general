@@ -32,6 +32,13 @@ options:
       - netstat
       - ss
     version_added: 4.1.0
+  include_non_listening:
+    description:
+        - Show both listening and non-listening sockets (for TCP this means established connections).
+        - Adds the return values C(state) and C(foreign_address) to the returned facts.
+    type: bool
+    default: false
+    version_added: 5.4.0
 '''
 
 EXAMPLES = r'''
@@ -59,6 +66,11 @@ EXAMPLES = r'''
 - name: List all ports
   ansible.builtin.debug:
     msg: "{{ (ansible_facts.tcp_listen + ansible_facts.udp_listen) | map(attribute='port') | unique | sort | list }}"
+
+- name: Gather facts on all ports and override which command to use
+  community.general.listen_ports_facts:
+    command: 'netstat'
+    include_non_listening: 'yes'
 '''
 
 RETURN = r'''
@@ -77,6 +89,18 @@ ansible_facts:
           returned: always
           type: str
           sample: "0.0.0.0"
+        foreign_address:
+          description: The address of the remote end of the socket.
+          returned: if I(include_non_listening=true)
+          type: str
+          sample: "10.80.0.1"
+          version_added: 5.4.0
+        state:
+          description: The state of the socket.
+          returned: if I(include_non_listening=true)
+          type: str
+          sample: "ESTABLISHED"
+          version_added: 5.4.0
         name:
           description: The name of the listening process.
           returned: if user permissions allow
@@ -117,6 +141,18 @@ ansible_facts:
           returned: always
           type: str
           sample: "0.0.0.0"
+        foreign_address:
+          description: The address of the remote end of the socket.
+          returned: if I(include_non_listening=true)
+          type: str
+          sample: "10.80.0.1"
+          version_added: 5.4.0
+        state:
+          description: The state of the socket. UDP is a connectionless protocol. Shows UCONN or ESTAB.
+          returned: if I(include_non_listening=true)
+          type: str
+          sample: "UCONN"
+          version_added: 5.4.0
         name:
           description: The name of the listening process.
           returned: if user permissions allow
@@ -155,47 +191,84 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.basic import AnsibleModule
 
 
+def split_pid_name(pid_name):
+    """
+    Split the entry PID/Program name into the PID (int) and the name (str)
+    :param pid_name:  PID/Program String seperated with a dash. E.g 51/sshd: returns pid = 51 and name = sshd
+    :return: PID (int) and the program name (str)
+    """
+    try:
+        pid, name = pid_name.split("/", 1)
+    except ValueError:
+        # likely unprivileged user, so add empty name & pid
+        return 0, ""
+    else:
+        name = name.rstrip(":")
+        return int(pid), name
+
+
 def netStatParse(raw):
+    """
+    The netstat result can be either split in 6,7 or 8 elements depending on the values of state, process and name.
+    For UDP the state is always empty. For UDP and TCP the process can be empty.
+    So these cases have to be checked.
+    :param raw: Netstat raw output String. First line explains the format, each following line contains a connection.
+    :return: List of dicts, each dict contains protocol, state, local address, foreign address, port, name, pid for one
+     connection.
+    """
     results = list()
     for line in raw.splitlines():
-        listening_search = re.search('[^ ]+:[0-9]+', line)
-        if listening_search:
-            splitted = line.split()
-            conns = re.search('([^ ]+):([0-9]+)', splitted[3])
-            pidstr = ''
-            if 'tcp' in splitted[0]:
-                protocol = 'tcp'
-                pidstr = splitted[6]
-            elif 'udp' in splitted[0]:
-                protocol = 'udp'
-                pidstr = splitted[5]
-            pids = re.search(r'(([0-9]+)/(.*)|-)', pidstr)
-            if conns and pids:
-                address = conns.group(1)
-                port = conns.group(2)
-                if (pids.group(2)):
-                    pid = pids.group(2)
-                else:
-                    pid = 0
-                if (pids.group(3)):
-                    name = pids.group(3)
-                else:
-                    name = ''
-                result = {
-                    'pid': int(pid),
-                    'address': address,
-                    'port': int(port),
-                    'protocol': protocol,
-                    'name': name,
-                }
-                if result not in results:
-                    results.append(result)
+        if line.startswith(("tcp", "udp")):
+            # set variables to default state, in case they are not specified
+            state = ""
+            pid_and_name = ""
+            process = ""
+            formatted_line = line.split()
+            protocol, recv_q, send_q, address, foreign_address, rest = \
+                formatted_line[0], formatted_line[1], formatted_line[2], formatted_line[3], formatted_line[4], formatted_line[5:]
+            address, port = address.rsplit(":", 1)
+
+            if protocol.startswith("tcp"):
+                # nestat distinguishes between tcp6 and tcp
+                protocol = "tcp"
+                if len(rest) == 3:
+                    state, pid_and_name, process = rest
+                if len(rest) == 2:
+                    state, pid_and_name = rest
+
+            if protocol.startswith("udp"):
+                # safety measure, similar to tcp6
+                protocol = "udp"
+                if len(rest) == 2:
+                    pid_and_name, process = rest
+                if len(rest) == 1:
+                    pid_and_name = rest[0]
+
+            pid, name = split_pid_name(pid_name=pid_and_name)
+            result = {
+                'protocol': protocol,
+                'state': state,
+                'address': address,
+                'foreign_address': foreign_address,
+                'port': int(port),
+                'name': name,
+                'pid': int(pid),
+            }
+            if result not in results:
+                results.append(result)
             else:
                 raise EnvironmentError('Could not get process information for the listening ports.')
     return results
 
 
 def ss_parse(raw):
+    """
+    The ss_parse result can be either split in 6 or 7 elements depending on the process column,
+    e.g. due to unprivileged user.
+    :param raw: ss raw output String. First line explains the format, each following line contains a connection.
+    :return: List of dicts, each dict contains protocol, state, local address, foreign address, port, name, pid for one
+     connection.
+    """
     results = list()
     regex_conns = re.compile(pattern=r'\[?(.+?)\]?:([0-9]+)$')
     regex_pid = re.compile(pattern=r'"(.*?)",pid=(\d+)')
@@ -221,8 +294,8 @@ def ss_parse(raw):
         except ValueError:
             # unexpected stdout from ss
             raise EnvironmentError(
-                'Expected `ss` table layout "Netid, State, Recv-Q, Send-Q, Local Address:Port, Peer Address:Port" and optionally "Process", \
-                    but got something else: {0}'.format(line)
+                'Expected `ss` table layout "Netid, State, Recv-Q, Send-Q, Local Address:Port, Peer Address:Port" and \
+                 optionally "Process", but got something else: {0}'.format(line)
             )
 
         conns = regex_conns.search(local_addr_port)
@@ -239,45 +312,43 @@ def ss_parse(raw):
         port = conns.group(2)
         for name, pid in pids:
             result = {
-                'pid': int(pid),
-                'address': address,
-                'port': int(port),
                 'protocol': protocol,
-                'name': name
+                'state': state,
+                'address': address,
+                'foreign_address': peer_addr_port,
+                'port': int(port),
+                'name': name,
+                'pid': int(pid),
             }
             results.append(result)
     return results
 
 
 def main():
+    command_args = ['-p', '-l', '-u', '-n', '-t']
     commands_map = {
         'netstat': {
-            'args': [
-                '-p',
-                '-l',
-                '-u',
-                '-n',
-                '-t',
-            ],
+            'args': [],
             'parse_func': netStatParse
         },
         'ss': {
-            'args': [
-                '-p',
-                '-l',
-                '-u',
-                '-n',
-                '-t',
-            ],
+            'args': [],
             'parse_func': ss_parse
         },
     }
     module = AnsibleModule(
         argument_spec=dict(
-            command=dict(type='str', choices=list(sorted(commands_map)))
+            command=dict(type='str', choices=list(sorted(commands_map))),
+            include_non_listening=dict(default=False, type='bool'),
         ),
         supports_check_mode=True,
     )
+
+    if module.params['include_non_listening']:
+        command_args = ['-p', '-u', '-n', '-t', '-a']
+
+    commands_map['netstat']['args'] = command_args
+    commands_map['ss']['args'] = command_args
 
     if platform.system() != 'Linux':
         module.fail_json(msg='This module requires Linux.')
@@ -333,13 +404,17 @@ def main():
             parse_func = commands_map[command]['parse_func']
             results = parse_func(stdout)
 
-            for p in results:
-                p['stime'] = getPidSTime(p['pid'])
-                p['user'] = getPidUser(p['pid'])
-                if p['protocol'].startswith('tcp'):
-                    result['ansible_facts']['tcp_listen'].append(p)
-                elif p['protocol'].startswith('udp'):
-                    result['ansible_facts']['udp_listen'].append(p)
+            for connection in results:
+                # only display state and foreign_address for include_non_listening.
+                if not module.params['include_non_listening']:
+                    connection.pop('state', None)
+                    connection.pop('foreign_address', None)
+                connection['stime'] = getPidSTime(connection['pid'])
+                connection['user'] = getPidUser(connection['pid'])
+                if connection['protocol'].startswith('tcp'):
+                    result['ansible_facts']['tcp_listen'].append(connection)
+                elif connection['protocol'].startswith('udp'):
+                    result['ansible_facts']['udp_listen'].append(connection)
     except (KeyError, EnvironmentError) as e:
         module.fail_json(msg=to_native(e))
 
