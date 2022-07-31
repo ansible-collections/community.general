@@ -143,6 +143,22 @@ RETURN = '''
     returned: success
     type: any
     sample: '"96" or ["red", "blue", "green"]'
+  cmd:
+    description:
+      - A list with the resulting C(xfconf-query) command executed by the module.
+    returned: success
+    type: list
+    sample:
+      - /usr/bin/xfconf-query
+      - --channel
+      - xfce4-panel
+      - --property
+      - /plugins/plugin-19/timezone
+      - --create
+      - --type
+      - string
+      - --set
+      - Pacific/Auckland
 '''
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
