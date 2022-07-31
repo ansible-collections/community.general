@@ -31,6 +31,10 @@ class ModuleHelperBase(object):
     def diff_mode(self):
         return self.module._diff
 
+    @property
+    def verbosity(self):
+        return self.module._verbosity
+
     def do_raise(self, *args, **kwargs):
         raise _MHE(*args, **kwargs)
 
