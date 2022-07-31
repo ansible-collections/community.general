@@ -1,3 +1,4 @@
 passwordstore_packages:
+  - gopass
   - gnupg
   - password-store

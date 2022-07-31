@@ -31,6 +31,26 @@
       disable_gpg_check: yes
   when: ansible_facts.pkg_mgr in ['zypper', 'community.general.zypper']
 
+# See https://github.com/gopasspw/gopass/issues/1849#issuecomment-802789285
+- name: Install gopass on Debian
+  when: ansible_facts.os_family == 'Debian'
+  become: yes
+  block:
+  - name: Fetch gopass repo keyring
+    ansible.builtin.get_url:
+      url: https://packages.gopass.pw/repos/gopass/gopass-archive-keyring.gpg
+      dest: /usr/share/keyrings/gopass-archive-keyring.gpg
+  - name: Add gopass repo
+    ansible.builtin.apt_repository:
+      repo: "deb [arch=amd64,arm64,armhf \
+        signed-by=/usr/share/keyrings/gopass-archive-keyring.gpg] \
+        https://packages.gopass.pw/repos/gopass stable main"
+      state: present
+  - name: Update apt-cache and install gopass package
+    ansible.builtin.apt:
+      name: gopass
+      update_cache: yes
+
 - name: Install on macOS
   when: ansible_facts.distribution == 'MacOSX'
   block:
@@ -48,6 +68,7 @@
         name:
           - gnupg2
           - pass
+          - gopass
         state: present
         update_homebrew: no
       become: yes
