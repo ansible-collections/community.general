@@ -266,6 +266,9 @@ files:
     maintainers: $team_huawei
     labels: huawei hwc_utils networking
     keywords: cloud huawei hwc
+  $module_utils/identity/bitwarden.py:
+    maintainers: lungj
+    labels: bitwarden
   $module_utils/identity/keycloak/keycloak.py:
     maintainers: $team_keycloak
   $module_utils/ipa.py:
@@ -558,6 +561,8 @@ files:
     labels: m:xml xml
     ignore: magnus919
   $modules/identity/bitwarden.py:
+    maintainers: lungj
+  $modules/identity/bitwarden_info.py:
     maintainers: lungj
   $modules/identity/ipa/:
     maintainers: $team_ipa

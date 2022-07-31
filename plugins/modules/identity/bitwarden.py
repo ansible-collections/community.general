@@ -27,122 +27,75 @@ options:
     cli_path:
         type: path
         description: Used to specify the exact path to the C(bw) command line interface
-        required: false
         default: 'bw'
     organization_name:
         type: str
         description:
             - Name of organization to target.
-            - Leave as null for a wildcard vault or C('') for personal vaults.
-            - Mutually exclusive from organization_id.
-        required: false
-        default: null
+            - Leave as C(null) for a wildcard vault or C('') for personal vaults.
+            - Mutually exclusive from I(organization_id).
     organization_id:
         type: str
         description:
             - UID of organization to target.
-            - Leave as null for a wildcard vault.
-            - Mutually exclusive from organization_name.
-        required: false
-        default: null
+            - Leave as C(null) for a wildcard vault.
+            - Mutually exclusive from I(organization_name).
     folder_name:
         type: str
         description:
             - Name of folder to target.
-            - Leave as null for a wildcard folder.
+            - Leave as C(null) for a wildcard folder.
             - Use C('') or C('No Folder') for no folder.
-            - Mutually exclusive from folder_id.
-        required: false
-        default: null
+            - Mutually exclusive from I(folder_id).
     folder_id:
         type: str
         description:
             - UID of folder to target.
-            - Leave as null for a wildcard folder.
-            - Mutually exclusive from folder_name.
-        required: false
-        default: null
+            - Leave as C(null) for a wildcard folder.
+            - Mutually exclusive from I(folder_name).
     item_name:
         type: str
         description:
             - Name of item to target.
-            - Mutually exclusive from item_id.
-        required: false
-        default: null
+            - Mutually exclusive from I(item_id).
     item_id:
         type: str
         description:
             - UID of item to target.
-            - Mutually exclusive from item_name.
-        required: false
-        default: null
+            - Mutually exclusive from I(item_name).
     login:
         type: dict
         description:
-            - Mapping of keys to values for bw login details such as C(username) and C(password).
-        required: false
+            - Mapping of keys to values for C(bw) login details such as C(username) and C(password).
         default: {}
     notes:
         type: str
         description:
             - A note about the item that is stored as metadata about the item.
-        required: false
-        default: null
     target:
         type: str
         description:
             - The type of item being added/modified/removed/queried.
-            - For additions/modifications/removal, must be one of C(item) or C(folder).
-            - For queries, the above targets are permitted along with
-                - C(items),
-                - C(folders),
-                - C(organization), and
-                - C(organizations).
-        required: false
+        choices:
+            - item
+            - folder
         default: 'item'
     state:
         type: str
         description:
-            - To modify the target, C(absent) or C(present).
-            - To query the state, C(query)
-        required: False
-        default: 'query'
+            - Action to perform on target.
+            - The C(absent) option will remove the target if it exists. This includes non-empty folders.
+            - The C(created) option will create the target, if needed, with the fields in I(login) and I(notes).
+            - C(created) will not update an existing entry.
+            - The C(present) option will create the target, if needed, and update fields in I(login) and I(notes).
+        choices:
+            - absent
+            - created
+            - present
+        default: 'present'
 '''
 
 EXAMPLES = '''
-- name: "Get all organizations"
-  community.general.bitwarden:
-    organization_name: null
-    target: "organizations"
-  delegate_to: "localhost"
-
-- name: "Get all folders"
-  community.general.bitwarden:
-    target: "folders"
-  delegate_to: "localhost"
-
-- name: "Get all items in a folder within an organization"
-  community.general.bitwarden:
-    organization_name: "Test"
-    folder_name: "my_folder"
-    target: "items"
-  delegate_to: "localhost"
-
-- name: "Get an item without an organization in a specific folder"
-  community.general.bitwarden:
-    organization_name: ""
-    folder_name: "my_folder"
-    item_name: "a secret item"
-    target: "items"
-  register: "ret_val"
-  delegate_to: "localhost"
-
-# Note this will not display anything due to no_log being set.
-- name: "Access the password"
-  ansible.builtin.debug:
-    msg: >-
-      {{ ret_val['ansible_module_results']['login']['password'] }}
-
 - name: "Ensure a folder exists"
   community.general.bitwarden:
     folder_name: "my_folder"
@@ -169,6 +122,19 @@ EXAMPLES = '''
     target: "item"
     state: "absent"
   delegate_to: "localhost"
+
+- name: "Create an entry in the database if it does not already exist"
+  community.general.bitwarden:
+    folder_name: "my_folder"
+    item_name: "some item"
+    login:
+      username: "a_user"
+      password: "some password"
+    notes: >-
+      Some information about a user is stored here. foo
+    target: "item"
+    state: "created"
+  delegate_to: "localhost"
 '''
 
 RETURN = '''
@@ -180,294 +146,15 @@ RETURN = '''
 from collections import defaultdict
 import json
 
-from subprocess import Popen, PIPE
-
-from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.module_utils.basic import AnsibleModule
 
-
-class BitwardenException(Exception):
-    pass
-
-
-class Client(object):
-    '''A wrapper for for bw command.'''
-
-    def __init__(self, cli_path):
-        '''
-        Args:
-            cli_path(Path): Path to the bw executable.
-        '''
-        self._cli_path = cli_path
-
-    def run(self, args, stdin=None, expected_rc=0):
-        '''Run the bw client.
-
-        Args:
-            args(list): Arguments to pass to the bw CLI client.
-            stdin(str): Data to write to the client's stdin.
-            expected_rc(int): Expected return code of bw CLI client.
-
-        Return:
-            (str, str): The contents of standard out and standard error.
-        '''
-        proc = Popen([self._cli_path] + args, stdout=PIPE, stderr=PIPE, stdin=PIPE)
-        out, err = proc.communicate(to_bytes(stdin))
-        rc = proc.wait()
-        if rc != expected_rc:
-            raise BitwardenException(err)
-        return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict')
-
-    def run_json(self, args, stdin=None, expected_rc=0):
-        '''Run the bw client.
-
-        Args:
-            args(list): Arguments to pass to the bw CLI client.
-            stdin(str): Data to write to the client's stdin.
-            expected_rc(int): Expected return code of bw CLI client.
-
-        Return:
-            dict: Decoded dictionary object returned by bw CLI client.
-        '''
-        stdout, stderr = self.run(args, stdin, expected_rc)
-        return json.loads(stdout)
-
-
-class _Element(object):
-    '''Common elements for items in a Bitwarden vault.'''
-
-    id = property(lambda self: self._id or self.dict['id'])
-    name = property(lambda self: self._name or self.dict['name'])
-
-    _dict = None
-
-    @property
-    def exists(self):
-        # Determine existence by attempting to access the item.
-        try:
-            obj_dict = self.dict
-        except KeyError:
-            return False
-        # Wildcard objects can return a dict, but their name is None.
-        return obj_dict['name'] is not None
-
-    @property
-    def dict(self):
-        '''Return a dictionary containing the JSON representation of this object.'''
-        return self._populated._dict
-
-    @dict.setter
-    def dict(self, value):
-        '''Populate this object with a dictionary.'''
-        self._dict = value
-        self._dict_resolve_callback(value)
-
-    def _dict_resolve_callback(self, value):
-        '''Callback after self._dict is populated by value.
-
-        Used for filling in any other attributes necessary.
-        '''
-        pass
-
-    @property
-    def _populated(self):
-        '''Return self with the side effect of resolving objects from bw.
-
-        Populate self._dict; use cached values, if possible.
-        '''
-        # Not cached?
-        if not self._dict:
-            if self._id:
-                # Search by id, if id specified.
-                val = self._by_attribute('id', self._id).dict
-            elif self._name:
-                # Search by name, if name specified.
-                val = self._by_attribute('name', self._name).dict
-            else:
-                # Preserve name == ''.
-                val = {
-                    'id': None,
-                    'name': self._name,
-                }
-            self.dict = val
-
-        return self
-
-
-class Item(_Element):
-    '''An item in the password database.'''
-
-    folder = property(lambda self: self._folder)
-    organization = property(lambda self: self._organization)
-
-    def __init__(self, name=None, id_=None, folder=None, organization=None, dict_=None):
-        if [name is None, id_ is None, dict_ is None].count(False) > 1:
-            raise AssertionError('Cannot specify item in multiple ways')
-
-        if not (name or id_ or dict):
-            raise AssertionError('At least one way of specifying an Item is required')
-
-        self._name = name
-        self._id = id_
-        self._folder = folder
-        self._organization = organization
-
-        if dict_:
-            self.dict = dict_
-
-    def _by_attribute(self, attribute, value):
-        '''Return list of Item objects that match the search parameters.'''
-
-        query = ['list', 'items', '--search', value] + self.organization.bw_filter_args
-
-        # Filter by folder and attribute since `bw` ORs filters together.
-        matches = [Item(dict_=d) for d in Bitwarden.client.run_json(query)
-                   if self.folder.matches(d) and d[attribute] == value]
-
-        if not matches:
-            raise KeyError('Item not found')
-        if len(matches) > 1:
-            raise AssertionError('Item not unique')
-
-        return matches[0]
-
-    def _dict_resolve_callback(self, value):
-        self._organization = Organization(id_=value['organizationId'])
-        self._folder = Folder(id_=value['folderId'])
-
-
-class Folder(_Element):
-
-    organization = property(lambda self: self._organization)
-
-    def __init__(self, name=None, id_=None, organization=None, dict_=None):
-        if [name is None, id_ is None, dict_ is None].count(False) > 1:
-            raise AssertionError('Cannot specify folder in multiple ways')
-
-        self._name = name
-        self._id = id_
-        self._organization = organization
-
-        if dict_:
-            self.dict = dict_
-
-    def _by_attribute(self, attribute, value):
-        '''Return folder dict where the specified attribute
-        has the specified value.
-        '''
-        matches = [folder for folder in self.organization.folders if folder.dict[attribute] == value]
-
-        if not matches:
-            raise KeyError("Folder not found")
-        if len(matches) > 1:
-            raise AssertionError("Folder not unique")
-
-        return matches[0]
-
-    @property
-    def items(self):
-        query = ['list', 'items']
-
-        # Only restrict by folder if specified.
-        if self.name is not None:
-            # bw treats 'null' as items not belonging to any folder.
-            query.extend(['--folderid', self.id or 'null'])
-
-        # Filter by organization since `bw` ORs filters together.
-        return [Item(dict_=d) for d in Bitwarden.client.run_json(query) if self.organization.matches(d)]
-
-    def get_item(self, name=None, id_=None):
-        return Item(name, id_, self, self.organization)
-
-    def matches(self, folder):
-        '''Return whether folder matches a pattern indicated by self.
-
-        If self.name is None, any folder matches.
-        If self.name is '' or 'No Folder', only the null folder is matched.
-        All other folders are matched by id.
-        '''
-
-        if self.name is None:
-            return True
-
-        # No Folder is a special folder name in bw.
-        if self.name in ('', 'No Folder'):
-            return folder['folderId'] is None
-
-        return self.id == folder['folderId']
-
-
-class Organization(_Element):
-
-    def __init__(self, name=None, id_=None, dict_=None):
-        if [name is None, id_ is None, dict_ is None].count(False) > 1:
-            raise AssertionError('Cannot specify organization in multiple ways')
-
-        self._name = name
-        self._id = id_
-
-        if dict_:
-            self.dict = dict_
-
-    def _by_attribute(self, attribute, value):
-        '''Return organization dict where the specified attribute
-        has the specified value.
-        '''
-
-        matches = [org for org in Bitwarden.organizations() if org.dict[attribute] == value]
-
-        if not matches:
-            raise KeyError("Organization not found")
-        if len(matches) > 1:
-            raise AssertionError("Organization not unique")
-
-        return matches[0]
-
-    @property
-    def folders(self):
-        query = ['list', 'folders'] + self.bw_filter_args
-
-        return [Folder(dict_=d) for d in
-                Bitwarden.client.run_json(query)]
-
-    def get_folder(self, name=None, id_=None):
-        return Folder(name, id_, self)
-
-    def matches(self, org):
-        '''Return whether org matches a pattern indicated by self.
-
-        If self.name is None, any organization matches.
-        If self.name is '', only the null organization is matched.
-        All other organizations are matched by id.
-        '''
-
-        if self.name is None:
-            return True
-
-        if self.name == '':
-            return org['organizationId'] is None
-
-        return self.id == org['organizationId']
-
-    @property
-    def bw_filter_args(self):
-        '''Return bw filter args required to select this organization.
-
-        An Organization with an empty name ('') is treated as requiring no organization.
-        An Organization with a null name (None) is treated as allowing any organization.
-
-        Return:
-            list: List of strings to pass to bw.
-        '''
-        if self.name is None:
-            return []
-
-        # If name is not None, id will be a UID or None.
-        # `bw` uses 'null' instead of None.
-        return ['--organizationid', self.id or 'null']
+from ansible_collections.community.general.plugins.module_utils.identity.bitwarden import (
+    BitwardenException, Client, Organization
+)
 
 
 class Bitwarden(object):
+    '''Accessor for mutating Bitwarden vaults.'''
 
     organization = property(lambda self: self._organization)
     folder = property(lambda self: self._folder)
@@ -495,35 +182,11 @@ class Bitwarden(object):
         self._target = module.params.get('target')
         self._state = module.params.get('state')
 
-    @staticmethod
-    def organizations():
-        return [Organization(dict_=d) for d in Bitwarden.client.run_json(['list', 'organizations'])]
-
-    @classmethod
-    def set_client_path(cls, client_path):
-        cls.client = Client(client_path)
-
-    def _handle_query(self):
-        '''Handle all state="query" requests.'''
-
-        # Use a lookup table to determine how to handle the query.
-        dispatch = defaultdict(
-            _err('Unknown target'),
-            organization=lambda: self.organization,
-            organizations=Bitwarden.organizations,
-            folder=lambda: self.folder,
-            folders=lambda: self.organization.folders,
-            item=lambda: self.item,
-            items=lambda: self.folder.items,
-        )
-
-        return {
-            'changed': False,
-            'ansible_module_results': _to_dict(dispatch[self._target]()),
-        }
-
-    def _handle_present_item(self):
+    def _handle_present_item(self, update=True):
         ret_val = {'changed': False}
+
+        # Determine whether any updates should be made if the item exists.
+        do_updates = not self.item.exists or update
 
         # Get a base version of the item to modify.
         if self.item.exists:
@@ -535,7 +198,7 @@ class Bitwarden(object):
             # Create a new item based on the template dict.
             if not self.item.name:
                 raise AssertionError('Name not specified')
-            base = Bitwarden.client.run_json(['get', 'template', 'item'])
+            base = Client.run_json(['get', 'template', 'item'])
             base['name'] = self.item.name
             base['login'] = {}
             base['organizationId'] = self.organization.id
@@ -549,27 +212,27 @@ class Bitwarden(object):
 
         # Update base `login` key's contents.
         for key, value in self._login.items():
-            if key not in base['login'] or base['login'][key] != value:
+            if do_updates and (key not in base['login'] or base['login'][key] != value):
                 base['login'][key] = value
                 ret_val['changed'] = True
 
         # Update the base notes section.
-        if self._notes is not None:
+        if do_updates and self._notes is not None:
             if base['notes'] != self._notes:
                 base['notes'] = self._notes
                 ret_val['changed'] = True
 
         if ret_val['changed']:
             # Encode it using bw.
-            out, _stderr = Bitwarden.client.run(['encode'], stdin=json.dumps(base))
-            ret_val['ansible_module_results'] = Bitwarden.client.run_json(bw_args, stdin=out)
+            out, _stderr = Client.run(['encode'], stdin=json.dumps(base))
+            ret_val['ansible_module_results'] = Client.run_json(bw_args, stdin=out)
         else:
             # Return cached value, which should be identical, if no change occured.
             ret_val['ansible_module_results'] = base
 
         return ret_val
 
-    def _handle_present_holder(self):
+    def _handle_present_folder(self):
         ret_val = {'changed': False}
 
         if self.folder.exists:
@@ -583,31 +246,40 @@ class Bitwarden(object):
                 raise AssertionError('Illegal folder name used')
 
             # Fill in a template for a folder object to fill in.
-            template = Bitwarden.client.run_json(['get', 'template', 'folder'])
+            template = Client.run_json(['get', 'template', 'folder'])
             template['name'] = self.folder.name
 
             # Encode it using bw.
-            out, _stderr = Bitwarden.client.run(['encode'], stdin=json.dumps(template))
+            out, _stderr = Client.run(['encode'], stdin=json.dumps(template))
 
             # Create the folder.
             bw_args = ['create', 'folder'] + self.organization.bw_filter_args
-            ret_val['ansible_module_results'] = Bitwarden.client.run_json(bw_args, stdin=out)
+            ret_val['ansible_module_results'] = Client.run_json(bw_args, stdin=out)
             ret_val['changed'] = True
 
         return ret_val
 
-    def _handle_present(self):
-        if self._target == 'organization':
-            raise BitwardenException('Creating organizations not supported')
+    def _handle_present(self, update=True):
+        # Use a lookup table to determine handler for desired target.
+        dispatch = defaultdict(
+            _err('Unknown target'),
+            organization=_err('Creating organizations not supported'),
+            folder=self._handle_present_folder,
+            item=lambda: self._handle_present_item(update),
+        )
 
-        elif self._target == 'folder':
-            return self._handle_present_holder()
+        return dispatch[self._target]()
 
-        elif self._target == 'item':
-            return self._handle_present_item()
+    def _handle_created(self):
+        # Use a lookup table to determine handler for desired target.
+        dispatch = defaultdict(
+            _err('Unknown target'),
+            organization=_err('Creating organizations not supported'),
+            folder=self._handle_present_folder,
+            item=self._handle_created_item,
+        )
 
-        else:
-            raise BitwardenException('Unknown target')
+        return dispatch[self._target]()
 
     def _handle_absent(self):
         ret_val = {'changed': False}
@@ -617,11 +289,11 @@ class Bitwarden(object):
         if self._target == 'organization':
             raise BitwardenException('Removing organizations not supported.')
 
-        elif self._target in ('folder', 'item'):
+        if self._target in ('folder', 'item'):
             # Dynamically select folder/item.
             element = getattr(self, self._target)
             if element.exists:
-                ret_val['ansible_module_results'] = Bitwarden.client.run(['delete', self._target, element.id] + org_args)[0]
+                ret_val['ansible_module_results'] = Client.run(['delete', self._target, element.id] + org_args)[0]
                 ret_val['changed'] = True
             else:
                 ret_val['ansible_module_results'] = ''
@@ -635,8 +307,8 @@ class Bitwarden(object):
         # Use a lookup table to determine handler for desired state.
         dispatch = defaultdict(
             _err('Unknown state'),
-            query=self._handle_query,
             present=self._handle_present,
+            created=lambda: self._handle_present(False),
             absent=self._handle_absent,
         )
 
@@ -679,8 +351,8 @@ def main():
             item_id=dict(type='str'),
             login=dict(type='dict', default={}, no_log=True),
             notes=dict(type='str'),
-            target=dict(type='str', default='item'),
-            state=dict(type='str', default='query'),
+            target=dict(type='str', default='item', choices=['item', 'folder']),
+            state=dict(type='str', default='present', choices=['present', 'absent', 'created']),
         ),
         mutually_exclusive=[
             ('organization_name', 'organization_id'),
@@ -689,8 +361,8 @@ def main():
         ],
         supports_check_mode=False
     )
-
-    Bitwarden.set_client_path(module.params.get('cli_path'))
+    Client.cli_path = module.params.get('cli_path')
+    Client.module = module
 
     module.exit_json(**Bitwarden(module).run())
 

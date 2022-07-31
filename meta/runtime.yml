@@ -82,6 +82,8 @@ plugin_routing:
       redirect: community.general.source_control.bitbucket.bitbucket_pipeline_variable
     bitwarden:
       redirect: community.general.identity.bitwarden
+    bitwarden_info:
+      redirect: community.general.identity.bitwarden_info
     bower:
       redirect: community.general.packaging.language.bower
     bundler:

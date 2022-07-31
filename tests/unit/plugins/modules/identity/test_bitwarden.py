@@ -14,7 +14,7 @@ from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, set_module_args
 
 from ansible_collections.community.general.plugins.modules.identity import bitwarden
-from ansible_collections.community.general.plugins.modules.identity.bitwarden import Client, BitwardenException
+from ansible_collections.community.general.plugins.module_utils.identity.bitwarden import Client
 
 # Some objects that will be involved in unit testing. #
 
@@ -797,7 +797,7 @@ MOCK_RESPONSES = {
 }
 
 
-def _py26_workaround(fn):
+def py26_workaround(fn):
     '''Workaround for Python 2.6 test issues.
 
     Python 2.6's json encoder/decoder is non-deterministic and doesn't support the sort_keys
@@ -822,11 +822,10 @@ def _py26_workaround(fn):
     # index 0 is the major version and index 1 is the minor version.
     if sys.version_info[:2] < (2, 7):
         return wrapped
-    else:
-        return fn
+    return fn
 
 
-class MockJson(object):
+class _MockJson(object):
     '''Mock json module that automatically sorts keys in Python 2.7 or higher.'''
     def __getattr__(self, attr):
         return getattr(json, attr)
@@ -843,15 +842,13 @@ class MockJson(object):
         return json.dumps(data, *args, **kwargs)
 
 
-def _client(responses):
+def client(responses):
     '''Return a MockClient that uses the lookup table in responses.'''
-    def init(_ignored_path):
-        return MockClient(responses)
-
-    return init
+    MockClient.responses = responses
+    return MockClient.run_command
 
 
-def _mock():
+def mock():
     # Mock exit_json
     def exit_json(*_args, **kwargs):
         if 'changed' not in kwargs:
@@ -869,19 +866,14 @@ def _mock():
 
 class MockClient(Client):
     '''Mock of a bw client that gets responses using a lookup table.'''
-    command_history = property(lambda self: self._command_history)
+    command_history = []
+    responses = {}
 
-    def __init__(self, responses):
-        self._responses = responses
-        self._command_history = []
-
-    def run(self, args, stdin=None, expected_rc=0):
-        '''Return stdout and stderr contents based on lookup table.'''
-        self._command_history.append(args)
-        result = MOCK_RESPONSES[tuple(args), stdin]
-
-        if result.get('rc', 0) != expected_rc:
-            raise BitwardenException
+    @staticmethod
+    def run_command(module, args, data=None, binary_data=True):
+        MockClient.command_history.append(args)
+        # Strip off argument 0, `bw`.
+        result = MOCK_RESPONSES[tuple(args[1:]), data]
 
         def _id_key(val):
             return val['id'] or '0'
@@ -895,517 +887,30 @@ class MockClient(Client):
             stdout_obj = json.dumps(stdout_obj)
 
         # Mocking using Python-generated json for clearer code.
-        return stdout_obj, result.get('stderr', '')
+        return result.get('rc', 0), stdout_obj, result.get('stderr', '')
 
-    @property
-    def number_of_edits(self):
+    @staticmethod
+    def number_of_edits():
         '''Return True iff a command in the command history edited the vault.'''
         mod_commands = ('create', 'edit', 'delete')
-        return [args[0] in mod_commands
-                for args in self._command_history].count(True)
 
-
-@patch(
-    'ansible_collections.community.general.plugins.modules.identity.bitwarden.Client',
-    new=_client(MOCK_RESPONSES))
-class TestBitwardenQueryOrganization(unittest.TestCase):
-    '''Test querying organizations or organization information.'''
-    def setUp(self):
-        _mock()
-        self.module = bitwarden
-
-    def tearDown(self):
-        # Some tests that should fail during initialization won't have a `client` attribute.
-        if hasattr(self.module.Bitwarden, 'client'):
-            self.assertFalse(self.module.Bitwarden.client.number_of_edits)
-
-    def test_query_all(self):
-        '''Test getting a list of all organizations.'''
-        set_module_args({
-            'target': 'organizations',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(ansible_exit_json.exception.args[0], {
-            'changed': False,
-            'ansible_module_results': [ORGANIZATIONS['9ca']]
-        })
-
-    def test_query_by_name(self):
-        '''Test getting an organization by name.'''
-        set_module_args({
-            'target': 'organization',
-            'organization_name': 'Test',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(ansible_exit_json.exception.args[0], {
-            'changed': False,
-            'ansible_module_results': ORGANIZATIONS['9ca']
-        })
-
-    def test_query_by_id(self):
-        '''Test getting an organization by id.'''
-        set_module_args({
-            'target':
-            'organization',
-            'organization_id':
-            '9caf72f5-55ad-4a15-b923-aee001714d67',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(ansible_exit_json.exception.args[0], {
-            'changed': False,
-            'ansible_module_results': ORGANIZATIONS['9ca']
-        })
-
-    def test_query_by_name_and_id(self):
-        '''Test getting an organization by specifying both name and id.'''
-        set_module_args({
-            'target':
-            'organization',
-            'organization_name':
-            'Test',
-            'organization_id':
-            '9caf72f5-55ad-4a15-b923-aee001714d67',
-        })
-        with self.assertRaises(AnsibleFailJson):
-            self.module.main()
-
-    def test_query_by_name_non_existent(self):
-        '''Test getting an organization by name where it does not exist.'''
-        set_module_args({
-            'target': 'organization',
-            'organization_name': 'Tes',
-        })
-        with self.assertRaises(KeyError):
-            self.module.main()
-
-    def test_query_by_id_non_existent(self):
-        '''Test getting an organization by id where it does not exist.'''
-        set_module_args({
-            'target':
-            'organization',
-            'organization_id':
-            '9caf72f5-55ad-4a15-b923-aee001714d6',
-        })
-        with self.assertRaises(KeyError):
-            self.module.main()
-
-
-@patch(
-    'ansible_collections.community.general.plugins.modules.identity.bitwarden.Client',
-    new=_client(MOCK_RESPONSES))
-class TestBitwardenQueryFolder(unittest.TestCase):
-    '''Test querying folders or folder information.'''
-    def setUp(self):
-        _mock()
-        self.module = bitwarden
-
-    def tearDown(self):
-        # Some tests that should fail during initialization won't have a `client` attribute.
-        if hasattr(self.module.Bitwarden, 'client'):
-            self.assertFalse(self.module.Bitwarden.client.number_of_edits)
-
-    def test_query_all(self):
-        '''Test getting all folders.'''
-        set_module_args({
-            'target': 'folders',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(
-            ansible_exit_json.exception.args[0], {
-                'changed':
-                False,
-                'ansible_module_results': [
-                    FOLDERS[None], FOLDERS['2c8'], FOLDERS['2d0'],
-                    FOLDERS['3b1'], FOLDERS['6b7']
-                ]
-            })
-
-    def test_query_by_name(self):
-        '''Test getting information about a folder with a specific name.'''
-        set_module_args({
-            'target': 'folder',
-            'folder_name': 'my_folder',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(ansible_exit_json.exception.args[0], {
-            'changed': False,
-            'ansible_module_results': FOLDERS['2d0']
-        })
-
-    def test_query_by_id(self):
-        '''Test getting information about a folder with a specific id.'''
-        set_module_args({
-            'target': 'folder',
-            'folder_id': '2d03899d-d56f-43ed-923d-aee100334387',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(ansible_exit_json.exception.args[0], {
-            'changed': False,
-            'ansible_module_results': FOLDERS['2d0']
-        })
-
-    def test_query_by_name_and_id(self):
-        '''Test getting information about a folder by specifying name and id.'''
-        set_module_args({
-            'target': 'folder',
-            'folder_name': 'my_folder',
-            'folder_id': '2d03899d-d56f-43ed-923d-aee100334387',
-        })
-        with self.assertRaises(AnsibleFailJson):
-            self.module.main()
-
-    def test_query_by_name_non_existent(self):
-        '''Test getting information about a folder with a specific name that does not exist.'''
-        set_module_args({
-            'target': 'folder',
-            'folder_name': 'my_folde',
-        })
-        with self.assertRaises(KeyError):
-            self.module.main()
-
-    def test_query_by_id_non_existent(self):
-        '''Test getting information about a folder with a specific id that does not exist.'''
-        set_module_args({
-            'target': 'folder',
-            'folder_id': '2d03899d-d56f-43ed-923d-aee10033438',
-        })
-        with self.assertRaises(KeyError):
-            self.module.main()
-
-
-@patch(
-    'ansible_collections.community.general.plugins.modules.identity.bitwarden.Client',
-    new=_client(MOCK_RESPONSES))
-class TestBitwardenQueryItem(unittest.TestCase):
-    '''Test querying items or item information.'''
-    def setUp(self):
-        _mock()
-        self.module = bitwarden
-
-    def tearDown(self):
-        # Some tests that should fail during initialization won't have a `client` attribute.
-        if hasattr(self.module.Bitwarden, 'client'):
-            self.assertFalse(self.module.Bitwarden.client.number_of_edits)
-
-    def test_query_all(self):
-        '''Test getting a list of all items.'''
-        set_module_args({'target': 'items'})
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(
-            ansible_exit_json.exception.args[0], {
-                'changed':
-                False,
-                'ansible_module_results': [
-                    ITEMS['08c'], ITEMS['3e4'], ITEMS['58b'], ITEMS['5eb'],
-                    ITEMS['634'], ITEMS['650'], ITEMS['7b1'], ITEMS['7fa'],
-                    ITEMS['8d1'], ITEMS['909'], ITEMS['ac4'], ITEMS['d2f'],
-                    ITEMS['d3c'], ITEMS['d69'], ITEMS['dcb'], ITEMS['e51'],
-                    ITEMS['ed4'], ITEMS['f12']
-                ]
-            })
-
-    def test_query_all_in_no_organization(self):
-        '''Test getting a list of all items in the personal vault.'''
-        set_module_args({
-            'target': 'items',
-            'organization_name': '',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(
-            ansible_exit_json.exception.args[0], {
-                'changed':
-                False,
-                'ansible_module_results':
-                [ITEMS['5eb'], ITEMS['650'], ITEMS['909'], ITEMS['dcb']]
-            })
-
-    def test_query_all_in_organization_by_name(self):
-        '''Test getting a list of all items in a named organization.'''
-        set_module_args({
-            'target': 'items',
-            'organization_name': 'Test',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(
-            ansible_exit_json.exception.args[0], {
-                'changed':
-                False,
-                'ansible_module_results': [
-                    ITEMS['08c'], ITEMS['3e4'], ITEMS['58b'], ITEMS['634'],
-                    ITEMS['7b1'], ITEMS['7fa'], ITEMS['8d1'], ITEMS['ac4'],
-                    ITEMS['d2f'], ITEMS['d3c'], ITEMS['d69'], ITEMS['e51'],
-                    ITEMS['ed4'], ITEMS['f12']
-                ]
-            })
-
-    def test_query_all_in_organization_by_id(self):
-        '''Test getting a list of all items in a organization specified by id.'''
-        set_module_args({
-            'target':
-            'items',
-            'organization_id':
-            '9caf72f5-55ad-4a15-b923-aee001714d67',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(
-            ansible_exit_json.exception.args[0], {
-                'changed':
-                False,
-                'ansible_module_results': [
-                    ITEMS['08c'], ITEMS['3e4'], ITEMS['58b'], ITEMS['634'],
-                    ITEMS['7b1'], ITEMS['7fa'], ITEMS['8d1'], ITEMS['ac4'],
-                    ITEMS['d2f'], ITEMS['d3c'], ITEMS['d69'], ITEMS['e51'],
-                    ITEMS['ed4'], ITEMS['f12']
-                ]
-            })
-
-    def test_query_all_in_no_folder(self):
-        '''Test getting a list of all items not in a folder.'''
-        set_module_args({
-            'target': 'items',
-            'folder_name': '',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(
-            ansible_exit_json.exception.args[0], {
-                'changed':
-                False,
-                'ansible_module_results': [
-                    ITEMS['08c'], ITEMS['3e4'], ITEMS['58b'], ITEMS['5eb'],
-                    ITEMS['634'], ITEMS['7b1'], ITEMS['7fa'], ITEMS['8d1'],
-                    ITEMS['ac4'], ITEMS['d2f'], ITEMS['d3c'], ITEMS['d69'],
-                    ITEMS['dcb'], ITEMS['ed4']
-                ]
-            })
-
-    def test_query_all_in_folder_by_name(self):
-        '''Test getting a list of all items in a folder with a specified name.'''
-        set_module_args({
-            'target': 'items',
-            'folder_name': 'Hellog',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(ansible_exit_json.exception.args[0], {
-            'changed': False,
-            'ansible_module_results': [ITEMS['e51']]
-        })
-
-    def test_query_all_in_folder_by_id(self):
-        '''Test getting a list of all items in a folder with a specified id.'''
-        set_module_args({
-            'target': 'items',
-            'folder_id': '2c8a747e-6f0b-4cc8-a98f-aee20038cc9a',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(ansible_exit_json.exception.args[0], {
-            'changed': False,
-            'ansible_module_results': [ITEMS['e51']]
-        })
-
-    def test_query_all_in_folder_empty_in_org(self):
-        '''Test getting a list of all items in a folder that is empty for a specific organization.'''
-        set_module_args({
-            'target': 'items',
-            'folder_id': '3b12a9da-7c49-40b8-ad33-aede017a7ead',
-            'organization_name': 'Test',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(ansible_exit_json.exception.args[0], {
-            'changed': False,
-            'ansible_module_results': []
-        })
-
-    def test_query_all_in_folder_empty_in_personal(self):
-        '''Test getting a list of all items in a folder that is empty for the personal vault.'''
-        set_module_args({
-            'target': 'items',
-            'folder_id': '2c8a747e-6f0b-4cc8-a98f-aee20038cc9a',
-            'organization_name': '',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(ansible_exit_json.exception.args[0], {
-            'changed': False,
-            'ansible_module_results': []
-        })
-
-    def test_query_all_in_folder_in_org(self):
-        '''Test getting a list of all items in a folder in an organization.'''
-        set_module_args({
-            'target': 'items',
-            'folder_id': '2c8a747e-6f0b-4cc8-a98f-aee20038cc9a',
-            'organization_name': 'Test',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(ansible_exit_json.exception.args[0], {
-            'changed': False,
-            'ansible_module_results': [ITEMS['e51']]
-        })
-
-    def test_query_by_name(self):
-        '''Test getting an item by name that is unique across all organizations/folders.'''
-        set_module_args({
-            'target': 'item',
-            'item_name': 'a_test',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(ansible_exit_json.exception.args[0], {
-            'changed': False,
-            'ansible_module_results': ITEMS['909']
-        })
-
-    def test_query_by_name_partial_match(self):
-        '''Test getting an item by name that is unique across all organizations/folders
-        but is a partial match to other items.'''
-        set_module_args({
-            'target': 'item',
-            'item_name': 'some item',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(ansible_exit_json.exception.args[0], {
-            'changed': False,
-            'ansible_module_results': ITEMS['e51']
-        })
-
-    def test_query_by_name_duplicate(self):
-        '''Test getting an item by name that is not unique across all organizations/folders.'''
-        set_module_args({
-            'target': 'item',
-            'item_name': 'some item2',
-        })
-        with self.assertRaises(AssertionError):
-            self.module.main()
-
-    def test_query_by_name_duplicate_folder(self):
-        '''Test getting an item by name that appears in a folder that is in two organizations.'''
-        set_module_args({
-            'target': 'item',
-            'folder_name': 'my_folder',
-            'item_name': 'my_account',
-        })
-        with self.assertRaises(AssertionError):
-            self.module.main()
-
-    def test_query_by_name_duplicate_organization(self):
-        '''Test getting an item by name that appears in two folders in the same organization.'''
-        set_module_args({
-            'target': 'item',
-            'organization_name': 'Test',
-            'item_name': 'my_account',
-        })
-        with self.assertRaises(AssertionError):
-            self.module.main()
-
-    def test_query_by_name_disambiguated(self):
-        '''Test getting an item by name that appears in different folders and organizations
-        but specifying both organization and folder to disambiguate.'''
-        set_module_args({
-            'target': 'item',
-            'organization_name': 'Test',
-            'folder_name': 'my_folder',
-            'item_name': 'my_account',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(ansible_exit_json.exception.args[0], {
-            'changed': False,
-            'ansible_module_results': ITEMS['f12']
-        })
-
-    def test_query_by_id(self):
-        '''Test getting an item by id.'''
-        set_module_args({
-            'target': 'item',
-            'item_id': 'e5148226-34b3-4bad-bc37-aee20038d49c',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(ansible_exit_json.exception.args[0], {
-            'changed': False,
-            'ansible_module_results': ITEMS['e51']
-        })
-
-    def test_query_by_name_and_id(self):
-        '''Test getting an item by specifying both name and id.'''
-        set_module_args({
-            'target': 'item',
-            'item_name': 'some item',
-            'item_id': 'e5148226-34b3-4bad-bc37-aee20038d49c',
-        })
-        with self.assertRaises(AnsibleFailJson):
-            self.module.main()
-
-    def test_query_by_name_non_existent(self):
-        '''Test getting an item by name that is a substring of an existent item.'''
-        set_module_args({
-            'target': 'item',
-            'folder_name': 'some ite',
-        })
-        with self.assertRaises(KeyError):
-            self.module.main()
-
-    def test_query_by_id_non_existent(self):
-        '''Test getting an item by id that is a substring of an existent item's id.'''
-        set_module_args({
-            'target': 'item',
-            'item_id': 'e5148226-34b3-4bad-bc37-aee20038d49',
-        })
-        with self.assertRaises(KeyError):
-            self.module.main()
-
-    def test_query_by_id_in_correct_folder(self):
-        '''Test getting an item by id in a specific folder.'''
-        set_module_args({
-            'target': 'item',
-            'folder_name': 'Hellog',
-            'item_id': 'e5148226-34b3-4bad-bc37-aee20038d49c',
-        })
-        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
-            self.module.main()
-        self.assertEqual(ansible_exit_json.exception.args[0], {
-            'changed': False,
-            'ansible_module_results': ITEMS['e51']
-        })
-
-    def test_query_by_id_in_wrong_folder(self):
-        '''Test getting an item by id in a folder where it does not exist.'''
-        set_module_args({
-            'target': 'item',
-            'folder_name': 'my_folder',
-            'item_id': 'e5148226-34b3-4bad-bc37-aee20038d49c',
-        })
-        with self.assertRaises(KeyError):
-            self.module.main()
+        # args[1] is the main command passed into `bw`.
+        return [args[1] in mod_commands
+                for args in MockClient.command_history].count(True)
 
 
 @patch(
     'ansible_collections.community.general.plugins.modules.identity.bitwarden.json',
-    new=MockJson())
+    new=_MockJson())
 @patch(
-    'ansible_collections.community.general.plugins.modules.identity.bitwarden.Client',
-    new=_client(MOCK_RESPONSES))
+    'ansible.module_utils.basic.AnsibleModule.run_command',
+    new=client(MOCK_RESPONSES))
 class TestBitwardenPresentFolder(unittest.TestCase):
     '''Test "present" idempotent behaviour for folders.'''
     def setUp(self):
-        _mock()
+        mock()
         self.module = bitwarden
+        MockClient.command_history = []
 
     def test_create_nonexistent(self):
         '''Test ensuring a folder exists that did not previously exist.'''
@@ -1420,7 +925,7 @@ class TestBitwardenPresentFolder(unittest.TestCase):
             'changed': True,
             'ansible_module_results': NEW_FOLDER
         })
-        self.assertEqual(self.module.Bitwarden.client.number_of_edits, 1)
+        self.assertEqual(MockClient.number_of_edits(), 1)
 
     def test_create_existent(self):
         '''Test ensuring a folder exists that previously existed.'''
@@ -1435,22 +940,67 @@ class TestBitwardenPresentFolder(unittest.TestCase):
             'changed': False,
             'ansible_module_results': FOLDERS['2c8']
         })
-        self.assertFalse(self.module.Bitwarden.client.number_of_edits)
+        self.assertFalse(MockClient.number_of_edits())
 
 
 @patch(
     'ansible_collections.community.general.plugins.modules.identity.bitwarden.json',
-    new=MockJson())
+    new=_MockJson())
 @patch(
-    'ansible_collections.community.general.plugins.modules.identity.bitwarden.Client',
-    new=_client(MOCK_RESPONSES))
+    'ansible.module_utils.basic.AnsibleModule.run_command',
+    new=client(MOCK_RESPONSES))
+class TestBitwardenCreatedFolder(unittest.TestCase):
+    '''Test "present" idempotent behaviour for folders.'''
+    def setUp(self):
+        mock()
+        self.module = bitwarden
+        MockClient.command_history = []
+
+    def test_create_nonexistent(self):
+        '''Test ensuring a folder exists that did not previously exist.'''
+        set_module_args({
+            'target': 'folder',
+            'state': 'created',
+            'folder_name': 'new folder name',
+        })
+        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+            self.module.main()
+        self.assertEqual(ansible_exit_json.exception.args[0], {
+            'changed': True,
+            'ansible_module_results': NEW_FOLDER
+        })
+        self.assertEqual(MockClient.number_of_edits(), 1)
+
+    def test_create_existent(self):
+        '''Test ensuring a folder exists that previously existed.'''
+        set_module_args({
+            'target': 'folder',
+            'state': 'created',
+            'folder_name': 'Hellog',
+        })
+        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+            self.module.main()
+        self.assertEqual(ansible_exit_json.exception.args[0], {
+            'changed': False,
+            'ansible_module_results': FOLDERS['2c8']
+        })
+        self.assertFalse(MockClient.number_of_edits())
+
+
+@patch(
+    'ansible_collections.community.general.plugins.modules.identity.bitwarden.json',
+    new=_MockJson())
+@patch(
+    'ansible.module_utils.basic.AnsibleModule.run_command',
+    new=client(MOCK_RESPONSES))
 class TestBitwardenPresentItem(unittest.TestCase):
     '''Test "present" idempotent behaviour for items.'''
     def setUp(self):
-        _mock()
+        mock()
         self.module = bitwarden
+        MockClient.command_history = []
 
-    @_py26_workaround
+    @py26_workaround
     def test_create_nonexistent(self):
         '''Test ensuring an item exists that did not previously exist.'''
         set_module_args({
@@ -1469,9 +1019,9 @@ class TestBitwardenPresentItem(unittest.TestCase):
             'changed': True,
             'ansible_module_results': NEW_ITEM
         })
-        self.assertEqual(self.module.Bitwarden.client.number_of_edits, 1)
+        self.assertEqual(MockClient.number_of_edits(), 1)
 
-    @_py26_workaround
+    @py26_workaround
     def test_create_existent_no_data(self):
         '''Test ensuring an item exists that already existed -- but without specifying any
         extra data that might lead to a modification.'''
@@ -1488,7 +1038,7 @@ class TestBitwardenPresentItem(unittest.TestCase):
             'changed': False,
             'ansible_module_results': ITEMS['dcb']
         })
-        self.assertFalse(self.module.Bitwarden.client.number_of_edits)
+        self.assertFalse(MockClient.number_of_edits())
 
     def test_create_existent_no_changed_data(self):
         '''Test ensuring an item exists that already existed and trying to set its data
@@ -1509,9 +1059,9 @@ class TestBitwardenPresentItem(unittest.TestCase):
             'changed': False,
             'ansible_module_results': ITEMS['dcb']
         })
-        self.assertFalse(self.module.Bitwarden.client.number_of_edits)
+        self.assertFalse(MockClient.number_of_edits())
 
-    @_py26_workaround
+    @py26_workaround
     def test_create_existent_changed_data(self):
         '''Test ensuring an item exists that already existed and trying to set its data
         to a new value.'''
@@ -1531,9 +1081,9 @@ class TestBitwardenPresentItem(unittest.TestCase):
             'changed': True,
             'ansible_module_results': MODIFIED_DCB_USERNAME
         })
-        self.assertEqual(self.module.Bitwarden.client.number_of_edits, 1)
+        self.assertEqual(MockClient.number_of_edits(), 1)
 
-    @_py26_workaround
+    @py26_workaround
     def test_create_existent_changed_notes(self):
         '''Test ensuring an item exists that already existed and trying to set its notes
         to a new value.'''
@@ -1551,17 +1101,135 @@ class TestBitwardenPresentItem(unittest.TestCase):
             'changed': True,
             'ansible_module_results': MODIFIED_DCB_NOTES
         })
-        self.assertEqual(self.module.Bitwarden.client.number_of_edits, 1)
+        self.assertEqual(MockClient.number_of_edits(), 1)
 
 
 @patch(
-    'ansible_collections.community.general.plugins.modules.identity.bitwarden.Client',
-    new=_client(MOCK_RESPONSES))
+    'ansible_collections.community.general.plugins.modules.identity.bitwarden.json',
+    new=_MockJson())
+@patch(
+    'ansible.module_utils.basic.AnsibleModule.run_command',
+    new=client(MOCK_RESPONSES))
+class TestBitwardenCreatedItem(unittest.TestCase):
+    '''Test "created" behaviour for items.'''
+    def setUp(self):
+        mock()
+        self.module = bitwarden
+        MockClient.command_history = []
+
+    @py26_workaround
+    def test_create_nonexistent(self):
+        '''Test ensuring an item exists that did not previously exist.'''
+        set_module_args({
+            'target': 'item',
+            'state': 'created',
+            'item_name': 'a new item',
+            'login': {
+                'username': 'new username',
+                'password': 'new password',
+            },
+            'notes': 'test note',
+        })
+        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+            self.module.main()
+        self.assertEqual(ansible_exit_json.exception.args[0], {
+            'changed': True,
+            'ansible_module_results': NEW_ITEM
+        })
+        self.assertEqual(MockClient.number_of_edits(), 1)
+
+    @py26_workaround
+    def test_create_existent_no_data(self):
+        '''Test ensuring an item exists that already existed -- but without specifying any
+        extra data that might lead to a modification.'''
+        set_module_args({
+            'target': 'item',
+            'state': 'created',
+            'folder_name': '',
+            'organization_name': '',
+            'item_name': 'my_account',
+        })
+        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+            self.module.main()
+        self.assertEqual(ansible_exit_json.exception.args[0], {
+            'changed': False,
+            'ansible_module_results': ITEMS['dcb']
+        })
+        self.assertFalse(MockClient.number_of_edits())
+
+    def test_create_existent_no_changed_data(self):
+        '''Test ensuring an item exists that already existed and trying to set its data
+        to something its old value.'''
+        set_module_args({
+            'target': 'item',
+            'state': 'created',
+            'folder_name': '',
+            'organization_name': '',
+            'item_name': 'my_account',
+            'login': {
+                'username': 'account',
+            }
+        })
+        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+            self.module.main()
+        self.assertEqual(ansible_exit_json.exception.args[0], {
+            'changed': False,
+            'ansible_module_results': ITEMS['dcb']
+        })
+        self.assertFalse(MockClient.number_of_edits())
+
+    @py26_workaround
+    def test_create_existent_changed_data(self):
+        '''Test ensuring an item exists that already existed and trying to set its data
+        to a new value.'''
+        set_module_args({
+            'target': 'item',
+            'state': 'created',
+            'folder_name': '',
+            'organization_name': '',
+            'item_name': 'my_account',
+            'login': {
+                'username': 'account_x',
+            }
+        })
+        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+            self.module.main()
+        self.assertEqual(ansible_exit_json.exception.args[0], {
+            'changed': False,
+            'ansible_module_results': ITEMS['dcb']
+        })
+        self.assertFalse(MockClient.number_of_edits())
+
+    @py26_workaround
+    def test_create_existent_changed_notes(self):
+        '''Test ensuring an item exists that already existed and trying to set its notes
+        to a new value.'''
+        set_module_args({
+            'target': 'item',
+            'state': 'created',
+            'folder_name': '',
+            'organization_name': '',
+            'item_name': 'my_account',
+            'notes': 'can you hear me now?'
+        })
+        with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+            self.module.main()
+        self.assertEqual(ansible_exit_json.exception.args[0], {
+            'changed': False,
+            'ansible_module_results': ITEMS['dcb']
+        })
+        self.assertFalse(MockClient.number_of_edits())
+
+
+@patch(
+    'ansible.module_utils.basic.AnsibleModule.run_command',
+    new=client(MOCK_RESPONSES))
 class TestBitwardenAbsentFolder(unittest.TestCase):
     '''Test "absent" idempotent behaviour for folders.'''
     def setUp(self):
-        _mock()
+        mock()
         self.module = bitwarden
+        MockClient.command_history = []
 
     def test_delete_nonexistent(self):
         '''Test ensuring a previously non-existent folder does not exist.'''
@@ -1576,7 +1244,7 @@ class TestBitwardenAbsentFolder(unittest.TestCase):
             'changed': False,
             'ansible_module_results': ''
         })
-        self.assertFalse(self.module.Bitwarden.client.number_of_edits)
+        self.assertFalse(MockClient.number_of_edits())
 
     def test_delete_existent_empty(self):
         '''Test ensuring a previously existent folder does not exist. The folder contains
@@ -1592,7 +1260,7 @@ class TestBitwardenAbsentFolder(unittest.TestCase):
             'changed': True,
             'ansible_module_results': ''
         })
-        self.assertEqual(self.module.Bitwarden.client.number_of_edits, 1)
+        self.assertEqual(MockClient.number_of_edits(), 1)
 
     def test_delete_existent_nonempty(self):
         '''Test ensuring a previously existent folder does not exist. The folder contains
@@ -1608,17 +1276,18 @@ class TestBitwardenAbsentFolder(unittest.TestCase):
             'changed': True,
             'ansible_module_results': ''
         })
-        self.assertEqual(self.module.Bitwarden.client.number_of_edits, 1)
+        self.assertEqual(MockClient.number_of_edits(), 1)
 
 
 @patch(
-    'ansible_collections.community.general.plugins.modules.identity.bitwarden.Client',
-    new=_client(MOCK_RESPONSES))
+    'ansible.module_utils.basic.AnsibleModule.run_command',
+    new=client(MOCK_RESPONSES))
 class TestBitwardenAbsentItem(unittest.TestCase):
     '''Test "absent" idempotent behaviour for items.'''
     def setUp(self):
-        _mock()
+        mock()
         self.module = bitwarden
+        MockClient.command_history = []
 
     def test_absent_nonexistent(self):
         '''Test ensuring a non-existent item continues to not exist.'''
@@ -1633,7 +1302,7 @@ class TestBitwardenAbsentItem(unittest.TestCase):
             'changed': False,
             'ansible_module_results': ''
         })
-        self.assertFalse(self.module.Bitwarden.client.number_of_edits)
+        self.assertFalse(MockClient.number_of_edits())
 
     def test_absent_unique(self):
         '''Test ensuring a uniquely named item does not exist.'''
@@ -1648,7 +1317,7 @@ class TestBitwardenAbsentItem(unittest.TestCase):
             'changed': True,
             'ansible_module_results': ''
         })
-        self.assertEqual(self.module.Bitwarden.client.number_of_edits, 1)
+        self.assertEqual(MockClient.number_of_edits(), 1)
 
     def test_absent_name_in_multiple_folders(self):
         '''Test ensuring a non-uniquely specified item does not exist.'''
@@ -1659,7 +1328,7 @@ class TestBitwardenAbsentItem(unittest.TestCase):
         })
         with self.assertRaises(AssertionError):
             self.module.main()
-        self.assertFalse(self.module.Bitwarden.client.number_of_edits)
+        self.assertFalse(MockClient.number_of_edits())
 
     def test_absent_using_unique_folder_org(self):
         '''Test ensuring an item that requires matching folder and organization to
@@ -1677,7 +1346,7 @@ class TestBitwardenAbsentItem(unittest.TestCase):
             'changed': True,
             'ansible_module_results': ''
         })
-        self.assertEqual(self.module.Bitwarden.client.number_of_edits, 1)
+        self.assertEqual(MockClient.number_of_edits(), 1)
 
 
 if __name__ == '__main__':
