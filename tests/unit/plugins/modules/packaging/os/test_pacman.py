@@ -100,6 +100,19 @@ valid_inventory = {
     "upgradable_pkgs": {
         "sqlite": VersionTuple(current="3.36.0-1", latest="3.37.0-1"),
     },
+    "pkg_reasons": {
+        "file": "explicit",
+        "filesystem": "explicit",
+        "findutils": "explicit",
+        "gawk": "explicit",
+        "gettext": "explicit",
+        "grep": "explicit",
+        "gzip": "explicit",
+        "pacman": "explicit",
+        "pacman-mirrorlist": "dependency",
+        "sed": "explicit",
+        "sqlite": "explicit",
+    },
 }
 
 empty_inventory = {
@@ -108,6 +121,7 @@ empty_inventory = {
     "installed_groups": {},
     "available_groups": {},
     "upgradable_pkgs": {},
+    "pkg_reasons": {},
 }
 
 
@@ -255,6 +269,27 @@ class TestPacman:
                         """,
                         "",
                     ),
+                    (  # pacman --query --explicit
+                        0,
+                        """file 5.41-1
+                        filesystem 2021.11.11-1
+                        findutils 4.8.0-1
+                        gawk 5.1.1-1
+                        gettext 0.21-1
+                        grep 3.7-1
+                        gzip 1.11-1
+                        pacman 6.0.1-2
+                        sed 4.8-1
+                        sqlite 3.36.0-1
+                        """,
+                        "",
+                    ),
+                    (  # pacman --query --deps
+                        0,
+                        """pacman-mirrorlist 20211114-1
+                        """,
+                        "",
+                    ),
                 ],
                 None,
             ),
@@ -272,6 +307,8 @@ class TestPacman:
                         "",
                         "warning: config file /etc/pacman.conf, line 34: directive 'TotalDownload' in section 'options' not recognized.",
                     ),
+                    (0, "", ""),
+                    (0, "", ""),
                 ],
                 None,
             ),
@@ -288,6 +325,8 @@ class TestPacman:
                         "partial\npkg\\nlist",
                         "some warning",
                     ),
+                    (0, "", ""),
+                    (0, "", ""),
                 ],
                 AnsibleFailJson,
             ),
@@ -375,6 +414,8 @@ class TestPacman:
                     (["pacman", "--query", "--groups"], {'check_rc': True}, 0, '', ''),
                     (["pacman", "--sync", "--groups", "--groups"], {'check_rc': True}, 0, '', ''),
                     (["pacman", "--query", "--upgrades"], {'check_rc': False}, 0, '', ''),
+                    (["pacman", "--query", "--explicit"], {'check_rc': True}, 0, 'foo 1.0.0-1', ''),
+                    (["pacman", "--query", "--deps"], {'check_rc': True}, 0, '', ''),
                 ],
                 False,
             ),
@@ -843,7 +884,7 @@ class TestPacman:
                     ],
                     "state": "present",
                 },
-                ["sudo", "somepackage", "otherpkg"],
+                ["otherpkg", "somepackage", "sudo"],
                 [
                     Package("sudo", "sudo"),
                     Package("grep", "grep"),
