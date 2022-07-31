@@ -557,6 +557,8 @@ files:
     maintainers: dagwieers magnus919 tbielawa cmprescott sm4rk0
     labels: m:xml xml
     ignore: magnus919
+  $modules/identity/bitwarden.py:
+    maintainers: lungj
   $modules/identity/ipa/:
     maintainers: $team_ipa
   $modules/identity/ipa/ipa_pwpolicy.py:
