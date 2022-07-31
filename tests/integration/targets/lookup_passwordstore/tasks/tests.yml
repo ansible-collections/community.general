@@ -84,7 +84,7 @@
   command: pass init ansible-test
 
 - name: Initialise gopass passwordstore
-  command: gopass init --path {{ lookup('env','HOME') }}/.gopass-store ansible-test
+  command: gopass init --path $HOME/.gopass-store ansible-test
   args:
     creates: "{{ lookup('env','HOME') }}/.gopass-store"
 

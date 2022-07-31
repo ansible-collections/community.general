@@ -1,3 +1,2 @@
 passwordstore_packages:
-  - curl
   - pass
