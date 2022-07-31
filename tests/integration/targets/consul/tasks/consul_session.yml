@@ -158,3 +158,15 @@
     that:
       - search_deleted is skipped  # each iteration is skipped
       - search_deleted is not changed  # and then unchanged
+
+- name: ensure session can be created with a ttl
+  consul_session:
+    state: present
+    name: session-with-ttl
+    ttl: 180  # sec
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result['ttl'] == 180
