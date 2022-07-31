@@ -1,0 +1,2 @@
+minor_changes:
+  - ModuleHelper module utils - added property ``verbosity`` to base class (https://github.com/ansible-collections/community.general/pull/5035).
