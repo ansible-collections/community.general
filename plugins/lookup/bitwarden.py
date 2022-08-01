@@ -89,7 +89,7 @@ class Bitwarden(object):
         initial_matches = AnsibleJSONDecoder().raw_decode(out)[0]
 
         # Filter to only include results from the right field.
-        return list(filter(lambda item: item[search_field] == search_value, initial_matches))
+        return [item for item in initial_matches if item[search_field] == search_value]
 
     def get_field(self, field, search_value, search_field="name"):
         """Return a list of the specified field for records whose search_field match search_value.
