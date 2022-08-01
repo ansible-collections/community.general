@@ -11,21 +11,24 @@ DOCUMENTATION = '''
       - Andrew Zenk (!UNKNOWN) <azenk@umn.edu>
     requirements:
       - lpass (command line utility)
-      - must have already logged into lastpass
-    short_description: fetch data from lastpass
+      - must have already logged into LastPass
+    short_description: fetch data from LastPass
     description:
-      - use the lpass command line utility to fetch specific fields from lastpass
+      - Use the lpass command line utility to fetch specific fields from LastPass.
     options:
       _terms:
-        description: key from which you want to retrieve the field
-        required: True
+        description: Key from which you want to retrieve the field.
+        required: true
+        type: list
+        elements: str
       field:
-        description: field to return from lastpass
+        description: Field to return from LastPass.
         default: 'password'
+        type: str
 '''
 
 EXAMPLES = """
-- name: get 'custom_field' from lastpass entry 'entry-name'
+- name: get 'custom_field' from LastPass entry 'entry-name'
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.lastpass', 'entry-name', field='custom_field') }}"
 """
@@ -88,12 +91,14 @@ class LPass(object):
 class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
+        self.set_options(var_options=variables, direct=kwargs)
+        field = self.get_option('field')
+
         lp = LPass()
 
         if not lp.logged_in:
-            raise AnsibleError("Not logged into lastpass: please run 'lpass login' first")
+            raise AnsibleError("Not logged into LastPass: please run 'lpass login' first")
 
-        field = kwargs.get('field', 'password')
         values = []
         for term in terms:
             values.append(lp.get_field(term, field))

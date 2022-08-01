@@ -26,6 +26,7 @@ from ansible_collections.community.general.tests.unit.compat.mock import patch
 
 from ansible.errors import AnsibleError
 from ansible.module_utils import six
+from ansible.plugins.loader import lookup_loader
 from ansible_collections.community.general.plugins.lookup.lastpass import LookupModule, LPass, LPassException
 
 
@@ -126,6 +127,9 @@ class LoggedOutMockLPass(MockLPass):
 
 class TestLPass(unittest.TestCase):
 
+    def setUp(self):
+        self.lookup = lookup_loader.get('community.general.lastpass')
+
     def test_lastpass_cli_path(self):
         lp = MockLPass(path='/dev/null')
         self.assertEqual('/dev/null', lp.cli_path)
@@ -158,30 +162,27 @@ class TestLPass(unittest.TestCase):
 
 class TestLastpassPlugin(unittest.TestCase):
 
+    def setUp(self):
+        self.lookup = lookup_loader.get('community.general.lastpass')
+
     @patch('ansible_collections.community.general.plugins.lookup.lastpass.LPass', new=MockLPass)
     def test_lastpass_plugin_normal(self):
-        lookup_plugin = LookupModule()
-
         for entry in MOCK_ENTRIES:
             entry_id = entry.get('id')
             for k, v in six.iteritems(entry):
                 self.assertEqual(v.strip(),
-                                 lookup_plugin.run([entry_id], field=k)[0])
+                                 self.lookup.run([entry_id], field=k)[0])
 
     @patch('ansible_collections.community.general.plugins.lookup.lastpass.LPass', LoggedOutMockLPass)
     def test_lastpass_plugin_logged_out(self):
-        lookup_plugin = LookupModule()
-
         entry = MOCK_ENTRIES[0]
         entry_id = entry.get('id')
         with self.assertRaises(AnsibleError):
-            lookup_plugin.run([entry_id], field='password')
+            self.lookup.run([entry_id], field='password')
 
     @patch('ansible_collections.community.general.plugins.lookup.lastpass.LPass', DisconnectedMockLPass)
     def test_lastpass_plugin_disconnected(self):
-        lookup_plugin = LookupModule()
-
         entry = MOCK_ENTRIES[0]
         entry_id = entry.get('id')
         with self.assertRaises(AnsibleError):
-            lookup_plugin.run([entry_id], field='password')
+            self.lookup.run([entry_id], field='password')
