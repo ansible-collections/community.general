@@ -1877,3 +1877,23 @@ releases:
     - 4911-dsv-honor-tld-option.yml
     - 4933-fix-rax-clb-nodes.yaml
     release_date: '2022-07-12'
+  4.8.5:
+    changes:
+      bugfixes:
+      - pacman - fixed name resolution of URL packages (https://github.com/ansible-collections/community.general/pull/4959).
+      - proxmox - fix error handling when getting VM by name when ``state=absent``
+        (https://github.com/ansible-collections/community.general/pull/4945).
+      - proxmox inventory plugin - fix crash when ``enabled=1`` is used in agent config
+        string (https://github.com/ansible-collections/community.general/pull/4910).
+      - proxmox_kvm - fix error handling when getting VM by name when ``state=absent``
+        (https://github.com/ansible-collections/community.general/pull/4945).
+      - slack - fix incorrect channel prefix ``#`` caused by incomplete pattern detection
+        by adding ``G0`` and ``GF`` as channel ID patterns (https://github.com/ansible-collections/community.general/pull/5019).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 4.8.5.yml
+    - 4910-fix-for-agent-enabled.yml
+    - 4945-fix-get_vm-int-parse-handling.yaml
+    - 4959-pacman-fix-url-packages-name.yaml
+    - 5019-slack-support-more-groups.yml
+    release_date: '2022-08-01'
