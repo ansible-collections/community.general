@@ -143,6 +143,24 @@ RETURN = '''
     returned: success
     type: any
     sample: '"96" or ["red", "blue", "green"]'
+  cmd:
+    description:
+      - A list with the resulting C(xfconf-query) command executed by the module.
+    returned: success
+    type: list
+    elements: str
+    version_added: 5.4.0
+    sample:
+      - /usr/bin/xfconf-query
+      - --channel
+      - xfce4-panel
+      - --property
+      - /plugins/plugin-19/timezone
+      - --create
+      - --type
+      - string
+      - --set
+      - Pacific/Auckland
 '''
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
@@ -211,6 +229,11 @@ class XFConfProperty(StateModuleHelper):
     def state_absent(self):
         with self.runner('channel property reset', check_mode_skip=True) as ctx:
             ctx.run(reset=True)
+            self.vars.stdout = ctx.results_out
+            self.vars.stderr = ctx.results_err
+            self.vars.cmd = ctx.cmd
+            if self.verbosity >= 4:
+                self.vars.run_info = ctx.run_info
         self.vars.value = None
 
     def state_present(self):
@@ -237,6 +260,11 @@ class XFConfProperty(StateModuleHelper):
 
         with self.runner('channel property create force_array values_and_types', check_mode_skip=True) as ctx:
             ctx.run(create=True, force_array=self.vars.is_array, values_and_types=(self.vars.value, value_type))
+            self.vars.stdout = ctx.results_out
+            self.vars.stderr = ctx.results_err
+            self.vars.cmd = ctx.cmd
+            if self.verbosity >= 4:
+                self.vars.run_info = ctx.run_info
 
         if not self.vars.is_array:
             self.vars.value = self.vars.value[0]
