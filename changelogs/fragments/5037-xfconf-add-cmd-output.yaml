@@ -1,0 +1,2 @@
+minor_changes:
+  - xfconf - add ``stdout``, ``stderr`` and ``cmd`` to the module results (https://github.com/ansible-collections/community.general/pull/5037).
