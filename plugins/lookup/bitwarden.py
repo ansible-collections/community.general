@@ -42,6 +42,7 @@ RETURN = """
   _raw:
     description: List of requested field or JSON object of list of matches.
     type: list
+    elements: raw
 """
 
 from subprocess import Popen, PIPE
