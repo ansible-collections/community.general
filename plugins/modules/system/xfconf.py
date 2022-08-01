@@ -148,6 +148,8 @@ RETURN = '''
       - A list with the resulting C(xfconf-query) command executed by the module.
     returned: success
     type: list
+    elements: str
+    version_added: 5.4.0
     sample:
       - /usr/bin/xfconf-query
       - --channel
