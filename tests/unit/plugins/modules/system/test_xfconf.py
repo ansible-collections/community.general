@@ -268,7 +268,7 @@ def test_xfconf(mocker, capfd, patch_xfconf, testcase):
     # Mock function used for running commands first
     call_results = [item[2] for item in testcase['run_command.calls']]
     mock_run_command = mocker.patch(
-        'ansible_collections.community.general.plugins.module_utils.mh.module_helper.AnsibleModule.run_command',
+        'ansible.module_utils.basic.AnsibleModule.run_command',
         side_effect=call_results)
 
     # Try to run test case
@@ -295,6 +295,11 @@ def test_xfconf(mocker, capfd, patch_xfconf, testcase):
         print("call args list =\n%s" % call_args_list)
         print("expected args list =\n%s" % expected_call_args_list)
         assert call_args_list == expected_call_args_list
+
+        expected_cmd, dummy, expected_res = testcase['run_command.calls'][-1]
+        assert results['cmd'] == expected_cmd
+        assert results['stdout'] == expected_res[1]
+        assert results['stderr'] == expected_res[2]
 
     for conditional_test_result in ('msg', 'value', 'previous_value'):
         if conditional_test_result in testcase:
