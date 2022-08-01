@@ -197,6 +197,8 @@ files:
   $inventories/virtualbox.py: {}
   $lookups/:
     labels: lookups
+  $lookups/bitwarden.py:
+    maintainers: lungj
   $lookups/cartesian.py: {}
   $lookups/chef_databag.py: {}
   $lookups/collection_version.py:
