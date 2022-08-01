@@ -11,7 +11,7 @@ DOCUMENTATION = """
     requirements:
       - bw (command line utility)
       - be logged into bitwarden
-    short_description: Retrieve secrets from Bitwarden.
+    short_description: Retrieve secrets from Bitwarden
     version_added: 5.4.0
     description:
       - Retrieve secrets from Bitwarden.
