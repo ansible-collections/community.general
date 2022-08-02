@@ -1,2 +1,0 @@
-minor_changes:
- - lastpass - use config manager for handling plugin options (https://github.com/ansible-collections/community.general/pull/5022).
