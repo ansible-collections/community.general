@@ -58,6 +58,7 @@ class WdcRedfishUtils(RedfishUtils):
             response = self.get_request(uri)
             if response['ret']:
                 self.root_uri = root_uri
+                break
 
     def _find_updateservice_resource(self):
         """Find the update service resource as well as additional WDC-specific resources."""
@@ -157,8 +158,7 @@ class WdcRedfishUtils(RedfishUtils):
                 'msg': "FWActivate requested"}
 
     def _get_bundle_version(self,
-                            bundle_uri,
-                            update_creds):
+                            bundle_uri):
         """Get the firmware version from a bundle file, and whether or not it is multi-tenant.
 
         Only supports HTTP at this time.  Assumes URI exists and is a tarfile.
@@ -169,20 +169,12 @@ class WdcRedfishUtils(RedfishUtils):
         and checks the appropriate byte in the file.
 
         :param str bundle_uri:  HTTP URI of the firmware bundle.
-        :param dict or None update_creds: Dict containing username and password to access the bundle.
         :return: Firmware version number contained in the bundle, and whether or not the bundle is multi-tenant.
         Either value will be None if unable to deterine.
         :rtype: str or None, bool or None
         """
-        parsed_url = urlparse(bundle_uri)
-        if update_creds:
-            original_netloc = parsed_url.netloc
-            parsed_url._replace(netloc="{0}:{1}{2}".format(update_creds.get("username"),
-                                                           update_creds.get("password"),
-                                                           original_netloc))
-
         bundle_temp_filename = fetch_file(module=self.module,
-                                          url=urlunparse(parsed_url))
+                                          url=bundle_uri)
         if not tarfile.is_tarfile(bundle_temp_filename):
             return None, None
         tf = tarfile.open(bundle_temp_filename)
@@ -223,8 +215,21 @@ class WdcRedfishUtils(RedfishUtils):
         Performs retries, handles timeouts as needed.
 
         """
+        # Convert credentials to standard HTTP format
+        if update_opts.get("update_creds") is not None and "username" in update_opts["update_creds"] and "password" in update_opts["update_creds"]:
+            update_creds = update_opts["update_creds"]
+            parsed_url = urlparse(update_opts["update_image_uri"])
+            if update_creds:
+                original_netloc = parsed_url.netloc
+                parsed_url = parsed_url._replace(netloc="{0}:{1}@{2}".format(update_creds.get("username"),
+                                                                             update_creds.get("password"),
+                                                                             original_netloc))
+                update_opts["update_image_uri"] = urlunparse(parsed_url)
+                del update_opts["update_creds"]
+
         # Make sure bundle URI is HTTP(s)
         bundle_uri = update_opts["update_image_uri"]
+
         if not self.uri_is_http(bundle_uri):
             return {
                 'ret': False,
@@ -250,9 +255,7 @@ class WdcRedfishUtils(RedfishUtils):
         # Check the FW version in the bundle file, and compare it to what is already on the IOMs
 
         # Bundle version number
-        update_creds = update_opts.get("update_creds")
-        bundle_firmware_version, is_bundle_multi_tenant = self._get_bundle_version(bundle_uri,
-                                                                                   update_creds)
+        bundle_firmware_version, is_bundle_multi_tenant = self._get_bundle_version(bundle_uri)
         if bundle_firmware_version is None or is_bundle_multi_tenant is None:
             return {
                 'ret': False,
@@ -313,6 +316,7 @@ class WdcRedfishUtils(RedfishUtils):
             if retry_number != 0:
                 time.sleep(retry_interval_seconds)
             retry_number += 1
+
             result = self.simple_update(update_opts)
             if result['ret'] is not True:
                 # Sometimes a timeout error is returned even though the update actually was requested.
