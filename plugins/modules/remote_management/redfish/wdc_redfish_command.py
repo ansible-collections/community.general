@@ -57,8 +57,9 @@ options:
   resource_id:
     required: false
     description:
-      - ID of the component to modify, such as "Enclosure", "IOModuleAFRU", "PowerSupplyBFRU", "FanExternalFRU3", or "FanInternalFRU".
+      - ID of the component to modify, such as C(Enclosure), C(IOModuleAFRU), C(PowerSupplyBFRU), C(FanExternalFRU3), or C(FanInternalFRU).
     type: str
+    version_added: 5.4.0
   update_image_uri:
     required: false
     description:
