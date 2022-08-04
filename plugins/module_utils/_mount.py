@@ -3,7 +3,7 @@
 # This particular file snippet, and this file snippet only, is based on
 # Lib/posixpath.py of cpython
 # It is licensed under the PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
-# (See PSF-license.txt in this collection)
+# (See LICENSES/PSF-2.0.txt in this collection)
 
 from __future__ import absolute_import, division, print_function
 
