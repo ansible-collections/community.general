@@ -41,7 +41,8 @@ options:
           - A list of allowed networks
         type: list
         elements: str
-        default: REF_NetworkAny
+        default:
+          - REF_NetworkAny
     auth_profile:
         type: str
         description:

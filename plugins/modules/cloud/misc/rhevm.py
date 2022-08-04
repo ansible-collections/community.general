@@ -148,7 +148,7 @@ vm:
     description: Returns all of the VMs variables and execution.
     returned: always
     type: dict
-    sample: '{
+    sample: {
         "boot_order": [
             "hd",
             "network"
@@ -206,7 +206,7 @@ vm:
         "vmcpu": "4",
         "vmhost": "host416",
         "vmmem": "16"
-    }'
+    }
 '''
 
 EXAMPLES = r'''
