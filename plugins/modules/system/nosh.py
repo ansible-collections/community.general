@@ -147,7 +147,7 @@ status:
             description: []  # FIXME
             returned: success
             type: list
-            sample: '[]'
+            sample: []
         DaemontoolsEncoreState:
             description: []  # FIXME
             returned: success
@@ -192,7 +192,7 @@ status:
             description: []  # FIXME
             returned: success
             type: list
-            sample: '[]'
+            sample: []
         RestartExitStatusCode:
             description: []  # FIXME
             returned: success

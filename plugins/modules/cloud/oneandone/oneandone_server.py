@@ -212,7 +212,8 @@ RETURN = '''
 servers:
     description: Information about each server that was processed
     type: list
-    sample: '[{"hostname": "my-server", "id": "server-id"}]'
+    sample:
+      - {"hostname": "my-server", "id": "server-id"}
     returned: always
 '''
 
