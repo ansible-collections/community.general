@@ -149,7 +149,7 @@ rules:
     description: the HCL JSON representation of the rules associated to the ACL, in the format described in the
                  Consul documentation (https://www.consul.io/docs/guides/acl.html#rule-specification).
     returned: I(status) == "present"
-    type: str
+    type: dict
     sample: {
         "key": {
             "foo": {
