@@ -80,7 +80,6 @@ file_local:
 
 import os
 import traceback
-import sys
 
 PYCDLIB_IMP_ERR = None
 try:
@@ -109,18 +108,18 @@ def iso_get_file(module, iso_path, get_files_list):
                     os.makedirs(file_local_dir)
                 except OSError as err:
                     iso.close()
-                    return -1, 'Exception caught when creating folder {} \
-                        with error {}'.format(file_local_dir, to_native(err))
+                    return -1, f"Exception caught when creating folder {file_local_dir} \
+                        with error {to_native(err)}"
 
             record = iso.get_record(rr_path=file_in_iso)
             if record.is_file():
                 iso.get_file_from_iso(file_local, rr_path=file_in_iso)
             else:
                 iso.close()
-                return -1, "{} is not a file in ISO".format(file_in_iso)
+                return -1, f"{file_in_iso} is not a file in ISO"
     except Exception as err:
-        module.fail_json(msg='Exception caught when fetch files from ISO {} \
-            with error {}'.format(iso_path, to_native(err)))
+        module.fail_json(msg=str(f"Exception caught when fetch files from ISO {iso_path} \
+            with error {to_native(err)}"))
 
     return 0, ""
 
@@ -140,7 +139,7 @@ def main():
 
     iso = module.params.get('iso')
     if not os.path.exists(iso):
-        module.fail_json(msg='The {} does not exist.'.format(iso))
+        module.fail_json(msg=str(f"The {iso} does not exist."))
 
     get_files_list = module.params.get('get_files')
     if get_files_list and len(get_files_list) > 0:
