@@ -379,6 +379,7 @@ def main():
             purge_workspace=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent', 'planned']),
             variables=dict(type='dict'),
+            declare_variables=dict(type='bool', default=False),
             variables_files=dict(aliases=['variables_file'], type='list', elements='path'),
             plan_file=dict(type='path'),
             state_file=dict(type='path'),
@@ -405,6 +406,7 @@ def main():
     purge_workspace = module.params.get('purge_workspace')
     state = module.params.get('state')
     variables = module.params.get('variables') or {}
+    declare_variables = module.params.get('declare_variables')
     variables_files = module.params.get('variables_files')
     plan_file = module.params.get('plan_file')
     state_file = module.params.get('state_file')
@@ -458,6 +460,12 @@ def main():
     if variables_files:
         for f in variables_files:
             variables_args.extend(['-var-file', f])
+
+    if declare_variables:
+       gen_variables_file = tempfile.NamedTemporaryFile(mode='w', dir=project_path, prefix="generated_variables_", suffix=".tf")
+       for k, v in variables.items():
+           gen_variables_file.write("variable \"" + k + "\" {}\n")
+           gen_variables_file.flush()
 
     preflight_validation(command[0], project_path, checked_version, variables_args)
 
@@ -517,6 +525,10 @@ def main():
             command=' '.join(outputs_command))
     else:
         outputs = json.loads(outputs_text)
+
+    # delete the generated variables.tf file after command returns
+    if declare_variables:
+       gen_variables_file.close()
 
     # Restore the Terraform workspace found when running the module
     if workspace_ctx["current"] != workspace:
