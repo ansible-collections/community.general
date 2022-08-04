@@ -160,7 +160,8 @@ modlist:
   description: list of modified parameters
   returned: success
   type: list
-  sample: '[[2, "olcRootDN", ["cn=root,dc=example,dc=com"]]]'
+  sample:
+    - [2, "olcRootDN", ["cn=root,dc=example,dc=com"]]
 '''
 
 import traceback

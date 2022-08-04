@@ -114,21 +114,13 @@ commands:
   type: list
   returned: on_success
   elements: str
-  sample: |-
-    [
-      "/usr/bin/dpkg-divert --no-rename --remove /etc/foobarrc",
-      "/usr/bin/dpkg-divert --package ansible --no-rename --add /etc/foobarrc"
-    ]
+  sample: "/usr/bin/dpkg-divert --no-rename --remove /etc/foobarrc"
 messages:
   description: The dpkg-divert relevant messages (stdout or stderr).
   type: list
   returned: on_success
   elements: str
-  sample: |-
-    [
-      "Removing 'local diversion of /etc/foobarrc to /etc/foobarrc.distrib'",
-      "Adding 'diversion of /etc/foobarrc to /etc/foobarrc.distrib by ansible'"
-    ]
+  sample: "Removing 'local diversion of /etc/foobarrc to /etc/foobarrc.distrib'"
 diversion:
   description: The status of the diversion after task execution.
   type: dict
@@ -146,11 +138,11 @@ diversion:
     state:
       description: The state of the diversion.
       type: str
-  sample: |-
+  sample:
     {
       "divert": "/etc/foobarrc.distrib",
       "holder": "LOCAL",
-      "path": "/etc/foobarrc"
+      "path": "/etc/foobarrc",
       "state": "present"
     }
 '''

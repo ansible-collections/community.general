@@ -234,8 +234,9 @@ roles:
     description: list of dictionaries of roles, each role is described by name, cardinality, state and nodes ids
     type: list
     returned: success
-    sample: '[{"cardinality": 1,"name": "foo","state": "RUNNING","ids": [ 123, 456 ]},
-              {"cardinality": 2,"name": "bar","state": "RUNNING", "ids": [ 452, 567, 746 ]}]'
+    sample:
+      - {"cardinality": 1,"name": "foo","state": "RUNNING", "ids": [ 123, 456 ]}
+      - {"cardinality": 2,"name": "bar","state": "RUNNING", "ids": [ 452, 567, 746 ]}
 '''
 
 import os

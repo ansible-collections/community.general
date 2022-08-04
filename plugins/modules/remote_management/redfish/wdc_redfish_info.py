@@ -96,32 +96,22 @@ Description:
     description: Firmware update status description.
     returned: always
     type: str
-    sample:
-      - Ready for FW update
-      - FW update in progress
-      - FW update completed. Waiting for activation.
+    sample: Ready for FW update
 ErrorCode:
     description: Numeric error code for firmware update status.  Non-zero indicates an error condition.
     returned: always
     type: int
-    sample:
-      - 0
+    sample: 0
 EstimatedRemainingMinutes:
     description: Estimated number of minutes remaining in firmware update operation.
     returned: always
     type: int
-    sample:
-      - 0
-      - 20
+    sample: 20
 StatusCode:
     description: Firmware update status code.
     returned: always
     type: int
-    sample:
-      - 0 (Ready for FW update)
-      - 1 (FW update in progress)
-      - 2 (FW update completed.  Waiting for activation.)
-      - 3 (FW update failed.)
+    sample: 2
 '''
 
 from ansible.module_utils.basic import AnsibleModule

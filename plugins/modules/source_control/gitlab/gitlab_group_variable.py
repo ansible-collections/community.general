@@ -140,22 +140,22 @@ group_variable:
       description: A list of variables which were created.
       returned: always
       type: list
-      sample: "['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']"
+      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
     untouched:
       description: A list of variables which exist.
       returned: always
       type: list
-      sample: "['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']"
+      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
     removed:
       description: A list of variables which were deleted.
       returned: always
       type: list
-      sample: "['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']"
+      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
     updated:
       description: A list of variables whose values were changed.
       returned: always
       type: list
-      sample: "['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']"
+      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
 '''
 
 import traceback
