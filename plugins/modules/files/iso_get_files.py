@@ -109,9 +109,8 @@ def iso_get_file(module, iso_path, get_files_list):
                     os.makedirs(file_local_dir)
                 except OSError as err:
                     iso.close()
-                    return -1, (f"Exception caught when creating folder {file_local_dir}"
-                                f"with error {to_native(err)}"
-                                )
+                    return -1, (f"Exception caught when creating folder {file_local_dir} "
+                                f"with error {to_native(err)}")
 
             record = iso.get_record(rr_path=file_in_iso)
             if record.is_file():
@@ -120,8 +119,9 @@ def iso_get_file(module, iso_path, get_files_list):
                 iso.close()
                 return -1, f"{file_in_iso} is not a file in ISO"
     except Exception as err:
-        module.fail_json(msg=str(f"Exception caught when fetch files from ISO {iso_path} \
-            with error {to_native(err)}"))
+        module.fail_json(msg=str(
+            (f"Exception caught when fetch files from ISO {iso_path} "
+             f"with error {to_native(err)}")))
 
     return 0, ""
 
