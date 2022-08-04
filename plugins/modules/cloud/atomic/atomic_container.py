@@ -88,7 +88,7 @@ msg:
     description: The command standard output
     returned: always
     type: str
-    sample: [u'Using default tag: latest ...']
+    sample: 'Using default tag: latest ...'
 '''
 
 # import module snippets

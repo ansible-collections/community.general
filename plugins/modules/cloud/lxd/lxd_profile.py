@@ -222,7 +222,7 @@ actions:
   description: List of actions performed for the profile.
   returned: success
   type: list
-  sample: '["create"]'
+  sample: ["create"]
 '''
 
 import os

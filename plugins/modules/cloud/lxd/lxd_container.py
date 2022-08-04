@@ -393,7 +393,7 @@ actions:
   description: List of actions performed for the instance.
   returned: success
   type: list
-  sample: '["create", "start"]'
+  sample: ["create", "start"]
 '''
 import datetime
 import os

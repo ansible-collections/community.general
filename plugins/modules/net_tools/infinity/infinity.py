@@ -116,10 +116,17 @@ network_info:
     description: when reserving a LAN network from a Infinity supernet by providing network_size, the information about the reserved network is returned.
     returned: success
     type: str
-    sample:  {"network_address": "192.168.10.32/28","network_family": "4", "network_id": 3102,
-    "network_size": null,"description": null,"network_location": "3085",
-    "ranges": { "id": 0, "name": null,"first_ip": null,"type": null,"last_ip": null},
-    "network_type": "lan","network_name": "'reserve_new_ansible_network'"}
+    sample: {
+        "network_address": "192.168.10.32/28",
+        "network_family": "4",
+        "network_id": 3102,
+        "network_size": null,
+        "description": null,
+        "network_location": "3085",
+        "ranges": { "id": 0, "name": null,"first_ip": null,"type": null,"last_ip": null},
+        "network_type": "lan",
+        "network_name": "'reserve_new_ansible_network'"
+    }
 '''
 
 

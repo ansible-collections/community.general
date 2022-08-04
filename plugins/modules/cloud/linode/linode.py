@@ -152,7 +152,7 @@ options:
     description:
     - Set status of Lassie watchdog.
     type: bool
-    default: "True"
+    default: true
 requirements:
     - python >= 2.6
     - linode-python
