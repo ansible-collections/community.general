@@ -141,7 +141,8 @@ MODULE_ISO_CUSTOMIZE = None
 # Create local temporary direction to store files getting from ISO
 def get_local_tmp_dir():
     dir_name = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time()))
-    tmp_dir = f"/tmp/{dir_name}"
+    tmp_dir = os.path.join('/tmp', dir_name)
+
     try:
         os.makedirs(tmp_dir)
     except OSError as err:

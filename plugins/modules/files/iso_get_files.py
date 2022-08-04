@@ -81,6 +81,7 @@ file_local:
 import os
 import traceback
 
+
 PYCDLIB_IMP_ERR = None
 try:
     import pycdlib
@@ -108,8 +109,9 @@ def iso_get_file(module, iso_path, get_files_list):
                     os.makedirs(file_local_dir)
                 except OSError as err:
                     iso.close()
-                    return -1, f"Exception caught when creating folder {file_local_dir} \
-                        with error {to_native(err)}"
+                    return -1, (f"Exception caught when creating folder {file_local_dir}"
+                                f"with error {to_native(err)}"
+                                )
 
             record = iso.get_record(rr_path=file_in_iso)
             if record.is_file():
