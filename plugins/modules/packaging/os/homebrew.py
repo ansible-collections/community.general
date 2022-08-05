@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, Andrew Dunham <andrew@du.nham.ca>
-# (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
-# (c) 2015, Indrajit Raychaudhuri <irc+code@indrajit.com>
+# Copyright (c) 2013, Andrew Dunham <andrew@du.nham.ca>
+# Copyright (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
+# Copyright (c) 2015, Indrajit Raychaudhuri <irc+code@indrajit.com>
 #
 # Based on macports (Jimmy Tang <jcftang@gmail.com>)
 #
