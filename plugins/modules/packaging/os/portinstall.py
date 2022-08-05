@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, berenddeboer
+# Copyright (c) 2013, berenddeboer
 # Written by berenddeboer <berend@pobox.com>
 # Based on pkgng module written by bleader <bleader at ratonland.org>
 #
