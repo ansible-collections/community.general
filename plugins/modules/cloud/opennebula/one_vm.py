@@ -289,6 +289,17 @@ EXAMPLES = '''
       name: foo
       bar: bar1
 
+- name: "Deploy an new instance with list type attribute 'bar' and set its name to 'foo'"
+  community.general.one_vm:
+    template_id: 53
+    attributes:
+      name: foo
+      bar: |
+        [
+          key1 = "val1",
+          key2 = "val2"
+        ]
+
 - name: "Enforce that 2 instances with attributes 'foo1: app1' and 'foo2: app2' are deployed"
   community.general.one_vm:
     template_id: 53
