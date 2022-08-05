@@ -107,7 +107,7 @@ files:
     maintainers: $team_ansible_core
   $doc_fragments/:
     labels: docs_fragments
-  $doc_fragments/new_struct_with.py:
+  $doc_fragments/data_structure_merging.py:
     maintainers: indelog
   $doc_fragments/hpe3par.py:
     maintainers: farhan7500 gautamphegde
@@ -122,6 +122,8 @@ files:
     labels: xenserver
   $filters/counter.py:
     maintainers: keilr
+  $filters/data_structure_merging.py:
+    maintainers: indelog
   $filters/dict.py:
     maintainers: felixfontein
   $filters/dict_kv.py:
@@ -141,8 +143,6 @@ files:
   $filters/json_query.py: {}
   $filters/lists_mergeby.py:
     maintainers: vbotka
-  $filters/new_struct_with.py:
-    maintainers: indelog
   $filters/random_mac.py: {}
   $filters/time.py:
     maintainers: resmo
@@ -258,6 +258,8 @@ files:
     maintainers: amigus endlesstrax delineaKrehl tylerezimmerman
   $module_utils/:
     labels: module_utils
+  $module_utils/data_structure_merging.py:
+    maintainers: indelog
   $module_utils/gconftool2.py:
     maintainers: russoz
     labels: gconftool2
@@ -311,8 +313,6 @@ files:
   $module_utils/wdc_redfish_utils.py:
     maintainers: $team_wdc
     labels: wdc_redfish_utils
-  $module_utils/vars.py:
-    maintainers: indelog
   $module_utils/xenserver.py:
     maintainers: bvitnik
     labels: xenserver

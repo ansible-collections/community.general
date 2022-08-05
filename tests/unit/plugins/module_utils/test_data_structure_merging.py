@@ -10,7 +10,7 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils.vars import DataStructureMerging
+from ansible_collections.community.general.plugins.module_utils.data_structure_merging import DataStructureMerging
 
 CASES_DataStructureMerging_TEST_GET_RESULT = [
     {

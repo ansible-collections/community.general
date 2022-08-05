@@ -164,7 +164,7 @@ RETURN = r'''
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common._collections_compat import Mapping, Sequence
-from ansible_collections.community.general.plugins.module_utils.vars import DataStructureMerging
+from ansible_collections.community.general.plugins.module_utils.data_structure_merging import DataStructureMerging
 
 
 def data_structure_merging(base, changes, present, merge_list_by_index=False, keep_empty=False, remove_null=False):
@@ -186,5 +186,5 @@ class FilterModule(object):
 
     def filters(self):
         return {
-            'data_strucutre_merging': data_structure_merging,
+            'data_structure_merging': data_structure_merging,
         }
