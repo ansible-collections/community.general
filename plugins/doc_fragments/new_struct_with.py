@@ -28,22 +28,21 @@ options:
         B(base) data.
       - If C(yes), acts to adds/updates them.
       - If C(no), acts to remove them.
-  list_as_dict:
+  merge_list_by_index:
     type: bool
     required: false
     default: false
     description:
-      - There is two way to operate on lists.
-      - If C(no), simply checks the presence of an item in both lists.
-        Depending on the state of I(present), items in list on C(changes) side
-        be added or removed from items on B(base) data side. This limit the
-        comparison on the first level of the list (it is not possible to recursively
-        comparison items whit this) but you not need to take care about the position
-        of items.
-      - If C(yes), lists are treated as dictionaries by using items index
-        number as key. This permits to comparison items depending on their
-        position and operate recursively on them as long as it is possibles to
-        be sure of the values position.
+      - Lists items can be merged by their values or by their index.
+      - If C(no), it gets items in the list in C(change) side that are not
+        present in the list in the B(base) side, then it removes or add the
+        difference depending on the I(present) parameter value. This is not
+        recursive but the positions of values in both lists is not important.
+      - If C(yes), the differencing is done by comparing values on both lists
+        by their index position. This act like merging two dictionary where the
+        keys are index number of list items. With this, it is possible to
+        operate recursively on lists but by taking care about positions of
+        items in both to make sure to comparing correct values.
   keep_empty:
     type: bool
     required: false

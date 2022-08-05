@@ -80,23 +80,23 @@ EXAMPLES = r'''
     changes: ['Z', 'B', {C: '1'}, {E: '3'}]
 # "result": ['A', {C: '1', D: '2'}]
 
-- name: by using `list_as_dict=true`, lists act as dict, so we can recursively
-        changes them
+- name: by using `merge_list_by_index=true` and `present=true` add or update
+        items in lists by comparing them by their index
   ansible.builtin.set_fact:
     result: >
       {{ base | community.general.new_struct_with(changes, present=true,
-          list_as_dict=true) }}
+          merge_list_by_index=true) }}
   vars:
     base: ['A', 'B', {C: '1', D: '2'}, {E: '3'}]
     changes: ['Z', 'B', {C: '9', D: '2'}, {E: '3'}]
 # "result": ['Z', 'B', {C: '9', D: '2'}, {E: '3'}]
 
-- name: by using `list_as_dict=true`, lists act as dict, with `present=false`
-        we can recursively remove items in them
+- name: by using `merge_list_by_index=true` and `present=true` remove
+        items in lists by comparing them by their index
   ansible.builtin.set_fact:
     result: >
       {{ base | community.general.new_struct_with(changes, present=false,
-          list_as_dict=true) }}
+          merge_list_by_index=true) }}
   vars:
     base: ['A', 'B', {C: '1', D: '2'}, {E: '3'}]
     changes: ['Z', 'B', {C: '9', D: '2'}, {E: '3'}]
@@ -146,8 +146,8 @@ EXAMPLES = r'''
         removed not taking care about its actual value
   ansible.builtin.set_fact:
     result: >
-      {{ base | community.general.intersect_data_with(changes,
-          list_as_dict=true, remove_null=true) }}
+      {{ base | community.general.new_struct_with(changes,
+          merge_list_by_index=true, remove_null=true) }}
   vars:
     base: {A: '1', B: '2', C: {CA: '3', CB: '4'}, D: ['DA', 'DB']}
     changes: {B: null, C: {CB: null}, D: null}
@@ -167,12 +167,12 @@ from ansible.module_utils.common._collections_compat import Mapping, Sequence
 from ansible_collections.community.general.plugins.module_utils.vars import NewStructWith
 
 
-def new_struct_with(base, changes, present, list_as_dict=False, keep_empty=False, remove_null=False):
+def new_struct_with(base, changes, present, merge_list_by_index=False, keep_empty=False, remove_null=False):
     # type: (Mapping|Sequence, Mapping|Sequence, bool, bool, bool, bool) -> list|dict
     try:
         return NewStructWith(base, changes,
                              present=present,
-                             list_as_dict=list_as_dict,
+                             merge_seq_by_index=merge_list_by_index,
                              keep_empty=keep_empty,
                              remove_null=remove_null).get()
     except TypeError as e:

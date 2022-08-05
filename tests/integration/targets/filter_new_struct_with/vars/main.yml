@@ -5,7 +5,7 @@ test_case:
     base: {A: {AA: '1'}, B: ['2', '3'], C: '4'}
     changes: {A: {AB: '9'}, B: ['8', '2'], C: '7'}
     present: true
-    list_as_dict: false
+    merge_list_by_index: false
     keep_empty: false
     remove_null: false
     expected: {A: {AA: '1', AB: '9'}, B: ['2', '3', '8'], 'C': '7'}
@@ -13,39 +13,39 @@ test_case:
     base: {A: {AA: '1', AB: '2'}, B: ['3', '4'], C: '5'}
     changes: {A: {AA: '1'}, B: ['3', '9'], C: '8'}
     present: false
-    list_as_dict: false
+    merge_list_by_index: false
     keep_empty: false
     remove_null: false
     expected: {A: {AB: '2'}, B: ['4'], C: '5'}
-  - id: "(10) list as list changes present"
+  - id: "(10) no merge list by index, changes present"
     base: ['A', 'B', {C: '1', D: '2'}, {E: '3'}]
     changes: ['Z', 'B', {C: '1'}, {E: '3'}]
     present: true
-    list_as_dict: false
+    merge_list_by_index: false
     keep_empty: false
     remove_null: false
     expected: ['A', 'B', {C: '1', D: '2'}, {E: '3'}, 'Z', {C: '1'}]
-  - id: "(11) list as list changes absent"
+  - id: "(11) no merge list by index, changes absent"
     base: ['A', 'B', {C: '1', D: '2'}, {E: '3'}]
     changes: ['Z', 'B', {C: '1'}, {E: '3'}]
     present: false
-    list_as_dict: false
+    merge_list_by_index: false
     keep_empty: false
     remove_null: false
     expected: ['A', {C: '1', D: '2'}]
-  - id: "(12) list as dict changes present"
+  - id: "(12) merge list by index, changes present"
     base: ['A', 'B', {C: '1', D: '2'}, {E: '3'}]
     changes: ['Z', 'B', {C: '9', D: '2'}, {E: '3'}]
     present: true
-    list_as_dict: true
+    merge_list_by_index: true
     keep_empty: false
     remove_null: false
     expected: ['Z', 'B', {C: '9', D: '2'}, {E: '3'}]
-  - id: "(13) list as dict changes absent"
+  - id: "(13) merge list by index, changes absent"
     base: ['A', 'B', {C: '1', D: '2'}, {E: '3'}]
     changes: ['Z', 'B', {C: '9', D: '2'}, {E: '3'}]
     present: false
-    list_as_dict: true
+    merge_list_by_index: true
     keep_empty: false
     remove_null: false
     expected: ['A', {C: '1'}]
@@ -53,7 +53,7 @@ test_case:
     base: {A: {AA: '1'}, B: ['2', '3'], C: '4'}
     changes: {A: {AA: '1'}, B: ['2', '3']}
     present: false
-    list_as_dict: false
+    merge_list_by_index: false
     keep_empty: false
     remove_null: false
     expected: {C: '4'}
@@ -61,7 +61,7 @@ test_case:
     base: {A: {AA: '1'}, B: ['2', '3'], C: '4'}
     changes: {A: {AA: '1'}, B: ['2', '3']}
     present: false
-    list_as_dict: false
+    merge_list_by_index: false
     keep_empty: true
     remove_null: false
     expected: {A: {}, B: [], C: '4'}
@@ -69,7 +69,7 @@ test_case:
     base: ['A', 'B', 'C', {DA: '1', DB: '2'}, 'E']
     changes: [null, null, 'Z', {DA: '1', DB: null}, 'E']
     present: true
-    list_as_dict: true
+    merge_list_by_index: true
     keep_empty: false
     remove_null: false
     expected: ['A', 'B', 'Z', {DA: '1', DB: '2'}, 'E']
@@ -77,7 +77,7 @@ test_case:
     base: ['A', 'B', 'C', {DA: '1', DB: '2'}, 'E']
     changes: [null, null, 'Z', {DA: '1', DB: null}, 'E']
     present: false
-    list_as_dict: true
+    merge_list_by_index: true
     keep_empty: false
     remove_null: false
     expected: ['A', 'B', 'C', {DB: '2'}]
@@ -85,7 +85,7 @@ test_case:
     base: {A: '1', B: '2', C: {CA: '3', CB: '4'}, D: ['DA', 'DB']}
     changes: {B: null, C: {CB: null}, D: null}
     present: false
-    list_as_dict: true
+    merge_list_by_index: true
     keep_empty: false
     remove_null: true
     expected: {A: '1', C: {CA: '3'}}
@@ -93,7 +93,7 @@ test_case:
     base: "{{ ansible_facts['ansible_local'] }}"
     changes: {unprobable_key: "that can not exists"}
     present: false
-    list_as_dict: false
+    merge_list_by_index: false
     keep_empty: false
     remove_null: false
     expected: "{{ ansible_facts['ansible_local'] }}"

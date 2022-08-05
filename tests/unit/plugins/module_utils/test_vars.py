@@ -16,7 +16,7 @@ CASES_NewStructWith_TEST_GET_RESULT = [
     {
         'id': '00_simple_presence_of_change',
         'present': True,
-        'list_to_dict': False,
+        'merge_seq_by_index': False,
         'keep_empty': False,
         'remove_null': False,
         'base': {'A': {'AA': '1'}, 'B': ['2', '3'], 'C': '4'},
@@ -26,7 +26,7 @@ CASES_NewStructWith_TEST_GET_RESULT = [
     {
         'id': '01_simple_absence_of_change',
         'present': False,
-        'list_to_dict': False,
+        'merge_seq_by_index': False,
         'keep_empty': False,
         'remove_null': False,
         'base': {'A': {'AA': '1', 'AB': '2'}, 'B': ['3', '4'], 'C': '5'},
@@ -34,9 +34,9 @@ CASES_NewStructWith_TEST_GET_RESULT = [
         'expected': {'A': {'AB': '2'}, 'B': ['4'], 'C': '5'},
     },
     {
-        'id': '10_with_list_as_list_changes_present',
+        'id': '10_with_merge_seq_by_index_changes_present',
         'present': True,
-        'list_to_dict': False,
+        'merge_seq_by_index': False,
         'keep_empty': False,
         'remove_null': False,
         'base': ['A', 'B', {'C': '1', 'D': '2'}, {'E': '3'}],
@@ -44,9 +44,9 @@ CASES_NewStructWith_TEST_GET_RESULT = [
         'expected': ['A', 'B', {'C': '1', 'D': '2'}, {'E': '3'}, 'Z', {'C': '1'}],
     },
     {
-        'id': '11_with_list_as_list_modif_absent',
+        'id': '11_with_merge_seq_by_index_modif_absent',
         'present': False,
-        'list_to_dict': False,
+        'merge_seq_by_index': False,
         'keep_empty': False,
         'remove_null': False,
         'base': ['A', 'B', {'C': '1', 'D': '2'}, {'E': '3'}],
@@ -54,9 +54,9 @@ CASES_NewStructWith_TEST_GET_RESULT = [
         'expected': ['A', {'C': '1', 'D': '2'}],
     },
     {
-        'id': '12_with_list_as_dict_modif_present',
+        'id': '12_with_no_merge_seq_by_index_modif_present',
         'present': True,
-        'list_to_dict': True,
+        'merge_seq_by_index': True,
         'keep_empty': False,
         'remove_null': False,
         'base': ['A', 'B', {'C': '1', 'D': '2'}, {'E': '3'}],
@@ -64,9 +64,9 @@ CASES_NewStructWith_TEST_GET_RESULT = [
         'expected': ['Z', 'B', {'C': '9', 'D': '2'}, {'E': '3'}],
     },
     {
-        'id': '13_with_list_as_dict_modif_absent',
+        'id': '13_with_no_merge_seq_by_index_modif_absent',
         'present': False,
-        'list_to_dict': True,
+        'merge_seq_by_index': True,
         'keep_empty': False,
         'remove_null': False,
         'base': ['A', 'B', {'C': '1', 'D': '2'}, {'E': '3'}],
@@ -76,7 +76,7 @@ CASES_NewStructWith_TEST_GET_RESULT = [
     {
         'id': '20_without_keep_empty',
         'present': False,
-        'list_to_dict': False,
+        'merge_seq_by_index': False,
         'keep_empty': False,
         'remove_null': False,
         'base': {'A': {'AA': '1'}, 'B': ['2', '3'], 'C': '4'},
@@ -86,7 +86,7 @@ CASES_NewStructWith_TEST_GET_RESULT = [
     {
         'id': '21_with_keep_empty',
         'present': False,
-        'list_to_dict': False,
+        'merge_seq_by_index': False,
         'keep_empty': True,
         'remove_null': False,
         'base': {'A': {'AA': '1'}, 'B': ['2', '3'], 'C': '4'},
@@ -96,7 +96,7 @@ CASES_NewStructWith_TEST_GET_RESULT = [
     {
         'id': '30_ignore_none_present',
         'present': True,
-        'list_to_dict': True,
+        'merge_seq_by_index': True,
         'keep_empty': False,
         'remove_null': False,
         'base': ['A', 'B', 'C', {'DA': '1', 'DB': '2'}, 'E'],
@@ -106,7 +106,7 @@ CASES_NewStructWith_TEST_GET_RESULT = [
     {
         'id': '31_ignore_none_absent',
         'present': False,
-        'list_to_dict': True,
+        'merge_seq_by_index': True,
         'keep_empty': False,
         'remove_null': False,
         'base': ['A', 'B', 'C', {'DA': '1', 'DB': '2'}, 'E'],
@@ -116,7 +116,7 @@ CASES_NewStructWith_TEST_GET_RESULT = [
     {
         'id': '32_remove_null',
         'present': False,
-        'list_to_dict': True,
+        'merge_seq_by_index': True,
         'keep_empty': False,
         'remove_null': True,
         'base': {'A': '1', 'B': '2', 'C': {'CA': '3', 'CB': '4'}, 'D': ['DA', 'DB']},
@@ -161,7 +161,7 @@ def test_new_struct_with(testcase):
     res = NewStructWith(testcase['base'],
                         testcase['changes'],
                         testcase['present'],
-                        testcase['list_to_dict'],
+                        testcase['merge_seq_by_index'],
                         testcase['keep_empty'],
                         testcase['remove_null']).get()
     assert(res == testcase['expected'])

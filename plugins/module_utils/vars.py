@@ -13,8 +13,9 @@ from ansible.module_utils.six import string_types
 
 class NewStructWith(object):
 
+    # merge list like dict
     def __init__(self, base, changes, present=True,
-                 list_as_dict=False, keep_empty=False, remove_null=False):
+                 merge_seq_by_index=False, keep_empty=False, remove_null=False):
         # type: (Mapping|Sequence, Mapping|Sequence, bool, bool, bool, bool) -> None
         """
         Starting from two similar data structure, a `base`  that acting as the
@@ -69,18 +70,19 @@ class NewStructWith(object):
         * get this result :
           `{'A': {'AB': '2'}, 'B': ['4'], 'C': '5'}`
 
-        `list_as_dict` parameter defines the way by update list items in `base`
-        with lists items in `changes`.
-        - When `False`, simply check if an item in a list from `changes` side is
-          also present or absent from the corresponding list in `base` side.
-          With this, it is not possible to update lists items recursively but,
-          you not need to take care about the position of the item in both
-          list.
-        - When `True`, acts as if lists are dictionaries with their index
-          number as key. With this, values in both lists are compared
-          depending on their position and, it becomes possible to
-          recursively intersect their items as long as it is possibles to be
-          sure of the values position.
+        `merge_seq_by_index` sequences items can be merged by their values or
+        by their index.
+        - When `False`, it gets items in the sequence in `change` side that are
+          not present in the sequence in `base` side, then it removes or add
+          the difference depending on the `present` parameter value. This is
+          not recursive but the positions of values in both sequence is not
+          important.
+        - When `True`, the differencing is done by comparing values on both
+          sequence by their index position. This act like merging two dict
+          where the keys are index number of sequence items. With this, it is
+          possible to operate recursively on sequences but by taking care about
+          positions of items in both to make sure to comparing correct
+          values.
 
         Examples when `merge_seq_by_index=False` :
         * with this `base` data :
@@ -122,8 +124,8 @@ class NewStructWith(object):
 
         `keep_null` parameter defines how to treat `None` value in `changes`.
         - When `Fase`, `None` value are simply ignored. This can be useful when
-          lists are updated as dictionaries (when using`list_as_dict` with
-          `True`) and only an item at a specific position must be updated
+          lists are updated as dictionaries (when using `merge_seq_by_index`
+          with `True`) and only an item at a specific position must be updated
           without taking care of value of items that are before.
         - When `True`, all keys with in `changes` that have a `None` value are
           not be present in result. This can be used to ensure that a key in
@@ -165,7 +167,7 @@ class NewStructWith(object):
         self._base = base
         self._changes = changes
         self._present = present
-        self._list_as_dict = list_as_dict
+        self._merge_seq_by_index = merge_seq_by_index
         self._keep_empty = keep_empty
         self._remove_none = remove_null
 
@@ -216,7 +218,7 @@ class NewStructWith(object):
 
     def _get_new_list_with_changes_present(self, base, changes):
         # type: (Sequence, Sequence) -> list
-        if self._list_as_dict:
+        if self._merge_seq_by_index:
             base_dict = self._convert_generic_sequence_to_dict(base)
             changes_dict = self._convert_generic_sequence_to_dict(changes)
             res_dict = self._get_new_dict_with_changes_present(base_dict, changes_dict)
@@ -227,7 +229,7 @@ class NewStructWith(object):
 
     def _get_new_list_with_changes_absent(self, base, changes):
         # type: (Sequence, Sequence) -> list
-        if self._list_as_dict:
+        if self._merge_seq_by_index:
             base_dict = self._convert_generic_sequence_to_dict(base)
             changes_dict = self._convert_generic_sequence_to_dict(changes)
             new = self._get_new_dict_with_changes_absent(base_dict, changes_dict)
