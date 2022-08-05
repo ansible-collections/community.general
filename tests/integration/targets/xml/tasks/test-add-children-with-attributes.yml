@@ -19,6 +19,9 @@
           type: light
     register: add_children_with_attributes
 
+  - name: Add trailing newline
+    shell: echo "" >> /tmp/ansible-xml-beers.xml
+
   - name: Compare to expected result
     copy:
       src: results/test-add-children-with-attributes.xml

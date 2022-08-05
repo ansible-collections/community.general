@@ -17,6 +17,9 @@
       - beer: Old Rasputin
     register: add_children_elements
 
+  - name: Add trailing newline
+    shell: echo "" >> /tmp/ansible-xml-beers.xml
+
   - name: Compare to expected result
     copy:
       src: results/test-add-children-elements.xml
