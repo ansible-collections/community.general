@@ -14,18 +14,19 @@ options:
     type: raw
     required: true
     description:
-      - A structure assimilable to a dictionary or a list that acting to
-        add, update or remove keys/items from the B(base) data.
-      - Must have the same type as B(base) (both are lists or dictionaries).
+      - A data structure assimilable to a dictionary or a list that acting to
+        add, update or remove keys/items from source data structure.
+      - It must have the same type of that the source data structure (both are
+        lists or both are dictionaries).
       - Keys/items that composing it be present or absent in the result
-        depending on used parameters.
+        depending on the used parameters.
   present:
     type: bool
     required: false
     default: true
     description:
       - Indicate how keys/items in I(changes) are used to update them in
-        B(base) data.
+        the source data structure.
       - If C(yes), acts to adds/updates them.
       - If C(no), acts to remove them.
   merge_list_by_index:
@@ -33,15 +34,16 @@ options:
     required: false
     default: false
     description:
-      - Lists items can be merged by their values or by their index.
-      - If C(no), it gets items in the list in C(change) side that are not
-        present in the list in the B(base) side, then it removes or add the
-        difference depending on the I(present) parameter value. This is not
-        recursive but the positions of values in both lists is not important.
-      - If C(yes), the differencing is done by comparing values on both lists
+      - Set if the lists items are merged depending on their index or not.
+      - If C(no), it simply does a diff on items in both lists. The rest
+        depends on the value of I(present) parameter. If I(present) is true,
+        items that be present in I(changes) but not in the source data
+        structure will be added. If I(present) is false items that be present
+        in both side will be removed.
+      - If C(yes), the differencing is done by comparing values in both lists
         by their index position. This act like merging two dictionary where the
         keys are index number of list items. With this, it is possible to
-        operate recursively on lists but by taking care about positions of
+        operate recursively in lists but by taking care about positions of
         items in both to make sure to comparing correct values.
   keep_empty:
     type: bool

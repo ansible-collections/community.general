@@ -17,76 +17,68 @@ class DataStructureMerging(object):
                  merge_seq_by_index=False, keep_empty=False, remove_null=False):
         # type: (Mapping|Sequence, Mapping|Sequence, bool, bool, bool, bool) -> None
         """
-        Starting from two similar data structure, a `base`  that acting as the
-        source of data and `changes` that acting to add, update or remove
-        keys/items from the `base`, creates a new one similar strucutre.
+        Getting a new data structure by merging two other, `base` and `changes`.
 
-        `base` and `changes` are two structure that can be assimilable to
-        `Mapping` and `Sequence`, excluding string. Both must have similar
-        type, if one is a `Mapping` the other too, and if one is a `Sequence`
-        the other too.
+        `base` and `changes` must be two `Sequence` or two `Mapping`. If `base`
+        and `changes` are two `Sequence` the result will be a `list` and if
+        they are two `Mapping` the result will be a `dict`.
+
+        `base` acts as the source for the new data strucure. All of its
+        items that do not be updated by those in `changes` be present in the
+        result as they are.
+
+        `changes` acts to add, update or remove items in `base`, depending on
+        the used parameters.
 
         This is originally designed to easily update configurations structures
         provided by format like JSON, YAML or TOML by ensuring the presence or
-        the absence of some values in keys/items to the result.
+        the absence of some values in keys/items in the result.
 
-        To create the new structure starting from `base` and `changes` iterates
-        over all keys/items in `base` and for each which is also exists in
-        `changes` for a same path in the structure, compares their values. When
-        the compared values in both side are assimilable to dictionaries,
-        operate recursively on them.
+        To getting the result by merging `base` and `changes`, it iterates over
+        all keys/items in `base` and for each which also exists in `changes`
+        for a same path in the structure, compares their values. When the
+        compared values are assimilable to `Mapping`, operate recursively on
+        them.
 
-        `base` data structure acts as basis for the new one. Keys/items that
-        composing it be present or absent to the result depending on the
-        `present` parameter and to their path in the structure.
-
-        `changes` data structure acts to adding/updating or removing keys/items
-        from the original data. Keys/items that composing it be present or
-        absent to the result depending on the state of `present` parameter and
-        to their path in the structure.
-
-        `present` parameter defines if keys/items in `changes` must be present
-        or not to the result depending on their path in the structure.
-        - When `True`, keys/items in `changes` are used to update or add
-          keys/items at `base`.
-        - When `False`, keys/items in `changes` that for a same path in the
-          structure, also exists in `base` and have same value in both not be
-          present in the result (acts as they are removed from `base`).
+        `present` parameter is a boolean that set if items in `changes` be used
+        to adding/updating or to removing items from `base`.
+        - When `True`, it acts to add or update items.
+        - When `False`, it acts to remove items.
 
         Examples when `present=True` :
-        * with this `base` data :
+        * with this value as `base` :
           `{'A': {'AA': '1'}, 'B': ['2', '3'], 'C': '4'}`
-        * and this `changes` data :
+        * and this value as `changes` :
           `{'A': {'AB': '9'}, 'B': ['8', '2'], 'C': '7'}`
         * get this result :
           `{'A': {'AA': '1', 'AB': '9'}, 'B': ['2', '3', '8'], 'C': '7'}`
 
         Example when `present=False` :
-        * with this `base` data :
+        * with this value as `base` :
           `{'A': {'AA': '1', 'AB': '2'}, 'B': ['3', '4'], 'C': '5'}`
-        * and this `changes` data :
+        * and this value as `changes` :
           `{'A': {'AA': '1'}, 'B': ['3', '9'], 'C': '8'}`
         * get this result :
           `{'A': {'AB': '2'}, 'B': ['4'], 'C': '5'}`
 
-        `merge_seq_by_index` sequences items can be merged by their values or
-        by their index.
-        - When `False`, it gets items in the sequence in `change` side that are
-          not present in the sequence in `base` side, then it removes or add
-          the difference depending on the `present` parameter value. This is
-          not recursive but the positions of values in both sequence is not
-          important.
-        - When `True`, the differencing is done by comparing values on both
-          sequence by their index position. This act like merging two dict
-          where the keys are index number of sequence items. With this, it is
+        `merge_seq_by_index` is a boolean that set if `Sequence` items are
+        merged depending on their index or not.
+        - When `False`, it simply does a diff on items in both `Sequence`. The
+          rest depends on the value of `present` parameter. If `present` is
+          true, items that be present in `changes` and not present in `base`
+          will be added. If `present` is false items that be present in both
+          side will be removed.
+        - When `True`, the differencing is done by comparing values in both
+          `Sequence` by their index position. This act like merging two dict
+          where the keys are the index number of items. With this, it is
           possible to operate recursively on sequences but by taking care about
-          positions of items in both to make sure to comparing correct
+          positions of items in both side to make sure to comparing correct
           values.
 
         Examples when `merge_seq_by_index=False` :
-        * with this `base` data :
+        * with this value as `base` :
           `['A', 'B', {'C': '1', 'D': '2'}, {'E': '3'}]`
-        * and this `changes` data :
+        * and this value as `changes` :
           `['Z', 'B', {'C': '1'}, {'E': '3'}]`
         * if using `present=True`, get :
           `['A', 'B', {'C': '1', 'D': '2'}, {'E': '3'}, 'Z', {'C': '1'}]`
@@ -94,27 +86,25 @@ class DataStructureMerging(object):
           `['A', {'C': '1', 'D': '2'}]`
 
         Examples when `merge_seq_by_index=True` :
-        * with this `base` data :
+        * with this value as `base` :
           `['A', 'B', {'C': '1', 'D': '2'}, {'E': '3'}]`
-        * and this `changes` data :
+        * and `this value as `changes` :
           `['Z', 'B', {'C': '9', 'D': '2'}, {'E': '3'}]`
         * if using`present=True`, get :
           `['Z', 'B', {'C': '9', 'D': '2'}, {'E': '3'}]`
         * or if using `present=False`, get :
           `['A', {'C': '1'}]`
 
-        `keep_empty` parameter defines if keys with emptied dictionaries or
-        lists must be kept or not in the result. This has no effect when
-        `present` parameter is `True`.
-        - When `False`, keys that contain empty dictionary or list after the
-          update not be kept in the result.
-        - When `True`, keys that contain empty dictionary or list after the
-          update be kept in the result.
+        `keep_empty` parameter defines if emptied `Sequence` or `Mapping` items
+        in the structure be kept or not. This has no effect when `present`
+        parameter is `True`.
+        - When `False`, emptied `Sequence` or `Mapping are kept.
+        - When `True`, emptied `Sequence` or `Mapping` are removed.
 
         Examples :
-        * with this `base` data :
+        * with this value as `base` :
           `{'A': {'AA': '1'}, 'B': ['2', '3'], 'C': '4'}`
-        * and this `changes` data :
+        * and this value as `changes` :
           `{'A': {'AA': '1'}, 'B': ['2', '3']}`
         * if using `keep_empty=False` with `present=False`, get :
           `{'C': '4'}`
@@ -122,19 +112,18 @@ class DataStructureMerging(object):
           `{'A': {}, 'B': [], 'C': '4'}`
 
         `keep_null` parameter defines how to treat `None` value in `changes`.
-        - When `Fase`, `None` value are simply ignored. This can be useful when
-          lists are updated as dictionaries (when using `merge_seq_by_index`
-          with `True`) and only an item at a specific position must be updated
-          without taking care of value of items that are before.
+        - When `False`, `None` value are simply ignored. This can be useful
+          when is needed to only update a specific item in the `Sequence` by
+          ignoring other that be before.
         - When `True`, all keys with in `changes` that have a `None` value are
-          not be present in result. This can be used to ensure that a key in
-          `base` be removed without taking care of the value that it can have.
+          removed not taking care about their value in `base`. It is useful
+          when is needed to ensure that a key will be removed.
 
-        Example that ingoing lists values at specific position with
+        Example that ignoring items at a specific position with
         `remove_none=False` and `merge_seq_by_index=True` :
-        * with this `base` data :
+        * with this value as `base` :
           `['A', 'B', 'C', {'DA': '1', 'DB': '2'}, 'E']`
-        * and this `changes` data :
+        * and this value as `changes` :
           `[None, None, 'Z', {'DA': '1', 'DB': None}, 'E']`
         * if using `present=True', get :
           `['A', 'B', 'Z', {'DA': '1', 'DB': '2'}, 'E']`
@@ -142,9 +131,9 @@ class DataStructureMerging(object):
           `['A', 'B', 'C', {'DB': '2'}]`
 
         Example that remove keys/items with `remove_none=True` and `present=False` :
-        * with this `base` data :
+        * with this value as `base` :
          `{'A': '1', 'B': '2', 'C': {'CA': '3', 'CB': '4'}, 'D': ['DA', 'DB']}`
-        * and this `changes` data :
+        * and this value as `changes` :
           `{'B': None, 'C': {'CB': None}, 'D': None}`
         * get :
           `{'A': '1', 'C': {'CA': '3'}}`

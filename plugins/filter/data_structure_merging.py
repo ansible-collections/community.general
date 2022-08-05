@@ -8,32 +8,32 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 name: data_structure_merging
-short_description: Get a new data structure data structure starting from two
-                   other, one as a base and the second acting as changes.
+short_description: Get a new data structure by updating the one provided in
+                   I(_input) with items of I(changes).
 version_added: 5.3.0
 author: DEMAREST Maxime (@indelog)
 description:
-  - Get a new data structure starting from two similar other, one called
-    B(base) provided by I(_input) that acts as data source and the second
-    called C(changes) that acts to add, update or remove keys/items from
-    B(base).
+  - Starting from two similar data structure, assimilable to lists or
+    dictionaries, provided by I(_input) and I(changes), create a new one by
+    updating keys/items of I(_input) by those of I(changes).
+  - Items in I(changes) can be used to add or update items from I(_input) or to
+    remove them.
   - Basically, this is designed for working on configurations structures provided
     by format like JSON, YAML or TOML to ensuring the presence or the absence
     of some values in keys/items inside.
-  - I(_input) and I(changes) must be both assimilable to dictionaries or lists
-    and have same type (both are list or both are dictionary).
-  - Updating B(base) keys/items with I(changes) keys/items is done by comparing
+  - Updating the input keys/items with those in I(changes) is done by comparing
     their values for a same path in the structure. If the compared values are
     both assimilable to dictionaries, recursively operate on them.
 positional: changes
 options:
   _input:
     description:
-      - A data structure assimilable to a dictionary or a list acting as data
-        source to make new one.
-      - Must have the same type as I(changes) (both are lists or dictionaries).
-      - All of its keys/items which are not be updated or removed by keys/items
-        in I(changes) will be present as they are in the result.
+      - A data structure assimilable to a dictionary or a list which items act
+        as the source of data.
+      - Its type must be similar to that of I(changes) (both are lists or both
+        are dictionaries).
+      - All of its keys/items who not updated or removed by the merging with
+        I(changes) will be kept as they are in the result.
     type: raw
     required: true
 extends_documentation_fragment: community.general.data_structure_merging
@@ -43,7 +43,7 @@ seealso:
  '''
 
 EXAMPLES = r'''
-- name: result with keys/items in `base` updated by theses in `changes`
+- name: with `present=true`, add or update keys/items with those in `changes`
   ansible.builtin.set_fact:
     result: >
       {{ base | community.general.data_structure_merging(changes, present=true) }}
@@ -52,7 +52,7 @@ EXAMPLES = r'''
     changes: {A: {AB: '9'}, B: ['8', '2'], C: '7'}
 # "result": {"A": {"AA": "1", "AB": "9"}, "B": ["2", "3", "8"], "C": "7"}}
 
-- name: result with keys/items from `base` without keys/items from `changes`
+- name: with `present=true`, remove keys/items with those in `changes`
         that have same value in `base`
   ansible.builtin.set_fact:
     result: >
@@ -62,7 +62,7 @@ EXAMPLES = r'''
     changes: {A: {AA: '1'}, B: ['3', '9'], C: '8'}
 # "result": {A: {AB: '2'}, B: ['4'], C: '5'}}
 
-- name: work on lists, all items `base` and `changes` be in the result
+- name: merge two list by ensuring that data in `changes` be present
   ansible.builtin.set_fact:
     result: >
       {{ base | community.general.data_structure_merging(changes, present=true) }}
@@ -71,7 +71,7 @@ EXAMPLES = r'''
     changes: ['Z', 'B', {C: '1'}, {E: '3'}]
 # "result": ['A', 'B', {C: '1', D: '2'}, {E: '3'}, 'Z', {C: '1'}]
 
-- name: work on lists, remove items in `changes` from `base` to get result
+- name: merge two list by ensuring that data in `changes` be absent
   ansible.builtin.set_fact:
     result: >
       {{ base | community.general.data_structure_merging(changes, present=false) }}"
@@ -80,8 +80,8 @@ EXAMPLES = r'''
     changes: ['Z', 'B', {C: '1'}, {E: '3'}]
 # "result": ['A', {C: '1', D: '2'}]
 
-- name: by using `merge_list_by_index=true` and `present=true` add or update
-        items in lists by comparing them by their index
+- name: add/update items in list by merging their items by index, like this,
+        list acts like dict with the index number as keys
   ansible.builtin.set_fact:
     result: >
       {{ base | community.general.data_structure_merging(changes, present=true,
@@ -91,8 +91,8 @@ EXAMPLES = r'''
     changes: ['Z', 'B', {C: '9', D: '2'}, {E: '3'}]
 # "result": ['Z', 'B', {C: '9', D: '2'}, {E: '3'}]
 
-- name: by using `merge_list_by_index=true` and `present=true` remove
-        items in lists by comparing them by their index
+- name: remove items in list by merging their items by index, like this, list
+        acts like dict with the index number as keys
   ansible.builtin.set_fact:
     result: >
       {{ base | community.general.data_structure_merging(changes, present=false,
@@ -102,7 +102,7 @@ EXAMPLES = r'''
     changes: ['Z', 'B', {C: '9', D: '2'}, {E: '3'}]
 # "result": ['A', {C: '1'}]
 
-- name: By default, nested lists/dictionaries that be emptied are removed
+- name: by default, nested lists/dictionaries that be emptied are removed
   ansible.builtin.set_fact:
     result: >
       {{ base | community.general.data_structure_merging(changes, present=false) }}
@@ -111,7 +111,7 @@ EXAMPLES = r'''
     changes: {A: {AA: '1'}, B: ['2', '3']}
 # "result": {C: '4'}
 
-- name: If use `keep_empty=true`, nested lists/dictionaries emptied are keept
+- name: if use `keep_empty=true`, nested lists/dictionaries emptied are keept
   ansible.builtin.set_fact:
     result: >
       {{ base | community.general.data_structure_merging(changes, present=false,
@@ -121,7 +121,7 @@ EXAMPLES = r'''
     changes: {A: {AA: '1'}, B: ['2', '3']}
 # "result": {A: {}, B: [], C: '4'}
 
-- name: Use `null` value to ignore some items in list to avoid updating
+- name: use `null` value to ignore some items in list to avoid updating
         them when using `dict_as_list=true`
   ansible.builtin.set_fact:
     result: >
@@ -142,7 +142,7 @@ EXAMPLES = r'''
     changes: [null, null, 'Z', {DA: '1', DB: null}, 'E']
 # "result": ['A', 'B', 'C', {DB: '2'}]
 
-- name: with `remove_null=true`, you can use null value to ensure a key be
+- name: with `remove_null=true`, null value can be used to ensure that a key be
         removed not taking care about its actual value
   ansible.builtin.set_fact:
     result: >
@@ -156,9 +156,9 @@ EXAMPLES = r'''
 
 RETURN = r'''
   _result:
-    description: A new structure that contains keys/items provided in I(_input)
-                 updated with keys/items provided in I(changes) depending to
-                 used parameters.
+    description: A new data structure that contains keys/items provided in
+                 I(_input) updated with keys/items provided in I(changes)
+                 depending to used parameters.
     type: raw
 '''
 
