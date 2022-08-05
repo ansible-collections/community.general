@@ -934,7 +934,7 @@ def create_attributes_str(attributes_dict, labels_list):
         attributes_str += 'LABELS="' + ','.join('{label}'.format(label=label) for label in labels_list) + '"\n'
     if attributes_dict:
         for key, val in attributes_dict.items():
-            if val.lstrip()[0] == "[":
+            if str(val).lstrip().startswith("["):
                 attributes_str += '{key}={val}\n'.format(key=key.upper(), val=val)
             else:
                 attributes_str += '{key}="{val}"\n'.format(key=key.upper(), val=val)
