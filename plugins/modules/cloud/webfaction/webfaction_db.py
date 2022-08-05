@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2015, Quentin Stafford-Fraser, with contributions gratefully acknowledged from:
+# Copyright (c) 2015, Quentin Stafford-Fraser, with contributions gratefully acknowledged from:
 #     * Andy Baker
 #     * Federico Tarantini
 #

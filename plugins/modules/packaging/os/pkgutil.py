@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2013, Alexander Winkler <mail () winkler-alexander.de>
+# Copyright (c) 2013, Alexander Winkler <mail () winkler-alexander.de>
 # based on svr4pkg by
 #  Boyd Adamson <boyd () boydadamson.com> (2012)
 #

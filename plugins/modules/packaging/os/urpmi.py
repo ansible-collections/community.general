@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2013, Philippe Makowski
+# Copyright (c) 2013, Philippe Makowski
 # Written by Philippe Makowski <philippem@mageia.org>
 # Based on apt module written by Matthew Williams <matthew@flowroute.com>
 

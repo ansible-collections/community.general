@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2013, Evgenii Terechkov
+# Copyright (c) 2013, Evgenii Terechkov
 # Written by Evgenii Terechkov <evg@altlinux.org>
 # Based on urpmi module written by Philippe Makowski <philippem@mageia.org>
 

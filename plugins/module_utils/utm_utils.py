@@ -5,7 +5,7 @@
 # still belong to the author of the module, and may assign their own license
 # to the complete work.
 #
-# Copyright: (c) 2018, Johannes Brunswicker <johannes.brunswicker@gmail.com>
+# Copyright (c) 2018, Johannes Brunswicker <johannes.brunswicker@gmail.com>
 #
 # Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
 # SPDX-License-Identifier: BSD-2-Clause

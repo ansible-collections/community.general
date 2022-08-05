@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2018, Scott Buchanan <sbuchanan@ri.pn>
-# Copyright: (c) 2016, Andrew Zenk <azenk@umn.edu> (lastpass.py used as starting point)
-# Copyright: (c) 2018, Ansible Project
+# Copyright (c) 2018, Scott Buchanan <sbuchanan@ri.pn>
+# Copyright (c) 2016, Andrew Zenk <azenk@umn.edu> (lastpass.py used as starting point)
+# Copyright (c) 2018, Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 

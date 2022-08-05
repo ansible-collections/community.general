@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
-# Copyright: (c) 2016, Indrajit Raychaudhuri <irc+code@indrajit.com>
+# Copyright (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
+# Copyright (c) 2016, Indrajit Raychaudhuri <irc+code@indrajit.com>
 #
 # Based on homebrew (Andrew Dunham <andrew@du.nham.ca>)
 #
