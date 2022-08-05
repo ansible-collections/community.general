@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2012, Franck Cuny <franck@lumberjaph.net>
-# (c) 2021, Alexei Znamensky <russoz@gmail.com>
+# Copyright (c) 2012, Franck Cuny <franck@lumberjaph.net>
+# Copyright (c) 2021, Alexei Znamensky <russoz@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 

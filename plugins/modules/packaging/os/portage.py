@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2016, William L Thomson Jr
-# (c) 2013, Yap Sok Ann
+# Copyright (c) 2016, William L Thomson Jr
+# Copyright (c) 2013, Yap Sok Ann
 # Written by Yap Sok Ann <sokann@gmail.com>
 # Modified by William L. Thomson Jr. <wlt@o-sinc.com>
 # Based on apt module written by Matthew Williams <matthew@flowroute.com>

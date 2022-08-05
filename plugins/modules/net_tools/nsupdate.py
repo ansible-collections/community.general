@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2016, Marcin Skarbek <github@skarbek.name>
-# (c) 2016, Andreas Olsson <andreas@arrakis.se>
-# (c) 2017, Loic Blot <loic.blot@unix-experience.fr>
+# Copyright (c) 2016, Marcin Skarbek <github@skarbek.name>
+# Copyright (c) 2016, Andreas Olsson <andreas@arrakis.se>
+# Copyright (c) 2017, Loic Blot <loic.blot@unix-experience.fr>
 #
 # This module was ported from https://github.com/mskarbek/ansible-nsupdate
 #

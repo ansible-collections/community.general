@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
-# (c) 2013, Paul Durivage <paul.durivage@rackspace.com>
+# Copyright (c) 2013, Paul Durivage <paul.durivage@rackspace.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
