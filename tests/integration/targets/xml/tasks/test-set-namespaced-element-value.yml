@@ -33,6 +33,9 @@
       value: '11'
     register: set_element_second_run
 
+  - name: Add trailing newline
+    shell: echo "" >> /tmp/ansible-xml-namespaced-beers.xml
+
   - name: Compare to expected result
     copy:
       src: results/test-set-namespaced-element-value.xml

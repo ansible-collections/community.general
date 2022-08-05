@@ -16,6 +16,9 @@
       state: absent
     register: remove_element
 
+  - name: Add trailing newline
+    shell: echo "" >> /tmp/ansible-xml-beers.xml
+
   - name: Compare to expected result
     copy:
       src: results/test-remove-element.xml
