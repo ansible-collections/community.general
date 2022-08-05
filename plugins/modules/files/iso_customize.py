@@ -146,8 +146,7 @@ def get_local_tmp_dir():
     try:
         os.makedirs(tmp_dir)
     except OSError as err:
-        ret_msg = (f"Exception caught when creating folder {tmp_dir} "
-                   f"with error {to_native(err)}")
+        ret_msg = f"Failed to create folder {tmp_dir} with error {to_native(err)}"
         MODULE_ISO_CUSTOMIZE.fail_json(msg=ret_msg)
 
     return tmp_dir
@@ -166,13 +165,12 @@ def iso_get_file(opened_iso, iso_file, tmp_dir):
         else:
             return -1, f"{iso_file} is not a file in ISO"
     except Exception as err:
-        MODULE_ISO_CUSTOMIZE.fail_json(msg=str(
-            (f"Failed to get iso file {iso_file} "
-             f"with error: {to_native(err)}")))
+        msg = f"Failed to get iso file {iso_file} with error: {to_native(err)}"
+        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
 
     if not os.path.exists(file_local):
-        return -1, (f"Failed to get file {iso_file} in ISO."
-                    f"Please check the file exists in ISO or not")
+        msg = f"Failed to get file {iso_file} in ISO. Does file exists in ISO ?"
+        return -1, msg
 
     return 0, file_local
 
@@ -265,9 +263,8 @@ def iso_add_file(opened_iso, src_file, dest_file):
         opened_iso.add_file(file_local, iso_path=file_in_iso_path,
                             rr_name=file_name.lower())
     except Exception as err:
-        MODULE_ISO_CUSTOMIZE.fail_json(msg=str(
-            (f"Failed to add local file {file_local} to "
-             f"iso {file_in_iso_path} with error: {to_native(err)}")))
+        msg = f"Failed to add local file {file_local} to ISO with error: {to_native(err)}"
+        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
 
     return 0, ""
 
@@ -283,9 +280,8 @@ def iso_delete_file(opened_iso, dest_file):
         if record and not record.is_file():
             return -1, f"the file {dest_file} does not exists in ISO or not a file."
     except Exception as err:
-        MODULE_ISO_CUSTOMIZE.fail_json(msg=str(
-            (f"Failed to get record for file {dest_file}, "
-             f"with error: {to_native(err)}")))
+        msg = f"Failed to get record for file {dest_file} with error: {to_native(err)}"
+        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
 
     if '.' not in file_name:
         file_in_iso_path = dest_file.upper() + '.;1'
@@ -296,9 +292,8 @@ def iso_delete_file(opened_iso, dest_file):
         opened_iso.rm_file(
             iso_path=file_in_iso_path, rr_name=file_name.lower())
     except Exception as err:
-        MODULE_ISO_CUSTOMIZE.fail_json(msg=str(
-            (f"Failed to delete iso file {dest_file} with error: "
-             f"{to_native(err)}")))
+        msg = f"Failed to delete iso file {dest_file} with error: {to_native(err)}"
+        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
 
     return 0, ""
 
@@ -351,8 +346,8 @@ def iso_rebuild(src_iso, dest_iso, op_data_list):
 
         iso.write(dest_iso)
     except Exception as err:
-        MODULE_ISO_CUSTOMIZE.fail_json(msg=str(
-            (f"Failed to rebuild ISO {src_iso} with error: {to_native(err)}")))
+        msg = f"Failed to rebuild ISO {src_iso} with error: {to_native(err)}"
+        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
     finally:
         if iso:
             iso.close()
@@ -394,9 +389,8 @@ def main():
         try:
             os.makedirs(dest_iso_dir)
         except OSError as err:
-            module.fail_json(msg=str(
-                (f"Exception caught when creating folder {dest_iso_dir} "
-                 f"with error: {to_native(err)}")))
+            msg = f"Failed to create folder {dest_iso_dir}. error: {to_native(err)}"
+            module.fail_json(msg=msg)
 
     MODULE_ISO_CUSTOMIZE = module
 
@@ -410,7 +404,7 @@ def main():
     if add_files_list and len(add_files_list) > 0:
         for item in add_files_list:
             if not os.path.exists(item['src_file']):
-                module.fail_json(msg=str(f"The {item['src_file']} does not exist."))
+                module.fail_json(msg=f"The {item['src_file']} does not exist.")
         op_data_item['op'] = "add_files"
         op_data_item['data'] = add_files_list
         op_data_list.append(copy.deepcopy(op_data_item))
