@@ -21,6 +21,9 @@
       state: absent
     register: remove_namespaced_attribute
 
+  - name: Add trailing newline
+    shell: echo "" >> /tmp/ansible-xml-namespaced-beers.xml
+
   - name: Compare to expected result
     copy:
       src: results/test-remove-namespaced-attribute.xml

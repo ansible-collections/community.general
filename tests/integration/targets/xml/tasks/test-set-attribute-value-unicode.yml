@@ -17,6 +17,9 @@
       value: нет
     register: set_attribute_value_unicode
 
+  - name: Add trailing newline
+    shell: echo "" >> /tmp/ansible-xml-beers.xml
+
   - name: Compare to expected result
     copy:
       src: results/test-set-attribute-value-unicode.xml
