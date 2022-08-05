@@ -1,9 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# (c) 2016, Tomas Karasek <tom.to.the.k@gmail.com>
-# (c) 2016, Matt Baldwin <baldwin@stackpointcloud.com>
-# (c) 2016, Thibaud Morel l'Horset <teebes@gmail.com>
-#
+# Copyright (c) 2016, Tomas Karasek <tom.to.the.k@gmail.com>
+# Copyright (c) 2016, Matt Baldwin <baldwin@stackpointcloud.com>
+# Copyright (c) 2016, Thibaud Morel l'Horset <teebes@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 

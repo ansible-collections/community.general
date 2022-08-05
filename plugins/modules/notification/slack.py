@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2020, Lee Goolsbee <lgoolsbee@atlassian.com>
-# (c) 2020, Michal Middleton <mm.404@icloud.com>
-# (c) 2017, Steve Pletcher <steve@steve-pletcher.com>
-# (c) 2016, René Moser <mail@renemoser.net>
-# (c) 2015, Stefan Berggren <nsg@nsg.cc>
-# (c) 2014, Ramon de la Fuente <ramon@delafuente.nl>
+# Copyright (c) 2020, Lee Goolsbee <lgoolsbee@atlassian.com>
+# Copyright (c) 2020, Michal Middleton <mm.404@icloud.com>
+# Copyright (c) 2017, Steve Pletcher <steve@steve-pletcher.com>
+# Copyright (c) 2016, René Moser <mail@renemoser.net>
+# Copyright (c) 2015, Stefan Berggren <nsg@nsg.cc>
+# Copyright (c) 2014, Ramon de la Fuente <ramon@delafuente.nl>
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later

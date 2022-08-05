@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, Patrick Pelletier <pp.pelletier@gmail.com>
+# Copyright (c) 2013, Patrick Pelletier <pp.pelletier@gmail.com>
 # Based on pacman (Afterburn) and pkgin (Shaun Zinck) modules
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)

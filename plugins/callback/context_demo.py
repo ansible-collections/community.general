@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# (C) 2012, Michael DeHaan, <michael.dehaan@gmail.com>
-# (c) 2017 Ansible Project
+# Copyright (C) 2012, Michael DeHaan, <michael.dehaan@gmail.com>
+# Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
