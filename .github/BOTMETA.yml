@@ -107,7 +107,7 @@ files:
     maintainers: $team_ansible_core
   $doc_fragments/:
     labels: docs_fragments
-  $doc_fragments/data_structure_merging.py:
+  $doc_fragments/structure_merging.py:
     maintainers: indelog
   $doc_fragments/hpe3par.py:
     maintainers: farhan7500 gautamphegde
@@ -122,7 +122,7 @@ files:
     labels: xenserver
   $filters/counter.py:
     maintainers: keilr
-  $filters/data_structure_merging.py:
+  $filters/structure_merging.py:
     maintainers: indelog
   $filters/dict.py:
     maintainers: felixfontein
@@ -258,7 +258,7 @@ files:
     maintainers: amigus endlesstrax delineaKrehl tylerezimmerman
   $module_utils/:
     labels: module_utils
-  $module_utils/data_structure_merging.py:
+  $module_utils/structure_merging.py:
     maintainers: indelog
   $module_utils/gconftool2.py:
     maintainers: russoz
