@@ -3,8 +3,9 @@
 # (c) 2017,  Jean-Philippe Evrard <jean-philippe@evrard.me>
 # 2020, SCC France, Eric Belhomme <ebelhomme@fr.scc.com>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# # Copyright: (c) 2018, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+# # Copyright (c) 2018, Ansible Project
 #
 etcd3_ver: "v3.2.14"
 etcd3_download_server: "https://storage.googleapis.com/etcd"

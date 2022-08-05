@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright: (c) 2021, Andreas Botzner (@paginabianca) <andreas at botzner dot com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2021, Andreas Botzner (@paginabianca) <andreas at botzner dot com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 # Proxmox Tasks module unit tests.
 # The API responses used in these tests were recorded from PVE version 6.4-8
