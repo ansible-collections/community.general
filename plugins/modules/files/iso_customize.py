@@ -204,7 +204,7 @@ def iso_add_dir(opened_iso, dir_path):
         parent_dir = "/"
     check_dirname = check_dirname.strip()
 
-    for dirname, dirlist, _ in opened_iso.walk(iso_path=parent_dir.upper()):
+    for dirname, dirlist, dummy_filelist in opened_iso.walk(iso_path=parent_dir.upper()):
         if dirname == parent_dir.upper():
             if check_dirname.upper() in dirlist:
                 return 0, ""
