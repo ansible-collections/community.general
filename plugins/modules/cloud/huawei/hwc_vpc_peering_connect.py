@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2019 Huawei
-# GNU General Public License v3.0+ (see COPYING or
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or SPDX-License-Identifier: GPL-3.0-or-later
 # https://www.gnu.org/licenses/gpl-3.0.txt)
 
 
