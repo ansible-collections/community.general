@@ -1,3 +1,8 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: "Verify required variables: model_name, model_type, oneclick_username, oneclick_password, oneclick_url"
   fail:
     msg: "One or more of the following variables are not set: model_name, model_type, oneclick_username, oneclick_password, oneclick_url"

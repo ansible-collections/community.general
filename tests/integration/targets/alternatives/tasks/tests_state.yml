@@ -1,3 +1,8 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Add a few dummy alternatives with state = present and make sure that the
 # group is in 'auto' mode and the highest priority alternative is selected.
 - name: Add some dummy alternatives with state = present
