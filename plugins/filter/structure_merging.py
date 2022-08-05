@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-name: data_structure_merging
+name: structure_merging
 short_description: Get a new data structure by updating the one provided in
                    I(_input) with items of I(changes).
 version_added: 5.3.0
@@ -36,7 +36,7 @@ options:
         I(changes) will be kept as they are in the result.
     type: raw
     required: true
-extends_documentation_fragment: community.general.data_structure_merging
+extends_documentation_fragment: community.general.structure_merging
 seealso:
   - module: ansible.utils.update_fact
     description: Do something similar in another way.
@@ -46,7 +46,7 @@ EXAMPLES = r'''
 - name: with `present=true`, add or update keys/items with those in `changes`
   ansible.builtin.set_fact:
     result: >
-      {{ base | community.general.data_structure_merging(changes, present=true) }}
+      {{ base | community.general.structure_merging(changes, present=true) }}
   vars:
     base: {A: {AA: '1'}, B: ['2', '3'], C: '4'}
     changes: {A: {AB: '9'}, B: ['8', '2'], C: '7'}
@@ -56,7 +56,7 @@ EXAMPLES = r'''
         that have same value in `base`
   ansible.builtin.set_fact:
     result: >
-      {{ base | community.general.data_structure_merging(changes, present=false) }}
+      {{ base | community.general.structure_merging(changes, present=false) }}
   vars:
     base: {A: {AA: '1', AB: '2'}, B: ['3', '4'], C: '5'}
     changes: {A: {AA: '1'}, B: ['3', '9'], C: '8'}
@@ -65,7 +65,7 @@ EXAMPLES = r'''
 - name: merge two list by ensuring that data in `changes` be present
   ansible.builtin.set_fact:
     result: >
-      {{ base | community.general.data_structure_merging(changes, present=true) }}
+      {{ base | community.general.structure_merging(changes, present=true) }}
   vars:
     base: ['A', 'B', {C: '1', D: '2'}, {E: '3'}]
     changes: ['Z', 'B', {C: '1'}, {E: '3'}]
@@ -74,7 +74,7 @@ EXAMPLES = r'''
 - name: merge two list by ensuring that data in `changes` be absent
   ansible.builtin.set_fact:
     result: >
-      {{ base | community.general.data_structure_merging(changes, present=false) }}"
+      {{ base | community.general.structure_merging(changes, present=false) }}"
   vars:
     base: ['A', 'B', {C: '1', D: '2'}, {E: '3'}]
     changes: ['Z', 'B', {C: '1'}, {E: '3'}]
@@ -84,7 +84,7 @@ EXAMPLES = r'''
         list acts like dict with the index number as keys
   ansible.builtin.set_fact:
     result: >
-      {{ base | community.general.data_structure_merging(changes, present=true,
+      {{ base | community.general.structure_merging(changes, present=true,
           merge_list_by_index=true) }}
   vars:
     base: ['A', 'B', {C: '1', D: '2'}, {E: '3'}]
@@ -95,7 +95,7 @@ EXAMPLES = r'''
         acts like dict with the index number as keys
   ansible.builtin.set_fact:
     result: >
-      {{ base | community.general.data_structure_merging(changes, present=false,
+      {{ base | community.general.structure_merging(changes, present=false,
           merge_list_by_index=true) }}
   vars:
     base: ['A', 'B', {C: '1', D: '2'}, {E: '3'}]
@@ -105,7 +105,7 @@ EXAMPLES = r'''
 - name: by default, nested lists/dictionaries that be emptied are removed
   ansible.builtin.set_fact:
     result: >
-      {{ base | community.general.data_structure_merging(changes, present=false) }}
+      {{ base | community.general.structure_merging(changes, present=false) }}
   vars:
     base: {A: {AA: '1'}, B: ['2', '3'], C: '4'}
     changes: {A: {AA: '1'}, B: ['2', '3']}
@@ -114,7 +114,7 @@ EXAMPLES = r'''
 - name: if use `keep_empty=true`, nested lists/dictionaries emptied are keept
   ansible.builtin.set_fact:
     result: >
-      {{ base | community.general.data_structure_merging(changes, present=false,
+      {{ base | community.general.structure_merging(changes, present=false,
           keep_empty=true) }}
   vars:
     base: {A: {AA: '1'}, B: ['2', '3'], C: '4'}
@@ -125,7 +125,7 @@ EXAMPLES = r'''
         them when using `dict_as_list=true`
   ansible.builtin.set_fact:
     result: >
-      {{ base | community.general.data_structure_merging(changes, dict_as_list=true) }}
+      {{ base | community.general.structure_merging(changes, dict_as_list=true) }}
   vars:
     base: ['A', 'B', 'C', {DA: '1', DB: '2'}, 'E']
     changes: [null, null, 'Z', {DA: '1', DB: null}, 'E']
@@ -135,7 +135,7 @@ EXAMPLES = r'''
         them when using `dict_as_list=true` and `present=false`
   ansible.builtin.set_fact:
     result: >
-      {{ base | community.general.data_structure_merging(changes, present=false,
+      {{ base | community.general.structure_merging(changes, present=false,
           dict_as_list=true) }}
   vars:
     base: ['A', 'B', 'C', {DA: '1', DB: '2'}, 'E']
@@ -146,7 +146,7 @@ EXAMPLES = r'''
         removed not taking care about its actual value
   ansible.builtin.set_fact:
     result: >
-      {{ base | community.general.data_structure_merging(changes,
+      {{ base | community.general.structure_merging(changes,
           merge_list_by_index=true, remove_null=true) }}
   vars:
     base: {A: '1', B: '2', C: {CA: '3', CB: '4'}, D: ['DA', 'DB']}
@@ -164,17 +164,17 @@ RETURN = r'''
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils.common._collections_compat import Mapping, Sequence
-from ansible_collections.community.general.plugins.module_utils.data_structure_merging import DataStructureMerging
+from ansible_collections.community.general.plugins.module_utils.structure_merging import StructureMerging
 
 
-def data_structure_merging(base, changes, present, merge_list_by_index=False, keep_empty=False, remove_null=False):
+def structure_merging(base, changes, present, merge_list_by_index=False, keep_empty=False, remove_null=False):
     # type: (Mapping|Sequence, Mapping|Sequence, bool, bool, bool, bool) -> list|dict
     try:
-        return DataStructureMerging(base, changes,
-                                    present=present,
-                                    merge_seq_by_index=merge_list_by_index,
-                                    keep_empty=keep_empty,
-                                    remove_null=remove_null).get()
+        return StructureMerging(base, changes,
+                                present=present,
+                                merge_seq_by_index=merge_list_by_index,
+                                keep_empty=keep_empty,
+                                remove_null=remove_null).get()
     except TypeError as e:
         raise AnsibleFilterError(e)
 
@@ -186,5 +186,5 @@ class FilterModule(object):
 
     def filters(self):
         return {
-            'data_structure_merging': data_structure_merging,
+            'structure_merging': structure_merging,
         }

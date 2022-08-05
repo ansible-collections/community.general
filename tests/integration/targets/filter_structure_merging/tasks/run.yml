@@ -4,7 +4,7 @@
 
 - name: "{{ case.id }} - get result"
   ansible.builtin.set_fact:
-    result: "{{ case.base|community.general.data_structure_merging(case.changes, present=case.present, merge_list_by_index=case.merge_list_by_index, keep_empty=case.keep_empty, remove_null=case.remove_null) }}"
+    result: "{{ case.base|community.general.structure_merging(case.changes, present=case.present, merge_list_by_index=case.merge_list_by_index, keep_empty=case.keep_empty, remove_null=case.remove_null) }}"
 
 - name: "{{ case.id }} - check result"
   ansible.builtin.assert:
