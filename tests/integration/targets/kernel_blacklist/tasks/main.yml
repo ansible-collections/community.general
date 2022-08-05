@@ -44,7 +44,7 @@
     - orig_stat.stat.size == stat_test_1.stat.size
     - orig_stat.stat.checksum == stat_test_1.stat.checksum
     - orig_stat.stat.mtime == stat_test_1.stat.mtime
-    - stat_test_1.stat.checksum == 'blacklist aaaa\nblacklist bbbb\nblacklist cccc'|checksum
+    - stat_test_1.stat.checksum == 'blacklist aaaa\nblacklist bbbb\nblacklist cccc\n' | checksum
 
 - name: add new item to list
   community.general.kernel_blacklist:

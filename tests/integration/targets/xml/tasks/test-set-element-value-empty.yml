@@ -16,6 +16,9 @@
       value: ''
     register: set_element_value_empty
 
+  - name: Add trailing newline
+    shell: echo "" >> /tmp/ansible-xml-beers.xml
+
   - name: Compare to expected result
     copy:
       src: results/test-set-element-value-empty.xml

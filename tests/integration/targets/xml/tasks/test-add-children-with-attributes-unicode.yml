@@ -19,6 +19,9 @@
           type: экстра
     register: add_children_with_attributes_unicode
 
+  - name: Add trailing newline
+    shell: echo "" >> /tmp/ansible-xml-beers.xml
+
   - name: Compare to expected result
     copy:
       src: results/test-add-children-with-attributes-unicode.xml

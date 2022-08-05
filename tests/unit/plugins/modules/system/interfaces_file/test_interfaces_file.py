@@ -77,6 +77,8 @@ class TestInterfacesFileModule(unittest.TestCase):
     def compareStringWithFile(self, string, path):
         # self.assertEqual("","_",msg=path)
         testfilepath = os.path.join(golden_output_path, path)
+        if string and not string.endswith('\n'):
+            string += '\n'
         goldenstring = string
         if not os.path.isfile(testfilepath):
             f = io.open(testfilepath, 'wb')
