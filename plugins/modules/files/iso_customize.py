@@ -46,11 +46,11 @@ options:
      elements: dict
      required: no
      suboptions:
-       src_file: 
+       src_file:
          description:
          - The absolute path with file name in local machine.
          type: path
-       dest_file: 
+       dest_file:
          description:
          - The absolute path with file name on ISO file.
          type: path
@@ -75,7 +75,7 @@ options:
          description:
          - the match string in line of file, it supports regular expression
          type: str
-       replace: 
+       replace:
          description:
          - the target string
          type: str
@@ -146,10 +146,9 @@ def get_local_tmp_dir():
     try:
         os.makedirs(tmp_dir)
     except OSError as err:
-        MODULE_ISO_CUSTOMIZE.fail_json(msg=str(
-            (f"Exception caught when creating folder {tmp_dir} "
-             f"with error {to_native(err)}")
-            ))
+        ret_msg = (f"Exception caught when creating folder {tmp_dir} "
+                   f"with error {to_native(err)}")
+        MODULE_ISO_CUSTOMIZE.fail_json(msg=ret_msg)
 
     return tmp_dir
 
@@ -169,8 +168,7 @@ def iso_get_file(opened_iso, iso_file, tmp_dir):
     except Exception as err:
         MODULE_ISO_CUSTOMIZE.fail_json(msg=str(
             (f"Failed to get iso file {iso_file} "
-             f"with error: {to_native(err)}")
-            ))
+             f"with error: {to_native(err)}")))
 
     if not os.path.exists(file_local):
         return -1, (f"Failed to get file {iso_file} in ISO."
