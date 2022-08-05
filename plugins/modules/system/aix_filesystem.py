@@ -106,55 +106,55 @@ EXAMPLES = r'''
 - name: Create filesystem in a previously defined logical volume.
   community.general.aix_filesystem:
     device: testlv
-    community.general.filesystem: /testfs
+    filesystem: /testfs
     state: present
 
 - name: Creating NFS filesystem from nfshost.
   community.general.aix_filesystem:
     device: /home/ftp
     nfs_server: nfshost
-    community.general.filesystem: /home/ftp
+    filesystem: /home/ftp
     state: present
 
 - name: Creating a new file system without a previously logical volume.
   community.general.aix_filesystem:
-    community.general.filesystem: /newfs
+    filesystem: /newfs
     size: 1G
     state: present
     vg: datavg
 
 - name: Unmounting /testfs.
   community.general.aix_filesystem:
-    community.general.filesystem: /testfs
+    filesystem: /testfs
     state: unmounted
 
 - name: Resizing /mksysb to +512M.
   community.general.aix_filesystem:
-    community.general.filesystem: /mksysb
+    filesystem: /mksysb
     size: +512M
     state: present
 
 - name: Resizing /mksysb to 11G.
   community.general.aix_filesystem:
-    community.general.filesystem: /mksysb
+    filesystem: /mksysb
     size: 11G
     state: present
 
 - name: Resizing /mksysb to -2G.
   community.general.aix_filesystem:
-    community.general.filesystem: /mksysb
+    filesystem: /mksysb
     size: -2G
     state: present
 
 - name: Remove NFS filesystem /home/ftp.
   community.general.aix_filesystem:
-    community.general.filesystem: /home/ftp
+    filesystem: /home/ftp
     rm_mount_point: yes
     state: absent
 
 - name: Remove /newfs.
   community.general.aix_filesystem:
-    community.general.filesystem: /newfs
+    filesystem: /newfs
     rm_mount_point: yes
     state: absent
 '''
