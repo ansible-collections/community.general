@@ -1,0 +1,2 @@
+minor_changes:
+  - "Added MIT license as ``MIT-license.txt`` for ``tests/unit/plugins/modules/packaging/language/test_gem.py`` (https://github.com/ansible-collections/community.general/pull/5065, https://github.com/ansible-collections/community.general/pull/5072)."
