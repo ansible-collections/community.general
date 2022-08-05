@@ -10,9 +10,9 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils.vars import NewStructWith
+from ansible_collections.community.general.plugins.module_utils.vars import DataStructureMerging
 
-CASES_NewStructWith_TEST_GET_RESULT = [
+CASES_DataStructureMerging_TEST_GET_RESULT = [
     {
         'id': '00_simple_presence_of_change',
         'present': True,
@@ -124,9 +124,9 @@ CASES_NewStructWith_TEST_GET_RESULT = [
         'expected': {'A': '1', 'C': {'CA': '3'}},
     },
 ]
-CASES_NewStructWith_TEST_GET_RESULT_IDS = [item['id'] for item in CASES_NewStructWith_TEST_GET_RESULT]
+CASES_DataStructureMerging_TEST_GET_RESULT_IDS = [item['id'] for item in CASES_DataStructureMerging_TEST_GET_RESULT]
 
-CASES_NewStructWith_TEST_ERRORS = [
+CASES_DataStructureMerging_TEST_ERRORS = [
     {
         'id': '00_not_same_type',
         'base': ['A'],
@@ -153,23 +153,23 @@ CASES_NewStructWith_TEST_ERRORS = [
         'changes': ['A', 'B', 'C'],
     },
 ]
-CASES_NewStructWith_TEST_ERRORS_IDS = [item['id'] for item in CASES_NewStructWith_TEST_ERRORS]
+CASES_DataStructureMerging_TEST_ERRORS_IDS = [item['id'] for item in CASES_DataStructureMerging_TEST_ERRORS]
 
 
-@pytest.mark.parametrize('testcase', CASES_NewStructWith_TEST_GET_RESULT, ids=CASES_NewStructWith_TEST_GET_RESULT_IDS)
-def test_new_struct_with(testcase):
-    res = NewStructWith(testcase['base'],
-                        testcase['changes'],
-                        testcase['present'],
-                        testcase['merge_seq_by_index'],
-                        testcase['keep_empty'],
-                        testcase['remove_null']).get()
+@pytest.mark.parametrize('testcase', CASES_DataStructureMerging_TEST_GET_RESULT, ids=CASES_DataStructureMerging_TEST_GET_RESULT_IDS)
+def test_DataStructureMerging(testcase):
+    res = DataStructureMerging(testcase['base'],
+                               testcase['changes'],
+                               testcase['present'],
+                               testcase['merge_seq_by_index'],
+                               testcase['keep_empty'],
+                               testcase['remove_null']).get()
     assert(res == testcase['expected'])
 
 
 @pytest.mark.parametrize('testcase',
-                         CASES_NewStructWith_TEST_ERRORS,
-                         ids=CASES_NewStructWith_TEST_ERRORS_IDS)
-def test_new_struct_with_error(testcase):
+                         CASES_DataStructureMerging_TEST_ERRORS,
+                         ids=CASES_DataStructureMerging_TEST_ERRORS_IDS)
+def test_DataStructureMerging_error(testcase):
     with pytest.raises(TypeError):
-        NewStructWith(testcase['base'], testcase['changes'])
+        DataStructureMerging(testcase['base'], testcase['changes'])

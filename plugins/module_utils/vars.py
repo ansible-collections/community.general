@@ -11,9 +11,8 @@ from ansible.module_utils.common._collections_compat import Mapping, Sequence
 from ansible.module_utils.six import string_types
 
 
-class NewStructWith(object):
+class DataStructureMerging(object):
 
-    # merge list like dict
     def __init__(self, base, changes, present=True,
                  merge_seq_by_index=False, keep_empty=False, remove_null=False):
         # type: (Mapping|Sequence, Mapping|Sequence, bool, bool, bool, bool) -> None
@@ -259,4 +258,5 @@ class NewStructWith(object):
     @staticmethod
     def _convert_generic_mapping_to_list(elem):
         # type: (Mapping) -> list
+        return list(elem.values())
         return list(elem.values())
