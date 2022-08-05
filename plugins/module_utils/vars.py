@@ -257,4 +257,4 @@ class NewStructWith(object):
     @staticmethod
     def _convert_generic_mapping_to_list(elem):
         # type: (Mapping) -> list
-        return [val for key, val in elem.items()]
+        return list(elem.values())
