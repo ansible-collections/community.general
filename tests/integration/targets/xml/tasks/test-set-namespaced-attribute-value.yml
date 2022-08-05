@@ -22,6 +22,9 @@
       value: 'false'
     register: set_namespaced_attribute_value
 
+  - name: Add trailing newline
+    shell: echo "" >> /tmp/ansible-xml-namespaced-beers.xml
+
   - name: Compare to expected result
     copy:
       src: results/test-set-namespaced-attribute-value.xml
