@@ -1,3 +1,4 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
@@ -7,7 +8,7 @@
 # Copyright (c) 2020, Lukas Bestle <project-ansible@lukasbestle.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
----
+
 # Test preparation
 - name: Uninstall Rested to ensure consistent starting point
   mas:

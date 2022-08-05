@@ -1,3 +1,8 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: 'Download NPM'
   unarchive:
     src: 'https://ansible-ci-files.s3.amazonaws.com/test/integration/targets/npm/{{ nodejs_path }}.tar.gz'
