@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2020, Amin Vakil <info@aminvakil.com>
-# Copyright: (c) 2016-2018, Matt Davis <mdavis@ansible.com>
-# Copyright: (c) 2018, Sam Doran <sdoran@redhat.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2020, Amin Vakil <info@aminvakil.com>
+# Copyright (c) 2016-2018, Matt Davis <mdavis@ansible.com>
+# Copyright (c) 2018, Sam Doran <sdoran@redhat.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
