@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2015, Kevin Brebanov <https://github.com/kbrebanov>
+# Copyright (c) 2015, Kevin Brebanov <https://github.com/kbrebanov>
 # Based on pacman (Afterburn <https://github.com/afterburn>, Aaron Bull Schaefer <aaron@elasticdog.com>)
 # and apt (Matthew Williams <matthew@flowroute.com>) modules.
 #

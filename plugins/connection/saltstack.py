@@ -2,8 +2,8 @@
 # Based on local.py (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
 # Based on chroot.py (c) 2013, Maykel Moya <mmoya@speedyrails.com>
 # Based on func.py
-# (c) 2014, Michael Scherer <misc@zarb.org>
-# (c) 2017 Ansible Project
+# Copyright (c) 2014, Michael Scherer <misc@zarb.org>
+# Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 

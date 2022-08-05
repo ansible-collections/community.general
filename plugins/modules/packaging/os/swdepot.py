@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, Raul Melo
+# Copyright (c) 2013, Raul Melo
 # Written by Raul Melo <raulmelo@gmail.com>
 # Based on yum module written by Seth Vidal <skvidal at fedoraproject.org>
 #

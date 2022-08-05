@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2014, Kim Nørgaard
+# Copyright (c) 2014, Kim Nørgaard
 # Written by Kim Nørgaard <jasen@jasen.dk>
 # Based on pkgng module written by bleader <bleader@ratonland.org>
 # that was based on pkgin module written by Shaun Zinck <shaun.zinck at gmail.com>

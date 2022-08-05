@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, Jimmy Tang <jcftang@gmail.com>
+# Copyright (c) 2013, Jimmy Tang <jcftang@gmail.com>
 # Based on okpg (Patrick Pelletier <pp.pelletier@gmail.com>), pacman
 # (Afterburn) and pkgin (Shaun Zinck) modules
 #

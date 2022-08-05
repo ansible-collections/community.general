@@ -1,14 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, Patrick Callahan <pmc@patrickcallahan.com>
+# Copyright (c) 2013, Patrick Callahan <pmc@patrickcallahan.com>
 # based on
 #     openbsd_pkg
-#         (c) 2013
+#         Copyright (c) 2013
 #         Patrik Lundin <patrik.lundin.swe@gmail.com>
 #
 #     yum
-#         (c) 2012, Red Hat, Inc
+#         Copyright (c) 2012, Red Hat, Inc
 #         Written by Seth Vidal <skvidal at fedoraproject.org>
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
