@@ -33,7 +33,7 @@ options:
         description:
             - Name of organization to target.
             - Leave both I(organization_name) and I(organization_id) empty for a wildcard vault.
-            - Use to I(organization_name='') for personal vaults.
+            - Use I(organization_name='') for personal vaults.
             - Mutually exclusive from I(organization_id).
     organization_id:
         type: str
