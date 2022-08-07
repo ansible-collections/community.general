@@ -22,6 +22,7 @@ _state_map = dict(
     reinstall_all='reinstall-all',
 )
 
+
 def pipx_runner(module, command, **kwargs):
     runner = CmdRunner(
         module,
