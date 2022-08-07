@@ -4,6 +4,7 @@
 # Lib/posixpath.py of cpython
 # It is licensed under the PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
 # (See LICENSES/PSF-2.0.txt in this collection)
+# SPDX-License-Identifier: PSF-2.0
 
 from __future__ import absolute_import, division, print_function
 
