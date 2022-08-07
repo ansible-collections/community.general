@@ -328,18 +328,6 @@ def _err(msg):
     return exception_raiser
 
 
-def _to_dict(obj):
-    '''Return a 'dict'-ized version of the inputs.
-
-    Turn an iterable of _Elements into a list of dicts.
-    Turn a single _Element into a dict version of the element.
-    '''
-    if hasattr(obj, '__iter__'):
-        return [el.dict for el in obj]
-
-    return obj.dict
-
-
 def main():
     module = AnsibleModule(
         argument_spec=dict(

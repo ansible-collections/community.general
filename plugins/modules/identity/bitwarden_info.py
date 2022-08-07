@@ -166,7 +166,7 @@ class BitwardenInfo(object):
 
         return {
             'changed': False,
-            'ansible_module_results': _to_dict(dispatch[self._target]()),
+            'ansible_module_results': _dictize_elements(dispatch[self._target]()),
         }
 
 
@@ -182,7 +182,7 @@ def _err(msg):
     return exception_raiser
 
 
-def _to_dict(obj):
+def _dictize_elements(obj):
     '''Return a 'dict'-ized version of the inputs.
 
     Turn an iterable of _Elements into a list of dicts.
