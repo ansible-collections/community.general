@@ -55,6 +55,12 @@ options:
       - Timeout in seconds for URL requests to OOB controller.
     default: 10
     type: int
+  resource_id:
+    required: false
+    description:
+      - ID of the component to modify, such as C(Enclosure), C(IOModuleAFRU), C(PowerSupplyBFRU), C(FanExternalFRU3), or C(FanInternalFRU).
+    type: str
+    version_added: 5.4.0
   update_image_uri:
     required: false
     description:
@@ -76,8 +82,6 @@ options:
         description:
           - The password for retrieving the update image.
         type: str
-requirements:
-  - dnspython (2.1.0 for Python 3, 1.16.0 for Python 2)
 notes:
   - In the inventory, you can specify baseuri or ioms.  See the EXAMPLES section.
   - ioms is a list of FQDNs for the enclosure's IOMs.
@@ -125,6 +129,47 @@ EXAMPLES = '''
     update_creds:
       username: operator
       password: supersecretpwd
+
+- name: Turn on enclosure indicator LED
+  community.general.wdc_redfish_command:
+    category: Chassis
+    resource_id: Enclosure
+    command: IndicatorLedOn
+    username: "{{ username }}"
+    password: "{{ password }}"
+
+- name: Turn off IOM A indicator LED
+  community.general.wdc_redfish_command:
+    category: Chassis
+    resource_id: IOModuleAFRU
+    command: IndicatorLedOff
+    username: "{{ username }}"
+    password: "{{ password }}"
+
+- name: Turn on Power Supply B indicator LED
+  community.general.wdc_redfish_command:
+    category: Chassis
+    resource_id: PowerSupplyBFRU
+    command: IndicatorLedOn
+    username: "{{ username }}"
+    password: "{{ password }}"
+
+- name: Turn on External Fan 3 indicator LED
+  community.general.wdc_redfish_command:
+    category: Chassis
+    resource_id: FanExternalFRU3
+    command: IndicatorLedOn
+    username: "{{ username }}"
+    password: "{{ password }}"
+
+- name: Turn on Internal Fan indicator LED
+  community.general.wdc_redfish_command:
+    category: Chassis
+    resource_id: FanInternalFRU
+    command: IndicatorLedOn
+    username: "{{ username }}"
+    password: "{{ password }}"
+
 '''
 
 RETURN = '''
@@ -143,6 +188,10 @@ CATEGORY_COMMANDS_ALL = {
     "Update": [
         "FWActivate",
         "UpdateAndActivate"
+    ],
+    "Chassis": [
+        "IndicatorLedOn",
+        "IndicatorLedOff"
     ]
 }
 
@@ -164,6 +213,7 @@ def main():
                     password=dict(no_log=True)
                 )
             ),
+            resource_id=dict(),
             update_image_uri=dict(),
             timeout=dict(type='int', default=10)
         ),
@@ -191,6 +241,9 @@ def main():
     # timeout
     timeout = module.params['timeout']
 
+    # Resource to modify
+    resource_id = module.params['resource_id']
+
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
         module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, sorted(CATEGORY_COMMANDS_ALL.keys()))))
@@ -209,7 +262,7 @@ def main():
             "https://" + iom for iom in module.params['ioms']
         ]
     rf_utils = WdcRedfishUtils(creds, root_uris, timeout, module,
-                               resource_id=None, data_modification=True)
+                               resource_id=resource_id, data_modification=True)
 
     # Organize by Categories / Commands
 
@@ -236,17 +289,33 @@ def main():
                 update_opts["update_image_uri"] = module.params['update_image_uri']
                 result = rf_utils.update_and_activate(update_opts)
 
+    elif category == "Chassis":
+        result = rf_utils._find_chassis_resource()
         if result['ret'] is False:
             module.fail_json(msg=to_native(result['msg']))
+
+        led_commands = ["IndicatorLedOn", "IndicatorLedOff"]
+
+        # Check if more than one led_command is present
+        num_led_commands = sum([command in led_commands for command in command_list])
+        if num_led_commands > 1:
+            result = {'ret': False, 'msg': "Only one IndicatorLed command should be sent at a time."}
         else:
-            del result['ret']
-            changed = result.get('changed', True)
-            session = result.get('session', dict())
-            module.exit_json(changed=changed,
-                             session=session,
-                             msg='Action was successful' if not module.check_mode else result.get(
-                                 'msg', "No action performed in check mode."
-                             ))
+            for command in command_list:
+                if command.startswith("IndicatorLed"):
+                    result = rf_utils.manage_chassis_indicator_led(command)
+
+    if result['ret'] is False:
+        module.fail_json(msg=to_native(result['msg']))
+    else:
+        del result['ret']
+        changed = result.get('changed', True)
+        session = result.get('session', dict())
+        module.exit_json(changed=changed,
+                         session=session,
+                         msg='Action was successful' if not module.check_mode else result.get(
+                             'msg', "No action performed in check mode."
+                         ))
 
 
 if __name__ == '__main__':

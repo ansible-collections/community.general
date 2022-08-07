@@ -49,6 +49,37 @@ MOCK_SUCCESSFUL_RESPONSE_WITH_UPDATE_SERVICE_RESOURCE = {
     "data": {
         "UpdateService": {
             "@odata.id": "/UpdateService"
+        },
+        "Chassis": {
+            "@odata.id": "/Chassis"
+        }
+    }
+}
+
+MOCK_SUCCESSFUL_RESPONSE_CHASSIS = {
+    "ret": True,
+    "data": {
+        "Members": [
+            {
+                "@odata.id": "/redfish/v1/Chassis/Enclosure"
+            }
+        ]
+    }
+}
+
+MOCK_SUCCESSFUL_RESPONSE_CHASSIS_ENCLOSURE = {
+    "ret": True,
+    "data": {
+        "Id": "Enclosure",
+        "IndicatorLED": "Off",
+        "Actions": {
+            "Oem": {
+                "WDC": {
+                    "#Chassis.Locate": {
+                        "target": "/Chassis.Locate"
+                    }
+                }
+            }
         }
     }
 }
@@ -205,15 +236,31 @@ def mock_get_request_enclosure_multi_tenant(*args, **kwargs):
         raise RuntimeError("Illegal call to get_request in test: " + args[1])
 
 
+def mock_get_request_led_indicator(*args, **kwargs):
+    """Mock for get_request for LED indicator tests."""
+    if args[1].endswith("/redfish/v1") or args[1].endswith("/redfish/v1/"):
+        return MOCK_SUCCESSFUL_RESPONSE_WITH_UPDATE_SERVICE_RESOURCE
+    elif args[1].endswith("/Chassis"):
+        return MOCK_SUCCESSFUL_RESPONSE_CHASSIS
+    elif args[1].endswith("Chassis/Enclosure"):
+        return MOCK_SUCCESSFUL_RESPONSE_CHASSIS_ENCLOSURE
+    else:
+        raise RuntimeError("Illegal call to get_request in test: " + args[1])
+
+
 def mock_post_request(*args, **kwargs):
     """Mock post_request with successful response."""
-    if args[1].endswith("/UpdateService.FWActivate"):
-        return {
-            "ret": True,
-            "data": ACTION_WAS_SUCCESSFUL_MESSAGE
-        }
-    else:
-        raise RuntimeError("Illegal POST call to: " + args[1])
+    valid_endpoints = [
+        "/UpdateService.FWActivate",
+        "/Chassis.Locate"
+    ]
+    for endpoint in valid_endpoints:
+        if args[1].endswith(endpoint):
+            return {
+                "ret": True,
+                "data": ACTION_WAS_SUCCESSFUL_MESSAGE
+            }
+    raise RuntimeError("Illegal POST call to: " + args[1])
 
 
 def mock_get_firmware_inventory_version_1_2_3(*args, **kwargs):
@@ -276,6 +323,68 @@ class TestWdcRedfishCommand(unittest.TestCase):
                 'ioms': [],
             })
             module.main()
+
+    def test_module_enclosure_led_indicator_on(self):
+        """Test turning on a valid LED indicator (in this case we use the Enclosure resource)."""
+        module_args = {
+            'category': 'Chassis',
+            'command': 'IndicatorLedOn',
+            'username': 'USERID',
+            'password': 'PASSW0RD=21',
+            "resource_id": "Enclosure",
+            "baseuri": "example.com"
+        }
+        set_module_args(module_args)
+
+        with patch.multiple("ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
+                            get_request=mock_get_request_led_indicator,
+                            post_request=mock_post_request):
+            with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+                module.main()
+            self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE,
+                             get_exception_message(ansible_exit_json))
+            self.assertTrue(is_changed(ansible_exit_json))
+
+    def test_module_invalid_resource_led_indicator_on(self):
+        """Test turning LED on for an invalid resource id."""
+        module_args = {
+            'category': 'Chassis',
+            'command': 'IndicatorLedOn',
+            'username': 'USERID',
+            'password': 'PASSW0RD=21',
+            "resource_id": "Disk99",
+            "baseuri": "example.com"
+        }
+        set_module_args(module_args)
+
+        with patch.multiple("ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
+                            get_request=mock_get_request_led_indicator,
+                            post_request=mock_post_request):
+            with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
+                module.main()
+            expected_error_message = "Chassis resource Disk99 not found"
+            self.assertEqual(expected_error_message,
+                             get_exception_message(ansible_fail_json))
+
+    def test_module_enclosure_led_off_already_off(self):
+        """Test turning LED indicator off when it's already off.  Confirm changed is False and no POST occurs."""
+        module_args = {
+            'category': 'Chassis',
+            'command': 'IndicatorLedOff',
+            'username': 'USERID',
+            'password': 'PASSW0RD=21',
+            "resource_id": "Enclosure",
+            "baseuri": "example.com"
+        }
+        set_module_args(module_args)
+
+        with patch.multiple("ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
+                            get_request=mock_get_request_led_indicator):
+            with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+                module.main()
+            self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE,
+                             get_exception_message(ansible_exit_json))
+            self.assertFalse(is_changed(ansible_exit_json))
 
     def test_module_fw_activate_first_iom_unavailable(self):
         """Test that if the first IOM is not available, the 2nd one is used."""
