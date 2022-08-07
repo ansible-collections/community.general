@@ -146,8 +146,8 @@ def get_local_tmp_dir():
     try:
         os.makedirs(tmp_dir)
     except OSError as err:
-        ret_msg = f"Failed to create folder {tmp_dir} with error {to_native(err)}"
-        MODULE_ISO_CUSTOMIZE.fail_json(msg=ret_msg)
+        msg = "Failed to create folder %s with error %s" % (tmp_dir, to_native(err))
+        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
 
     return tmp_dir
 
@@ -163,23 +163,22 @@ def iso_get_file(opened_iso, iso_file, tmp_dir):
         if record.is_file():
             opened_iso.get_file_from_iso(file_local, rr_path=iso_file)
         else:
-            return -1, f"{iso_file} is not a file in ISO"
+            return -1, "%s is not a file in ISO" % iso_file
     except Exception as err:
-        msg = f"Failed to get iso file {iso_file} with error: {to_native(err)}"
+        msg = "Failed to get iso file %s with error: %s" % (iso_file, to_native(err))
         MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
 
     if not os.path.exists(file_local):
-        msg = f"Failed to get file {iso_file} in ISO. Does file exists in ISO ?"
-        return -1, msg
+        return -1, "Failed to get file %s in ISO. Does file exists in ISO ?" % iso_file
 
     return 0, file_local
 
 
 def modify_local_file(local_file, regexp, replace):
     if not os.path.exists(local_file):
-        return -1, f"Not find file {local_file}"
+        return -1, "Not find file %s" % local_file
 
-    shutil.copy(local_file, f"{local_file}.org")
+    shutil.copy(local_file, "%s.org" % local_file)
     with open(local_file, "r+", encoding="utf-8") as fp:
         lines = fp.readlines()
         for (i,) in enumerate(lines):
@@ -206,15 +205,15 @@ def iso_add_dir(opened_iso, dir_path):
                 return 0, ""
 
             if parent_dir == "/":
-                current_dirpath = f"/{check_dirname}"
+                current_dirpath = "/%s" % check_dirname
             else:
-                current_dirpath = f"{parent_dir}/{check_dirname}"
+                current_dirpath = "%s/%s" % (parent_dir, check_dirname)
 
             try:
                 opened_iso.add_directory(current_dirpath.upper(), rr_name=check_dirname)
                 break
             except Exception as err:
-                msg = f"Failed to create dir {current_dirpath} with error: {to_native(err)}"
+                msg = "Failed to create dir %s with error: %s" % (current_dirpath, to_native(err))
                 return -1, msg
 
     return 0, ""
@@ -228,9 +227,9 @@ def iso_add_dirs(opened_iso, dir_path):
         if not item.strip():
             continue
         if current_dirpath == "/":
-            current_dirpath = f"/{item}".format(item)
+            current_dirpath = "/%s" % item
         else:
-            current_dirpath = f"{current_dirpath}/{item}"
+            current_dirpath = "%s/%s" % (current_dirpath, item)
 
         ret, ret_msg = iso_add_dir(opened_iso, current_dirpath)
         if ret != 0:
@@ -242,7 +241,7 @@ def iso_add_dirs(opened_iso, dir_path):
 def iso_add_file(opened_iso, src_file, dest_file):
     dest_file = dest_file.strip()
     if dest_file[0] != "/":
-        dest_file = f"/{dest_file}"
+        dest_file = "/%s" % dest_file
 
     file_local = src_file.strip()
 
@@ -263,7 +262,7 @@ def iso_add_file(opened_iso, src_file, dest_file):
         opened_iso.add_file(file_local, iso_path=file_in_iso_path,
                             rr_name=file_name.lower())
     except Exception as err:
-        msg = f"Failed to add local file {file_local} to ISO with error: {to_native(err)}"
+        msg = "Failed to add local file %s to ISO with error: %s" % (file_local, to_native(err))
         MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
 
     return 0, ""
@@ -272,15 +271,15 @@ def iso_add_file(opened_iso, src_file, dest_file):
 def iso_delete_file(opened_iso, dest_file):
     dest_file = dest_file.strip()
     if dest_file[0] != "/":
-        dest_file = f"/{dest_file}"
+        dest_file = "/%s" % dest_file
     file_name = os.path.basename(dest_file)
 
     try:
         record = opened_iso.get_record(rr_path=dest_file)
         if record and not record.is_file():
-            return -1, f"the file {dest_file} does not exists in ISO or not a file."
+            return -1, "the file %s does not exists in ISO or not a file." % dest_file
     except Exception as err:
-        msg = f"Failed to get record for file {dest_file} with error: {to_native(err)}"
+        msg = "Failed to get record of file %s with error: %s" % (dest_file, to_native(err))
         MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
 
     if '.' not in file_name:
@@ -292,7 +291,7 @@ def iso_delete_file(opened_iso, dest_file):
         opened_iso.rm_file(
             iso_path=file_in_iso_path, rr_name=file_name.lower())
     except Exception as err:
-        msg = f"Failed to delete iso file {dest_file} with error: {to_native(err)}"
+        msg = "Failed to delete iso file %s with error: %s" % (dest_file, to_native(err))
         MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
 
     return 0, ""
@@ -346,7 +345,7 @@ def iso_rebuild(src_iso, dest_iso, op_data_list):
 
         iso.write(dest_iso)
     except Exception as err:
-        msg = f"Failed to rebuild ISO {src_iso} with error: {to_native(err)}"
+        msg = "Failed to rebuild ISO %s with error: %s" % (src_iso, to_native(err))
         MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
     finally:
         if iso:
@@ -376,7 +375,7 @@ def main():
 
     src_iso = module.params.get('src_iso')
     if not os.path.exists(src_iso):
-        module.fail_json(msg=str(f"The {src_iso} does not exist."))
+        module.fail_json(msg="The %s does not exist." % src_iso)
 
     dest_iso = module.params.get('dest_iso')
     if dest_iso and len(dest_iso) == 0:
@@ -389,7 +388,7 @@ def main():
         try:
             os.makedirs(dest_iso_dir)
         except OSError as err:
-            msg = f"Failed to create folder {dest_iso_dir}. error: {to_native(err)}"
+            msg = "Failed to create folder %s with error: %s" % (dest_iso_dir, to_native(err))
             module.fail_json(msg=msg)
 
     MODULE_ISO_CUSTOMIZE = module
@@ -404,7 +403,7 @@ def main():
     if add_files_list and len(add_files_list) > 0:
         for item in add_files_list:
             if not os.path.exists(item['src_file']):
-                module.fail_json(msg=f"The {item['src_file']} does not exist.")
+                module.fail_json(msg="The %s does not exist." % item['src_file'])
         op_data_item['op'] = "add_files"
         op_data_item['data'] = add_files_list
         op_data_list.append(copy.deepcopy(op_data_item))
