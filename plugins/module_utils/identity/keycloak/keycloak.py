@@ -1,7 +1,30 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017, Eike Frost <ei@kefro.st>
-# BSD 2-Clause license (see LICENSES/BSD-2-Clause.txt)
-# SPDX-License-Identifier: BSD-2-Clause
+#
+# This code is part of Ansible, but is an independent component.
+# This particular file snippet, and this file snippet only, is BSD licensed.
+# Modules you write using this snippet, which is embedded dynamically by Ansible
+# still belong to the author of the module, and may assign their own license
+# to the complete work.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#    * Redistributions in binary form must reproduce the above copyright notice,
+#      this list of conditions and the following disclaimer in the documentation
+#      and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+# USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import absolute_import, division, print_function
 
@@ -35,6 +58,8 @@ URL_CLIENTTEMPLATE = "{url}/admin/realms/{realm}/client-templates/{id}"
 URL_CLIENTTEMPLATES = "{url}/admin/realms/{realm}/client-templates"
 URL_GROUPS = "{url}/admin/realms/{realm}/groups"
 URL_GROUP = "{url}/admin/realms/{realm}/groups/{groupid}"
+URL_USERS = "{url}/admin/realms/{realm}/users"
+URL_USER = "{url}/admin/realms/{realm}/users/{userid}"
 
 URL_CLIENTSCOPES = "{url}/admin/realms/{realm}/client-scopes"
 URL_CLIENTSCOPE = "{url}/admin/realms/{realm}/client-scopes/{id}"
@@ -1748,3 +1773,70 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Unable to delete component %s in realm %s: %s'
                                       % (cid, realm, str(e)))
+
+    def get_users(self, realm="master"):
+        """ Fetch the name and ID of all users on the Keycloak server.
+
+        To fetch the full data of the group, make a subsequent call to
+        get_user_by_userid, passing in the ID of the group you wish to return.
+
+        :param realm: Return the groups of this realm (default "master").
+        """
+        users_url = URL_USERS.format(url=self.baseurl, realm=realm)
+        try:
+            return json.loads(to_native(open_url(users_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
+                                                 validate_certs=self.validate_certs).read()))
+        except Exception as e:
+            self.module.fail_json(msg="Could not fetch list of users in realm %s: %s"
+                                      % (realm, str(e)))
+
+    def get_user_by_userid(self, uid, realm="master"):
+        """ Fetch a keycloak user from the provided realm using the user's unique ID.
+
+        If the user does not exist, None is returned.
+
+        uid is a UUID provided by the Keycloak API
+        :param uid: UUID of the user to be returned
+        :param realm: Realm in which the user resides; default 'master'.
+        """
+        user_url = URL_USER.format(url=self.baseurl, realm=realm,userid=uid)
+        try:
+            return json.loads(to_native(open_url(user_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
+                                                 timeout=self.connection_timeout,
+                                                 validate_certs=self.validate_certs).read()))
+
+        except HTTPError as e:
+            if e.code == 404:
+                return None
+            else:
+                self.module.fail_json(msg="Could not fetch user %s in realm %s: %s"
+                                          % (uid, realm, str(e)))
+        except Exception as e:
+            self.module.fail_json(msg="Could not fetch user %s in realm %s: %s"
+                                      % (uid, realm, str(e)))
+
+    def get_user_by_name(self, name, realm="master"):
+        """ Fetch a keycloak group within a realm based on its name.
+
+        The Keycloak API does not allow filtering of the Groups resource by name.
+        As a result, this method first retrieves the entire list of groups - name and ID -
+        then performs a second query to fetch the group.
+
+        If the group does not exist, None is returned.
+        :param name: Name of the group to fetch.
+        :param realm: Realm in which the group resides; default 'master'
+        """
+        users_url = URL_USERS.format(url=self.baseurl, realm=realm)
+        try:
+            all_users = self.get_users(realm=realm)
+
+            for user in all_users:
+                if user['username'] == name:
+                    return self.get_user_by_userid(user['id'], realm=realm)
+
+            return None
+
+        except Exception as e:
+            self.module.fail_json(msg="Could not fetch user %s in realm %s: %s"
+                                      % (name, realm, str(e)))
