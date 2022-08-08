@@ -96,7 +96,7 @@ def main():
         if not path.endswith('.license') and os.path.exists(path + '.license'):
             path = path + '.license'
         valid_licenses_for_path = valid_licenses
-        if path.startswith('plugins/') and not path.startswith(('plugins/modules/', 'plugins/module_utils/')):
+        if path.startswith('plugins/') and not path.startswith(('plugins/modules/', 'plugins/module_utils/', 'plugins/doc_fragments/')):
             valid_licenses_for_path = [license for license in valid_licenses if license == 'GPL-3.0-or-later']
         licenses = find_licenses(path, relax=path in no_comments_allowed)
         if not licenses:
