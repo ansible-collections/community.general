@@ -35,7 +35,12 @@ class Client(object):
         Return:
             (str, str): The contents of standard out and standard error.
         '''
-        out, err = Client.module.run_command([Client.module.get_bin_path(Client.cli_path, required=True)] + args, data=stdin, binary_data=True, check_rc=True)[1:]
+        out, err = Client.module.run_command(
+            [Client.module.get_bin_path(Client.cli_path, required=True)] +
+            args,
+            data=stdin,
+            binary_data=True,
+            check_rc=True)[1:]
 
         return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict')
 
