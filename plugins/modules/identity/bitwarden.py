@@ -34,36 +34,36 @@ options:
             - Name of organization to target.
             - Leave both I(organization_name) and I(organization_id) empty for a wildcard vault.
             - Use I(organization_name='') for personal vaults.
-            - Mutually exclusive from I(organization_id).
+            - Mutually exclusive with I(organization_id).
     organization_id:
         type: str
         description:
             - UID of organization to target.
             - Leave as C(null) for a wildcard vault.
-            - Mutually exclusive from I(organization_name).
+            - Mutually exclusive with I(organization_name).
     folder_name:
         type: str
         description:
             - Name of folder to target.
             - Leave as C(null) for a wildcard folder.
             - Use C('') or C('No Folder') for no folder.
-            - Mutually exclusive from I(folder_id).
+            - Mutually exclusive with I(folder_id).
     folder_id:
         type: str
         description:
             - UID of folder to target.
             - Leave as C(null) for a wildcard folder.
-            - Mutually exclusive from I(folder_name).
+            - Mutually exclusive with I(folder_name).
     item_name:
         type: str
         description:
             - Name of item to target.
-            - Mutually exclusive from I(item_id).
+            - Mutually exclusive with I(item_id).
     item_id:
         type: str
         description:
             - UID of item to target.
-            - Mutually exclusive from I(item_name).
+            - Mutually exclusive with I(item_name).
     login:
         type: dict
         description:
