@@ -154,7 +154,7 @@ from ansible_collections.community.general.plugins.module_utils.identity.bitward
 )
 
 
-class Bitwarden(object):
+class Bitwarden:
     '''Accessor for mutating Bitwarden vaults.'''
 
     organization = property(lambda self: self._organization)

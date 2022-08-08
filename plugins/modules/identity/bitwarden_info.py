@@ -126,7 +126,7 @@ from ansible_collections.community.general.plugins.module_utils.identity.bitward
 )
 
 
-class BitwardenInfo(object):
+class BitwardenInfo:
     '''Accessor for Bitwarden vault information.'''
     organization = property(lambda self: self._organization)
     folder = property(lambda self: self._folder)

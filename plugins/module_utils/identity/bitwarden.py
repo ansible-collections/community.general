@@ -16,7 +16,7 @@ class BitwardenException(Exception):
     pass
 
 
-class Client(object):
+class Client:
     '''A wrapper for for bw command.'''
 
     # Path to the `bw` executable.
@@ -59,7 +59,7 @@ class Client(object):
         return json.loads(stdout)
 
 
-class _Element(object):
+class _Element:
     '''Common elements for items in a Bitwarden vault.'''
 
     id = property(lambda self: self._id or self.dict['id'])

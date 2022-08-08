@@ -826,7 +826,7 @@ def py26_workaround(fn):
     return fn
 
 
-class _MockJson(object):
+class _MockJson:
     '''Mock json module that automatically sorts keys in Python 2.7 or higher.'''
     def __getattr__(self, attr):
         return getattr(json, attr)
