@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.general.tests.unit.compat.mock import Mock, patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
     AnsibleExitJson, AnsibleFailJson, set_module_args
 )
@@ -21,6 +21,7 @@ from ansible_collections.community.general.tests.unit.plugins.modules.identity.t
 )
 
 
+@patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', new=Mock(return_value='/usr/bin/bw'))
 @patch(
     'ansible.module_utils.basic.AnsibleModule.run_command',
     new=client(MOCK_RESPONSES))
@@ -108,6 +109,7 @@ class TestBitwardenQueryOrganization(unittest.TestCase):
             self.module.main()
 
 
+@patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', new=Mock(return_value='/usr/bin/bw'))
 @patch(
     'ansible.module_utils.basic.AnsibleModule.run_command',
     new=client(MOCK_RESPONSES))
@@ -193,6 +195,7 @@ class TestBitwardenQueryFolder(unittest.TestCase):
             self.module.main()
 
 
+@patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', new=Mock(return_value='/usr/bin/bw'))
 @patch(
     'ansible.module_utils.basic.AnsibleModule.run_command',
     new=client(MOCK_RESPONSES))

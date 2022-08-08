@@ -11,7 +11,7 @@ import json
 import sys
 
 from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.general.tests.unit.compat.mock import Mock, patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, set_module_args
 
 from ansible_collections.community.general.plugins.module_utils.identity.bitwarden import BitwardenException, Client
@@ -903,6 +903,7 @@ class MockClient(Client):
                 for args in MockClient.command_history].count(True)
 
 
+@patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', new=Mock(return_value='/usr/bin/bw'))
 @patch(
     'ansible_collections.community.general.plugins.modules.identity.bitwarden.json',
     new=_MockJson())
@@ -947,6 +948,7 @@ class TestBitwardenPresentFolder(unittest.TestCase):
         self.assertFalse(MockClient.number_of_edits())
 
 
+@patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', new=Mock(return_value='/usr/bin/bw'))
 @patch(
     'ansible_collections.community.general.plugins.modules.identity.bitwarden.json',
     new=_MockJson())
@@ -991,6 +993,7 @@ class TestBitwardenCreatedFolder(unittest.TestCase):
         self.assertFalse(MockClient.number_of_edits())
 
 
+@patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', new=Mock(return_value='/usr/bin/bw'))
 @patch(
     'ansible_collections.community.general.plugins.modules.identity.bitwarden.json',
     new=_MockJson())
@@ -1108,6 +1111,7 @@ class TestBitwardenPresentItem(unittest.TestCase):
         self.assertEqual(MockClient.number_of_edits(), 1)
 
 
+@patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', new=Mock(return_value='/usr/bin/bw'))
 @patch(
     'ansible_collections.community.general.plugins.modules.identity.bitwarden.json',
     new=_MockJson())
@@ -1225,6 +1229,7 @@ class TestBitwardenCreatedItem(unittest.TestCase):
         self.assertFalse(MockClient.number_of_edits())
 
 
+@patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', new=Mock(return_value='/usr/bin/bw'))
 @patch(
     'ansible.module_utils.basic.AnsibleModule.run_command',
     new=client(MOCK_RESPONSES))
@@ -1283,6 +1288,7 @@ class TestBitwardenAbsentFolder(unittest.TestCase):
         self.assertEqual(MockClient.number_of_edits(), 1)
 
 
+@patch('ansible.module_utils.basic.AnsibleModule.get_bin_path', new=Mock(return_value='/usr/bin/bw'))
 @patch(
     'ansible.module_utils.basic.AnsibleModule.run_command',
     new=client(MOCK_RESPONSES))
