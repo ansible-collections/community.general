@@ -118,8 +118,6 @@ RETURN = '''
 '''
 
 
-from collections import defaultdict
-
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.identity.bitwarden import (
@@ -154,15 +152,14 @@ class BitwardenInfo(object):
     def run(self):
         '''Handle requests.'''
         # Use a lookup table to determine how to handle the query.
-        dispatch = defaultdict(
-            _err('Unknown target'),
-            organization=lambda: self.organization,
-            organizations=organizations,
-            folder=lambda: self.folder,
-            folders=lambda: self.organization.folders,
-            item=lambda: self.item,
-            items=lambda: self.folder.items,
-        )
+        dispatch = {
+            'organization': lambda: self.organization,
+            'organizations': organizations,
+            'folder': lambda: self.folder,
+            'folders': lambda: self.organization.folders,
+            'item': lambda: self.item,
+            'items': lambda: self.folder.items,
+        }
 
         return {
             'changed': False,

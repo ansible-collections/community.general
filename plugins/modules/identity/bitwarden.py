@@ -144,7 +144,6 @@ RETURN = '''
 '''
 
 
-from collections import defaultdict
 import json
 
 from ansible.module_utils.basic import AnsibleModule
@@ -263,23 +262,19 @@ class Bitwarden(object):
 
     def _handle_present(self, update=True):
         # Use a lookup table to determine handler for desired target.
-        dispatch = defaultdict(
-            _err('Unknown target'),
-            organization=_err('Creating organizations not supported'),
-            folder=self._handle_present_folder,
-            item=lambda: self._handle_present_item(update),
-        )
+        dispatch = {
+            'folder': self._handle_present_folder,
+            'item': lambda: self._handle_present_item(update),
+        }
 
         return dispatch[self._target]()
 
     def _handle_created(self):
         # Use a lookup table to determine handler for desired target.
-        dispatch = defaultdict(
-            _err('Unknown target'),
-            organization=_err('Creating organizations not supported'),
-            folder=self._handle_present_folder,
-            item=self._handle_created_item,
-        )
+        dispatch = {
+            'folder': self._handle_present_folder,
+            'item': self._handle_created_item,
+        }
 
         return dispatch[self._target]()
 
@@ -288,31 +283,23 @@ class Bitwarden(object):
 
         org_args = self.organization.bw_filter_args
 
-        if self._target == 'organization':
-            raise BitwardenException('Removing organizations not supported.')
-
-        if self._target in ('folder', 'item'):
-            # Dynamically select folder/item.
-            element = getattr(self, self._target)
-            if element.exists:
-                ret_val['ansible_module_results'] = Client.run(['delete', self._target, element.id] + org_args)[0]
-                ret_val['changed'] = True
-            else:
-                ret_val['ansible_module_results'] = ''
-
+        # Dynamically select folder/item.
+        element = getattr(self, self._target)
+        if element.exists:
+            ret_val['ansible_module_results'] = Client.run(['delete', self._target, element.id] + org_args)[0]
+            ret_val['changed'] = True
         else:
-            raise BitwardenException('Unknown target.')
+            ret_val['ansible_module_results'] = ''
 
         return ret_val
 
     def run(self):
         # Use a lookup table to determine handler for desired state.
-        dispatch = defaultdict(
-            _err('Unknown state'),
-            present=self._handle_present,
-            created=lambda: self._handle_present(False),
-            absent=self._handle_absent,
-        )
+        dispatch = {
+            'present': self._handle_present,
+            'created': lambda: self._handle_present(False),
+            'absent': self._handle_absent,
+        }
 
         return dispatch[self._state]()
 
