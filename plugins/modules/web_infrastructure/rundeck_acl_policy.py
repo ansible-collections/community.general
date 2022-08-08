@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2017, Loic Blot <loic.blot@unix-experience.fr>
+# Copyright (c) 2017, Loic Blot <loic.blot@unix-experience.fr>
 # Sponsored by Infopro Digital. http://www.infopro-digital.com/
 # Sponsored by E.T.A.I. http://www.etai.fr/
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)

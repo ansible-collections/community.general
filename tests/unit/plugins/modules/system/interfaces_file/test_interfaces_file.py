@@ -1,4 +1,4 @@
-# (c) 2017, Roman Belyakovsky <ihryamzik () gmail.com>
+# Copyright (c) 2017, Roman Belyakovsky <ihryamzik () gmail.com>
 #
 # This file is part of Ansible
 #
