@@ -167,18 +167,6 @@ class BitwardenInfo(object):
         }
 
 
-def _err(msg):
-    '''Return a function that raises a BitwardenException.
-
-    Args:
-        msg (str): The message to include in the exception.
-    '''
-    def exception_raiser():
-        raise BitwardenException(msg)
-
-    return exception_raiser
-
-
 def _dictize_elements(obj):
     '''Return a 'dict'-ized version of the inputs.
 

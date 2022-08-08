@@ -293,15 +293,3 @@ class Organization(_Element):
         # If name is not None, id will be a UID or None.
         # `bw` uses 'null' instead of None.
         return ['--organizationid', self.id or 'null']
-
-
-def _err(msg):
-    '''Return a function that raises a BitwardenException.
-
-    Args:
-        msg (str): The message to include in the exception.
-    '''
-    def exception_raiser():
-        raise BitwardenException(msg)
-
-    return exception_raiser

@@ -304,18 +304,6 @@ class Bitwarden(object):
         return dispatch[self._state]()
 
 
-def _err(msg):
-    '''Return a function that raises a BitwardenException.
-
-    Args:
-        msg (str): The message to include in the exception.
-    '''
-    def exception_raiser():
-        raise BitwardenException(msg)
-
-    return exception_raiser
-
-
 def main():
     module = AnsibleModule(
         argument_spec=dict(
