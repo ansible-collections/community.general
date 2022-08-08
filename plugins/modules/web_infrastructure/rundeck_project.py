@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Ansible module to manage rundeck projects
-# (c) 2017, Loic Blot <loic.blot@unix-experience.fr>
+# Copyright (c) 2017, Loic Blot <loic.blot@unix-experience.fr>
 # Sponsored by Infopro Digital. http://www.infopro-digital.com/
 # Sponsored by E.T.A.I. http://www.etai.fr/
 #
