@@ -211,17 +211,18 @@ class Bitwarden(object):
 
         bw_args += self.organization.bw_filter_args
 
-        # Update base `login` key's contents.
-        for key, value in self._login.items():
-            if do_updates and (key not in base['login'] or base['login'][key] != value):
-                base['login'][key] = value
-                ret_val['changed'] = True
+        if do_updates:
+            # Update base `login` key's contents.
+            for key, value in self._login.items():
+                if key not in base['login'] or base['login'][key] != value:
+                    base['login'][key] = value
+                    ret_val['changed'] = True
 
-        # Update the base notes section.
-        if do_updates and self._notes is not None:
-            if base['notes'] != self._notes:
-                base['notes'] = self._notes
-                ret_val['changed'] = True
+            # Update the base notes section.
+            if self._notes is not None:
+                if base['notes'] != self._notes:
+                    base['notes'] = self._notes
+                    ret_val['changed'] = True
 
         if ret_val['changed']:
             # Encode it using bw.
