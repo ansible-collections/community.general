@@ -121,7 +121,7 @@ RETURN = '''
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils.identity.bitwarden import (
-    BitwardenException, Client, Organization, organizations
+    BitwardenException, Client, Organization
 )
 
 
@@ -154,7 +154,7 @@ class BitwardenInfo(object):
         # Use a lookup table to determine how to handle the query.
         dispatch = {
             'organization': lambda: self.organization,
-            'organizations': organizations,
+            'organizations': Organization.get_all,
             'folder': lambda: self.folder,
             'folders': lambda: self.organization.folders,
             'item': lambda: self.item,

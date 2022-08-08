@@ -62,6 +62,11 @@ class _Element(object):
 
     _dict = None
 
+    @classmethod
+    def get_all(cls):
+        # The pluralization heuristic works for Organization, Folder, and Item.
+        return [cls(dict_=d) for d in Client.run_json(['list', cls.__name__.lower() + 's'])]
+
     @property
     def exists(self):
         # Determine existence by attempting to access the item.
@@ -237,7 +242,7 @@ class Organization(_Element):
         has the specified value.
         '''
 
-        matches = [org for org in organizations() if org.dict[attribute] == value]
+        matches = [org for org in Organization.get_all() if org.dict[attribute] == value]
 
         if not matches:
             raise KeyError("Organization not found")
@@ -288,10 +293,6 @@ class Organization(_Element):
         # If name is not None, id will be a UID or None.
         # `bw` uses 'null' instead of None.
         return ['--organizationid', self.id or 'null']
-
-
-def organizations():
-    return [Organization(dict_=d) for d in Client.run_json(['list', 'organizations'])]
 
 
 def _err(msg):
