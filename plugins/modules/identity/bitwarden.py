@@ -214,7 +214,7 @@ class Bitwarden(object):
         if do_updates:
             # Update base `login` key's contents.
             for key, value in self._login.items():
-                if key not in base['login'] or base['login'][key] != value:
+                if base['login'].get(key) != value:
                     base['login'][key] = value
                     ret_val['changed'] = True
 
