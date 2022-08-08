@@ -2,6 +2,8 @@
 # This code is part of Ansible, but is an independent component.
 # This particular file snippet, and this file snippet only, is based on
 # Lib/posixpath.py of cpython
+#
+# Copyright (c) 2001-2022 Python Software Foundation.  All rights reserved.
 # It is licensed under the PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
 # (See LICENSES/PSF-2.0.txt in this collection)
 # SPDX-License-Identifier: PSF-2.0
