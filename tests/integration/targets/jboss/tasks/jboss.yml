@@ -4,8 +4,8 @@
 # Integration tests for jboss module.
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# helloworld.war (got from https://github.com/aeimer/java-example-helloworld-war/) license:
-# MIT License
+# helloworld.war (got from https://github.com/aeimer/java-example-helloworld-war/) is licensed
+# under the MIT license:
 #
 # Copyright (c) 2017 Alex Eimer
 #
