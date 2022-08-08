@@ -134,22 +134,13 @@ EXAMPLES = '''
 
 import json
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    CmdStateModuleHelper, ArgFormat
-)
+from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
+from ansible_collections.community.general.plugins.module_utils.pipx import pipx_runner
+
 from ansible.module_utils.facts.compat import ansible_facts
 
 
-_state_map = dict(
-    present='install',
-    absent='uninstall',
-    uninstall_all='uninstall-all',
-    upgrade_all='upgrade-all',
-    reinstall_all='reinstall-all',
-)
-
-
-class PipX(CmdStateModuleHelper):
+class PipX(StateModuleHelper):
     output_params = ['name', 'source', 'index_url', 'force', 'installdeps']
     module = dict(
         argument_spec=dict(
@@ -173,26 +164,10 @@ class PipX(CmdStateModuleHelper):
             ('state', 'install', ['name']),
             ('state', 'absent', ['name']),
             ('state', 'uninstall', ['name']),
+            # missing upgrade and reinstall requiring 'name'
             ('state', 'inject', ['name', 'inject_packages']),
         ],
         supports_check_mode=True,
-    )
-    command_args_formats = dict(
-        state=dict(fmt=lambda v: [_state_map.get(v, v)]),
-        name_source=dict(fmt=lambda n, s: [s] if s else [n], stars=1),
-        install_deps=dict(fmt="--include-deps", style=ArgFormat.BOOLEAN),
-        inject_packages=dict(fmt=lambda v: v),
-        force=dict(fmt="--force", style=ArgFormat.BOOLEAN),
-        include_injected=dict(fmt="--include-injected", style=ArgFormat.BOOLEAN),
-        index_url=dict(fmt=('--index-url', '{0}'),),
-        python=dict(fmt=('--python', '{0}'),),
-        _list=dict(fmt=('list', '--include-injected', '--json'), style=ArgFormat.BOOLEAN),
-        editable=dict(fmt="--editable", style=ArgFormat.BOOLEAN),
-        pip_args=dict(fmt=('--pip-args', '{0}'),),
-    )
-    check_rc = True
-    run_command_fixed_options = dict(
-        environ_update={'USE_EMOJI': '0'}
     )
 
     def _retrieve_installed(self):
@@ -211,8 +186,7 @@ class PipX(CmdStateModuleHelper):
                 }
             return results
 
-        installed = self.run_command(params=[{'_list': True}], process_output=process_list,
-                                     publish_rc=False, publish_out=False, publish_err=False, publish_cmd=False)
+        installed = self.runner('_list', output_process=process_list).run(_list=1)
 
         if self.vars.name is not None:
             app_list = installed.get(self.vars.name)
@@ -229,19 +203,26 @@ class PipX(CmdStateModuleHelper):
         else:
             facts = ansible_facts(self.module, gather_subset=['python'])
             self.command = [facts['python']['executable'], '-m', 'pipx']
+        self.runner = pipx_runner(self.module, self.command)
 
         self.vars.set('application', self._retrieve_installed(), change=True, diff=True)
 
     def __quit_module__(self):
         self.vars.application = self._retrieve_installed()
 
+    def _capture_results(self, ctx):
+        self.vars.stdout = ctx.results_out
+        self.vars.stderr = ctx.results_err
+        self.vars.cmd = ctx.cmd
+        if self.verbosity >= 4:
+            self.vars.run_info = ctx.run_info
+
     def state_install(self):
         if not self.vars.application or self.vars.force:
             self.changed = True
-            if not self.module.check_mode:
-                self.run_command(params=[
-                    'state', 'index_url', 'install_deps', 'force', 'python', 'editable', 'pip_args',
-                    {'name_source': [self.vars.name, self.vars.source]}])
+            with self.runner('state index_url install_deps force python editable pip_args name_source', check_mode_skip=True) as ctx:
+                ctx.run(name_source=[self.vars.name, self.vars.source])
+                self._capture_results(ctx)
 
     state_present = state_install
 
@@ -250,12 +231,16 @@ class PipX(CmdStateModuleHelper):
             self.do_raise("Trying to upgrade a non-existent application: {0}".format(self.vars.name))
         if self.vars.force:
             self.changed = True
-        if not self.module.check_mode:
-            self.run_command(params=['state', 'index_url', 'install_deps', 'force', 'editable', 'pip_args', 'name'])
+
+        with self.runner('state index_url install_deps force editable pip_args name', check_mode_skip=True) as ctx:
+            ctx.run()
+            self._capture_results(ctx)
 
     def state_uninstall(self):
-        if self.vars.application and not self.module.check_mode:
-            self.run_command(params=['state', 'name'])
+        if self.vars.application:
+            with self.runner('state name', check_mode_skip=True) as ctx:
+                ctx.run()
+                self._capture_results(ctx)
 
     state_absent = state_uninstall
 
@@ -263,30 +248,35 @@ class PipX(CmdStateModuleHelper):
         if not self.vars.application:
             self.do_raise("Trying to reinstall a non-existent application: {0}".format(self.vars.name))
         self.changed = True
-        if not self.module.check_mode:
-            self.run_command(params=['state', 'name', 'python'])
+        with self.runner('state name python', check_mode_skip=True) as ctx:
+            ctx.run()
+            self._capture_results(ctx)
 
     def state_inject(self):
         if not self.vars.application:
             self.do_raise("Trying to inject packages into a non-existent application: {0}".format(self.vars.name))
         if self.vars.force:
             self.changed = True
-        if not self.module.check_mode:
-            self.run_command(params=['state', 'index_url', 'force', 'editable', 'pip_args', 'name', 'inject_packages'])
+        with self.runner('state index_url force editable pip_args name inject_packages', check_mode_skip=True) as ctx:
+            ctx.run()
+            self._capture_results(ctx)
 
     def state_uninstall_all(self):
-        if not self.module.check_mode:
-            self.run_command(params=['state'])
+        with self.runner('state', check_mode_skip=True) as ctx:
+            ctx.run()
+            self._capture_results(ctx)
 
     def state_reinstall_all(self):
-        if not self.module.check_mode:
-            self.run_command(params=['state', 'python'])
+        with self.runner('state python', check_mode_skip=True) as ctx:
+            ctx.run()
+            self._capture_results(ctx)
 
     def state_upgrade_all(self):
         if self.vars.force:
             self.changed = True
-        if not self.module.check_mode:
-            self.run_command(params=['state', 'include_injected', 'force'])
+        with self.runner('state include_injected force', check_mode_skip=True) as ctx:
+            ctx.run()
+            self._capture_results(ctx)
 
 
 def main():
