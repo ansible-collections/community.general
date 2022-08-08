@@ -36,7 +36,7 @@ class Client(object):
         Return:
             (str, str): The contents of standard out and standard error.
         '''
-        rc, out, err = Client.module.run_command([Client.cli_path] + args, data=stdin, binary_data=True)
+        rc, out, err = Client.module.run_command([Client.module.get_bin_path(Client.cli_path, required=True)] + args, data=stdin, binary_data=True)
 
         if rc != expected_rc:
             raise BitwardenException(err)
