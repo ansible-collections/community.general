@@ -1,5 +1,5 @@
-# (c) 2012-2014, Michael DeHaan <michael.dehaan@gmail.com>
-# (c) 2020 Ansible Project
+# Copyright (c) 2012-2014, Michael DeHaan <michael.dehaan@gmail.com>
+# Copyright (c) 2020 Ansible Project
 #
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
