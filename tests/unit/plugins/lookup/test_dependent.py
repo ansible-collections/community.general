@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# (c) 2020-2021, Felix Fontein <felix@fontein.de>
+# Copyright (c) 2020-2021, Felix Fontein <felix@fontein.de>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
