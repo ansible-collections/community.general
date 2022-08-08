@@ -252,7 +252,7 @@ class Bitwarden(object):
             template['name'] = self.folder.name
 
             # Encode it using bw.
-            out, _stderr = Client.run(['encode'], stdin=json.dumps(template))
+            out = Client.run(['encode'], stdin=json.dumps(template))[0]
 
             # Create the folder.
             bw_args = ['create', 'folder'] + self.organization.bw_filter_args
