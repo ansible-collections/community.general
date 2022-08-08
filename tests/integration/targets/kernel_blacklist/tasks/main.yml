@@ -44,7 +44,16 @@
     - orig_stat.stat.size == stat_test_1.stat.size
     - orig_stat.stat.checksum == stat_test_1.stat.checksum
     - orig_stat.stat.mtime == stat_test_1.stat.mtime
-    - stat_test_1.stat.checksum == 'blacklist aaaa\nblacklist bbbb\nblacklist cccc\n' | checksum
+    - stat_test_1.stat.checksum == expected_content | checksum
+  vars:
+    expected_content: |
+      # Copyright (c) Ansible Project
+      # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+      # SPDX-License-Identifier: GPL-3.0-or-later
+
+      blacklist aaaa
+      blacklist bbbb
+      blacklist cccc
 
 - name: add new item to list
   community.general.kernel_blacklist:
@@ -65,6 +74,10 @@
     - slurp_test_2.content|b64decode == content
   vars:
     content: |
+      # Copyright (c) Ansible Project
+      # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+      # SPDX-License-Identifier: GPL-3.0-or-later
+
       blacklist aaaa
       blacklist bbbb
       blacklist cccc
@@ -89,6 +102,10 @@
     - slurp_test_3.content|b64decode == content
   vars:
     content: |
+      # Copyright (c) Ansible Project
+      # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+      # SPDX-License-Identifier: GPL-3.0-or-later
+
       blacklist aaaa
       blacklist cccc
       blacklist dddd

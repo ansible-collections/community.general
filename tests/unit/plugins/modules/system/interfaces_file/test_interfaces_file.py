@@ -46,6 +46,7 @@ golden_output_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'golden
 class TestInterfacesFileModule(unittest.TestCase):
     def getTestFiles(self, include_filter=None, exclude_filter=None):
         flist = next(os.walk(fixture_path))[2]
+        flist = [file for file in flist if not file.endswith('.license')]
         if include_filter:
             flist = filter(lambda x: re.match(include_filter, x), flist)
         if exclude_filter:
