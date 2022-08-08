@@ -1800,7 +1800,7 @@ class KeycloakAPI(object):
         :param uid: UUID of the user to be returned
         :param realm: Realm in which the user resides; default 'master'.
         """
-        user_url = URL_USER.format(url=self.baseurl, realm=realm,userid=uid)
+        user_url = URL_USER.format(url=self.baseurl, realm=realm, userid=uid)
         try:
             return json.loads(to_native(open_url(user_url, method="GET", http_agent=self.http_agent, headers=self.restheaders,
                                                  timeout=self.connection_timeout,
