@@ -25,36 +25,32 @@ class Client(object):
     module = None
 
     @staticmethod
-    def run(args, stdin=None, expected_rc=0):
+    def run(args, stdin=None):
         '''Run the bw client.
 
         Args:
             args(list): Arguments to pass to the bw CLI client.
             stdin(str): Data to write to the client's stdin.
-            expected_rc(int): Expected return code of bw CLI client.
 
         Return:
             (str, str): The contents of standard out and standard error.
         '''
-        rc, out, err = Client.module.run_command([Client.module.get_bin_path(Client.cli_path, required=True)] + args, data=stdin, binary_data=True)
+        out, err = Client.module.run_command([Client.module.get_bin_path(Client.cli_path, required=True)] + args, data=stdin, binary_data=True, check_rc=True)[1:]
 
-        if rc != expected_rc:
-            raise BitwardenException(err)
         return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict')
 
     @staticmethod
-    def run_json(args, stdin=None, expected_rc=0):
+    def run_json(args, stdin=None):
         '''Run the bw client.
 
         Args:
             args(list): Arguments to pass to the bw CLI client.
             stdin(str): Data to write to the client's stdin.
-            expected_rc(int): Expected return code of bw CLI client.
 
         Return:
             dict: Decoded dictionary object returned by bw CLI client.
         '''
-        stdout, _stderr = Client.run(args, stdin, expected_rc)
+        stdout, _stderr = Client.run(args, stdin)
         return json.loads(stdout)
 
 

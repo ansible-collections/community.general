@@ -870,7 +870,7 @@ class MockClient(Client):
     responses = {}
 
     @staticmethod
-    def run_command(module, args, data=None, binary_data=True):
+    def run_command(module, args, data=None, binary_data=True, check_rc=False):
         MockClient.command_history.append(args)
         # Strip off argument 0, `bw`.
         result = MOCK_RESPONSES[tuple(args[1:]), data]
@@ -885,6 +885,9 @@ class MockClient(Client):
 
         if result.get('json', True):
             stdout_obj = json.dumps(stdout_obj)
+
+        if result.get('rc', 0):
+            raise NotImplementedError('No simulation of non-zero rc')
 
         # Mocking using Python-generated json for clearer code.
         return result.get('rc', 0), stdout_obj, result.get('stderr', '')
