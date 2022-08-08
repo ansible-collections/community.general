@@ -14,7 +14,7 @@ module: keycloak_user_info
 
 short_description: Allows obtaining Keycloak user information via Keycloak API
 
-version_added: 4.3.0
+version_added: 5.4.0
 
 description:
     - This module allows you to get Keycloak user information via the Keycloak REST API.
@@ -93,7 +93,7 @@ msg:
 end_state:
     description: Representation of the user after module execution (sample is truncated).
     returned: on success
-    type: complex
+    type: dict
     contains:
         username:
             description: Username.
@@ -163,7 +163,7 @@ users:
     - Representation of the group after module execution.
     - Deprecated return value, it will be removed in community.general 6.0.0. Please use the return value I(end_state) instead.
   returned: always
-  type: complex
+  type: dict
   contains:
         username:
             description: Username.
