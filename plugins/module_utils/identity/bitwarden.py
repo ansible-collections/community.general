@@ -50,7 +50,7 @@ class Client(object):
         Return:
             dict: Decoded dictionary object returned by bw CLI client.
         '''
-        stdout, _stderr = Client.run(args, stdin)
+        stdout = Client.run(args, stdin)[0]
         return json.loads(stdout)
 
 

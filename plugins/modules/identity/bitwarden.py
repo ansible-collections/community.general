@@ -225,7 +225,7 @@ class Bitwarden(object):
 
         if ret_val['changed']:
             # Encode it using bw.
-            out, _stderr = Client.run(['encode'], stdin=json.dumps(base))
+            out = Client.run(['encode'], stdin=json.dumps(base))[0]
             ret_val['ansible_module_results'] = Client.run_json(bw_args, stdin=out)
         else:
             # Return cached value, which should be identical, if no change occured.
