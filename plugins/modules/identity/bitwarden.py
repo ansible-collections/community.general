@@ -111,7 +111,7 @@ EXAMPLES = '''
       username: "a_user"
       password: "some password"
     notes: >-
-      Some information about a user is stored here. foo
+      This password needs to be used in conjunction with an HSM.
     target: "item"
     state: "present"
   delegate_to: "localhost"
@@ -132,7 +132,7 @@ EXAMPLES = '''
       username: "a_user"
       password: "some password"
     notes: >-
-      Some information about a user is stored here. foo
+      This password needs to be used in conjunction with an HSM.
     target: "item"
     state: "created"
   delegate_to: "localhost"
