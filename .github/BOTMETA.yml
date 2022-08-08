@@ -295,6 +295,9 @@ files:
   $module_utils/oracle/oci_utils.py:
     maintainers: $team_oracle
     labels: cloud
+  $module_utils/pipx.py:
+    maintainers: russoz
+    labels: pipx
   $module_utils/pure.py:
     maintainers: $team_purestorage
     labels: pure pure_storage
