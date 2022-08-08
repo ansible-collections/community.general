@@ -13,8 +13,8 @@ from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, set_module_args
 
+from ansible_collections.community.general.plugins.module_utils.identity.bitwarden import BitwardenException, Client
 from ansible_collections.community.general.plugins.modules.identity import bitwarden
-from ansible_collections.community.general.plugins.module_utils.identity.bitwarden import Client
 
 # Some objects that will be involved in unit testing. #
 
@@ -1329,7 +1329,7 @@ class TestBitwardenAbsentItem(unittest.TestCase):
             'state': 'absent',
             'item_name': 'some item2',
         })
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(BitwardenException):
             self.module.main()
         self.assertFalse(MockClient.number_of_edits())
 

@@ -148,7 +148,7 @@ class Item(_Element):
         if not matches:
             raise KeyError('Item not found')
         if len(matches) > 1:
-            raise AssertionError('Item not unique')
+            raise BitwardenException('Item not unique')
 
         return matches[0]
 
@@ -182,7 +182,7 @@ class Folder(_Element):
         if not matches:
             raise KeyError("Folder not found")
         if len(matches) > 1:
-            raise AssertionError("Folder not unique")
+            raise BitwardenException("Folder not unique")
 
         return matches[0]
 
@@ -242,7 +242,7 @@ class Organization(_Element):
         if not matches:
             raise KeyError("Organization not found")
         if len(matches) > 1:
-            raise AssertionError("Organization not unique")
+            raise BitwardenException("Organization not unique")
 
         return matches[0]
 

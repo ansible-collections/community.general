@@ -12,6 +12,7 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
     AnsibleExitJson, AnsibleFailJson, set_module_args
 )
 
+from ansible_collections.community.general.plugins.module_utils.identity.bitwarden import BitwardenException
 from ansible_collections.community.general.plugins.modules.identity import bitwarden_info
 
 from ansible_collections.community.general.tests.unit.plugins.modules.identity.test_bitwarden import (
@@ -401,7 +402,7 @@ class TestBitwardenQueryItem(unittest.TestCase):
             'target': 'item',
             'item_name': 'some item2',
         })
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(BitwardenException):
             self.module.main()
 
     def test_query_by_name_duplicate_folder(self):
@@ -411,7 +412,7 @@ class TestBitwardenQueryItem(unittest.TestCase):
             'folder_name': 'my_folder',
             'item_name': 'my_account',
         })
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(BitwardenException):
             self.module.main()
 
     def test_query_by_name_duplicate_organization(self):
@@ -421,7 +422,7 @@ class TestBitwardenQueryItem(unittest.TestCase):
             'organization_name': 'Test',
             'item_name': 'my_account',
         })
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(BitwardenException):
             self.module.main()
 
     def test_query_by_name_disambiguated(self):
