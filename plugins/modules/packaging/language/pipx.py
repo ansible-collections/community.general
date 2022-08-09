@@ -164,7 +164,8 @@ class PipX(StateModuleHelper):
             ('state', 'install', ['name']),
             ('state', 'absent', ['name']),
             ('state', 'uninstall', ['name']),
-            # missing upgrade and reinstall requiring 'name'
+            ('state', 'upgrade', ['name']),
+            ('state', 'reinstall', ['name']),
             ('state', 'inject', ['name', 'inject_packages']),
         ],
         supports_check_mode=True,
