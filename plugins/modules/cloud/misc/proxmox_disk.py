@@ -199,7 +199,7 @@ options:
   mpbs:
     description:
       - Maximum r/w speed in megabytes per second.
-    type:
+    type: int
   mpbs_max:
     description:
       - Maximum unthrottled r/w pool in megabytes per second.
