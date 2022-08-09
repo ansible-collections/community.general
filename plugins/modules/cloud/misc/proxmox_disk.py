@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright: (c) 2022, Castor Sky (@castorsky) <csky57@gmail.com>
+# Copyright (c) 2022, Castor Sky (@castorsky) <csky57@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -33,7 +34,7 @@ options:
   state:
     description:
       - Indicate desired state of the disk. C(absent) can be used only with C(remove) action
-    type: string
+    type: str
     choices: ['present', 'absent']
     default: present
   action:
@@ -41,6 +42,7 @@ options:
       - Action to perform on the disk.
     type: str
     choices: ['create', 'update', 'grow', 'detach', 'move', 'remove']
+    required: True
   force_replace:
     description:
       - Force replace existing attached disk with the new one leaving old disk unused
@@ -48,13 +50,15 @@ options:
     default: False
   storage:
     description:
-      - The drive’s backing storage.
+      - The drive's backing storage.
       - Used primarily in C(create) and C(move) actions.
     type: str
   size:
     description:
       - For create action C(size) is desired volume size in GB to allocate.
-      - For grow action C(size) is the new size of volume. With the C(+) sign the value is added to the actual size of the volume and without it, the value is taken as an absolute one.
+      - >
+        For grow action C(size) is the new size of volume. With the C(+) sign
+        the value is added to the actual size of the volume and without it, the value is taken as an absolute one.
     type: str
   bwlimit:
     description:
@@ -124,12 +128,12 @@ options:
     type: int
   cache:
     description:
-      - The drive’s cache mode
+      - The drive's cache mode
     type: str
     choices: ['none', 'writethrough', 'writeback', 'unsafe', 'directsync']
   cyls:
     description:
-      - Force the drive’s physical geometry to have a specific cylinder count.
+      - Force the drive's physical geometry to have a specific cylinder count.
     type: int
   detect_zeroes:
     description:
@@ -142,14 +146,14 @@ options:
     choices: ['ignore', 'on']
   format:
     description:
-      - The drive’s backing file’s data format.
+      - The drive's backing file's data format.
     type: str
     choices: ['raw', 'cow', 'qcow', 'qed', 'qcow2', 'vmdk', 'cloop']
   heads:
     description:
-      - Force the drive’s physical geometry to have a specific head count.
+      - Force the drive's physical geometry to have a specific head count.
     type: int
-  import-from:
+  import_from:
     description:
       - Import volume from this existing one. To use this parameter you have to specify C(size=0) in C(create) action
       - Volume string format
@@ -222,7 +226,7 @@ options:
     type: int
   media:
     description:
-      - The drive’s media type.
+      - The drive's media type.
     type: str
     choices: ['cdrom', 'disk']
   queues:
@@ -249,11 +253,11 @@ options:
     type: bool
   secs:
     description:
-      - Force the drive’s physical geometry to have a specific sector count.
+      - Force the drive's physical geometry to have a specific sector count.
     type: int
   serial:
     description:
-      - The drive’s reported serial number, url-encoded, up to 20 bytes long.
+      - The drive's reported serial number, url-encoded, up to 20 bytes long.
     type: str
   shared:
     description:
@@ -262,7 +266,7 @@ options:
     type: bool
   snapshot:
     description:
-      - Controls qemu’s snapshot mode feature.
+      - Controls qemu's snapshot mode feature.
       - If activated, changes made to the disk are temporary and will be discarded when the VM is shutdown.
     type: bool
   ssd:
@@ -281,7 +285,7 @@ options:
     choices: ['enospc', 'ignore', 'report', 'stop']
   wwn:
     description:
-      - The drive’s worldwide name, encoded as 16 bytes hex string, prefixed by 0x.
+      - The drive's worldwide name, encoded as 16 bytes hex string, prefixed by 0x.
     type: str
 extends_documentation_fragment:
   - community.general.proxmox.documentation
@@ -442,7 +446,7 @@ def disk_conf_str_to_dict(config_string):
 class ProxmoxDiskAnsible(ProxmoxAnsible):
     create_update_fields = [
         'aio', 'backup', 'bps', 'bps_max_length', 'bps_rd', 'bps_rd_max_length', 'bps_wr', 'bps_wr_max_length',
-        'cache', 'cyls', 'detect_zeroes', 'discard', 'format', 'heads', 'import-from', 'iops', 'iops_max',
+        'cache', 'cyls', 'detect_zeroes', 'discard', 'format', 'heads', 'import_from', 'iops', 'iops_max',
         'iops_max_length', 'iops_rd', 'iops_rd_max', 'iops_rd_max_length', 'iops_wr', 'iops_wr_max',
         'iops_wr_max_length', 'iothread', 'mpbs', 'mpbs_max', 'mpbs_rd', 'mpbs_rd_max', 'mpbs_wr', 'mpbs_wr_max',
         'media', 'queues', 'replicate', 'rerror', 'ro', 'scsiblock', 'secs', 'serial', 'shared', 'snapshot',
@@ -472,13 +476,16 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
             self.module.fail_json(vmid=vmid, msg='Unable to replace existing disk %s without the *force* flag' % disk)
 
         params = self.sanitize_params()
-        if params.get("import-from") and self.module.params["size"] != "0":
-            self.module.fail_json(vmid=vmid, msg='Only size=0 is acceptable with <import-from> parameter.')
+        import_string = params.pop('import_from', None)
+        if import_string and self.module.params["size"] != "0":
+            self.module.fail_json(vmid=vmid, msg='Only size=0 is acceptable with <import_from> parameter.')
 
         config_str = "%s:%s" % (self.module.params["storage"], self.module.params["size"])
+        if import_string:
+            config_str += 'import-from=%s' % import_string
 
         for k, v in params.items():
-            config_str += f',{k}={v}'
+            config_str += ',%s=%s' % (k, v)
 
         disk_config = {self.module.params["disk"]: config_str}
         self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**disk_config)
@@ -488,7 +495,7 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         config_str = disk_config["volume"]
         params = self.sanitize_params()
         for k, v in params.items():
-            config_str += f',{k}={v}'
+            config_str += ',%s=%s' % (k, v)
 
         disk_config = {self.module.params["disk"]: config_str}
         self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**disk_config)
@@ -543,6 +550,7 @@ def main():
         discard=dict(choices=['ignore', 'on']),
         format=dict(choices=['raw', 'cow', 'qcow', 'qed', 'qcow2', 'vmdk', 'cloop']),
         heads=dict(type='int'),
+        import_from=dict(type='str'),
         iops=dict(type='int'),
         iops_max=dict(type='int'),
         iops_max_length=dict(type='int'),
@@ -566,7 +574,7 @@ def main():
         ro=dict(type='bool'),
         scsiblock=dict(type='bool'),
         secs=dict(type='int'),
-        serial=dict(typr='str'),
+        serial=dict(type='str'),
         shared=dict(type='bool'),
         snapshot=dict(type='bool'),
         ssd=dict(type='bool'),
@@ -583,7 +591,7 @@ def main():
         timeout=dict(type='int', default='600'),
 
         # Module related parameters
-        name=dict(typr='str'),
+        name=dict(type='str'),
         vmid=dict(type='int'),
         disk=dict(type='str', required=True),
         storage=dict(type='str'),
@@ -592,8 +600,6 @@ def main():
         force_replace=dict(type='bool', default=False),
         action=dict(choices=['create', 'update', 'grow', 'detach', 'move', 'remove'], required=True)
     )
-    # This is sole dashed parameter so add it separately
-    disk_args.update({'import-from': dict(type='str')})
 
     module_args.update(disk_args)
 
@@ -603,7 +609,7 @@ def main():
         required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
         required_if=[
             ('action', 'create', ('storage', 'size')),
-            ('action', 'grow', 'size')
+            ('action', 'grow', ['size'])
         ],
         supports_check_mode=False,
         mutually_exclusive=[('target_vmid', 'target_storage')]
