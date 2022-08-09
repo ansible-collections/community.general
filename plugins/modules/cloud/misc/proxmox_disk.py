@@ -113,7 +113,7 @@ options:
   bps_rd_max_length:
     description:
       - Maximum length of read I/O bursts in seconds.
-    type: int['none', 'writethrough', 'writeback', 'unsafe', 'directsync']
+    type: int
   bps_wr:
     description:
       - Maximum write speed in bytes per second.
