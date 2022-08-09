@@ -1,2 +1,2 @@
 minor_changes:
-  - one_vm - support array type attributes (https://github.com/ansible-collections/community.general/pull/5045).
+  - one_vm - support vector attributes (https://github.com/ansible-collections/community.general/pull/5045).
