@@ -482,7 +482,7 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
 
         config_str = "%s:%s" % (self.module.params["storage"], self.module.params["size"])
         if import_string:
-            config_str += 'import-from=%s' % import_string
+            config_str += ',import-from=%s' % import_string
 
         for k, v in params.items():
             config_str += ',%s=%s' % (k, v)
