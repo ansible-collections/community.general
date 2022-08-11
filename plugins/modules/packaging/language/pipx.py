@@ -25,6 +25,7 @@ options:
             - Desired state for the application.
             - The states C(present) and C(absent) are aliases to C(install) and C(uninstall), respectively.
             - The state C(latest) is equivalent to executing the task twice, with state C(install) and then C(upgrade).
+              It was added in community.general 5.5.0.
     name:
         type: str
         description:
