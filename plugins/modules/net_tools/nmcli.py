@@ -923,7 +923,7 @@ options:
                 description: This defines the service type of connection.
                 type: str
                 required: true
-                choices: [ pptp, l2tp ]
+                choices: [ org.freedesktop.NetworkManager.pptp, org.freedesktop.NetworkManager.l2tp ]
             gateway:
                 description: The gateway to connection. It can be an IP address (for example C(192.0.2.1))
                     or a FQDN address (for example C(vpn.example.com)).
@@ -949,7 +949,7 @@ options:
             ipsec-enabled:
                 description:
                     - Enable or disable IPSec tunnel to L2TP host.
-                    - This option is need when C(service-type) is C(l2tp).
+                    - This option is need when C(service-type) is C(org.freedesktop.NetworkManager.l2tp).
                 type: bool
                 choices: [ yes, no ]
             ipsec-psk:
@@ -1350,7 +1350,7 @@ EXAMPLES = r'''
     conn_name: my-vpn-connection
     vpn:
         permissions: "{{ ansible_user }}"
-        service-type: l2tp
+        service-type: org.freedesktop.NetworkManager.l2tp
         gateway: vpn.example.com
         password-flags: 2
         user: brittany
@@ -1670,7 +1670,7 @@ class Nmcli(object):
                 for name, value in self.vpn.items():
                     if name == 'service-type':
                         options.update({
-                            'vpn-type': value,
+                            'vpn.service-type': value,
                         })
                     elif name == 'permissions':
                         options.update({
@@ -2100,8 +2100,12 @@ class Nmcli(object):
                 if key == self.mtu_setting and self.mtu is None:
                     self.mtu = 0
                 if key == 'vpn.data':
-                    current_value = list(map(str.strip, current_value.split(',')))
-                    value = list(map(str.strip, value.split(',')))
+                    current_values = []
+                    for item in current_value.split(','):
+                        name, value_ = map(str.strip, item.split('=', 1))
+                        current_values.append('%s=%s' % (name, value_))
+                    current_value = sorted(current_values)
+                    value = sorted(map(str.strip, value.split(',')))
             else:
                 # parameter does not exist
                 current_value = None
