@@ -27,6 +27,15 @@ options:
       - The path of a terraform binary to use, relative to the 'service_path'
         unless you supply an absolute path.
     type: path
+  declare_variables:
+    description:
+      - If true, generate a Terraform file that declares all variables supplied via this module's
+        'variables' parameter. Type, description, and default value are not specified.
+      - The file is generated before and automatically deleted after executing Terraform.
+      - Terraform does not allow declaring variables twice, so you will need to remove all
+        declarations of Ansible-sourced variables from your Terraform code before enabling this.
+    default: false
+    type: bool
   project_path:
     description:
       - The path to the root of the Terraform directory with the
