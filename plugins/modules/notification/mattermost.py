@@ -61,7 +61,12 @@ options:
     type: str
     description:
       - Url for the message sender's icon.
-    default: https://www.ansible.com/favicon.ico
+    default: None
+  icon_emoji:
+    type: str
+    description:
+      - Emoji name for the message sender's icon (without the colons).
+    default: None
   validate_certs:
     description:
       - If C(no), SSL certificates will not be validated. This should only be used
@@ -77,7 +82,7 @@ EXAMPLES = """
     api_key: my_api_key
     text: '{{ inventory_hostname }} completed'
 
-- name: Send notification message via Mattermost all options
+- name: Send notification message via Mattermost all options (with icon url)
   community.general.mattermost:
     url: http://mattermost.example.com
     api_key: my_api_key
@@ -85,6 +90,15 @@ EXAMPLES = """
     channel: notifications
     username: 'Ansible on {{ inventory_hostname }}'
     icon_url: http://www.example.com/some-image-file.png
+
+- name: Send notification message via Mattermost all options (with icon emoji)
+  community.general.mattermost:
+    url: http://mattermost.example.com
+    api_key: my_api_key
+    text: '{{ inventory_hostname }} completed'
+    channel: notifications
+    username: 'Ansible on {{ inventory_hostname }}'
+    icon_emoji: robot_face
 
 - name: Send attachments message via Mattermost
   community.general.mattermost:
@@ -127,7 +141,8 @@ def main():
             text=dict(type='str'),
             channel=dict(type='str', default=None),
             username=dict(type='str', default='Ansible'),
-            icon_url=dict(type='str', default='https://www.ansible.com/favicon.ico'),
+            icon_url=dict(type='str', default=None),
+            icon_emoji=dict(type='str', default=None),
             validate_certs=dict(default=True, type='bool'),
             attachments=dict(type='list', elements='dict'),
         ),
@@ -144,7 +159,7 @@ def main():
 
     # define payload
     payload = {}
-    for param in ['text', 'channel', 'username', 'icon_url', 'attachments']:
+    for param in ['text', 'channel', 'username', 'icon_url', 'icon_emoji', 'attachments']:
         if module.params[param] is not None:
             payload[param] = module.params[param]
 
