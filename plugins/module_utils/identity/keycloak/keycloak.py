@@ -1817,6 +1817,7 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg="Could not fetch user %s in realm %s: %s"
                                       % (name, realm, str(e)))
+
     def create_user(self, userrep, realm="master"):
         """ Create a Keycloak User.
 
@@ -1824,11 +1825,11 @@ class KeycloakAPI(object):
         :return: HTTPResponse object on success
         """
         users_url = URL_USERS.format(url=self.baseurl, realm=realm)
-    
+
         if userrep['name']:
             userrep['username'] = userrep['name']
             userrep.pop('name', None)
-        
+
         try:
             return open_url(users_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(userrep), validate_certs=self.validate_certs)
@@ -1843,11 +1844,11 @@ class KeycloakAPI(object):
         :return HTTPResponse object on success
         """
         user_url = URL_USER.format(url=self.baseurl, realm=realm, userid=userrep['id'])
-    
+
         if userrep['name']:
             userrep['username'] = userrep['name']
             userrep.pop('name', None)
-        
+
         try:
             return open_url(user_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(userrep), validate_certs=self.validate_certs)
@@ -1864,7 +1865,7 @@ class KeycloakAPI(object):
         :param name: The name of the user. A lookup will be performed to retrieve the user ID.
         :param userid: The ID of the user (preferred to name).
         :param realm: The realm in which this user resides, default "master".
-        """        
+        """
 
         if userid is None and name is None:
             # prefer an exception since this is almost certainly a programming error in the module itself.

@@ -75,8 +75,9 @@ options:
       description:
           - Last name of the user.
     credentials:
-      type: dict
+      type: list
       description: user credentials configuration.
+      elements: dict
 
     email:
       type: str
@@ -119,8 +120,8 @@ author:
 EXAMPLES = '''
 - name: Create a Keycloak user, authentication with credentials
   community.general.keycloak_user:
-    name: my-new-kc-user
-    realm: MyCustomRealm
+    name: drstrange
+    realm: midgard
     state: present
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
@@ -131,7 +132,7 @@ EXAMPLES = '''
 
 - name: Create a Keycloak user, authentication with token
   community.general.keycloak_user:
-    name: my-new-kc-user
+    name: drstrange
     realm: MyCustomRealm
     state: present
     auth_client_id: admin-cli
@@ -153,7 +154,7 @@ EXAMPLES = '''
 
 - name: Delete a Keycloak user based on name
   community.general.keycloak_user:
-    name: my-user-for-deletion
+    name: drstrange
     state: absent
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
@@ -165,7 +166,7 @@ EXAMPLES = '''
 - name: Update the name of a Keycloak user
   community.general.keycloak_user:
     id: '9d59aa76-2755-48c6-b1af-beb70a82c3cd'
-    name: an-updated-kc-user-name
+    name: bruce
     state: present
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
@@ -181,7 +182,7 @@ EXAMPLES = '''
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
-    name: my-new_user
+    name: drstrange
     attributes:
         attrib1: value1
         attrib2: value2
@@ -191,6 +192,30 @@ EXAMPLES = '''
             - individual
             - list
             - items
+  delegate_to: localhost
+- name: Create/Update a user with password, full name and email (all params)
+  community.general.keycloak_user:
+    name: drstrange
+    realm: midgard
+    state: present
+    first_name: Stephen
+    last_name: Strane
+    email: drstrange@marvel.com
+    email_verified: True
+    enabled: True
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    auth_username: USERNAME
+    auth_password: PASSWORD
+    groups:
+      - avengers
+      - spiderman
+      - multiverse-of-madness
+    credentials:
+    - type: password
+      value:  holmes@sher.lock
+      temporary: False
   delegate_to: localhost
 '''
 
@@ -305,7 +330,7 @@ def main():
         last_name=dict(type='str'),
         groups=dict(type='list', elements='str'),
         required_actions=dict(type='list', elements='str'),
-        credentials=dict(type='dict'),
+        credentials=dict(type='list', elements='dict', no_log=True),
         email_verified=dict(type='bool', default=True),
 
     )
