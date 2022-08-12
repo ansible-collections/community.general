@@ -123,8 +123,7 @@ def rax_find_image(module, rax_module, image, exit=True):
     except ValueError:
         try:
             image = cs.images.find(human_id=image)
-        except(cs.exceptions.NotFound,
-               cs.exceptions.NoUniqueMatch):
+        except (cs.exceptions.NotFound, cs.exceptions.NoUniqueMatch):
             try:
                 image = cs.images.find(name=image)
             except (cs.exceptions.NotFound,

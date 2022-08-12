@@ -62,7 +62,7 @@ if HAS_TLS and ssl_ctx is not None:
         smtp_server2 = smtpd_tls.DebuggingServer(('127.0.0.1', port2), None, ssl_ctx=ssl_ctx, starttls=False)
 else:
     print('Start SMTP server on port', port1)
-    smtp_server1 = smtpd.DebuggingServer(('127.0.0.1', port1), None)
+    smtp_server1 = smtpd.DebuggingServer(('127.0.0.1', port1), None)  # pylint: disable=used-before-assignment
     if port2:
         print('WARNING: TLS is NOT supported on this system, not listening on port %s.' % port2)
 

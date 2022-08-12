@@ -128,7 +128,7 @@ def get_facts(args=None):
         retvals['failed'] = has_failed
         retvals['msg'] = msg
         retvals['stderr'] = "API returned an error: {0}" . format(response.status_code)
-        return(retvals)
+        return retvals
 
     # we don't want to return the same thing twice
     msg = None
@@ -140,7 +140,7 @@ def get_facts(args=None):
         if val is not None:
             retvals[val] = eval(val)
 
-    return(retvals)
+    return retvals
 
 
 def main():

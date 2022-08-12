@@ -2061,7 +2061,7 @@ class RedfishUtils(object):
             if property in data:
                 nic[property] = data[property]
         result['entries'] = nic
-        return(result)
+        return result
 
     def get_nic_inventory(self, resource_uri):
         result = {}

@@ -84,6 +84,7 @@ try:
     import keyring
 
     HAS_KEYRING = True
+    KEYRING_IMP_ERR = None
 except ImportError:
     HAS_KEYRING = False
     KEYRING_IMP_ERR = traceback.format_exc()

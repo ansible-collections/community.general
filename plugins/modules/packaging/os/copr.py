@@ -85,6 +85,7 @@ try:
     import dnf.repodict
     from dnf.conf import Conf
     HAS_DNF_PACKAGES = True
+    DNF_IMP_ERR = None
 except ImportError:
     DNF_IMP_ERR = traceback.format_exc()
     HAS_DNF_PACKAGES = False

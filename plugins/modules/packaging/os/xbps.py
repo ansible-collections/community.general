@@ -159,7 +159,7 @@ def upgrade(module, xbps_path):
 
     rc, stdout, stderr = module.run_command(cmdneedupgrade, check_rc=False)
     if rc == 0:
-        if(len(stdout.splitlines()) == 0):
+        if len(stdout.splitlines()) == 0:
             module.exit_json(changed=False, msg='Nothing to upgrade')
         elif module.check_mode:
             module.exit_json(changed=True, msg='Would have performed upgrade')

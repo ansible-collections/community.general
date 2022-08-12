@@ -92,7 +92,7 @@ class iLORedfishUtils(RedfishUtils):
         data = response['data']
 
         ntp_list = data[setkey]
-        if(len(ntp_list) == 2):
+        if len(ntp_list) == 2:
             ntp_list.pop(0)
 
         ntp_list.append(mgr_attributes['mgr_attr_value'])

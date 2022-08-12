@@ -112,7 +112,7 @@ def poll_reload_status(api_key=None, job_id=None, payload=None):
         memset_api = response.json()
         msg = None
 
-    return(memset_api, msg, stderr)
+    return memset_api, msg, stderr
 
 
 def reload_dns(args=None):
@@ -134,7 +134,7 @@ def reload_dns(args=None):
         retvals['failed'] = has_failed
         retvals['memset_api'] = response.json()
         retvals['msg'] = msg
-        return(retvals)
+        return retvals
 
     # set changed to true if the reload request was accepted.
     has_changed = True
@@ -154,7 +154,7 @@ def reload_dns(args=None):
         if val is not None:
             retvals[val] = eval(val)
 
-    return(retvals)
+    return retvals
 
 
 def main():

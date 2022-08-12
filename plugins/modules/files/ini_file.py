@@ -310,7 +310,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
         # override option with no value to option with value if not allow_no_value
         if len(values) > 0:
             for index, line in enumerate(section_lines):
-                if not changed_lines[index] and match_active_opt(option, section_lines[index]):
+                if not changed_lines[index] and match_active_opt(option, section_lines[index]):  # pylint: disable=unnecessary-list-index-lookup
                     newline = assignment_format % (option, values.pop(0))
                     (changed, msg) = update_section_line(changed, section_lines, index, changed_lines, newline, msg)
                     if len(values) == 0:

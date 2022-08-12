@@ -1253,7 +1253,6 @@ def setChanged():
 
 
 def setMsg(message):
-    global failed
     msg.append(message)
 
 

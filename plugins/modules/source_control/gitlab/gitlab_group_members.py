@@ -161,6 +161,7 @@ import traceback
 try:
     import gitlab
     HAS_PY_GITLAB = True
+    GITLAB_IMP_ERR = None
 except ImportError:
     GITLAB_IMP_ERR = traceback.format_exc()
     HAS_PY_GITLAB = False
