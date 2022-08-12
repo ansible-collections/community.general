@@ -362,7 +362,7 @@ def format_disk_size(size_bytes, unit):
     This function has been adapted from https://github.com/Distrotech/parted/blo
     b/279d9d869ff472c52b9ec2e180d568f0c99e30b0/libparted/unit.c
     """
-    global units_si, units_iec
+    global units_si, units_iec  # pylint: disable=global-variable-not-assigned
 
     unit = unit.lower()
 
@@ -458,7 +458,7 @@ def get_device_info(device, unit):
     Fetches information about a disk and its partitions and it returns a
     dictionary.
     """
-    global module, parted_exec
+    global module, parted_exec  # pylint: disable=global-variable-not-assigned
 
     # If parted complains about missing labels, it means there are no partitions.
     # In this case only, use a custom function to fetch information and emulate
@@ -485,7 +485,7 @@ def check_parted_label(device):
     to 3.1 don't return data when there is no label. For more information see:
     http://upstream.rosalinux.ru/changelogs/libparted/3.1/changelog.html
     """
-    global parted_exec
+    global parted_exec  # pylint: disable=global-variable-not-assigned
 
     # Check the version
     parted_major, parted_minor, dummy = parted_version()
@@ -531,7 +531,7 @@ def parted_version():
     """
     Returns the major and minor version of parted installed on the system.
     """
-    global module, parted_exec
+    global module, parted_exec  # pylint: disable=global-variable-not-assigned
 
     rc, out, err = module.run_command("%s --version" % parted_exec)
     if rc != 0:
@@ -550,7 +550,7 @@ def parted(script, device, align):
     """
     Runs a parted script.
     """
-    global module, parted_exec
+    global module, parted_exec  # pylint: disable=global-variable-not-assigned
 
     align_option = '-a %s' % align
     if align == 'undefined':
@@ -601,7 +601,7 @@ def check_size_format(size_str):
 
 
 def main():
-    global module, units_si, units_iec, parted_exec
+    global module, units_si, units_iec, parted_exec  # pylint: disable=global-variable-not-assigned
 
     changed = False
     output_script = ""

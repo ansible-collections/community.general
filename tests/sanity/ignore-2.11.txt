@@ -23,6 +23,7 @@ plugins/modules/cloud/univention/udm_user.py validate-modules:parameter-list-no-
 plugins/modules/clustering/consul/consul.py validate-modules:doc-missing-type
 plugins/modules/clustering/consul/consul.py validate-modules:undocumented-parameter
 plugins/modules/clustering/consul/consul_session.py validate-modules:parameter-state-invalid-choice
+plugins/modules/files/ini_file.py pylint:bad-option-value
 plugins/modules/packaging/language/composer.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
 plugins/modules/packaging/language/yarn.py use-argspec-type-path
 plugins/modules/packaging/os/apt_rpm.py validate-modules:parameter-invalid   # invalid alias - removed in 5.0.0
