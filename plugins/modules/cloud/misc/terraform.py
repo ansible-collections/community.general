@@ -537,7 +537,7 @@ def main():
 
     # delete the generated variables.tf file after command returns
     if declare_variables:
-       gen_variables_file.close()
+        gen_variables_file.close()
 
     # Restore the Terraform workspace found when running the module
     if workspace_ctx["current"] != workspace:
