@@ -61,12 +61,10 @@ options:
     type: str
     description:
       - Url for the message sender's icon.
-    default: None
   icon_emoji:
     type: str
     description:
       - Emoji name for the message sender's icon (without the colons).
-    default: None
   validate_certs:
     description:
       - If C(no), SSL certificates will not be validated. This should only be used
