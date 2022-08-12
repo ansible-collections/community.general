@@ -64,7 +64,7 @@ class Connection(ConnectionBase):
         self.client = fc.Client(self.host)
         return self
 
-    def exec_command(self, cmd, become_user=None, sudoable=False, executable='/bin/sh', in_data=None):
+    def exec_command(self, cmd, exec_command=None, sudoable=True):
         """ run a command on the remote minion """
 
         if in_data:
