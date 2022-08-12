@@ -263,7 +263,7 @@ def iterate_data(module, request_object):
                 request_object.url = base_url + '&page=' + str(page)
                 new_results = Session().send(request_object)
                 data = data + new_results.json()["data"]
-        return(data)
+        return data
     else:
         module.fail_json('API Call failed, check ID, key and sandbox values')
 
