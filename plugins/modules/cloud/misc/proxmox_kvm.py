@@ -963,12 +963,9 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                 kwargs.update(kwargs[k])
                 del kwargs[k]
 
-        # Map bool to string, according to API documentation.
         try:
-            if boolean(kwargs['agent'], strict=True):
-                kwargs['agent'] = 'enabled=1'
-            else:
-                kwargs['agent'] = 'enabled=0'
+            # The API also allows booleans instead of e.g. `enabled=1` for backward-compatibility.
+            kwargs['agent'] = boolean(kwargs['agent'], strict=True)
         except TypeError:
             # Not something that Ansible would parse as a boolean.
             pass
