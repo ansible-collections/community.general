@@ -315,9 +315,9 @@ class TestPmem(ModuleTestCase):
         test_result = result.exception.args[0]['result']
         expected = json.loads(namespace)
 
-        for i, notuse in enumerate(test_result):
-            self.assertEqual(test_result[i]['dev'], expected[i]['dev'])
-            self.assertEqual(test_result[i]['size'], expected[i]['size'])
+        for i, result in enumerate(test_result):
+            self.assertEqual(result['dev'], expected[i]['dev'])
+            self.assertEqual(result['size'], expected[i]['size'])
 
     def test_fail_when_required_args_missing(self):
         with self.assertRaises(AnsibleFailJson):

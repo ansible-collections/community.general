@@ -98,13 +98,13 @@ from ansible.module_utils.facts.packages import CLIMgr
 
 class PIP(CLIMgr):
 
-    def __init__(self, pip):
+    def __init__(self, pip, module):
 
         self.CLI = pip
+        self.module = module
 
     def list_installed(self):
-        global module
-        rc, out, err = module.run_command([self._cli, 'list', '-l', '--format=json'])
+        rc, out, err = self.module.run_command([self._cli, 'list', '-l', '--format=json'])
         if rc != 0:
             raise Exception("Unable to list packages rc=%s : %s" % (rc, err))
         return json.loads(out)
@@ -117,7 +117,6 @@ class PIP(CLIMgr):
 def main():
 
     # start work
-    global module
     module = AnsibleModule(
         argument_spec=dict(
             clients=dict(type='list', elements='path', default=['pip']),
@@ -134,7 +133,7 @@ def main():
             module.warn('Skipping invalid pip client: %s' % (pip))
             continue
         try:
-            pip_mgr = PIP(pip)
+            pip_mgr = PIP(pip, module)
             if pip_mgr.is_available():
                 found += 1
                 packages[pip] = pip_mgr.get_packages()

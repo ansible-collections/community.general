@@ -664,7 +664,7 @@ def get_connection_info(module):
     if not password:
         password = os.environ.get('ONEFLOW_PASSWORD')
 
-    if not(url and username and password):
+    if not (url and username and password):
         module.fail_json(msg="One or more connection parameters (api_url, api_username, api_password) were not specified")
     from collections import namedtuple
 
