@@ -471,10 +471,10 @@ def main():
             variables_args.extend(['-var-file', f])
 
     if declare_variables:
-       gen_variables_file = tempfile.NamedTemporaryFile(mode='w', dir=project_path, prefix="generated_variables_", suffix=".tf")
-       for k, v in variables.items():
-           gen_variables_file.write("variable \"" + k + "\" {}\n")
-           gen_variables_file.flush()
+        gen_variables_file = tempfile.NamedTemporaryFile(mode='w', dir=project_path, prefix="generated_variables_", suffix=".tf")
+        for k, v in variables.items():
+            gen_variables_file.write("variable \"" + k + "\" {}\n")
+            gen_variables_file.flush()
 
     preflight_validation(command[0], project_path, checked_version, variables_args)
 
