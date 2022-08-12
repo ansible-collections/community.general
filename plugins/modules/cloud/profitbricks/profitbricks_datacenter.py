@@ -184,7 +184,7 @@ def remove_datacenter(module, profitbricks):
     name = module.params.get('name')
     changed = False
 
-    if(uuid_match.match(name)):
+    if uuid_match.match(name):
         _remove_datacenter(module, profitbricks, name)
         changed = True
     else:

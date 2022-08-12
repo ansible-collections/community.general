@@ -233,13 +233,13 @@ class CallbackModule(CallbackModule_default):
         # Remove non-essential attributes
         for attr in self.removed_attributes:
             if attr in result:
-                del(result[attr])
+                del result[attr]
 
         # Remove empty attributes (list, dict, str)
         for attr in result.copy():
             if isinstance(result[attr], (MutableSequence, MutableMapping, binary_type, text_type)):
                 if not result[attr]:
-                    del(result[attr])
+                    del result[attr]
 
     def _handle_exceptions(self, result):
         if 'exception' in result:

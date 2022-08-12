@@ -329,7 +329,7 @@ class Homectl(object):
         cmd = [self.module.get_bin_path('homectl', True)]
         cmd.append('create')
         cmd.append('--identity=-')  # Read the user record from standard input.
-        return(self.module.run_command(cmd, data=record))
+        return self.module.run_command(cmd, data=record)
 
     def _hash_password(self, password):
         method = crypt.METHOD_SHA512

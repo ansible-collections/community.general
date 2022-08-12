@@ -262,8 +262,8 @@ class BalancerMember(object):
         else:
             try:
                 soup = BeautifulSoup(balancer_member_page[0])
-            except TypeError:
-                self.module.fail_json(msg="Cannot parse balancer_member_page HTML! " + str(soup))
+            except TypeError as exc:
+                self.module.fail_json(msg="Cannot parse balancer_member_page HTML! " + str(exc))
             else:
                 subsoup = soup.findAll('table')[1].findAll('tr')
                 keys = subsoup[0].findAll('th')
