@@ -22,6 +22,7 @@ plugins/modules/cloud/univention/udm_user.py validate-modules:parameter-list-no-
 plugins/modules/clustering/consul/consul.py validate-modules:doc-missing-type
 plugins/modules/clustering/consul/consul.py validate-modules:undocumented-parameter
 plugins/modules/clustering/consul/consul_session.py validate-modules:parameter-state-invalid-choice
+plugins/modules/files/ini_file.py pylint:bad-option-value
 plugins/modules/packaging/language/yarn.py use-argspec-type-path
 plugins/modules/packaging/os/redhat_subscription.py validate-modules:return-syntax-error
 plugins/modules/remote_management/manageiq/manageiq_policies.py validate-modules:parameter-state-invalid-choice
