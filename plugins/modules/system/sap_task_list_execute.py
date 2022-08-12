@@ -188,6 +188,7 @@ except ImportError:
     PYRFC_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 else:
     HAS_PYRFC_LIBRARY = True
+    PYRFC_LIBRARY_IMPORT_ERROR = None
 try:
     import xmltodict
 except ImportError:
@@ -195,6 +196,7 @@ except ImportError:
     XMLTODICT_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 else:
     HAS_XMLTODICT_LIBRARY = True
+    XMLTODICT_LIBRARY_IMPORT_ERROR = None
 
 
 def call_rfc_method(connection, method_name, kwargs):

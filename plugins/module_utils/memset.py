@@ -79,7 +79,7 @@ def memset_api_call(api_key, api_method, payload=None):
     if msg is None:
         msg = response.json()
 
-    return(has_failed, msg, response)
+    return has_failed, msg, response
 
 
 def check_zone_domain(data, domain):
@@ -93,7 +93,7 @@ def check_zone_domain(data, domain):
             if zone_domain['domain'] == domain:
                 exists = True
 
-    return(exists)
+    return exists
 
 
 def check_zone(data, name):
@@ -110,7 +110,7 @@ def check_zone(data, name):
         if counter == 1:
             exists = True
 
-    return(exists, counter)
+    return exists, counter
 
 
 def get_zone_id(zone_name, current_zones):
@@ -136,4 +136,4 @@ def get_zone_id(zone_name, current_zones):
         zone_id = None
         msg = 'Zone ID could not be returned as duplicate zone names were detected'
 
-    return(zone_exists, msg, counter, zone_id)
+    return zone_exists, msg, counter, zone_id

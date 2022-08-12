@@ -125,7 +125,7 @@ from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 def add_remote(module, binary, name, flatpakrepo_url, method):
     """Add a new remote."""
-    global result
+    global result  # pylint: disable=global-variable-not-assigned
     command = [binary, "remote-add", "--{0}".format(method), name, flatpakrepo_url]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
@@ -133,7 +133,7 @@ def add_remote(module, binary, name, flatpakrepo_url, method):
 
 def remove_remote(module, binary, name, method):
     """Remove an existing remote."""
-    global result
+    global result  # pylint: disable=global-variable-not-assigned
     command = [binary, "remote-delete", "--{0}".format(method), "--force", name]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
@@ -154,7 +154,7 @@ def remote_exists(module, binary, name, method):
 
 
 def _flatpak_command(module, noop, command):
-    global result
+    global result  # pylint: disable=global-variable-not-assigned
     result['command'] = ' '.join(command)
     if noop:
         result['rc'] = 0
