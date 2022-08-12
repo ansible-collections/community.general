@@ -324,7 +324,7 @@ def delete_volume(module, profitbricks):
                 break
 
     for n in instance_ids:
-        if(uuid_match.match(n)):
+        if uuid_match.match(n):
             _delete_volume(module, profitbricks, datacenter, n)
             changed = True
         else:

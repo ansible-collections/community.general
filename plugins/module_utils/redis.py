@@ -15,6 +15,7 @@ try:
     from redis import Redis
     from redis import __version__ as redis_version
     HAS_REDIS_PACKAGE = True
+    REDIS_IMP_ERR = None
 except ImportError:
     REDIS_IMP_ERR = traceback.format_exc()
     HAS_REDIS_PACKAGE = False
@@ -22,6 +23,7 @@ except ImportError:
 try:
     import certifi
     HAS_CERTIFI_PACKAGE = True
+    CERTIFI_IMPORT_ERROR = None
 except ImportError:
     CERTIFI_IMPORT_ERROR = traceback.format_exc()
     HAS_CERTIFI_PACKAGE = False
