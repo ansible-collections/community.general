@@ -1817,3 +1817,76 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg="Could not fetch user %s in realm %s: %s"
                                       % (name, realm, str(e)))
+    def create_user(self, userrep, realm="master"):
+        """ Create a Keycloak User.
+
+        :param userrep: a UserRepresentation of the user to be created. Must contain at minimum the field name.
+        :return: HTTPResponse object on success
+        """
+        users_url = URL_USERS.format(url=self.baseurl, realm=realm)
+    
+        if userrep['name']:
+            userrep['username'] = userrep['name']
+            userrep.pop('name', None)
+        
+        try:
+            return open_url(users_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(userrep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg="Could not create user %s in realm %s: %s"
+                                      % (userrep['username'], realm, str(e)))
+
+    def update_user(self, userrep, realm="master"):
+        """ Update an existing user.
+
+        :param userrep: A UserRepresentation of the updated user.
+        :return HTTPResponse object on success
+        """
+        user_url = URL_USER.format(url=self.baseurl, realm=realm, userid=userrep['id'])
+    
+        if userrep['name']:
+            userrep['username'] = userrep['name']
+            userrep.pop('name', None)
+        
+        try:
+            return open_url(user_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            data=json.dumps(userrep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not update user %s in realm %s: %s'
+                                      % (userrep['username'], realm, str(e)))
+
+    def delete_user(self, name=None, userid=None, realm="master"):
+        """ Delete a user. One of name or userid must be provided.
+
+        Providing the user ID is preferred as it avoids a second lookup to
+        convert a user name to an ID.
+
+        :param name: The name of the user. A lookup will be performed to retrieve the user ID.
+        :param userid: The ID of the user (preferred to name).
+        :param realm: The realm in which this user resides, default "master".
+        """        
+
+        if userid is None and name is None:
+            # prefer an exception since this is almost certainly a programming error in the module itself.
+            raise Exception("Unable to delete user - one of user ID or name must be provided.")
+
+        # only lookup the name if userid isn't provided.
+        # in the case that both are provided, prefer the ID, since it's one
+        # less lookup.
+        if userid is None and name is not None:
+            for user in self.get_users(realm=realm):
+                if user['username'] == name:
+                    userid = user['id']
+                    break
+
+        # if the user doesn't exist - no problem, nothing to delete.
+        if userid is None:
+            return None
+
+        # should have a good userid by here.
+        user_url = URL_USER.format(realm=realm, userid=userid, url=self.baseurl)
+        try:
+            return open_url(user_url, method='DELETE', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
+                            validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg="Unable to delete user %s: %s" % (userid, str(e)))

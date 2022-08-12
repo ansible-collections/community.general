@@ -614,6 +614,8 @@ plugin_routing:
       redirect: community.general.identity.keycloak.keycloak_user_federation
     keycloak_user_info:
       redirect: community.general.identity.keycloak.keycloak_user_info
+    keycloak_user:
+      redirect: community.general.identity.keycloak.keycloak_user
     keyring:
       redirect: community.general.system.keyring
     keyring_info:

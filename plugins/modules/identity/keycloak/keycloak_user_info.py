@@ -151,7 +151,7 @@ end_state:
             returned: always
             sample: false
         access:
-            description: A dict describing the accesses you have to this group based on the credentials used.
+            description: A dict describing the accesses you have to this user based on the credentials used.
             type: dict
             returned: always
             sample:
@@ -160,7 +160,7 @@ end_state:
                 view: true
 users:
   description:
-    - Representation of the group after module execution.
+    - Representation of the user after module execution.
     - Deprecated return value, it will be removed in community.general 6.0.0. Please use the return value I(end_state) instead.
   returned: always
   type: dict
@@ -221,7 +221,7 @@ users:
             returned: always
             sample: false
         access:
-            description: A dict describing the accesses you have to this group based on the credentials used.
+            description: A dict describing the accesses you have to this user based on the credentials used.
             type: dict
             returned: always
             sample:
@@ -256,7 +256,7 @@ def main():
                            required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
-    result = dict(changed=False, msg='', diff={}, group='')
+    result = dict(changed=False, msg='', diff={}, user='')
 
     # Obtain access token, initialize API
     try:
