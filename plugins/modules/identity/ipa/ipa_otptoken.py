@@ -446,8 +446,8 @@ def ensure(module, client):
                 module_otptoken['all'] = True
                 ipa_otptoken = client.otptoken_add(name=uniqueid, item=module_otptoken)
         else:
-            if not(validate_modifications(ansible_to_ipa, module, ipa_otptoken,
-                                          module_otptoken, unmodifiable_after_creation)):
+            if not validate_modifications(ansible_to_ipa, module, ipa_otptoken,
+                                          module_otptoken, unmodifiable_after_creation):
                 module.fail_json(msg="Modifications requested in module are not valid")
 
             # IPA will reject 'modifications' that do not actually modify anything

@@ -212,6 +212,7 @@ except ImportError:
     XMLTODICT_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 else:
     HAS_XMLTODICT_LIBRARY = True
+    XMLTODICT_LIBRARY_IMPORT_ERROR = None
 
 
 class PersistentMemory(object):

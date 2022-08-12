@@ -165,10 +165,10 @@ class BE(object):
             for line in out.splitlines():
                 if self.is_freebsd:
                     check = line.split()
-                    if(check == []):
+                    if check == []:
                         continue
                     full_name = check[0].split('/')
-                    if(full_name == []):
+                    if full_name == []:
                         continue
                     check[0] = full_name[len(full_name) - 1]
                     if check[0] == self.name:

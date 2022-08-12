@@ -75,8 +75,8 @@ class TestMyModule():
         }
         mod_obj.params = args
         lxca_cmms.main()
-        assert(mock.call(argument_spec=expected_arguments_spec,
-                         supports_check_mode=False) == ansible_mod_cls.call_args)
+        assert mock.call(argument_spec=expected_arguments_spec,
+                         supports_check_mode=False) == ansible_mod_cls.call_args
 
     @mock.patch('ansible_collections.community.general.plugins.module_utils.remote_management.lxca.common.setup_conn', autospec=True)
     @mock.patch('ansible_collections.community.general.plugins.modules.remote_management.lxca.lxca_cmms._cmms_by_uuid',

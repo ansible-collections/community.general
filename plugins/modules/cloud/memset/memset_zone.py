@@ -140,7 +140,7 @@ def check(args=None):
     retvals['changed'] = has_changed
     retvals['failed'] = has_failed
 
-    return(retvals)
+    return retvals
 
 
 def create_zone(args=None, zone_exists=None, payload=None):
@@ -186,7 +186,7 @@ def create_zone(args=None, zone_exists=None, payload=None):
         _has_failed, _msg, response = memset_api_call(api_key=args['api_key'], api_method=api_method, payload=payload)
         memset_api = response.json()
 
-    return(has_failed, has_changed, memset_api, msg)
+    return has_failed, has_changed, memset_api, msg
 
 
 def delete_zone(args=None, zone_exists=None, payload=None):
@@ -234,7 +234,7 @@ def delete_zone(args=None, zone_exists=None, payload=None):
     else:
         has_failed, has_changed = False, False
 
-    return(has_failed, has_changed, memset_api, msg)
+    return has_failed, has_changed, memset_api, msg
 
 
 def create_or_delete(args=None):
@@ -256,7 +256,7 @@ def create_or_delete(args=None):
         retvals['failed'] = _has_failed
         retvals['msg'] = _msg
 
-        return(retvals)
+        return retvals
 
     zone_exists, _msg, counter, _zone_id = get_zone_id(zone_name=args['name'], current_zones=response.json())
 
@@ -272,7 +272,7 @@ def create_or_delete(args=None):
         if val is not None:
             retvals[val] = eval(val)
 
-    return(retvals)
+    return retvals
 
 
 def main():

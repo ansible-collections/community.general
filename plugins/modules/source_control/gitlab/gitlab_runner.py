@@ -189,7 +189,7 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
 
 try:
-    cmp
+    cmp  # pylint: disable=used-before-assignment
 except NameError:
     def cmp(a, b):
         return (a > b) - (a < b)

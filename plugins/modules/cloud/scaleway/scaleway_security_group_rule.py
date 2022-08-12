@@ -143,6 +143,7 @@ except ImportError:
     IPADDRESS_IMP_ERR = traceback.format_exc()
     HAS_IPADDRESS = False
 else:
+    IPADDRESS_IMP_ERR = None
     HAS_IPADDRESS = True
 
 

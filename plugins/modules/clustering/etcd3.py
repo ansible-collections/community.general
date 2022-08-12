@@ -127,6 +127,7 @@ from ansible.module_utils.common.text.converters import to_native
 try:
     import etcd3
     HAS_ETCD = True
+    ETCD_IMP_ERR = None
 except ImportError:
     ETCD_IMP_ERR = traceback.format_exc()
     HAS_ETCD = False

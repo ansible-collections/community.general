@@ -239,7 +239,7 @@ class ManageIQAlertProfiles(object):
             except Exception as e:
                 msg = "Updating profile '{name}' failed: {error}"
                 msg = msg.format(name=old_profile['name'], error=e)
-                self.module.fail_json(msg=msg, result=result)
+                self.module.fail_json(msg=msg)
 
         if changed:
             msg = "Profile {name} updated successfully".format(name=desired_profile['name'])
