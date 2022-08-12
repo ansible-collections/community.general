@@ -87,6 +87,7 @@ from os import path
 try:
     from pdpyras import APISession
     HAS_PD_PY = True
+    PD_IMPORT_ERR = None
 except ImportError:
     HAS_PD_PY = False
     PD_IMPORT_ERR = traceback.format_exc()
@@ -94,6 +95,7 @@ except ImportError:
 try:
     from pdpyras import PDClientError
     HAS_PD_CLIENT_ERR = True
+    PD_CLIENT_ERR_IMPORT_ERR = None
 except ImportError:
     HAS_PD_CLIENT_ERR = False
     PD_CLIENT_ERR_IMPORT_ERR = traceback.format_exc()
