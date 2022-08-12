@@ -1,0 +1,2 @@
+minor_changes:
+  - terraform - adds ``generate_variables`` parameter for automatically declaring the Terraform vars from Ansible (https://github.com/ansible-collections/community.general/pull/5097).
