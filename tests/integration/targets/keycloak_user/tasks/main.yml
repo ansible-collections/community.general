@@ -1,0 +1,42 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Delete realm
+  community.general.keycloak_realm: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      id: "{{ realm }}"
+      realm: "{{ realm }}"
+      state: absent
+
+- name: Create realm
+  community.general.keycloak_realm: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      id: "{{ realm }}"
+      realm: "{{ realm }}"
+      state: present
+
+
+- name: Check without Credentials
+  include_tasks: ./nocreds.yaml
+- name: Check with Credentials
+  include_tasks: ./creds.yaml
+
+- name: Get User Info
+  community.general.keycloak_user_info: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      name: "{{username}}"
+      realm: "{{realm}}"
+  register: check_user_info
+- name: Assert changes not detected in last two tasks (desire when same, and check)
+  assert:
+    that:
+      - desire_user_with_creds_when_present_and_same is changed
+      - check_user_with_creds_when_present_and_same is changed
+      - desire_user_when_present_and_same is not changed
+      - check_user_when_present_and_same is not changed
+      - check_user_info.users.username == username

@@ -1,0 +1,30 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+url: http://localhost:8080
+admin_realm: master
+admin_user: admin
+admin_password: admin
+realm: myrealm
+username: drstrange
+role: myrole
+first_name: Stephen
+last_name: Strange
+email: drstrange@marvel.com
+email_verified: true
+enabled: true
+credentials: 
+- type: password
+  value: "testing123"
+
+attributes:
+  universe: marvel
+  skills: magic
+  
+auth_args:
+  auth_keycloak_url: "{{ url }}"
+  auth_realm: "{{ admin_realm }}"
+  auth_username: "{{ admin_user }}"
+  auth_password: "{{ admin_password }}"

@@ -1,0 +1,45 @@
+- name: Desired User
+  community.general.keycloak_user: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      realm: "{{ realm }}"
+      username: "{{ username }}"
+      state: present
+      first_name: "{{ first_name }}"
+      last_name: "{{ last_name }}"
+      email: "{{ email }}"
+      email_verified: "{{ email_verified}}"
+      enabled: "{{ enabled }}"
+      attributes: "{{ attributes }}"
+  register: desire_user_not_present
+
+- name: Desire user again with same props
+  community.general.keycloak_user: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      realm: "{{ realm }}"
+      username: "{{ username }}"
+      state: present
+      first_name: "{{ first_name }}"
+      last_name: "{{ last_name }}"
+      email: "{{ email }}"
+      email_verified: "{{ email_verified}}"
+      enabled: "{{ enabled }}"
+      attributes: "{{ attributes }}"
+  register: desire_user_when_present_and_same
+
+- name: Check User again with same props
+  community.general.keycloak_user: "{{ auth_args | combine(call_args) }}"
+  check_mode: yes
+  vars:
+    call_args:
+      realm: "{{ realm }}"
+      username: "{{ username }}"
+      state: present
+      first_name: "{{ first_name }}"
+      last_name: "{{ last_name }}"
+      email: "{{ email }}"
+      email_verified: "{{ email_verified}}"
+      enabled: "{{ enabled }}"
+      attributes: "{{ attributes }}"
+  register: check_user_when_present_and_same
