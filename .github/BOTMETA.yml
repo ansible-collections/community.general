@@ -599,6 +599,8 @@ files:
     maintainers: laurpaum
   $modules/identity/keycloak/keycloak_user_info.py:
     maintainers: drpdishant MahekKatariya
+  $modules/identity/keycloak/keycloak_user.py:
+    maintainers: drpdishant MahekKatariya
   $modules/identity/onepassword_info.py:
     maintainers: Rylon
   $modules/identity/opendj/opendj_backendprop.py:
