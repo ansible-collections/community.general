@@ -88,12 +88,6 @@ options:
       description: Set whether the email is verified or not.
       default: True
 
-    groups:
-      type: list
-      description: A list of groups to assign to the user.
-      elements: str
-
-
     required_actions:
       type: list
       description: A list of actions that will be applied on the user
@@ -208,10 +202,6 @@ EXAMPLES = '''
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
-    groups:
-      - avengers
-      - spiderman
-      - multiverse-of-madness
     credentials:
     - type: password
       value:  holmes@sher.lock
@@ -328,11 +318,9 @@ def main():
         enabled=dict(type='bool', default=True),
         first_name=dict(type='str'),
         last_name=dict(type='str'),
-        groups=dict(type='list', elements='str'),
         required_actions=dict(type='list', elements='str'),
         credentials=dict(type='list', elements='dict', no_log=True),
         email_verified=dict(type='bool', default=True),
-
     )
 
     argument_spec.update(meta_args)
