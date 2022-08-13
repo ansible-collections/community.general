@@ -49,7 +49,7 @@ options:
       type: bool
       default: true
 
-    name:
+    username:
         type: str
         description:
             - Name of the user.
@@ -78,7 +78,19 @@ options:
       type: list
       description: user credentials configuration.
       elements: dict
-
+      suboptions:
+        type:
+          description:
+            - Type of credential e.g password.
+          type: str
+        value:
+          description:
+            - Value of the credential.
+          type: str
+        userLabel:
+          description:
+            - User-defined Label for the credential.
+          type: str
     email:
       type: str
       description: Email for the user.
@@ -160,7 +172,7 @@ EXAMPLES = '''
 - name: Update the name of a Keycloak user
   community.general.keycloak_user:
     id: '9d59aa76-2755-48c6-b1af-beb70a82c3cd'
-    name: bruce
+    username: bruce
     state: present
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
@@ -312,14 +324,19 @@ def main():
         state=dict(default='present', choices=['present', 'absent']),
         realm=dict(default='master'),
         id=dict(type='str'),
-        name=dict(type='str'),
+        username=dict(type='str'),
         attributes=dict(type='dict'),
         email=dict(type='str'),
         enabled=dict(type='bool', default=True),
         first_name=dict(type='str'),
         last_name=dict(type='str'),
         required_actions=dict(type='list', elements='str'),
-        credentials=dict(type='list', elements='dict', no_log=True),
+        credentials=dict(type='list', elements='dict',
+                         options=dict(
+                              type=dict(type='str'),
+                              value=dict(type='str', no_log=True),
+                              userLabel=dict(type='str'),
+                         )),
         email_verified=dict(type='bool', default=True),
     )
 
@@ -327,7 +344,7 @@ def main():
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
-                           required_one_of=([['id', 'name'],
+                           required_one_of=([['id', 'username'],
                                              ['token', 'auth_realm', 'auth_username', 'auth_password']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
@@ -344,7 +361,7 @@ def main():
     realm = module.params.get('realm')
     state = module.params.get('state')
     uid = module.params.get('id')
-    name = module.params.get('name')
+    name = module.params.get('username')
     attributes = module.params.get('attributes')
 
     # attributes in Keycloak have their values returned as lists

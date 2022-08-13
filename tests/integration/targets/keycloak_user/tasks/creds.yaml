@@ -48,4 +48,3 @@
       credentials: "{{ credentials }}"
       attributes: "{{ attributes }}"
   register: check_user_with_creds_when_present_and_same
-

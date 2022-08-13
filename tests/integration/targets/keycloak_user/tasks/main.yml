@@ -32,7 +32,7 @@
       name: "{{username}}"
       realm: "{{realm}}"
   register: check_user_info
-- name: Assert changes not detected in last two tasks (desire when same, and check)
+- name: Assert expected results
   assert:
     that:
       - desire_user_with_creds_when_present_and_same is changed

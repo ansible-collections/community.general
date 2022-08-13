@@ -78,8 +78,8 @@ def keycloak_argument_spec():
         auth_client_id=dict(type='str', default='admin-cli'),
         auth_realm=dict(type='str'),
         auth_client_secret=dict(type='str', default=None, no_log=True),
-        auth_username=dict(type='str', aliases=['username']),
-        auth_password=dict(type='str', aliases=['password'], no_log=True),
+        auth_username=dict(type='str'),
+        auth_password=dict(type='str', no_log=True),
         validate_certs=dict(type='bool', default=True),
         connection_timeout=dict(type='int', default=10),
         token=dict(type='str', no_log=True),
@@ -1826,10 +1826,6 @@ class KeycloakAPI(object):
         """
         users_url = URL_USERS.format(url=self.baseurl, realm=realm)
 
-        if userrep['name']:
-            userrep['username'] = userrep['name']
-            userrep.pop('name', None)
-
         try:
             return open_url(users_url, method='POST', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
                             data=json.dumps(userrep), validate_certs=self.validate_certs)
@@ -1844,10 +1840,6 @@ class KeycloakAPI(object):
         :return HTTPResponse object on success
         """
         user_url = URL_USER.format(url=self.baseurl, realm=realm, userid=userrep['id'])
-
-        if userrep['name']:
-            userrep['username'] = userrep['name']
-            userrep.pop('name', None)
 
         try:
             return open_url(user_url, method='PUT', http_agent=self.http_agent, headers=self.restheaders, timeout=self.connection_timeout,
