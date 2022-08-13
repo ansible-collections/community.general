@@ -1,0 +1,2 @@
+minor_changes:
+  - mattermost-notification-plugin - add option ``icon_emoji`` to allow specifying an already existing emoji as the profile picture for the webhook notification (https://github.com/ansible-collections/community.general/pull/5113).
