@@ -65,6 +65,7 @@ options:
     type: str
     description:
       - Emoji name for the message sender's icon (without the colons).
+    version_added: 5.5.0
   validate_certs:
     description:
       - If C(no), SSL certificates will not be validated. This should only be used
