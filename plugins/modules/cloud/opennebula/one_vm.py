@@ -289,7 +289,7 @@ EXAMPLES = '''
       name: foo
       bar: bar1
 
-- name: "Deploy an new instance with vector attribute 'bar' and set its name to 'foo'"
+- name: "Deploy an new instance with vector attribute 'bar' ( BAR=[BAZ1="val1", BAZ2="val2"] ) and set its name to 'foo'"
   community.general.one_vm:
     template_id: 53
     attributes:
@@ -297,15 +297,6 @@ EXAMPLES = '''
       bar:
         baz1: "val1"
         baz2: "val2"
-
-- name: "Deploy an new instance with vector attribute 'bar' which has duplicate key name and set its name to 'foo'"
-  community.general.one_vm:
-    template_id: 53
-    attributes:
-      name: foo
-      bar:
-        - baz: "val1"
-        - baz: "val2"
 
 - name: "Enforce that 2 instances with attributes 'foo1: app1' and 'foo2: app2' are deployed"
   community.general.one_vm:
@@ -952,12 +943,8 @@ def create_attributes_str(attributes_dict, labels_list):
         attributes_str += 'LABELS="' + ','.join('{label}'.format(label=label) for label in labels_list) + '"\n'
     if attributes_dict:
         for key, val in attributes_dict.items():
-            if isinstance(val, list):
-                vals = ','.join('{k}="{v}"'.format(k=k.upper(), v=v) for i in val for k, v in i.items())
-                attributes_str += '{key} = [{vals}]\n'.format(key=key.upper(), vals=vals)
-            elif isinstance(val, dict):
-                vals = ','.join('{k}="{v}"'.format(k=k.upper(), v=v) for k, v in val.items())
-                attributes_str += '{key} = [{vals}]\n'.format(key=key.upper(), vals=vals)
+            if isinstance(val, dict):
+                attributes_str += '{key} = [{vals}]\n'.format(key=key.upper(), vals=','.join('{k}="{v}"'.format(k=k.upper(), v=v) for k, v in val.items()))
             else:
                 attributes_str += '{key}="{val}"\n'.format(key=key.upper(), val=val)
 
@@ -1344,13 +1331,9 @@ TEMPLATE_RESTRICTED_ATTRIBUTES = ["CPU", "VCPU", "OS", "FEATURES", "MEMORY", "DI
 
 
 def check_attributes(module, attributes):
-    for key, val in attributes.items():
+    for key in attributes.keys():
         if key in TEMPLATE_RESTRICTED_ATTRIBUTES:
             module.fail_json(msg='Restricted attribute `' + key + '` cannot be used when filtering VMs.')
-        if isinstance(val, list):
-            if not all(isinstance(i, dict) for i in val):
-                module.fail_json(msg='Ilegal format attribute `' + key + '` list item must be a key/value map.')
-
     # Check the format of the name attribute
     check_name_attribute(module, attributes)
 
