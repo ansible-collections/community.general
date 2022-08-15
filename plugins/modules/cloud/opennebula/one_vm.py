@@ -289,7 +289,7 @@ EXAMPLES = '''
       name: foo
       bar: bar1
 
-- name: "Deploy an new instance with vector attribute 'bar' ( BAR=[BAZ1="val1", BAZ2="val2"] ) and set its name to 'foo'"
+- name: "Deploy an new instance with vector attribute 'bar' ( BAR=[BAZ1=\\"val1\\", BAZ2=\\"val2\\"] ) and set its name to 'foo'"
   community.general.one_vm:
     template_id: 53
     attributes:
