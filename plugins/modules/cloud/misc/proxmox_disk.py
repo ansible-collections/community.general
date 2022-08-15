@@ -621,7 +621,7 @@ def main():
     disk_regex = compile(r'^([a-z]+)([0-9]+)$')
     disk_bus = sub(disk_regex, r'\1', disk)
     disk_number = int(sub(disk_regex, r'\2', disk))
-    if disk_bus not in proxmox.supported_ranges.keys():
+    if disk_bus not in proxmox.supported_ranges:
         proxmox.module.fail_json(msg='Unsupported disk bus: %s' % disk_bus)
     elif disk_number not in proxmox.supported_ranges[disk_bus]:
         bus_range = proxmox.supported_ranges[disk_bus]
