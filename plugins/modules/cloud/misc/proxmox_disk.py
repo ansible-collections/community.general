@@ -20,7 +20,7 @@ options:
   name:
     description:
       - The (unique) name of the VM.
-      - Required only one of C(name) or C(vmid).
+      - Required only one of I(name) or I(vmid).
     type: str
   vmid:
     description:
