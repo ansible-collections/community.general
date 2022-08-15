@@ -128,7 +128,7 @@ options:
     type: int
   cache:
     description:
-      - The drive's cache mode
+      - The drive's cache mode.
     type: str
     choices: ['none', 'writethrough', 'writeback', 'unsafe', 'directsync']
   cyls:
