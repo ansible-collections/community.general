@@ -494,8 +494,7 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         disk_config = disk_conf_str_to_dict(vm_config[disk])
         config_str = disk_config["volume"]
         params = self.sanitize_params()
-        for k, v in params.items():
-            config_str += ',%s=%s' % (k, v)
+        config_str = ','.join('%s=%s' % (k, v) for k, v in params.items())
 
         disk_config = {self.module.params["disk"]: config_str}
         self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**disk_config)
