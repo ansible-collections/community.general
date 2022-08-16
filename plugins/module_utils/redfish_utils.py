@@ -2162,11 +2162,15 @@ class RedfishUtils(object):
         result["entries"] = virtualmedia_results
         return result
 
-    def get_multi_virtualmedia(self):
+    def get_multi_virtualmedia(self, resource_type):
         ret = True
         entries = []
 
-        resource_uris = self.manager_uris
+        #  Given resource_type, use the proper URI
+        if resource_type == 'Systems':
+            resource_uris = self.systems_uris
+        elif resource_type == 'Manager':
+            resource_uris = self.manager_uris
 
         for resource_uri in resource_uris:
             virtualmedia = self.get_virtualmedia(resource_uri)
@@ -2187,8 +2191,12 @@ class RedfishUtils(object):
             else:
                 if media_match_strict:
                     continue
-            # if ejected, 'Inserted' should be False
-            if (not data.get('Inserted', False)):
+            # Base on current XCC capability, slot RDOC1/2 and Remote1/2/3/4 are not supported to Insert/Eject.
+            if ("/Systems/1/" in uri or "/Manager/1/" in uri) and ('RDOC' in uri or 'Remote' in uri):
+                continue
+            # if ejected, 'Inserted' should be False and 'ImageName' cleared
+            if (not data.get('Inserted', False) and
+                    not data.get('ImageName')):
                 return uri, data
         return None, None
 
@@ -2262,7 +2270,7 @@ class RedfishUtils(object):
             return response
         return {'ret': True, 'changed': True, 'msg': "VirtualMedia inserted"}
 
-    def virtual_media_insert(self, options):
+    def virtual_media_insert(self, resource_type, options):
         param_map = {
             'Inserted': 'inserted',
             'WriteProtected': 'write_protected',
@@ -2279,7 +2287,12 @@ class RedfishUtils(object):
         media_types = options.get('media_types')
 
         # locate and read the VirtualMedia resources
-        response = self.get_request(self.root_uri + self.manager_uri)
+        #  Given resource_type, use the proper URI
+        if resource_type == 'Systems':
+            resource_uri = self.systems_uri
+        elif resource_type == 'Manager':
+            resource_uri = self.manager_uri
+        response = self.get_request(self.root_uri + resource_uri)
         if response['ret'] is False:
             return response
         data = response['data']
@@ -2288,7 +2301,7 @@ class RedfishUtils(object):
 
         # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
         # Inserted and WriteProtected are not writable
-        if data["FirmwareVersion"].startswith("iLO 4"):
+        if "FirmwareVersion" in data and data["FirmwareVersion"].startswith("iLO 4"):
             image_only = True
 
         # Supermicro does also not support Inserted and WriteProtected
@@ -2378,14 +2391,19 @@ class RedfishUtils(object):
         return {'ret': True, 'changed': True,
                 'msg': "VirtualMedia ejected"}
 
-    def virtual_media_eject(self, options):
+    def virtual_media_eject(self, resource_type, options):
         image_url = options.get('image_url')
         if not image_url:
             return {'ret': False,
                     'msg': "image_url option required for VirtualMediaEject"}
 
         # locate and read the VirtualMedia resources
-        response = self.get_request(self.root_uri + self.manager_uri)
+        # Given resource_type, use the proper URI
+        if resource_type == 'Systems':
+            resource_uri = self.systems_uri
+        elif resource_type == 'Manager':
+            resource_uri = self.manager_uri
+        response = self.get_request(self.root_uri + resource_uri)
         if response['ret'] is False:
             return response
         data = response['data']
@@ -2395,7 +2413,7 @@ class RedfishUtils(object):
         # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
         # Inserted is not writable
         image_only = False
-        if data["FirmwareVersion"].startswith("iLO 4"):
+        if "FirmwareVersion" in data and data["FirmwareVersion"].startswith("iLO 4"):
             image_only = True
 
         if 'Supermicro' in data['Oem']:
