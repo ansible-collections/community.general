@@ -33,64 +33,65 @@ options:
     required: True
   state:
     description:
-      - Indicate desired state of the disk. C(absent) can be used only with C(remove) action
+      - Indicates desired state of the disk.
+      - >
+        I(state=present) intended only for creating new disk (with or without replacing existing disk,
+        see I(force_replace) option).
+      - For changing options in existing disk use I(state=updated)
+      - When I(state=detached) and disk is C(unused[n]) it will be left in same state (not removed).
     type: str
-    choices: ['present', 'absent']
+    choices: ['present', 'updated', 'grown', 'detached', 'moved', 'absent']
     default: present
-  action:
-    description:
-      - Action to perform on the disk.
-    type: str
-    choices: ['create', 'update', 'grow', 'detach', 'move', 'remove']
-    required: True
   force_replace:
     description:
-      - Force replace existing attached disk with the new one leaving old disk unused
+      - Force replace existing attached disk with the new one leaving old disk unused.
+      - When disk exists and I(force_replace=False) creation will be silently skipped.
     type: bool
     default: False
   storage:
     description:
       - The drive's backing storage.
-      - Used primarily in C(create) and C(move) actions.
+      - Used primarily when I(state) is C(present) or C(moved).
     type: str
   size:
     description:
-      - For create action C(size) is desired volume size in GB to allocate.
+      - For I(state=present) C(size) is desired volume size in GB to allocate.
       - >
-        For grow action C(size) is the new size of volume. With the C(+) sign
-        the value is added to the actual size of the volume and without it, the value is taken as an absolute one.
+        For I(state=grown) C(size) is the new size of volume. With the C(+) sign
+        the value is added to the actual size of the volume
+        and without it, the value is taken as an absolute one.
     type: str
   bwlimit:
     description:
       - Override I/O bandwidth limit (in KB/s).
-      - Used only in C(move) action
+      - Used only when I(state=moved).
     type: int
   delete_moved:
     description:
       - Delete the original disk after successful copy.
       - By default the original disk is kept as unused disk.
-      - Used only in C(move) action
+      - Used only when I(state=moved).
     type: bool
   target_disk:
     description:
       - The config key the disk will be moved to on the target VM (for example, C(ide0) or C(scsi1)).
       - Default is the source disk key.
-      - Used only in C(move) action
+      - Used only when I(state=moved).
     type: str
   target_storage:
     description:
       - Target storage.
-      - Used only in C(move) action
+      - Used only when I(state=moved).
     type: str
   target_vmid:
     description:
       - The (unique) ID of the VM.
-      - Used only in C(move) action
+      - Used only when I(state=moved).
     type: int
   timeout:
     description:
-      - Timeout for move action
-      - Used only in C(move) action
+      - Timeout to wait when moving disk.
+      - Used only when I(state=moved).
     type: int
     default: 600
   aio:
@@ -155,7 +156,7 @@ options:
     type: int
   import_from:
     description:
-      - Import volume from this existing one. To use this parameter you have to specify C(size=0) in C(create) action
+      - Import volume from this existing one. To use this parameter you have to specify C(size=0) when creating disk.
       - Volume string format
       - C(<STORAGE>:<VMID>/<FULL_NAME>) or C(<ABSOLUTE_PATH>/<FULL_NAME>)
       - Attention! Only root can use absolute paths.
@@ -248,8 +249,8 @@ options:
     type: bool
   scsiblock:
     description:
-      - Whether to use scsi-block for full passthrough of host block device
-      - Can lead to I/O errors in combination with low memory or high memory fragmentation on host
+      - Whether to use scsi-block for full passthrough of host block device.
+      - Can lead to I/O errors in combination with low memory or high memory fragmentation on host.
     type: bool
   secs:
     description:
@@ -300,12 +301,11 @@ EXAMPLES = '''
     api_token_secret: some-token-data
     name: vm-name
     disk: scsi3
-    action: create
-    state: present
     backup: True
     cache: none
     storage: local-zfs
     size: 5
+    state: present
 
 - name: Create new disk in VM (force rewrite in case it exists already)
   community.general.proxmox_disk:
@@ -315,12 +315,11 @@ EXAMPLES = '''
     api_token_secret: some-token-data
     vmid: 101
     disk: scsi3
-    action: create
-    state: present
     format: qcow2
     storage: local
     size: 16
     force_replace: True
+    state: present
 
 - name: Update existing disk
   community.general.proxmox_disk:
@@ -330,11 +329,10 @@ EXAMPLES = '''
     api_token_secret: some-token-data
     vmid: 101
     disk: ide0
-    action: update
     backup: False
     ro: True
     aio: native
-    state: present
+    state: updated
 
 - name: Grow existing disk
   community.general.proxmox_disk:
@@ -344,7 +342,8 @@ EXAMPLES = '''
     api_token_secret: some-token-data
     vmid: 101
     disk: sata4
-    size: +5GB
+    size: +5G
+    state: grown
 
 - name: Detach disk (leave it unused)
   community.general.proxmox_disk:
@@ -354,8 +353,7 @@ EXAMPLES = '''
     api_token_secret: some-token-data
     name: vm-name
     disk: virtio0
-    action: detach
-    state: present
+    state: detached
 
 - name: Move disk to another storage
   community.general.proxmox_disk:
@@ -366,8 +364,7 @@ EXAMPLES = '''
     disk: scsi7
     target_storage: local
     format: qcow2
-    action: move
-    state: present
+    state: moved
 
 - name: Move disk from one VM to another
   community.general.proxmox_disk:
@@ -378,17 +375,7 @@ EXAMPLES = '''
     vmid: 101
     disk: scsi7
     target_vmid: 201
-    action: move
-    state: present
-
-- name: Move disk from one VM to another
-  community.general.proxmox_disk:
-    api_host: node1
-    api_user: root@pam
-    api_token_id: token1
-    api_token_secret: some-token-data
-    name: vm-name
-    disk: scsi7
+    state: moved
 
 - name: Remove disk permanently
   community.general.proxmox_disk:
@@ -397,7 +384,6 @@ EXAMPLES = '''
     api_password: secret
     vmid: 101
     disk: scsi4
-    action: remove
     state: absent
 '''
 
@@ -473,7 +459,11 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         # Would not replace existing disk without 'force' flag
         force_replace = self.module.params['force_replace']
         if not force_replace and disk in vm_config:
-            self.module.fail_json(vmid=vmid, msg='Unable to replace existing disk %s without the *force* flag' % disk)
+            self.module.exit_json(
+                changed=False,
+                vmid=vmid,
+                msg="Disk %s already exists in VM %s." % (disk, vmid)
+            )
 
         params = self.sanitize_params()
         import_string = params.pop('import_from', None)
@@ -494,7 +484,9 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         disk_config = disk_conf_str_to_dict(vm_config[disk])
         config_str = disk_config["volume"]
         params = self.sanitize_params()
-        config_str = ','.join('%s=%s' % (k, v) for k, v in params.items())
+
+        for k, v in params.items():
+            config_str += ',%s=%s' % (k, v)
 
         disk_config = {self.module.params["disk"]: config_str}
         self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**disk_config)
@@ -595,9 +587,8 @@ def main():
         disk=dict(type='str', required=True),
         storage=dict(type='str'),
         size=dict(type='str'),
-        state=dict(choices=['present', 'absent'], default='present'),
+        state=dict(choices=['present', 'updated', 'grown', 'detached', 'moved', 'absent'], default='present'),
         force_replace=dict(type='bool', default=False),
-        action=dict(choices=['create', 'update', 'grow', 'detach', 'move', 'remove'], required=True)
     )
 
     module_args.update(disk_args)
@@ -607,9 +598,10 @@ def main():
         required_together=[('api_token_id', 'api_token_secret')],
         required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
         required_if=[
-            ('action', 'create', ('storage', 'size')),
-            ('action', 'grow', ['size'])
+            ('state', 'present', ('storage', 'size')),
+            ('state', 'grown', ['size'])
         ],
+        required_by={'target_disk': 'target_vmid'},
         supports_check_mode=False,
         mutually_exclusive=[('target_vmid', 'target_storage')]
     )
@@ -630,7 +622,6 @@ def main():
     name = module.params['name']
     state = module.params['state']
     vmid = module.params['vmid']
-    action = module.params['action']
 
     # If vmid is not defined then retrieve its value from the vm name,
     if not vmid:
@@ -645,7 +636,7 @@ def main():
     except Exception as e:
         proxmox.module.fail_json(msg='Getting information for VM %s failed with exception: %s' % (vmid, str(e)))
 
-    if state == 'present' and action == 'create':
+    if state == 'present':
         try:
             proxmox.create_disk(disk, vmid, vm, vm_config)
             module.exit_json(changed=True, vmid=vmid, msg="Disk %s created in VM %s" % (disk, vmid))
@@ -653,50 +644,53 @@ def main():
             module.fail_json(vmid=vmid, msg='Unable to create disk %s in VM %s: %s' % (disk, vmid, str(e)))
 
     # Do not try to perform actions on missing disk
-    if disk not in vm_config and action in ['remove', 'update', 'grow', 'detach', 'move']:
-        module.fail_json(vmid=vmid, msg='Unable to %s missing disk %s in VM %s' % (action, disk, vmid))
+    if disk not in vm_config and state in ['absent', 'updated', 'grown', 'detached', 'moved']:
+        module.fail_json(vmid=vmid, msg='Unable to process missing disk %s in VM %s' % (disk, vmid))
 
-    elif state == 'absent' and action == 'remove':
+    elif state == 'absent':
         try:
             proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).unlink.put(vmid=vmid, idlist=disk, force=1)
-            module.exit_json(changed=True, vmid=vmid, msg="Disk %s removed in VM %s" % (disk, vmid))
+            module.exit_json(changed=True, vmid=vmid, msg="Disk %s removed from VM %s" % (disk, vmid))
         except Exception as e:
             module.fail_json(vmid=vmid, msg='Unable to remove disk %s from VM %s: %s' % (disk, vmid, str(e)))
 
-    elif state == 'present' and action in ['update', 'grow', 'detach', 'move']:
+    elif state == 'updated':
         try:
-            if action == 'update':
-                proxmox.update_disk(disk, vmid, vm, vm_config)
-                module.exit_json(changed=True, vmid=vmid, msg="Disk %s updated in VM %s" % (disk, vmid))
-
-            elif action == 'detach':
-                if disk_bus == 'unused':
-                    module.fail_json(changed=False, vmid=vmid,
-                                     msg='Unable to detach detached disk %s in VM %s' % (disk, vmid))
-                proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).unlink.put(vmid=vmid, idlist=disk, force=0)
-                module.exit_json(changed=True, vmid=vmid, msg="Disk %s detached from VM %s" % (disk, vmid))
-
-            elif action == 'move':
-                proxmox.move_disk(disk, vmid, vm, vm_config)
-                disk_config = disk_conf_str_to_dict(vm_config[disk])
-                module.exit_json(
-                    changed=True,
-                    vmid=vmid,
-                    msg="Disk %s moved from VM %s storage %s" % (disk, vmid, disk_config["storage_name"]))
-
-            elif action == 'grow':
-                size = module.params['size']
-                if not match(r'^\+?\d+(\.\d+)?[KMGT]?$', size):
-                    module.exit_json(vmid=vmid, msg="Unrecognized size pattern for disk %s: %s" % (disk, size))
-                proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).resize.set(vmid=vmid, disk=disk, size=size)
-                module.exit_json(changed=True, vmid=vmid, msg="Disk %s resized in VM %s" % (disk, vmid))
-
+            proxmox.update_disk(disk, vmid, vm, vm_config)
+            module.exit_json(changed=True, vmid=vmid, msg="Disk %s updated in VM %s" % (disk, vmid))
         except Exception as e:
-            module.fail_json(msg="Action %s in VM %s failed with exception: %s" % (action, vmid, str(e)))
+            module.fail_json(msg="Failed to updated disk %s in VM %s with exception: %s" % (disk, vmid, str(e)))
 
-    else:
-        module.fail_json(vmid=vmid,
-                         msg='Unsupported combination of parameters state=%s and action=%s' % (state, action))
+    elif state == 'detached':
+        try:
+            if disk_bus == 'unused':
+                module.exit_json(changed=False, vmid=vmid, msg='Disk %s already detached in VM %s' % (disk, vmid))
+            proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).unlink.put(vmid=vmid, idlist=disk, force=0)
+            module.exit_json(changed=True, vmid=vmid, msg="Disk %s detached from VM %s" % (disk, vmid))
+        except Exception as e:
+            module.fail_json(msg="Failed to detach disk %s from VM %s with exception: %s" % (disk, vmid, str(e)))
+
+    elif state == 'moved':
+        try:
+            proxmox.move_disk(disk, vmid, vm, vm_config)
+            disk_config = disk_conf_str_to_dict(vm_config[disk])
+            module.exit_json(
+                changed=True,
+                vmid=vmid,
+                storage=disk_config["storage_name"],
+                msg="Disk %s moved from VM %s storage %s" % (disk, vmid, disk_config["storage_name"]))
+        except Exception as e:
+            module.fail_json(msg="Failed to move disk %s in VM %s with exception: %s" % (disk, vmid, str(e)))
+
+    elif state == 'grown':
+        try:
+            size = module.params['size']
+            if not match(r'^\+?\d+(\.\d+)?[KMGT]?$', size):
+                module.exit_json(vmid=vmid, msg="Unrecognized size pattern for disk %s: %s" % (disk, size))
+            proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).resize.set(vmid=vmid, disk=disk, size=size)
+            module.exit_json(changed=True, vmid=vmid, msg="Disk %s resized in VM %s" % (disk, vmid))
+        except Exception as e:
+            module.fail_json(msg="Failed to resize disk %s in VM %s with exception: %s" % (disk, vmid, str(e)))
 
 
 if __name__ == '__main__':
