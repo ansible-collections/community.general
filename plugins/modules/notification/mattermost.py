@@ -33,7 +33,7 @@ options:
       - Mattermost webhook api key. Log into your mattermost site, go to
         Menu -> Integration -> Incoming Webhook -> Add Incoming Webhook.
         This will give you full URL. api_key is the last part.
-        http://mattermost.example.com/hooks/C(API_KEY)
+        https://mattermost.example.com/hooks/C(API_KEY)
     required: true
   text:
     type: str
@@ -55,16 +55,21 @@ options:
   username:
     type: str
     description:
-      - This is the sender of the message (Username Override need to be enabled by mattermost admin, see mattermost doc.
+      - This is the sender of the message.
+      - System Console -> Integrations -> "Enable integrations to override usernames" needs to be set to C(true).
     default: Ansible
   icon_url:
     type: str
     description:
-      - Url for the message sender's icon.
+      - URL for the message sender's icon.
+      - The default is C(https://www.ansible.com/favicon.ico).
+      - System Console -> Integrations -> "Enable integrations to override profile picture icons" needs to be set to C(true).
   icon_emoji:
     type: str
     description:
       - Emoji name for the message sender's icon (without the colons).
+      - This option takes precedence over C(icon_url).
+      - System Console -> Integrations -> "Enable integrations to override profile picture icons" needs to be set to C(true).
     version_added: 5.5.0
   validate_certs:
     description:
@@ -81,7 +86,7 @@ EXAMPLES = """
     api_key: my_api_key
     text: '{{ inventory_hostname }} completed'
 
-- name: Send notification message via Mattermost all options (with icon url)
+- name: Send notification message via Mattermost all options (with icon_url)
   community.general.mattermost:
     url: http://mattermost.example.com
     api_key: my_api_key
@@ -90,7 +95,7 @@ EXAMPLES = """
     username: 'Ansible on {{ inventory_hostname }}'
     icon_url: http://www.example.com/some-image-file.png
 
-- name: Send notification message via Mattermost all options (with icon emoji)
+- name: Send notification message via Mattermost all options (with icon_emoji)
   community.general.mattermost:
     url: http://mattermost.example.com
     api_key: my_api_key
