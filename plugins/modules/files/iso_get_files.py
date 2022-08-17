@@ -32,21 +32,17 @@ options:
        names are limited to 255 characters.'
     type: path
     required: yes
+  dest_dir:
+    description:
+    - Dest directory, please create it if it does not exist
+    type: path
+    required: yes
   get_files:
     description:
     - The absolute path with file name on ISO file.
     type: list
-    elements: dict
     required: yes
-    suboptions:
-      file_in_iso:
-        description:
-        - the path of file in ISO
-        type: path
-      file_local:
-        description:
-        - the local path
-        type: path
+    elements: str
 '''
 
 EXAMPLES = r'''

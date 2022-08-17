@@ -32,54 +32,54 @@ options:
       names are limited to 255 characters.'
     type: path
     required: yes
-    dest_iso:
-      description:
-      - The absolute path with file name of the customized ISO file on local machine.
-      - Will create intermediate folders when they does not exist.
-      type: path
-      required: yes
-    add_files:
-      description:
-      - The absolute path with file name on ISO file.
-      - Will create intermediate folders when they does not exist.
-      - The file will be replaced if already exists in ISO.
-      type: list
-      elements: dict
-      required: no
-      suboptions:
-        src_file:
-          description:
-          - The absolute path with file name in local machine.
-          type: str
-        dest_file:
-          description:
-          - The absolute path with file name on ISO file.
-          type: str
-    delete_files:
-      description:
-      - The absolute path with file name on ISO file.
-      type: list
-      elements: path
-      required: no
-    modify_files:
-      description:
-      - replace the line/lines with specific string in file of ISO
-      type: list
-      elements: dict
-      required: no
-      suboptions:
-        file:
-          description:
-          - The absolute path with file name on ISO file.
-          type: path
-        regexp:
-          description:
-          - the match string in line of file, it supports regular expression
-          type: str
-        replace:
-          description:
-          - the target string
-          type: str
+  dest_iso:
+    description:
+    - The absolute path with file name of the customized ISO file on local machine.
+    - Will create intermediate folders when they does not exist.
+    type: path
+    required: yes
+  add_files:
+    description:
+    - The absolute path with file name on ISO file.
+    - Will create intermediate folders when they does not exist.
+    - The file will be replaced if already exists in ISO.
+    type: list
+    required: no
+    elements: dict
+    suboptions:
+      src_file:
+        description:
+        - The absolute path with file name in local machine.
+        type: str
+      dest_file:
+        description:
+        - The absolute path with file name on ISO file.
+        type: str
+  delete_files:
+    description:
+    - The absolute path with file name on ISO file.
+    type: list
+    required: no
+    elements: path
+  modify_files:
+    description:
+    - replace the line/lines with specific string in file of ISO
+    type: list
+    required: no
+    elements: dict
+    suboptions:
+      file:
+        description:
+        - The absolute path with file name on ISO file.
+        type: path
+      regexp:
+        description:
+        - the match string in line of file, it supports regular expression
+        type: str
+      replace:
+        description:
+        - the target string
+        type: str
 '''
 
 EXAMPLES = r'''
@@ -199,7 +199,6 @@ def iso_add_dir(opened_iso, dir_path):
 
             try:
                 opened_iso.add_directory(current_dirpath.upper(), rr_name=check_dirname)
-                break
             except Exception as err:
                 msg = "Failed to create dir %s with error: %s" % (current_dirpath, to_native(err))
                 return -1, msg
