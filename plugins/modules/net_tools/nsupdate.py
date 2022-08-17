@@ -1,13 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2016, Marcin Skarbek <github@skarbek.name>
-# (c) 2016, Andreas Olsson <andreas@arrakis.se>
-# (c) 2017, Loic Blot <loic.blot@unix-experience.fr>
+# Copyright (c) 2016, Marcin Skarbek <github@skarbek.name>
+# Copyright (c) 2016, Andreas Olsson <andreas@arrakis.se>
+# Copyright (c) 2017, Loic Blot <loic.blot@unix-experience.fr>
 #
 # This module was ported from https://github.com/mskarbek/ansible-nsupdate
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type

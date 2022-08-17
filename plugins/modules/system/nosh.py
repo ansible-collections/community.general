@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2017, Thomas Caravia <taca@kadisius.eu>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Thomas Caravia <taca@kadisius.eu>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -147,7 +148,7 @@ status:
             description: []  # FIXME
             returned: success
             type: list
-            sample: '[]'
+            sample: []
         DaemontoolsEncoreState:
             description: []  # FIXME
             returned: success
@@ -192,7 +193,7 @@ status:
             description: []  # FIXME
             returned: success
             type: list
-            sample: '[]'
+            sample: []
         RestartExitStatusCode:
             description: []  # FIXME
             returned: success

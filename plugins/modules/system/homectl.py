@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2022, James Livulpi
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2022, James Livulpi
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -328,7 +329,7 @@ class Homectl(object):
         cmd = [self.module.get_bin_path('homectl', True)]
         cmd.append('create')
         cmd.append('--identity=-')  # Read the user record from standard input.
-        return(self.module.run_command(cmd, data=record))
+        return self.module.run_command(cmd, data=record)
 
     def _hash_password(self, password):
         method = crypt.METHOD_SHA512

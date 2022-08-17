@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2022, Alexander Hussey <ahussey@redhat.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2022, Alexander Hussey <ahussey@redhat.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 """
 Ansible Module - community.general.keyring_info
 """
@@ -73,6 +74,7 @@ try:
     import keyring
 
     HAS_KEYRING = True
+    KEYRING_IMP_ERR = None
 except ImportError:
     HAS_KEYRING = False
     KEYRING_IMP_ERR = traceback.format_exc()

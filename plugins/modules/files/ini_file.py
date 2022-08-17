@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2012, Jan-Piet Mens <jpmens () gmail.com>
-# Copyright: (c) 2015, Ales Nosek <anosek.nosek () gmail.com>
-# Copyright: (c) 2017, Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2012, Jan-Piet Mens <jpmens () gmail.com>
+# Copyright (c) 2015, Ales Nosek <anosek.nosek () gmail.com>
+# Copyright (c) 2017, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -309,7 +310,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
         # override option with no value to option with value if not allow_no_value
         if len(values) > 0:
             for index, line in enumerate(section_lines):
-                if not changed_lines[index] and match_active_opt(option, section_lines[index]):
+                if not changed_lines[index] and match_active_opt(option, section_lines[index]):  # pylint: disable=unnecessary-list-index-lookup
                     newline = assignment_format % (option, values.pop(0))
                     (changed, msg) = update_section_line(changed, section_lines, index, changed_lines, newline, msg)
                     if len(values) == 0:

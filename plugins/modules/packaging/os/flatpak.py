@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2017 John Kwiatkoski (@JayKayy) <jkwiat40@gmail.com>
-# Copyright: (c) 2018 Alexander Bethke (@oolongbrothers) <oolongbrothers@gmx.net>
-# Copyright: (c) 2017 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017 John Kwiatkoski (@JayKayy) <jkwiat40@gmail.com>
+# Copyright (c) 2018 Alexander Bethke (@oolongbrothers) <oolongbrothers@gmx.net>
+# Copyright (c) 2017 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -162,7 +163,7 @@ OUTDATED_FLATPAK_VERSION_ERROR_MESSAGE = "Unknown option --columns=application"
 
 def install_flat(module, binary, remote, names, method, no_dependencies):
     """Add new flatpaks."""
-    global result
+    global result  # pylint: disable=global-variable-not-assigned
     uri_names = []
     id_names = []
     for name in names:
@@ -189,7 +190,7 @@ def install_flat(module, binary, remote, names, method, no_dependencies):
 
 def uninstall_flat(module, binary, names, method):
     """Remove existing flatpaks."""
-    global result
+    global result  # pylint: disable=global-variable-not-assigned
     installed_flat_names = [
         _match_installed_flat_name(module, binary, name, method)
         for name in names
@@ -224,7 +225,7 @@ def _match_installed_flat_name(module, binary, name, method):
     # This is a difficult function, since if the user supplies a flatpakref url,
     # we have to rely on a naming convention:
     # The flatpakref file name needs to match the flatpak name
-    global result
+    global result  # pylint: disable=global-variable-not-assigned
     parsed_name = _parse_flatpak_name(name)
     # Try running flatpak list with columns feature
     command = [binary, "list", "--{0}".format(method), "--app", "--columns=application"]
@@ -248,7 +249,7 @@ def _match_installed_flat_name(module, binary, name, method):
 
 
 def _match_flat_using_outdated_flatpak_format(module, binary, parsed_name, method):
-    global result
+    global result  # pylint: disable=global-variable-not-assigned
     command = [binary, "list", "--{0}".format(method), "--app", "--columns=application"]
     output = _flatpak_command(module, False, command)
     for row in output.split('\n'):
@@ -257,7 +258,7 @@ def _match_flat_using_outdated_flatpak_format(module, binary, parsed_name, metho
 
 
 def _match_flat_using_flatpak_column_feature(module, binary, parsed_name, method):
-    global result
+    global result  # pylint: disable=global-variable-not-assigned
     command = [binary, "list", "--{0}".format(method), "--app"]
     output = _flatpak_command(module, False, command)
     for row in output.split('\n'):
@@ -276,7 +277,7 @@ def _parse_flatpak_name(name):
 
 
 def _flatpak_version(module, binary):
-    global result
+    global result  # pylint: disable=global-variable-not-assigned
     command = [binary, "--version"]
     output = _flatpak_command(module, False, command)
     version_number = output.split()[1]
@@ -284,7 +285,7 @@ def _flatpak_version(module, binary):
 
 
 def _flatpak_command(module, noop, command, ignore_failure=False):
-    global result
+    global result  # pylint: disable=global-variable-not-assigned
     result['command'] = ' '.join(command)
     if noop:
         result['rc'] = 0

@@ -3,7 +3,8 @@
 
 # Copyright 2016 Dino Occhialini <dino.occhialini@gmail.com>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -158,7 +159,7 @@ def upgrade(module, xbps_path):
 
     rc, stdout, stderr = module.run_command(cmdneedupgrade, check_rc=False)
     if rc == 0:
-        if(len(stdout.splitlines()) == 0):
+        if len(stdout.splitlines()) == 0:
             module.exit_json(changed=False, msg='Nothing to upgrade')
         elif module.check_mode:
             module.exit_json(changed=True, msg='Would have performed upgrade')

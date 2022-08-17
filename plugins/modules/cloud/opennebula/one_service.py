@@ -1,5 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
 from __future__ import (absolute_import, division, print_function)
@@ -234,8 +237,9 @@ roles:
     description: list of dictionaries of roles, each role is described by name, cardinality, state and nodes ids
     type: list
     returned: success
-    sample: '[{"cardinality": 1,"name": "foo","state": "RUNNING","ids": [ 123, 456 ]},
-              {"cardinality": 2,"name": "bar","state": "RUNNING", "ids": [ 452, 567, 746 ]}]'
+    sample:
+      - {"cardinality": 1,"name": "foo","state": "RUNNING", "ids": [ 123, 456 ]}
+      - {"cardinality": 2,"name": "bar","state": "RUNNING", "ids": [ 452, 567, 746 ]}
 '''
 
 import os
@@ -660,7 +664,7 @@ def get_connection_info(module):
     if not password:
         password = os.environ.get('ONEFLOW_PASSWORD')
 
-    if not(url and username and password):
+    if not (url and username and password):
         module.fail_json(msg="One or more connection parameters (api_url, api_username, api_password) were not specified")
     from collections import namedtuple
 

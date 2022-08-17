@@ -1,5 +1,9 @@
-# Below information has been taken from https://developer.scaleway.com/#servers
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Below information has been taken from https://developer.scaleway.com/#servers
 scaleway_image_id: 6a601340-19c1-4ca7-9c1c-0704bcc9f5fe
 scaleway_organization: '{{ scw_org }}'
 scaleway_region: ams1

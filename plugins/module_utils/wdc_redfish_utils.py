@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2022 Western Digital Corporation
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -404,3 +405,50 @@ class WdcRedfishUtils(RedfishUtils):
             return iom_b_firmware_version
         else:
             return None
+
+    @staticmethod
+    def _get_led_locate_uri(data):
+        """Get the LED locate URI given a resource body."""
+        if "Actions" not in data:
+            return None
+        if "Oem" not in data["Actions"]:
+            return None
+        if "WDC" not in data["Actions"]["Oem"]:
+            return None
+        if "#Chassis.Locate" not in data["Actions"]["Oem"]["WDC"]:
+            return None
+        if "target" not in data["Actions"]["Oem"]["WDC"]["#Chassis.Locate"]:
+            return None
+        return data["Actions"]["Oem"]["WDC"]["#Chassis.Locate"]["target"]
+
+    def manage_indicator_led(self, command, resource_uri):
+        key = 'IndicatorLED'
+
+        payloads = {'IndicatorLedOn': 'On', 'IndicatorLedOff': 'Off'}
+        current_led_status_map = {'IndicatorLedOn': 'Blinking', 'IndicatorLedOff': 'Off'}
+
+        result = {}
+        response = self.get_request(self.root_uri + resource_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+        if key not in data:
+            return {'ret': False, 'msg': "Key %s not found" % key}
+        current_led_status = data[key]
+        if current_led_status == current_led_status_map[command]:
+            return {'ret': True, 'changed': False}
+
+        led_locate_uri = self._get_led_locate_uri(data)
+        if led_locate_uri is None:
+            return {'ret': False, 'msg': 'LED locate URI not found.'}
+
+        if command in payloads.keys():
+            payload = {'LocateState': payloads[command]}
+            response = self.post_request(self.root_uri + led_locate_uri, payload)
+            if response['ret'] is False:
+                return response
+        else:
+            return {'ret': False, 'msg': 'Invalid command'}
+
+        return result

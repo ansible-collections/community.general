@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-#  Copyright: Edward Hilgendorf, <edward@hilgendorf.me>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+#  Copyright Edward Hilgendorf, <edward@hilgendorf.me>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -233,10 +234,11 @@ import json
 try:
     from requests import Request, Session
 except ImportError:
-    HAS_ANOTHER_LIBRARY = False
-    ANOTHER_LIBRARY_IMPORT_ERROR = traceback.format_exc()
+    HAS_REQUESTS = False
+    REQUESTS_IMPORT_ERROR = traceback.format_exc()
 else:
-    HAS_ANOTHER_LIBRARY = True
+    HAS_REQUESTS = True
+    REQUESTS_IMPORT_ERROR = None
 
 
 def build_url(account, key, is_sandbox):
@@ -261,7 +263,7 @@ def iterate_data(module, request_object):
                 request_object.url = base_url + '&page=' + str(page)
                 new_results = Session().send(request_object)
                 data = data + new_results.json()["data"]
-        return(data)
+        return data
     else:
         module.fail_json('API Call failed, check ID, key and sandbox values')
 
@@ -305,11 +307,10 @@ def main():
                     params['api_key'],
                     params['sandbox'])
 
-    if not HAS_ANOTHER_LIBRARY:
-        # Needs: from ansible.module_utils.basic import missing_required_lib
+    if not HAS_REQUESTS:
         module.exit_json(
-            msg=missing_required_lib('another_library'),
-            exception=ANOTHER_LIBRARY_IMPORT_ERROR)
+            msg=missing_required_lib('requests'),
+            exception=REQUESTS_IMPORT_ERROR)
 
     # At minimum we need account and key
     if params['account_id'] and params['api_key']:
