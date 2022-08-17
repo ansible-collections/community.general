@@ -37,4 +37,3 @@
       assert:
         that:
         - customize_iso_result is not failed
-

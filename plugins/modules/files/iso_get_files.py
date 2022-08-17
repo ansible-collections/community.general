@@ -74,8 +74,8 @@ file_local:
   description: path of the local files
   returned: on success
   type: list
-  sample: 
-    - “/tmp/iso_files/preseed/ubuntu.seed"
+  sample:
+    - "/tmp/iso_files/preseed/ubuntu.seed"
     - "/tmp/iso_files/boot/grub/grub.cfg"
 '''
 
