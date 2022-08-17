@@ -30,12 +30,13 @@ options:
   declare_variables:
     description:
       - If true, generate a Terraform file that declares all variables supplied via this module's
-        'variables' parameter. Type, description, and default value are not specified.
+        I(variables) parameter. Type, description, and default value are not specified.
       - The file is generated before and automatically deleted after executing Terraform.
       - Terraform does not allow declaring variables twice, so you will need to remove all
         declarations of Ansible-sourced variables from your Terraform code before enabling this.
     default: false
     type: bool
+    version_added: 5.5.0
   project_path:
     description:
       - The path to the root of the Terraform directory with the
