@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2022, Ansible Project
-# Copyright: (c) 2022, VMware, Inc. All Rights Reserved.
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2022, Ansible Project
+# Copyright (c) 2022, VMware, Inc. All Rights Reserved.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -13,72 +14,72 @@ DOCUMENTATION = r'''
 module: iso_customize
 short_description: Customize the ISO file by add/delete/modify files
 description:
-    - This module is used to customize the ISO file by add/delete/modify files.
+  - This module is used to customize the ISO file by add/delete/modify files.
 author:
-    - Yuhua Zou (@ZouYuhua) <zouy@vmware.com>
+  - Yuhua Zou (@ZouYuhua) <zouy@vmware.com>
 requirements:
-- "pycdlib"
-- "python >= 2.7"
+  - "pycdlib"
+  - "python >= 2.7"
 version_added: '5.5.0'
 
 options:
-   src_iso:
-     description:
-     - This is the absolute paths of source ISO file.
-     - Will fail if specified ISO file does not exist on local machine.
-     - 'Note: With all ISO9660 levels from 1 to 3, all file names are restricted to uppercase letters, numbers and
-       underscores (_). File names are limited to 31 characters, directory nesting is limited to 8 levels, and path
-       names are limited to 255 characters.'
-     type: path
-     required: yes
-   dest_iso:
-     description:
-     - The absolute path with file name of the customized ISO file on local machine.
-     - Will create intermediate folders when they does not exist.
-     type: path
-     required: yes
-   add_files:
-     description:
-     - The absolute path with file name on ISO file.
-     - Will create intermediate folders when they does not exist.
-     - The file will be replaced if already exists in ISO.
-     type: list
-     elements: dict
-     required: no
-     suboptions:
-       src_file:
-         description:
-         - The absolute path with file name in local machine.
-         type: path
-       dest_file:
-         description:
-         - The absolute path with file name on ISO file.
-         type: path
-   delete_files:
-     description:
-     - The absolute path with file name on ISO file.
-     type: list
-     elements: path
-     required: no
-   modify_files:
-     description:
-     - replace the line/lines with specific string in file of ISO
-     type: list
-     elements: dict
-     required: no
-     suboptions:
-       file:
-         description:
-         - The absolute path with file name on ISO file.
-         type: path
-       regexp:
-         description:
-         - the match string in line of file, it supports regular expression
-         type: str
-       replace:
-         description:
-         - the target string
-         type: str
+  src_iso:
+    description:
+    - This is the absolute paths of source ISO file.
+    - Will fail if specified ISO file does not exist on local machine.
+    - 'Note: With all ISO9660 levels from 1 to 3, all file names are restricted to uppercase letters, numbers and
+      underscores (_). File names are limited to 31 characters, directory nesting is limited to 8 levels, and path
+      names are limited to 255 characters.'
+    type: path
+    required: yes
+    dest_iso:
+      description:
+      - The absolute path with file name of the customized ISO file on local machine.
+      - Will create intermediate folders when they does not exist.
+      type: path
+      required: yes
+    add_files:
+      description:
+      - The absolute path with file name on ISO file.
+      - Will create intermediate folders when they does not exist.
+      - The file will be replaced if already exists in ISO.
+      type: list
+      elements: dict
+      required: no
+      suboptions:
+        src_file:
+          description:
+          - The absolute path with file name in local machine.
+          type: str
+        dest_file:
+          description:
+          - The absolute path with file name on ISO file.
+          type: str
+    delete_files:
+      description:
+      - The absolute path with file name on ISO file.
+      type: list
+      elements: path
+      required: no
+    modify_files:
+      description:
+      - replace the line/lines with specific string in file of ISO
+      type: list
+      elements: dict
+      required: no
+      suboptions:
+        file:
+          description:
+          - The absolute path with file name on ISO file.
+          type: path
+        regexp:
+          description:
+          - the match string in line of file, it supports regular expression
+          type: str
+        replace:
+          description:
+          - the target string
+          type: str
 '''
 
 EXAMPLES = r'''
@@ -105,15 +106,15 @@ EXAMPLES = r'''
 
 RETURN = r'''
 src_iso:
-    description: path of source ISO file.
-    returned: on success
-    type: str
-    sample: "/path/to/file.iso"
+  description: path of source ISO file.
+  returned: on success
+  type: str
+  sample: "/path/to/file.iso"
 dest_iso:
-    description: path of the customized iso file.
-    returned: on success
-    type: str
-    sample: "/path/to/customized.iso"
+  description: path of the customized iso file.
+  returned: on success
+  type: str
+  sample: "/path/to/customized.iso"
 
 '''
 
@@ -123,6 +124,7 @@ import re
 import shutil
 import time
 import copy
+import tempfile
 
 PYCDLIB_IMP_ERR = None
 try:
@@ -136,20 +138,6 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
 MODULE_ISO_CUSTOMIZE = None
-
-
-# Create local temporary direction to store files getting from ISO
-def get_local_tmp_dir():
-    dir_name = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time()))
-    tmp_dir = os.path.join('/tmp', dir_name)
-
-    try:
-        os.makedirs(tmp_dir)
-    except OSError as err:
-        msg = "Failed to create folder %s with error %s" % (tmp_dir, to_native(err))
-        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
-
-    return tmp_dir
 
 
 def iso_get_file(opened_iso, iso_file, tmp_dir):
@@ -179,9 +167,9 @@ def modify_local_file(local_file, regexp, replace):
         return -1, "Not find file %s" % local_file
 
     shutil.copy(local_file, "%s.org" % local_file)
-    with open(local_file, "r+", encoding="utf-8") as fp:
+    with open(local_file, "r+") as fp:
         lines = fp.readlines()
-        for (i,) in enumerate(lines):
+        for (i, dummy_line) in enumerate(lines):
             lines[i] = re.sub(regexp, replace, lines[i], count=0)
         fp.seek(0, 0)
         fp.truncate()
@@ -324,7 +312,7 @@ def iso_rebuild(src_iso, dest_iso, op_data_list):
                     if ret != 0:
                         MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
             elif op == "modify_files":
-                tmp_dir = get_local_tmp_dir()
+                tmp_dir = tempfile.mkdtemp()
                 for item in data:
                     file_in_iso = item['file'].strip()
                     ret, msg = iso_get_file(iso, file_in_iso, tmp_dir)
@@ -379,7 +367,7 @@ def main():
 
     dest_iso = module.params.get('dest_iso')
     if dest_iso and len(dest_iso) == 0:
-        module.fail_json(str(msg='Please specify the absolute path of the customized ISO file \
+        module.fail_json(str(msg='Please specify the path of the customized ISO file \
             using dest_iso parameter.'))
 
     dest_iso_dir = os.path.dirname(dest_iso)
@@ -394,13 +382,13 @@ def main():
     MODULE_ISO_CUSTOMIZE = module
 
     delete_files_list = module.params.get('delete_files')
-    if delete_files_list and len(delete_files_list) > 0:
+    if delete_files_list:
         op_data_item['op'] = "delete_files"
         op_data_item['data'] = delete_files_list
         op_data_list.append(copy.deepcopy(op_data_item))
 
     add_files_list = module.params.get('add_files')
-    if add_files_list and len(add_files_list) > 0:
+    if add_files_list:
         for item in add_files_list:
             if not os.path.exists(item['src_file']):
                 module.fail_json(msg="The %s does not exist." % item['src_file'])
@@ -409,7 +397,7 @@ def main():
         op_data_list.append(copy.deepcopy(op_data_item))
 
     modify_files_list = module.params.get('modify_files')
-    if modify_files_list and len(modify_files_list) > 0:
+    if modify_files_list:
         op_data_item['op'] = "modify_files"
         op_data_item['data'] = modify_files_list
         op_data_list.append(copy.deepcopy(op_data_item))
