@@ -1,3 +1,8 @@
+# Copyright (c) 2022, Ansible Project
+# Copyright (c) 2022, VMware, Inc. All Rights Reserved.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: iso_get_files
   hosts: localhost
   gather_facts: no
@@ -7,12 +12,17 @@
     - name: "Get files from ISO"
       community.general.iso_get_files:
         iso: "{{ test_files_dir }}/test.iso"
+        dest_dir: "/tmp/"
         get_files:
-          - file_in_iso: "/1.txt"
-            file_local: "/tmp/aaa/1.txt.org"
-          - file_in_iso: "/delete/1.txt"
-            file_local: "/tmp/aaa/2.txt"
+          - "/1.txt"
+          - "/delete/1.txt"
       register: iso_get_files
 
     - name: "Display the ISO customized result"
       debug: var=iso_get_files
+    
+    - name: Test iso_get_files
+      assert:
+        that:
+        - iso_get_files is not failed
+

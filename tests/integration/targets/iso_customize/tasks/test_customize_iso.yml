@@ -1,3 +1,8 @@
+# Copyright (c) 2022, Ansible Project
+# Copyright (c) 2022, VMware, Inc. All Rights Reserved.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: iso_customize
   hosts: localhost
   gather_facts: no
@@ -12,11 +17,9 @@
           - "/1.txt"
           - "/delete/1.txt"
         add_files:
-          - src_file: "/{{ test_files_dir }}/ks.cfg"
-            dest_file: "/ks.cfg"
           - src_file: "/{{ test_files_dir }}/ubuntu.seed"
             dest_file: "/preseed/ubuntu.seed"
-          - src_file: "/{{ test_files_dir }}/grub.cfg"
+          - src_file: "/Users/zouy/Documents/grub.cfg"
             dest_file: "/boot/grub/grub.cfg"
         modify_files:
           - file: "/boot/grub/grub.cfg"
@@ -29,3 +32,9 @@
 
     - name: "Display the ISO customized result"
       debug: var=customize_iso_result
+    
+    - name: Test customize iso result
+      assert:
+        that:
+        - customize_iso_result is not failed
+
