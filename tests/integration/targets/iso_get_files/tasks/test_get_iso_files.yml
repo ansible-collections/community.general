@@ -25,4 +25,3 @@
       assert:
         that:
         - iso_get_files is not failed
-
