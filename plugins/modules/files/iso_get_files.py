@@ -25,17 +25,17 @@ version_added: '5.5.0'
 options:
   iso:
     description:
-    - This is the absolute paths of source ISO file.
+    - This is the path of source ISO file.
     - Will fail if specified ISO file does not exist on local machine.
     - 'Note: With all ISO9660 levels from 1 to 3, all file names are restricted to uppercase letters, numbers and
        underscores (_). File names are limited to 31 characters, directory nesting is limited to 8 levels, and path
        names are limited to 255 characters.'
-    type: path
+    type: str
     required: yes
   dest_dir:
     description:
     - Dest directory, please create it if it does not exist
-    type: path
+    type: str
     required: yes
   get_files:
     description:
@@ -77,7 +77,7 @@ file_local:
 
 import os
 import traceback
-
+import errno
 
 PYCDLIB_IMP_ERR = None
 try:
@@ -106,12 +106,13 @@ def iso_get_file(module, iso_path, dest_dir, get_files_list):
             file_local_dir = os.path.dirname(file_local)
             if not os.path.exists(file_local_dir):
                 try:
-                    os.makedirs(file_local_dir, exist_ok=True)
+                    os.makedirs(file_local_dir)
                 except OSError as err:
-                    iso.close()
-                    msg = "Failed to create folder %s with error: %s" % (
-                        file_local_dir, to_native(err))
-                    return -1, msg
+                    if err.errno != errno.EEXIST:
+                        iso.close()
+                        msg = "Failed to create folder %s with error: %s" % (
+                          file_local_dir, to_native(err))
+                        return -1, msg
 
             record = iso.get_record(rr_path=file_in_iso)
             if record.is_file():
@@ -129,8 +130,8 @@ def iso_get_file(module, iso_path, dest_dir, get_files_list):
 
 def main():
     argument_spec = dict(
-        iso=dict(type='path', required=True),
-        dest_dir=dict(type='path', required=True),
+        iso=dict(type='str', required=True),
+        dest_dir=dict(type='str', required=True),
         get_files=dict(type='list', required=True, elements='str'),
     )
     module = AnsibleModule(

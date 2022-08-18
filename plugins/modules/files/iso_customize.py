@@ -25,18 +25,18 @@ version_added: '5.5.0'
 options:
   src_iso:
     description:
-    - This is the absolute paths of source ISO file.
+    - This is the path of source ISO file.
     - Will fail if specified ISO file does not exist on local machine.
     - 'Note: With all ISO9660 levels from 1 to 3, all file names are restricted to uppercase letters, numbers and
       underscores (_). File names are limited to 31 characters, directory nesting is limited to 8 levels, and path
       names are limited to 255 characters.'
-    type: path
+    type: str
     required: yes
   dest_iso:
     description:
-    - The absolute path with file name of the customized ISO file on local machine.
+    - The path with file name of the customized ISO file on local machine.
     - Will create intermediate folders when they does not exist.
-    type: path
+    type: str
     required: yes
   add_files:
     description:
@@ -49,7 +49,7 @@ options:
     suboptions:
       src_file:
         description:
-        - The absolute path with file name in local machine.
+        - The path with file name in local machine.
         type: str
       dest_file:
         description:
@@ -60,47 +60,21 @@ options:
     - The absolute path with file name on ISO file.
     type: list
     required: no
-    elements: path
-  modify_files:
-    description:
-    - replace the line/lines with specific string in file of ISO
-    type: list
-    required: no
-    elements: dict
-    suboptions:
-      file:
-        description:
-        - The absolute path with file name on ISO file.
-        type: path
-      regexp:
-        description:
-        - the match string in line of file, it supports regular expression
-        type: str
-      replace:
-        description:
-        - the target string
-        type: str
+    elements: str
 '''
 
 EXAMPLES = r'''
 - name: "Customize ISO file"
   community.general.iso_customize:
-    src_iso: "/Users/zouy/Documents/ubuntu-22.04-desktop-amd64.iso"
-    dest_iso: "/Users/zouy/Documents/ubuntu-22.04-desktop-amd64-customized.iso"
+    src_iso: "/path/to/ubuntu-22.04-desktop-amd64.iso"
+    dest_iso: "/path/to/ubuntu-22.04-desktop-amd64-customized.iso"
     delete_files:
       - "/preseed/ubuntu.seed"
     add_files:
-      - src_file: "/Users/zouy/Documents/ks.cfg"
-        dest_file: "/ks.cfg"
-      - src_file: "/Users/zouy/Documents/ubuntu.seed"
+      - src_file: "/path/to/grub.cfg"
+        dest_file: "/boot/grub/grub.cfg"
+      - src_file: "/path/to/ubuntu.seed"
         dest_file: "/preseed/ubuntu.seed"
-    modify_files:
-      - file: "/boot/grub/grub.cfg"
-        regexp: "timeout=30"
-        replace: "default=0\nset timeout=5"
-      - file: "/boot/grub/grub.cfg"
-        regexp: "maybe-ubiquity quiet splash ---"
-        replace: 'boot=casper debug-ubiquity automatic-ubiquity quiet splash noprompt ---'
   register: customize_iso_result
 '''
 
@@ -120,11 +94,7 @@ dest_iso:
 
 import os
 import traceback
-import re
-import shutil
-import time
 import copy
-import tempfile
 
 PYCDLIB_IMP_ERR = None
 try:
@@ -138,46 +108,6 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
 MODULE_ISO_CUSTOMIZE = None
-
-
-def iso_get_file(opened_iso, iso_file, tmp_dir):
-    file_name = os.path.basename(iso_file)
-    file_local = os.path.join(tmp_dir, file_name)
-    if os.path.exists(file_local):
-        return 0, file_local
-
-    try:
-        record = opened_iso.get_record(rr_path=iso_file)
-        if record.is_file():
-            opened_iso.get_file_from_iso(file_local, rr_path=iso_file)
-        else:
-            return -1, "%s is not a file in ISO" % iso_file
-    except Exception as err:
-        msg = "Failed to get iso file %s with error: %s" % (iso_file, to_native(err))
-        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
-
-    if not os.path.exists(file_local):
-        return -1, "Failed to get file %s in ISO. Does file exists in ISO ?" % iso_file
-
-    return 0, file_local
-
-
-def modify_local_file(local_file, regexp, replace):
-    if not os.path.exists(local_file):
-        return -1, "Not find file %s" % local_file
-
-    shutil.copy(local_file, "%s.org" % local_file)
-    with open(local_file, "r+") as fp:
-        lines = fp.readlines()
-        for (i, dummy_line) in enumerate(lines):
-            lines[i] = re.sub(regexp, replace, lines[i], count=0)
-        fp.seek(0, 0)
-        fp.truncate()
-        fp.writelines(lines)
-        fp.flush()
-        fp.close()
-
-    return 0, ""
 
 
 # The upper dir exist, we only add subdirectoy
@@ -284,13 +214,6 @@ def iso_delete_file(opened_iso, dest_file):
     return 0, ""
 
 
-def iso_replace_file(opened_iso, src_file, dest_file):
-    ret, msg = iso_delete_file(opened_iso, dest_file)
-    if ret != 0:
-        return ret, msg
-    return iso_add_file(opened_iso, src_file, dest_file)
-
-
 def iso_rebuild(src_iso, dest_iso, op_data_list):
     try:
         iso = pycdlib.PyCdlib()
@@ -310,25 +233,6 @@ def iso_rebuild(src_iso, dest_iso, op_data_list):
                                             item['dest_file'])
                     if ret != 0:
                         MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
-            elif op == "modify_files":
-                tmp_dir = tempfile.mkdtemp()
-                for item in data:
-                    file_in_iso = item['file'].strip()
-                    ret, msg = iso_get_file(iso, file_in_iso, tmp_dir)
-                    if ret != 0:
-                        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
-
-                    local_file = msg
-                    regexp = item['regexp']
-                    replace_str = item['replace']
-                    ret, msg = modify_local_file(
-                        local_file, regexp, replace_str)
-                    if ret != 0:
-                        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
-
-                    iso_replace_file(iso, local_file, file_in_iso)
-                    if ret != 0:
-                        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
 
         iso.write(dest_iso)
     except Exception as err:
@@ -346,11 +250,10 @@ def main():
     global MODULE_ISO_CUSTOMIZE
 
     argument_spec = dict(
-        src_iso=dict(type='path', required=True),
-        dest_iso=dict(type='path', required=True),
-        delete_files=dict(type='list', required=False, elements='path'),
+        src_iso=dict(type='str', required=True),
+        dest_iso=dict(type='str', required=True),
+        delete_files=dict(type='list', required=False, elements='str'),
         add_files=dict(type='list', required=False, elements='dict'),
-        modify_files=dict(type='list', required=False, elements='dict'),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -365,18 +268,13 @@ def main():
         module.fail_json(msg="The %s does not exist." % src_iso)
 
     dest_iso = module.params.get('dest_iso')
-    if dest_iso and len(dest_iso) == 0:
+    if not dest_iso:
         module.fail_json(str(msg='Please specify the path of the customized ISO file \
             using dest_iso parameter.'))
 
     dest_iso_dir = os.path.dirname(dest_iso)
     if dest_iso_dir and not os.path.exists(dest_iso_dir):
-        # will create intermediate dir for customized ISO file
-        try:
-            os.makedirs(dest_iso_dir)
-        except OSError as err:
-            msg = "Failed to create folder %s with error: %s" % (dest_iso_dir, to_native(err))
-            module.fail_json(msg=msg)
+        module.fail_json(msg="The dest directory %s does not exist" % dest_iso_dir)
 
     MODULE_ISO_CUSTOMIZE = module
 
@@ -395,12 +293,6 @@ def main():
         op_data_item['data'] = add_files_list
         op_data_list.append(copy.deepcopy(op_data_item))
 
-    modify_files_list = module.params.get('modify_files')
-    if modify_files_list:
-        op_data_item['op'] = "modify_files"
-        op_data_item['data'] = modify_files_list
-        op_data_list.append(copy.deepcopy(op_data_item))
-
     iso_rebuild(src_iso, dest_iso, op_data_list)
     result = dict(
         changed=False,
@@ -408,7 +300,6 @@ def main():
         customized_iso=dest_iso,
         delete_files=delete_files_list,
         add_files=add_files_list,
-        modify_files=modify_files_list,
     )
 
     result['changed'] = True
