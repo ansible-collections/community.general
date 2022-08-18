@@ -19,11 +19,13 @@ description:
 options:
     state:
         type: str
-        choices: [present, absent, install, uninstall, uninstall_all, inject, upgrade, upgrade_all, reinstall, reinstall_all]
+        choices: [present, absent, install, uninstall, uninstall_all, inject, upgrade, upgrade_all, reinstall, reinstall_all, latest]
         default: install
         description:
             - Desired state for the application.
             - The states C(present) and C(absent) are aliases to C(install) and C(uninstall), respectively.
+            - The state C(latest) is equivalent to executing the task twice, with state C(install) and then C(upgrade).
+              It was added in community.general 5.5.0.
     name:
         type: str
         description:
@@ -146,7 +148,7 @@ class PipX(StateModuleHelper):
         argument_spec=dict(
             state=dict(type='str', default='install',
                        choices=['present', 'absent', 'install', 'uninstall', 'uninstall_all',
-                                'inject', 'upgrade', 'upgrade_all', 'reinstall', 'reinstall_all']),
+                                'inject', 'upgrade', 'upgrade_all', 'reinstall', 'reinstall_all', 'latest']),
             name=dict(type='str'),
             source=dict(type='str'),
             install_deps=dict(type='bool', default=False),
@@ -166,6 +168,7 @@ class PipX(StateModuleHelper):
             ('state', 'uninstall', ['name']),
             ('state', 'upgrade', ['name']),
             ('state', 'reinstall', ['name']),
+            ('state', 'latest', ['name']),
             ('state', 'inject', ['name', 'inject_packages']),
         ],
         supports_check_mode=True,
@@ -277,6 +280,17 @@ class PipX(StateModuleHelper):
             self.changed = True
         with self.runner('state include_injected force', check_mode_skip=True) as ctx:
             ctx.run()
+            self._capture_results(ctx)
+
+    def state_latest(self):
+        if not self.vars.application or self.vars.force:
+            self.changed = True
+            with self.runner('state index_url install_deps force python editable pip_args name_source', check_mode_skip=True) as ctx:
+                ctx.run(state='install', name_source=[self.vars.name, self.vars.source])
+                self._capture_results(ctx)
+
+        with self.runner('state index_url install_deps force editable pip_args name', check_mode_skip=True) as ctx:
+            ctx.run(state='upgrade')
             self._capture_results(ctx)
 
 

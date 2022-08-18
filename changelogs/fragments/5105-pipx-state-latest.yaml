@@ -1,0 +1,2 @@
+minor_changes:
+  - pipx - added state ``latest`` to the module (https://github.com/ansible-collections/community.general/pull/5105).
