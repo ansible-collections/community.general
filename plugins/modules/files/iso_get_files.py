@@ -110,8 +110,7 @@ def iso_get_file(module, iso_path, dest_dir, get_files_list):
                 except OSError as err:
                     if err.errno != errno.EEXIST:
                         iso.close()
-                        msg = "Failed to create folder %s with error: %s" % (
-                          file_local_dir, to_native(err))
+                        msg = "Failed to create folder %s with error: %s" % (file_local_dir, to_native(err))
                         return -1, msg
 
             record = iso.get_record(rr_path=file_in_iso)
