@@ -1253,7 +1253,7 @@ connection.permissions:                 brittany
 ipv4.method:                            auto
 ipv6.method:                            auto
 vpn.service-type:                       org.freedesktop.NetworkManager.pptp
-vpn.data:                               gateway = vpn.example.com, password-flags = 2, user = brittany
+vpn.data:                               gateway=vpn.example.com, password-flags=2, user=brittany
 """
 
 

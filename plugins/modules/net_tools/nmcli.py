@@ -2100,12 +2100,8 @@ class Nmcli(object):
                 if key == self.mtu_setting and self.mtu is None:
                     self.mtu = 0
                 if key == 'vpn.data':
-                    current_values = []
-                    for item in current_value.split(','):
-                        name, value_ = map(str.strip, item.split('=', 1))
-                        current_values.append('%s=%s' % (name, value_))
-                    current_value = sorted(current_values)
-                    value = sorted(map(str.strip, value.split(',')))
+                    current_value = sorted(re.sub(r'\s*=\s*', '=', part.strip(), count=1) for part in current_value.split(','))
+                    value = sorted(part.strip() for part in value.split(','))
             else:
                 # parameter does not exist
                 current_value = None
