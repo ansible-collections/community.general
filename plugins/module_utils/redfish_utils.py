@@ -202,6 +202,16 @@ class RedfishUtils(object):
     def _init_session(self):
         pass
 
+    def _get_vendor(self):
+        response = self.get_request(self.root_uri + self.service_root)
+        if response['ret'] is False:
+            return {'ret': False, 'Vendor': ''}
+        data = response['data']
+        if 'Vendor' in data:
+            return {'ret': True, 'Vendor': data["Vendor"]}
+        else:
+            return {'ret': True, 'Vendor': ''}
+
     def _find_accountservice_resource(self):
         response = self.get_request(self.root_uri + self.service_root)
         if response['ret'] is False:
@@ -2162,7 +2172,7 @@ class RedfishUtils(object):
         result["entries"] = virtualmedia_results
         return result
 
-    def get_multi_virtualmedia(self, resource_type):
+    def get_multi_virtualmedia(self, resource_type='Manager'):
         ret = True
         entries = []
 
@@ -2182,7 +2192,7 @@ class RedfishUtils(object):
 
     @staticmethod
     def _find_empty_virt_media_slot(resources, media_types,
-                                    media_match_strict=True):
+                                    media_match_strict=True, vendor=''):
         for uri, data in resources.items():
             # check MediaTypes
             if 'MediaTypes' in data and media_types:
@@ -2191,8 +2201,8 @@ class RedfishUtils(object):
             else:
                 if media_match_strict:
                     continue
-            # Base on current XCC capability, slot RDOC1/2 and Remote1/2/3/4 are not supported to Insert/Eject.
-            if ("/Systems/1/" in uri or "/Manager/1/" in uri) and ('RDOC' in uri or 'Remote' in uri):
+            # Base on current Lenovo server capability, filter out slot RDOC1/2 and Remote1/2/3/4 which are not supported to Insert/Eject.
+            if vendor == 'Lenovo' and ('RDOC' in uri or 'Remote' in uri):
                 continue
             # if ejected, 'Inserted' should be False and 'ImageName' cleared
             if (not data.get('Inserted', False) and
@@ -2270,7 +2280,7 @@ class RedfishUtils(object):
             return response
         return {'ret': True, 'changed': True, 'msg': "VirtualMedia inserted"}
 
-    def virtual_media_insert(self, resource_type, options):
+    def virtual_media_insert(self, options, resource_type='Manager'):
         param_map = {
             'Inserted': 'inserted',
             'WriteProtected': 'write_protected',
@@ -2328,12 +2338,13 @@ class RedfishUtils(object):
 
         # find an empty slot to insert the media
         # try first with strict media_type matching
+        vendor = self._get_vendor()['Vendor']
         uri, data = self._find_empty_virt_media_slot(
-            resources, media_types, media_match_strict=True)
+            resources, media_types, media_match_strict=True, vendor=vendor)
         if not uri:
             # if not found, try without strict media_type matching
             uri, data = self._find_empty_virt_media_slot(
-                resources, media_types, media_match_strict=False)
+                resources, media_types, media_match_strict=False, vendor=vendor)
         if not uri:
             return {'ret': False,
                     'msg': "Unable to find an available VirtualMedia resource "
@@ -2391,7 +2402,7 @@ class RedfishUtils(object):
         return {'ret': True, 'changed': True,
                 'msg': "VirtualMedia ejected"}
 
-    def virtual_media_eject(self, resource_type, options):
+    def virtual_media_eject(self, options, resource_type='Manager'):
         image_url = options.get('image_url')
         if not image_url:
             return {'ret': False,

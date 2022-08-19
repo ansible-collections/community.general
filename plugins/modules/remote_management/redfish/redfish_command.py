@@ -792,9 +792,9 @@ def main():
             elif command.startswith('IndicatorLed'):
                 result = rf_utils.manage_system_indicator_led(command)
             elif command == 'VirtualMediaInsert':
-                result = rf_utils.virtual_media_insert(category, virtual_media)
+                result = rf_utils.virtual_media_insert(virtual_media, category)
             elif command == 'VirtualMediaEject':
-                result = rf_utils.virtual_media_eject(category, virtual_media)
+                result = rf_utils.virtual_media_eject(virtual_media, category)
 
     elif category == "Chassis":
         result = rf_utils._find_chassis_resource()
@@ -843,9 +843,9 @@ def main():
             elif command == 'ClearLogs':
                 result = rf_utils.clear_logs()
             elif command == 'VirtualMediaInsert':
-                result = rf_utils.virtual_media_insert(category, virtual_media)
+                result = rf_utils.virtual_media_insert(virtual_media, category)
             elif command == 'VirtualMediaEject':
-                result = rf_utils.virtual_media_eject(category, virtual_media)
+                result = rf_utils.virtual_media_eject(virtual_media, category)
 
     elif category == "Update":
         # execute only if we find UpdateService resources
