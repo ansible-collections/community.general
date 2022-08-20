@@ -27,7 +27,7 @@ jobs:
 
       - name: Remove changelog fragments for REUSE compliance check
         run: |
-          rm -fv changelogs/fragments/*.yml
+          rm -fv changelogs/fragments/*.yml changelogs/fragments/*.yaml
 
       - name: Check REUSE compliance
         run: |
