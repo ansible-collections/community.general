@@ -1,0 +1,37 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install dnspython library
+  pip:
+    name: dnspython
+    state: present
+    extra_args: "-c {{ remote_constraints }}"
+
+- name: Test dig lookup with existing domain
+  set_fact:
+    dig_existing: "{{ lookup('community.general.dig', 'github.com.') }}"
+
+- name: Test dig lookup with non-existing domain and fail_on_error=no
+  set_fact:
+    dig_nonexisting_fail_no: "{{ lookup('community.general.dig', 'non-existing.domain.', 'fail_on_error=no') }}"
+
+- name: Verify that NXDOMAIN was returned
+  assert:
+    that: dig_nonexisting_fail_no == 'NXDOMAIN'
+
+- name: Test dig lookup with non-existing domain and fail_on_error=yes
+  set_fact:
+    dig_nonexisting_fail_yes: "{{ lookup('community.general.dig', 'non-existing.domain.', 'fail_on_error=yes') }}"
+  ignore_errors: yes
+  register: dig_nonexisting_fail_yes_result
+
+- name: Verify that the task failed
+  assert:
+    that: dig_nonexisting_fail_yes_result is failed
