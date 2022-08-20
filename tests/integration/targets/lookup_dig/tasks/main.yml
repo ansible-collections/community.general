@@ -11,7 +11,7 @@
 - name: Install dnspython library
   pip:
     name: dnspython
-    state: present
+    extra_args: "-c {{ remote_constraints }}"
 
 - name: Test dig lookup with existing domain
   set_fact:
