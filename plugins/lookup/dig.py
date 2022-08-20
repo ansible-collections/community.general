@@ -172,6 +172,7 @@ RETURN = """
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.utils.display import Display
 import socket
 
@@ -321,9 +322,9 @@ class LookupModule(LookupBase):
                     except Exception as e:
                         raise AnsibleError("dns lookup illegal CLASS: %s" % to_native(e))
                 elif opt == 'retry_servfail':
-                    myres.retry_servfail = bool(arg)
+                    myres.retry_servfail = boolean(arg)
                 elif opt == 'fail_on_error':
-                    fail_on_error = bool(arg)
+                    fail_on_error = boolean(arg)
 
                 continue
 
