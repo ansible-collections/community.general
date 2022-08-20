@@ -73,6 +73,7 @@ def main():
     # These files are completely ignored
     ignore_paths = [
         '.ansible-test-timeout.json',
+        '.reuse/dep5',
         'LICENSES/*.txt',
         'COPYING',
     ]

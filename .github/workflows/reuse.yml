@@ -25,10 +25,6 @@ jobs:
         run: |
           pip install reuse
 
-      - name: Remove changelog fragments for REUSE compliance check
-        run: |
-          rm -fv changelogs/fragments/*.yml changelogs/fragments/*.yaml
-
       - name: Check REUSE compliance
         run: |
           reuse lint
