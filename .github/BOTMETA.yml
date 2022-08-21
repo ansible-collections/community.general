@@ -125,6 +125,8 @@ files:
     labels: xenserver
   $filters/counter.py:
     maintainers: keilr
+  $filters/crc32.py:
+    maintainers: jouir
   $filters/dict.py:
     maintainers: felixfontein
   $filters/dict_kv.py:
