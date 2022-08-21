@@ -33,7 +33,8 @@ def find_licenses(filename, relax=False):
                     has_copyright = True
                 idx = line.find('SPDX-License-Identifier: ')
                 if idx >= 0:
-                    spdx_license_identifiers.append(line[idx + len('SPDX-License-Identifier: '):])
+                    lic_id = line[idx + len('SPDX-License-Identifier: '):]
+                    spdx_license_identifiers.extend(lic_id.split(' OR '))
                 if 'GNU General Public License' in line:
                     if 'v3.0+' in line:
                         other_license_identifiers.append('GPL-3.0-or-later')
@@ -67,18 +68,14 @@ def main():
     no_comments_allowed = [
         'changelogs/fragments/*.yml',
         'changelogs/fragments/*.yaml',
-        'tests/sanity/extra/*.json',
-        'tests/sanity/ignore-2.*.txt',
-        'COPYING',
     ]
 
     # These files are completely ignored
     ignore_paths = [
-        'CHANGELOG.rst',
-        'changelogs/changelog.yaml',
-        'tests/sanity/extra/licenses.py',  # The strings in find_licenses() confuse this code :-)
         '.ansible-test-timeout.json',
+        '.reuse/dep5',
         'LICENSES/*.txt',
+        'COPYING',
     ]
 
     no_comments_allowed = [fn for pattern in no_comments_allowed for fn in glob.glob(pattern)]
