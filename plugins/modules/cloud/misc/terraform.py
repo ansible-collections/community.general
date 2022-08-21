@@ -385,7 +385,13 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
         return plan_path, False, out, err, plan_command if state == 'planned' else command
     elif rc == 1:
         # failure to plan
-        module.fail_json(msg='Terraform plan could not be created\r\nSTDOUT: {0}\r\n\r\nSTDERR: {1}'.format(out, err))
+        module.fail_json(
+            msg='Terraform plan could not be created\r\nSTDOUT: {0}\r\n\r\nSTDERR: {1}\r\nCOMMAND: {2}'.format(
+                out,
+                err,
+                ' '.join([shlex_quote(arg) for arg in variables_args])
+            )
+        )
     elif rc == 2:
         # changes, but successful
         return plan_path, True, out, err, plan_command if state == 'planned' else command
@@ -474,39 +480,71 @@ def main():
     if state == 'present' and module.params.get('parallelism') is not None:
         command.append('-parallelism=%d' % module.params.get('parallelism'))
 
+    def format_args(vars):
+        if isinstance(vars, str):
+            return '"{string}"'.format(string=vars)
+        elif isinstance(vars, bool):
+            if vars:
+                return 'true'
+            else:
+                return 'false'
+        elif isinstance(vars, (integer_types, float)):
+            return str(vars)
+        else:
+            return vars
+
     def process_complex_args(vars):
         ret_out = []
         if isinstance(vars, dict):
             for k, v in vars.items():
                 if isinstance(v, dict):
                     ret_out.append('{0}={{{1}}}'.format(k, process_complex_args(v)))
-                if isinstance(v, list):
-                    ret_out.append("{0}=[{1}]".format(k, process_complex_args(v)))
-                if isinstance(v, (integer_types, float, str, bool)):
-                    ret_out.append('{0}={1}'.format(k, json.dumps(v)))
+                elif isinstance(v, list):
+                    ret_out.append("{0}={1}".format(k, process_complex_args(v)))
+                elif isinstance(v, (integer_types, float, str, bool)):
+                    ret_out.append('{0}={1}'.format(k, format_args(v)))
+                else:
+                    # only to handle anything unforseen
+                    module.fail_json(msg="Supported types are, dictionaries, lists, strings, integer_types, boolean and float.")
         if isinstance(vars, list):
             l_out = []
             for item in vars:
                 if isinstance(item, dict):
                     l_out.append("{{{0}}}".format(process_complex_args(item)))
+                elif isinstance(item, list):
+                    l_out.append("{0}".format(process_complex_args(item)))
                 elif isinstance(item, (str, integer_types, float, bool)):
-                    l_out.append(json.dumps(item))
+                    l_out.append(format_args(item))
                 else:
-                    module.fail_json(msg="List can contain, dictionaries, strings, integer_types, boolean and float.")
+                    # only to handle anything unforseen
+                    module.fail_json(msg="Supported types are, dictionaries, lists, strings, integer_types, boolean and float.")
+
             ret_out.append("[{0}]".format(",".join(l_out)))
         return ",".join(ret_out)
 
     variables_args = []
     for k, v in variables.items():
-        if isinstance(v, (dict, list)):
+        if isinstance(v, dict):
+            variables_args.extend([
+                '-var',
+                '{0}={{{1}}}'.format(k, process_complex_args(v))
+            ])
+        elif isinstance(v, list):
             variables_args.extend([
                 '-var',
                 '{0}={1}'.format(k, process_complex_args(v))
             ])
+        # terraform does not like shlex_quote fixing double-quotes on the top-level
+        # just passing the plain string and shlex_quote will take care of the rest
+        elif isinstance(v, str):
+            variables_args.extend([
+                '-var',
+                "{0}={1}".format(k, v)
+            ])
         else:
             variables_args.extend([
                 '-var',
-                '{0}={1}'.format(k, v)
+                '{0}={1}'.format(k, format_args(v))
             ])
 
     if variables_files:
