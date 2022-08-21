@@ -15,7 +15,9 @@ on:
     - cron: '30 7 * * *'
 
 jobs:
-  build:
+  check:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
 
     steps:
