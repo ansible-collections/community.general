@@ -6,8 +6,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils.six import string_types
 from ansible.module_utils.common.text.converters import to_bytes
+from ansible.module_utils.common.collections import is_string
 
 try:
     from zlib import crc32
@@ -46,7 +46,7 @@ RETURN = '''
 
 
 def crc32s(value):
-    if not isinstance(value, string_types):
+    if not is_string(value):
         raise AnsibleFilterError('Invalid value type (%s) for crc32 (%r)' %
                                  (type(value), value))
 
