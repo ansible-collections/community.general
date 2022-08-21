@@ -923,7 +923,6 @@ options:
                 description: This defines the service type of connection.
                 type: str
                 required: true
-                choices: [ org.freedesktop.NetworkManager.pptp, org.freedesktop.NetworkManager.l2tp ]
             gateway:
                 description: The gateway to connection. It can be an IP address (for example C(192.0.2.1))
                     or a FQDN address (for example C(vpn.example.com)).
