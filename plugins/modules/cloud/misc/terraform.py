@@ -488,10 +488,7 @@ def main():
                 return 'true'
             else:
                 return 'false'
-        elif isinstance(vars, (integer_types, float)):
-            return str(vars)
-        else:
-            return vars
+        return str(vars)
 
     def process_complex_args(vars):
         ret_out = []
