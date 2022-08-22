@@ -32,6 +32,17 @@ class WdcRedfishUtils(RedfishUtils):
     UPDATE_STATUS_MESSAGE_FW_UPDATE_COMPLETED_WAITING_FOR_ACTIVATION = "FW update completed. Waiting for activation."
     UPDATE_STATUS_MESSAGE_FW_UPDATE_FAILED = "FW update failed."
 
+    # Dict keys for resource bodies
+    # Standard keys
+    ACTIONS = "Actions"
+    OEM = "Oem"
+    WDC = "WDC"
+    TARGET = "target"
+
+    # Keys for specific operations
+    CHASSIS_LOCATE = "#Chassis.Locate"
+    CHASSIS_POWER_MODE = "#Chassis.PowerMode"
+
     def __init__(self,
                  creds,
                  root_uris,
@@ -409,17 +420,32 @@ class WdcRedfishUtils(RedfishUtils):
     @staticmethod
     def _get_led_locate_uri(data):
         """Get the LED locate URI given a resource body."""
-        if "Actions" not in data:
+        if WdcRedfishUtils.ACTIONS not in data:
             return None
-        if "Oem" not in data["Actions"]:
+        if WdcRedfishUtils.OEM not in data[WdcRedfishUtils.ACTIONS]:
             return None
-        if "WDC" not in data["Actions"]["Oem"]:
+        if WdcRedfishUtils.WDC not in data[WdcRedfishUtils.ACTIONS][WdcRedfishUtils.OEM]:
             return None
-        if "#Chassis.Locate" not in data["Actions"]["Oem"]["WDC"]:
+        if WdcRedfishUtils.CHASSIS_LOCATE not in data[WdcRedfishUtils.ACTIONS][WdcRedfishUtils.OEM][WdcRedfishUtils.WDC]:
             return None
-        if "target" not in data["Actions"]["Oem"]["WDC"]["#Chassis.Locate"]:
+        if WdcRedfishUtils.TARGET not in data[WdcRedfishUtils.ACTIONS][WdcRedfishUtils.OEM][WdcRedfishUtils.WDC][WdcRedfishUtils.CHASSIS_LOCATE]:
             return None
-        return data["Actions"]["Oem"]["WDC"]["#Chassis.Locate"]["target"]
+        return data[WdcRedfishUtils.ACTIONS][WdcRedfishUtils.OEM][WdcRedfishUtils.WDC][WdcRedfishUtils.CHASSIS_LOCATE][WdcRedfishUtils.TARGET]
+
+    @staticmethod
+    def _get_power_mode_uri(data):
+        """Get the Power Mode URI given a resource body."""
+        if WdcRedfishUtils.ACTIONS not in data:
+            return None
+        if WdcRedfishUtils.OEM not in data[WdcRedfishUtils.ACTIONS]:
+            return None
+        if WdcRedfishUtils.WDC not in data[WdcRedfishUtils.ACTIONS][WdcRedfishUtils.OEM]:
+            return None
+        if WdcRedfishUtils.CHASSIS_POWER_MODE not in data[WdcRedfishUtils.ACTIONS][WdcRedfishUtils.OEM][WdcRedfishUtils.WDC]:
+            return None
+        if WdcRedfishUtils.TARGET not in data[WdcRedfishUtils.ACTIONS][WdcRedfishUtils.OEM][WdcRedfishUtils.WDC][WdcRedfishUtils.CHASSIS_POWER_MODE]:
+            return None
+        return data[WdcRedfishUtils.ACTIONS][WdcRedfishUtils.OEM][WdcRedfishUtils.WDC][WdcRedfishUtils.CHASSIS_POWER_MODE][WdcRedfishUtils.TARGET]
 
     def manage_indicator_led(self, command, resource_uri):
         key = 'IndicatorLED'
@@ -446,6 +472,46 @@ class WdcRedfishUtils(RedfishUtils):
         if command in payloads.keys():
             payload = {'LocateState': payloads[command]}
             response = self.post_request(self.root_uri + led_locate_uri, payload)
+            if response['ret'] is False:
+                return response
+        else:
+            return {'ret': False, 'msg': 'Invalid command'}
+
+        return result
+
+    def manage_chassis_power_mode(self, command):
+        return self.manage_power_mode(command, self.chassis_uri)
+
+    def manage_power_mode(self, command, resource_uri=None):
+        if resource_uri is None:
+            resource_uri = self.chassis_uri
+
+        payloads = {'PowerModeNormal': 'Normal', 'PowerModeLow': 'Low'}
+        requested_power_mode = payloads[command]
+
+        result = {}
+        response = self.get_request(self.root_uri + resource_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+
+        # Make sure the response includes Oem.WDC.PowerMode, and get current power mode
+        power_mode = 'PowerMode'
+        if WdcRedfishUtils.OEM not in data or WdcRedfishUtils.WDC not in data[WdcRedfishUtils.OEM] or\
+                power_mode not in data[WdcRedfishUtils.OEM][WdcRedfishUtils.WDC]:
+            return {'ret': False, 'msg': 'Resource does not support Oem.WDC.PowerMode'}
+        current_power_mode = data[WdcRedfishUtils.OEM][WdcRedfishUtils.WDC][power_mode]
+        if current_power_mode == requested_power_mode:
+            return {'ret': True, 'changed': False}
+
+        power_mode_uri = self._get_power_mode_uri(data)
+        if power_mode_uri is None:
+            return {'ret': False, 'msg': 'Power Mode URI not found.'}
+
+        if command in payloads.keys():
+            payload = {'PowerMode': payloads[command]}
+            response = self.post_request(self.root_uri + power_mode_uri, payload)
             if response['ret'] is False:
                 return response
         else:
