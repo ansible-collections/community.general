@@ -1,3 +1,3 @@
 ---
 bugfixes:
-  - xfs_quota - the call to "xfs_quota" to set up project quotas was missing the project name and hence failed (https://github.com/ansible-collections/community.general/issues/5143).
+  - xfs_quota - the call to ``xfs_quota`` to set up project quotas was missing the project name and hence failed (https://github.com/ansible-collections/community.general/issues/5143).
