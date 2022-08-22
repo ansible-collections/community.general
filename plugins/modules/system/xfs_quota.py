@@ -294,7 +294,7 @@ def main():
                         break
 
         if not prj_set and not module.check_mode:
-            cmd = "project -s"
+            cmd = "project -s %s" % name
             rc, stdout, stderr = exec_quota(module, xfs_quota_bin, cmd, mountpoint)
             if rc != 0:
                 result["cmd"] = cmd
