@@ -205,7 +205,7 @@ CATEGORY_COMMANDS_ALL = {
         "IndicatorLedOn",
         "IndicatorLedOff",
         "PowerModeLow",
-        "PowerModeNormal"
+        "PowerModeNormal",
     ]
 }
 

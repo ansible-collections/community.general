@@ -262,7 +262,7 @@ def mock_post_request(*args, **kwargs):
     valid_endpoints = [
         "/UpdateService.FWActivate",
         "/Chassis.Locate",
-        "/Chassis.PowerMode"
+        "/Chassis.PowerMode",
     ]
     for endpoint in valid_endpoints:
         if args[1].endswith(endpoint):
