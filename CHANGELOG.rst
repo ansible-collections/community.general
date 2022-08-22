@@ -6,6 +6,19 @@ Community General Release Notes
 
 This changelog describes changes after version 2.0.0.
 
+v3.8.9
+======
+
+Release Summary
+---------------
+
+Maintenance release.
+
+Minor Changes
+-------------
+
+- Added MIT license as ``MIT-license.txt`` for ``tests/unit/plugins/modules/packaging/language/test_gem.py`` (https://github.com/ansible-collections/community.general/pull/5065, https://github.com/ansible-collections/community.general/pull/5072).
+
 v3.8.8
 ======
 

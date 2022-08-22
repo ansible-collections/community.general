@@ -2189,3 +2189,13 @@ releases:
     - 4712-consul-bugfix.yaml
     - simplified-bsd-license.yml
     release_date: '2022-06-06'
+  3.8.9:
+    changes:
+      minor_changes:
+      - Added MIT license as ``MIT-license.txt`` for ``tests/unit/plugins/modules/packaging/language/test_gem.py``
+        (https://github.com/ansible-collections/community.general/pull/5065, https://github.com/ansible-collections/community.general/pull/5072).
+      release_summary: Maintenance release.
+    fragments:
+    - 3.8.9.yml
+    - licenses.yml
+    release_date: '2022-08-22'
