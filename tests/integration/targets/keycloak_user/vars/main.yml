@@ -15,9 +15,10 @@ last_name: Strange
 email: drstrange@marvel.com
 email_verified: true
 enabled: true
+password: "testing123"
 credentials: 
 - type: password
-  value: "testing123"
+  value: "{{password}}"
 
 attributes:
   universe: marvel

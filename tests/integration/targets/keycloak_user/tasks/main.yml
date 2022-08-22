@@ -17,8 +17,8 @@
     call_args:
       id: "{{ realm }}"
       realm: "{{ realm }}"
+      enabled: True
       state: present
-
 
 - name: Check without Credentials
   include_tasks: ./nocreds.yaml
@@ -31,6 +31,7 @@
     call_args:
       name: "{{username}}"
       realm: "{{realm}}"
+
   register: check_user_info
 - name: Assert expected results
   assert:
@@ -40,3 +41,4 @@
       - desire_user_when_present_and_same is not changed
       - check_user_when_present_and_same is not changed
       - check_user_info.users.username == username
+      - check_user_credentials_by_fetching_access_token

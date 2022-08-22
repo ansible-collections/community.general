@@ -1,3 +1,9 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+
 ## Setting the Credentials will always return with state change
 
 - name: Desired User with Credentials
@@ -48,3 +54,16 @@
       credentials: "{{ credentials }}"
       attributes: "{{ attributes }}"
   register: check_user_with_creds_when_present_and_same
+
+- name: Get Token (Check with Credentials)
+  ansible.builtin.uri:
+    url: "{{url}}/realms/{{realm}}/protocol/openid-connect/token"
+    body_format: form-urlencoded
+    method: POST
+    body:
+      username: "{{username}}"
+      password: "{{password}}"
+      client_id: "admin-cli"
+      grant_type: "password"
+  no_log: True
+  register: check_user_credentials_by_fetching_access_token
