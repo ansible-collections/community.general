@@ -91,6 +91,11 @@ options:
           description:
             - User-defined Label for the credential.
           type: str
+        temporary:
+          description:
+            - Whether the password is temporary or not.
+          type: bool
+          default: false
     email:
       type: str
       description: Email for the user.
@@ -335,6 +340,7 @@ def main():
                          options=dict(
                               type=dict(type='str'),
                               value=dict(type='str', no_log=True),
+                              temporary=dict(type='bool', default=False),
                               userLabel=dict(type='str'),
                          )),
         email_verified=dict(type='bool', default=True),
