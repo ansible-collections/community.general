@@ -562,8 +562,6 @@ plugin_routing:
       redirect: community.general.files.iso_extract
     iso_customize:
       redirect: community.general.files.iso_customize
-    iso_get_files:
-      redirect: community.general.files.iso_get_files
     jabber:
       redirect: community.general.notification.jabber
     java_cert:
