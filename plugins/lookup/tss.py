@@ -171,19 +171,29 @@ try:
 
     HAS_TSS_SDK = True
 except ImportError:
-    SecretServer = None
-    SecretServerError = None
-    HAS_TSS_SDK = False
+    try:
+        from delinea.secrets.server import SecretServer, SecretServerError
+
+        HAS_TSS_SDK = True
+    except ImportError:
+        SecretServer = None
+        SecretServerError = None
+        HAS_TSS_SDK = False
 
 try:
     from thycotic.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
 
     HAS_TSS_AUTHORIZER = True
 except ImportError:
-    PasswordGrantAuthorizer = None
-    DomainPasswordGrantAuthorizer = None
-    AccessTokenAuthorizer = None
-    HAS_TSS_AUTHORIZER = False
+    try:
+        from delinea.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
+
+        HAS_TSS_AUTHORIZER = True
+    except ImportError:
+        PasswordGrantAuthorizer = None
+        DomainPasswordGrantAuthorizer = None
+        AccessTokenAuthorizer = None
+        HAS_TSS_AUTHORIZER = False
 
 
 display = Display()
