@@ -189,7 +189,7 @@ except ImportError:
         from delinea.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
 
         HAS_TSS_AUTHORIZER = True
-    except:
+    except ImportError:
         PasswordGrantAuthorizer = None
         DomainPasswordGrantAuthorizer = None
         AccessTokenAuthorizer = None
