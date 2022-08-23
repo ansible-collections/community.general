@@ -108,7 +108,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
 MODULE_ISO_CUSTOMIZE = None
-
+ISO_MODE = "iso9660"
 
 # The upper dir exist, we only add subdirectoy
 def iso_add_dir(opened_iso, dir_path):
@@ -128,7 +128,14 @@ def iso_add_dir(opened_iso, dir_path):
                 current_dirpath = "%s/%s" % (parent_dir, check_dirname)
 
             try:
-                opened_iso.add_directory(current_dirpath.upper(), rr_name=check_dirname)
+                if ISO_MODE == "iso9660":
+                    opened_iso.add_directory(current_dirpath.upper())
+                elif ISO_MODE == "rr":
+                    opened_iso.add_directory(current_dirpath.upper(), rr_name=check_dirname)
+                elif ISO_MODE == "joliet":
+                    opened_iso.add_directory(current_dirpath.upper(), joliet_path=current_dirpath)
+                elif ISO_MODE == "udf":
+                    opened_iso.add_directory(current_dirpath.upper(), udf_path=current_dirpath)
             except Exception as err:
                 msg = "Failed to create dir %s with error: %s" % (current_dirpath, to_native(err))
                 return -1, msg
@@ -176,8 +183,14 @@ def iso_add_file(opened_iso, src_file, dest_file):
 
     try:
         # The file will be replaced if it exists in ISO
-        opened_iso.add_file(file_local, iso_path=file_in_iso_path,
-                            rr_name=file_name.lower())
+        if ISO_MODE == "iso9660":
+            opened_iso.add_file(file_local, iso_path=file_in_iso_path)
+        elif ISO_MODE == "rr":
+            opened_iso.add_file(file_local, iso_path=file_in_iso_path, rr_name=file_name)
+        elif ISO_MODE == "joliet":
+            opened_iso.add_file(file_local, iso_path=file_in_iso_path, joliet_path=dest_file)
+        elif ISO_MODE == "udf":
+            opened_iso.add_file(file_local, iso_path=file_in_iso_path, udf_path=dest_file)
     except Exception as err:
         msg = "Failed to add local file %s to ISO with error: %s" % (file_local, to_native(err))
         MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
@@ -191,22 +204,36 @@ def iso_delete_file(opened_iso, dest_file):
         dest_file = "/%s" % dest_file
     file_name = os.path.basename(dest_file)
 
-    try:
-        record = opened_iso.get_record(rr_path=dest_file)
-        if record and not record.is_file():
-            return -1, "the file %s does not exists in ISO or not a file." % dest_file
-    except Exception as err:
-        msg = "Failed to get record of file %s with error: %s" % (dest_file, to_native(err))
-        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
-
     if '.' not in file_name:
         file_in_iso_path = dest_file.upper() + '.;1'
     else:
         file_in_iso_path = dest_file.upper() + ';1'
 
     try:
-        opened_iso.rm_file(
-            iso_path=file_in_iso_path, rr_name=file_name.lower())
+        if ISO_MODE == "iso9660":
+            record = opened_iso.get_record(iso_path=file_in_iso_path)
+        elif ISO_MODE == "rr":
+            record = opened_iso.get_record(rr_path=dest_file)
+        elif ISO_MODE == "joliet":
+            record = opened_iso.get_record(joliet_path=dest_file)
+        elif ISO_MODE == "udf":
+            record = opened_iso.get_record(udf_path=dest_file)
+
+        if record and not record.is_file():
+            return -1, "the file %s does not exists in ISO or not a file." % dest_file
+    except Exception as err:
+        msg = "Failed to get record of file %s with error: %s" % (dest_file, to_native(err))
+        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
+
+    try:
+        if ISO_MODE == "iso9660":
+            opened_iso.rm_file(iso_path=file_in_iso_path)
+        elif ISO_MODE == "rr":
+            opened_iso.rm_file(iso_path=file_in_iso_path, rr_name=os.path.basename(dest_file))
+        elif ISO_MODE == "joliet":
+            opened_iso.rm_file(joliet_path=dest_file)
+        elif ISO_MODE == "udf":
+            opened_iso.rm_file(udf_path=dest_file)
     except Exception as err:
         msg = "Failed to delete iso file %s with error: %s" % (dest_file, to_native(err))
         MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
@@ -215,9 +242,17 @@ def iso_delete_file(opened_iso, dest_file):
 
 
 def iso_rebuild(src_iso, dest_iso, op_data_list):
+    global ISO_MODE
+
     try:
         iso = pycdlib.PyCdlib()
         iso.open(src_iso)
+        if iso.has_rock_ridge():
+            ISO_MODE = "rr"
+        elif iso.has_joliet():
+            ISO_MODE = "joliet"
+        elif iso.has_udf():
+            ISO_MODE = "udf"
 
         for op_data in op_data_list:
             op = op_data['op'].strip()
