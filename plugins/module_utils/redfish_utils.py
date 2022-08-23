@@ -3053,42 +3053,40 @@ class RedfishUtils(object):
     def get_multi_manager_inventory(self):
         return self.aggregate_managers(self.get_manager_inventory)
 
-    def set_sessionservice(self, sessionservice_config):
+    def set_session_service(self, sessions_config):
         result = {}
         response = self.get_request(self.root_uri + self.session_service_uri)
         if response['ret'] is False:
             return response
-        current_sessionservice_config = response['data']
+        current_sessions_config = response['data']
         payload = {}
-        for property in sessionservice_config.keys():
-            value = sessionservice_config[property]
-            if property not in current_sessionservice_config:
-                return {'ret': False, 'msg': "Property %s in sessionservice_config is invalid" % property}
+        for property, value in sessions_config.items():
+            value = sessions_config[property]
+            if property not in current_sessions_config:
+                return {'ret': False, 'msg': "Property %s in sessions_config is invalid" % property}
             if isinstance(value, dict):
-                if isinstance(current_sessionservice_config[property], dict):
+                if isinstance(current_sessions_config[property], dict):
                     payload[property] = value
-                elif isinstance(current_sessionservice_config[property], list):
-                    payload[property] = list()
-                    payload[property].append(value)
+                elif isinstance(current_sessions_config[property], list):
+                    payload[property] = [value]
                 else:
-                    return {'ret': False, 'msg': "Value of property %s in sessionservice_config is invalid" % property}
+                    return {'ret': False, 'msg': "Value of property %s in sessions_config is invalid" % property}
             else:
                 payload[property] = value
 
         need_change = False
-        for property in payload.keys():
-            set_value = payload[property]
-            cur_value = current_sessionservice_config[property]
+        for property, set_value in payload.items():
+            cur_value = current_sessions_config[property]
             if not isinstance(set_value, dict) and not isinstance(set_value, list):
                 if set_value != cur_value:
                     need_change = True
             if isinstance(set_value, dict):
                 for subprop in payload[property].keys():
-                    if subprop not in current_sessionservice_config[property]:
+                    if subprop not in current_sessions_config[property]:
                         need_change = True
                         break
                     sub_set_value = payload[property][subprop]
-                    sub_cur_value = current_sessionservice_config[property][subprop]
+                    sub_cur_value = current_sessions_config[property][subprop]
                     if sub_set_value != sub_cur_value:
                         need_change = True
             if isinstance(set_value, list):
@@ -3097,11 +3095,11 @@ class RedfishUtils(object):
                     continue
                 for i in range(len(set_value)):
                     for subprop in payload[property][i].keys():
-                        if subprop not in current_sessionservice_config[property][i]:
+                        if subprop not in current_sessions_config[property][i]:
                             need_change = True
                             break
                         sub_set_value = payload[property][i][subprop]
-                        sub_cur_value = current_sessionservice_config[property][i][subprop]
+                        sub_cur_value = current_sessions_config[property][i][subprop]
                         if sub_set_value != sub_cur_value:
                             need_change = True
         if not need_change:
