@@ -1,2 +1,0 @@
-bugfixes:
-  - nsupdate - compatibility with NS records (https://github.com/ansible-collections/community.general/pull/5112).
