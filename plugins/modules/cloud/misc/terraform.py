@@ -386,17 +386,24 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
     elif rc == 1:
         # failure to plan
         module.fail_json(
-            msg='Terraform plan could not be created\r\nSTDOUT: {0}\r\n\r\nSTDERR: {1}\r\nCOMMAND: {2}'.format(
-                out,
-                err,
-                ' '.join([shlex_quote(arg) for arg in variables_args])
+            msg='Terraform plan could not be created\r\nSTDOUT: {out}\r\n\r\nSTDERR: {err}\r\nCOMMAND: {cmd} {args}'.format(
+                out=out,
+                err=err,
+                cmd=plan_command,
+                args=' '.join([shlex_quote(arg) for arg in variables_args])
             )
         )
     elif rc == 2:
         # changes, but successful
         return plan_path, True, out, err, plan_command if state == 'planned' else command
 
-    module.fail_json(msg='Terraform plan failed with unexpected exit code {0}. \r\nSTDOUT: {1}\r\n\r\nSTDERR: {2}'.format(rc, out, err))
+    module.fail_json(msg='Terraform plan failed with unexpected exit code {rc}. \r\nSTDOUT: {out}\r\nSTDERR: {err}\r\nCOMMAND: {cmd} {args}'.format(
+        rc=rc,
+        out=out,
+        err=err,
+        cmd=plan_command,
+        args=' '.join([shlex_quote(arg) for arg in variables_args])
+    ))
 
 
 def main():
@@ -501,7 +508,7 @@ def main():
                 elif isinstance(v, (integer_types, float, str, bool)):
                     ret_out.append('{0}={1}'.format(k, format_args(v)))
                 else:
-                    # only to handle anything unforseen
+                    # only to handle anything unforeseen
                     module.fail_json(msg="Supported types are, dictionaries, lists, strings, integer_types, boolean and float.")
         if isinstance(vars, list):
             l_out = []
@@ -513,7 +520,7 @@ def main():
                 elif isinstance(item, (str, integer_types, float, bool)):
                     l_out.append(format_args(item))
                 else:
-                    # only to handle anything unforseen
+                    # only to handle anything unforeseen
                     module.fail_json(msg="Supported types are, dictionaries, lists, strings, integer_types, boolean and float.")
 
             ret_out.append("[{0}]".format(",".join(l_out)))
