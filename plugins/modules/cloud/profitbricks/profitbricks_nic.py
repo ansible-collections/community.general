@@ -48,7 +48,7 @@ options:
     description:
       - wait for the operation to complete before returning
     required: false
-    default: "yes"
+    default: true
     type: bool
   wait_timeout:
     description:

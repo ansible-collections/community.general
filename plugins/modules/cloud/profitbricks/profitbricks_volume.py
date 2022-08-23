@@ -74,7 +74,7 @@ options:
   auto_increment:
     description:
       - Whether or not to increment a single number in the name for created virtual machines.
-    default: yes
+    default: true
     type: bool
   instance_ids:
     description:
@@ -96,7 +96,7 @@ options:
     description:
       - wait for the datacenter to be created before returning
     required: false
-    default: "yes"
+    default: true
     type: bool
   wait_timeout:
     description:
@@ -125,7 +125,7 @@ EXAMPLES = '''
     datacenter: Tardis One
     name: vol%02d
     count: 5
-    auto_increment: yes
+    auto_increment: true
     wait_timeout: 500
     state: present
 

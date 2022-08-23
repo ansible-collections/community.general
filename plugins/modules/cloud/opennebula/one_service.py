@@ -66,10 +66,10 @@ options:
     type: str
   unique:
     description:
-      - Setting C(unique=yes) will make sure that there is only one service instance running with a name set with C(service_name) when
+      - Setting C(unique=true) will make sure that there is only one service instance running with a name set with C(service_name) when
       - instantiating a service from a template specified with C(template_id)/C(template_name). Check examples below.
     type: bool
-    default: no
+    default: false
   state:
     description:
       - C(present) - instantiate a service from a template specified with C(template_id)/C(template_name).
@@ -93,7 +93,7 @@ options:
     description:
       - Wait for the instance to reach RUNNING state after DEPLOYING or COOLDOWN state after SCALING
     type: bool
-    default: no
+    default: false
   wait_timeout:
     description:
       - How long before wait gives up, in seconds
@@ -116,7 +116,7 @@ options:
     description:
       - Force the new cardinality even if it is outside the limits
     type: bool
-    default: no
+    default: false
 author:
     - "Milan Ilic (@ilicmilan)"
 '''
@@ -149,7 +149,7 @@ EXAMPLES = '''
   community.general.one_service:
     template_id: 53
     service_name: 'foo'
-    unique: yes
+    unique: true
 
 - name: Delete a service by ID
   community.general.one_service:
@@ -176,7 +176,7 @@ EXAMPLES = '''
 - name: Wait service to become RUNNING
   community.general.one_service:
     service_id: 112
-    wait: yes
+    wait: true
 
 - name: Change role cardinality
   community.general.one_service:
@@ -189,7 +189,7 @@ EXAMPLES = '''
     service_id: 112
     role: foo
     cardinality: 7
-    wait: yes
+    wait: true
 '''
 
 RETURN = '''
