@@ -36,7 +36,7 @@ options:
     description:
       - Accept any licences.
     type: bool
-    default: no
+    default: false
     aliases: [ accept, accept_licences ]
   be_name:
     description:
@@ -46,7 +46,7 @@ options:
     description:
       - Refresh publishers before execution.
     type: bool
-    default: yes
+    default: true
 '''
 EXAMPLES = '''
 - name: Install Vim
@@ -56,7 +56,7 @@ EXAMPLES = '''
 - name: Install Vim without refreshing publishers
   community.general.pkg5:
     name: editor/vim
-    refresh: no
+    refresh: false
 
 - name: Remove finger daemon
   community.general.pkg5:
