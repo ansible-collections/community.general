@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 name: tss
-author: Delinea Integrations <GitHub@delinea.com>
+author: @delineaKrehl <GitHub@delinea.com>
 short_description: Get secrets from Delinea Secret Server
 version_added: 1.0.0
 description:
