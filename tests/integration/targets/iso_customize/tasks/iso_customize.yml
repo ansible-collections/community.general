@@ -1,0 +1,47 @@
+# Copyright (c) 2022, Ansible Project
+# Copyright (c) 2022, VMware, Inc. All Rights Reserved.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Check if iso file created
+  stat:
+    path: "{{ test_dir }}/test.iso"
+  register: iso_file
+
+- assert:
+    that:
+    - iso_file.stat.exists == True
+
+
+- name: "Customize ISO file"
+  community.general.iso_customize:
+    src_iso: "{{ test_dir }}/test.iso"
+    dest_iso: "{{ test_dir }}/{{ dest_iso_name }}"
+    delete_files:
+      - "/test01.cfg"
+    add_files:
+      - src_file: "{{ test_dir }}/test01.cfg"
+        dest_file: "/preseed/ubuntu.seed"
+  register: customize_iso_result
+
+- name: "Display the ISO customized result"
+  debug: var=customize_iso_result
+
+- name: Test customize iso result
+  assert:
+    that:
+    - customize_iso_result is not failed
+
+- name: Delete iso file after testing
+  file:
+    path: "{{ test_dir }}/test.iso"
+    state: absent
+
+- name: Check the iso file is deleted
+  stat:
+    path: "{{ test_dir }}/test.iso"
+  register: iso_file
+
+- assert:
+    that:
+    - iso_file.stat.exists == False
