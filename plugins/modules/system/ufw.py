@@ -286,8 +286,8 @@ EXAMPLES = r'''
   community.general.ufw:
     rule: deny
     route: true
-    src: 1.2.3.0/24
-    dest: 4.5.6.0/24
+    src: 192.0.2.0/24
+    dest: 198.51.100.0/24
 '''
 
 import re
