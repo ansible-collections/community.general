@@ -72,14 +72,14 @@ options:
       - Whether the record should be the only one for that record type and record name.
       - Only use with C(state) is set to C(present) on a record.
     type: 'bool'
-    default: no
+    default: false
   sandbox:
     description:
       - Use the DNSimple sandbox environment.
       - Requires a dedicated account in the dnsimple sandbox environment.
       - Check U(https://developer.dnsimple.com/sandbox/) for more information.
     type: 'bool'
-    default: no
+    default: false
     version_added: 3.5.0
 requirements:
   - "dnsimple >= 2.0.0"
