@@ -323,6 +323,7 @@ options:
         description:
             - This is only used with bond - xmit_hash_policy type.
         type: str
+        version_added: 5.6.0
     arp_interval:
         description:
             - This is only used with bond - ARP interval.
