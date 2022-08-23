@@ -8,11 +8,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 name: tss
-author: Adam Migus (@amigus) <adam@migus.org>
-short_description: Get secrets from Thycotic Secret Server
+author: Delinea Integrations <GitHub@delinea.com>
+short_description: Get secrets from Delinea Secret Server
 version_added: 1.0.0
 description:
-    - Uses the Thycotic Secret Server Python SDK to get Secrets from Secret
+    - Uses the Delinea Secret Server Python SDK to get Secrets from Secret
       Server using token authentication with I(username) and I(password) on
       the REST API at I(base_url).
     - When using self-signed certificates the environment variable
@@ -65,7 +65,7 @@ options:
         version_added: 3.6.0
     token:
         description:
-          - Existing token for Thycotic authorizer.
+          - Existing token for Delinea authorizer.
           - If provided, I(username) and I(password) are not needed.
           - Requires C(python-tss-sdk) version 1.0.0 or greater.
         env:
@@ -167,7 +167,7 @@ from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
 try:
-    from thycotic.secrets.server import SecretServer, SecretServerError
+    from delinea.secrets.server import SecretServer, SecretServerError
 
     HAS_TSS_SDK = True
 except ImportError:
@@ -176,7 +176,7 @@ except ImportError:
     HAS_TSS_SDK = False
 
 try:
-    from thycotic.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
+    from delinea.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
 
     HAS_TSS_AUTHORIZER = True
 except ImportError:
