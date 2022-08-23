@@ -21,7 +21,7 @@ options:
     description:
     - Force volume group creation.
     type: bool
-    default: no
+    default: false
   pp_size:
     description:
     - The size of the physical partition in megabytes.

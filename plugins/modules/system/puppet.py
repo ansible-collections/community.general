@@ -35,8 +35,8 @@ options:
   noop:
     description:
       - Override puppet.conf noop mode.
-      - When C(yes), run Puppet agent with C(--noop) switch set.
-      - When C(no), run Puppet agent with C(--no-noop) switch set.
+      - When C(true), run Puppet agent with C(--noop) switch set.
+      - When C(false), run Puppet agent with C(--no-noop) switch set.
       - When unset (default), use default or puppet.conf value if defined.
     type: bool
   facts:
@@ -139,7 +139,7 @@ EXAMPLES = r'''
 
 - name: Run puppet agent in noop mode
   community.general.puppet:
-    noop: yes
+    noop: true
 
 - name: Run a manifest with debug, log to both syslog and console, specify module path
   community.general.puppet:
