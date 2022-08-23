@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - tss.py - adding support for updated Delinea library (https://github.com/DelineaXPM/python-tss-sdk/issues/9).
