@@ -168,7 +168,7 @@ from ansible.utils.display import Display
 
 try:
     from thycotic.secrets.server import SecretServer, SecretServerError
-    
+
     HAS_TSS_SDK = True
 except ImportError:
     try:
@@ -182,11 +182,12 @@ except ImportError:
 
 try:
     from thycotic.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
-    
+
     HAS_TSS_AUTHORIZER = True
 except ImportError:
     try:
         from delinea.secrets.server import PasswordGrantAuthorizer, DomainPasswordGrantAuthorizer, AccessTokenAuthorizer
+
         HAS_TSS_AUTHORIZER = True
     except:
         PasswordGrantAuthorizer = None
