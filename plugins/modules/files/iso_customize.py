@@ -110,6 +110,7 @@ from ansible.module_utils.common.text.converters import to_native
 MODULE_ISO_CUSTOMIZE = None
 ISO_MODE = "iso9660"
 
+
 # The upper dir exist, we only add subdirectoy
 def iso_add_dir(opened_iso, dir_path):
     parent_dir, check_dirname = dir_path.rsplit("/", 1)
