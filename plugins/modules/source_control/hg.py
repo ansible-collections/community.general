@@ -20,7 +20,7 @@ options:
     repo:
         description:
             - The repository address.
-        required: yes
+        required: true
         aliases: [ name ]
         type: str
     dest:
@@ -37,24 +37,24 @@ options:
     force:
         description:
             - Discards uncommitted changes. Runs C(hg update -C).  Prior to
-              1.9, the default was C(yes).
+              1.9, the default was C(true).
         type: bool
-        default: 'no'
+        default: false
     purge:
         description:
             - Deletes untracked files. Runs C(hg purge).
         type: bool
-        default: 'no'
+        default: false
     update:
         description:
-            - If C(no), do not retrieve new revisions from the origin repository
+            - If C(false), do not retrieve new revisions from the origin repository
         type: bool
-        default: 'yes'
+        default: true
     clone:
         description:
-            - If C(no), do not clone the repository if it does not exist locally.
+            - If C(false), do not clone the repository if it does not exist locally.
         type: bool
-        default: 'yes'
+        default: true
     executable:
         description:
             - Path to hg executable to use. If not supplied,
@@ -77,14 +77,14 @@ EXAMPLES = '''
     repo: https://bitbucket.org/user/repo1
     dest: /home/user/repo1
     revision: stable
-    purge: yes
+    purge: true
 
 - name: Get information about the repository whether or not it has already been cloned locally.
   community.general.hg:
     repo: git://bitbucket.org/user/repo
     dest: /srv/checkout
-    clone: no
-    update: no
+    clone: false
+    update: false
 '''
 
 import os
@@ -245,7 +245,7 @@ def main():
     cleaned = False
 
     if not dest and (clone or update):
-        module.fail_json(msg="the destination directory must be specified unless clone=no and update=no")
+        module.fail_json(msg="the destination directory must be specified unless clone=false and update=false")
 
     hg = Hg(module, dest, repo, revision, hg_path)
 

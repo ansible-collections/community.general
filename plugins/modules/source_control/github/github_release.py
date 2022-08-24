@@ -59,13 +59,13 @@ options:
     draft:
         description:
             - Sets if the release is a draft or not. (boolean)
-        type: 'bool'
-        default: 'no'
+        type: bool
+        default: false
     prerelease:
         description:
             - Sets if the release is a prerelease or not. (boolean)
         type: bool
-        default: 'no'
+        default: false
 
 author:
     - "Adrian Moisey (@adrianmoisey)"

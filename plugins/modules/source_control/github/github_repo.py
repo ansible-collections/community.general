@@ -101,9 +101,9 @@ EXAMPLES = '''
     organization: MyOrganization
     name: myrepo
     description: "Just for fun"
-    private: yes
+    private: true
     state: present
-    force_defaults: no
+    force_defaults: false
   register: result
 
 - name: Delete the repository

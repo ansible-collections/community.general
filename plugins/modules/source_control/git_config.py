@@ -30,7 +30,7 @@ options:
     description:
       - List all settings (optionally limited to a given I(scope)).
     type: bool
-    default: 'no'
+    default: false
   name:
     description:
       - The name of the setting. If no value is supplied, the value will
@@ -52,7 +52,7 @@ options:
       - This is required when setting config values.
       - If this is set to C(local), you must also specify the C(repo) parameter.
       - If this is set to C(file), you must also specify the C(file) parameter.
-      - It defaults to system only when not using I(list_all)=C(yes).
+      - It defaults to system only when not using I(list_all)=C(true).
     choices: [ "file", "local", "global", "system" ]
     type: str
   state:
@@ -123,35 +123,35 @@ EXAMPLES = '''
     name: alias.ci
     scope: global
 
-- name: Scope system is also assumed when reading values, unless list_all=yes
+- name: Scope system is also assumed when reading values, unless list_all=true
   community.general.git_config:
     name: alias.diffc
 
 - name: Read all values from git config
   community.general.git_config:
-    list_all: yes
+    list_all: true
     scope: global
 
 - name: When list_all is yes and no scope is specified, you get configuration from all scopes
   community.general.git_config:
-    list_all: yes
+    list_all: true
 
 - name: Specify a repository to include local settings
   community.general.git_config:
-    list_all: yes
+    list_all: true
     repo: /path/to/repo.git
 '''
 
 RETURN = '''
 ---
 config_value:
-  description: When list_all=no and value is not set, a string containing the value of the setting in name
+  description: When I(list_all=false) and value is not set, a string containing the value of the setting in name
   returned: success
   type: str
   sample: "vim"
 
 config_values:
-  description: When list_all=yes, a dict containing key/value pairs of multiple configuration settings
+  description: When I(list_all=true), a dict containing key/value pairs of multiple configuration settings
   returned: success
   type: dict
   sample:

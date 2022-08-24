@@ -102,17 +102,17 @@ options:
     description:
       - Require confirmation.
     type: bool
-    default: yes
+    default: true
   isadmin:
     description:
       - Grant admin privileges to the user.
     type: bool
-    default: no
+    default: false
   external:
     description:
       - Define external parameter for this user.
     type: bool
-    default: no
+    default: false
   identities:
     description:
       - List of identities to be added/updated for this user.
