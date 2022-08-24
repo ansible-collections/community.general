@@ -77,8 +77,8 @@ EXAMPLES = '''
 - name: Remove packages foo and bar
   community.general.xbps:
     name:
-        - foo
-        - bar
+      - foo
+      - bar
     state: absent
 
 - name: Recursively remove package foo
