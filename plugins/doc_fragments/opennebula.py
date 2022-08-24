@@ -36,7 +36,7 @@ options:
             - Whether to validate the SSL certificates or not.
             - This parameter is ignored if PYTHONHTTPSVERIFY environment variable is used.
         type: bool
-        default: yes
+        default: true
     wait_timeout:
         description:
             - Time to wait for the desired state to be reached before timeout, in seconds.
