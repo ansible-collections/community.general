@@ -56,7 +56,7 @@ options:
     description:
       - Set value to C(true) to force node into install state if it already exists in stacki.
     type: bool
-    default: no
+    default: false
   state:
     description:
       - Set value to the desired state for the specified host.

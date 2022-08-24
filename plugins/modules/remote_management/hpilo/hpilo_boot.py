@@ -63,7 +63,7 @@ options:
     description:
     - Whether to force a reboot (even when the system is already booted).
     - As a safeguard, without force, hpilo_boot will refuse to reboot a server that is already running.
-    default: no
+    default: false
     type: bool
   ssl_version:
     description:

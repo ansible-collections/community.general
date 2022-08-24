@@ -38,7 +38,7 @@ options:
         description:
             - Verify TLS certificates (do not disable this in production).
         type: bool
-        default: yes
+        default: true
 
     realm:
         type: str

@@ -35,26 +35,26 @@ options:
     description:
     - The ISO image to extract files from.
     type: path
-    required: yes
+    required: true
     aliases: [ path, src ]
   dest:
     description:
     - The destination directory to extract files to.
     type: path
-    required: yes
+    required: true
   files:
     description:
     - A list of files to extract from the image.
     - Extracting directories does not work.
     type: list
     elements: str
-    required: yes
+    required: true
   force:
     description:
-    - If C(yes), which will replace the remote file when contents are different than the source.
-    - If C(no), the file will only be extracted and copied if the destination does not already exist.
+    - If C(true), which will replace the remote file when contents are different than the source.
+    - If C(false), the file will only be extracted and copied if the destination does not already exist.
     type: bool
-    default: yes
+    default: true
   executable:
     description:
     - The path to the C(7z) executable to use for extracting files from the ISO.
@@ -62,7 +62,7 @@ options:
     type: path
 notes:
 - Only the file checksum (content) is taken into account when extracting files
-  from the ISO image. If C(force=no), only checks the presence of the file.
+  from the ISO image. If C(force=false), only checks the presence of the file.
 - In Ansible 2.3 this module was using C(mount) and C(umount) commands only,
   requiring root access. This is no longer needed with the introduction of 7zip
   for extraction.

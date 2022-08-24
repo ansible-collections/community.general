@@ -81,18 +81,18 @@ options:
     - Search for a given C(xpath) and provide the count of any matches.
     - This parameter requires C(xpath) to be set.
     type: bool
-    default: no
+    default: false
   print_match:
     description:
     - Search for a given C(xpath) and print out any matches.
     - This parameter requires C(xpath) to be set.
     type: bool
-    default: no
+    default: false
   pretty_print:
     description:
     - Pretty print XML output.
     type: bool
-    default: no
+    default: false
   content:
     description:
     - Search for a given C(xpath) and get content.
@@ -110,13 +110,13 @@ options:
       - Create a backup file including the timestamp information so you can get
         the original file back if you somehow clobbered it incorrectly.
     type: bool
-    default: no
+    default: false
   strip_cdata_tags:
     description:
       - Remove CDATA tags surrounding text values.
       - Note that this might break your XML file if text values contain characters that could be interpreted as XML.
     type: bool
-    default: no
+    default: false
   insertbefore:
     description:
       - Add additional child-element(s) before the first selected element for a given C(xpath).
@@ -125,7 +125,7 @@ options:
         or a hash where the key is an element name and the value is the element value.
       - This parameter requires C(xpath) to be set.
     type: bool
-    default: no
+    default: false
   insertafter:
     description:
       - Add additional child-element(s) after the last selected element for a given C(xpath).
@@ -134,7 +134,7 @@ options:
         or a hash where the key is an element name and the value is the element value.
       - This parameter requires C(xpath) to be set.
     type: bool
-    default: no
+    default: false
 requirements:
 - lxml >= 2.3.0
 notes:
@@ -193,7 +193,7 @@ EXAMPLES = r'''
   community.general.xml:
     path: /foo/bar.xml
     xpath: /business/beers/beer
-    count: yes
+    count: true
   register: hits
 
 - ansible.builtin.debug:
@@ -219,7 +219,7 @@ EXAMPLES = r'''
   community.general.xml:
     path: /foo/bar.xml
     xpath: '/business/beers/beer[text()="Rochefort 10"]'
-    insertbefore: yes
+    insertbefore: true
     add_children:
     - beer: Old Rasputin
     - beer: Old Motor Oil
@@ -330,7 +330,7 @@ actions:
 backup_file:
     description: The name of the backup file that was created
     type: str
-    returned: when backup=yes
+    returned: when I(backup=true)
     sample: /path/to/file.xml.1942.2017-08-24@14:16:01~
 count:
     description: The count of xpath matches.

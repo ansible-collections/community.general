@@ -48,7 +48,7 @@ options:
     description:
       - Apply permissions to everyone.
     type: bool
-    default: no
+    default: false
   permissions:
     description:
       - The list of permission(s) to delegate (required if C(state) is C(present)).
@@ -68,7 +68,7 @@ options:
     description:
       - Unallow permissions recursively (ignored when C(state) is C(present)).
     type: bool
-    default: no
+    default: false
 author:
 - Nate Coraor (@natefoo)
 '''
@@ -84,7 +84,7 @@ EXAMPLES = r'''
   community.general.zfs_delegate_admin:
     name: rpool/myvol
     groups: backup
-    everyone: yes
+    everyone: true
     permissions: send
 
 - name: Grant `zfs send,receive` to users `foo` and `bar` with local scope only
@@ -92,12 +92,12 @@ EXAMPLES = r'''
     name: rpool/myfs
     users: foo,bar
     permissions: send,receive
-    local: yes
+    local: true
 
 - name: Revoke all permissions from everyone (permissions specifically assigned to users and groups remain)
   community.general.zfs_delegate_admin:
     name: rpool/myfs
-    everyone: yes
+    everyone: true
     state: absent
 '''
 

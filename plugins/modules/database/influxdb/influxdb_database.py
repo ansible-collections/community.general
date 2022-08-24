@@ -56,8 +56,8 @@ EXAMPLES = r'''
       username: "{{influxdb_username}}"
       password: "{{influxdb_password}}"
       database_name: "{{influxdb_database_name}}"
-      ssl: yes
-      validate_certs: yes
+      ssl: true
+      validate_certs: true
 '''
 
 RETURN = r'''

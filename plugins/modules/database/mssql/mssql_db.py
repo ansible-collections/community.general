@@ -57,7 +57,7 @@ options:
       - Automatically commit the change only if the import succeed. Sometimes it is necessary to use autocommit=true, since some content can't be changed
         within a transaction.
     type: bool
-    default: 'no'
+    default: false
 notes:
    - Requires the pymssql Python package on the remote host. For Ubuntu, this
      is as easy as pip install pymssql (See M(ansible.builtin.pip).)

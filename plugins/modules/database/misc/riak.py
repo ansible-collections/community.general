@@ -57,10 +57,10 @@ options:
     type: str
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be used
+      - If C(false), SSL certificates will not be validated. This should only be used
         on personally controlled sites using self-signed certificates.
     type: bool
-    default: 'yes'
+    default: true
 '''
 
 EXAMPLES = '''
@@ -71,7 +71,7 @@ EXAMPLES = '''
 
 - name: Wait for handoffs to finish. Use with async and poll.
   community.general.riak:
-    wait_for_handoffs: yes
+    wait_for_handoffs: true
 
 - name: Wait for riak_kv service to startup
   community.general.riak:

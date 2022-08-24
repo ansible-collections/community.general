@@ -59,7 +59,7 @@ options:
     aliases: [ keystone_v3_domain_id ]
   tenant_mapping_enabled:
     type: bool
-    default: 'no'
+    default: false
     description: Whether to enable mapping of existing tenants. defaults to False.
   api_version:
     type: str
@@ -88,7 +88,7 @@ options:
       validate_certs:
         description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
         type: bool
-        default: 'yes'
+        default: true
       security_protocol:
         type: str
         description: How SSL certificates should be used for HTTPS requests. defaults to None.
@@ -119,7 +119,7 @@ options:
       validate_certs:
         description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
         type: bool
-        default: 'yes'
+        default: true
       security_protocol:
         type: str
         choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation','non-ssl']
@@ -179,7 +179,7 @@ options:
         description:
           - Whether certificates should be verified for connections.
         type: bool
-        default: yes
+        default: true
         aliases: [ verify_ssl ]
 '''
 
