@@ -20,7 +20,7 @@ options:
     name:
         description:
             - ZFS dataset name.
-        required: yes
+        required: true
         aliases: [ "ds", "dataset" ]
         type: str
     recurse:
@@ -28,13 +28,13 @@ options:
             - Specifies if properties for any children should be recursively
               displayed.
         type: bool
-        default: 'no'
+        default: false
     parsable:
         description:
             - Specifies if property values should be displayed in machine
               friendly format.
         type: bool
-        default: 'no'
+        default: false
     properties:
         description:
             - Specifies which dataset properties should be queried in comma-separated format.
@@ -62,7 +62,7 @@ EXAMPLES = '''
 - name: Report space usage on ZFS filesystems under data/home
   community.general.zfs_facts:
     name: data/home
-    recurse: yes
+    recurse: true
     type: filesystem
 
 - ansible.builtin.debug:

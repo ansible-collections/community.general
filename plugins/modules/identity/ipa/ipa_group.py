@@ -17,9 +17,9 @@ description:
 options:
   append:
     description:
-    - If C(yes), add the listed I(user) and I(group) to the group members.
-    - If C(no), only the listed I(user) and I(group) will be group members, removing any other members.
-    default: no
+    - If C(true), add the listed I(user) and I(group) to the group members.
+    - If C(false), only the listed I(user) and I(group) will be group members, removing any other members.
+    default: false
     type: bool
     version_added: 4.0.0
   cn:
@@ -45,9 +45,9 @@ options:
   group:
     description:
     - List of group names assigned to this group.
-    - If I(append=no) and an empty list is passed all groups will be removed from this group.
+    - If I(append=false) and an empty list is passed all groups will be removed from this group.
     - Groups that are already assigned but not passed will be removed.
-    - If I(append=yes) the listed groups will be assigned without removing other groups.
+    - If I(append=true) the listed groups will be assigned without removing other groups.
     - If option is omitted assigned groups will not be checked or changed.
     type: list
     elements: str
@@ -58,9 +58,9 @@ options:
   user:
     description:
     - List of user names assigned to this group.
-    - If I(append=no) and an empty list is passed all users will be removed from this group.
+    - If I(append=false) and an empty list is passed all users will be removed from this group.
     - Users that are already assigned but not passed will be removed.
-    - If I(append=yes) the listed users will be assigned without removing other users.
+    - If I(append=true) the listed users will be assigned without removing other users.
     - If option is omitted assigned users will not be checked or changed.
     type: list
     elements: str
@@ -110,7 +110,7 @@ EXAMPLES = r'''
     name: developers
     user:
     - john
-    append: yes
+    append: true
     state: present
     ipa_host: ipa.example.com
     ipa_user: admin

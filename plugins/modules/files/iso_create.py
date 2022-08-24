@@ -31,14 +31,14 @@ options:
        underscores (_). File names are limited to 31 characters, directory nesting is limited to 8 levels, and path
        names are limited to 255 characters.'
      type: list
-     required: yes
+     required: true
      elements: path
    dest_iso:
      description:
      - The absolute path with file name of the new generated ISO file on local machine.
      - Will create intermediate folders when they does not exist.
      type: path
-     required: yes
+     required: true
    interchange_level:
      description:
      - The ISO9660 interchange level to use, it dictates the rules on the names of files.

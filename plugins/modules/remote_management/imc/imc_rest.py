@@ -71,10 +71,10 @@ options:
     type: int
   validate_certs:
     description:
-    - If C(no), SSL certificates will not be validated.
-    - This should only set to C(no) used on personally controlled sites using self-signed certificates.
+    - If C(false), SSL certificates will not be validated.
+    - This should only set to C(false) used on personally controlled sites using self-signed certificates.
     type: bool
-    default: 'yes'
+    default: true
 notes:
 - The XML fragments don't need an authentication cookie, this is injected by the module automatically.
 - The Cisco IMC XML output is being translated to JSON using the Cobra convention.
@@ -93,7 +93,7 @@ EXAMPLES = r'''
     hostname: '{{ imc_hostname }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: no
+    validate_certs: false
     content: |
       <configConfMo><inConfig>
         <computeRackUnit dn="sys/rack-unit-1" adminPower="down"/>
@@ -105,7 +105,7 @@ EXAMPLES = r'''
     hostname: '{{ imc_hostname }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: no
+    validate_certs: false
     timeout: 120
     content: |
       <!-- Configure Serial-on-LAN -->
@@ -130,7 +130,7 @@ EXAMPLES = r'''
     hostname: '{{ imc_hostname }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: no
+    validate_certs: false
     content: |
       <!-- Configure PXE boot -->
       <configConfMo><inConfig>
@@ -148,7 +148,7 @@ EXAMPLES = r'''
     hostname: '{{ imc_host }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: no
+    validate_certs: false
     content: |
       <configConfMo><inConfig>
         <lsbootStorage dn="sys/rack-unit-1/boot-policy/storage-read-write" access="read-write" order="1" type="storage"/>
@@ -160,7 +160,7 @@ EXAMPLES = r'''
     hostname: '{{ imc_host }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: no
+    validate_certs: false
     content: |
         <configConfMo><inConfig>
           <computeRackUnit dn="sys/rack-unit-1" usrLbl="Customer Lab - POD{{ pod_id }} - {{ inventory_hostname_short }}"/>
@@ -172,7 +172,7 @@ EXAMPLES = r'''
     hostname: '{{ imc_host }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
-    validate_certs: no
+    validate_certs: false
     timeout: 120
     content: |
         <configConfMo><inConfig>
