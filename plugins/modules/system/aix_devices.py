@@ -30,12 +30,12 @@ options:
     description:
     - Forces action.
     type: bool
-    default: no
+    default: false
   recursive:
     description:
     - Removes or defines a device and children devices.
     type: bool
-    default: no
+    default: false
   state:
     description:
     - Controls the device state.
@@ -87,13 +87,13 @@ EXAMPLES = r'''
 - name: Put vscsi1 and children devices in Defined state.
   community.general.aix_devices:
     device: vscsi1
-    recursive: yes
+    recursive: true
     state: defined
 
 - name: Removes vscsi1 and children devices.
   community.general.aix_devices:
     device: vscsi1
-    recursive: yes
+    recursive: true
     state: removed
 
 - name: Changes en1 mtu to 9000 and disables arp.

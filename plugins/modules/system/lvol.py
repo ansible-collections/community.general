@@ -52,13 +52,13 @@ options:
     description:
     - Whether the volume is active and visible to the host.
     type: bool
-    default: 'yes'
+    default: true
   force:
     description:
     - Shrink or remove operations of volumes requires this switch. Ensures that
       that filesystems get never corrupted/destroyed by mistake.
     type: bool
-    default: 'no'
+    default: false
   opts:
     type: str
     description:
@@ -79,14 +79,14 @@ options:
     description:
     - Shrink if current size is higher than size requested.
     type: bool
-    default: 'yes'
+    default: true
   resizefs:
     description:
     - Resize the underlying filesystem together with the logical volume.
     - Supported for C(ext2), C(ext3), C(ext4), C(reiserfs) and C(XFS) filesystems.
       Attempts to resize other filesystem types will fail.
     type: bool
-    default: 'no'
+    default: false
 notes:
   - You must specify lv (when managing the state of logical volumes) or thinpool (when managing a thin provisioned volume).
 '''
@@ -161,35 +161,35 @@ EXAMPLES = '''
     vg: firefly
     lv: test
     size: 80%VG
-    force: yes
+    force: true
 
 - name: Reduce the logical volume to 512m
   community.general.lvol:
     vg: firefly
     lv: test
     size: 512
-    force: yes
+    force: true
 
 - name: Reduce the logical volume by given space
   community.general.lvol:
     vg: firefly
     lv: test
     size: -512M
-    force: yes
+    force: true
 
 - name: Set the logical volume to 512m and do not try to shrink if size is lower than current one
   community.general.lvol:
     vg: firefly
     lv: test
     size: 512
-    shrink: no
+    shrink: false
 
 - name: Remove the logical volume.
   community.general.lvol:
     vg: firefly
     lv: test
     state: absent
-    force: yes
+    force: true
 
 - name: Create a snapshot volume of the test logical volume.
   community.general.lvol:
@@ -487,7 +487,7 @@ def main():
         if state == 'absent':
             # remove LV
             if not force:
-                module.fail_json(msg="Sorry, no removal of logical volume %s without force=yes." % (this_lv['name']))
+                module.fail_json(msg="Sorry, no removal of logical volume %s without force=true." % (this_lv['name']))
             lvremove_cmd = module.get_bin_path("lvremove", required=True)
             rc, dummy, err = module.run_command("%s %s --force %s/%s" % (lvremove_cmd, test_opt, vg, this_lv['name']))
             if rc == 0:
@@ -527,7 +527,7 @@ def main():
                 if size_requested < 1:
                     module.fail_json(msg="Sorry, no shrinking of %s to 0 permitted." % (this_lv['name']))
                 elif not force:
-                    module.fail_json(msg="Sorry, no shrinking of %s without force=yes" % (this_lv['name']))
+                    module.fail_json(msg="Sorry, no shrinking of %s without force=true" % (this_lv['name']))
                 else:
                     tool = module.get_bin_path("lvreduce", required=True)
                     tool = '%s %s' % (tool, '--force')
@@ -561,7 +561,7 @@ def main():
                 if float(size) == 0:
                     module.fail_json(msg="Sorry, no shrinking of %s to 0 permitted." % (this_lv['name']))
                 if not force:
-                    module.fail_json(msg="Sorry, no shrinking of %s without force=yes." % (this_lv['name']))
+                    module.fail_json(msg="Sorry, no shrinking of %s without force=true." % (this_lv['name']))
                 else:
                     tool = module.get_bin_path("lvreduce", required=True)
                     tool = '%s %s' % (tool, '--force')

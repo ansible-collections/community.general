@@ -40,7 +40,7 @@ options:
     description:
       - Reload SELinux policy after commit.
     type: bool
-    default: yes
+    default: true
   ignore_selinux_state:
     description:
     - Run independent of selinux runtime state

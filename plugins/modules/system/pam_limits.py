@@ -69,23 +69,23 @@ options:
         the original file back if you somehow clobbered it incorrectly.
     required: false
     type: bool
-    default: "no"
+    default: false
   use_min:
     description:
-      - If set to C(yes), the minimal value will be used or conserved.
+      - If set to C(true), the minimal value will be used or conserved.
       - If the specified value is inferior to the value in the file,
         file content is replaced with the new value, else content is not modified.
     required: false
     type: bool
-    default: "no"
+    default: false
   use_max:
     description:
-      - If set to C(yes), the maximal value will be used or conserved.
+      - If set to C(true), the maximal value will be used or conserved.
       - If the specified value is superior to the value in the file,
         file content is replaced with the new value, else content is not modified.
     required: false
     type: bool
-    default: "no"
+    default: false
   dest:
     type: str
     description:
@@ -116,7 +116,7 @@ EXAMPLES = r'''
     limit_type: hard
     limit_item: fsize
     value: 1000000
-    use_max: yes
+    use_max: true
 
 - name: Add or modify memlock, both soft and hard, limit for the user james with a comment
   community.general.pam_limits:

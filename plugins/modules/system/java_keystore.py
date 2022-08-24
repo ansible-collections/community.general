@@ -76,7 +76,7 @@ options:
     description:
       - Keystore is created even if it already exists.
     type: bool
-    default: 'no'
+    default: false
   owner:
     description:
       - Name of the user that should own jks file.
