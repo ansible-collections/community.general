@@ -118,6 +118,19 @@ EXAMPLES = '''
     ansible.builtin.debug:
       msg: "{{ result.redfish_facts.virtual_media.entries | to_nice_json }}"
 
+  - name: Get Virtual Media information from Systems
+    community.general.redfish_info:
+      category: Systems
+      command: GetVirtualMedia
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+    register: result
+
+  - name: Print fetched information
+    ansible.builtin.debug:
+      msg: "{{ result.redfish_facts.virtual_media.entries | to_nice_json }}"
+
   - name: Get Volume Inventory
     community.general.redfish_info:
       category: Systems
@@ -303,7 +316,7 @@ CATEGORY_COMMANDS_ALL = {
     "Systems": ["GetSystemInventory", "GetPsuInventory", "GetCpuInventory",
                 "GetMemoryInventory", "GetNicInventory", "GetHealthReport",
                 "GetStorageControllerInventory", "GetDiskInventory", "GetVolumeInventory",
-                "GetBiosAttributes", "GetBootOrder", "GetBootOverride"],
+                "GetBiosAttributes", "GetBootOrder", "GetBootOverride", "GetVirtualMedia"],
     "Chassis": ["GetFanInventory", "GetPsuInventory", "GetChassisPower",
                 "GetChassisThermals", "GetChassisInventory", "GetHealthReport"],
     "Accounts": ["ListUsers"],
@@ -420,6 +433,8 @@ def main():
                     result["boot_override"] = rf_utils.get_multi_boot_override()
                 elif command == "GetHealthReport":
                     result["health_report"] = rf_utils.get_multi_system_health_report()
+                elif command == "GetVirtualMedia":
+                    result["virtual_media"] = rf_utils.get_multi_virtualmedia(category)
 
         elif category == "Chassis":
             # execute only if we find Chassis resource
@@ -485,7 +500,7 @@ def main():
                 if command == "GetManagerNicInventory":
                     result["manager_nics"] = rf_utils.get_multi_nic_inventory(category)
                 elif command == "GetVirtualMedia":
-                    result["virtual_media"] = rf_utils.get_multi_virtualmedia()
+                    result["virtual_media"] = rf_utils.get_multi_virtualmedia(category)
                 elif command == "GetLogs":
                     result["log"] = rf_utils.get_logs()
                 elif command == "GetNetworkProtocols":
