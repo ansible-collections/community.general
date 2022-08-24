@@ -58,7 +58,7 @@ options:
   subject:
     description:
     - The subject of the email being sent.
-    required: yes
+    required: true
     type: str
     aliases: [ msg ]
   body:

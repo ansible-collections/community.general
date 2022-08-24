@@ -63,7 +63,7 @@ options:
         applications that subsequently subscribe to the topic can received the last
         retained message immediately.
     type: bool
-    default: 'no'
+    default: false
   ca_cert:
     type: path
     description:

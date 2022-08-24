@@ -25,13 +25,13 @@ options:
     description:
       - The webhook ID.
       - "Format from Discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token})."
-    required: yes
+    required: true
     type: str
   webhook_token:
     description:
       - The webhook token.
       - "Format from Discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token})."
-    required: yes
+    required: true
     type: str
   content:
     description:

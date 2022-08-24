@@ -76,13 +76,13 @@ options:
     description:
       - Designates whether TLS/SSL should be used when connecting to the IRC server
     type: bool
-    default: 'no'
+    default: false
   part:
     description:
       - Designates whether user should part from channel after sending message or not.
         Useful for when using a faux bot and not wanting join/parts between messages.
     type: bool
-    default: 'yes'
+    default: true
   style:
     type: str
     description:
