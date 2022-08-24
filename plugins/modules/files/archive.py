@@ -64,7 +64,7 @@ options:
     description:
       - Remove any added source files and trees after adding to archive.
     type: bool
-    default: no
+    default: false
 notes:
     - Requires tarfile, zipfile, gzip and bzip2 packages on target host.
     - Requires lzma or backports.lzma if using xz format.
@@ -84,7 +84,7 @@ EXAMPLES = r'''
 - name: Compress regular file /path/to/foo into /path/to/foo.gz and remove it
   community.general.archive:
     path: /path/to/foo
-    remove: yes
+    remove: true
 
 - name: Create a zip archive of /path/to/foo
   community.general.archive:

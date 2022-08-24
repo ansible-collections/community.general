@@ -21,7 +21,7 @@ options:
     description:
     - The CSV filename to read data from.
     type: path
-    required: yes
+    required: true
     aliases: [ filename ]
   key:
     description:
@@ -45,7 +45,7 @@ options:
     description:
     - Whether the C(key) used is expected to be unique.
     type: bool
-    default: yes
+    default: true
   delimiter:
     description:
     - A one-character string used to separate fields.

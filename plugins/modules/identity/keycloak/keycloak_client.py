@@ -620,7 +620,7 @@ EXAMPLES = '''
     client_template: test
     use_template_config: False
     use_template_scope: false
-    use_template_mappers: no
+    use_template_mappers: false
     always_display_in_console: true
     registered_nodes:
       node01.example.com: 1507828202

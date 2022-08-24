@@ -109,7 +109,7 @@ EXAMPLES = '''
   community.general.elasticsearch_plugin:
     name: ingest-geoip
     state: present
-    force: yes
+    force: true
 '''
 
 import os
