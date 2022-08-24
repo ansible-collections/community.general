@@ -31,7 +31,7 @@ options:
     description:
       - Do not run unit tests.
     type: bool
-    default: no
+    default: false
   locallib:
     description:
       - Specify the install base to install modules.
@@ -44,12 +44,12 @@ options:
     description:
       - Use the mirror's index file instead of the CPAN Meta DB.
     type: bool
-    default: no
+    default: false
   installdeps:
     description:
       - Only install dependencies.
     type: bool
-    default: no
+    default: false
   version:
     description:
       - Version specification for the perl module. When I(mode) is C(new), C(cpanm) version operators are accepted.
@@ -122,7 +122,7 @@ EXAMPLES = '''
     mirror: 'http://cpan.cpantesters.org/'
 
 - name: Install Dancer perl package into the system root path
-  become: yes
+  become: true
   community.general.cpanm:
     name: Dancer
 
