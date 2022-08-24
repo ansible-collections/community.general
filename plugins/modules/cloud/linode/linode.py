@@ -26,7 +26,7 @@ options:
      - Linode API key.
      - C(LINODE_API_KEY) env variable can be used instead.
     type: str
-    required: yes
+    required: true
   name:
     description:
      - Name to give the instance (alphanumeric, dashes, underscore).
@@ -185,10 +185,10 @@ EXAMPLES = '''
      datacenter: 2
      distribution: 99
      password: 'superSecureRootPassword'
-     private_ip: yes
+     private_ip: true
      ssh_pub_key: 'ssh-rsa qwerty'
      swap: 768
-     wait: yes
+     wait: true
      wait_timeout: 600
      state: present
   delegate_to: localhost
@@ -203,10 +203,10 @@ EXAMPLES = '''
      distribution: 99
      kernel_id: 138
      password: 'superSecureRootPassword'
-     private_ip: yes
+     private_ip: true
      ssh_pub_key: 'ssh-rsa qwerty'
      swap: 768
-     wait: yes
+     wait: true
      wait_timeout: 600
      state: present
      alert_bwquota_enabled: True
@@ -239,7 +239,7 @@ EXAMPLES = '''
      password: 'superSecureRootPassword'
      ssh_pub_key: 'ssh-rsa qwerty'
      swap: 768
-     wait: yes
+     wait: true
      wait_timeout: 600
      state: present
   delegate_to: localhost

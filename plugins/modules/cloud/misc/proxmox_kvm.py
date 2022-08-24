@@ -20,7 +20,7 @@ options:
   acpi:
     description:
       - Specify if ACPI should be enabled/disabled.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(yes).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(true).
     type: bool
   agent:
     description:
@@ -38,7 +38,7 @@ options:
   autostart:
     description:
       - Specify if the VM should be automatically restarted after crash (currently ignored in PVE API).
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(no).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
     type: bool
   balloon:
     description:
@@ -160,7 +160,7 @@ options:
     description:
       - Allow to force stop VM.
       - Can be used with states C(stopped), C(restarted) and C(absent).
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(no).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
     type: bool
   format:
     description:
@@ -184,7 +184,7 @@ options:
       - For VM templates, we try to create a linked clone by default.
       - Used only with clone
     type: bool
-    default: 'yes'
+    default: true
   hostpci:
     description:
       - Specify a hash/dictionary of map host pci devices into guest. C(hostpci='{"key":"value", "key":"value"}').
@@ -238,7 +238,7 @@ options:
   kvm:
     description:
       - Enable/disable KVM hardware virtualization.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(yes).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(true).
     type: bool
   localtime:
     description:
@@ -314,7 +314,7 @@ options:
   onboot:
     description:
       - Specifies whether a VM will be started during system bootup.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(yes).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(true).
     type: bool
   ostype:
     description:
@@ -335,7 +335,7 @@ options:
     type: bool
   reboot:
     description:
-      - Allow reboot. If set to C(yes), the VM exit on reboot.
+      - Allow reboot. If set to C(true), the VM exit on reboot.
     type: bool
   revert:
     description:
@@ -437,7 +437,7 @@ options:
   tablet:
     description:
       - Enables/disables the USB tablet device.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(no).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
     type: bool
   tags:
     description:
@@ -459,7 +459,7 @@ options:
   template:
     description:
       - Enables/disables the template.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(no).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
     type: bool
   timeout:
     description:
@@ -468,12 +468,12 @@ options:
     default: 30
   update:
     description:
-      - If C(yes), the VM will be updated with new value.
+      - If C(true), the VM will be updated with new value.
       - Cause of the operations of the API and security reasons, I have disabled the update of the following parameters
       - C(net, virtio, ide, sata, scsi). Per example updating C(net) update the MAC address and C(virtio) create always new disk...
       - Update of C(pool) is disabled. It needs an additional API endpoint not covered by this module.
     type: bool
-    default: 'no'
+    default: false
   vcpus:
     description:
       - Sets number of hotplugged vcpus.
@@ -625,7 +625,7 @@ EXAMPLES = '''
     name: zavala
     node: sabrewulf
     storage: VMs
-    full: no
+    full: false
     format: unspecified
     timeout: 500
 
@@ -659,7 +659,7 @@ EXAMPLES = '''
     api_host: helldorado
     name: spynal
     node: sabrewulf
-    protection: yes
+    protection: true
 
 - name: Create new VM using cloud-init with a username and password
   community.general.proxmox_kvm:
@@ -724,7 +724,7 @@ EXAMPLES = '''
     name: spynal
     node: sabrewulf
     state: stopped
-    force: yes
+    force: true
 
 - name: Restart VM
   community.general.proxmox_kvm:
@@ -762,7 +762,7 @@ EXAMPLES = '''
     node: sabrewulf
     cores: 8
     memory: 16384
-    update: yes
+    update: true
 
 - name: Delete QEMU parameters
   community.general.proxmox_kvm:
@@ -1394,7 +1394,7 @@ def main():
                 if module.params['force']:
                     proxmox.stop_vm(vm, True)
                 else:
-                    module.exit_json(changed=False, vmid=vmid, msg="VM %s is running. Stop it before deletion or use force=yes." % vmid)
+                    module.exit_json(changed=False, vmid=vmid, msg="VM %s is running. Stop it before deletion or use force=true." % vmid)
             taskid = proxmox_node.qemu.delete(vmid)
             if not proxmox.wait_for_task(vm['node'], taskid):
                 module.fail_json(msg='Reached timeout while waiting for removing VM. Last line in task before timeout: %s' %

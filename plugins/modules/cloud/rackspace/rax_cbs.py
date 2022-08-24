@@ -62,7 +62,7 @@ options:
     description:
       - wait for the volume to be in state 'available' before returning
     type: bool
-    default: 'no'
+    default: false
   wait_timeout:
     type: int
     description:
@@ -91,7 +91,7 @@ EXAMPLES = '''
         volume_type: SSD
         size: 150
         region: DFW
-        wait: yes
+        wait: true
         state: present
         meta:
           app: my-cool-app
