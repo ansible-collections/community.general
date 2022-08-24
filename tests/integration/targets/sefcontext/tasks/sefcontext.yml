@@ -100,3 +100,56 @@
     that:
     - sixth is not changed
     - sixth.setype == 'unlabeled_t'
+
+#
+# NB: file equivalancy exists, or doesn't
+#
+- name: Create SELinux equivalance of /var/lib/pgsql for /tmp/foo
+  sefcontext:
+    equiv: '/var/lib/pgsql'
+    path: '/tmp/foo'
+    setype: 'many_t'
+    reload: no
+  register: equiv1
+
+- assert:
+    that:
+      - equiv1 is changed
+
+- name: Create SELinux equivalance of /var/lib/pgsql /tmp/foo (again)
+  sefcontext:
+    equiv: '/var/lib/pgsql'
+    path: '/tmp/foo'
+    setype: 'many_t'
+    reload: no
+  register: equiv2
+
+- assert:
+    that:
+      - equiv2 is not changed
+
+- name: Delete SELinux equivalance of /var/lib/pgsql for /tmp/foo
+  sefcontext:
+    state: absent
+    equiv: '/var/lib/pgsql'
+    path: '/tmp/foo'
+    setype: 'many_t'
+    reload: no
+  register: equiv3
+
+- assert:
+    that:
+      - equiv3 is changed
+
+- name: Delete SELinux equivalance of /var/lib/pgsql for /tmp/foo (again)
+  sefcontext:
+    state: absent
+    equiv: '/var/lib/pgsql'
+    path: '/tmp/foo'
+    setype: 'many_t'
+    reload: no
+  register: equiv4
+
+- assert:
+    that:
+      - equiv4 is not changed

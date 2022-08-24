@@ -22,6 +22,14 @@ options:
     type: str
     required: yes
     aliases: [ path ]
+  equiv:
+    description:
+    - set target selinux equivalence to this path.
+    - setype must be set, the bogus 'many_t' works.
+    - when set, ftype, seuser, selevel are ignored.
+    type: str
+    required: no
+    default: None
   ftype:
     description:
     - The file type that should have SELinux contexts applied.
@@ -94,6 +102,27 @@ EXAMPLES = r'''
 
 - name: Apply new SELinux file context to filesystem
   ansible.builtin.command: restorecon -irv /srv/git_repos
+
+
+- name: Create SELinux equivalance of /var/lib/pgsql for /tmp/foo
+  community.general.sefcontext:
+    state: present
+    equiv: '/var/lib/pgsql'
+    path: '/tmp/foo'
+    setype: 'many_t'  # setype 'many_t' does not exist, but works with no conflicts.
+    reload: no
+
+- name: Apply new SELinux equivalence to /tmp/foo
+  ansible.builtin.command: restorecon -irv /tmp/foo
+
+# remove the previous equivalence mapping
+- name: Delete SELinux equivalance of /var/lib/pgsql for /tmp/foo
+  sefcontext:
+    state: absent
+    equiv: '/var/lib/pgsql'
+    path: '/tmp/foo'
+    setype: 'many_t'
+    reload: no
 '''
 
 RETURN = r'''
@@ -246,6 +275,79 @@ def semanage_fcontext_delete(module, result, target, ftype, do_reload, sestore='
     module.exit_json(changed=changed, **result)
 
 
+def semanage_fcontext_equivalence(sefcontext, target):
+    ''' Test if equivalence exists for target in policy. Return None if it does not exist. '''
+    try:
+        # this is for the shipped equivs.
+        return sefcontext.equiv_dist[target]
+    except KeyError:
+        try:
+            # these are the local added items.
+            return sefcontext.equiv[target]
+        except KeyError:
+            return None
+
+
+def semanage_fcontext_equiv_add(module, result, target, equiv, do_reload, sestore=''):
+    ''' Add or modify SELinux directory equivalence mapping definition to the policy. '''
+
+    changed = False
+    prepared_diff = ''
+
+    try:
+        sefcontext = seobject.fcontextRecords(sestore)
+        sefcontext.set_reload(do_reload)
+        exists = semanage_fcontext_equivalence(sefcontext, target)
+        if exists:
+            module.exit_json(changed=changed, exists=exists, **result)
+
+        if not module.check_mode:
+            sefcontext.add_equal(target, equiv)
+
+        changed = True
+
+        if module._diff:
+            prepared_diff += '# Change to semanage file equivalence mappings\n'
+            prepared_diff += '+%s      %s\n' % (target, equiv)
+
+    except Exception as e:
+        module.fail_json(msg="%s: %s\n" % (e.__class__.__name__, to_native(e)))
+
+    if module._diff and prepared_diff:
+        result['diff'] = dict(prepared=prepared_diff)
+
+    module.exit_json(changed=changed, **result)
+
+
+def semanage_fcontext_equiv_delete(module, result, target, equiv, do_reload, sestore=''):
+    ''' Delete SELinux file directory equivalence mapping definition from the policy. '''
+
+    changed = False
+    prepared_diff = ''
+
+    try:
+        sefcontext = seobject.fcontextRecords(sestore)
+        sefcontext.set_reload(do_reload)
+        exists = semanage_fcontext_equivalence(sefcontext, target)
+
+        if exists:
+            if not module.check_mode:
+                sefcontext.delete(target, equiv)
+            changed = True
+
+        if module._diff:
+            prepared_diff += '# Deletion to semanage equivalence mappings\n'
+            prepared_diff += '-%s      %s\n' % (target, equiv)
+
+    except Exception as e:
+        module.fail_json(msg="%s: %s\n" % (e.__class__.__name__, to_native(e)))
+
+    if module._diff and prepared_diff:
+        result['diff'] = dict(prepared=prepared_diff)
+
+    module.exit_json(changed=changed, **result)
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -257,6 +359,7 @@ def main():
             selevel=dict(type='str', aliases=['serange']),
             state=dict(type='str', default='present', choices=['absent', 'present']),
             reload=dict(type='bool', default=True),
+            equiv=dict(type='str'),
         ),
         supports_check_mode=True,
     )
@@ -278,13 +381,20 @@ def main():
     serange = module.params['selevel']
     state = module.params['state']
     do_reload = module.params['reload']
+    equiv = module.params['equiv']
 
     result = dict(target=target, ftype=ftype, setype=setype, state=state)
 
     if state == 'present':
-        semanage_fcontext_modify(module, result, target, ftype, setype, do_reload, serange, seuser)
+        if equiv:
+            semanage_fcontext_equiv_add(module, result, target, equiv, do_reload)
+        else:
+            semanage_fcontext_modify(module, result, target, ftype, setype, do_reload, serange, seuser)
     elif state == 'absent':
-        semanage_fcontext_delete(module, result, target, ftype, do_reload)
+        if equiv:
+            semanage_fcontext_equiv_delete(module, result, target, equiv, do_reload)
+        else:
+            semanage_fcontext_delete(module, result, target, ftype, do_reload)
     else:
         module.fail_json(msg='Invalid value of argument "state": {0}'.format(state))
 
