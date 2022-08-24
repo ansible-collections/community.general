@@ -80,7 +80,7 @@ options:
     description:
       - Whether the body is html content that should be rendered.
     type: bool
-    default: 'no'
+    default: false
   headers:
     type: dict
     description:
@@ -89,7 +89,7 @@ options:
     type: str
     description:
       - The e-mail body content.
-    required: yes
+    required: true
 author: "Matt Makai (@makaimc)"
 '''
 
