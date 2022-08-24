@@ -50,16 +50,16 @@ options:
         a regular file as their target I(dev).
       - Support for character devices on FreeBSD has been added in community.general 3.4.0.
     type: path
-    required: yes
+    required: true
     aliases: [device]
   force:
     description:
-      - If C(yes), allows to create new filesystem on devices that already has filesystem.
+      - If C(true), allows to create new filesystem on devices that already has filesystem.
     type: bool
-    default: 'no'
+    default: false
   resizefs:
     description:
-      - If C(yes), if the block device and filesystem size differ, grow the filesystem into the space.
+      - If C(true), if the block device and filesystem size differ, grow the filesystem into the space.
       - Supported for C(btrfs), C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs), C(ufs) and C(vfat) filesystems.
         Attempts to resize other filesystem types will fail.
       - XFS Will only grow if mounted. Currently, the module is based on commands
@@ -67,7 +67,7 @@ options:
         not supported on FreeBSD systems.
       - vFAT will likely fail if fatresize < 1.04.
     type: bool
-    default: 'no'
+    default: false
   opts:
     description:
       - List of options to be passed to mkfs command.
@@ -82,7 +82,7 @@ notes:
   - Potential filesystems on I(dev) are checked using C(blkid). In case C(blkid)
     is unable to detect a filesystem (and in case C(fstyp) on FreeBSD is also
     unable to detect a filesystem), this filesystem is overwritten even if
-    I(force) is C(no).
+    I(force) is C(false).
   - On FreeBSD systems, both C(e2fsprogs) and C(util-linux) packages provide
     a C(blkid) command that is compatible with this module. However, these
     packages conflict with each other, and only the C(util-linux) package
@@ -581,7 +581,7 @@ def main():
 
             module.exit_json(changed=True, msg=out)
         elif fs and not force:
-            module.fail_json(msg="'%s' is already used as %s, use force=yes to overwrite" % (dev, fs), rc=rc, err=err)
+            module.fail_json(msg="'%s' is already used as %s, use force=true to overwrite" % (dev, fs), rc=rc, err=err)
 
         # create fs
         filesystem.create(mkfs_opts, dev)

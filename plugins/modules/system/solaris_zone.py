@@ -53,7 +53,7 @@ options:
     description:
       - Whether to create a sparse (C(true)) or whole root (C(false)) zone.
     type: bool
-    default: no
+    default: false
   root_password:
     description:
       - The password hash for the root account. If not specified, the zone's root account

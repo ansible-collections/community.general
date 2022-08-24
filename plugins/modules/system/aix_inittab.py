@@ -21,13 +21,13 @@ options:
     description:
     - Name of the inittab entry.
     type: str
-    required: yes
+    required: true
     aliases: [ service ]
   runlevel:
     description:
     - Runlevel of the entry.
     type: str
-    required: yes
+    required: true
   action:
     description:
     - Action what the init has to do with this entry.
@@ -49,7 +49,7 @@ options:
     description:
     - What command has to run.
     type: str
-    required: yes
+    required: true
   insertafter:
     description:
     - After which inittabline should the new entry inserted.
@@ -78,7 +78,7 @@ EXAMPLES = '''
     command: echo hello
     insertafter: existingservice
     state: present
-  become: yes
+  become: true
 
 # Change inittab entry startmyservice to runlevel "2" and processaction "wait".
 - name: Change startmyservice to inittab
@@ -88,7 +88,7 @@ EXAMPLES = '''
     action: wait
     command: echo hello
     state: present
-  become: yes
+  become: true
 
 - name: Remove startmyservice from inittab
   community.general.aix_inittab:
@@ -97,7 +97,7 @@ EXAMPLES = '''
     action: wait
     command: echo hello
     state: absent
-  become: yes
+  become: true
 '''
 
 RETURN = '''

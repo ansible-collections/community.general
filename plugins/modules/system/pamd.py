@@ -95,7 +95,7 @@ options:
        - Create a backup file including the timestamp information so you can
          get the original file back if you somehow clobbered it incorrectly.
      type: bool
-     default: no
+     default: false
 '''
 
 EXAMPLES = r'''

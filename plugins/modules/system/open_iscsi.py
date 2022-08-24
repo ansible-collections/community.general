@@ -78,7 +78,7 @@ options:
         - Whether the list of target nodes on the portal should be
           (re)discovered and added to the persistent iSCSI database.
         - Keep in mind that C(iscsiadm) discovery resets configuration, like C(node.startup)
-          to manual, hence combined with C(auto_node_startup=yes) will always return
+          to manual, hence combined with C(auto_node_startup=true) will always return
           a changed state.
         type: bool
         default: false
@@ -100,31 +100,31 @@ options:
 EXAMPLES = r'''
 - name: Perform a discovery on sun.com and show available target nodes
   community.general.open_iscsi:
-    show_nodes: yes
-    discover: yes
+    show_nodes: true
+    discover: true
     portal: sun.com
 
 - name: Perform a discovery on 10.1.2.3 and show available target nodes
   community.general.open_iscsi:
-    show_nodes: yes
-    discover: yes
+    show_nodes: true
+    discover: true
     ip: 10.1.2.3
 
 # NOTE: Only works if exactly one target is exported to the initiator
 - name: Discover targets on portal and login to the one available
   community.general.open_iscsi:
     portal: '{{ iscsi_target }}'
-    login: yes
-    discover: yes
+    login: true
+    discover: true
 
 - name: Connect to the named target, after updating the local persistent database (cache)
   community.general.open_iscsi:
-    login: yes
+    login: true
     target: iqn.1986-03.com.sun:02:f8c1f9e0-c3ec-ec84-c9c9-8bfb0cd5de3d
 
 - name: Disconnect from the cached named target
   community.general.open_iscsi:
-    login: no
+    login: false
     target: iqn.1986-03.com.sun:02:f8c1f9e0-c3ec-ec84-c9c9-8bfb0cd5de3d
 
 - name: Override and disable automatic portal login on specific portal

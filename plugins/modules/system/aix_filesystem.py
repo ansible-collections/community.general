@@ -24,18 +24,20 @@ options:
     description:
       - Specifies whether the file system is to be processed by the accounting subsystem.
     type: bool
-    default: no
+    default: false
   attributes:
     description:
       - Specifies attributes for files system separated by comma.
     type: list
     elements: str
-    default: agblksize='4096',isnapshot='no'
+    default:
+      - agblksize='4096'
+      - isnapshot='no'
   auto_mount:
     description:
       - File system is automatically mounted at system restart.
     type: bool
-    default: yes
+    default: true
   device:
     description:
       - Logical volume (LV) device name or remote export device to create a NFS file system.
@@ -70,7 +72,7 @@ options:
     description:
       - Removes the mount point directory when used with state C(absent).
     type: bool
-    default: no
+    default: false
   size:
     description:
       - Specifies the file system size.
@@ -149,13 +151,13 @@ EXAMPLES = r'''
 - name: Remove NFS filesystem /home/ftp.
   community.general.aix_filesystem:
     filesystem: /home/ftp
-    rm_mount_point: yes
+    rm_mount_point: true
     state: absent
 
 - name: Remove /newfs.
   community.general.aix_filesystem:
     filesystem: /newfs
-    rm_mount_point: yes
+    rm_mount_point: true
     state: absent
 '''
 

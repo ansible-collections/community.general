@@ -59,7 +59,7 @@ EXAMPLES = r'''
   community.general.make:
     chdir: /home/ubuntu/cool-project
     target: install
-  become: yes
+  become: true
 
 - name: Build 'all' target with extra arguments
   community.general.make:
