@@ -73,7 +73,7 @@ options:
     description:
     - Wait for the load-balancer to reach its desired state before returning.
     type: bool
-    default: 'no'
+    default: false
 
   wait_timeout:
     type: int

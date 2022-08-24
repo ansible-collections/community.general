@@ -43,7 +43,7 @@ options:
     description:
       - Whether to wait for the tasks to finish before returning.
     type: bool
-    default: 'yes'
+    default: true
 requirements:
     - python = 2.7
     - requests >= 2.5.0

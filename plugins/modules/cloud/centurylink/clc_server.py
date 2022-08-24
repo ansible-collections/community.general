@@ -25,7 +25,7 @@ options:
     description:
       - Whether to add a public ip to the server
     type: bool
-    default: 'no'
+    default: false
   alias:
     description:
       - The account alias to provision the servers under.
@@ -96,8 +96,8 @@ options:
     description:
       - Whether to create the server as 'Managed' or not.
     type: bool
-    default: 'no'
-    required: False
+    default: false
+    required: false
   memory:
     description:
       - Memory in GB.
@@ -194,7 +194,7 @@ options:
     description:
       - Whether to wait for the provisioning tasks to finish before returning.
     type: bool
-    default: 'yes'
+    default: true
 requirements:
     - python = 2.7
     - requests >= 2.5.0
