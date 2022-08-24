@@ -44,7 +44,7 @@ options:
         description:
             - A boolean switch to make a secure or insecure connection to the server.
         type: bool
-        default: no
+        default: false
     name:
         description:
             - The name of the VM.
@@ -107,7 +107,7 @@ options:
         description:
             - To make your VM High Available.
         type: bool
-        default: yes
+        default: true
     disks:
         description:
             - This option uses complex arguments and is a list of disks with the options name, size and domain.
@@ -129,7 +129,7 @@ options:
         description:
             - This option sets the delete protection checkbox.
         type: bool
-        default: yes
+        default: true
     cd_drive:
         description:
             - The CD you wish to have mounted on the VM when I(state = 'CD').
@@ -308,7 +308,7 @@ EXAMPLES = r'''
       network: rhevm
       ip: 172.31.222.200
       netmask: 255.255.255.0
-      management: yes
+      management: true
     - name: bond0.36
       network: vlan36
       ip: 10.2.36.200

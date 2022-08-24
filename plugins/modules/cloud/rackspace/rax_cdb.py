@@ -20,7 +20,7 @@ options:
     type: str
     description:
       - Name of the databases server instance
-    required: yes
+    required: true
   flavor:
     type: int
     description:
@@ -54,7 +54,7 @@ options:
     description:
       - wait for the instance to be in state 'running' before returning
     type: bool
-    default: 'no'
+    default: false
   wait_timeout:
     type: int
     description:
@@ -81,7 +81,7 @@ EXAMPLES = '''
         volume: 2
         cdb_type: MySQL
         cdb_version: 5.6
-        wait: yes
+        wait: true
         state: present
       register: rax_db_server
 '''

@@ -33,7 +33,7 @@ options:
     type: str
     description:
       - Name to give the load balancer
-    required: yes
+    required: true
   port:
     type: int
     description:
@@ -93,7 +93,7 @@ options:
     description:
       - wait for the balancer to be in state 'running' before returning
     type: bool
-    default: 'no'
+    default: false
   wait_timeout:
     type: int
     description:
@@ -124,7 +124,7 @@ EXAMPLES = '''
         type: SERVICENET
         timeout: 30
         region: DFW
-        wait: yes
+        wait: true
         state: present
         meta:
           app: my-cool-app

@@ -357,8 +357,8 @@ EXAMPLES = '''
     state: present
     alias: fw_zone
     image_uuid: 95f265b8-96b2-11e6-9597-972f3af4b6d5
-    firewall_enabled: yes
-    indestructible_zoneroot: yes
+    firewall_enabled: true
+    indestructible_zoneroot: true
     nics:
       - nic_tag: admin
         ip: dhcp

@@ -26,7 +26,7 @@ options:
     type: str
     description:
       - Label (name) to give the network
-    required: yes
+    required: true
   cidr:
     type: str
     description:

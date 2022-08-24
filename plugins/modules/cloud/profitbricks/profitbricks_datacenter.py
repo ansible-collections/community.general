@@ -45,7 +45,7 @@ options:
     description:
       - wait for the datacenter to be created before returning
     required: false
-    default: "yes"
+    default: true
     type: bool
   wait_timeout:
     description:
