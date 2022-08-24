@@ -19,7 +19,7 @@ options:
     description:
       - Attach read-only configuration drive to server as label config-2
     type: bool
-    default: 'no'
+    default: false
   cooldown:
     type: int
     description:
@@ -112,7 +112,7 @@ options:
       - wait for the scaling group to finish provisioning the minimum amount of
         servers
     type: bool
-    default: 'no'
+    default: false
   wait_timeout:
     type: int
     description:

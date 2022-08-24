@@ -80,22 +80,22 @@ options:
     description:
       - Flag to determine if the instance should be hourly billed.
     type: bool
-    default: 'yes'
+    default: true
   private:
     description:
       - Flag to determine if the instance should be private only.
     type: bool
-    default: 'no'
+    default: false
   dedicated:
     description:
       - Flag to determine if the instance should be deployed in dedicated space.
     type: bool
-    default: 'no'
+    default: false
   local_disk:
     description:
       - Flag to determine if local disk should be used for the new instance.
     type: bool
-    default: 'yes'
+    default: true
   cpus:
     description:
       - Count of cpus to be assigned to new virtual instance.
@@ -158,7 +158,7 @@ options:
     description:
       - Flag used to wait for active status before returning.
     type: bool
-    default: 'yes'
+    default: true
   wait_time:
     description:
       - Time in seconds before wait returns.
@@ -174,7 +174,7 @@ author:
 EXAMPLES = '''
 - name: Build instance
   hosts: localhost
-  gather_facts: no
+  gather_facts: false
   tasks:
   - name: Build instance request
     community.general.sl_vm:
@@ -182,19 +182,19 @@ EXAMPLES = '''
       domain: anydomain.com
       datacenter: dal09
       tags: ansible-module-test
-      hourly: yes
-      private: no
-      dedicated: no
-      local_disk: yes
+      hourly: true
+      private: false
+      dedicated: false
+      local_disk: true
       cpus: 1
       memory: 1024
       disks: [25]
       os_code: UBUNTU_LATEST
-      wait: no
+      wait: false
 
 - name: Build additional instances
   hosts: localhost
-  gather_facts: no
+  gather_facts: false
   tasks:
   - name: Build instances request
     community.general.sl_vm:
@@ -219,10 +219,10 @@ EXAMPLES = '''
         tags:
           - ansible-module-test
           - ansible-module-test-replicas
-        hourly: yes
-        private: no
-        dedicated: no
-        local_disk: yes
+        hourly: true
+        private: false
+        dedicated: false
+        local_disk: true
         cpus: 1
         memory: 1024
         disks:
@@ -237,10 +237,10 @@ EXAMPLES = '''
         tags:
           - ansible-module-test
           - ansible-module-test-replicas
-        hourly: yes
-        private: no
-        dedicated: no
-        local_disk: yes
+        hourly: true
+        private: false
+        dedicated: false
+        local_disk: true
         cpus: 1
         memory: 1024
         disks:
@@ -248,11 +248,11 @@ EXAMPLES = '''
           - 100
         os_code: UBUNTU_LATEST
         ssh_keys: []
-        wait: yes
+        wait: true
 
 - name: Cancel instances
   hosts: localhost
-  gather_facts: no
+  gather_facts: false
   tasks:
   - name: Cancel by tag
     community.general.sl_vm:

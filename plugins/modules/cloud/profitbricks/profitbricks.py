@@ -20,7 +20,7 @@ options:
     description:
       - Whether or not to increment a single number in the name for created virtual machines.
     type: bool
-    default: 'yes'
+    default: true
   name:
     description:
       - The name of the virtual machine.
@@ -89,7 +89,7 @@ options:
     description:
       - This will assign the machine to the public LAN. If no LAN exists with public Internet access it is created.
     type: bool
-    default: 'no'
+    default: false
   lan:
     description:
       - The ID of the LAN you wish to add the servers to.
@@ -107,7 +107,7 @@ options:
     description:
       - wait for the instance to be in state 'running' before returning
     type: bool
-    default: 'yes'
+    default: true
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
@@ -117,7 +117,7 @@ options:
     description:
       - remove the bootVolume of the virtual machine you're destroying.
     type: bool
-    default: 'yes'
+    default: true
   state:
     description:
       - create or terminate instances
