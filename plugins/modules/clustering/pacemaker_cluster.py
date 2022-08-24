@@ -37,13 +37,13 @@ options:
       description:
         - Force the change of the cluster state
       type: bool
-      default: 'yes'
+      default: true
 '''
 EXAMPLES = '''
 ---
 - name: Set cluster Online
   hosts: localhost
-  gather_facts: no
+  gather_facts: false
   tasks:
   - name: Get cluster state
     community.general.pacemaker_cluster:

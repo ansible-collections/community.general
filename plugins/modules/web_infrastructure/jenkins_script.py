@@ -33,11 +33,11 @@ options:
     default: http://localhost:8080
   validate_certs:
     description:
-      - If set to C(no), the SSL certificates will not be validated.
-        This should only set to C(no) used on personally controlled sites
+      - If set to C(false), the SSL certificates will not be validated.
+        This should only set to C(false) used on personally controlled sites
         using self-signed certificates as it avoids verifying the source site.
     type: bool
-    default: 'yes'
+    default: true
   user:
     type: str
     description:
@@ -90,7 +90,7 @@ EXAMPLES = '''
     user: admin
     password: admin
     url: https://localhost
-    validate_certs: no
+    validate_certs: false
 '''
 
 RETURN = '''

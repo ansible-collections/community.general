@@ -41,7 +41,7 @@ options:
     description:
       - Decides if the sandbox API should be used. Otherwise (default) the production API of DNS Made Easy is used.
     type: bool
-    default: 'no'
+    default: false
 
   record_name:
     description:
@@ -80,16 +80,16 @@ options:
 
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be used
+      - If C(false), SSL certificates will not be validated. This should only be used
         on personally controlled sites using self-signed certificates.
     type: bool
-    default: 'yes'
+    default: true
 
   monitor:
     description:
-      - If C(yes), add or change the monitor.  This is applicable only for A records.
+      - If C(true), add or change the monitor.  This is applicable only for A records.
     type: bool
-    default: 'no'
+    default: false
 
   systemDescription:
     description:
@@ -147,16 +147,16 @@ options:
 
   failover:
     description:
-      - If C(yes), add or change the failover.  This is applicable only for A records.
+      - If C(true), add or change the failover.  This is applicable only for A records.
     type: bool
-    default: 'no'
+    default: false
 
   autoFailover:
     description:
       - If true, fallback to the primary IP address is manual after a failover.
       - If false, fallback to the primary IP address is automatic after a failover.
     type: bool
-    default: 'no'
+    default: false
 
   ip1:
     description:
@@ -283,7 +283,7 @@ EXAMPLES = '''
     record_name: test
     record_type: A
     record_value: 127.0.0.1
-    monitor: yes
+    monitor: true
     ip1: 127.0.0.2
     protocol: HTTP  # default
     port: 80  # default
@@ -300,7 +300,7 @@ EXAMPLES = '''
     record_name: test
     record_type: A
     record_value: 127.0.0.1
-    monitor: yes
+    monitor: true
     ip1: 127.0.0.2
     protocol: HTTP  # default
     port: 80  # default
@@ -323,7 +323,7 @@ EXAMPLES = '''
     failover: True
     ip1: 127.0.0.2
     ip2: 127.0.0.3
-    monitor: yes
+    monitor: true
     protocol: HTTPS
     port: 443
     maxEmails: 1
@@ -339,7 +339,7 @@ EXAMPLES = '''
     record_name: test
     record_type: A
     record_value: 127.0.0.1
-    failover: no
+    failover: false
 
 - name: Remove a monitor
   community.general.dnsmadeeasy:
@@ -350,7 +350,7 @@ EXAMPLES = '''
     record_name: test
     record_type: A
     record_value: 127.0.0.1
-    monitor: no
+    monitor: false
 '''
 
 # ============================================

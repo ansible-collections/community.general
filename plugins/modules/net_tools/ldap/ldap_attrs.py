@@ -62,9 +62,9 @@ options:
   ordered:
     required: false
     type: bool
-    default: 'no'
+    default: false
     description:
-      - If C(yes), prepend list values with X-ORDERED index numbers in all
+      - If C(true), prepend list values with X-ORDERED index numbers in all
         attributes specified in the current task. This is useful mostly with
         I(olcAccess) attribute to easily manage LDAP Access Control Lists.
 extends_documentation_fragment:
@@ -115,7 +115,7 @@ EXAMPLES = r'''
             to dn.base="dc=example,dc=com"
             by dn="cn=admin,dc=example,dc=com" write
             by * read
-    ordered: yes
+    ordered: true
     state: exact
 
 - name: Declare some indexes
