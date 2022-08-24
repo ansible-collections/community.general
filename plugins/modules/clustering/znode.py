@@ -48,7 +48,7 @@ options:
         description:
             - Recursively delete node and all its children.
         type: bool
-        default: 'no'
+        default: false
 requirements:
     - kazoo >= 2.1
     - python >= 2.6

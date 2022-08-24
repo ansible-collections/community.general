@@ -54,10 +54,10 @@ options:
   create:
     required: false
     type: bool
-    default: "yes"
+    default: true
     description:
       - Used with C(state=present). If specified, the file will be created
-        if it does not already exist. If set to "no", will fail if the
+        if it does not already exist. If set to C(false), will fail if the
         file does not exist
 notes:
   - "This module depends on the I(passlib) Python library, which needs to be installed on all target systems."
