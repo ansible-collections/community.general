@@ -118,7 +118,7 @@ EXAMPLES = r'''
     cert_path: /opt/certs/rootca.crt
     keystore_path: /tmp/cacerts
     keystore_pass: changeit
-    keystore_create: yes
+    keystore_create: true
     state: present
     cert_alias: LE_RootCA
     trust_cacert: True
@@ -128,7 +128,7 @@ EXAMPLES = r'''
     cert_url: google.com
     keystore_path: /tmp/cacerts
     keystore_pass: changeit
-    keystore_create: yes
+    keystore_create: true
     state: present
 
 - name: Import a pkcs12 keystore with a specified alias, create it if it doesn't exist
@@ -137,7 +137,7 @@ EXAMPLES = r'''
     cert_alias: default
     keystore_path: /opt/wildfly/standalone/configuration/defaultkeystore.jks
     keystore_pass: changeit
-    keystore_create: yes
+    keystore_create: true
     state: present
 
 - name: Import SSL certificate to JCEKS keystore
@@ -149,7 +149,7 @@ EXAMPLES = r'''
     keystore_path: /opt/someapp/security/keystore.jceks
     keystore_type: "JCEKS"
     keystore_pass: changeit
-    keystore_create: yes
+    keystore_create: true
     state: present
 '''
 

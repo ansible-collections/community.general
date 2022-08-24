@@ -195,7 +195,7 @@ EXAMPLES = '''
     password: myreallysecurepassword1!
     state: present
     disksize: 10G
-    resize: yes
+    resize: true
 
 - name: Remove an existing user 'janet'
   community.general.homectl:

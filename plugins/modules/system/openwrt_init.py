@@ -63,7 +63,7 @@ EXAMPLES = '''
 - name: Enable service httpd
   community.general.openwrt_init:
     name: httpd
-    enabled: yes
+    enabled: true
 '''
 
 RETURN = '''

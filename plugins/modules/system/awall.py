@@ -34,7 +34,7 @@ options:
       - Activate the new firewall rules.
       - Can be run with other steps or on its own.
     type: bool
-    default: no
+    default: false
 '''
 
 EXAMPLES = r'''
@@ -49,11 +49,11 @@ EXAMPLES = r'''
     - foo
     - bar
     state: disabled
-    activate: no
+    activate: false
 
 - name: Activate currently enabled firewall rules
   community.general.awall:
-    activate: yes
+    activate: true
 '''
 
 RETURN = ''' # '''

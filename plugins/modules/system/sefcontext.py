@@ -19,7 +19,7 @@ options:
     description:
     - Target path (expression).
     type: str
-    required: yes
+    required: true
     aliases: [ path ]
   ftype:
     description:
@@ -40,7 +40,7 @@ options:
     description:
     - SELinux type for the specified target.
     type: str
-    required: yes
+    required: true
   seuser:
     description:
     - SELinux user for the specified target.
@@ -61,12 +61,12 @@ options:
     - Reload SELinux policy after commit.
     - Note that this does not apply SELinux file contexts to existing files.
     type: bool
-    default: yes
+    default: true
   ignore_selinux_state:
     description:
     - Useful for scenarios (chrooted environment) that you can't get the real SELinux state.
     type: bool
-    default: no
+    default: false
 notes:
 - The changes are persistent across reboots.
 - The M(community.general.sefcontext) module does not modify existing files to the new
