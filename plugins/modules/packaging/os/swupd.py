@@ -71,7 +71,7 @@ options:
 EXAMPLES = '''
 - name: Update the OS to the latest version
   community.general.swupd:
-    update: yes
+    update: true
 
 - name: Installs the "foo" bundle
   community.general.swupd:
@@ -85,11 +85,11 @@ EXAMPLES = '''
 
 - name: Check integrity of filesystem
   community.general.swupd:
-    verify: yes
+    verify: true
 
 - name: Downgrade OS to release 12920
   community.general.swupd:
-    verify: yes
+    verify: true
     manifest: 12920
 '''
 
