@@ -85,7 +85,7 @@ options:
     description:
       - Specifies whether the certificate needs to be validated while communicating.
     type: bool
-    default: no
+    default: false
 extends_documentation_fragment:
 - community.general.hpe3par
 
@@ -108,7 +108,7 @@ EXAMPLES = r'''
     set_size: 8
     high_availability: MAG
     disk_type: FC
-    secure: no
+    secure: false
 
 - name: Delete CPG sample_cpg
   community.general.ss_3par_cpg:
@@ -117,7 +117,7 @@ EXAMPLES = r'''
     storage_system_password: password
     state: absent
     cpg_name: sample_cpg
-    secure: no
+    secure: false
 '''
 
 RETURN = r'''
