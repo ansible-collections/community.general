@@ -26,7 +26,7 @@ DOCUMENTATION = '''
     options:
       plugin:
         description: The name of this plugin, it should always be set to C(community.general.proxmox) for this plugin to recognize it as it's own.
-        required: yes
+        required: true
         choices: ['community.general.proxmox']
         type: str
       url:
@@ -44,7 +44,7 @@ DOCUMENTATION = '''
           - Proxmox authentication user.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_USER) will be used instead.
           - Since community.general 4.7.0 you can also use templating to specify the value of the I(user).
-        required: yes
+        required: true
         type: str
         env:
           - name: PROXMOX_USER
@@ -83,7 +83,7 @@ DOCUMENTATION = '''
       validate_certs:
         description: Verify SSL certificate if using HTTPS.
         type: boolean
-        default: yes
+        default: true
       group_prefix:
         description: Prefix to apply to Proxmox groups.
         default: proxmox_
@@ -98,14 +98,14 @@ DOCUMENTATION = '''
           - When I(want_facts) is set to C(true) more details about QEMU VM status are possible, besides the running and stopped states.
             Currently if the VM is running and it is suspended, the status will be running and the machine will be in C(running) group,
             but its actual state will be paused. See I(qemu_extended_statuses) for how to retrieve the real status.
-        default: no
+        default: false
         type: bool
       qemu_extended_statuses:
         description:
           - Requires I(want_facts) to be set to C(true) to function. This will allow you to differentiate betweend C(paused) and C(prelaunch)
             statuses of the QEMU VMs.
           - This introduces multiple groups [prefixed with I(group_prefix)] C(prelaunch) and C(paused).
-        default: no
+        default: false
         type: bool
         version_added: 5.1.0
       want_proxmox_nodes_ansible_host:
