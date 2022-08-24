@@ -40,7 +40,7 @@ options:
               This option can only be specified if there is a single snap in the task.
         type: bool
         required: false
-        default: no
+        default: false
     channel:
         description:
             - Define which release of a snap is installed and tracked for updates.
@@ -104,7 +104,7 @@ EXAMPLES = '''
 - name: Install "foo" with option --classic
   community.general.snap:
     name: foo
-    classic: yes
+    classic: true
 
 # Install a snap with from a specific channel
 - name: Install "foo" with option --channel=latest/edge

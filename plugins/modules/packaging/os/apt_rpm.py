@@ -35,7 +35,7 @@ options:
     description:
       - update the package database first C(apt-get update).
     type: bool
-    default: no
+    default: false
 author:
 - Evgenii Terechkov (@evgkrsk)
 '''
@@ -68,7 +68,7 @@ EXAMPLES = '''
   community.general.apt_rpm:
     name: bar
     state: present
-    update_cache: yes
+    update_cache: true
 '''
 
 import json

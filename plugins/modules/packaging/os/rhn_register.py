@@ -54,7 +54,7 @@ options:
         description:
             - Force registration, even if system is already registered.
         type: bool
-        default: no
+        default: false
         version_added: 2.0.0
     ca_cert:
         description:
@@ -73,14 +73,14 @@ options:
         default: []
     enable_eus:
         description:
-            - If C(no), extended update support will be requested.
+            - If C(false), extended update support will be requested.
         type: bool
-        default: no
+        default: false
     nopackages:
         description:
-            - If C(yes), the registered node will not upload its installed packages information to Satellite server.
+            - If C(true), the registered node will not upload its installed packages information to Satellite server.
         type: bool
-        default: no
+        default: false
 '''
 
 EXAMPLES = r'''
@@ -100,7 +100,7 @@ EXAMPLES = r'''
   community.general.rhn_register:
     state: present
     activationkey: 1-222333444
-    enable_eus: yes
+    enable_eus: true
 
 - name: Register with activationkey and set a profilename which may differ from the hostname
   community.general.rhn_register:
@@ -128,7 +128,7 @@ EXAMPLES = r'''
     username: joe_user
     password: somepass
     server_url: https://xmlrpc.my.satellite/XMLRPC
-    force: yes
+    force: true
 '''
 
 RETURN = r'''

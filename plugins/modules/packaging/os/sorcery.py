@@ -39,7 +39,7 @@ options:
         description:
             - Whether to cast, dispel or rebuild a package
             - state C(cast) is an equivalent of C(present), not C(latest)
-            - state C(latest) always triggers C(update_cache=yes)
+            - state C(latest) always triggers C(update_cache=true)
             - state C(rebuild) implies cast of all specified spells, not only
               those existed before
         choices: ["present", "latest", "absent", "cast", "dispelled", "rebuild"]
@@ -61,13 +61,13 @@ options:
         description:
             - Whether or not to update sorcery scripts at the very first stage
         type: bool
-        default: no
+        default: false
 
     update_cache:
         description:
             - Whether or not to update grimoire collection before casting spells
         type: bool
-        default: no
+        default: false
         aliases: ["update_codex"]
 
     cache_valid_time:
@@ -132,17 +132,17 @@ EXAMPLES = '''
   community.general.sorcery:
     spell: '*'
     state: rebuild
-    update: yes
-    update_cache: yes
+    update: true
+    update_cache: true
 
 - name: Refresh the grimoire collection if it is 1 day old using native sorcerous alias
   community.general.sorcery:
-    update_codex: yes
+    update_codex: true
     cache_valid_time: 86400
 
 - name: Update only Sorcery itself
   community.general.sorcery:
-    update: yes
+    update: true
 '''
 
 

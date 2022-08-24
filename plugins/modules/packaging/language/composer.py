@@ -126,12 +126,12 @@ EXAMPLES = '''
     command: create-project
     arguments: package/package /path/to/project ~1.0
     working_dir: /path/to/project
-    prefer_dist: yes
+    prefer_dist: true
 
 - name: Install a package globally
   community.general.composer:
     command: require
-    global_command: yes
+    global_command: true
     arguments: my/package
 '''
 

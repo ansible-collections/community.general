@@ -48,7 +48,7 @@ options:
             - Use local package base instead of fetching an updated one.
         type: bool
         required: false
-        default: no
+        default: false
     annotation:
         description:
             - A list of keyvalue-pairs of the form
@@ -91,14 +91,14 @@ options:
             - Remove automatically installed packages which are no longer needed.
         required: false
         type: bool
-        default: no
+        default: false
     ignore_osver:
         description:
             - Ignore FreeBSD OS version check, useful on -STABLE and -CURRENT branches.
             - Defines the C(IGNORE_OSVERSION) environment variable.
         required: false
         type: bool
-        default: no
+        default: false
         version_added: 1.3.0
 author: "bleader (@bleader)"
 notes:

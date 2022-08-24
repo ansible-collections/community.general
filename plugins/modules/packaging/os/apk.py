@@ -25,7 +25,7 @@ options:
       - During upgrade, reset versioned world dependencies and change logic to prefer replacing or downgrading packages (instead of holding them)
         if the currently installed package is no longer available from any repository.
     type: bool
-    default: no
+    default: false
   name:
     description:
       - A package name, like C(foo), or multiple packages, like C(foo, bar).
@@ -35,7 +35,7 @@ options:
     description:
       - Do not use any local cache path.
     type: bool
-    default: no
+    default: false
     version_added: 1.0.0
   repository:
     description:
@@ -56,12 +56,12 @@ options:
     description:
       - Update repository indexes. Can be run with other steps or on it's own.
     type: bool
-    default: no
+    default: false
   upgrade:
     description:
       - Upgrade all installed packages to their latest version.
     type: bool
-    default: no
+    default: false
   world:
     description:
       - Use a custom world file when checking for explicitly installed packages.
@@ -77,12 +77,12 @@ EXAMPLES = '''
 - name: Update repositories and install foo package
   community.general.apk:
     name: foo
-    update_cache: yes
+    update_cache: true
 
 - name: Update repositories and install foo and bar packages
   community.general.apk:
     name: foo,bar
-    update_cache: yes
+    update_cache: true
 
 - name: Remove foo package
   community.general.apk:
@@ -108,39 +108,39 @@ EXAMPLES = '''
   community.general.apk:
     name: foo
     state: latest
-    update_cache: yes
+    update_cache: true
 
 - name: Update repositories and update packages foo and bar to latest versions
   community.general.apk:
     name: foo,bar
     state: latest
-    update_cache: yes
+    update_cache: true
 
 - name: Update all installed packages to the latest versions
   community.general.apk:
-    upgrade: yes
+    upgrade: true
 
 - name: Upgrade / replace / downgrade / uninstall all installed packages to the latest versions available
   community.general.apk:
-    available: yes
-    upgrade: yes
+    available: true
+    upgrade: true
 
 - name: Update repositories as a separate step
   community.general.apk:
-    update_cache: yes
+    update_cache: true
 
 - name: Install package from a specific repository
   community.general.apk:
     name: foo
     state: latest
-    update_cache: yes
+    update_cache: true
     repository: http://dl-3.alpinelinux.org/alpine/edge/main
 
 - name: Install package without using cache
   community.general.apk:
     name: foo
     state: latest
-    no_cache: yes
+    no_cache: true
 
 - name: Install package checking a custom world
   community.general.apk:

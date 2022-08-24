@@ -44,7 +44,7 @@ options:
     description:
       - Install the node.js library globally
     required: false
-    default: no
+    default: false
     type: bool
   executable:
     type: path
@@ -56,14 +56,14 @@ options:
       - Use the --ignore-scripts flag when installing.
     required: false
     type: bool
-    default: no
+    default: false
   production:
     description:
       - Install dependencies in production mode.
       - Yarn will ignore any dependencies under devDependencies in package.json
     required: false
     type: bool
-    default: no
+    default: false
   registry:
     type: str
     description:
@@ -96,12 +96,12 @@ EXAMPLES = '''
 - name: Install "imagemin" node.js package globally.
   community.general.yarn:
     name: imagemin
-    global: yes
+    global: true
 
 - name: Remove the globally-installed package "imagemin".
   community.general.yarn:
     name: imagemin
-    global: yes
+    global: true
     state: absent
 
 - name: Install "imagemin" node.js package from custom registry.

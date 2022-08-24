@@ -38,54 +38,68 @@ options:
               that they are not required by other packages and were not
               explicitly installed by a user.
         type: bool
-        default: no
+        default: false
     update_cache:
         description:
             - Whether or not to refresh the master package lists. This can be
               run as part of a package installation or as a separate step.
         type: bool
-        default: yes
+        default: true
     upgrade:
         description:
             - Whether or not to upgrade whole system
         type: bool
-        default: no
+        default: false
     upgrade_xbps:
         description:
             - Whether or not to upgrade the xbps package when necessary.
               Before installing new packages,
               xbps requires the user to update the xbps package itself.
-              Thus when this option is set to C(no),
+              Thus when this option is set to C(false),
               upgrades and installations will fail when xbps is not up to date.
         type: bool
-        default: yes
+        default: true
         version_added: '0.2.0'
 '''
 
 EXAMPLES = '''
 - name: Install package foo (automatically updating the xbps package if needed)
-  community.general.xbps: name=foo state=present
+  community.general.xbps:
+    name: foo
+    state: present
 
 - name: Upgrade package foo
-  community.general.xbps: name=foo state=latest update_cache=yes
+  community.general.xbps:
+    name: foo
+    state: latest
+    update_cache: true
 
 - name: Remove packages foo and bar
-  community.general.xbps: name=foo,bar state=absent
+  community.general.xbps:
+    name:
+        - foo
+        - bar
+    state: absent
 
 - name: Recursively remove package foo
-  community.general.xbps: name=foo state=absent recurse=yes
+  community.general.xbps:
+    name: foo
+    state: absent
+    recurse: true
 
 - name: Update package cache
-  community.general.xbps: update_cache=yes
+  community.general.xbps:
+    update_cache: true
 
 - name: Upgrade packages
-  community.general.xbps: upgrade=yes
+  community.general.xbps:
+    upgrade: true
 
 - name: Install a package, failing if the xbps package is out of date
   community.general.xbps:
     name: foo
     state: present
-    upgrade_xbps: no
+    upgrade_xbps: false
 '''
 
 RETURN = '''

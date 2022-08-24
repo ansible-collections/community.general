@@ -36,12 +36,12 @@ options:
       - Remove other then added repositories
       - Used if I(state=present)
     type: bool
-    default: no
+    default: false
   update:
     description:
       - Update the package database after changing repositories.
     type: bool
-    default: no
+    default: false
 author:
 - Mikhail Gordeev (@obirvalger)
 '''
@@ -56,13 +56,13 @@ EXAMPLES = '''
   community.general.apt_repo:
     repo: Sisysphus
     state: present
-    remove_others: yes
+    remove_others: true
 
 - name: Add local repository `/space/ALT/Sisyphus` and update package cache
   community.general.apt_repo:
     repo: copy:///space/ALT/Sisyphus
     state: present
-    update: yes
+    update: true
 '''
 
 RETURN = ''' # '''

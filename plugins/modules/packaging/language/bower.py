@@ -25,12 +25,12 @@ options:
     description:
       - Install packages from local cache, if the packages were installed before
     type: bool
-    default: 'no'
+    default: false
   production:
     description:
       - Install with --production flag
     type: bool
-    default: 'no'
+    default: false
   path:
     type: path
     description:
@@ -80,7 +80,7 @@ EXAMPLES = '''
 - npm:
     path: /app/location
     name: bower
-    global: no
+    global: false
 - community.general.bower:
     path: /app/location
     relative_execpath: node_modules/.bin

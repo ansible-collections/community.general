@@ -51,12 +51,12 @@ options:
         description:
             - update homebrew itself first.
         type: bool
-        default: no
+        default: false
     upgrade_all:
         description:
             - upgrade all homebrew packages.
         type: bool
-        default: no
+        default: false
         aliases: ['upgrade']
     install_options:
         description:
@@ -91,18 +91,18 @@ EXAMPLES = '''
 - community.general.homebrew:
     name: foo
     state: present
-    update_homebrew: yes
+    update_homebrew: true
 
 # Update homebrew first and upgrade formula foo to latest available with 'brew' in default path
 - community.general.homebrew:
     name: foo
     state: latest
-    update_homebrew: yes
+    update_homebrew: true
 
 # Update homebrew and upgrade all packages
 - community.general.homebrew:
-    update_homebrew: yes
-    upgrade_all: yes
+    update_homebrew: true
+    upgrade_all: true
 
 # Miscellaneous other examples
 - community.general.homebrew:
@@ -133,7 +133,7 @@ EXAMPLES = '''
 
 - name: Use ignore-pinned option while upgrading all
   community.general.homebrew:
-    upgrade_all: yes
+    upgrade_all: true
     upgrade_options: ignore-pinned
 '''
 

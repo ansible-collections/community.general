@@ -35,7 +35,7 @@ options:
     description:
       - Install the node.js library globally.
     required: false
-    default: no
+    default: false
     type: bool
   executable:
     description:
@@ -48,23 +48,23 @@ options:
       - Use the C(--ignore-scripts) flag when installing.
     required: false
     type: bool
-    default: no
+    default: false
   unsafe_perm:
     description:
       - Use the C(--unsafe-perm) flag when installing.
     type: bool
-    default: no
+    default: false
   ci:
     description:
       - Install packages based on package-lock file, same as running C(npm ci).
     type: bool
-    default: no
+    default: false
   production:
     description:
       - Install dependencies in production mode, excluding devDependencies.
     required: false
     type: bool
-    default: no
+    default: false
   registry:
     description:
       - The registry to install modules from.
@@ -81,13 +81,13 @@ options:
     description:
       - Use the C(--no-optional) flag when installing.
     type: bool
-    default: no
+    default: false
     version_added: 2.0.0
   no_bin_links:
     description:
       - Use the C(--no-bin-links) flag when installing.
     type: bool
-    default: no
+    default: false
     version_added: 2.5.0
 requirements:
     - npm installed in bin path (recommended /usr/local/bin)
@@ -108,12 +108,12 @@ EXAMPLES = r'''
 - name: Install "coffee-script" node.js package globally.
   community.general.npm:
     name: coffee-script
-    global: yes
+    global: true
 
 - name: Remove the globally package "coffee-script".
   community.general.npm:
     name: coffee-script
-    global: yes
+    global: true
     state: absent
 
 - name: Install "coffee-script" node.js package from custom registry.

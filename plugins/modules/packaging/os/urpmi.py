@@ -21,7 +21,7 @@ options:
   name:
     description:
       - A list of package names to install, upgrade or remove.
-    required: yes
+    required: true
     aliases: [ package, pkg ]
     type: list
     elements: str
@@ -35,18 +35,18 @@ options:
     description:
       - Update the package database first C(urpmi.update -a).
     type: bool
-    default: no
+    default: false
   no_recommends:
     description:
       - Corresponds to the C(--no-recommends) option for I(urpmi).
     type: bool
-    default: yes
+    default: true
   force:
     description:
       - Assume "yes" is the answer to any question urpmi has to ask.
         Corresponds to the C(--force) option for I(urpmi).
     type: bool
-    default: yes
+    default: true
   root:
     description:
       - Specifies an alternative install root, relative to which all packages will be installed.
@@ -77,7 +77,7 @@ EXAMPLES = '''
 - community.general.urpmi:
     name: bar
     state: present
-    update_cache: yes
+    update_cache: true
 '''
 
 

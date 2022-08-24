@@ -51,7 +51,7 @@ options:
     - Update homebrew itself first.
     - Note that C(brew cask update) is a synonym for C(brew update).
     type: bool
-    default: no
+    default: false
   install_options:
     description:
     - Options flags to install a package.
@@ -62,13 +62,13 @@ options:
     description:
     - Allow external apps.
     type: bool
-    default: no
+    default: false
   upgrade_all:
     description:
     - Upgrade all casks.
     - Mutually exclusive with C(upgraded) state.
     type: bool
-    default: no
+    default: false
     aliases: [ 'upgrade' ]
   greedy:
     description:
@@ -76,7 +76,7 @@ options:
     - Passes --greedy to brew cask outdated when checking
       if an installed cask has a newer version available.
     type: bool
-    default: no
+    default: false
 '''
 EXAMPLES = '''
 - name: Install cask

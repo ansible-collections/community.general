@@ -47,12 +47,12 @@ options:
     choices: [ absent, installed, latest, present, removed ]
   update_catalog:
     description:
-    - If you always want to refresh your catalog from the mirror, even when it's not stale, set this to C(yes).
+    - If you always want to refresh your catalog from the mirror, even when it's not stale, set this to C(true).
     type: bool
-    default: no
+    default: false
   force:
     description:
-    - To allow the update process to downgrade packages to match what is present in the repository, set this to C(yes).
+    - To allow the update process to downgrade packages to match what is present in the repository, set this to C(true).
     - This is useful for rolling back to stable from testing, or similar operations.
     type: bool
     default: false
@@ -94,7 +94,7 @@ EXAMPLES = r'''
   community.general.pkgutil:
     name: '*'
     state: latest
-    force: yes
+    force: true
 '''
 
 RETURN = r''' # '''

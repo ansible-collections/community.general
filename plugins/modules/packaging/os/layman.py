@@ -43,11 +43,11 @@ options:
     type: str
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be
-        set to C(no) when no other option exists.  Prior to 1.9.3 the code
-        defaulted to C(no).
+      - If C(false), SSL certificates will not be validated. This should only be
+        set to C(false) when no other option exists.  Prior to 1.9.3 the code
+        defaulted to C(false).
     type: bool
-    default: yes
+    default: true
 '''
 
 EXAMPLES = '''
