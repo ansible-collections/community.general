@@ -41,7 +41,7 @@ DOCUMENTATION = '''
       overwrite:
         description: Overwrite the password if it does already exist.
         type: bool
-        default: 'no'
+        default: false
       umask:
         description:
           - Sets the umask for the created .gpg files. The first octed must be greater than 3 (user readable).
@@ -52,7 +52,7 @@ DOCUMENTATION = '''
       returnall:
         description: Return all the content of the password, not only the first line.
         type: bool
-        default: 'no'
+        default: false
       subkey:
         description: Return a specific subkey of the password. When set to C(password), always returns the first line.
         default: password
@@ -63,13 +63,13 @@ DOCUMENTATION = '''
         type: integer
         default: 16
       backup:
-        description: Used with C(overwrite=yes). Backup the previous password in a subkey.
+        description: Used with C(overwrite=true). Backup the previous password in a subkey.
         type: bool
-        default: 'no'
+        default: false
       nosymbols:
         description: use alphanumeric characters.
         type: bool
-        default: 'no'
+        default: false
       missing:
         description:
           - List of preference about what to do if the password file is missing.
