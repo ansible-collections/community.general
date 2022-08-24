@@ -71,11 +71,11 @@ options:
     default: ssh
   use_ssl:
     description:
-      - Configures the I(transport) to use SSL if set to C(yes) only when the
+      - Configures the I(transport) to use SSL if set to C(true) only when the
         I(transport) argument is configured as rest.  If the transport
         argument is not I(rest), this value is ignored.
     type: bool
-    default: yes
+    default: true
   provider:
     description:
       - Convenience method that allows all I(openswitch) arguments to be passed as

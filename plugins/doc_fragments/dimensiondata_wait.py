@@ -21,7 +21,7 @@ options:
     description:
       - Should we wait for the task to complete before moving onto the next.
     type: bool
-    default: no
+    default: false
   wait_time:
     description:
       - The maximum amount of time (in seconds) to wait for the task to complete.

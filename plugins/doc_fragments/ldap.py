@@ -49,13 +49,13 @@ options:
     description:
       - If true, we'll use the START_TLS LDAP extension.
     type: bool
-    default: no
+    default: false
   validate_certs:
     description:
-      - If set to C(no), SSL certificates will not be validated.
+      - If set to C(false), SSL certificates will not be validated.
       - This should only be used on sites using self-signed certificates.
     type: bool
-    default: yes
+    default: true
   sasl_class:
     description:
       - The class to use for SASL authentication.
