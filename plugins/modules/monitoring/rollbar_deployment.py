@@ -56,11 +56,11 @@ options:
     default: 'https://api.rollbar.com/api/1/deploy/'
   validate_certs:
     description:
-      - If C(no), SSL certificates for the target url will not be validated.
+      - If C(false), SSL certificates for the target url will not be validated.
         This should only be used on personally controlled sites using
         self-signed certificates.
     required: false
-    default: 'yes'
+    default: true
     type: bool
 '''
 
