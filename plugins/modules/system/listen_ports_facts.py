@@ -71,7 +71,7 @@ EXAMPLES = r'''
 - name: Gather facts on all ports and override which command to use
   community.general.listen_ports_facts:
     command: 'netstat'
-    include_non_listening: 'yes'
+    include_non_listening: true
 '''
 
 RETURN = r'''

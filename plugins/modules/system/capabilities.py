@@ -19,13 +19,13 @@ options:
         description:
             - Specifies the path to the file to be managed.
         type: str
-        required: yes
+        required: true
         aliases: [ key ]
     capability:
         description:
             - Desired capability to set (with operator and flags, if state is C(present)) or remove (if state is C(absent))
         type: str
-        required: yes
+        required: true
         aliases: [ cap ]
     state:
         description:

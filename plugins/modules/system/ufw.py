@@ -179,7 +179,7 @@ EXAMPLES = r'''
 - community.general.ufw:
     rule: reject
     port: auth
-    log: yes
+    log: true
 
 # ufw supports connection rate limiting, which is useful for protecting
 # against brute-force login attacks. ufw will deny connections if an IP
@@ -192,7 +192,7 @@ EXAMPLES = r'''
     proto: tcp
 
 # Allow OpenSSH. (Note that as ufw manages its own state, simply removing
-# a rule=allow task can leave those ports exposed. Either use delete=yes
+# a rule=allow task can leave those ports exposed. Either use delete=true
 # or a separate state=reset task)
 - community.general.ufw:
     rule: allow
@@ -202,7 +202,7 @@ EXAMPLES = r'''
   community.general.ufw:
     rule: allow
     name: OpenSSH
-    delete: yes
+    delete: true
 
 - name: Deny all access to port 53
   community.general.ufw:
@@ -285,9 +285,9 @@ EXAMPLES = r'''
 - name: Deny forwarded/routed traffic from subnet 1.2.3.0/24 to subnet 4.5.6.0/24
   community.general.ufw:
     rule: deny
-    route: yes
-    src: 1.2.3.0/24
-    dest: 4.5.6.0/24
+    route: true
+    src: 192.0.2.0/24
+    dest: 198.51.100.0/24
 '''
 
 import re

@@ -29,7 +29,7 @@ options:
     description:
       - Name of the crontab variable.
     type: str
-    required: yes
+    required: true
   value:
     description:
       - The value to set this variable to.
@@ -67,7 +67,7 @@ options:
       - If set, create a backup of the crontab before it is modified.
         The location of the backup is returned in the C(backup) variable by this module.
     type: bool
-    default: no
+    default: false
 requirements:
   - cron
 author:

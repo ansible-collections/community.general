@@ -30,10 +30,10 @@ options:
   no_reload:
     description:
         - Disable reloading of the SELinux policy after making change to a domain's permissive setting.
-        - The default is C(no), which causes policy to be reloaded when a domain changes state.
+        - The default is C(false), which causes policy to be reloaded when a domain changes state.
         - Reloading the policy does not work on older versions of the C(policycoreutils-python) library, for example in EL 6."
     type: bool
-    default: no
+    default: false
   store:
     description:
       - Name of the SELinux policy store to use.

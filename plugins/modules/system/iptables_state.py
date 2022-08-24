@@ -71,14 +71,14 @@ options:
       - The file the iptables state should be saved to.
       - The file the iptables state should be restored from.
     type: path
-    required: yes
+    required: true
   state:
     description:
       - Whether the firewall state should be saved (into a file) or restored
         (from a file).
     type: str
     choices: [ saved, restored ]
-    required: yes
+    required: true
   table:
     description:
       - When I(state=restored), restore only the named table even if the input
@@ -133,7 +133,7 @@ EXAMPLES = r'''
   community.general.iptables_state:
     state: saved
     path: /tmp/iptables
-  check_mode: yes
+  check_mode: true
   changed_when: false
   register: iptables_state
 

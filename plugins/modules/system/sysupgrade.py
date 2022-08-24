@@ -20,24 +20,24 @@ options:
         description:
         - Apply the latest snapshot.
         - Otherwise release will be applied.
-        default: no
+        default: false
         type: bool
     force:
         description:
         - Force upgrade (for snapshots only).
-        default: no
+        default: false
         type: bool
     keep_files:
         description:
         - Keep the files under /home/_sysupgrade.
         - By default, the files will be deleted after the upgrade.
-        default: no
+        default: false
         type: bool
     fetch_only:
         description:
         - Fetch and verify files and create /bsd.upgrade but do not reboot.
         - Set to C(false) if you want sysupgrade to reboot. This will cause Ansible to error, as it expects the module to exit gracefully. See the examples.
-        default: yes
+        default: true
         type: bool
     installurl:
         description:
@@ -55,7 +55,7 @@ EXAMPLES = r'''
 
 - name: Upgrade to latest snapshot
   community.general.sysupgrade:
-    snapshot: yes
+    snapshot: true
     installurl: https://cloudflare.cdn.openbsd.org/pub/OpenBSD
   register: sysupgrade
 
@@ -68,8 +68,8 @@ EXAMPLES = r'''
 
 - name: Have sysupgrade automatically reboot
   community.general.sysupgrade:
-    fetch_only: no
-  ignore_errors: yes
+    fetch_only: false
+  ignore_errors: true
 '''
 
 RETURN = r'''

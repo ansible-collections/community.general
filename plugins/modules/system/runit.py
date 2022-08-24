@@ -21,7 +21,7 @@ options:
         description:
             - Name of the service to manage.
         type: str
-        required: yes
+        required: true
     state:
         description:
             - C(started)/C(stopped) are idempotent actions that will not run

@@ -23,7 +23,7 @@ options:
     description:
     - A GConf preference key is an element in the GConf repository
       that corresponds to an application preference. See man gconftool-2(1).
-    required: yes
+    required: true
   value:
     type: str
     description:
@@ -40,7 +40,7 @@ options:
     description:
     - The action to take upon the key/value.
     - State C(get) is deprecated and will be removed in community.general 8.0.0. Please use the module M(community.general.gconftool2_info) instead.
-    required: yes
+    required: true
     choices: [ absent, get, present ]
   config_source:
     type: str
@@ -53,7 +53,7 @@ options:
       specified then the config_source must be specified as well.
       See man gconftool-2(1).
     type: bool
-    default: 'no'
+    default: false
 '''
 
 EXAMPLES = """
@@ -192,11 +192,11 @@ def main():
                                  % str(state))
 
         if direct and config_source is None:
-            module.fail_json(msg='If "direct" is "yes" then the ' +
+            module.fail_json(msg='If "direct" is "true" then the ' +
                                  '"config_source" must be specified')
         elif not direct and config_source is not None:
             module.fail_json(msg='If the "config_source" is specified ' +
-                                 'then "direct" must be "yes"')
+                                 'then "direct" must be "true"')
 
     # Create a gconf2 preference
     gconf_pref = GConf2Preference(module, key, value_type,

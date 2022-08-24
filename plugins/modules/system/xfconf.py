@@ -72,7 +72,7 @@ options:
     description:
       - Force array even if only one element
     type: bool
-    default: 'no'
+    default: false
     aliases: ['array']
     version_added: 1.0.0
   disable_facts:

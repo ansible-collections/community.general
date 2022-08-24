@@ -70,7 +70,7 @@ options:
         exists (this lock being a dpkg-divert feature, and bypassing it being
         a module feature).
     type: bool
-    default: no
+    default: false
   force:
     description:
       - When I(rename=true) and I(force=true), renaming is performed even if
@@ -78,7 +78,7 @@ options:
         file at this location will be lost.
       - This parameter is ignored when I(rename=false).
     type: bool
-    default: no
+    default: false
 notes:
   - This module supports I(check_mode) and I(diff).
 requirements:
@@ -99,14 +99,14 @@ EXAMPLES = r'''
   community.general.dpkg_divert:
     path: /usr/bin/busybox
     divert: /usr/bin/busybox.dpkg-divert
-    rename: yes
+    rename: true
 
 - name: Remove the busybox diversion and move the diverted file back
   community.general.dpkg_divert:
     path: /usr/bin/busybox
     state: absent
-    rename: yes
-    force: yes
+    rename: true
+    force: true
 '''
 
 RETURN = r'''

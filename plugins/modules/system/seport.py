@@ -43,12 +43,12 @@ options:
     description:
       - Reload SELinux policy after commit.
     type: bool
-    default: yes
+    default: true
   ignore_selinux_state:
     description:
     - Run independent of selinux runtime state
     type: bool
-    default: no
+    default: false
 notes:
    - The changes are persistent across reboots.
    - Not tested on any debian based system.
