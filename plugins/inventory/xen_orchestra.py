@@ -23,7 +23,7 @@ DOCUMENTATION = '''
     options:
         plugin:
             description: The name of this plugin, it should always be set to C(community.general.xen_orchestra) for this plugin to recognize it as its own.
-            required: yes
+            required: true
             choices: ['community.general.xen_orchestra']
             type: str
         api_host:
@@ -37,7 +37,7 @@ DOCUMENTATION = '''
             description:
                 - Xen Orchestra user.
                 - If the value is not specified in the inventory configuration, the value of environment variable C(ANSIBLE_XO_USER) will be used instead.
-            required: yes
+            required: true
             type: str
             env:
                 - name: ANSIBLE_XO_USER
@@ -45,7 +45,7 @@ DOCUMENTATION = '''
             description:
                 - Xen Orchestra password.
                 - If the value is not specified in the inventory configuration, the value of environment variable C(ANSIBLE_XO_PASSWORD) will be used instead.
-            required: yes
+            required: true
             type: str
             env:
                 - name: ANSIBLE_XO_PASSWORD

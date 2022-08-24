@@ -626,7 +626,7 @@ playbook.yml: >
   ---
   - name: "Default plugin output: play example"
     hosts: localhost
-    gather_facts: no
+    gather_facts: false
     tasks:
       - name:  Default plugin output
         ansible.builtin.debug:
@@ -634,7 +634,7 @@ playbook.yml: >
 
   - name: Override from play vars
     hosts: localhost
-    gather_facts: no
+    gather_facts: false
     vars:
       ansible_connection: local
       green: "\e[0m\e[38;5;82m"

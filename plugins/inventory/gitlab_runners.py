@@ -54,7 +54,7 @@ DOCUMENTATION = '''
         verbose_output:
             description: Toggle to (not) include all available nodes metadata
             type: bool
-            default: yes
+            default: true
 '''
 
 EXAMPLES = '''
