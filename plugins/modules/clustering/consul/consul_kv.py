@@ -45,7 +45,7 @@ options:
         description:
           - The key at which the value should be stored.
         type: str
-        required: yes
+        required: true
     value:
         description:
           - The value should be associated with the given key, required if C(state)
@@ -54,7 +54,7 @@ options:
     recurse:
         description:
           - If the key represents a prefix, each entry with the prefix can be
-            retrieved by setting this to C(yes).
+            retrieved by setting this to C(true).
         type: bool
     retrieve:
         description:
@@ -102,7 +102,7 @@ options:
         description:
           - Whether to verify the tls certificate of the consul agent.
         type: bool
-        default: 'yes'
+        default: true
 '''
 
 

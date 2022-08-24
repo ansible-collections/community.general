@@ -36,7 +36,7 @@ options:
     type: str
     description:
       - Plugin name.
-    required: yes
+    required: true
   owner:
     type: str
     description:
@@ -113,7 +113,7 @@ options:
       - Defines whether to install plugin dependencies.
       - This option takes effect only if the I(version) is not defined.
     type: bool
-    default: yes
+    default: true
 
 notes:
   - Plugin installation should be run under root or the same user which owns
@@ -140,7 +140,7 @@ EXAMPLES = '''
 - name: Install plugin without its dependencies
   community.general.jenkins_plugin:
     name: build-pipeline-plugin
-    with_dependencies: no
+    with_dependencies: false
 
 - name: Make sure the plugin is always up-to-date
   community.general.jenkins_plugin:
@@ -195,11 +195,11 @@ EXAMPLES = '''
   vars:
     my_jenkins_plugins:
       token-macro:
-        enabled: yes
+        enabled: true
       build-pipeline-plugin:
         version: "1.4.9"
-        pinned: no
-        enabled: yes
+        pinned: false
+        enabled: true
   tasks:
     - name: Install plugins without a specific version
       community.general.jenkins_plugin:
@@ -220,17 +220,17 @@ EXAMPLES = '''
 
     - name: Initiate the fact
       ansible.builtin.set_fact:
-        jenkins_restart_required: no
+        jenkins_restart_required: false
 
     - name: Check if restart is required by any of the versioned plugins
       ansible.builtin.set_fact:
-        jenkins_restart_required: yes
+        jenkins_restart_required: true
       when: item.changed
       with_items: "{{ my_jenkins_plugin_versioned.results }}"
 
     - name: Check if restart is required by any of the unversioned plugins
       ansible.builtin.set_fact:
-        jenkins_restart_required: yes
+        jenkins_restart_required: true
       when: item.changed
       with_items: "{{ my_jenkins_plugin_unversioned.results }}"
 
@@ -256,7 +256,7 @@ EXAMPLES = '''
 
     - name: Reset the fact
       ansible.builtin.set_fact:
-        jenkins_restart_required: no
+        jenkins_restart_required: false
       when: jenkins_restart_required
 
     - name: Plugin pinning

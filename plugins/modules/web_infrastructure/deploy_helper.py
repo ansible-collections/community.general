@@ -93,7 +93,7 @@ options:
     description:
       - Whether to run the clean procedure in case of C(state=finalize).
     type: bool
-    default: 'yes'
+    default: true
 
   keep_releases:
     type: int

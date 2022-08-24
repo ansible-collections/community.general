@@ -107,7 +107,7 @@ EXAMPLES = """
     organization: MyOrg
     user_name: Foo
     user_email: foo@bar.com
-    user_disabled: yes
+    user_disabled: true
 
 - name: Make sure the user Foo is not part of MyOrg anymore
   community.general.pritunl_user:

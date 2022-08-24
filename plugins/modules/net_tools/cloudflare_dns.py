@@ -83,7 +83,7 @@ options:
     description:
     - Proxy through Cloudflare network or just use DNS.
     type: bool
-    default: no
+    default: false
   record:
     description:
     - Record to add.
@@ -205,7 +205,7 @@ EXAMPLES = r'''
     zone: example.net
     type: CNAME
     value: example.com
-    proxied: yes
+    proxied: true
     account_email: test@example.com
     account_api_key: dummyapitoken
     state: present
