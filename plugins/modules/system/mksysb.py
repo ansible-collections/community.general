@@ -22,32 +22,32 @@ options:
     description:
       - Backup encrypted files.
     type: bool
-    default: "yes"
+    default: true
   backup_dmapi_fs:
     description:
       - Back up DMAPI filesystem files.
     type: bool
-    default: "yes"
+    default: true
   create_map_files:
     description:
       - Creates a new MAP files.
     type: bool
-    default: "no"
+    default: false
   exclude_files:
     description:
       - Excludes files using C(/etc/rootvg.exclude).
     type: bool
-    default: "no"
+    default: false
   exclude_wpar_files:
     description:
       - Excludes WPAR files.
     type: bool
-    default: "no"
+    default: false
   extended_attrs:
     description:
       - Backup extended attributes.
     type: bool
-    default: "yes"
+    default: true
   name:
     type: str
     description:
@@ -57,13 +57,13 @@ options:
     description:
       - Creates a new file data.
     type: bool
-    default: "yes"
+    default: true
   software_packing:
     description:
       - Exclude files from packing option listed in
         C(/etc/exclude_packing.rootvg).
     type: bool
-    default: "no"
+    default: false
   storage_path:
     type: str
     description:
@@ -73,7 +73,7 @@ options:
     description:
       - Creates backup using snapshots.
     type: bool
-    default: "no"
+    default: false
 '''
 
 EXAMPLES = '''
@@ -81,8 +81,8 @@ EXAMPLES = '''
   community.general.mksysb:
     name: myserver
     storage_path: /repository/images
-    exclude_files: yes
-    exclude_wpar_files: yes
+    exclude_files: true
+    exclude_wpar_files: true
 '''
 
 RETURN = '''
