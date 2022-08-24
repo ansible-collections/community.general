@@ -38,7 +38,7 @@ options:
       - Whether to include dependencies or not.
     required: false
     type: bool
-    default: "yes"
+    default: true
   repository:
     type: str
     description:
@@ -50,7 +50,7 @@ options:
       - Install gem in user's local gems cache or for all users
     required: false
     type: bool
-    default: "yes"
+    default: true
   executable:
     type: path
     description:
@@ -80,7 +80,7 @@ options:
     description:
       - Rewrite the shebang line on installed scripts to use /usr/bin/env.
     required: false
-    default: "no"
+    default: false
     type: bool
   version:
     type: str
@@ -91,13 +91,13 @@ options:
     description:
       - Allow installation of pre-release versions of the gem.
     required: false
-    default: "no"
+    default: false
     type: bool
   include_doc:
     description:
       - Install with or without docs.
     required: false
-    default: "no"
+    default: false
     type: bool
   build_flags:
     type: str
@@ -108,7 +108,7 @@ options:
     description:
       - Force gem to install, bypassing dependency checks.
     required: false
-    default: "no"
+    default: false
     type: bool
 author:
     - "Ansible Core Team"
