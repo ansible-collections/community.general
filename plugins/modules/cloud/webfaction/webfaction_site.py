@@ -53,7 +53,7 @@ options:
         description:
             - Whether or not to use HTTPS
         type: bool
-        default: 'no'
+        default: false
 
     site_apps:
         description:
@@ -92,7 +92,7 @@ EXAMPLES = '''
         - 'testsite1.my_domain.org'
       site_apps:
         - ['testapp1', '/']
-      https: no
+      https: false
       login_name: "{{webfaction_user}}"
       login_password: "{{webfaction_passwd}}"
 '''
