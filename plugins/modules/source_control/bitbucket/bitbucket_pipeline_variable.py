@@ -44,7 +44,7 @@ options:
     description:
       - Whether to encrypt the variable value.
     type: bool
-    default: no
+    default: false
   state:
     description:
       - Indicates desired state of the variable.
