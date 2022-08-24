@@ -36,15 +36,15 @@ options:
     type: str
   use_ssl:
     description:
-    - If C(no), an HTTP connection will be used instead of the default HTTPS connection.
+    - If C(false), an HTTP connection will be used instead of the default HTTPS connection.
     type: bool
-    default: 'yes'
+    default: true
   validate_certs:
     description:
-    - If C(no), SSL certificates will not be validated.
-    - This should only set to C(no) when used on personally controlled sites using self-signed certificates.
+    - If C(false), SSL certificates will not be validated.
+    - This should only set to C(false) when used on personally controlled sites using self-signed certificates.
     type: bool
-    default: 'yes'
+    default: true
   name:
     description:
     - The system name to manage.
@@ -62,7 +62,7 @@ options:
     - Sync on changes.
     - Concurrently syncing Cobbler is bound to fail.
     type: bool
-    default: no
+    default: false
   state:
     description:
     - Whether the system should be present, absent or a query is made.
@@ -101,7 +101,7 @@ EXAMPLES = r'''
     password: ins3965!
     name: bdsol-aci51-apic1.cisco.com
     properties:
-      netboot_enabled: yes
+      netboot_enabled: true
     state: present
   delegate_to: localhost
 

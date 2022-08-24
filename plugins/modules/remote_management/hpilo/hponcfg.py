@@ -36,7 +36,7 @@ options:
   verbose:
     description:
      - Run hponcfg in verbose mode (-v).
-    default: no
+    default: false
     type: bool
 requirements:
  - hponcfg tool
