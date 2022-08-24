@@ -39,7 +39,7 @@ options:
       - can get the original file back if you somehow clobbered it incorrectly.
     type: bool
     required: false
-    default: no
+    default: false
 requirements: [ ]
 author: Anders Ingemann (@andsens)
 '''
@@ -132,7 +132,7 @@ def main():
     arg_spec = {'name': {'type': 'str', 'required': True},
                 'path': {'type': 'str', 'default': '/etc/sensu/conf.d/subscriptions.json'},
                 'state': {'type': 'str', 'default': 'present', 'choices': ['present', 'absent']},
-                'backup': {'type': 'bool', 'default': 'no'},
+                'backup': {'type': 'bool', 'default': False},
                 }
 
     module = AnsibleModule(argument_spec=arg_spec,
