@@ -73,10 +73,10 @@ options:
     type: str
   validate_certs:
     description:
-      - If C(no), SSL certificates for the target URL will not be validated.
+      - If C(false), SSL certificates for the target URL will not be validated.
         This should only be used on personally controlled sites using self-signed certificates.
     required: false
-    default: yes
+    default: true
     type: bool
 notes:
   - Supports C(check_mode). Note that check mode simply does nothing except returning C(changed=true) in case the I(url) seems to be correct.
