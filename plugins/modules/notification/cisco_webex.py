@@ -26,14 +26,14 @@ options:
     description:
        - The request parameter you would like to send the message to.
        - Messages can be sent to either a room or individual (by ID or E-Mail).
-    required: yes
+    required: true
     choices: ['roomId', 'toPersonEmail', 'toPersonId']
     type: str
 
   recipient_id:
     description:
       - The unique identifier associated with the supplied C(recipient_type).
-    required: yes
+    required: true
     type: str
 
   msg_type:
@@ -47,14 +47,14 @@ options:
   personal_token:
     description:
       - Your personal access token required to validate the Webex Teams API.
-    required: yes
+    required: true
     aliases: ['token']
     type: str
 
   msg:
     description:
       - The message you would like to send.
-    required: yes
+    required: true
     type: str
 '''
 

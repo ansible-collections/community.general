@@ -28,8 +28,8 @@ options:
       - Message to send.
   markdown:
     description:
-      - If C(yes), text will be parsed as markdown.
-    default: 'yes'
+      - If C(true), text will be parsed as markdown.
+    default: true
     type: bool
   channel:
     type: str
@@ -58,7 +58,7 @@ EXAMPLES = """
     url: |
       https://hook.bearychat.com/=ae2CF/incoming/e61bd5c57b164e04b11ac02e66f47f60
     text: "{{ inventory_hostname }} completed"
-    markdown: no
+    markdown: false
     channel: "#ansible"
     attachments:
       - title: "Ansible on {{ inventory_hostname }}"
