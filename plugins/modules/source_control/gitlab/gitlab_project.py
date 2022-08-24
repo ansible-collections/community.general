@@ -58,23 +58,23 @@ options:
       - Whether you want to create issues or not.
       - Possible values are true and false.
     type: bool
-    default: yes
+    default: true
   merge_requests_enabled:
     description:
       - If merge requests can be made or not.
       - Possible values are true and false.
     type: bool
-    default: yes
+    default: true
   wiki_enabled:
     description:
       - If an wiki for this project should be available or not.
     type: bool
-    default: yes
+    default: true
   snippets_enabled:
     description:
       - If creating snippets should be available or not.
     type: bool
-    default: yes
+    default: true
   visibility:
     description:
       - C(private) Project access must be granted explicitly for each user.

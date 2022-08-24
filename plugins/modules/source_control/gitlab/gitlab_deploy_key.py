@@ -46,7 +46,7 @@ options:
     description:
       - Whether this key can push to the project.
     type: bool
-    default: no
+    default: false
   state:
     description:
       - When C(present) the deploy key added to the project if it doesn't exist.
@@ -73,7 +73,7 @@ EXAMPLES = '''
     project: "my_group/my_project"
     title: "Jenkins CI"
     state: present
-    can_push: yes
+    can_push: true
 
 - name: "Remove the previous deploy key from the project"
   community.general.gitlab_deploy_key:

@@ -117,8 +117,8 @@ EXAMPLES = '''
         value: abc123
       - name: SECRET_ACCESS_KEY
         value: dassgrfaeui8989
-        masked: yes
-        protected: yes
+        masked: true
+        protected: true
         environment_scope: production
 
 - name: Set or update some CI/CD variables

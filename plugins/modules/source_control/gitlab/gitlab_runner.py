@@ -66,14 +66,14 @@ options:
     description:
       - Searches only runners available to the user when searching for existing, when false admin token required.
       - Mutually exclusive with I(project) since community.general 4.5.0.
-    default: no
+    default: false
     type: bool
     version_added: 2.0.0
   active:
     description:
       - Define if the runners is immediately active after creation.
     required: False
-    default: yes
+    default: true
     type: bool
   locked:
     description:
@@ -100,7 +100,7 @@ options:
     description:
       - Run untagged jobs or not.
     required: False
-    default: yes
+    default: true
     type: bool
   tag_list:
     description: The tags that apply to the runner.
@@ -135,7 +135,7 @@ EXAMPLES = '''
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     description: Docker Machine t1
-    owned: yes
+    owned: true
     state: absent
 
 - name: Register runner for a specific project
