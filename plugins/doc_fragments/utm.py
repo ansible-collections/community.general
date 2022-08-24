@@ -43,7 +43,7 @@ options:
         description:
           - Whether the REST interface's ssl certificate should be verified or not.
         type: bool
-        default: yes
+        default: true
     state:
         description:
           - The desired state of the object.

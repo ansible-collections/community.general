@@ -47,5 +47,5 @@ options:
       - If C(false), SSL certificates will not be validated.
       - This should only be used on private instances of the CloudControl API that use self-signed certificates.
     type: bool
-    default: yes
+    default: true
 '''

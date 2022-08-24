@@ -34,7 +34,7 @@ options:
     description:
       - Validate SSL certs of the Online API.
     type: bool
-    default: yes
+    default: true
 notes:
   - Also see the API documentation on U(https://console.online.net/en/api/)
   - If C(api_token) is not set within the module, the following

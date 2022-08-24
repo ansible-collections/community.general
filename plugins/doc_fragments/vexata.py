@@ -40,10 +40,10 @@ options:
   validate_certs:
     description:
       - Allows connection when SSL certificates are not valid. Set to C(false) when certificates are not trusted.
-      - If set to C(yes), please make sure Python >= 2.7.9 is installed on the given machine.
+      - If set to C(true), please make sure Python >= 2.7.9 is installed on the given machine.
     required: false
     type: bool
-    default: 'no'
+    default: false
 
 requirements:
   - Vexata VX100 storage array with VXOS >= v3.5.0 on storage array

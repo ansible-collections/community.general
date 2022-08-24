@@ -40,7 +40,7 @@ options:
         description:
           - Whether SSL certificates should be verified for HTTPS requests. defaults to True.
         type: bool
-        default: yes
+        default: true
         aliases: [ verify_ssl ]
       ca_cert:
         description:
