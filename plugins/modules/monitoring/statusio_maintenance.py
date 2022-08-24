@@ -74,32 +74,32 @@ options:
         description:
             - If it affects all components and containers
         type: bool
-        default: 'no'
+        default: false
     automation:
         description:
             - Automatically start and end the maintenance window
         type: bool
-        default: 'no'
+        default: false
     maintenance_notify_now:
         description:
             - Notify subscribers now
         type: bool
-        default: 'no'
+        default: false
     maintenance_notify_72_hr:
         description:
             - Notify subscribers 72 hours before maintenance start time
         type: bool
-        default: 'no'
+        default: false
     maintenance_notify_24_hr:
         description:
             - Notify subscribers 24 hours before maintenance start time
         type: bool
-        default: 'no'
+        default: false
     maintenance_notify_1_hr:
         description:
             - Notify subscribers 1 hour before maintenance start time
         type: bool
-        default: 'no'
+        default: false
     maintenance_id:
         type: str
         description:

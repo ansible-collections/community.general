@@ -43,7 +43,7 @@ options:
       - Create a backup file (if yes), including the timestamp information so
       - you can get the original file back if you somehow clobbered it incorrectly.
     type: bool
-    default: 'no'
+    default: false
   command:
     type: str
     description:
@@ -97,7 +97,7 @@ options:
     description:
       - Whether the check is a metric
     type: bool
-    default: 'no'
+    default: false
   standalone:
     description:
       - Whether the check should be scheduled by the sensu client or server
@@ -153,7 +153,7 @@ EXAMPLES = '''
   community.general.sensu_check:
     name: cpu_load
     command: /etc/sensu/plugins/system/cpu-mpstat-metrics.rb
-    metric: yes
+    metric: true
     handlers: relay
     subscribers: common
     interval: 60
@@ -328,7 +328,7 @@ def main():
     arg_spec = {'name': {'type': 'str', 'required': True},
                 'path': {'type': 'str', 'default': '/etc/sensu/conf.d/checks.json'},
                 'state': {'type': 'str', 'default': 'present', 'choices': ['present', 'absent']},
-                'backup': {'type': 'bool', 'default': 'no'},
+                'backup': {'type': 'bool', 'default': False},
                 'command': {'type': 'str'},
                 'handlers': {'type': 'list', 'elements': 'str'},
                 'subscribers': {'type': 'list', 'elements': 'str'},
@@ -339,7 +339,7 @@ def main():
                 'subdue_begin': {'type': 'str'},
                 'subdue_end': {'type': 'str'},
                 'dependencies': {'type': 'list', 'elements': 'str'},
-                'metric': {'type': 'bool', 'default': 'no'},
+                'metric': {'type': 'bool', 'default': False},
                 'standalone': {'type': 'bool'},
                 'publish': {'type': 'bool'},
                 'occurrences': {'type': 'int'},

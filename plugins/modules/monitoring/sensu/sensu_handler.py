@@ -64,12 +64,12 @@ options:
     description:
       - If events matching one or more silence entries should be handled.
     type: bool
-    default: 'no'
+    default: false
   handle_flapping:
     description:
       - If events in the flapping state should be handled.
     type: bool
-    default: 'no'
+    default: false
   command:
     type: str
     description:

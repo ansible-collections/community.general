@@ -73,10 +73,10 @@ options:
         default: Created by Ansible
     validate_certs:
         description:
-            - If C(no), SSL certificates will not be validated. This should only be used
+            - If C(false), SSL certificates will not be validated. This should only be used
               on personally controlled sites using self-signed certificates.
         type: bool
-        default: 'yes'
+        default: true
 '''
 
 EXAMPLES = '''

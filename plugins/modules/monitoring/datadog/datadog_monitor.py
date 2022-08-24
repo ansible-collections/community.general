@@ -91,7 +91,7 @@ options:
         description:
           - Whether this monitor will notify when data stops reporting.
         type: bool
-        default: 'no'
+        default: false
     no_data_timeframe:
         description:
           - The number of minutes before a monitor will notify when data stops reporting.
@@ -116,7 +116,7 @@ options:
         description:
           - Whether tagged users will be notified on changes to this monitor.
         type: bool
-        default: 'no'
+        default: false
     thresholds:
         type: dict
         description:
@@ -128,7 +128,7 @@ options:
         description:
           - Whether changes to this monitor should be restricted to the creator or admins.
         type: bool
-        default: 'no'
+        default: false
     require_full_window:
         description:
           - Whether this monitor needs a full window of data before it gets evaluated.
@@ -153,7 +153,7 @@ options:
         description:
           - Whether notifications from this monitor automatically inserts its triggering tags into the title.
         type: bool
-        default: yes
+        default: true
         version_added: 1.3.0
     priority:
         description:
