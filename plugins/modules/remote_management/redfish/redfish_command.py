@@ -507,6 +507,20 @@ EXAMPLES = '''
 
   - name: Insert Virtual Media
     community.general.redfish_command:
+      category: Systems
+      command: VirtualMediaInsert
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      virtual_media:
+        image_url: 'http://example.com/images/SomeLinux-current.iso'
+        media_types:
+          - CD
+          - DVD
+      resource_id: 1
+
+  - name: Insert Virtual Media
+    community.general.redfish_command:
       category: Manager
       command: VirtualMediaInsert
       baseuri: "{{ baseuri }}"
@@ -518,6 +532,17 @@ EXAMPLES = '''
           - CD
           - DVD
       resource_id: BMC
+
+  - name: Eject Virtual Media
+    community.general.redfish_command:
+      category: Systems
+      command: VirtualMediaEject
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      virtual_media:
+        image_url: 'http://example.com/images/SomeLinux-current.iso'
+      resource_id: 1
 
   - name: Eject Virtual Media
     community.general.redfish_command:
@@ -593,7 +618,7 @@ from ansible.module_utils.common.text.converters import to_native
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["PowerOn", "PowerForceOff", "PowerForceRestart", "PowerGracefulRestart",
                 "PowerGracefulShutdown", "PowerReboot", "SetOneTimeBoot", "EnableContinuousBootOverride", "DisableBootOverride",
-                "IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink"],
+                "IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink", "VirtualMediaInsert", "VirtualMediaEject"],
     "Chassis": ["IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink"],
     "Accounts": ["AddUser", "EnableUser", "DeleteUser", "DisableUser",
                  "UpdateUserRole", "UpdateUserPassword", "UpdateUserName",
@@ -766,6 +791,10 @@ def main():
                 result = rf_utils.set_boot_override(boot_opts)
             elif command.startswith('IndicatorLed'):
                 result = rf_utils.manage_system_indicator_led(command)
+            elif command == 'VirtualMediaInsert':
+                result = rf_utils.virtual_media_insert(virtual_media, category)
+            elif command == 'VirtualMediaEject':
+                result = rf_utils.virtual_media_eject(virtual_media, category)
 
     elif category == "Chassis":
         result = rf_utils._find_chassis_resource()
@@ -814,9 +843,9 @@ def main():
             elif command == 'ClearLogs':
                 result = rf_utils.clear_logs()
             elif command == 'VirtualMediaInsert':
-                result = rf_utils.virtual_media_insert(virtual_media)
+                result = rf_utils.virtual_media_insert(virtual_media, category)
             elif command == 'VirtualMediaEject':
-                result = rf_utils.virtual_media_eject(virtual_media)
+                result = rf_utils.virtual_media_eject(virtual_media, category)
 
     elif category == "Update":
         # execute only if we find UpdateService resources
