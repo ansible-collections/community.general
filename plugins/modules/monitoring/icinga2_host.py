@@ -26,16 +26,16 @@ options:
       - HTTP, HTTPS, or FTP URL in the form (http|https|ftp)://[user[:pass]]@host.domain[:port]/path
   use_proxy:
     description:
-      - If C(no), it will not use a proxy, even if one is defined in
+      - If C(false), it will not use a proxy, even if one is defined in
         an environment variable on the target hosts.
     type: bool
-    default: 'yes'
+    default: true
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be used
+      - If C(false), SSL certificates will not be validated. This should only be used
         on personally controlled sites using self-signed certificates.
     type: bool
-    default: 'yes'
+    default: true
   url_username:
     type: str
     description:
@@ -53,7 +53,7 @@ options:
         send a 401, logins will fail. This option forces the sending of the Basic authentication header
         upon initial request.
     type: bool
-    default: 'no'
+    default: false
   client_cert:
     type: path
     description:

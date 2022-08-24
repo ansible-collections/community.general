@@ -43,9 +43,9 @@ options:
      aliases: [password]
    use_proxy:
      description:
-     - if C(no), it will not use a proxy, even if one is defined in
+     - if C(false), it will not use a proxy, even if one is defined in
        an environment variable on the target hosts.
-     default: yes
+     default: true
      required: false
      type: bool
    name:
@@ -63,7 +63,7 @@ options:
      - Validate SSL certificates. Only change this to C(false) if you can guarantee that you are talking to the correct endpoint and there is no
        man-in-the-middle attack happening.
      type: bool
-     default: yes
+     default: true
      required: false
    attributes:
      description:

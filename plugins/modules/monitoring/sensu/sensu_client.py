@@ -44,7 +44,7 @@ options:
     description:
       - If safe mode is enabled for the client. Safe mode requires local check definitions in order to accept a check request and execute the check.
     type: bool
-    default: 'no'
+    default: false
   redact:
     type: list
     elements: str
@@ -58,7 +58,7 @@ options:
     description:
       - If Sensu should monitor keepalives for this client.
     type: bool
-    default: 'yes'
+    default: true
   keepalive:
     type: dict
     description:
