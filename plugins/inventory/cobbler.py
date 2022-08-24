@@ -19,7 +19,7 @@ DOCUMENTATION = '''
     options:
       plugin:
         description: The name of this plugin, it should always be set to C(community.general.cobbler) for this plugin to recognize it as it's own.
-        required: yes
+        required: true
         choices: [ 'cobbler', 'community.general.cobbler' ]
       url:
         description: URL to cobbler.
@@ -28,18 +28,18 @@ DOCUMENTATION = '''
             - name: COBBLER_SERVER
       user:
         description: Cobbler authentication user.
-        required: no
+        required: false
         env:
             - name: COBBLER_USER
       password:
         description: Cobbler authentication password
-        required: no
+        required: false
         env:
             - name: COBBLER_PASSWORD
       cache_fallback:
         description: Fallback to cached results if connection to cobbler fails
         type: boolean
-        default: no
+        default: false
       exclude_profiles:
         description:
           - Profiles to exclude from inventory.
@@ -70,7 +70,7 @@ DOCUMENTATION = '''
       want_facts:
         description: Toggle, if C(true) the plugin will retrieve host facts from the server
         type: boolean
-        default: yes
+        default: true
 '''
 
 EXAMPLES = '''

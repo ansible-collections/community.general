@@ -46,7 +46,7 @@ EXAMPLES = r"""
     dest: /web/{{ item.path }}
     state: link
     follow: false  # avoid corrupting target files if the link already exists
-    force: yes
+    force: true
     mode: '{{ item.mode }}'
   with_community.general.filetree: web/
   when: item.state == 'link'
