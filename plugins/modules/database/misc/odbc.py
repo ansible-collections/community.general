@@ -20,12 +20,12 @@ options:
     dsn:
       description:
         - The connection string passed into ODBC.
-      required: yes
+      required: true
       type: str
     query:
       description:
         - The SQL query to perform.
-      required: yes
+      required: true
       type: str
     params:
       description:
@@ -38,7 +38,7 @@ options:
         - Some databases allow a commit after a select whereas others raise an exception.
         - Default is C(true) to support legacy module behavior.
       type: bool
-      default: yes
+      default: true
       version_added: 1.3.0
 requirements:
   - "python >= 2.6"
@@ -58,7 +58,7 @@ EXAMPLES = '''
     params:
       - "value1"
     commit: false
-  changed_when: no
+  changed_when: false
 '''
 
 RETURN = '''
