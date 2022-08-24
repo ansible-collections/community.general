@@ -50,12 +50,12 @@ options:
     description:
       - Use https to access balancer management page.
     type: bool
-    default: 'no'
+    default: false
   validate_certs:
     description:
       - Validate ssl/tls certificates.
     type: bool
-    default: 'yes'
+    default: true
 '''
 
 EXAMPLES = '''
