@@ -67,7 +67,7 @@ EXAMPLES = '''
   community.general.opkg:
     name: foo
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Remove foo
   community.general.opkg:

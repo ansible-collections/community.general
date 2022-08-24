@@ -40,19 +40,19 @@ options:
     description:
       - Update packages to the best version available (--update)
     type: bool
-    default: no
+    default: false
 
   deep:
     description:
       - Consider the entire dependency tree of packages (--deep)
     type: bool
-    default: no
+    default: false
 
   newuse:
     description:
       - Include installed packages where USE flags have changed (--newuse)
     type: bool
-    default: no
+    default: false
 
   changed_use:
     description:
@@ -60,31 +60,31 @@ options:
       - flags that the user has not enabled are added or removed
       - (--changed-use)
     type: bool
-    default: no
+    default: false
 
   oneshot:
     description:
       - Do not add the packages to the world file (--oneshot)
     type: bool
-    default: no
+    default: false
 
   noreplace:
     description:
       - Do not re-emerge installed packages (--noreplace)
     type: bool
-    default: yes
+    default: true
 
   nodeps:
     description:
       - Only merge packages but not their dependencies (--nodeps)
     type: bool
-    default: no
+    default: false
 
   onlydeps:
     description:
       - Only merge packages' dependencies but not the packages (--onlydeps)
     type: bool
-    default: no
+    default: false
 
   depclean:
     description:
@@ -92,25 +92,25 @@ options:
       - If no package is specified, clean up the world's dependencies
       - Otherwise, --depclean serves as a dependency aware version of --unmerge
     type: bool
-    default: no
+    default: false
 
   quiet:
     description:
       - Run emerge in quiet mode (--quiet)
     type: bool
-    default: no
+    default: false
 
   verbose:
     description:
       - Run emerge in verbose mode (--verbose)
     type: bool
-    default: no
+    default: false
 
   sync:
     description:
       - Sync package repositories first
-      - If yes, perform "emerge --sync"
-      - If web, perform "emerge-webrsync"
+      - If C(yes), perform "emerge --sync"
+      - If C(web), perform "emerge-webrsync"
     choices: [ "web", "yes", "no" ]
     type: str
 
@@ -118,32 +118,32 @@ options:
     description:
       - Merge only packages specified at C(PORTAGE_BINHOST) in C(make.conf).
     type: bool
-    default: no
+    default: false
     version_added: 1.3.0
 
   getbinpkg:
     description:
       - Prefer packages specified at C(PORTAGE_BINHOST) in C(make.conf).
     type: bool
-    default: no
+    default: false
 
   usepkgonly:
     description:
       - Merge only binaries (no compiling).
     type: bool
-    default: no
+    default: false
 
   usepkg:
     description:
       - Tries to use the binary package(s) in the locally available packages directory.
     type: bool
-    default: no
+    default: false
 
   keepgoing:
     description:
       - Continue as much as possible after an error.
     type: bool
-    default: no
+    default: false
 
   jobs:
     description:
@@ -165,7 +165,7 @@ options:
       - Redirect all build output to logs alone, and do not display it
       - on stdout (--quiet-build)
     type: bool
-    default: no
+    default: false
 
   quietfail:
     description:
@@ -173,7 +173,7 @@ options:
       - Only the die message and the path of the build log will be
       - displayed on stdout.
     type: bool
-    default: no
+    default: false
 
 requirements: [ gentoolkit ]
 author:
@@ -196,34 +196,34 @@ EXAMPLES = '''
 - name: Update package foo to the latest version (os specific alternative to latest)
   community.general.portage:
     package: foo
-    update: yes
+    update: true
 
 - name: Install package foo using PORTAGE_BINHOST setup
   community.general.portage:
     package: foo
-    getbinpkg: yes
+    getbinpkg: true
 
 - name: Re-install world from binary packages only and do not allow any compiling
   community.general.portage:
     package: '@world'
-    usepkgonly: yes
+    usepkgonly: true
 
 - name: Sync repositories and update world
   community.general.portage:
     package: '@world'
-    update: yes
-    deep: yes
-    sync: yes
+    update: true
+    deep: true
+    sync: true
 
 - name: Remove unneeded packages
   community.general.portage:
-    depclean: yes
+    depclean: true
 
 - name: Remove package foo if it is not explicitly needed
   community.general.portage:
     package: foo
     state: absent
-    depclean: yes
+    depclean: true
 '''
 
 import os

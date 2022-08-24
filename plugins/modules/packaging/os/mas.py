@@ -40,7 +40,7 @@ options:
         description:
             - Upgrade all installed Mac App Store apps.
         type: bool
-        default: "no"
+        default: false
         aliases: ["upgrade"]
 requirements:
     - macOS 10.11+
@@ -77,7 +77,7 @@ EXAMPLES = '''
 
 - name: Upgrade all installed Mac App Store apps
   community.general.mas:
-    upgrade_all: yes
+    upgrade_all: true
 
 - name: Install specific apps and also upgrade all others
   community.general.mas:
@@ -85,13 +85,13 @@ EXAMPLES = '''
       - 409183694 # Keynote
       - 413857545 # Divvy
     state: present
-    upgrade_all: yes
+    upgrade_all: true
 
 - name: Uninstall Divvy
   community.general.mas:
     id: 413857545
     state: absent
-  become: yes # Uninstallation requires root permissions
+  become: true # Uninstallation requires root permissions
 '''
 
 RETURN = r''' # '''
@@ -274,7 +274,7 @@ def main():
             if mas.is_installed(app):
                 # Ensure we are root
                 if os.getuid() != 0:
-                    module.fail_json(msg="Uninstalling apps requires root permissions ('become: yes')")
+                    module.fail_json(msg="Uninstalling apps requires root permissions ('become: true')")
 
                 mas.app_command('uninstall', app)
 

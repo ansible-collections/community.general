@@ -138,7 +138,7 @@ options:
         description:
             -  Register the system even if it is already registered
         type: bool
-        default: no
+        default: false
     release:
         description:
             - Set a release version
@@ -173,7 +173,7 @@ options:
                       RHSM server immediately. When this option is false, then syspurpose attributes
                       will be synchronized with RHSM server by rhsmcertd daemon.
                 type: bool
-                default: no
+                default: false
 '''
 
 EXAMPLES = '''

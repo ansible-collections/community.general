@@ -73,33 +73,33 @@ options:
             signature being installed. Has an effect only if state is
             I(present) or I(latest).
         required: false
-        default: "no"
+        default: false
         type: bool
     disable_recommends:
         description:
-          - Corresponds to the C(--no-recommends) option for I(zypper). Default behavior (C(yes)) modifies zypper's default behavior; C(no) does
+          - Corresponds to the C(--no-recommends) option for I(zypper). Default behavior (C(true)) modifies zypper's default behavior; C(false) does
             install recommended packages.
         required: false
-        default: "yes"
+        default: true
         type: bool
     force:
         description:
           - Adds C(--force) option to I(zypper). Allows to downgrade packages and change vendor or architecture.
         required: false
-        default: "no"
+        default: false
         type: bool
     force_resolution:
         description:
           - Adds C(--force-resolution) option to I(zypper). Allows to (un)install packages with conflicting requirements (resolver will choose a solution).
         required: false
-        default: "no"
+        default: false
         type: bool
         version_added: '0.2.0'
     update_cache:
         description:
           - Run the equivalent of C(zypper refresh) before the operation. Disabled in check mode.
         required: false
-        default: "no"
+        default: false
         type: bool
         aliases: [ "refresh" ]
     oldpackage:
@@ -107,7 +107,7 @@ options:
           - Adds C(--oldpackage) option to I(zypper). Allows to downgrade packages with less side-effects than force. This is implied as soon as a
             version is specified as part of the package name.
         required: false
-        default: "no"
+        default: false
         type: bool
     extra_args:
         required: false
@@ -156,7 +156,7 @@ EXAMPLES = '''
   community.general.zypper:
     name: apache2
     state: present
-    disable_recommends: no
+    disable_recommends: false
 
 - name: Apply a given patch
   community.general.zypper:
@@ -207,7 +207,7 @@ EXAMPLES = '''
   community.general.zypper:
     name: openssl
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: "Install specific version (possible comparisons: <, >, <=, >=, =)"
   community.general.zypper:

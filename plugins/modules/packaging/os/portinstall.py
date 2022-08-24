@@ -37,7 +37,7 @@ options:
             - use packages instead of ports whenever available
         type: bool
         required: false
-        default: yes
+        default: true
 author: "berenddeboer (@berenddeboer)"
 '''
 

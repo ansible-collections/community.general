@@ -34,7 +34,7 @@ options:
         have any effect, the environment must be deleted and newly
         created.
     type: bool
-    default: 'no'
+    default: false
   virtualenv_command:
     type: str
     description:

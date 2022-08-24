@@ -48,7 +48,7 @@ options:
               Same as C(extra_args="--nodeps --nodeps").
               When combined with I(update_cache), force a refresh of all package databases.
               Same as C(update_cache_extra_args="--refresh --refresh").
-        default: no
+        default: false
         type: bool
 
     remove_nosave:
@@ -56,7 +56,7 @@ options:
             - When removing packages, do not save modified configuration files as C(.pacsave) files.
               (passes C(--nosave) to pacman)
         version_added: 4.6.0
-        default: no
+        default: false
         type: bool
 
     executable:
@@ -198,7 +198,7 @@ EXAMPLES = """
   community.general.pacman:
     name: foo
     state: latest
-    update_cache: yes
+    update_cache: true
 
 - name: Remove packages foo and bar
   community.general.pacman:
@@ -215,11 +215,11 @@ EXAMPLES = """
 
 - name: Run the equivalent of "pacman -Sy" as a separate step
   community.general.pacman:
-    update_cache: yes
+    update_cache: true
 
 - name: Run the equivalent of "pacman -Su" as a separate step
   community.general.pacman:
-    upgrade: yes
+    upgrade: true
 
 - name: Run the equivalent of "pacman -Syu" as a separate step
   # Since community.general 5.0.0 the 'changed' state of this call
@@ -232,14 +232,14 @@ EXAMPLES = """
   #   register: result
   #   changed_when: result.packages | length > 0
   community.general.pacman:
-    update_cache: yes
-    upgrade: yes
+    update_cache: true
+    upgrade: true
 
 - name: Run the equivalent of "pacman -Rdd", force remove package baz
   community.general.pacman:
     name: baz
     state: absent
-    force: yes
+    force: true
 
 - name: Install foo as dependency and leave reason untouched if already installed
   community.general.pacman:

@@ -83,7 +83,7 @@ options:
             responds to an initial request with a 401 status. Since some basic auth services do not properly
             send a 401, logins will fail. This option forces the sending of the Basic authentication header
             upon initial request.
-        default: 'no'
+        default: false
         type: bool
         version_added: '0.2.0'
     dest:
@@ -105,9 +105,9 @@ options:
         default: 10
     validate_certs:
         description:
-            - If C(no), SSL certificates will not be validated. This should only be set to C(no) when no other option exists.
+            - If C(false), SSL certificates will not be validated. This should only be set to C(false) when no other option exists.
         type: bool
-        default: 'yes'
+        default: true
     client_cert:
         description:
             - PEM formatted certificate chain file to be used for SSL client authentication.
@@ -122,11 +122,11 @@ options:
         version_added: '1.3.0'
     keep_name:
         description:
-            - If C(yes), the downloaded artifact's name is preserved, i.e the version number remains part of it.
+            - If C(true), the downloaded artifact's name is preserved, i.e the version number remains part of it.
             - This option only has effect when C(dest) is a directory and C(version) is set to C(latest) or C(version_by_spec)
               is defined.
         type: bool
-        default: 'no'
+        default: false
     verify_checksum:
         type: str
         description:
@@ -214,7 +214,7 @@ EXAMPLES = '''
     artifact_id: spring-core
     group_id: org.springframework
     dest: /tmp/
-    keep_name: yes
+    keep_name: true
 
 - name: Download the latest version of the JUnit framework artifact from Maven local
   community.general.maven_artifact:
