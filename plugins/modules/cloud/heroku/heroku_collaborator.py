@@ -36,7 +36,7 @@ options:
     description:
       - Suppress email invitation when creating collaborator
     type: bool
-    default: "no"
+    default: false
   user:
     type: str
     description:

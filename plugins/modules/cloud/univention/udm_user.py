@@ -149,13 +149,13 @@ options:
         type: str
     overridePWHistory:
         type: bool
-        default: 'no'
+        default: false
         description:
             - Override password history
         aliases: [ override_pw_history ]
     overridePWLength:
         type: bool
-        default: 'no'
+        default: false
         description:
             - Override password check
         aliases: [ override_pw_length ]

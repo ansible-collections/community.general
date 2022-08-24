@@ -27,7 +27,7 @@ notes:
    U(https://raw.githubusercontent.com/xapi-project/xen-api/master/scripts/examples/python/XenAPI/XenAPI.py)'
 - 'If no scheme is specified in I(hostname), module defaults to C(http://) because C(https://) is problematic in most setups. Make sure you are
    accessing XenServer host in trusted environment or use C(https://) scheme explicitly.'
-- 'To use C(https://) scheme for I(hostname) you have to either import host certificate to your OS certificate store or use I(validate_certs): C(no)
+- 'To use C(https://) scheme for I(hostname) you have to either import host certificate to your OS certificate store or use I(validate_certs): C(false)
    which requires XenAPI library from XenServer 7.2 SDK or newer and Python 2.7.9 or newer.'
 - 'Network configuration inside a guest OS, by using I(networks.type), I(networks.ip), I(networks.gateway) etc. parameters, is supported on
   XenServer 7.0 or newer for Windows guests by using official XenServer Guest agent support for network configuration. The module will try to
@@ -93,7 +93,7 @@ options:
     description:
     - Convert VM to template.
     type: bool
-    default: no
+    default: false
   folder:
     description:
     - Destination folder for VM.
@@ -253,21 +253,21 @@ options:
         description:
         - VM param name.
         type: str
-        required: yes
+        required: true
       value:
         description:
         - VM param value.
         type: raw
-        required: yes
+        required: true
   wait_for_ip_address:
     description:
     - Wait until XenServer detects an IP address for the VM. If I(state) is set to C(absent), this parameter is ignored.
     - This requires XenServer Tools to be preinstalled on the VM to work properly.
     type: bool
-    default: no
+    default: false
   state_change_timeout:
     description:
-    - 'By default, module will wait indefinitely for VM to accquire an IP address if I(wait_for_ip_address): C(yes).'
+    - 'By default, module will wait indefinitely for VM to accquire an IP address if I(wait_for_ip_address): C(true).'
     - If this parameter is set to positive value, the module will instead wait specified number of seconds for the state change.
     - In case of timeout, module will generate an error message.
     type: int
@@ -277,13 +277,13 @@ options:
     - Whether to create a Linked Clone from the template, existing VM or snapshot. If no, will create a full copy.
     - This is equivalent to C(Use storage-level fast disk clone) option in XenCenter.
     type: bool
-    default: no
+    default: false
   force:
     description:
     - Ignore warnings and complete the actions.
     - This parameter is useful for removing VM in running state or reconfiguring VM params that require VM to be shut down.
     type: bool
-    default: no
+    default: false
 extends_documentation_fragment:
 - community.general.xenserver.documentation
 
@@ -295,7 +295,7 @@ EXAMPLES = r'''
     hostname: "{{ xenserver_hostname }}"
     username: "{{ xenserver_username }}"
     password: "{{ xenserver_password }}"
-    validate_certs: no
+    validate_certs: false
     folder: /testvms
     name: testvm_2
     state: poweredon
@@ -313,7 +313,7 @@ EXAMPLES = r'''
     networks:
     - name: VM Network
       mac: aa:bb:dd:aa:00:14
-    wait_for_ip_address: yes
+    wait_for_ip_address: true
   delegate_to: localhost
   register: deploy
 
@@ -322,10 +322,10 @@ EXAMPLES = r'''
     hostname: "{{ xenserver_hostname }}"
     username: "{{ xenserver_username }}"
     password: "{{ xenserver_password }}"
-    validate_certs: no
+    validate_certs: false
     folder: /testvms
     name: testvm_6
-    is_template: yes
+    is_template: true
     disk:
     - size_gb: 10
       sr: my_sr

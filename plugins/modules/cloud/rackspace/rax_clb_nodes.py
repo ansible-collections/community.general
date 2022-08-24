@@ -64,7 +64,7 @@ options:
       - Type of node
   wait:
     required: false
-    default: "no"
+    default: false
     type: bool
     description:
       - Wait for the load balancer to become active before returning
@@ -99,7 +99,7 @@ EXAMPLES = '''
     port: 80
     condition: enabled
     type: primary
-    wait: yes
+    wait: true
     credentials: /path/to/credentials
 
 - name: Drain connections from a node
@@ -108,7 +108,7 @@ EXAMPLES = '''
     load_balancer_id: 71
     node_id: 410
     condition: draining
-    wait: yes
+    wait: true
     credentials: /path/to/credentials
 
 - name: Remove a node from the load balancer
@@ -117,7 +117,7 @@ EXAMPLES = '''
     load_balancer_id: 71
     node_id: 410
     state: absent
-    wait: yes
+    wait: true
     credentials: /path/to/credentials
 '''
 

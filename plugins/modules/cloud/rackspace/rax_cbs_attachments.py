@@ -42,7 +42,7 @@ options:
     description:
       - wait for the volume to be in 'in-use'/'available' state before returning
     type: bool
-    default: 'no'
+    default: false
   wait_timeout:
     type: int
     description:
@@ -70,7 +70,7 @@ EXAMPLES = '''
         server: my-server
         device: /dev/xvdd
         region: DFW
-        wait: yes
+        wait: true
         state: present
       register: my_volume
 '''

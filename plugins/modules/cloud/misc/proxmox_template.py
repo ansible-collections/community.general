@@ -52,7 +52,7 @@ options:
     description:
       - can be used only with C(state=present), exists template will be overwritten
     type: bool
-    default: 'no'
+    default: false
   state:
     description:
      - Indicate desired state of the template
@@ -92,7 +92,7 @@ EXAMPLES = '''
     storage: local
     content_type: vztmpl
     src: ~/ubuntu-14.04-x86_64.tar.gz
-    force: yes
+    force: true
 
 - name: Delete template with minimal options
   community.general.proxmox_template:

@@ -58,7 +58,7 @@ options:
       - If C(False), the module will fail under these conditions.
       - This is intended to prevent accidental expansion of a VLAN's network (since this operation is not reversible).
     type: bool
-    default: 'no'
+    default: false
 '''
 
 EXAMPLES = '''
@@ -72,7 +72,7 @@ EXAMPLES = '''
     private_ipv4_base_address: 192.168.23.0
     private_ipv4_prefix_size: 24
     state: present
-    wait: yes
+    wait: true
 
 - name: Read / get VLAN details
   community.general.dimensiondata_vlan:
@@ -81,7 +81,7 @@ EXAMPLES = '''
     network_domain: test_network
     name: my_vlan1
     state: readonly
-    wait: yes
+    wait: true
 
 - name: Delete a VLAN
   community.general.dimensiondata_vlan:
@@ -90,7 +90,7 @@ EXAMPLES = '''
     network_domain: test_network
     name: my_vlan_1
     state: absent
-    wait: yes
+    wait: true
 '''
 
 RETURN = '''

@@ -32,7 +32,7 @@ options:
     - Specifies that the nic tag will be attached to a created I(etherstub).
     - Parameter I(etherstub) is mutually exclusive with both I(mtu), and I(mac).
     type: bool
-    default: no
+    default: false
   mtu:
     description:
     - Specifies the size of the I(mtu) of the desired nic tag.
@@ -42,7 +42,7 @@ options:
     description:
     - When I(state) is absent set this switch will use the C(-f) parameter and delete the nic tag regardless of existing VMs.
     type: bool
-    default: no
+    default: false
   state:
     description:
     - Create or delete a SmartOS nic tag.

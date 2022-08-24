@@ -121,7 +121,7 @@ options:
     description:
       - wait for the instance to be in state 'running' before returning
     required: false
-    default: "yes"
+    default: true
     type: bool
   wait_timeout:
     description:

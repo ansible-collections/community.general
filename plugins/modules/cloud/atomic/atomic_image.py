@@ -44,7 +44,7 @@ options:
         description:
           - Start or Stop the container.
         type: bool
-        default: 'yes'
+        default: true
 '''
 
 EXAMPLES = r'''

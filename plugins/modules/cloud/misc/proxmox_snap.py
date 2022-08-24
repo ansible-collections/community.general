@@ -36,12 +36,12 @@ options:
   force:
     description:
       - For removal from config file, even if removing disk snapshot fails.
-    default: no
+    default: false
     type: bool
   vmstate:
     description:
       - Snapshot includes RAM.
-    default: no
+    default: false
     type: bool
   description:
     description:
@@ -175,8 +175,8 @@ def main():
         state=dict(default='present', choices=['present', 'absent', 'rollback']),
         description=dict(type='str'),
         snapname=dict(type='str', default='ansible_snap'),
-        force=dict(type='bool', default='no'),
-        vmstate=dict(type='bool', default='no'),
+        force=dict(type='bool', default=False),
+        vmstate=dict(type='bool', default=False),
     )
     module_args.update(snap_args)
 

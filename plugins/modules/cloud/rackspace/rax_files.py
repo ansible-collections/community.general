@@ -20,7 +20,7 @@ options:
       - Optionally clear existing metadata when applying metadata to existing containers.
         Selecting this option is only appropriate when setting type=meta
     type: bool
-    default: "no"
+    default: false
   container:
     type: str
     description:
@@ -82,7 +82,7 @@ extends_documentation_fragment:
 EXAMPLES = '''
 - name: "Test Cloud Files Containers"
   hosts: local
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: "List all containers"
       community.general.rax_files:
@@ -112,22 +112,22 @@ EXAMPLES = '''
     - name: "Make container public"
       community.general.rax_files:
         container: mycontainer
-        public: yes
+        public: true
 
     - name: "Make container public with a 24 hour TTL"
       community.general.rax_files:
         container: mycontainer
-        public: yes
+        public: true
         ttl: 86400
 
     - name: "Make container private"
       community.general.rax_files:
         container: mycontainer
-        private: yes
+        private: true
 
 - name: "Test Cloud Files Containers Metadata Storage"
   hosts: local
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: "Get mycontainer2 metadata"
       community.general.rax_files:

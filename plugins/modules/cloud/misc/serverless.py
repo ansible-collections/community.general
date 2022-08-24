@@ -46,17 +46,17 @@ options:
       - When this option is C(false) all the functions will be built, but no stack update will be run to send them out.
       - This is mostly useful for generating artifacts to be stored/deployed elsewhere.
     type: bool
-    default: yes
+    default: true
   force:
     description:
       - Whether or not to force full deployment, equivalent to serverless C(--force) option.
     type: bool
-    default: no
+    default: false
   verbose:
     description:
       - Shows all stack events during deployment, and display any Stack Output.
     type: bool
-    default: no
+    default: false
 notes:
    - Currently, the C(serverless) command must be in the path of the node executing the task.
      In the future this may be a flag.
