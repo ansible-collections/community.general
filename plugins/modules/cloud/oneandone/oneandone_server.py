@@ -120,7 +120,7 @@ options:
         for each individual server to be deleted before moving on with
         other tasks.)
     type: bool
-    default: 'yes'
+    default: true
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
@@ -137,7 +137,7 @@ options:
         hostnames by appending a count after them or substituting the count
         where there is a %02d or %03d in the hostname string.
     type: bool
-    default: 'yes'
+    default: true
 
 requirements:
   - "1and1"
@@ -173,7 +173,7 @@ EXAMPLES = '''
     datacenter: ES
     appliance: C5A349786169F140BCBC335675014C08
     count: 3
-    wait: yes
+    wait: true
     wait_timeout: 600
     wait_interval: 10
     ssh_key: SSH_PUBLIC_KEY

@@ -93,7 +93,7 @@ options:
       256 items.
   disabled:
     description:
-    - If "yes", ensure the check is created, but don't actually use it yet.
+    - If C(true), ensure the check is created, but don't actually use it yet.
     type: bool
     default: false
   metadata:

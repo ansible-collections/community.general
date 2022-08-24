@@ -57,10 +57,10 @@ options:
     - Wait until XenServer detects an IP address for the VM.
     - This requires XenServer Tools to be preinstalled on the VM to work properly.
     type: bool
-    default: no
+    default: false
   state_change_timeout:
     description:
-    - 'By default, module will wait indefinitely for VM to change state or acquire an IP address if C(wait_for_ip_address: yes).'
+    - 'By default, module will wait indefinitely for VM to change state or acquire an IP address if C(wait_for_ip_address: true).'
     - If this parameter is set to positive value, the module will instead wait specified number of seconds for the state change.
     - In case of timeout, module will generate an error message.
     type: int

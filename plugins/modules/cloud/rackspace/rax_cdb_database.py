@@ -18,12 +18,12 @@ options:
     type: str
     description:
       - The databases server UUID
-    required: yes
+    required: true
   name:
     type: str
     description:
       - Name to give to the database
-    required: yes
+    required: true
   character_set:
     type: str
     description:

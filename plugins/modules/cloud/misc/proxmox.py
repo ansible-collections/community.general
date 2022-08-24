@@ -86,7 +86,7 @@ options:
   onboot:
     description:
       - specifies whether a VM will be started during system bootup
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(no).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
     type: bool
   storage:
     description:
@@ -118,7 +118,7 @@ options:
       - with C(state=present) force option allow to overwrite existing container
       - with states C(stopped) , C(restarted) allow to force stop instance
     type: bool
-    default: 'no'
+    default: false
   purge:
     description:
       - Remove container from all related configurations.
@@ -142,7 +142,7 @@ options:
     description:
       - Indicate if the container should be unprivileged
     type: bool
-    default: 'no'
+    default: false
   description:
     description:
       - Specify the description for the container. Only used on the configuration web interface.
@@ -239,7 +239,7 @@ EXAMPLES = r'''
     password: 123456
     hostname: example.org
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
-    force: yes
+    force: true
 
 - name: Create new container with minimal options use environment PROXMOX_PASSWORD variable(you should export it before)
   community.general.proxmox:
@@ -369,7 +369,7 @@ EXAMPLES = r'''
     api_user: root@pam
     api_password: 1q2w3e
     api_host: node1
-    force: yes
+    force: true
     state: stopped
 
 - name: Restart container(stopped or mounted container you can't restart)

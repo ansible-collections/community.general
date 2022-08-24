@@ -55,7 +55,7 @@ options:
         description:
             - Whether the app should restart with an C(autostart.cgi) script
         type: bool
-        default: 'no'
+        default: false
 
     extra_info:
         description:
@@ -67,7 +67,7 @@ options:
         description:
             - IF the port should be opened
         type: bool
-        default: 'no'
+        default: false
 
     login_name:
         description:

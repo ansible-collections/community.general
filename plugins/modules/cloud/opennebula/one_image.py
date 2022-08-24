@@ -102,12 +102,12 @@ EXAMPLES = '''
 - name: Disable the IMAGE by id
   community.general.one_image:
     id: 37
-    enabled: no
+    enabled: false
 
 - name: Enable the IMAGE by name
   community.general.one_image:
     name: bar-image
-    enabled: yes
+    enabled: true
 
 - name: Clone the IMAGE by name
   community.general.one_image:

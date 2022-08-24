@@ -19,17 +19,17 @@ options:
     type: str
     description:
       - The databases server UUID
-    required: yes
+    required: true
   db_username:
     type: str
     description:
       - Name of the database user
-    required: yes
+    required: true
   db_password:
     type: str
     description:
       - Database user password
-    required: yes
+    required: true
   databases:
     type: list
     elements: str
