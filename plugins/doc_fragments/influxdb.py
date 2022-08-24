@@ -46,10 +46,10 @@ options:
     version_added: '0.2.0'
   validate_certs:
     description:
-    - If set to C(no), the SSL certificates will not be validated.
-    - This should only set to C(no) used on personally controlled sites using self-signed certificates.
+    - If set to C(false), the SSL certificates will not be validated.
+    - This should only set to C(false) used on personally controlled sites using self-signed certificates.
     type: bool
-    default: yes
+    default: true
   ssl:
     description:
     - Use https instead of http to connect to InfluxDB server.
