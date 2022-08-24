@@ -70,7 +70,7 @@ options:
         description:
           - whether to verify the TLS certificate of the consul agent
         type: bool
-        default: 'yes'
+        default: true
     notes:
         type: str
         description:

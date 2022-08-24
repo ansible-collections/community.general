@@ -35,7 +35,7 @@ options:
             - Whether the connection should start on boot.
             - Whether the connection profile can be automatically activated
         type: bool
-        default: yes
+        default: true
     conn_name:
         description:
             - The name used to call the connection. Pattern is <type>[-<ifname>][-<num>].
@@ -155,7 +155,7 @@ options:
             - Set as default route.
             - This parameter is mutually_exclusive with gw4 parameter.
         type: bool
-        default: no
+        default: false
         version_added: 2.0.0
     dns4:
         description:
@@ -331,7 +331,7 @@ options:
         description:
             - This is only used with bridge and controls whether Spanning Tree Protocol (STP) is enabled for this bridge.
         type: bool
-        default: yes
+        default: true
     priority:
         description:
             - This is only used with 'bridge' - sets STP priority.
@@ -1183,7 +1183,7 @@ EXAMPLES = r'''
       ip4: 192.0.2.100/24
       gw4: 192.0.2.1
       state: present
-      autoconnect: yes
+      autoconnect: true
 
   - name: Optionally, at the same time specify IPv6 addresses for the device
     community.general.nmcli:

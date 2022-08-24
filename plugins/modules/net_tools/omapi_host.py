@@ -70,7 +70,7 @@ options:
         description:
             - Enable dynamic DNS updates for this host.
         type: bool
-        default: no
+        default: false
 
 '''
 EXAMPLES = r'''
@@ -82,7 +82,7 @@ EXAMPLES = r'''
     macaddr: 44:dd:ab:dd:11:44
     name: server01
     ip: 192.168.88.99
-    ddns: yes
+    ddns: true
     statements:
     - filename "pxelinux.0"
     - next-server 1.1.1.1
