@@ -60,7 +60,7 @@ options:
         description:
             - Verify TLS certificates (do not disable this in production).
         type: bool
-        default: yes
+        default: true
 
     connection_timeout:
         description:
