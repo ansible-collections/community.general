@@ -31,7 +31,7 @@ options:
             - Update Macports and the ports tree, either prior to installing ports or as a separate step.
             - Equivalent to running C(port selfupdate).
         aliases: ['update_cache', 'update_ports']
-        default: "no"
+        default: false
         type: bool
     state:
         description:
@@ -43,7 +43,7 @@ options:
         description:
             - Upgrade all outdated ports, either prior to installing ports or as a separate step.
             - Equivalent to running C(port upgrade outdated).
-        default: "no"
+        default: false
         type: bool
     variant:
         description:
@@ -72,13 +72,13 @@ EXAMPLES = '''
 
 - name: Update Macports and the ports tree, then upgrade all outdated ports
   community.general.macports:
-    selfupdate: yes
-    upgrade: yes
+    selfupdate: true
+    upgrade: true
 
 - name: Update Macports and the ports tree, then install the foo port
   community.general.macports:
     name: foo
-    selfupdate: yes
+    selfupdate: true
 
 - name: Remove the foo port
   community.general.macports:

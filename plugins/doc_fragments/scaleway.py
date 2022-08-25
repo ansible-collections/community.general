@@ -40,7 +40,7 @@ options:
     description:
       - Validate SSL certs of the Scaleway API.
     type: bool
-    default: yes
+    default: true
 notes:
   - Also see the API documentation on U(https://developer.scaleway.com/)
   - If C(api_token) is not set within the module, the following

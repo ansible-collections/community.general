@@ -47,7 +47,7 @@ options:
     description:
       - Add new elements to the array for a key which has an array as its value.
     type: bool
-    default: no
+    default: false
   value:
     description:
       - The value to write.
@@ -92,7 +92,7 @@ EXAMPLES = r'''
     key: AutomaticCheckEnabled
     type: int
     value: 1
-  become: yes
+  become: true
 
 - community.general.osx_defaults:
     domain: com.apple.screensaver

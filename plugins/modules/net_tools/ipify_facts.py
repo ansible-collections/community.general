@@ -33,7 +33,7 @@ options:
     description:
       - When set to C(NO), SSL certificates will not be validated.
     type: bool
-    default: yes
+    default: true
 notes:
   - Visit https://www.ipify.org to get more information.
 '''
