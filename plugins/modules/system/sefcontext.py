@@ -29,7 +29,6 @@ options:
     - when set, ftype, seuser, selevel are ignored.
     type: str
     required: no
-    default: None
   ftype:
     description:
     - The file type that should have SELinux contexts applied.
