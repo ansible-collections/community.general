@@ -1,4 +1,4 @@
 ---
 dependencies:
   - setup_pkg_mgr
-  - setup_remote_tmp_dir
+  - setup_remote_tmp_dir_outside_tmp
