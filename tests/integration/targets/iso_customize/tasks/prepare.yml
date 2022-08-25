@@ -1,0 +1,30 @@
+# Copyright (c) 2022, Ansible Project
+# Copyright (c) 2022, VMware, Inc. All Rights Reserved.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Make sure our testing sub-directory does not exist
+  file:
+    path: '{{ test_dir }}'
+    state: absent
+
+- name: Create our testing sub-directory
+  file:
+    path: '{{ test_dir }}'
+    state: directory
+
+- name: Create temperary file for testing
+  ansible.builtin.file:
+    path: "{{ test_dir }}/test01.cfg"
+    state: touch
+  register: file_result
+
+- name: Check if test files created
+  stat:
+    path: "{{ test_dir }}/test01.cfg"
+  register: test_file
+
+- assert:
+    that:
+    - file_result is changed
+    - test_file.stat.exists == True
