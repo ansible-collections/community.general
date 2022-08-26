@@ -55,7 +55,7 @@ options:
     type: str
   size:
     description:
-      - For I(state=present) C(size) is desired volume size in GB to allocate.
+      - For I(state=present) I(size) is desired volume size in GB to allocate.
       - >
         For I(state=grown) C(size) is the new size of volume. With the C(+) sign
         the value is added to the actual size of the volume
