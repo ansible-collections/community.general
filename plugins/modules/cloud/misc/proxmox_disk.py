@@ -24,7 +24,7 @@ options:
     type: str
   vmid:
     description:
-      - The (unique) ID of the VM.
+      - The unique ID of the VM.
     type: int
   disk:
     description:
