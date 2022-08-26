@@ -621,11 +621,7 @@ def main():
 
     name = module.params['name']
     state = module.params['state']
-    vmid = module.params['vmid']
-
-    # If vmid is not defined then retrieve its value from the vm name,
-    if not vmid:
-        vmid = proxmox.get_vmid(name)
+    vmid = module.params['vmid'] or proxmox.get_vmid(name)
 
     # Ensure VM id exists and retrieve its config
     vm = None
