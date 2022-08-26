@@ -286,7 +286,7 @@ options:
     choices: ['enospc', 'ignore', 'report', 'stop']
   wwn:
     description:
-      - The drive's worldwide name, encoded as 16 bytes hex string, prefixed by 0x.
+      - The drive's worldwide name, encoded as 16 bytes hex string, prefixed by C(0x).
     type: str
 extends_documentation_fragment:
   - community.general.proxmox.documentation
