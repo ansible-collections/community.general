@@ -389,7 +389,7 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
             msg='Terraform plan could not be created\r\nSTDOUT: {out}\r\n\r\nSTDERR: {err}\r\nCOMMAND: {cmd} {args}'.format(
                 out=out,
                 err=err,
-                cmd=plan_command,
+                cmd=' '.join(plan_command),
                 args=' '.join([shlex_quote(arg) for arg in variables_args])
             )
         )
@@ -401,7 +401,7 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
         rc=rc,
         out=out,
         err=err,
-        cmd=plan_command,
+        cmd=' '.join(plan_command),
         args=' '.join([shlex_quote(arg) for arg in variables_args])
     ))
 
