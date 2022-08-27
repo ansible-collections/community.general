@@ -56,11 +56,13 @@ options:
     type: str
   size:
     description:
-      - For I(state=present) I(size) is desired volume size in GB to allocate (specify I(size) without suffix).
+      - Desired volume size in GB to allocate when I(state=present) (specify I(size) without suffix).
       - >
-        For I(state=grown) C(size) is the new size of volume. With the C(+) sign
+        New (or additional) size of volume when I(state=grown). With the C(+) sign
         the value is added to the actual size of the volume
         and without it, the value is taken as an absolute one.
+      - >
+        I(size) has strict format 
     type: str
   bwlimit:
     description:
@@ -128,11 +130,11 @@ options:
     type: int
   detect_zeroes:
     description:
-      - Controls whether to detect and try to optimize writes of zeroes.
+      - Control whether to detect and try to optimize writes of zeroes.
     type: bool
   discard:
     description:
-      - Controls whether to pass discard/trim requests to the underlying storage.
+      - Control whether to pass discard/trim requests to the underlying storage.
     type: str
     choices: ['ignore', 'on']
   format:
@@ -258,7 +260,7 @@ options:
     type: bool
   snapshot:
     description:
-      - Controls qemu's snapshot mode feature.
+      - Control qemu's snapshot mode feature.
       - If activated, changes made to the disk are temporary and will be discarded when the VM is shutdown.
     type: bool
   ssd:
