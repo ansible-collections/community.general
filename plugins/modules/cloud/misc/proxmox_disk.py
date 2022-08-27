@@ -498,10 +498,7 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         params['target-disk'] = self.module.params['target_disk']
         params['target-vmid'] = self.module.params['target_vmid']
         params['format'] = self.module.params['format']
-        try:
-            params['delete'] = int(self.module.params['delete_moved'])
-        except TypeError:
-            params['delete'] = 0
+        params['delete'] = 1 if self.module.params.get('delete_moved', False) else 0
         # Remove not defined args
         params = dict((k, v) for k, v in params.items() if v is not None)
 
