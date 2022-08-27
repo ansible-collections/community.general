@@ -19,12 +19,13 @@ author: "Castor Sky (@castorsky) <csky57@gmail.com>"
 options:
   name:
     description:
-      - The (unique) name of the VM.
-      - Required only one of I(name) or I(vmid).
+      - The unique name of the VM.
+      - You can specify either I(name) or I(vmid) or both of them.
     type: str
   vmid:
     description:
       - The unique ID of the VM.
+      - You can specify either I(vmid) or I(name) or both of them.
     type: int
   disk:
     description:
@@ -419,12 +420,9 @@ def disk_conf_str_to_dict(config_string):
         volume_name=volume_name
     )
 
-    for i in config:
-        kv = i.split('=')
-        try:
-            config_current[kv[0]] = kv[1]
-        except IndexError:
-            config_current[kv[0]] = ''
+    for option in config:
+        k, v = option.split('=')
+        config_current[k] = v
 
     return config_current
 
@@ -513,7 +511,7 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
             status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
             if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
                 return True
-            if timeout == 0:
+            if timeout <= 0:
                 self.module.fail_json(
                     msg='Reached timeout while waiting for moving VM disk. Last line in task before timeout: %s' %
                         self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
