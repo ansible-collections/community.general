@@ -61,8 +61,6 @@ options:
         New (or additional) size of volume when I(state=grown). With the C(+) sign
         the value is added to the actual size of the volume
         and without it, the value is taken as an absolute one.
-      - >
-        I(size) has strict format 
     type: str
   bwlimit:
     description:
@@ -148,7 +146,7 @@ options:
     type: int
   import_from:
     description:
-      - Import volume from this existing one. To use this parameter you have to specify I(size=0) when creating disk.
+      - Import volume from this existing one.
       - Volume string format
       - C(<STORAGE>:<VMID>/<FULL_NAME>) or C(<ABSOLUTE_PATH>/<FULL_NAME>)
       - Attention! Only root can use absolute paths.
@@ -394,7 +392,6 @@ msg:
 '''
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible.errors import AnsibleOptionsError
 from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec,
                                                                                 ProxmoxAnsible)
 from re import compile, match, sub
@@ -437,13 +434,13 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         unused=range(0, 256)
     )
 
-    def sanitize_params(self):
+    def get_create_update_attributes(self):
         # Sanitize parameters dictionary:
         # - Remove not defined args
         # - Ensure True and False converted to int.
         # - Remove unnecessary parameters
         params = dict((k, v) for k, v in self.module.params.items() if v is not None and k in self.create_update_fields)
-        params = dict((k, int(v)) for k, v in params.items() if isinstance(v, bool))
+        params.update(dict((k, int(v)) for k, v in params.items() if isinstance(v, bool)))
         return params
 
     def create_disk(self, disk, vmid, vm, vm_config):
@@ -452,40 +449,39 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         if not force_replace and disk in vm_config:
             return False
 
-        params = self.sanitize_params()
-        import_string = params.pop('import_from', None)
-        if import_string and self.module.params["size"] != "0":
-            raise AnsibleOptionsError('Only size=0 is acceptable with <import_from> parameter.')
+        attributes = self.get_create_update_attributes()
+        import_string = attributes.pop('import_from', None)
 
-        config_str = "%s:%s" % (self.module.params["storage"], self.module.params["size"])
         if import_string:
-            config_str += ',import-from=%s' % import_string
+            config_str = "%s:%s,import-from=%s" % (self.module.params["storage"], "0", import_string)
+        else:
+            config_str = "%s:%s" % (self.module.params["storage"], self.module.params["size"])
 
-        for k, v in params.items():
+        for k, v in attributes.items():
             config_str += ',%s=%s' % (k, v)
 
-        disk_config = {self.module.params["disk"]: config_str}
-        self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**disk_config)
+        create_disk = {self.module.params["disk"]: config_str}
+        self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**create_disk)
         return True
 
     def update_disk(self, disk, vmid, vm, vm_config):
         disk_config = disk_conf_str_to_dict(vm_config[disk])
         config_str = disk_config["volume"]
-        params = self.sanitize_params()
+        attributes = self.get_create_update_attributes()
 
-        for k, v in params.items():
+        for k, v in attributes.items():
             config_str += ',%s=%s' % (k, v)
 
         # Now compare old and new config to detect if changes are needed
         for option in ['size', 'storage_name', 'volume', 'volume_name']:
-            params.update({option: disk_config[option]})
+            attributes.update({option: disk_config[option]})
         # Values in params are numbers, but strings are needed to compare with disk_config
-        params = dict((k, str(v)) for k, v in params.items())
-        if disk_config == params:
+        attributes = dict((k, str(v)) for k, v in attributes.items())
+        if disk_config == attributes:
             return False
 
-        disk_config = {self.module.params["disk"]: config_str}
-        self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**disk_config)
+        update_disk = {self.module.params["disk"]: config_str}
+        self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**update_disk)
         return True
 
     def move_disk(self, disk, vmid, vm, vm_config):
@@ -594,7 +590,7 @@ def main():
         required_together=[('api_token_id', 'api_token_secret')],
         required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
         required_if=[
-            ('state', 'present', ('storage', 'size')),
+            ('state', 'present', ['storage']),
             ('state', 'grown', ['size'])
         ],
         required_by={
@@ -602,7 +598,7 @@ def main():
             'mbps_max': 'mbps',
             'mbps_rd_max': 'mbps_rd',
             'mbps_wr_max': 'mbps_wr',
-            'bps_max_length' : 'mbps_max',
+            'bps_max_length': 'mbps_max',
             'bps_rd_max_length': 'mbps_rd_max',
             'bps_wr_max_length': 'mbps_wr_max',
             'iops_max': 'iops',
@@ -618,7 +614,8 @@ def main():
             ('mbps', 'mbps_rd'),
             ('mbps', 'mbps_wr'),
             ('iops', 'iops_rd'),
-            ('iops', 'iops_wr')
+            ('iops', 'iops_wr'),
+            ('import_from', 'size')
         ]
     )
 
