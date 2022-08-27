@@ -38,7 +38,7 @@ options:
       - >
         I(state=present) intended only for creating new disk (with or without replacing existing disk,
         see I(force_replace) option).
-      - For changing options in existing disk use I(state=updated)
+      - For changing options in existing disk use I(state=updated). Options will be replaced, not appended.
       - When I(state=detached) and disk is C(unused[n]) it will be left in same state (not removed).
     type: str
     choices: ['present', 'updated', 'grown', 'detached', 'moved', 'absent']
@@ -52,11 +52,11 @@ options:
   storage:
     description:
       - The drive's backing storage.
-      - Used primarily when I(state) is C(present) or C(moved).
+      - Used only when I(state) is C(present).
     type: str
   size:
     description:
-      - For I(state=present) I(size) is desired volume size in GB to allocate.
+      - For I(state=present) I(size) is desired volume size in GB to allocate (specify I(size) without suffix).
       - >
         For I(state=grown) C(size) is the new size of volume. With the C(+) sign
         the value is added to the actual size of the volume
@@ -83,6 +83,7 @@ options:
     description:
       - Target storage.
       - Used only when I(state=moved).
+      - You can move between storages only in scope of one VM.
     type: str
   target_vmid:
     description:
@@ -91,7 +92,7 @@ options:
     type: int
   timeout:
     description:
-      - Timeout to wait when moving disk.
+      - Timeout in seconds to wait when moving disk.
       - Used only when I(state=moved).
     type: int
     default: 600
@@ -104,25 +105,13 @@ options:
     description:
       - Whether the drive should be included when making backups.
     type: bool
-  bps:
-    description:
-      - Maximum r/w speed in bytes per second.
-    type: int
   bps_max_length:
     description:
-      - Maximum length of I/O bursts in seconds.
-    type: int
-  bps_rd:
-    description:
-      - Maximum read speed in bytes per second.
+      - Maximum length of total r/w I/O bursts in seconds.
     type: int
   bps_rd_max_length:
     description:
       - Maximum length of read I/O bursts in seconds.
-    type: int
-  bps_wr:
-    description:
-      - Maximum write speed in bytes per second.
     type: int
   bps_wr_max_length:
     description:
@@ -157,22 +146,22 @@ options:
     type: int
   import_from:
     description:
-      - Import volume from this existing one. To use this parameter you have to specify C(size=0) when creating disk.
+      - Import volume from this existing one. To use this parameter you have to specify I(size=0) when creating disk.
       - Volume string format
       - C(<STORAGE>:<VMID>/<FULL_NAME>) or C(<ABSOLUTE_PATH>/<FULL_NAME>)
       - Attention! Only root can use absolute paths.
     type: str
   iops:
     description:
-      - Maximum r/w I/O in operations per second.
+      - Maximum total r/w I/O in operations per second.
     type: int
   iops_max:
     description:
-      - Maximum unthrottled r/w I/O pool in operations per second.
+      - Maximum unthrottled total r/w I/O pool in operations per second.
     type: int
   iops_max_length:
     description:
-      - Maximum length of I/O bursts in seconds.
+      - Maximum length of total r/w I/O bursts in seconds.
     type: int
   iops_rd:
     description:
@@ -202,30 +191,31 @@ options:
     description:
       - Whether to use iothreads for this drive (only for SCSI and VirtIO)
     type: bool
-  mpbs:
+  mbps:
     description:
-      - Maximum r/w speed in megabytes per second.
-    type: int
-  mpbs_max:
+      - Maximum total r/w speed in megabytes per second.
+      - Can be fractional but use with caution - fractionals less than 1 are not supported officially.
+    type: float
+  mbps_max:
     description:
-      - Maximum unthrottled r/w pool in megabytes per second.
-    type: int
-  mpbs_rd:
+      - Maximum unthrottled total r/w pool in megabytes per second.
+    type: float
+  mbps_rd:
     description:
       - Maximum read speed in megabytes per second.
-    type: int
-  mpbs_rd_max:
+    type: float
+  mbps_rd_max:
     description:
       - Maximum unthrottled read pool in megabytes per second.
-    type: int
-  mpbs_wr:
+    type: float
+  mbps_wr:
     description:
       - Maximum write speed in megabytes per second.
-    type: int
-  mpbs_wr_max:
+    type: float
+  mbps_wr_max:
     description:
       - Maximum unthrottled write pool in megabytes per second.
-    type: int
+    type: float
   media:
     description:
       - The drive's media type.
@@ -402,6 +392,7 @@ msg:
 '''
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
+from ansible.errors import AnsibleOptionsError
 from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec,
                                                                                 ProxmoxAnsible)
 from re import compile, match, sub
@@ -429,14 +420,14 @@ def disk_conf_str_to_dict(config_string):
 
 class ProxmoxDiskAnsible(ProxmoxAnsible):
     create_update_fields = [
-        'aio', 'backup', 'bps', 'bps_max_length', 'bps_rd', 'bps_rd_max_length', 'bps_wr', 'bps_wr_max_length',
+        'aio', 'backup', 'bps_max_length', 'bps_rd_max_length', 'bps_wr_max_length',
         'cache', 'cyls', 'detect_zeroes', 'discard', 'format', 'heads', 'import_from', 'iops', 'iops_max',
         'iops_max_length', 'iops_rd', 'iops_rd_max', 'iops_rd_max_length', 'iops_wr', 'iops_wr_max',
-        'iops_wr_max_length', 'iothread', 'mpbs', 'mpbs_max', 'mpbs_rd', 'mpbs_rd_max', 'mpbs_wr', 'mpbs_wr_max',
+        'iops_wr_max_length', 'iothread', 'mbps', 'mbps_max', 'mbps_rd', 'mbps_rd_max', 'mbps_wr', 'mbps_wr_max',
         'media', 'queues', 'replicate', 'rerror', 'ro', 'scsiblock', 'secs', 'serial', 'shared', 'snapshot',
         'ssd', 'trans', 'werror', 'wwn'
     ]
-    supported_ranges = dict(
+    supported_bus_num_ranges = dict(
         ide=range(0, 4),
         scsi=range(0, 31),
         sata=range(0, 6),
@@ -450,23 +441,19 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         # - Ensure True and False converted to int.
         # - Remove unnecessary parameters
         params = dict((k, v) for k, v in self.module.params.items() if v is not None and k in self.create_update_fields)
-        params.update(dict((k, int(v)) for k, v in params.items() if isinstance(v, bool)))
+        params = dict((k, int(v)) for k, v in params.items() if isinstance(v, bool))
         return params
 
     def create_disk(self, disk, vmid, vm, vm_config):
         # Would not replace existing disk without 'force' flag
         force_replace = self.module.params['force_replace']
         if not force_replace and disk in vm_config:
-            self.module.exit_json(
-                changed=False,
-                vmid=vmid,
-                msg="Disk %s already exists in VM %s." % (disk, vmid)
-            )
+            return False
 
         params = self.sanitize_params()
         import_string = params.pop('import_from', None)
         if import_string and self.module.params["size"] != "0":
-            self.module.fail_json(vmid=vmid, msg='Only size=0 is acceptable with <import_from> parameter.')
+            raise AnsibleOptionsError('Only size=0 is acceptable with <import_from> parameter.')
 
         config_str = "%s:%s" % (self.module.params["storage"], self.module.params["size"])
         if import_string:
@@ -477,6 +464,7 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
 
         disk_config = {self.module.params["disk"]: config_str}
         self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**disk_config)
+        return True
 
     def update_disk(self, disk, vmid, vm, vm_config):
         disk_config = disk_conf_str_to_dict(vm_config[disk])
@@ -486,8 +474,17 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         for k, v in params.items():
             config_str += ',%s=%s' % (k, v)
 
+        # Now compare old and new config to detect if changes are needed
+        for option in ['size', 'storage_name', 'volume', 'volume_name']:
+            params.update({option: disk_config[option]})
+        # Values in params are numbers, but strings are needed to compare with disk_config
+        params = dict((k, str(v)) for k, v in params.items())
+        if disk_config == params:
+            return False
+
         disk_config = {self.module.params["disk"]: config_str}
         self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**disk_config)
+        return True
 
     def move_disk(self, disk, vmid, vm, vm_config):
         params = dict()
@@ -502,6 +499,11 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         # Remove not defined args
         params = dict((k, v) for k, v in params.items() if v is not None)
 
+        if params.get('storage', False):
+            disk_config = disk_conf_str_to_dict(vm_config[disk])
+            if params['storage'] == disk_config['storage_name']:
+                return False
+
         taskid = self.proxmox_api.nodes(vm['node']).qemu(vmid).move_disk.post(**params)
         timeout = self.module.params['timeout']
         while timeout:
@@ -515,7 +517,7 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
 
             sleep(1)
             timeout -= 1
-        return False
+        return True
 
 
 def main():
@@ -524,11 +526,8 @@ def main():
         # Proxmox native parameters
         aio=dict(choices=['native', 'threads', 'io_uring']),
         backup=dict(type='bool'),
-        bps=dict(type='int'),
         bps_max_length=dict(type='int'),
-        bps_rd=dict(type='int'),
         bps_rd_max_length=dict(type='int'),
-        bps_wr=dict(type='int'),
         bps_wr_max_length=dict(type='int'),
         cache=dict(choices=['none', 'writethrough', 'writeback', 'unsafe', 'directsync']),
         cyls=dict(type='int'),
@@ -547,12 +546,12 @@ def main():
         iops_wr_max=dict(type='int'),
         iops_wr_max_length=dict(type='int'),
         iothread=dict(type='bool'),
-        mpbs=dict(type='int'),
-        mpbs_max=dict(type='int'),
-        mpbs_rd=dict(type='int'),
-        mpbs_rd_max=dict(type='int'),
-        mpbs_wr=dict(type='int'),
-        mpbs_wr_max=dict(type='int'),
+        mbps=dict(type='float'),
+        mbps_max=dict(type='float'),
+        mbps_rd=dict(type='float'),
+        mbps_rd_max=dict(type='float'),
+        mbps_wr=dict(type='float'),
+        mbps_wr_max=dict(type='float'),
         media=dict(choices=['cdrom', 'disk']),
         queues=dict(type='int'),
         replicate=dict(type='bool'),
@@ -596,9 +595,29 @@ def main():
             ('state', 'present', ('storage', 'size')),
             ('state', 'grown', ['size'])
         ],
-        required_by={'target_disk': 'target_vmid'},
+        required_by={
+            'target_disk': 'target_vmid',
+            'mbps_max': 'mbps',
+            'mbps_rd_max': 'mbps_rd',
+            'mbps_wr_max': 'mbps_wr',
+            'bps_max_length' : 'mbps_max',
+            'bps_rd_max_length': 'mbps_rd_max',
+            'bps_wr_max_length': 'mbps_wr_max',
+            'iops_max': 'iops',
+            'iops_rd_max': 'iops_rd',
+            'iops_wr_max': 'iops_wr',
+            'iops_max_length': 'iops_max',
+            'iops_rd_max_length': 'iops_rd_max',
+            'iops_wr_max_length': 'iops_wr_max'
+        },
         supports_check_mode=False,
-        mutually_exclusive=[('target_vmid', 'target_storage')]
+        mutually_exclusive=[
+            ('target_vmid', 'target_storage'),
+            ('mbps', 'mbps_rd'),
+            ('mbps', 'mbps_wr'),
+            ('iops', 'iops_rd'),
+            ('iops', 'iops_wr')
+        ]
     )
 
     proxmox = ProxmoxDiskAnsible(module)
@@ -608,10 +627,10 @@ def main():
     disk_regex = compile(r'^([a-z]+)([0-9]+)$')
     disk_bus = sub(disk_regex, r'\1', disk)
     disk_number = int(sub(disk_regex, r'\2', disk))
-    if disk_bus not in proxmox.supported_ranges:
+    if disk_bus not in proxmox.supported_bus_num_ranges:
         proxmox.module.fail_json(msg='Unsupported disk bus: %s' % disk_bus)
-    elif disk_number not in proxmox.supported_ranges[disk_bus]:
-        bus_range = proxmox.supported_ranges[disk_bus]
+    elif disk_number not in proxmox.supported_bus_num_ranges[disk_bus]:
+        bus_range = proxmox.supported_bus_num_ranges[disk_bus]
         proxmox.module.fail_json(msg='Disk %s number not in range %s..%s ' % (disk, bus_range[0], bus_range[-1]))
 
     name = module.params['name']
@@ -629,17 +648,21 @@ def main():
 
     if state == 'present':
         try:
-            proxmox.create_disk(disk, vmid, vm, vm_config)
-            module.exit_json(changed=True, vmid=vmid, msg="Disk %s created in VM %s" % (disk, vmid))
+            if proxmox.create_disk(disk, vmid, vm, vm_config):
+                module.exit_json(changed=True, vmid=vmid, msg="Disk %s created in VM %s" % (disk, vmid))
+            else:
+                module.exit_json(changed=False, vmid=vmid, msg="Disk %s already exists in VM %s." % (disk, vmid))
         except Exception as e:
             module.fail_json(vmid=vmid, msg='Unable to create disk %s in VM %s: %s' % (disk, vmid, str(e)))
 
     # Do not try to perform actions on missing disk
-    if disk not in vm_config and state in ['absent', 'updated', 'grown', 'detached', 'moved']:
+    if disk not in vm_config and state in ['updated', 'grown', 'moved']:
         module.fail_json(vmid=vmid, msg='Unable to process missing disk %s in VM %s' % (disk, vmid))
 
     elif state == 'absent':
         try:
+            if disk not in vm_config:
+                module.exit_json(changed=False, vmid=vmid, msg="Disk %s is already absent in VM %s" % (disk, vmid))
             proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).unlink.put(vmid=vmid, idlist=disk, force=1)
             module.exit_json(changed=True, vmid=vmid, msg="Disk %s removed from VM %s" % (disk, vmid))
         except Exception as e:
@@ -647,8 +670,10 @@ def main():
 
     elif state == 'updated':
         try:
-            proxmox.update_disk(disk, vmid, vm, vm_config)
-            module.exit_json(changed=True, vmid=vmid, msg="Disk %s updated in VM %s" % (disk, vmid))
+            if proxmox.update_disk(disk, vmid, vm, vm_config):
+                module.exit_json(changed=True, vmid=vmid, msg="Disk %s updated in VM %s" % (disk, vmid))
+            else:
+                module.exit_json(changed=False, vmid=vmid, msg="Disk %s up to date in VM %s" % (disk, vmid))
         except Exception as e:
             module.fail_json(msg="Failed to updated disk %s in VM %s with exception: %s" % (disk, vmid, str(e)))
 
@@ -656,6 +681,8 @@ def main():
         try:
             if disk_bus == 'unused':
                 module.exit_json(changed=False, vmid=vmid, msg='Disk %s already detached in VM %s' % (disk, vmid))
+            if disk not in vm_config:
+                module.exit_json(changed=False, vmid=vmid, msg="Disk %s not present in VM %s config" % (disk, vmid))
             proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).unlink.put(vmid=vmid, idlist=disk, force=0)
             module.exit_json(changed=True, vmid=vmid, msg="Disk %s detached from VM %s" % (disk, vmid))
         except Exception as e:
@@ -663,13 +690,13 @@ def main():
 
     elif state == 'moved':
         try:
-            proxmox.move_disk(disk, vmid, vm, vm_config)
             disk_config = disk_conf_str_to_dict(vm_config[disk])
-            module.exit_json(
-                changed=True,
-                vmid=vmid,
-                storage=disk_config["storage_name"],
-                msg="Disk %s moved from VM %s storage %s" % (disk, vmid, disk_config["storage_name"]))
+            disk_storage = disk_config["storage_name"]
+            if proxmox.move_disk(disk, vmid, vm, vm_config):
+                module.exit_json(changed=True, vmid=vmid,
+                                 msg="Disk %s moved from VM %s storage %s" % (disk, vmid, disk_storage))
+            else:
+                module.exit_json(changed=False, vmid=vmid, msg="Disk %s already at %s storage" % (disk, disk_storage))
         except Exception as e:
             module.fail_json(msg="Failed to move disk %s in VM %s with exception: %s" % (disk, vmid, str(e)))
 
@@ -677,7 +704,11 @@ def main():
         try:
             size = module.params['size']
             if not match(r'^\+?\d+(\.\d+)?[KMGT]?$', size):
-                module.exit_json(vmid=vmid, msg="Unrecognized size pattern for disk %s: %s" % (disk, size))
+                module.fail_json(msg="Unrecognized size pattern for disk %s: %s" % (disk, size))
+            disk_config = disk_conf_str_to_dict(vm_config[disk])
+            actual_size = disk_config['size']
+            if size == actual_size:
+                module.exit_json(changed=False, vmid=vmid, msg="Disk %s is already %s size" % (disk, size))
             proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).resize.set(vmid=vmid, disk=disk, size=size)
             module.exit_json(changed=True, vmid=vmid, msg="Disk %s resized in VM %s" % (disk, vmid))
         except Exception as e:
