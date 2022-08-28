@@ -103,6 +103,12 @@
     include_injected: true
   register: info2_lint
 
+- name: ensure applications are uninstalled
+  community.general.pipx:
+    name: "{{ item.name }}"
+    state: absent
+  loop: "{{ apps }}"
+
 - name: check assertions multiple apps
   assert:
     that:
