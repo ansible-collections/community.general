@@ -963,12 +963,13 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                 kwargs.update(kwargs[k])
                 del kwargs[k]
 
-        try:
-            # The API also allows booleans instead of e.g. `enabled=1` for backward-compatibility.
-            kwargs['agent'] = boolean(kwargs['agent'], strict=True)
-        except TypeError:
-            # Not something that Ansible would parse as a boolean.
-            pass
+        if 'agent' in kwargs:
+            try:
+                # The API also allows booleans instead of e.g. `enabled=1` for backward-compatibility.
+                kwargs['agent'] = boolean(kwargs['agent'], strict=True)
+            except TypeError:
+                # Not something that Ansible would parse as a boolean.
+                pass
 
         # Rename numa_enabled to numa, according the API documentation
         if 'numa_enabled' in kwargs:
