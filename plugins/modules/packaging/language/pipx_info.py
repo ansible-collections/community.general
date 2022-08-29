@@ -19,7 +19,7 @@ description:
 options:
     name:
         description:
-            - Name of an application with C(pipx).
+            - Name of an application installed with C(pipx).
         type: str
     include_deps:
         description:
