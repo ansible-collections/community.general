@@ -62,11 +62,9 @@ options:
 '''
 
 EXAMPLES = r'''
-description:
-- In this example, the file /preseed/ubuntu.seed is deleted at first. Then we add local file
-- /path/to/ubuntu.seed to /path/to/ubuntu.seed inside ISO. So the file /path/to/ubuntu.seed
-- inside ISO is replaced.
-
+# NOTE: In this example, the file /preseed/ubuntu.seed is deleted at first. Then we add local file
+# /path/to/ubuntu.seed to /path/to/ubuntu.seed inside ISO. So the file /path/to/ubuntu.seed
+# inside ISO is replaced.
 - name: "Customize ISO file"
   community.general.iso_customize:
     src_iso: "/path/to/ubuntu-22.04-desktop-amd64.iso"
