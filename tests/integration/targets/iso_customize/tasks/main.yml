@@ -11,9 +11,8 @@
 - name: install pycdlib
   pip:
     name: pycdlib
-    # state: latest
-    # extra_args: "-c {{ remote_constraints }}"
   register: install_pycdlib
+
 - debug: var=install_pycdlib
 
 - set_fact:
@@ -29,9 +28,6 @@
       - "{{ output_test_dir }}/test01.cfg"
     dest_iso: "{{ output_test_dir }}/test.iso"
     interchange_level: 3
-  register: iso_result
-
-- debug: var=iso_result
 
 - include_tasks: iso_customize.yml  
   vars:
@@ -44,9 +40,6 @@
       - "{{ output_test_dir }}/test01.cfg"
     dest_iso: "{{ output_test_dir }}/test.iso"
     rock_ridge: "1.09"
-  register: iso_result
-
-- debug: var=iso_result
 
 - include_tasks: iso_customize.yml
   vars:
@@ -61,9 +54,6 @@
     interchange_level: 3
     joliet: 3
     vol_ident: AUTOINSTALL
-  register: iso_result
-
-- debug: var=iso_result
 
 - include_tasks: iso_customize.yml 
   vars:
@@ -76,9 +66,6 @@
       - "{{ output_test_dir }}/test01.cfg"
     dest_iso: "{{ output_test_dir }}/test.iso"
     udf: True
-  register: iso_result
-
-- debug: var=iso_result
 
 - include_tasks: iso_customize.yml 
   vars:

@@ -37,6 +37,12 @@ options:
     - The path with file name of the customized ISO file on local machine.
     type: str
     required: true
+  delete_files:
+    description:
+    - Absolute paths for files inside the ISO file that should be removed.
+    type: list
+    required: false
+    elements: str
   add_files:
     description:
     - Allows to add and replace files in the ISO file.
@@ -53,12 +59,6 @@ options:
         description:
         - The absolute path of the file inside the ISO file.
         type: str
-  delete_files:
-    description:
-    - Absolute paths for files inside the ISO file that should be removed.
-    type: list
-    required: false
-    elements: str
 '''
 
 EXAMPLES = r'''
@@ -77,6 +77,10 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
+description:
+- In the example, the file /preseed/ubuntu.seed is deleted at first. Then we add local file
+- /path/to/ubuntu.seed to /path/to/ubuntu.seed inside ISO. So the file /path/to/ubuntu.seed
+- inside ISO is replaced.
 src_iso:
   description: Path of source ISO file.
   returned: on success

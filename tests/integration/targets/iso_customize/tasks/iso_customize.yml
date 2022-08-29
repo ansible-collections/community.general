@@ -3,15 +3,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Check if iso file created
-  stat:
-    path: "{{ test_dir }}/test.iso"
-  register: iso_file
-
-- assert:
-    that:
-    - iso_file.stat.exists == True
-
 - name: "Customize ISO file"
   community.general.iso_customize:
     src_iso: "{{ test_dir }}/test.iso"
