@@ -14,13 +14,13 @@ DOCUMENTATION = r'''
 module: iso_customize
 short_description: Customize the ISO file by add/delete/modify files
 description:
-  - This module is used to customize the ISO file by add/delete/modify files.
+  - This module is used to customize the ISO file by add/delete files.
 author:
   - Yuhua Zou (@ZouYuhua) <zouy@vmware.com>
 requirements:
   - "pycdlib"
   - "python >= 2.7"
-version_added: '5.5.0'
+version_added: '5.6.0'
 
 options:
   src_iso:
@@ -31,35 +31,33 @@ options:
       underscores (_). File names are limited to 31 characters, directory nesting is limited to 8 levels, and path
       names are limited to 255 characters.'
     type: str
-    required: yes
+    required: true
   dest_iso:
     description:
     - The path with file name of the customized ISO file on local machine.
-    - Will create intermediate folders when they does not exist.
     type: str
-    required: yes
+    required: true
   add_files:
     description:
-    - The absolute path with file name on ISO file.
-    - Will create intermediate folders when they does not exist.
-    - The file will be replaced if already exists in ISO.
+    - Allows to add and replace files in the ISO file.
+    - Will create intermediate folders inside the ISO file when they do not exist.
     type: list
-    required: no
+    required: false
     elements: dict
     suboptions:
       src_file:
         description:
-        - The path with file name in local machine.
-        type: str
+        - The path with file name on the machine the module is executed on.
+        type: path
       dest_file:
         description:
-        - The absolute path with file name on ISO file.
+        - The absolute path of the file inside the ISO file.
         type: str
   delete_files:
     description:
-    - The absolute path with file name on ISO file.
+    - Absolute paths for files inside the ISO file that should be removed.
     type: list
-    required: no
+    required: false
     elements: str
 '''
 
@@ -80,7 +78,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 src_iso:
-  description: path of source ISO file.
+  description: Path of source ISO file.
   returned: on success
   type: str
   sample: "/path/to/file.iso"
