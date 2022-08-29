@@ -14,6 +14,10 @@
     state: absent
     name: tox
 
+- name: retrieve applications (empty)
+  community.general.pipx_info: {}
+  register: info_empty
+
 - name: install application tox
   community.general.pipx:
     name: tox
@@ -41,20 +45,21 @@
 - name: check assertions tox
   assert:
     that:
-        - info_all.pipx_results|length == 1
-        - "'tox' in info_all.pipx_results"
-        - "'version' in info_all.pipx_results.tox"
-        - "'dependencies' not in info_all.pipx_results.tox"
-        - "'injected' not in info_all.pipx_results.tox"
-        - info_all_deps.pipx_results|length == 1
-        - "'tox' in info_all_deps.pipx_results"
-        - "'version' in info_all.pipx_results.tox"
-        - info_all_deps.pipx_results.tox.dependencies == ["virtualenv"]
-        - "'injected' not in info_all.pipx_results.tox"
-        - info_tox.application == "tox"
-        - "'version' in info_tox"
-        - info_tox.dependencies == ["virtualenv"]
-        - "'injected' not in info_tox"
+      - info_empty.application|length == 0
+
+      - info_all.application|length == 1
+      - info_all.application[0].name == "tox"
+      - "'version' in info_all.application[0]"
+      - "'dependencies' not in info_all.application[0]"
+      - "'injected' not in info_all.application[0]"
+
+      - info_all_deps.application|length == 1
+      - info_all_deps.application[0].name == "tox"
+      - "'version' in info_all_deps.application[0]"
+      - info_all_deps.application[0].dependencies == ["virtualenv"]
+      - "'injected' not in info_all.application[0]"
+
+      - info_tox.application == info_all_deps.application
 
 ##############################################################################
 - name: set test applications
@@ -112,20 +117,23 @@
 - name: check assertions multiple apps
   assert:
     that:
-        - info2_all.pipx_results|length == 2
-        - "'tox' in info2_all.pipx_results"
-        - info2_all.pipx_results.tox.version == "3.24.0"
-        - "'dependencies' not in info2_all.pipx_results.tox"
-        - "'injected' not in info2_all.pipx_results.tox"
+      - all_apps|length == 2
+      - all_apps[1].name == "tox"
+      - all_apps[1].version == "3.24.0"
+      - "'dependencies' not in all_apps[1]"
+      - "'injected' not in all_apps[1]"
 
-        - info2_all_deps.pipx_results|length == 2
-        - "'tox' in info2_all_deps.pipx_results"
-        - info2_all_deps.pipx_results.tox.version == "3.24.0"
-        - info2_all_deps.pipx_results.tox.dependencies == ["virtualenv"]
-        - "'injected' in info2_all_deps.pipx_results['ansible-lint']"
-        - "'licenses' in info2_all_deps.pipx_results['ansible-lint'].injected"
+      - all_apps_deps|length == 2
+      - all_apps_deps[1].name == "tox"
+      - all_apps_deps[1].version == "3.24.0"
+      - all_apps_deps[1].dependencies == ["virtualenv"]
+      - "'injected' in all_apps_deps[0]"
+      - "'licenses' in all_apps_deps[0].injected"
 
-        - info2_lint.application == "ansible-lint"
-        - "'version' in info2_lint"
-        - "'injected' in info2_lint"
-        - "'licenses' in info2_lint.injected"
+      - lint|length == 1
+      - all_apps_deps|length == 2
+      - lint[0] == all_apps_deps[0]
+  vars:
+    all_apps: "{{ info2_all.application|sort(attribute='name') }}"
+    all_apps_deps: "{{ info2_all_deps.application|sort(attribute='name') }}"
+    lint: "{{ info2_lint.application|sort(attribute='name') }}"

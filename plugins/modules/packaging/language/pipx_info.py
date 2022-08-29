@@ -54,9 +54,73 @@ author:
 '''
 
 EXAMPLES = '''
+- name: retrieve all installed applications
+  community.general.pipx_info: {}
+
+- name: retrieve all installed applications, include dependencies and injected packages
+  community.general.pipx_info:
+    include_deps: true
+    include_injected: true
+
+- name: retrieve application tox
+  community.general.pipx_info:
+    name: tox
+    include_deps: true
+
+- name: retrieve application ansible-lint, include dependencies
+  community.general.pipx_info:
+    name: ansible-lint
+    include_deps: true
 '''
 
 RETURN = '''
+application:
+  description: The list of installed applications
+  returned: success
+  type: list
+  elements: dict
+  contains:
+    name:
+      description: The name of the installed application.
+      returned: success
+      type: str
+      sample: "tox"
+    version:
+      description: The version of the installed application.
+      returned: success
+      type: str
+      sample: "3.24.0"
+    dependencies:
+      description: The dependencies of the installed application, when I(include_deps=true).
+      returned: success
+      type: list
+      elements: str
+      sample: ["virtualenv"]
+    injected:
+      description: The injected packages for the installed application, when I(include_injected=true).
+      returned: success
+      type: dict
+      sample:
+        licenses: "0.6.1"
+
+raw_output:
+  description: The raw output of the C(pipx list) command, when I(include_raw=true). Used for debugging.
+  returned: success
+  type: dict
+
+cmd:
+  description: Command executed to obtain the list of installed applications.
+  returned: success
+  type: list
+  elements: str
+  sample: [
+    "/usr/bin/python3.10",
+    "-m",
+    "pipx",
+    "list",
+    "--include-injected",
+    "--json"
+  ]
 '''
 
 import json
@@ -93,48 +157,39 @@ class PipXInfo(ModuleHelper):
     def __run__(self):
         def process_list(rc, out, err):
             if not out:
-                return {}
+                return []
 
-            results = {}
+            results = []
             raw_data = json.loads(out)
-            for venv_name, venv in raw_data['venvs'].items():
-                results[venv_name] = {
-                    'version': venv['metadata']['main_package']['package_version'],
-                    'injected': dict(
-                        (k, v['package_version']) for k, v in venv['metadata']['injected_packages'].items()
-                    ),
-                    'dependencies': list(venv['metadata']['main_package']['app_paths_of_dependencies']),
+            if self.vars.include_raw:
+                self.vars.raw_output = raw_data
+
+            if self.vars.name:
+                if self.vars.name in raw_data['venvs']:
+                    data = {self.vars.name: raw_data['venvs'][self.vars.name]}
+                else:
+                    data = {}
+            else:
+                data = raw_data['venvs']
+
+            for venv_name, venv in data.items():
+                entry = {
+                    'name': venv_name,
+                    'version': venv['metadata']['main_package']['package_version']
                 }
+                if self.vars.include_injected:
+                    entry['injected'] = dict(
+                        (k, v['package_version']) for k, v in venv['metadata']['injected_packages'].items()
+                    )
+                if self.vars.include_deps:
+                    entry['dependencies'] = list(venv['metadata']['main_package']['app_paths_of_dependencies'])
+                results.append(entry)
 
             return results
 
         with self.runner('_list', output_process=process_list) as ctx:
-            installed = ctx.run(_list=1)
+            self.vars.application = ctx.run(_list=1)
             self._capture_results(ctx)
-
-        if self.vars.include_raw:
-            self.vars.raw_list = installed
-
-        if self.vars.name:
-            app_entry = installed.get(self.vars.name)
-            if app_entry:
-                self.vars.application = self.vars.name
-                self.vars.version = app_entry['version']
-                if self.vars.include_injected:
-                    self.vars.injected = app_entry['injected']
-                if self.vars.include_deps:
-                    self.vars.dependencies = app_entry['dependencies']
-
-        else:
-            results = {}
-            for name, entry in installed.items():
-                results[name] = {'version': entry['version']}
-                if self.vars.include_injected:
-                    results[name]['injected'] = entry['injected']
-                if self.vars.include_deps:
-                    results[name]['dependencies'] = entry['dependencies']
-
-            self.vars.pipx_results = results
 
     def _capture_results(self, ctx):
         self.vars.cmd = ctx.cmd
