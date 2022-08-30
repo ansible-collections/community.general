@@ -12,9 +12,11 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: iso_customize
-short_description: Customize the ISO file by add/delete/modify files
+short_description: Customize the ISO file by add/delete/change files
 description:
-  - This module is used to customize the ISO file by add/delete files.
+  - This module is used to customize the ISO file by add/delete/change files.
+  - We can change the file with combinded option "delete_files" (delete the file inside ISO) 
+  - and option "add_files" (adding file to ISO with the same name as previous deleted file)
 author:
   - Yuhua Zou (@ZouYuhua) <zouy@vmware.com>
 requirements:
@@ -27,9 +29,6 @@ options:
     description:
     - This is the path of source ISO file.
     - Will fail if specified ISO file does not exist on local machine.
-    - 'Note: With all ISO9660 levels from 1 to 3, all file names are restricted to uppercase letters, numbers and
-      underscores (_). File names are limited to 31 characters, directory nesting is limited to 8 levels, and path
-      names are limited to 255 characters.'
     type: str
     required: true
   dest_iso:
@@ -62,9 +61,6 @@ options:
 '''
 
 EXAMPLES = r'''
-# NOTE: In this example, the file /preseed/ubuntu.seed is deleted at first. Then we add local file
-# /path/to/ubuntu.seed to /path/to/ubuntu.seed inside ISO. So the file /path/to/ubuntu.seed
-# inside ISO is replaced.
 - name: "Customize ISO file"
   community.general.iso_customize:
     src_iso: "/path/to/ubuntu-22.04-desktop-amd64.iso"
