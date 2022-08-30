@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2013, Philippe Makowski
+# Copyright (c) 2013, Philippe Makowski
 # Written by Philippe Makowski <philippem@mageia.org>
 # Based on apt module written by Matthew Williams <matthew@flowroute.com>
 
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -20,7 +21,7 @@ options:
   name:
     description:
       - A list of package names to install, upgrade or remove.
-    required: yes
+    required: true
     aliases: [ package, pkg ]
     type: list
     elements: str
@@ -34,18 +35,18 @@ options:
     description:
       - Update the package database first C(urpmi.update -a).
     type: bool
-    default: no
+    default: false
   no_recommends:
     description:
       - Corresponds to the C(--no-recommends) option for I(urpmi).
     type: bool
-    default: yes
+    default: true
   force:
     description:
       - Assume "yes" is the answer to any question urpmi has to ask.
         Corresponds to the C(--force) option for I(urpmi).
     type: bool
-    default: yes
+    default: true
   root:
     description:
       - Specifies an alternative install root, relative to which all packages will be installed.
@@ -76,7 +77,7 @@ EXAMPLES = '''
 - community.general.urpmi:
     name: bar
     state: present
-    update_cache: yes
+    update_cache: true
 '''
 
 

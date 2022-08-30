@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
-# Copyright: (c) 2015, Werner Dijkerman (ikben@werner-dijkerman.nl)
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
+# Copyright (c) 2015, Werner Dijkerman (ikben@werner-dijkerman.nl)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -57,23 +58,23 @@ options:
       - Whether you want to create issues or not.
       - Possible values are true and false.
     type: bool
-    default: yes
+    default: true
   merge_requests_enabled:
     description:
       - If merge requests can be made or not.
       - Possible values are true and false.
     type: bool
-    default: yes
+    default: true
   wiki_enabled:
     description:
       - If an wiki for this project should be available or not.
     type: bool
-    default: yes
+    default: true
   snippets_enabled:
     description:
       - If creating snippets should be available or not.
     type: bool
-    default: yes
+    default: true
   visibility:
     description:
       - C(private) Project access must be granted explicitly for each user.

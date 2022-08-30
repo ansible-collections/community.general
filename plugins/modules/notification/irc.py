@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, Jan-Piet Mens <jpmens () gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2013, Jan-Piet Mens <jpmens () gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -75,13 +76,13 @@ options:
     description:
       - Designates whether TLS/SSL should be used when connecting to the IRC server
     type: bool
-    default: 'no'
+    default: false
   part:
     description:
       - Designates whether user should part from channel after sending message or not.
         Useful for when using a faux bot and not wanting join/parts between messages.
     type: bool
-    default: 'yes'
+    default: true
   style:
     type: str
     description:

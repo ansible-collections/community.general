@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2017, Giovanni Sciortino (@giovannisciortino)
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Giovanni Sciortino (@giovannisciortino)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -34,7 +35,7 @@ options:
       - The ID of repositories to enable.
       - To operate on several repositories this can accept a comma separated
         list or a YAML list.
-    required: True
+    required: true
     type: list
     elements: str
   purge:
@@ -43,7 +44,7 @@ options:
         Only set this to C(True) if passing in a list of repositories to the C(name) field.
         Using this with C(loop) will most likely not have the desired result.
     type: bool
-    default: no
+    default: false
 '''
 
 EXAMPLES = '''

@@ -9,7 +9,8 @@
 # Based on pacman module written by Afterburn <http://github.com/afterburn>
 #  that was based on apt module written by Matthew Williams <matthew@flowroute.com>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -48,27 +49,27 @@ options:
         description:
           - Update repository database. Can be run with other steps or on it's own.
         type: bool
-        default: no
+        default: false
     upgrade:
         description:
           - Upgrade main packages to their newer versions
         type: bool
-        default: no
+        default: false
     full_upgrade:
         description:
           - Upgrade all packages to their newer versions
         type: bool
-        default: no
+        default: false
     clean:
         description:
           - Clean packages cache
         type: bool
-        default: no
+        default: false
     force:
         description:
           - Force package reinstall
         type: bool
-        default: no
+        default: false
 '''
 
 EXAMPLES = '''
@@ -85,7 +86,7 @@ EXAMPLES = '''
 - name: Update cache and install foo package
   community.general.pkgin:
     name: foo
-    update_cache: yes
+    update_cache: true
 
 - name: Remove package foo
   community.general.pkgin:
@@ -99,24 +100,24 @@ EXAMPLES = '''
 
 - name: Update repositories as a separate step
   community.general.pkgin:
-    update_cache: yes
+    update_cache: true
 
 - name: Upgrade main packages (equivalent to pkgin upgrade)
   community.general.pkgin:
-    upgrade: yes
+    upgrade: true
 
 - name: Upgrade all packages (equivalent to pkgin full-upgrade)
   community.general.pkgin:
-    full_upgrade: yes
+    full_upgrade: true
 
 - name: Force-upgrade all packages (equivalent to pkgin -F full-upgrade)
   community.general.pkgin:
-    full_upgrade: yes
-    force: yes
+    full_upgrade: true
+    force: true
 
 - name: Clean packages cache (equivalent to pkgin clean)
   community.general.pkgin:
-    clean: yes
+    clean: true
 '''
 
 

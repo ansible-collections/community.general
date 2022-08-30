@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -20,7 +21,7 @@ options:
     type: str
     description:
       - Name of the databases server instance
-    required: yes
+    required: true
   flavor:
     type: int
     description:
@@ -54,7 +55,7 @@ options:
     description:
       - wait for the instance to be in state 'running' before returning
     type: bool
-    default: 'no'
+    default: false
   wait_timeout:
     type: int
     description:
@@ -81,7 +82,7 @@ EXAMPLES = '''
         volume: 2
         cdb_type: MySQL
         cdb_version: 5.6
-        wait: yes
+        wait: true
         state: present
       register: rax_db_server
 '''

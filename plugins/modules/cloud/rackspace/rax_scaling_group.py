@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -18,7 +19,7 @@ options:
     description:
       - Attach read-only configuration drive to server as label config-2
     type: bool
-    default: 'no'
+    default: false
   cooldown:
     type: int
     description:
@@ -111,7 +112,7 @@ options:
       - wait for the scaling group to finish provisioning the minimum amount of
         servers
     type: bool
-    default: 'no'
+    default: false
   wait_timeout:
     type: int
     description:

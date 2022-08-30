@@ -1,22 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
-# (c) 2016, Jiangge Zhang <tonyseek@gmail.com>
-#
-# This file is part of Ansible
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+# Copyright (c) 2016, Jiangge Zhang <tonyseek@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -42,8 +28,8 @@ options:
       - Message to send.
   markdown:
     description:
-      - If C(yes), text will be parsed as markdown.
-    default: 'yes'
+      - If C(true), text will be parsed as markdown.
+    default: true
     type: bool
   channel:
     type: str
@@ -72,7 +58,7 @@ EXAMPLES = """
     url: |
       https://hook.bearychat.com/=ae2CF/incoming/e61bd5c57b164e04b11ac02e66f47f60
     text: "{{ inventory_hostname }} completed"
-    markdown: no
+    markdown: false
     channel: "#ansible"
     attachments:
       - title: "Ansible on {{ inventory_hostname }}"

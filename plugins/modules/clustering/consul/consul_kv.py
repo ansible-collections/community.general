@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# (c) 2015, Steve Gargan <steve.gargan@gmail.com>
-# (c) 2018 Genome Research Ltd.
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2015, Steve Gargan <steve.gargan@gmail.com>
+# Copyright (c) 2018 Genome Research Ltd.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -45,7 +46,7 @@ options:
         description:
           - The key at which the value should be stored.
         type: str
-        required: yes
+        required: true
     value:
         description:
           - The value should be associated with the given key, required if C(state)
@@ -54,7 +55,7 @@ options:
     recurse:
         description:
           - If the key represents a prefix, each entry with the prefix can be
-            retrieved by setting this to C(yes).
+            retrieved by setting this to C(true).
         type: bool
     retrieve:
         description:
@@ -102,7 +103,7 @@ options:
         description:
           - Whether to verify the tls certificate of the consul agent.
         type: bool
-        default: 'yes'
+        default: true
 '''
 
 

@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2021, Lennert Mertens (lennert@nubera.be)
-# Copyright: (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
-# Copyright: (c) 2015, Werner Dijkerman (ikben@werner-dijkerman.nl)
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2021, Lennert Mertens (lennert@nubera.be)
+# Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
+# Copyright (c) 2015, Werner Dijkerman (ikben@werner-dijkerman.nl)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -101,17 +102,17 @@ options:
     description:
       - Require confirmation.
     type: bool
-    default: yes
+    default: true
   isadmin:
     description:
       - Grant admin privileges to the user.
     type: bool
-    default: no
+    default: false
   external:
     description:
       - Define external parameter for this user.
     type: bool
-    default: no
+    default: false
   identities:
     description:
       - List of identities to be added/updated for this user.

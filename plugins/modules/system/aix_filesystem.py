@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2017, Kairo Araujo <kairo@kairo.eti.br>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Kairo Araujo <kairo@kairo.eti.br>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 
@@ -23,18 +24,20 @@ options:
     description:
       - Specifies whether the file system is to be processed by the accounting subsystem.
     type: bool
-    default: no
+    default: false
   attributes:
     description:
       - Specifies attributes for files system separated by comma.
     type: list
     elements: str
-    default: agblksize='4096',isnapshot='no'
+    default:
+      - agblksize='4096'
+      - isnapshot='no'
   auto_mount:
     description:
       - File system is automatically mounted at system restart.
     type: bool
-    default: yes
+    default: true
   device:
     description:
       - Logical volume (LV) device name or remote export device to create a NFS file system.
@@ -69,7 +72,7 @@ options:
     description:
       - Removes the mount point directory when used with state C(absent).
     type: bool
-    default: no
+    default: false
   size:
     description:
       - Specifies the file system size.
@@ -105,56 +108,56 @@ EXAMPLES = r'''
 - name: Create filesystem in a previously defined logical volume.
   community.general.aix_filesystem:
     device: testlv
-    community.general.filesystem: /testfs
+    filesystem: /testfs
     state: present
 
 - name: Creating NFS filesystem from nfshost.
   community.general.aix_filesystem:
     device: /home/ftp
     nfs_server: nfshost
-    community.general.filesystem: /home/ftp
+    filesystem: /home/ftp
     state: present
 
 - name: Creating a new file system without a previously logical volume.
   community.general.aix_filesystem:
-    community.general.filesystem: /newfs
+    filesystem: /newfs
     size: 1G
     state: present
     vg: datavg
 
 - name: Unmounting /testfs.
   community.general.aix_filesystem:
-    community.general.filesystem: /testfs
+    filesystem: /testfs
     state: unmounted
 
 - name: Resizing /mksysb to +512M.
   community.general.aix_filesystem:
-    community.general.filesystem: /mksysb
+    filesystem: /mksysb
     size: +512M
     state: present
 
 - name: Resizing /mksysb to 11G.
   community.general.aix_filesystem:
-    community.general.filesystem: /mksysb
+    filesystem: /mksysb
     size: 11G
     state: present
 
 - name: Resizing /mksysb to -2G.
   community.general.aix_filesystem:
-    community.general.filesystem: /mksysb
+    filesystem: /mksysb
     size: -2G
     state: present
 
 - name: Remove NFS filesystem /home/ftp.
   community.general.aix_filesystem:
-    community.general.filesystem: /home/ftp
-    rm_mount_point: yes
+    filesystem: /home/ftp
+    rm_mount_point: true
     state: absent
 
 - name: Remove /newfs.
   community.general.aix_filesystem:
-    community.general.filesystem: /newfs
-    rm_mount_point: yes
+    filesystem: /newfs
+    rm_mount_point: true
     state: absent
 '''
 

@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2017, Vitaliy Zhhuta <zhhuta () gmail.com>
+# Copyright (c) 2017, Vitaliy Zhhuta <zhhuta () gmail.com>
 # insipred by Kamil Szczygiel <kamil.szczygiel () intel.com> influxdb_database module
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 
@@ -34,7 +35,7 @@ options:
     description:
       - Whether the user should be in the admin role or not.
       - Since version 2.8, the role will also be updated.
-    default: no
+    default: false
     type: bool
   state:
     description:
@@ -72,7 +73,7 @@ EXAMPLES = r'''
   community.general.influxdb_user:
     user_name: john
     user_password: s3cr3t
-    admin: yes
+    admin: true
     hostname: "{{ influxdb_hostname }}"
     login_username: "{{ influxdb_username }}"
     login_password: "{{ influxdb_password }}"

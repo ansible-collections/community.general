@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2018, Martin Migasiewicz <migasiew.nk@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2018, Martin Migasiewicz <migasiew.nk@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -46,9 +47,9 @@ options:
       - Whether the service should not be restarted automatically by launchd.
       - Services might have the 'KeepAlive' attribute set to true in a launchd configuration.
         In case this is set to true, stopping a service will cause that launchd starts the service again.
-      - Set this option to C(yes) to let this module change the 'KeepAlive' attribute to false.
+      - Set this option to C(true) to let this module change the 'KeepAlive' attribute to false.
       type: bool
-      default: no
+      default: false
 notes:
 - A user must privileged to manage services using this module.
 requirements:
@@ -81,7 +82,7 @@ EXAMPLES = r'''
   community.general.launchd:
     name: org.memcached
     state: stopped
-    force_stop: yes
+    force_stop: true
 
 - name: Restart memcached
   community.general.launchd:

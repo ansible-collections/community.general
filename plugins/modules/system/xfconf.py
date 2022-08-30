@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# (c) 2017, Joseph Benden <joe@benden.us>
+# Copyright (c) 2017, Joseph Benden <joe@benden.us>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -71,7 +72,7 @@ options:
     description:
       - Force array even if only one element
     type: bool
-    default: 'no'
+    default: false
     aliases: ['array']
     version_added: 1.0.0
   disable_facts:
@@ -143,14 +144,28 @@ RETURN = '''
     returned: success
     type: any
     sample: '"96" or ["red", "blue", "green"]'
+  cmd:
+    description:
+      - A list with the resulting C(xfconf-query) command executed by the module.
+    returned: success
+    type: list
+    elements: str
+    version_added: 5.4.0
+    sample:
+      - /usr/bin/xfconf-query
+      - --channel
+      - xfce4-panel
+      - --property
+      - /plugins/plugin-19/timezone
+      - --create
+      - --type
+      - string
+      - --set
+      - Pacific/Auckland
 '''
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils.xfconf import xfconf_runner
-
-
-class XFConfException(Exception):
-    pass
 
 
 class XFConfProperty(StateModuleHelper):
@@ -198,7 +213,7 @@ class XFConfProperty(StateModuleHelper):
         if err.rstrip() == self.does_not:
             return None
         if rc or len(err):
-            raise XFConfException('xfconf-query failed with error (rc={0}): {1}'.format(rc, err))
+            self.do_raise('xfconf-query failed with error (rc={0}): {1}'.format(rc, err))
 
         result = out.rstrip()
         if "Value is an array with" in result:
@@ -215,6 +230,11 @@ class XFConfProperty(StateModuleHelper):
     def state_absent(self):
         with self.runner('channel property reset', check_mode_skip=True) as ctx:
             ctx.run(reset=True)
+            self.vars.stdout = ctx.results_out
+            self.vars.stderr = ctx.results_err
+            self.vars.cmd = ctx.cmd
+            if self.verbosity >= 4:
+                self.vars.run_info = ctx.run_info
         self.vars.value = None
 
     def state_present(self):
@@ -231,7 +251,7 @@ class XFConfProperty(StateModuleHelper):
             value_type = value_type * values_len
         elif types_len != values_len:
             # or complain if lists' lengths are different
-            raise XFConfException('Number of elements in "value" and "value_type" must be the same')
+            self.do_raise('Number of elements in "value" and "value_type" must be the same')
 
         # calculates if it is an array
         self.vars.is_array = \
@@ -241,6 +261,11 @@ class XFConfProperty(StateModuleHelper):
 
         with self.runner('channel property create force_array values_and_types', check_mode_skip=True) as ctx:
             ctx.run(create=True, force_array=self.vars.is_array, values_and_types=(self.vars.value, value_type))
+            self.vars.stdout = ctx.results_out
+            self.vars.stderr = ctx.results_err
+            self.vars.cmd = ctx.cmd
+            if self.verbosity >= 4:
+                self.vars.run_info = ctx.run_info
 
         if not self.vars.is_array:
             self.vars.value = self.vars.value[0]

@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2012, Franck Cuny <franck@lumberjaph.net>
-# (c) 2021, Alexei Znamensky <russoz@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2012, Franck Cuny <franck@lumberjaph.net>
+# Copyright (c) 2021, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -30,7 +31,7 @@ options:
     description:
       - Do not run unit tests.
     type: bool
-    default: no
+    default: false
   locallib:
     description:
       - Specify the install base to install modules.
@@ -43,12 +44,12 @@ options:
     description:
       - Use the mirror's index file instead of the CPAN Meta DB.
     type: bool
-    default: no
+    default: false
   installdeps:
     description:
       - Only install dependencies.
     type: bool
-    default: no
+    default: false
   version:
     description:
       - Version specification for the perl module. When I(mode) is C(new), C(cpanm) version operators are accepted.
@@ -121,7 +122,7 @@ EXAMPLES = '''
     mirror: 'http://cpan.cpantesters.org/'
 
 - name: Install Dancer perl package into the system root path
-  become: yes
+  become: true
   community.general.cpanm:
     name: Dancer
 

@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -36,11 +37,11 @@ options:
     type: str
   force:
     description:
-      - The default is C(yes), which will replace the existing remote key
-        if it's different than C(pubkey). If C(no), the key will only be
+      - The default is C(true), which will replace the existing remote key
+        if it's different than C(pubkey). If C(false), the key will only be
         set if no key with the given C(name) exists.
     type: bool
-    default: 'yes'
+    default: true
 
 author: Robert Estelle (@erydo)
 '''

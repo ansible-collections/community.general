@@ -6,7 +6,8 @@
 # Built using https://github.com/hamnis/useful-scripts/blob/master/python/download-maven-artifact
 # as a reference and starting point.
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
@@ -82,7 +83,7 @@ options:
             responds to an initial request with a 401 status. Since some basic auth services do not properly
             send a 401, logins will fail. This option forces the sending of the Basic authentication header
             upon initial request.
-        default: 'no'
+        default: false
         type: bool
         version_added: '0.2.0'
     dest:
@@ -104,9 +105,9 @@ options:
         default: 10
     validate_certs:
         description:
-            - If C(no), SSL certificates will not be validated. This should only be set to C(no) when no other option exists.
+            - If C(false), SSL certificates will not be validated. This should only be set to C(false) when no other option exists.
         type: bool
-        default: 'yes'
+        default: true
     client_cert:
         description:
             - PEM formatted certificate chain file to be used for SSL client authentication.
@@ -121,11 +122,11 @@ options:
         version_added: '1.3.0'
     keep_name:
         description:
-            - If C(yes), the downloaded artifact's name is preserved, i.e the version number remains part of it.
+            - If C(true), the downloaded artifact's name is preserved, i.e the version number remains part of it.
             - This option only has effect when C(dest) is a directory and C(version) is set to C(latest) or C(version_by_spec)
               is defined.
         type: bool
-        default: 'no'
+        default: false
     verify_checksum:
         type: str
         description:
@@ -150,6 +151,15 @@ options:
         default: 'md5'
         choices: ['md5', 'sha1']
         version_added: 3.2.0
+    unredirected_headers:
+        type: list
+        elements: str
+        version_added: 5.2.0
+        description:
+            - A list of headers that should not be included in the redirection. This headers are sent to the fetch_url C(fetch_url) function.
+            - On ansible-core version 2.12 or later, the default of this option is C([Authorization, Cookie]).
+            - Useful if the redirection URL does not need to have sensitive headers in the request.
+            - Requires ansible-core version 2.12 or later.
     directory_mode:
         type: str
         description:
@@ -204,7 +214,7 @@ EXAMPLES = '''
     artifact_id: spring-core
     group_id: org.springframework
     dest: /tmp/
-    keep_name: yes
+    keep_name: true
 
 - name: Download the latest version of the JUnit framework artifact from Maven local
   community.general.maven_artifact:
@@ -230,6 +240,7 @@ import tempfile
 import traceback
 import re
 
+from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible.module_utils.ansible_release import __version__ as ansible_version
 from re import match
 
@@ -509,7 +520,18 @@ class MavenDownloader:
         self.module.params['url_password'] = self.module.params.get('password', '')
         self.module.params['http_agent'] = self.user_agent
 
-        response, info = fetch_url(self.module, url_to_use, timeout=req_timeout, headers=self.headers)
+        kwargs = {}
+        if self.module.params['unredirected_headers']:
+            kwargs['unredirected_headers'] = self.module.params['unredirected_headers']
+
+        response, info = fetch_url(
+            self.module,
+            url_to_use,
+            timeout=req_timeout,
+            headers=self.headers,
+            **kwargs
+        )
+
         if info['status'] == 200:
             return response
         if force:
@@ -614,11 +636,19 @@ def main():
             keep_name=dict(required=False, default=False, type='bool'),
             verify_checksum=dict(required=False, default='download', choices=['never', 'download', 'change', 'always']),
             checksum_alg=dict(required=False, default='md5', choices=['md5', 'sha1']),
+            unredirected_headers=dict(type='list', elements='str', required=False),
             directory_mode=dict(type='str'),
         ),
         add_file_common_args=True,
         mutually_exclusive=([('version', 'version_by_spec')])
     )
+
+    if LooseVersion(ansible_version) < LooseVersion("2.12") and module.params['unredirected_headers']:
+        module.fail_json(msg="Unredirected Headers parameter provided, but your ansible-core version does not support it. Minimum version is 2.12")
+
+    if LooseVersion(ansible_version) >= LooseVersion("2.12") and module.params['unredirected_headers'] is None:
+        # if the user did not supply unredirected params, we use the default, ONLY on ansible core 2.12 and above
+        module.params['unredirected_headers'] = ['Authorization', 'Cookie']
 
     if not HAS_LXML_ETREE:
         module.fail_json(msg=missing_required_lib('lxml'), exception=LXML_ETREE_IMP_ERR)

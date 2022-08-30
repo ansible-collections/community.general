@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) Ansible project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -51,7 +53,7 @@ options:
     description:
       - If C(true), the deploy key will only be able to read repository contents. Otherwise, the deploy key will be able to read and write.
     type: bool
-    default: 'yes'
+    default: true
   state:
     description:
       - The state of the deploy key.
@@ -62,7 +64,7 @@ options:
     description:
       - If C(true), forcefully adds the deploy key by deleting any existing deploy key with the same public key or title.
     type: bool
-    default: 'no'
+    default: false
   username:
     description:
       - The username to authenticate with. Should not be set when using personal access token
@@ -90,7 +92,7 @@ EXAMPLES = '''
     repo: "example"
     name: "new-deploy-key"
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAwXxn7kIMNWzcDfou..."
-    read_only: yes
+    read_only: true
     username: "johndoe"
     password: "supersecretpassword"
 
@@ -100,7 +102,7 @@ EXAMPLES = '''
     repository: "example"
     name: "new-deploy-key"
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAwXxn7kIMNWzcDfou..."
-    force: yes
+    force: true
     username: "johndoe"
     password: "supersecretpassword"
     state: absent
@@ -111,7 +113,7 @@ EXAMPLES = '''
     repository: "example"
     name: "new-deploy-key"
     key: "{{ lookup('file', '~/.ssh/github.pub') }}"
-    force: yes
+    force: true
     token: "ABAQDAwXxn7kIMNWzcDfo..."
 
 - name: Re-add a deploy key to a GitHub repository but with a different name
@@ -140,7 +142,7 @@ EXAMPLES = '''
     repo: "example"
     name: "new-deploy-key"
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAwXxn7kIMNWzcDfou..."
-    read_only: yes
+    read_only: true
     username: "janedoe"
     password: "supersecretpassword"
 '''

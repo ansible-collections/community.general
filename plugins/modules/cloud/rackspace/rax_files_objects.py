@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
-# (c) 2013, Paul Durivage <paul.durivage@rackspace.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2013, Paul Durivage <paul.durivage@rackspace.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -63,7 +63,7 @@ options:
         from Cloud Files.  Setting to false downloads the contents of a container to a single,
         flat directory
     type: bool
-    default: 'yes'
+    default: true
   type:
     type: str
     description:
@@ -153,14 +153,14 @@ EXAMPLES = '''
         method: get
         src: FileThatDoesNotExist.jpg
         dest: ~/Downloads/testcont
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: "Attempt to delete remote object that does not exist"
       community.general.rax_files_objects:
         container: testcont
         method: delete
         dest: FileThatDoesNotExist.jpg
-      ignore_errors: yes
+      ignore_errors: true
 
 - name: "Test Cloud Files Objects Metadata"
   hosts: local

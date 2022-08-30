@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2013, Evgenii Terechkov
+# Copyright (c) 2013, Evgenii Terechkov
 # Written by Evgenii Terechkov <evg@altlinux.org>
 # Based on urpmi module written by Philippe Makowski <philippem@mageia.org>
 
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -34,7 +35,7 @@ options:
     description:
       - update the package database first C(apt-get update).
     type: bool
-    default: no
+    default: false
 author:
 - Evgenii Terechkov (@evgkrsk)
 '''
@@ -67,7 +68,7 @@ EXAMPLES = '''
   community.general.apt_rpm:
     name: bar
     state: present
-    update_cache: yes
+    update_cache: true
 '''
 
 import json

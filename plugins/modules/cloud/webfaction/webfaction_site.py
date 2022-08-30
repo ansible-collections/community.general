@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2015, Quentin Stafford-Fraser
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2015, Quentin Stafford-Fraser
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # Create Webfaction website using Ansible and the Webfaction API
 
@@ -52,7 +53,7 @@ options:
         description:
             - Whether or not to use HTTPS
         type: bool
-        default: 'no'
+        default: false
 
     site_apps:
         description:
@@ -91,7 +92,7 @@ EXAMPLES = '''
         - 'testsite1.my_domain.org'
       site_apps:
         - ['testapp1', '/']
-      https: no
+      https: false
       login_name: "{{webfaction_user}}"
       login_password: "{{webfaction_passwd}}"
 '''

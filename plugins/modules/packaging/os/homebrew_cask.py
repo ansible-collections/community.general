@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
-# Copyright: (c) 2016, Indrajit Raychaudhuri <irc+code@indrajit.com>
+# Copyright (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
+# Copyright (c) 2016, Indrajit Raychaudhuri <irc+code@indrajit.com>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -50,7 +51,7 @@ options:
     - Update homebrew itself first.
     - Note that C(brew cask update) is a synonym for C(brew update).
     type: bool
-    default: no
+    default: false
   install_options:
     description:
     - Options flags to install a package.
@@ -61,13 +62,13 @@ options:
     description:
     - Allow external apps.
     type: bool
-    default: no
+    default: false
   upgrade_all:
     description:
     - Upgrade all casks.
     - Mutually exclusive with C(upgraded) state.
     type: bool
-    default: no
+    default: false
     aliases: [ 'upgrade' ]
   greedy:
     description:
@@ -75,7 +76,7 @@ options:
     - Passes --greedy to brew cask outdated when checking
       if an installed cask has a newer version available.
     type: bool
-    default: no
+    default: false
 '''
 EXAMPLES = '''
 - name: Install cask

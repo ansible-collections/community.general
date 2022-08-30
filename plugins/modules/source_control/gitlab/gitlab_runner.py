@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2021, Raphaël Droz (raphael.droz@gmail.com)
-# Copyright: (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
-# Copyright: (c) 2018, Samy Coenen <samy.coenen@nubera.be>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2021, Raphaël Droz (raphael.droz@gmail.com)
+# Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
+# Copyright (c) 2018, Samy Coenen <samy.coenen@nubera.be>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -65,14 +66,14 @@ options:
     description:
       - Searches only runners available to the user when searching for existing, when false admin token required.
       - Mutually exclusive with I(project) since community.general 4.5.0.
-    default: no
+    default: false
     type: bool
     version_added: 2.0.0
   active:
     description:
       - Define if the runners is immediately active after creation.
     required: False
-    default: yes
+    default: true
     type: bool
   locked:
     description:
@@ -99,7 +100,7 @@ options:
     description:
       - Run untagged jobs or not.
     required: False
-    default: yes
+    default: true
     type: bool
   tag_list:
     description: The tags that apply to the runner.
@@ -134,7 +135,7 @@ EXAMPLES = '''
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     description: Docker Machine t1
-    owned: yes
+    owned: true
     state: absent
 
 - name: Register runner for a specific project
@@ -188,7 +189,7 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
 
 try:
-    cmp
+    cmp  # pylint: disable=used-before-assignment
 except NameError:
     def cmp(a, b):
         return (a > b) - (a < b)

@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -63,7 +64,7 @@ options:
       - Type of node
   wait:
     required: false
-    default: "no"
+    default: false
     type: bool
     description:
       - Wait for the load balancer to become active before returning
@@ -98,7 +99,7 @@ EXAMPLES = '''
     port: 80
     condition: enabled
     type: primary
-    wait: yes
+    wait: true
     credentials: /path/to/credentials
 
 - name: Drain connections from a node
@@ -107,7 +108,7 @@ EXAMPLES = '''
     load_balancer_id: 71
     node_id: 410
     condition: draining
-    wait: yes
+    wait: true
     credentials: /path/to/credentials
 
 - name: Remove a node from the load balancer
@@ -116,7 +117,7 @@ EXAMPLES = '''
     load_balancer_id: 71
     node_id: 410
     state: absent
-    wait: yes
+    wait: true
     credentials: /path/to/credentials
 '''
 

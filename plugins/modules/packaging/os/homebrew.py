@@ -1,13 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, Andrew Dunham <andrew@du.nham.ca>
-# (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
-# (c) 2015, Indrajit Raychaudhuri <irc+code@indrajit.com>
+# Copyright (c) 2013, Andrew Dunham <andrew@du.nham.ca>
+# Copyright (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
+# Copyright (c) 2015, Indrajit Raychaudhuri <irc+code@indrajit.com>
 #
 # Based on macports (Jimmy Tang <jcftang@gmail.com>)
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -50,12 +51,12 @@ options:
         description:
             - update homebrew itself first.
         type: bool
-        default: no
+        default: false
     upgrade_all:
         description:
             - upgrade all homebrew packages.
         type: bool
-        default: no
+        default: false
         aliases: ['upgrade']
     install_options:
         description:
@@ -90,18 +91,18 @@ EXAMPLES = '''
 - community.general.homebrew:
     name: foo
     state: present
-    update_homebrew: yes
+    update_homebrew: true
 
 # Update homebrew first and upgrade formula foo to latest available with 'brew' in default path
 - community.general.homebrew:
     name: foo
     state: latest
-    update_homebrew: yes
+    update_homebrew: true
 
 # Update homebrew and upgrade all packages
 - community.general.homebrew:
-    update_homebrew: yes
-    upgrade_all: yes
+    update_homebrew: true
+    upgrade_all: true
 
 # Miscellaneous other examples
 - community.general.homebrew:
@@ -132,7 +133,7 @@ EXAMPLES = '''
 
 - name: Use ignore-pinned option while upgrading all
   community.general.homebrew:
-    upgrade_all: yes
+    upgrade_all: true
     upgrade_options: ignore-pinned
 '''
 

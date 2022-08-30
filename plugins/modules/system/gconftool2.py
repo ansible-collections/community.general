@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016, Kenneth D. Evensen <kevensen@redhat.com>
-# Copyright: (c) 2017, Abhijeet Kasurde <akasurde@redhat.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Kenneth D. Evensen <kevensen@redhat.com>
+# Copyright (c) 2017, Abhijeet Kasurde <akasurde@redhat.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -21,14 +22,14 @@ options:
     type: str
     description:
     - A GConf preference key is an element in the GConf repository
-      that corresponds to an application preference. See man gconftool-2(1)
-    required: yes
+      that corresponds to an application preference. See man gconftool-2(1).
+    required: true
   value:
     type: str
     description:
     - Preference keys typically have simple values such as strings,
       integers, or lists of strings and integers. This is ignored if the state
-      is "get". See man gconftool-2(1)
+      is "get". See man gconftool-2(1).
   value_type:
     type: str
     description:
@@ -38,20 +39,21 @@ options:
     type: str
     description:
     - The action to take upon the key/value.
-    required: yes
+    - State C(get) is deprecated and will be removed in community.general 8.0.0. Please use the module M(community.general.gconftool2_info) instead.
+    required: true
     choices: [ absent, get, present ]
   config_source:
     type: str
     description:
     - Specify a configuration source to use rather than the default path.
-      See man gconftool-2(1)
+      See man gconftool-2(1).
   direct:
     description:
     - Access the config database directly, bypassing server.  If direct is
       specified then the config_source must be specified as well.
-      See man gconftool-2(1)
+      See man gconftool-2(1).
     type: bool
-    default: 'no'
+    default: false
 '''
 
 EXAMPLES = """
@@ -119,6 +121,10 @@ class GConf2Preference(object):
             # If the call is "get", then we don't need as many parameters and
             # we can ignore some
             if call_type == 'get':
+                self.ansible.deprecate(
+                    msg="State 'get' is deprecated. Please use the module community.general.gconftool2_info instead",
+                    version="8.0.0", collection_name="community.general"
+                )
                 cmd.extend(["--get", self.key])
             # Otherwise, we will use all relevant parameters
             elif call_type == 'set':
@@ -186,11 +192,11 @@ def main():
                                  % str(state))
 
         if direct and config_source is None:
-            module.fail_json(msg='If "direct" is "yes" then the ' +
+            module.fail_json(msg='If "direct" is "true" then the ' +
                                  '"config_source" must be specified')
         elif not direct and config_source is not None:
             module.fail_json(msg='If the "config_source" is specified ' +
-                                 'then "direct" must be "yes"')
+                                 'then "direct" must be "true"')
 
     # Create a gconf2 preference
     gconf_pref = GConf2Preference(module, key, value_type,

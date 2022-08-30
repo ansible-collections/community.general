@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2017, Jasper Lievisse Adriaanse <j@jasper.la>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Jasper Lievisse Adriaanse <j@jasper.la>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -357,8 +358,8 @@ EXAMPLES = '''
     state: present
     alias: fw_zone
     image_uuid: 95f265b8-96b2-11e6-9597-972f3af4b6d5
-    firewall_enabled: yes
-    indestructible_zoneroot: yes
+    firewall_enabled: true
+    indestructible_zoneroot: true
     nics:
       - nic_tag: admin
         ip: dhcp

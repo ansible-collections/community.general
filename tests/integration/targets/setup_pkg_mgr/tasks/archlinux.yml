@@ -1,4 +1,8 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Since Arch Linux is a rolling distribution, it regularly needs its packages upgraded, otherwise some tests might
 # stop working due to conflicts during package installation. Since there is no good way to do this on container
 # startup time, we use the setup_pkg_mgr setup role to do this once per CI run (hopefully). In case the Arch Linux

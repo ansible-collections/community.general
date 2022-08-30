@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2019, Trevor Highfill <trevor.highfill@outlook.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2019, Trevor Highfill <trevor.highfill@outlook.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -626,7 +627,7 @@ playbook.yml: >
   ---
   - name: "Default plugin output: play example"
     hosts: localhost
-    gather_facts: no
+    gather_facts: false
     tasks:
       - name:  Default plugin output
         ansible.builtin.debug:
@@ -634,7 +635,7 @@ playbook.yml: >
 
   - name: Override from play vars
     hosts: localhost
-    gather_facts: no
+    gather_facts: false
     vars:
       ansible_connection: local
       green: "\e[0m\e[38;5;82m"

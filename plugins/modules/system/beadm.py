@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016, Adam Števko <adam.stevko@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Adam Števko <adam.stevko@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -164,10 +165,10 @@ class BE(object):
             for line in out.splitlines():
                 if self.is_freebsd:
                     check = line.split()
-                    if(check == []):
+                    if check == []:
                         continue
                     full_name = check[0].split('/')
-                    if(full_name == []):
+                    if full_name == []:
                         continue
                     check[0] = full_name[len(full_name) - 1]
                     if check[0] == self.name:

@@ -1,8 +1,9 @@
-# (c) 2017, Roman Belyakovsky <ihryamzik () gmail.com>
+# Copyright (c) 2017, Roman Belyakovsky <ihryamzik () gmail.com>
 #
 # This file is part of Ansible
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -45,6 +46,7 @@ golden_output_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'golden
 class TestInterfacesFileModule(unittest.TestCase):
     def getTestFiles(self, include_filter=None, exclude_filter=None):
         flist = next(os.walk(fixture_path))[2]
+        flist = [file for file in flist if not file.endswith('.license')]
         if include_filter:
             flist = filter(lambda x: re.match(include_filter, x), flist)
         if exclude_filter:
@@ -76,6 +78,8 @@ class TestInterfacesFileModule(unittest.TestCase):
     def compareStringWithFile(self, string, path):
         # self.assertEqual("","_",msg=path)
         testfilepath = os.path.join(golden_output_path, path)
+        if string and not string.endswith('\n'):
+            string += '\n'
         goldenstring = string
         if not os.path.isfile(testfilepath):
             f = io.open(testfilepath, 'wb')

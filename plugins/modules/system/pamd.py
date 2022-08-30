@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2017, Kenneth D. Evensen <kdevensen@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Kenneth D. Evensen <kdevensen@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -94,7 +95,7 @@ options:
        - Create a backup file including the timestamp information so you can
          get the original file back if you somehow clobbered it incorrectly.
      type: bool
-     default: no
+     default: false
 '''
 
 EXAMPLES = r'''
@@ -226,34 +227,6 @@ change_count:
     type: int
     sample: 1
     returned: success
-new_rule:
-    description: The changes to the rule.  This was available in Ansible 2.4 and Ansible 2.5.  It was removed in Ansible 2.6.
-    type: str
-    sample: None      None None sha512 shadow try_first_pass use_authtok
-    returned: success
-updated_rule_(n):
-    description: The rule(s) that was/were changed.  This is only available in
-      Ansible 2.4 and was removed in Ansible 2.5.
-    type: str
-    sample:
-    - password      sufficient  pam_unix.so sha512 shadow try_first_pass
-      use_authtok
-    returned: success
-action:
-    description:
-    - "That action that was taken and is one of: update_rule,
-      insert_before_rule, insert_after_rule, args_present, args_absent,
-      absent. This was available in Ansible 2.4 and removed in Ansible 2.8"
-    returned: always
-    type: str
-    sample: "update_rule"
-dest:
-    description:
-    - "Path to pam.d service that was changed.  This is only available in
-      Ansible 2.3 and was removed in Ansible 2.4."
-    returned: success
-    type: str
-    sample: "/etc/pam.d/system-auth"
 backupdest:
     description:
     - "The file name of the backup file, if created."

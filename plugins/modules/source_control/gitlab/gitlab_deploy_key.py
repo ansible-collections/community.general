@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
-# Copyright: (c) 2018, Marcus Watkins <marwatk@marcuswatkins.net>
+# Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
+# Copyright (c) 2018, Marcus Watkins <marwatk@marcuswatkins.net>
 # Based on code:
-# Copyright: (c) 2013, Phillip Gentry <phillip@cx.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2013, Phillip Gentry <phillip@cx.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -45,7 +46,7 @@ options:
     description:
       - Whether this key can push to the project.
     type: bool
-    default: no
+    default: false
   state:
     description:
       - When C(present) the deploy key added to the project if it doesn't exist.
@@ -72,7 +73,7 @@ EXAMPLES = '''
     project: "my_group/my_project"
     title: "Jenkins CI"
     state: present
-    can_push: yes
+    can_push: true
 
 - name: "Remove the previous deploy key from the project"
   community.general.gitlab_deploy_key:

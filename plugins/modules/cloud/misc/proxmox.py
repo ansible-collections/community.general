@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -85,7 +86,7 @@ options:
   onboot:
     description:
       - specifies whether a VM will be started during system bootup
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(no).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
     type: bool
   storage:
     description:
@@ -117,7 +118,7 @@ options:
       - with C(state=present) force option allow to overwrite existing container
       - with states C(stopped) , C(restarted) allow to force stop instance
     type: bool
-    default: 'no'
+    default: false
   purge:
     description:
       - Remove container from all related configurations.
@@ -141,7 +142,7 @@ options:
     description:
       - Indicate if the container should be unprivileged
     type: bool
-    default: 'no'
+    default: false
   description:
     description:
       - Specify the description for the container. Only used on the configuration web interface.
@@ -238,7 +239,7 @@ EXAMPLES = r'''
     password: 123456
     hostname: example.org
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
-    force: yes
+    force: true
 
 - name: Create new container with minimal options use environment PROXMOX_PASSWORD variable(you should export it before)
   community.general.proxmox:
@@ -368,7 +369,7 @@ EXAMPLES = r'''
     api_user: root@pam
     api_password: 1q2w3e
     api_host: node1
-    force: yes
+    force: true
     state: stopped
 
 - name: Restart container(stopped or mounted container you can't restart)
@@ -743,6 +744,8 @@ def main():
             module.fail_json(msg="restarting of VM %s failed with exception: %s" % (vmid, e))
 
     elif state == 'absent':
+        if not vmid:
+            module.exit_json(changed=False, msg='VM with hostname = %s is already absent' % hostname)
         try:
             vm = proxmox.get_vm(vmid, ignore_missing=True)
             if not vm:

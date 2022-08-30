@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2015, Hewlett-Packard Development Company, L.P.
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2015, Hewlett-Packard Development Company, L.P.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -34,8 +35,8 @@ options:
   noop:
     description:
       - Override puppet.conf noop mode.
-      - When C(yes), run Puppet agent with C(--noop) switch set.
-      - When C(no), run Puppet agent with C(--no-noop) switch set.
+      - When C(true), run Puppet agent with C(--noop) switch set.
+      - When C(false), run Puppet agent with C(--no-noop) switch set.
       - When unset (default), use default or puppet.conf value if defined.
     type: bool
   facts:
@@ -138,7 +139,7 @@ EXAMPLES = r'''
 
 - name: Run puppet agent in noop mode
   community.general.puppet:
-    noop: yes
+    noop: true
 
 - name: Run a manifest with debug, log to both syslog and console, specify module path
   community.general.puppet:

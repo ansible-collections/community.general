@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) Ansible project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -33,7 +34,7 @@ options:
     description:
       - Validate SSL certs of the Online API.
     type: bool
-    default: yes
+    default: true
 notes:
   - Also see the API documentation on U(https://console.online.net/en/api/)
   - If C(api_token) is not set within the module, the following

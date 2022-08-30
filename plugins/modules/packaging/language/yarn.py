@@ -3,7 +3,8 @@
 
 # (c) 2017 David Gunter <david.gunter@tivix.com>
 # Copyright (c) 2017 Chris Hoffman <christopher.hoffman@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 
 from __future__ import absolute_import, division, print_function
@@ -43,7 +44,7 @@ options:
     description:
       - Install the node.js library globally
     required: false
-    default: no
+    default: false
     type: bool
   executable:
     type: path
@@ -55,14 +56,14 @@ options:
       - Use the --ignore-scripts flag when installing.
     required: false
     type: bool
-    default: no
+    default: false
   production:
     description:
       - Install dependencies in production mode.
       - Yarn will ignore any dependencies under devDependencies in package.json
     required: false
     type: bool
-    default: no
+    default: false
   registry:
     type: str
     description:
@@ -95,12 +96,12 @@ EXAMPLES = '''
 - name: Install "imagemin" node.js package globally.
   community.general.yarn:
     name: imagemin
-    global: yes
+    global: true
 
 - name: Remove the globally-installed package "imagemin".
   community.general.yarn:
     name: imagemin
-    global: yes
+    global: true
     state: absent
 
 - name: Install "imagemin" node.js package from custom registry.
@@ -221,7 +222,7 @@ class Yarn(object):
             rc, out, err = self.module.run_command(cmd, check_rc=check_rc, cwd=cwd)
             return out, err
 
-        return(None, None)
+        return None, None
 
     def list(self):
         cmd = ['list', '--depth=0', '--json']

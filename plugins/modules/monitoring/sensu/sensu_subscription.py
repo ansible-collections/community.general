@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2014, Anders Ingemann <aim@secoya.dk>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2014, Anders Ingemann <aim@secoya.dk>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -39,7 +40,7 @@ options:
       - can get the original file back if you somehow clobbered it incorrectly.
     type: bool
     required: false
-    default: no
+    default: false
 requirements: [ ]
 author: Anders Ingemann (@andsens)
 '''
@@ -132,7 +133,7 @@ def main():
     arg_spec = {'name': {'type': 'str', 'required': True},
                 'path': {'type': 'str', 'default': '/etc/sensu/conf.d/subscriptions.json'},
                 'state': {'type': 'str', 'default': 'present', 'choices': ['present', 'absent']},
-                'backup': {'type': 'bool', 'default': 'no'},
+                'backup': {'type': 'bool', 'default': False},
                 }
 
     module = AnsibleModule(argument_spec=arg_spec,

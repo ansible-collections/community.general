@@ -1,5 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
 from __future__ import (absolute_import, division, print_function)
@@ -86,7 +89,7 @@ options:
   hard:
     description:
       - Reboot, power-off or terminate instances C(hard)
-    default: no
+    default: false
     type: bool
   wait:
     description:
@@ -95,7 +98,7 @@ options:
       - doesn't mean that you will be able to SSH on that machine only that
       - boot process have started on that instance, see 'wait_for' example for
       - details.
-    default: yes
+    default: true
     type: bool
   wait_timeout:
     description:
@@ -199,7 +202,7 @@ options:
   persistent:
     description:
       - Create a private persistent copy of the template plus any image defined in DISK, and instantiate that copy.
-    default: NO
+    default: false
     type: bool
     version_added: '0.2.0'
   datastore_id:
@@ -248,7 +251,7 @@ EXAMPLES = '''
 - name: Deploy a new VM  as persistent
   community.general.one_vm:
     template_id: 90
-    persistent: yes
+    persistent: true
 
 - name: Change VM's permissions to 640
   community.general.one_vm:

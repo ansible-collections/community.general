@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2020, Ansible Project
-# Copyright: (c) 2020, VMware, Inc. All Rights Reserved.
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2020, Ansible Project
+# Copyright (c) 2020, VMware, Inc. All Rights Reserved.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -30,14 +31,14 @@ options:
        underscores (_). File names are limited to 31 characters, directory nesting is limited to 8 levels, and path
        names are limited to 255 characters.'
      type: list
-     required: yes
+     required: true
      elements: path
    dest_iso:
      description:
      - The absolute path with file name of the new generated ISO file on local machine.
      - Will create intermediate folders when they does not exist.
      type: path
-     required: yes
+     required: true
    interchange_level:
      description:
      - The ISO9660 interchange level to use, it dictates the rules on the names of files.

@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2017, Thomas Caravia <taca@kadisius.eu>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Thomas Caravia <taca@kadisius.eu>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -50,7 +51,7 @@ options:
               effect prior to I(state=reset).
     user:
         required: false
-        default: 'no'
+        default: false
         type: bool
         description:
             - Run system-control talking to the calling user's service manager, rather than
@@ -63,10 +64,14 @@ notes:
 
 EXAMPLES = '''
 - name: Start dnscache if not running
-  community.general.nosh: name=dnscache state=started
+  community.general.nosh:
+    name: dnscache
+    state: started
 
 - name: Stop mpd, if running
-  community.general.nosh: name=mpd state=stopped
+  community.general.nosh:
+    name: mpd
+    state: stopped
 
 - name: Restart unbound or start it if not already running
   community.general.nosh:
@@ -79,26 +84,36 @@ EXAMPLES = '''
     state: reloaded
 
 - name: Disable nsd
-  community.general.nosh: name=nsd enabled=no
+  community.general.nosh:
+    name: nsd
+    enabled: false
 
 - name: For package installers, set nginx running state according to local enable settings, preset and reset
-  community.general.nosh: name=nginx preset=True state=reset
+  community.general.nosh:
+    name: nginx
+    preset: true
+    state: reset
 
 - name: Reboot the host if nosh is the system manager, would need a "wait_for*" task at least, not recommended as-is
-  community.general.nosh: name=reboot state=started
+  community.general.nosh:
+    name: reboot
+    state: started
 
 - name: Using conditionals with the module facts
   tasks:
     - name: Obtain information on tinydns service
-      community.general.nosh: name=tinydns
+      community.general.nosh:
+        name: tinydns
       register: result
 
     - name: Fail if service not loaded
-      ansible.builtin.fail: msg="The {{ result.name }} service is not loaded"
+      ansible.builtin.fail:
+        msg: "The {{ result.name }} service is not loaded"
       when: not result.status
 
     - name: Fail if service is running
-      ansible.builtin.fail: msg="The {{ result.name }} service is running"
+      ansible.builtin.fail:
+        msg: "The {{ result.name }} service is running"
       when: result.status and result.status['DaemontoolsEncoreState'] == "running"
 '''
 
@@ -147,7 +162,7 @@ status:
             description: []  # FIXME
             returned: success
             type: list
-            sample: '[]'
+            sample: []
         DaemontoolsEncoreState:
             description: []  # FIXME
             returned: success
@@ -192,7 +207,7 @@ status:
             description: []  # FIXME
             returned: success
             type: list
-            sample: '[]'
+            sample: []
         RestartExitStatusCode:
             description: []  # FIXME
             returned: success

@@ -6,7 +6,9 @@
 #
 # This module is proudly sponsored by iGeolise (www.igeolise.com) and
 # Tiny Lab Productions (www.tinylabproductions.com).
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) Ansible project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -73,10 +75,10 @@ options:
         description: ["An arbitrary string to use for aggregation."]
     validate_certs:
         description:
-            - If C(no), SSL certificates will not be validated. This should only be used
+            - If C(false), SSL certificates will not be validated. This should only be used
               on personally controlled sites using self-signed certificates.
         type: bool
-        default: 'yes'
+        default: true
 '''
 
 EXAMPLES = '''

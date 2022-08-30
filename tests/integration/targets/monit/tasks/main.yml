@@ -1,7 +1,12 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 - block:
   - name: Install EPEL repository (RHEL only)
@@ -46,15 +51,15 @@
       src: httpd_echo.py
       dest: "{{ process_file }}"
 
-  - name: Install virtualenv
+  - name: Install virtualenv on CentOS 8
     package:
       name: virtualenv
       state: present
     when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '8'
 
-  - name: Install virtualenv
-    package:
-      name: python-virtualenv
+  - name: Install virtualenv on Arch Linux
+    pip:
+      name: virtualenv
       state: present
     when: ansible_os_family == 'Archlinux'
 
@@ -62,6 +67,7 @@
     pip:
       name: "{{ item }}"
       virtualenv: "{{ process_venv }}"
+      extra_args: "-c {{ remote_constraints }}"
     loop:
       - setuptools==44
       - python-daemon

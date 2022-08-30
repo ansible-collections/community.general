@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2016, Renato Orgito <orgito@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Renato Orgito <orgito@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -64,16 +65,16 @@ options:
     use_proxy:
         required: false
         description:
-            - if C(no), it will not use a proxy, even if one is defined in an environment
+            - if C(false), it will not use a proxy, even if one is defined in an environment
                 variable on the target hosts.
-        default: 'yes'
+        default: true
         type: bool
     validate_certs:
         required: false
         description:
-            - If C(no), SSL certificates will not be validated. This should only be used
+            - If C(false), SSL certificates will not be validated. This should only be used
                 on personally controlled sites using self-signed certificates.
-        default: 'yes'
+        default: true
         type: bool
     agentport:
         type: int
@@ -107,7 +108,7 @@ EXAMPLES = '''
     oneclick_url: http://oneclick.example.com:8080
     oneclick_user: username
     oneclick_password: password
-    use_proxy: no
+    use_proxy: false
     state: absent
 '''
 

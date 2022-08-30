@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -51,7 +52,7 @@ options:
     description:
       - can be used only with C(state=present), exists template will be overwritten
     type: bool
-    default: 'no'
+    default: false
   state:
     description:
      - Indicate desired state of the template
@@ -91,7 +92,7 @@ EXAMPLES = '''
     storage: local
     content_type: vztmpl
     src: ~/ubuntu-14.04-x86_64.tar.gz
-    force: yes
+    force: true
 
 - name: Delete template with minimal options
   community.general.proxmox_template:

@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -21,15 +22,15 @@ options:
         created servers. Only applicable when used with the I(group) attribute
         or meta key.
     type: bool
-    default: 'yes'
+    default: true
   boot_from_volume:
     description:
       - Whether or not to boot the instance from a Cloud Block Storage volume.
-        If C(yes) and I(image) is specified a new volume will be created at
+        If C(true) and I(image) is specified a new volume will be created at
         boot time. I(boot_volume_size) is required with I(image) to create a
         new volume at boot time.
     type: bool
-    default: 'no'
+    default: false
   boot_volume:
     type: str
     description:
@@ -46,12 +47,12 @@ options:
       - Whether the I(boot_volume) or newly created volume from I(image) will
         be terminated when the server is terminated
     type: bool
-    default: 'no'
+    default: false
   config_drive:
     description:
       - Attach read-only configuration drive to server as label config-2
     type: bool
-    default: 'no'
+    default: false
   count:
     type: int
     description:
@@ -73,12 +74,12 @@ options:
   exact_count:
     description:
       - Explicitly ensure an exact count of instances, used with
-        state=active/present. If specified as C(yes) and I(count) is less than
+        state=active/present. If specified as C(true) and I(count) is less than
         the servers matched, servers will be deleted to match the count. If
         the number of matched servers is fewer than specified in I(count)
         additional servers will be added.
     type: bool
-    default: 'no'
+    default: false
   extra_client_args:
     type: dict
     description:
@@ -156,7 +157,7 @@ options:
     description:
       - wait for the instance to be in state 'running' before returning
     type: bool
-    default: 'no'
+    default: false
   wait_timeout:
     type: int
     description:
@@ -190,7 +191,7 @@ EXAMPLES = '''
         key_name: my_rackspace_key
         files:
           /root/test.txt: /home/localuser/test.txt
-        wait: yes
+        wait: true
         state: present
         networks:
           - private
@@ -211,9 +212,9 @@ EXAMPLES = '''
         state: present
         count: 10
         count_offset: 10
-        exact_count: yes
+        exact_count: true
         group: test
-        wait: yes
+        wait: true
       register: rax
 '''
 

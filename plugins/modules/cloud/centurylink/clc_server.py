@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2015 CenturyLink
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -24,7 +25,7 @@ options:
     description:
       - Whether to add a public ip to the server
     type: bool
-    default: 'no'
+    default: false
   alias:
     description:
       - The account alias to provision the servers under.
@@ -95,8 +96,8 @@ options:
     description:
       - Whether to create the server as 'Managed' or not.
     type: bool
-    default: 'no'
-    required: False
+    default: false
+    required: false
   memory:
     description:
       - Memory in GB.
@@ -193,7 +194,7 @@ options:
     description:
       - Whether to wait for the provisioning tasks to finish before returning.
     type: bool
-    default: 'yes'
+    default: true
 requirements:
     - python = 2.7
     - requests >= 2.5.0

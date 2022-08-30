@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# (c) 2021, Tyler Gates <tgates81@gmail.com>
+# Copyright (c) 2021, Tyler Gates <tgates81@gmail.com>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -42,9 +43,9 @@ options:
      aliases: [password]
    use_proxy:
      description:
-     - if C(no), it will not use a proxy, even if one is defined in
+     - if C(false), it will not use a proxy, even if one is defined in
        an environment variable on the target hosts.
-     default: yes
+     default: true
      required: false
      type: bool
    name:
@@ -62,7 +63,7 @@ options:
      - Validate SSL certificates. Only change this to C(false) if you can guarantee that you are talking to the correct endpoint and there is no
        man-in-the-middle attack happening.
      type: bool
-     default: yes
+     default: true
      required: false
    attributes:
      description:

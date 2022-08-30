@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2016, Olivier Boukili <boukili.olivier@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Olivier Boukili <boukili.olivier@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -49,12 +50,12 @@ options:
     description:
       - Use https to access balancer management page.
     type: bool
-    default: 'no'
+    default: false
   validate_certs:
     description:
       - Validate ssl/tls certificates.
     type: bool
-    default: 'yes'
+    default: true
 '''
 
 EXAMPLES = '''
@@ -261,8 +262,8 @@ class BalancerMember(object):
         else:
             try:
                 soup = BeautifulSoup(balancer_member_page[0])
-            except TypeError:
-                self.module.fail_json(msg="Cannot parse balancer_member_page HTML! " + str(soup))
+            except TypeError as exc:
+                self.module.fail_json(msg="Cannot parse balancer_member_page HTML! " + str(exc))
             else:
                 subsoup = soup.findAll('table')[1].findAll('tr')
                 keys = subsoup[0].findAll('th')

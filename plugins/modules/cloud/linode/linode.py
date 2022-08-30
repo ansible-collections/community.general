@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -25,7 +26,7 @@ options:
      - Linode API key.
      - C(LINODE_API_KEY) env variable can be used instead.
     type: str
-    required: yes
+    required: true
   name:
     description:
      - Name to give the instance (alphanumeric, dashes, underscore).
@@ -152,7 +153,7 @@ options:
     description:
     - Set status of Lassie watchdog.
     type: bool
-    default: "True"
+    default: true
 requirements:
     - python >= 2.6
     - linode-python
@@ -184,10 +185,10 @@ EXAMPLES = '''
      datacenter: 2
      distribution: 99
      password: 'superSecureRootPassword'
-     private_ip: yes
+     private_ip: true
      ssh_pub_key: 'ssh-rsa qwerty'
      swap: 768
-     wait: yes
+     wait: true
      wait_timeout: 600
      state: present
   delegate_to: localhost
@@ -202,10 +203,10 @@ EXAMPLES = '''
      distribution: 99
      kernel_id: 138
      password: 'superSecureRootPassword'
-     private_ip: yes
+     private_ip: true
      ssh_pub_key: 'ssh-rsa qwerty'
      swap: 768
-     wait: yes
+     wait: true
      wait_timeout: 600
      state: present
      alert_bwquota_enabled: True
@@ -238,7 +239,7 @@ EXAMPLES = '''
      password: 'superSecureRootPassword'
      ssh_pub_key: 'ssh-rsa qwerty'
      swap: 768
-     wait: yes
+     wait: true
      wait_timeout: 600
      state: present
   delegate_to: localhost

@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -73,7 +74,7 @@ options:
   auto_increment:
     description:
       - Whether or not to increment a single number in the name for created virtual machines.
-    default: yes
+    default: true
     type: bool
   instance_ids:
     description:
@@ -95,7 +96,7 @@ options:
     description:
       - wait for the datacenter to be created before returning
     required: false
-    default: "yes"
+    default: true
     type: bool
   wait_timeout:
     description:
@@ -124,7 +125,7 @@ EXAMPLES = '''
     datacenter: Tardis One
     name: vol%02d
     count: 5
-    auto_increment: yes
+    auto_increment: true
     wait_timeout: 500
     state: present
 
@@ -324,7 +325,7 @@ def delete_volume(module, profitbricks):
                 break
 
     for n in instance_ids:
-        if(uuid_match.match(n)):
+        if uuid_match.match(n):
             _delete_volume(module, profitbricks, datacenter, n)
             changed = True
         else:

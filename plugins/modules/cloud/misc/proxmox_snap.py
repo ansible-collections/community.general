@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright: (c) 2020, Jeffrey van Pelt (@Thulium-Drake) <jeff@vanpelt.one>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2020, Jeffrey van Pelt (@Thulium-Drake) <jeff@vanpelt.one>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -35,12 +36,12 @@ options:
   force:
     description:
       - For removal from config file, even if removing disk snapshot fails.
-    default: no
+    default: false
     type: bool
   vmstate:
     description:
       - Snapshot includes RAM.
-    default: no
+    default: false
     type: bool
   description:
     description:
@@ -174,8 +175,8 @@ def main():
         state=dict(default='present', choices=['present', 'absent', 'rollback']),
         description=dict(type='str'),
         snapname=dict(type='str', default='ansible_snap'),
-        force=dict(type='bool', default='no'),
-        vmstate=dict(type='bool', default='no'),
+        force=dict(type='bool', default=False),
+        vmstate=dict(type='bool', default=False),
     )
     module_args.update(snap_args)
 

@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2018, Red Hat, Inc.
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2018, Red Hat, Inc.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -47,7 +48,7 @@ options:
     activated:
         description:
             - The "activate" status for a VDO volume.  If this is set
-              to "no", the VDO volume cannot be started, and it will
+              to C(false), the VDO volume cannot be started, and it will
               not start on system startup.  However, on initial
               creation, a VDO volume with "activated" set to "off"
               will be running, until stopped.  This is the default
@@ -269,7 +270,7 @@ options:
               checks it is important to make sure that all parameters
               provided are accurate and intentional."
         type: bool
-        default: no
+        default: false
         version_added: 2.4.0
 notes:
   - In general, the default thread configuration should be used.
@@ -724,7 +725,7 @@ def run_module():
         # Note that a disabled VDO volume cannot be started by the
         # 'vdo start' command, by design.  To accurately track changed
         # status, don't try to start a disabled VDO volume.
-        # If the playbook contains 'activated: yes', assume that
+        # If the playbook contains 'activated: true', assume that
         # the activate_vdo() operation succeeded, as 'vdoactivatestatus'
         # will have the activated status prior to the activate_vdo()
         # call.

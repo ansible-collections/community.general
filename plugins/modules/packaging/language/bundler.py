@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2015, Tim Hoiberg <tim.hoiberg@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2015, Tim Hoiberg <tim.hoiberg@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -44,7 +45,7 @@ options:
       - Only applies if state is C(present). If set removes any gems on the
         target host that are not in the gemfile
     type: bool
-    default: 'no'
+    default: false
   gemfile:
     type: path
     description:
@@ -54,19 +55,19 @@ options:
     description:
       - If set only installs gems from the cache on the target host
     type: bool
-    default: 'no'
+    default: false
   deployment_mode:
     description:
       - Only applies if state is C(present). If set it will install gems in
         ./vendor/bundle instead of the default location. Requires a Gemfile.lock
         file to have been created prior
     type: bool
-    default: 'no'
+    default: false
   user_install:
     description:
       - Only applies if state is C(present). Installs gems in the local user's cache or for all users
     type: bool
-    default: 'yes'
+    default: true
   gem_path:
     type: path
     description:
@@ -105,7 +106,7 @@ EXAMPLES = '''
 - name: Install gems into ./vendor/bundle
   community.general.bundler:
     state: present
-    deployment_mode: yes
+    deployment_mode: true
 
 - name: Install gems using a Gemfile in another directory
   community.general.bundler:

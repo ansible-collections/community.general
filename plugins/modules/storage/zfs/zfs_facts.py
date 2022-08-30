@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2016, Adam Števko <adam.stevko@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Adam Števko <adam.stevko@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -19,7 +20,7 @@ options:
     name:
         description:
             - ZFS dataset name.
-        required: yes
+        required: true
         aliases: [ "ds", "dataset" ]
         type: str
     recurse:
@@ -27,13 +28,13 @@ options:
             - Specifies if properties for any children should be recursively
               displayed.
         type: bool
-        default: 'no'
+        default: false
     parsable:
         description:
             - Specifies if property values should be displayed in machine
               friendly format.
         type: bool
-        default: 'no'
+        default: false
     properties:
         description:
             - Specifies which dataset properties should be queried in comma-separated format.
@@ -61,7 +62,7 @@ EXAMPLES = '''
 - name: Report space usage on ZFS filesystems under data/home
   community.general.zfs_facts:
     name: data/home
-    recurse: yes
+    recurse: true
     type: filesystem
 
 - ansible.builtin.debug:

@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright: Ansible Project
+# Copyright Ansible Project
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -71,14 +72,14 @@ options:
       - Whether the record should be the only one for that record type and record name.
       - Only use with C(state) is set to C(present) on a record.
     type: 'bool'
-    default: no
+    default: false
   sandbox:
     description:
       - Use the DNSimple sandbox environment.
       - Requires a dedicated account in the dnsimple sandbox environment.
       - Check U(https://developer.dnsimple.com/sandbox/) for more information.
     type: 'bool'
-    default: no
+    default: false
     version_added: 3.5.0
 requirements:
   - "dnsimple >= 2.0.0"

@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016, Dag Wieers (@dagwieers) <dag@wieers.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Dag Wieers (@dagwieers) <dag@wieers.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -19,7 +20,7 @@ options:
     description:
     - Target path (expression).
     type: str
-    required: yes
+    required: true
     aliases: [ path ]
   ftype:
     description:
@@ -40,7 +41,7 @@ options:
     description:
     - SELinux type for the specified target.
     type: str
-    required: yes
+    required: true
   seuser:
     description:
     - SELinux user for the specified target.
@@ -61,12 +62,12 @@ options:
     - Reload SELinux policy after commit.
     - Note that this does not apply SELinux file contexts to existing files.
     type: bool
-    default: yes
+    default: true
   ignore_selinux_state:
     description:
     - Useful for scenarios (chrooted environment) that you can't get the real SELinux state.
     type: bool
-    default: no
+    default: false
 notes:
 - The changes are persistent across reboots.
 - The M(community.general.sefcontext) module does not modify existing files to the new

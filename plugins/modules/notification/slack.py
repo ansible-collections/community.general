@@ -1,14 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2020, Lee Goolsbee <lgoolsbee@atlassian.com>
-# (c) 2020, Michal Middleton <mm.404@icloud.com>
-# (c) 2017, Steve Pletcher <steve@steve-pletcher.com>
-# (c) 2016, René Moser <mail@renemoser.net>
-# (c) 2015, Stefan Berggren <nsg@nsg.cc>
-# (c) 2014, Ramon de la Fuente <ramon@delafuente.nl>
+# Copyright (c) 2020, Lee Goolsbee <lgoolsbee@atlassian.com>
+# Copyright (c) 2020, Michal Middleton <mm.404@icloud.com>
+# Copyright (c) 2017, Steve Pletcher <steve@steve-pletcher.com>
+# Copyright (c) 2016, René Moser <mail@renemoser.net>
+# Copyright (c) 2015, Stefan Berggren <nsg@nsg.cc>
+# Copyright (c) 2014, Ramon de la Fuente <ramon@delafuente.nl>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -103,10 +104,10 @@ options:
       - 'none'
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be used
+      - If C(false), SSL certificates will not be validated. This should only be used
         on personally controlled sites using self-signed certificates.
     type: bool
-    default: 'yes'
+    default: true
   color:
     type: str
     description:
@@ -293,7 +294,7 @@ def build_payload_for_slack(text, channel, thread_id, username, icon_url, icon_e
         # With a custom color we have to set the message as attachment, and explicitly turn markdown parsing on for it.
         payload = dict(attachments=[dict(text=escape_quotes(text), color=color, mrkdwn_in=["text"])])
     if channel is not None:
-        if channel.startswith(('#', '@', 'C0')):
+        if channel.startswith(('#', '@', 'C0', 'GF', 'G0')):
             payload['channel'] = channel
         else:
             payload['channel'] = '#' + channel

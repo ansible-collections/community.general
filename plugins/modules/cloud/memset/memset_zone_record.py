@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2018, Simon Weald <ansible@simonweald.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -221,7 +222,7 @@ def create_zone_record(args=None, zone_id=None, records=None, payload=None):
                 # nothing to do; record is already correct so we populate
                 # the return var with the existing record's details.
                 memset_api = zone_record
-                return(has_changed, has_failed, memset_api, msg)
+                return has_changed, has_failed, memset_api, msg
             else:
                 # merge dicts ensuring we change any updated values
                 payload = zone_record.copy()
@@ -231,7 +232,7 @@ def create_zone_record(args=None, zone_id=None, records=None, payload=None):
                     has_changed = True
                     # return the new record to the user in the returned var.
                     memset_api = new_record
-                    return(has_changed, has_failed, memset_api, msg)
+                    return has_changed, has_failed, memset_api, msg
                 has_failed, msg, response = memset_api_call(api_key=args['api_key'], api_method=api_method, payload=payload)
                 if not has_failed:
                     has_changed = True
@@ -246,7 +247,7 @@ def create_zone_record(args=None, zone_id=None, records=None, payload=None):
             has_changed = True
             # populate the return var with the new record's details.
             memset_api = new_record
-            return(has_changed, has_failed, memset_api, msg)
+            return has_changed, has_failed, memset_api, msg
         has_failed, msg, response = memset_api_call(api_key=args['api_key'], api_method=api_method, payload=payload)
         if not has_failed:
             has_changed = True
@@ -254,7 +255,7 @@ def create_zone_record(args=None, zone_id=None, records=None, payload=None):
             #  empty msg as we don't want to return a boatload of json to the user.
             msg = None
 
-    return(has_changed, has_failed, memset_api, msg)
+    return has_changed, has_failed, memset_api, msg
 
 
 def delete_zone_record(args=None, records=None, payload=None):
@@ -270,7 +271,7 @@ def delete_zone_record(args=None, records=None, payload=None):
         for zone_record in records:
             if args['check_mode']:
                 has_changed = True
-                return(has_changed, has_failed, memset_api, msg)
+                return has_changed, has_failed, memset_api, msg
             payload['id'] = zone_record['id']
             api_method = 'dns.zone_record_delete'
             has_failed, msg, response = memset_api_call(api_key=args['api_key'], api_method=api_method, payload=payload)
@@ -280,7 +281,7 @@ def delete_zone_record(args=None, records=None, payload=None):
                 #  empty msg as we don't want to return a boatload of json to the user.
                 msg = None
 
-    return(has_changed, has_failed, memset_api, msg)
+    return has_changed, has_failed, memset_api, msg
 
 
 def create_or_delete(args=None):
@@ -304,7 +305,7 @@ def create_or_delete(args=None):
         retvals['failed'] = _has_failed
         retvals['msg'] = msg
         retvals['stderr'] = "API returned an error: {0}" . format(response.status_code)
-        return(retvals)
+        return retvals
 
     zone_exists, _msg, counter, zone_id = get_zone_id(zone_name=args['zone'], current_zones=response.json())
 
@@ -317,7 +318,7 @@ def create_or_delete(args=None):
         retvals['failed'] = has_failed
         retvals['msg'] = stderr
         retvals['stderr'] = stderr
-        return(retvals)
+        return retvals
 
     # get a list of all records ( as we can't limit records by zone)
     api_method = 'dns.zone_record_list'
@@ -339,7 +340,7 @@ def create_or_delete(args=None):
         if val is not None:
             retvals[val] = eval(val)
 
-    return(retvals)
+    return retvals
 
 
 def main():

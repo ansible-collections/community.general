@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2014, Kevin Carter <kevin.carter@rackspace.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2014, Kevin Carter <kevin.carter@rackspace.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -90,7 +91,7 @@ options:
         description:
           - Enable a container log for host actions to the container.
         type: bool
-        default: 'no'
+        default: false
     container_log_level:
         choices:
           - Info
@@ -118,13 +119,13 @@ options:
           - This is not supported by all container storage backends.
           - Enabling this may fail if the backing store does not support snapshots.
         type: bool
-        default: 'no'
+        default: false
     archive:
         description:
           - Create an archive of a container.
           - This will create a tarball of the running container.
         type: bool
-        default: 'no'
+        default: false
     archive_path:
         description:
           - Path the save the archived container.

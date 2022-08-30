@@ -1,3 +1,7 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 certifi < 2022.5.18 ; python_version < '3.5' # certifi 2022.5.18 requires Python 3.5 or later
 coverage >= 4.2, < 5.0.0, != 4.3.2 ; python_version <= '3.7' # features in 4.2+ required, avoid known bug in 4.3.2 on python 2.6, coverage 5.0+ incompatible
 coverage >= 4.5.4, < 5.0.0 ; python_version > '3.7' # coverage had a bug in < 4.5.4 that would cause unit tests to hang in Python 3.8, coverage 5.0+ incompatible
@@ -50,6 +54,8 @@ redis == 2.10.6 ; python_version < '2.7'
 redis < 4.0.0 ; python_version >= '2.7' and python_version < '3.6'
 redis ; python_version >= '3.6'
 pycdlib < 1.13.0 ; python_version < '3'  # 1.13.0 does not work with Python 2, while not declaring that
+python-daemon <= 2.3.0 ; python_version < '3'
+bcrypt < 4.0.0  # TEMP: restrict to < 4.0.0 since installing 4.0.0 fails on RHEL 8
 
 # freeze pylint and its requirements for consistent test results
 astroid == 2.2.5

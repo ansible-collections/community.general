@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2018, Mikhail Gordeev
+# Copyright (c) 2018, Mikhail Gordeev
 
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -35,12 +36,12 @@ options:
       - Remove other then added repositories
       - Used if I(state=present)
     type: bool
-    default: no
+    default: false
   update:
     description:
       - Update the package database after changing repositories.
     type: bool
-    default: no
+    default: false
 author:
 - Mikhail Gordeev (@obirvalger)
 '''
@@ -55,13 +56,13 @@ EXAMPLES = '''
   community.general.apt_repo:
     repo: Sisysphus
     state: present
-    remove_others: yes
+    remove_others: true
 
 - name: Add local repository `/space/ALT/Sisyphus` and update package cache
   community.general.apt_repo:
     repo: copy:///space/ALT/Sisyphus
     state: present
-    update: yes
+    update: true
 '''
 
 RETURN = ''' # '''

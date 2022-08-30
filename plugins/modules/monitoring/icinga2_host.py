@@ -3,7 +3,9 @@
 
 # This module is proudly sponsored by CGI (www.cgi.com) and
 # KPN (www.kpn.com).
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) Ansible project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -24,16 +26,16 @@ options:
       - HTTP, HTTPS, or FTP URL in the form (http|https|ftp)://[user[:pass]]@host.domain[:port]/path
   use_proxy:
     description:
-      - If C(no), it will not use a proxy, even if one is defined in
+      - If C(false), it will not use a proxy, even if one is defined in
         an environment variable on the target hosts.
     type: bool
-    default: 'yes'
+    default: true
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be used
+      - If C(false), SSL certificates will not be validated. This should only be used
         on personally controlled sites using self-signed certificates.
     type: bool
-    default: 'yes'
+    default: true
   url_username:
     type: str
     description:
@@ -51,7 +53,7 @@ options:
         send a 401, logins will fail. This option forces the sending of the Basic authentication header
         upon initial request.
     type: bool
-    default: 'no'
+    default: false
   client_cert:
     type: path
     description:

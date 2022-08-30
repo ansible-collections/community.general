@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, Patrik Lundin <patrik@sigterm.se>
+# Copyright (c) 2013, Patrik Lundin <patrik@sigterm.se>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -23,7 +24,7 @@ options:
     name:
         description:
         - A name or a list of names of the packages.
-        required: yes
+        required: true
         type: list
         elements: str
     state:
@@ -42,13 +43,13 @@ options:
             not already installed.
           - Mutually exclusive with I(snapshot).
         type: bool
-        default: no
+        default: false
     snapshot:
         description:
           - Force C(%c) and C(%m) to expand to C(snapshots), even on a release kernel.
           - Mutually exclusive with I(build).
         type: bool
-        default: no
+        default: false
         version_added: 1.3.0
     ports_dir:
         description:
@@ -62,13 +63,13 @@ options:
             file(s) in the old packages which are annotated with @extra in
             the packaging-list.
         type: bool
-        default: no
+        default: false
     quick:
         description:
           - Replace or delete packages quickly; do not bother with checksums
             before removing normal files.
         type: bool
-        default: no
+        default: false
 notes:
   - When used with a C(loop:) each package will be processed individually,
     it is much more efficient to pass the list directly to the I(name) option.
@@ -94,7 +95,7 @@ EXAMPLES = '''
   community.general.openbsd_pkg:
     name: nmap
     state: present
-    build: yes
+    build: true
 
 - name: Specify a pkg flavour with '--'
   community.general.openbsd_pkg:
@@ -119,13 +120,13 @@ EXAMPLES = '''
 - name: Purge a package and it's configuration files
   community.general.openbsd_pkg:
     name: mpd
-    clean: yes
+    clean: true
     state: absent
 
 - name: Quickly remove a package without checking checksums
   community.general.openbsd_pkg:
     name: qt5
-    quick: yes
+    quick: true
     state: absent
 '''
 

@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -33,7 +34,7 @@ options:
     type: str
     description:
       - Name to give the load balancer
-    required: yes
+    required: true
   port:
     type: int
     description:
@@ -93,7 +94,7 @@ options:
     description:
       - wait for the balancer to be in state 'running' before returning
     type: bool
-    default: 'no'
+    default: false
   wait_timeout:
     type: int
     description:
@@ -124,7 +125,7 @@ EXAMPLES = '''
         type: SERVICENET
         timeout: 30
         region: DFW
-        wait: yes
+        wait: true
         state: present
         meta:
           app: my-cool-app
