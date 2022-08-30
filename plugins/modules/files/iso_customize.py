@@ -12,9 +12,9 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: iso_customize
-short_description: Customize the ISO file by add/delete/change files
+short_description: Add/remove/change files in ISO file
 description:
-  - This module is used to customize the ISO file by add/delete/change files.
+  - This module is used to add/remove/change files in ISO file.
   - We can change the file with combinded option "delete_files" (delete the file inside ISO)
   - and option "add_files" (adding file to ISO with the same name as previous deleted file)
 author:
