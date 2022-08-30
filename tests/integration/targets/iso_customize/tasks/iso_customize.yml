@@ -22,81 +22,62 @@
     that:
     - customize_iso_result is not failed
 
-- name: Create sub directory to mount customized ISO
-  file:
-    path: '{{ test_dir }}/iso_mount'
-    state: directory
-
 - debug: var=ansible_distribution
 
-- name: "Mount customized ISO"
-  ansible.posix.mount:
-    path: "{{ test_dir }}/iso_mount"
-    src: "{{ test_dir }}/{{ dest_iso_name }}"
-    opts: "ro,noauto"
-    fstab: "{{ test_dir }}/temp.fstab"
-    fstype: "iso9660"
-    boot: false
-    state: mounted
-  register: mount_result
-  when: ansible_distribution != "MacOSX"
+# Only need to check the files is deleted/added as the requested modifications 
+# in one type of OS(take MacOS here)
+- block:
+    - name: Create sub directory to mount customized ISO
+      file:
+        path: '{{ test_dir }}/iso_mount'
+        state: directory
 
-- name: "Mount customized ISO on MAC"
-  shell: "hdiutil attach {{ test_dir }}/{{ dest_iso_name }} -mountroot {{ test_dir }}/iso_mount"
-  register: mount_result
+    - name: "Mount customized ISO on MAC"
+      shell: "hdiutil attach {{ test_dir }}/{{ dest_iso_name }} -mountroot {{ test_dir }}/iso_mount"
+
+    # For MAC, we have different root directory for different type of ISO
+    - set_fact:
+        mount_root_dir: "{{ test_dir }}/iso_mount/disk_image"
+
+    - set_fact:
+        mount_root_dir: "{{ test_dir }}/iso_mount/AUTOINSTALL"
+      when: dest_iso_name.find('joliet') != -1
+
+    - set_fact:
+        mount_root_dir: "{{ test_dir }}/iso_mount/CDROM"
+      when: dest_iso_name.find('udf') != -1
+
+    - debug: var=mount_root_dir
+
+    - name: Check the file test01.cfg is deleted
+      stat:
+        path: "{{ mount_root_dir }}/test01.cfg"
+      register: check_file
+
+    - assert:
+        that:
+        - check_file.stat.exists == False
+
+    - name: Check the file /preseed/ubuntu.seed is added
+      stat:
+        path: "{{ mount_root_dir }}/preseed/ubuntu.seed"
+      register: check_file
+
+    - assert:
+        that:
+        - check_file.stat.exists == True
+
+    - name: Umount ISO
+      mount:
+        path: "{{ mount_root_dir }}"
+        fstab: "{{ test_dir }}/temp.fstab"
+        state: unmounted
+
+    - name: Delete directory
+      file:
+        path: "{{ test_dir }}/iso_mount"
+        state: absent
   when: ansible_distribution == "MacOSX"
-
-- name: "Display the mount result"
-  debug: var=mount_result
-
-# For MAC, we have different root directory for different type of ISO
-- set_fact:
-    mount_root_dir: "{{ test_dir }}/iso_mount/disk_image"
-  when: ansible_distribution == "MacOSX"
-
-- set_fact:
-    mount_root_dir: "{{ test_dir }}/iso_mount/AUTOINSTALL"
-  when: dest_iso_name.find('joliet') != -1
-
-- set_fact:
-    mount_root_dir: "{{ test_dir }}/iso_mount/CDROM"
-  when: dest_iso_name.find('udf') != -1
-
-# For not MAC, the root directory is iso_mount
-- set_fact:
-    mount_root_dir: "{{ test_dir }}/iso_mount"
-  when: ansible_distribution != "MacOSX"
-
-- debug: var=mount_root_dir
-
-- name: Check the file test01.cfg is deleted
-  stat:
-    path: "{{ mount_root_dir }}/test01.cfg"
-  register: check_file
-
-- assert:
-    that:
-    - check_file.stat.exists == False
-
-- name: Check the file /preseed/ubuntu.seed is added
-  stat:
-    path: "{{ mount_root_dir }}/preseed/ubuntu.seed"
-  register: check_file
-
-- assert:
-    that:
-    - check_file.stat.exists == True
-
-- name: Umount ISO
-  mount:
-    path: "{{ mount_root_dir }}"
-    fstab: "{{ test_dir }}/temp.fstab"
-    state: unmounted
-
-- name: Delete directory
-  file:
-    path: "{{ test_dir }}/iso_mount"
-    state: absent
 
 - name: Delete iso file after testing
   file:
