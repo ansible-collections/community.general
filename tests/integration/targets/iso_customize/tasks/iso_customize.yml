@@ -49,13 +49,10 @@
 - name: "Display the mount result"
   debug: var=mount_result
 
+# For MAC, we have different root directory for different type of ISO
 - set_fact:
     mount_root_dir: "{{ test_dir }}/iso_mount/disk_image"
   when: ansible_distribution == "MacOSX"
-
-- set_fact:
-    mount_root_dir: "{{ test_dir }}/iso_mount"
-  when: ansible_distribution != "MacOSX"
 
 - set_fact:
     mount_root_dir: "{{ test_dir }}/iso_mount/AUTOINSTALL"
@@ -64,6 +61,11 @@
 - set_fact:
     mount_root_dir: "{{ test_dir }}/iso_mount/CDROM"
   when: dest_iso_name.find('udf') != -1
+
+# For not MAC, the root directory is iso_mount
+- set_fact:
+    mount_root_dir: "{{ test_dir }}/iso_mount"
+  when: ansible_distribution != "MacOSX"
 
 - debug: var=mount_root_dir
 

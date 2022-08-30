@@ -15,7 +15,7 @@ module: iso_customize
 short_description: Customize the ISO file by add/delete/change files
 description:
   - This module is used to customize the ISO file by add/delete/change files.
-  - We can change the file with combinded option "delete_files" (delete the file inside ISO) 
+  - We can change the file with combinded option "delete_files" (delete the file inside ISO)
   - and option "add_files" (adding file to ISO with the same name as previous deleted file)
 author:
   - Yuhua Zou (@ZouYuhua) <zouy@vmware.com>
