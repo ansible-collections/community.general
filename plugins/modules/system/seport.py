@@ -49,6 +49,12 @@ options:
     - Run independent of selinux runtime state
     type: bool
     default: false
+  local:
+    description:
+    - Work with local modifications only.
+    type: bool
+    default: false
+    version_added: 5.6.0
 notes:
    - The changes are persistent across reboots.
    - Not tested on any debian based system.
@@ -89,6 +95,14 @@ EXAMPLES = r'''
     proto: tcp
     setype: memcache_port_t
     state: present
+
+- name: Remove tcp port 22 local modification if exists
+  community.general.seport:
+    ports: 22
+    protocol: tcp
+    setype: ssh_port_t
+    state: absent
+    local: true
 '''
 
 import traceback
@@ -117,7 +131,7 @@ def get_runtime_status(ignore_selinux_state=False):
     return ignore_selinux_state or selinux.is_selinux_enabled()
 
 
-def semanage_port_get_ports(seport, setype, proto):
+def semanage_port_get_ports(seport, setype, proto, local):
     """ Get the list of ports that have the specified type definition.
 
     :param community.general.seport: Instance of seobject.portRecords
@@ -131,7 +145,7 @@ def semanage_port_get_ports(seport, setype, proto):
     :rtype: list
     :return: List of ports that have the specified SELinux type.
     """
-    records = seport.get_all_by_type()
+    records = seport.get_all_by_type(locallist=local)
     if (setype, proto) in records:
         return records[(setype, proto)]
     else:
@@ -165,7 +179,7 @@ def semanage_port_get_type(seport, port, proto):
     return records.get(key)
 
 
-def semanage_port_add(module, ports, proto, setype, do_reload, serange='s0', sestore=''):
+def semanage_port_add(module, ports, proto, setype, do_reload, serange='s0', sestore='', local=False):
     """ Add SELinux port type definition to the policy.
 
     :type module: AnsibleModule
@@ -196,7 +210,7 @@ def semanage_port_add(module, ports, proto, setype, do_reload, serange='s0', ses
     try:
         seport = seobject.portRecords(sestore)
         seport.set_reload(do_reload)
-        ports_by_type = semanage_port_get_ports(seport, setype, proto)
+        ports_by_type = semanage_port_get_ports(seport, setype, proto, local)
         for port in ports:
             if port in ports_by_type:
                 continue
@@ -216,7 +230,7 @@ def semanage_port_add(module, ports, proto, setype, do_reload, serange='s0', ses
     return change
 
 
-def semanage_port_del(module, ports, proto, setype, do_reload, sestore=''):
+def semanage_port_del(module, ports, proto, setype, do_reload, sestore='', local=False):
     """ Delete SELinux port type definition from the policy.
 
     :type module: AnsibleModule
@@ -244,7 +258,7 @@ def semanage_port_del(module, ports, proto, setype, do_reload, sestore=''):
     try:
         seport = seobject.portRecords(sestore)
         seport.set_reload(do_reload)
-        ports_by_type = semanage_port_get_ports(seport, setype, proto)
+        ports_by_type = semanage_port_get_ports(seport, setype, proto, local)
         for port in ports:
             if port in ports_by_type:
                 change = True
@@ -266,6 +280,7 @@ def main():
             setype=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
             reload=dict(type='bool', default=True),
+            local=dict(type='bool', default=False)
         ),
         supports_check_mode=True,
     )
@@ -286,6 +301,7 @@ def main():
     setype = module.params['setype']
     state = module.params['state']
     do_reload = module.params['reload']
+    local = module.params['local']
 
     result = {
         'ports': ports,
@@ -295,9 +311,9 @@ def main():
     }
 
     if state == 'present':
-        result['changed'] = semanage_port_add(module, ports, proto, setype, do_reload)
+        result['changed'] = semanage_port_add(module, ports, proto, setype, do_reload, local=local)
     elif state == 'absent':
-        result['changed'] = semanage_port_del(module, ports, proto, setype, do_reload)
+        result['changed'] = semanage_port_del(module, ports, proto, setype, do_reload, local=local)
     else:
         module.fail_json(msg='Invalid value of argument "state": {0}'.format(state))
 
