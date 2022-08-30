@@ -966,7 +966,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         if 'agent' in kwargs:
             try:
                 # The API also allows booleans instead of e.g. `enabled=1` for backward-compatibility.
-                kwargs['agent'] = boolean(kwargs['agent'], strict=True)
+                kwargs['agent'] = '1' if boolean(kwargs['agent'], strict=True) else '0'
             except TypeError:
                 # Not something that Ansible would parse as a boolean.
                 pass
