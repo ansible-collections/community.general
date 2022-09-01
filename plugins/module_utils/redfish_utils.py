@@ -3077,7 +3077,7 @@ class RedfishUtils(object):
         need_change = False
         for property, set_value in payload.items():
             cur_value = current_sessions_config[property]
-            if not isinstance(set_value, dict) and not isinstance(set_value, list):
+            if not isinstance(set_value, (dict, list)):
                 if set_value != cur_value:
                     need_change = True
             if isinstance(set_value, dict):
@@ -3094,7 +3094,7 @@ class RedfishUtils(object):
                     need_change = True
                     continue
                 for i in range(len(set_value)):
-                    for subprop in payload[property][i].keys():
+                    for subprop in set_value[i].keys():
                         if subprop not in current_sessions_config[property][i]:
                             need_change = True
                             break
