@@ -1247,7 +1247,7 @@ def main():
                 module.fail.json(msg='node is mandatory for creating/updating vm')
             elif update and not any([vmid, name]):
                 module.fail_json(msg='vmid or name is mandatory for updating vm')
-            elif not name:
+            elif not update and not name:
                 module.fail_json(msg='name is mandatory for creating vm')
             elif not proxmox.get_node(node):
                 module.fail_json(msg="node '%s' does not exist in cluster" % node)
