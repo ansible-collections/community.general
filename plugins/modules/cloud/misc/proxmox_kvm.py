@@ -1245,7 +1245,7 @@ def main():
                 module.exit_json(changed=False, vmid=proxmox.get_vmid(name), msg="VM with name <%s> already exists" % name)
             elif not node:
                 module.fail.json(msg='node is mandatory for creating/updating vm')
-            elif update and ((not vmid) or (not name)):
+            elif update and not any(vmid, name):
                 module.fail_json(msg='vmid or name is mandatory for updating vm')
             elif not name:
                 module.fail_json(msg='name is mandatory for creating vm')
