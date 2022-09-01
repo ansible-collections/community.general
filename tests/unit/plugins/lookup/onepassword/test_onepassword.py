@@ -9,6 +9,8 @@ import itertools
 import json
 import pytest
 
+from .conftest import OP_VERSION_FIXTURES
+
 
 from ansible.errors import AnsibleLookupError
 from ansible_collections.community.general.plugins.lookup.onepassword import (
@@ -16,11 +18,6 @@ from ansible_collections.community.general.plugins.lookup.onepassword import (
     OnePassCLIv1,
     OnePassCLIv2,
 )
-
-OP_VERSION_FIXTURES = [
-    "opv1",
-    "opv2"
-]
 
 # Intentionally excludes metadata leaf nodes that would exist in real output if not relevant.
 MOCK_ENTRIES = {
