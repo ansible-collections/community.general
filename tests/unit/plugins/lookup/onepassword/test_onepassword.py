@@ -5,6 +5,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import itertools
 import json
 import pytest
 
@@ -16,6 +17,10 @@ from ansible_collections.community.general.plugins.lookup.onepassword import (
     OnePassCLIv2,
 )
 
+OP_VERSION_FIXTURES = [
+    "opv1",
+    "opv2"
+]
 
 # Intentionally excludes metadata leaf nodes that would exist in real output if not relevant.
 MOCK_ENTRIES = {
@@ -167,92 +172,115 @@ def test_op_unsupported_cli_version(fake_op):
         fake_op("99.77.77")
 
 
-def test_op_set_token_with_config(opv2, mocker):
+@pytest.mark.parametrize("op_fixture", OP_VERSION_FIXTURES)
+def test_op_set_token_with_config(op_fixture, mocker, request):
+    op = request.getfixturevalue(op_fixture)
     token = "F5417F77529B41B595D7F9D6F76EC057"
     mocker.patch("os.path.isfile", return_value=True)
-    mocker.patch.object(opv2._cli, "signin", return_value=(0, token + "\n", ""))
+    mocker.patch.object(op._cli, "signin", return_value=(0, token + "\n", ""))
 
-    opv2.set_token()
+    op.set_token()
 
-    assert opv2.token == token
+    assert op.token == token
 
 
 @pytest.mark.parametrize(
-    "message",
-    (
-        "Missing required parameters",
-        "The operation is unauthorized",
-    )
+    ("op_fixture", "message"),
+    [
+        (op, value)
+        for op in OP_VERSION_FIXTURES
+        for value in
+        (
+            "Missing required parameters",
+            "The operation is unauthorized",
+        )
+    ]
 )
-def test_op_set_token_with_config_missing_args(opv2, mocker, message):
+def test_op_set_token_with_config_missing_args(op_fixture, message, request, mocker):
+    op = request.getfixturevalue(op_fixture)
     mocker.patch("os.path.isfile", return_value=True)
-    mocker.patch.object(opv2._cli, "signin", return_value=(99, "", ""), side_effect=AnsibleLookupError(message))
-    mocker.patch.object(opv2._cli, "full_signin", return_value=(0, "", ""))
+    mocker.patch.object(op._cli, "signin", return_value=(99, "", ""), side_effect=AnsibleLookupError(message))
+    mocker.patch.object(op._cli, "full_signin", return_value=(0, "", ""))
 
     with pytest.raises(AnsibleLookupError, match=message):
-        opv2.set_token()
+        op.set_token()
 
-    opv2._cli.full_signin.assert_not_called()
+    op._cli.full_signin.assert_not_called()
 
 
-def test_op_set_token_with_config_full_signin(opv2, mocker):
+@pytest.mark.parametrize("op_fixture", OP_VERSION_FIXTURES)
+def test_op_set_token_with_config_full_signin(op_fixture, request, mocker):
+    op = request.getfixturevalue(op_fixture)
     mocker.patch("os.path.isfile", return_value=True)
-    mocker.patch.object(opv2._cli, "signin", return_value=(99, "", ""), side_effect=AnsibleLookupError("Raised intentionally"))
-    mocker.patch.object(opv2._cli, "full_signin", return_value=(0, "", ""))
+    mocker.patch.object(op._cli, "signin", return_value=(99, "", ""), side_effect=AnsibleLookupError("Raised intentionally"))
+    mocker.patch.object(op._cli, "full_signin", return_value=(0, "", ""))
 
-    opv2.set_token()
+    op.set_token()
 
-    opv2._cli.full_signin.assert_called()
+    op._cli.full_signin.assert_called()
 
 
-def test_op_set_token_without_config(opv2, mocker):
+@pytest.mark.parametrize("op_fixture", OP_VERSION_FIXTURES)
+def test_op_set_token_without_config(op_fixture, request, mocker):
+    op = request.getfixturevalue(op_fixture)
     token = "B988E8A2680A4A348962751A96861FA1"
     mocker.patch("os.path.isfile", return_value=False)
-    mocker.patch.object(opv2._cli, "signin", return_value=(99, "", ""))
-    mocker.patch.object(opv2._cli, "full_signin", return_value=(0, token + "\n", ""))
+    mocker.patch.object(op._cli, "signin", return_value=(99, "", ""))
+    mocker.patch.object(op._cli, "full_signin", return_value=(0, token + "\n", ""))
 
-    opv2.set_token()
+    op.set_token()
 
-    opv2._cli.signin.assert_not_called()
-    assert opv2.token == token
-
-
-@pytest.mark.parametrize("login_status", (False, True))
-def test_op_assert_logged_in(mocker, login_status, opv2):
-    mocker.patch.object(opv2._cli, "assert_logged_in", return_value=login_status)
-    mocker.patch.object(opv2, "set_token")
-
-    opv2.assert_logged_in()
-
-    opv2._cli.assert_logged_in.assert_called_once()
-    assert opv2.logged_in == login_status
-
-    if not login_status:
-        opv2.set_token.assert_called_once()
-
-
-def test_op_get_raw(mocker, opv2):
-    mocker.patch.object(opv2._cli, "get_raw", return_value=[99, "RAW OUTPUT", ""])
-
-    result = opv2.get_raw("some item")
-
-    assert result == "RAW OUTPUT"
-    opv2._cli.get_raw.assert_called_once()
+    op._cli.signin.assert_not_called()
+    assert op.token == token
 
 
 @pytest.mark.parametrize(
-    ("output", "expected"),
+    ("op_fixture", "login_status"),
+    [(op, value) for op in OP_VERSION_FIXTURES for value in [False, True]]
+)
+def test_op_assert_logged_in(mocker, login_status, op_fixture, request):
+    op = request.getfixturevalue(op_fixture)
+    mocker.patch.object(op._cli, "assert_logged_in", return_value=login_status)
+    mocker.patch.object(op, "set_token")
+
+    op.assert_logged_in()
+
+    op._cli.assert_logged_in.assert_called_once()
+    assert op.logged_in == login_status
+
+    if not login_status:
+        op.set_token.assert_called_once()
+
+
+@pytest.mark.parametrize("op_fixture", OP_VERSION_FIXTURES)
+def test_op_get_raw_v1(mocker, op_fixture, request):
+    op = request.getfixturevalue(op_fixture)
+    mocker.patch.object(op._cli, "get_raw", return_value=[99, "RAW OUTPUT", ""])
+
+    result = op.get_raw("some item")
+
+    assert result == "RAW OUTPUT"
+    op._cli.get_raw.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    ("op_fixture", "output", "expected"),
     (
-        ("RAW OUTPUT", "RAW OUTPUT"),
-        (None, ""),
-        ("", ""),
+        list(itertools.chain([op], d))
+        for op in OP_VERSION_FIXTURES
+        for d in [
+            ("RAW OUTPUT", "RAW OUTPUT"),
+            (None, ""),
+            ("", ""),
+        ]
     )
 )
-def test_op_get_field(mocker, opv2, output, expected):
-    mocker.patch.object(opv2, "get_raw", return_value=output)
-    mocker.patch.object(opv2._cli, "_parse_field", return_value=output)
+def test_op_get_field(mocker, op_fixture, output, expected, request):
+    op = request.getfixturevalue(op_fixture)
+    mocker.patch.object(op, "get_raw", return_value=output)
+    mocker.patch.object(op._cli, "_parse_field", return_value=output)
 
-    result = opv2.get_field("some item", "some field")
+    result = op.get_field("some item", "some field")
 
     assert result == expected
 
@@ -267,4 +295,13 @@ def test_op_lookup(mocker, cli_class, vault, queries, output, expected):
     mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePassCLIBase._run", return_value=(0, json.dumps(output), ""))
 
     result = LookupModule().run(queries, vault=vault)
-    assert expected == result
+    assert result == expected
+
+
+@pytest.mark.parametrize("op_fixture", OP_VERSION_FIXTURES)
+def test_signin(op_fixture, request):
+    op = request.getfixturevalue(op_fixture)
+    op._cli.master_password = "master_pass"
+    op._cli.signin()
+    print(op._cli.version)
+    op._cli._run.assert_called_once_with(['signin', '--raw'], command_input=b"master_pass")
