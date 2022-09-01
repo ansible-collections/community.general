@@ -224,6 +224,7 @@ files:
     maintainers: jpmens
   $lookups/dsv.py:
     maintainers: delineaKrehl tylerezimmerman
+    ignore: amigus
   $lookups/etcd3.py:
     maintainers: eric-belhomme
   $lookups/etcd.py:
