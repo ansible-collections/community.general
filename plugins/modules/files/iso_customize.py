@@ -66,7 +66,7 @@ EXAMPLES = r'''
     src_iso: "/path/to/ubuntu-22.04-desktop-amd64.iso"
     dest_iso: "/path/to/ubuntu-22.04-desktop-amd64-customized.iso"
     delete_files:
-      - "/preseed/ubuntu.seed"
+      - "/boot.catalog"
     add_files:
       - src_file: "/path/to/grub.cfg"
         dest_file: "/boot/grub/grub.cfg"
@@ -90,7 +90,6 @@ dest_iso:
 
 import os
 import traceback
-import copy
 
 PYCDLIB_IMP_ERR = None
 try:
@@ -124,15 +123,16 @@ def iso_add_dir(opened_iso, dir_path):
             else:
                 current_dirpath = "%s/%s" % (parent_dir, check_dirname)
 
+            current_dirpath_upper = current_dirpath.upper()
             try:
                 if ISO_MODE == "iso9660":
-                    opened_iso.add_directory(current_dirpath.upper())
+                    opened_iso.add_directory(current_dirpath_upper)
                 elif ISO_MODE == "rr":
-                    opened_iso.add_directory(current_dirpath.upper(), rr_name=check_dirname)
+                    opened_iso.add_directory(current_dirpath_upper, rr_name=check_dirname)
                 elif ISO_MODE == "joliet":
-                    opened_iso.add_directory(current_dirpath.upper(), joliet_path=current_dirpath)
+                    opened_iso.add_directory(current_dirpath_upper, joliet_path=current_dirpath)
                 elif ISO_MODE == "udf":
-                    opened_iso.add_directory(current_dirpath.upper(), udf_path=current_dirpath)
+                    opened_iso.add_directory(current_dirpath_upper, udf_path=current_dirpath)
             except Exception as err:
                 msg = "Failed to create dir %s with error: %s" % (current_dirpath, to_native(err))
                 return -1, msg
@@ -217,20 +217,21 @@ def iso_delete_file(opened_iso, dest_file):
             record = opened_iso.get_record(udf_path=dest_file)
 
         if record and not record.is_file():
-            return -1, "the file %s does not exists in ISO or not a file." % dest_file
+            return -1, "The file %s does not exists in ISO or not a file." % dest_file
     except Exception as err:
-        msg = "Failed to get record of file %s with error: %s" % (dest_file, to_native(err))
+        msg = "Failed to get record of file %s in ISO with filesystem %s. error: %s" % (
+            dest_file, ISO_MODE, to_native(err))
         MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
 
     try:
         if ISO_MODE == "iso9660":
-            opened_iso.rm_file(iso_path=file_in_iso_path)
+            opened_iso.rm_hard_link(iso_path=file_in_iso_path)
         elif ISO_MODE == "rr":
-            opened_iso.rm_file(iso_path=file_in_iso_path, rr_name=os.path.basename(dest_file))
+            opened_iso.rm_hard_link(iso_path=file_in_iso_path)
         elif ISO_MODE == "joliet":
-            opened_iso.rm_file(joliet_path=dest_file)
+            opened_iso.rm_hard_link(joliet_path=dest_file)
         elif ISO_MODE == "udf":
-            opened_iso.rm_file(udf_path=dest_file)
+            opened_iso.rm_hard_link(udf_path=dest_file)
     except Exception as err:
         msg = "Failed to delete iso file %s with error: %s" % (dest_file, to_native(err))
         MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
@@ -252,7 +253,7 @@ def iso_rebuild(src_iso, dest_iso, op_data_list):
             ISO_MODE = "udf"
 
         for op_data in op_data_list:
-            op = op_data['op'].strip()
+            op = op_data['op']
             data = op_data['data']
             if op == "delete_files":
                 for item in data:
@@ -278,7 +279,6 @@ def iso_rebuild(src_iso, dest_iso, op_data_list):
 
 def main():
     op_data_list = []
-    op_data_item = {}
     global MODULE_ISO_CUSTOMIZE
 
     argument_spec = dict(
@@ -301,8 +301,8 @@ def main():
 
     dest_iso = module.params.get('dest_iso')
     if not dest_iso:
-        module.fail_json(str(msg='Please specify the path of the customized ISO file \
-            using dest_iso parameter.'))
+        msg = 'Please specify the path of the customized ISO file using dest_iso parameter.'
+        module.fail_json(str(msg=msg))
 
     dest_iso_dir = os.path.dirname(dest_iso)
     if dest_iso_dir and not os.path.exists(dest_iso_dir):
@@ -312,18 +312,14 @@ def main():
 
     delete_files_list = module.params.get('delete_files')
     if delete_files_list:
-        op_data_item['op'] = "delete_files"
-        op_data_item['data'] = delete_files_list
-        op_data_list.append(copy.deepcopy(op_data_item))
+        op_data_list.append({'op':'delete_files', 'data': delete_files_list})
 
     add_files_list = module.params.get('add_files')
     if add_files_list:
         for item in add_files_list:
             if not os.path.exists(item['src_file']):
                 module.fail_json(msg="The %s does not exist." % item['src_file'])
-        op_data_item['op'] = "add_files"
-        op_data_item['data'] = add_files_list
-        op_data_list.append(copy.deepcopy(op_data_item))
+        op_data_list.append({'op':'add_files', 'data': add_files_list})
 
     iso_rebuild(src_iso, dest_iso, op_data_list)
     result = dict(

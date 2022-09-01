@@ -3,35 +3,30 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+- name: Add a line to the file test02.cfg and make sure it succeed
+  ansible.builtin.lineinfile:
+    path: "{{ test_dir }}/test02.cfg"
+    regexp: "^test"
+    line: "test"
+
 - name: "Customize ISO file"
   community.general.iso_customize:
     src_iso: "{{ test_dir }}/test.iso"
     dest_iso: "{{ test_dir }}/{{ dest_iso_name }}"
     delete_files:
       - "/test01.cfg"
+      - "/test02.cfg"
     add_files:
       - src_file: "{{ test_dir }}/test01.cfg"
         dest_file: "/preseed/ubuntu.seed"
-  register: customize_iso_result
-
-- name: "Display the ISO customized result"
-  debug: var=customize_iso_result
-
-- name: Test customize iso result
-  assert:
-    that:
-    - customize_iso_result is not failed
+      - src_file: "{{ test_dir }}/test02.cfg"
+        dest_file: "/test02.cfg"
 
 - debug: var=ansible_distribution
 
 # Only need to check the files is deleted/added as the requested modifications 
 # in one type of OS(take MacOS here)
 - block:
-    - name: Create sub directory to mount customized ISO
-      file:
-        path: '{{ test_dir }}/iso_mount'
-        state: directory
-
     - name: "Mount customized ISO on MAC"
       shell: "hdiutil attach {{ test_dir }}/{{ dest_iso_name }} -mountroot {{ test_dir }}/iso_mount"
 
@@ -67,19 +62,20 @@
         that:
         - check_file.stat.exists == True
 
+    - name: Check if the file test02.cfg is repalced or not
+      shell: "cat {{ mount_root_dir }}/test02.cfg"
+      register: check_file_content
+      failed_when: check_file_content.stdout.find("test") == -1
+
     - name: Umount ISO
       mount:
         path: "{{ mount_root_dir }}"
         fstab: "{{ test_dir }}/temp.fstab"
         state: unmounted
-
-    - name: Delete directory
-      file:
-        path: "{{ test_dir }}/iso_mount"
-        state: absent
   when: ansible_distribution == "MacOSX"
 
-- name: Delete iso file after testing
-  file:
-    path: "{{ test_dir }}/test.iso"
+- name: Delete line of file test02.cfg
+  ansible.builtin.lineinfile:
+    path: "{{ test_dir }}/test02.cfg"
+    regexp: "test" 
     state: absent

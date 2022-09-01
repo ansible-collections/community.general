@@ -3,7 +3,11 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Make sure the testing sub-directory does not exist
+- name: install pycdlib
+  pip:
+    name: pycdlib
+
+- name: Make sure the previous testing sub-directory is deleted
   file:
     path: '{{ test_dir }}'
     state: absent
@@ -13,18 +17,15 @@
     path: '{{ test_dir }}'
     state: directory
 
+- name: Create sub directory to mount customized ISO
+  file:
+    path: '{{ test_dir }}/iso_mount'
+    state: directory
+
 - name: Create temperary file for testing
   ansible.builtin.file:
-    path: "{{ test_dir }}/test01.cfg"
+    path: "{{ item }}"
     state: touch
-  register: file_result
-
-- name: Check if test files created
-  stat:
-    path: "{{ test_dir }}/test01.cfg"
-  register: test_file
-
-- assert:
-    that:
-    - file_result is changed
-    - test_file.stat.exists == True
+  with_items:
+    - "{{ test_dir }}/test01.cfg"
+    - "{{ test_dir }}/test02.cfg"

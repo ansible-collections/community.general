@@ -8,13 +8,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: install pycdlib
-  pip:
-    name: pycdlib
-  register: install_pycdlib
-
-- debug: var=install_pycdlib
-
 - set_fact:
     output_test_dir: '{{ remote_tmp_dir }}/test_iso_customize'
 
@@ -26,6 +19,7 @@
   community.general.iso_create:
     src_files:
       - "{{ output_test_dir }}/test01.cfg"
+      - "{{ output_test_dir }}/test02.cfg"
     dest_iso: "{{ output_test_dir }}/test.iso"
     interchange_level: 3
 
@@ -38,6 +32,7 @@
   community.general.iso_create:
     src_files:
       - "{{ output_test_dir }}/test01.cfg"
+      - "{{ output_test_dir }}/test02.cfg"
     dest_iso: "{{ output_test_dir }}/test.iso"
     rock_ridge: "1.09"
 
@@ -50,6 +45,7 @@
   community.general.iso_create:
     src_files:
       - "{{ output_test_dir }}/test01.cfg"
+      - "{{ output_test_dir }}/test02.cfg"
     dest_iso: "{{ output_test_dir }}/test.iso"
     interchange_level: 3
     joliet: 3
@@ -64,6 +60,7 @@
   community.general.iso_create:
     src_files:
       - "{{ output_test_dir }}/test01.cfg"
+      - "{{ output_test_dir }}/test02.cfg"
     dest_iso: "{{ output_test_dir }}/test.iso"
     udf: True
 
@@ -71,3 +68,8 @@
   vars:
     test_dir: "{{ output_test_dir }}"
     dest_iso_name: "iso_customize_udf.iso"
+
+- name: Delete testing sub-directory
+  file:
+    path: '{{ output_test_dir }}'
+    state: absent
