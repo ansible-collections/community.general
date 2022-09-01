@@ -138,7 +138,7 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def _parse_field(self, data_json, field_name, section_title):
-        pass
+        """Main method for parsing data returned from the op command line tool"""
 
     def _run(self, args, expected_rc=0, command_input=None, ignore_errors=False, environment_update=None):
         command = [self.path] + args
@@ -164,19 +164,19 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def assert_logged_in(self):
-        pass
+        """Check whether a login session exists"""
 
     @abc.abstractmethod
     def full_signin(self):
-        pass
+        """Performa full login"""
 
     @abc.abstractmethod
-    def get_raw(self, item_id, vault, token):
-        pass
+    def get_raw(self, item_id, vault=None, token=None):
+        """Gets the specified item from the vault"""
 
     @abc.abstractmethod
     def signin(self):
-        pass
+        """Sign in using the master password"""
 
     @property
     def path(self):
@@ -510,7 +510,6 @@ class OnePassCLIv2(OnePassCLIBase):
         self._check_required_params(['master_password'])
 
         args = ["signin", "--raw"]
-
         if self.subdomain:
             args.extend(["--account", self.subdomain])
 
