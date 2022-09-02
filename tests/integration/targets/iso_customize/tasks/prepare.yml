@@ -22,10 +22,13 @@
     path: '{{ test_dir }}/iso_mount'
     state: directory
 
-- name: Create temperary file for testing
+- name: Create temperary file test01.cfg for testing
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ test_dir }}/test01.cfg"
     state: touch
-  with_items:
-    - "{{ test_dir }}/test01.cfg"
-    - "{{ test_dir }}/test02.cfg"
+
+- name: Create temperary file test02.cfg for testing
+  ansible.builtin.file:
+    path: "{{ test_dir }}/test02.cfg"
+    state: touch
+
