@@ -30,6 +30,13 @@ options:
   disk:
     description:
       - The disk key (C(unused[n]), C(ide[n]), C(sata[n]), C(scsi[n]) or C(virtio[n])) you want to operate on.
+      - Disk buses (IDE, SATA and so on) have fixed ranges of C(n) that accepted by Proxmox API.
+      - >
+        For IDE: 0-3;
+        for SCSI: 0-30;
+        for SATA: 0-5;
+        for VirtIO: 0-15;
+        for Unused: 0-255.
     type: str
     required: True
   state:
