@@ -284,7 +284,11 @@ def test_op_get_field(mocker, op_fixture, output, expected, request):
 
 @pytest.mark.parametrize(
     ("cli_class", "vault", "queries", "output", "expected"),
-    ((_cli_class, item["vault_name"], item["queries"], item["output"], item["expected"]) for _cli_class in MOCK_ENTRIES for item in MOCK_ENTRIES[_cli_class]),
+    (
+        sorted(_cli_class, item["vault_name"], item["queries"], item["output"], item["expected"])
+        for _cli_class in MOCK_ENTRIES
+        for item in MOCK_ENTRIES[_cli_class]
+    ),
 )
 def test_op_lookup(mocker, cli_class, vault, queries, output, expected):
     mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePass._get_cli_class", cli_class)
