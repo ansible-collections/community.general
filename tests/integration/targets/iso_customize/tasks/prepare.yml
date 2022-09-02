@@ -29,4 +29,3 @@
   with_items:
     - "{{ test_dir }}/test01.cfg"
     - "{{ test_dir }}/test02.cfg"
-
