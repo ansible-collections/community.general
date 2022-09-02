@@ -15,8 +15,9 @@ module: iso_customize
 short_description: Add/remove/change files in ISO file
 description:
   - This module is used to add/remove/change files in ISO file.
-  - We can change the file with combinded option "delete_files" (delete the file inside ISO)
-  - and option "add_files" (adding file to ISO with the same name as previous deleted file)
+  - If you need delete action, make sure all delete actions come first, then all add actions.
+  - We can change the file with combinded options "delete_files" (delete the file inside ISO)
+  - and "add_files" (adding file to ISO with the same name as previous deleted file)
 author:
   - Yuhua Zou (@ZouYuhua) <zouy@vmware.com>
 requirements:
@@ -67,6 +68,7 @@ EXAMPLES = r'''
     dest_iso: "/path/to/ubuntu-22.04-desktop-amd64-customized.iso"
     delete_files:
       - "/boot.catalog"
+      - "/preseed/ubuntu.seed"
     add_files:
       - src_file: "/path/to/grub.cfg"
         dest_file: "/boot/grub/grub.cfg"
