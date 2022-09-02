@@ -285,7 +285,7 @@ def test_op_get_field(mocker, op_fixture, output, expected, request):
 @pytest.mark.parametrize(
     ("cli_class", "vault", "queries", "output", "expected"),
     (
-        sorted(_cli_class, item["vault_name"], item["queries"], item["output"], item["expected"])
+        (_cli_class, item["vault_name"], item["queries"], item["output"], item["expected"])
         for _cli_class in MOCK_ENTRIES
         for item in MOCK_ENTRIES[_cli_class]
     ),
