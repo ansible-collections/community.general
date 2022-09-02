@@ -31,4 +31,3 @@
   ansible.builtin.file:
     path: "{{ test_dir }}/test02.cfg"
     state: touch
-
