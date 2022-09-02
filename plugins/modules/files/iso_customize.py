@@ -241,7 +241,7 @@ def iso_delete_file(opened_iso, dest_file):
     return 0, ""
 
 
-def iso_rebuild(src_iso, dest_iso, op_data_list):
+def iso_rebuild(src_iso, dest_iso, delete_files_list, add_files_list):
     global ISO_MODE
 
     try:
@@ -254,20 +254,16 @@ def iso_rebuild(src_iso, dest_iso, op_data_list):
         elif iso.has_udf():
             ISO_MODE = "udf"
 
-        for op_data in op_data_list:
-            op = op_data['op']
-            data = op_data['data']
-            if op == "delete_files":
-                for item in data:
-                    ret, msg = iso_delete_file(iso, item.strip())
-                    if ret != 0:
-                        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
-            elif op == "add_files":
-                for item in data:
-                    ret, msg = iso_add_file(iso, item['src_file'],
-                                            item['dest_file'])
-                    if ret != 0:
-                        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
+        if delete_files_list:
+            for item in delete_files_list:
+                ret, msg = iso_delete_file(iso, item.strip())
+                if ret != 0:
+                    MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
+        if add_files_list:
+            for item in add_files_list:
+                ret, msg = iso_add_file(iso, item['src_file'], item['dest_file'])
+                if ret != 0:
+                    MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
 
         iso.write(dest_iso)
     except Exception as err:
@@ -276,7 +272,6 @@ def iso_rebuild(src_iso, dest_iso, op_data_list):
     finally:
         if iso:
             iso.close()
-    return
 
 
 def main():
@@ -313,17 +308,13 @@ def main():
     MODULE_ISO_CUSTOMIZE = module
 
     delete_files_list = module.params.get('delete_files')
-    if delete_files_list:
-        op_data_list.append({'op': 'delete_files', 'data': delete_files_list})
-
     add_files_list = module.params.get('add_files')
     if add_files_list:
         for item in add_files_list:
             if not os.path.exists(item['src_file']):
                 module.fail_json(msg="The %s does not exist." % item['src_file'])
-        op_data_list.append({'op': 'add_files', 'data': add_files_list})
 
-    iso_rebuild(src_iso, dest_iso, op_data_list)
+    iso_rebuild(src_iso, dest_iso, delete_files_list, add_files_list)
     result = dict(
         changed=False,
         src_iso=src_iso,

@@ -70,6 +70,6 @@
     dest_iso_name: "iso_customize_udf.iso"
 
 - name: Delete testing sub-directory
-  file:
+  ansible.builtin.file:
     path: '{{ output_test_dir }}'
     state: absent

@@ -8,17 +8,17 @@
     name: pycdlib
 
 - name: Make sure the previous testing sub-directory is deleted
-  file:
+  ansible.builtin.file:
     path: '{{ test_dir }}'
     state: absent
 
 - name: Create our testing sub-directory
-  file:
+  ansible.builtin.file:
     path: '{{ test_dir }}'
     state: directory
 
 - name: Create sub directory to mount customized ISO
-  file:
+  ansible.builtin.file:
     path: '{{ test_dir }}/iso_mount'
     state: directory
 
@@ -29,3 +29,4 @@
   with_items:
     - "{{ test_dir }}/test01.cfg"
     - "{{ test_dir }}/test02.cfg"
+
