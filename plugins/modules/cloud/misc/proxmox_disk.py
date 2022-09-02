@@ -522,16 +522,16 @@ def main():
     module_args = proxmox_auth_argument_spec()
     disk_args = dict(
         # Proxmox native parameters
-        aio=dict(choices=['native', 'threads', 'io_uring']),
+        aio=dict(type='str', choices=['native', 'threads', 'io_uring']),
         backup=dict(type='bool'),
         bps_max_length=dict(type='int'),
         bps_rd_max_length=dict(type='int'),
         bps_wr_max_length=dict(type='int'),
-        cache=dict(choices=['none', 'writethrough', 'writeback', 'unsafe', 'directsync']),
+        cache=dict(type='str', choices=['none', 'writethrough', 'writeback', 'unsafe', 'directsync']),
         cyls=dict(type='int'),
         detect_zeroes=dict(type='bool'),
-        discard=dict(choices=['ignore', 'on']),
-        format=dict(choices=['raw', 'cow', 'qcow', 'qed', 'qcow2', 'vmdk', 'cloop']),
+        discard=dict(type='str', choices=['ignore', 'on']),
+        format=dict(type='str', choices=['raw', 'cow', 'qcow', 'qed', 'qcow2', 'vmdk', 'cloop']),
         heads=dict(type='int'),
         import_from=dict(type='str'),
         iops=dict(type='int'),
@@ -550,10 +550,10 @@ def main():
         mbps_rd_max=dict(type='float'),
         mbps_wr=dict(type='float'),
         mbps_wr_max=dict(type='float'),
-        media=dict(choices=['cdrom', 'disk']),
+        media=dict(type='str', choices=['cdrom', 'disk']),
         queues=dict(type='int'),
         replicate=dict(type='bool'),
-        rerror=dict(choices=['ignore', 'report', 'stop']),
+        rerror=dict(type='str', choices=['ignore', 'report', 'stop']),
         ro=dict(type='bool'),
         scsiblock=dict(type='bool'),
         secs=dict(type='int'),
@@ -561,8 +561,8 @@ def main():
         shared=dict(type='bool'),
         snapshot=dict(type='bool'),
         ssd=dict(type='bool'),
-        trans=dict(choices=['auto', 'lba', 'none']),
-        werror=dict(choices=['enospc', 'ignore', 'report', 'stop']),
+        trans=dict(type='str', choices=['auto', 'lba', 'none']),
+        werror=dict(type='str', choices=['enospc', 'ignore', 'report', 'stop']),
         wwn=dict(type='str'),
 
         # Disk moving relates parameters
@@ -579,7 +579,8 @@ def main():
         disk=dict(type='str', required=True),
         storage=dict(type='str'),
         size=dict(type='str'),
-        state=dict(choices=['present', 'updated', 'grown', 'detached', 'moved', 'absent'], default='present'),
+        state=dict(type='str', choices=['present', 'updated', 'grown', 'detached', 'moved', 'absent'],
+                   default='present'),
         force_replace=dict(type='bool', default=False),
     )
 
