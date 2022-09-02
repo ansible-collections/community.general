@@ -615,7 +615,7 @@ def main():
             ('mbps', 'mbps_wr'),
             ('iops', 'iops_rd'),
             ('iops', 'iops_wr'),
-            ('import_from', 'size')
+            ('import_from', 'size'),
         ]
     )
 
