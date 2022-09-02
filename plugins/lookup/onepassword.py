@@ -106,8 +106,12 @@ from ansible.errors import AnsibleLookupError
 from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.module_utils.six import with_metaclass
+from ansible.utils.display import Display
 
 from ansible_collections.community.general.plugins.module_utils.onepassword import OnePasswordConfig
+
+DISPLAY = Display()
+PLUGIN_NAME = __name__.replace("ansible_collections.", "")
 
 
 class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
@@ -443,8 +447,10 @@ class OnePassCLIv2(OnePassCLIBase):
             }
         """
         data = json.loads(data_json)
-        section = section_title or "fields"
-        for field in data.get(section):
+        if section_title is not None:
+            DISPLAY.warning("{action}: 'section' is not valid for op >= 2.0.0. Ignoring.".format(action=PLUGIN_NAME))
+
+        for field in data.get("fields", []):
             # If the field name exists in the section, return that value
             if field.get(field_name):
                 return field.get(field_name)
