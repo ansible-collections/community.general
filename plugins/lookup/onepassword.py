@@ -449,7 +449,11 @@ class OnePassCLIv2(OnePassCLIBase):
             if field.get(field_name):
                 return field.get(field_name)
 
-            # If the field name doesn't exist in the section, match on the value of "id" and return "value"
+            # If the field name doesn't exist in the section, match on the value of "label"
+            # then "id" and return "value"
+            if field.get("label") == field_name:
+                return field["value"]
+
             if field.get("id") == field_name:
                 return field["value"]
 
