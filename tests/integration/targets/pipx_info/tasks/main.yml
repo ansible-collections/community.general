@@ -1,0 +1,139 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: install pipx
+  pip:
+    name: pipx
+    extra_args: --user
+
+##############################################################################
+- name: ensure application tox is uninstalled
+  community.general.pipx:
+    state: absent
+    name: tox
+
+- name: retrieve applications (empty)
+  community.general.pipx_info: {}
+  register: info_empty
+
+- name: install application tox
+  community.general.pipx:
+    name: tox
+
+- name: retrieve applications
+  community.general.pipx_info: {}
+  register: info_all
+
+- name: retrieve applications (include_deps=true)
+  community.general.pipx_info:
+    include_deps: true
+  register: info_all_deps
+
+- name: retrieve application tox
+  community.general.pipx_info:
+    name: tox
+    include_deps: true
+  register: info_tox
+
+- name: uninstall application tox
+  community.general.pipx:
+    state: absent
+    name: tox
+
+- name: check assertions tox
+  assert:
+    that:
+      - info_empty.application|length == 0
+
+      - info_all.application|length == 1
+      - info_all.application[0].name == "tox"
+      - "'version' in info_all.application[0]"
+      - "'dependencies' not in info_all.application[0]"
+      - "'injected' not in info_all.application[0]"
+
+      - info_all_deps.application|length == 1
+      - info_all_deps.application[0].name == "tox"
+      - "'version' in info_all_deps.application[0]"
+      - info_all_deps.application[0].dependencies == ["virtualenv"]
+      - "'injected' not in info_all.application[0]"
+
+      - info_tox.application == info_all_deps.application
+
+##############################################################################
+- name: set test applications
+  set_fact:
+    apps:
+      - name: tox
+        source: tox==3.24.0
+      - name: ansible-lint
+        inject_packages:
+          - licenses
+
+- name: ensure applications are uninstalled
+  community.general.pipx:
+    name: "{{ item.name }}"
+    state: absent
+  loop: "{{ apps }}"
+
+- name: install applications
+  community.general.pipx:
+    name: "{{ item.name }}"
+    source: "{{ item.source|default(omit) }}"
+  loop: "{{ apps }}"
+
+- name: inject packages
+  community.general.pipx:
+    state: inject
+    name: "{{ item.name }}"
+    inject_packages: "{{ item.inject_packages }}"
+  when: "'inject_packages' in item"
+  loop: "{{ apps }}"
+
+- name: retrieve applications
+  community.general.pipx_info: {}
+  register: info2_all
+
+- name: retrieve applications (include_deps=true)
+  community.general.pipx_info:
+    include_deps: true
+    include_injected: true
+  register: info2_all_deps
+
+- name: retrieve application ansible-lint
+  community.general.pipx_info:
+    name: ansible-lint
+    include_deps: true
+    include_injected: true
+  register: info2_lint
+
+- name: ensure applications are uninstalled
+  community.general.pipx:
+    name: "{{ item.name }}"
+    state: absent
+  loop: "{{ apps }}"
+
+- name: check assertions multiple apps
+  assert:
+    that:
+      - all_apps|length == 2
+      - all_apps[1].name == "tox"
+      - all_apps[1].version == "3.24.0"
+      - "'dependencies' not in all_apps[1]"
+      - "'injected' not in all_apps[1]"
+
+      - all_apps_deps|length == 2
+      - all_apps_deps[1].name == "tox"
+      - all_apps_deps[1].version == "3.24.0"
+      - all_apps_deps[1].dependencies == ["virtualenv"]
+      - "'injected' in all_apps_deps[0]"
+      - "'licenses' in all_apps_deps[0].injected"
+
+      - lint|length == 1
+      - all_apps_deps|length == 2
+      - lint[0] == all_apps_deps[0]
+  vars:
+    all_apps: "{{ info2_all.application|sort(attribute='name') }}"
+    all_apps_deps: "{{ info2_all_deps.application|sort(attribute='name') }}"
+    lint: "{{ info2_lint.application|sort(attribute='name') }}"
