@@ -1,0 +1,2 @@
+bugfixes:
+  - "nmcli - avoid changed status for most cases with VPN connections (https://github.com/ansible-collections/community.general/pull/5126)."

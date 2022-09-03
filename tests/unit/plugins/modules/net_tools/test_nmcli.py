@@ -1201,7 +1201,7 @@ TESTCASE_VPN_L2TP = [
         'conn_name': 'vpn_l2tp',
         'vpn': {
             'permissions': 'brittany',
-            'service-type': 'l2tp',
+            'service-type': 'org.freedesktop.NetworkManager.l2tp',
             'gateway': 'vpn.example.com',
             'password-flags': '2',
             'user': 'brittany',
@@ -1221,9 +1221,8 @@ connection.autoconnect:                 no
 connection.permissions:                 brittany
 ipv4.method:                            auto
 ipv6.method:                            auto
-vpn-type:                               l2tp
 vpn.service-type:                       org.freedesktop.NetworkManager.l2tp
-vpn.data:                               gateway=vpn.example.com, password-flags=2, user=brittany, ipsec-enabled=true, ipsec-psk=QnJpdHRhbnkxMjM=
+vpn.data:                               gateway = vpn.example.com, ipsec-enabled = true, ipsec-psk = QnJpdHRhbnkxMjM=, password-flags = 2, user = brittany
 vpn.secrets:                            ipsec-psk = QnJpdHRhbnkxMjM=
 vpn.persistent:                         no
 vpn.timeout:                            0
@@ -1235,7 +1234,7 @@ TESTCASE_VPN_PPTP = [
         'conn_name': 'vpn_pptp',
         'vpn': {
             'permissions': 'brittany',
-            'service-type': 'pptp',
+            'service-type': 'org.freedesktop.NetworkManager.pptp',
             'gateway': 'vpn.example.com',
             'password-flags': '2',
             'user': 'brittany',
@@ -1253,9 +1252,8 @@ connection.autoconnect:                 no
 connection.permissions:                 brittany
 ipv4.method:                            auto
 ipv6.method:                            auto
-vpn-type:                               pptp
 vpn.service-type:                       org.freedesktop.NetworkManager.pptp
-vpn.data:                               password-flags=2, gateway=vpn.example.com, user=brittany
+vpn.data:                               gateway=vpn.example.com, password-flags=2, user=brittany
 """
 
 
@@ -3630,7 +3628,7 @@ def test_create_vpn_l2tp(mocked_generic_connection_create, capfd):
 
     for param in ['connection.autoconnect', 'no',
                   'connection.permissions', 'brittany',
-                  'vpn.data', 'vpn-type', 'l2tp',
+                  'vpn.data', 'vpn.service-type', 'org.freedesktop.NetworkManager.l2tp',
                   ]:
         assert param in add_args_text
 
@@ -3670,7 +3668,7 @@ def test_create_vpn_pptp(mocked_generic_connection_create, capfd):
 
     for param in ['connection.autoconnect', 'no',
                   'connection.permissions', 'brittany',
-                  'vpn.data', 'vpn-type', 'pptp',
+                  'vpn.data', 'vpn.service-type', 'org.freedesktop.NetworkManager.pptp',
                   ]:
         assert param in add_args_text
 
