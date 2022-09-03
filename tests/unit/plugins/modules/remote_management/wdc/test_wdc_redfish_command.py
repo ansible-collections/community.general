@@ -78,8 +78,16 @@ MOCK_SUCCESSFUL_RESPONSE_CHASSIS_ENCLOSURE = {
                 "WDC": {
                     "#Chassis.Locate": {
                         "target": "/Chassis.Locate"
+                    },
+                    "#Chassis.PowerMode": {
+                        "target": "/redfish/v1/Chassis/Enclosure/Actions/Chassis.PowerMode",
                     }
                 }
+            }
+        },
+        "Oem": {
+            "WDC": {
+                "PowerMode": "Normal"
             }
         }
     }
@@ -237,8 +245,8 @@ def mock_get_request_enclosure_multi_tenant(*args, **kwargs):
         raise RuntimeError("Illegal call to get_request in test: " + args[1])
 
 
-def mock_get_request_led_indicator(*args, **kwargs):
-    """Mock for get_request for LED indicator tests."""
+def mock_get_request(*args, **kwargs):
+    """Mock for get_request for simple resource tests."""
     if args[1].endswith("/redfish/v1") or args[1].endswith("/redfish/v1/"):
         return MOCK_SUCCESSFUL_RESPONSE_WITH_UPDATE_SERVICE_RESOURCE
     elif args[1].endswith("/Chassis"):
@@ -253,7 +261,8 @@ def mock_post_request(*args, **kwargs):
     """Mock post_request with successful response."""
     valid_endpoints = [
         "/UpdateService.FWActivate",
-        "/Chassis.Locate"
+        "/Chassis.Locate",
+        "/Chassis.PowerMode",
     ]
     for endpoint in valid_endpoints:
         if args[1].endswith(endpoint):
@@ -325,6 +334,64 @@ class TestWdcRedfishCommand(unittest.TestCase):
             })
             module.main()
 
+    def test_module_chassis_power_mode_low(self):
+        """Test setting chassis power mode to low (happy path)."""
+        module_args = {
+            'category': 'Chassis',
+            'command': 'PowerModeLow',
+            'username': 'USERID',
+            'password': 'PASSW0RD=21',
+            'resource_id': 'Enclosure',
+            'baseuri': 'example.com'
+        }
+        set_module_args(module_args)
+        with patch.multiple("ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
+                            get_request=mock_get_request,
+                            post_request=mock_post_request):
+            with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+                module.main()
+            self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE,
+                             get_exception_message(ansible_exit_json))
+            self.assertTrue(is_changed(ansible_exit_json))
+
+    def test_module_chassis_power_mode_normal_when_already_normal(self):
+        """Test setting chassis power mode to normal when it already is.  Verify we get changed=False."""
+        module_args = {
+            'category': 'Chassis',
+            'command': 'PowerModeNormal',
+            'username': 'USERID',
+            'password': 'PASSW0RD=21',
+            'resource_id': 'Enclosure',
+            'baseuri': 'example.com'
+        }
+        set_module_args(module_args)
+        with patch.multiple("ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
+                            get_request=mock_get_request):
+            with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
+                module.main()
+            self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE,
+                             get_exception_message(ansible_exit_json))
+            self.assertFalse(is_changed(ansible_exit_json))
+
+    def test_module_chassis_power_mode_invalid_command(self):
+        """Test that we get an error when issuing an invalid PowerMode command."""
+        module_args = {
+            'category': 'Chassis',
+            'command': 'PowerModeExtraHigh',
+            'username': 'USERID',
+            'password': 'PASSW0RD=21',
+            'resource_id': 'Enclosure',
+            'baseuri': 'example.com'
+        }
+        set_module_args(module_args)
+        with patch.multiple("ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
+                            get_request=mock_get_request):
+            with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
+                module.main()
+            expected_error_message = "Invalid Command 'PowerModeExtraHigh'"
+            self.assertIn(expected_error_message,
+                          get_exception_message(ansible_fail_json))
+
     def test_module_enclosure_led_indicator_on(self):
         """Test turning on a valid LED indicator (in this case we use the Enclosure resource)."""
         module_args = {
@@ -338,7 +405,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
         set_module_args(module_args)
 
         with patch.multiple("ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
-                            get_request=mock_get_request_led_indicator,
+                            get_request=mock_get_request,
                             post_request=mock_post_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
                 module.main()
@@ -359,7 +426,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
         set_module_args(module_args)
 
         with patch.multiple("ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
-                            get_request=mock_get_request_led_indicator,
+                            get_request=mock_get_request,
                             post_request=mock_post_request):
             with self.assertRaises(AnsibleFailJson) as ansible_fail_json:
                 module.main()
@@ -380,7 +447,7 @@ class TestWdcRedfishCommand(unittest.TestCase):
         set_module_args(module_args)
 
         with patch.multiple("ansible_collections.community.general.plugins.module_utils.wdc_redfish_utils.WdcRedfishUtils",
-                            get_request=mock_get_request_led_indicator):
+                            get_request=mock_get_request):
             with self.assertRaises(AnsibleExitJson) as ansible_exit_json:
                 module.main()
             self.assertEqual(ACTION_WAS_SUCCESSFUL_MESSAGE,
