@@ -101,6 +101,12 @@ options:
           - Specifies the duration of a session in seconds (between 10 and 86400).
         type: int
         version_added: 5.4.0
+    token:
+        description:
+          - The token key identifying an ACL rule set that controls access to
+            the key value pair.
+        type: str
+        version_added: 5.6.0
 '''
 
 EXAMPLES = '''
@@ -241,7 +247,8 @@ def get_consul_api(module):
     return consul.Consul(host=module.params.get('host'),
                          port=module.params.get('port'),
                          scheme=module.params.get('scheme'),
-                         verify=module.params.get('validate_certs'))
+                         verify=module.params.get('validate_certs'),
+                         token=module.params.get('token'))
 
 
 def test_dependencies(module):
@@ -265,6 +272,7 @@ def main():
         node=dict(type='str'),
         state=dict(type='str', default='present', choices=['absent', 'info', 'list', 'node', 'present']),
         datacenter=dict(type='str'),
+        token=dict(type='str', no_log=True),
     )
 
     module = AnsibleModule(
