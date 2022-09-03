@@ -810,6 +810,8 @@ files:
     maintainers: bcoca matburt maxamillion
   $modules/packaging/language/pipx.py:
     maintainers: russoz
+  $modules/packaging/language/pipx_info.py:
+    maintainers: russoz
   $modules/packaging/language/yarn.py:
     maintainers: chrishoffman verkaufer
   $modules/packaging/os/apk.py:
