@@ -1131,6 +1131,8 @@ plugin_routing:
       redirect: community.general.packaging.language.pip_package_info
     pipx:
       redirect: community.general.packaging.language.pipx
+    pipx_info:
+      redirect: community.general.packaging.language.pipx_info
     pkg5:
       redirect: community.general.packaging.os.pkg5
     pkg5_publisher:
