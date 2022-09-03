@@ -256,8 +256,6 @@ def netStatParse(raw):
             }
             if result not in results:
                 results.append(result)
-            else:
-                raise EnvironmentError('Could not get process information for the listening ports.')
     return results
 
 
