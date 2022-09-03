@@ -142,7 +142,7 @@ options:
     description:
       - Indicate if the container should be unprivileged
     type: bool
-    default: false
+    default: True
   description:
     description:
       - Specify the description for the container. Only used on the configuration web interface.
@@ -566,7 +566,7 @@ def main():
         purge=dict(type='bool', default=False),
         state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted']),
         pubkey=dict(type='str'),
-        unprivileged=dict(type='bool', default=False),
+        unprivileged=dict(type='bool', default=True),
         description=dict(type='str'),
         hookscript=dict(type='str'),
         proxmox_default_behavior=dict(type='str', default='no_defaults', choices=['compatibility', 'no_defaults']),
