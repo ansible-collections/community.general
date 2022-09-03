@@ -170,6 +170,18 @@ EXAMPLES = '''
     username: "{{ username }}"
     password: "{{ password }}"
 
+- name: Set chassis to Low Power Mode
+  community.general.wdc_redfish_command:
+    category: Chassis
+    resource_id: Enclosure
+    command: PowerModeLow
+
+- name: Set chassis to Normal Power Mode
+  community.general.wdc_redfish_command:
+    category: Chassis
+    resource_id: Enclosure
+    command: PowerModeNormal
+
 '''
 
 RETURN = '''
@@ -191,7 +203,9 @@ CATEGORY_COMMANDS_ALL = {
     ],
     "Chassis": [
         "IndicatorLedOn",
-        "IndicatorLedOff"
+        "IndicatorLedOff",
+        "PowerModeLow",
+        "PowerModeNormal",
     ]
 }
 
@@ -304,6 +318,8 @@ def main():
             for command in command_list:
                 if command.startswith("IndicatorLed"):
                     result = rf_utils.manage_chassis_indicator_led(command)
+                elif command.startswith("PowerMode"):
+                    result = rf_utils.manage_chassis_power_mode(command)
 
     if result['ret'] is False:
         module.fail_json(msg=to_native(result['msg']))
