@@ -279,7 +279,7 @@ def remove_value(module):
                      data=existing)
 
 
-def get_consul_api(module, token=None):
+def get_consul_api(module):
     return consul.Consul(host=module.params.get('host'),
                          port=module.params.get('port'),
                          scheme=module.params.get('scheme'),
