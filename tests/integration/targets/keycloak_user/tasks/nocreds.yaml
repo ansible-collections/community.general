@@ -8,7 +8,7 @@
   vars:
     call_args:
       realm: "{{ realm }}"
-      username: "{{ username }}"
+      name: "{{ username }}"
       state: present
       first_name: "{{ first_name }}"
       last_name: "{{ last_name }}"
@@ -23,7 +23,7 @@
   vars:
     call_args:
       realm: "{{ realm }}"
-      username: "{{ username }}"
+      name: "{{ username }}"
       state: present
       first_name: "{{ first_name }}"
       last_name: "{{ last_name }}"
@@ -39,7 +39,7 @@
   vars:
     call_args:
       realm: "{{ realm }}"
-      username: "{{ username }}"
+      name: "{{ username }}"
       state: present
       first_name: "{{ first_name }}"
       last_name: "{{ last_name }}"

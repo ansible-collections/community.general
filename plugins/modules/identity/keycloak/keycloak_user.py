@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: keycloak_user
 
@@ -49,7 +49,7 @@ options:
       type: bool
       default: true
 
-    username:
+    name:
         type: str
         description:
             - Name of the user.
@@ -126,9 +126,9 @@ author:
 
 extends_documentation_fragment:
 - community.general.keycloak
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 - name: Create a Keycloak user, authentication with credentials
   community.general.keycloak_user:
     name: drstrange
@@ -224,9 +224,9 @@ EXAMPLES = '''
       value:  holmes@sher.lock
       temporary: False
   delegate_to: localhost
-'''
+"""
 
-RETURN = '''
+RETURN = """
 msg:
     description: Message as to what action was taken.
     returned: always
@@ -310,10 +310,15 @@ user:
         manageMembership: true
         view: true
 
-'''
+"""
 
-from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
-    keycloak_argument_spec, get_token, KeycloakError
+from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import (
+    KeycloakAPI,
+    camel,
+    keycloak_argument_spec,
+    get_token,
+    KeycloakError,
+)
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -326,35 +331,44 @@ def main():
     argument_spec = keycloak_argument_spec()
 
     meta_args = dict(
-        state=dict(default='present', choices=['present', 'absent']),
-        realm=dict(default='master'),
-        id=dict(type='str'),
-        username=dict(type='str'),
-        attributes=dict(type='dict'),
-        email=dict(type='str'),
-        enabled=dict(type='bool', default=True),
-        first_name=dict(type='str'),
-        last_name=dict(type='str'),
-        required_actions=dict(type='list', elements='str'),
-        credentials=dict(type='list', elements='dict',
-                         options=dict(
-                              type=dict(type='str'),
-                              value=dict(type='str', no_log=True),
-                              temporary=dict(type='bool', default=False),
-                              userLabel=dict(type='str'),
-                         )),
-        email_verified=dict(type='bool', default=True),
+        state=dict(default="present", choices=["present", "absent"]),
+        realm=dict(default="master"),
+        id=dict(type="str"),
+        name=dict(type="str"),
+        attributes=dict(type="dict"),
+        email=dict(type="str"),
+        enabled=dict(type="bool", default=True),
+        first_name=dict(type="str"),
+        last_name=dict(type="str"),
+        required_actions=dict(type="list", elements="str"),
+        credentials=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                type=dict(type="str"),
+                value=dict(type="str", no_log=True),
+                temporary=dict(type="bool", default=False),
+                userLabel=dict(type="str"),
+            ),
+        ),
+        email_verified=dict(type="bool", default=True),
     )
 
     argument_spec.update(meta_args)
 
-    module = AnsibleModule(argument_spec=argument_spec,
-                           supports_check_mode=True,
-                           required_one_of=([['id', 'username'],
-                                             ['token', 'auth_realm', 'auth_username', 'auth_password']]),
-                           required_together=([['auth_realm', 'auth_username', 'auth_password']]))
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_one_of=(
+            [
+                ["id", "name"],
+                ["token", "auth_realm", "auth_username", "auth_password"],
+            ]
+        ),
+        required_together=([["auth_realm", "auth_username", "auth_password"]]),
+    )
 
-    result = dict(changed=False, msg='', diff={}, user='')
+    result = dict(changed=False, msg="", diff={}, user="")
 
     # Obtain access token, initialize API
     try:
@@ -364,27 +378,32 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get('realm')
-    state = module.params.get('state')
-    uid = module.params.get('id')
-    name = module.params.get('username')
-    attributes = module.params.get('attributes')
+    realm = module.params.get("realm")
+    state = module.params.get("state")
+    uid = module.params.get("id")
+    username = module.params.get("name")
+    attributes = module.params.get("attributes")
 
     # attributes in Keycloak have their values returned as lists
     # via the API. attributes is a dict, so we'll transparently convert
     # the values to lists.
     if attributes is not None:
-        for key, val in module.params['attributes'].items():
-            module.params['attributes'][key] = [val] if not isinstance(val, list) else val
+        for key, val in module.params["attributes"].items():
+            module.params["attributes"][key] = (
+                [val] if not isinstance(val, list) else val
+            )
 
     # Filter and map the parameters names that apply to the user
-    user_params = [x for x in module.params
-                   if x not in list(keycloak_argument_spec().keys()) + ['state', 'realm'] and
-                   module.params.get(x) is not None]
+    user_params = [
+        x
+        for x in module.params
+        if x not in list(keycloak_argument_spec().keys()) + ["state", "realm"]
+        and module.params.get(x) is not None
+    ]
 
     # See if it already exists in Keycloak
     if uid is None:
-        before_user = kc.get_user_by_name(name, realm=realm)
+        before_user = kc.get_user_by_name(username, realm=realm)
     else:
         before_user = kc.get_user_by_userid(uid, realm=realm)
 
@@ -397,7 +416,11 @@ def main():
     for param in user_params:
         new_param_value = module.params.get(param)
         old_value = before_user[param] if param in before_user else None
-        if new_param_value != old_value:
+        if param == "name":
+            changeset[camel("username")] = new_param_value
+        elif param == "user_groups":
+            changeset[camel("groups")] = new_param_value
+        elif new_param_value != old_value:
             changeset[camel(param)] = new_param_value
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
@@ -406,56 +429,58 @@ def main():
 
     # Cater for when it doesn't exist (an empty dict)
     if not before_user:
-        if state == 'absent':
+        if state == "absent":
             # Do nothing and exit
             if module._diff:
-                result['diff'] = dict(before='', after='')
-            result['changed'] = False
-            result['end_state'] = {}
-            result['user'] = result['end_state']
-            result['msg'] = 'user does not exist; doing nothing.'
+                result["diff"] = dict(before="", after="")
+            result["changed"] = False
+            result["end_state"] = {}
+            result["user"] = result["end_state"]
+            result["msg"] = "user does not exist; doing nothing."
             module.exit_json(**result)
 
         # Process a creation
-        result['changed'] = True
 
-        if name is None:
-            module.fail_json(msg='name must be specified when creating a new user')
+        if username is None:
+            module.fail_json(msg="name must be specified when creating a new user")
 
         if module._diff:
-            result['diff'] = dict(before='', after=desired_user)
+            result["diff"] = dict(before="", after=desired_user)
 
         if module.check_mode:
             module.exit_json(**result)
 
         # create it
         kc.create_user(desired_user, realm=realm)
-        after_user = kc.get_user_by_name(name, realm)
+        after_user = kc.get_user_by_name(username, realm)
+        result["end_state"] = after_user
+        result["user"] = result["end_state"]
 
-        result['end_state'] = after_user
-        result['user'] = result['end_state']
-
-        result['msg'] = 'user {name} has been created with ID {id}'.format(name=after_user['username'],
-                                                                           id=after_user['id'])
+        result["msg"] = "user {name} has been created with ID {id}".format(
+            name=after_user["username"], id=after_user["id"]
+        )
+        result["changed"] = True
         module.exit_json(**result)
 
     else:
-        if state == 'present':
+        if state == "present":
             # Process an update
 
             # no changes
             if desired_user == before_user:
-                result['changed'] = False
-                result['end_state'] = desired_user
-                result['user'] = result['end_state']
-                result['msg'] = "No changes required to user {name}.".format(name=before_user['username'])
+                result["changed"] = False
+                result["end_state"] = desired_user
+                result["user"] = result["end_state"]
+                result["msg"] = "No changes required to user {name}.".format(
+                    name=before_user["username"]
+                )
                 module.exit_json(**result)
 
             # doing an update
-            result['changed'] = True
+            result["changed"] = True
 
             if module._diff:
-                result['diff'] = dict(before=before_user, after=desired_user)
+                result["diff"] = dict(before=before_user, after=desired_user)
 
             if module.check_mode:
                 module.exit_json(**result)
@@ -463,35 +488,37 @@ def main():
             # do the update
             kc.update_user(desired_user, realm=realm)
 
-            after_user = kc.get_user_by_userid(desired_user['id'], realm=realm)
+            after_user = kc.get_user_by_userid(desired_user["id"], realm=realm)
 
-            result['end_state'] = after_user
-            result['user'] = result['end_state']
+            result["end_state"] = after_user
+            result["user"] = result["end_state"]
 
-            result['msg'] = "user {id} has been updated".format(id=after_user['id'])
+            result["msg"] = "user {id} has been updated".format(id=after_user["id"])
             module.exit_json(**result)
 
         else:
             # Process a deletion (because state was not 'present')
-            result['changed'] = True
+            result["changed"] = True
 
             if module._diff:
-                result['diff'] = dict(before=before_user, after='')
+                result["diff"] = dict(before=before_user, after="")
 
             if module.check_mode:
                 module.exit_json(**result)
 
             # delete it
-            uid = before_user['id']
+            uid = before_user["id"]
             kc.delete_user(userid=uid, realm=realm)
 
-            result['end_state'] = {}
-            result['user'] = result['end_state']
+            result["end_state"] = {}
+            result["user"] = result["end_state"]
 
-            result['msg'] = "user {name} has been deleted".format(name=before_user['username'])
+            result["msg"] = "user {name} has been deleted".format(
+                name=before_user["username"]
+            )
 
     module.exit_json(**result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

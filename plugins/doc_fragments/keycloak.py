@@ -41,11 +41,15 @@ options:
         description:
             - Username to authenticate for API access with.
         type: str
+        aliases:
+          - username
 
     auth_password:
         description:
             - Password to authenticate for API access with.
         type: str
+        aliases:
+          - password
 
     token:
         description:
