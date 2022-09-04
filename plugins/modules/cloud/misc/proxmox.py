@@ -612,7 +612,7 @@ def main():
     if module.params['unprivileged'] is None:
         module.params['unprivileged'] = False
         module.deprecate(
-            'The default value {0} is being deprecated and it will be replaced by {1}'.format(
+            'The default value {0} for the parameter "unprivileged" is being deprecated and it will be replaced by {1}'.format(
                 False, True
             ),
             version='7.0.0',
