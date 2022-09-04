@@ -56,7 +56,7 @@ options:
     type: bool
     default: true
     description:
-      - Used with C(state=present). If specified, the file will be created
+      - Used with I(state=present). If specified, the file will be created
         if it does not already exist. If set to C(false), will fail if the
         file does not exist
 notes:
