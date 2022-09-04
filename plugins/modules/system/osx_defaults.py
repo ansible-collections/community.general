@@ -51,7 +51,7 @@ options:
   value:
     description:
       - The value to write.
-      - Only required when C(state=present).
+      - Only required when I(state=present).
     type: raw
   state:
     description:
