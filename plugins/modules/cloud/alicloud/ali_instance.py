@@ -232,7 +232,7 @@ options:
     dry_run:
       description:
         - Specifies whether to send a dry-run request.
-        - If I(dry_run=True), Only a dry-run request is sent and no instance is created. The system checks whether the
+        - If I(dry_run=true), Only a dry-run request is sent and no instance is created. The system checks whether the
           required parameters are set, and validates the request format, service permissions, and available ECS instances.
           If the validation fails, the corresponding error code is returned. If the validation succeeds, the DryRunOperation error code is returned.
         - If I(dry_run=false), A request is sent. If the validation succeeds, the instance is created.
