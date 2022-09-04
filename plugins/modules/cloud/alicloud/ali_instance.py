@@ -90,7 +90,7 @@ options:
     max_bandwidth_out:
       description:
         - Maximum outgoing bandwidth to the public network, measured in Mbps (Megabits per second).
-          Required when I(allocate_public_ip=True). Ignored when I(allocate_public_ip=False).
+          Required when I(allocate_public_ip=true). Ignored when I(allocate_public_ip=false).
       default: 0
       type: int
     host_name:
