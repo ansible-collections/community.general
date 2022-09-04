@@ -46,12 +46,12 @@ options:
       type: str
     image_id:
       description:
-        - Image ID used to launch instances. Required when C(state=present) and creating new ECS instances.
+        - Image ID used to launch instances. Required when I(state=present) and creating new ECS instances.
       aliases: ['image']
       type: str
     instance_type:
       description:
-        - Instance type used to launch instances. Required when C(state=present) and creating new ECS instances.
+        - Instance type used to launch instances. Required when I(state=present) and creating new ECS instances.
       aliases: ['type']
       type: str
     security_groups:
@@ -90,7 +90,7 @@ options:
     max_bandwidth_out:
       description:
         - Maximum outgoing bandwidth to the public network, measured in Mbps (Megabits per second).
-          Required when C(allocate_public_ip=True). Ignored when C(allocate_public_ip=False).
+          Required when I(allocate_public_ip=true). Ignored when I(allocate_public_ip=false).
       default: 0
       type: int
     host_name:
@@ -154,7 +154,7 @@ options:
       type: str
     period:
       description:
-        - The charge duration of the instance, in month. Required when C(instance_charge_type=PrePaid).
+        - The charge duration of the instance, in months. Required when I(instance_charge_type=PrePaid).
         - The valid value are [1-9, 12, 24, 36].
       default: 1
       type: int
@@ -165,7 +165,7 @@ options:
       default: False
     auto_renew_period:
       description:
-        - The duration of the automatic renew the charge of the instance. Required when C(auto_renew=True).
+        - The duration of the automatic renew the charge of the instance. Required when I(auto_renew=true).
       choices: [1, 2, 3, 6, 12]
       type: int
     instance_ids:
@@ -217,31 +217,31 @@ options:
       version_added: '0.2.0'
     spot_strategy:
       description:
-         - The bidding mode of the pay-as-you-go instance. This parameter is valid when InstanceChargeType is set to PostPaid.
+        - The bidding mode of the pay-as-you-go instance. This parameter is valid when InstanceChargeType is set to PostPaid.
       choices: ['NoSpot', 'SpotWithPriceLimit', 'SpotAsPriceGo']
       default: 'NoSpot'
       type: str
       version_added: '0.2.0'
     period_unit:
       description:
-         - The duration unit that you will buy the resource. It is valid when C(instance_charge_type=PrePaid)
+        - The duration unit that you will buy the resource. It is valid when I(instance_charge_type=PrePaid).
       choices: ['Month', 'Week']
       default: 'Month'
       type: str
       version_added: '0.2.0'
     dry_run:
       description:
-         - Specifies whether to send a dry-run request.
-         - If I(dry_run=True), Only a dry-run request is sent and no instance is created. The system checks whether the
-           required parameters are set, and validates the request format, service permissions, and available ECS instances.
-           If the validation fails, the corresponding error code is returned. If the validation succeeds, the DryRunOperation error code is returned.
-         - If I(dry_run=False), A request is sent. If the validation succeeds, the instance is created.
+        - Specifies whether to send a dry-run request.
+        - If I(dry_run=true), Only a dry-run request is sent and no instance is created. The system checks whether the
+          required parameters are set, and validates the request format, service permissions, and available ECS instances.
+          If the validation fails, the corresponding error code is returned. If the validation succeeds, the DryRunOperation error code is returned.
+        - If I(dry_run=false), A request is sent. If the validation succeeds, the instance is created.
       default: False
       type: bool
       version_added: '0.2.0'
     include_data_disks:
       description:
-         - Whether to change instance disks charge type when changing instance charge type.
+        - Whether to change instance disks charge type when changing instance charge type.
       default: True
       type: bool
       version_added: '0.2.0'
