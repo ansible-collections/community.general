@@ -613,9 +613,7 @@ def main():
     if module.params['unprivileged'] is None:
         module.params['unprivileged'] = False
         module.deprecate(
-            'The default value `false` for the parameter "unprivileged" is deprecated and it will be replaced by `true`'
-                False, True
-            ),
+            'The default value `false` for the parameter "unprivileged" is deprecated and it will be replaced by `true`',
             version='7.0.0',
             collection_name='community.general'
         )
