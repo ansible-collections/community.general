@@ -235,7 +235,7 @@ options:
         - If I(dry_run=True), Only a dry-run request is sent and no instance is created. The system checks whether the
           required parameters are set, and validates the request format, service permissions, and available ECS instances.
           If the validation fails, the corresponding error code is returned. If the validation succeeds, the DryRunOperation error code is returned.
-        - If I(dry_run=False), A request is sent. If the validation succeeds, the instance is created.
+        - If I(dry_run=false), A request is sent. If the validation succeeds, the instance is created.
       default: False
       type: bool
       version_added: '0.2.0'
