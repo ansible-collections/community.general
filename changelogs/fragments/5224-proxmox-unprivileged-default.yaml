@@ -1,0 +1,2 @@
+deprecated_features:
+  - proxmox module - Deprecated the current ``unprivileged`` default value, will be changed to ``true`` in 7.0.0. (https://github.com/ansible-collections/community.general/pull/5224)
