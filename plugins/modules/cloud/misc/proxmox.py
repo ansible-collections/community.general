@@ -141,8 +141,8 @@ options:
   unprivileged:
     description:
       - Indicate if the container should be unprivileged.
-      - The default value for this param is C(no) but that is being deprecated.
-      - It will be replaced with C(yes) in community.general 7.0.0
+      - The default value for this param is C(false) but that is being deprecated.
+      - It will be replaced with C(true) in community.general 7.0.0
     type: bool
   description:
     description:
