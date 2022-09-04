@@ -39,7 +39,7 @@ options:
         description:
             - Whether to cast, dispel or rebuild a package
             - state C(cast) is an equivalent of C(present), not C(latest)
-            - state C(latest) always triggers C(update_cache=true)
+            - state C(latest) always triggers I(update_cache=true)
             - state C(rebuild) implies cast of all specified spells, not only
               those existed before
         choices: ["present", "latest", "absent", "cast", "dispelled", "rebuild"]
