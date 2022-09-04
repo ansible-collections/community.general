@@ -34,7 +34,7 @@ notes:
   - Keep in mind that the C(dconf) CLI tool, which this module wraps around,
     utilises an unusual syntax for the values (GVariant). For example, if you
     wanted to provide a string value, the correct syntax would be
-    C(value="'myvalue'") - with single quotes as part of the Ansible parameter
+    I(value="'myvalue'") - with single quotes as part of the Ansible parameter
     value.
   - When using loops in combination with a value like
     :code:`"[('xkb', 'us'), ('xkb', 'se')]"`, you need to be aware of possible

@@ -27,7 +27,7 @@ options:
   name:
     description:
     - The name of the package.
-    - When using C(state=latest), this can be C('*'), which updates all installed packages managed by pkgutil.
+    - When using I(state=latest), this can be C('*'), which updates all installed packages managed by pkgutil.
     type: list
     required: true
     elements: str

@@ -137,11 +137,11 @@ EXAMPLES = r'''
 RETURN = r'''
 systems:
   description: List of systems
-  returned: C(state=query) and C(name) is not provided
+  returned: I(state=query) and I(name) is not provided
   type: list
 system:
   description: (Resulting) information about the system we are working with
-  returned: when C(name) is provided
+  returned: when I(name) is provided
   type: dict
 '''
 

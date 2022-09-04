@@ -25,7 +25,7 @@ options:
   name:
     description:
       - The overlay id to install, synchronize, or uninstall.
-        Use 'ALL' to sync all of the installed overlays (can be used only when C(state=updated)).
+        Use 'ALL' to sync all of the installed overlays (can be used only when I(state=updated)).
     required: true
     type: str
   list_url:

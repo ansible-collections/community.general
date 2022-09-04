@@ -45,9 +45,9 @@ options:
     force:
         description:
             - When removing packages, forcefully remove them, without any checks.
-              Same as C(extra_args="--nodeps --nodeps").
+              Same as I(extra_args="--nodeps --nodeps").
               When combined with I(update_cache), force a refresh of all package databases.
-              Same as C(update_cache_extra_args="--refresh --refresh").
+              Same as I(update_cache_extra_args="--refresh --refresh").
         default: false
         type: bool
 
@@ -115,7 +115,7 @@ options:
     reason_for:
         description:
             - Set the install reason for C(all) packages or only for C(new) packages.
-            - In case of C(state=latest) already installed packages which will be updated to a newer version are not counted as C(new).
+            - In case of I(state=latest) already installed packages which will be updated to a newer version are not counted as C(new).
         default: new
         choices: [ all, new ]
         type: str
