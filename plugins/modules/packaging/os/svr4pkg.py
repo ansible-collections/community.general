@@ -39,13 +39,13 @@ options:
 
   src:
     description:
-      - Specifies the location to install the package from. Required when C(state=present).
+      - Specifies the location to install the package from. Required when I(state=present).
       - "Can be any path acceptable to the C(pkgadd) command's C(-d) option. e.g.: C(somefile.pkg), C(/dir/with/pkgs), C(http:/server/mypkgs.pkg)."
       - If using a file or directory, they must already be accessible by the host. See the M(ansible.builtin.copy) module for a way to get them there.
     type: str
   proxy:
     description:
-      - HTTP[s] proxy to be used if C(src) is a URL.
+      - HTTP[s] proxy to be used if I(src) is a URL.
     type: str
   response_file:
     description:

@@ -24,10 +24,10 @@ options:
     name:
         description:
             - Name or list of names of packages to install/remove.
-            - "With I(name=*), I(state: latest) will operate, but I(state: present) and I(state: absent) will be noops."
+            - "With I(name=*), I(state=latest) will operate, but I(state=present) and I(state=absent) will be noops."
             - >
                 Warning: In Ansible 2.9 and earlier this module had a misfeature
-                where I(name=*) with I(state: latest) or I(state: present) would
+                where I(name=*) with I(state=latest) or I(state=present) would
                 install every package from every package repository, filling up
                 the machines disk. Avoid using them unless you are certain that
                 your role will only be used with newer versions.

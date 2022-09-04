@@ -41,7 +41,7 @@ options:
         description:
             - Directory of your project (see --working-dir). This is required when
               the command is not run globally.
-            - Will be ignored if C(global_command=true).
+            - Will be ignored if I(global_command=true).
     global_command:
         description:
             - Runs the specified command globally.
