@@ -27,7 +27,7 @@ options:
     type: str
   pubkey:
     description:
-      - SSH public key value. Required when C(state=present).
+      - SSH public key value. Required when I(state=present).
     type: str
   state:
     description:
@@ -39,7 +39,7 @@ options:
     description:
       - The default is C(true), which will replace the existing remote key
         if it's different than C(pubkey). If C(false), the key will only be
-        set if no key with the given C(name) exists.
+        set if no key with the given I(name) exists.
     type: bool
     default: true
 
