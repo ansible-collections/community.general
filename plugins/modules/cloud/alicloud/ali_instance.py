@@ -165,7 +165,7 @@ options:
       default: False
     auto_renew_period:
       description:
-        - The duration of the automatic renew the charge of the instance. Required when I(auto_renew=True).
+        - The duration of the automatic renew the charge of the instance. Required when I(auto_renew=true).
       choices: [1, 2, 3, 6, 12]
       type: int
     instance_ids:
