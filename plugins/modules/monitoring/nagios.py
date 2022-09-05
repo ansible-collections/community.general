@@ -324,7 +324,7 @@ def main():
             ('action', 'disable_alerts', ['host', 'services']),
             ('action', 'silence_nagios', ['services']),
             ('action', 'unsilence_nagios', ['services']),
-            ('action', 'command', ['services', 'command']),
+            ('action', 'command', ['command']),
             ('action', 'servicegroup_host_downtime', ['host', 'servicegroup']),
             ('action', 'servicegroup_service_downtime', ['host', 'servicegroup']),
             ('action', 'acknowledge', ['host', 'services']),
