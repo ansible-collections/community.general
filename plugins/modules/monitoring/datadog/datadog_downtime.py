@@ -151,7 +151,6 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 # Import Datadog
-from ansible.module_utils.common.text.converters import to_native
 
 DATADOG_IMP_ERR = None
 HAS_DATADOG = True
