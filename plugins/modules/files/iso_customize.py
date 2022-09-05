@@ -256,7 +256,7 @@ def iso_rebuild(src_iso, dest_iso, delete_files_list, add_files_list):
 
         if delete_files_list:
             for item in delete_files_list:
-                ret, msg = iso_delete_file(iso, item.strip())
+                ret, msg = iso_delete_file(iso, item)
                 if ret != 0:
                     MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
         if add_files_list:
