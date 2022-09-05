@@ -256,7 +256,7 @@ def main():
                            required_one_of=([['token', 'auth_realm', 'auth_username', 'auth_password']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
-    result = dict(changed=False, msg='', diff={}, user='')
+    result = dict(changed=False, msg='', diff={}, users='')
 
     # Obtain access token, initialize API
     try:
