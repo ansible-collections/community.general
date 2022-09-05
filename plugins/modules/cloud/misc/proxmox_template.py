@@ -60,7 +60,7 @@ options:
     choices: ['present', 'absent']
     default: present
 notes:
-  - Requires C(proxmoxer) and C(requests) modules on host. This modules can be installed with C(pip).
+  - Requires C(proxmoxer) and C(requests) modules on host. This modules can be installed with M(ansible.builtin.pip).
 author: Sergei Antipov (@UnderGreen)
 extends_documentation_fragment: community.general.proxmox.documentation
 '''
