@@ -22,45 +22,45 @@ options:
     type: str
   src:
     description:
-      - path to uploaded file
-      - required only for C(state=present)
+      - Path to uploaded file.
+      - Required only for I(state=present).
     type: path
   template:
     description:
-      - the template name
-      - Required for state C(absent) to delete a template.
-      - Required for state C(present) to download an appliance container template (pveam).
+      - The template name.
+      - Required for I(state=absent) to delete a template.
+      - Required for I(state=present) to download an appliance container template (pveam).
     type: str
   content_type:
     description:
-      - content type
-      - required only for C(state=present)
+      - Content type.
+      - Required only for I(state=present).
     type: str
     default: 'vztmpl'
     choices: ['vztmpl', 'iso']
   storage:
     description:
-      - target storage
+      - Target storage.
     type: str
     default: 'local'
   timeout:
     description:
-      - timeout for operations
+      - Timeout for operations.
     type: int
     default: 30
   force:
     description:
-      - can be used only with C(state=present), exists template will be overwritten
+      - It can only be used with I(state=present), existing template will be overwritten.
     type: bool
     default: false
   state:
     description:
-     - Indicate desired state of the template
+     - Indicate desired state of the template.
     type: str
     choices: ['present', 'absent']
     default: present
 notes:
-  - Requires proxmoxer and requests modules on host. This modules can be installed with pip.
+  - Requires C(proxmoxer) and C(requests) modules on host. This modules can be installed with M(ansible.builtin.pip).
 author: Sergei Antipov (@UnderGreen)
 extends_documentation_fragment: community.general.proxmox.documentation
 '''
