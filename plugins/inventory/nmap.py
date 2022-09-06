@@ -20,7 +20,7 @@ DOCUMENTATION = '''
     options:
         plugin:
             description: token that ensures this is a source file for the 'nmap' plugin.
-            required: True
+            required: true
             choices: ['nmap', 'community.general.nmap']
         sudo:
             description: Set to C(true) to execute a C(sudo nmap) plugin scan.
@@ -29,7 +29,7 @@ DOCUMENTATION = '''
             type: boolean
         address:
             description: Network IP or range of IPs to scan, you can use a simple range (10.2.2.15-25) or CIDR notation.
-            required: True
+            required: true
         exclude:
             description: list of addresses to exclude
             type: list
@@ -37,15 +37,15 @@ DOCUMENTATION = '''
         ports:
             description: Enable/disable scanning for open ports
             type: boolean
-            default: True
+            default: true
         ipv4:
             description: use IPv4 type addresses
             type: boolean
-            default: True
+            default: true
         ipv6:
             description: use IPv6 type addresses
             type: boolean
-            default: True
+            default: true
     notes:
         - At least one of ipv4 or ipv6 is required to be True, both can be True, but they cannot both be False.
         - 'TODO: add OS fingerprinting'
@@ -53,14 +53,14 @@ DOCUMENTATION = '''
 EXAMPLES = '''
 # inventory.config file in YAML format
 plugin: community.general.nmap
-strict: False
+strict: false
 address: 192.168.0.0/24
 
 
 # a sudo nmap scan to fully use nmap scan power.
 plugin: community.general.nmap
 sudo: true
-strict: False
+strict: false
 address: 192.168.0.0/24
 '''
 

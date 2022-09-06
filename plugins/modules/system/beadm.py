@@ -22,7 +22,7 @@ options:
         description:
             - ZFS boot environment name.
         type: str
-        required: True
+        required: true
         aliases: [ "be" ]
     snapshot:
         description:
@@ -133,7 +133,7 @@ force:
     description: If forced action is wanted
     returned: always
     type: bool
-    sample: False
+    sample: false
 '''
 
 import os

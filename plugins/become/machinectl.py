@@ -56,7 +56,7 @@ DOCUMENTATION = '''
               - name: ANSIBLE_MACHINECTL_FLAGS
         become_pass:
             description: Password for machinectl
-            required: False
+            required: false
             vars:
               - name: ansible_become_password
               - name: ansible_become_pass

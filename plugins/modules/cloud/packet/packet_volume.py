@@ -84,7 +84,7 @@ options:
     description:
      - Create new volume locked.
     type: bool
-    default: False
+    default: false
 
   billing_cycle:
     description:
@@ -102,13 +102,13 @@ options:
       snapshot_count:
         description:
           - How many snapshots to keep, a positive integer.
-        required: True
+        required: true
         type: int
 
       snapshot_frequency:
         description:
           - Frequency of snapshots.
-        required: True
+        required: true
         choices: ["15min", "1hour", "1day", "1week", "1month", "1year"]
         type: str
 

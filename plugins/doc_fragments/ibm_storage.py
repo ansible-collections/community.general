@@ -18,17 +18,17 @@ options:
         description:
             - Management user on the spectrum accelerate storage system.
         type: str
-        required: True
+        required: true
     password:
         description:
             - Password for username on the spectrum accelerate storage system.
         type: str
-        required: True
+        required: true
     endpoints:
         description:
             - The hostname or management IP of Spectrum Accelerate storage system.
         type: str
-        required: True
+        required: true
 notes:
   - This module requires pyxcli python library.
     Use 'pip install pyxcli' in order to get pyxcli.

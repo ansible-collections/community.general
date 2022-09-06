@@ -230,7 +230,7 @@ EXAMPLES = '''
           - 100
         os_code: UBUNTU_LATEST
         ssh_keys: []
-        wait: True
+        wait: true
       - hostname: instance-3
         domain: anydomain.com
         datacenter: dal09

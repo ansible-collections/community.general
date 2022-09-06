@@ -66,7 +66,7 @@ options:
         description:
         - Force replace the existent vault on IPA server.
         type: bool
-        default: False
+        default: false
         choices: ["True", "False"]
     validate_certs:
         description:
@@ -115,7 +115,7 @@ EXAMPLES = r'''
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
-    replace: True
+    replace: true
 
 - name: Get vault info if already exists
   community.general.ipa_vault:

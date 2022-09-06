@@ -20,12 +20,12 @@ DOCUMENTATION = '''
     options:
         plugin:
             description: token that ensures this is a source file for the 'virtualbox' plugin
-            required: True
+            required: true
             choices: ['virtualbox', 'community.general.virtualbox']
         running_only:
             description: toggles showing all vms vs only those currently running
             type: boolean
-            default: False
+            default: false
         settings_password_file:
             description: provide a file containing the settings password (equivalent to --settingspwfile)
         network_info_path:

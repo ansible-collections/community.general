@@ -42,7 +42,7 @@ options:
     description:
       - Trust imported cert as CAcert.
     type: bool
-    default: False
+    default: false
     version_added: '0.2.0'
   pkcs12_path:
     description:
@@ -122,7 +122,7 @@ EXAMPLES = r'''
     keystore_create: true
     state: present
     cert_alias: LE_RootCA
-    trust_cacert: True
+    trust_cacert: true
 
 - name: Import SSL certificate from google.com to a keystore, create it if it doesn't exist
   community.general.java_cert:

@@ -22,11 +22,11 @@ DOCUMENTATION = '''
         name:
           description:
             - Name of the databag
-          required: True
+          required: true
         item:
           description:
             - Item to fetch
-          required: True
+          required: true
 '''
 
 EXAMPLES = """

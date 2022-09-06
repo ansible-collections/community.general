@@ -56,7 +56,7 @@ DOCUMENTATION = '''
               - name: ANSIBLE_PBRUN_FLAGS
         become_pass:
             description: Password for pbrun
-            required: False
+            required: false
             vars:
               - name: ansible_become_password
               - name: ansible_become_pass
@@ -69,7 +69,7 @@ DOCUMENTATION = '''
                 key: password
         wrap_exe:
             description: Toggle to wrap the command pbrun calls in 'shell -c' or not
-            default: False
+            default: false
             type: bool
             ini:
               - section: pbrun_become_plugin

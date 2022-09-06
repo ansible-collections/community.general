@@ -53,12 +53,12 @@ options:
     resolved:
         description:
           - whether the hostname's ipv4 address is already resolved or not
-        default: False
+        default: false
         type: bool
     resolved6:
         description:
           - whether the hostname's ipv6 address is already resolved or not
-        default: False
+        default: false
         type: bool
     timeout:
         type: int

@@ -24,7 +24,7 @@ options:
     description:
       - IP address for A/AAAA record, FQDN for CNAME/MX/NS, or text data for
         SRV/TXT
-    required: True
+    required: true
   domain:
     type: str
     description:
@@ -38,7 +38,7 @@ options:
     type: str
     description:
       - FQDN record name to create
-    required: True
+    required: true
   overwrite:
     description:
       - Add new records if data doesn't match, instead of updating existing
@@ -100,7 +100,7 @@ extends_documentation_fragment:
 EXAMPLES = '''
 - name: Create DNS Records
   hosts: all
-  gather_facts: False
+  gather_facts: false
   tasks:
     - name: Create A record
       local_action:

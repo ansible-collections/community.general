@@ -84,7 +84,7 @@ RETURN = '''
 changed:
     description: True if a sshkey was created or removed.
     type: bool
-    sample: True
+    sample: true
     returned: always
 sshkeys:
     description: Information about sshkeys that were created/removed.

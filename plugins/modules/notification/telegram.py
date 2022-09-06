@@ -54,8 +54,8 @@ EXAMPLES = """
       chat_id: 000000
       parse_mode: "markdown"
       text: "Your precious application has been deployed: https://example.com"
-      disable_web_page_preview: True
-      disable_notification: True
+      disable_web_page_preview: true
+      disable_notification: true
 
 - name: Forward message to someone
   community.general.telegram:
@@ -64,7 +64,7 @@ EXAMPLES = """
     api_args:
       chat_id: 000000
       from_chat_id: 111111
-      disable_notification: True
+      disable_notification: true
       message_id: '{{ saved_msg_id }}'
 """
 

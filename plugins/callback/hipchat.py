@@ -21,7 +21,7 @@ DOCUMENTATION = '''
     options:
       token:
         description: HipChat API token for v1 or v2 API.
-        required: True
+        required: true
         env:
           - name: HIPCHAT_TOKEN
         ini:
@@ -29,7 +29,7 @@ DOCUMENTATION = '''
             key: token
       api_version:
         description: HipChat API version, v1 or v2.
-        required: False
+        required: false
         default: v1
         env:
           - name: HIPCHAT_API_VERSION
@@ -55,7 +55,7 @@ DOCUMENTATION = '''
       notify:
         description: Add notify flag to important messages
         type: bool
-        default: True
+        default: true
         env:
           - name: HIPCHAT_NOTIFY
         ini:

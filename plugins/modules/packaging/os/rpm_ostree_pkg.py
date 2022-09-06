@@ -62,7 +62,7 @@ changed:
     description: State changes.
     returned: always
     type: bool
-    sample: True
+    sample: true
 action:
     description: Action performed.
     returned: always

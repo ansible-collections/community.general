@@ -20,7 +20,7 @@ DOCUMENTATION = '''
     options:
       _terms:
         description: query key.
-        required: True
+        required: true
       passwordstore:
         description:
           - Location of the password store.

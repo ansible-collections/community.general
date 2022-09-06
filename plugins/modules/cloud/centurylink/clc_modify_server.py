@@ -19,7 +19,7 @@ options:
     description:
       - A list of server Ids to modify.
     type: list
-    required: True
+    required: true
     elements: str
   cpu:
     description:

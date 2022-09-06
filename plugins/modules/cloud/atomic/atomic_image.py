@@ -31,7 +31,7 @@ options:
     name:
         description:
           - Name of the container image.
-        required: True
+        required: true
         type: str
     state:
         description:

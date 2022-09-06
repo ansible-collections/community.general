@@ -119,7 +119,7 @@ EXAMPLES = '''
     user: admin
     token: 126df5c60d66c66e3b75b11104a16a8a
     url: https://jenkins.example.com
-    validate_certs: False
+    validate_certs: false
   register: my_jenkins_job_info
 '''
 

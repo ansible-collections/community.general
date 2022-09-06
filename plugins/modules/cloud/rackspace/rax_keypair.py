@@ -45,7 +45,7 @@ extends_documentation_fragment:
 EXAMPLES = '''
 - name: Create a keypair
   hosts: localhost
-  gather_facts: False
+  gather_facts: false
   tasks:
     - name: Keypair request
       local_action:
@@ -67,7 +67,7 @@ EXAMPLES = '''
 
 - name: Create a keypair
   hosts: localhost
-  gather_facts: False
+  gather_facts: false
   tasks:
     - name: Keypair request
       local_action:

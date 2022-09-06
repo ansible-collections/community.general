@@ -18,7 +18,7 @@ description:
 options:
   _terms:
     description: path(s) of files to read
-    required: True
+    required: true
 '''
 
 EXAMPLES = r"""

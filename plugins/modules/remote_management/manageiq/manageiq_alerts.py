@@ -26,7 +26,7 @@ options:
     description:
       - absent - alert should not exist,
       - present - alert should exist,
-    required: False
+    required: false
     choices: ['absent', 'present']
     default: 'present'
   description:
@@ -84,7 +84,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: False
+      validate_certs: false
 
 - name: Add an alert with a "miq expression" to ManageIQ
   community.general.manageiq_alerts:
@@ -111,7 +111,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: False
+      validate_certs: false
 
 - name: Delete an alert from ManageIQ
   community.general.manageiq_alerts:
@@ -121,7 +121,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: False
+      validate_certs: false
 '''
 
 RETURN = '''

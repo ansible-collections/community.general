@@ -19,7 +19,7 @@ DOCUMENTATION = r'''
     options:
         plugin:
             description: Token that ensures this is a source file for the 'scaleway' plugin.
-            required: True
+            required: true
             choices: ['scaleway', 'community.general.scaleway']
         regions:
             description: Filter results on a specific Scaleway region.

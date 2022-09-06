@@ -52,7 +52,7 @@ options:
         description:
           - Should the login data be stripped when proxying the request to the backend host
         type: bool
-        default: True
+        default: true
         choices:
           - True
           - False
@@ -112,7 +112,7 @@ options:
         description:
           - Allow session persistency
         type: bool
-        default: False
+        default: false
         choices:
           - True
           - False
@@ -125,7 +125,7 @@ options:
         description:
           - Specifies if limitation of session lifetime is active
         type: bool
-        default: True
+        default: true
         choices:
           - True
           - False
@@ -147,7 +147,7 @@ options:
         description:
           - Specifies if session timeout is active
         type: bool
-        default: True
+        default: true
         choices:
           - True
           - False
@@ -178,7 +178,7 @@ options:
         description:
           - Should a redirect to the requested URL be made
         type: bool
-        default: False
+        default: false
         choices:
           - True
           - False

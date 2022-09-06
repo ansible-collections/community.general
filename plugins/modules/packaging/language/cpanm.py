@@ -113,7 +113,7 @@ EXAMPLES = '''
 - name: Install Dancer perl package without running the unit tests in indicated locallib
   community.general.cpanm:
     name: Dancer
-    notest: True
+    notest: true
     locallib: /srv/webapps/my_app/extlib
 
 - name: Install Dancer perl package from a specific mirror

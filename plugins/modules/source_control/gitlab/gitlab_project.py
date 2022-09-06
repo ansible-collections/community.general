@@ -186,7 +186,7 @@ EXAMPLES = r'''
   community.general.gitlab_project:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
-    validate_certs: False
+    validate_certs: false
     name: my_first_project
     state: absent
   delegate_to: localhost
@@ -194,15 +194,15 @@ EXAMPLES = r'''
 - name: Create GitLab Project in group Ansible
   community.general.gitlab_project:
     api_url: https://gitlab.example.com/
-    validate_certs: True
+    validate_certs: true
     api_username: dj-wasabi
     api_password: "MySecretPassword"
     name: my_first_project
     group: ansible
-    issues_enabled: False
+    issues_enabled: false
     merge_method: rebase_merge
-    wiki_enabled: True
-    snippets_enabled: True
+    wiki_enabled: true
+    snippets_enabled: true
     import_url: http://git.example.com/example/lab.git
     initialize_with_readme: true
     state: present

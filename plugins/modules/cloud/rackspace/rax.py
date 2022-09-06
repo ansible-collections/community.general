@@ -179,7 +179,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Build a Cloud Server
-  gather_facts: False
+  gather_facts: false
   tasks:
     - name: Server build request
       local_action:
@@ -200,7 +200,7 @@ EXAMPLES = '''
 
 - name: Build an exact count of cloud servers with incremented names
   hosts: local
-  gather_facts: False
+  gather_facts: false
   tasks:
     - name: Server build requests
       local_action:

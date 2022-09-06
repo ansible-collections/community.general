@@ -191,10 +191,10 @@ EXAMPLES = '''
       command: SetNetworkProtocols
       network_protocols:
         SNMP:
-          ProtocolEnabled: True
+          ProtocolEnabled: true
           Port: 161
         HTTP:
-          ProtocolEnabled: False
+          ProtocolEnabled: false
           Port: 8080
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
@@ -206,7 +206,7 @@ EXAMPLES = '''
       command: SetManagerNic
       nic_config:
         DHCPv4:
-          DHCPEnabled: False
+          DHCPEnabled: false
         IPv4StaticAddresses:
           Address: 192.168.1.3
           Gateway: 192.168.1.1

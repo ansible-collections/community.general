@@ -16,7 +16,7 @@ DOCUMENTATION = '''
     author: Brian Coca (@bcoca)
     options:
       _uri:
-        required: True
+        required: true
         description:
           - Path in which the cache plugin will save the files
         env:

@@ -33,7 +33,7 @@ options:
         description:
           - Whether to add the content type header or not
         type: bool
-        default: False
+        default: false
     address:
         type: str
         description:
@@ -59,7 +59,7 @@ options:
         description:
           - Whether to enable the compression
         type: bool
-        default: False
+        default: false
     domain:
         type: list
         elements: str
@@ -75,17 +75,17 @@ options:
         description:
           - Whether to enable html rewrite or not
         type: bool
-        default: False
+        default: false
     htmlrewrite_cookies:
         description:
           - Whether to enable html rewrite cookie or not
         type: bool
-        default: False
+        default: false
     implicitredirect:
         description:
           - Whether to enable implicit redirection or not
         type: bool
-        default: False
+        default: false
     lbmethod:
         type: str
         description:
@@ -111,7 +111,7 @@ options:
         description:
           - Whether to preserve host header
         type: bool
-        default: False
+        default: false
     profile:
         type: str
         description:
@@ -121,7 +121,7 @@ options:
         description:
           - Whether to activate the frontend entry or not
         type: bool
-        default: True
+        default: true
     type:
         type: str
         description:
@@ -134,7 +134,7 @@ options:
         description:
           - Whether to pass the host header or not
         type: bool
-        default: False
+        default: false
 
 extends_documentation_fragment:
 - community.general.utm

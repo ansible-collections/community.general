@@ -61,7 +61,7 @@ options:
         description:
             - If the I(state) is C(present) and I(value) is set, perform a
               read after setting the value and return this value.
-        default: True
+        default: true
         type: bool
     session:
         description:

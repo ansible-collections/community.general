@@ -68,7 +68,7 @@ options:
   vm_start_on_hold:
     description:
       - Set to true to put vm on hold while creating
-    default: False
+    default: false
     type: bool
   instance_ids:
     description:

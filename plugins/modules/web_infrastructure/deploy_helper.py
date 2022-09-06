@@ -34,7 +34,7 @@ description:
 options:
   path:
     type: path
-    required: True
+    required: true
     aliases: ['dest']
     description:
       - The root path of the project.
@@ -234,7 +234,7 @@ EXAMPLES = '''
     path: /path/to/root
     release: '{{ deploy_helper.new_release }}'
     state: finalize
-    clean: False
+    clean: false
 - community.general.deploy_helper:
     path: /path/to/root
     state: clean

@@ -119,7 +119,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Create a monitoring check
-  gather_facts: False
+  gather_facts: false
   hosts: local
   connection: local
   tasks:

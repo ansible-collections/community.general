@@ -22,7 +22,7 @@ options:
     name:
         description:
             - Name of the plugin to install.
-        required: True
+        required: true
         type: str
     state:
         description:
@@ -40,13 +40,13 @@ options:
               parameter. If, for example, the plugin is already installed, changing this has no
               effect.
             - For ES 1.x use url.
-        required: False
+        required: false
         type: str
     url:
         description:
             - Set exact URL to download the plugin from (Only works for ES 1.x).
             - For ES 2.x and higher, use src.
-        required: False
+        required: false
         type: str
     timeout:
         description:
@@ -57,7 +57,7 @@ options:
     force:
         description:
             - "Force batch mode when installing plugins. This is only necessary if a plugin requires additional permissions and console detection fails."
-        default: False
+        default: false
         type: bool
     plugin_bin:
         description:

@@ -79,7 +79,7 @@ options:
     description:
       - whether to verify the tls certificate of the consul agent
     required: false
-    default: True
+    default: true
 requirements:
   - python-consul
   - pyhcl

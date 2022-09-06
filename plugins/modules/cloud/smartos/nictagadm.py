@@ -80,7 +80,7 @@ etherstub:
   description: specifies if the nic tag will create and attach to an etherstub.
   returned: always
   type: bool
-  sample: False
+  sample: false
 mtu:
   description: specifies which MTU size was passed during the nictagadm add command. mtu and etherstub are mutually exclusive.
   returned: always
@@ -90,7 +90,7 @@ force:
   description: Shows if -f was used during the deletion of a nic tag
   returned: always
   type: bool
-  sample: False
+  sample: false
 state:
   description: state of the target
   returned: always

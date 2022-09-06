@@ -15,7 +15,7 @@ class ModuleDocFragment(object):
                          idempotent operation, and doesn't create the resource if it already exists. Setting this option
                          to true, forcefully creates a copy of the resource, even if it already exists.This option is
                          mutually exclusive with I(key_by).
-            default: False
+            default: false
             type: bool
         key_by:
             description: The list of comma-separated attributes of this resource which should be used to uniquely

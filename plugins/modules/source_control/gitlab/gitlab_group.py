@@ -94,14 +94,14 @@ EXAMPLES = '''
   community.general.gitlab_group:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
-    validate_certs: False
+    validate_certs: false
     name: my_first_group
     state: absent
 
 - name: "Create GitLab Group"
   community.general.gitlab_group:
     api_url: https://gitlab.example.com/
-    validate_certs: True
+    validate_certs: true
     api_username: dj-wasabi
     api_password: "MySecretPassword"
     name: my_first_group
@@ -112,7 +112,7 @@ EXAMPLES = '''
 - name: "Create GitLab SubGroup"
   community.general.gitlab_group:
     api_url: https://gitlab.example.com/
-    validate_certs: True
+    validate_certs: true
     api_username: dj-wasabi
     api_password: "MySecretPassword"
     name: my_first_group
@@ -124,7 +124,7 @@ EXAMPLES = '''
 - name: "Create GitLab Group for SubGroups only"
   community.general.gitlab_group:
     api_url: https://gitlab.example.com/
-    validate_certs: True
+    validate_certs: true
     api_username: dj-wasabi
     api_password: "MySecretPassword"
     name: my_main_group

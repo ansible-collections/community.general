@@ -28,7 +28,7 @@ options:
             - Specifies if property values should be displayed in machine
               friendly format.
         type: bool
-        default: False
+        default: false
         required: false
     properties:
         description:
@@ -113,7 +113,7 @@ parsable:
     description: if parsable output should be provided in machine friendly format.
     returned: if 'parsable' is set to True
     type: bool
-    sample: True
+    sample: true
 '''
 
 from collections import defaultdict

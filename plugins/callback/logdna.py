@@ -18,7 +18,7 @@ DOCUMENTATION = '''
       - whitelisting in configuration
     options:
       conf_key:
-        required: True
+        required: true
         description: LogDNA Ingestion Key
         type: string
         env:
@@ -27,7 +27,7 @@ DOCUMENTATION = '''
           - section: callback_logdna
             key: conf_key
       plugin_ignore_errors:
-        required: False
+        required: false
         description: Whether to ignore errors on failing or not
         type: boolean
         env:
@@ -35,9 +35,9 @@ DOCUMENTATION = '''
         ini:
           - section: callback_logdna
             key: plugin_ignore_errors
-        default: False
+        default: false
       conf_hostname:
-        required: False
+        required: false
         description: Alternative Host Name; the current host name by default
         type: string
         env:
@@ -46,7 +46,7 @@ DOCUMENTATION = '''
           - section: callback_logdna
             key: conf_hostname
       conf_tags:
-        required: False
+        required: false
         description: Tags
         type: string
         env:

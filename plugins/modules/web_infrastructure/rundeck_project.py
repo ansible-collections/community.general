@@ -32,12 +32,12 @@ options:
         type: str
         description:
             - Sets the project name.
-        required: True
+        required: true
     url:
         type: str
         description:
             - Sets the rundeck instance URL.
-        required: True
+        required: true
     api_version:
         type: int
         description:
@@ -48,7 +48,7 @@ options:
         type: str
         description:
             - Sets the token to authenticate against Rundeck API.
-        required: True
+        required: true
     client_cert:
         version_added: '0.2.0'
     client_key:

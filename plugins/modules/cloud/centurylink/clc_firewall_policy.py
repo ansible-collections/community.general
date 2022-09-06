@@ -19,7 +19,7 @@ options:
     description:
       - Target datacenter for the firewall policy
     type: str
-    required: True
+    required: true
   state:
     description:
       - Whether to create or delete the firewall policy
@@ -53,7 +53,7 @@ options:
     description:
       - CLC alias for the source account
     type: str
-    required: True
+    required: true
   destination_account_alias:
     description:
       - CLC alias for the destination account
@@ -90,7 +90,7 @@ EXAMPLES = '''
 ---
 - name: Create Firewall Policy
   hosts: localhost
-  gather_facts: False
+  gather_facts: false
   connection: local
   tasks:
     - name: Create / Verify an Firewall Policy at CenturyLink Cloud
@@ -105,7 +105,7 @@ EXAMPLES = '''
 
 - name: Delete Firewall Policy
   hosts: localhost
-  gather_facts: False
+  gather_facts: false
   connection: local
   tasks:
     - name: Delete an Firewall Policy at CenturyLink Cloud

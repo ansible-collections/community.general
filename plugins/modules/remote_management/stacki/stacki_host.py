@@ -19,23 +19,23 @@ options:
   name:
     description:
       - Name of the host to be added to Stacki.
-    required: True
+    required: true
     type: str
   stacki_user:
     description:
       - Username for authenticating with Stacki API, but if not specified, the environment variable C(stacki_user) is used instead.
-    required: True
+    required: true
     type: str
   stacki_password:
     description:
       - Password for authenticating with Stacki API, but if not
        specified, the environment variable C(stacki_password) is used instead.
-    required: True
+    required: true
     type: str
   stacki_endpoint:
     description:
       - URL for the Stacki API Endpoint.
-    required: True
+    required: true
     type: str
   prim_intf_mac:
     description:

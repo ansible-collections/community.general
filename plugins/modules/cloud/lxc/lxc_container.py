@@ -413,7 +413,7 @@ lxc_container:
             description: if the container was cloned
             returned: success, when clone_name is specified
             type: bool
-            sample: True
+            sample: true
 """
 
 import os

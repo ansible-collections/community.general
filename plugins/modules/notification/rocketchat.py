@@ -135,10 +135,10 @@ EXAMPLES = """
         fields:
           - title: System A
             value: 'load average: 0,74, 0,66, 0,63'
-            short: True
+            short: true
           - title: System B
             value: 'load average: 5,16, 4,64, 2,43'
-            short: True
+            short: true
   delegate_to: localhost
 """
 

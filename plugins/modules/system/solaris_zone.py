@@ -97,7 +97,7 @@ EXAMPLES = '''
     name: zone1
     state: present
     path: /zones/zone1
-    sparse: True
+    sparse: true
     root_password: Be9oX7OSwWoU.
     config: 'set autoboot=true; add net; set physical=bge0; set address=10.1.1.1; end'
 

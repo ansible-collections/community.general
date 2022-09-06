@@ -25,7 +25,7 @@ DOCUMENTATION = '''
       recurse:
         type: boolean
         description: If true, will retrieve all the values that have the given key as prefix.
-        default: False
+        default: false
       index:
         description:
           - If the key has a value with the specified index then this is returned allowing access to historical values.
@@ -56,7 +56,7 @@ DOCUMENTATION = '''
           - Whether to use http or https.
           - If you use C(ANSIBLE_CONSUL_URL) this value will be used from there.
       validate_certs:
-        default: True
+        default: true
         description: Whether to verify the ssl connection or not.
         env:
           - name: ANSIBLE_CONSUL_VALIDATE_CERTS
