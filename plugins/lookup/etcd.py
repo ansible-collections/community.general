@@ -21,7 +21,7 @@ DOCUMENTATION = '''
                 - the list of keys to lookup on the etcd server
             type: list
             elements: string
-            required: True
+            required: true
         url:
             description:
                 - Environment variable with the url for the etcd server
@@ -37,7 +37,7 @@ DOCUMENTATION = '''
         validate_certs:
             description:
                 - toggle checking that the ssl certificates are valid, you normally only want to turn this off with self-signed certs.
-            default: True
+            default: true
             type: boolean
 '''
 

@@ -16,10 +16,10 @@ DOCUMENTATION = r'''
     options:
         plugin:
             description: token that ensures this is a source file for the 'online' plugin.
-            required: True
+            required: true
             choices: ['online', 'community.general.online']
         oauth_token:
-            required: True
+            required: true
             description: Online OAuth token.
             env:
                 # in order of precedence

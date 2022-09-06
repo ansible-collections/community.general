@@ -119,7 +119,7 @@ EXAMPLES = '''
   hwc_vpc_subnet:
     gateway_ip: "192.168.100.32"
     name: "ansible_network_subnet_test"
-    dhcp_enable: True
+    dhcp_enable: true
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
   register: subnet

@@ -20,7 +20,7 @@ options:
     description:
       - The name of the loadbalancer
     type: str
-    required: True
+    required: true
   description:
     description:
       - A description for the loadbalancer
@@ -29,12 +29,12 @@ options:
     description:
       - The alias of your CLC Account
     type: str
-    required: True
+    required: true
   location:
     description:
       - The location of the datacenter where the load balancer resides in
     type: str
-    required: True
+    required: true
   method:
     description:
       -The balancing method for the load balancer pool

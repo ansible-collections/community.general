@@ -21,7 +21,7 @@ DOCUMENTATION = '''
       - If you increase verbosity all tasks are printed.
     options:
       nocolor:
-        default: False
+        default: false
         description: This setting allows suppressing colorizing output
         env:
           - name: ANSIBLE_NOCOLOR
