@@ -15,59 +15,59 @@ module: netcup_dns
 notes: []
 short_description: manage Netcup DNS records
 description:
-  - "Manages DNS records via the Netcup API, see the docs U(https://ccp.netcup.net/run/webservice/servers/endpoint.php)"
+  - "Manages DNS records via the Netcup API, see the docs U(https://ccp.netcup.net/run/webservice/servers/endpoint.php)."
 options:
   api_key:
     description:
-      - API key for authentication, must be obtained via the netcup CCP (U(https://ccp.netcup.net))
+      - "API key for authentication, must be obtained via the netcup CCP (U(https://ccp.netcup.net))."
     required: True
     type: str
   api_password:
     description:
-      - API password for authentication, must be obtained via the netcup CCP (https://ccp.netcup.net)
+      - "API password for authentication, must be obtained via the netcup CCP (U(https://ccp.netcup.net))."
     required: True
     type: str
   customer_id:
     description:
-      - Netcup customer id
+      - Netcup customer id.
     required: True
     type: int
   domain:
     description:
-      - Domainname the records should be added / removed
+      - Domainname the records should be added / removed.
     required: True
     type: str
   record:
     description:
-      - Record to add or delete, supports wildcard (*). Default is C(@) (e.g. the zone name)
+      - Record to add or delete, supports wildcard (*). Default is C(@) (e.g. the zone name).
     default: "@"
     aliases: [ name ]
     type: str
   type:
     description:
-      - Record type
+      - Record type.
     choices: ['A', 'AAAA', 'MX', 'CNAME', 'CAA', 'SRV', 'TXT', 'TLSA', 'NS', 'DS']
     required: True
     type: str
   value:
     description:
-      - Record value
+      - Record value.
     required: true
     type: str
   solo:
     type: bool
     default: False
     description:
-      - Whether the record should be the only one for that record type and record name. Only use with C(state=present)
+      - Whether the record should be the only one for that record type and record name. Only use with I(state=present).
       - This will delete all other records with the same record name and type.
   priority:
     description:
-      - Record priority. Required for C(type=MX)
+      - Record priority. Required for I(type=MX).
     required: False
     type: int
   state:
     description:
-      - Whether the record should exist or not
+      - Whether the record should exist or not.
     required: False
     default: present
     choices: [ 'present', 'absent' ]
