@@ -73,7 +73,7 @@ options:
      - If set to C(True), then version 2.60 of the UDF spec is used.
      - If not specified or set to C(False), then no UDF support is added.
      type: bool
-     default: False
+     default: false
 '''
 
 EXAMPLES = r'''
@@ -139,7 +139,7 @@ udf:
     description: Configured UDF support.
     returned: on success
     type: bool
-    sample: False
+    sample: false
 '''
 
 import os

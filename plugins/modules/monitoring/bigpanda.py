@@ -64,7 +64,7 @@ options:
     type: str
     description:
       - Base URL of the API server.
-    required: False
+    required: false
     default: https://api.bigpanda.io
   validate_certs:
     description:

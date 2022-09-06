@@ -523,7 +523,7 @@ EXAMPLES = '''
           min_size: 0
           target: 0
           unit: instance
-          monitoring: True
+          monitoring: true
           name: ansible-group
           on_demand_instance_type: c3.large
           product: Linux/UNIX
@@ -561,7 +561,7 @@ EXAMPLES = '''
           min_size: 0
           target: 0
           unit: instance
-          monitoring: True
+          monitoring: true
           name: ansible-group-tal
           on_demand_instance_type: c3.large
           product: Linux/UNIX
@@ -576,7 +576,7 @@ EXAMPLES = '''
             - c3.large
           do_not_update:
             - image_id
-          wait_for_instances: True
+          wait_for_instances: true
           wait_timeout: 600
       register: result
 
@@ -608,7 +608,7 @@ EXAMPLES = '''
           min_size: 0
           target: 0
           unit: instance
-          monitoring: True
+          monitoring: true
           name: ansible-group-tal
           on_demand_instance_type: c3.large
           product: Linux/UNIX
@@ -627,7 +627,7 @@ EXAMPLES = '''
             - c3.large
           do_not_update:
             - image_id
-          wait_for_instances: True
+          wait_for_instances: true
           wait_timeout: 600
       register: result
 
@@ -659,7 +659,7 @@ EXAMPLES = '''
               virtual_name: ephemeral0
             - device_name: '/dev/xvdb/'
               virtual_name: ephemeral1
-          monitoring: True
+          monitoring: true
           name: ansible-group
           on_demand_instance_type: c3.large
           product: Linux/UNIX
@@ -697,7 +697,7 @@ EXAMPLES = '''
           min_size: 0
           target: 0
           unit: instance
-          monitoring: True
+          monitoring: true
           name: ansible-group
           on_demand_instance_type: c3.large
           product: Linux/UNIX
@@ -737,7 +737,7 @@ EXAMPLES = '''
           min_size: 0
           target: 2
           unit: instance
-          monitoring: True
+          monitoring: true
           name: ansible-group-1
           on_demand_instance_type: c3.large
           product: Linux/UNIX

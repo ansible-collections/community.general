@@ -48,7 +48,7 @@ DOCUMENTATION = '''
         description: The logentries "TCP token"
         env:
           - name: LOGENTRIES_ANSIBLE_TOKEN
-        required: True
+        required: true
         ini:
           - section: callback_logentries
             key: token
@@ -57,7 +57,7 @@ DOCUMENTATION = '''
           - Toggle to decide whether to use TLS to encrypt the communications with the API server
         env:
           - name: LOGENTRIES_USE_TLS
-        default: False
+        default: false
         type: boolean
         ini:
           - section: callback_logentries
@@ -65,7 +65,7 @@ DOCUMENTATION = '''
       flatten:
         description: flatten complex data structures into a single dictionary with complex keys
         type: boolean
-        default: False
+        default: false
         env:
           - name: LOGENTRIES_FLATTEN
         ini:

@@ -213,13 +213,13 @@ EXAMPLES = '''
     name: this_is_a_test
     protocol_mappers:
       - config:
-          access.token.claim: True
+          access.token.claim: true
           claim.name: "family_name"
-          id.token.claim: True
+          id.token.claim: true
           jsonType.label: String
           user.attribute: lastName
-          userinfo.token.claim: True
-        consentRequired: True
+          userinfo.token.claim: true
+        consentRequired: true
         consentText: "${familyName}"
         name: family name
         protocol: openid-connect

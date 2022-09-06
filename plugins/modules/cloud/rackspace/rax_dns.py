@@ -54,7 +54,7 @@ extends_documentation_fragment:
 EXAMPLES = '''
 - name: Create domain
   hosts: all
-  gather_facts: False
+  gather_facts: false
   tasks:
     - name: Domain create request
       local_action:

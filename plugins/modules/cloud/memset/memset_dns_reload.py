@@ -42,7 +42,7 @@ EXAMPLES = '''
 - name: Submit DNS reload and poll
   community.general.memset_dns_reload:
     api_key: 5eb86c9196ab03919abcf03857163741
-    poll: True
+    poll: true
   delegate_to: localhost
 '''
 

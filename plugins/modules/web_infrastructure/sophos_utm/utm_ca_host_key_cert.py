@@ -51,7 +51,7 @@ options:
     encrypted:
         description:
           - Optionally enable encryption.
-        default: False
+        default: false
         type: bool
     key:
         description:

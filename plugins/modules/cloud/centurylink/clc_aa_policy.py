@@ -19,17 +19,17 @@ options:
     description:
       - The name of the Anti Affinity Policy.
     type: str
-    required: True
+    required: true
   location:
     description:
       - Datacenter in which the policy lives/should live.
     type: str
-    required: True
+    required: true
   state:
     description:
       - Whether to create or delete the policy.
     type: str
-    required: False
+    required: false
     default: present
     choices: ['present','absent']
 requirements:
@@ -55,7 +55,7 @@ EXAMPLES = '''
 ---
 - name: Create AA Policy
   hosts: localhost
-  gather_facts: False
+  gather_facts: false
   connection: local
   tasks:
     - name: Create an Anti Affinity Policy
@@ -71,7 +71,7 @@ EXAMPLES = '''
 
 - name: Delete AA Policy
   hosts: localhost
-  gather_facts: False
+  gather_facts: false
   connection: local
   tasks:
     - name: Delete an Anti Affinity Policy

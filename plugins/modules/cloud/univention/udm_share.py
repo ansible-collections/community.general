@@ -106,7 +106,7 @@ options:
         description:
         - Show in Windows network environment.
         type: bool
-        default: True
+        default: true
         aliases: [ samba_browsable ]
     sambaCreateMode:
         default: '0744'

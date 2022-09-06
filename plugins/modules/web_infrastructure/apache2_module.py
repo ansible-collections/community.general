@@ -31,13 +31,13 @@ options:
          - Identifier of the module as listed by C(apache2ctl -M).
            This is optional and usually determined automatically by the common convention of
            appending C(_module) to I(name) as well as custom exception for popular modules.
-     required: False
+     required: false
    force:
      description:
         - Force disabling of default modules and override Debian warnings.
      required: false
      type: bool
-     default: False
+     default: false
    state:
      type: str
      description:
@@ -48,7 +48,7 @@ options:
      description:
         - Ignore configuration checks about inconsistent module configuration. Especially for mpm_* modules.
      type: bool
-     default: False
+     default: false
 requirements: ["a2enmod","a2dismod"]
 notes:
   - This does not work on RedHat-based distributions. It does work on Debian- and SuSE-based distributions.
@@ -70,13 +70,13 @@ EXAMPLES = '''
   community.general.apache2_module:
     state: absent
     name: autoindex
-    force: True
+    force: true
 
 - name: Disable mpm_worker and ignore warnings about missing mpm module
   community.general.apache2_module:
     state: absent
     name: mpm_worker
-    ignore_configcheck: True
+    ignore_configcheck: true
 
 - name: Enable dump_io module, which is identified as dumpio_module inside apache2
   community.general.apache2_module:

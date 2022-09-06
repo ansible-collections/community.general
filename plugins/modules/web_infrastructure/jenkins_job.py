@@ -114,7 +114,7 @@ EXAMPLES = '''
   community.general.jenkins_job:
     name: test
     password: admin
-    enabled: False
+    enabled: false
     url: http://localhost:8080
     user: admin
 
@@ -122,7 +122,7 @@ EXAMPLES = '''
   community.general.jenkins_job:
     name: test
     token: asdfasfasfasdfasdfadfasfasdfasdfc
-    enabled: False
+    enabled: false
     url: http://localhost:8080
     user: admin
 '''

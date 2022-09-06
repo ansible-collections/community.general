@@ -228,12 +228,12 @@ EXAMPLES = '''
     protocol: openid-connect
     protocol_mappers:
       - config:
-          access.token.claim: True
+          access.token.claim: true
           claim.name: "family_name"
-          id.token.claim: True
+          id.token.claim: true
           jsonType.label: String
           user.attribute: lastName
-          userinfo.token.claim: True
+          userinfo.token.claim: true
         name: family name
         protocol: openid-connect
         protocolMapper: oidc-usermodel-property-mapper

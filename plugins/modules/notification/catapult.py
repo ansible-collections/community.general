@@ -90,7 +90,7 @@ changed:
     description: Whether the api accepted the message.
     returned: always
     type: bool
-    sample: True
+    sample: true
 '''
 
 

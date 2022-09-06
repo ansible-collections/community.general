@@ -18,7 +18,7 @@ DOCUMENTATION = '''
       _raw:
         description:
           - a set of lists
-        required: True
+        required: true
 '''
 
 EXAMPLES = """

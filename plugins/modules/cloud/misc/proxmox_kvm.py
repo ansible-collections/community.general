@@ -580,7 +580,7 @@ EXAMPLES = '''
       storage: VMs_LVM_thin
       format: raw
       efitype: 4m
-      pre_enrolled_keys: False
+      pre_enrolled_keys: false
 
 - name: Create VM with 1 10GB SATA disk and an EFI disk, with Secure Boot enabled by default
   community.general.proxmox_kvm:

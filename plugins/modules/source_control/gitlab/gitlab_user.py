@@ -144,14 +144,14 @@ EXAMPLES = '''
   community.general.gitlab_user:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
-    validate_certs: False
+    validate_certs: false
     username: myusername
     state: absent
 
 - name: "Create GitLab User"
   community.general.gitlab_user:
     api_url: https://gitlab.example.com/
-    validate_certs: True
+    validate_certs: true
     api_username: dj-wasabi
     api_password: "MySecretPassword"
     name: My Name
@@ -167,7 +167,7 @@ EXAMPLES = '''
 - name: "Create GitLab User using external identity provider"
   community.general.gitlab_user:
     api_url: https://gitlab.example.com/
-    validate_certs: True
+    validate_certs: true
     api_token: "{{ access_token }}"
     name: My Name
     username: myusername
@@ -184,7 +184,7 @@ EXAMPLES = '''
   community.general.gitlab_user:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
-    validate_certs: False
+    validate_certs: false
     username: myusername
     state: blocked
 
@@ -192,7 +192,7 @@ EXAMPLES = '''
   community.general.gitlab_user:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
-    validate_certs: False
+    validate_certs: false
     username: myusername
     state: unblocked
 '''

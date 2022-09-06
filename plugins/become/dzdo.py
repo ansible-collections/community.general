@@ -55,7 +55,7 @@ DOCUMENTATION = '''
               - name: ANSIBLE_DZDO_FLAGS
         become_pass:
             description: Options to pass to dzdo
-            required: False
+            required: false
             vars:
               - name: ansible_become_password
               - name: ansible_become_pass

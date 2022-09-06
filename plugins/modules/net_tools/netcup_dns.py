@@ -20,22 +20,22 @@ options:
   api_key:
     description:
       - "API key for authentication, must be obtained via the netcup CCP (U(https://ccp.netcup.net))."
-    required: True
+    required: true
     type: str
   api_password:
     description:
       - "API password for authentication, must be obtained via the netcup CCP (U(https://ccp.netcup.net))."
-    required: True
+    required: true
     type: str
   customer_id:
     description:
       - Netcup customer id.
-    required: True
+    required: true
     type: int
   domain:
     description:
       - Domainname the records should be added / removed.
-    required: True
+    required: true
     type: str
   record:
     description:
@@ -47,7 +47,7 @@ options:
     description:
       - Record type.
     choices: ['A', 'AAAA', 'MX', 'CNAME', 'CAA', 'SRV', 'TXT', 'TLSA', 'NS', 'DS']
-    required: True
+    required: true
     type: str
   value:
     description:
@@ -56,19 +56,19 @@ options:
     type: str
   solo:
     type: bool
-    default: False
+    default: false
     description:
       - Whether the record should be the only one for that record type and record name. Only use with I(state=present).
       - This will delete all other records with the same record name and type.
   priority:
     description:
       - Record priority. Required for I(type=MX).
-    required: False
+    required: false
     type: int
   state:
     description:
       - Whether the record should exist or not.
-    required: False
+    required: false
     default: present
     choices: [ 'present', 'absent' ]
     type: str

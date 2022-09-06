@@ -37,13 +37,13 @@ options:
   hostname:
     description:
       - A hostname of a device to/from which to assign/remove a subnet.
-    required: False
+    required: false
     type: str
 
   device_id:
     description:
       - UUID of a device to/from which to assign/remove a subnet.
-    required: False
+    required: false
     type: str
 
   project_id:
@@ -118,7 +118,7 @@ RETURN = '''
 changed:
   description: True if an IP address assignments were altered in any way (created or removed).
   type: bool
-  sample: True
+  sample: true
   returned: success
 
 device_id:
@@ -135,15 +135,15 @@ subnet:
     assigned_to: { href : /devices/61f9aa5e-0530-47f5-97c2-113828e61ed0 }
     cidr: 31
     created_at: '2017-08-07T15:15:30Z'
-    enabled: True
+    enabled: true
     gateway: 147.75.90.240
     href: /ips/31eda960-0a16-4c0f-b196-f3dc4928529f
     id: 1eda960-0a16-4c0f-b196-f3dc4928529f
-    manageable: True
-    management: True
+    manageable: true
+    management: true
     netmask: 255.255.255.254
     network: 147.75.90.240
-    public: True
+    public: true
   returned: success
 '''
 

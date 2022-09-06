@@ -55,7 +55,7 @@ DOCUMENTATION = '''
               - name: ANSIBLE_DOAS_FLAGS
         become_pass:
             description: password for doas prompt
-            required: False
+            required: false
             vars:
               - name: ansible_become_password
               - name: ansible_become_pass

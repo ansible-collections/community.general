@@ -71,7 +71,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: False
+      validate_certs: false
 
 - name: Create new tags for a provider in ManageIQ
   community.general.manageiq_tags:
@@ -86,7 +86,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: False
+      validate_certs: false
 
 - name: Remove tags for a provider in ManageIQ
   community.general.manageiq_tags:
@@ -102,7 +102,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: False
+      validate_certs: false
 
 - name: List current tags for a provider in ManageIQ
   community.general.manageiq_tags:
@@ -113,7 +113,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: False
+      validate_certs: false
 '''
 
 RETURN = '''

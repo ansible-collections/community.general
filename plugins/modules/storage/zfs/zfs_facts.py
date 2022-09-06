@@ -80,12 +80,12 @@ parsable:
     description: if parsable output should be provided in machine friendly format.
     returned: if 'parsable' is set to True
     type: bool
-    sample: True
+    sample: true
 recurse:
     description: if we should recurse over ZFS dataset
     returned: if 'recurse' is set to True
     type: bool
-    sample: True
+    sample: true
 zfs_datasets:
     description: ZFS dataset facts
     returned: always

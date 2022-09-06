@@ -52,7 +52,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Monitoring notification example
-  gather_facts: False
+  gather_facts: false
   hosts: local
   connection: local
   tasks:

@@ -38,7 +38,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Build a Queue
-  gather_facts: False
+  gather_facts: false
   hosts: local
   connection: local
   tasks:

@@ -17,10 +17,10 @@ DOCUMENTATION = '''
         description: sets of key value pairs of parameters
       key:
         description: key to query
-        required: True
+        required: true
       file:
         description: path to shelve file
-        required: True
+        required: true
 '''
 
 EXAMPLES = """

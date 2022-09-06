@@ -32,7 +32,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Load Rackspace Cloud Identity
-  gather_facts: False
+  gather_facts: false
   hosts: local
   connection: local
   tasks:

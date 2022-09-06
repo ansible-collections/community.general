@@ -25,7 +25,7 @@ DOCUMENTATION = '''
             env:
               - name: ANSIBLE_BECOME_USER
               - name: ANSIBLE_KSU_USER
-            required: True
+            required: true
         become_exe:
             description: Su executable
             default: ksu
@@ -56,7 +56,7 @@ DOCUMENTATION = '''
               - name: ANSIBLE_KSU_FLAGS
         become_pass:
             description: ksu password
-            required: False
+            required: false
             vars:
               - name: ansible_ksu_pass
               - name: ansible_become_pass

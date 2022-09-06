@@ -70,7 +70,7 @@ reboot_needed:
   description: Whether or not a reboot is required after an update.
   returned: always
   type: bool
-  sample: True
+  sample: true
 '''
 
 from ansible.module_utils.basic import AnsibleModule

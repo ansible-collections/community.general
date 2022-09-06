@@ -27,7 +27,7 @@ options:
     type: str
     description:
       - A unique name for the handler. The name cannot contain special characters or spaces.
-    required: True
+    required: true
   type:
     type: str
     description:

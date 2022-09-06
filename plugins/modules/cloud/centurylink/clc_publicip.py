@@ -30,7 +30,7 @@ options:
     description:
       - A list of servers to create public ips on.
     type: list
-    required: True
+    required: true
     elements: str
   state:
     description:
@@ -66,7 +66,7 @@ EXAMPLES = '''
 
 - name: Add Public IP to Server
   hosts: localhost
-  gather_facts: False
+  gather_facts: false
   connection: local
   tasks:
     - name: Create Public IP For Servers
@@ -86,7 +86,7 @@ EXAMPLES = '''
 
 - name: Delete Public IP from Server
   hosts: localhost
-  gather_facts: False
+  gather_facts: false
   connection: local
   tasks:
     - name: Create Public IP For Servers

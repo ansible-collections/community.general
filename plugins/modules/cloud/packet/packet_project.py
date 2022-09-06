@@ -108,7 +108,7 @@ RETURN = '''
 changed:
   description: True if a project was created or removed.
   type: bool
-  sample: True
+  sample: true
   returned: success
 
 name:

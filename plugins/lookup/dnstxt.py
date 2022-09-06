@@ -17,7 +17,7 @@ DOCUMENTATION = '''
     options:
       _terms:
         description: domain or list of domains to query TXT records from
-        required: True
+        required: true
         type: list
         elements: string
 '''

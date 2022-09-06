@@ -111,7 +111,7 @@ EXAMPLES = '''
   community.general.homebrew_cask:
     name: alfred
     state: present
-    accept_external_apps: True
+    accept_external_apps: true
 
 - name: Remove cask with force option
   community.general.homebrew_cask:
@@ -133,7 +133,7 @@ EXAMPLES = '''
   community.general.homebrew_cask:
     name: 1password
     state: upgraded
-    greedy: True
+    greedy: true
 
 - name: Using sudo password for installing cask
   community.general.homebrew_cask:

@@ -27,17 +27,17 @@ options:
     type: str
     description:
       - Name of the project containing the issue. Must exist previously.
-    required: True
+    required: true
   subject:
     type: str
     description:
       - The issue subject.
-    required: True
+    required: true
   issue_type:
     type: str
     description:
       - The issue type. Must exist previously.
-    required: True
+    required: true
   priority:
     type: str
     description:

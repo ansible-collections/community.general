@@ -49,27 +49,27 @@ organizations:
     sample:
         [
             {
-                "auth_api": False,
+                "auth_api": false,
                 "name": "FooOrg",
-                "auth_token": None,
+                "auth_token": null,
                 "user_count": 0,
-                "auth_secret": None,
+                "auth_secret": null,
                 "id": "csftwlu6uhralzi2dpmhekz3",
             },
             {
-                "auth_api": False,
+                "auth_api": false,
                 "name": "MyOrg",
-                "auth_token": None,
+                "auth_token": null,
                 "user_count": 3,
-                "auth_secret": None,
+                "auth_secret": null,
                 "id": "58070daee63f3b2e6e472c36",
             },
             {
-                "auth_api": False,
+                "auth_api": false,
                 "name": "BarOrg",
-                "auth_token": None,
+                "auth_token": null,
                 "user_count": 0,
-                "auth_secret": None,
+                "auth_secret": null,
                 "id": "v1sncsxxybnsylc8gpqg85pg",
             }
         ]

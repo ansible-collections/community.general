@@ -26,7 +26,7 @@ options:
       type: str
       description:
       - This is the feature name to enable or disable.
-      required: True
+      required: true
     state:
       type: str
       description:

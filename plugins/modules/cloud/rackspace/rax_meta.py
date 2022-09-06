@@ -41,7 +41,7 @@ extends_documentation_fragment:
 EXAMPLES = '''
 - name: Set metadata for a server
   hosts: all
-  gather_facts: False
+  gather_facts: false
   tasks:
     - name: Set metadata
       local_action:

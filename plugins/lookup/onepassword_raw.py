@@ -22,7 +22,7 @@ DOCUMENTATION = '''
     options:
       _terms:
         description: identifier(s) (UUID, name, or domain; case-insensitive) of item(s) to retrieve.
-        required: True
+        required: true
       master_password:
         description: The password used to unlock the specified vault.
         aliases: ['vault_password']

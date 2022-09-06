@@ -21,7 +21,7 @@ DOCUMENTATION = '''
                 - The list of keys to lookup on the Puppetmaster
             type: list
             elements: string
-            required: True
+            required: true
       _bin_file:
             description:
                 - Binary file to execute Hiera

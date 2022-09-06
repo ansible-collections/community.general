@@ -65,7 +65,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: False
+      validate_certs: false
 
 - name: Delete an alert profile from ManageIQ
   community.general.manageiq_alert_profiles:
@@ -75,7 +75,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: False
+      validate_certs: false
 '''
 
 RETURN = '''

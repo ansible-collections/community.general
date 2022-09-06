@@ -15,7 +15,7 @@ DOCUMENTATION = '''
     options:
       _terms:
         description: lists to flatten
-        required: True
+        required: true
     notes:
       - unlike 'items' which only flattens 1 level, this plugin will continue to flatten until it cannot find lists anymore.
       - aka highlander plugin, there can only be one (list).

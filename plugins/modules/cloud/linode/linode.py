@@ -209,15 +209,15 @@ EXAMPLES = '''
      wait: true
      wait_timeout: 600
      state: present
-     alert_bwquota_enabled: True
+     alert_bwquota_enabled: true
      alert_bwquota_threshold: 80
-     alert_bwin_enabled: True
+     alert_bwin_enabled: true
      alert_bwin_threshold: 10
-     alert_cpu_enabled: True
+     alert_cpu_enabled: true
      alert_cpu_threshold: 210
-     alert_bwout_enabled: True
+     alert_bwout_enabled: true
      alert_bwout_threshold: 10
-     alert_diskio_enabled: True
+     alert_diskio_enabled: true
      alert_diskio_threshold: 10000
      backupweeklyday: 1
      backupwindow: 2
@@ -225,7 +225,7 @@ EXAMPLES = '''
      additional_disks:
       - {Label: 'disk1', Size: 2500, Type: 'raw'}
       - {Label: 'newdisk', Size: 2000}
-     watchdog: True
+     watchdog: true
   delegate_to: localhost
   register: linode_creation
 

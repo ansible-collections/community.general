@@ -24,7 +24,7 @@ options:
   user_name:
     description:
       - Name of the user.
-    required: True
+    required: true
     type: str
   user_password:
     description:
