@@ -22,11 +22,11 @@ description:
 options:
   state:
     description:
-      - If C(state=present), the filesystem is created if it doesn't already
+      - If I(state=present), the filesystem is created if it doesn't already
         exist, that is the default behaviour if I(state) is omitted.
-      - If C(state=absent), filesystem signatures on I(dev) are wiped if it
+      - If I(state=absent), filesystem signatures on I(dev) are wiped if it
         contains a filesystem (as known by C(blkid)).
-      - When C(state=absent), all other options but I(dev) are ignored, and the
+      - When I(state=absent), all other options but I(dev) are ignored, and the
         module doesn't fail if the device I(dev) doesn't actually exist.
     type: str
     choices: [ present, absent ]
@@ -36,7 +36,7 @@ options:
     choices: [ btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap, ufs ]
     description:
       - Filesystem type to be created. This option is required with
-        C(state=present) (or if I(state) is omitted).
+        I(state=present) (or if I(state) is omitted).
       - ufs support has been added in community.general 3.4.0.
     type: str
     aliases: [type]
@@ -65,12 +65,12 @@ options:
       - XFS Will only grow if mounted. Currently, the module is based on commands
         from C(util-linux) package to perform operations, so resizing of XFS is
         not supported on FreeBSD systems.
-      - vFAT will likely fail if fatresize < 1.04.
+      - vFAT will likely fail if C(fatresize < 1.04).
     type: bool
     default: false
   opts:
     description:
-      - List of options to be passed to mkfs command.
+      - List of options to be passed to C(mkfs) command.
     type: str
 requirements:
   - Uses specific tools related to the I(fstype) for creating or resizing a

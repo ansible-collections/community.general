@@ -50,30 +50,30 @@ options:
     type: str
   template_name:
     description:
-      - Name of service template to use to create a new instance of a service
+      - Name of service template to use to create a new instance of a service.
     type: str
   template_id:
     description:
-      - ID of a service template to use to create a new instance of a service
+      - ID of a service template to use to create a new instance of a service.
     type: int
   service_id:
     description:
-      - ID of a service instance that you would like to manage
+      - ID of a service instance that you would like to manage.
     type: int
   service_name:
     description:
-      - Name of a service instance that you would like to manage
+      - Name of a service instance that you would like to manage.
     type: str
   unique:
     description:
-      - Setting C(unique=true) will make sure that there is only one service instance running with a name set with C(service_name) when
-      - instantiating a service from a template specified with C(template_id)/C(template_name). Check examples below.
+      - Setting I(unique=true) will make sure that there is only one service instance running with a name set with C(service_name) when
+        instantiating a service from a template specified with I(template_id) or I(template_name). Check examples below.
     type: bool
     default: false
   state:
     description:
-      - C(present) - instantiate a service from a template specified with C(template_id)/C(template_name).
-      - C(absent) - terminate an instance of a service specified with C(service_id)/C(service_name).
+      - C(present) - instantiate a service from a template specified with I(template_id) or I(template_name).
+      - C(absent) - terminate an instance of a service specified with I(template_id) or I(template_name).
     choices: ["present", "absent"]
     default: present
     type: str
@@ -83,20 +83,20 @@ options:
     type: str
   owner_id:
     description:
-      - ID of the user which will be set as the owner of the service
+      - ID of the user which will be set as the owner of the service.
     type: int
   group_id:
     description:
-      - ID of the group which will be set as the group of the service
+      - ID of the group which will be set as the group of the service.
     type: int
   wait:
     description:
-      - Wait for the instance to reach RUNNING state after DEPLOYING or COOLDOWN state after SCALING
+      - Wait for the instance to reach RUNNING state after DEPLOYING or COOLDOWN state after SCALING.
     type: bool
     default: false
   wait_timeout:
     description:
-      - How long before wait gives up, in seconds
+      - How long before wait gives up, in seconds.
     default: 300
     type: int
   custom_attrs:
@@ -106,15 +106,15 @@ options:
     type: dict
   role:
     description:
-      - Name of the role whose cardinality should be changed
+      - Name of the role whose cardinality should be changed.
     type: str
   cardinality:
     description:
-      - Number of VMs for the specified role
+      - Number of VMs for the specified role.
     type: int
   force:
     description:
-      - Force the new cardinality even if it is outside the limits
+      - Force the new cardinality even if it is outside the limits.
     type: bool
     default: false
 author:

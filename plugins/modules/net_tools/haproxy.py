@@ -21,7 +21,7 @@ notes:
       sockets configured for level 'admin'. For example, you can add the line
       'stats socket /var/run/haproxy.sock level admin' to the general section of
       haproxy.cfg. See U(http://haproxy.1wt.eu/download/1.5/doc/configuration.txt).
-    - Depends on netcat (nc) being available; you need to install the appropriate
+    - Depends on netcat (C(nc)) being available; you need to install the appropriate
       package for your operating system before this module can be used.
 options:
   backend:
@@ -33,7 +33,7 @@ options:
     description:
       - Wait until the server has no active connections or until the timeout
         determined by wait_interval and wait_retries is reached.
-      - Continue only after the status changes to 'MAINT'.
+      - Continue only after the status changes to C(MAINT).
       - This overrides the shutdown_sessions option.
     type: bool
     default: false
@@ -78,13 +78,13 @@ options:
     version_added: "1.0.0"
   fail_on_not_found:
     description:
-      - Fail whenever trying to enable/disable a backend host that does not exist
+      - Fail whenever trying to enable/disable a backend host that does not exist.
     type: bool
     default: false
   wait:
     description:
-      - Wait until the server reports a status of 'UP' when C(state=enabled),
-        status of 'MAINT' when C(state=disabled) or status of 'DRAIN' when C(state=drain)
+      - Wait until the server reports a status of C(UP) when I(state=enabled),
+        status of C(MAINT) when I(state=disabled) or status of C(DRAIN) when I(state=drain).
     type: bool
     default: false
   wait_interval:

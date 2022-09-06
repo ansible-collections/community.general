@@ -23,14 +23,14 @@ options:
     description:
       - config in XML format.
       - Required if job does not yet exist.
-      - Mutually exclusive with C(enabled).
-      - Considered if C(state=present).
+      - Mutually exclusive with I(enabled).
+      - Considered if I(state=present).
     required: false
   enabled:
     description:
       - Whether the job should be enabled or disabled.
-      - Mutually exclusive with C(config).
-      - Considered if C(state=present).
+      - Mutually exclusive with I(config).
+      - Considered if I(state=present).
     type: bool
     required: false
   name:
