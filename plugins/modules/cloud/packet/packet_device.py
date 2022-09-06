@@ -255,7 +255,7 @@ RETURN = '''
 changed:
     description: True if a device was altered in any way (created, modified or removed)
     type: bool
-    sample: True
+    sample: true
     returned: success
 
 devices:

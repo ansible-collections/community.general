@@ -112,8 +112,8 @@ EXAMPLES = r'''
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
-    validate_certs: False
-    random_password: True
+    validate_certs: false
+    random_password: true
 
 - name: Ensure host is disabled
   community.general.ipa_host:
@@ -146,7 +146,7 @@ EXAMPLES = r'''
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
-    update_dns: True
+    update_dns: true
 '''
 
 RETURN = r'''

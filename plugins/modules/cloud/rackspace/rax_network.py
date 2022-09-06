@@ -42,7 +42,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Build an Isolated Network
-  gather_facts: False
+  gather_facts: false
 
   tasks:
     - name: Network create request

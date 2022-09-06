@@ -596,7 +596,7 @@ EXAMPLES = '''
     root_url: https://www.example.com/
     admin_url: https://www.example.com/admin_url
     base_url: basepath
-    enabled: True
+    enabled: true
     client_authenticator_type: client-secret
     secret: REALLYWELLKEPTSECRET
     redirect_uris:
@@ -605,20 +605,20 @@ EXAMPLES = '''
     web_origins:
       - https://www.example.com/*
     not_before: 1507825725
-    bearer_only: False
-    consent_required: False
-    standard_flow_enabled: True
-    implicit_flow_enabled: False
-    direct_access_grants_enabled: False
-    service_accounts_enabled: False
-    authorization_services_enabled: False
-    public_client: False
-    frontchannel_logout: False
+    bearer_only: false
+    consent_required: false
+    standard_flow_enabled: true
+    implicit_flow_enabled: false
+    direct_access_grants_enabled: false
+    service_accounts_enabled: false
+    authorization_services_enabled: false
+    public_client: false
+    frontchannel_logout: false
     protocol: openid-connect
     full_scope_allowed: false
     node_re_registration_timeout: -1
     client_template: test
-    use_template_config: False
+    use_template_config: false
     use_template_scope: false
     use_template_mappers: false
     always_display_in_console: true
@@ -633,13 +633,13 @@ EXAMPLES = '''
         browser: 4c90336b-bf1d-4b87-916d-3677ba4e5fbb
     protocol_mappers:
       - config:
-          access.token.claim: True
+          access.token.claim: true
           claim.name: "family_name"
-          id.token.claim: True
+          id.token.claim: true
           jsonType.label: String
           user.attribute: lastName
-          userinfo.token.claim: True
-        consentRequired: True
+          userinfo.token.claim: true
+        consentRequired: true
         consentText: "${familyName}"
         name: family name
         protocol: openid-connect
@@ -653,14 +653,14 @@ EXAMPLES = '''
         protocol: saml
         protocolMapper: saml-role-list-mapper
     attributes:
-      saml.authnstatement: True
-      saml.client.signature: True
-      saml.force.post.binding: True
-      saml.server.signature: True
+      saml.authnstatement: true
+      saml.client.signature: true
+      saml.force.post.binding: true
+      saml.server.signature: true
       saml.signature.algorithm: RSA_SHA256
       saml.signing.certificate: CERTIFICATEHERE
       saml.signing.private.key: PRIVATEKEYHERE
-      saml_force_name_id_format: False
+      saml_force_name_id_format: false
       saml_name_id_format: username
       saml_signature_canonicalization_method: "http://www.w3.org/2001/10/xml-exc-c14n#"
       user.info.response.signature.alg: RS256

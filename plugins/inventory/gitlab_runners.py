@@ -66,7 +66,7 @@ host: https://gitlab.com
 # Example using constructed features to create groups and set ansible_host
 plugin: community.general.gitlab_runners
 host: https://gitlab.com
-strict: False
+strict: false
 keyed_groups:
   # add e.g. amd64 hosts to an arch_amd64 group
   - prefix: arch

@@ -112,7 +112,7 @@ EXAMPLES = '''
     topic: 'service/ansible/{{ ansible_hostname }}'
     payload: 'Hello at {{ ansible_date_time.iso8601 }}'
     qos: 0
-    retain: False
+    retain: false
     client_id: ans001
   delegate_to: localhost
 '''

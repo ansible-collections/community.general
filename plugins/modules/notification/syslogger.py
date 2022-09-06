@@ -18,7 +18,7 @@ options:
         type: str
         description:
             - This is the message to place in syslog.
-        required: True
+        required: true
     priority:
         type: str
         description:
@@ -37,7 +37,7 @@ options:
         description:
             - Log the PID in brackets.
         type: bool
-        default: False
+        default: false
     ident:
         description:
             - Specify the name of application name which is sending the log to syslog.
@@ -88,7 +88,7 @@ log_pid:
   description: Log PID status
   returned: always
   type: bool
-  sample: True
+  sample: true
 msg:
   description: Message sent to syslog
   returned: always

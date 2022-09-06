@@ -56,7 +56,7 @@ DOCUMENTATION = '''
               - name: ANSIBLE_SESU_FLAGS
         become_pass:
             description: Password to pass to sesu
-            required: False
+            required: false
             vars:
               - name: ansible_become_password
               - name: ansible_become_pass
