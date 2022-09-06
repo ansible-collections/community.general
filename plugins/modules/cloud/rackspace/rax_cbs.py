@@ -78,7 +78,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Build a Block Storage Volume
-  gather_facts: False
+  gather_facts: false
   hosts: local
   connection: local
   tasks:

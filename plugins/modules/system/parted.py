@@ -28,7 +28,7 @@ options:
   device:
     description: The block device (disk) where to operate.
     type: str
-    required: True
+    required: true
   align:
     description: Set alignment for newly created partitions. Use 'undefined' for parted default aligment.
     type: str

@@ -117,7 +117,7 @@ reboot_required:
     description: Indicates that the system reboot is required to complete the PMem configuration.
     returned: success
     type: bool
-    sample: True
+    sample: true
 result:
     description:
      - Shows the value of AppDirect, Memory Mode and Reserved size in bytes.
@@ -173,7 +173,7 @@ EXAMPLES = r'''
 - name: Configure the Pmem as AppDirect with not interleaved 10, Memory Mode 70, and the Reserved 20 percent.
   community.general.pmem:
     appdirect: 10
-    appdirect_interleaved: False
+    appdirect_interleaved: false
     memorymode: 70
 
 - name: Configure the Pmem each socket.
@@ -181,7 +181,7 @@ EXAMPLES = r'''
     socket:
       - id: 0
         appdirect: 10
-        appdirect_interleaved: False
+        appdirect_interleaved: false
         memorymode: 70
         reserved: 20
       - id: 1

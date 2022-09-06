@@ -131,8 +131,8 @@ EXAMPLES = '''
     api_id: api_id
     api_key: api_key
     statuspage: statuspage_id
-    maintenance_notify_1_hr: True
-    automation: True
+    maintenance_notify_1_hr: true
+    automation: true
 
 - name: Create a maintenance window for 60 minutes on server1 and server2
   community.general.statusio_maintenance:
@@ -145,8 +145,8 @@ EXAMPLES = '''
     api_id: api_id
     api_key: api_key
     statuspage: statuspage_id
-    maintenance_notify_1_hr: True
-    automation: True
+    maintenance_notify_1_hr: true
+    automation: true
   delegate_to: localhost
 
 - name: Create a future maintenance window for 24 hours to all hosts inside the Primary Data Center

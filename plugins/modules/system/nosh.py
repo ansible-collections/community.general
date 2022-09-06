@@ -132,7 +132,7 @@ enabled:
     description: whether the service is enabled at system bootstrap
     returned: success
     type: bool
-    sample: True
+    sample: true
 preset:
     description: whether the enabled status reflects the one set in the relevant C(*.preset) file
     returned: success
@@ -177,7 +177,7 @@ status:
             description: []  # FIXME
             returned: success
             type: bool
-            sample: True
+            sample: true
         LogService:
             description: []  # FIXME
             returned: success
@@ -322,7 +322,7 @@ user:
     description: whether the user-level service manager is called
     returned: success
     type: bool
-    sample: False
+    sample: false
 '''
 
 

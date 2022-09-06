@@ -24,12 +24,12 @@ DOCUMENTATION = '''
             - The list of keys (or key prefixes) to look up on the etcd3 server.
             type: list
             elements: str
-            required: True
+            required: true
         prefix:
             description:
             - Look for key or prefix key.
             type: bool
-            default: False
+            default: false
         endpoints:
             description:
             - Counterpart of C(ETCDCTL_ENDPOINTS) environment variable.

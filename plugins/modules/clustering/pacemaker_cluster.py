@@ -52,7 +52,7 @@ EXAMPLES = '''
 
 RETURN = '''
 changed:
-    description: True if the cluster state has changed
+    description: true if the cluster state has changed
     type: bool
     returned: always
 out:

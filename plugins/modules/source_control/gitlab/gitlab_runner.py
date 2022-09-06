@@ -46,14 +46,14 @@ options:
   description:
     description:
       - The unique name of the runner.
-    required: True
+    required: true
     type: str
     aliases:
       - name
   state:
     description:
       - Make sure that the runner with the same name exists with the same configuration or delete the runner with the same name.
-    required: False
+    required: false
     default: present
     choices: ["present", "absent"]
     type: str
@@ -72,39 +72,39 @@ options:
   active:
     description:
       - Define if the runners is immediately active after creation.
-    required: False
+    required: false
     default: true
     type: bool
   locked:
     description:
       - Determines if the runner is locked or not.
-    required: False
-    default: False
+    required: false
+    default: false
     type: bool
   access_level:
     description:
       - Determines if a runner can pick up jobs only from protected branches.
       - If set to C(ref_protected), runner can pick up jobs only from protected branches.
       - If set to C(not_protected), runner can pick up jobs from both protected and unprotected branches.
-    required: False
+    required: false
     default: ref_protected
     choices: ["ref_protected", "not_protected"]
     type: str
   maximum_timeout:
     description:
       - The maximum time that a runner has to complete a specific job.
-    required: False
+    required: false
     default: 3600
     type: int
   run_untagged:
     description:
       - Run untagged jobs or not.
-    required: False
+    required: false
     default: true
     type: bool
   tag_list:
     description: The tags that apply to the runner.
-    required: False
+    required: false
     default: []
     type: list
     elements: str
@@ -118,10 +118,10 @@ EXAMPLES = '''
     registration_token: 4gfdsg345
     description: Docker Machine t1
     state: present
-    active: True
+    active: true
     tag_list: ['docker']
-    run_untagged: False
-    locked: False
+    run_untagged: false
+    locked: false
 
 - name: "Delete runner"
   community.general.gitlab_runner:

@@ -68,11 +68,11 @@ response:
     type: dict
     sample:
         {
-            "auth_api": False,
+            "auth_api": false,
             "name": "Foo",
-            "auth_token": None,
+            "auth_token": null,
             "user_count": 0,
-            "auth_secret": None,
+            "auth_secret": null,
             "id": "csftwlu6uhralzi2dpmhekz3",
         }
 """

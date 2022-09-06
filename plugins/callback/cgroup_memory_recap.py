@@ -23,7 +23,7 @@ DOCUMENTATION = '''
         - To create the cgroup, first use a command such as C(sudo cgcreate -a ec2-user:ec2-user -t ec2-user:ec2-user -g memory:ansible_profile)
     options:
       max_mem_file:
-        required: True
+        required: true
         description: Path to cgroups C(memory.max_usage_in_bytes) file. Example C(/sys/fs/cgroup/memory/ansible_profile/memory.max_usage_in_bytes)
         env:
           - name: CGROUP_MAX_MEM_FILE
@@ -31,7 +31,7 @@ DOCUMENTATION = '''
           - section: callback_cgroupmemrecap
             key: max_mem_file
       cur_mem_file:
-        required: True
+        required: true
         description: Path to C(memory.usage_in_bytes) file. Example C(/sys/fs/cgroup/memory/ansible_profile/memory.usage_in_bytes)
         env:
           - name: CGROUP_CUR_MEM_FILE

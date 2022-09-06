@@ -88,7 +88,7 @@ EXAMPLES = r'''
     - "select user_name from users;"
     - select * from SYSTEM;
     host: "localhost"
-    autocommit: False
+    autocommit: false
 
 - name: Run several queries from file
   community.general.hana_query:
@@ -109,7 +109,7 @@ EXAMPLES = r'''
     query:
     - "select user_name from users;"
     - select * from users;
-    autocommit: False
+    autocommit: false
 '''
 
 RETURN = r'''

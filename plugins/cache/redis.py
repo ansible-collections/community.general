@@ -21,7 +21,7 @@ DOCUMENTATION = '''
           - The format is C(host:port:db:password), for example C(localhost:6379:0:changeme).
           - To use encryption in transit, prefix the connection with C(tls://), as in C(tls://localhost:6379:0:changeme).
           - To use redis sentinel, use separator C(;), for example C(localhost:26379;localhost:26379;0:changeme). Requires redis>=2.9.0.
-        required: True
+        required: true
         env:
           - name: ANSIBLE_CACHE_PLUGIN_CONNECTION
         ini:
