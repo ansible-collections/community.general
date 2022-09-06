@@ -48,7 +48,7 @@ options:
         type: str
     path:
         description:
-            - "A ':' separated list of paths to search for C(brew) executable."
+            - "A C(:) separated list of paths to search for C(brew) executable."
         default: '/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin'
         type: path
         version_added: '2.1.0'
