@@ -59,7 +59,7 @@ DOCUMENTATION = '''
               - name: ANSIBLE_PFEXEC_FLAGS
         become_pass:
             description: pfexec password
-            required: False
+            required: false
             vars:
               - name: ansible_become_password
               - name: ansible_become_pass
@@ -72,7 +72,7 @@ DOCUMENTATION = '''
                 key: password
         wrap_exe:
             description: Toggle to wrap the command pfexec calls in 'shell -c' or not
-            default: False
+            default: false
             type: bool
             ini:
               - section: pfexec_become_plugin

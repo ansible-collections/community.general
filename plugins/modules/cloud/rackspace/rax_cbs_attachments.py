@@ -58,7 +58,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Attach a Block Storage Volume
-  gather_facts: False
+  gather_facts: false
   hosts: local
   connection: local
   tasks:

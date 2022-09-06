@@ -304,7 +304,7 @@ record:
             description: No documentation available.
             returned: success
             type: bool
-            sample: False
+            sample: false
         meta:
             description: No documentation available.
             returned: success
@@ -329,12 +329,12 @@ record:
             description: Whether this record can be proxied through Cloudflare.
             returned: success
             type: bool
-            sample: False
+            sample: false
         proxied:
             description: Whether the record is proxied through Cloudflare.
             returned: success
             type: bool
-            sample: False
+            sample: false
         ttl:
             description: The time-to-live for the record.
             returned: success

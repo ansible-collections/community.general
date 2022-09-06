@@ -55,7 +55,7 @@ options:
                 type: str
                 description:
                     - The name of the particular 1Password vault to search, useful if your 1Password user has access to multiple vaults (optional).
-        required: True
+        required: true
     auto_login:
         type: dict
         description:
@@ -80,18 +80,18 @@ options:
                 description:
                     - The master password for your subdomain.
                     - This is always required when specifying C(auto_login).
-                required: True
+                required: true
             secret_key:
                 type: str
                 description:
                     - The secret key for your subdomain.
                     - Only required for initial sign in.
         default: {}
-        required: False
+        required: false
     cli_path:
         type: path
         description: Used to specify the exact path to the C(op) command line interface
-        required: False
+        required: false
         default: 'op'
 '''
 
@@ -114,7 +114,7 @@ EXAMPLES = '''
         vault:   Name of the vault       # optional, only necessary if there is more than 1 Vault available
   delegate_to: localhost
   register: my_1password_item
-  no_log: True                           # Don't want to log the secrets to the console!
+  no_log: true                           # Don't want to log the secrets to the console!
 
 # Gather secrets combining simple and advanced search terms to retrieve two items, one of which we fetch two
 # fields. In the first 'password' is fetched, as a field name is not specified (default behaviour) and in the

@@ -42,7 +42,7 @@ DOCUMENTATION = '''
               - name: ANSIBLE_PMRUN_FLAGS
         become_pass:
             description: pmrun password
-            required: False
+            required: false
             vars:
               - name: ansible_become_password
               - name: ansible_become_pass

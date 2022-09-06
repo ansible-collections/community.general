@@ -22,7 +22,7 @@ options:
     name:
       description:
       - Name of the plugin to install.
-      required: True
+      required: true
       type: str
     state:
       description:

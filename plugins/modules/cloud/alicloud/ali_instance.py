@@ -101,7 +101,7 @@ options:
       description:
         - Specifies whether to add sequential suffixes to the host_name.
           The sequential suffix ranges from 001 to 999.
-      default: False
+      default: false
       type: bool
       version_added: '0.2.0'
     password:
@@ -143,7 +143,7 @@ options:
     allocate_public_ip:
       description:
         - Whether allocate a public ip for the new instance.
-      default: False
+      default: false
       aliases: [ 'assign_public_ip' ]
       type: bool
     instance_charge_type:
@@ -162,7 +162,7 @@ options:
       description:
         - Whether automate renew the charge of the instance.
       type: bool
-      default: False
+      default: false
     auto_renew_period:
       description:
         - The duration of the automatic renew the charge of the instance. Required when I(auto_renew=true).
@@ -177,7 +177,7 @@ options:
     force:
       description:
         - Whether the current operation needs to be execute forcibly.
-      default: False
+      default: false
       type: bool
     tags:
       description:
@@ -189,7 +189,7 @@ options:
       description:
         - Delete any tags not specified in the task that are on the instance.
           If True, it means you have to specify all the desired tags on each task affecting an instance.
-      default: False
+      default: false
       type: bool
       version_added: '0.2.0'
     key_name:
@@ -236,13 +236,13 @@ options:
           required parameters are set, and validates the request format, service permissions, and available ECS instances.
           If the validation fails, the corresponding error code is returned. If the validation succeeds, the DryRunOperation error code is returned.
         - If I(dry_run=false), A request is sent. If the validation succeeds, the instance is created.
-      default: False
+      default: false
       type: bool
       version_added: '0.2.0'
     include_data_disks:
       description:
         - Whether to change instance disks charge type when changing instance charge type.
-      default: True
+      default: true
       type: bool
       version_added: '0.2.0'
 author:
@@ -265,7 +265,7 @@ EXAMPLES = '''
     image: ubuntu1404_64_40G_cloudinit_20160727.raw
     instance_type: ecs.n4.small
     vswitch_id: vsw-abcd1234
-    assign_public_ip: True
+    assign_public_ip: true
     max_bandwidth_out: 10
     host_name: myhost
     password: mypassword
@@ -275,7 +275,7 @@ EXAMPLES = '''
     security_groups: ["sg-f2rwnfh23r"]
 
     instance_ids: ["i-abcd12346", "i-abcd12345"]
-    force: True
+    force: true
 
   tasks:
     - name: Launch ECS instance in VPC network

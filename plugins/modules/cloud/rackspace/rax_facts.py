@@ -37,7 +37,7 @@ extends_documentation_fragment:
 EXAMPLES = '''
 - name: Gather info about servers
   hosts: all
-  gather_facts: False
+  gather_facts: false
   tasks:
     - name: Get facts about servers
       local_action:

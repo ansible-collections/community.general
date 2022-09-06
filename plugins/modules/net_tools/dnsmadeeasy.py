@@ -254,7 +254,7 @@ EXAMPLES = '''
     record_name: test
     record_type: A
     record_value: 127.0.0.1
-    failover: True
+    failover: true
     ip1: 127.0.0.2
     ip2: 127.0.0.3
 
@@ -267,7 +267,7 @@ EXAMPLES = '''
     record_name: test
     record_type: A
     record_value: 127.0.0.1
-    failover: True
+    failover: true
     ip1: 127.0.0.2
     ip2: 127.0.0.3
     ip3: 127.0.0.4
@@ -320,7 +320,7 @@ EXAMPLES = '''
     record_name: test
     record_type: A
     record_value: 127.0.0.1
-    failover: True
+    failover: true
     ip1: 127.0.0.2
     ip2: 127.0.0.3
     monitor: true

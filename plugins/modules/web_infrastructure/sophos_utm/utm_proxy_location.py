@@ -72,7 +72,7 @@ options:
         description:
           - Activate hot standby mode
         type: bool
-        default: False
+        default: false
     path:
         type: str
         description:
@@ -82,7 +82,7 @@ options:
         description:
           - Whether the location is active or not
         type: bool
-        default: True
+        default: true
     stickysession_id:
         type: str
         description:
@@ -92,12 +92,12 @@ options:
         description:
           - Enable the stickysession
         type: bool
-        default: False
+        default: false
     websocket_passthrough:
         description:
           - Enable the websocket passthrough
         type: bool
-        default: False
+        default: false
 
 extends_documentation_fragment:
 - community.general.utm

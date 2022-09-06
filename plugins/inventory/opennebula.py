@@ -34,7 +34,7 @@ DOCUMENTATION = r'''
               - If not set then the value of the C(ONE_URL) environment variable is used.
             env:
               - name: ONE_URL
-            required: True
+            required: true
             type: string
         api_username:
             description:
@@ -49,7 +49,7 @@ DOCUMENTATION = r'''
               - If not set, the value of the C(ONE_PASSWORD) environment variable is used.
             env:
               - name: ONE_PASSWORD
-            required: False
+            required: false
             type: string
         api_authfile:
             description:
@@ -58,7 +58,7 @@ DOCUMENTATION = r'''
               - Set environment variable C(ONE_AUTH) to override this path.
             env:
               - name: ONE_AUTH
-            required: False
+            required: false
             type: string
         hostname:
             description: Field to match the hostname. Note C(v4_first_ip) corresponds to the first IPv4 found on VM.
@@ -74,7 +74,7 @@ DOCUMENTATION = r'''
         group_by_labels:
             description: Create host groups by vm labels
             type: bool
-            default: True
+            default: true
 '''
 
 EXAMPLES = r'''

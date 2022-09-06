@@ -713,7 +713,7 @@ playbook.yml: >
       - name: Using alias vars (see ansible.cfg)
         ansible.builtin.debug:
           msg:
-        when: False
+        when: false
         vars:
           ansible_callback_diy_playbook_on_task_start_msg: ""
           on_skipped_msg: "DIY output(via task vars): skipped example:\n\e[0m\e[38;5;4m\u25b6\u25b6 {{ ansible_callback_diy.result.task.name }}\n"

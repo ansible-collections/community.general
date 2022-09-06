@@ -142,7 +142,7 @@ memset_api:
       description: Adds the current domain onto the address field for C(CNAME), C(MX), C(NS) and C(SRV) types.
       returned: always
       type: bool
-      sample: False
+      sample: false
     ttl:
       description: Record TTL.
       returned: always
