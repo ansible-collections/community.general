@@ -33,16 +33,16 @@ options:
   value:
     description:
       - The value to set this variable to.
-      - Required if C(state=present).
+      - Required if I(state=present).
     type: str
   insertafter:
     description:
       - If specified, the variable will be inserted after the variable specified.
-      - Used with C(state=present).
+      - Used with I(state=present).
     type: str
   insertbefore:
     description:
-      - Used with C(state=present). If specified, the variable will be inserted
+      - Used with I(state=present). If specified, the variable will be inserted
         just before the variable specified.
     type: str
   state:
