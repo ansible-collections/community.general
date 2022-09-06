@@ -23,11 +23,11 @@ description:
   - The C(nagios) module is not idempotent.
   - All actions require the I(host) parameter to be given explicitly. In playbooks you can use the C({{inventory_hostname}}) variable to refer
     to the host the playbook is currently running on.
-  - You can specify multiple services at once by separating them with commas, .e.g., C(services=httpd,nfs,puppet).
+  - You can specify multiple services at once by separating them with commas, .e.g. I(services=httpd,nfs,puppet).
   - When specifying what service to handle there is a special service value, I(host), which will handle alerts/downtime/acknowledge for the I(host itself),
-    e.g., C(service=host). This keyword may not be given with other services at the same time.
+    e.g., I(service=host). This keyword may not be given with other services at the same time.
     I(Setting alerts/downtime/acknowledge for a host does not affect alerts/downtime/acknowledge for any of the services running on it.)
-    To schedule downtime for all services on particular host use keyword "all", e.g., C(service=all).
+    To schedule downtime for all services on particular host use keyword "all", e.g., I(service=all).
 options:
   action:
     description:
@@ -52,17 +52,17 @@ options:
   author:
     description:
      - Author to leave downtime comments as.
-       Only usable with the C(downtime) and C(acknowledge) action.
+       Only used when I(action) is C(downtime) or C(acknowledge).
     type: str
     default: Ansible
   comment:
     description:
-     - Comment for C(downtime) and C(acknowledge)action.
+     - Comment when I(action) is C(downtime) or C(acknowledge).
     type: str
     default: Scheduling downtime
   start:
     description:
-      - When downtime should start, in time_t format (epoch seconds).
+      - When downtime should start, in C(time_t) format (epoch seconds).
     version_added: '0.2.0'
     type: str
   minutes:
@@ -73,9 +73,10 @@ options:
     default: 30
   services:
     description:
-      - What to manage downtime/alerts for. Separate multiple services with commas.
-        C(service) is an alias for C(services).
-        B(Required) option when using the C(downtime), C(acknowledge), C(forced_check), C(enable_alerts), and C(disable_alerts) actions.
+      - >
+        What to manage downtime/alerts for. Separate multiple services with commas.
+        I(service) is an alias for I(services).
+        B(Required) option when I(action) is one of: C(downtime), C(acknowledge), C(forced_check), C(enable_alerts), C(disable_alerts).
     aliases: [ "service" ]
     type: str
   servicegroup:

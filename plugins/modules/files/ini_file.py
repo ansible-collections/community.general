@@ -33,7 +33,7 @@ options:
     aliases: [ dest ]
   section:
     description:
-      - Section name in INI file. This is added if C(state=present) automatically when
+      - Section name in INI file. This is added if I(state=present) automatically when
         a single value is being set.
       - If left empty or set to C(null), the I(option) will be placed before the first I(section).
       - Using C(null) is also required if the config format does not support sections.
@@ -69,11 +69,11 @@ options:
   state:
     description:
       - If set to C(absent) and I(exclusive) set to C(true) all matching I(option) lines are removed.
-      - If set to C(absent) and I(exclusive) set to C(false) the specified C(option=value) lines are removed,
+      - If set to C(absent) and I(exclusive) set to C(false) the specified I(option=value) lines are removed,
         but the other I(option)s with the same name are not touched.
-      - If set to C(present) and I(exclusive) set to C(false) the specified C(option=values) lines are added,
+      - If set to C(present) and I(exclusive) set to C(false) the specified I(option=values) lines are added,
         but the other I(option)s with the same name are not touched.
-      - If set to C(present) and I(exclusive) set to C(true) all given C(option=values) lines will be
+      - If set to C(present) and I(exclusive) set to C(true) all given I(option=values) lines will be
         added and the other I(option)s with the same name are removed.
     type: str
     choices: [ absent, present ]
