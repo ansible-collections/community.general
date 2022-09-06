@@ -65,7 +65,7 @@ EXAMPLES = '''
 - name: Disable all repositories except rhel-7-server-rpms
   community.general.rhsm_repository:
     name: rhel-7-server-rpms
-    purge: True
+    purge: true
 '''
 
 RETURN = '''

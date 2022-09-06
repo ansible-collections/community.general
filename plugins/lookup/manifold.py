@@ -20,24 +20,24 @@ DOCUMENTATION = '''
                   matched resources will be returned.
             type: list
             elements: string
-            required: False
+            required: false
         api_token:
             description:
                 - manifold API token
             type: string
-            required: True
+            required: true
             env:
               - name: MANIFOLD_API_TOKEN
         project:
             description:
                 - The project label you want to get the resource for.
             type: string
-            required: False
+            required: false
         team:
             description:
                 - The team label you want to get the resource for.
             type: string
-            required: False
+            required: false
 '''
 
 EXAMPLES = '''

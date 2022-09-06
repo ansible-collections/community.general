@@ -111,7 +111,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Build a Load Balancer
-  gather_facts: False
+  gather_facts: false
   hosts: local
   connection: local
   tasks:

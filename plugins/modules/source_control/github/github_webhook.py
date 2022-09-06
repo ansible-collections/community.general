@@ -113,7 +113,7 @@ EXAMPLES = '''
     url: https://jenkins.example.com/ghprbhook/
     content_type: json
     secret: "{{ github_shared_secret }}"
-    insecure_ssl: True
+    insecure_ssl: true
     events:
       - issue_comment
       - pull_request

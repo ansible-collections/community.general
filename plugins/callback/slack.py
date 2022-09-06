@@ -21,7 +21,7 @@ DOCUMENTATION = '''
         - Before 2.4 only environment variables were available for configuring this plugin
     options:
       webhook_url:
-        required: True
+        required: true
         description: Slack Webhook URL
         env:
           - name: SLACK_WEBHOOK_URL
@@ -51,7 +51,7 @@ DOCUMENTATION = '''
         ini:
           - section: callback_slack
             key: validate_certs
-        default: True
+        default: true
         type: bool
 '''
 

@@ -26,18 +26,18 @@ options:
     backend:
         description:
           - Define the backend to use for the container.
-        required: True
+        required: true
         choices: ["docker", "ostree"]
         type: str
     name:
         description:
           - Name of the container.
-        required: True
+        required: true
         type: str
     image:
         description:
           - The image to use to install the container.
-        required: True
+        required: true
         type: str
     rootfs:
         description:

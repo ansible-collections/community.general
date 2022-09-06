@@ -83,7 +83,7 @@ extends_documentation_fragment:
 EXAMPLES = '''
 - name: "Test Cloud Files Objects"
   hosts: local
-  gather_facts: False
+  gather_facts: false
   tasks:
     - name: "Get objects from test container"
       community.general.rax_files_objects:

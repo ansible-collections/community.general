@@ -66,8 +66,8 @@ EXAMPLES = r'''
     secured: '{{ item.secured }}'
     state: present
   with_items:
-    - { name: AWS_ACCESS_KEY, value: ABCD1234, secured: False }
-    - { name: AWS_SECRET, value: qwe789poi123vbn0, secured: True }
+    - { name: AWS_ACCESS_KEY, value: ABCD1234, secured: false }
+    - { name: AWS_SECRET, value: qwe789poi123vbn0, secured: true }
 
 - name: Remove pipeline variable
   community.general.bitbucket_pipeline_variable:

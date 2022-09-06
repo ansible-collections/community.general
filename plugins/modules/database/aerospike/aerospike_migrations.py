@@ -23,73 +23,73 @@ options:
     host:
         description:
             - Which host do we use as seed for info connection
-        required: False
+        required: false
         type: str
         default: localhost
     port:
         description:
             - Which port to connect to Aerospike on (service port)
-        required: False
+        required: false
         type: int
         default: 3000
     connect_timeout:
         description:
             - How long to try to connect before giving up (milliseconds)
-        required: False
+        required: false
         type: int
         default: 1000
     consecutive_good_checks:
         description:
             - How many times should the cluster report "no migrations"
               consecutively before returning OK back to ansible?
-        required: False
+        required: false
         type: int
         default: 3
     sleep_between_checks:
         description:
             - How long to sleep between each check (seconds).
-        required: False
+        required: false
         type: int
         default: 60
     tries_limit:
         description:
             - How many times do we poll before giving up and failing?
         default: 300
-        required: False
+        required: false
         type: int
     local_only:
         description:
             - Do you wish to only check for migrations on the local node
               before returning, or do you want all nodes in the cluster
               to finish before returning?
-        required: True
+        required: true
         type: bool
     min_cluster_size:
         description:
             - Check will return bad until cluster size is met
               or until tries is exhausted
-        required: False
+        required: false
         type: int
         default: 1
     fail_on_cluster_change:
         description:
             - Fail if the cluster key changes
               if something else is changing the cluster, we may want to fail
-        required: False
+        required: false
         type: bool
-        default: True
+        default: true
     migrate_tx_key:
         description:
             - The metric key used to determine if we have tx migrations
               remaining. Changeable due to backwards compatibility.
-        required: False
+        required: false
         type: str
         default: migrate_tx_partitions_remaining
     migrate_rx_key:
         description:
             - The metric key used to determine if we have rx migrations
               remaining. Changeable due to backwards compatibility.
-        required: False
+        required: false
         type: str
         default: migrate_rx_partitions_remaining
     target_cluster_size:
@@ -102,7 +102,7 @@ options:
             - If this option is specified on a cluster that has at least 1
               host <4.3 then it will be ignored until the min version reaches
               4.3.
-        required: False
+        required: false
         type: int
 '''
 EXAMPLES = '''
@@ -114,7 +114,7 @@ EXAMPLES = '''
     consecutive_good_checks: 5
     sleep_between_checks: 15
     tries_limit: 600
-    local_only: False
+    local_only: false
 
 # example playbook:
 - name: Upgrade aerospike
@@ -140,7 +140,7 @@ EXAMPLES = '''
 # Tries Limit * Sleep Between Checks * delay * retries
     - name: Wait for aerospike migrations
       community.general.aerospike_migrations:
-          local_only: True
+          local_only: true
           sleep_between_checks: 1
           tries_limit: 5
           consecutive_good_checks: 3

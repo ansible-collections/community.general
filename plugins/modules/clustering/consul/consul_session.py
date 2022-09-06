@@ -88,7 +88,7 @@ options:
         description:
           - Whether to verify the TLS certificate of the consul agent.
         type: bool
-        default: True
+        default: true
     behavior:
         description:
           - The optional behavior that can be attached to the session when it

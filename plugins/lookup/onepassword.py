@@ -22,7 +22,7 @@ DOCUMENTATION = '''
     options:
       _terms:
         description: identifier(s) (UUID, name, or subdomain; case-insensitive) of item(s) to retrieve.
-        required: True
+        required: true
       field:
         description: field to return from each matching item (case-insensitive).
         default: 'password'
