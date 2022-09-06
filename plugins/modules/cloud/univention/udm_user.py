@@ -37,15 +37,15 @@ options:
         type: str
     firstname:
         description:
-            - First name. Required if C(state=present).
+            - First name. Required if I(state=present).
         type: str
     lastname:
         description:
-            - Last name. Required if C(state=present).
+            - Last name. Required if I(state=present).
         type: str
     password:
         description:
-            - Password. Required if C(state=present).
+            - Password. Required if I(state=present).
         type: str
     birthday:
         description:

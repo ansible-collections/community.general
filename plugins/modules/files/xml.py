@@ -22,13 +22,13 @@ options:
     description:
     - Path to the file to operate on.
     - This file must exist ahead of time.
-    - This parameter is required, unless C(xmlstring) is given.
+    - This parameter is required, unless I(xmlstring) is given.
     type: path
     aliases: [ dest, file ]
   xmlstring:
     description:
     - A string containing XML on which to operate.
-    - This parameter is required, unless C(path) is given.
+    - This parameter is required, unless I(path) is given.
     type: str
   xpath:
     description:
@@ -49,7 +49,7 @@ options:
     aliases: [ ensure ]
   attribute:
     description:
-    - The attribute to select when using parameter C(value).
+    - The attribute to select when using parameter I(value).
     - This is a string, not prepended with C(@).
     type: raw
   value:
@@ -61,31 +61,31 @@ options:
     type: raw
   add_children:
     description:
-    - Add additional child-element(s) to a selected element for a given C(xpath).
+    - Add additional child-element(s) to a selected element for a given I(xpath).
     - Child elements must be given in a list and each item may be either a string
       (eg. C(children=ansible) to add an empty C(<ansible/>) child element),
       or a hash where the key is an element name and the value is the element value.
-    - This parameter requires C(xpath) to be set.
+    - This parameter requires I(xpath) to be set.
     type: list
     elements: raw
   set_children:
     description:
-    - Set the child-element(s) of a selected element for a given C(xpath).
+    - Set the child-element(s) of a selected element for a given I(xpath).
     - Removes any existing children.
-    - Child elements must be specified as in C(add_children).
-    - This parameter requires C(xpath) to be set.
+    - Child elements must be specified as in I(add_children).
+    - This parameter requires I(xpath) to be set.
     type: list
     elements: raw
   count:
     description:
-    - Search for a given C(xpath) and provide the count of any matches.
-    - This parameter requires C(xpath) to be set.
+    - Search for a given I(xpath) and provide the count of any matches.
+    - This parameter requires I(xpath) to be set.
     type: bool
     default: false
   print_match:
     description:
-    - Search for a given C(xpath) and print out any matches.
-    - This parameter requires C(xpath) to be set.
+    - Search for a given I(xpath) and print out any matches.
+    - This parameter requires I(xpath) to be set.
     type: bool
     default: false
   pretty_print:
@@ -95,13 +95,13 @@ options:
     default: false
   content:
     description:
-    - Search for a given C(xpath) and get content.
-    - This parameter requires C(xpath) to be set.
+    - Search for a given I(xpath) and get content.
+    - This parameter requires I(xpath) to be set.
     type: str
     choices: [ attribute, text ]
   input_type:
     description:
-    - Type of input for C(add_children) and C(set_children).
+    - Type of input for I(add_children) and I(set_children).
     type: str
     choices: [ xml, yaml ]
     default: yaml
@@ -119,20 +119,20 @@ options:
     default: false
   insertbefore:
     description:
-      - Add additional child-element(s) before the first selected element for a given C(xpath).
+      - Add additional child-element(s) before the first selected element for a given I(xpath).
       - Child elements must be given in a list and each item may be either a string
         (eg. C(children=ansible) to add an empty C(<ansible/>) child element),
         or a hash where the key is an element name and the value is the element value.
-      - This parameter requires C(xpath) to be set.
+      - This parameter requires I(xpath) to be set.
     type: bool
     default: false
   insertafter:
     description:
-      - Add additional child-element(s) after the last selected element for a given C(xpath).
+      - Add additional child-element(s) after the last selected element for a given I(xpath).
       - Child elements must be given in a list and each item may be either a string
         (eg. C(children=ansible) to add an empty C(<ansible/>) child element),
         or a hash where the key is an element name and the value is the element value.
-      - This parameter requires C(xpath) to be set.
+      - This parameter requires I(xpath) to be set.
     type: bool
     default: false
 requirements:
@@ -141,7 +141,7 @@ notes:
 - Use the C(--check) and C(--diff) options when testing your expressions.
 - The diff output is automatically pretty-printed, so may not reflect the actual file content, only the file structure.
 - This module does not handle complicated xpath expressions, so limit xpath selectors to simple expressions.
-- Beware that in case your XML elements are namespaced, you need to use the C(namespaces) parameter, see the examples.
+- Beware that in case your XML elements are namespaced, you need to use the I(namespaces) parameter, see the examples.
 - Namespaces prefix should be used for all children of an element where namespace is defined, unless another namespace is defined for them.
 seealso:
 - name: Xml module development community wiki
