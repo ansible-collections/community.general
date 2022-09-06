@@ -1,2 +1,2 @@
 bugfixes:
-  - osx_defaults - When passing `~` as the value of osx_defaults, it got expanded directly (https://github.com/ansible-collections/community.general/issues/5234). Fix this behavoir by setting expand_user_and_vars to False (https://github.com/ansible-collections/community.general/pull/5243).
+  - osx_defaults - no longer expand ``~`` in ``value`` to the user's home directory, or expand environment variables (https://github.com/ansible-collections/community.general/issues/5234, https://github.com/ansible-collections/community.general/pull/5243).
