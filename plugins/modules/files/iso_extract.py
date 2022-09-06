@@ -28,7 +28,7 @@ description:
   mounts the ISO image to a temporary location, and copies files to a given
   destination, if needed.
 requirements:
-- Either 7z (from I(7zip) or I(p7zip) package)
+- Either 7z (from C(7zip) or C(p7zip) package)
 - Or mount capabilities (root-access, or CAP_SYS_ADMIN capability on Linux)
 options:
   image:
@@ -62,7 +62,7 @@ options:
     type: path
 notes:
 - Only the file checksum (content) is taken into account when extracting files
-  from the ISO image. If C(force=false), only checks the presence of the file.
+  from the ISO image. If I(force=false), only checks the presence of the file.
 - In Ansible 2.3 this module was using C(mount) and C(umount) commands only,
   requiring root access. This is no longer needed with the introduction of 7zip
   for extraction.

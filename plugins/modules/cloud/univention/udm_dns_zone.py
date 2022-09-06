@@ -44,13 +44,13 @@ options:
         type: list
         elements: str
         description:
-            - List of appropriate name servers. Required if C(state=present).
+            - List of appropriate name servers. Required if I(state=present).
     interfaces:
         type: list
         elements: str
         description:
             - List of interface IP addresses, on which the server should
-              response this zone. Required if C(state=present).
+              response this zone. Required if I(state=present).
 
     refresh:
         type: int

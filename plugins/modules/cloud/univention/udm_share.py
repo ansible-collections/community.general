@@ -38,17 +38,17 @@ options:
         required: false
         description:
             - Host FQDN (server which provides the share), e.g. C({{
-              ansible_fqdn }}). Required if C(state=present).
+              ansible_fqdn }}). Required if I(state=present).
         type: str
     path:
         required: false
         description:
-            - Directory on the providing server, e.g. C(/home). Required if C(state=present).
+            - Directory on the providing server, e.g. C(/home). Required if I(state=present).
         type: path
     sambaName:
         required: false
         description:
-            - Windows name. Required if C(state=present).
+            - Windows name. Required if I(state=present).
         type: str
         aliases: [ samba_name ]
     ou:
