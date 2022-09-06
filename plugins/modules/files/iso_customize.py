@@ -15,9 +15,9 @@ module: iso_customize
 short_description: Add/remove/change files in ISO file
 description:
   - This module is used to add/remove/change files in ISO file.
-  - If you need delete action, make sure all delete actions come first, then all add actions.
-  - We can change the file with combinded options "delete_files" (delete the file inside ISO)
-  - and "add_files" (adding file to ISO with the same name as previous deleted file)
+  - The module will always execute all I(delete_files) actions first, then all I(add_files) actions.
+  - We can change an existing file inside the ISO image by combining options I(delete_files)
+  - and I(add_files).
 author:
   - Yuhua Zou (@ZouYuhua) <zouy@vmware.com>
 requirements:
@@ -181,7 +181,6 @@ def iso_add_file(opened_iso, src_file, dest_file):
             MODULE_ISO_CUSTOMIZE.fail_json(msg=ret_msg)
 
     try:
-        # The file will be replaced if it exists in ISO
         if ISO_MODE == "iso9660":
             opened_iso.add_file(file_local, iso_path=file_in_iso_path)
         elif ISO_MODE == "rr":
@@ -254,16 +253,15 @@ def iso_rebuild(src_iso, dest_iso, delete_files_list, add_files_list):
         elif iso.has_udf():
             ISO_MODE = "udf"
 
-        if delete_files_list:
-            for item in delete_files_list:
-                ret, msg = iso_delete_file(iso, item)
-                if ret != 0:
-                    MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
-        if add_files_list:
-            for item in add_files_list:
-                ret, msg = iso_add_file(iso, item['src_file'], item['dest_file'])
-                if ret != 0:
-                    MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
+        for item in delete_files_list:
+            ret, msg = iso_delete_file(iso, item)
+            if ret != 0:
+                MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
+
+        for item in add_files_list:
+            ret, msg = iso_add_file(iso, item['src_file'], item['dest_file'])
+            if ret != 0:
+                MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
 
         iso.write(dest_iso)
     except Exception as err:
@@ -297,33 +295,28 @@ def main():
         module.fail_json(msg="The %s does not exist." % src_iso)
 
     dest_iso = module.params.get('dest_iso')
-    if not dest_iso:
-        msg = 'Please specify the path of the customized ISO file using dest_iso parameter.'
-        module.fail_json(str(msg=msg))
-
     dest_iso_dir = os.path.dirname(dest_iso)
     if dest_iso_dir and not os.path.exists(dest_iso_dir):
         module.fail_json(msg="The dest directory %s does not exist" % dest_iso_dir)
 
     MODULE_ISO_CUSTOMIZE = module
 
-    delete_files_list = module.params.get('delete_files')
+    delete_files_list = [s.strip() for s in module.params.get('delete_files')]
     add_files_list = module.params.get('add_files')
     if add_files_list:
         for item in add_files_list:
             if not os.path.exists(item['src_file']):
-                module.fail_json(msg="The %s does not exist." % item['src_file'])
+                module.fail_json(msg="The file %s does not exist." % item['src_file'])
 
     iso_rebuild(src_iso, dest_iso, delete_files_list, add_files_list)
     result = dict(
-        changed=False,
+        changed=True,
         src_iso=src_iso,
         customized_iso=dest_iso,
         delete_files=delete_files_list,
         add_files=add_files_list,
     )
 
-    result['changed'] = True
     module.exit_json(**result)
 
 

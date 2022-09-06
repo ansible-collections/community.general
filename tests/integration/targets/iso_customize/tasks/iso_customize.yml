@@ -28,7 +28,7 @@
 # in one type of OS(take MacOS here)
 - block:
     - name: "Mount customized ISO on MAC"
-      shell: "hdiutil attach {{ test_dir }}/{{ dest_iso_name }} -mountroot {{ test_dir }}/iso_mount"
+      command: "hdiutil attach {{ test_dir }}/{{ dest_iso_name }} -mountroot {{ test_dir }}/iso_mount"
 
     # For MAC, we have different root directory for different type of ISO
     - set_fact:
@@ -62,10 +62,12 @@
         that:
         - check_file.stat.exists == True
 
-    - name: Check if the file test02.cfg is repalced or not
-      shell: "cat {{ mount_root_dir }}/test02.cfg"
-      register: check_file_content
-      failed_when: check_file_content.stdout.find("test") == -1
+    - name: Get the content of file test02.cfg
+      set_fact:
+        file_contents: "{{ lookup('file', mount_root_dir + '/test02.cfg') }}"
+
+    - fail: msg="Failed to replace the file test02.cfg"
+      when: file_contents != "test"
 
     - name: Umount ISO
       mount:
