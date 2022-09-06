@@ -1,0 +1,2 @@
+minor_changes:
+  - nagios - minor refactoring on parameter validation for different actions (https://github.com//pull/5239).
