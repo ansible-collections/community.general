@@ -55,15 +55,6 @@
   set_fact:
     terraform_binary_path: "{{ terraform_binary_path.stdout or remote_tmp_dir ~ '/terraform' }}"
 
-- name: Create terraform project directory
-  file:
-    path: "{{ terraform_project_dir }}/{{ item['name'] }}"
-    state: directory
-    mode: 0755
-  loop: "{{ terraform_provider_versions }}"
-  loop_control:
-    index_var: provider_index
-
 - name: Loop over provider upgrade test tasks
   include_tasks: test_provider_upgrade.yml
   vars:
@@ -71,3 +62,6 @@
   loop: "{{ terraform_provider_versions }}"
   loop_control:
     index_var: provider_index
+
+- name: Test Complex Varibles
+  include_tasks: complex_variables.yml

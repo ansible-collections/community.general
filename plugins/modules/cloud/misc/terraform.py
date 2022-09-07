@@ -323,7 +323,7 @@ def get_workspace_context(bin_path, project_path):
     command = [bin_path, 'workspace', 'list', '-no-color']
     rc, out, err = module.run_command(command, cwd=project_path)
     if rc != 0:
-        module.warn("Failed to list Terraform workspaces:\r\n{0}".format(err))
+        module.warn("Failed to list Terraform workspaces:\n{0}".format(err))
     for item in out.split('\n'):
         stripped_item = item.strip()
         if not stripped_item:
@@ -386,7 +386,7 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
     elif rc == 1:
         # failure to plan
         module.fail_json(
-            msg='Terraform plan could not be created\r\nSTDOUT: {out}\r\n\r\nSTDERR: {err}\r\nCOMMAND: {cmd} {args}'.format(
+            msg='Terraform plan could not be created\nSTDOUT: {out}\nSTDERR: {err}\nCOMMAND: {cmd} {args}'.format(
                 out=out,
                 err=err,
                 cmd=' '.join(plan_command),
@@ -397,7 +397,7 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
         # changes, but successful
         return plan_path, True, out, err, plan_command if state == 'planned' else command
 
-    module.fail_json(msg='Terraform plan failed with unexpected exit code {rc}. \r\nSTDOUT: {out}\r\nSTDERR: {err}\r\nCOMMAND: {cmd} {args}'.format(
+    module.fail_json(msg='Terraform plan failed with unexpected exit code {rc}.\nSTDOUT: {out}\nSTDERR: {err}\nCOMMAND: {cmd} {args}'.format(
         rc=rc,
         out=out,
         err=err,
