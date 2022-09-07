@@ -1,0 +1,2 @@
+bugfixes:
+  - slack - fix message update for channels which starts with ``CP``. When ``message-id`` was passed it failed for channels wich starts with ``CP`` because of ``#`` simbol was added befor the ``channel_id``.(https://github.com/ansible-collections/community.general/pull/5249#issuecomment-1238520553).
