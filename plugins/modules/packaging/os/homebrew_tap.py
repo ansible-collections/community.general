@@ -48,8 +48,8 @@ options:
         type: str
     path:
         description:
-            - "A ':' separated list of paths to search for C(brew) executable."
-        default: '/usr/local/bin:/opt/homebrew/bin'
+            - "A C(:) separated list of paths to search for C(brew) executable."
+        default: '/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin'
         type: path
         version_added: '2.1.0'
 requirements: [ homebrew ]
@@ -219,7 +219,7 @@ def main():
             url=dict(default=None, required=False),
             state=dict(default='present', choices=['present', 'absent']),
             path=dict(
-                default="/usr/local/bin:/opt/homebrew/bin",
+                default="/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin",
                 required=False,
                 type='path',
             ),
