@@ -1,0 +1,2 @@
+minor_changes:
+  - "nmcli - honor IP options for VPNs (https://github.com/ansible-collections/community.general/pull/5228)."
