@@ -235,7 +235,9 @@ EXAMPLES = """
 - name: Edit message
   community.general.slack:
     token: thetoken/generatedby/slack
-    channel: "{{ slack_response.channel }}" #doesn't accept channel name. Must be `channel_id` stored in `slack_response` from the previous task.
+    # The 'channel' option does not accept the channel name. It must use the 'channel_id',
+    # which can be retrieved for example from 'slack_response' from the previous task.
+    channel: "{{ slack_response.channel }}"
     msg: Deployment complete!
     message_id: "{{ slack_response.ts }}"
 """
