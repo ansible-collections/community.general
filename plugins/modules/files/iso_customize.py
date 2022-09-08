@@ -277,8 +277,8 @@ def main():
     global MODULE_ISO_CUSTOMIZE
 
     argument_spec = dict(
-        src_iso=dict(type='str', required=True),
-        dest_iso=dict(type='str', required=True),
+        src_iso=dict(type='path', required=True),
+        dest_iso=dict(type='path', required=True),
         delete_files=dict(type='list', required=False, elements='str'),
         add_files=dict(type='list', required=False, elements='dict'),
     )
