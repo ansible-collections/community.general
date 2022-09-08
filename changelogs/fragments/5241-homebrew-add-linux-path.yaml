@@ -1,0 +1,2 @@
+minor_changes:
+  - homebrew, homebrew_tap - added Homebrew on Linux path to defaults (https://github.com/ansible-collections/community.general/pull/5241).
