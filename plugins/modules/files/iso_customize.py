@@ -273,7 +273,6 @@ def iso_rebuild(src_iso, dest_iso, delete_files_list, add_files_list):
 
 
 def main():
-    op_data_list = []
     global MODULE_ISO_CUSTOMIZE
 
     argument_spec = dict(
@@ -290,19 +289,19 @@ def main():
         module.fail_json(
             missing_required_lib('pycdlib'), exception=PYCDLIB_IMP_ERR)
 
-    src_iso = module.params.get('src_iso')
+    src_iso = module.params['src_iso']
     if not os.path.exists(src_iso):
         module.fail_json(msg="The %s does not exist." % src_iso)
 
-    dest_iso = module.params.get('dest_iso')
+    dest_iso = module.params['dest_iso']
     dest_iso_dir = os.path.dirname(dest_iso)
     if dest_iso_dir and not os.path.exists(dest_iso_dir):
         module.fail_json(msg="The dest directory %s does not exist" % dest_iso_dir)
 
     MODULE_ISO_CUSTOMIZE = module
 
-    delete_files_list = [s.strip() for s in module.params.get('delete_files')]
-    add_files_list = module.params.get('add_files')
+    delete_files_list = [s.strip() for s in module.params['delete_files']]
+    add_files_list = module.params['add_files']
     if add_files_list:
         for item in add_files_list:
             if not os.path.exists(item['src_file']):
