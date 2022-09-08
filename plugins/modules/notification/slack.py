@@ -68,7 +68,7 @@ options:
     type: str
   message_id:
     description:
-      - Optional. Message ID to edit, instead of posting a new message. 
+      - Optional. Message ID to edit, instead of posting a new message.
       - If supplied I(channel_id) must be in form of C(C0xxxxxxx). use C({{ slack_response.channel_id }}) to get I(channel_id) from previous task run.
       - Corresponds to C(ts) in the Slack API (U(https://api.slack.com/messaging/modifying)).
     type: str
