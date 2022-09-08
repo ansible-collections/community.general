@@ -169,24 +169,24 @@ stderr:
 
 EXAMPLES = """
 - name: Install package foo from repo
-  community.general.pacman:
+  community.general.packaging.os.pacman:
     name: foo
     state: present
 
 - name: Install package bar from file
-  community.general.pacman:
+  community.general.packaging.os.pacman:
     name: ~/bar-1.0-1-any.pkg.tar.xz
     state: present
 
 - name: Install package foo from repo and bar from file
-  community.general.pacman:
+  community.general.packaging.os.pacman:
     name:
       - foo
       - ~/bar-1.0-1-any.pkg.tar.xz
     state: present
 
 - name: Install package from AUR using a Pacman compatible AUR helper
-  community.general.pacman:
+  community.general.packaging.os.pacman:
     name: foo
     state: present
     executable: yay
@@ -195,30 +195,30 @@ EXAMPLES = """
 - name: Upgrade package foo
   # The 'changed' state of this call will indicate whether the cache was
   # updated *or* whether foo was installed/upgraded.
-  community.general.pacman:
+  community.general.packaging.os.pacman:
     name: foo
     state: latest
     update_cache: true
 
 - name: Remove packages foo and bar
-  community.general.pacman:
+  community.general.packaging.os.pacman:
     name:
       - foo
       - bar
     state: absent
 
 - name: Recursively remove package baz
-  community.general.pacman:
+  community.general.packaging.os.pacman:
     name: baz
     state: absent
     extra_args: --recursive
 
 - name: Run the equivalent of "pacman -Sy" as a separate step
-  community.general.pacman:
+  community.general.packaging.os.pacman:
     update_cache: true
 
 - name: Run the equivalent of "pacman -Su" as a separate step
-  community.general.pacman:
+  community.general.packaging.os.pacman:
     upgrade: true
 
 - name: Run the equivalent of "pacman -Syu" as a separate step
@@ -231,25 +231,25 @@ EXAMPLES = """
   #
   #   register: result
   #   changed_when: result.packages | length > 0
-  community.general.pacman:
+  community.general.packaging.os.pacman:
     update_cache: true
     upgrade: true
 
 - name: Run the equivalent of "pacman -Rdd", force remove package baz
-  community.general.pacman:
+  community.general.packaging.os.pacman:
     name: baz
     state: absent
     force: true
 
 - name: Install foo as dependency and leave reason untouched if already installed
-  community.general.pacman:
+  community.general.packaging.os.pacman:
     name: foo
     state: present
     reason: dependency
     reason_for: new
 
 - name: Run the equivalent of "pacman -S --asexplicit", mark foo as explicit and install it if not present
-  community.general.pacman:
+  community.general.packaging.os.pacman:
     name: foo
     state: present
     reason: explicit
