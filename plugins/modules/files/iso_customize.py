@@ -81,12 +81,12 @@ RETURN = r'''
 src_iso:
   description: Path of source ISO file.
   returned: on success
-  type: path
+  type: str
   sample: "/path/to/file.iso"
 dest_iso:
   description: path of the customized iso file.
   returned: on success
-  type: path
+  type: str
   sample: "/path/to/customized.iso"
 '''
 
