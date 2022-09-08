@@ -30,12 +30,12 @@ options:
     description:
     - This is the path of source ISO file.
     - Will fail if specified ISO file does not exist on local machine.
-    type: str
+    type: path
     required: true
   dest_iso:
     description:
     - The path with file name of the customized ISO file on local machine.
-    type: str
+    type: path
     required: true
   delete_files:
     description:
@@ -81,12 +81,12 @@ RETURN = r'''
 src_iso:
   description: Path of source ISO file.
   returned: on success
-  type: str
+  type: path
   sample: "/path/to/file.iso"
 dest_iso:
   description: path of the customized iso file.
   returned: on success
-  type: str
+  type: path
   sample: "/path/to/customized.iso"
 '''
 
