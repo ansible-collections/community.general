@@ -1730,6 +1730,7 @@ class Nmcli(object):
             '802-11-wireless',
             'gsm',
             'wireguard',
+            'vpn',
         )
 
     @property
