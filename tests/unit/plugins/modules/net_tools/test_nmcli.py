@@ -1208,6 +1208,8 @@ TESTCASE_VPN_L2TP = [
             'ipsec-enabled': 'true',
             'ipsec-psk': 'QnJpdHRhbnkxMjM=',
         },
+        'gw4_ignore_auto': True,
+        'routes4': ['192.168.200.0/24'],
         'autoconnect': 'false',
         'state': 'present',
         '_ansible_check_mode': False,
@@ -1220,7 +1222,14 @@ connection.type:                        vpn
 connection.autoconnect:                 no
 connection.permissions:                 brittany
 ipv4.method:                            auto
+ipv4.routes:                            { ip = 192.168.200.0/24 }
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                yes
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 vpn.service-type:                       org.freedesktop.NetworkManager.l2tp
 vpn.data:                               gateway = vpn.example.com, ipsec-enabled = true, ipsec-psk = QnJpdHRhbnkxMjM=, password-flags = 2, user = brittany
 vpn.secrets:                            ipsec-psk = QnJpdHRhbnkxMjM=
@@ -1251,7 +1260,13 @@ connection.type:                        vpn
 connection.autoconnect:                 no
 connection.permissions:                 brittany
 ipv4.method:                            auto
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
 ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
 vpn.service-type:                       org.freedesktop.NetworkManager.pptp
 vpn.data:                               gateway=vpn.example.com, password-flags=2, user=brittany
 """
