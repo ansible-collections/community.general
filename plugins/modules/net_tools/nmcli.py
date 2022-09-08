@@ -319,6 +319,11 @@ options:
         description:
             - This is only used with bond - updelay.
         type: int
+    xmit_hash_policy:
+        description:
+            - This is only used with bond - xmit_hash_policy type.
+        type: str
+        version_added: 5.6.0
     arp_interval:
         description:
             - This is only used with bond - ARP interval.
@@ -1440,6 +1445,7 @@ class Nmcli(object):
         self.primary = module.params['primary']
         self.downdelay = module.params['downdelay']
         self.updelay = module.params['updelay']
+        self.xmit_hash_policy = module.params['xmit_hash_policy']
         self.arp_interval = module.params['arp_interval']
         self.arp_ip_target = module.params['arp_ip_target']
         self.slavepriority = module.params['slavepriority']
@@ -1580,6 +1586,7 @@ class Nmcli(object):
                 'mode': self.mode,
                 'primary': self.primary,
                 'updelay': self.updelay,
+                'xmit_hash_policy': self.xmit_hash_policy,
             })
         elif self.type == 'bond-slave':
             options.update({
@@ -2228,6 +2235,7 @@ def main():
             miimon=dict(type='int'),
             downdelay=dict(type='int'),
             updelay=dict(type='int'),
+            xmit_hash_policy=dict(type='str'),
             arp_interval=dict(type='int'),
             arp_ip_target=dict(type='str'),
             primary=dict(type='str'),
