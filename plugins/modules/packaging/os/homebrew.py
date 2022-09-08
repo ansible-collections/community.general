@@ -39,7 +39,7 @@ options:
             - "A C(:) separated list of paths to search for C(brew) executable.
               Since a package (I(formula) in homebrew parlance) location is prefixed relative to the actual path of I(brew) command,
               providing an alternative I(brew) path enables managing different set of packages in an alternative location in the system."
-        default: '/usr/local/bin:/opt/homebrew/bin'
+        default: '/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin'
         type: path
     state:
         description:
@@ -876,7 +876,7 @@ def main():
                 elements='str',
             ),
             path=dict(
-                default="/usr/local/bin:/opt/homebrew/bin",
+                default="/usr/local/bin:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin",
                 required=False,
                 type='path',
             ),
