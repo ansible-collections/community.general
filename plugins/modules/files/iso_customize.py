@@ -54,10 +54,12 @@ options:
         description:
         - The path with file name on the machine the module is executed on.
         type: path
+        required: true
       dest_file:
         description:
         - The absolute path of the file inside the ISO file.
         type: str
+        required: true
 '''
 
 EXAMPLES = r'''
@@ -103,12 +105,9 @@ except ImportError:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
-MODULE_ISO_CUSTOMIZE = None
-ISO_MODE = "iso9660"
-
 
 # The upper dir exist, we only add subdirectoy
-def iso_add_dir(opened_iso, dir_path):
+def iso_add_dir(module, opened_iso, iso_type, dir_path):
     parent_dir, check_dirname = dir_path.rsplit("/", 1)
     if not parent_dir.strip():
         parent_dir = "/"
@@ -117,7 +116,7 @@ def iso_add_dir(opened_iso, dir_path):
     for dirname, dirlist, dummy_filelist in opened_iso.walk(iso_path=parent_dir.upper()):
         if dirname == parent_dir.upper():
             if check_dirname.upper() in dirlist:
-                return 0, ""
+                return
 
             if parent_dir == "/":
                 current_dirpath = "/%s" % check_dirname
@@ -126,22 +125,20 @@ def iso_add_dir(opened_iso, dir_path):
 
             current_dirpath_upper = current_dirpath.upper()
             try:
-                if ISO_MODE == "iso9660":
+                if iso_type == "iso9660":
                     opened_iso.add_directory(current_dirpath_upper)
-                elif ISO_MODE == "rr":
+                elif iso_type == "rr":
                     opened_iso.add_directory(current_dirpath_upper, rr_name=check_dirname)
-                elif ISO_MODE == "joliet":
+                elif iso_type == "joliet":
                     opened_iso.add_directory(current_dirpath_upper, joliet_path=current_dirpath)
-                elif ISO_MODE == "udf":
+                elif iso_type == "udf":
                     opened_iso.add_directory(current_dirpath_upper, udf_path=current_dirpath)
             except Exception as err:
                 msg = "Failed to create dir %s with error: %s" % (current_dirpath, to_native(err))
-                return -1, msg
-
-    return 0, ""
+                module.fail_json(msg=msg)
 
 
-def iso_add_dirs(opened_iso, dir_path):
+def iso_add_dirs(module, opened_iso, iso_type, dir_path):
     dirnames = dir_path.strip().split("/")
 
     current_dirpath = "/"
@@ -153,14 +150,10 @@ def iso_add_dirs(opened_iso, dir_path):
         else:
             current_dirpath = "%s/%s" % (current_dirpath, item)
 
-        ret, ret_msg = iso_add_dir(opened_iso, current_dirpath)
-        if ret != 0:
-            return ret, ret_msg
-
-    return 0, ""
+        iso_add_dir(module, opened_iso, iso_type, current_dirpath)
 
 
-def iso_add_file(opened_iso, src_file, dest_file):
+def iso_add_file(module, opened_iso, iso_type, src_file, dest_file):
     dest_file = dest_file.strip()
     if dest_file[0] != "/":
         dest_file = "/%s" % dest_file
@@ -175,27 +168,23 @@ def iso_add_file(opened_iso, src_file, dest_file):
         file_in_iso_path = dest_file.upper() + ';1'
 
     if file_dir and file_dir != "/":
-        ret, ret_msg = iso_add_dirs(opened_iso, file_dir)
-        if ret != 0:
-            MODULE_ISO_CUSTOMIZE.fail_json(msg=ret_msg)
+        iso_add_dirs(module, opened_iso, iso_type, file_dir)
 
     try:
-        if ISO_MODE == "iso9660":
+        if iso_type == "iso9660":
             opened_iso.add_file(file_local, iso_path=file_in_iso_path)
-        elif ISO_MODE == "rr":
+        elif iso_type == "rr":
             opened_iso.add_file(file_local, iso_path=file_in_iso_path, rr_name=file_name)
-        elif ISO_MODE == "joliet":
+        elif iso_type == "joliet":
             opened_iso.add_file(file_local, iso_path=file_in_iso_path, joliet_path=dest_file)
-        elif ISO_MODE == "udf":
+        elif iso_type == "udf":
             opened_iso.add_file(file_local, iso_path=file_in_iso_path, udf_path=dest_file)
     except Exception as err:
         msg = "Failed to add local file %s to ISO with error: %s" % (file_local, to_native(err))
-        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
-
-    return 0, ""
+        module.fail_json(msg=msg)
 
 
-def iso_delete_file(opened_iso, dest_file):
+def iso_delete_file(module, opened_iso, iso_type, dest_file):
     dest_file = dest_file.strip()
     if dest_file[0] != "/":
         dest_file = "/%s" % dest_file
@@ -207,86 +196,82 @@ def iso_delete_file(opened_iso, dest_file):
         file_in_iso_path = dest_file.upper() + ';1'
 
     try:
-        if ISO_MODE == "iso9660":
+        if iso_type == "iso9660":
             record = opened_iso.get_record(iso_path=file_in_iso_path)
-        elif ISO_MODE == "rr":
+        elif iso_type == "rr":
             record = opened_iso.get_record(rr_path=dest_file)
-        elif ISO_MODE == "joliet":
+        elif iso_type == "joliet":
             record = opened_iso.get_record(joliet_path=dest_file)
-        elif ISO_MODE == "udf":
+        elif iso_type == "udf":
             record = opened_iso.get_record(udf_path=dest_file)
 
         if record and not record.is_file():
-            return -1, "The file %s does not exists in ISO or not a file." % dest_file
+            module.fail_json(msg="The %s is not a file but directory." % dest_file)
     except Exception as err:
         msg = "Failed to get record of file %s in ISO with filesystem %s. error: %s" % (
-            dest_file, ISO_MODE, to_native(err))
-        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
+            dest_file, iso_type, to_native(err))
+        module.fail_json(msg=msg)
 
     try:
-        if ISO_MODE == "iso9660":
+        if iso_type == "iso9660":
             opened_iso.rm_hard_link(iso_path=file_in_iso_path)
-        elif ISO_MODE == "rr":
+        elif iso_type == "rr":
             opened_iso.rm_hard_link(iso_path=file_in_iso_path)
-        elif ISO_MODE == "joliet":
+        elif iso_type == "joliet":
             opened_iso.rm_hard_link(joliet_path=dest_file)
-        elif ISO_MODE == "udf":
+        elif iso_type == "udf":
             opened_iso.rm_hard_link(udf_path=dest_file)
     except Exception as err:
         msg = "Failed to delete iso file %s with error: %s" % (dest_file, to_native(err))
-        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
-
-    return 0, ""
+        module.fail_json(msg=msg)
 
 
-def iso_rebuild(src_iso, dest_iso, delete_files_list, add_files_list):
-    global ISO_MODE
+def iso_rebuild(module, src_iso, dest_iso, delete_files_list, add_files_list):
+    iso = None
+    iso_type = "iso9660"
 
     try:
         iso = pycdlib.PyCdlib()
         iso.open(src_iso)
         if iso.has_rock_ridge():
-            ISO_MODE = "rr"
+            iso_type = "rr"
         elif iso.has_joliet():
-            ISO_MODE = "joliet"
+            iso_type = "joliet"
         elif iso.has_udf():
-            ISO_MODE = "udf"
+            iso_type = "udf"
 
         for item in delete_files_list:
-            ret, msg = iso_delete_file(iso, item)
-            if ret != 0:
-                MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
+            iso_delete_file(module, iso, iso_type, item)
 
         for item in add_files_list:
-            ret, msg = iso_add_file(iso, item['src_file'], item['dest_file'])
-            if ret != 0:
-                MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
+            iso_add_file(module, iso, iso_type, item['src_file'], item['dest_file'])
 
         iso.write(dest_iso)
     except Exception as err:
         msg = "Failed to rebuild ISO %s with error: %s" % (src_iso, to_native(err))
-        MODULE_ISO_CUSTOMIZE.fail_json(msg=msg)
+        module.fail_json(msg=msg)
     finally:
         if iso:
             iso.close()
 
 
 def main():
-    global MODULE_ISO_CUSTOMIZE
-
     argument_spec = dict(
         src_iso=dict(type='path', required=True),
         dest_iso=dict(type='path', required=True),
         delete_files=dict(type='list', elements='str', default=[]),
-        add_files=dict(type='list', elements='dict', default=[], options=dict(
-            src_file=dict(type='path', required=True),
-            dest_file=dict(type='str', required=True)
-        ))
+        add_files=dict(
+            type='list', elements='dict', default=[],
+            options=dict(
+                src_file=dict(type='path', required=True),
+                dest_file=dict(type='str', required=True),
+            ),
+        ),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_one_of=[('delete_files', 'add_files'),],
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
     if not HAS_PYCDLIB:
         module.fail_json(
@@ -301,8 +286,6 @@ def main():
     if dest_iso_dir and not os.path.exists(dest_iso_dir):
         module.fail_json(msg="The dest directory %s does not exist" % dest_iso_dir)
 
-    MODULE_ISO_CUSTOMIZE = module
-
     delete_files_list = [s.strip() for s in module.params['delete_files']]
     add_files_list = module.params['add_files']
     if add_files_list:
@@ -310,15 +293,18 @@ def main():
             if not os.path.exists(item['src_file']):
                 module.fail_json(msg="The file %s does not exist." % item['src_file'])
 
-    iso_rebuild(src_iso, dest_iso, delete_files_list, add_files_list)
     result = dict(
-        changed=True,
+        changed=False,
         src_iso=src_iso,
         customized_iso=dest_iso,
         delete_files=delete_files_list,
         add_files=add_files_list,
     )
 
+    if not module.check_mode:
+        iso_rebuild(module, src_iso, dest_iso, delete_files_list, add_files_list)
+
+    result['changed'] = True
     module.exit_json(**result)
 
 
