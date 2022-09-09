@@ -179,7 +179,6 @@ out:
 '''
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.json_utils import json
 import traceback
 try:
     from pyrfc import Connection

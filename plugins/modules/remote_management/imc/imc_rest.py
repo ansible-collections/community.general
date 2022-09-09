@@ -264,7 +264,6 @@ output:
 import datetime
 import os
 import traceback
-from functools import partial
 
 LXML_ETREE_IMP_ERR = None
 try:
