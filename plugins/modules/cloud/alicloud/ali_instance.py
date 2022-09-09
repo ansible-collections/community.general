@@ -617,9 +617,10 @@ ids:
 
 import re
 import time
-import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import ecs_argument_spec, ecs_connect
+from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import (
+    ecs_argument_spec, ecs_connect, FOOTMARK_IMP_ERR, HAS_FOOTMARK
+)
 
 
 def get_instances_info(connection, ids):
@@ -797,6 +798,9 @@ def main():
     )
     )
     module = AnsibleModule(argument_spec=argument_spec)
+
+    if HAS_FOOTMARK is False:
+        module.fail_json(msg=missing_required_lib('footmark'), exception=FOOTMARK_IMP_ERR)
 
     ecs = ecs_connect(module)
     host_name = module.params['host_name']

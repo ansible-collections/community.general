@@ -341,9 +341,10 @@ ids:
     sample: [i-12345er, i-3245fs]
 '''
 
-import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import ecs_argument_spec, ecs_connect
+from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import (
+    ecs_argument_spec, ecs_connect, FOOTMARK_IMP_ERR, HAS_FOOTMARK
+)
 
 
 def main():
@@ -358,6 +359,9 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True,
     )
+
+    if HAS_FOOTMARK is False:
+        module.fail_json(msg=missing_required_lib('footmark'), exception=FOOTMARK_IMP_ERR)
 
     ecs = ecs_connect(module)
 
