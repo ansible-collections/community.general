@@ -270,7 +270,7 @@ def main():
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
-        required_one_of=[('delete_files', 'add_files'),],
+        required_one_of=[('delete_files', 'add_files'), ],
         supports_check_mode=True,
     )
     if not HAS_PYCDLIB:
