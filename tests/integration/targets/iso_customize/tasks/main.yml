@@ -88,6 +88,12 @@
     test_dir: "{{ output_test_dir }}"
     dest_iso_name: "iso_customize_delete.iso"
 
+# Test: misc exception
+- include_tasks: iso_customize_exception.yml
+  vars:
+    test_dir: "{{ output_test_dir }}"
+    dest_iso_name: "iso_customize_exception.iso"
+
 - name: Delete testing sub-directory
   ansible.builtin.file:
     path: '{{ output_test_dir }}'

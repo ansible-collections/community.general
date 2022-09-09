@@ -16,8 +16,7 @@ short_description: Add/remove/change files in ISO file
 description:
   - This module is used to add/remove/change files in ISO file.
   - The module will always execute all I(delete_files) actions first, then all I(add_files) actions.
-  - We can change an existing file inside the ISO image by combining options I(delete_files)
-  - and I(add_files).
+  - We can change an existing file inside the ISO image by combining options I(delete_files) and I(add_files).
 author:
   - Yuhua Zou (@ZouYuhua) <zouy@vmware.com>
 requirements:
@@ -279,13 +278,14 @@ def main():
         src_iso=dict(type='path', required=True),
         dest_iso=dict(type='path', required=True),
         delete_files=dict(type='list', elements='str', default=[]),
-        add_files=dict(type='list', elements='dict', default=[]),
+        add_files=dict(type='list', elements='dict', default=[], options=dict(
+            src_file=dict(type='path', required=True),
+            dest_file=dict(type='str', required=True)
+        ))
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
-        required_one_of=[
-          ('delete_files', 'add_files'),
-        ],
+        required_one_of=[('delete_files', 'add_files'),],
         supports_check_mode=False,
     )
     if not HAS_PYCDLIB:
