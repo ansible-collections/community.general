@@ -617,18 +617,10 @@ ids:
 
 import re
 import time
-import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import ecs_argument_spec, ecs_connect
-
-HAS_FOOTMARK = False
-FOOTMARK_IMP_ERR = None
-try:
-    from footmark.exception import ECSResponseError
-    HAS_FOOTMARK = True
-except ImportError:
-    FOOTMARK_IMP_ERR = traceback.format_exc()
-    HAS_FOOTMARK = False
+from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import (
+    ecs_argument_spec, ecs_connect, FOOTMARK_IMP_ERR, HAS_FOOTMARK
+)
 
 
 def get_instances_info(connection, ids):

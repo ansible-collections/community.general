@@ -15,6 +15,7 @@ __metaclass__ = type
 
 import os
 import json
+import traceback
 from ansible.module_utils.basic import env_fallback
 
 try:
@@ -28,8 +29,11 @@ try:
     import footmark.dns
     import footmark.ram
     import footmark.market
+
+    FOOTMARK_IMP_ERR = None
     HAS_FOOTMARK = True
 except ImportError:
+    FOOTMARK_IMP_ERR = traceback.format_exc()
     HAS_FOOTMARK = False
 
 

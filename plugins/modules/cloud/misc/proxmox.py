@@ -390,11 +390,10 @@ EXAMPLES = r'''
 '''
 
 import time
-import traceback
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
-from ansible.module_utils.basic import AnsibleModule, env_fallback
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
