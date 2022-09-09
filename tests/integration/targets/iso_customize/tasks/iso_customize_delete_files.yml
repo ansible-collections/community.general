@@ -1,0 +1,41 @@
+# Copyright (c) 2022, Ansible Project
+# Copyright (c) 2022, VMware, Inc. All Rights Reserved.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "Customize ISO file: delete file"
+  community.general.iso_customize:
+    src_iso: "{{ test_dir }}/test1.iso"
+    dest_iso: "{{ test_dir }}/{{ dest_iso_name }}"
+    delete_files:
+      - "/test01.cfg"
+
+- debug: var=ansible_distribution
+
+# Only need to check the files is deleted/added as the requested modifications 
+# in one type of OS(take MacOS here)
+- block:
+    - name: "Mount customized ISO on MAC"
+      command: "hdiutil attach {{ test_dir }}/{{ dest_iso_name }} -mountroot {{ test_dir }}/iso_mount"
+
+    # For MAC, we have different root directory for different type of ISO
+    - set_fact:
+        mount_root_dir: "{{ test_dir }}/iso_mount/disk_image"
+
+    - debug: var=mount_root_dir
+
+    - name: Check the file test01.cfg is deleted
+      stat:
+        path: "{{ mount_root_dir }}/test01.cfg"
+      register: check_file
+
+    - assert:
+        that:
+        - check_file.stat.exists == False
+
+    - name: Umount ISO
+      mount:
+        path: "{{ mount_root_dir }}"
+        fstab: "{{ test_dir }}/temp.fstab"
+        state: unmounted
+  when: ansible_distribution == "MacOSX"

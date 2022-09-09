@@ -15,6 +15,7 @@
   vars:
     test_dir: "{{ output_test_dir }}"
 
+# Add files and deletes files
 - name: Create iso file with a specified file and directory
   community.general.iso_create:
     src_files:
@@ -64,10 +65,28 @@
     dest_iso: "{{ output_test_dir }}/test.iso"
     udf: True
 
-- include_tasks: iso_customize.yml 
+- include_tasks: iso_customize.yml
   vars:
     test_dir: "{{ output_test_dir }}"
     dest_iso_name: "iso_customize_udf.iso"
+
+# Create initial iso for customzing with only option add_files/delete_files
+- name: Create iso file with a specified file and directory
+  community.general.iso_create:
+    src_files:
+      - "{{ output_test_dir }}/test01.cfg"
+    dest_iso: "{{ output_test_dir }}/test1.iso"
+    interchange_level: 3
+
+- include_tasks: iso_customize_add_files.yml
+  vars:
+    test_dir: "{{ output_test_dir }}"
+    dest_iso_name: "iso_customize_add.iso"
+
+- include_tasks: iso_customize_delete_files.yml
+  vars:
+    test_dir: "{{ output_test_dir }}"
+    dest_iso_name: "iso_customize_delete.iso"
 
 - name: Delete testing sub-directory
   ansible.builtin.file:

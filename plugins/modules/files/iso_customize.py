@@ -278,11 +278,14 @@ def main():
     argument_spec = dict(
         src_iso=dict(type='path', required=True),
         dest_iso=dict(type='path', required=True),
-        delete_files=dict(type='list', required=False, elements='str'),
-        add_files=dict(type='list', required=False, elements='dict'),
+        delete_files=dict(type='list', elements='str', default=[]),
+        add_files=dict(type='list', elements='dict', default=[]),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
+        required_one_of=[
+          ('delete_files', 'add_files'),
+        ],
         supports_check_mode=False,
     )
     if not HAS_PYCDLIB:
