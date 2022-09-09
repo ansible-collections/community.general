@@ -139,7 +139,7 @@ except ImportError:
 else:
     redis_found = True
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.formatters import human_to_bytes
 from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.redis import (
