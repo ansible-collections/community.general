@@ -72,10 +72,7 @@ EXAMPLES = '''
     update_cache: yes
 '''
 
-import json
 import os
-import shlex
-import sys
 
 from ansible.module_utils.basic import AnsibleModule
 

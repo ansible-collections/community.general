@@ -124,7 +124,6 @@ repo:
 
 import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-import sys
 
 GITHUB_IMP_ERR = None
 try:

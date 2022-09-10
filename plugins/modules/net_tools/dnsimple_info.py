@@ -228,7 +228,6 @@ dnsimple_record_info:
 import traceback
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.basic import missing_required_lib
-import json
 
 try:
     from requests import Request, Session

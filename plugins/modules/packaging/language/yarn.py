@@ -155,7 +155,6 @@ out:
 '''
 
 import os
-import re
 import json
 
 from ansible.module_utils.basic import AnsibleModule
