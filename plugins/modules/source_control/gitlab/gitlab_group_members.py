@@ -152,19 +152,9 @@ EXAMPLES = r'''
 RETURN = r''' # '''
 
 from ansible.module_utils.api import basic_auth_argument_spec
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
-
-import traceback
-
-try:
-    import gitlab
-    HAS_PY_GITLAB = True
-    GITLAB_IMP_ERR = None
-except ImportError:
-    GITLAB_IMP_ERR = traceback.format_exc()
-    HAS_PY_GITLAB = False
+from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication, gitlab
 
 
 class GitLabGroup(object):
@@ -282,9 +272,6 @@ def main():
         ],
         supports_check_mode=True,
     )
-
-    if not HAS_PY_GITLAB:
-        module.fail_json(msg=missing_required_lib('python-gitlab', url='https://python-gitlab.readthedocs.io/en/stable/'), exception=GITLAB_IMP_ERR)
 
     access_level_int = {
         'guest': gitlab.GUEST_ACCESS,
