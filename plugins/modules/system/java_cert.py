@@ -175,8 +175,6 @@ cmd:
 
 import os
 import tempfile
-import random
-import string
 import re
 
 

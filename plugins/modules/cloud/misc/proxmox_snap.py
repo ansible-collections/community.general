@@ -99,7 +99,6 @@ EXAMPLES = r'''
 RETURN = r'''#'''
 
 import time
-import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib, env_fallback
 from ansible.module_utils.common.text.converters import to_native

@@ -170,8 +170,6 @@ instance:
     }
 '''
 
-import re
-
 HAS_XENAPI = False
 try:
     import XenAPI
