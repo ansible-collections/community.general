@@ -160,7 +160,6 @@ config_values:
     alias.diffc: "diff --cached"
     alias.remotev: "remote -v"
 '''
-import os
 
 from ansible.module_utils.basic import AnsibleModule
 

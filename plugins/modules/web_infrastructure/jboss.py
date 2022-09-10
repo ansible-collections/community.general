@@ -73,7 +73,6 @@ EXAMPLES = r"""
 RETURN = r""" # """
 
 import os
-import shutil
 import time
 from ansible.module_utils.basic import AnsibleModule
 

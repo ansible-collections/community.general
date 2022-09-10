@@ -158,7 +158,6 @@ record:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-import os
 
 
 class ResourceRecord(object):

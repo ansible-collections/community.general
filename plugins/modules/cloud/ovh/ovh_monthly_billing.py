@@ -73,8 +73,6 @@ EXAMPLES = '''
 RETURN = '''
 '''
 
-import os
-import sys
 import traceback
 
 try:
