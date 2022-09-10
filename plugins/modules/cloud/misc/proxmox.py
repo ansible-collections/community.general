@@ -140,9 +140,11 @@ options:
     type: str
   unprivileged:
     description:
-      - Indicate if the container should be unprivileged
+      - Indicate if the container should be unprivileged.
+      - >
+        The default value for this parameter is C(false) but that is deprecated
+        and it will be replaced with C(true) in community.general 7.0.0.
     type: bool
-    default: false
   description:
     description:
       - Specify the description for the container. Only used on the configuration web interface.
@@ -565,7 +567,7 @@ def main():
         purge=dict(type='bool', default=False),
         state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted']),
         pubkey=dict(type='str'),
-        unprivileged=dict(type='bool', default=False),
+        unprivileged=dict(type='bool'),
         description=dict(type='str'),
         hookscript=dict(type='str'),
         proxmox_default_behavior=dict(type='str', default='no_defaults', choices=['compatibility', 'no_defaults']),
@@ -606,6 +608,14 @@ def main():
         template_store = module.params['ostemplate'].split(":")[0]
     timeout = module.params['timeout']
     clone = module.params['clone']
+
+    if module.params['unprivileged'] is None:
+        module.params['unprivileged'] = False
+        module.deprecate(
+            'The default value `false` for the parameter "unprivileged" is deprecated and it will be replaced with `true`',
+            version='7.0.0',
+            collection_name='community.general'
+        )
 
     if module.params['proxmox_default_behavior'] == 'compatibility':
         old_default_values = dict(
