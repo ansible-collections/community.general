@@ -866,8 +866,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         timeout = self.module.params['timeout']
 
         while timeout:
-            task = self.proxmox_api.nodes(node).tasks(taskid).status.get()
-            if task['status'] == 'stopped' and task['exitstatus'] == 'OK':
+            if self.api_task_ok(node, taskid):
                 # Wait an extra second as the API can be a ahead of the hypervisor
                 time.sleep(1)
                 return True

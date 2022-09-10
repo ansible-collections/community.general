@@ -119,8 +119,7 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
         else:
             taskid = self.snapshot(vm, vmid).post(snapname=snapname, description=description, vmstate=int(vmstate))
         while timeout:
-            status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
-            if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
+            if self.api_task_ok(vm['node'], taskid):
                 return True
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for creating VM snapshot. Last line in task before timeout: %s' %
@@ -136,8 +135,7 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
 
         taskid = self.snapshot(vm, vmid).delete(snapname, force=int(force))
         while timeout:
-            status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
-            if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
+            if self.api_task_ok(vm['node'], taskid):
                 return True
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for removing VM snapshot. Last line in task before timeout: %s' %
@@ -153,8 +151,7 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
 
         taskid = self.snapshot(vm, vmid)(snapname).post("rollback")
         while timeout:
-            status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
-            if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
+            if self.api_task_ok(vm['node'], taskid):
                 return True
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for rolling back VM snapshot. Last line in task before timeout: %s' %
