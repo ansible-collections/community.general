@@ -145,7 +145,6 @@ system:
   type: dict
 '''
 
-import copy
 import datetime
 import ssl
 
