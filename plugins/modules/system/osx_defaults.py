@@ -304,7 +304,8 @@ class OSXDefaults(object):
         if not isinstance(value, list):
             value = [value]
 
-        rc, out, err = self.module.run_command(self._base_command() + ['write', self.domain, self.key, '-' + self.type] + value)
+        rc, out, err = self.module.run_command(self._base_command() + ['write', self.domain, self.key, '-' + self.type] + value,
+                                               expand_user_and_vars=False)
 
         if rc != 0:
             raise OSXDefaultsException('An error occurred while writing value to defaults: %s' % out)
