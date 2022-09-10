@@ -64,6 +64,14 @@ def find_group(gitlab_instance, identifier):
     return project
 
 
+def ensure_gitlab_package(module):
+    if not HAS_GITLAB_PACKAGE:
+        module.fail_json(
+            msg=missing_required_lib("python-gitlab", url='https://python-gitlab.readthedocs.io/en/stable/'),
+            exception=GITLAB_IMP_ERR
+        )
+
+
 def gitlab_authentication(module):
     gitlab_url = module.params['api_url']
     validate_certs = module.params['validate_certs']
@@ -73,11 +81,7 @@ def gitlab_authentication(module):
     gitlab_oauth_token = module.params['api_oauth_token']
     gitlab_job_token = module.params['api_job_token']
 
-    if not HAS_GITLAB_PACKAGE:
-        module.fail_json(
-            msg=missing_required_lib("python-gitlab", url='https://python-gitlab.readthedocs.io/en/stable/'),
-            exception=GITLAB_IMP_ERR
-        )
+    ensure_gitlab_package(module)
 
     try:
         # python-gitlab library remove support for username/password authentication since 1.13.0

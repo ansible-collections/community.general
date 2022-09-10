@@ -188,7 +188,9 @@ except Exception:
     GITLAB_IMP_ERR = traceback.format_exc()
     HAS_GITLAB_PACKAGE = False
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import (
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package
+)
 
 
 def vars_to_variables(vars, module):
@@ -430,6 +432,7 @@ def main():
         ],
         supports_check_mode=True
     )
+    ensure_gitlab_package(module)
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)

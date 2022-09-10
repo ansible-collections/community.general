@@ -75,7 +75,9 @@ from ansible.module_utils.api import basic_auth_argument_spec
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication, gitlab
+from ansible_collections.community.general.plugins.module_utils.gitlab import (
+    auth_argument_spec, gitlab_authentication, gitlab, ensure_gitlab_package
+)
 
 
 class GitlabProtectedBranch(object):
@@ -155,6 +157,7 @@ def main():
         ],
         supports_check_mode=True
     )
+    ensure_gitlab_package(module)
 
     project = module.params['project']
     name = module.params['name']

@@ -162,7 +162,9 @@ hook:
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, find_project, gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import (
+    auth_argument_spec, find_project, gitlab_authentication, ensure_gitlab_package
+)
 
 
 class GitLabHook(object):
@@ -318,6 +320,7 @@ def main():
         ],
         supports_check_mode=True,
     )
+    ensure_gitlab_package(module)
 
     state = module.params['state']
     project_identifier = module.params['project']

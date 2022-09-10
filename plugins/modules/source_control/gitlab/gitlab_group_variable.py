@@ -164,7 +164,9 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.six import string_types
 from ansible.module_utils.six import integer_types
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import (
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package
+)
 
 
 def vars_to_variables(vars, module):
@@ -407,6 +409,7 @@ def main():
         ],
         supports_check_mode=True
     )
+    ensure_gitlab_package(module)
 
     purge = module.params['purge']
     var_list = module.params['vars']

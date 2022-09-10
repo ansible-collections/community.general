@@ -251,7 +251,9 @@ from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, find_group, find_project, gitlab_authentication, gitlab
+from ansible_collections.community.general.plugins.module_utils.gitlab import (
+    auth_argument_spec, find_group, find_project, gitlab_authentication, gitlab, ensure_gitlab_package
+)
 
 
 class GitLabProject(object):
@@ -435,6 +437,7 @@ def main():
         ],
         supports_check_mode=True,
     )
+    ensure_gitlab_package(module)
 
     group_identifier = module.params['group']
     project_name = module.params['name']
