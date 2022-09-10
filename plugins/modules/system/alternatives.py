@@ -128,7 +128,6 @@ EXAMPLES = r'''
 
 import os
 import re
-import subprocess
 
 from ansible.module_utils.basic import AnsibleModule
 

@@ -296,7 +296,6 @@ from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url, url_argument_spec
 from ansible.module_utils.six import text_type, binary_type
 from ansible.module_utils.common.text.converters import to_native
-import base64
 import hashlib
 import io
 import json
