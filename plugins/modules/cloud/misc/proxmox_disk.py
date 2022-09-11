@@ -12,7 +12,7 @@ DOCUMENTATION = r'''
 ---
 module: proxmox_disk
 short_description: Management of a disk of a Qemu(KVM) VM in a Proxmox VE cluster.
-version_added: 5.5.0
+version_added: 5.6.0
 description:
   - Allows you to perform some supported operations on a disk in Qemu(KVM) Virtual Machines in a Proxmox VE cluster.
 author: "Castor Sky (@castorsky) <csky57@gmail.com>"
