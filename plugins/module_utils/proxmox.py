@@ -140,6 +140,4 @@ class ProxmoxAnsible(object):
 
     def api_task_ok(self, node, taskid):
         status = self.proxmox_api.nodes(node).tasks(taskid).status.get()
-        if status['status'] == 'stopped' and status['exitstatus'] == 'OK':
-            return True
-        return False
+        return status['status'] == 'stopped' and status['exitstatus'] == 'OK'
