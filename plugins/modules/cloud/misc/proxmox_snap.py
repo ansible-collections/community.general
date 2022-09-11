@@ -44,7 +44,8 @@ options:
       - Allows to snapshot a container even if it has configured mountpoints.
       - Temporarily disables all configured mountpoints, takes snapshot, and finally restores original configuration.
       - If running, the container will be stopped and restarted to apply config changes.
-      - Due to restrictions in the Proxmox API this option can only be used authenticating as I(root@pam) with I(api_password) set, API tokens don't work either. See U(https://pve.proxmox.com/pve-docs/api-viewer/#/nodes/{node}/lxc/{vmid}/config) (PUT tab) for more details.
+      - Due to restrictions in the Proxmox API this option can only be used authenticating as I(root@pam) with I(api_password) set, API tokens don't work either.
+      - See U(https://pve.proxmox.com/pve-docs/api-viewer/#/nodes/{node}/lxc/{vmid}/config) (PUT tab) for more details.
     default: false
     type: bool
   vmstate:
@@ -138,7 +139,7 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
     def _container_mp_get(self, vm, vmid):
         cfg = self.vmconfig(vm, vmid).get()
         mountpoints = {}
-        for key,value in cfg.items():
+        for key, value in cfg.items():
             if key.startswith('mp'):
                 mountpoints[key] = value
         return mountpoints
@@ -194,7 +195,10 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
                 # The correct permissions are required only to reconfig mounts.
                 # Not checking now would allow to remove the configuration BUT
                 # fail later, leaving the container in a misconfigured state.
-                if self.module.params['api_user'] != 'root@pam' or not self.module.params['api_password']:
+                if (
+                    self.module.params['api_user'] != 'root@pam' 
+                    or not self.module.params['api_password']
+                ):
                     self.module.fail_json(msg='Snapshot with `unbind=True` can only be performed authenticating as `root@pam` with `api_password`, API tokens are not supported.')
                     return False
                 mountpoints = self._container_mp_get(vm, vmid)
