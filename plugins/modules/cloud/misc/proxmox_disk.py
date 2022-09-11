@@ -38,7 +38,7 @@ options:
         for VirtIO: 0-15;
         for Unused: 0-255.
     type: str
-    required: True
+    required: true
   state:
     description:
       - Indicates desired state of the disk.
@@ -53,9 +53,9 @@ options:
   force_replace:
     description:
       - Force replace existing attached disk with the new one leaving old disk unused.
-      - When disk exists and I(force_replace=False) creation will be silently skipped.
+      - When disk exists and I(force_replace=false) creation will be silently skipped.
     type: bool
-    default: False
+    default: false
   storage:
     description:
       - The drive's backing storage.
@@ -299,7 +299,7 @@ EXAMPLES = '''
     api_token_secret: some-token-data
     name: vm-name
     disk: scsi3
-    backup: True
+    backup: true
     cache: none
     storage: local-zfs
     size: 5
@@ -316,7 +316,7 @@ EXAMPLES = '''
     format: qcow2
     storage: local
     size: 16
-    force_replace: True
+    force_replace: true
     state: present
 
 - name: Update existing disk
@@ -327,8 +327,8 @@ EXAMPLES = '''
     api_token_secret: some-token-data
     vmid: 101
     disk: ide0
-    backup: False
-    ro: True
+    backup: false
+    ro: true
     aio: native
     state: updated
 
