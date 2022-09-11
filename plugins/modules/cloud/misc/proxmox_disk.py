@@ -46,9 +46,18 @@ options:
         I(state=present) intended only for creating new disk (with or without replacing existing disk,
         see I(force_replace) option).
       - For changing options in existing disk use I(state=updated). Options will be replaced, not appended.
-      - When I(state=detached) and disk is C(unused[n]) it will be left in same state (not removed).
+      - >
+        Use I(state=detached) to detach existing disk from VM but do not remove it entirely.
+        When I(state=detached) and disk is C(unused[n]) it will be left in same state (not removed).
+      - >
+        I(state=moved) may be used to change backing storage for the disk in bounds of the same VM
+        or to send the disk to another VM (using the same backing storage).
+      - >
+        I(state=resized) intended to change the disk size. As of Proxmox 7.2 you can only increase the disk size
+        because shrinking disks is not supported by the PVE API and has to be done manually.
+      - To entirely remove the disk from backing storage use I(state=absent).
     type: str
-    choices: ['present', 'updated', 'grown', 'detached', 'moved', 'absent']
+    choices: ['present', 'updated', 'resized', 'detached', 'moved', 'absent']
     default: present
   force_replace:
     description:
@@ -65,7 +74,7 @@ options:
     description:
       - Desired volume size in GB to allocate when I(state=present) (specify I(size) without suffix).
       - >
-        New (or additional) size of volume when I(state=grown). With the C(+) sign
+        New (or additional) size of volume when I(state=resized). With the C(+) sign
         the value is added to the actual size of the volume
         and without it, the value is taken as an absolute one.
     type: str
@@ -341,7 +350,7 @@ EXAMPLES = '''
     vmid: 101
     disk: sata4
     size: +5G
-    state: grown
+    state: resized
 
 - name: Detach disk (leave it unused)
   community.general.proxmox_disk:
@@ -586,7 +595,7 @@ def main():
         disk=dict(type='str', required=True),
         storage=dict(type='str'),
         size=dict(type='str'),
-        state=dict(type='str', choices=['present', 'updated', 'grown', 'detached', 'moved', 'absent'],
+        state=dict(type='str', choices=['present', 'updated', 'resized', 'detached', 'moved', 'absent'],
                    default='present'),
         force_replace=dict(type='bool', default=False),
     )
@@ -599,7 +608,7 @@ def main():
         required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
         required_if=[
             ('state', 'present', ['storage']),
-            ('state', 'grown', ['size'])
+            ('state', 'resized', ['size'])
         ],
         required_by={
             'target_disk': 'target_vmid',
@@ -663,7 +672,7 @@ def main():
             module.fail_json(vmid=vmid, msg='Unable to create disk %s in VM %s: %s' % (disk, vmid, str(e)))
 
     # Do not try to perform actions on missing disk
-    if disk not in vm_config and state in ['updated', 'grown', 'moved']:
+    if disk not in vm_config and state in ['updated', 'resized', 'moved']:
         module.fail_json(vmid=vmid, msg='Unable to process missing disk %s in VM %s' % (disk, vmid))
 
     elif state == 'absent':
@@ -707,7 +716,7 @@ def main():
         except Exception as e:
             module.fail_json(msg="Failed to move disk %s in VM %s with exception: %s" % (disk, vmid, str(e)))
 
-    elif state == 'grown':
+    elif state == 'resized':
         try:
             size = module.params['size']
             if not match(r'^\+?\d+(\.\d+)?[KMGT]?$', size):
