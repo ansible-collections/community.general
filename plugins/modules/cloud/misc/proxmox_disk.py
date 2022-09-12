@@ -177,7 +177,7 @@ options:
       - Volume string format
       - C(<STORAGE>:<VMID>/<FULL_NAME>) or C(<ABSOLUTE_PATH>/<FULL_NAME>)
       - Attention! Only root can use absolute paths.
-      - This parameter is mutually exclusive with I(size). 
+      - This parameter is mutually exclusive with I(size).
     type: str
   iops:
     description:
