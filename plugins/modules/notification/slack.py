@@ -69,7 +69,8 @@ options:
   message_id:
     description:
       - Optional. Message ID to edit, instead of posting a new message.
-        Corresponds to C(ts) in the Slack API (U(https://api.slack.com/messaging/modifying)).
+      - If supplied I(channel_id) must be in form of C(C0xxxxxxx). use C({{ slack_response.channel_id }}) to get I(channel_id) from previous task run.
+      - Corresponds to C(ts) in the Slack API (U(https://api.slack.com/messaging/modifying)).
     type: str
     version_added: 1.2.0
   username:
@@ -234,6 +235,8 @@ EXAMPLES = """
 - name: Edit message
   community.general.slack:
     token: thetoken/generatedby/slack
+    # The 'channel' option does not accept the channel name. It must use the 'channel_id',
+    # which can be retrieved for example from 'slack_response' from the previous task.
     channel: "{{ slack_response.channel }}"
     msg: Deployment complete!
     message_id: "{{ slack_response.ts }}"
@@ -294,7 +297,7 @@ def build_payload_for_slack(text, channel, thread_id, username, icon_url, icon_e
         # With a custom color we have to set the message as attachment, and explicitly turn markdown parsing on for it.
         payload = dict(attachments=[dict(text=escape_quotes(text), color=color, mrkdwn_in=["text"])])
     if channel is not None:
-        if channel.startswith(('#', '@', 'C0', 'GF', 'G0')):
+        if channel.startswith(('#', '@', 'C0', 'GF', 'G0', 'CP')):
             payload['channel'] = channel
         else:
             payload['channel'] = '#' + channel
