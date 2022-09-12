@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - proxmox_kvm - replace new condition with proper condition to allow for using ``vmid`` on update (https://github.com/ansible-collections/community.general/pull/5206).
