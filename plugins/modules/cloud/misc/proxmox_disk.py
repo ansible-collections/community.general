@@ -58,7 +58,7 @@ options:
         because shrinking disks is not supported by the PVE API and has to be done manually.
       - To entirely remove the disk from backing storage use I(state=absent).
     type: str
-    choices: ['present', 'updated', 'resized', 'detached', 'moved', 'absent']
+    choices: ['present', 'resized', 'detached', 'moved', 'absent']
     default: present
   create:
     description:
