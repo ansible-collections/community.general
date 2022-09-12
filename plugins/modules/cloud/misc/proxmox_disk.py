@@ -682,7 +682,8 @@ def main():
     except Exception as e:
         proxmox.module.fail_json(msg='Getting information for VM %s failed with exception: %s' % (vmid, str(e)))
 
-    if state == 'present':
+    update = module.params['update']
+    if state == 'present' and not update:
         try:
             if proxmox.create_disk(disk, vmid, vm, vm_config):
                 module.exit_json(changed=True, vmid=vmid, msg="Disk %s created in VM %s" % (disk, vmid))
@@ -695,16 +696,7 @@ def main():
     if disk not in vm_config and state in ['updated', 'resized', 'moved']:
         module.fail_json(vmid=vmid, msg='Unable to process missing disk %s in VM %s' % (disk, vmid))
 
-    elif state == 'absent':
-        try:
-            if disk not in vm_config:
-                module.exit_json(changed=False, vmid=vmid, msg="Disk %s is already absent in VM %s" % (disk, vmid))
-            proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).unlink.put(vmid=vmid, idlist=disk, force=1)
-            module.exit_json(changed=True, vmid=vmid, msg="Disk %s removed from VM %s" % (disk, vmid))
-        except Exception as e:
-            module.fail_json(vmid=vmid, msg='Unable to remove disk %s from VM %s: %s' % (disk, vmid, str(e)))
-
-    elif state == 'updated':
+    elif (state == 'updated') or (state == 'present' and update):
         try:
             if proxmox.update_disk(disk, vmid, vm, vm_config):
                 module.exit_json(changed=True, vmid=vmid, msg="Disk %s updated in VM %s" % (disk, vmid))
@@ -749,6 +741,15 @@ def main():
             module.exit_json(changed=True, vmid=vmid, msg="Disk %s resized in VM %s" % (disk, vmid))
         except Exception as e:
             module.fail_json(msg="Failed to resize disk %s in VM %s with exception: %s" % (disk, vmid, str(e)))
+
+    elif state == 'absent':
+        try:
+            if disk not in vm_config:
+                module.exit_json(changed=False, vmid=vmid, msg="Disk %s is already absent in VM %s" % (disk, vmid))
+            proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).unlink.put(vmid=vmid, idlist=disk, force=1)
+            module.exit_json(changed=True, vmid=vmid, msg="Disk %s removed from VM %s" % (disk, vmid))
+        except Exception as e:
+            module.fail_json(vmid=vmid, msg='Unable to remove disk %s from VM %s: %s' % (disk, vmid, str(e)))
 
 
 if __name__ == '__main__':
