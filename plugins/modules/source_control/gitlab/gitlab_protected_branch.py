@@ -70,22 +70,14 @@ EXAMPLES = '''
 RETURN = '''
 '''
 
-import traceback
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
-GITLAB_IMP_ERR = None
-try:
-    import gitlab
-    HAS_GITLAB_PACKAGE = True
-except Exception:
-    GITLAB_IMP_ERR = traceback.format_exc()
-    HAS_GITLAB_PACKAGE = False
-
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import (
+    auth_argument_spec, gitlab_authentication, gitlab, ensure_gitlab_package
+)
 
 
 class GitlabProtectedBranch(object):
@@ -165,15 +157,13 @@ def main():
         ],
         supports_check_mode=True
     )
+    ensure_gitlab_package(module)
 
     project = module.params['project']
     name = module.params['name']
     merge_access_levels = module.params['merge_access_levels']
     push_access_level = module.params['push_access_level']
     state = module.params['state']
-
-    if not HAS_GITLAB_PACKAGE:
-        module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
     gitlab_version = gitlab.__version__
     if LooseVersion(gitlab_version) < LooseVersion('2.3.0'):
