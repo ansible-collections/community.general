@@ -159,21 +159,14 @@ group_variable:
       sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
 '''
 
-import traceback
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.six import string_types
 from ansible.module_utils.six import integer_types
 
-GITLAB_IMP_ERR = None
-try:
-    import gitlab
-    HAS_GITLAB_PACKAGE = True
-except Exception:
-    GITLAB_IMP_ERR = traceback.format_exc()
-    HAS_GITLAB_PACKAGE = False
-
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import (
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package
+)
 
 
 def vars_to_variables(vars, module):
@@ -416,9 +409,7 @@ def main():
         ],
         supports_check_mode=True
     )
-
-    if not HAS_GITLAB_PACKAGE:
-        module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
+    ensure_gitlab_package(module)
 
     purge = module.params['purge']
     var_list = module.params['vars']
