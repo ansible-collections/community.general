@@ -159,22 +159,12 @@ hook:
   type: dict
 '''
 
-import re
-import traceback
-
-GITLAB_IMP_ERR = None
-try:
-    import gitlab
-    HAS_GITLAB_PACKAGE = True
-except Exception:
-    GITLAB_IMP_ERR = traceback.format_exc()
-    HAS_GITLAB_PACKAGE = False
-
 from ansible.module_utils.api import basic_auth_argument_spec
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, find_project, gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import (
+    auth_argument_spec, find_project, gitlab_authentication, ensure_gitlab_package
+)
 
 
 class GitLabHook(object):
@@ -330,6 +320,7 @@ def main():
         ],
         supports_check_mode=True,
     )
+    ensure_gitlab_package(module)
 
     state = module.params['state']
     project_identifier = module.params['project']
@@ -345,9 +336,6 @@ def main():
     wiki_page_events = module.params['wiki_page_events']
     enable_ssl_verification = module.params['hook_validate_certs']
     hook_token = module.params['token']
-
-    if not HAS_GITLAB_PACKAGE:
-        module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
     gitlab_instance = gitlab_authentication(module)
 

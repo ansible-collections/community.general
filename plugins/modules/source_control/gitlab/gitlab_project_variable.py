@@ -176,7 +176,6 @@ project_variable:
 
 import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.six import string_types
 from ansible.module_utils.six import integer_types
@@ -189,7 +188,9 @@ except Exception:
     GITLAB_IMP_ERR = traceback.format_exc()
     HAS_GITLAB_PACKAGE = False
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import (
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package
+)
 
 
 def vars_to_variables(vars, module):
@@ -431,6 +432,7 @@ def main():
         ],
         supports_check_mode=True
     )
+    ensure_gitlab_package(module)
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
