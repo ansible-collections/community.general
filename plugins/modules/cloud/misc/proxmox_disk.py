@@ -43,8 +43,11 @@ options:
     description:
       - Indicates desired state of the disk.
       - >
-        I(state=present) intended only for creating new disk (with or without replacing existing disk,
-        see I(force_replace) option).
+        I(state=present) can be used to create, replace disk or update options in existing disk. When both parameters
+        I(force_replace) and I(update) are C(false) I(state=present) will create new disk only if there is no
+        existing disk (otherwise action will be skipped). When I(force_replace=true) and the disk exists it will
+        be replaced with new one and old disk will be kept as C(unused[n]). When I(update=true) existing disk will be
+        updated with new set of options (previous options will be replaced).
       - For changing options in existing disk use I(state=updated). Options will be replaced, not appended.
       - >
         Use I(state=detached) to detach existing disk from VM but do not remove it entirely.
@@ -63,6 +66,13 @@ options:
     description:
       - Force replace existing attached disk with the new one leaving old disk unused.
       - When disk exists and I(force_replace=false) creation will be silently skipped.
+      - Mutually exclusive with I(update).
+    type: bool
+    default: false
+  update:
+    description:
+      - Force update options in existing disk when I(state=present).
+      - Mutually exclusive with I(force_replace).
     type: bool
     default: false
   storage:
@@ -97,14 +107,15 @@ options:
     type: str
   target_storage:
     description:
-      - Target storage.
-      - Used only when I(state=moved).
+      - Move the disk to this storage when I(state=moved).
       - You can move between storages only in scope of one VM.
+      - Mutually exclusive with I(target_vmid).
     type: str
   target_vmid:
     description:
-      - The (unique) ID of the VM.
-      - Used only when I(state=moved).
+      - The (unique) ID of the VM where disk will be placed when I(state=moved).
+      - You can move disk between VMs only when the same storage is used.
+      - Mutually exclusive with I(target_vmid).
     type: int
   timeout:
     description:
@@ -166,10 +177,12 @@ options:
       - Volume string format
       - C(<STORAGE>:<VMID>/<FULL_NAME>) or C(<ABSOLUTE_PATH>/<FULL_NAME>)
       - Attention! Only root can use absolute paths.
+      - This parameter is mutually exclusive with I(size). 
     type: str
   iops:
     description:
       - Maximum total r/w I/O in operations per second.
+      - You can specify either total limit or per operation (mutually exclusive with I(iops_rd) and I(iops_wr)).
     type: int
   iops_max:
     description:
@@ -182,6 +195,7 @@ options:
   iops_rd:
     description:
       - Maximum read I/O in operations per second.
+      - You can specify either read or total limit (mutually exclusive with I(iops)).
     type: int
   iops_rd_max:
     description:
@@ -194,6 +208,7 @@ options:
   iops_wr:
     description:
       - Maximum write I/O in operations per second.
+      - You can specify either write or total limit (mutually exclusive with I(iops)).
     type: int
   iops_wr_max:
     description:
@@ -211,7 +226,8 @@ options:
     description:
       - Maximum total r/w speed in megabytes per second.
       - Can be fractional but use with caution - fractionals less than 1 are not supported officially.
-    type: float
+      - You can specify either total limit or per operation (mutually exclusive with I(mbps_rd) and I(mbps_wr)).
+   type: float
   mbps_max:
     description:
       - Maximum unthrottled total r/w pool in megabytes per second.
@@ -219,6 +235,7 @@ options:
   mbps_rd:
     description:
       - Maximum read speed in megabytes per second.
+      - You can specify either read or total limit (mutually exclusive with I(mbps)).
     type: float
   mbps_rd_max:
     description:
@@ -227,7 +244,8 @@ options:
   mbps_wr:
     description:
       - Maximum write speed in megabytes per second.
-    type: float
+      - You can specify either write or total limit (mutually exclusive with I(mbps)).
+   type: float
   mbps_wr_max:
     description:
       - Maximum unthrottled write pool in megabytes per second.
@@ -598,6 +616,7 @@ def main():
         state=dict(type='str', choices=['present', 'updated', 'resized', 'detached', 'moved', 'absent'],
                    default='present'),
         force_replace=dict(type='bool', default=False),
+        update=dict(type='bool', default=False),
     )
 
     module_args.update(disk_args)
@@ -608,7 +627,7 @@ def main():
         required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
         required_if=[
             ('state', 'present', ['storage']),
-            ('state', 'resized', ['size'])
+            ('state', 'resized', ['size']),
         ],
         required_by={
             'target_disk': 'target_vmid',
@@ -623,7 +642,7 @@ def main():
             'iops_wr_max': 'iops_wr',
             'iops_max_length': 'iops_max',
             'iops_rd_max_length': 'iops_rd_max',
-            'iops_wr_max_length': 'iops_wr_max'
+            'iops_wr_max_length': 'iops_wr_max',
         },
         supports_check_mode=False,
         mutually_exclusive=[
@@ -633,6 +652,7 @@ def main():
             ('iops', 'iops_rd'),
             ('iops', 'iops_wr'),
             ('import_from', 'size'),
+            ('force_replace', 'update'),
         ]
     )
 
