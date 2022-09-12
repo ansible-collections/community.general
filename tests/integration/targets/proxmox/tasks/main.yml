@@ -354,9 +354,9 @@
       that:
       - results is not changed
       - results.vmid == {{ vmid }}
-      - results.msg == "Disk {{ disk }} already exists in VM {{ vmid }}."
+      - results.msg == "Disk {{ disk }} is up to date in VM {{ vmid }}"
 
-  - name: Add new disk replacing existing disk (detach latter)
+  - name: Add new disk replacing existing disk (detach old and leave unused)
     proxmox_disk:
       api_host: "{{ api_host }}"
       api_user: "{{ user }}@{{ domain }}"
@@ -366,8 +366,8 @@
       vmid: "{{ vmid }}"
       disk: "{{ disk }}"
       storage: "{{ storage }}"
-      size: 1
-      force_replace: True
+      size: 2
+      create: forced
       state: present
     register: results
 
@@ -392,7 +392,7 @@
       backup: False
       ro: True
       aio: native
-      state: updated
+      state: present
     register: results
 
   - assert:
@@ -414,7 +414,7 @@
       vmid: "{{ vmid }}"
       disk: "{{ disk }}"
       size: +1G
-      state: grown
+      state: resized
     register: results
 
   - assert:

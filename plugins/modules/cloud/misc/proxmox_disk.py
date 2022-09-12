@@ -43,12 +43,10 @@ options:
     description:
       - Indicates desired state of the disk.
       - >
-        I(state=present) can be used to create, replace disk or update options in existing disk. When both parameters
-        I(force_replace) and I(update) are C(false) I(state=present) will create new disk only if there is no
-        existing disk (otherwise action will be skipped). When I(force_replace=true) and the disk exists it will
-        be replaced with new one and old disk will be kept as C(unused[n]). When I(update=true) existing disk will be
-        updated with new set of options (previous options will be replaced).
-      - For changing options in existing disk use I(state=updated). Options will be replaced, not appended.
+        I(state=present) can be used to create, replace disk or update options in existing disk. It will create missing
+        disk or update options in existing one by default. See the I(create) parameter description to control behavior
+        of this option.
+      - Some updates on options (like I(cache)) are not being applied instantly and require VM restart.
       - >
         Use I(state=detached) to detach existing disk from VM but do not remove it entirely.
         When I(state=detached) and disk is C(unused[n]) it will be left in same state (not removed).
@@ -62,19 +60,15 @@ options:
     type: str
     choices: ['present', 'updated', 'resized', 'detached', 'moved', 'absent']
     default: present
-  force_replace:
+  create:
     description:
-      - Force replace existing attached disk with the new one leaving old disk unused.
-      - When disk exists and I(force_replace=false) creation will be silently skipped.
-      - Mutually exclusive with I(update).
-    type: bool
-    default: false
-  update:
-    description:
-      - Force update options in existing disk when I(state=present).
-      - Mutually exclusive with I(force_replace).
-    type: bool
-    default: false
+      - With I(create) flag you can control behavior of I(state=present).
+      - When I(create=disabled) it will not create new disk (if not exists) but will update options in existing disk.
+      - When I(create=regular) it will either create new disk (if not exists) or update options in existing disk.
+      - When I(create=forced) it will always create new disk (if disk exists it will be detached and left unused).
+    type: str
+    choices: ['disabled', 'regular', 'forced']
+    default: regular
   storage:
     description:
       - The drive's backing storage.
@@ -343,7 +337,7 @@ EXAMPLES = '''
     format: qcow2
     storage: local
     size: 16
-    force_replace: true
+    create: forced
     state: present
 
 - name: Update existing disk
@@ -357,7 +351,7 @@ EXAMPLES = '''
     backup: false
     ro: true
     aio: native
-    state: updated
+    state: present
 
 - name: Grow existing disk
   community.general.proxmox_disk:
@@ -468,7 +462,7 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         unused=range(0, 256)
     )
 
-    def get_create_update_attributes(self):
+    def get_create_attributes(self):
         # Sanitize parameters dictionary:
         # - Remove not defined args
         # - Ensure True and False converted to int.
@@ -478,45 +472,48 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         return params
 
     def create_disk(self, disk, vmid, vm, vm_config):
-        # Would not replace existing disk without 'force' flag
-        force_replace = self.module.params['force_replace']
-        if not force_replace and disk in vm_config:
-            return False
+        create = self.module.params['create']
+        if create == 'disabled' and disk not in vm_config:
+            # NOOP
+            return False, "Disk %s not found in VM %s and creation was disabled in parameters." % (disk, vmid)
 
-        attributes = self.get_create_update_attributes()
-        import_string = attributes.pop('import_from', None)
+        if (create == 'regular' and disk not in vm_config) or (create == 'forced'):
+            # CREATE
+            attributes = self.get_create_attributes()
+            import_string = attributes.pop('import_from', None)
 
-        if import_string:
-            config_str = "%s:%s,import-from=%s" % (self.module.params["storage"], "0", import_string)
-        else:
-            config_str = "%s:%s" % (self.module.params["storage"], self.module.params["size"])
+            if import_string:
+                config_str = "%s:%s,import-from=%s" % (self.module.params["storage"], "0", import_string)
+            else:
+                config_str = "%s:%s" % (self.module.params["storage"], self.module.params["size"])
 
-        for k, v in attributes.items():
-            config_str += ',%s=%s' % (k, v)
+            for k, v in attributes.items():
+                config_str += ',%s=%s' % (k, v)
 
-        create_disk = {self.module.params["disk"]: config_str}
-        self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**create_disk)
-        return True
+            create_disk = {self.module.params["disk"]: config_str}
+            self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**create_disk)
+            return True, "Disk %s created in VM %s" % (disk, vmid)
 
-    def update_disk(self, disk, vmid, vm, vm_config):
-        disk_config = disk_conf_str_to_dict(vm_config[disk])
-        config_str = disk_config["volume"]
-        attributes = self.get_create_update_attributes()
+        if create in ['disabled', 'regular'] and disk in vm_config:
+            # UPDATE
+            disk_config = disk_conf_str_to_dict(vm_config[disk])
+            config_str = disk_config["volume"]
+            attributes = self.get_create_attributes()
 
-        for k, v in attributes.items():
-            config_str += ',%s=%s' % (k, v)
+            for k, v in attributes.items():
+                config_str += ',%s=%s' % (k, v)
 
-        # Now compare old and new config to detect if changes are needed
-        for option in ['size', 'storage_name', 'volume', 'volume_name']:
-            attributes.update({option: disk_config[option]})
-        # Values in params are numbers, but strings are needed to compare with disk_config
-        attributes = dict((k, str(v)) for k, v in attributes.items())
-        if disk_config == attributes:
-            return False
+            # Now compare old and new config to detect if changes are needed
+            for option in ['size', 'storage_name', 'volume', 'volume_name']:
+                attributes.update({option: disk_config[option]})
+            # Values in params are numbers, but strings are needed to compare with disk_config
+            attributes = dict((k, str(v)) for k, v in attributes.items())
+            if disk_config == attributes:
+                return False, "Disk %s is up to date in VM %s" % (disk, vmid)
 
-        update_disk = {self.module.params["disk"]: config_str}
-        self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**update_disk)
-        return True
+            update_disk = {self.module.params["disk"]: config_str}
+            self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**update_disk)
+            return True, "Disk %s updated in VM %s" % (disk, vmid)
 
     def move_disk(self, disk, vmid, vm, vm_config):
         params = dict()
@@ -613,10 +610,9 @@ def main():
         disk=dict(type='str', required=True),
         storage=dict(type='str'),
         size=dict(type='str'),
-        state=dict(type='str', choices=['present', 'updated', 'resized', 'detached', 'moved', 'absent'],
+        state=dict(type='str', choices=['present', 'resized', 'detached', 'moved', 'absent'],
                    default='present'),
-        force_replace=dict(type='bool', default=False),
-        update=dict(type='bool', default=False),
+        create=dict(type='str', choices=['disabled', 'regular', 'forced'], default='regular'),
     )
 
     module_args.update(disk_args)
@@ -626,7 +622,7 @@ def main():
         required_together=[('api_token_id', 'api_token_secret')],
         required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
         required_if=[
-            ('state', 'present', ['storage']),
+            ('create', 'forced', ['storage']),
             ('state', 'resized', ['size']),
         ],
         required_by={
@@ -652,7 +648,6 @@ def main():
             ('iops', 'iops_rd'),
             ('iops', 'iops_wr'),
             ('import_from', 'size'),
-            ('force_replace', 'update'),
         ]
     )
 
@@ -682,28 +677,19 @@ def main():
     except Exception as e:
         proxmox.module.fail_json(msg='Getting information for VM %s failed with exception: %s' % (vmid, str(e)))
 
-    update = module.params['update']
-    if state == 'present' and not update:
-        try:
-            if proxmox.create_disk(disk, vmid, vm, vm_config):
-                module.exit_json(changed=True, vmid=vmid, msg="Disk %s created in VM %s" % (disk, vmid))
-            else:
-                module.exit_json(changed=False, vmid=vmid, msg="Disk %s already exists in VM %s." % (disk, vmid))
-        except Exception as e:
-            module.fail_json(vmid=vmid, msg='Unable to create disk %s in VM %s: %s' % (disk, vmid, str(e)))
-
     # Do not try to perform actions on missing disk
-    if disk not in vm_config and state in ['updated', 'resized', 'moved']:
+    if disk not in vm_config and state in ['resized', 'moved']:
         module.fail_json(vmid=vmid, msg='Unable to process missing disk %s in VM %s' % (disk, vmid))
 
-    elif (state == 'updated') or (state == 'present' and update):
+    if state == 'present':
         try:
-            if proxmox.update_disk(disk, vmid, vm, vm_config):
-                module.exit_json(changed=True, vmid=vmid, msg="Disk %s updated in VM %s" % (disk, vmid))
+            success, message = proxmox.create_disk(disk, vmid, vm, vm_config)
+            if success:
+                module.exit_json(changed=True, vmid=vmid, msg=message)
             else:
-                module.exit_json(changed=False, vmid=vmid, msg="Disk %s up to date in VM %s" % (disk, vmid))
+                module.exit_json(changed=False, vmid=vmid, msg=message)
         except Exception as e:
-            module.fail_json(msg="Failed to updated disk %s in VM %s with exception: %s" % (disk, vmid, str(e)))
+            module.fail_json(vmid=vmid, msg='Unable to create/update disk %s in VM %s: %s' % (disk, vmid, str(e)))
 
     elif state == 'detached':
         try:
