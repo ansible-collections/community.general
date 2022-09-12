@@ -14,10 +14,9 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
 try:
-    from urllib import quote_plus  # Python 2.X
     from urlparse import urljoin
 except ImportError:
-    from urllib.parse import quote_plus, urljoin  # Python 3+
+    from urllib.parse import urljoin  # Python 3+
 
 import traceback
 
@@ -27,6 +26,7 @@ try:
     import requests
     HAS_GITLAB_PACKAGE = True
 except Exception:
+    gitlab = None
     GITLAB_IMP_ERR = traceback.format_exc()
     HAS_GITLAB_PACKAGE = False
 
@@ -64,6 +64,14 @@ def find_group(gitlab_instance, identifier):
     return project
 
 
+def ensure_gitlab_package(module):
+    if not HAS_GITLAB_PACKAGE:
+        module.fail_json(
+            msg=missing_required_lib("python-gitlab", url='https://python-gitlab.readthedocs.io/en/stable/'),
+            exception=GITLAB_IMP_ERR
+        )
+
+
 def gitlab_authentication(module):
     gitlab_url = module.params['api_url']
     validate_certs = module.params['validate_certs']
@@ -73,8 +81,7 @@ def gitlab_authentication(module):
     gitlab_oauth_token = module.params['api_oauth_token']
     gitlab_job_token = module.params['api_job_token']
 
-    if not HAS_GITLAB_PACKAGE:
-        module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
+    ensure_gitlab_package(module)
 
     try:
         # python-gitlab library remove support for username/password authentication since 1.13.0
