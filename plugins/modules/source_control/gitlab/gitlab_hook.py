@@ -223,9 +223,8 @@ class GitLabHook(object):
                 hook.save()
             except Exception as e:
                 self._module.fail_json(msg="Failed to update hook: %s " % e)
-            return True
-        else:
-            return False
+
+        return changed
 
     '''
     @param project Project Object
@@ -247,9 +246,9 @@ class GitLabHook(object):
         changed = False
 
         for arg_key, arg_value in arguments.items():
-            if arguments[arg_key] is not None:
-                if getattr(hook, arg_key, None) != arguments[arg_key]:
-                    setattr(hook, arg_key, arguments[arg_key])
+            if arg_value is not None:
+                if getattr(hook, arg_key, None) != arg_value:
+                    setattr(hook, arg_key, arg_value)
                     changed = True
 
         return (changed, hook)
@@ -277,10 +276,8 @@ class GitLabHook(object):
         return False
 
     def delete_hook(self):
-        if self._module.check_mode:
-            return True
-
-        return self.hook_object.delete()
+        if not self._module.check_mode:
+            self.hook_object.delete()
 
 
 def main():
