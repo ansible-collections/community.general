@@ -227,7 +227,7 @@ options:
       - Maximum total r/w speed in megabytes per second.
       - Can be fractional but use with caution - fractionals less than 1 are not supported officially.
       - You can specify either total limit or per operation (mutually exclusive with I(mbps_rd) and I(mbps_wr)).
-   type: float
+    type: float
   mbps_max:
     description:
       - Maximum unthrottled total r/w pool in megabytes per second.
@@ -245,7 +245,7 @@ options:
     description:
       - Maximum write speed in megabytes per second.
       - You can specify either write or total limit (mutually exclusive with I(mbps)).
-   type: float
+    type: float
   mbps_wr_max:
     description:
       - Maximum unthrottled write pool in megabytes per second.
