@@ -15,8 +15,7 @@ module: iso_customize
 short_description: Add/remove/change files in ISO file
 description:
   - This module is used to add/remove/change files in ISO file.
-  - The module will always execute all I(delete_files) actions first, then all I(add_files) actions.
-  - We can change an existing file inside the ISO image by combining options I(delete_files) and I(add_files).
+  - The file inside ISO will be overwritten if it exists by option I(add_files).
 author:
   - Yuhua Zou (@ZouYuhua) <zouy@vmware.com>
 requirements:
@@ -69,7 +68,6 @@ EXAMPLES = r'''
     dest_iso: "/path/to/ubuntu-22.04-desktop-amd64-customized.iso"
     delete_files:
       - "/boot.catalog"
-      - "/preseed/ubuntu.seed"
     add_files:
       - src_file: "/path/to/grub.cfg"
         dest_file: "/boot/grub/grub.cfg"
@@ -153,6 +151,19 @@ def iso_add_dirs(module, opened_iso, iso_type, dir_path):
         iso_add_dir(module, opened_iso, iso_type, current_dirpath)
 
 
+def iso_rr_check_file_exist(opened_iso, dest_file):
+    try:
+        record = opened_iso.get_record(rr_path=dest_file)
+        # The record present file or directory
+        if record and record.is_file():
+            return True
+    except Exception:
+        # If we get exception, that means the file does not exists
+        pass
+
+    return False
+
+
 def iso_add_file(module, opened_iso, iso_type, src_file, dest_file):
     dest_file = dest_file.strip()
     if dest_file[0] != "/":
@@ -174,6 +185,10 @@ def iso_add_file(module, opened_iso, iso_type, src_file, dest_file):
         if iso_type == "iso9660":
             opened_iso.add_file(file_local, iso_path=file_in_iso_path)
         elif iso_type == "rr":
+            # For ISO with Rock Ridge 1.09 / 1.10, it won't overwrite the existing file
+            # So we take workaround here: delete the existing file and then add file
+            if iso_rr_check_file_exist(opened_iso, dest_file):
+                opened_iso.rm_hard_link(iso_path=file_in_iso_path)
             opened_iso.add_file(file_local, iso_path=file_in_iso_path, rr_name=file_name)
         elif iso_type == "joliet":
             opened_iso.add_file(file_local, iso_path=file_in_iso_path, joliet_path=dest_file)
