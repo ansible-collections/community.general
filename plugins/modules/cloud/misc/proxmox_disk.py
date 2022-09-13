@@ -499,6 +499,8 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
             disk_config = disk_conf_str_to_dict(vm_config[disk])
             config_str = disk_config["volume"]
             attributes = self.get_create_attributes()
+            # 'import_from' fails on disk updates
+            attributes.pop('import_from', None)
 
             for k, v in attributes.items():
                 config_str += ',%s=%s' % (k, v)
