@@ -5,7 +5,7 @@
 
 namespace: community
 name: general
-version: 5.6.0
+version: 5.7.0
 readme: README.md
 authors:
   - Ansible (https://github.com/ansible)
