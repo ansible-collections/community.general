@@ -59,6 +59,10 @@ options:
         - The absolute path of the file inside the ISO file.
         type: str
         required: true
+notes:
+- The function "add_file" in pycdlib will overwrite the existing file in ISO with type ISO9660 / Rock Ridge 1.12 / Joliet / UDF.
+- But it won't overwrite the existing file in ISO with Rock Ridge 1.09 / 1.10.
+- So we take workaround: delete the existing file and then add file for ISO with Rock Ridge.
 '''
 
 EXAMPLES = r'''
