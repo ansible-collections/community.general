@@ -599,14 +599,17 @@ class OnePass(object):
 class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
-        field = kwargs.get("field", "password")
-        section = kwargs.get("section")
-        vault = kwargs.get("vault")
-        subdomain = kwargs.get("subdomain")
-        domain = kwargs.get("domain", "1password.com")
-        username = kwargs.get("username")
-        secret_key = kwargs.get("secret_key")
-        master_password = kwargs.get("master_password", kwargs.get("vault_password", ""))
+        self.set_options(var_options=variables, direct=kwargs)
+        options = self.get_options()
+
+        field = options["field"]
+        section = options["section"]
+        vault = options["vault"]
+        subdomain = options["subdomain"]
+        domain = options["domain"]
+        username = options["username"]
+        secret_key = options["secret_key"]
+        master_password = options["master_password"]
 
         op = OnePass(subdomain, domain, username, secret_key, master_password)
         op.assert_logged_in()

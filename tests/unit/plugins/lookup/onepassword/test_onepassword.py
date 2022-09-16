@@ -13,6 +13,7 @@ from .conftest import OP_VERSION_FIXTURES
 from .fixtures import MOCK_ENTRIES
 
 from ansible.errors import AnsibleLookupError
+from ansible.plugins.loader import lookup_loader
 from ansible_collections.community.general.plugins.lookup.onepassword import (
     LookupModule,
     OnePassCLIv1,
@@ -164,7 +165,9 @@ def test_op_lookup(mocker, cli_class, vault, queries, kwargs, output, expected):
     mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePass.assert_logged_in", return_value=True)
     mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePassCLIBase._run", return_value=(0, json.dumps(output), ""))
 
-    result = LookupModule().run(queries, vault=vault, **kwargs)
+    op_lookup = lookup_loader.get("community.general.onepassword")
+    result = op_lookup.run(queries, vault=vault, **kwargs)
+
     assert result == expected
 
 
