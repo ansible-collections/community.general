@@ -34,7 +34,7 @@
 
 - assert:
     that:
-    - check_file.stat.exists == False
+    - check_file.stat.exists is false
 
 - name: Check the file /preseed/ubuntu.seed is added
   stat:
@@ -43,7 +43,7 @@
 
 - assert:
     that:
-    - check_file.stat.exists == True
+    - check_file.stat.exists is true
 
 - name: Get the content of file test02.cfg
   set_fact:

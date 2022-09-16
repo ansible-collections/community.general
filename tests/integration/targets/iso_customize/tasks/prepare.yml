@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: install pycdlib
-  pip:
+  ansible.builtin.pip:
     name: pycdlib
 
 - name: Make sure the previous testing sub-directory is deleted
@@ -22,7 +22,7 @@
     path: '{{ test_dir }}/iso_mount'
     state: directory
 
-- name: Create temperary file test01.cfg for testing
+- name: Create temporary file test01.cfg for testing
   ansible.builtin.file:
     path: "{{ test_dir }}/test01.cfg"
     state: touch
@@ -33,7 +33,7 @@
     regexp: "^aaa"
     line: "aaa"
 
-- name: Create temperary file test02.cfg for testing
+- name: Create temporary file test02.cfg for testing
   ansible.builtin.file:
     path: "{{ test_dir }}/test02.cfg"
     state: touch
