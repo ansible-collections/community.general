@@ -31,6 +31,7 @@
         fstab: "/tmp/temp.fstab"
         fstype: "iso9660"
         state: mounted
+      become: yes
 
     - set_fact:
         mount_root_dir: "{{ test_dir }}/iso_mount"
