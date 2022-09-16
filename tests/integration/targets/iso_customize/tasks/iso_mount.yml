@@ -24,6 +24,7 @@
 
 - block:
     - name: "Mount {{ iso_name }} to {{ test_dir }}/iso_mount on localhost"
+      become: true
       ansible.posix.mount:
         path: "{{ test_dir }}/iso_mount"
         src: "{{ test_dir }}/{{ iso_name }}"
@@ -31,7 +32,6 @@
         fstab: "/tmp/temp.fstab"
         fstype: "iso9660"
         state: mounted
-      become: yes
 
     - set_fact:
         mount_root_dir: "{{ test_dir }}/iso_mount"

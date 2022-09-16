@@ -25,7 +25,7 @@
 
 - assert:
     that:
-    - check_file.stat.exists is true
+    - check_file.stat.exists == True
 
 - name: Umount ISO
   mount:
