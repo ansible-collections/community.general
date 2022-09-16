@@ -11,30 +11,24 @@
       - src_file: "{{ test_dir }}/test01.cfg"
         dest_file: "/preseed/ubuntu.seed"
 
-# Only need to check the files is deleted/added as the requested modifications 
-# in one type of OS(take MacOS here)
-- block:
-    - name: "Mount customized ISO on MAC"
-      command: "hdiutil attach {{ test_dir }}/{{ dest_iso_name }} -mountroot {{ test_dir }}/iso_mount"
 
-    # For MAC, we have different root directory for different type of ISO
-    - set_fact:
-        mount_root_dir: "{{ test_dir }}/iso_mount/disk_image"
+- include_tasks: iso_mount.yml
+  vars:
+    iso_name: "{{ dest_iso_name }}"
 
-    - debug: var=mount_root_dir
+- debug: var=mount_root_dir
 
-    - name: Check the file /preseed/ubuntu.seed is added
-      stat:
-        path: "{{ mount_root_dir }}/preseed/ubuntu.seed"
-      register: check_file
+- name: Check the file /preseed/ubuntu.seed is added
+  stat:
+    path: "{{ mount_root_dir }}/preseed/ubuntu.seed"
+  register: check_file
 
-    - assert:
-        that:
-        - check_file.stat.exists == True
+- assert:
+    that:
+    - check_file.stat.exists == True
 
-    - name: Umount ISO
-      mount:
-        path: "{{ mount_root_dir }}"
-        fstab: "{{ test_dir }}/temp.fstab"
-        state: unmounted
-  when: ansible_distribution == "MacOSX"
+- name: Umount ISO
+  mount:
+    path: "{{ mount_root_dir }}"
+    fstab: "{{ test_dir }}/temp.fstab"
+    state: unmounted

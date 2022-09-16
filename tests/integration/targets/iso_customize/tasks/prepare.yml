@@ -27,6 +27,12 @@
     path: "{{ test_dir }}/test01.cfg"
     state: touch
 
+- name: Add a line to the file test01.cfg and make sure it succeed
+  ansible.builtin.lineinfile:
+    path: "{{ test_dir }}/test01.cfg"
+    regexp: "^aaa"
+    line: "aaa"
+
 - name: Create temperary file test02.cfg for testing
   ansible.builtin.file:
     path: "{{ test_dir }}/test02.cfg"

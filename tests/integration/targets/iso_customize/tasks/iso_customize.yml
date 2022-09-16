@@ -21,20 +21,9 @@
       - src_file: "{{ test_dir }}/test02.cfg"
         dest_file: "/test02.cfg"
 
-- name: "Mount customized ISO on MAC"
-  command: "hdiutil attach {{ test_dir }}/{{ dest_iso_name }} -mountroot {{ test_dir }}/iso_mount"
-
-# For MAC, we have different root directory for different type of ISO
-- set_fact:
-    mount_root_dir: "{{ test_dir }}/iso_mount/disk_image"
-
-- set_fact:
-    mount_root_dir: "{{ test_dir }}/iso_mount/AUTOINSTALL"
-  when: dest_iso_name.find('joliet') != -1
-
-- set_fact:
-    mount_root_dir: "{{ test_dir }}/iso_mount/CDROM"
-  when: dest_iso_name.find('udf') != -1
+- include_tasks: iso_mount.yml
+  vars:
+    iso_name: "{{ dest_iso_name }}"
 
 - debug: var=mount_root_dir
 

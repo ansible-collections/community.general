@@ -60,9 +60,10 @@ options:
         type: str
         required: true
 notes:
+- The pycdlib states it supports Python 2.7 and 3.4 only
 - The function "add_file" in pycdlib will overwrite the existing file in ISO with type ISO9660 / Rock Ridge 1.12 / Joliet / UDF.
 - But it won't overwrite the existing file in ISO with Rock Ridge 1.09 / 1.10.
-- So we take workaround "delete the existing file at first and then add file for ISO with Rock Ridge".
+- So we take workaround: delete the existing file and then add file for ISO with Rock Ridge.
 '''
 
 EXAMPLES = r'''
@@ -239,7 +240,9 @@ def iso_delete_file(module, opened_iso, iso_type, dest_file):
         elif iso_type == "joliet":
             opened_iso.rm_hard_link(joliet_path=dest_file)
         elif iso_type == "udf":
-            opened_iso.rm_hard_link(udf_path=dest_file)
+            # function "rm_hard_link" won't work in some OS (such as Ubuntu with python 3.10.4)
+            # take function "rm_file" instead
+            opened_iso.rm_file(udf_path=dest_file)
     except Exception as err:
         msg = "Failed to delete iso file %s with error: %s" % (dest_file, to_native(err))
         module.fail_json(msg=msg)
