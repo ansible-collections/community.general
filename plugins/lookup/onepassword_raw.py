@@ -77,14 +77,13 @@ class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
-        options = self.get_options()
 
-        vault = options["vault"]
-        subdomain = options["subdomain"]
-        domain = options["domain", "1password.com"]
-        username = options["username"]
-        secret_key = options["secret_key"]
-        master_password = options["master_password"]
+        vault = self.get_option("vault")
+        subdomain = self.get_option("subdomain")
+        domain = self.get_option("domain", "1password.com")
+        username = self.get_option("username")
+        secret_key = self.get_option("secret_key")
+        master_password = self.get_option("master_password")
 
         op = OnePass(subdomain, domain, username, secret_key, master_password)
         op.assert_logged_in()
