@@ -10,7 +10,7 @@ import json
 import pytest
 
 from .conftest import OP_VERSION_FIXTURES
-from .fixtures import MOCK_ENTRIES
+from .common import MOCK_ENTRIES
 
 from ansible.errors import AnsibleLookupError
 from ansible.plugins.loader import lookup_loader
