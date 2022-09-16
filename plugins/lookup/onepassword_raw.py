@@ -86,7 +86,6 @@ class LookupModule(LookupBase):
         secret_key = options["secret_key"]
         master_password = options["master_password"]
 
-
         op = OnePass(subdomain, domain, username, secret_key, master_password)
         op.assert_logged_in()
 
