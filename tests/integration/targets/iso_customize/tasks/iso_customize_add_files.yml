@@ -9,7 +9,7 @@
     dest_iso: "{{ test_dir }}/{{ dest_iso_name }}"
     add_files:
       - src_file: "{{ test_dir }}/test01.cfg"
-        dest_file: "/preseed/ubuntu.seed"
+        dest_file: "preseed/ubuntu.seed"
 
 
 - include_tasks: iso_mount.yml

@@ -9,3 +9,4 @@ skip/aix
 skip/freebsd
 skip/alpine
 skip/python2.6
+needs/root

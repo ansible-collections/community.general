@@ -21,7 +21,7 @@ author:
 requirements:
   - "pycdlib"
   - "python >= 2.7"
-version_added: '5.6.0'
+version_added: '5.7.0'
 
 options:
   src_iso:

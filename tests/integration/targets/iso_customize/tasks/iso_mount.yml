@@ -29,7 +29,7 @@
         path: "{{ test_dir }}/iso_mount"
         src: "{{ test_dir }}/{{ iso_name }}"
         opts: "ro,noauto"
-        fstab: "/tmp/temp.fstab"
+        fstab: "{{ test_dir }}/temp.fstab"
         fstype: "iso9660"
         state: mounted
 

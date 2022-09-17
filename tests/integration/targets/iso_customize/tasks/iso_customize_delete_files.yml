@@ -8,7 +8,7 @@
     src_iso: "{{ test_dir }}/test1.iso"
     dest_iso: "{{ test_dir }}/{{ dest_iso_name }}"
     delete_files:
-      - "/test01.cfg"
+      - "test01.cfg"
 
 - debug: var=ansible_distribution
 
