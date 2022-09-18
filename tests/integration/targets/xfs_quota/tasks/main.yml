@@ -8,7 +8,14 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- block: 
+- when: >-
+    not (ansible_os_family == 'Suse' and ansible_python.version.major == 2)
+
+  block:
+    - name: "Install filesystem tools"
+      ansible.builtin.package:
+        name: xfsprogs
+
     - name: Create test user
       user:
         name: xfsquotauser
