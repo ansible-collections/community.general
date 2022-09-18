@@ -236,7 +236,7 @@ CASES_CHECK_DEST_FILE_CHECK_PARAMS = [[item['param_check'],
 
 CASES_MIXIN_BACKUP_DEST = [
     {
-        'id': '010_no_do_bakcup_can_not_backup',
+        'id': '010_no_do_backup_can_not_backup',
         'module_args': {'path': DUMMY_DEST, 'backup': False},
         'dest_infos': {'can_backup': False},
         'expect_backup_file': None,
@@ -248,7 +248,7 @@ CASES_MIXIN_BACKUP_DEST = [
         'expect_backup_file': None,
     },
     {
-        'id': '030_not_do_bakcup_can_backup',
+        'id': '030_not_do_backup_can_backup',
         'module_args': {'path': DUMMY_DEST, 'backup': False},
         'dest_infos': {'can_backup': True},
         'expect_backup_file': None,
