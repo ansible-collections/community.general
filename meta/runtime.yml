@@ -1213,6 +1213,8 @@ plugin_routing:
       redirect: community.general.cloud.profitbricks.profitbricks_volume_attachments
     proxmox:
       redirect: community.general.cloud.misc.proxmox
+    proxmox_disk:
+      redirect: community.general.cloud.misc.proxmox_disk
     proxmox_domain_info:
       redirect: community.general.cloud.misc.proxmox_domain_info
     proxmox_group_info:
