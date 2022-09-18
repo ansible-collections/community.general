@@ -390,7 +390,7 @@
       vmid: "{{ vmid }}"
       disk: "{{ disk }}"
       backup: False
-      ro: True
+      ro: true
       aio: native
       state: present
     register: results
