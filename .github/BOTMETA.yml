@@ -378,6 +378,8 @@ files:
   $modules/cloud/misc/proxmox_template.py:
     maintainers: UnderGreen
     ignore: skvidal
+  $modules/cloud/misc/proxmox_disk.py:
+    maintainers: castorsky
   $modules/cloud/misc/rhevm.py:
     maintainers: $team_virt TimothyVandenbrande
     labels: rhevm virt
