@@ -389,7 +389,7 @@
       api_token_secret: "{{ api_token_secret | default(omit) }}"
       vmid: "{{ vmid }}"
       disk: "{{ disk }}"
-      backup: False
+      backup: false
       ro: true
       aio: native
       state: present
