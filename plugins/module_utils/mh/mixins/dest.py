@@ -311,10 +311,12 @@ class DestFileMixin(object):
         Write the binary data from `self.raw_content` into an Ansible temp
         file.
         """
-        fd, self._tmpfile = tempfile.mkstemp(dir=self.module.tmpdir)
-        os.write(fd, self.raw_content)
-        self.module.add_cleanup_file(self._tmpfile)
-        os.close(fd)
+        try:
+            fd, self._tmpfile = tempfile.mkstemp(dir=self.module.tmpdir)
+            os.write(fd, self.raw_content)
+        finally:
+            self.module.add_cleanup_file(self._tmpfile)
+            os.close(fd)
 
     @check_mode_skip
     def _backup_dest(self):
