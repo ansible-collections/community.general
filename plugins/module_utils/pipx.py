@@ -6,7 +6,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from ansible.module_utils.parsing.convert_bool import boolean
 from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt as fmt
 
 
