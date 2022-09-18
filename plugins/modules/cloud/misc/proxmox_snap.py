@@ -48,7 +48,7 @@ options:
       - See U(https://pve.proxmox.com/pve-docs/api-viewer/#/nodes/{node}/lxc/{vmid}/config) (PUT tab) for more details.
     default: false
     type: bool
-    version_added: 5.6.0
+    version_added: 5.7.0
   vmstate:
     description:
       - Snapshot includes RAM.
