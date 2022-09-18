@@ -413,7 +413,7 @@ vmid:
   type: int
   sample: 101
 msg:
-  description: A short message
+  description: A short message on what the module did.
   returned: always
   type: str
   sample: "Disk scsi3 created in VM 101"
