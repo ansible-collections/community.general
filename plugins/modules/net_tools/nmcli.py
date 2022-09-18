@@ -2099,17 +2099,17 @@ class Nmcli(object):
                     # MAC addresses are case insensitive, nmcli always reports them in uppercase
                     value = value.upper()
                     # ensure current_value is also converted to uppercase in case nmcli changes behaviour
-                    if (current_value):
+                    if current_value:
                         current_value = current_value.upper()
                 if key == 'gsm.apn':
                     # Depending on version nmcli adds double-qoutes to gsm.apn
                     # Need to strip them in order to compare both
-                    if (current_value):
+                    if current_value:
                         current_value = current_value.strip('"')
                 if key == self.mtu_setting and self.mtu is None:
                     self.mtu = 0
                 if key == 'vpn.data':
-                    if (current_value):
+                    if current_value:
                         current_value = sorted(re.sub(r'\s*=\s*', '=', part.strip(), count=1) for part in current_value.split(','))
                     value = sorted(part.strip() for part in value.split(','))
             else:
