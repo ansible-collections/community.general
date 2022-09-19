@@ -313,6 +313,202 @@
         - results.vmid == {{ vmid }}
         - results.msg == "Nic net5 deleted on VM with vmid {{ vmid }}"
 
+- name: Create new disk in VM
+  tags: ['create_disk']
+  block:
+  - name: Add new disk (without force) to VM
+    proxmox_disk:
+      api_host: "{{ api_host }}"
+      api_user: "{{ user }}@{{ domain }}"
+      api_password: "{{ api_password | default(omit) }}"
+      api_token_id: "{{ api_token_id | default(omit) }}"
+      api_token_secret: "{{ api_token_secret | default(omit) }}"
+      vmid: "{{ vmid }}"
+      disk: "{{ disk }}"
+      storage: "{{ storage }}"
+      size: 1
+      state: present
+    register: results
+
+  - assert:
+      that:
+      - results is changed
+      - results.vmid == {{ vmid }}
+      - results.msg == "Disk {{ disk }} created in VM {{ vmid }}"
+
+  - name: Try add disk again with same options (expect no-op)
+    proxmox_disk:
+      api_host: "{{ api_host }}"
+      api_user: "{{ user }}@{{ domain }}"
+      api_password: "{{ api_password | default(omit) }}"
+      api_token_id: "{{ api_token_id | default(omit) }}"
+      api_token_secret: "{{ api_token_secret | default(omit) }}"
+      vmid: "{{ vmid }}"
+      disk: "{{ disk }}"
+      storage: "{{ storage }}"
+      size: 1
+      state: present
+    register: results
+
+  - assert:
+      that:
+      - results is not changed
+      - results.vmid == {{ vmid }}
+      - results.msg == "Disk {{ disk }} is up to date in VM {{ vmid }}"
+
+  - name: Add new disk replacing existing disk (detach old and leave unused)
+    proxmox_disk:
+      api_host: "{{ api_host }}"
+      api_user: "{{ user }}@{{ domain }}"
+      api_password: "{{ api_password | default(omit) }}"
+      api_token_id: "{{ api_token_id | default(omit) }}"
+      api_token_secret: "{{ api_token_secret | default(omit) }}"
+      vmid: "{{ vmid }}"
+      disk: "{{ disk }}"
+      storage: "{{ storage }}"
+      size: 2
+      create: forced
+      state: present
+    register: results
+
+  - assert:
+      that:
+      - results is changed
+      - results.vmid == {{ vmid }}
+      - results.msg == "Disk {{ disk }} created in VM {{ vmid }}"
+
+- name: Update existing disk in VM
+  tags: ['update_disk']
+  block:
+  - name: Update disk configuration
+    proxmox_disk:
+      api_host: "{{ api_host }}"
+      api_user: "{{ user }}@{{ domain }}"
+      api_password: "{{ api_password | default(omit) }}"
+      api_token_id: "{{ api_token_id | default(omit) }}"
+      api_token_secret: "{{ api_token_secret | default(omit) }}"
+      vmid: "{{ vmid }}"
+      disk: "{{ disk }}"
+      backup: false
+      ro: true
+      aio: native
+      state: present
+    register: results
+
+  - assert:
+      that:
+      - results is changed
+      - results.vmid == {{ vmid }}
+      - results.msg == "Disk {{ disk }} updated in VM {{ vmid }}"
+
+- name: Grow existing disk in VM
+  tags: ['grow_disk']
+  block:
+  - name: Increase disk size
+    proxmox_disk:
+      api_host: "{{ api_host }}"
+      api_user: "{{ user }}@{{ domain }}"
+      api_password: "{{ api_password | default(omit) }}"
+      api_token_id: "{{ api_token_id | default(omit) }}"
+      api_token_secret: "{{ api_token_secret | default(omit) }}"
+      vmid: "{{ vmid }}"
+      disk: "{{ disk }}"
+      size: +1G
+      state: resized
+    register: results
+
+  - assert:
+      that:
+      - results is changed
+      - results.vmid == {{ vmid }}
+      - results.msg == "Disk {{ disk }} resized in VM {{ vmid }}"
+
+- name: Detach disk and leave it unused
+  tags: ['detach_disk']
+  block:
+  - name: Detach disk
+    proxmox_disk:
+      api_host: "{{ api_host }}"
+      api_user: "{{ user }}@{{ domain }}"
+      api_password: "{{ api_password | default(omit) }}"
+      api_token_id: "{{ api_token_id | default(omit) }}"
+      api_token_secret: "{{ api_token_secret | default(omit) }}"
+      vmid: "{{ vmid }}"
+      disk: "{{ disk }}"
+      state: detached
+    register: results
+
+  - assert:
+      that:
+      - results is changed
+      - results.vmid == {{ vmid }}
+      - results.msg == "Disk {{ disk }} detached from VM {{ vmid }}"
+
+- name: Move disk to another storage or another VM
+  tags: ['move_disk']
+  block:
+  - name: Move disk to another storage inside same VM
+    proxmox_disk:
+      api_host: "{{ api_host }}"
+      api_user: "{{ user }}@{{ domain }}"
+      api_password: "{{ api_password | default(omit) }}"
+      api_token_id: "{{ api_token_id | default(omit) }}"
+      api_token_secret: "{{ api_token_secret | default(omit) }}"
+      vmid: "{{ vmid }}"
+      disk: "{{ disk }}"
+      target_storage: "{{ target_storage }}"
+      format: "{{ target_format }}"
+      state: moved
+    register: results
+
+  - assert:
+      that:
+      - results is changed
+      - results.vmid == {{ vmid }}
+      - results.msg == "Disk {{ disk }} moved from VM {{ vmid }} storage {{ results.storage }}"
+
+  - name: Move disk to another VM (same storage)
+    proxmox_disk:
+      api_host: "{{ api_host }}"
+      api_user: "{{ user }}@{{ domain }}"
+      api_password: "{{ api_password | default(omit) }}"
+      api_token_id: "{{ api_token_id | default(omit) }}"
+      api_token_secret: "{{ api_token_secret | default(omit) }}"
+      vmid: "{{ vmid }}"
+      disk: "{{ disk }}"
+      target_vmid: "{{ target_vm }}"
+      target_disk: "{{ target_disk }}"
+      state: moved
+    register: results
+
+  - assert:
+      that:
+      - results is changed
+      - results.vmid == {{ vmid }}
+      - results.msg == "Disk {{ disk }} moved from VM {{ vmid }} storage {{ results.storage }}"
+
+
+- name: Remove disk permanently
+  tags: ['remove_disk']
+  block:
+  - name: Remove disk
+    proxmox_disk:
+      api_host: "{{ api_host }}"
+      api_user: "{{ user }}@{{ domain }}"
+      api_password: "{{ api_password | default(omit) }}"
+      api_token_id: "{{ api_token_id | default(omit) }}"
+      api_token_secret: "{{ api_token_secret | default(omit) }}"
+      vmid: "{{ target_vm }}"
+      disk: "{{ target_disk }}"
+      state: absent
+    register: results
+
+  - assert:
+      that:
+      - results is changed
+      - results.vmid == {{ target_vm }}
+      - results.msg == "Disk {{ target_disk }} removed from VM {{ target_vm }}"
+
 - name: VM stop
   tags: [ 'stop' ]
   block:
