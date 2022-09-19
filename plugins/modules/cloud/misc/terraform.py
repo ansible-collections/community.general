@@ -86,7 +86,7 @@ options:
       - Ansible lists are mapped to terraform lists.
       - Ansible integers or floats are mapped to terraform numbers.
       - Ansible booleans are mapped to terraform booleans.
-      - "B(Note) passwords passed as variables will be visible in the log output. Make sure to use C(no_log: true) in production!"
+      - "B(Note) passwords passed as variables will be visible in the log output. Make sure to use I(no_log=true) in production!"
     type: dict
   targets:
     description:
