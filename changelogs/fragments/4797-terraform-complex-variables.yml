@@ -1,2 +1,2 @@
 minor_changes:
-  - terrform - adds capability to handle complex variable structures for ``variables`` parameter in the module (https://github.com/ansible-collections/community.general/pull/4797).
+  - terraform - adds capability to handle complex variable structures for ``variables`` parameter in the module (https://github.com/ansible-collections/community.general/pull/4797).
