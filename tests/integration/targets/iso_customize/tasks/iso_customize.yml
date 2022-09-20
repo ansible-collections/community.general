@@ -27,15 +27,6 @@
 
 - debug: var=mount_root_dir
 
-- name: "Get file list of directory {{ mount_root_dir }}"
-  ansible.builtin.find:
-    paths: "{{ mount_root_dir }}"
-    recurse: yes
-  register: find_result
-
-- debug: 
-    msg: "{{ find_result.files }}"
-
 - name: Check the file test01.cfg is deleted
   stat:
     path: "{{ mount_root_dir }}/test01.cfg"
@@ -54,9 +45,19 @@
     that:
     - check_file.stat.exists == True
 
+- block:
+    - name: Get the content of file test02.cfg
+      command: "cat {{ mount_root_dir }}/test02.cfg"
+      register: get_file_content
+
+    - set_fact:
+        file_contents: "{{ get_file_content.stdout }}"
+  when: ansible_distribution == 'RedHat' and ansible_distribution_version is version('7.9', '==')
+
 - name: Get the content of file test02.cfg
   set_fact:
     file_contents: "{{ lookup('file', mount_root_dir + '/test02.cfg') }}"
+  when: not (ansible_distribution == 'RedHat' and ansible_distribution_version is version('7.9', '=='))
 
 - fail: msg="Failed to replace the file test02.cfg"
   when: file_contents != "test"
