@@ -3085,7 +3085,7 @@ class RedfishUtils(object):
                     if subprop not in current_sessions_config[property]:
                         need_change = True
                         break
-                    sub_set_value = payload[property][subprop]
+                    sub_set_value = set_value[i][subprop]
                     sub_cur_value = current_sessions_config[property][subprop]
                     if sub_set_value != sub_cur_value:
                         need_change = True
