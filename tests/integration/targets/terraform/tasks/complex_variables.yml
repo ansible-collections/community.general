@@ -30,20 +30,20 @@
         age: 99
       list_of_strings:
         - "kosala"
-        - 'cli specials"&$%@#*!(){}[]""'
+        - 'cli specials"&$%@#*!(){}[]:""'
         - "xxx"
         - "zzz"
       list_of_objects:
         - name: "kosala"
           age: 99
-        - name: 'cli specials"&$%@#*!(){}[]""'
+        - name: 'cli specials"&$%@#*!(){}[]:""'
           age: 0.1
         - name: "zzz"
           age: 9.789
         - name: "lll"
           age: 1000
       boolean: true
-      string_type: 'cli specials"&$%@#*!(){}[]""'
+      string_type: 'cli specials"&$%@#*!(){}[]:""'
       list_of_lists:
         - [ 1 ]
         - [ 11, 12, 13 ]

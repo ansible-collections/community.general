@@ -18,7 +18,7 @@ variable "list_of_strings" {
   type        = list(string)
   description = "list of strings"
   validation {
-    condition     = (var.list_of_strings[1] == "cli specials\"&$%@#*!(){}[]\"\"")
+    condition     = (var.list_of_strings[1] == "cli specials\"&$%@#*!(){}[]:\"\"")
     error_message = "Strings do not match."
   }
 }
@@ -29,7 +29,7 @@ variable "list_of_objects" {
     age  = number
   }))
   validation {
-    condition     = (var.list_of_objects[1].name == "cli specials\"&$%@#*!(){}[]\"\"")
+    condition     = (var.list_of_objects[1].name == "cli specials\"&$%@#*!(){}[]:\"\"")
     error_message = "Strings do not match."
   }
 }
@@ -43,7 +43,7 @@ variable "boolean" {
 variable "string_type" {
   type = string
   validation {
-    condition     = (var.string_type == "cli specials\"&$%@#*!(){}[]\"\"")
+    condition     = (var.string_type == "cli specials\"&$%@#*!(){}[]:\"\"")
     error_message = "Strings do not match."
   }
 }
