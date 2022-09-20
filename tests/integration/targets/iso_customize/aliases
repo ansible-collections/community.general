@@ -9,7 +9,6 @@ skip/aix
 skip/freebsd
 skip/alpine
 skip/python2.6
-needs/privileged
+skip/docker
 needs/root
-skip/rhel7.9
-skip/centos7
+
