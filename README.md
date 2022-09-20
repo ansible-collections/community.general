@@ -23,7 +23,7 @@ If you encounter abusive behavior violating the [Ansible Code of Conduct](https:
 
 ## Tested with Ansible
 
-Tested with the current ansible-core 2.11, ansible-core 2.12, ansible-core 2.13 releases and the current development version of ansible-core. Ansible-core versions before 2.11.0 are not supported. This includes all ansible-base 2.10 and Ansible 2.9 releases.
+Tested with the current ansible-core 2.11, ansible-core 2.12, ansible-core 2.13, ansible-core 2.14 releases and the current development version of ansible-core. Ansible-core versions before 2.11.0 are not supported. This includes all ansible-base 2.10 and Ansible 2.9 releases.
 
 Parts of this collection will not work with ansible-core 2.11 on Python 3.12+.
 
