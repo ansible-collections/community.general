@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create terraform project directory (complex variables)
-  file:
+  ansible.builtin.file:
     path: "{{ terraform_project_dir }}/complex_vars"
     state: directory
     mode: 0755
