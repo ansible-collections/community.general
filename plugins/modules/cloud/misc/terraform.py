@@ -260,6 +260,7 @@ command:
 import os
 import json
 import tempfile
+import re
 from ansible.module_utils.six.moves import shlex_quote
 from ansible.module_utils.six import integer_types
 
@@ -489,7 +490,7 @@ def main():
 
     def format_args(vars):
         if isinstance(vars, str):
-            return '"{string}"'.format(string=vars)
+            return '"{string}"'.format(string=re.sub('"', '\\"', vars))
         elif isinstance(vars, bool):
             if vars:
                 return 'true'
