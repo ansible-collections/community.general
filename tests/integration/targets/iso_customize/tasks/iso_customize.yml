@@ -27,6 +27,15 @@
 
 - debug: var=mount_root_dir
 
+- name: "Get file list of directory {{ mount_root_dir }}"
+  ansible.builtin.find:
+    paths: "{{ mount_root_dir }}"
+    recurse: yes
+  register: find_result
+
+- debug: 
+    msg: "{{ find_result.files }}"
+
 - name: Check the file test01.cfg is deleted
   stat:
     path: "{{ mount_root_dir }}/test01.cfg"
