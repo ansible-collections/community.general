@@ -17,6 +17,10 @@ variable "dictionaries" {
 variable "list_of_strings" {
   type        = list(string)
   description = "list of strings"
+  validation {
+    condition     = (var.list_of_strings[1] == "cli specials\"&$%@#*!(){}[]\"\"")
+    error_message = "Strings do not match."
+  }
 }
 
 variable "list_of_objects" {
@@ -24,7 +28,10 @@ variable "list_of_objects" {
     name = string
     age  = number
   }))
-
+  validation {
+    condition     = (var.list_of_objects[1].name == "cli specials\"&$%@#*!(){}[]\"\"")
+    error_message = "Strings do not match."
+  }
 }
 
 variable "boolean" {
@@ -36,10 +43,9 @@ variable "boolean" {
 variable "string_type" {
   type = string
   validation {
-    condition     = (var.string_type == "randomstring2\"&$%@")
+    condition     = (var.string_type == "cli specials\"&$%@#*!(){}[]\"\"")
     error_message = "Strings do not match."
   }
-  default = "randomstring2\"&$%@"
 }
 
 variable "list_of_lists" {

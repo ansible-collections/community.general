@@ -26,24 +26,24 @@
     force_init: yes
     variables:
       dictionaries:
-        name: kosala
+        name: "kosala"
         age: 99
       list_of_strings:
-        - kosala
-        - yyy
-        - xxx
-        - zzz
+        - "kosala"
+        - 'cli specials"&$%@#*!(){}[]""'
+        - "xxx"
+        - "zzz"
       list_of_objects:
-        - name: kosala
+        - name: "kosala"
           age: 99
-        - name: yyy
+        - name: 'cli specials"&$%@#*!(){}[]""'
           age: 0.1
-        - name: zzz
+        - name: "zzz"
           age: 9.789
-        - name: lll
+        - name: "lll"
           age: 1000
       boolean: true
-      string_type: 'randomstring2"&$%@'
+      string_type: 'cli specials"&$%@#*!(){}[]""'
       list_of_lists:
         - [ 1 ]
         - [ 11, 12, 13 ]
