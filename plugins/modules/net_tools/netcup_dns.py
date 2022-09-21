@@ -72,6 +72,11 @@ options:
     default: present
     choices: [ 'present', 'absent' ]
     type: str
+  timeout:
+    description:
+      - HTTP(s) connection timeout
+    default: 5
+    type: int
 requirements:
   - "nc-dnsapi >= 0.1.3"
 author: "Nicolai Buchwitz (@nbuchwitz)"
@@ -129,6 +134,18 @@ EXAMPLES = '''
     type: "AAAA"
     value: "::1"
     solo: true
+
+- name: Increase the connection timeout to avoid problems with an unstable connection
+  community.general.netcup_dns:
+    api_key: "..."
+    api_password: "..."
+    customer_id: "..."
+    domain: "example.com"
+    name: "mail"
+    type: "A"
+    value: "127.0.0.1"
+    timeout: 30
+
 '''
 
 RETURN = '''
@@ -193,6 +210,7 @@ def main():
             priority=dict(required=False, type='int'),
             solo=dict(required=False, type='bool', default=False),
             state=dict(required=False, choices=['present', 'absent'], default='present'),
+            timeout=dict(required=False, type='int', default=5),
 
         ),
         supports_check_mode=True
@@ -211,6 +229,7 @@ def main():
     priority = module.params.get('priority')
     solo = module.params.get('solo')
     state = module.params.get('state')
+    timeout = module.params.get('timeout')
 
     if record_type == 'MX' and not priority:
         module.fail_json(msg="record type MX required the 'priority' argument")
@@ -218,7 +237,7 @@ def main():
     has_changed = False
     all_records = []
     try:
-        with nc_dnsapi.Client(customer_id, api_key, api_password) as api:
+        with nc_dnsapi.Client(customer_id, api_key, api_password, timeout) as api:
             all_records = api.dns_records(domain)
             record = DNSRecord(record, record_type, value, priority=priority)
 
