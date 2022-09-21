@@ -25,7 +25,8 @@ DOCUMENTATION = """
       search:
         description: Field to retrieve, for example C(name) or C(id).
         type: str
-        default: 'name'
+        default: name
+        version_added: 5.7.0
       field:
         description: Field to fetch; leave unset to fetch whole response.
         type: str
