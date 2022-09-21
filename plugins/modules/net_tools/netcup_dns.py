@@ -74,9 +74,10 @@ options:
     type: str
   timeout:
     description:
-      - HTTP(s) connection timeout
+      - HTTP(S) connection timeout in seconds.
     default: 5
     type: int
+    version_added: 5.7.0
 requirements:
   - "nc-dnsapi >= 0.1.3"
 author: "Nicolai Buchwitz (@nbuchwitz)"
