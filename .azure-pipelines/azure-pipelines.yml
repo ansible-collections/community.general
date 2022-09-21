@@ -142,6 +142,7 @@ stages:
             - test: 3.8
             - test: 3.9
             - test: '3.10'
+            - test: '3.11'
   - stage: Units_2_14
     displayName: Units 2.14
     dependsOn: []
@@ -152,8 +153,7 @@ stages:
           testFormat: 2.14/units/{0}/1
           targets:
             - test: 2.7
-            - test: 3.7
-            - test: '3.10'
+            - test: 3.9
   - stage: Units_2_13
     displayName: Units 2.13
     dependsOn: []
@@ -164,8 +164,7 @@ stages:
           testFormat: 2.13/units/{0}/1
           targets:
             - test: 2.7
-            - test: 3.6
-            - test: 3.9
+            - test: 3.8
   - stage: Units_2_12
     displayName: Units 2.12
     dependsOn: []
@@ -176,7 +175,6 @@ stages:
           testFormat: 2.12/units/{0}/1
           targets:
             - test: 2.6
-            - test: 3.6
             - test: 3.8
   - stage: Units_2_11
     displayName: Units 2.11
@@ -187,10 +185,8 @@ stages:
           nameFormat: Python {0}
           testFormat: 2.11/units/{0}/1
           targets:
-            - test: 2.6
             - test: 2.7
             - test: 3.5
-            - test: 3.9
 
 ## Remote
   - stage: Remote_devel
@@ -315,12 +311,8 @@ stages:
         parameters:
           testFormat: 2.14/linux/{0}
           targets:
-            - name: openSUSE 15
-              test: opensuse15
             - name: Ubuntu 20.04
               test: ubuntu2004
-            - name: Alpine 3
-              test: alpine3
           groups:
             - 1
             - 2
