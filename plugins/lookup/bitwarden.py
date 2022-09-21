@@ -23,7 +23,7 @@ DOCUMENTATION = """
         type: list
         elements: str
       search:
-        description: Search field, e.g. name or id
+        description: Field to retrieve, for example C(name) or C(id).
         type: str
         default: 'name'
       field:
