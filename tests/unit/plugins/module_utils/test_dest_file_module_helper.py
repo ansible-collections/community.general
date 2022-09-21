@@ -359,7 +359,7 @@ def _mock_os_for_dest_file(request, mocker):
 @pytest.mark.usefixtures('_mock_os_for_dest_file')
 def test_010_check_dest_file_info(expected):
     dest_check = DestFileChecks(DUMMY_DEST)
-    assert(dest_check.infos() == expected)
+    assert (dest_check.infos() == expected)
 
 
 @pytest.mark.parametrize('param,raise_,_mock_os_for_dest_file',
@@ -389,11 +389,11 @@ def test_110_dest_file_mixin_init_module(mocker):
     dummy = MDestFile()
     dummy.__init_module__()
     dummy._dest_check.assert_has_calls([mocker.call.check(True, True), mocker.call.infos()])
-    assert(isinstance(dummy._dest_infos, mocker.MagicMock))
-    assert(dummy._dest_attrs.get('path') == DUMMY_DEST)
-    assert(dummy._dest_attrs.get('mode') == '0644')
-    assert(dummy._dest_attrs.get('owner') == 'foo')
-    assert(dummy.vars['created'] is False)
+    assert (isinstance(dummy._dest_infos, mocker.MagicMock))
+    assert (dummy._dest_attrs.get('path') == DUMMY_DEST)
+    assert (dummy._dest_attrs.get('mode') == '0644')
+    assert (dummy._dest_attrs.get('owner') == 'foo')
+    assert (dummy.vars['created'] is False)
 
 
 @pytest.mark.parametrize('patch_ansible_module,raw_content',
@@ -409,7 +409,7 @@ def test_120_dest_file_mixin_read_dest(raw_content, mocker):
     dummy = MDestFile()
     dummy.__read_dest__()
     open.assert_called_once_with(DUMMY_DEST, 'rb')
-    assert(dummy.raw_content == raw_content)
+    assert (dummy.raw_content == raw_content)
 
 
 @pytest.mark.parametrize('patch_ansible_module', [{'path': DUMMY_DEST}], indirect=True)
@@ -426,8 +426,8 @@ def test_210_write_tempfile(mocker):
 
     os.write.assert_called_once_with(dummy_fd, DUMMY_RAW_CONTENT)
     os.close.assert_called_once_with(dummy_fd)
-    assert(DUMMY_TMPF in dummy.module.cleanup_files)
-    assert(dummy._tmpfile == DUMMY_TMPF)
+    assert (DUMMY_TMPF in dummy.module.cleanup_files)
+    assert (dummy._tmpfile == DUMMY_TMPF)
 
 
 @pytest.mark.parametrize('patch_ansible_module,dest_infos,expected',
@@ -440,7 +440,7 @@ def test_220_backup_dest(dest_infos, expected, mocker):
     mocker.patch.object(dummy.module, 'backup_local', return_value=expected)
     dummy._dest_infos = dest_infos
     dummy._backup_dest()
-    assert(dummy.vars.get('backup_file') == expected)
+    assert (dummy.vars.get('backup_file') == expected)
 
 
 @pytest.mark.parametrize('patch_ansible_module', [{'path': DUMMY_DEST}], indirect=True)
@@ -464,9 +464,9 @@ def test_230_replace_dest_with_temp(raise_, backup_file, mocker):
         dummy._replace_dest_with_temp()
     except Exception:
         if backup_file is not None:
-            assert(DUMMY_BACKUP in dummy.module.cleanup_files)
+            assert (DUMMY_BACKUP in dummy.module.cleanup_files)
         else:
-            assert(DUMMY_BACKUP not in dummy.module.cleanup_files)
+            assert (DUMMY_BACKUP not in dummy.module.cleanup_files)
     dummy.module.atomic_move.assert_called_once_with(DUMMY_TMPF, DUMMY_DEST)
 
 
@@ -488,11 +488,11 @@ def test_240_update_dest_fs_attribute(changes, mocker):
     dummy._dest_attrs = dummy.module.load_file_common_arguments(dummy.module.params)
     dummy._update_dest_fs_attributes()
     for key, val in changes.items():
-        assert(dummy.vars.meta(key).has_changed is True)
+        assert (dummy.vars.meta(key).has_changed is True)
         meta_diff = dummy.vars.meta(key).diff_result
-        assert(meta_diff['before'] is dummy._dest_attrs[key])
-        assert(meta_diff['after'] is val)
-    assert(dummy.changed is bool(changes))
+        assert (meta_diff['before'] is dummy._dest_attrs[key])
+        assert (meta_diff['after'] is val)
+    assert (dummy.changed is bool(changes))
 
 
 @pytest.mark.parametrize('patch_ansible_module', [{'path': DUMMY_DEST}], indirect=True)
@@ -511,7 +511,7 @@ def test_250_update_dest(has_changed, can_create, is_created, mocker):
     mock_.attach_mock(mocker.patch.object(dummy, '_replace_dest_with_temp'), '_replace_dest_with_temp')
     mock_.attach_mock(mocker.patch.object(dummy, '_update_dest_fs_attributes'), '_update_dest_fs_attributes')
     dummy.__update_dest__()
-    assert(dummy.vars['created'] == is_created)
+    assert (dummy.vars['created'] == is_created)
     if is_created:
         mock_.assert_has_calls([
             mocker.call._write_temp_file(),
@@ -538,7 +538,7 @@ def test_910_run_call(mocker):
     dummy.raw_content = DUMMY_RAW_CONTENT
     with pytest.raises(SystemExit):
         dummy.run()
-    assert(dummy.has_changed() is True)
+    assert (dummy.has_changed() is True)
     mock_.assert_has_calls([
         mocker.call.__init__module__(),
         mocker.call.__read_dest__(),
