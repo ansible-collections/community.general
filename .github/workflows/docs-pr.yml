@@ -24,7 +24,6 @@ jobs:
     uses: ansible-community/github-docs-build/.github/workflows/_shared-docs-build-pr.yml@main
     with:
       init-fail-on-error: true
-      ansible-ref: stable-2.14
       provide-link-targets: |
         ansible_collections.ansible.builtin.dict2items_filter
         ansible_collections.ansible.builtin.path_join_filter
