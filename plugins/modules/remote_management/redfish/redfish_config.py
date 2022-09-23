@@ -117,7 +117,7 @@ options:
     description:
       - Setting dict of Sessions.
     type: dict
-    version_added: '5.4.0'
+    version_added: '5.7.0'
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''
