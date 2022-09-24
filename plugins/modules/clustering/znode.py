@@ -49,6 +49,18 @@ options:
             - Recursively delete node and all its children.
         type: bool
         default: false
+    scheme:
+        description:
+            - 'Authentication scheme.'
+        choices: [ digest, sasl ]
+        type: str
+        default: "digest"
+        required: false
+    credential:
+        description:
+            - 'The credential value. Depends on scheme (format "digest": user:password, "sasl": user:password).'
+        type: str
+        required: false
 requirements:
     - kazoo >= 2.1
     - python >= 2.6
@@ -67,6 +79,13 @@ EXAMPLES = """
   community.general.znode:
     hosts: 'localhost:2181'
     name: /mypath
+    op: get
+
+- name: Getting the value and stat structure for a znode using digest authentication
+  community.general.znode:
+    hosts: 'localhost:2181'
+    credential: 'user1:s3cr3t'
+    name: /secretmypath
     op: get
 
 - name: Listing a particular znode's children
@@ -122,7 +141,9 @@ def main():
             op=dict(choices=['get', 'wait', 'list']),
             state=dict(choices=['present', 'absent']),
             timeout=dict(default=300, type='int'),
-            recursive=dict(default=False, type='bool')
+            recursive=dict(default=False, type='bool'),
+            scheme=dict(default='digest', choices=['digest', 'sasl']),
+            credential=dict(type='str')
         ),
         supports_check_mode=False
     )
@@ -201,6 +222,8 @@ class KazooCommandProxy():
 
     def start(self):
         self.zk.start()
+        if (self.module.params['credential']):
+            self.zk.add_auth(self.module.params['scheme'], self.module.params['credential'])
 
     def wait(self):
         return self._wait(self.module.params['name'], self.module.params['timeout'])

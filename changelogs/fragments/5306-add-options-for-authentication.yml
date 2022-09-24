@@ -1,0 +1,2 @@
+minor_changes:
+  - znode - possibility to use zookeeper ACL authentication
