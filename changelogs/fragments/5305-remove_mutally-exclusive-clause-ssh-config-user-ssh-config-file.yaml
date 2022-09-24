@@ -1,0 +1,2 @@
+minor_changes:
+  - system/ssh_config - remove constraint between ``user`` and ``ssh_config_file`` parameters (https://github.com/ansible-collections/community.general/pull/5305).
