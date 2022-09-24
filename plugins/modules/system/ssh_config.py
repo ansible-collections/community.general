@@ -185,7 +185,7 @@ class SSHConfig():
         if self.user:
             if self.config_file is None:
                 self.config_file = os.path.join(os.path.expanduser('~%s' % self.user), '.ssh', 'config')
-            else
+            else:
                 self.config_file = os.path.join(os.path.expanduser('~%s' % self.user), '.ssh', 'config.d', self.config_file)
         elif self.config_file is None:
             self.config_file = '/etc/ssh/ssh_config'
