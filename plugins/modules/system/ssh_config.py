@@ -31,8 +31,7 @@ options:
     description:
       - Which user account this configuration file belongs to.
       - If none given and I(ssh_config_file) is not specified, C(/etc/ssh/ssh_config) is used.
-      - If a user is given, C(~/.ssh/config) is used.
-      - Mutually exclusive with I(ssh_config_file).
+      - If a user is given and I(ssh_config_file) is not specified, C(~/.ssh/config) is used.
     type: str
   group:
     description:
@@ -86,7 +85,7 @@ options:
     description:
       - SSH config file.
       - If I(user) and this option are not specified, C(/etc/ssh/ssh_config) is used.
-      - Mutually exclusive with I(user).
+      - If I(user) is specified and this option is not specified, C(~/.ssh/config) is used.
     type: path
 requirements:
 - StormSSH
@@ -184,7 +183,10 @@ class SSHConfig():
 
     def check_ssh_config_path(self):
         if self.user:
-            self.config_file = os.path.join(os.path.expanduser('~%s' % self.user), '.ssh', 'config')
+            if self.config_file is None:
+                self.config_file = os.path.join(os.path.expanduser('~%s' % self.user), '.ssh', 'config')
+            else
+                self.config_file = os.path.join(os.path.expanduser('~%s' % self.user), '.ssh', 'config.d', self.config_file)
         elif self.config_file is None:
             self.config_file = '/etc/ssh/ssh_config'
 
@@ -312,9 +314,6 @@ def main():
             user_known_hosts_file=dict(type='str', default=None),
         ),
         supports_check_mode=True,
-        mutually_exclusive=[
-            ['user', 'ssh_config_file'],
-        ],
     )
 
     if not HAS_STORM:
