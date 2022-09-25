@@ -62,6 +62,7 @@ options:
             - 'The credential value. Depends on scheme (format "digest": user:password, "sasl": user:password).'
         type: str
         required: false
+        version_added: 5.7.0
 requirements:
     - kazoo >= 2.1
     - python >= 2.6
