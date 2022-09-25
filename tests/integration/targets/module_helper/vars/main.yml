@@ -1,4 +1,9 @@
 ---
+# Copyright (c) 2022, DEMAREST Maxime <maxime@indelog.fr>
+#
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 test_cases_dest_file_module_helper:
 
   - id: "(010) fail to create when the creation is not allowed"
