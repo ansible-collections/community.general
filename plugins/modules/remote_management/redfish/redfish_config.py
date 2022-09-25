@@ -113,6 +113,12 @@ options:
       - Redfish HostInterface instance ID if multiple HostInterfaces are present.
     type: str
     version_added: '4.1.0'
+  sessions_config:
+    required: false
+    description:
+      - Setting dict of Sessions.
+    type: dict
+    version_added: '5.7.0'
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''
@@ -235,6 +241,16 @@ EXAMPLES = '''
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+
+  - name: Set SessionService Session Timeout to 30 minutes
+    community.general.redfish_config:
+      category: Sessions
+      command: SetSessionService
+      sessions_config:
+        SessionTimeout: 1800
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
 '''
 
 RETURN = '''
@@ -254,7 +270,8 @@ from ansible.module_utils.common.text.converters import to_native
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["SetBiosDefaultSettings", "SetBiosAttributes", "SetBootOrder",
                 "SetDefaultBootOrder"],
-    "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface"]
+    "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface"],
+    "Sessions": ["SetSessionService"],
 }
 
 
@@ -284,6 +301,7 @@ def main():
             strip_etag_quotes=dict(type='bool', default=False),
             hostinterface_config=dict(type='dict', default={}),
             hostinterface_id=dict(),
+            sessions_config=dict(type='dict', default={}),
         ),
         required_together=[
             ('username', 'password'),
@@ -330,6 +348,9 @@ def main():
     # HostInterface instance ID
     hostinterface_id = module.params['hostinterface_id']
 
+    # Sessions config options
+    sessions_config = module.params['sessions_config']
+
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
     rf_utils = RedfishUtils(creds, root_uri, timeout, module,
@@ -375,6 +396,16 @@ def main():
                 result = rf_utils.set_manager_nic(nic_addr, nic_config)
             elif command == "SetHostInterface":
                 result = rf_utils.set_hostinterface_attributes(hostinterface_config, hostinterface_id)
+
+    elif category == "Sessions":
+        # execute only if we find a Sessions resource
+        result = rf_utils._find_sessionservice_resource()
+        if result['ret'] is False:
+            module.fail_json(msg=to_native(result['msg']))
+
+        for command in command_list:
+            if command == "SetSessionService":
+                result = rf_utils.set_session_service(sessions_config)
 
     # Return data back or fail with proper message
     if result['ret'] is True:

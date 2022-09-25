@@ -240,6 +240,7 @@ class RedfishUtils(object):
             return {'ret': False, 'msg': "SessionService resource not found"}
         else:
             session_service = data["SessionService"]["@odata.id"]
+            self.session_service_uri = session_service
             response = self.get_request(self.root_uri + session_service)
             if response['ret'] is False:
                 return response
@@ -3081,3 +3082,60 @@ class RedfishUtils(object):
 
     def get_multi_manager_inventory(self):
         return self.aggregate_managers(self.get_manager_inventory)
+
+    def set_session_service(self, sessions_config):
+        result = {}
+        response = self.get_request(self.root_uri + self.session_service_uri)
+        if response['ret'] is False:
+            return response
+        current_sessions_config = response['data']
+        payload = {}
+        for property, value in sessions_config.items():
+            value = sessions_config[property]
+            if property not in current_sessions_config:
+                return {'ret': False, 'msg': "Property %s in sessions_config is invalid" % property}
+            if isinstance(value, dict):
+                if isinstance(current_sessions_config[property], dict):
+                    payload[property] = value
+                elif isinstance(current_sessions_config[property], list):
+                    payload[property] = [value]
+                else:
+                    return {'ret': False, 'msg': "Value of property %s in sessions_config is invalid" % property}
+            else:
+                payload[property] = value
+
+        need_change = False
+        for property, set_value in payload.items():
+            cur_value = current_sessions_config[property]
+            if not isinstance(set_value, (dict, list)):
+                if set_value != cur_value:
+                    need_change = True
+            if isinstance(set_value, dict):
+                for subprop in set_value.keys():
+                    if subprop not in current_sessions_config[property]:
+                        need_change = True
+                        break
+                    sub_set_value = set_value[subprop]
+                    sub_cur_value = current_sessions_config[property][subprop]
+                    if sub_set_value != sub_cur_value:
+                        need_change = True
+            if isinstance(set_value, list):
+                if len(set_value) != len(cur_value):
+                    need_change = True
+                    continue
+                for i in range(len(set_value)):
+                    for subprop in set_value[i].keys():
+                        if subprop not in current_sessions_config[property][i]:
+                            need_change = True
+                            break
+                        sub_set_value = set_value[i][subprop]
+                        sub_cur_value = current_sessions_config[property][i][subprop]
+                        if sub_set_value != sub_cur_value:
+                            need_change = True
+        if not need_change:
+            return {'ret': True, 'changed': False, 'msg': "SessionService already configured"}
+
+        response = self.patch_request(self.root_uri + self.session_service_uri, payload)
+        if response['ret'] is False:
+            return response
+        return {'ret': True, 'changed': True, 'msg': "Modified SessionService"}
