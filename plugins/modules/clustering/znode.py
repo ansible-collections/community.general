@@ -49,7 +49,7 @@ options:
             - Recursively delete node and all its children.
         type: bool
         default: false
-    scheme:
+    auth_scheme:
         description:
             - 'Authentication scheme.'
         choices: [ digest, sasl ]
@@ -57,9 +57,9 @@ options:
         default: "digest"
         required: false
         version_added: 5.7.0
-    credential:
+    auth_credential:
         description:
-            - 'The credential value. Depends on scheme (format for I(scheme=digest) is C(user:password), and the format for I(scheme=sasl) is C(user:password)).'
+            - 'The authentication credential value. Depends on auth_scheme (format for I(auth_scheme=digest) is C(user:password), and the format for I(auth_scheme=sasl) is C(user:password)).'
         type: str
         required: false
         version_added: 5.7.0
@@ -86,7 +86,7 @@ EXAMPLES = """
 - name: Getting the value and stat structure for a znode using digest authentication
   community.general.znode:
     hosts: 'localhost:2181'
-    credential: 'user1:s3cr3t'
+    auth_credential: 'user1:s3cr3t'
     name: /secretmypath
     op: get
 
@@ -144,8 +144,8 @@ def main():
             state=dict(choices=['present', 'absent']),
             timeout=dict(default=300, type='int'),
             recursive=dict(default=False, type='bool'),
-            scheme=dict(default='digest', choices=['digest', 'sasl']),
-            credential=dict(type='str', no_log=True),
+            auth_scheme=dict(default='digest', choices=['digest', 'sasl']),
+            auth_credential=dict(type='str', no_log=True),
         ),
         supports_check_mode=False
     )
@@ -224,8 +224,8 @@ class KazooCommandProxy():
 
     def start(self):
         self.zk.start()
-        if (self.module.params['credential']):
-            self.zk.add_auth(self.module.params['scheme'], self.module.params['credential'])
+        if (self.module.params['auth_credential']):
+            self.zk.add_auth(self.module.params['auth_scheme'], self.module.params['auth_credential'])
 
     def wait(self):
         return self._wait(self.module.params['name'], self.module.params['timeout'])
