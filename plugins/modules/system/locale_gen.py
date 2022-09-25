@@ -197,15 +197,15 @@ def main():
     name = module.params['name']
     state = module.params['state']
 
-    if not os.path.exists("/etc/locale.gen"):
-        if os.path.exists("/var/lib/locales/supported.d/"):
-            # Ubuntu created its own system to manage locales.
-            ubuntuMode = True
+    if not os.path.exists("/var/lib/locales/supported.d/"):
+        if os.path.exists("/etc/locale.gen"):
+            # We found the common way to manage locales.
+            ubuntuMode = False
         else:
             module.fail_json(msg="/etc/locale.gen and /var/lib/locales/supported.d/local are missing. Is the package \"locales\" installed?")
     else:
-        # We found the common way to manage locales.
-        ubuntuMode = False
+        # Ubuntu created its own system to manage locales.
+        ubuntuMode = True
 
     if not is_available(name, ubuntuMode):
         module.fail_json(msg="The locale you've entered is not available "
