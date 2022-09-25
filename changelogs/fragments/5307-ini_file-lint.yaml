@@ -1,0 +1,2 @@
+bugfixes:
+  - ini_file - minor refactor fixing a python lint error (https://github.com/ansible-collections/community.general/pull/5307).
