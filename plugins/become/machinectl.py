@@ -117,7 +117,7 @@ class BecomeModule(BecomeBase):
 
         flags = self.get_option('become_flags')
         user = self.get_option('become_user')
-        return '%s -q shell %s %s@ %s' % (become, flags, user, cmd)
+        return '%s -q shell %s %s@ %s' % (become, flags, user, self._build_success_command(cmd, shell))
 
     def check_success(self, b_output):
         b_output = self.remove_ansi_codes(b_output)
