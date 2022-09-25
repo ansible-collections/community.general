@@ -59,7 +59,7 @@ options:
         version_added: 5.7.0
     credential:
         description:
-            - 'The credential value. Depends on scheme (format "digest": user:password, "sasl": user:password).'
+            - 'The credential value. Depends on scheme (format for I(scheme=digest) is C(user:password), and the format for I(scheme=sasl) is C(user:password)).'
         type: str
         required: false
         version_added: 5.7.0
