@@ -1,0 +1,2 @@
+minor_changes:
+  - machinectl become plugin - combine the success command when building the become command to be consistent with other become plugins (https://github.com/ansible-collections/community.general/pull/5287).
