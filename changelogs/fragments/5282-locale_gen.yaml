@@ -1,0 +1,2 @@
+bugfixes:
+  - "locale_gen - fix support for Ubuntu (https://github.com/ansible-collections/community.general/issues/5281)."
