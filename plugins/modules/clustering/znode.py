@@ -56,6 +56,7 @@ options:
         type: str
         default: "digest"
         required: false
+        version_added: 5.7.0
     credential:
         description:
             - 'The credential value. Depends on scheme (format "digest": user:password, "sasl": user:password).'
