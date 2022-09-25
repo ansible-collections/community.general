@@ -145,7 +145,7 @@ def main():
             timeout=dict(default=300, type='int'),
             recursive=dict(default=False, type='bool'),
             scheme=dict(default='digest', choices=['digest', 'sasl']),
-            credential=dict(type='str')
+            credential=dict(type='str', no_log=True),
         ),
         supports_check_mode=False
     )
