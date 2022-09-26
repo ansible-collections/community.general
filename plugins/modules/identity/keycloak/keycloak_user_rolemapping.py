@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2022, Dušan Marković (@bratwurzt)
+# Copyright (c) 2022, Dušan Marković (@bratwurzt)
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import absolute_import, division, print_function
@@ -13,7 +13,7 @@ module: keycloak_user_rolemapping
 
 short_description: Allows administration of Keycloak user_rolemapping with the Keycloak API
 
-version_added: 5.3.0
+version_added: 5.7.0
 
 description:
     - This module allows you to add, remove or modify Keycloak user_rolemapping with the Keycloak REST API.
@@ -60,14 +60,14 @@ options:
     uid:
         type: str
         description:
-            - Id of the user to be mapped.
+            - ID of the user to be mapped.
             - This parameter is not required for updating or deleting the rolemapping but
               providing it will reduce the number of API calls required.
 
     service_account_user_client_id:
         type: str
         description:
-            - client_id of the service-account-user to be mapped.
+            - Client ID of the service-account-user to be mapped.
             - This parameter is not required for updating or deleting the rolemapping but
               providing it will reduce the number of API calls required.
 
@@ -75,12 +75,13 @@ options:
         type: str
         description:
             - Name of the client to be mapped (different than I(cid)).
-            - This parameter is required (can be replaced by cid for less API call).
+            - This parameter is required if I(cid) is not provided (can be replaced by I(cid)
+              to reduce the number of API calls that must be made).
 
     cid:
         type: str
         description:
-            - Id of the client to be mapped.
+            - ID of the client to be mapped.
             - This parameter is not required for updating or deleting the rolemapping but
               providing it will reduce the number of API calls required.
 
@@ -93,7 +94,7 @@ options:
             name:
                 type: str
                 description:
-                    - Name of the role_representation.
+                    - Name of the role representation.
                     - This parameter is required only when creating or updating the role_representation.
             id:
                 type: str
