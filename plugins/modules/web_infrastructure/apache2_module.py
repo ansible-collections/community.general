@@ -197,6 +197,8 @@ def _set_state(module, state):
     a2mod_binary = {'present': 'a2enmod', 'absent': 'a2dismod'}[state]
     success_msg = "Module %s %s" % (name, state_string)
 
+    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
+
     if _module_is_enabled(module) != want_enabled:
         if module.check_mode:
             module.exit_json(changed=True,
@@ -219,6 +221,8 @@ def _set_state(module, state):
             module.exit_json(changed=True,
                              result=success_msg,
                              warnings=module.warnings)
+        elif result == 0:
+            module.exit_json(changed=(' already ' not in stdout), result=success_msg)
         else:
             msg = (
                 'Failed to set module {name} to {state}:\n'

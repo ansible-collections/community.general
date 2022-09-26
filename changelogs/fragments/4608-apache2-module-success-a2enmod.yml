@@ -1,0 +1,2 @@
+minor_changes:
+  - apache2_module - return success if a2enmod detects that module was already installed (https://github.com/ansible-collections/community.general/pull/4608).

@@ -91,7 +91,7 @@
 
   - name: use identifier to enable module, fix for https://github.com/ansible/ansible/issues/33669
     community.general.apache2_module:
-      name: dump_io
+      name: dumpio
       state: present
     ignore_errors: True
     register: enable_dumpio_wrong
@@ -122,7 +122,8 @@
       identifier: dumpio_module
       state: absent
 
-  - assert:
+  - name: ensure that identifier can be used to enable module
+    assert:
       that:
         - enable_dumpio_wrong is failed
         - enable_dumpio_correct_1 is changed
