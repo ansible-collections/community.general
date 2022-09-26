@@ -1,0 +1,2 @@
+bugfixes:
+  - redhat_subscription - fix redhat_subscription module is not idempotent when pool_ids are used (https://github.com/ansible-collections/community.general/issues/5313).
