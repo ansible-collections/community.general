@@ -27,12 +27,11 @@ options:
   src_iso:
     description:
     - This is the path of source ISO file.
-    - Will fail if specified ISO file does not exist on local machine.
     type: path
     required: true
   dest_iso:
     description:
-    - The path with file name of the customized ISO file on local machine.
+    - The path of the customized ISO file.
     type: path
     required: true
   delete_files:
@@ -62,8 +61,8 @@ options:
 notes:
 - The C(pycdlib) library states it supports Python 2.7 and 3.4 only.
 - >
-  The function "add_file" in pycdlib will overwrite the existing file in ISO with type ISO9660 / Rock Ridge 1.12 / Joliet / UDF.
-  But it won't overwrite the existing file in ISO with Rock Ridge 1.09 / 1.10.
+  The function I(add_file) in pycdlib will overwrite the existing file in ISO with type ISO9660 / Rock Ridge 1.12 / Joliet / UDF.
+  But it will not overwrite the existing file in ISO with Rock Ridge 1.09 / 1.10.
   So we take workaround "delete the existing file and then add file for ISO with Rock Ridge".
 '''
 
@@ -302,7 +301,7 @@ def main():
 
     src_iso = module.params['src_iso']
     if not os.path.exists(src_iso):
-        module.fail_json(msg="The %s does not exist." % src_iso)
+        module.fail_json(msg="ISO file %s does not exist." % src_iso)
 
     dest_iso = module.params['dest_iso']
     dest_iso_dir = os.path.dirname(dest_iso)
@@ -317,11 +316,11 @@ def main():
                 module.fail_json(msg="The file %s does not exist." % item['src_file'])
 
     result = dict(
-        changed=False,
         src_iso=src_iso,
         customized_iso=dest_iso,
         delete_files=delete_files_list,
         add_files=add_files_list,
+        changed=True,
     )
 
     if not module.check_mode:
