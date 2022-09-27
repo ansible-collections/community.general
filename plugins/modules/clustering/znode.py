@@ -59,7 +59,8 @@ options:
         version_added: 5.7.0
     auth_credential:
         description:
-            - 'The authentication credential value. Depends on auth_scheme (format for I(auth_scheme=digest) is C(user:password), and the format for I(auth_scheme=sasl) is C(user:password)).'
+            - 'The authentication credential value. Depends on auth_scheme (format for I(auth_scheme=digest) is C(user:password),
+               and the format for I(auth_scheme=sasl) is C(user:password)).'
         type: str
         required: false
         version_added: 5.7.0
