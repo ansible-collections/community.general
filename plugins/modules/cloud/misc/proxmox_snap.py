@@ -38,6 +38,17 @@ options:
       - For removal from config file, even if removing disk snapshot fails.
     default: false
     type: bool
+  unbind:
+    description:
+      - This option only applies to LXC containers.
+      - Allows to snapshot a container even if it has configured mountpoints.
+      - Temporarily disables all configured mountpoints, takes snapshot, and finally restores original configuration.
+      - If running, the container will be stopped and restarted to apply config changes.
+      - Due to restrictions in the Proxmox API this option can only be used authenticating as C(root@pam) with I(api_password), API tokens do not work either.
+      - See U(https://pve.proxmox.com/pve-docs/api-viewer/#/nodes/{node}/lxc/{vmid}/config) (PUT tab) for more details.
+    default: false
+    type: bool
+    version_added: 5.7.0
   vmstate:
     description:
       - Snapshot includes RAM.
@@ -78,6 +89,16 @@ EXAMPLES = r'''
     state: present
     snapname: pre-updates
 
+- name: Create new snapshot for a container with configured mountpoints
+  community.general.proxmox_snap:
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    vmid: 100
+    state: present
+    unbind: true # requires root@pam+password auth, API tokens are not supported
+    snapname: pre-updates
+
 - name: Remove container snapshot
   community.general.proxmox_snap:
     api_user: root@pam
@@ -110,17 +131,89 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
     def snapshot(self, vm, vmid):
         return getattr(self.proxmox_api.nodes(vm['node']), vm['type'])(vmid).snapshot
 
-    def snapshot_create(self, vm, vmid, timeout, snapname, description, vmstate):
+    def vmconfig(self, vm, vmid):
+        return getattr(self.proxmox_api.nodes(vm['node']), vm['type'])(vmid).config
+
+    def vmstatus(self, vm, vmid):
+        return getattr(self.proxmox_api.nodes(vm['node']), vm['type'])(vmid).status
+
+    def _container_mp_get(self, vm, vmid):
+        cfg = self.vmconfig(vm, vmid).get()
+        mountpoints = {}
+        for key, value in cfg.items():
+            if key.startswith('mp'):
+                mountpoints[key] = value
+        return mountpoints
+
+    def _container_mp_disable(self, vm, vmid, timeout, unbind, mountpoints, vmstatus):
+        # shutdown container if running
+        if vmstatus == 'running':
+            self.shutdown_instance(vm, vmid, timeout)
+        # delete all mountpoints configs
+        self.vmconfig(vm, vmid).put(delete=' '.join(mountpoints))
+
+    def _container_mp_restore(self, vm, vmid, timeout, unbind, mountpoints, vmstatus):
+        # NOTE: requires auth as `root@pam`, API tokens are not supported
+        # see https://pve.proxmox.com/pve-docs/api-viewer/#/nodes/{node}/lxc/{vmid}/config
+        # restore original config
+        self.vmconfig(vm, vmid).put(**mountpoints)
+        # start container (if was running before snap)
+        if vmstatus == 'running':
+            self.start_instance(vm, vmid, timeout)
+
+    def start_instance(self, vm, vmid, timeout):
+        taskid = self.vmstatus(vm, vmid).start.post()
+        while timeout:
+            if self.api_task_ok(vm['node'], taskid):
+                return True
+            timeout -= 1
+            if timeout == 0:
+                self.module.fail_json(msg='Reached timeout while waiting for VM to start. Last line in task before timeout: %s' %
+                                      self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
+            time.sleep(1)
+        return False
+
+    def shutdown_instance(self, vm, vmid, timeout):
+        taskid = self.vmstatus(vm, vmid).shutdown.post()
+        while timeout:
+            if self.api_task_ok(vm['node'], taskid):
+                return True
+            timeout -= 1
+            if timeout == 0:
+                self.module.fail_json(msg='Reached timeout while waiting for VM to stop. Last line in task before timeout: %s' %
+                                      self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
+            time.sleep(1)
+        return False
+
+    def snapshot_create(self, vm, vmid, timeout, snapname, description, vmstate, unbind):
         if self.module.check_mode:
             return True
 
         if vm['type'] == 'lxc':
+            if unbind is True:
+                # check if credentials will work
+                # WARN: it is crucial this check runs here!
+                # The correct permissions are required only to reconfig mounts.
+                # Not checking now would allow to remove the configuration BUT
+                # fail later, leaving the container in a misconfigured state.
+                if (
+                    self.module.params['api_user'] != 'root@pam'
+                    or not self.module.params['api_password']
+                ):
+                    self.module.fail_json(msg='`unbind=True` requires authentication as `root@pam` with `api_password`, API tokens are not supported.')
+                    return False
+                mountpoints = self._container_mp_get(vm, vmid)
+                vmstatus = self.vmstatus(vm, vmid).current().get()['status']
+                if mountpoints:
+                    self._container_mp_disable(vm, vmid, timeout, unbind, mountpoints, vmstatus)
             taskid = self.snapshot(vm, vmid).post(snapname=snapname, description=description)
         else:
             taskid = self.snapshot(vm, vmid).post(snapname=snapname, description=description, vmstate=int(vmstate))
+
         while timeout:
-            status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
-            if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
+            if self.api_task_ok(vm['node'], taskid):
+                if vm['type'] == 'lxc' and unbind is True and mountpoints:
+                    self._container_mp_restore(vm, vmid, timeout, unbind, mountpoints, vmstatus)
                 return True
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for creating VM snapshot. Last line in task before timeout: %s' %
@@ -128,6 +221,8 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
 
             time.sleep(1)
             timeout -= 1
+        if vm['type'] == 'lxc' and unbind is True and mountpoints:
+            self._container_mp_restore(vm, vmid, timeout, unbind, mountpoints, vmstatus)
         return False
 
     def snapshot_remove(self, vm, vmid, timeout, snapname, force):
@@ -136,8 +231,7 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
 
         taskid = self.snapshot(vm, vmid).delete(snapname, force=int(force))
         while timeout:
-            status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
-            if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
+            if self.api_task_ok(vm['node'], taskid):
                 return True
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for removing VM snapshot. Last line in task before timeout: %s' %
@@ -153,8 +247,7 @@ class ProxmoxSnapAnsible(ProxmoxAnsible):
 
         taskid = self.snapshot(vm, vmid)(snapname).post("rollback")
         while timeout:
-            status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
-            if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
+            if self.api_task_ok(vm['node'], taskid):
                 return True
             if timeout == 0:
                 self.module.fail_json(msg='Reached timeout while waiting for rolling back VM snapshot. Last line in task before timeout: %s' %
@@ -175,6 +268,7 @@ def main():
         description=dict(type='str'),
         snapname=dict(type='str', default='ansible_snap'),
         force=dict(type='bool', default=False),
+        unbind=dict(type='bool', default=False),
         vmstate=dict(type='bool', default=False),
     )
     module_args.update(snap_args)
@@ -193,6 +287,7 @@ def main():
     snapname = module.params['snapname']
     timeout = module.params['timeout']
     force = module.params['force']
+    unbind = module.params['unbind']
     vmstate = module.params['vmstate']
 
     # If hostname is set get the VM id from ProxmoxAPI
@@ -209,7 +304,7 @@ def main():
                 if i['name'] == snapname:
                     module.exit_json(changed=False, msg="Snapshot %s is already present" % snapname)
 
-            if proxmox.snapshot_create(vm, vmid, timeout, snapname, description, vmstate):
+            if proxmox.snapshot_create(vm, vmid, timeout, snapname, description, vmstate, unbind):
                 if module.check_mode:
                     module.exit_json(changed=False, msg="Snapshot %s would be created" % snapname)
                 else:
