@@ -137,3 +137,7 @@ class ProxmoxAnsible(object):
                 return None
 
             self.module.fail_json(msg='VM with vmid %s does not exist in cluster' % vmid)
+
+    def api_task_ok(self, node, taskid):
+        status = self.proxmox_api.nodes(node).tasks(taskid).status.get()
+        return status['status'] == 'stopped' and status['exitstatus'] == 'OK'

@@ -482,8 +482,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             taskid = getattr(proxmox_node, VZ_TYPE).create(vmid=vmid, storage=storage, memory=memory, swap=swap, **kwargs)
 
         while timeout:
-            if (proxmox_node.tasks(taskid).status.get()['status'] == 'stopped' and
-                    proxmox_node.tasks(taskid).status.get()['exitstatus'] == 'OK'):
+            if self.api_task_ok(node, taskid):
                 return True
             timeout -= 1
             if timeout == 0:
@@ -496,8 +495,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
     def start_instance(self, vm, vmid, timeout):
         taskid = getattr(self.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.start.post()
         while timeout:
-            if (self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['status'] == 'stopped' and
-                    self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):
+            if self.api_task_ok(vm['node'], taskid):
                 return True
             timeout -= 1
             if timeout == 0:
@@ -513,8 +511,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         else:
             taskid = getattr(self.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.shutdown.post()
         while timeout:
-            if (self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['status'] == 'stopped' and
-                    self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):
+            if self.api_task_ok(vm['node'], taskid):
                 return True
             timeout -= 1
             if timeout == 0:
@@ -527,8 +524,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
     def umount_instance(self, vm, vmid, timeout):
         taskid = getattr(self.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.umount.post()
         while timeout:
-            if (self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['status'] == 'stopped' and
-                    self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):
+            if self.api_task_ok(vm['node'], taskid):
                 return True
             timeout -= 1
             if timeout == 0:
@@ -775,8 +771,7 @@ def main():
             taskid = getattr(proxmox.proxmox_api.nodes(vm['node']), VZ_TYPE).delete(vmid, **delete_params)
 
             while timeout:
-                task_status = proxmox.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
-                if (task_status['status'] == 'stopped' and task_status['exitstatus'] == 'OK'):
+                if proxmox.api_task_ok(vm['node'], taskid):
                     module.exit_json(changed=True, msg="VM %s removed" % vmid)
                 timeout -= 1
                 if timeout == 0:
