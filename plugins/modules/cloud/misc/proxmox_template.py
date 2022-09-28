@@ -131,8 +131,7 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
         Check the task status and wait until the task is completed or the timeout is reached.
         """
         while timeout:
-            task_status = self.proxmox_api.nodes(node).tasks(taskid).status.get()
-            if task_status['status'] == 'stopped' and task_status['exitstatus'] == 'OK':
+            if self.api_task_ok(node, taskid):
                 return True
             timeout = timeout - 1
             if timeout == 0:
