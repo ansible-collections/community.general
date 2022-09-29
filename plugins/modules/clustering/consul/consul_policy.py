@@ -74,8 +74,6 @@ options:
     required: false
     default: True
 requirements:
-  - python-consul
-  - pyhcl
   - requests
 '''
 

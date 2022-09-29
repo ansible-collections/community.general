@@ -49,25 +49,29 @@ options:
     type: list
     elements: dict
     description:
-      - TODO
+      - List of policies to attach to the token.
+      - Each element must have a "name" or "id" (or both) to identify the policy. See consul_policy for more info.
     required: false
   roles:
     type: list
     elements: dict
     description:
-      - TODO
+      - List of roles to attach to the token.
+      - Each element must have a "name" or "id" (or both) to identify the role.
     required: false
   service_identities:
     type: list
     elements: dict
     description:
-      - TODO
+      - List of service identities to attach to the token.
+      - Each element must have a "name" and optionally a "datacenters" list of datacenters the policy is valid for. An empty datacenters list allows all datacenters
     required: false
   node_identities:
     type: list
     elements: dict
     description:
-      - TODO
+      - List of node identities to attach to the token.
+      - Each element must have a "name" and optionally a "datacenter" the policy is valid for. An empty datacenter allows all datacenters
     required: false
   host:
     description:
@@ -98,8 +102,6 @@ options:
     required: false
     default: True
 requirements:
-  - python-consul
-  - pyhcl
   - requests
 '''
 
