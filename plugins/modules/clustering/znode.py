@@ -226,7 +226,7 @@ class KazooCommandProxy():
 
     def start(self):
         self.zk.start()
-        if (self.module.params['auth_credential']):
+        if self.module.params['auth_credential']:
             self.zk.add_auth(self.module.params['auth_scheme'], self.module.params['auth_credential'])
 
     def wait(self):
