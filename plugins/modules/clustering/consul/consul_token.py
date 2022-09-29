@@ -239,7 +239,7 @@ def get_auth_headers(configuration):
 
 
 class RequestError(Exception):
-  pass
+    pass
 
 
 def handle_consul_response_error(response):
