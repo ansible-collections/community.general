@@ -504,7 +504,7 @@ files:
     maintainers: bvitnik
   $modules/clustering/consul/:
     maintainers: $team_consul
-    ignore: colin-nolan
+    ignore: colin-nolan Hakon
   $modules/clustering/etcd3.py:
     maintainers: evrardjp
     ignore: vfauth
