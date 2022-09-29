@@ -141,14 +141,14 @@ EXAMPLES = '''
     ttl: 600  # sec
 '''
 
+from ansible.module_utils.basic import AnsibleModule
+
 try:
     import requests
     from requests.exceptions import ConnectionError
     has_requests = True
 except ImportError:
     has_requests = False
-
-from ansible.module_utils.basic import AnsibleModule
 
 
 def execute(module):
@@ -164,12 +164,13 @@ def execute(module):
 
 
 class RequestError(Exception):
-  pass
+    pass
 
 
 def handle_consul_response_error(response):
     if 400 <= response.status_code < 600:
         raise RequestError('%d %s' % (response.status_code, response.content))
+
 
 def get_consul_url(module):
     return '%s://%s:%s/v1' % (module.params.get('scheme'),
@@ -182,27 +183,45 @@ def get_auth_headers(module):
     else:
         return {}
 
+
 def list_sessions(module, datacenter):
-  url = '%s/session/list' % get_consul_url(module)
-  headers = get_auth_headers(module)
-  response = requests.get(url, headers=headers, params={'dc': datacenter}, verify=module.params.get('validate_certs'))
-  handle_consul_response_error(response)
-  return response.json()
+    url = '%s/session/list' % get_consul_url(module)
+    headers = get_auth_headers(module)
+    response = requests.get(
+        url,
+        headers=headers,
+        params={
+            'dc': datacenter},
+        verify=module.params.get('validate_certs'))
+    handle_consul_response_error(response)
+    return response.json()
 
 
 def list_sessions_for_node(module, node, datacenter):
-  url = '%s/session/node/%s' % (get_consul_url(module), node)
-  headers = get_auth_headers(module)
-  response = requests.get(url, headers=headers, params={'dc': datacenter}, verify=module.params.get('validate_certs'))
-  handle_consul_response_error(response)
-  return response.json()
+    url = '%s/session/node/%s' % (get_consul_url(module), node)
+    headers = get_auth_headers(module)
+    response = requests.get(
+        url,
+        headers=headers,
+        params={
+            'dc': datacenter},
+        verify=module.params.get('validate_certs'))
+    handle_consul_response_error(response)
+    return response.json()
+
 
 def get_session_info(module, session_id, datacenter):
-  url = '%s/session/info/%s' % (get_consul_url(module), session_id)
-  headers = get_auth_headers(module)
-  response = requests.get(url, headers=headers, params={'dc': datacenter}, verify=module.params.get('validate_certs'))
-  handle_consul_response_error(response)
-  return response.json()
+    url = '%s/session/info/%s' % (get_consul_url(module), session_id)
+    headers = get_auth_headers(module)
+    response = requests.get(
+        url,
+        headers=headers,
+        params={
+            'dc': datacenter},
+        verify=module.params.get('validate_certs'))
+    handle_consul_response_error(response)
+    return response.json()
+
 
 def lookup_sessions(module):
 
@@ -234,22 +253,31 @@ def lookup_sessions(module):
     except Exception as e:
         module.fail_json(msg="Could not retrieve session info %s" % e)
 
-def create_session(module, name, behavior, ttl, node, lock_delay, datacenter, checks):
-  url = '%s/session/create' % get_consul_url(module)
-  headers = get_auth_headers(module)
-  create_data = {
-    "LockDelay": lock_delay,
-    "Node": node,
-    "Name": name,
-    "Checks": checks,
-    "Behavior": behavior,
-  }
-  if ttl is not None:
-    create_data["TTL"] = "%ss" % str(ttl) # TTL is in seconds
-  response = requests.put(url, headers=headers, params={'dc': datacenter}, json=create_data, verify=module.params.get('validate_certs'))
-  handle_consul_response_error(response)
-  create_session_response_dict = response.json()
-  return create_session_response_dict["ID"]
+
+def create_session(module, name, behavior, ttl, node,
+                   lock_delay, datacenter, checks):
+    url = '%s/session/create' % get_consul_url(module)
+    headers = get_auth_headers(module)
+    create_data = {
+        "LockDelay": lock_delay,
+        "Node": node,
+        "Name": name,
+        "Checks": checks,
+        "Behavior": behavior,
+    }
+    if ttl is not None:
+        create_data["TTL"] = "%ss" % str(ttl)  # TTL is in seconds
+    response = requests.put(
+        url,
+        headers=headers,
+        params={
+            'dc': datacenter},
+        json=create_data,
+        verify=module.params.get('validate_certs'))
+    handle_consul_response_error(response)
+    create_session_response_dict = response.json()
+    return create_session_response_dict["ID"]
+
 
 def update_session(module):
 
@@ -263,14 +291,14 @@ def update_session(module):
 
     try:
         session = create_session(module,
-            name=name,
-            behavior=behavior,
-            ttl=ttl,
-            node=node,
-            lock_delay=delay,
-            datacenter=datacenter,
-            checks=checks
-        )
+                                 name=name,
+                                 behavior=behavior,
+                                 ttl=ttl,
+                                 node=node,
+                                 lock_delay=delay,
+                                 datacenter=datacenter,
+                                 checks=checks
+                                 )
         module.exit_json(changed=True,
                          session_id=session,
                          name=name,
@@ -282,12 +310,17 @@ def update_session(module):
     except Exception as e:
         module.fail_json(msg="Could not create/update session %s" % e)
 
+
 def destroy_session(module, session_id):
-  url = '%s/session/destroy/%s' % (get_consul_url(module), session_id)
-  headers = get_auth_headers(module)
-  response = requests.put(url, headers=headers, verify=module.params.get('validate_certs'))
-  handle_consul_response_error(response)
-  return response.content == "true"
+    url = '%s/session/destroy/%s' % (get_consul_url(module), session_id)
+    headers = get_auth_headers(module)
+    response = requests.put(
+        url,
+        headers=headers,
+        verify=module.params.get('validate_certs'))
+    handle_consul_response_error(response)
+    return response.content == "true"
+
 
 def remove_session(module):
     session_id = module.params.get('id')
@@ -312,7 +345,12 @@ def main():
     argument_spec = dict(
         checks=dict(type='list', elements='str'),
         delay=dict(type='int', default='15'),
-        behavior=dict(type='str', default='release', choices=['release', 'delete']),
+        behavior=dict(
+            type='str',
+            default='release',
+            choices=[
+                'release',
+                'delete']),
         ttl=dict(type='int'),
         host=dict(type='str', default='localhost'),
         port=dict(type='int', default=8500),
@@ -321,7 +359,15 @@ def main():
         id=dict(type='str'),
         name=dict(type='str'),
         node=dict(type='str'),
-        state=dict(type='str', default='present', choices=['absent', 'info', 'list', 'node', 'present']),
+        state=dict(
+            type='str',
+            default='present',
+            choices=[
+                'absent',
+                'info',
+                'list',
+                'node',
+                'present']),
         datacenter=dict(type='str'),
         token=dict(type='str', no_log=True),
     )
