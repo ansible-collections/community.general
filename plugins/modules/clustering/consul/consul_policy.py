@@ -177,7 +177,7 @@ def get_auth_headers(configuration):
 
 
 class RequestError(Exception):
-  pass
+    pass
 
 
 def handle_consul_response_error(response):
@@ -284,16 +284,16 @@ class Configuration:
 
     def __init__(self, token=None, host=None, scheme=None, validate_certs=None, name=None, description=None, port=None,
                  rules=None, valid_datacenters=None, state=None):
-        self.token = token    # type: str
-        self.host = host    # type: str
-        self.scheme = scheme    # type: str
-        self.validate_certs = validate_certs    # type: bool
-        self.name = name    # type: str
-        self.description = description  # type: str
-        self.port = port    # type: int
-        self.rules = rules    # type: str
+        self.token = token                          # type: str
+        self.host = host                            # type: str
+        self.scheme = scheme                        # type: str
+        self.validate_certs = validate_certs        # type: bool
+        self.name = name                            # type: str
+        self.description = description              # type: str
+        self.port = port                            # type: int
+        self.rules = rules                          # type: str
         self.valid_datacenters = valid_datacenters  # type: str
-        self.state = state    # type: str
+        self.state = state                          # type: str
 
 
 class Output:
@@ -302,9 +302,9 @@ class Output:
     """
 
     def __init__(self, changed=None, operation=None, policy=None):
-        self.changed = changed  # type: bool
+        self.changed = changed      # type: bool
         self.operation = operation  # type: str
-        self.policy = policy # type: dict
+        self.policy = policy        # type: dict
 
 
 def check_dependencies():

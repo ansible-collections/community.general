@@ -64,7 +64,8 @@ options:
     elements: dict
     description:
       - List of service identities to attach to the token.
-      - Each element must have a "name" and optionally a "datacenters" list of datacenters the policy is valid for. An empty datacenters list allows all datacenters
+      - Each element must have a "name" and optionally a "datacenters" list of datacenters the policy is valid for.
+      - An empty datacenters list allows all datacenters
     required: false
   node_identities:
     type: list
@@ -152,7 +153,20 @@ token:
     description: The token object, containing for example SecretID and AccessorID
     returned: success
     type: str
-    sample: {"AccessorID": "28F86FE2-8F61-46EA-BDD8-2AFE7F2B9F0A", "CreateIndex": 29, "CreateTime": "2022-09-29T09:10:35.8117161Z", "Description": "", "Hash": "+HNHaPJ/mr/PSh6cgtlELFHVrY3Mi/gsEfNB6ODnq5E=", "Local": false, "ModifyIndex": 29, "Policies": [{"ID": "8bcfa038-cb1e-51db-d3cb-80758345d23e", "Name": "foo-access"}], "SecretID": "3b370630-b374-7c71-93e2-a5fd5eb4deae"}
+    sample: |
+        {
+            "AccessorID": "28F86FE2-8F61-46EA-BDD8-2AFE7F2B9F0A",
+            "CreateIndex": 29,
+            "CreateTime": "2022-09-29T09:10:35.8117161Z",
+            "Description": "",
+            "Hash": "+HNHaPJ/mr/PSh6cgtlELFHVrY3Mi/gsEfNB6ODnq5E=",
+            "Local": false,
+            "ModifyIndex": 29,
+            "Policies": [
+                {"ID": "8bcfa038-cb1e-51db-d3cb-80758345d23e", "Name": "foo-access"}
+            ],
+            "SecretID": "3b370630-b374-7c71-93e2-a5fd5eb4deae"
+        }
 operation:
     description: the operation performed on the token
     returned: changed
@@ -213,7 +227,7 @@ _ARGUMENT_SPEC = {
 
 def get_consul_url(configuration):
     return '%s://%s:%s/v1' % (configuration.scheme,
-                              configuration.host, configuration.port)
+                            configuration.host, configuration.port)
 
 
 def get_auth_headers(configuration):
@@ -291,7 +305,6 @@ def create_token(configuration):
 
     response = requests.put(url, headers=headers, json=create_token_data, verify=configuration.validate_certs)
     handle_consul_response_error(response)
-
 
     resulting_token = response.json()
 
@@ -444,7 +457,7 @@ class Configuration:
         self.validate_certs = validate_certs                                        # type: bool
         self.id = id                                                                # type: str
         self.description = description                                              # type: str
-        self.token = token
+        self.token = token                                                          # type: str
         self.roles = [RoleLink(r) for r in roles]                                   # type: list(RoleLink)
         self.policies = [PolicyLink(p) for p in policies]                           # type: list(PolicyLink)
         self.service_identities = [ServiceIdentity(s) for s in service_identities]  # type: list(ServiceIdentity)
@@ -459,9 +472,9 @@ class Output:
     """
 
     def __init__(self, changed=None, operation=None, token=None):
-        self.changed = changed  # type: bool
+        self.changed = changed      # type: bool
         self.operation = operation  # type: str
-        self.token = token # type: dict
+        self.token = token          # type: dict
 
 
 def check_dependencies():
