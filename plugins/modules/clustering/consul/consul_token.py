@@ -222,7 +222,7 @@ _ARGUMENT_SPEC = {
     SERVICE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', default=[]),
     NODE_IDENTITIES_PARAMETER_NAME: dict(type='list', elements='dict', default=[]),
     LOCAL_PARAMETER_NAME: dict(type='bool', default=False),
-    TOKEN_PARAMETER_NAME: dict(type='str'),
+    TOKEN_PARAMETER_NAME: dict(type='str', no_log=True),
     STATE_PARAMETER_NAME: dict(default=PRESENT_STATE_VALUE, choices=[PRESENT_STATE_VALUE, ABSENT_STATE_VALUE]),
 }
 
