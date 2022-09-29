@@ -228,8 +228,7 @@ _ARGUMENT_SPEC = {
 
 
 def get_consul_url(configuration):
-    return '%s://%s:%s/v1' % (configuration.scheme,
-                            configuration.host, configuration.port)
+    return '%s://%s:%s/v1' % (configuration.scheme, configuration.host, configuration.port)
 
 
 def get_auth_headers(configuration):
