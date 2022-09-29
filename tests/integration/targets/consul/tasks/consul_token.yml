@@ -1,0 +1,83 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create a policy with rules
+  consul_policy:
+    name: foo-access
+    rules: |
+        key "foo" {
+            policy = "read"
+        }
+        key "private/foo" {
+            policy = "deny"
+        }
+    token: "{{ consul_management_token }}"
+  register: policy_result
+
+- name: Create a token with policy
+  consul_token:
+    mgmt_token: "{{ consul_management_token }}"
+    id: 28F86FE2-8F61-46EA-BDD8-2AFE7F2B9F0A
+    policies:
+      - name: "foo-access"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result['token']['AccessorID'] == '28F86FE2-8F61-46EA-BDD8-2AFE7F2B9F0A'
+
+- name: Create a token with a specific token and ID from policy
+  consul_token:
+    mgmt_token: "{{ consul_management_token }}"
+    id: F49E877B-2482-4AE1-8D6B-03ACF65097F7
+    token: 1b3bd454-2778-4271-9bcf-d7fafac78e31
+    policies:
+      - id: "{{policy_result['policy']['ID']}}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result['token']['SecretID'] == '1b3bd454-2778-4271-9bcf-d7fafac78e31'
+      - result['token']['Policies'][0]['ID'] == "{{policy_result['policy']['ID']}}"
+
+- name: Create a token with service identity
+  consul_token:
+    mgmt_token: "{{ consul_management_token }}"
+    id: ED8E0D78-2B1B-4CC2-950F-A12956CB50B1
+    service_identities:
+      - name: web
+        datacenters:
+          - dc1
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result['token']['ServiceIdentities'][0]['ServiceName'] == "web"
+      - result['token']['ServiceIdentities'][0]['Datacenters'][0] == "dc1"
+
+- name: Create a token with node identity
+  consul_token:
+    mgmt_token: "{{ consul_management_token }}"
+    id: E584B772-B2B9-44DC-A06D-DFECA11F6065
+    node_identities:
+      - name: node-1
+        datacenter: dc2
+  register: result
+- assert:
+    that:
+      - result is changed
+      - result['token']['NodeIdentities'][0]['NodeName'] == "node-1"
+      - result['token']['NodeIdentities'][0]['Datacenter'] == "dc2"
+- name: Remove the last token
+  consul_token:
+    mgmt_token: "{{ consul_management_token }}"
+    id: E584B772-B2B9-44DC-A06D-DFECA11F6065
+    state: absent
+- assert:
+    that:
+      - result is changed
