@@ -142,6 +142,8 @@ plugin_routing:
       redirect: community.general.clustering.consul.consul_policy
     consul_kv:
       redirect: community.general.clustering.consul.consul_kv
+    consul_role:
+      redirect: community.general.clustering.consul.consul_role
     consul_session:
       redirect: community.general.clustering.consul.consul_session
     consul_token:

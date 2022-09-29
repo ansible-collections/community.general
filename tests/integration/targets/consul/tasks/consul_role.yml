@@ -1,0 +1,68 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create a policy with rules
+  consul_policy:
+    name: foo-access-for-role
+    rules: |
+        key "foo" {
+            policy = "read"
+        }
+        key "private/foo" {
+            policy = "deny"
+        }
+    token: "{{ consul_management_token }}"
+  register: policy_result
+
+- name: Create a role with policy
+  consul_role:
+    name: foo-role-with-policy
+    policies:
+      - name: "foo-access-for-role"
+    token: "{{ consul_management_token }}"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result['role']['Name'] == 'foo-role-with-policy'
+
+- name: Create a role with service identity
+  consul_role:
+    token: "{{ consul_management_token }}"
+    name: role-with-service-identity
+    service_identities:
+      - name: web
+        datacenters:
+          - dc1
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result['role']['ServiceIdentities'][0]['ServiceName'] == "web"
+      - result['role']['ServiceIdentities'][0]['Datacenters'][0] == "dc1"
+
+- name: Create a role with node identity
+  consul_role:
+    token: "{{ consul_management_token }}"
+    name: role-with-node-identity
+    node_identities:
+      - name: node-1
+        datacenter: dc2
+  register: result
+- assert:
+    that:
+      - result is changed
+      - result['role']['NodeIdentities'][0]['NodeName'] == "node-1"
+      - result['role']['NodeIdentities'][0]['Datacenter'] == "dc2"
+- name: Remove the last role
+  consul_role:
+    token: "{{ consul_management_token }}"
+    name: role-with-node-identity
+    state: absent
+- assert:
+    that:
+      - result is changed

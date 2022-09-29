@@ -81,7 +81,7 @@ requirements:
 
 EXAMPLES = """
 - name: Create a policy with rules
-  consul_policy:
+  community.general.consul_policy:
     host: consul1.example.com
     token: some_management_acl
     name: foo-access
@@ -93,7 +93,7 @@ EXAMPLES = """
             policy = "deny"
         }
 - name: Update the rules associated to a policy
-  consul_policy:
+  community.general.consul_policy:
     host: consul1.example.com
     token: some_management_acl
     name: foo-access
@@ -108,7 +108,7 @@ EXAMPLES = """
             policy = "write"
         }
 - name: Remove a policy
-  consul_policy:
+  community.general.consul_policy:
     host: consul1.example.com
     token: some_management_acl
     name: foo-access

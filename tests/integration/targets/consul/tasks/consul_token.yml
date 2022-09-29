@@ -81,3 +81,23 @@
 - assert:
     that:
       - result is changed
+- name: Create a role with policy
+  consul_role:
+    name: foo-role
+    policies:
+      - name: "foo-access"
+    token: "{{ consul_management_token }}"
+  register: role_result
+
+- name: Create a token with role
+  consul_token:
+    mgmt_token: "{{ consul_management_token }}"
+    id: 28F86FE2-8F61-46EA-BDD8-2AFE7F2B9F0A
+    roles:
+      - name: "foo-role"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result['token']['AccessorID'] == '28F86FE2-8F61-46EA-BDD8-2AFE7F2B9F0A'
