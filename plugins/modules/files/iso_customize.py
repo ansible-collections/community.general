@@ -172,12 +172,12 @@ def iso_check_file_exists(opened_iso, dest_file):
 
             if item.upper() not in dirlist:
                 return False
-        
+
         if parent_dir == "/":
             parent_dir = "/%s" % item
         else:
             parent_dir = "%s/%s" % (parent_dir, item)
-    
+
     if '.' not in file_name:
         file_in_iso_path = file_name.upper() + '.;1'
     else:
