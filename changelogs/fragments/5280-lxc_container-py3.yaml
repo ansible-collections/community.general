@@ -2,4 +2,4 @@ bugfixes:
   - The ``lxc_container``` module has been updated to support Python 3 (https://github.com/ansible-collections/community.general/pull/5304)
 
 breaking_changes:
-  - The ``lxc_container`` module will no longer make any effort to support Python 2 (https://github.com/ansible-collections/community.general/pull/5304)
+  - The ``lxc_container`` module will no longer make any effort to support Python 2 (https://github.com/ansible-collections/community.general/pull/5304). 
