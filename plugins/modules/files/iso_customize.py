@@ -156,17 +156,41 @@ def iso_add_dirs(module, opened_iso, iso_type, dir_path):
         iso_add_dir(module, opened_iso, iso_type, current_dirpath)
 
 
-def iso_rr_check_file_exist(opened_iso, dest_file):
-    try:
-        record = opened_iso.get_record(rr_path=dest_file)
-        # The record present file or directory
-        if record and record.is_file():
-            return True
-    except Exception:
-        # If we get exception, that means the file does not exists
-        pass
+def iso_check_file_exists(opened_iso, dest_file):
+    file_dir = os.path.dirname(dest_file).strip()
+    file_name = os.path.basename(dest_file)
+    dirnames = file_dir.strip().split("/")
 
-    return False
+    parent_dir = "/"
+    for item in dirnames:
+        if not item.strip():
+            continue
+
+        for dirname, dirlist, dummy_filelist in opened_iso.walk(iso_path=parent_dir.upper()):
+            if dirname != parent_dir.upper():
+                break
+
+            if item.upper() not in dirlist:
+                return False
+        
+        if parent_dir == "/":
+            parent_dir = "/%s" % item
+        else:
+            parent_dir = "%s/%s" % (parent_dir, item)
+    
+    if '.' not in file_name:
+        file_in_iso_path = file_name.upper() + '.;1'
+    else:
+        file_in_iso_path = file_name.upper() + ';1'
+
+    for dirname, dummy_dirlist, filelist in opened_iso.walk(iso_path=parent_dir.upper()):
+        if dirname != parent_dir.upper():
+            return False
+
+        if file_name.upper() in filelist or file_in_iso_path in filelist:
+            return True
+        else:
+            return False
 
 
 def iso_add_file(module, opened_iso, iso_type, src_file, dest_file):
@@ -192,12 +216,16 @@ def iso_add_file(module, opened_iso, iso_type, src_file, dest_file):
         elif iso_type == "rr":
             # For ISO with Rock Ridge 1.09 / 1.10, it won't overwrite the existing file
             # So we take workaround here: delete the existing file and then add file
-            if iso_rr_check_file_exist(opened_iso, dest_file):
-                opened_iso.rm_hard_link(iso_path=file_in_iso_path)
+            if iso_check_file_exists(opened_iso, dest_file):
+                opened_iso.rm_file(iso_path=file_in_iso_path)
             opened_iso.add_file(file_local, iso_path=file_in_iso_path, rr_name=file_name)
         elif iso_type == "joliet":
             opened_iso.add_file(file_local, iso_path=file_in_iso_path, joliet_path=dest_file)
         elif iso_type == "udf":
+            # For ISO with UDF, it won't always succeed to overwrite the existing file
+            # So we take workaround here: delete the existing file and then add file
+            if iso_check_file_exists(opened_iso, dest_file):
+                opened_iso.rm_file(udf_path=dest_file)
             opened_iso.add_file(file_local, iso_path=file_in_iso_path, udf_path=dest_file)
     except Exception as err:
         msg = "Failed to add local file %s to ISO with error: %s" % (file_local, to_native(err))
@@ -210,6 +238,9 @@ def iso_delete_file(module, opened_iso, iso_type, dest_file):
         dest_file = "/%s" % dest_file
     file_name = os.path.basename(dest_file)
 
+    if not iso_check_file_exists(opened_iso, dest_file):
+        module.fail_json(msg="The file %s does not exist." % dest_file)
+
     if '.' not in file_name:
         file_in_iso_path = dest_file.upper() + '.;1'
     else:
@@ -217,31 +248,12 @@ def iso_delete_file(module, opened_iso, iso_type, dest_file):
 
     try:
         if iso_type == "iso9660":
-            record = opened_iso.get_record(iso_path=file_in_iso_path)
+            opened_iso.rm_file(iso_path=file_in_iso_path)
         elif iso_type == "rr":
-            record = opened_iso.get_record(rr_path=dest_file)
+            opened_iso.rm_file(iso_path=file_in_iso_path)
         elif iso_type == "joliet":
-            record = opened_iso.get_record(joliet_path=dest_file)
+            opened_iso.rm_file(joliet_path=dest_file)
         elif iso_type == "udf":
-            record = opened_iso.get_record(udf_path=dest_file)
-
-        if record and not record.is_file():
-            module.fail_json(msg="The %s is not a file but directory." % dest_file)
-    except Exception as err:
-        msg = "Failed to get record of file %s in ISO with filesystem %s. error: %s" % (
-            dest_file, iso_type, to_native(err))
-        module.fail_json(msg=msg)
-
-    try:
-        if iso_type == "iso9660":
-            opened_iso.rm_hard_link(iso_path=file_in_iso_path)
-        elif iso_type == "rr":
-            opened_iso.rm_hard_link(iso_path=file_in_iso_path)
-        elif iso_type == "joliet":
-            opened_iso.rm_hard_link(joliet_path=dest_file)
-        elif iso_type == "udf":
-            # function "rm_hard_link" won't work in some OS (such as Ubuntu with python 3.10.4)
-            # take function "rm_file" instead
             opened_iso.rm_file(udf_path=dest_file)
     except Exception as err:
         msg = "Failed to delete iso file %s with error: %s" % (dest_file, to_native(err))
@@ -253,7 +265,7 @@ def iso_rebuild(module, src_iso, dest_iso, delete_files_list, add_files_list):
     iso_type = "iso9660"
 
     try:
-        iso = pycdlib.PyCdlib()
+        iso = pycdlib.PyCdlib(always_consistent=True)
         iso.open(src_iso)
         if iso.has_rock_ridge():
             iso_type = "rr"

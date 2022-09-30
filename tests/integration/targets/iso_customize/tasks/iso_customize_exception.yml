@@ -55,7 +55,7 @@
     delete_files:
       - "/test03.cfg"
   register: customized_result
-  failed_when: customized_result.msg.find("Could not find path") == -1
+  failed_when: customized_result.msg.find("does not exist") == -1
 
 # Test: failed when local src file does not exists
 - name: "Testcase: local src file does not exists"
