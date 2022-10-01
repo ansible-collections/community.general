@@ -1,0 +1,143 @@
+# Copyright (c) 2022, Dušan Marković (@bratwurzt)
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+
+- name: Create client
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    service_accounts_enabled: True
+    state: present
+  register: client
+
+- name: Create new realm role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    description: "{{ description_1 }}"
+    state: present
+
+- name: Map a realm role to client service account
+  vars:
+    - roles: [ {'name': '{{ role }}'} ]
+  community.general.keycloak_user_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    service_account_user_client_id: "{{ client_id }}"
+    roles: "{{ roles }}"
+    state: present
+  register: result
+
+- name: Assert realm role is assigned
+  assert:
+    that:
+      - result is changed
+      - result.end_state | selectattr("clientRole", "eq", false) | selectattr("name", "eq", "{{role}}") | list | count > 0
+
+- name: Unmap a realm role from client service account
+  vars:
+    - roles: [ {'name': '{{ role }}'} ]
+  community.general.keycloak_user_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    service_account_user_client_id: "{{ client_id }}"
+    roles: "{{ roles }}"
+    state: absent
+  register: result
+
+- name: Assert realm role is unassigned
+  assert:
+    that:
+      - result is changed
+      - (result.end_state | length) == (result.existing | length) - 1
+      - result.existing | selectattr("clientRole", "eq", false) | selectattr("name", "eq", "{{role}}") | list | count > 0
+      - result.end_state | selectattr("clientRole", "eq", false) | selectattr("name", "eq", "{{role}}") | list | count == 0
+
+- name: Delete existing realm role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    state: absent
+
+- name: Create new client role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ role }}"
+    description: "{{ description_1 }}"
+    state: present
+
+- name: Map a client role to client service account
+  vars:
+    - roles: [ {'name': '{{ role }}'} ]
+  community.general.keycloak_user_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    service_account_user_client_id: "{{ client_id }}"
+    roles: "{{ roles }}"
+    state: present
+  register: result
+
+- name: Assert client role is assigned
+  assert:
+    that:
+      - result is changed
+      - result.end_state | selectattr("clientRole", "eq", true) | selectattr("name", "eq", "{{role}}") | list | count > 0
+
+- name: Unmap a client role from client service account
+  vars:
+    - roles: [ {'name': '{{ role }}'} ]
+  community.general.keycloak_user_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    service_account_user_client_id: "{{ client_id }}"
+    roles: "{{ roles }}"
+    state: absent
+  register: result
+
+- name: Assert client role is unassigned
+  assert:
+    that:
+      - result is changed
+      - result.end_state == []
+      - result.existing | selectattr("clientRole", "eq", true) | selectattr("name", "eq", "{{role}}") | list | count > 0
