@@ -96,6 +96,7 @@ options:
       - When disabled, supports only simple variables I(Strings), I(Integers) and I(Floats).
     type: bool
     default: false
+    version_added: 5.7.0
   targets:
     description:
       - A list of specific resources to target in this plan/application. The
