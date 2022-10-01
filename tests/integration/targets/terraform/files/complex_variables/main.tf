@@ -18,10 +18,18 @@ resource "null_resource" "mynullresource" {
     name = var.boolean ? var.dictionaries.name : var.list_of_objects[0].name
 
     # top level string
-    sample_string = var.string_type
+    sample_string_1 = var.string_type
 
     # nested lists
     num_from_matrix = var.list_of_lists[1][2]
   }
 
+}
+
+output "string_type" {
+  value = var.string_type
+}
+
+output "multiline_string" {
+  value = var.multiline_string
 }
