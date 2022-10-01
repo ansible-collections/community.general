@@ -91,7 +91,9 @@ options:
     type: dict
   complex_vars:
     description:
-      - Enable/disable capability to handle complex variable structures for C(terraform). If C(true) the C(variables) would accept I(Booleans), I(Objects) and I(Lists) to be passed to C(terraform). When disables supports only simple variables I(Strings) and I(Numbers).
+      - Enable/disable capability to handle complex variable structures for C(terraform).
+      - If C(true) the C(variables) would accept I(Booleans), I(Objects) and I(Lists) to be passed to C(terraform).
+      - When disabled, supports only simple variables I(Strings), I(Integers) and I(Floats).
     type: bool
     default: false
   targets:
@@ -424,7 +426,7 @@ def main():
             purge_workspace=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent', 'planned']),
             variables=dict(type='dict'),
-            complex_vars=dict(type=bool, default=False),
+            complex_vars=dict(type='bool', default=False),
             variables_files=dict(aliases=['variables_file'], type='list', elements='path'),
             plan_file=dict(type='path'),
             state_file=dict(type='path'),
