@@ -589,6 +589,8 @@ files:
     maintainers: Gaetan2907
   $modules/identity/keycloak/keycloak_client_rolemapping.py:
     maintainers: Gaetan2907
+  $modules/identity/keycloak/keycloak_user_rolemapping.py:
+    maintainers: bratwurzt
   $modules/identity/keycloak/keycloak_group.py:
     maintainers: adamgoossens
   $modules/identity/keycloak/keycloak_identity_provider.py:
