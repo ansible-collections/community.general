@@ -4,3 +4,4 @@ removed_features:
   - "bitbucket* modules - ``username`` is no longer an alias of ``workspace``, but of ``user``."
   - "keycloak_group - the return value ``group`` has been removed. Use ``end_state`` instead."
   - "keycloak_authentication - the return value ``flow`` has been removed. Use ``end_state`` instead."
+  - "vmadm - the ``debug`` option has been removed. It was not used anyway."
