@@ -5,3 +5,4 @@ removed_features:
   - "keycloak_group - the return value ``group`` has been removed. Use ``end_state`` instead."
   - "keycloak_authentication - the return value ``flow`` has been removed. Use ``end_state`` instead."
   - "vmadm - the ``debug`` option has been removed. It was not used anyway."
+  - "lxd_container - the default of the ``ignore_volatile_options`` option changed from ``true`` to ``false``."
