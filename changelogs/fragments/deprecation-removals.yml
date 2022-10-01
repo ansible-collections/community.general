@@ -1,0 +1,2 @@
+removed_features:
+  - "mail callback plugin - the ``sender`` option is now required."
