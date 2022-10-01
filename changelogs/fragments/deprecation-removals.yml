@@ -8,3 +8,4 @@ removed_features:
   - "lxd_container - the default of the ``ignore_volatile_options`` option changed from ``true`` to ``false``."
   - "gitlab_group_members - ``gitlab_group`` must now always contain the full path, and no longer just the name or path."
   - "gem - the default of the ``norc`` option changed from ``false`` to ``true``."
+  - "module_helper module utils - remove the ``VarDict`` attribute from ``ModuleHelper``. Import ``VarDict`` from ``ansible_collections.community.general.plugins.module_utils.mh.mixins.vars`` instead."
