@@ -1,3 +1,4 @@
 removed_features:
   - "mail callback plugin - the ``sender`` option is now required."
   - "proxmox inventory plugin - the default of the ``want_proxmox_nodes_ansible_host`` option changed from ``true`` to ``false``."
+  - "bitbucket* modules - ``username`` is no longer an alias of ``workspace``, but of ``user``."
