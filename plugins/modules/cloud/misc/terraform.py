@@ -94,7 +94,7 @@ options:
     description:
       - Enable/disable capability to handle complex variable structures for C(terraform).
       - If C(true) the C(variables) would accept I(Booleans), I(Objects) and I(Lists) to be passed to C(terraform).
-      - When disabled, supports only simple variables I(Strings), I(Integers) and I(Floats).
+      - When disabled, supports only simple variables (strings, integers, and floats), and passes them on unquoted.
     type: bool
     default: false
     version_added: 5.7.0
