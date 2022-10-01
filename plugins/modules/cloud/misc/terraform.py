@@ -80,14 +80,20 @@ options:
     aliases: [ 'variables_file' ]
   variables:
     description:
-      - A group of key-values to override template variables or those in variables files.
-      - Support complex variable structures to reflect terraform variable syntax.
+      - A group of key-values pairs to override template variables or those in variables files.
+      - Support complex variable structures (Lists, Dictionaries and Boolean) to reflect terraform variable syntax when C(complex_vars=true).
+      - Ansible integers or floats are mapped to terraform numbers.
+      - Ansible strings are mapped to terraform strings.
       - Ansible dictionaries are mapped to terraform objects.
       - Ansible lists are mapped to terraform lists.
-      - Ansible integers or floats are mapped to terraform numbers.
       - Ansible booleans are mapped to terraform booleans.
       - "B(Note) passwords passed as variables will be visible in the log output. Make sure to use I(no_log=true) in production!"
     type: dict
+  complex_vars:
+    description:
+      - Enable/disable capability to handle complex variable structures for C(terraform). If C(true) the C(variables) would accept I(Booleans), I(Objects) and I(Lists) to be passed to C(terraform). When disables supports only simple variables I(Strings) and I(Numbers).
+    type: bool
+    default: false
   targets:
     description:
       - A list of specific resources to target in this plan/application. The
@@ -197,6 +203,7 @@ EXAMPLES = """
   community.general.terraform:
     project_path: '{{ project_dir }}'
     state: present
+    camplex_vars: true
     variables:
       vm_name: "{{ inventory_hostname }}"
       vm_vcpus: 2
@@ -260,7 +267,6 @@ command:
 import os
 import json
 import tempfile
-import re
 from ansible.module_utils.six.moves import shlex_quote
 from ansible.module_utils.six import integer_types
 
@@ -418,6 +424,7 @@ def main():
             purge_workspace=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent', 'planned']),
             variables=dict(type='dict'),
+            complex_vars=dict(type=bool, default=False),
             variables_files=dict(aliases=['variables_file'], type='list', elements='path'),
             plan_file=dict(type='path'),
             state_file=dict(type='path'),
@@ -444,6 +451,7 @@ def main():
     purge_workspace = module.params.get('purge_workspace')
     state = module.params.get('state')
     variables = module.params.get('variables') or {}
+    complex_vars = module.params.get('complex_vars')
     variables_files = module.params.get('variables_files')
     plan_file = module.params.get('plan_file')
     state_file = module.params.get('state_file')
@@ -490,7 +498,7 @@ def main():
 
     def format_args(vars):
         if isinstance(vars, str):
-            return '"{string}"'.format(string=re.sub('"', '\\"', vars))
+            return '"{string}"'.format(string=vars.replace('\\', '\\\\').replace('"', '\\"'))
         elif isinstance(vars, bool):
             if vars:
                 return 'true'
@@ -528,28 +536,35 @@ def main():
         return ",".join(ret_out)
 
     variables_args = []
-    for k, v in variables.items():
-        if isinstance(v, dict):
+    if complex_vars:
+        for k, v in variables.items():
+            if isinstance(v, dict):
+                variables_args.extend([
+                    '-var',
+                    '{0}={{{1}}}'.format(k, process_complex_args(v))
+                ])
+            elif isinstance(v, list):
+                variables_args.extend([
+                    '-var',
+                    '{0}={1}'.format(k, process_complex_args(v))
+                ])
+            # on the top-level we need to pass just the python string with necessary
+            # terraform string escape sequences
+            elif isinstance(v, str):
+                variables_args.extend([
+                    '-var',
+                    "{0}={1}".format(k, v)
+                ])
+            else:
+                variables_args.extend([
+                    '-var',
+                    '{0}={1}'.format(k, format_args(v))
+                ])
+    else:
+        for k, v in variables.items():
             variables_args.extend([
                 '-var',
-                '{0}={{{1}}}'.format(k, process_complex_args(v))
-            ])
-        elif isinstance(v, list):
-            variables_args.extend([
-                '-var',
-                '{0}={1}'.format(k, process_complex_args(v))
-            ])
-        # terraform does not like shlex_quote fixing double-quotes on the top-level
-        # just passing the plain string and shlex_quote will take care of the rest
-        elif isinstance(v, str):
-            variables_args.extend([
-                '-var',
-                "{0}={1}".format(k, v)
-            ])
-        else:
-            variables_args.extend([
-                '-var',
-                '{0}={1}'.format(k, format_args(v))
+                '{0}={1}'.format(k, v)
             ])
 
     if variables_files:
