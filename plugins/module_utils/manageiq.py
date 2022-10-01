@@ -158,7 +158,7 @@ class ManageIQ(object):
             self.module.fail_json(msg=msg)
 
     def policies(self, resource_id, resource_type, resource_name):
-        manageiq = ManageIQ(self._module)
+        manageiq = ManageIQ(self.module)
 
         # query resource id, fail if resource does not exist
         if resource_id is None:
