@@ -7,3 +7,4 @@ removed_features:
   - "vmadm - the ``debug`` option has been removed. It was not used anyway."
   - "lxd_container - the default of the ``ignore_volatile_options`` option changed from ``true`` to ``false``."
   - "gitlab_group_members - ``gitlab_group`` must now always contain the full path, and no longer just the name or path."
+  - "gem - the default of the ``norc`` option changed from ``false`` to ``true``."
