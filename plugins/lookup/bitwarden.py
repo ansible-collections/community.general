@@ -22,6 +22,11 @@ DOCUMENTATION = """
         required: true
         type: list
         elements: str
+      search:
+        description: Field to retrieve, for example C(name) or C(id).
+        type: str
+        default: name
+        version_added: 5.7.0
       field:
         description: Field to fetch; leave unset to fetch whole response.
         type: str
@@ -32,6 +37,11 @@ EXAMPLES = """
   ansible.builtin.debug:
     msg: >-
       {{ lookup('community.general.bitwarden', 'a_test', field='password') }}
+
+- name: "Get 'password' from Bitwarden record with id 'bafba515-af11-47e6-abe3-af1200cd18b2'"
+  ansible.builtin.debug:
+    msg: >-
+      {{ lookup('community.general.bitwarden', 'bafba515-af11-47e6-abe3-af1200cd18b2', search='id', field='password') }}
 
 - name: "Get full Bitwarden record named 'a_test'"
   ansible.builtin.debug:
@@ -81,7 +91,7 @@ class Bitwarden(object):
             raise BitwardenException(err)
         return to_text(out, errors='surrogate_or_strict'), to_text(err, errors='surrogate_or_strict')
 
-    def _get_matches(self, search_value, search_field="name"):
+    def _get_matches(self, search_value, search_field):
         """Return matching records whose search_field is equal to key.
         """
         out, err = self._run(['list', 'items', '--search', search_value])
@@ -97,7 +107,7 @@ class Bitwarden(object):
 
         If field is None, return the whole record for each match.
         """
-        matches = self._get_matches(search_value)
+        matches = self._get_matches(search_value, search_field)
 
         if field:
             return [match['login'][field] for match in matches]
@@ -110,10 +120,11 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
         field = self.get_option('field')
+        search_field = self.get_option('search')
         if not _bitwarden.logged_in:
             raise AnsibleError("Not logged into Bitwarden. Run 'bw login'.")
 
-        return [_bitwarden.get_field(field, term) for term in terms]
+        return [_bitwarden.get_field(field, term, search_field) for term in terms]
 
 
 _bitwarden = Bitwarden()
