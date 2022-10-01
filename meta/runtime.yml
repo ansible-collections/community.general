@@ -710,6 +710,8 @@ plugin_routing:
       redirect: community.general.remote_management.manageiq.manageiq_policies
     manageiq_provider:
       redirect: community.general.remote_management.manageiq.manageiq_provider
+    manageiq_provider_info:
+      redirect: community.general.remote_management.manageiq.manageiq_provider_info
     manageiq_tags:
       redirect: community.general.remote_management.manageiq.manageiq_tags
     manageiq_tenant:
