@@ -214,59 +214,6 @@ end_state:
                 manage: true
                 manageMembership: true
                 view: true
-
-group:
-  description:
-    - Representation of the group after module execution.
-    - Deprecated return value, it will be removed in community.general 6.0.0. Please use the return value I(end_state) instead.
-  returned: always
-  type: complex
-  contains:
-    id:
-      description: GUID that identifies the group.
-      type: str
-      returned: always
-      sample: 23f38145-3195-462c-97e7-97041ccea73e
-    name:
-      description: Name of the group.
-      type: str
-      returned: always
-      sample: grp-test-123
-    attributes:
-      description: Attributes applied to this group.
-      type: dict
-      returned: always
-      sample:
-        attr1: ["val1", "val2", "val3"]
-    path:
-      description: URI path to the group.
-      type: str
-      returned: always
-      sample: /grp-test-123
-    realmRoles:
-      description: An array of the realm-level roles granted to this group.
-      type: list
-      returned: always
-      sample: []
-    subGroups:
-      description: A list of groups that are children of this group. These groups will have the same parameters as
-                   documented here.
-      type: list
-      returned: always
-    clientRoles:
-      description: A list of client-level roles granted to this group.
-      type: list
-      returned: always
-      sample: []
-    access:
-      description: A dict describing the accesses you have to this group based on the credentials used.
-      type: dict
-      returned: always
-      sample:
-        manage: true
-        manageMembership: true
-        view: true
-
 '''
 
 from ansible_collections.community.general.plugins.module_utils.identity.keycloak.keycloak import KeycloakAPI, camel, \
@@ -356,7 +303,6 @@ def main():
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
             result['end_state'] = {}
-            result['group'] = result['end_state']
             result['msg'] = 'Group does not exist; doing nothing.'
             module.exit_json(**result)
 
@@ -377,7 +323,6 @@ def main():
         after_group = kc.get_group_by_name(name, realm)
 
         result['end_state'] = after_group
-        result['group'] = result['end_state']
 
         result['msg'] = 'Group {name} has been created with ID {id}'.format(name=after_group['name'],
                                                                             id=after_group['id'])
@@ -391,7 +336,6 @@ def main():
             if desired_group == before_group:
                 result['changed'] = False
                 result['end_state'] = desired_group
-                result['group'] = result['end_state']
                 result['msg'] = "No changes required to group {name}.".format(name=before_group['name'])
                 module.exit_json(**result)
 
@@ -410,7 +354,6 @@ def main():
             after_group = kc.get_group_by_groupid(desired_group['id'], realm=realm)
 
             result['end_state'] = after_group
-            result['group'] = result['end_state']
 
             result['msg'] = "Group {id} has been updated".format(id=after_group['id'])
             module.exit_json(**result)
@@ -430,7 +373,6 @@ def main():
             kc.delete_group(groupid=gid, realm=realm)
 
             result['end_state'] = {}
-            result['group'] = result['end_state']
 
             result['msg'] = "Group {name} has been deleted".format(name=before_group['name'])
 

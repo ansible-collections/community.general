@@ -173,39 +173,6 @@ msg:
     returned: always
     type: str
 
-flow:
-    description:
-      - JSON representation for the authentication.
-      - Deprecated return value, it will be removed in community.general 6.0.0. Please use the return value I(end_state) instead.
-    returned: on success
-    type: dict
-    sample: {
-      "alias": "Copy of first broker login",
-      "authenticationExecutions": [
-        {
-          "alias": "review profile config",
-          "authenticationConfig": {
-            "alias": "review profile config",
-            "config": { "update.profile.on.first.login": "missing" },
-            "id": "6f09e4fb-aad4-496a-b873-7fa9779df6d7"
-          },
-          "configurable": true,
-          "displayName": "Review Profile",
-          "id": "8f77dab8-2008-416f-989e-88b09ccf0b4c",
-          "index": 0,
-          "level": 0,
-          "providerId": "idp-review-profile",
-          "requirement": "REQUIRED",
-          "requirementChoices": [ "REQUIRED", "ALTERNATIVE", "DISABLED" ]
-        }
-      ],
-      "builtIn": false,
-      "description": "Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account",
-      "id": "bc228863-5887-4297-b898-4d988f8eaa5c",
-      "providerId": "basic-flow",
-      "topLevel": true
-    }
-
 end_state:
     description: Representation of the authentication after module execution.
     returned: on success
@@ -407,7 +374,6 @@ def main():
                 result['diff'] = dict(before='', after='')
             result['changed'] = False
             result['end_state'] = {}
-            result['flow'] = result['end_state']
             result['msg'] = new_auth_repr["alias"] + ' absent'
             module.exit_json(**result)
 
@@ -440,7 +406,6 @@ def main():
             if exec_repr is not None:
                 auth_repr["authenticationExecutions"] = exec_repr
             result['end_state'] = auth_repr
-            result['flow'] = result['end_state']
 
     else:
         if state == 'present':
@@ -478,7 +443,6 @@ def main():
             if exec_repr is not None:
                 auth_repr["authenticationExecutions"] = exec_repr
             result['end_state'] = auth_repr
-            result['flow'] = result['end_state']
 
         else:
             # Process a deletion (because state was not 'present')
