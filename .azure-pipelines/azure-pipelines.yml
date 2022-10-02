@@ -262,8 +262,8 @@ stages:
           targets:
             - name: OS X 10.11
               test: osx/10.11
-            - name: macOS 10.15
-              test: macos/10.15
+            # - name: macOS 10.15
+            #   test: macos/10.15
           groups:
             - 1
             - 2
