@@ -81,7 +81,7 @@ options:
   variables:
     description:
       - A group of key-values pairs to override template variables or those in variables files.
-        By default, only string, boolean, and number values are allowed, which are passed on unquoted.
+        By default, only string and number values are allowed, which are passed on unquoted.
       - Support complex variable structures (lists, dictionaries, numbers, and booleans) to reflect terraform variable syntax when I(complex_vars=true).
       - Ansible integers or floats are mapped to terraform numbers.
       - Ansible strings are mapped to terraform strings.
