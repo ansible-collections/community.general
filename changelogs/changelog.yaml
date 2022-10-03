@@ -1921,3 +1921,37 @@ releases:
     - 5112-fix-nsupdate-ns-entry.yaml
     - licenses.yml
     release_date: '2022-08-22'
+  4.8.7:
+    changes:
+      bugfixes:
+      - locale_gen - fix support for Ubuntu (https://github.com/ansible-collections/community.general/issues/5281).
+      - tss lookup plugin - adding support for updated Delinea library (https://github.com/DelineaXPM/python-tss-sdk/issues/9,
+        https://github.com/ansible-collections/community.general/pull/5151).
+      minor_changes:
+      - gitlab module util - minor refactor when checking for installed dependency
+        (https://github.com/ansible-collections/community.general/pull/5259).
+      - gitlab_branch - minor refactor when checking for installed dependency (https://github.com/ansible-collections/community.general/pull/5259).
+      - gitlab_deploy_key - minor refactor when checking for installed dependency
+        (https://github.com/ansible-collections/community.general/pull/5259).
+      - gitlab_group - minor refactor when checking for installed dependency (https://github.com/ansible-collections/community.general/pull/5259).
+      - gitlab_group_members - minor refactor when checking for installed dependency
+        (https://github.com/ansible-collections/community.general/pull/5259).
+      - gitlab_group_variable - minor refactor when checking for installed dependency
+        (https://github.com/ansible-collections/community.general/pull/5259).
+      - gitlab_hook - minor refactor when checking for installed dependency (https://github.com/ansible-collections/community.general/pull/5259).
+      - gitlab_project - minor refactor when checking for installed dependency (https://github.com/ansible-collections/community.general/pull/5259).
+      - gitlab_project_members - minor refactor when checking for installed dependency
+        (https://github.com/ansible-collections/community.general/pull/5259).
+      - gitlab_project_variable - minor refactor when checking for installed dependency
+        (https://github.com/ansible-collections/community.general/pull/5259).
+      - gitlab_protected_branch - minor refactor when checking for installed dependency
+        (https://github.com/ansible-collections/community.general/pull/5259).
+      - gitlab_runner - minor refactor when checking for installed dependency (https://github.com/ansible-collections/community.general/pull/5259).
+      - gitlab_user - minor refactor when checking for installed dependency (https://github.com/ansible-collections/community.general/pull/5259).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 4.8.7.yml
+    - 5151-add-delinea-support-tss-lookup.yml
+    - 5259-gitlab-imports.yaml
+    - 5282-locale_gen.yaml
+    release_date: '2022-10-03'
