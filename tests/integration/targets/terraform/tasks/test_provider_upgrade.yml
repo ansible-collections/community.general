@@ -3,6 +3,15 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+- name: Create terraform project directory (provider upgrade)
+  file:
+    path: "{{ terraform_project_dir }}/{{ item['name'] }}"
+    state: directory
+    mode: 0755
+  loop: "{{ terraform_provider_versions }}"
+  loop_control:
+    index_var: provider_index
+
 - name: Output terraform provider test project
   ansible.builtin.template:
     src: templates/provider_test/main.tf.j2
