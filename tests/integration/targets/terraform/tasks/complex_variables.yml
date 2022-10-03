@@ -1,0 +1,60 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create terraform project directory (complex variables)
+  ansible.builtin.file:
+    path: "{{ terraform_project_dir }}/complex_vars"
+    state: directory
+    mode: 0755
+
+- name: copy terraform files to work space
+  ansible.builtin.copy:
+    src: "complex_variables/{{ item }}"
+    dest: "{{ terraform_project_dir }}/complex_vars/{{ item }}"
+  with_items:
+    - main.tf
+    - variables.tf
+
+# This task would test the various complex variable structures of the with the
+# terraform null_resource
+- name: test complex variables
+  community.general.terraform:
+    project_path: "{{ terraform_project_dir }}/complex_vars"
+    binary_path: "{{ terraform_binary_path }}"
+    force_init: yes
+    complex_vars: true
+    variables:
+      dictionaries:
+        name: "kosala"
+        age: 99
+      list_of_strings:
+        - "kosala"
+        - 'cli specials"&$%@#*!(){}[]:"" \\'
+        - "xxx"
+        - "zzz"
+      list_of_objects:
+        - name: "kosala"
+          age: 99
+        - name: 'cli specials"&$%@#*!(){}[]:"" \\'
+          age: 0.1
+        - name: "zzz"
+          age: 9.789
+        - name: "lll"
+          age: 1000
+      boolean: true
+      string_type: 'cli specials"&$%@#*!(){}[]:"" \\'
+      multiline_string: |
+        one
+        two
+      list_of_lists:
+        - [ 1 ]
+        - [ 11, 12, 13 ]
+        - [ 2 ]
+        - [ 3 ]
+    state: present
+  register: terraform_init_result
+
+- assert:
+    that: terraform_init_result is not failed
