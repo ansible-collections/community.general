@@ -80,9 +80,25 @@ options:
     aliases: [ 'variables_file' ]
   variables:
     description:
-      - A group of key-values to override template variables or those in
-        variables files.
+      - A group of key-values pairs to override template variables or those in variables files.
+        By default, only string and number values are allowed, which are passed on unquoted.
+      - Support complex variable structures (lists, dictionaries, numbers, and booleans) to reflect terraform variable syntax when I(complex_vars=true).
+      - Ansible integers or floats are mapped to terraform numbers.
+      - Ansible strings are mapped to terraform strings.
+      - Ansible dictionaries are mapped to terraform objects.
+      - Ansible lists are mapped to terraform lists.
+      - Ansible booleans are mapped to terraform booleans.
+      - "B(Note) passwords passed as variables will be visible in the log output. Make sure to use I(no_log=true) in production!"
     type: dict
+  complex_vars:
+    description:
+      - Enable/disable capability to handle complex variable structures for C(terraform).
+      - If C(true) the I(variables) also accepts dictionaries, lists, and booleans to be passed to C(terraform).
+        Strings that are passed are correctly quoted.
+      - When disabled, supports only simple variables (strings, integers, and floats), and passes them on unquoted.
+    type: bool
+    default: false
+    version_added: 5.7.0
   targets:
     description:
       - A list of specific resources to target in this plan/application. The
@@ -188,6 +204,26 @@ EXAMPLES = """
       - /path/to/plugins_dir_1
       - /path/to/plugins_dir_2
 
+- name: Complex variables example
+  community.general.terraform:
+    project_path: '{{ project_dir }}'
+    state: present
+    camplex_vars: true
+    variables:
+      vm_name: "{{ inventory_hostname }}"
+      vm_vcpus: 2
+      vm_mem: 2048
+      vm_additional_disks:
+        - label: "Third Disk"
+          size: 40
+          thin_provisioned: true
+          unit_number: 2
+        - label: "Fourth Disk"
+          size: 22
+          thin_provisioned: true
+          unit_number: 3
+    force_init: true
+
 ### Example directory structure for plugin_paths example
 # $ tree /path/to/plugins_dir_1
 # /path/to/plugins_dir_1/
@@ -237,6 +273,7 @@ import os
 import json
 import tempfile
 from ansible.module_utils.six.moves import shlex_quote
+from ansible.module_utils.six import integer_types
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -298,7 +335,7 @@ def get_workspace_context(bin_path, project_path):
     command = [bin_path, 'workspace', 'list', '-no-color']
     rc, out, err = module.run_command(command, cwd=project_path)
     if rc != 0:
-        module.warn("Failed to list Terraform workspaces:\r\n{0}".format(err))
+        module.warn("Failed to list Terraform workspaces:\n{0}".format(err))
     for item in out.split('\n'):
         stripped_item = item.strip()
         if not stripped_item:
@@ -360,12 +397,25 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
         return plan_path, False, out, err, plan_command if state == 'planned' else command
     elif rc == 1:
         # failure to plan
-        module.fail_json(msg='Terraform plan could not be created\r\nSTDOUT: {0}\r\n\r\nSTDERR: {1}'.format(out, err))
+        module.fail_json(
+            msg='Terraform plan could not be created\nSTDOUT: {out}\nSTDERR: {err}\nCOMMAND: {cmd} {args}'.format(
+                out=out,
+                err=err,
+                cmd=' '.join(plan_command),
+                args=' '.join([shlex_quote(arg) for arg in variables_args])
+            )
+        )
     elif rc == 2:
         # changes, but successful
         return plan_path, True, out, err, plan_command if state == 'planned' else command
 
-    module.fail_json(msg='Terraform plan failed with unexpected exit code {0}. \r\nSTDOUT: {1}\r\n\r\nSTDERR: {2}'.format(rc, out, err))
+    module.fail_json(msg='Terraform plan failed with unexpected exit code {rc}.\nSTDOUT: {out}\nSTDERR: {err}\nCOMMAND: {cmd} {args}'.format(
+        rc=rc,
+        out=out,
+        err=err,
+        cmd=' '.join(plan_command),
+        args=' '.join([shlex_quote(arg) for arg in variables_args])
+    ))
 
 
 def main():
@@ -379,6 +429,7 @@ def main():
             purge_workspace=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent', 'planned']),
             variables=dict(type='dict'),
+            complex_vars=dict(type='bool', default=False),
             variables_files=dict(aliases=['variables_file'], type='list', elements='path'),
             plan_file=dict(type='path'),
             state_file=dict(type='path'),
@@ -405,6 +456,7 @@ def main():
     purge_workspace = module.params.get('purge_workspace')
     state = module.params.get('state')
     variables = module.params.get('variables') or {}
+    complex_vars = module.params.get('complex_vars')
     variables_files = module.params.get('variables_files')
     plan_file = module.params.get('plan_file')
     state_file = module.params.get('state_file')
@@ -449,12 +501,77 @@ def main():
     if state == 'present' and module.params.get('parallelism') is not None:
         command.append('-parallelism=%d' % module.params.get('parallelism'))
 
+    def format_args(vars):
+        if isinstance(vars, str):
+            return '"{string}"'.format(string=vars.replace('\\', '\\\\').replace('"', '\\"'))
+        elif isinstance(vars, bool):
+            if vars:
+                return 'true'
+            else:
+                return 'false'
+        return str(vars)
+
+    def process_complex_args(vars):
+        ret_out = []
+        if isinstance(vars, dict):
+            for k, v in vars.items():
+                if isinstance(v, dict):
+                    ret_out.append('{0}={{{1}}}'.format(k, process_complex_args(v)))
+                elif isinstance(v, list):
+                    ret_out.append("{0}={1}".format(k, process_complex_args(v)))
+                elif isinstance(v, (integer_types, float, str, bool)):
+                    ret_out.append('{0}={1}'.format(k, format_args(v)))
+                else:
+                    # only to handle anything unforeseen
+                    module.fail_json(msg="Supported types are, dictionaries, lists, strings, integer_types, boolean and float.")
+        if isinstance(vars, list):
+            l_out = []
+            for item in vars:
+                if isinstance(item, dict):
+                    l_out.append("{{{0}}}".format(process_complex_args(item)))
+                elif isinstance(item, list):
+                    l_out.append("{0}".format(process_complex_args(item)))
+                elif isinstance(item, (str, integer_types, float, bool)):
+                    l_out.append(format_args(item))
+                else:
+                    # only to handle anything unforeseen
+                    module.fail_json(msg="Supported types are, dictionaries, lists, strings, integer_types, boolean and float.")
+
+            ret_out.append("[{0}]".format(",".join(l_out)))
+        return ",".join(ret_out)
+
     variables_args = []
-    for k, v in variables.items():
-        variables_args.extend([
-            '-var',
-            '{0}={1}'.format(k, v)
-        ])
+    if complex_vars:
+        for k, v in variables.items():
+            if isinstance(v, dict):
+                variables_args.extend([
+                    '-var',
+                    '{0}={{{1}}}'.format(k, process_complex_args(v))
+                ])
+            elif isinstance(v, list):
+                variables_args.extend([
+                    '-var',
+                    '{0}={1}'.format(k, process_complex_args(v))
+                ])
+            # on the top-level we need to pass just the python string with necessary
+            # terraform string escape sequences
+            elif isinstance(v, str):
+                variables_args.extend([
+                    '-var',
+                    "{0}={1}".format(k, v)
+                ])
+            else:
+                variables_args.extend([
+                    '-var',
+                    '{0}={1}'.format(k, format_args(v))
+                ])
+    else:
+        for k, v in variables.items():
+            variables_args.extend([
+                '-var',
+                '{0}={1}'.format(k, v)
+            ])
+
     if variables_files:
         for f in variables_files:
             variables_args.extend(['-var-file', f])
