@@ -54,6 +54,7 @@ EXAMPLES = '''
       username: 'admin'
       password: 'smartvm'
       validate_certs: false
+  register: result
 '''
 
 RETURN = '''
