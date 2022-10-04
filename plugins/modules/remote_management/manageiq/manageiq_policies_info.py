@@ -46,7 +46,7 @@ options:
 
 EXAMPLES = '''
 - name: List current policy_profile and policies for a provider in ManageIQ
-  community.general.manageiq_policies:
+  community.general.manageiq_policies_info:
     resource_name: 'EngLab'
     resource_type: 'provider'
     manageiq_connection:
