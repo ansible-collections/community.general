@@ -1,3 +1,0 @@
-minor_changes:
-  - terraform - adds capability to handle complex variable structures for ``variables`` parameter in the module.
-    This must be enabled with the new ``complex_vars`` parameter (https://github.com/ansible-collections/community.general/pull/4797).
