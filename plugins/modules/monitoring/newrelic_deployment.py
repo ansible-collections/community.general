@@ -15,23 +15,18 @@ module: newrelic_deployment
 author: "Matt Coddington (@mcodd)"
 short_description: Notify newrelic about app deployments
 description:
-   - Notify newrelic about app deployments (see https://docs.newrelic.com/docs/apm/new-relic-apm/maintenance/deployment-notifications#api)
+   - Notify newrelic about app deployments (see https://docs.newrelic.com/docs/apm/new-relic-apm/maintenance/record-monitor-deployments/)
 options:
   token:
     type: str
     description:
-      - API token, to place in the x-api-key header.
+      - API token, to place in the Api-Key header.
     required: true
-  app_name:
-    type: str
-    description:
-      - (one of app_name or application_id are required) The value of app_name in the newrelic.yml file used by the application
-    required: false
   application_id:
     type: str
     description:
-      - (one of app_name or application_id are required) The application id, found in the URL when viewing the application in RPM
-    required: false
+      - The application id, found in the metadata of the application in APM.
+    required: true
   changelog:
     type: str
     description:
@@ -52,16 +47,6 @@ options:
     description:
       - The name of the user/process that triggered this deployment
     required: false
-  appname:
-    type: str
-    description:
-      - Name of the application
-    required: false
-  environment:
-    type: str
-    description:
-      - The environment for this deployment
-    required: false
   validate_certs:
     description:
       - If C(false), SSL certificates will not be validated. This should only be used
@@ -77,7 +62,7 @@ EXAMPLES = '''
 - name:  Notify newrelic about an app deployment
   community.general.newrelic_deployment:
     token: AAAAAA
-    app_name: myapp
+    application_id: 12345678
     user: ansible deployment
     revision: '1.0'
 '''
@@ -96,33 +81,19 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             token=dict(required=True, no_log=True),
-            app_name=dict(required=False),
-            application_id=dict(required=False),
+            application_id=dict(required=True),
             changelog=dict(required=False),
             description=dict(required=False),
             revision=dict(required=False),
             user=dict(required=False),
-            appname=dict(required=False),
-            environment=dict(required=False),
             validate_certs=dict(default=True, type='bool'),
         ),
-        required_one_of=[['app_name', 'application_id']],
         supports_check_mode=True
     )
 
     # build list of params
     params = {}
-    if module.params["app_name"] and module.params["application_id"]:
-        module.fail_json(msg="only one of 'app_name' or 'application_id' can be set")
-
-    if module.params["app_name"]:
-        params["app_name"] = module.params["app_name"]
-    elif module.params["application_id"]:
-        params["application_id"] = module.params["application_id"]
-    else:
-        module.fail_json(msg="you must set one of 'app_name' or 'application_id'")
-
-    for item in ["changelog", "description", "revision", "user", "appname", "environment"]:
+    for item in ["changelog", "description", "revision", "user"]:
         if module.params[item]:
             params[item] = module.params[item]
 
@@ -131,12 +102,15 @@ def main():
         module.exit_json(changed=True)
 
     # Send the data to NewRelic
-    url = "https://rpm.newrelic.com/deployments.xml"
-    data = urlencode(params)
-    headers = {
-        'x-api-key': module.params["token"],
+    url = "https://api.newrelic.com/v2/applications/%s/deployments.json" % module.params["application_id"]
+    data = {
+      'deployment': params
     }
-    response, info = fetch_url(module, url, data=data, headers=headers)
+    headers = {
+        'Api-Key': module.params["token"],
+        'Content-Type': 'application/json',
+    }
+    response, info = fetch_url(module, url, data=module.jsonify(data), headers=headers, method="POST")
     if info['status'] in (200, 201):
         module.exit_json(changed=True)
     else:
@@ -144,4 +118,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+  main()
