@@ -1,0 +1,2 @@
+minor_changes:
+  - "become_pfexec - remove superflous quotes preventing exe wrap from working as expected, fixes #3671, see https://github.com/ansible-collections/community.general/issues/3671#issuecomment-1174906473"
