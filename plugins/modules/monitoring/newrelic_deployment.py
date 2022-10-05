@@ -107,7 +107,7 @@ def main():
     # Send the data to NewRelic
     url = "https://api.newrelic.com/v2/applications/%s/deployments.json" % module.params["application_id"]
     data = {
-      'deployment': params
+        'deployment': params
     }
     headers = {
         'Api-Key': module.params["token"],
@@ -121,4 +121,4 @@ def main():
 
 
 if __name__ == '__main__':
-  main()
+    main()
