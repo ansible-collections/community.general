@@ -93,6 +93,9 @@ def main():
 
     # build list of params
     params = {}
+    if not module.params["application_id"]:
+        module.fail_json(msg="you must set the 'application_id'")
+
     for item in ["changelog", "description", "revision", "user"]:
         if module.params[item]:
             params[item] = module.params[item]
