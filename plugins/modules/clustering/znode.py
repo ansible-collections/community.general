@@ -56,7 +56,7 @@ options:
         type: str
         default: "digest"
         required: false
-        version_added: 5.7.0
+        version_added: 5.8.0
     auth_credential:
         description:
             - The authentication credential value. Depends on I(auth_scheme).
@@ -64,7 +64,7 @@ options:
               and the format for I(auth_scheme=sasl) is C(user:password).
         type: str
         required: false
-        version_added: 5.7.0
+        version_added: 5.8.0
 requirements:
     - kazoo >= 2.1
     - python >= 2.6
