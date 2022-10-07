@@ -69,7 +69,7 @@ DOCUMENTATION = '''
           - Disable sending logs.
         env:
           - name: ANSIBLE_OPENTELEMETRY_DISABLE_LOGS
-        version_added: 3.9.0
+        version_added: 5.8.0
     requirements:
       - opentelemetry-api (Python library)
       - opentelemetry-exporter-otlp (Python library)
