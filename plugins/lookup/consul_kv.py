@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-# (c) 2015, Steve Gargan <steve.gargan@gmail.com>
-# (c) 2017 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2015, Steve Gargan <steve.gargan@gmail.com>
+# Copyright (c) 2017 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
@@ -24,7 +25,7 @@ DOCUMENTATION = '''
       recurse:
         type: boolean
         description: If true, will retrieve all the values that have the given key as prefix.
-        default: False
+        default: false
       index:
         description:
           - If the key has a value with the specified index then this is returned allowing access to historical values.
@@ -55,7 +56,7 @@ DOCUMENTATION = '''
           - Whether to use http or https.
           - If you use C(ANSIBLE_CONSUL_URL) this value will be used from there.
       validate_certs:
-        default: True
+        default: true
         description: Whether to verify the ssl connection or not.
         env:
           - name: ANSIBLE_CONSUL_VALIDATE_CERTS

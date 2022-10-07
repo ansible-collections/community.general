@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2017, 2018 Kairo Araujo <kairo@kairo.eti.br>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, 2018 Kairo Araujo <kairo@kairo.eti.br>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -29,12 +30,12 @@ options:
     description:
     - Forces action.
     type: bool
-    default: no
+    default: false
   recursive:
     description:
     - Removes or defines a device and children devices.
     type: bool
-    default: no
+    default: false
   state:
     description:
     - Controls the device state.
@@ -86,13 +87,13 @@ EXAMPLES = r'''
 - name: Put vscsi1 and children devices in Defined state.
   community.general.aix_devices:
     device: vscsi1
-    recursive: yes
+    recursive: true
     state: defined
 
 - name: Removes vscsi1 and children devices.
   community.general.aix_devices:
     device: vscsi1
-    recursive: yes
+    recursive: true
     state: removed
 
 - name: Changes en1 mtu to 9000 and disables arp.

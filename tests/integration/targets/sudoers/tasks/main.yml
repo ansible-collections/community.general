@@ -1,10 +1,19 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Initialise environment
 
-- name: Register sudoers.d directory
+- name: Register variables
   set_fact:
     sudoers_path: /etc/sudoers.d
     alt_sudoers_path: /etc/sudoers_alt
+
+- name: Install sudo package
+  ansible.builtin.package:
+    name: sudo
+  when: ansible_os_family != 'Darwin'
 
 - name: Ensure sudoers directory exists
   ansible.builtin.file:
@@ -28,6 +37,11 @@
     user: alice
     commands: /usr/local/bin/command
   register: rule_1
+
+- name: Stat my-sudo-rule-1 file
+  ansible.builtin.stat:
+    path: "{{ sudoers_path }}/my-sudo-rule-1"
+  register: rule_1_stat
 
 - name: Grab contents of my-sudo-rule-1
   ansible.builtin.slurp:
@@ -130,7 +144,72 @@
   register: revoke_rule_1_stat
 
 
+# Validation testing
+
+- name: Attempt command without full path to executable
+  community.general.sudoers:
+    name: edge-case-1
+    state: present
+    user: alice
+    commands: systemctl
+  ignore_errors: true
+  register: edge_case_1
+
+
+- name: Attempt command without full path to executable, but disabling validation
+  community.general.sudoers:
+    name: edge-case-2
+    state: present
+    user: alice
+    commands: systemctl
+    validation: absent
+    sudoers_path: "{{ alt_sudoers_path }}"
+  register: edge_case_2
+
+- name: find visudo
+  command:
+    cmd: which visudo
+  register: which_visudo
+  when: ansible_os_family != 'Darwin'
+
+- name: Prevent visudo being executed
+  file:
+    path: "{{ which_visudo.stdout }}"
+    mode: '-x'
+  when: ansible_os_family != 'Darwin'
+
+- name: Attempt command without full path to executable, but enforcing validation with no visudo present
+  community.general.sudoers:
+    name: edge-case-3
+    state: present
+    user: alice
+    commands: systemctl
+    validation: required
+  ignore_errors: true
+  when: ansible_os_family != 'Darwin'
+  register: edge_case_3
+  
+  
+- name: Revoke non-existing rule
+  community.general.sudoers:
+    name: non-existing-rule
+    state: absent
+  register: revoke_non_existing_rule
+
+- name: Stat non-existing rule
+  ansible.builtin.stat:
+    path: "{{ sudoers_path }}/non-existing-rule"
+  register: revoke_non_existing_rule_stat
+
+
 # Run assertions
+
+- name: Check rule 1 file stat
+  ansible.builtin.assert:
+    that:
+      - rule_1_stat.stat.exists
+      - rule_1_stat.stat.isreg
+      - rule_1_stat.stat.mode == '0440'
 
 - name: Check changed status
   ansible.builtin.assert:
@@ -139,6 +218,7 @@
       - rule_1_again is not changed
       - rule_5 is changed
       - revoke_rule_1 is changed
+      - revoke_non_existing_rule is not changed
 
 - name: Check contents
   ansible.builtin.assert:
@@ -150,7 +230,22 @@
       - "rule_5_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command\n'"
       - "rule_6_contents['content'] | b64decode == 'alice ALL=(bob)NOPASSWD: /usr/local/bin/command\n'"
 
-- name: Check stats
+- name: Check revocation stat
   ansible.builtin.assert:
     that:
       - not revoke_rule_1_stat.stat.exists
+      - not revoke_non_existing_rule_stat.stat.exists
+      
+- name: Check edge case responses
+  ansible.builtin.assert:
+    that:
+      - edge_case_1 is failed
+      - "'Failed to validate sudoers rule' in edge_case_1.msg"
+      - edge_case_2 is not failed
+
+- name: Check missing validation edge case
+  ansible.builtin.assert:
+    that:
+      - edge_case_3 is failed
+      - "'Failed to find required executable' in edge_case_3.msg"
+  when: ansible_os_family != 'Darwin'

@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2017, Eike Frost <ei@kefro.st>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -212,13 +213,13 @@ EXAMPLES = '''
     name: this_is_a_test
     protocol_mappers:
       - config:
-          access.token.claim: True
+          access.token.claim: true
           claim.name: "family_name"
-          id.token.claim: True
+          id.token.claim: true
           jsonType.label: String
           user.attribute: lastName
-          userinfo.token.claim: True
-        consentRequired: True
+          userinfo.token.claim: true
+        consentRequired: true
         consentText: "${familyName}"
         name: family name
         protocol: openid-connect

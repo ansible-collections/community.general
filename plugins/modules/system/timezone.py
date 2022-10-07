@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016, Shinichi TAMURA (@tmshn)
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Shinichi TAMURA (@tmshn)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -790,7 +791,7 @@ class AIXTimezone(Timezone):
     inspects C(/etc/environment) to determine the current timezone.
 
     While AIX time zones can be set using two formats (POSIX and
-    Olson) the prefered method is Olson.
+    Olson) the preferred method is Olson.
     See the following article for more information:
     https://developer.ibm.com/articles/au-aix-posix/
 

@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -25,18 +26,18 @@ options:
     backend:
         description:
           - Define the backend to use for the container.
-        required: True
+        required: true
         choices: ["docker", "ostree"]
         type: str
     name:
         description:
           - Name of the container.
-        required: True
+        required: true
         type: str
     image:
         description:
           - The image to use to install the container.
-        required: True
+        required: true
         type: str
     rootfs:
         description:
@@ -88,7 +89,7 @@ msg:
     description: The command standard output
     returned: always
     type: str
-    sample: [u'Using default tag: latest ...']
+    sample: 'Using default tag: latest ...'
 '''
 
 # import module snippets

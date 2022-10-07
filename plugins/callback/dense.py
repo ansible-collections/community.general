@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-# (c) 2016, Dag Wieers <dag@wieers.com>
-# (c) 2017 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Dag Wieers <dag@wieers.com>
+# Copyright (c) 2017 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -232,13 +233,13 @@ class CallbackModule(CallbackModule_default):
         # Remove non-essential attributes
         for attr in self.removed_attributes:
             if attr in result:
-                del(result[attr])
+                del result[attr]
 
         # Remove empty attributes (list, dict, str)
         for attr in result.copy():
             if isinstance(result[attr], (MutableSequence, MutableMapping, binary_type, text_type)):
                 if not result[attr]:
-                    del(result[attr])
+                    del result[attr]
 
     def _handle_exceptions(self, result):
         if 'exception' in result:

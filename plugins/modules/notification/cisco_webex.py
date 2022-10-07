@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -25,14 +26,14 @@ options:
     description:
        - The request parameter you would like to send the message to.
        - Messages can be sent to either a room or individual (by ID or E-Mail).
-    required: yes
+    required: true
     choices: ['roomId', 'toPersonEmail', 'toPersonId']
     type: str
 
   recipient_id:
     description:
       - The unique identifier associated with the supplied C(recipient_type).
-    required: yes
+    required: true
     type: str
 
   msg_type:
@@ -46,14 +47,14 @@ options:
   personal_token:
     description:
       - Your personal access token required to validate the Webex Teams API.
-    required: yes
+    required: true
     aliases: ['token']
     type: str
 
   msg:
     description:
       - The message you would like to send.
-    required: yes
+    required: true
     type: str
 '''
 

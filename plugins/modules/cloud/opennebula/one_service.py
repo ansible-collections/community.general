@@ -1,5 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # Make coding more python3-ish
 from __future__ import (absolute_import, division, print_function)
@@ -47,30 +50,30 @@ options:
     type: str
   template_name:
     description:
-      - Name of service template to use to create a new instance of a service
+      - Name of service template to use to create a new instance of a service.
     type: str
   template_id:
     description:
-      - ID of a service template to use to create a new instance of a service
+      - ID of a service template to use to create a new instance of a service.
     type: int
   service_id:
     description:
-      - ID of a service instance that you would like to manage
+      - ID of a service instance that you would like to manage.
     type: int
   service_name:
     description:
-      - Name of a service instance that you would like to manage
+      - Name of a service instance that you would like to manage.
     type: str
   unique:
     description:
-      - Setting C(unique=yes) will make sure that there is only one service instance running with a name set with C(service_name) when
-      - instantiating a service from a template specified with C(template_id)/C(template_name). Check examples below.
+      - Setting I(unique=true) will make sure that there is only one service instance running with a name set with C(service_name) when
+        instantiating a service from a template specified with I(template_id) or I(template_name). Check examples below.
     type: bool
-    default: no
+    default: false
   state:
     description:
-      - C(present) - instantiate a service from a template specified with C(template_id)/C(template_name).
-      - C(absent) - terminate an instance of a service specified with C(service_id)/C(service_name).
+      - C(present) - instantiate a service from a template specified with I(template_id) or I(template_name).
+      - C(absent) - terminate an instance of a service specified with I(template_id) or I(template_name).
     choices: ["present", "absent"]
     default: present
     type: str
@@ -80,20 +83,20 @@ options:
     type: str
   owner_id:
     description:
-      - ID of the user which will be set as the owner of the service
+      - ID of the user which will be set as the owner of the service.
     type: int
   group_id:
     description:
-      - ID of the group which will be set as the group of the service
+      - ID of the group which will be set as the group of the service.
     type: int
   wait:
     description:
-      - Wait for the instance to reach RUNNING state after DEPLOYING or COOLDOWN state after SCALING
+      - Wait for the instance to reach RUNNING state after DEPLOYING or COOLDOWN state after SCALING.
     type: bool
-    default: no
+    default: false
   wait_timeout:
     description:
-      - How long before wait gives up, in seconds
+      - How long before wait gives up, in seconds.
     default: 300
     type: int
   custom_attrs:
@@ -103,17 +106,17 @@ options:
     type: dict
   role:
     description:
-      - Name of the role whose cardinality should be changed
+      - Name of the role whose cardinality should be changed.
     type: str
   cardinality:
     description:
-      - Number of VMs for the specified role
+      - Number of VMs for the specified role.
     type: int
   force:
     description:
-      - Force the new cardinality even if it is outside the limits
+      - Force the new cardinality even if it is outside the limits.
     type: bool
-    default: no
+    default: false
 author:
     - "Milan Ilic (@ilicmilan)"
 '''
@@ -146,7 +149,7 @@ EXAMPLES = '''
   community.general.one_service:
     template_id: 53
     service_name: 'foo'
-    unique: yes
+    unique: true
 
 - name: Delete a service by ID
   community.general.one_service:
@@ -173,7 +176,7 @@ EXAMPLES = '''
 - name: Wait service to become RUNNING
   community.general.one_service:
     service_id: 112
-    wait: yes
+    wait: true
 
 - name: Change role cardinality
   community.general.one_service:
@@ -186,7 +189,7 @@ EXAMPLES = '''
     service_id: 112
     role: foo
     cardinality: 7
-    wait: yes
+    wait: true
 '''
 
 RETURN = '''
@@ -234,12 +237,12 @@ roles:
     description: list of dictionaries of roles, each role is described by name, cardinality, state and nodes ids
     type: list
     returned: success
-    sample: '[{"cardinality": 1,"name": "foo","state": "RUNNING","ids": [ 123, 456 ]},
-              {"cardinality": 2,"name": "bar","state": "RUNNING", "ids": [ 452, 567, 746 ]}]'
+    sample:
+      - {"cardinality": 1,"name": "foo","state": "RUNNING", "ids": [ 123, 456 ]}
+      - {"cardinality": 2,"name": "bar","state": "RUNNING", "ids": [ 452, 567, 746 ]}
 '''
 
 import os
-import sys
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url
 
@@ -660,7 +663,7 @@ def get_connection_info(module):
     if not password:
         password = os.environ.get('ONEFLOW_PASSWORD')
 
-    if not(url and username and password):
+    if not (url and username and password):
         module.fail_json(msg="One or more connection parameters (api_url, api_username, api_password) were not specified")
     from collections import namedtuple
 

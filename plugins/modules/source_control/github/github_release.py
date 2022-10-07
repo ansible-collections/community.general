@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright: Ansible Team
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Team
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -58,13 +59,13 @@ options:
     draft:
         description:
             - Sets if the release is a draft or not. (boolean)
-        type: 'bool'
-        default: 'no'
+        type: bool
+        default: false
     prerelease:
         description:
             - Sets if the release is a prerelease or not. (boolean)
         type: bool
-        default: 'no'
+        default: false
 
 author:
     - "Adrian Moisey (@adrianmoisey)"

@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2014, Sebastien Rohaut <sebastien.rohaut@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2014, Sebastien Rohaut <sebastien.rohaut@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -68,23 +69,23 @@ options:
         the original file back if you somehow clobbered it incorrectly.
     required: false
     type: bool
-    default: "no"
+    default: false
   use_min:
     description:
-      - If set to C(yes), the minimal value will be used or conserved.
+      - If set to C(true), the minimal value will be used or conserved.
       - If the specified value is inferior to the value in the file,
         file content is replaced with the new value, else content is not modified.
     required: false
     type: bool
-    default: "no"
+    default: false
   use_max:
     description:
-      - If set to C(yes), the maximal value will be used or conserved.
+      - If set to C(true), the maximal value will be used or conserved.
       - If the specified value is superior to the value in the file,
         file content is replaced with the new value, else content is not modified.
     required: false
     type: bool
-    default: "no"
+    default: false
   dest:
     type: str
     description:
@@ -115,7 +116,7 @@ EXAMPLES = r'''
     limit_type: hard
     limit_item: fsize
     value: 1000000
-    use_max: yes
+    use_max: true
 
 - name: Add or modify memlock, both soft and hard, limit for the user james with a comment
   community.general.pam_limits:

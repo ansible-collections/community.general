@@ -1,12 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2021, Alexei Znamensky (russoz) <russoz@gmail.com>
-# Copyright: (c) 2021, Marcus Rickert <marcus.rickert@web.de>
-# Copyright: (c) 2018, Stanislas Lange (angristan) <angristan@pm.me>
-# Copyright: (c) 2018, Victor Carceler <vcarceler@iespuigcastellar.xeill.net>
+# Copyright (c) 2021, Alexei Znamensky (russoz) <russoz@gmail.com>
+# Copyright (c) 2021, Marcus Rickert <marcus.rickert@web.de>
+# Copyright (c) 2018, Stanislas Lange (angristan) <angristan@pm.me>
+# Copyright (c) 2018, Victor Carceler <vcarceler@iespuigcastellar.xeill.net>
 
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -39,7 +40,7 @@ options:
               This option can only be specified if there is a single snap in the task.
         type: bool
         required: false
-        default: no
+        default: false
     channel:
         description:
             - Define which release of a snap is installed and tracked for updates.
@@ -103,7 +104,7 @@ EXAMPLES = '''
 - name: Install "foo" with option --classic
   community.general.snap:
     name: foo
-    classic: yes
+    classic: true
 
 # Install a snap with from a specific channel
 - name: Install "foo" with option --channel=latest/edge
@@ -147,7 +148,7 @@ import numbers
 from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    CmdStateModuleHelper, ArgFormat, ModuleHelperException
+    CmdStateModuleHelper, ArgFormat
 )
 
 
@@ -218,8 +219,8 @@ class Snap(CmdStateModuleHelper):
         option_map = {}
 
         if not isinstance(json_subtree, dict):
-            raise ModuleHelperException("Non-dict non-leaf element encountered while parsing option map. "
-                                        "The output format of 'snap set' may have changed. Aborting!")
+            self.do_raise("Non-dict non-leaf element encountered while parsing option map. "
+                          "The output format of 'snap set' may have changed. Aborting!")
 
         for key, value in json_subtree.items():
             full_key = key if prefix is None else prefix + "." + key
@@ -252,7 +253,7 @@ class Snap(CmdStateModuleHelper):
             option_map = self.convert_json_to_map(out)
 
         except Exception as e:
-            raise ModuleHelperException(
+            self.do_raise(
                 msg="Parsing option map returned by 'snap get {0}' triggers exception '{1}', output:\n'{2}'".format(snap_name, str(e), out))
 
         return option_map
@@ -267,7 +268,7 @@ class Snap(CmdStateModuleHelper):
         result = out.splitlines()[1]
         match = self.__disable_re.match(result)
         if not match:
-            raise ModuleHelperException(msg="Unable to parse 'snap list {0}' output:\n{1}".format(snap_name, out))
+            self.do_raise(msg="Unable to parse 'snap list {0}' output:\n{1}".format(snap_name, out))
         notes = match.group('notes')
         return "disabled" not in notes.split(',')
 
@@ -300,7 +301,7 @@ class Snap(CmdStateModuleHelper):
         else:
             msg = "Ooops! Snap installation failed while executing '{cmd}', please examine logs and " \
                   "error output for more details.".format(cmd=self.vars.cmd)
-        raise ModuleHelperException(msg=msg)
+        self.do_raise(msg=msg)
 
     def state_present(self):
 
@@ -330,14 +331,14 @@ class Snap(CmdStateModuleHelper):
 
                 if not match:
                     msg = "Cannot parse set option '{option_string}'".format(option_string=option_string)
-                    raise ModuleHelperException(msg)
+                    self.do_raise(msg)
 
                 snap_prefix = match.group("snap_prefix")
                 selected_snap_name = snap_prefix[:-1] if snap_prefix else None
 
                 if selected_snap_name is not None and selected_snap_name not in self.vars.name:
                     msg = "Snap option '{option_string}' refers to snap which is not in the list of snap names".format(option_string=option_string)
-                    raise ModuleHelperException(msg)
+                    self.do_raise(msg)
 
                 if selected_snap_name is None or (snap_name is not None and snap_name == selected_snap_name):
                     key = match.group("key")
@@ -360,11 +361,11 @@ class Snap(CmdStateModuleHelper):
                     if rc != 0:
                         if 'has no "configure" hook' in err:
                             msg = "Snap '{snap}' does not have any configurable options".format(snap=snap_name)
-                            raise ModuleHelperException(msg)
+                            self.do_raise(msg)
 
                         msg = "Cannot set options '{options}' for snap '{snap}': error={error}".format(
                             options=" ".join(options_changed), snap=snap_name, error=err)
-                        raise ModuleHelperException(msg)
+                        self.do_raise(msg)
 
         if overall_options_changed:
             self.vars.options_changed = overall_options_changed
@@ -385,7 +386,7 @@ class Snap(CmdStateModuleHelper):
             return
         msg = "Ooops! Snap operation failed while executing '{cmd}', please examine logs and " \
               "error output for more details.".format(cmd=self.vars.cmd)
-        raise ModuleHelperException(msg=msg)
+        self.do_raise(msg=msg)
 
     def state_absent(self):
         self._generic_state_action(self.is_snap_installed, "snaps_removed", ['classic', 'channel', 'state'])

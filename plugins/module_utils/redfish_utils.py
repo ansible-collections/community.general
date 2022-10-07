@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017-2018 Dell EMC Inc.
-# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -201,6 +202,16 @@ class RedfishUtils(object):
     def _init_session(self):
         pass
 
+    def _get_vendor(self):
+        response = self.get_request(self.root_uri + self.service_root)
+        if response['ret'] is False:
+            return {'ret': False, 'Vendor': ''}
+        data = response['data']
+        if 'Vendor' in data:
+            return {'ret': True, 'Vendor': data["Vendor"]}
+        else:
+            return {'ret': True, 'Vendor': ''}
+
     def _find_accountservice_resource(self):
         response = self.get_request(self.root_uri + self.service_root)
         if response['ret'] is False:
@@ -229,6 +240,7 @@ class RedfishUtils(object):
             return {'ret': False, 'msg': "SessionService resource not found"}
         else:
             session_service = data["SessionService"]["@odata.id"]
+            self.session_service_uri = session_service
             response = self.get_request(self.root_uri + session_service)
             if response['ret'] is False:
                 return response
@@ -1888,14 +1900,13 @@ class RedfishUtils(object):
                         for property in properties:
                             if property in data:
                                 chassis_power_result[property] = data[property]
-                else:
-                    return {'ret': False, 'msg': 'Key PowerControl not found.'}
                 chassis_power_results.append(chassis_power_result)
-            else:
-                return {'ret': False, 'msg': 'Key Power not found.'}
 
-        result['entries'] = chassis_power_results
-        return result
+        if len(chassis_power_results) > 0:
+            result['entries'] = chassis_power_results
+            return result
+        else:
+            return {'ret': False, 'msg': 'Power information not found.'}
 
     def get_chassis_thermals(self):
         result = {}
@@ -2061,7 +2072,7 @@ class RedfishUtils(object):
             if property in data:
                 nic[property] = data[property]
         result['entries'] = nic
-        return(result)
+        return result
 
     def get_nic_inventory(self, resource_uri):
         result = {}
@@ -2162,11 +2173,15 @@ class RedfishUtils(object):
         result["entries"] = virtualmedia_results
         return result
 
-    def get_multi_virtualmedia(self):
+    def get_multi_virtualmedia(self, resource_type='Manager'):
         ret = True
         entries = []
 
-        resource_uris = self.manager_uris
+        #  Given resource_type, use the proper URI
+        if resource_type == 'Systems':
+            resource_uris = self.systems_uris
+        elif resource_type == 'Manager':
+            resource_uris = self.manager_uris
 
         for resource_uri in resource_uris:
             virtualmedia = self.get_virtualmedia(resource_uri)
@@ -2178,7 +2193,7 @@ class RedfishUtils(object):
 
     @staticmethod
     def _find_empty_virt_media_slot(resources, media_types,
-                                    media_match_strict=True):
+                                    media_match_strict=True, vendor=''):
         for uri, data in resources.items():
             # check MediaTypes
             if 'MediaTypes' in data and media_types:
@@ -2187,6 +2202,9 @@ class RedfishUtils(object):
             else:
                 if media_match_strict:
                     continue
+            # Base on current Lenovo server capability, filter out slot RDOC1/2 and Remote1/2/3/4 which are not supported to Insert/Eject.
+            if vendor == 'Lenovo' and ('RDOC' in uri or 'Remote' in uri):
+                continue
             # if ejected, 'Inserted' should be False and 'ImageName' cleared
             if (not data.get('Inserted', False) and
                     not data.get('ImageName')):
@@ -2225,7 +2243,7 @@ class RedfishUtils(object):
         return resources, headers
 
     @staticmethod
-    def _insert_virt_media_payload(options, param_map, data, ai):
+    def _insert_virt_media_payload(options, param_map, data, ai, image_only=False):
         payload = {
             'Image': options.get('image_url')
         }
@@ -2239,6 +2257,12 @@ class RedfishUtils(object):
                                        options.get(option), option,
                                        allowable)}
                 payload[param] = options.get(option)
+
+        # Some hardware (such as iLO 4 or Supermicro) only supports the Image property
+        # Inserted and WriteProtected are not writable
+        if image_only:
+            del payload['Inserted']
+            del payload['WriteProtected']
         return payload
 
     def virtual_media_insert_via_patch(self, options, param_map, uri, data, image_only=False):
@@ -2247,15 +2271,9 @@ class RedfishUtils(object):
                    {'AllowableValues': v}) for k, v in data.items()
                   if k.endswith('@Redfish.AllowableValues'))
         # construct payload
-        payload = self._insert_virt_media_payload(options, param_map, data, ai)
-        if 'Inserted' not in payload:
+        payload = self._insert_virt_media_payload(options, param_map, data, ai, image_only)
+        if 'Inserted' not in payload and not image_only:
             payload['Inserted'] = True
-
-        # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
-        # Inserted and WriteProtected are not writable
-        if image_only:
-            del payload['Inserted']
-            del payload['WriteProtected']
 
         # PATCH the resource
         response = self.patch_request(self.root_uri + uri, payload)
@@ -2263,7 +2281,7 @@ class RedfishUtils(object):
             return response
         return {'ret': True, 'changed': True, 'msg': "VirtualMedia inserted"}
 
-    def virtual_media_insert(self, options):
+    def virtual_media_insert(self, options, resource_type='Manager'):
         param_map = {
             'Inserted': 'inserted',
             'WriteProtected': 'write_protected',
@@ -2280,7 +2298,12 @@ class RedfishUtils(object):
         media_types = options.get('media_types')
 
         # locate and read the VirtualMedia resources
-        response = self.get_request(self.root_uri + self.manager_uri)
+        #  Given resource_type, use the proper URI
+        if resource_type == 'Systems':
+            resource_uri = self.systems_uri
+        elif resource_type == 'Manager':
+            resource_uri = self.manager_uri
+        response = self.get_request(self.root_uri + resource_uri)
         if response['ret'] is False:
             return response
         data = response['data']
@@ -2289,7 +2312,14 @@ class RedfishUtils(object):
 
         # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
         # Inserted and WriteProtected are not writable
-        if data["FirmwareVersion"].startswith("iLO 4"):
+        if "FirmwareVersion" in data and data["FirmwareVersion"].startswith("iLO 4"):
+            image_only = True
+
+        # Supermicro does also not support Inserted and WriteProtected
+        # Supermicro uses as firmware version only a number so we can't check for it because we
+        # can't be sure that this firmware version is nut used by another vendor
+        # Tested with Supermicro Firmware 01.74.02
+        if 'Supermicro' in data['Oem']:
             image_only = True
 
         virt_media_uri = data["VirtualMedia"]["@odata.id"]
@@ -2309,12 +2339,13 @@ class RedfishUtils(object):
 
         # find an empty slot to insert the media
         # try first with strict media_type matching
+        vendor = self._get_vendor()['Vendor']
         uri, data = self._find_empty_virt_media_slot(
-            resources, media_types, media_match_strict=True)
+            resources, media_types, media_match_strict=True, vendor=vendor)
         if not uri:
             # if not found, try without strict media_type matching
             uri, data = self._find_empty_virt_media_slot(
-                resources, media_types, media_match_strict=False)
+                resources, media_types, media_match_strict=False, vendor=vendor)
         if not uri:
             return {'ret': False,
                     'msg': "Unable to find an available VirtualMedia resource "
@@ -2346,7 +2377,7 @@ class RedfishUtils(object):
         # get ActionInfo or AllowableValues
         ai = self._get_all_action_info_values(action)
         # construct payload
-        payload = self._insert_virt_media_payload(options, param_map, data, ai)
+        payload = self._insert_virt_media_payload(options, param_map, data, ai, image_only)
         # POST to action
         response = self.post_request(self.root_uri + action_uri, payload)
         if response['ret'] is False:
@@ -2372,14 +2403,19 @@ class RedfishUtils(object):
         return {'ret': True, 'changed': True,
                 'msg': "VirtualMedia ejected"}
 
-    def virtual_media_eject(self, options):
+    def virtual_media_eject(self, options, resource_type='Manager'):
         image_url = options.get('image_url')
         if not image_url:
             return {'ret': False,
                     'msg': "image_url option required for VirtualMediaEject"}
 
         # locate and read the VirtualMedia resources
-        response = self.get_request(self.root_uri + self.manager_uri)
+        # Given resource_type, use the proper URI
+        if resource_type == 'Systems':
+            resource_uri = self.systems_uri
+        elif resource_type == 'Manager':
+            resource_uri = self.manager_uri
+        response = self.get_request(self.root_uri + resource_uri)
         if response['ret'] is False:
             return response
         data = response['data']
@@ -2389,7 +2425,10 @@ class RedfishUtils(object):
         # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
         # Inserted is not writable
         image_only = False
-        if data["FirmwareVersion"].startswith("iLO 4"):
+        if "FirmwareVersion" in data and data["FirmwareVersion"].startswith("iLO 4"):
+            image_only = True
+
+        if 'Supermicro' in data['Oem']:
             image_only = True
 
         virt_media_uri = data["VirtualMedia"]["@odata.id"]
@@ -3020,3 +3059,83 @@ class RedfishUtils(object):
         if not result["entries"]:
             return {'ret': False, 'msg': "No HostInterface objects found"}
         return result
+
+    def get_manager_inventory(self, manager_uri):
+        result = {}
+        inventory = {}
+        # Get these entries, but does not fail if not found
+        properties = ['FirmwareVersion', 'ManagerType', 'Manufacturer', 'Model',
+                      'PartNumber', 'PowerState', 'SerialNumber', 'Status', 'UUID']
+
+        response = self.get_request(self.root_uri + manager_uri)
+        if response['ret'] is False:
+            return response
+        result['ret'] = True
+        data = response['data']
+
+        for property in properties:
+            if property in data:
+                inventory[property] = data[property]
+
+        result["entries"] = inventory
+        return result
+
+    def get_multi_manager_inventory(self):
+        return self.aggregate_managers(self.get_manager_inventory)
+
+    def set_session_service(self, sessions_config):
+        result = {}
+        response = self.get_request(self.root_uri + self.session_service_uri)
+        if response['ret'] is False:
+            return response
+        current_sessions_config = response['data']
+        payload = {}
+        for property, value in sessions_config.items():
+            value = sessions_config[property]
+            if property not in current_sessions_config:
+                return {'ret': False, 'msg': "Property %s in sessions_config is invalid" % property}
+            if isinstance(value, dict):
+                if isinstance(current_sessions_config[property], dict):
+                    payload[property] = value
+                elif isinstance(current_sessions_config[property], list):
+                    payload[property] = [value]
+                else:
+                    return {'ret': False, 'msg': "Value of property %s in sessions_config is invalid" % property}
+            else:
+                payload[property] = value
+
+        need_change = False
+        for property, set_value in payload.items():
+            cur_value = current_sessions_config[property]
+            if not isinstance(set_value, (dict, list)):
+                if set_value != cur_value:
+                    need_change = True
+            if isinstance(set_value, dict):
+                for subprop in set_value.keys():
+                    if subprop not in current_sessions_config[property]:
+                        need_change = True
+                        break
+                    sub_set_value = set_value[subprop]
+                    sub_cur_value = current_sessions_config[property][subprop]
+                    if sub_set_value != sub_cur_value:
+                        need_change = True
+            if isinstance(set_value, list):
+                if len(set_value) != len(cur_value):
+                    need_change = True
+                    continue
+                for i in range(len(set_value)):
+                    for subprop in set_value[i].keys():
+                        if subprop not in current_sessions_config[property][i]:
+                            need_change = True
+                            break
+                        sub_set_value = set_value[i][subprop]
+                        sub_cur_value = current_sessions_config[property][i][subprop]
+                        if sub_set_value != sub_cur_value:
+                            need_change = True
+        if not need_change:
+            return {'ret': True, 'changed': False, 'msg': "SessionService already configured"}
+
+        response = self.patch_request(self.root_uri + self.session_service_uri, payload)
+        if response['ret'] is False:
+            return response
+        return {'ret': True, 'changed': True, 'msg': "Modified SessionService"}

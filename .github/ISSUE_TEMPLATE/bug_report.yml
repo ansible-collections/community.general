@@ -1,4 +1,8 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 name: Bug report
 description: Create a report to help us improve
 
@@ -105,7 +109,7 @@ body:
   attributes:
     label: Steps to Reproduce
     description: |
-      Describe exactly how to reproduce the problem, using a minimal test-case. It would *really* help us understand your problem if you could also pased any playbooks, configs and commands you used.
+      Describe exactly how to reproduce the problem, using a minimal test-case. It would *really* help us understand your problem if you could also passed any playbooks, configs and commands you used.
 
       **HINT:** You can paste https://gist.github.com links for larger files.
     value: |

@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016, Adfinis SyGroup AG
+# Copyright (c) 2016, Adfinis SyGroup AG
 # Tobias Rueetschi <tobias.ruetschi@adfinis-sygroup.ch>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -43,13 +44,13 @@ options:
         type: list
         elements: str
         description:
-            - List of appropriate name servers. Required if C(state=present).
+            - List of appropriate name servers. Required if I(state=present).
     interfaces:
         type: list
         elements: str
         description:
             - List of interface IP addresses, on which the server should
-              response this zone. Required if C(state=present).
+              response this zone. Required if I(state=present).
 
     refresh:
         type: int

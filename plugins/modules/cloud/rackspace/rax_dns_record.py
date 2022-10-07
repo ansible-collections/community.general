@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -23,7 +24,7 @@ options:
     description:
       - IP address for A/AAAA record, FQDN for CNAME/MX/NS, or text data for
         SRV/TXT
-    required: True
+    required: true
   domain:
     type: str
     description:
@@ -37,7 +38,7 @@ options:
     type: str
     description:
       - FQDN record name to create
-    required: True
+    required: true
   overwrite:
     description:
       - Add new records if data doesn't match, instead of updating existing
@@ -99,7 +100,7 @@ extends_documentation_fragment:
 EXAMPLES = '''
 - name: Create DNS Records
   hosts: all
-  gather_facts: False
+  gather_facts: false
   tasks:
     - name: Create A record
       local_action:

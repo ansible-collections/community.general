@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2018, Simon Weald <ansible@simonweald.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -41,7 +42,7 @@ EXAMPLES = '''
 - name: Submit DNS reload and poll
   community.general.memset_dns_reload:
     api_key: 5eb86c9196ab03919abcf03857163741
-    poll: True
+    poll: true
   delegate_to: localhost
 '''
 
@@ -111,7 +112,7 @@ def poll_reload_status(api_key=None, job_id=None, payload=None):
         memset_api = response.json()
         msg = None
 
-    return(memset_api, msg, stderr)
+    return memset_api, msg, stderr
 
 
 def reload_dns(args=None):
@@ -133,7 +134,7 @@ def reload_dns(args=None):
         retvals['failed'] = has_failed
         retvals['memset_api'] = response.json()
         retvals['msg'] = msg
-        return(retvals)
+        return retvals
 
     # set changed to true if the reload request was accepted.
     has_changed = True
@@ -153,7 +154,7 @@ def reload_dns(args=None):
         if val is not None:
             retvals[val] = eval(val)
 
-    return(retvals)
+    return retvals
 
 
 def main():

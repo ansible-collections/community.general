@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # Copyright 2012 Dag Wieers <dag@wieers.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -62,7 +63,7 @@ options:
     description:
     - Whether to force a reboot (even when the system is already booted).
     - As a safeguard, without force, hpilo_boot will refuse to reboot a server that is already running.
-    default: no
+    default: false
     type: bool
   ssl_version:
     description:

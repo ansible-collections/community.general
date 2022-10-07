@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2020, Adam Vaughan (@adamvaughan) avaughan@pagerduty.com
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2020, Adam Vaughan (@adamvaughan) avaughan@pagerduty.com
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -72,10 +73,10 @@ options:
     type: str
   validate_certs:
     description:
-      - If C(no), SSL certificates for the target URL will not be validated.
+      - If C(false), SSL certificates for the target URL will not be validated.
         This should only be used on personally controlled sites using self-signed certificates.
     required: false
-    default: yes
+    default: true
     type: bool
 notes:
   - Supports C(check_mode). Note that check mode simply does nothing except returning C(changed=true) in case the I(url) seems to be correct.

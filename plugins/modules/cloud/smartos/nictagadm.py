@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2018, Bruce Smith <Bruce.Smith.IT@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2018, Bruce Smith <Bruce.Smith.IT@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -31,7 +32,7 @@ options:
     - Specifies that the nic tag will be attached to a created I(etherstub).
     - Parameter I(etherstub) is mutually exclusive with both I(mtu), and I(mac).
     type: bool
-    default: no
+    default: false
   mtu:
     description:
     - Specifies the size of the I(mtu) of the desired nic tag.
@@ -41,7 +42,7 @@ options:
     description:
     - When I(state) is absent set this switch will use the C(-f) parameter and delete the nic tag regardless of existing VMs.
     type: bool
-    default: no
+    default: false
   state:
     description:
     - Create or delete a SmartOS nic tag.
@@ -79,7 +80,7 @@ etherstub:
   description: specifies if the nic tag will create and attach to an etherstub.
   returned: always
   type: bool
-  sample: False
+  sample: false
 mtu:
   description: specifies which MTU size was passed during the nictagadm add command. mtu and etherstub are mutually exclusive.
   returned: always
@@ -89,7 +90,7 @@ force:
   description: Shows if -f was used during the deletion of a nic tag
   returned: always
   type: bool
-  sample: False
+  sample: false
 state:
   description: state of the target
   returned: always

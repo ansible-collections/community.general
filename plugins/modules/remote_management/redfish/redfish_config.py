@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2017-2018 Dell EMC Inc.
-# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -20,48 +21,48 @@ options:
   category:
     required: true
     description:
-      - Category to execute on OOB controller
+      - Category to execute on OOB controller.
     type: str
   command:
     required: true
     description:
-      - List of commands to execute on OOB controller
+      - List of commands to execute on OOB controller.
     type: list
     elements: str
   baseuri:
     required: true
     description:
-      - Base URI of OOB controller
+      - Base URI of OOB controller.
     type: str
   username:
     description:
-      - User for authentication with OOB controller
+      - Username for authenticating to OOB controller.
     type: str
   password:
     description:
-      - Password for authentication with OOB controller
+      - Password for authenticating to OOB controller.
     type: str
   auth_token:
     description:
-      - Security token for authentication with OOB controller
+      - Security token for authenticating to OOB controller.
     type: str
     version_added: 2.3.0
   bios_attributes:
     required: false
     description:
-      - dictionary of BIOS attributes to update
+      - Dictionary of BIOS attributes to update.
     default: {}
     type: dict
     version_added: '0.2.0'
   timeout:
     description:
-      - Timeout in seconds for URL requests to OOB controller
+      - Timeout in seconds for HTTP requests to OOB controller.
     default: 10
     type: int
   boot_order:
     required: false
     description:
-      - list of BootOptionReference strings specifying the BootOrder
+      - List of BootOptionReference strings specifying the BootOrder.
     default: []
     type: list
     elements: str
@@ -69,26 +70,26 @@ options:
   network_protocols:
     required: false
     description:
-      -  setting dict of manager services to update
+      - Setting dict of manager services to update.
     type: dict
     version_added: '0.2.0'
   resource_id:
     required: false
     description:
-      - The ID of the System, Manager or Chassis to modify
+      - ID of the System, Manager or Chassis to modify.
     type: str
     version_added: '0.2.0'
   nic_addr:
     required: false
     description:
-      - EthernetInterface Address string on OOB controller
+      - EthernetInterface Address string on OOB controller.
     default: 'null'
     type: str
     version_added: '0.2.0'
   nic_config:
     required: false
     description:
-      - setting dict of EthernetInterface on OOB controller
+      - Setting dict of EthernetInterface on OOB controller.
     type: dict
     version_added: '0.2.0'
   strip_etag_quotes:
@@ -112,6 +113,12 @@ options:
       - Redfish HostInterface instance ID if multiple HostInterfaces are present.
     type: str
     version_added: '4.1.0'
+  sessions_config:
+    required: false
+    description:
+      - Setting dict of Sessions.
+    type: dict
+    version_added: '5.7.0'
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''
@@ -190,10 +197,10 @@ EXAMPLES = '''
       command: SetNetworkProtocols
       network_protocols:
         SNMP:
-          ProtocolEnabled: True
+          ProtocolEnabled: true
           Port: 161
         HTTP:
-          ProtocolEnabled: False
+          ProtocolEnabled: false
           Port: 8080
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
@@ -205,7 +212,7 @@ EXAMPLES = '''
       command: SetManagerNic
       nic_config:
         DHCPv4:
-          DHCPEnabled: False
+          DHCPEnabled: false
         IPv4StaticAddresses:
           Address: 192.168.1.3
           Gateway: 192.168.1.1
@@ -234,6 +241,16 @@ EXAMPLES = '''
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+
+  - name: Set SessionService Session Timeout to 30 minutes
+    community.general.redfish_config:
+      category: Sessions
+      command: SetSessionService
+      sessions_config:
+        SessionTimeout: 1800
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
 '''
 
 RETURN = '''
@@ -253,7 +270,8 @@ from ansible.module_utils.common.text.converters import to_native
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["SetBiosDefaultSettings", "SetBiosAttributes", "SetBootOrder",
                 "SetDefaultBootOrder"],
-    "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface"]
+    "Manager": ["SetNetworkProtocols", "SetManagerNic", "SetHostInterface"],
+    "Sessions": ["SetSessionService"],
 }
 
 
@@ -283,6 +301,7 @@ def main():
             strip_etag_quotes=dict(type='bool', default=False),
             hostinterface_config=dict(type='dict', default={}),
             hostinterface_id=dict(),
+            sessions_config=dict(type='dict', default={}),
         ),
         required_together=[
             ('username', 'password'),
@@ -329,6 +348,9 @@ def main():
     # HostInterface instance ID
     hostinterface_id = module.params['hostinterface_id']
 
+    # Sessions config options
+    sessions_config = module.params['sessions_config']
+
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
     rf_utils = RedfishUtils(creds, root_uri, timeout, module,
@@ -374,6 +396,16 @@ def main():
                 result = rf_utils.set_manager_nic(nic_addr, nic_config)
             elif command == "SetHostInterface":
                 result = rf_utils.set_hostinterface_attributes(hostinterface_config, hostinterface_id)
+
+    elif category == "Sessions":
+        # execute only if we find a Sessions resource
+        result = rf_utils._find_sessionservice_resource()
+        if result['ret'] is False:
+            module.fail_json(msg=to_native(result['msg']))
+
+        for command in command_list:
+            if command == "SetSessionService":
+                result = rf_utils.set_session_service(sessions_config)
 
     # Return data back or fail with proper message
     if result['ret'] is True:

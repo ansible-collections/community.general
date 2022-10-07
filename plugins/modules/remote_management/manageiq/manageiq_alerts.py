@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017 Red Hat Inc.
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -25,7 +26,7 @@ options:
     description:
       - absent - alert should not exist,
       - present - alert should exist,
-    required: False
+    required: false
     choices: ['absent', 'present']
     default: 'present'
   description:
@@ -83,7 +84,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: False
+      validate_certs: false
 
 - name: Add an alert with a "miq expression" to ManageIQ
   community.general.manageiq_alerts:
@@ -110,7 +111,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: False
+      validate_certs: false
 
 - name: Delete an alert from ManageIQ
   community.general.manageiq_alerts:
@@ -120,7 +121,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: False
+      validate_certs: false
 '''
 
 RETURN = '''

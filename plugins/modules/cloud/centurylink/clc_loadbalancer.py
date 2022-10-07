@@ -3,7 +3,8 @@
 #
 # Copyright (c) 2015 CenturyLink
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -19,7 +20,7 @@ options:
     description:
       - The name of the loadbalancer
     type: str
-    required: True
+    required: true
   description:
     description:
       - A description for the loadbalancer
@@ -28,12 +29,12 @@ options:
     description:
       - The alias of your CLC Account
     type: str
-    required: True
+    required: true
   location:
     description:
       - The location of the datacenter where the load balancer resides in
     type: str
-    required: True
+    required: true
   method:
     description:
       -The balancing method for the load balancer pool

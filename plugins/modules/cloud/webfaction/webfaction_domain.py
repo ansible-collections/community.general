@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2015, Quentin Stafford-Fraser
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2015, Quentin Stafford-Fraser
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # Create Webfaction domains and subdomains using Ansible and the Webfaction API
 
@@ -18,7 +19,7 @@ description:
     - Add or remove domains or subdomains on a Webfaction host. Further documentation at https://github.com/quentinsf/ansible-webfaction.
 author: Quentin Stafford-Fraser (@quentinsf)
 notes:
-    - If you are I(deleting) domains by using C(state=absent), then note that if you specify subdomains, just those particular subdomains will be deleted.
+    - If you are I(deleting) domains by using I(state=absent), then note that if you specify subdomains, just those particular subdomains will be deleted.
       If you don't specify subdomains, the domain will be deleted.
     - >
       You can run playbooks that use this on a local machine, or on a Webfaction host, or elsewhere, since the scripts use the remote webfaction API.

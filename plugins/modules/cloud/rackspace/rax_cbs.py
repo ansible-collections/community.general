@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -17,34 +18,34 @@ options:
   description:
     type: str
     description:
-      - Description to give the volume being created
+      - Description to give the volume being created.
   image:
     type: str
     description:
-      - image to use for bootable volumes. Can be an C(id), C(human_id) or
-        C(name). This option requires C(pyrax>=1.9.3)
+      - Image to use for bootable volumes. Can be an C(id), C(human_id) or
+        C(name). This option requires C(pyrax>=1.9.3).
   meta:
     type: dict
     description:
-      - A hash of metadata to associate with the volume
+      - A hash of metadata to associate with the volume.
   name:
     type: str
     description:
-      - Name to give the volume being created
+      - Name to give the volume being created.
     required: true
   size:
     type: int
     description:
-      - Size of the volume to create in Gigabytes
+      - Size of the volume to create in Gigabytes.
     default: 100
   snapshot_id:
     type: str
     description:
-      - The id of the snapshot to create the volume from
+      - The id of the snapshot to create the volume from.
   state:
     type: str
     description:
-      - Indicate desired state of the resource
+      - Indicate desired state of the resource.
     choices:
       - present
       - absent
@@ -52,20 +53,20 @@ options:
   volume_type:
     type: str
     description:
-      - Type of the volume being created
+      - Type of the volume being created.
     choices:
       - SATA
       - SSD
     default: SATA
   wait:
     description:
-      - wait for the volume to be in state 'available' before returning
+      - Wait for the volume to be in state C(available) before returning.
     type: bool
-    default: 'no'
+    default: false
   wait_timeout:
     type: int
     description:
-      - how long before wait gives up, in seconds
+      - how long before wait gives up, in seconds.
     default: 300
 author:
     - "Christopher H. Laco (@claco)"
@@ -77,7 +78,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Build a Block Storage Volume
-  gather_facts: False
+  gather_facts: false
   hosts: local
   connection: local
   tasks:
@@ -90,7 +91,7 @@ EXAMPLES = '''
         volume_type: SSD
         size: 150
         region: DFW
-        wait: yes
+        wait: true
         state: present
         meta:
           app: my-cool-app

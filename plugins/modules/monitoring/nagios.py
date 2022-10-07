@@ -7,7 +7,8 @@
 # func-nagios - Schedule downtime and enables/disable notifications
 # Copyright 2011, Red Hat, Inc.
 # Tim Bielawa <tbielawa@redhat.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -22,11 +23,11 @@ description:
   - The C(nagios) module is not idempotent.
   - All actions require the I(host) parameter to be given explicitly. In playbooks you can use the C({{inventory_hostname}}) variable to refer
     to the host the playbook is currently running on.
-  - You can specify multiple services at once by separating them with commas, .e.g., C(services=httpd,nfs,puppet).
+  - You can specify multiple services at once by separating them with commas, .e.g. I(services=httpd,nfs,puppet).
   - When specifying what service to handle there is a special service value, I(host), which will handle alerts/downtime/acknowledge for the I(host itself),
-    e.g., C(service=host). This keyword may not be given with other services at the same time.
+    e.g., I(service=host). This keyword may not be given with other services at the same time.
     I(Setting alerts/downtime/acknowledge for a host does not affect alerts/downtime/acknowledge for any of the services running on it.)
-    To schedule downtime for all services on particular host use keyword "all", e.g., C(service=all).
+    To schedule downtime for all services on particular host use keyword "all", e.g., I(service=all).
 options:
   action:
     description:
@@ -51,17 +52,17 @@ options:
   author:
     description:
      - Author to leave downtime comments as.
-       Only usable with the C(downtime) and C(acknowledge) action.
+       Only used when I(action) is C(downtime) or C(acknowledge).
     type: str
     default: Ansible
   comment:
     description:
-     - Comment for C(downtime) and C(acknowledge)action.
+     - Comment when I(action) is C(downtime) or C(acknowledge).
     type: str
     default: Scheduling downtime
   start:
     description:
-      - When downtime should start, in time_t format (epoch seconds).
+      - When downtime should start, in C(time_t) format (epoch seconds).
     version_added: '0.2.0'
     type: str
   minutes:
@@ -72,9 +73,10 @@ options:
     default: 30
   services:
     description:
-      - What to manage downtime/alerts for. Separate multiple services with commas.
-        C(service) is an alias for C(services).
-        B(Required) option when using the C(downtime), C(acknowledge), C(forced_check), C(enable_alerts), and C(disable_alerts) actions.
+      - >
+        What to manage downtime/alerts for. Separate multiple services with commas.
+        I(service) is an alias for I(services).
+        B(Required) option when I(action) is one of: C(downtime), C(acknowledge), C(forced_check), C(enable_alerts), C(disable_alerts).
     aliases: [ "service" ]
     type: str
   servicegroup:
@@ -250,8 +252,6 @@ import stat
 from ansible.module_utils.basic import AnsibleModule
 
 
-######################################################################
-
 def which_cmdfile():
     locations = [
         # rhel
@@ -285,8 +285,6 @@ def which_cmdfile():
 
     return None
 
-######################################################################
-
 
 def main():
     ACTION_CHOICES = [
@@ -307,95 +305,42 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            action=dict(required=True, choices=ACTION_CHOICES),
-            author=dict(default='Ansible'),
-            comment=dict(default='Scheduling downtime'),
-            host=dict(required=False, default=None),
-            servicegroup=dict(required=False, default=None),
-            start=dict(required=False, default=None),
-            minutes=dict(default=30, type='int'),
-            cmdfile=dict(default=which_cmdfile()),
-            services=dict(default=None, aliases=['service']),
-            command=dict(required=False, default=None),
-        )
+            action=dict(type='str', required=True, choices=ACTION_CHOICES),
+            author=dict(type='str', default='Ansible'),
+            comment=dict(type='str', default='Scheduling downtime'),
+            host=dict(type='str'),
+            servicegroup=dict(type='str'),
+            start=dict(type='str'),
+            minutes=dict(type='int', default=30),
+            cmdfile=dict(type='str', default=which_cmdfile()),
+            services=dict(type='str', aliases=['service']),
+            command=dict(type='str'),
+        ),
+        required_if=[
+            ('action', 'downtime', ['host', 'services']),
+            ('action', 'delete_downtime', ['host', 'services']),
+            ('action', 'silence', ['host']),
+            ('action', 'unsilence', ['host']),
+            ('action', 'enable_alerts', ['host', 'services']),
+            ('action', 'disable_alerts', ['host', 'services']),
+            ('action', 'command', ['command']),
+            ('action', 'servicegroup_host_downtime', ['host', 'servicegroup']),
+            ('action', 'servicegroup_service_downtime', ['host', 'servicegroup']),
+            ('action', 'acknowledge', ['host', 'services']),
+            ('action', 'forced_check', ['host', 'services']),
+        ],
     )
 
-    action = module.params['action']
-    host = module.params['host']
-    servicegroup = module.params['servicegroup']
-    start = module.params['start']
-    services = module.params['services']
-    cmdfile = module.params['cmdfile']
-    command = module.params['command']
-
-    ##################################################################
-    # Required args per action:
-    # downtime = (minutes, service, host)
-    # acknowledge = (service, host)
-    # (un)silence = (host)
-    # (enable/disable)_alerts = (service, host)
-    # command = command
-    #
-    # AnsibleModule will verify most stuff, we need to verify
-    # 'service' manually.
-
-    ##################################################################
-    if action not in ['command', 'silence_nagios', 'unsilence_nagios']:
-        if not host:
-            module.fail_json(msg='no host specified for action requiring one')
-    ######################################################################
-    if action == 'downtime':
-        # Make sure there's an actual service selected
-        if not services:
-            module.fail_json(msg='no service selected to set downtime for')
-
-    ######################################################################
-    if action == 'delete_downtime':
-        # Make sure there's an actual service selected
-        if not services:
-            module.fail_json(msg='no service selected to set downtime for')
-
-    ######################################################################
-
-    if action in ['servicegroup_service_downtime', 'servicegroup_host_downtime']:
-        # Make sure there's an actual servicegroup selected
-        if not servicegroup:
-            module.fail_json(msg='no servicegroup selected to set downtime for')
-
-    ##################################################################
-    if action in ['enable_alerts', 'disable_alerts']:
-        if not services:
-            module.fail_json(msg='a service is required when setting alerts')
-
-    if action in ['command']:
-        if not command:
-            module.fail_json(msg='no command passed for command action')
-    ######################################################################
-    if action == 'acknowledge':
-        # Make sure there's an actual service selected
-        if not services:
-            module.fail_json(msg='no service selected to acknowledge')
-
-    ##################################################################
-    if action == 'forced_check':
-        # Make sure there's an actual service selected
-        if not services:
-            module.fail_json(msg='no service selected to check')
-
-    ##################################################################
-    if not cmdfile:
+    if not module.params['cmdfile']:
         module.fail_json(msg='unable to locate nagios.cfg')
 
-    ##################################################################
     ansible_nagios = Nagios(module, **module.params)
     if module.check_mode:
         module.exit_json(changed=True)
     else:
         ansible_nagios.act()
-    ##################################################################
 
 
-######################################################################
 class Nagios(object):
     """
     Perform common tasks in Nagios related to downtime and
@@ -452,10 +397,9 @@ class Nagios(object):
             self.module.fail_json(msg='nagios command file is not a fifo file',
                                   cmdfile=self.cmdfile)
         try:
-            fp = open(self.cmdfile, 'w')
-            fp.write(cmd)
-            fp.flush()
-            fp.close()
+            with open(self.cmdfile, 'w') as fp:
+                fp.write(cmd)
+                fp.flush()
             self.command_results.append(cmd.strip())
         except IOError:
             self.module.fail_json(msg='unable to write to nagios command file',

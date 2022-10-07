@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2021, Sergey Mikhaltsov <metanovii@gmail.com>
-# Copyright: (c) 2020, Zainab Alsaffar <Zainab.Alsaffar@mail.rit.edu>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2021, Sergey Mikhaltsov <metanovii@gmail.com>
+# Copyright (c) 2020, Zainab Alsaffar <Zainab.Alsaffar@mail.rit.edu>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -90,7 +91,7 @@ EXAMPLES = r'''
   community.general.gitlab_project_members:
     api_url: 'https://gitlab.example.com'
     api_token: 'Your-Private-Token'
-    validate_certs: True
+    validate_certs: true
     project: projectname
     gitlab_user: username
     access_level: developer
@@ -100,7 +101,7 @@ EXAMPLES = r'''
   community.general.gitlab_project_members:
     api_url: 'https://gitlab.example.com'
     api_token: 'Your-Private-Token'
-    validate_certs: False
+    validate_certs: false
     project: projectname
     gitlab_user: username
     state: absent
@@ -154,18 +155,11 @@ EXAMPLES = r'''
 RETURN = r''' # '''
 
 from ansible.module_utils.api import basic_auth_argument_spec
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
-
-import traceback
-
-try:
-    import gitlab
-    HAS_PY_GITLAB = True
-except ImportError:
-    GITLAB_IMP_ERR = traceback.format_exc()
-    HAS_PY_GITLAB = False
+from ansible_collections.community.general.plugins.module_utils.gitlab import (
+    auth_argument_spec, gitlab_authentication, gitlab, ensure_gitlab_package
+)
 
 
 class GitLabProjectMembers(object):
@@ -280,9 +274,7 @@ def main():
         ],
         supports_check_mode=True,
     )
-
-    if not HAS_PY_GITLAB:
-        module.fail_json(msg=missing_required_lib('python-gitlab', url='https://python-gitlab.readthedocs.io/en/stable/'), exception=GITLAB_IMP_ERR)
+    ensure_gitlab_package(module)
 
     access_level_int = {
         'guest': gitlab.GUEST_ACCESS,

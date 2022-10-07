@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# James Laska (jlaska@redhat.com)
+# Copyright (c) James Laska (jlaska@redhat.com)
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -137,7 +138,7 @@ options:
         description:
             -  Register the system even if it is already registered
         type: bool
-        default: no
+        default: false
     release:
         description:
             - Set a release version
@@ -172,7 +173,7 @@ options:
                       RHSM server immediately. When this option is false, then syspurpose attributes
                       will be synchronized with RHSM server by rhsmcertd daemon.
                 type: bool
-                default: no
+                default: false
 '''
 
 EXAMPLES = '''
@@ -468,7 +469,7 @@ class Rhsm(RegistrationBase):
             items = ["--all"]
 
         if items:
-            args = [SUBMAN_CMD, 'unsubscribe'] + items
+            args = [SUBMAN_CMD, 'remove'] + items
             rc, stderr, stdout = self.module.run_command(args, check_rc=True)
         return serials
 
@@ -592,15 +593,22 @@ class Rhsm(RegistrationBase):
         consumed_pools = RhsmPools(self.module, consumed=True)
 
         existing_pools = {}
+        serials_to_remove = []
         for p in consumed_pools:
-            existing_pools[p.get_pool_id()] = p.QuantityUsed
+            pool_id = p.get_pool_id()
+            quantity_used = p.get_quantity_used()
+            existing_pools[pool_id] = quantity_used
 
-        serials_to_remove = [p.Serial for p in consumed_pools if pool_ids.get(p.get_pool_id(), 0) != p.QuantityUsed]
+            quantity = pool_ids.get(pool_id, 0)
+            if quantity is not None and quantity != quantity_used:
+                serials_to_remove.append(p.Serial)
+
         serials = self.unsubscribe(serials=serials_to_remove)
 
         missing_pools = {}
         for pool_id, quantity in sorted(pool_ids.items()):
-            if existing_pools.get(pool_id, 0) != quantity:
+            quantity_used = existing_pools.get(pool_id, 0)
+            if quantity is None and quantity_used == 0 or quantity not in (None, 0, quantity_used):
                 missing_pools[pool_id] = quantity
 
         self.subscribe_by_pool_ids(missing_pools)
@@ -633,6 +641,9 @@ class RhsmPool(object):
 
     def get_pool_id(self):
         return getattr(self, 'PoolId', getattr(self, 'PoolID'))
+
+    def get_quantity_used(self):
+        return int(getattr(self, 'QuantityUsed'))
 
     def subscribe(self):
         args = "subscription-manager attach --pool %s" % self.get_pool_id()

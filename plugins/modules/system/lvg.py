@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2013, Alexander Bulimov <lazywolf0@gmail.com>
+# Copyright (c) 2013, Alexander Bulimov <lazywolf0@gmail.com>
 # Based on lvol module by Jeroen Hoekx <jeroen.hoekx@dsquare.be>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -43,7 +44,7 @@ options:
     type: str
   pvresize:
     description:
-    - If C(yes), resize the physical volume to the maximum available size.
+    - If C(true), resize the physical volume to the maximum available size.
     type: bool
     default: false
     version_added: '0.2.0'
@@ -59,9 +60,9 @@ options:
     default: present
   force:
     description:
-    - If C(yes), allows to remove volume group with logical volumes.
+    - If C(true), allows to remove volume group with logical volumes.
     type: bool
-    default: no
+    default: false
 seealso:
 - module: community.general.filesystem
 - module: community.general.lvol
@@ -101,7 +102,7 @@ EXAMPLES = r'''
   community.general.lvg:
     vg: resizableVG
     pvs: /dev/sda3
-    pvresize: yes
+    pvresize: true
 '''
 
 import itertools
@@ -257,7 +258,7 @@ def main():
                     else:
                         module.fail_json(msg="Failed to remove volume group %s" % (vg), rc=rc, err=err)
                 else:
-                    module.fail_json(msg="Refuse to remove non-empty volume group %s without force=yes" % (vg))
+                    module.fail_json(msg="Refuse to remove non-empty volume group %s without force=true" % (vg))
 
         # resize VG
         current_devs = [os.path.realpath(pv['name']) for pv in pvs if pv['vg_name'] == vg]

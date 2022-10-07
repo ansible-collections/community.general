@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2020, Zainab Alsaffar <Zainab.Alsaffar@mail.rit.edu>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2020, Zainab Alsaffar <Zainab.Alsaffar@mail.rit.edu>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -86,6 +87,7 @@ from os import path
 try:
     from pdpyras import APISession
     HAS_PD_PY = True
+    PD_IMPORT_ERR = None
 except ImportError:
     HAS_PD_PY = False
     PD_IMPORT_ERR = traceback.format_exc()
@@ -93,6 +95,7 @@ except ImportError:
 try:
     from pdpyras import PDClientError
     HAS_PD_CLIENT_ERR = True
+    PD_CLIENT_ERR_IMPORT_ERR = None
 except ImportError:
     HAS_PD_CLIENT_ERR = False
     PD_CLIENT_ERR_IMPORT_ERR = traceback.format_exc()

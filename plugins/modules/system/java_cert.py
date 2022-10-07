@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2013, RSD Services S.A
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2013, RSD Services S.A
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -41,7 +42,7 @@ options:
     description:
       - Trust imported cert as CAcert.
     type: bool
-    default: False
+    default: false
     version_added: '0.2.0'
   pkcs12_path:
     description:
@@ -118,17 +119,17 @@ EXAMPLES = r'''
     cert_path: /opt/certs/rootca.crt
     keystore_path: /tmp/cacerts
     keystore_pass: changeit
-    keystore_create: yes
+    keystore_create: true
     state: present
     cert_alias: LE_RootCA
-    trust_cacert: True
+    trust_cacert: true
 
 - name: Import SSL certificate from google.com to a keystore, create it if it doesn't exist
   community.general.java_cert:
     cert_url: google.com
     keystore_path: /tmp/cacerts
     keystore_pass: changeit
-    keystore_create: yes
+    keystore_create: true
     state: present
 
 - name: Import a pkcs12 keystore with a specified alias, create it if it doesn't exist
@@ -137,7 +138,7 @@ EXAMPLES = r'''
     cert_alias: default
     keystore_path: /opt/wildfly/standalone/configuration/defaultkeystore.jks
     keystore_pass: changeit
-    keystore_create: yes
+    keystore_create: true
     state: present
 
 - name: Import SSL certificate to JCEKS keystore
@@ -149,7 +150,7 @@ EXAMPLES = r'''
     keystore_path: /opt/someapp/security/keystore.jceks
     keystore_type: "JCEKS"
     keystore_pass: changeit
-    keystore_create: yes
+    keystore_create: true
     state: present
 '''
 
@@ -175,8 +176,6 @@ cmd:
 
 import os
 import tempfile
-import random
-import string
 import re
 
 

@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, 2014, Jan-Piet Mens <jpmens () gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2013, 2014, Jan-Piet Mens <jpmens () gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -62,7 +63,7 @@ options:
         applications that subsequently subscribe to the topic can received the last
         retained message immediately.
     type: bool
-    default: 'no'
+    default: false
   ca_cert:
     type: path
     description:
@@ -111,7 +112,7 @@ EXAMPLES = '''
     topic: 'service/ansible/{{ ansible_hostname }}'
     payload: 'Hello at {{ ansible_date_time.iso8601 }}'
     qos: 0
-    retain: False
+    retain: false
     client_id: ans001
   delegate_to: localhost
 '''

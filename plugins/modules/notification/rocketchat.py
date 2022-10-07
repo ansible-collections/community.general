@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2016, Deepak Kothandan <deepak.kothandan@outlook.com>
-# (c) 2015, Stefan Berggren <nsg@nsg.cc>
-# (c) 2014, Ramon de la Fuente <ramon@delafuente.nl>
+# Copyright (c) 2016, Deepak Kothandan <deepak.kothandan@outlook.com>
+# Copyright (c) 2015, Stefan Berggren <nsg@nsg.cc>
+# Copyright (c) 2014, Ramon de la Fuente <ramon@delafuente.nl>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -73,10 +74,10 @@ options:
       - 0
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be used
+      - If C(false), SSL certificates will not be validated. This should only be used
         on personally controlled sites using self-signed certificates.
     type: bool
-    default: 'yes'
+    default: true
   color:
     type: str
     description:
@@ -134,10 +135,10 @@ EXAMPLES = """
         fields:
           - title: System A
             value: 'load average: 0,74, 0,66, 0,63'
-            short: True
+            short: true
           - title: System B
             value: 'load average: 5,16, 4,64, 2,43'
-            short: True
+            short: true
   delegate_to: localhost
 """
 

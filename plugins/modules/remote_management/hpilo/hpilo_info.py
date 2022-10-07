@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # Copyright 2012 Dag Wieers <dag@wieers.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -124,7 +125,7 @@ host_power_status:
       - Will be one of C(ON), C(OFF) and C(UNKNOWN).
     returned: always
     type: str
-    sample: ON
+    sample: "ON"
     version_added: 3.5.0
 '''
 

@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2017, Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -445,8 +446,8 @@ def ensure(module, client):
                 module_otptoken['all'] = True
                 ipa_otptoken = client.otptoken_add(name=uniqueid, item=module_otptoken)
         else:
-            if not(validate_modifications(ansible_to_ipa, module, ipa_otptoken,
-                                          module_otptoken, unmodifiable_after_creation)):
+            if not validate_modifications(ansible_to_ipa, module, ipa_otptoken,
+                                          module_otptoken, unmodifiable_after_creation):
                 module.fail_json(msg="Modifications requested in module are not valid")
 
             # IPA will reject 'modifications' that do not actually modify anything

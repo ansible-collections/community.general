@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2021, Rainer Leber <rainerleber@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2021, Rainer Leber <rainerleber@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -178,7 +179,6 @@ out:
 '''
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.json_utils import json
 import traceback
 try:
     from pyrfc import Connection
@@ -187,6 +187,7 @@ except ImportError:
     PYRFC_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 else:
     HAS_PYRFC_LIBRARY = True
+    PYRFC_LIBRARY_IMPORT_ERROR = None
 try:
     import xmltodict
 except ImportError:
@@ -194,6 +195,7 @@ except ImportError:
     XMLTODICT_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 else:
     HAS_XMLTODICT_LIBRARY = True
+    XMLTODICT_LIBRARY_IMPORT_ERROR = None
 
 
 def call_rfc_method(connection, method_name, kwargs):

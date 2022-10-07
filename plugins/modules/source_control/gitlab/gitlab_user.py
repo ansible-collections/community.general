@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2021, Lennert Mertens (lennert@nubera.be)
-# Copyright: (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
-# Copyright: (c) 2015, Werner Dijkerman (ikben@werner-dijkerman.nl)
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2021, Lennert Mertens (lennert@nubera.be)
+# Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
+# Copyright (c) 2015, Werner Dijkerman (ikben@werner-dijkerman.nl)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -101,17 +102,17 @@ options:
     description:
       - Require confirmation.
     type: bool
-    default: yes
+    default: true
   isadmin:
     description:
       - Grant admin privileges to the user.
     type: bool
-    default: no
+    default: false
   external:
     description:
       - Define external parameter for this user.
     type: bool
-    default: no
+    default: false
   identities:
     description:
       - List of identities to be added/updated for this user.
@@ -143,14 +144,14 @@ EXAMPLES = '''
   community.general.gitlab_user:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
-    validate_certs: False
+    validate_certs: false
     username: myusername
     state: absent
 
 - name: "Create GitLab User"
   community.general.gitlab_user:
     api_url: https://gitlab.example.com/
-    validate_certs: True
+    validate_certs: true
     api_username: dj-wasabi
     api_password: "MySecretPassword"
     name: My Name
@@ -166,7 +167,7 @@ EXAMPLES = '''
 - name: "Create GitLab User using external identity provider"
   community.general.gitlab_user:
     api_url: https://gitlab.example.com/
-    validate_certs: True
+    validate_certs: true
     api_token: "{{ access_token }}"
     name: My Name
     username: myusername
@@ -183,7 +184,7 @@ EXAMPLES = '''
   community.general.gitlab_user:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
-    validate_certs: False
+    validate_certs: false
     username: myusername
     state: blocked
 
@@ -191,7 +192,7 @@ EXAMPLES = '''
   community.general.gitlab_user:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
-    validate_certs: False
+    validate_certs: false
     username: myusername
     state: unblocked
 '''
@@ -220,21 +221,14 @@ user:
   type: dict
 '''
 
-import traceback
-
-GITLAB_IMP_ERR = None
-try:
-    import gitlab
-    HAS_GITLAB_PACKAGE = True
-except Exception:
-    GITLAB_IMP_ERR = traceback.format_exc()
-    HAS_GITLAB_PACKAGE = False
 
 from ansible.module_utils.api import basic_auth_argument_spec
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, find_group, gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import (
+    auth_argument_spec, find_group, gitlab_authentication, gitlab, ensure_gitlab_package
+)
 
 
 class GitLabUser(object):
@@ -305,7 +299,7 @@ class GitLabUser(object):
             # note: as we unfortunately have some uncheckable parameters
             #   where it is not possible to determine if the update
             #   changed something or not, we must assume here that a
-            #   changed happend and that an user object update is needed
+            #   changed happened and that an user object update is needed
             potentionally_changed = True
 
         # Assign ssh keys
@@ -615,6 +609,7 @@ def main():
             ('state', 'present', ['name', 'email']),
         )
     )
+    ensure_gitlab_package(module)
 
     user_name = module.params['name']
     state = module.params['state']
@@ -632,9 +627,6 @@ def main():
     user_external = module.params['external']
     user_identities = module.params['identities']
     overwrite_identities = module.params['overwrite_identities']
-
-    if not HAS_GITLAB_PACKAGE:
-        module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
     gitlab_instance = gitlab_authentication(module)
 

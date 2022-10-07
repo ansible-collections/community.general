@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# (c) 2015, Mathew Davies <thepixeldeveloper@googlemail.com>
-# (c) 2017, Sam Doran <sdoran@redhat.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2015, Mathew Davies <thepixeldeveloper@googlemail.com>
+# Copyright (c) 2017, Sam Doran <sdoran@redhat.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -21,7 +22,7 @@ options:
     name:
         description:
             - Name of the plugin to install.
-        required: True
+        required: true
         type: str
     state:
         description:
@@ -39,13 +40,13 @@ options:
               parameter. If, for example, the plugin is already installed, changing this has no
               effect.
             - For ES 1.x use url.
-        required: False
+        required: false
         type: str
     url:
         description:
             - Set exact URL to download the plugin from (Only works for ES 1.x).
             - For ES 2.x and higher, use src.
-        required: False
+        required: false
         type: str
     timeout:
         description:
@@ -56,7 +57,7 @@ options:
     force:
         description:
             - "Force batch mode when installing plugins. This is only necessary if a plugin requires additional permissions and console detection fails."
-        default: False
+        default: false
         type: bool
     plugin_bin:
         description:
@@ -108,7 +109,7 @@ EXAMPLES = '''
   community.general.elasticsearch_plugin:
     name: ingest-geoip
     state: present
-    force: yes
+    force: true
 '''
 
 import os

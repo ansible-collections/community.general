@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2017, Branko Majic <branko@majic.rs>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Branko Majic <branko@majic.rs>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -33,7 +34,7 @@ notes:
   - Keep in mind that the C(dconf) CLI tool, which this module wraps around,
     utilises an unusual syntax for the values (GVariant). For example, if you
     wanted to provide a string value, the correct syntax would be
-    C(value="'myvalue'") - with single quotes as part of the Ansible parameter
+    I(value="'myvalue'") - with single quotes as part of the Ansible parameter
     value.
   - When using loops in combination with a value like
     :code:`"[('xkb', 'us'), ('xkb', 'se')]"`, you need to be aware of possible

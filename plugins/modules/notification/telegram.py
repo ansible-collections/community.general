@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2016, Artem Feofanov <artem.feofanov@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Artem Feofanov <artem.feofanov@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -53,8 +54,8 @@ EXAMPLES = """
       chat_id: 000000
       parse_mode: "markdown"
       text: "Your precious application has been deployed: https://example.com"
-      disable_web_page_preview: True
-      disable_notification: True
+      disable_web_page_preview: true
+      disable_notification: true
 
 - name: Forward message to someone
   community.general.telegram:
@@ -63,7 +64,7 @@ EXAMPLES = """
     api_args:
       chat_id: 000000
       from_chat_id: 111111
-      disable_notification: True
+      disable_notification: true
       message_id: '{{ saved_msg_id }}'
 """
 

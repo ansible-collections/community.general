@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2015 CenturyLink
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -18,17 +19,17 @@ options:
     description:
       - The name of the Anti Affinity Policy.
     type: str
-    required: True
+    required: true
   location:
     description:
       - Datacenter in which the policy lives/should live.
     type: str
-    required: True
+    required: true
   state:
     description:
       - Whether to create or delete the policy.
     type: str
-    required: False
+    required: false
     default: present
     choices: ['present','absent']
 requirements:
@@ -54,7 +55,7 @@ EXAMPLES = '''
 ---
 - name: Create AA Policy
   hosts: localhost
-  gather_facts: False
+  gather_facts: false
   connection: local
   tasks:
     - name: Create an Anti Affinity Policy
@@ -70,7 +71,7 @@ EXAMPLES = '''
 
 - name: Delete AA Policy
   hosts: localhost
-  gather_facts: False
+  gather_facts: false
   connection: local
   tasks:
     - name: Delete an Anti Affinity Policy

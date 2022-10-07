@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
-# Copyright: (c) 2015, Werner Dijkerman (ikben@werner-dijkerman.nl)
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
+# Copyright (c) 2015, Werner Dijkerman (ikben@werner-dijkerman.nl)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -57,23 +58,23 @@ options:
       - Whether you want to create issues or not.
       - Possible values are true and false.
     type: bool
-    default: yes
+    default: true
   merge_requests_enabled:
     description:
       - If merge requests can be made or not.
       - Possible values are true and false.
     type: bool
-    default: yes
+    default: true
   wiki_enabled:
     description:
       - If an wiki for this project should be available or not.
     type: bool
-    default: yes
+    default: true
   snippets_enabled:
     description:
       - If creating snippets should be available or not.
     type: bool
-    default: yes
+    default: true
   visibility:
     description:
       - C(private) Project access must be granted explicitly for each user.
@@ -185,7 +186,7 @@ EXAMPLES = r'''
   community.general.gitlab_project:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
-    validate_certs: False
+    validate_certs: false
     name: my_first_project
     state: absent
   delegate_to: localhost
@@ -193,15 +194,15 @@ EXAMPLES = r'''
 - name: Create GitLab Project in group Ansible
   community.general.gitlab_project:
     api_url: https://gitlab.example.com/
-    validate_certs: True
+    validate_certs: true
     api_username: dj-wasabi
     api_password: "MySecretPassword"
     name: my_first_project
     group: ansible
-    issues_enabled: False
+    issues_enabled: false
     merge_method: rebase_merge
-    wiki_enabled: True
-    snippets_enabled: True
+    wiki_enabled: true
+    snippets_enabled: true
     import_url: http://git.example.com/example/lab.git
     initialize_with_readme: true
     state: present
@@ -245,21 +246,14 @@ project:
   type: dict
 '''
 
-import traceback
-
-GITLAB_IMP_ERR = None
-try:
-    import gitlab
-    HAS_GITLAB_PACKAGE = True
-except Exception:
-    GITLAB_IMP_ERR = traceback.format_exc()
-    HAS_GITLAB_PACKAGE = False
 
 from ansible.module_utils.api import basic_auth_argument_spec
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, find_group, find_project, gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import (
+    auth_argument_spec, find_group, find_project, gitlab_authentication, gitlab, ensure_gitlab_package
+)
 
 
 class GitLabProject(object):
@@ -443,6 +437,7 @@ def main():
         ],
         supports_check_mode=True,
     )
+    ensure_gitlab_package(module)
 
     group_identifier = module.params['group']
     project_name = module.params['name']
@@ -472,9 +467,6 @@ def main():
 
     if default_branch and not initialize_with_readme:
         module.fail_json(msg="Param default_branch need param initialize_with_readme set to true")
-
-    if not HAS_GITLAB_PACKAGE:
-        module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
     gitlab_instance = gitlab_authentication(module)
 

@@ -1,0 +1,2 @@
+bugfixes:
+  - proxmox inventory plugin - fixed extended status detection for qemu (https://github.com/ansible-collections/community.general/pull/4816).

@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2018, Sebastian Schenzel <sebastian.schenzel@mailbox.org>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2018, Sebastian Schenzel <sebastian.schenzel@mailbox.org>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 
@@ -26,7 +27,7 @@ options:
     name:
         description:
             - The name of the object. Will be used to identify the entry
-        required: True
+        required: true
         type: str
     op:
         description:
@@ -35,7 +36,7 @@ options:
         choices:
             - 'AND'
             - 'OR'
-        required: False
+        required: false
         type: str
     path:
         description:
@@ -43,82 +44,82 @@ options:
         type: list
         elements: str
         default: []
-        required: False
+        required: false
     skip_custom_threats_filters:
         description:
             - A list of threats to be skipped
         type: list
         elements: str
         default: []
-        required: False
+        required: false
     skip_threats_filter_categories:
         description:
             - Define which categories of threats are skipped
         type: list
         elements: str
         default: []
-        required: False
+        required: false
     skipav:
         description:
             - Skip the Antivirus Scanning
-        default: False
+        default: false
         type: bool
-        required: False
+        required: false
     skipbadclients:
         description:
             - Block clients with bad reputation
-        default: False
+        default: false
         type: bool
-        required: False
+        required: false
     skipcookie:
         description:
             - Skip the Cookie Signing check
-        default: False
+        default: false
         type: bool
-        required: False
+        required: false
     skipform:
         description:
             - Enable form hardening
-        default: False
+        default: false
         type: bool
-        required: False
+        required: false
     skipform_missingtoken:
         description:
             - Enable form hardening with missing tokens
-        default: False
+        default: false
         type: bool
-        required: False
+        required: false
     skiphtmlrewrite:
         description:
             - Protection against SQL
-        default: False
+        default: false
         type: bool
-        required: False
+        required: false
     skiptft:
         description:
             - Enable true file type control
-        default: False
+        default: false
         type: bool
-        required: False
+        required: false
     skipurl:
         description:
             - Enable static URL hardening
-        default: False
+        default: false
         type: bool
-        required: False
+        required: false
     source:
         description:
             - Define which categories of threats are skipped
         type: list
         elements: str
         default: []
-        required: False
+        required: false
     status:
         description:
             - Status of the exception rule set
-        default: True
+        default: true
         type: bool
-        required: False
+        required: false
 
 extends_documentation_fragment:
 - community.general.utm

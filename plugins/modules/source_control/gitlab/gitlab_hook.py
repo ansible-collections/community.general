@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
-# Copyright: (c) 2018, Marcus Watkins <marwatk@marcuswatkins.net>
+# Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
+# Copyright (c) 2018, Marcus Watkins <marwatk@marcuswatkins.net>
 # Based on code:
-# Copyright: (c) 2013, Phillip Gentry <phillip@cx.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2013, Phillip Gentry <phillip@cx.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -48,7 +49,7 @@ options:
     description:
       - Trigger hook on push events.
     type: bool
-    default: yes
+    default: true
   push_events_branch_filter:
     description:
       - Branch name of wildcard to trigger hook on push events
@@ -58,42 +59,42 @@ options:
     description:
       - Trigger hook on issues events.
     type: bool
-    default: no
+    default: false
   merge_requests_events:
     description:
       - Trigger hook on merge requests events.
     type: bool
-    default: no
+    default: false
   tag_push_events:
     description:
       - Trigger hook on tag push events.
     type: bool
-    default: no
+    default: false
   note_events:
     description:
       - Trigger hook on note events or when someone adds a comment.
     type: bool
-    default: no
+    default: false
   job_events:
     description:
       - Trigger hook on job events.
     type: bool
-    default: no
+    default: false
   pipeline_events:
     description:
       - Trigger hook on pipeline events.
     type: bool
-    default: no
+    default: false
   wiki_page_events:
     description:
       - Trigger hook on wiki events.
     type: bool
-    default: no
+    default: false
   hook_validate_certs:
     description:
       - Whether GitLab will do SSL verification when triggering the hook.
     type: bool
-    default: no
+    default: false
     aliases: [ enable_ssl_verification ]
   token:
     description:
@@ -112,9 +113,9 @@ EXAMPLES = '''
     project: "my_group/my_project"
     hook_url: "https://my-ci-server.example.com/gitlab-hook"
     state: present
-    push_events: yes
-    tag_push_events: yes
-    hook_validate_certs: no
+    push_events: true
+    tag_push_events: true
+    hook_validate_certs: false
     token: "my-super-secret-token-that-my-ci-server-will-check"
 
 - name: "Delete the previous hook"
@@ -158,22 +159,12 @@ hook:
   type: dict
 '''
 
-import re
-import traceback
-
-GITLAB_IMP_ERR = None
-try:
-    import gitlab
-    HAS_GITLAB_PACKAGE = True
-except Exception:
-    GITLAB_IMP_ERR = traceback.format_exc()
-    HAS_GITLAB_PACKAGE = False
-
 from ansible.module_utils.api import basic_auth_argument_spec
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, find_project, gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import (
+    auth_argument_spec, find_project, gitlab_authentication, ensure_gitlab_package
+)
 
 
 class GitLabHook(object):
@@ -232,9 +223,8 @@ class GitLabHook(object):
                 hook.save()
             except Exception as e:
                 self._module.fail_json(msg="Failed to update hook: %s " % e)
-            return True
-        else:
-            return False
+
+        return changed
 
     '''
     @param project Project Object
@@ -256,9 +246,9 @@ class GitLabHook(object):
         changed = False
 
         for arg_key, arg_value in arguments.items():
-            if arguments[arg_key] is not None:
-                if getattr(hook, arg_key, None) != arguments[arg_key]:
-                    setattr(hook, arg_key, arguments[arg_key])
+            if arg_value is not None:
+                if getattr(hook, arg_key, None) != arg_value:
+                    setattr(hook, arg_key, arg_value)
                     changed = True
 
         return (changed, hook)
@@ -286,10 +276,8 @@ class GitLabHook(object):
         return False
 
     def delete_hook(self):
-        if self._module.check_mode:
-            return True
-
-        return self.hook_object.delete()
+        if not self._module.check_mode:
+            self.hook_object.delete()
 
 
 def main():
@@ -329,6 +317,7 @@ def main():
         ],
         supports_check_mode=True,
     )
+    ensure_gitlab_package(module)
 
     state = module.params['state']
     project_identifier = module.params['project']
@@ -344,9 +333,6 @@ def main():
     wiki_page_events = module.params['wiki_page_events']
     enable_ssl_verification = module.params['hook_validate_certs']
     hook_token = module.params['token']
-
-    if not HAS_GITLAB_PACKAGE:
-        module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
     gitlab_instance = gitlab_authentication(module)
 

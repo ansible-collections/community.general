@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli - adds ``vpn`` type and parameter for supporting VPN with service type L2TP and PPTP (https://github.com/ansible-collections/community.general/pull/4746).

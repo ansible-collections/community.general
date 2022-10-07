@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2017-2020, Yann Amar <quidame@poivron.org>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017-2020, Yann Amar <quidame@poivron.org>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -69,7 +70,7 @@ options:
         exists (this lock being a dpkg-divert feature, and bypassing it being
         a module feature).
     type: bool
-    default: no
+    default: false
   force:
     description:
       - When I(rename=true) and I(force=true), renaming is performed even if
@@ -77,7 +78,7 @@ options:
         file at this location will be lost.
       - This parameter is ignored when I(rename=false).
     type: bool
-    default: no
+    default: false
 notes:
   - This module supports I(check_mode) and I(diff).
 requirements:
@@ -98,14 +99,14 @@ EXAMPLES = r'''
   community.general.dpkg_divert:
     path: /usr/bin/busybox
     divert: /usr/bin/busybox.dpkg-divert
-    rename: yes
+    rename: true
 
 - name: Remove the busybox diversion and move the diverted file back
   community.general.dpkg_divert:
     path: /usr/bin/busybox
     state: absent
-    rename: yes
-    force: yes
+    rename: true
+    force: true
 '''
 
 RETURN = r'''
@@ -114,21 +115,13 @@ commands:
   type: list
   returned: on_success
   elements: str
-  sample: |-
-    [
-      "/usr/bin/dpkg-divert --no-rename --remove /etc/foobarrc",
-      "/usr/bin/dpkg-divert --package ansible --no-rename --add /etc/foobarrc"
-    ]
+  sample: "/usr/bin/dpkg-divert --no-rename --remove /etc/foobarrc"
 messages:
   description: The dpkg-divert relevant messages (stdout or stderr).
   type: list
   returned: on_success
   elements: str
-  sample: |-
-    [
-      "Removing 'local diversion of /etc/foobarrc to /etc/foobarrc.distrib'",
-      "Adding 'diversion of /etc/foobarrc to /etc/foobarrc.distrib by ansible'"
-    ]
+  sample: "Removing 'local diversion of /etc/foobarrc to /etc/foobarrc.distrib'"
 diversion:
   description: The status of the diversion after task execution.
   type: dict
@@ -146,11 +139,11 @@ diversion:
     state:
       description: The state of the diversion.
       type: str
-  sample: |-
+  sample:
     {
       "divert": "/etc/foobarrc.distrib",
       "holder": "LOCAL",
-      "path": "/etc/foobarrc"
+      "path": "/etc/foobarrc",
       "state": "present"
     }
 '''

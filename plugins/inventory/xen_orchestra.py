@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2021 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -23,7 +24,7 @@ DOCUMENTATION = '''
     options:
         plugin:
             description: The name of this plugin, it should always be set to C(community.general.xen_orchestra) for this plugin to recognize it as its own.
-            required: yes
+            required: true
             choices: ['community.general.xen_orchestra']
             type: str
         api_host:
@@ -37,7 +38,7 @@ DOCUMENTATION = '''
             description:
                 - Xen Orchestra user.
                 - If the value is not specified in the inventory configuration, the value of environment variable C(ANSIBLE_XO_USER) will be used instead.
-            required: yes
+            required: true
             type: str
             env:
                 - name: ANSIBLE_XO_USER
@@ -45,7 +46,7 @@ DOCUMENTATION = '''
             description:
                 - Xen Orchestra password.
                 - If the value is not specified in the inventory configuration, the value of environment variable C(ANSIBLE_XO_PASSWORD) will be used instead.
-            required: yes
+            required: true
             type: str
             env:
                 - name: ANSIBLE_XO_PASSWORD

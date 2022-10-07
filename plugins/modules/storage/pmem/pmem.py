@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2022, Masayoshi Mizuma <msys.mizuma@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -99,7 +100,7 @@ options:
           - The size of namespace. This option supports the suffixes C(k) or C(K) or C(KB) for KiB,
             C(m) or C(M) or C(MB) for MiB, C(g) or C(G) or C(GB) for GiB and C(t) or C(T) or C(TB) for TiB.
           - This option is required if multiple namespaces are configured.
-          - If this option is not set, all of the avaiable space of a region is configured.
+          - If this option is not set, all of the available space of a region is configured.
         type: str
         required: false
   namespace_append:
@@ -116,7 +117,7 @@ reboot_required:
     description: Indicates that the system reboot is required to complete the PMem configuration.
     returned: success
     type: bool
-    sample: True
+    sample: true
 result:
     description:
      - Shows the value of AppDirect, Memory Mode and Reserved size in bytes.
@@ -172,7 +173,7 @@ EXAMPLES = r'''
 - name: Configure the Pmem as AppDirect with not interleaved 10, Memory Mode 70, and the Reserved 20 percent.
   community.general.pmem:
     appdirect: 10
-    appdirect_interleaved: False
+    appdirect_interleaved: false
     memorymode: 70
 
 - name: Configure the Pmem each socket.
@@ -180,7 +181,7 @@ EXAMPLES = r'''
     socket:
       - id: 0
         appdirect: 10
-        appdirect_interleaved: False
+        appdirect_interleaved: false
         memorymode: 70
         reserved: 20
       - id: 1
@@ -211,6 +212,7 @@ except ImportError:
     XMLTODICT_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 else:
     HAS_XMLTODICT_LIBRARY = True
+    XMLTODICT_LIBRARY_IMPORT_ERROR = None
 
 
 class PersistentMemory(object):

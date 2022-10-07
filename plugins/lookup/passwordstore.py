@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-# (c) 2017, Patrick Deelman <patrick@patrickdeelman.nl>
-# (c) 2017 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Patrick Deelman <patrick@patrickdeelman.nl>
+# Copyright (c) 2017 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -19,10 +20,16 @@ DOCUMENTATION = '''
     options:
       _terms:
         description: query key.
-        required: True
+        required: true
       passwordstore:
-        description: location of the password store.
-        default: '~/.password-store'
+        description:
+          - Location of the password store.
+          - 'The value is decided by checking the following in order:'
+          - If set, this value is used.
+          - If C(directory) is set, that value will be used.
+          - If I(backend=pass), then C(~/.password-store) is used.
+          - If I(backend=gopass), then the C(path) field in C(~/.config/gopass/config.yml) is used,
+            falling back to C(~/.local/share/gopass/stores/root) if not defined.
       directory:
         description: The directory of the password store.
         env:
@@ -34,7 +41,7 @@ DOCUMENTATION = '''
       overwrite:
         description: Overwrite the password if it does already exist.
         type: bool
-        default: 'no'
+        default: false
       umask:
         description:
           - Sets the umask for the created .gpg files. The first octed must be greater than 3 (user readable).
@@ -45,7 +52,7 @@ DOCUMENTATION = '''
       returnall:
         description: Return all the content of the password, not only the first line.
         type: bool
-        default: 'no'
+        default: false
       subkey:
         description: Return a specific subkey of the password. When set to C(password), always returns the first line.
         default: password
@@ -56,13 +63,13 @@ DOCUMENTATION = '''
         type: integer
         default: 16
       backup:
-        description: Used with C(overwrite=yes). Backup the previous password in a subkey.
+        description: Used with C(overwrite=true). Backup the previous password in a subkey.
         type: bool
-        default: 'no'
+        default: false
       nosymbols:
         description: use alphanumeric characters.
         type: bool
-        default: 'no'
+        default: false
       missing:
         description:
           - List of preference about what to do if the password file is missing.
@@ -106,6 +113,22 @@ DOCUMENTATION = '''
         type: str
         default: 15m
         version_added: 4.5.0
+      backend:
+        description:
+          - Specify which backend to use.
+          - Defaults to C(pass), passwordstore.org's original pass utility.
+          - C(gopass) support is incomplete.
+        ini:
+          - section: passwordstore_lookup
+            key: backend
+        vars:
+          - name: passwordstore_backend
+        type: str
+        default: pass
+        choices:
+          - pass
+          - gopass
+        version_added: 5.2.0
 '''
 EXAMPLES = """
 ansible.cfg: |
@@ -231,6 +254,24 @@ def check_output2(*popenargs, **kwargs):
 
 
 class LookupModule(LookupBase):
+    def __init__(self, loader=None, templar=None, **kwargs):
+
+        super(LookupModule, self).__init__(loader, templar, **kwargs)
+        self.realpass = None
+
+    def is_real_pass(self):
+        if self.realpass is None:
+            try:
+                passoutput = to_text(
+                    check_output2([self.pass_cmd, "--version"], env=self.env),
+                    errors='surrogate_or_strict'
+                )
+                self.realpass = 'pass: the standard unix password manager' in passoutput
+            except (subprocess.CalledProcessError) as e:
+                raise AnsibleError(e)
+
+        return self.realpass
+
     def parse_params(self, term):
         # I went with the "traditional" param followed with space separated KV pairs.
         # Waiting for final implementation of lookup parameter parsing.
@@ -270,10 +311,12 @@ class LookupModule(LookupBase):
             self.env = os.environ.copy()
             self.env['LANGUAGE'] = 'C'  # make sure to get errors in English as required by check_output2
 
-            # Set PASSWORD_STORE_DIR
-            if os.path.isdir(self.paramvals['directory']):
+            if self.backend == 'gopass':
+                self.env['GOPASS_NO_REMINDER'] = "YES"
+            elif os.path.isdir(self.paramvals['directory']):
+                # Set PASSWORD_STORE_DIR
                 self.env['PASSWORD_STORE_DIR'] = self.paramvals['directory']
-            else:
+            elif self.is_real_pass():
                 raise AnsibleError('Passwordstore directory \'{0}\' does not exist'.format(self.paramvals['directory']))
 
             # Set PASSWORD_STORE_UMASK if umask is set
@@ -288,7 +331,8 @@ class LookupModule(LookupBase):
     def check_pass(self):
         try:
             self.passoutput = to_text(
-                check_output2(["pass", "show", self.passname], env=self.env),
+                check_output2([self.pass_cmd, 'show'] +
+                              [self.passname], env=self.env),
                 errors='surrogate_or_strict'
             ).splitlines()
             self.password = self.passoutput[0]
@@ -302,8 +346,10 @@ class LookupModule(LookupBase):
                     if ':' in line:
                         name, value = line.split(':', 1)
                         self.passdict[name.strip()] = value.strip()
-            if os.path.isfile(os.path.join(self.paramvals['directory'], self.passname + ".gpg")):
-                # Only accept password as found, if there a .gpg file for it (might be a tree node otherwise)
+            if (self.backend == 'gopass' or
+                    os.path.isfile(os.path.join(self.paramvals['directory'], self.passname + ".gpg"))
+                    or not self.is_real_pass()):
+                # When using real pass, only accept password as found if there is a .gpg file for it (might be a tree node otherwise)
                 return True
         except (subprocess.CalledProcessError) as e:
             # 'not in password store' is the expected error if a password wasn't found
@@ -339,7 +385,7 @@ class LookupModule(LookupBase):
         if self.paramvals['backup']:
             msg += "lookup_pass: old password was {0} (Updated on {1})\n".format(self.password, datetime)
         try:
-            check_output2(['pass', 'insert', '-f', '-m', self.passname], input=msg, env=self.env)
+            check_output2([self.pass_cmd, 'insert', '-f', '-m', self.passname], input=msg, env=self.env)
         except (subprocess.CalledProcessError) as e:
             raise AnsibleError(e)
         return newpass
@@ -351,7 +397,7 @@ class LookupModule(LookupBase):
         datetime = time.strftime("%d/%m/%Y %H:%M:%S")
         msg = newpass + '\n' + "lookup_pass: First generated by ansible on {0}\n".format(datetime)
         try:
-            check_output2(['pass', 'insert', '-f', '-m', self.passname], input=msg, env=self.env)
+            check_output2([self.pass_cmd, 'insert', '-f', '-m', self.passname], input=msg, env=self.env)
         except (subprocess.CalledProcessError) as e:
             raise AnsibleError(e)
         return newpass
@@ -380,17 +426,30 @@ class LookupModule(LookupBase):
             yield
 
     def setup(self, variables):
+        self.backend = self.get_option('backend')
+        self.pass_cmd = self.backend  # pass and gopass are commands as well
         self.locked = None
         timeout = self.get_option('locktimeout')
         if not re.match('^[0-9]+[smh]$', timeout):
             raise AnsibleError("{0} is not a correct value for locktimeout".format(timeout))
         unit_to_seconds = {"s": 1, "m": 60, "h": 3600}
         self.lock_timeout = int(timeout[:-1]) * unit_to_seconds[timeout[-1]]
+
+        directory = variables.get('passwordstore', os.environ.get('PASSWORD_STORE_DIR', None))
+
+        if directory is None:
+            if self.backend == 'gopass':
+                try:
+                    with open(os.path.expanduser('~/.config/gopass/config.yml')) as f:
+                        directory = yaml.safe_load(f)['path']
+                except (FileNotFoundError, KeyError, yaml.YAMLError):
+                    directory = os.path.expanduser('~/.local/share/gopass/stores/root')
+            else:
+                directory = os.path.expanduser('~/.password-store')
+
         self.paramvals = {
             'subkey': 'password',
-            'directory': variables.get('passwordstore', os.environ.get(
-                                       'PASSWORD_STORE_DIR',
-                                       os.path.expanduser('~/.password-store'))),
+            'directory': directory,
             'create': False,
             'returnall': False,
             'overwrite': False,
@@ -402,6 +461,7 @@ class LookupModule(LookupBase):
         }
 
     def run(self, terms, variables, **kwargs):
+        self.set_options(var_options=variables, direct=kwargs)
         self.setup(variables)
         result = []
 

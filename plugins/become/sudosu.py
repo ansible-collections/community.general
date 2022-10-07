@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2021, Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2021, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -8,9 +9,9 @@ DOCUMENTATION = """
     name: sudosu
     short_description: Run tasks using sudo su -
     description:
-        - This become plugins allows your remote/login user to execute commands as another user via the C(sudo) and C(su) utilities combined.
+      - This become plugin allows your remote/login user to execute commands as another user via the C(sudo) and C(su) utilities combined.
     author:
-    - Dag Wieers (@dagwieers)
+      - Dag Wieers (@dagwieers)
     version_added: 2.4.0
     options:
         become_user:

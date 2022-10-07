@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, berenddeboer
+# Copyright (c) 2013, berenddeboer
 # Written by berenddeboer <berend@pobox.com>
 # Based on pkgng module written by bleader <bleader at ratonland.org>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -36,7 +37,7 @@ options:
             - use packages instead of ports whenever available
         type: bool
         required: false
-        default: yes
+        default: true
 author: "berenddeboer (@berenddeboer)"
 '''
 
@@ -57,9 +58,7 @@ EXAMPLES = '''
     state: absent
 '''
 
-import os
 import re
-import sys
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import shlex_quote

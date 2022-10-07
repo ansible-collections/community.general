@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-# (c) 2020, SCC France, Eric Belhomme <ebelhomme@fr.scc.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2020, SCC France, Eric Belhomme <ebelhomme@fr.scc.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -23,12 +24,12 @@ DOCUMENTATION = '''
             - The list of keys (or key prefixes) to look up on the etcd3 server.
             type: list
             elements: str
-            required: True
+            required: true
         prefix:
             description:
             - Look for key or prefix key.
             type: bool
-            default: False
+            default: false
         endpoints:
             description:
             - Counterpart of C(ETCDCTL_ENDPOINTS) environment variable.

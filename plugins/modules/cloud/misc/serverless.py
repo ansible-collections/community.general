@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016, Ryan Scott Brown <ryansb@redhat.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Ryan Scott Brown <ryansb@redhat.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -45,17 +46,17 @@ options:
       - When this option is C(false) all the functions will be built, but no stack update will be run to send them out.
       - This is mostly useful for generating artifacts to be stored/deployed elsewhere.
     type: bool
-    default: yes
+    default: true
   force:
     description:
       - Whether or not to force full deployment, equivalent to serverless C(--force) option.
     type: bool
-    default: no
+    default: false
   verbose:
     description:
       - Shows all stack events during deployment, and display any Stack Output.
     type: bool
-    default: no
+    default: false
 notes:
    - Currently, the C(serverless) command must be in the path of the node executing the task.
      In the future this may be a flag.
@@ -107,7 +108,7 @@ state:
   returned: always
 command:
   type: str
-  description: Full `serverless` command run by this module, in case you want to re-run the command outside the module.
+  description: Full C(serverless) command run by this module, in case you want to re-run the command outside the module.
   returned: always
   sample: serverless deploy --stage production
 '''

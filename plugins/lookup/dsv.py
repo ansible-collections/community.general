@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2020, Adam Migus <adam@migus.org>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2020, Adam Migus <adam@migus.org>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
@@ -122,6 +123,7 @@ class LookupModule(LookupBase):
                 "tenant": self.get_option("tenant"),
                 "client_id": self.get_option("client_id"),
                 "client_secret": self.get_option("client_secret"),
+                "tld": self.get_option("tld"),
                 "url_template": self.get_option("url_template"),
             }
         )

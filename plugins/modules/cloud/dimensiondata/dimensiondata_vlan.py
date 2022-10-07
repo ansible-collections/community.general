@@ -1,24 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#
 # Copyright (c) 2016 Dimension Data
-#
-# This module is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This software is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this software.  If not, see <http://www.gnu.org/licenses/>.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 # Authors:
 #   - Adam Friedman  <tintoy@tintoy.io>
-#
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -71,7 +58,7 @@ options:
       - If C(False), the module will fail under these conditions.
       - This is intended to prevent accidental expansion of a VLAN's network (since this operation is not reversible).
     type: bool
-    default: 'no'
+    default: false
 '''
 
 EXAMPLES = '''
@@ -85,7 +72,7 @@ EXAMPLES = '''
     private_ipv4_base_address: 192.168.23.0
     private_ipv4_prefix_size: 24
     state: present
-    wait: yes
+    wait: true
 
 - name: Read / get VLAN details
   community.general.dimensiondata_vlan:
@@ -94,7 +81,7 @@ EXAMPLES = '''
     network_domain: test_network
     name: my_vlan1
     state: readonly
-    wait: yes
+    wait: true
 
 - name: Delete a VLAN
   community.general.dimensiondata_vlan:
@@ -103,7 +90,7 @@ EXAMPLES = '''
     network_domain: test_network
     name: my_vlan_1
     state: absent
-    wait: yes
+    wait: true
 '''
 
 RETURN = '''

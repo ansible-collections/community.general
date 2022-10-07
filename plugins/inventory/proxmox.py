@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2016 Guido Günther <agx@sigxcpu.org>, Daniel Lobato Garcia <dlobatog@redhat.com>
 # Copyright (c) 2018 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
@@ -25,7 +26,7 @@ DOCUMENTATION = '''
     options:
       plugin:
         description: The name of this plugin, it should always be set to C(community.general.proxmox) for this plugin to recognize it as it's own.
-        required: yes
+        required: true
         choices: ['community.general.proxmox']
         type: str
       url:
@@ -43,7 +44,7 @@ DOCUMENTATION = '''
           - Proxmox authentication user.
           - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_USER) will be used instead.
           - Since community.general 4.7.0 you can also use templating to specify the value of the I(user).
-        required: yes
+        required: true
         type: str
         env:
           - name: PROXMOX_USER
@@ -82,7 +83,7 @@ DOCUMENTATION = '''
       validate_certs:
         description: Verify SSL certificate if using HTTPS.
         type: boolean
-        default: yes
+        default: true
       group_prefix:
         description: Prefix to apply to Proxmox groups.
         default: proxmox_
@@ -92,9 +93,21 @@ DOCUMENTATION = '''
         default: proxmox_
         type: str
       want_facts:
-        description: Gather LXC/QEMU configuration facts.
-        default: no
+        description:
+          - Gather LXC/QEMU configuration facts.
+          - When I(want_facts) is set to C(true) more details about QEMU VM status are possible, besides the running and stopped states.
+            Currently if the VM is running and it is suspended, the status will be running and the machine will be in C(running) group,
+            but its actual state will be paused. See I(qemu_extended_statuses) for how to retrieve the real status.
+        default: false
         type: bool
+      qemu_extended_statuses:
+        description:
+          - Requires I(want_facts) to be set to C(true) to function. This will allow you to differentiate betweend C(paused) and C(prelaunch)
+            statuses of the QEMU VMs.
+          - This introduces multiple groups [prefixed with I(group_prefix)] C(prelaunch) and C(paused).
+        default: false
+        type: bool
+        version_added: 5.1.0
       want_proxmox_nodes_ansible_host:
         version_added: 3.0.0
         description:
@@ -400,12 +413,20 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                         properties[parsed_key] = [tag.strip() for tag in stripped_value.split(",")]
 
                 # The first field in the agent string tells you whether the agent is enabled
-                # the rest of the comma separated string is extra config for the agent
-                if config == 'agent' and int(value.split(',')[0]):
-                    agent_iface_value = self._get_agent_network_interfaces(node, vmid, vmtype)
-                    if agent_iface_value:
-                        agent_iface_key = self.to_safe('%s%s' % (key, "_interfaces"))
-                        properties[agent_iface_key] = agent_iface_value
+                # the rest of the comma separated string is extra config for the agent.
+                # In some (newer versions of proxmox) instances it can be 'enabled=1'.
+                if config == 'agent':
+                    agent_enabled = 0
+                    try:
+                        agent_enabled = int(value.split(',')[0])
+                    except ValueError:
+                        if value.split(',')[0] == "enabled=1":
+                            agent_enabled = 1
+                    if agent_enabled:
+                        agent_iface_value = self._get_agent_network_interfaces(node, vmid, vmtype)
+                        if agent_iface_value:
+                            agent_iface_key = self.to_safe('%s%s' % (key, "_interfaces"))
+                            properties[agent_iface_key] = agent_iface_value
 
                 if config == 'lxc':
                     out_val = {}
@@ -431,6 +452,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _get_vm_status(self, properties, node, vmid, vmtype, name):
         ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/status/current" % (self.proxmox_url, node, vmtype, vmid))
         properties[self._fact('status')] = ret['status']
+        if vmtype == 'qemu':
+            properties[self._fact('qmpstatus')] = ret['qmpstatus']
 
     def _get_vm_snapshots(self, properties, node, vmid, vmtype, name):
         ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/snapshot" % (self.proxmox_url, node, vmtype, vmid))
@@ -489,7 +512,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         name, vmid = item['name'], item['vmid']
 
         # get status, config and snapshots if want_facts == True
-        if self.get_option('want_facts'):
+        want_facts = self.get_option('want_facts')
+        if want_facts:
             self._get_vm_status(properties, node, vmid, ittype, name)
             self._get_vm_config(properties, node, vmid, ittype, name)
             self._get_vm_snapshots(properties, node, vmid, ittype, name)
@@ -503,10 +527,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         node_type_group = self._group('%s_%s' % (node, ittype))
         self.inventory.add_child(self._group('all_' + ittype), name)
         self.inventory.add_child(node_type_group, name)
-        if item['status'] == 'stopped':
-            self.inventory.add_child(self._group('all_stopped'), name)
-        elif item['status'] == 'running':
-            self.inventory.add_child(self._group('all_running'), name)
+
+        item_status = item['status']
+        if item_status == 'running':
+            if want_facts and ittype == 'qemu' and self.get_option('qemu_extended_statuses'):
+                # get more details about the status of the qemu VM
+                item_status = properties.get(self._fact('qmpstatus'), item_status)
+        self.inventory.add_child(self._group('all_%s' % (item_status, )), name)
 
         return name
 
@@ -528,10 +555,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _populate(self):
 
         # create common groups
-        self.inventory.add_group(self._group('all_lxc'))
-        self.inventory.add_group(self._group('all_qemu'))
-        self.inventory.add_group(self._group('all_running'))
-        self.inventory.add_group(self._group('all_stopped'))
+        default_groups = ['lxc', 'qemu', 'running', 'stopped']
+
+        if self.get_option('qemu_extended_statuses'):
+            default_groups.extend(['prelaunch', 'paused'])
+
+        for group in default_groups:
+            self.inventory.add_group(self._group('all_%s' % (group)))
+
         nodes_group = self._group('nodes')
         self.inventory.add_group(nodes_group)
 
@@ -620,6 +651,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         if proxmox_password is None and (proxmox_token_id is None or proxmox_token_secret is None):
             raise AnsibleError('You must specify either a password or both token_id and token_secret.')
+
+        if self.get_option('qemu_extended_statuses') and not self.get_option('want_facts'):
+            raise AnsibleError('You must set want_facts to True if you want to use qemu_extended_statuses.')
 
         self.cache_key = self.get_cache_key(path)
         self.use_cache = cache and self.get_option('cache')

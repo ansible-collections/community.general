@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2021, Raphaël Droz (raphael.droz@gmail.com)
-# Copyright: (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
-# Copyright: (c) 2018, Samy Coenen <samy.coenen@nubera.be>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2021, Raphaël Droz (raphael.droz@gmail.com)
+# Copyright (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
+# Copyright (c) 2018, Samy Coenen <samy.coenen@nubera.be>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -45,14 +46,14 @@ options:
   description:
     description:
       - The unique name of the runner.
-    required: True
+    required: true
     type: str
     aliases:
       - name
   state:
     description:
       - Make sure that the runner with the same name exists with the same configuration or delete the runner with the same name.
-    required: False
+    required: false
     default: present
     choices: ["present", "absent"]
     type: str
@@ -65,45 +66,45 @@ options:
     description:
       - Searches only runners available to the user when searching for existing, when false admin token required.
       - Mutually exclusive with I(project) since community.general 4.5.0.
-    default: no
+    default: false
     type: bool
     version_added: 2.0.0
   active:
     description:
       - Define if the runners is immediately active after creation.
-    required: False
-    default: yes
+    required: false
+    default: true
     type: bool
   locked:
     description:
       - Determines if the runner is locked or not.
-    required: False
-    default: False
+    required: false
+    default: false
     type: bool
   access_level:
     description:
       - Determines if a runner can pick up jobs only from protected branches.
       - If set to C(ref_protected), runner can pick up jobs only from protected branches.
       - If set to C(not_protected), runner can pick up jobs from both protected and unprotected branches.
-    required: False
+    required: false
     default: ref_protected
     choices: ["ref_protected", "not_protected"]
     type: str
   maximum_timeout:
     description:
       - The maximum time that a runner has to complete a specific job.
-    required: False
+    required: false
     default: 3600
     type: int
   run_untagged:
     description:
       - Run untagged jobs or not.
-    required: False
-    default: yes
+    required: false
+    default: true
     type: bool
   tag_list:
     description: The tags that apply to the runner.
-    required: False
+    required: false
     default: []
     type: list
     elements: str
@@ -117,10 +118,10 @@ EXAMPLES = '''
     registration_token: 4gfdsg345
     description: Docker Machine t1
     state: present
-    active: True
+    active: true
     tag_list: ['docker']
-    run_untagged: False
-    locked: False
+    run_untagged: false
+    locked: false
 
 - name: "Delete runner"
   community.general.gitlab_runner:
@@ -134,7 +135,7 @@ EXAMPLES = '''
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     description: Docker Machine t1
-    owned: yes
+    owned: true
     state: absent
 
 - name: Register runner for a specific project
@@ -171,24 +172,17 @@ runner:
   type: dict
 '''
 
-import traceback
-
-GITLAB_IMP_ERR = None
-try:
-    import gitlab
-    HAS_GITLAB_PACKAGE = True
-except Exception:
-    GITLAB_IMP_ERR = traceback.format_exc()
-    HAS_GITLAB_PACKAGE = False
-
 from ansible.module_utils.api import basic_auth_argument_spec
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import (
+    auth_argument_spec, gitlab_authentication, gitlab, ensure_gitlab_package
+)
+
 
 try:
-    cmp
+    cmp  # pylint: disable=used-before-assignment
 except NameError:
     def cmp(a, b):
         return (a > b) - (a < b)
@@ -361,6 +355,7 @@ def main():
         ],
         supports_check_mode=True,
     )
+    ensure_gitlab_package(module)
 
     state = module.params['state']
     runner_description = module.params['description']
@@ -372,9 +367,6 @@ def main():
     maximum_timeout = module.params['maximum_timeout']
     registration_token = module.params['registration_token']
     project = module.params['project']
-
-    if not HAS_GITLAB_PACKAGE:
-        module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
 
     gitlab_instance = gitlab_authentication(module)
     gitlab_project = None

@@ -1,13 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, bleader
+# Copyright (c) 2013, bleader
 # Written by bleader <bleader@ratonland.org>
 # Based on pkgin module written by Shaun Zinck <shaun.zinck at gmail.com>
 # that was based on pacman module written by Afterburn <https://github.com/afterburn>
 #  that was based on apt module written by Matthew Williams <matthew@flowroute.com>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -23,10 +24,10 @@ options:
     name:
         description:
             - Name or list of names of packages to install/remove.
-            - "With I(name=*), I(state: latest) will operate, but I(state: present) and I(state: absent) will be noops."
+            - "With I(name=*), I(state=latest) will operate, but I(state=present) and I(state=absent) will be noops."
             - >
                 Warning: In Ansible 2.9 and earlier this module had a misfeature
-                where I(name=*) with I(state: latest) or I(state: present) would
+                where I(name=*) with I(state=latest) or I(state=present) would
                 install every package from every package repository, filling up
                 the machines disk. Avoid using them unless you are certain that
                 your role will only be used with newer versions.
@@ -47,7 +48,7 @@ options:
             - Use local package base instead of fetching an updated one.
         type: bool
         required: false
-        default: no
+        default: false
     annotation:
         description:
             - A list of keyvalue-pairs of the form
@@ -90,20 +91,20 @@ options:
             - Remove automatically installed packages which are no longer needed.
         required: false
         type: bool
-        default: no
+        default: false
     ignore_osver:
         description:
             - Ignore FreeBSD OS version check, useful on -STABLE and -CURRENT branches.
             - Defines the C(IGNORE_OSVERSION) environment variable.
         required: false
         type: bool
-        default: no
+        default: false
         version_added: 1.3.0
 author: "bleader (@bleader)"
 notes:
   - When using pkgsite, be careful that already in cache packages won't be downloaded again.
-  - When used with a `loop:` each package will be processed individually,
-    it is much more efficient to pass the list directly to the `name` option.
+  - When used with a C(loop:) each package will be processed individually,
+    it is much more efficient to pass the list directly to the I(name) option.
 '''
 
 EXAMPLES = '''

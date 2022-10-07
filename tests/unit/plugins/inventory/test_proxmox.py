@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2020, Jeffrey van Pelt <jeff@vanpelt.one>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 # The API responses used in these tests were recorded from PVE version 6.2.
 
@@ -520,6 +521,99 @@ def get_json(url):
                 }
             ]
         }
+    elif url == "https://localhost:8006/api2/json/nodes/testnode/lxc/100/status/current":
+        # _get_vm_status (lxc)
+        return {
+            "swap": 0,
+            "name": "test-lxc",
+            "diskread": 0,
+            "vmid": 100,
+            "diskwrite": 0,
+            "pid": 9000,
+            "mem": 89980928,
+            "netin": 1950776396424,
+            "disk": 4998168576,
+            "cpu": 0.00163430613110039,
+            "type": "lxc",
+            "uptime": 6793736,
+            "maxmem": 1073741824,
+            "status": "running",
+            "cpus": "1",
+            "ha": {
+                "group": 'null',
+                "state": "started",
+                "managed": 1
+            },
+            "maxdisk": 3348329267200,
+            "netout": 1947793356037,
+            "maxswap": 1073741824
+        }
+    elif url == "https://localhost:8006/api2/json/nodes/testnode/qemu/101/status/current":
+        # _get_vm_status (qemu)
+        return {
+            "status": "stopped",
+            "uptime": 0,
+            "maxmem": 5364514816,
+            "maxdisk": 34359738368,
+            "netout": 0,
+            "cpus": 2,
+            "ha": {
+                "managed": 0
+            },
+            "diskread": 0,
+            "vmid": 101,
+            "diskwrite": 0,
+            "name": "test-qemu",
+            "cpu": 0,
+            "disk": 0,
+            "netin": 0,
+            "mem": 0,
+            "qmpstatus": "stopped"
+        }
+    elif url == "https://localhost:8006/api2/json/nodes/testnode/qemu/102/status/current":
+        # _get_vm_status (qemu)
+        return {
+            "status": "stopped",
+            "uptime": 0,
+            "maxmem": 5364514816,
+            "maxdisk": 34359738368,
+            "netout": 0,
+            "cpus": 2,
+            "ha": {
+                "managed": 0
+            },
+            "diskread": 0,
+            "vmid": 102,
+            "diskwrite": 0,
+            "name": "test-qemu-windows",
+            "cpu": 0,
+            "disk": 0,
+            "netin": 0,
+            "mem": 0,
+            "qmpstatus": "prelaunch"
+        }
+    elif url == "https://localhost:8006/api2/json/nodes/testnode/qemu/103/status/current":
+        # _get_vm_status (qemu)
+        return {
+            "status": "stopped",
+            "uptime": 0,
+            "maxmem": 5364514816,
+            "maxdisk": 34359738368,
+            "netout": 0,
+            "cpus": 2,
+            "ha": {
+                "managed": 0
+            },
+            "diskread": 0,
+            "vmid": 103,
+            "diskwrite": 0,
+            "name": "test-qemu-multi-nic",
+            "cpu": 0,
+            "disk": 0,
+            "netin": 0,
+            "mem": 0,
+            "qmpstatus": "paused"
+        }
 
 
 def get_vm_snapshots(node, properties, vmtype, vmid, name):
@@ -537,21 +631,11 @@ def get_vm_snapshots(node, properties, vmtype, vmid, name):
          }]
 
 
-def get_vm_status(properties, node, vmtype, vmid, name):
-    return True
-
-
-def get_option(option):
-    if option == 'group_prefix':
-        return 'proxmox_'
-    if option == 'facts_prefix':
-        return 'proxmox_'
-    elif option == 'want_facts':
-        return True
-    elif option == 'want_proxmox_nodes_ansible_host':
-        return True
-    else:
-        return False
+def get_option(opts):
+    def fn(option):
+        default = opts.get('default', False)
+        return opts.get(option, default)
+    return fn
 
 
 def test_populate(inventory, mocker):
@@ -563,12 +647,19 @@ def test_populate(inventory, mocker):
     inventory.facts_prefix = 'proxmox_'
     inventory.strict = False
 
+    opts = {
+        'group_prefix': 'proxmox_',
+        'facts_prefix': 'proxmox_',
+        'want_facts': True,
+        'want_proxmox_nodes_ansible_host': True,
+        'qemu_extended_statuses': True
+    }
+
     # bypass authentication and API fetch calls
     inventory._get_auth = mocker.MagicMock(side_effect=get_auth)
     inventory._get_json = mocker.MagicMock(side_effect=get_json)
-    inventory._get_vm_status = mocker.MagicMock(side_effect=get_vm_status)
     inventory._get_vm_snapshots = mocker.MagicMock(side_effect=get_vm_snapshots)
-    inventory.get_option = mocker.MagicMock(side_effect=get_option)
+    inventory.get_option = mocker.MagicMock(side_effect=get_option(opts))
     inventory._can_add_host = mocker.MagicMock(return_value=True)
     inventory._populate()
 
@@ -610,3 +701,45 @@ def test_populate(inventory, mocker):
 
     # check that offline node is in inventory
     assert inventory.inventory.get_host('testnode2')
+
+    # make sure that ['prelaunch', 'paused'] are in the group list
+    for group in ['paused', 'prelaunch']:
+        assert ('%sall_%s' % (inventory.group_prefix, group)) in inventory.inventory.groups
+
+    # check if qemu-windows is in the prelaunch group
+    group_prelaunch = inventory.inventory.groups['proxmox_all_prelaunch']
+    assert group_prelaunch.hosts == [host_qemu_windows]
+
+    # check if qemu-multi-nic is in the paused group
+    group_paused = inventory.inventory.groups['proxmox_all_paused']
+    assert group_paused.hosts == [host_qemu_multi_nic]
+
+
+def test_populate_missing_qemu_extended_groups(inventory, mocker):
+    # module settings
+    inventory.proxmox_user = 'root@pam'
+    inventory.proxmox_password = 'password'
+    inventory.proxmox_url = 'https://localhost:8006'
+    inventory.group_prefix = 'proxmox_'
+    inventory.facts_prefix = 'proxmox_'
+    inventory.strict = False
+
+    opts = {
+        'group_prefix': 'proxmox_',
+        'facts_prefix': 'proxmox_',
+        'want_facts': True,
+        'want_proxmox_nodes_ansible_host': True,
+        'qemu_extended_statuses': False
+    }
+
+    # bypass authentication and API fetch calls
+    inventory._get_auth = mocker.MagicMock(side_effect=get_auth)
+    inventory._get_json = mocker.MagicMock(side_effect=get_json)
+    inventory._get_vm_snapshots = mocker.MagicMock(side_effect=get_vm_snapshots)
+    inventory.get_option = mocker.MagicMock(side_effect=get_option(opts))
+    inventory._can_add_host = mocker.MagicMock(return_value=True)
+    inventory._populate()
+
+    # make sure that ['prelaunch', 'paused'] are not in the group list
+    for group in ['paused', 'prelaunch']:
+        assert ('%sall_%s' % (inventory.group_prefix, group)) not in inventory.inventory.groups

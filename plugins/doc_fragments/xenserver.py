@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2018, Bojan Vitnik <bvitnik@mainstream.rs>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2018, Bojan Vitnik <bvitnik@mainstream.rs>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -36,5 +37,5 @@ options:
     - Allows connection when SSL certificates are not valid. Set to C(false) when certificates are not trusted.
     - If the value is not specified in the task, the value of environment variable C(XENSERVER_VALIDATE_CERTS) will be used instead.
     type: bool
-    default: yes
+    default: true
 '''

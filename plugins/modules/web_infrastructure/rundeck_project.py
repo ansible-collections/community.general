@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 
 # Ansible module to manage rundeck projects
-# (c) 2017, Loic Blot <loic.blot@unix-experience.fr>
+# Copyright (c) 2017, Loic Blot <loic.blot@unix-experience.fr>
 # Sponsored by Infopro Digital. http://www.infopro-digital.com/
 # Sponsored by E.T.A.I. http://www.etai.fr/
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -31,12 +32,12 @@ options:
         type: str
         description:
             - Sets the project name.
-        required: True
+        required: true
     url:
         type: str
         description:
             - Sets the rundeck instance URL.
-        required: True
+        required: true
     api_version:
         type: int
         description:
@@ -47,7 +48,7 @@ options:
         type: str
         description:
             - Sets the token to authenticate against Rundeck API.
-        required: True
+        required: true
     client_cert:
         version_added: '0.2.0'
     client_key:

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-# (c) 2017, Juan Manuel Parrilla <jparrill@redhat.com>
-# (c) 2012-17 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Juan Manuel Parrilla <jparrill@redhat.com>
+# Copyright (c) 2012-17 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -20,7 +21,7 @@ DOCUMENTATION = '''
                 - The list of keys to lookup on the Puppetmaster
             type: list
             elements: string
-            required: True
+            required: true
       _bin_file:
             description:
                 - Binary file to execute Hiera

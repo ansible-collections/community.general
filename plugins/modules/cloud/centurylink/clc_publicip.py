@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2015 CenturyLink
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -29,7 +30,7 @@ options:
     description:
       - A list of servers to create public ips on.
     type: list
-    required: True
+    required: true
     elements: str
   state:
     description:
@@ -42,7 +43,7 @@ options:
     description:
       - Whether to wait for the tasks to finish before returning.
     type: bool
-    default: 'yes'
+    default: true
 requirements:
     - python = 2.7
     - requests >= 2.5.0
@@ -65,7 +66,7 @@ EXAMPLES = '''
 
 - name: Add Public IP to Server
   hosts: localhost
-  gather_facts: False
+  gather_facts: false
   connection: local
   tasks:
     - name: Create Public IP For Servers
@@ -85,7 +86,7 @@ EXAMPLES = '''
 
 - name: Delete Public IP from Server
   hosts: localhost
-  gather_facts: False
+  gather_facts: false
   connection: local
   tasks:
     - name: Create Public IP For Servers

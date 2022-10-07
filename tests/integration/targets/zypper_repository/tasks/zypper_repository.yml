@@ -1,3 +1,8 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: Delete test repo
   community.general.zypper_repository:
     name: test
@@ -207,50 +212,53 @@
     that:
       - remove_repo is changed
 
-- name: add new repository via url to .repo file
-  community.general.zypper_repository:
-    repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
-    state: present
-  register: added_by_repo_file
+# For now, the URL does not work for 15.4
+- when: ansible_distribution_version is version('15.4', '<')
+  block:
+  - name: add new repository via url to .repo file
+    community.general.zypper_repository:
+      repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+      state: present
+    register: added_by_repo_file
 
-- name: get repository details from zypper
-  command: zypper lr systemsmanagement_Uyuni_Stable
-  register: get_repository_details_from_zypper
+  - name: get repository details from zypper
+    command: zypper lr systemsmanagement_Uyuni_Stable
+    register: get_repository_details_from_zypper
 
-- name: verify adding via .repo file was successful
-  assert:
-    that:
-      - "added_by_repo_file is changed"
-      - "get_repository_details_from_zypper.rc == 0"
-      - "'/systemsmanagement:/Uyuni:/Stable/' in get_repository_details_from_zypper.stdout"
+  - name: verify adding via .repo file was successful
+    assert:
+      that:
+        - "added_by_repo_file is changed"
+        - "get_repository_details_from_zypper.rc == 0"
+        - "'/systemsmanagement:/Uyuni:/Stable/' in get_repository_details_from_zypper.stdout"
 
-- name: add same repository via url to .repo file again to verify idempotency
-  community.general.zypper_repository:
-    repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
-    state: present
-  register: added_again_by_repo_file
+  - name: add same repository via url to .repo file again to verify idempotency
+    community.general.zypper_repository:
+      repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+      state: present
+    register: added_again_by_repo_file
 
-- name: verify nothing was changed adding a repo with the same .repo file
-  assert:
-    that:
-      - added_again_by_repo_file is not changed
+  - name: verify nothing was changed adding a repo with the same .repo file
+    assert:
+      that:
+        - added_again_by_repo_file is not changed
 
-- name: remove repository via url to .repo file
-  community.general.zypper_repository:
-    repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
-    state: absent
-  register: removed_by_repo_file
+  - name: remove repository via url to .repo file
+    community.general.zypper_repository:
+      repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+      state: absent
+    register: removed_by_repo_file
 
-- name: get list of files in /etc/zypp/repos.d/
-  command: ls /etc/zypp/repos.d/
-  changed_when: false
-  register: etc_zypp_reposd
+  - name: get list of files in /etc/zypp/repos.d/
+    command: ls /etc/zypp/repos.d/
+    changed_when: false
+    register: etc_zypp_reposd
 
-- name: verify removal via .repo file was successful, including cleanup of local .repo file in /etc/zypp/repos.d/
-  assert:
-    that:
-      - "removed_by_repo_file"
-      - "'/systemsmanagement:/Uyuni:/Stable/' not in etc_zypp_reposd.stdout"
+  - name: verify removal via .repo file was successful, including cleanup of local .repo file in /etc/zypp/repos.d/
+    assert:
+      that:
+        - "removed_by_repo_file"
+        - "'/systemsmanagement:/Uyuni:/Stable/' not in etc_zypp_reposd.stdout"
 
 - name: Copy test .repo file
   copy:

@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2015, Paul Markham <pmarkham@netrefinery.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2015, Paul Markham <pmarkham@netrefinery.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -52,7 +53,7 @@ options:
     description:
       - Whether to create a sparse (C(true)) or whole root (C(false)) zone.
     type: bool
-    default: no
+    default: false
   root_password:
     description:
       - The password hash for the root account. If not specified, the zone's root account
@@ -96,7 +97,7 @@ EXAMPLES = '''
     name: zone1
     state: present
     path: /zones/zone1
-    sparse: True
+    sparse: true
     root_password: Be9oX7OSwWoU.
     config: 'set autoboot=true; add net; set physical=bge0; set address=10.1.1.1; end'
 

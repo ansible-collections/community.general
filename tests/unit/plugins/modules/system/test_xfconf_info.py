@@ -1,5 +1,6 @@
-# Author: Alexei Znamensky (russoz@gmail.com)
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) Alexei Znamensky (russoz@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -16,7 +17,7 @@ TESTED_MODULE = xfconf_info.__name__
 @pytest.fixture
 def patch_xfconf_info(mocker):
     """
-    Function used for mocking some parts of redhat_subscribtion module
+    Function used for mocking some parts of redhat_subscription module
     """
     mocker.patch('ansible_collections.community.general.plugins.module_utils.mh.module_helper.AnsibleModule.get_bin_path',
                  return_value='/testbin/xfconf-query')

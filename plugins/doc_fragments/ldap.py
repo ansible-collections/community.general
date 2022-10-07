@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016, Peter Sagerson <psagers@ignorare.net>
-# Copyright: (c) 2016, Jiri Tyr <jiri.tyr@gmail.com>
-# Copyright: (c) 2017-2018 Keller Fuchs (@KellerFuchs) <kellerfuchs@hashbang.sh>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Peter Sagerson <psagers@ignorare.net>
+# Copyright (c) 2016, Jiri Tyr <jiri.tyr@gmail.com>
+# Copyright (c) 2017-2018 Keller Fuchs (@KellerFuchs) <kellerfuchs@hashbang.sh>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -48,13 +49,13 @@ options:
     description:
       - If true, we'll use the START_TLS LDAP extension.
     type: bool
-    default: no
+    default: false
   validate_certs:
     description:
-      - If set to C(no), SSL certificates will not be validated.
+      - If set to C(false), SSL certificates will not be validated.
       - This should only be used on sites using self-signed certificates.
     type: bool
-    default: yes
+    default: true
   sasl_class:
     description:
       - The class to use for SASL authentication.

@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2016, James Hogarth <james.hogarth@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, James Hogarth <james.hogarth@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -32,11 +33,11 @@ options:
     default: http://localhost:8080
   validate_certs:
     description:
-      - If set to C(no), the SSL certificates will not be validated.
-        This should only set to C(no) used on personally controlled sites
+      - If set to C(false), the SSL certificates will not be validated.
+        This should only set to C(false) used on personally controlled sites
         using self-signed certificates as it avoids verifying the source site.
     type: bool
-    default: 'yes'
+    default: true
   user:
     type: str
     description:
@@ -89,7 +90,7 @@ EXAMPLES = '''
     user: admin
     password: admin
     url: https://localhost
-    validate_certs: no
+    validate_certs: false
 '''
 
 RETURN = '''

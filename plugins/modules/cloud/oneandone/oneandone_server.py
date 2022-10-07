@@ -1,19 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# This file is part of Ansible
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -131,7 +120,7 @@ options:
         for each individual server to be deleted before moving on with
         other tasks.)
     type: bool
-    default: 'yes'
+    default: true
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
@@ -148,7 +137,7 @@ options:
         hostnames by appending a count after them or substituting the count
         where there is a %02d or %03d in the hostname string.
     type: bool
-    default: 'yes'
+    default: true
 
 requirements:
   - "1and1"
@@ -184,7 +173,7 @@ EXAMPLES = '''
     datacenter: ES
     appliance: C5A349786169F140BCBC335675014C08
     count: 3
-    wait: yes
+    wait: true
     wait_timeout: 600
     wait_interval: 10
     ssh_key: SSH_PUBLIC_KEY
@@ -212,7 +201,8 @@ RETURN = '''
 servers:
     description: Information about each server that was processed
     type: list
-    sample: '[{"hostname": "my-server", "id": "server-id"}]'
+    sample:
+      - {"hostname": "my-server", "id": "server-id"}
     returned: always
 '''
 

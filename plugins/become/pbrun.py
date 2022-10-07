@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2018, Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2018, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -55,7 +56,7 @@ DOCUMENTATION = '''
               - name: ANSIBLE_PBRUN_FLAGS
         become_pass:
             description: Password for pbrun
-            required: False
+            required: false
             vars:
               - name: ansible_become_password
               - name: ansible_become_pass
@@ -68,7 +69,7 @@ DOCUMENTATION = '''
                 key: password
         wrap_exe:
             description: Toggle to wrap the command pbrun calls in 'shell -c' or not
-            default: False
+            default: false
             type: bool
             ini:
               - section: pbrun_become_plugin

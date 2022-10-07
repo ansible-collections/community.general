@@ -3,7 +3,8 @@
 
 #
 # Copyright (c) 2015 CenturyLink
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -19,23 +20,23 @@ options:
     description:
       - The name of the Server Group
     type: str
-    required: True
+    required: true
   description:
     description:
       - A description of the Server Group
     type: str
-    required: False
+    required: false
   parent:
     description:
       - The parent group of the server group. If parent is not provided, it creates the group at top level.
     type: str
-    required: False
+    required: false
   location:
     description:
       - Datacenter to create the group in. If location is not provided, the group gets created in the default datacenter
         associated with the account
     type: str
-    required: False
+    required: false
   state:
     description:
       - Whether to create or delete the group
@@ -46,8 +47,8 @@ options:
     description:
       - Whether to wait for the tasks to finish before returning.
     type: bool
-    default: True
-    required: False
+    default: true
+    required: false
 requirements:
     - python = 2.7
     - requests >= 2.5.0
@@ -72,7 +73,7 @@ EXAMPLES = '''
 ---
 - name: Create Server Group
   hosts: localhost
-  gather_facts: False
+  gather_facts: false
   connection: local
   tasks:
     - name: Create / Verify a Server Group at CenturyLink Cloud
@@ -89,7 +90,7 @@ EXAMPLES = '''
 # Delete a Server Group
 - name: Delete Server Group
   hosts: localhost
-  gather_facts: False
+  gather_facts: false
   connection: local
   tasks:
     - name: Delete / Verify Absent a Server Group at CenturyLink Cloud

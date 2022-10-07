@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2018, Stefan Heitmueller <stefan.heitmueller@gmx.com>
 # Copyright (c) 2018 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 
@@ -54,7 +55,7 @@ DOCUMENTATION = '''
         verbose_output:
             description: Toggle to (not) include all available nodes metadata
             type: bool
-            default: yes
+            default: true
 '''
 
 EXAMPLES = '''
@@ -65,7 +66,7 @@ host: https://gitlab.com
 # Example using constructed features to create groups and set ansible_host
 plugin: community.general.gitlab_runners
 host: https://gitlab.com
-strict: False
+strict: false
 keyed_groups:
   # add e.g. amd64 hosts to an arch_amd64 group
   - prefix: arch

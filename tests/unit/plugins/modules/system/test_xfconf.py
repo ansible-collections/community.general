@@ -1,8 +1,13 @@
+# -*- coding: utf-8 -*-
 # Author: Alexei Znamensky (russoz@gmail.com)
 # Largely adapted from test_redhat_subscription by
 # Jiri Hnidek (jhnidek@redhat.com)
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) Alexei Znamensky (russoz@gmail.com)
+# Copyright (c) Jiri Hnidek (jhnidek@redhat.com)
+#
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -19,7 +24,7 @@ TESTED_MODULE = xfconf.__name__
 @pytest.fixture
 def patch_xfconf(mocker):
     """
-    Function used for mocking some parts of redhat_subscribtion module
+    Function used for mocking some parts of redhat_subscription module
     """
     mocker.patch('ansible_collections.community.general.plugins.module_utils.mh.module_helper.AnsibleModule.get_bin_path',
                  return_value='/testbin/xfconf-query')
@@ -108,6 +113,41 @@ TEST_CASES = [
             'previous_value': '90',
             'value_type': 'int',
             'value': '90',
+        },
+    ],
+    [
+        {
+            'channel': 'xfce4-session',
+            'property': '/general/SaveOnExit',
+            'state': 'present',
+            'value_type': 'bool',
+            'value': False,
+        },
+        {
+            'id': 'test_property_set_property_bool_false',
+            'run_command.calls': [
+                (
+                    # Calling of following command will be asserted
+                    ['/testbin/xfconf-query', '--channel', 'xfce4-session', '--property', '/general/SaveOnExit'],
+                    # Was return code checked?
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    # Mock of returned code, stdout and stderr
+                    (0, 'true\n', '',),
+                ),
+                (
+                    # Calling of following command will be asserted
+                    ['/testbin/xfconf-query', '--channel', 'xfce4-session', '--property', '/general/SaveOnExit',
+                     '--create', '--type', 'bool', '--set', 'false'],
+                    # Was return code checked?
+                    {'environ_update': {'LANGUAGE': 'C', 'LC_ALL': 'C'}, 'check_rc': False},
+                    # Mock of returned code, stdout and stderr
+                    (0, 'false\n', '',),
+                ),
+            ],
+            'changed': True,
+            'previous_value': 'true',
+            'value_type': 'bool',
+            'value': 'False',
         },
     ],
     [
@@ -232,7 +272,7 @@ def test_xfconf(mocker, capfd, patch_xfconf, testcase):
     # Mock function used for running commands first
     call_results = [item[2] for item in testcase['run_command.calls']]
     mock_run_command = mocker.patch(
-        'ansible_collections.community.general.plugins.module_utils.mh.module_helper.AnsibleModule.run_command',
+        'ansible.module_utils.basic.AnsibleModule.run_command',
         side_effect=call_results)
 
     # Try to run test case
@@ -252,12 +292,6 @@ def test_xfconf(mocker, capfd, patch_xfconf, testcase):
         assert results[test_result] == results['invocation']['module_args'][test_result], \
             "'{0}': '{1}' != '{2}'".format(test_result, results[test_result], results['invocation']['module_args'][test_result])
 
-    for conditional_test_result in ('msg', 'value', 'previous_value'):
-        if conditional_test_result in testcase:
-            assert conditional_test_result in results, "'{0}' not found in {1}".format(conditional_test_result, results)
-            assert results[conditional_test_result] == testcase[conditional_test_result], \
-                "'{0}': '{1}' != '{2}'".format(conditional_test_result, results[conditional_test_result], testcase[conditional_test_result])
-
     assert mock_run_command.call_count == len(testcase['run_command.calls'])
     if mock_run_command.call_count:
         call_args_list = [(item[0][0], item[1]) for item in mock_run_command.call_args_list]
@@ -265,3 +299,14 @@ def test_xfconf(mocker, capfd, patch_xfconf, testcase):
         print("call args list =\n%s" % call_args_list)
         print("expected args list =\n%s" % expected_call_args_list)
         assert call_args_list == expected_call_args_list
+
+        expected_cmd, dummy, expected_res = testcase['run_command.calls'][-1]
+        assert results['cmd'] == expected_cmd
+        assert results['stdout'] == expected_res[1]
+        assert results['stderr'] == expected_res[2]
+
+    for conditional_test_result in ('msg', 'value', 'previous_value'):
+        if conditional_test_result in testcase:
+            assert conditional_test_result in results, "'{0}' not found in {1}".format(conditional_test_result, results)
+            assert results[conditional_test_result] == testcase[conditional_test_result], \
+                "'{0}': '{1}' != '{2}'".format(conditional_test_result, results[conditional_test_result], testcase[conditional_test_result])

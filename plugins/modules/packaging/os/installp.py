@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2017, Kairo Araujo <kairo@kairo.eti.br>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Kairo Araujo <kairo@kairo.eti.br>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -20,7 +21,7 @@ options:
     description:
     - Whether to accept the license for the package(s).
     type: bool
-    default: no
+    default: false
   name:
     description:
     - One or more packages to install or remove.
@@ -48,28 +49,28 @@ EXAMPLES = r'''
   community.general.installp:
     name: foo
     repository_path: /repository/AIX71/installp/base
-    accept_license: yes
+    accept_license: true
     state: present
 
 - name: Install bos.sysmgt that includes bos.sysmgt.nim.master, bos.sysmgt.nim.spot
   community.general.installp:
     name: bos.sysmgt
     repository_path: /repository/AIX71/installp/base
-    accept_license: yes
+    accept_license: true
     state: present
 
 - name: Install bos.sysmgt.nim.master only
   community.general.installp:
     name: bos.sysmgt.nim.master
     repository_path: /repository/AIX71/installp/base
-    accept_license: yes
+    accept_license: true
     state: present
 
 - name: Install bos.sysmgt.nim.master and bos.sysmgt.nim.spot
   community.general.installp:
     name: bos.sysmgt.nim.master, bos.sysmgt.nim.spot
     repository_path: /repository/AIX71/installp/base
-    accept_license: yes
+    accept_license: true
     state: present
 
 - name: Remove packages bos.sysmgt.nim.master

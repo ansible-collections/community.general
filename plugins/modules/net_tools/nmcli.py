@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2015, Chris Long <alcamie@gmail.com> <chlong@redhat.com>
-# Copyright: (c) 2017, Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2015, Chris Long <alcamie@gmail.com> <chlong@redhat.com>
+# Copyright (c) 2017, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -34,7 +35,7 @@ options:
             - Whether the connection should start on boot.
             - Whether the connection profile can be automatically activated
         type: bool
-        default: yes
+        default: true
     conn_name:
         description:
             - The name used to call the connection. Pattern is <type>[-<ifname>][-<num>].
@@ -45,8 +46,8 @@ options:
             - The interface to bind the connection to.
             - The connection will only be applicable to this interface name.
             - A special value of C('*') can be used for interface-independent connections.
-            - The ifname argument is mandatory for all connection types except bond, team, bridge and vlan.
-            - This parameter defaults to C(conn_name) when left unset.
+            - The ifname argument is mandatory for all connection types except bond, team, bridge, vlan and vpn.
+            - This parameter defaults to C(conn_name) when left unset for all connection types except vpn that removes it.
         type: str
     type:
         description:
@@ -55,10 +56,11 @@ options:
             - Type C(generic) is added in Ansible 2.5.
             - Type C(infiniband) is added in community.general 2.0.0.
             - Type C(gsm) is added in community.general 3.7.0.
-            - Type C(wireguard) is added in community.general 4.3.0
+            - Type C(wireguard) is added in community.general 4.3.0.
+            - Type C(vpn) is added in community.general 5.1.0.
         type: str
         choices: [ bond, bond-slave, bridge, bridge-slave, dummy, ethernet, generic, gre, infiniband, ipip, sit, team, team-slave, vlan, vxlan, wifi, gsm,
-            wireguard ]
+            wireguard, vpn ]
     mode:
         description:
             - This is the type of device or network connection that you wish to create for a bond or bridge.
@@ -153,12 +155,12 @@ options:
             - Set as default route.
             - This parameter is mutually_exclusive with gw4 parameter.
         type: bool
-        default: no
+        default: false
         version_added: 2.0.0
     dns4:
         description:
-            - A list of up to 3 dns servers.
-            - IPv4 format e.g. to add two IPv4 DNS server addresses, use C(192.0.2.53 198.51.100.53).
+            - A list of up to 3 DNS servers.
+            - The entries must be IPv4 addresses, for example C(192.0.2.53).
         elements: str
         type: list
     dns4_search:
@@ -255,8 +257,8 @@ options:
         version_added: 4.4.0
     dns6:
         description:
-            - A list of up to 3 dns servers.
-            - IPv6 format e.g. to add two IPv6 DNS server addresses, use C(2001:4860:4860::8888 2001:4860:4860::8844).
+            - A list of up to 3 DNS servers.
+            - The entries must be IPv6 addresses, for example C(2001:4860:4860::8888).
         elements: str
         type: list
     dns6_search:
@@ -317,6 +319,11 @@ options:
         description:
             - This is only used with bond - updelay.
         type: int
+    xmit_hash_policy:
+        description:
+            - This is only used with bond - xmit_hash_policy type.
+        type: str
+        version_added: 5.6.0
     arp_interval:
         description:
             - This is only used with bond - ARP interval.
@@ -329,7 +336,7 @@ options:
         description:
             - This is only used with bridge and controls whether Spanning Tree Protocol (STP) is enabled for this bridge.
         type: bool
-        default: yes
+        default: true
     priority:
         description:
             - This is only used with 'bridge' - sets STP priority.
@@ -905,6 +912,57 @@ options:
                 description: C(NMSettingSecretFlags) indicating how to handle the I(wireguard.private-key) property.
                 type: int
                 choices: [ 0, 1, 2 ]
+    vpn:
+        description:
+            - Configuration of a VPN connection (PPTP and L2TP).
+            - In order to use L2TP you need to be sure that C(network-manager-l2tp) - and C(network-manager-l2tp-gnome)
+                if host has UI - are installed on the host.
+        type: dict
+        version_added: 5.1.0
+        suboptions:
+            permissions:
+                description: User that will have permission to use the connection.
+                type: str
+                required: true
+            service-type:
+                description: This defines the service type of connection.
+                type: str
+                required: true
+            gateway:
+                description: The gateway to connection. It can be an IP address (for example C(192.0.2.1))
+                    or a FQDN address (for example C(vpn.example.com)).
+                type: str
+                required: true
+            password-flags:
+                description:
+                    - NMSettingSecretFlags indicating how to handle the I(password) property.
+                    - 'Following choices are allowed:
+                      C(0) B(NONE): The system is responsible for providing and storing this secret (default);
+                      C(1) B(AGENT_OWNED): A user secret agent is responsible for providing and storing this secret; when it is required agents will be
+                           asked to retrieve it;
+                      C(2) B(NOT_SAVED): This secret should not be saved, but should be requested from the user each time it is needed;
+                      C(4) B(NOT_REQUIRED): In situations where it cannot be automatically determined that the secret is required
+                           (some VPNs and PPP providers do not require all secrets) this flag indicates that the specific secret is not required.'
+                type: int
+                choices: [ 0, 1, 2 , 4 ]
+                default: 0
+            user:
+                description: Username provided by VPN administrator.
+                type: str
+                required: true
+            ipsec-enabled:
+                description:
+                    - Enable or disable IPSec tunnel to L2TP host.
+                    - This option is need when C(service-type) is C(org.freedesktop.NetworkManager.l2tp).
+                type: bool
+                choices: [ yes, no ]
+            ipsec-psk:
+                description:
+                    - The pre-shared key in base64 encoding.
+                    - >
+                      You can encode using this Ansible jinja2 expression: C("0s{{ '[YOUR PRE-SHARED KEY]' | ansible.builtin.b64encode }}").
+                    - This is only used when I(ipsec-enabled=true).
+                type: str
 '''
 
 EXAMPLES = r'''
@@ -1129,7 +1187,7 @@ EXAMPLES = r'''
       ip4: 192.0.2.100/24
       gw4: 192.0.2.1
       state: present
-      autoconnect: yes
+      autoconnect: true
 
   - name: Optionally, at the same time specify IPv6 addresses for the device
     community.general.nmcli:
@@ -1288,6 +1346,23 @@ EXAMPLES = r'''
     autoconnect: true
     state: present
 
+- name: >-
+    Create a VPN L2TP connection for ansible_user to connect on vpn.example.com
+    authenticating with user 'brittany' and pre-shared key as 'Brittany123'
+  community.general.nmcli:
+    type: vpn
+    conn_name: my-vpn-connection
+    vpn:
+        permissions: "{{ ansible_user }}"
+        service-type: org.freedesktop.NetworkManager.l2tp
+        gateway: vpn.example.com
+        password-flags: 2
+        user: brittany
+        ipsec-enabled: true
+        ipsec-psk: "0s{{ 'Brittany123' | ansible.builtin.b64encode }}"
+    autoconnect: false
+    state: present
+
 '''
 
 RETURN = r"""#
@@ -1370,6 +1445,7 @@ class Nmcli(object):
         self.primary = module.params['primary']
         self.downdelay = module.params['downdelay']
         self.updelay = module.params['updelay']
+        self.xmit_hash_policy = module.params['xmit_hash_policy']
         self.arp_interval = module.params['arp_interval']
         self.arp_ip_target = module.params['arp_ip_target']
         self.slavepriority = module.params['slavepriority']
@@ -1404,6 +1480,7 @@ class Nmcli(object):
         self.wifi_sec = module.params['wifi_sec']
         self.gsm = module.params['gsm']
         self.wireguard = module.params['wireguard']
+        self.vpn = module.params['vpn']
 
         if self.method4:
             self.ipv4_method = self.method4
@@ -1430,7 +1507,7 @@ class Nmcli(object):
         if self._hairpin is None:
             self.module.deprecate(
                 "Parameter 'hairpin' default value will change from true to false in community.general 7.0.0. "
-                "Set the value explicitly to supress this warning.",
+                "Set the value explicitly to suppress this warning.",
                 version='7.0.0', collection_name='community.general',
             )
             # Should be False in 7.0.0 but then that should be in argument_specs
@@ -1509,6 +1586,7 @@ class Nmcli(object):
                 'mode': self.mode,
                 'primary': self.primary,
                 'updelay': self.updelay,
+                'xmit_hash_policy': self.xmit_hash_policy,
             })
         elif self.type == 'bond-slave':
             options.update({
@@ -1592,6 +1670,29 @@ class Nmcli(object):
                     options.update({
                         'wireguard.%s' % name: value,
                     })
+        elif self.type == 'vpn':
+            if self.vpn:
+                vpn_data_values = ''
+                for name, value in self.vpn.items():
+                    if name == 'service-type':
+                        options.update({
+                            'vpn.service-type': value,
+                        })
+                    elif name == 'permissions':
+                        options.update({
+                            'connection.permissions': value,
+                        })
+                    else:
+                        if vpn_data_values != '':
+                            vpn_data_values += ', '
+
+                        if isinstance(value, bool):
+                            value = self.bool_to_string(value)
+
+                        vpn_data_values += '%s=%s' % (name, value)
+                    options.update({
+                        'vpn.data': vpn_data_values,
+                    })
         # Convert settings values based on the situation.
         for setting, value in options.items():
             setting_type = self.settings_type(setting)
@@ -1636,6 +1737,7 @@ class Nmcli(object):
             '802-11-wireless',
             'gsm',
             'wireguard',
+            'vpn',
         )
 
     @property
@@ -1742,7 +1844,10 @@ class Nmcli(object):
 
     @staticmethod
     def list_to_string(lst):
-        return ",".join(lst or [""])
+        if lst is None:
+            return None
+        else:
+            return ",".join(lst)
 
     @staticmethod
     def settings_type(setting):
@@ -1831,6 +1936,10 @@ class Nmcli(object):
         options = {
             'connection.interface-name': ifname,
         }
+
+        # VPN doesn't need an interface but if sended it must be a valid interface.
+        if self.type == 'vpn' and self.ifname is None:
+            del options['connection.interface-name']
 
         options.update(self.connection_options())
 
@@ -1990,13 +2099,19 @@ class Nmcli(object):
                     # MAC addresses are case insensitive, nmcli always reports them in uppercase
                     value = value.upper()
                     # ensure current_value is also converted to uppercase in case nmcli changes behaviour
-                    current_value = current_value.upper()
+                    if current_value:
+                        current_value = current_value.upper()
                 if key == 'gsm.apn':
                     # Depending on version nmcli adds double-qoutes to gsm.apn
                     # Need to strip them in order to compare both
-                    current_value = current_value.strip('"')
+                    if current_value:
+                        current_value = current_value.strip('"')
                 if key == self.mtu_setting and self.mtu is None:
                     self.mtu = 0
+                if key == 'vpn.data':
+                    if current_value:
+                        current_value = sorted(re.sub(r'\s*=\s*', '=', part.strip(), count=1) for part in current_value.split(','))
+                    value = sorted(part.strip() for part in value.split(','))
             else:
                 # parameter does not exist
                 current_value = None
@@ -2024,6 +2139,10 @@ class Nmcli(object):
         options = {
             'connection.interface-name': self.ifname,
         }
+
+        # VPN doesn't need an interface but if sended it must be a valid interface.
+        if self.type == 'vpn' and self.ifname is None:
+            del options['connection.interface-name']
 
         if not self.type:
             current_con_type = self.show_connection().get('connection.type')
@@ -2064,6 +2183,7 @@ def main():
                           'wifi',
                           'gsm',
                           'wireguard',
+                          'vpn',
                       ]),
             ip4=dict(type='list', elements='str'),
             gw4=dict(type='str'),
@@ -2118,6 +2238,7 @@ def main():
             miimon=dict(type='int'),
             downdelay=dict(type='int'),
             updelay=dict(type='int'),
+            xmit_hash_policy=dict(type='str'),
             arp_interval=dict(type='int'),
             arp_ip_target=dict(type='str'),
             primary=dict(type='str'),
@@ -2163,6 +2284,7 @@ def main():
             wifi_sec=dict(type='dict', no_log=True),
             gsm=dict(type='dict'),
             wireguard=dict(type='dict'),
+            vpn=dict(type='dict'),
         ),
         mutually_exclusive=[['never_default4', 'gw4'],
                             ['routes4_extended', 'routes4'],

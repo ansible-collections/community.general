@@ -1,6 +1,8 @@
-# Author: Jiri Hnidek (jhnidek@redhat.com)
+# -*- coding: utf-8 -*-
+# Copyright (c) Jiri Hnidek (jhnidek@redhat.com)
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -118,7 +120,7 @@ TEST_CASES = [
                     (0, 'system identity: b26df632-25ed-4452-8f89-0308bfd167cb', '')
                 ),
                 (
-                    ['/testbin/subscription-manager', 'unsubscribe', '--all'],
+                    ['/testbin/subscription-manager', 'remove', '--all'],
                     {'check_rc': True},
                     (0, '', '')
                 ),
@@ -755,7 +757,7 @@ Entitlement Type:    Physical
                 (
                     [
                         '/testbin/subscription-manager',
-                        'unsubscribe',
+                        'remove',
                         '--serial=7807912223970164816',
                     ],
                     {'check_rc': True},

@@ -1,3 +1,8 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - debug:
     msg: ' with_alternatives: {{ with_alternatives }}, mode: {{ mode }}'
 
@@ -49,5 +54,3 @@
 
 - name: check that alternative has been updated
   command: "grep -Pzq '/bin/dummy{{ item }}\\n' '{{ alternatives_dir }}/dummy'"
-  # priority doesn't seem updated
-  #command: "grep -Pzq '/bin/dummy{{ item }}\\n50' '{{ alternatives_dir }}/dummy'"

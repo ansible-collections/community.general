@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2012, Jan-Piet Mens <jpmens () gmail.com>
-# Copyright: (c) 2015, Ales Nosek <anosek.nosek () gmail.com>
-# Copyright: (c) 2017, Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2012, Jan-Piet Mens <jpmens () gmail.com>
+# Copyright (c) 2015, Ales Nosek <anosek.nosek () gmail.com>
+# Copyright (c) 2017, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -32,7 +33,7 @@ options:
     aliases: [ dest ]
   section:
     description:
-      - Section name in INI file. This is added if C(state=present) automatically when
+      - Section name in INI file. This is added if I(state=present) automatically when
         a single value is being set.
       - If left empty or set to C(null), the I(option) will be placed before the first I(section).
       - Using C(null) is also required if the config format does not support sections.
@@ -64,44 +65,44 @@ options:
       - Create a backup file including the timestamp information so you can get
         the original file back if you somehow clobbered it incorrectly.
     type: bool
-    default: no
+    default: false
   state:
     description:
-      - If set to C(absent) and I(exclusive) set to C(yes) all matching I(option) lines are removed.
-      - If set to C(absent) and I(exclusive) set to C(no) the specified C(option=value) lines are removed,
+      - If set to C(absent) and I(exclusive) set to C(true) all matching I(option) lines are removed.
+      - If set to C(absent) and I(exclusive) set to C(false) the specified I(option=value) lines are removed,
         but the other I(option)s with the same name are not touched.
-      - If set to C(present) and I(exclusive) set to C(no) the specified C(option=values) lines are added,
+      - If set to C(present) and I(exclusive) set to C(false) the specified I(option=values) lines are added,
         but the other I(option)s with the same name are not touched.
-      - If set to C(present) and I(exclusive) set to C(yes) all given C(option=values) lines will be
+      - If set to C(present) and I(exclusive) set to C(true) all given I(option=values) lines will be
         added and the other I(option)s with the same name are removed.
     type: str
     choices: [ absent, present ]
     default: present
   exclusive:
     description:
-      - If set to C(yes) (default), all matching I(option) lines are removed when I(state=absent),
+      - If set to C(true) (default), all matching I(option) lines are removed when I(state=absent),
         or replaced when I(state=present).
-      - If set to C(no), only the specified I(value(s)) are added when I(state=present),
+      - If set to C(false), only the specified I(value(s)) are added when I(state=present),
         or removed when I(state=absent), and existing ones are not modified.
     type: bool
-    default: yes
+    default: true
     version_added: 3.6.0
   no_extra_spaces:
     description:
       - Do not insert spaces before and after '=' symbol.
     type: bool
-    default: no
+    default: false
   create:
     description:
-      - If set to C(no), the module will fail if the file does not already exist.
+      - If set to C(false), the module will fail if the file does not already exist.
       - By default it will create the file if it is missing.
     type: bool
-    default: yes
+    default: true
   allow_no_value:
     description:
       - Allow option without value and without '=' symbol.
     type: bool
-    default: no
+    default: false
 notes:
    - While it is possible to add an I(option) without specifying a I(value), this makes no sense.
    - As of Ansible 2.3, the I(dest) option has been changed to I(path) as default, but I(dest) still works as well.
@@ -120,7 +121,7 @@ EXAMPLES = r'''
     option: fav
     value: lemonade
     mode: '0600'
-    backup: yes
+    backup: true
 
 - name: Ensure "temperature=cold is in section "[drinks]" in specified file
   community.general.ini_file:
@@ -128,7 +129,7 @@ EXAMPLES = r'''
     section: drinks
     option: temperature
     value: cold
-    backup: yes
+    backup: true
 
 - name: Add "beverage=lemon juice" is in section "[drinks]" in specified file
   community.general.ini_file:
@@ -138,7 +139,7 @@ EXAMPLES = r'''
     value: lemon juice
     mode: '0600'
     state: present
-    exclusive: no
+    exclusive: false
 
 - name: Ensure multiple values "beverage=coke" and "beverage=pepsi" are in section "[drinks]" in specified file
   community.general.ini_file:
@@ -279,7 +280,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
     # handling multiple instances of option=value when state is 'present' with/without exclusive is a bit complex
     #
     # 1. edit all lines where we have a option=value pair with a matching value in values[]
-    # 2. edit all the remaing lines where we have a matching option
+    # 2. edit all the remaining lines where we have a matching option
     # 3. delete remaining lines where we have a matching option
     # 4. insert missing option line(s) at the end of the section
 
@@ -309,7 +310,7 @@ def do_ini(module, filename, section=None, option=None, values=None,
         # override option with no value to option with value if not allow_no_value
         if len(values) > 0:
             for index, line in enumerate(section_lines):
-                if not changed_lines[index] and match_active_opt(option, section_lines[index]):
+                if not changed_lines[index] and match_active_opt(option, line):
                     newline = assignment_format % (option, values.pop(0))
                     (changed, msg) = update_section_line(changed, section_lines, index, changed_lines, newline, msg)
                     if len(values) == 0:

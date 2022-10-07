@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright: (c) 2020, Tristan Le Guern <tleguern at bouledef.eu>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2020, Tristan Le Guern <tleguern at bouledef.eu>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -136,3 +137,7 @@ class ProxmoxAnsible(object):
                 return None
 
             self.module.fail_json(msg='VM with vmid %s does not exist in cluster' % vmid)
+
+    def api_task_ok(self, node, taskid):
+        status = self.proxmox_api.nodes(node).tasks(taskid).status.get()
+        return status['status'] == 'stopped' and status['exitstatus'] == 'OK'

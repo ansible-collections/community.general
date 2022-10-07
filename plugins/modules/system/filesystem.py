@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2021, quidame <quidame@poivron.org>
-# Copyright: (c) 2013, Alexander Bulimov <lazywolf0@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2021, quidame <quidame@poivron.org>
+# Copyright (c) 2013, Alexander Bulimov <lazywolf0@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -21,11 +22,11 @@ description:
 options:
   state:
     description:
-      - If C(state=present), the filesystem is created if it doesn't already
+      - If I(state=present), the filesystem is created if it doesn't already
         exist, that is the default behaviour if I(state) is omitted.
-      - If C(state=absent), filesystem signatures on I(dev) are wiped if it
+      - If I(state=absent), filesystem signatures on I(dev) are wiped if it
         contains a filesystem (as known by C(blkid)).
-      - When C(state=absent), all other options but I(dev) are ignored, and the
+      - When I(state=absent), all other options but I(dev) are ignored, and the
         module doesn't fail if the device I(dev) doesn't actually exist.
     type: str
     choices: [ present, absent ]
@@ -35,7 +36,7 @@ options:
     choices: [ btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap, ufs ]
     description:
       - Filesystem type to be created. This option is required with
-        C(state=present) (or if I(state) is omitted).
+        I(state=present) (or if I(state) is omitted).
       - ufs support has been added in community.general 3.4.0.
     type: str
     aliases: [type]
@@ -49,27 +50,27 @@ options:
         a regular file as their target I(dev).
       - Support for character devices on FreeBSD has been added in community.general 3.4.0.
     type: path
-    required: yes
+    required: true
     aliases: [device]
   force:
     description:
-      - If C(yes), allows to create new filesystem on devices that already has filesystem.
+      - If C(true), allows to create new filesystem on devices that already has filesystem.
     type: bool
-    default: 'no'
+    default: false
   resizefs:
     description:
-      - If C(yes), if the block device and filesystem size differ, grow the filesystem into the space.
+      - If C(true), if the block device and filesystem size differ, grow the filesystem into the space.
       - Supported for C(btrfs), C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs), C(ufs) and C(vfat) filesystems.
         Attempts to resize other filesystem types will fail.
       - XFS Will only grow if mounted. Currently, the module is based on commands
         from C(util-linux) package to perform operations, so resizing of XFS is
         not supported on FreeBSD systems.
-      - vFAT will likely fail if fatresize < 1.04.
+      - vFAT will likely fail if C(fatresize < 1.04).
     type: bool
-    default: 'no'
+    default: false
   opts:
     description:
-      - List of options to be passed to mkfs command.
+      - List of options to be passed to C(mkfs) command.
     type: str
 requirements:
   - Uses specific tools related to the I(fstype) for creating or resizing a
@@ -81,7 +82,7 @@ notes:
   - Potential filesystems on I(dev) are checked using C(blkid). In case C(blkid)
     is unable to detect a filesystem (and in case C(fstyp) on FreeBSD is also
     unable to detect a filesystem), this filesystem is overwritten even if
-    I(force) is C(no).
+    I(force) is C(false).
   - On FreeBSD systems, both C(e2fsprogs) and C(util-linux) packages provide
     a C(blkid) command that is compatible with this module. However, these
     packages conflict with each other, and only the C(util-linux) package
@@ -268,7 +269,7 @@ class Ext(Filesystem):
             if None not in (block_size, block_count):
                 break
         else:
-            raise ValueError(out)
+            raise ValueError(repr(out))
 
         return block_size * block_count
 
@@ -319,7 +320,7 @@ class XFS(Filesystem):
             if None not in (block_size, block_count):
                 break
         else:
-            raise ValueError(out)
+            raise ValueError(repr(out))
 
         return block_size * block_count
 
@@ -364,7 +365,7 @@ class Btrfs(Filesystem):
         for line in stdout.splitlines():
             if "Device size" in line:
                 return int(line.split()[-1])
-        raise ValueError(stdout)
+        raise ValueError(repr(stdout))
 
 
 class Ocfs2(Filesystem):
@@ -405,7 +406,7 @@ class F2fs(Filesystem):
             if None not in (sector_size, sector_count):
                 break
         else:
-            raise ValueError(out)
+            raise ValueError(repr(out))
 
         return sector_size * sector_count
 
@@ -428,12 +429,15 @@ class VFAT(Filesystem):
         dummy, out, dummy = self.module.run_command([cmd, '--info', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
         fssize = None
         for line in out.splitlines()[1:]:
-            param, value = line.split(':', 1)
-            if param.strip() == 'Size':
+            parts = line.split(':', 1)
+            if len(parts) < 2:
+                continue
+            param, value = parts
+            if param.strip() in ('Size', 'Cur size'):
                 fssize = int(value.strip())
                 break
         else:
-            raise ValueError(out)
+            raise ValueError(repr(out))
 
         return fssize
 
@@ -477,7 +481,7 @@ class UFS(Filesystem):
             if None not in (fragmentsize, providersize):
                 break
         else:
-            raise ValueError(out)
+            raise ValueError(repr(out))
 
         return fragmentsize * providersize
 
@@ -577,7 +581,7 @@ def main():
 
             module.exit_json(changed=True, msg=out)
         elif fs and not force:
-            module.fail_json(msg="'%s' is already used as %s, use force=yes to overwrite" % (dev, fs), rc=rc, err=err)
+            module.fail_json(msg="'%s' is already used as %s, use force=true to overwrite" % (dev, fs), rc=rc, err=err)
 
         # create fs
         filesystem.create(mkfs_opts, dev)

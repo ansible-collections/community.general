@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# copyright: (c) 2016, Loic Blot <loic.blot@unix-experience.fr>
+# Copyright (c) 2016, Loic Blot <loic.blot@unix-experience.fr>
 # Sponsored by Infopro Digital. http://www.infopro-digital.com/
 # Sponsored by E.T.A.I. http://www.etai.fr/
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -69,7 +70,7 @@ options:
         description:
             - Enable dynamic DNS updates for this host.
         type: bool
-        default: no
+        default: false
 
 '''
 EXAMPLES = r'''
@@ -81,7 +82,7 @@ EXAMPLES = r'''
     macaddr: 44:dd:ab:dd:11:44
     name: server01
     ip: 192.168.88.99
-    ddns: yes
+    ddns: true
     statements:
     - filename "pxelinux.0"
     - next-server 1.1.1.1

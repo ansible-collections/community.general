@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2015, Benjamin Copeland (@bhcopeland) <ben@copeland.me.uk>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2015, Benjamin Copeland (@bhcopeland) <ben@copeland.me.uk>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -73,32 +74,32 @@ options:
         description:
             - If it affects all components and containers
         type: bool
-        default: 'no'
+        default: false
     automation:
         description:
             - Automatically start and end the maintenance window
         type: bool
-        default: 'no'
+        default: false
     maintenance_notify_now:
         description:
             - Notify subscribers now
         type: bool
-        default: 'no'
+        default: false
     maintenance_notify_72_hr:
         description:
             - Notify subscribers 72 hours before maintenance start time
         type: bool
-        default: 'no'
+        default: false
     maintenance_notify_24_hr:
         description:
             - Notify subscribers 24 hours before maintenance start time
         type: bool
-        default: 'no'
+        default: false
     maintenance_notify_1_hr:
         description:
             - Notify subscribers 1 hour before maintenance start time
         type: bool
-        default: 'no'
+        default: false
     maintenance_id:
         type: str
         description:
@@ -130,8 +131,8 @@ EXAMPLES = '''
     api_id: api_id
     api_key: api_key
     statuspage: statuspage_id
-    maintenance_notify_1_hr: True
-    automation: True
+    maintenance_notify_1_hr: true
+    automation: true
 
 - name: Create a maintenance window for 60 minutes on server1 and server2
   community.general.statusio_maintenance:
@@ -144,8 +145,8 @@ EXAMPLES = '''
     api_id: api_id
     api_key: api_key
     statuspage: statuspage_id
-    maintenance_notify_1_hr: True
-    automation: True
+    maintenance_notify_1_hr: true
+    automation: true
   delegate_to: localhost
 
 - name: Create a future maintenance window for 24 hours to all hosts inside the Primary Data Center

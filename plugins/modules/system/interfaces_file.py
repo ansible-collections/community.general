@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright: (c) 2016, Roman Belyakovsky <ihryamzik () gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Roman Belyakovsky <ihryamzik () gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -47,7 +48,7 @@ options:
       - Create a backup file including the timestamp information so you can get
         the original file back if you somehow clobbered it incorrectly.
     type: bool
-    default: 'no'
+    default: false
   state:
     type: str
     description:
@@ -135,7 +136,7 @@ EXAMPLES = '''
     iface: eth1
     option: mtu
     value: 8000
-    backup: yes
+    backup: true
     state: present
   register: eth1_cfg
 '''

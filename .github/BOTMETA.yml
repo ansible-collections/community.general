@@ -1,3 +1,8 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 notifications: true
 automerge: true
 files:
@@ -120,6 +125,8 @@ files:
     labels: xenserver
   $filters/counter.py:
     maintainers: keilr
+  $filters/crc32.py:
+    maintainers: jouir
   $filters/dict.py:
     maintainers: felixfontein
   $filters/dict_kv.py:
@@ -197,6 +204,8 @@ files:
   $inventories/virtualbox.py: {}
   $lookups/:
     labels: lookups
+  $lookups/bitwarden.py:
+    maintainers: lungj
   $lookups/cartesian.py: {}
   $lookups/chef_databag.py: {}
   $lookups/collection_version.py:
@@ -214,7 +223,8 @@ files:
   $lookups/dnstxt.py:
     maintainers: jpmens
   $lookups/dsv.py:
-    maintainers: amigus endlesstrax
+    maintainers: delineaKrehl tylerezimmerman
+    ignore: amigus
   $lookups/etcd3.py:
     maintainers: eric-belhomme
   $lookups/etcd.py:
@@ -251,9 +261,13 @@ files:
     maintainers: RevBits
   $lookups/shelvefile.py: {}
   $lookups/tss.py:
-    maintainers: amigus endlesstrax
+    maintainers: delineaKrehl tylerezimmerman
+    ignore: amigus
   $module_utils/:
     labels: module_utils
+  $module_utils/gconftool2.py:
+    maintainers: russoz
+    labels: gconftool2
   $module_utils/gitlab.py:
     notify: jlozadad
     maintainers: $team_gitlab
@@ -285,6 +299,9 @@ files:
   $module_utils/oracle/oci_utils.py:
     maintainers: $team_oracle
     labels: cloud
+  $module_utils/pipx.py:
+    maintainers: russoz
+    labels: pipx
   $module_utils/pure.py:
     maintainers: $team_purestorage
     labels: pure pure_storage
@@ -301,9 +318,15 @@ files:
   $module_utils/utm_utils.py:
     maintainers: $team_e_spirit
     labels: utm_utils
+  $module_utils/wdc_redfish_utils.py:
+    maintainers: $team_wdc
+    labels: wdc_redfish_utils
   $module_utils/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
+  $module_utils/xfconf.py:
+    maintainers: russoz
+    labels: xfconf
   $modules/cloud/alicloud/:
     maintainers: xiaozhu36
   $modules/cloud/atomic/atomic_container.py:
@@ -355,6 +378,8 @@ files:
   $modules/cloud/misc/proxmox_template.py:
     maintainers: UnderGreen
     ignore: skvidal
+  $modules/cloud/misc/proxmox_disk.py:
+    maintainers: castorsky
   $modules/cloud/misc/rhevm.py:
     maintainers: $team_virt TimothyVandenbrande
     labels: rhevm virt
@@ -434,6 +459,8 @@ files:
     maintainers: claco
   $modules/cloud/scaleway/:
     maintainers: $team_scaleway
+  $modules/cloud/scaleway/scaleway_compute_private_network.py:
+    maintainers: pastral
   $modules/cloud/scaleway/scaleway_database_backup.py:
     maintainers: guillaume_ro_fr
   $modules/cloud/scaleway/scaleway_image_info.py:
@@ -562,6 +589,8 @@ files:
     maintainers: Gaetan2907
   $modules/identity/keycloak/keycloak_client_rolemapping.py:
     maintainers: Gaetan2907
+  $modules/identity/keycloak/keycloak_user_rolemapping.py:
+    maintainers: bratwurzt
   $modules/identity/keycloak/keycloak_group.py:
     maintainers: adamgoossens
   $modules/identity/keycloak/keycloak_identity_provider.py:
@@ -615,7 +644,7 @@ files:
   $modules/monitoring/nagios.py:
     maintainers: tbielawa tgoetheyn
   $modules/monitoring/newrelic_deployment.py:
-    maintainers: mcodd
+    ignore: mcodd
   $modules/monitoring/pagerduty.py:
     maintainers: suprememoocow thaumos
     labels: pagerduty
@@ -707,7 +736,7 @@ files:
   $modules/notification/discord.py:
     maintainers: cwollinger
   $modules/notification/flowdock.py:
-    maintainers: mcodd
+    ignore: mcodd
   $modules/notification/grove.py:
     maintainers: zimbatm
   $modules/notification/hipchat.py:
@@ -784,6 +813,8 @@ files:
   $modules/packaging/language/pip_package_info.py:
     maintainers: bcoca matburt maxamillion
   $modules/packaging/language/pipx.py:
+    maintainers: russoz
+  $modules/packaging/language/pipx_info.py:
     maintainers: russoz
   $modules/packaging/language/yarn.py:
     maintainers: chrishoffman verkaufer
@@ -915,7 +946,7 @@ files:
   $modules/packaging/os/xbps.py:
     maintainers: dinoocch the-maldridge
   $modules/packaging/os/yum_versionlock.py:
-    maintainers: florianpaulhoberg aminvakil
+    maintainers: gyptazy aminvakil
   $modules/packaging/os/zypper.py:
     maintainers: $team_suse
     labels: zypper
@@ -960,6 +991,10 @@ files:
   $modules/remote_management/redfish/:
     maintainers: $team_redfish
     ignore: jose-delarosa
+  $modules/remote_management/redfish/wdc_redfish_command.py:
+    maintainers: $team_wdc
+  $modules/remote_management/redfish/wdc_redfish_info.py:
+    maintainers: $team_wdc
   $modules/remote_management/stacki/stacki_host.py:
     maintainers: bsanders bbyhuy
     labels: stacki_host
@@ -1024,7 +1059,7 @@ files:
   $modules/system/alternatives.py:
     maintainers: mulby
     labels: alternatives
-    ignore: DavidWittman
+    ignore: DavidWittman jiuka
   $modules/system/aix_lvol.py:
     maintainers: adejoux
   $modules/system/awall.py:
@@ -1052,6 +1087,9 @@ files:
   $modules/system/gconftool2.py:
     maintainers: Akasurde kevensen
     labels: gconftool2
+  $modules/system/gconftool2_info.py:
+    maintainers: russoz
+    labels: gconftool2
   $modules/system/homectl.py:
     maintainers: jameslivulpi
   $modules/system/interfaces_file.py:
@@ -1059,6 +1097,10 @@ files:
     labels: interfaces_file
   $modules/system/iptables_state.py:
     maintainers: quidame
+  $modules/system/keyring.py:
+    maintainers: ahussey-redhat
+  $modules/system/keyring_info.py:
+    maintainers: ahussey-redhat
   $modules/system/shutdown.py:
     maintainers: nitzmahone samdoran aminvakil
   $modules/system/java_cert.py:
@@ -1281,5 +1323,6 @@ macros:
   team_rhn: FlossWare alikins barnabycourt vritant
   team_scaleway: remyleone abarbare
   team_solaris: bcoca fishman jasperla jpdasma mator scathatheworm troy2914 xen0l
-  team_suse: commel dcermak evrardjp lrupp toabctl AnderEnder alxgu andytom sealor
+  team_suse: commel evrardjp lrupp toabctl AnderEnder alxgu andytom sealor
   team_virt: joshainglis karmab tleguern Thulium-Drake Ajpantuso
+  team_wdc: mikemoerk

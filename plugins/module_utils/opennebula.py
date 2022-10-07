@@ -2,7 +2,8 @@
 #
 # Copyright 2018 www.privaz.io Valletech AB
 #
-# Simplified BSD License (see licenses/simplified_bsd.txt or https://opensource.org/licenses/BSD-2-Clause)
+# Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
+# SPDX-License-Identifier: BSD-2-Clause
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -83,12 +84,12 @@ class OpenNebulaModule:
         if self.module.params.get("api_username"):
             username = self.module.params.get("api_username")
         else:
-            self.fail("Either api_username or the environment vairable ONE_USERNAME must be provided")
+            self.fail("Either api_username or the environment variable ONE_USERNAME must be provided")
 
         if self.module.params.get("api_password"):
             password = self.module.params.get("api_password")
         else:
-            self.fail("Either api_password or the environment vairable ONE_PASSWORD must be provided")
+            self.fail("Either api_password or the environment variable ONE_PASSWORD must be provided")
 
         session = "%s:%s" % (username, password)
 

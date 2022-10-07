@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright: (c) 2018, Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2018, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -73,15 +74,18 @@ hooks:
   description: A list of hooks that exist for the repo
   returned: always
   type: list
-  sample: >
-    [{"has_shared_secret": true,
-      "url": "https://jenkins.example.com/ghprbhook/",
-      "events": ["issue_comment", "pull_request"],
-      "insecure_ssl": "1",
-      "content_type": "json",
-      "active": true,
-      "id": 6206,
-      "last_response": {"status": "active", "message": "OK", "code": 200}}]
+  elements: dict
+  sample:
+    - {
+        "has_shared_secret": true,
+        "url": "https://jenkins.example.com/ghprbhook/",
+        "events": ["issue_comment", "pull_request"],
+        "insecure_ssl": "1",
+        "content_type": "json",
+        "active": true,
+        "id": 6206,
+        "last_response": {"status": "active", "message": "OK", "code": 200}
+      }
 '''
 
 import traceback

@@ -1,10 +1,25 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: Install EPEL
   yum:
     name: https://s3.amazonaws.com/ansible-ci-files/test/integration/targets/setup_epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
     disable_gpg_check: true
-  when: ansible_facts.distribution in ['RedHat', 'CentOS']
+  when:
+    - ansible_facts.distribution in ['RedHat', 'CentOS']
+    - ansible_facts.distribution_major_version == '6'
+
+- name: Install EPEL
+  yum:
+    name: https://ci-files.testing.ansible.com/test/integration/targets/setup_epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+    disable_gpg_check: true
+  when:
+    - ansible_facts.distribution in ['RedHat', 'CentOS']
+    - ansible_facts.distribution_major_version != '6'

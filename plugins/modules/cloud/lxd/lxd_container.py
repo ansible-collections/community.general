@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016, Hiroaki Nakamura <hnakamur@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Hiroaki Nakamura <hnakamur@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -191,10 +192,10 @@ notes:
     2.1, the later requires python to be installed in the instance which can
     be done with the command module.
   - You can copy a file from the host to the instance
-    with the Ansible M(ansible.builtin.copy) and M(ansible.builtin.template) module and the `lxd` connection plugin.
+    with the Ansible M(ansible.builtin.copy) and M(ansible.builtin.template) module and the C(community.general.lxd) connection plugin.
     See the example below.
   - You can copy a file in the created instance to the localhost
-    with `command=lxc file pull instance_name/dir/filename filename`.
+    with C(command=lxc file pull instance_name/dir/filename filename).
     See the first example below.
 '''
 
@@ -393,7 +394,7 @@ actions:
   description: List of actions performed for the instance.
   returned: success
   type: list
-  sample: '["create", "start"]'
+  sample: ["create", "start"]
 '''
 import datetime
 import os

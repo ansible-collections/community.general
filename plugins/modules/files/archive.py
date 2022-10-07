@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016, Ben Doherty <bendohmv@gmail.com>
+# Copyright (c) 2016, Ben Doherty <bendohmv@gmail.com>
 # Sponsored by Oomph, Inc. http://www.oomphinc.com
-# Copyright: (c) 2017, Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -63,7 +64,7 @@ options:
     description:
       - Remove any added source files and trees after adding to archive.
     type: bool
-    default: no
+    default: false
 notes:
     - Requires tarfile, zipfile, gzip and bzip2 packages on target host.
     - Requires lzma or backports.lzma if using xz format.
@@ -83,7 +84,7 @@ EXAMPLES = r'''
 - name: Compress regular file /path/to/foo into /path/to/foo.gz and remove it
   community.general.archive:
     path: /path/to/foo
-    remove: yes
+    remove: true
 
 - name: Create a zip archive of /path/to/foo
   community.general.archive:

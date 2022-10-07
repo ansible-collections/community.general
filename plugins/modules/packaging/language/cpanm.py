@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2012, Franck Cuny <franck@lumberjaph.net>
-# (c) 2021, Alexei Znamensky <russoz@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2012, Franck Cuny <franck@lumberjaph.net>
+# Copyright (c) 2021, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -30,7 +31,7 @@ options:
     description:
       - Do not run unit tests.
     type: bool
-    default: no
+    default: false
   locallib:
     description:
       - Specify the install base to install modules.
@@ -43,12 +44,12 @@ options:
     description:
       - Use the mirror's index file instead of the CPAN Meta DB.
     type: bool
-    default: no
+    default: false
   installdeps:
     description:
       - Only install dependencies.
     type: bool
-    default: no
+    default: false
   version:
     description:
       - Version specification for the perl module. When I(mode) is C(new), C(cpanm) version operators are accepted.
@@ -112,7 +113,7 @@ EXAMPLES = '''
 - name: Install Dancer perl package without running the unit tests in indicated locallib
   community.general.cpanm:
     name: Dancer
-    notest: True
+    notest: true
     locallib: /srv/webapps/my_app/extlib
 
 - name: Install Dancer perl package from a specific mirror
@@ -121,7 +122,7 @@ EXAMPLES = '''
     mirror: 'http://cpan.cpantesters.org/'
 
 - name: Install Dancer perl package into the system root path
-  become: yes
+  become: true
   community.general.cpanm:
     name: Dancer
 
@@ -134,7 +135,7 @@ EXAMPLES = '''
 import os
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    ModuleHelper, CmdMixin, ArgFormat, ModuleHelperException
+    ModuleHelper, CmdMixin, ArgFormat
 )
 
 
@@ -171,10 +172,10 @@ class CPANMinus(CmdMixin, ModuleHelper):
         v = self.vars
         if v.mode == "compatibility":
             if v.name_check:
-                raise ModuleHelperException("Parameter name_check can only be used with mode=new")
+                self.do_raise("Parameter name_check can only be used with mode=new")
         else:
             if v.name and v.from_path:
-                raise ModuleHelperException("Parameters 'name' and 'from_path' are mutually exclusive when 'mode=new'")
+                self.do_raise("Parameters 'name' and 'from_path' are mutually exclusive when 'mode=new'")
 
         self.command = self.module.get_bin_path(v.executable if v.executable else self.command)
         self.vars.set("binary", self.command)
@@ -190,17 +191,16 @@ class CPANMinus(CmdMixin, ModuleHelper):
 
         return rc == 0
 
-    @staticmethod
-    def sanitize_pkg_spec_version(pkg_spec, version):
+    def sanitize_pkg_spec_version(self, pkg_spec, version):
         if version is None:
             return pkg_spec
         if pkg_spec.endswith('.tar.gz'):
-            raise ModuleHelperException(msg="parameter 'version' must not be used when installing from a file")
+            self.do_raise(msg="parameter 'version' must not be used when installing from a file")
         if os.path.isdir(pkg_spec):
-            raise ModuleHelperException(msg="parameter 'version' must not be used when installing from a directory")
+            self.do_raise(msg="parameter 'version' must not be used when installing from a directory")
         if pkg_spec.endswith('.git'):
             if version.startswith('~'):
-                raise ModuleHelperException(msg="operator '~' not allowed in version parameter when installing from git repository")
+                self.do_raise(msg="operator '~' not allowed in version parameter when installing from git repository")
             version = version if version.startswith('@') else '@' + version
         elif version[0] not in ('@', '~'):
             version = '~' + version
@@ -228,7 +228,7 @@ class CPANMinus(CmdMixin, ModuleHelper):
 
     def process_command_output(self, rc, out, err):
         if self.vars.mode == "compatibility" and rc != 0:
-            raise ModuleHelperException(msg=err, cmd=self.vars.cmd_args)
+            self.do_raise(msg=err, cmd=self.vars.cmd_args)
         return 'is up to date' not in err and 'is up to date' not in out
 
 

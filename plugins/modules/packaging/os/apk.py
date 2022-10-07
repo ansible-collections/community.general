@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2015, Kevin Brebanov <https://github.com/kbrebanov>
+# Copyright (c) 2015, Kevin Brebanov <https://github.com/kbrebanov>
 # Based on pacman (Afterburn <https://github.com/afterburn>, Aaron Bull Schaefer <aaron@elasticdog.com>)
 # and apt (Matthew Williams <matthew@flowroute.com>) modules.
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -24,7 +25,7 @@ options:
       - During upgrade, reset versioned world dependencies and change logic to prefer replacing or downgrading packages (instead of holding them)
         if the currently installed package is no longer available from any repository.
     type: bool
-    default: no
+    default: false
   name:
     description:
       - A package name, like C(foo), or multiple packages, like C(foo, bar).
@@ -34,7 +35,7 @@ options:
     description:
       - Do not use any local cache path.
     type: bool
-    default: no
+    default: false
     version_added: 1.0.0
   repository:
     description:
@@ -55,27 +56,33 @@ options:
     description:
       - Update repository indexes. Can be run with other steps or on it's own.
     type: bool
-    default: no
+    default: false
   upgrade:
     description:
       - Upgrade all installed packages to their latest version.
     type: bool
-    default: no
+    default: false
+  world:
+    description:
+      - Use a custom world file when checking for explicitly installed packages.
+    type: str
+    default: /etc/apk/world
+    version_added: 5.4.0
 notes:
-  - '"name" and "upgrade" are mutually exclusive.'
-  - When used with a `loop:` each package will be processed individually, it is much more efficient to pass the list directly to the `name` option.
+  - 'I(name) and I(upgrade) are mutually exclusive.'
+  - When used with a C(loop:) each package will be processed individually, it is much more efficient to pass the list directly to the I(name) option.
 '''
 
 EXAMPLES = '''
 - name: Update repositories and install foo package
   community.general.apk:
     name: foo
-    update_cache: yes
+    update_cache: true
 
 - name: Update repositories and install foo and bar packages
   community.general.apk:
     name: foo,bar
-    update_cache: yes
+    update_cache: true
 
 - name: Remove foo package
   community.general.apk:
@@ -101,39 +108,45 @@ EXAMPLES = '''
   community.general.apk:
     name: foo
     state: latest
-    update_cache: yes
+    update_cache: true
 
 - name: Update repositories and update packages foo and bar to latest versions
   community.general.apk:
     name: foo,bar
     state: latest
-    update_cache: yes
+    update_cache: true
 
 - name: Update all installed packages to the latest versions
   community.general.apk:
-    upgrade: yes
+    upgrade: true
 
 - name: Upgrade / replace / downgrade / uninstall all installed packages to the latest versions available
   community.general.apk:
-    available: yes
-    upgrade: yes
+    available: true
+    upgrade: true
 
 - name: Update repositories as a separate step
   community.general.apk:
-    update_cache: yes
+    update_cache: true
 
 - name: Install package from a specific repository
   community.general.apk:
     name: foo
     state: latest
-    update_cache: yes
+    update_cache: true
     repository: http://dl-3.alpinelinux.org/alpine/edge/main
 
 - name: Install package without using cache
   community.general.apk:
     name: foo
     state: latest
-    no_cache: yes
+    no_cache: true
+
+- name: Install package checking a custom world
+  community.general.apk:
+    name: foo
+    state: latest
+    world: /etc/apk/world.custom
 '''
 
 RETURN = '''
@@ -171,11 +184,11 @@ def update_package_db(module, exit):
         return True
 
 
-def query_toplevel(module, name):
-    # /etc/apk/world contains a list of top-level packages separated by ' ' or \n
+def query_toplevel(module, name, world):
+    # world contains a list of top-level packages separated by ' ' or \n
     # packages may contain repository (@) or version (=<>~) separator characters or start with negation !
     regex = re.compile(r'^' + re.escape(name) + r'([@=<>~].+)?$')
-    with open('/etc/apk/world') as f:
+    with open(world) as f:
         content = f.read().split()
         for p in content:
             if regex.search(p):
@@ -237,7 +250,7 @@ def upgrade_packages(module, available):
     module.exit_json(changed=True, msg="upgraded packages", stdout=stdout, stderr=stderr, packages=packagelist)
 
 
-def install_packages(module, names, state):
+def install_packages(module, names, state, world):
     upgrade = False
     to_install = []
     to_upgrade = []
@@ -250,7 +263,7 @@ def install_packages(module, names, state):
                 if state == 'latest' and not query_latest(module, dependency):
                     to_upgrade.append(dependency)
         else:
-            if not query_toplevel(module, name):
+            if not query_toplevel(module, name, world):
                 to_install.append(name)
             elif state == 'latest' and not query_latest(module, name):
                 to_upgrade.append(name)
@@ -313,6 +326,7 @@ def main():
             update_cache=dict(default=False, type='bool'),
             upgrade=dict(default=False, type='bool'),
             available=dict(default=False, type='bool'),
+            world=dict(default='/etc/apk/world', type='str'),
         ),
         required_one_of=[['name', 'update_cache', 'upgrade']],
         mutually_exclusive=[['name', 'upgrade']],
@@ -348,7 +362,7 @@ def main():
         upgrade_packages(module, p['available'])
 
     if p['state'] in ['present', 'latest']:
-        install_packages(module, p['name'], p['state'])
+        install_packages(module, p['name'], p['state'], p['world'])
     elif p['state'] == 'absent':
         remove_packages(module, p['name'])
 

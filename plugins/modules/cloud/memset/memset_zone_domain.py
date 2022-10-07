@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2018, Simon Weald <ansible@simonweald.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -110,7 +111,7 @@ def check(args=None):
     retvals['changed'] = has_changed
     retvals['failed'] = has_failed
 
-    return(retvals)
+    return retvals
 
 
 def create_zone_domain(args=None, zone_exists=None, zone_id=None, payload=None):
@@ -138,7 +139,7 @@ def create_zone_domain(args=None, zone_exists=None, zone_id=None, payload=None):
         if not has_failed:
             has_changed = True
 
-    return(has_failed, has_changed, msg)
+    return has_failed, has_changed, msg
 
 
 def delete_zone_domain(args=None, payload=None):
@@ -165,7 +166,7 @@ def delete_zone_domain(args=None, payload=None):
             # unset msg as we don't want to return unnecessary info to the user.
             msg = None
 
-    return(has_failed, has_changed, memset_api, msg)
+    return has_failed, has_changed, memset_api, msg
 
 
 def create_or_delete_domain(args=None):
@@ -188,7 +189,7 @@ def create_or_delete_domain(args=None):
         retvals['failed'] = has_failed
         retvals['msg'] = msg
         retvals['stderr'] = "API returned an error: {0}" . format(response.status_code)
-        return(retvals)
+        return retvals
 
     zone_exists, msg, counter, zone_id = get_zone_id(zone_name=args['zone'], current_zones=response.json())
 
@@ -203,7 +204,7 @@ def create_or_delete_domain(args=None):
 
         retvals['failed'] = has_failed
         retvals['msg'] = stderr
-        return(retvals)
+        return retvals
 
     if args['state'] == 'present':
         has_failed, has_changed, msg = create_zone_domain(args=args, zone_exists=zone_exists, zone_id=zone_id, payload=payload)
@@ -217,7 +218,7 @@ def create_or_delete_domain(args=None):
         if val is not None:
             retvals[val] = eval(val)
 
-    return(retvals)
+    return retvals
 
 
 def main():

@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2017-present Alibaba Group Holding Limited. He Guimin <heguimin36@163.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 #
 #  This file is part of Ansible
 #
@@ -45,12 +46,12 @@ options:
       type: str
     image_id:
       description:
-        - Image ID used to launch instances. Required when C(state=present) and creating new ECS instances.
+        - Image ID used to launch instances. Required when I(state=present) and creating new ECS instances.
       aliases: ['image']
       type: str
     instance_type:
       description:
-        - Instance type used to launch instances. Required when C(state=present) and creating new ECS instances.
+        - Instance type used to launch instances. Required when I(state=present) and creating new ECS instances.
       aliases: ['type']
       type: str
     security_groups:
@@ -89,7 +90,7 @@ options:
     max_bandwidth_out:
       description:
         - Maximum outgoing bandwidth to the public network, measured in Mbps (Megabits per second).
-          Required when C(allocate_public_ip=True). Ignored when C(allocate_public_ip=False).
+          Required when I(allocate_public_ip=true). Ignored when I(allocate_public_ip=false).
       default: 0
       type: int
     host_name:
@@ -100,7 +101,7 @@ options:
       description:
         - Specifies whether to add sequential suffixes to the host_name.
           The sequential suffix ranges from 001 to 999.
-      default: False
+      default: false
       type: bool
       version_added: '0.2.0'
     password:
@@ -142,7 +143,7 @@ options:
     allocate_public_ip:
       description:
         - Whether allocate a public ip for the new instance.
-      default: False
+      default: false
       aliases: [ 'assign_public_ip' ]
       type: bool
     instance_charge_type:
@@ -153,7 +154,7 @@ options:
       type: str
     period:
       description:
-        - The charge duration of the instance, in month. Required when C(instance_charge_type=PrePaid).
+        - The charge duration of the instance, in months. Required when I(instance_charge_type=PrePaid).
         - The valid value are [1-9, 12, 24, 36].
       default: 1
       type: int
@@ -161,10 +162,10 @@ options:
       description:
         - Whether automate renew the charge of the instance.
       type: bool
-      default: False
+      default: false
     auto_renew_period:
       description:
-        - The duration of the automatic renew the charge of the instance. Required when C(auto_renew=True).
+        - The duration of the automatic renew the charge of the instance. Required when I(auto_renew=true).
       choices: [1, 2, 3, 6, 12]
       type: int
     instance_ids:
@@ -176,7 +177,7 @@ options:
     force:
       description:
         - Whether the current operation needs to be execute forcibly.
-      default: False
+      default: false
       type: bool
     tags:
       description:
@@ -188,7 +189,7 @@ options:
       description:
         - Delete any tags not specified in the task that are on the instance.
           If True, it means you have to specify all the desired tags on each task affecting an instance.
-      default: False
+      default: false
       type: bool
       version_added: '0.2.0'
     key_name:
@@ -216,32 +217,32 @@ options:
       version_added: '0.2.0'
     spot_strategy:
       description:
-         - The bidding mode of the pay-as-you-go instance. This parameter is valid when InstanceChargeType is set to PostPaid.
+        - The bidding mode of the pay-as-you-go instance. This parameter is valid when InstanceChargeType is set to PostPaid.
       choices: ['NoSpot', 'SpotWithPriceLimit', 'SpotAsPriceGo']
       default: 'NoSpot'
       type: str
       version_added: '0.2.0'
     period_unit:
       description:
-         - The duration unit that you will buy the resource. It is valid when C(instance_charge_type=PrePaid)
+        - The duration unit that you will buy the resource. It is valid when I(instance_charge_type=PrePaid).
       choices: ['Month', 'Week']
       default: 'Month'
       type: str
       version_added: '0.2.0'
     dry_run:
       description:
-         - Specifies whether to send a dry-run request.
-         - If I(dry_run=True), Only a dry-run request is sent and no instance is created. The system checks whether the
-           required parameters are set, and validates the request format, service permissions, and available ECS instances.
-           If the validation fails, the corresponding error code is returned. If the validation succeeds, the DryRunOperation error code is returned.
-         - If I(dry_run=False), A request is sent. If the validation succeeds, the instance is created.
-      default: False
+        - Specifies whether to send a dry-run request.
+        - If I(dry_run=true), Only a dry-run request is sent and no instance is created. The system checks whether the
+          required parameters are set, and validates the request format, service permissions, and available ECS instances.
+          If the validation fails, the corresponding error code is returned. If the validation succeeds, the DryRunOperation error code is returned.
+        - If I(dry_run=false), A request is sent. If the validation succeeds, the instance is created.
+      default: false
       type: bool
       version_added: '0.2.0'
     include_data_disks:
       description:
-         - Whether to change instance disks charge type when changing instance charge type.
-      default: True
+        - Whether to change instance disks charge type when changing instance charge type.
+      default: true
       type: bool
       version_added: '0.2.0'
 author:
@@ -264,7 +265,7 @@ EXAMPLES = '''
     image: ubuntu1404_64_40G_cloudinit_20160727.raw
     instance_type: ecs.n4.small
     vswitch_id: vsw-abcd1234
-    assign_public_ip: True
+    assign_public_ip: true
     max_bandwidth_out: 10
     host_name: myhost
     password: mypassword
@@ -274,7 +275,7 @@ EXAMPLES = '''
     security_groups: ["sg-f2rwnfh23r"]
 
     instance_ids: ["i-abcd12346", "i-abcd12345"]
-    force: True
+    force: true
 
   tasks:
     - name: Launch ECS instance in VPC network
@@ -616,18 +617,10 @@ ids:
 
 import re
 import time
-import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import ecs_argument_spec, ecs_connect
-
-HAS_FOOTMARK = False
-FOOTMARK_IMP_ERR = None
-try:
-    from footmark.exception import ECSResponseError
-    HAS_FOOTMARK = True
-except ImportError:
-    FOOTMARK_IMP_ERR = traceback.format_exc()
-    HAS_FOOTMARK = False
+from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import (
+    ecs_argument_spec, ecs_connect, FOOTMARK_IMP_ERR, HAS_FOOTMARK
+)
 
 
 def get_instances_info(connection, ids):

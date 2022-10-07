@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# (c) 2015, Steve Gargan <steve.gargan@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2015, Steve Gargan <steve.gargan@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -69,7 +70,7 @@ options:
         description:
           - whether to verify the TLS certificate of the consul agent
         type: bool
-        default: 'yes'
+        default: true
     notes:
         type: str
         description:
@@ -333,7 +334,7 @@ def add_service(module, service):
                      service_id=result.id,
                      service_name=result.name,
                      service_port=result.port,
-                     checks=[check.to_dict() for check in service.checks],
+                     checks=[check.to_dict() for check in service.checks()],
                      tags=result.tags)
 
 

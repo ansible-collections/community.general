@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2017, Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # Cronvar Plugin: The goal of this plugin is to provide an idempotent
 # method for set cron variable values.  It should play well with the
@@ -28,20 +29,20 @@ options:
     description:
       - Name of the crontab variable.
     type: str
-    required: yes
+    required: true
   value:
     description:
       - The value to set this variable to.
-      - Required if C(state=present).
+      - Required if I(state=present).
     type: str
   insertafter:
     description:
       - If specified, the variable will be inserted after the variable specified.
-      - Used with C(state=present).
+      - Used with I(state=present).
     type: str
   insertbefore:
     description:
-      - Used with C(state=present). If specified, the variable will be inserted
+      - Used with I(state=present). If specified, the variable will be inserted
         just before the variable specified.
     type: str
   state:
@@ -66,7 +67,7 @@ options:
       - If set, create a backup of the crontab before it is modified.
         The location of the backup is returned in the C(backup) variable by this module.
     type: bool
-    default: no
+    default: false
 requirements:
   - cron
 author:

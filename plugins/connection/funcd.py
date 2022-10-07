@@ -3,7 +3,8 @@
 # Based on chroot.py (c) 2013, Maykel Moya <mmoya@speedyrails.com>
 # Copyright (c) 2013, Michael Scherer <misc@zarb.org>
 # Copyright (c) 2017 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -63,7 +64,7 @@ class Connection(ConnectionBase):
         self.client = fc.Client(self.host)
         return self
 
-    def exec_command(self, cmd, become_user=None, sudoable=False, executable='/bin/sh', in_data=None):
+    def exec_command(self, cmd, in_data=None, sudoable=True):
         """ run a command on the remote minion """
 
         if in_data:

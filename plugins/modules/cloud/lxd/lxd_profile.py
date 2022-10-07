@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016, Hiroaki Nakamura <hnakamur@gmail.com>
-# Copyright: (c) 2020, Frank Dornheim <dornheim@posteo.de>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Hiroaki Nakamura <hnakamur@gmail.com>
+# Copyright (c) 2020, Frank Dornheim <dornheim@posteo.de>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -222,7 +223,7 @@ actions:
   description: List of actions performed for the profile.
   returned: success
   type: list
-  sample: '["create"]'
+  sample: ["create"]
 '''
 
 import os
@@ -360,7 +361,7 @@ class LXDProfileManagement(object):
         )
 
     def _merge_dicts(self, source, destination):
-        """Merge Dictionarys
+        """Merge Dictionaries
 
         Get a list of filehandle numbers from logger to be handed to
         DaemonContext.files_preserve

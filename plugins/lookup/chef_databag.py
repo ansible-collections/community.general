@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-# (c) 2016, Josh Bradley <jbradley(at)digitalocean.com>
-# (c) 2017 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Josh Bradley <jbradley(at)digitalocean.com>
+# Copyright (c) 2017 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -16,16 +17,16 @@ DOCUMENTATION = '''
          The lookup order mirrors the one from Chef, all folders in the base path are walked back looking for the following configuration
          file in order : .chef/knife.rb, ~/.chef/knife.rb, /etc/chef/client.rb"
     requirements:
-        - "pychef (python library https://pychef.readthedocs.io `pip install pychef`)"
+        - "pychef (L(Python library, https://pychef.readthedocs.io), C(pip install pychef))"
     options:
         name:
           description:
             - Name of the databag
-          required: True
+          required: true
         item:
           description:
             - Item to fetch
-          required: True
+          required: true
 '''
 
 EXAMPLES = """

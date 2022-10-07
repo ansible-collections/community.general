@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2019 Dell EMC Inc.
-# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -14,44 +15,44 @@ short_description: Gather PowerEdge server information through iDRAC using Redfi
 description:
   - Builds Redfish URIs locally and sends them to remote iDRAC controllers to
     get information back.
-  - For use with Dell EMC iDRAC operations that require Redfish OEM extensions
+  - For use with Dell EMC iDRAC operations that require Redfish OEM extensions.
   - This module was called C(idrac_redfish_facts) before Ansible 2.9, returning C(ansible_facts).
     Note that the M(community.general.idrac_redfish_info) module no longer returns C(ansible_facts)!
 options:
   category:
     required: true
     description:
-      - Category to execute on iDRAC controller
+      - Category to execute on iDRAC.
     type: str
   command:
     required: true
     description:
-      - List of commands to execute on iDRAC controller
+      - List of commands to execute on iDRAC.
       - C(GetManagerAttributes) returns the list of dicts containing iDRAC,
-        LifecycleController and System attributes
+        LifecycleController and System attributes.
     type: list
     elements: str
   baseuri:
     required: true
     description:
-      - Base URI of iDRAC controller
+      - Base URI of iDRAC.
     type: str
   username:
     description:
-      - User for authentication with iDRAC controller
+      - Username for authenticating to iDRAC.
     type: str
   password:
     description:
-      - Password for authentication with iDRAC controller
+      - Password for authenticating to iDRAC.
     type: str
   auth_token:
     description:
-      - Security token for authentication with OOB controller
+      - Security token for authenticating to iDRAC.
     type: str
     version_added: 2.3.0
   timeout:
     description:
-      - Timeout in seconds for URL requests to OOB controller
+      - Timeout in seconds for HTTP requests to iDRAC.
     default: 10
     type: int
 

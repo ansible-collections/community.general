@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016, Kamil Szczygiel <kamil.szczygiel () intel.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Kamil Szczygiel <kamil.szczygiel () intel.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 
@@ -76,8 +77,8 @@ EXAMPLES = r'''
       policy_name: test
       duration: 1h
       replication: 1
-      ssl: yes
-      validate_certs: yes
+      ssl: true
+      validate_certs: true
       state: present
 
 - name: Create 1 day retention policy with 1 hour shard group duration
@@ -107,8 +108,8 @@ EXAMPLES = r'''
       policy_name: test
       duration: INF
       replication: 1
-      ssl: no
-      validate_certs: no
+      ssl: false
+      validate_certs: false
       shard_group_duration: 1w
       state: present
 
@@ -119,8 +120,8 @@ EXAMPLES = r'''
       policy_name: test
       duration: 5d1h30m
       replication: 1
-      ssl: no
-      validate_certs: no
+      ssl: false
+      validate_certs: false
       shard_group_duration: 1d10h30m
       state: present
 

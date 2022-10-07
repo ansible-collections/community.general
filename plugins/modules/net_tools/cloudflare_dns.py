@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016 Michael Gruener <michael.gruener@chaosmoon.net>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016 Michael Gruener <michael.gruener@chaosmoon.net>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -43,39 +44,39 @@ options:
   algorithm:
     description:
     - Algorithm number.
-    - Required for C(type=DS) and C(type=SSHFP) when C(state=present).
+    - Required for I(type=DS) and I(type=SSHFP) when I(state=present).
     type: int
   cert_usage:
     description:
     - Certificate usage number.
-    - Required for C(type=TLSA) when C(state=present).
+    - Required for I(type=TLSA) when I(state=present).
     type: int
     choices: [ 0, 1, 2, 3 ]
   hash_type:
     description:
     - Hash type number.
-    - Required for C(type=DS), C(type=SSHFP) and C(type=TLSA) when C(state=present).
+    - Required for I(type=DS), I(type=SSHFP) and I(type=TLSA) when I(state=present).
     type: int
     choices: [ 1, 2 ]
   key_tag:
     description:
     - DNSSEC key tag.
-    - Needed for C(type=DS) when C(state=present).
+    - Needed for I(type=DS) when I(state=present).
     type: int
   port:
     description:
     - Service port.
-    - Required for C(type=SRV) and C(type=TLSA).
+    - Required for I(type=SRV) and I(type=TLSA).
     type: int
   priority:
     description:
     - Record priority.
-    - Required for C(type=MX) and C(type=SRV)
+    - Required for I(type=MX) and I(type=SRV)
     default: 1
     type: int
   proto:
     description:
-    - Service protocol. Required for C(type=SRV) and C(type=TLSA).
+    - Service protocol. Required for I(type=SRV) and I(type=TLSA).
     - Common values are TCP and UDP.
     - Before Ansible 2.6 only TCP and UDP were available.
     type: str
@@ -83,11 +84,11 @@ options:
     description:
     - Proxy through Cloudflare network or just use DNS.
     type: bool
-    default: no
+    default: false
   record:
     description:
     - Record to add.
-    - Required if C(state=present).
+    - Required if I(state=present).
     - Default is C(@) (e.g. the zone name).
     type: str
     default: '@'
@@ -95,7 +96,7 @@ options:
   selector:
     description:
     - Selector number.
-    - Required for C(type=TLSA) when C(state=present).
+    - Required for I(type=TLSA) when I(state=present).
     choices: [ 0, 1 ]
     type: int
   service:
@@ -106,7 +107,7 @@ options:
   solo:
     description:
     - Whether the record should be the only one for that record type and record name.
-    - Only use with C(state=present).
+    - Only use with I(state=present).
     - This will delete all other records with the same record name and type.
     type: bool
   state:
@@ -128,20 +129,20 @@ options:
     default: 1
   type:
     description:
-      - The type of DNS record to create. Required if C(state=present).
-      - C(type=DS), C(type=SSHFP) and C(type=TLSA) added in Ansible 2.7.
+      - The type of DNS record to create. Required if I(state=present).
+      - I(type=DS), I(type=SSHFP) and I(type=TLSA) added in Ansible 2.7.
     type: str
     choices: [ A, AAAA, CNAME, DS, MX, NS, SPF, SRV, SSHFP, TLSA, TXT ]
   value:
     description:
     - The record value.
-    - Required for C(state=present).
+    - Required for I(state=present).
     type: str
     aliases: [ content ]
   weight:
     description:
     - Service weight.
-    - Required for C(type=SRV).
+    - Required for I(type=SRV).
     type: int
     default: 1
   zone:
@@ -205,7 +206,7 @@ EXAMPLES = r'''
     zone: example.net
     type: CNAME
     value: example.com
-    proxied: yes
+    proxied: true
     account_email: test@example.com
     account_api_key: dummyapitoken
     state: present
@@ -303,7 +304,7 @@ record:
             description: No documentation available.
             returned: success
             type: bool
-            sample: False
+            sample: false
         meta:
             description: No documentation available.
             returned: success
@@ -328,12 +329,12 @@ record:
             description: Whether this record can be proxied through Cloudflare.
             returned: success
             type: bool
-            sample: False
+            sample: false
         proxied:
             description: Whether the record is proxied through Cloudflare.
             returned: success
             type: bool
-            sample: False
+            sample: false
         ttl:
             description: The time-to-live for the record.
             returned: success

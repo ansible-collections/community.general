@@ -1,14 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Benjamin Jolivot <bjolivot@gmail.com>
+# Copyright (c) Benjamin Jolivot <bjolivot@gmail.com>
 # Inspired by slack module :
-#    # (c) 2017, Steve Pletcher <steve@steve-pletcher.com>
-#    # (c) 2016, René Moser <mail@renemoser.net>
-#    # (c) 2015, Stefan Berggren <nsg@nsg.cc>
-#    # (c) 2014, Ramon de la Fuente <ramon@delafuente.nl>)
+#    # Copyright (c) 2017, Steve Pletcher <steve@steve-pletcher.com>
+#    # Copyright (c) 2016, René Moser <mail@renemoser.net>
+#    # Copyright (c) 2015, Stefan Berggren <nsg@nsg.cc>
+#    # Copyright (c) 2014, Ramon de la Fuente <ramon@delafuente.nl>)
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -63,9 +64,9 @@ options:
     default: https://www.ansible.com/favicon.ico
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be used
+      - If C(false), SSL certificates will not be validated. This should only be used
         on personally controlled sites using self-signed certificates.
-    default: yes
+    default: true
     type: bool
 '''
 
@@ -96,10 +97,10 @@ EXAMPLES = """
         fields:
           - title: System A
             value: "load average: 0,74, 0,66, 0,63"
-            short: True
+            short: true
           - title: System B
             value: 'load average: 5,16, 4,64, 2,43'
-            short: True
+            short: true
 """
 
 RETURN = '''

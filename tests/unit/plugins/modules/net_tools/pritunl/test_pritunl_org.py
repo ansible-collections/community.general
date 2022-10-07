@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-# (c) 2021 Florian Dambrine <android.florian@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2021 Florian Dambrine <android.florian@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 
@@ -109,7 +110,7 @@ class TestPritunlOrg(ModuleTestCase):
         idempotent_exc = idempotent_result.exception.args[0]
 
         # Ensure both calls resulted in the same returned value
-        # except for changed which sould be false the second time
+        # except for changed which should be false the second time
         for k, v in iteritems(idempotent_exc):
             if k == "changed":
                 self.assertFalse(idempotent_exc[k])
@@ -158,7 +159,7 @@ class TestPritunlOrg(ModuleTestCase):
         idempotent_exc = idempotent_result.exception.args[0]
 
         # Ensure both calls resulted in the same returned value
-        # except for changed which sould be false the second time
+        # except for changed which should be false the second time
         self.assertFalse(idempotent_exc["changed"])
         self.assertEqual(idempotent_exc["response"], delete_exc["response"])
 

@@ -1,0 +1,35 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: Verify REUSE
+
+on:
+  push:
+    branches: [main]
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+  # Run CI once per day (at 07:30 UTC)
+  schedule:
+    - cron: '30 7 * * *'
+
+jobs:
+  check:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha || '' }}
+
+      - name: Install dependencies
+        run: |
+          pip install reuse
+
+      - name: Check REUSE compliance
+        run: |
+          reuse lint

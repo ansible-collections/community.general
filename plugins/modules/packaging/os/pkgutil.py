@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2013, Alexander Winkler <mail () winkler-alexander.de>
+# Copyright (c) 2013, Alexander Winkler <mail () winkler-alexander.de>
 # based on svr4pkg by
 #  Boyd Adamson <boyd () boydadamson.com> (2012)
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -26,7 +27,7 @@ options:
   name:
     description:
     - The name of the package.
-    - When using C(state=latest), this can be C('*'), which updates all installed packages managed by pkgutil.
+    - When using I(state=latest), this can be C('*'), which updates all installed packages managed by pkgutil.
     type: list
     required: true
     elements: str
@@ -46,12 +47,12 @@ options:
     choices: [ absent, installed, latest, present, removed ]
   update_catalog:
     description:
-    - If you always want to refresh your catalog from the mirror, even when it's not stale, set this to C(yes).
+    - If you always want to refresh your catalog from the mirror, even when it's not stale, set this to C(true).
     type: bool
-    default: no
+    default: false
   force:
     description:
-    - To allow the update process to downgrade packages to match what is present in the repository, set this to C(yes).
+    - To allow the update process to downgrade packages to match what is present in the repository, set this to C(true).
     - This is useful for rolling back to stable from testing, or similar operations.
     type: bool
     default: false
@@ -93,7 +94,7 @@ EXAMPLES = r'''
   community.general.pkgutil:
     name: '*'
     state: latest
-    force: yes
+    force: true
 '''
 
 RETURN = r''' # '''

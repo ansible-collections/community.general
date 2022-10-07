@@ -1,4 +1,8 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
   - name: Setup test fixture
     copy:
       src: fixtures/ansible-xml-beers.xml
@@ -11,6 +15,9 @@
       xpath: /business/website/address
       value: ''
     register: set_element_value_empty
+
+  - name: Add trailing newline
+    shell: echo "" >> /tmp/ansible-xml-beers.xml
 
   - name: Compare to expected result
     copy:

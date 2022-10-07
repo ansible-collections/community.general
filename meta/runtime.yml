@@ -1,4 +1,8 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 requires_ansible: '>=2.11.0'
 plugin_routing:
   connection:
@@ -292,6 +296,8 @@ plugin_routing:
       redirect: community.google.gce_tag
     gconftool2:
       redirect: community.general.system.gconftool2
+    gconftool2_info:
+      redirect: community.general.system.gconftool2_info
     gcp_backend_service:
       tombstone:
         removal_version: 2.0.0
@@ -606,6 +612,12 @@ plugin_routing:
       redirect: community.general.identity.keycloak.keycloak_role
     keycloak_user_federation:
       redirect: community.general.identity.keycloak.keycloak_user_federation
+    keycloak_user_rolemapping:
+      redirect: community.general.identity.keycloak.keycloak_user_rolemapping
+    keyring:
+      redirect: community.general.system.keyring
+    keyring_info:
+      redirect: community.general.system.keyring_info
     kibana_plugin:
       redirect: community.general.database.misc.kibana_plugin
     kubevirt_cdi_upload:
@@ -1121,6 +1133,8 @@ plugin_routing:
       redirect: community.general.packaging.language.pip_package_info
     pipx:
       redirect: community.general.packaging.language.pipx
+    pipx_info:
+      redirect: community.general.packaging.language.pipx_info
     pkg5:
       redirect: community.general.packaging.os.pkg5
     pkg5_publisher:
@@ -1201,6 +1215,8 @@ plugin_routing:
       redirect: community.general.cloud.profitbricks.profitbricks_volume_attachments
     proxmox:
       redirect: community.general.cloud.misc.proxmox
+    proxmox_disk:
+      redirect: community.general.cloud.misc.proxmox_disk
     proxmox_domain_info:
       redirect: community.general.cloud.misc.proxmox_domain_info
     proxmox_group_info:
@@ -1355,6 +1371,8 @@ plugin_routing:
       redirect: community.general.notification.say
     scaleway_compute:
       redirect: community.general.cloud.scaleway.scaleway_compute
+    scaleway_compute_private_network:
+      redirect: community.general.cloud.scaleway.scaleway_compute_private_network
     scaleway_database_backup:
       redirect: community.general.cloud.scaleway.scaleway_database_backup
     scaleway_image_facts:
@@ -1597,6 +1615,10 @@ plugin_routing:
       redirect: community.general.cloud.smartos.vmadm
     wakeonlan:
       redirect: community.general.remote_management.wakeonlan
+    wdc_redfish_command:
+      redirect: community.general.remote_management.redfish.wdc_redfish_command
+    wdc_redfish_info:
+      redirect: community.general.remote_management.redfish.wdc_redfish_info
     webfaction_app:
       redirect: community.general.cloud.webfaction.webfaction_app
     webfaction_db:

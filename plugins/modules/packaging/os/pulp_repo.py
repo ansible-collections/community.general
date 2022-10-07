@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2016, Joe Adams <@sysadmind>
+# Copyright (c) 2016, Joe Adams <@sysadmind>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -22,7 +23,7 @@ options:
     description:
       - Whether or not to add the export distributor to new C(rpm) repositories.
     type: bool
-    default: no
+    default: false
   feed:
     description:
       - Upstream feed URL to receive updates from.
@@ -35,14 +36,14 @@ options:
         properly send a 401, logins will fail. This option forces the sending of
         the Basic authentication header upon initial request.
     type: bool
-    default: no
+    default: false
   generate_sqlite:
     description:
       - Boolean flag to indicate whether sqlite files should be generated during
         a repository publish.
     required: false
     type: bool
-    default: no
+    default: false
   feed_ca_cert:
     description:
       - CA certificate string used to validate the feed source SSL certificate.
@@ -119,20 +120,20 @@ options:
   repoview:
     description:
       - Whether to generate repoview files for a published repository. Setting
-        this to "yes" automatically activates `generate_sqlite`.
+        this to C(true) automatically activates C(generate_sqlite).
     required: false
     type: bool
-    default: no
+    default: false
   serve_http:
     description:
       - Make the repo available over HTTP.
     type: bool
-    default: no
+    default: false
   serve_https:
     description:
       - Make the repo available over HTTPS.
     type: bool
-    default: yes
+    default: true
   state:
     description:
       - The repo state. A state of C(sync) will queue a sync of the repo.
@@ -151,15 +152,15 @@ options:
       - The username for use in HTTP basic authentication to the pulp API.
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be
+      - If C(false), SSL certificates will not be validated. This should only be
         used on personally controlled sites using self-signed certificates.
     type: bool
-    default: yes
+    default: true
   wait_for_completion:
     description:
       - Wait for asynchronous tasks to complete before returning.
     type: bool
-    default: no
+    default: false
 notes:
   - This module can currently only create distributors and importers on rpm
     repositories. Contributions to support other repo types are welcome.
@@ -182,7 +183,7 @@ EXAMPLES = '''
     relative_url: centos/6/updates
     url_username: admin
     url_password: admin
-    force_basic_auth: yes
+    force_basic_auth: true
     state: present
 
 - name: Remove a repo from the pulp server

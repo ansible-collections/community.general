@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017 Red Hat Inc.
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -64,7 +65,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: False
+      validate_certs: false
 
 - name: Delete an alert profile from ManageIQ
   community.general.manageiq_alert_profiles:
@@ -74,7 +75,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: False
+      validate_certs: false
 '''
 
 RETURN = '''
@@ -238,7 +239,7 @@ class ManageIQAlertProfiles(object):
             except Exception as e:
                 msg = "Updating profile '{name}' failed: {error}"
                 msg = msg.format(name=old_profile['name'], error=e)
-                self.module.fail_json(msg=msg, result=result)
+                self.module.fail_json(msg=msg)
 
         if changed:
             msg = "Profile {name} updated successfully".format(name=desired_profile['name'])

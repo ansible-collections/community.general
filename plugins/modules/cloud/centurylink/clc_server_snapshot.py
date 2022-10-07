@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2015 CenturyLink
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -18,26 +19,26 @@ options:
     description:
       - The list of CLC server Ids.
     type: list
-    required: True
+    required: true
     elements: str
   expiration_days:
     description:
       - The number of days to keep the server snapshot before it expires.
     type: int
     default: 7
-    required: False
+    required: false
   state:
     description:
       - The state to insure that the provided resources are in.
     type: str
     default: 'present'
-    required: False
+    required: false
     choices: ['present', 'absent', 'restore']
   wait:
     description:
       - Whether to wait for the provisioning tasks to finish before returning.
     default: 'True'
-    required: False
+    required: false
     type: str
 requirements:
     - python = 2.7
@@ -65,7 +66,7 @@ EXAMPLES = '''
         - UC1TEST-SVR01
         - UC1TEST-SVR02
     expiration_days: 10
-    wait: True
+    wait: true
     state: present
 
 - name: Restore server snapshot
@@ -73,7 +74,7 @@ EXAMPLES = '''
     server_ids:
         - UC1TEST-SVR01
         - UC1TEST-SVR02
-    wait: True
+    wait: true
     state: restore
 
 - name: Delete server snapshot
@@ -81,7 +82,7 @@ EXAMPLES = '''
     server_ids:
         - UC1TEST-SVR01
         - UC1TEST-SVR02
-    wait: True
+    wait: true
     state: absent
 '''
 

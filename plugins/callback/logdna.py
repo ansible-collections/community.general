@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-# (c) 2018, Samir Musali <samir.musali@logdna.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2018, Samir Musali <samir.musali@logdna.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -17,7 +18,7 @@ DOCUMENTATION = '''
       - whitelisting in configuration
     options:
       conf_key:
-        required: True
+        required: true
         description: LogDNA Ingestion Key
         type: string
         env:
@@ -26,7 +27,7 @@ DOCUMENTATION = '''
           - section: callback_logdna
             key: conf_key
       plugin_ignore_errors:
-        required: False
+        required: false
         description: Whether to ignore errors on failing or not
         type: boolean
         env:
@@ -34,9 +35,9 @@ DOCUMENTATION = '''
         ini:
           - section: callback_logdna
             key: plugin_ignore_errors
-        default: False
+        default: false
       conf_hostname:
-        required: False
+        required: false
         description: Alternative Host Name; the current host name by default
         type: string
         env:
@@ -45,7 +46,7 @@ DOCUMENTATION = '''
           - section: callback_logdna
             key: conf_hostname
       conf_tags:
-        required: False
+        required: false
         description: Tags
         type: string
         env:

@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2014, Dimitrios Tydeas Mengidis <tydeas.dr@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2014, Dimitrios Tydeas Mengidis <tydeas.dr@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -40,7 +41,7 @@ options:
         description:
             - Directory of your project (see --working-dir). This is required when
               the command is not run globally.
-            - Will be ignored if C(global_command=true).
+            - Will be ignored if I(global_command=true).
     global_command:
         description:
             - Runs the specified command globally.
@@ -81,7 +82,7 @@ options:
     classmap_authoritative:
         description:
             - Autoload classes from classmap only.
-            - Implicitely enable optimize_autoloader.
+            - Implicitly enable optimize_autoloader.
             - Recommended especially for production, but can take a bit of time to run.
         default: false
         type: bool
@@ -125,12 +126,12 @@ EXAMPLES = '''
     command: create-project
     arguments: package/package /path/to/project ~1.0
     working_dir: /path/to/project
-    prefer_dist: yes
+    prefer_dist: true
 
 - name: Install a package globally
   community.general.composer:
     command: require
-    global_command: yes
+    global_command: true
     arguments: my/package
 '''
 

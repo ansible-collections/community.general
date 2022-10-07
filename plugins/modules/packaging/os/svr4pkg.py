@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2012, Boyd Adamson <boyd () boydadamson.com>
+# Copyright (c) 2012, Boyd Adamson <boyd () boydadamson.com>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -38,13 +39,13 @@ options:
 
   src:
     description:
-      - Specifies the location to install the package from. Required when C(state=present).
+      - Specifies the location to install the package from. Required when I(state=present).
       - "Can be any path acceptable to the C(pkgadd) command's C(-d) option. e.g.: C(somefile.pkg), C(/dir/with/pkgs), C(http:/server/mypkgs.pkg)."
       - If using a file or directory, they must already be accessible by the host. See the M(ansible.builtin.copy) module for a way to get them there.
     type: str
   proxy:
     description:
-      - HTTP[s] proxy to be used if C(src) is a URL.
+      - HTTP[s] proxy to be used if I(src) is a URL.
     type: str
   response_file:
     description:

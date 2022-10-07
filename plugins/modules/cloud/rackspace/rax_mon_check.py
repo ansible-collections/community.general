@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -75,15 +76,15 @@ options:
   target_hostname:
     type: str
     description:
-    - One of `target_hostname` and `target_alias` is required for remote.* checks,
+    - One of I(target_hostname) and I(target_alias) is required for remote.* checks,
       but prohibited for agent.* checks. The hostname this check should target.
       Must be a valid IPv4, IPv6, or FQDN.
   target_alias:
     type: str
     description:
-    - One of `target_alias` and `target_hostname` is required for remote.* checks,
+    - One of I(target_alias) and I(target_hostname) is required for remote.* checks,
       but prohibited for agent.* checks. Use the corresponding key in the entity's
-      `ip_addresses` hash to resolve an IP address to target.
+      I(ip_addresses) hash to resolve an IP address to target.
   details:
     type: dict
     description:
@@ -92,7 +93,7 @@ options:
       256 items.
   disabled:
     description:
-    - If "yes", ensure the check is created, but don't actually use it yet.
+    - If C(true), ensure the check is created, but don't actually use it yet.
     type: bool
     default: false
   metadata:
@@ -118,7 +119,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Create a monitoring check
-  gather_facts: False
+  gather_facts: false
   hosts: local
   connection: local
   tasks:

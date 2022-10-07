@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2013, André Paramés <git@andreparames.com>
+# Copyright (c) 2013, André Paramés <git@andreparames.com>
 # Based on the Git module by Michael DeHaan <michael.dehaan@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -21,12 +22,12 @@ options:
         description:
             - SSH or HTTP protocol address of the parent branch.
         aliases: [ parent ]
-        required: yes
+        required: true
         type: str
     dest:
         description:
             - Absolute path of where the branch should be cloned to.
-        required: yes
+        required: true
         type: path
     version:
         description:
@@ -36,11 +37,11 @@ options:
         type: str
     force:
         description:
-            - If C(yes), any modified files in the working
+            - If C(true), any modified files in the working
               tree will be discarded.  Before 1.9 the default
-              value was C(yes).
+              value was C(true).
         type: bool
-        default: 'no'
+        default: false
     executable:
         description:
             - Path to bzr executable to use. If not supplied,
@@ -111,7 +112,7 @@ class Bzr(object):
         tree since that commit.
         '''
         if not force and self.has_local_mods():
-            self.module.fail_json(msg="Local modifications exist in branch (force=no).")
+            self.module.fail_json(msg="Local modifications exist in branch (force=false).")
         return self._command(["revert"], check_rc=True, cwd=self.dest)
 
     def fetch(self):

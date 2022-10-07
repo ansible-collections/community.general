@@ -1,4 +1,8 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - block:
   - name: Install cargo
     package:
@@ -7,8 +11,18 @@
   - set_fact:
       has_cargo: true
   when:
-    - ansible_system != 'FreeBSD' or ansible_distribution_version is version('13.0', '>')
+    - ansible_system != 'FreeBSD'
     - ansible_distribution != 'MacOSX'
     - ansible_distribution != 'RedHat' or ansible_distribution_version is version('8.0', '>=')
     - ansible_distribution != 'CentOS' or ansible_distribution_version is version('7.0', '>=')
     - ansible_distribution != 'Ubuntu' or ansible_distribution_version is version('18', '>=')
+
+- block:
+  - name: Install rust (containing cargo)
+    package:
+      name: rust
+      state: present
+  - set_fact:
+      has_cargo: true
+  when:
+    - ansible_system == 'FreeBSD' and ansible_distribution_version is version('13.0', '>')

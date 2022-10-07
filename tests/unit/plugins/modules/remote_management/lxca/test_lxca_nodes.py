@@ -1,4 +1,6 @@
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) Ansible project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -77,8 +79,8 @@ class TestMyModule():
         }
         mod_obj.params = args
         lxca_nodes.main()
-        assert(mock.call(argument_spec=expected_arguments_spec,
-                         supports_check_mode=False) == ansible_mod_cls.call_args)
+        assert mock.call(argument_spec=expected_arguments_spec,
+                         supports_check_mode=False) == ansible_mod_cls.call_args
 
     @mock.patch('ansible_collections.community.general.plugins.module_utils.remote_management.lxca.common.setup_conn', autospec=True)
     @mock.patch('ansible_collections.community.general.plugins.modules.remote_management.lxca.lxca_nodes._nodes_by_uuid',

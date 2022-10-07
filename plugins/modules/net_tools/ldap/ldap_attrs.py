@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2019, Maciej Delmanowski <drybjed@gmail.com>
-# Copyright: (c) 2017, Alexander Korinek <noles@a3k.net>
-# Copyright: (c) 2016, Peter Sagerson <psagers@ignorare.net>
-# Copyright: (c) 2016, Jiri Tyr <jiri.tyr@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2019, Maciej Delmanowski <drybjed@gmail.com>
+# Copyright (c) 2017, Alexander Korinek <noles@a3k.net>
+# Copyright (c) 2016, Peter Sagerson <psagers@ignorare.net>
+# Copyright (c) 2016, Jiri Tyr <jiri.tyr@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -61,9 +62,9 @@ options:
   ordered:
     required: false
     type: bool
-    default: 'no'
+    default: false
     description:
-      - If C(yes), prepend list values with X-ORDERED index numbers in all
+      - If C(true), prepend list values with X-ORDERED index numbers in all
         attributes specified in the current task. This is useful mostly with
         I(olcAccess) attribute to easily manage LDAP Access Control Lists.
 extends_documentation_fragment:
@@ -114,7 +115,7 @@ EXAMPLES = r'''
             to dn.base="dc=example,dc=com"
             by dn="cn=admin,dc=example,dc=com" write
             by * read
-    ordered: yes
+    ordered: true
     state: exact
 
 - name: Declare some indexes
@@ -160,7 +161,8 @@ modlist:
   description: list of modified parameters
   returned: success
   type: list
-  sample: '[[2, "olcRootDN", ["cn=root,dc=example,dc=com"]]]'
+  sample:
+    - [2, "olcRootDN", ["cn=root,dc=example,dc=com"]]
 '''
 
 import traceback

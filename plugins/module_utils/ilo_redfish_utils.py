@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
-# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -91,7 +92,7 @@ class iLORedfishUtils(RedfishUtils):
         data = response['data']
 
         ntp_list = data[setkey]
-        if(len(ntp_list) == 2):
+        if len(ntp_list) == 2:
             ntp_list.pop(0)
 
         ntp_list.append(mgr_attributes['mgr_attr_value'])

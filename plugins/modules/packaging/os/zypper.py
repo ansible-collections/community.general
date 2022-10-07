@@ -1,17 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, Patrick Callahan <pmc@patrickcallahan.com>
+# Copyright (c) 2013, Patrick Callahan <pmc@patrickcallahan.com>
 # based on
 #     openbsd_pkg
-#         (c) 2013
+#         Copyright (c) 2013
 #         Patrik Lundin <patrik.lundin.swe@gmail.com>
 #
 #     yum
-#         (c) 2012, Red Hat, Inc
+#         Copyright (c) 2012, Red Hat, Inc
 #         Written by Seth Vidal <skvidal at fedoraproject.org>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -37,7 +38,7 @@ options:
         - Can include a version like C(name=1.0), C(name>3.4) or C(name<=2.7). If a version is given, C(oldpackage) is implied and zypper is allowed to
           update the package within the version range given.
         - You can also pass a url or a local path to a rpm file.
-        - When using state=latest, this can be '*', which updates all installed packages.
+        - When using I(state=latest), this can be '*', which updates all installed packages.
         required: true
         aliases: [ 'pkg' ]
         type: list
@@ -72,33 +73,33 @@ options:
             signature being installed. Has an effect only if state is
             I(present) or I(latest).
         required: false
-        default: "no"
+        default: false
         type: bool
     disable_recommends:
         description:
-          - Corresponds to the C(--no-recommends) option for I(zypper). Default behavior (C(yes)) modifies zypper's default behavior; C(no) does
+          - Corresponds to the C(--no-recommends) option for I(zypper). Default behavior (C(true)) modifies zypper's default behavior; C(false) does
             install recommended packages.
         required: false
-        default: "yes"
+        default: true
         type: bool
     force:
         description:
           - Adds C(--force) option to I(zypper). Allows to downgrade packages and change vendor or architecture.
         required: false
-        default: "no"
+        default: false
         type: bool
     force_resolution:
         description:
           - Adds C(--force-resolution) option to I(zypper). Allows to (un)install packages with conflicting requirements (resolver will choose a solution).
         required: false
-        default: "no"
+        default: false
         type: bool
         version_added: '0.2.0'
     update_cache:
         description:
           - Run the equivalent of C(zypper refresh) before the operation. Disabled in check mode.
         required: false
-        default: "no"
+        default: false
         type: bool
         aliases: [ "refresh" ]
     oldpackage:
@@ -106,7 +107,7 @@ options:
           - Adds C(--oldpackage) option to I(zypper). Allows to downgrade packages with less side-effects than force. This is implied as soon as a
             version is specified as part of the package name.
         required: false
-        default: "no"
+        default: false
         type: bool
     extra_args:
         required: false
@@ -136,8 +137,8 @@ options:
           - Adds C(--clean-deps) option to I(zypper) remove command.
         version_added: '4.6.0'
 notes:
-  - When used with a `loop:` each package will be processed individually,
-    it is much more efficient to pass the list directly to the `name` option.
+  - When used with a C(loop:) each package will be processed individually,
+    it is much more efficient to pass the list directly to the I(name) option.
 # informational: requirements for nodes
 requirements:
     - "zypper >= 1.0  # included in openSUSE >= 11.1 or SUSE Linux Enterprise Server/Desktop >= 11.0"
@@ -155,7 +156,7 @@ EXAMPLES = '''
   community.general.zypper:
     name: apache2
     state: present
-    disable_recommends: no
+    disable_recommends: false
 
 - name: Apply a given patch
   community.general.zypper:
@@ -206,7 +207,7 @@ EXAMPLES = '''
   community.general.zypper:
     name: openssl
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: "Install specific version (possible comparisons: <, >, <=, >=, =)"
   community.general.zypper:

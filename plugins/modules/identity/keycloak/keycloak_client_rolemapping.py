@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) Ansible project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -277,20 +279,20 @@ def main():
                 module.fail_json(msg='Either the `name` or `id` has to be specified on each role.')
             # Fetch missing role_id
             if role['id'] is None:
-                role_id = kc.get_client_role_by_name(gid, cid, role['name'], realm=realm)
+                role_id = kc.get_client_role_id_by_name(cid, role['name'], realm=realm)
                 if role_id is not None:
                     role['id'] = role_id
                 else:
                     module.fail_json(msg='Could not fetch role %s:' % (role['name']))
             # Fetch missing role_name
             else:
-                role['name'] = kc.get_client_rolemapping_by_id(gid, cid, role['id'], realm=realm)['name']
+                role['name'] = kc.get_client_group_rolemapping_by_id(gid, cid, role['id'], realm=realm)['name']
                 if role['name'] is None:
                     module.fail_json(msg='Could not fetch role %s' % (role['id']))
 
     # Get effective client-level role mappings
-    available_roles_before = kc.get_client_available_rolemappings(gid, cid, realm=realm)
-    assigned_roles_before = kc.get_client_composite_rolemappings(gid, cid, realm=realm)
+    available_roles_before = kc.get_client_group_available_rolemappings(gid, cid, realm=realm)
+    assigned_roles_before = kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
 
     result['existing'] = assigned_roles_before
     result['proposed'] = roles
@@ -324,7 +326,7 @@ def main():
                 module.exit_json(**result)
             kc.add_group_rolemapping(gid, cid, update_roles, realm=realm)
             result['msg'] = 'Roles %s assigned to group %s.' % (update_roles, group_name)
-            assigned_roles_after = kc.get_client_composite_rolemappings(gid, cid, realm=realm)
+            assigned_roles_after = kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
             result['end_state'] = assigned_roles_after
             module.exit_json(**result)
         else:
@@ -336,7 +338,7 @@ def main():
                 module.exit_json(**result)
             kc.delete_group_rolemapping(gid, cid, update_roles, realm=realm)
             result['msg'] = 'Roles %s removed from group %s.' % (update_roles, group_name)
-            assigned_roles_after = kc.get_client_composite_rolemappings(gid, cid, realm=realm)
+            assigned_roles_after = kc.get_client_group_composite_rolemappings(gid, cid, realm=realm)
             result['end_state'] = assigned_roles_after
             module.exit_json(**result)
     # Do nothing

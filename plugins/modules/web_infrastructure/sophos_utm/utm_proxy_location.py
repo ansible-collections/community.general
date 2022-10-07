@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2018, Johannes Brunswicker <johannes.brunswicker@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2018, Johannes Brunswicker <johannes.brunswicker@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 
@@ -41,7 +42,8 @@ options:
           - A list of allowed networks
         type: list
         elements: str
-        default: REF_NetworkAny
+        default:
+          - REF_NetworkAny
     auth_profile:
         type: str
         description:
@@ -70,7 +72,7 @@ options:
         description:
           - Activate hot standby mode
         type: bool
-        default: False
+        default: false
     path:
         type: str
         description:
@@ -80,7 +82,7 @@ options:
         description:
           - Whether the location is active or not
         type: bool
-        default: True
+        default: true
     stickysession_id:
         type: str
         description:
@@ -90,12 +92,12 @@ options:
         description:
           - Enable the stickysession
         type: bool
-        default: False
+        default: false
     websocket_passthrough:
         description:
           - Enable the websocket passthrough
         type: bool
-        default: False
+        default: false
 
 extends_documentation_fragment:
 - community.general.utm

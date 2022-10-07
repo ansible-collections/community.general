@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-# (c) 2014, Brian Coca, Josh Drake, et al
-# (c) 2017 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2014, Brian Coca, Josh Drake, et al
+# Copyright (c) 2017 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -20,7 +21,7 @@ DOCUMENTATION = '''
           - The format is C(host:port:db:password), for example C(localhost:6379:0:changeme).
           - To use encryption in transit, prefix the connection with C(tls://), as in C(tls://localhost:6379:0:changeme).
           - To use redis sentinel, use separator C(;), for example C(localhost:26379;localhost:26379;0:changeme). Requires redis>=2.9.0.
-        required: True
+        required: true
         env:
           - name: ANSIBLE_CACHE_PLUGIN_CONNECTION
         ini:

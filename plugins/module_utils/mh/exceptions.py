@@ -1,22 +1,19 @@
 # -*- coding: utf-8 -*-
 # (c) 2020, Alexei Znamensky <russoz@gmail.com>
-# Copyright: (c) 2020, Ansible Project
-# Simplified BSD License (see licenses/simplified_bsd.txt or https://opensource.org/licenses/BSD-2-Clause)
+# Copyright (c) 2020, Ansible Project
+# Simplified BSD License (see LICENSES/BSD-2-Clause.txt or https://opensource.org/licenses/BSD-2-Clause)
+# SPDX-License-Identifier: BSD-2-Clause
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+from ansible.module_utils.common.text.converters import to_native
+
 
 class ModuleHelperException(Exception):
-    @staticmethod
-    def _get_remove(key, kwargs):
-        if key in kwargs:
-            result = kwargs[key]
-            del kwargs[key]
-            return result
-        return None
-
-    def __init__(self, *args, **kwargs):
-        self.msg = self._get_remove('msg', kwargs) or "Module failed with exception: {0}".format(self)
-        self.update_output = self._get_remove('update_output', kwargs) or {}
+    def __init__(self, msg, update_output=None, *args, **kwargs):
+        self.msg = to_native(msg or "Module failed with exception: {0}".format(self))
+        if update_output is None:
+            update_output = {}
+        self.update_output = update_output
         super(ModuleHelperException, self).__init__(*args)

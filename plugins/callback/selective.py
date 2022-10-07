@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-# (c) Fastly, inc 2016
-# (c) 2017 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) Fastly, inc 2016
+# Copyright (c) 2017 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -14,13 +15,13 @@ DOCUMENTATION = '''
       - set as main display callback
     short_description: only print certain tasks
     description:
-      - This callback only prints tasks that have been tagged with `print_action` or that have failed.
+      - This callback only prints tasks that have been tagged with C(print_action) or that have failed.
         This allows operators to focus on the tasks that provide value only.
-      - Tasks that are not printed are placed with a '.'.
+      - Tasks that are not printed are placed with a C(.).
       - If you increase verbosity all tasks are printed.
     options:
       nocolor:
-        default: False
+        default: false
         description: This setting allows suppressing colorizing output
         env:
           - name: ANSIBLE_NOCOLOR

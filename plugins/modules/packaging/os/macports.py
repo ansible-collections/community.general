@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, Jimmy Tang <jcftang@gmail.com>
+# Copyright (c) 2013, Jimmy Tang <jcftang@gmail.com>
 # Based on okpg (Patrick Pelletier <pp.pelletier@gmail.com>), pacman
 # (Afterburn) and pkgin (Shaun Zinck) modules
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -30,7 +31,7 @@ options:
             - Update Macports and the ports tree, either prior to installing ports or as a separate step.
             - Equivalent to running C(port selfupdate).
         aliases: ['update_cache', 'update_ports']
-        default: "no"
+        default: false
         type: bool
     state:
         description:
@@ -42,7 +43,7 @@ options:
         description:
             - Upgrade all outdated ports, either prior to installing ports or as a separate step.
             - Equivalent to running C(port upgrade outdated).
-        default: "no"
+        default: false
         type: bool
     variant:
         description:
@@ -71,13 +72,13 @@ EXAMPLES = '''
 
 - name: Update Macports and the ports tree, then upgrade all outdated ports
   community.general.macports:
-    selfupdate: yes
-    upgrade: yes
+    selfupdate: true
+    upgrade: true
 
 - name: Update Macports and the ports tree, then install the foo port
   community.general.macports:
     name: foo
-    selfupdate: yes
+    selfupdate: true
 
 - name: Remove the foo port
   community.general.macports:

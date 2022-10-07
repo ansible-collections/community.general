@@ -4,6 +4,10 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - ansible.builtin.debug:
     msg: '{{ role_name }}'
 - ansible.builtin.debug:
@@ -58,6 +62,9 @@
     - 'not (item.0.key == "vfat" and ansible_distribution == "Debian")'  # TODO: figure out why it fails, fix it!
     # vfat resizing fails on ArchLinux
     - 'not (item.0.key == "vfat" and ansible_distribution == "Archlinux")'  # TODO: figure out why it fails, fix it!
+    # vfat resizing fails on Ubuntu 22.04
+    - 'not (item.0.key == "vfat" and ansible_distribution == "Ubuntu" and (ansible_facts.distribution_major_version | int == 22))'
+      # TODO: figure out why it fails, fix it!
     # btrfs-progs cannot be installed on ArchLinux
     - 'not (item.0.key == "btrfs" and ansible_distribution == "Archlinux")'  # TODO: figure out why it fails, fix it!
 

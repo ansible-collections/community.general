@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
-# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
@@ -34,19 +35,19 @@ options:
     type: str
   username:
     description:
-      - User for authentication with iLO.
+      - Username for authenticating to iLO.
     type: str
   password:
     description:
-      - Password for authentication with iLO.
+      - Password for authenticating to iLO.
     type: str
   auth_token:
     description:
-      - Security token for authentication with OOB controller.
+      - Security token for authenticating to iLO.
     type: str
   timeout:
     description:
-      - Timeout in seconds for URL requests to iLO controller.
+      - Timeout in seconds for HTTP requests to iLO.
     default: 10
     type: int
   attribute_name:
@@ -82,6 +83,17 @@ EXAMPLES = '''
       password: Testpass123
       attribute_name: TimeZone
       attribute_value: Chennai
+
+  - name: Set NTP Servers
+    community.general.ilo_redfish_config:
+      category: Manager
+      command: SetNTPServers
+      baseuri: 15.X.X.X
+      username: Admin
+      password: Testpass123
+      attribute_name: StaticNTPServers
+      attribute_value: X.X.X.X
+
 '''
 
 RETURN = '''

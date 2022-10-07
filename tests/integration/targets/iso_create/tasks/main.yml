@@ -4,12 +4,14 @@
 ####################################################################
 
 # Test code for iso_create module
-# Copyright: (c) 2020, Diane Wang (Tomorrow9) <dianew@vmware.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2020, Diane Wang (Tomorrow9) <dianew@vmware.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 - name: install pycdlib
   pip:
     name: pycdlib
     # state: latest
+    extra_args: "-c {{ remote_constraints }}"
   register: install_pycdlib
 - debug: var=install_pycdlib
 
@@ -104,7 +106,7 @@
     - iso_result is changed
     - iso_file.stat.exists == True
 
-- name: Create iso file with Rock Ridge extention
+- name: Create iso file with Rock Ridge extension
   iso_create:
     src_files:
       - "{{ remote_tmp_dir }}/test1.cfg"
@@ -123,7 +125,7 @@
     - iso_result is changed
     - iso_file.stat.exists == True
 
-- name: Create iso file with Joliet extention
+- name: Create iso file with Joliet extension
   iso_create:
     src_files:
       - "{{ remote_tmp_dir }}/test1.cfg"

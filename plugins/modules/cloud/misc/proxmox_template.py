@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -21,45 +22,45 @@ options:
     type: str
   src:
     description:
-      - path to uploaded file
-      - required only for C(state=present)
+      - Path to uploaded file.
+      - Required only for I(state=present).
     type: path
   template:
     description:
-      - the template name
-      - Required for state C(absent) to delete a template.
-      - Required for state C(present) to download an appliance container template (pveam).
+      - The template name.
+      - Required for I(state=absent) to delete a template.
+      - Required for I(state=present) to download an appliance container template (pveam).
     type: str
   content_type:
     description:
-      - content type
-      - required only for C(state=present)
+      - Content type.
+      - Required only for I(state=present).
     type: str
     default: 'vztmpl'
     choices: ['vztmpl', 'iso']
   storage:
     description:
-      - target storage
+      - Target storage.
     type: str
     default: 'local'
   timeout:
     description:
-      - timeout for operations
+      - Timeout for operations.
     type: int
     default: 30
   force:
     description:
-      - can be used only with C(state=present), exists template will be overwritten
+      - It can only be used with I(state=present), existing template will be overwritten.
     type: bool
-    default: 'no'
+    default: false
   state:
     description:
-     - Indicate desired state of the template
+     - Indicate desired state of the template.
     type: str
     choices: ['present', 'absent']
     default: present
 notes:
-  - Requires proxmoxer and requests modules on host. This modules can be installed with pip.
+  - Requires C(proxmoxer) and C(requests) modules on host. This modules can be installed with M(ansible.builtin.pip).
 author: Sergei Antipov (@UnderGreen)
 extends_documentation_fragment: community.general.proxmox.documentation
 '''
@@ -91,7 +92,7 @@ EXAMPLES = '''
     storage: local
     content_type: vztmpl
     src: ~/ubuntu-14.04-x86_64.tar.gz
-    force: yes
+    force: true
 
 - name: Delete template with minimal options
   community.general.proxmox_template:
@@ -116,7 +117,7 @@ EXAMPLES = '''
 import os
 import time
 
-from ansible.module_utils.basic import AnsibleModule, env_fallback
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec, ProxmoxAnsible)
 
 
@@ -130,8 +131,7 @@ class ProxmoxTemplateAnsible(ProxmoxAnsible):
         Check the task status and wait until the task is completed or the timeout is reached.
         """
         while timeout:
-            task_status = self.proxmox_api.nodes(node).tasks(taskid).status.get()
-            if task_status['status'] == 'stopped' and task_status['exitstatus'] == 'OK':
+            if self.api_task_ok(node, taskid):
                 return True
             timeout = timeout - 1
             if timeout == 0:

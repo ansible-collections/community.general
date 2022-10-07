@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2014, Kevin Carter <kevin.carter@rackspace.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2014, Kevin Carter <kevin.carter@rackspace.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -90,7 +91,7 @@ options:
         description:
           - Enable a container log for host actions to the container.
         type: bool
-        default: 'no'
+        default: false
     container_log_level:
         choices:
           - Info
@@ -118,13 +119,13 @@ options:
           - This is not supported by all container storage backends.
           - Enabling this may fail if the backing store does not support snapshots.
         type: bool
-        default: 'no'
+        default: false
     archive:
         description:
           - Create an archive of a container.
           - This will create a tarball of the running container.
         type: bool
-        default: 'no'
+        default: false
     archive_path:
         description:
           - Path the save the archived container.
@@ -163,9 +164,9 @@ options:
         type: list
         elements: str
 requirements:
-  - 'lxc >= 1.0 # OS package'
-  - 'python >= 2.6 # OS Package'
-  - 'lxc-python2 >= 0.1 # PIP Package from https://github.com/lxc/python2-lxc'
+  - 'lxc >= 2.0 # OS package'
+  - 'python3 >= 3.5 # OS Package'
+  - 'python3-lxc # OS Package'
 notes:
   - Containers must have a unique name. If you attempt to create a container
     with a name that already exists in the users namespace the module will
@@ -183,10 +184,10 @@ notes:
     tarball of the running container. The "archive" option supports LVM backed
     containers and will create a snapshot of the running container when
     creating the archive.
-  - If your distro does not have a package for "python2-lxc", which is a
+  - If your distro does not have a package for C(python3-lxc), which is a
     requirement for this module, it can be installed from source at
-    "https://github.com/lxc/python2-lxc" or installed via pip using the package
-    name lxc-python2.
+    U(https://github.com/lxc/python3-lxc) or installed via pip using the
+    package name C(lxc).
 '''
 
 EXAMPLES = r"""
@@ -412,7 +413,7 @@ lxc_container:
             description: if the container was cloned
             returned: success, when clone_name is specified
             type: bool
-            sample: True
+            sample: true
 """
 
 import os
@@ -433,7 +434,6 @@ else:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.parsing.convert_bool import BOOLEANS_FALSE, BOOLEANS_TRUE
-from ansible.module_utils.six.moves import xrange
 from ansible.module_utils.common.text.converters import to_text, to_bytes
 
 
@@ -558,7 +558,7 @@ popd
 def create_script(command):
     """Write out a script onto a target.
 
-    This method should be backward compatible with Python 2.4+ when executing
+    This method should be backward compatible with Python when executing
     from within the container.
 
     :param command: command to run, this can be a script and can use spacing
@@ -938,7 +938,7 @@ class LxcContainerManagement(object):
         """
 
         self.container = self.get_container_bind()
-        for dummy in xrange(timeout):
+        for dummy in range(timeout):
             if self._get_state() != 'running':
                 self.container.start()
                 self.state_change = True
@@ -991,7 +991,7 @@ class LxcContainerManagement(object):
         :type timeout: ``int``
         """
 
-        for dummy in xrange(timeout):
+        for dummy in range(timeout):
             if not self._container_exists(container_name=self.container_name, lxc_path=self.lxc_path):
                 break
 

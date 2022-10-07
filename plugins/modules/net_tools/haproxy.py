@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2014, Ravi Bhure <ravibhure@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2014, Ravi Bhure <ravibhure@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -20,7 +21,7 @@ notes:
       sockets configured for level 'admin'. For example, you can add the line
       'stats socket /var/run/haproxy.sock level admin' to the general section of
       haproxy.cfg. See U(http://haproxy.1wt.eu/download/1.5/doc/configuration.txt).
-    - Depends on netcat (nc) being available; you need to install the appropriate
+    - Depends on netcat (C(nc)) being available; you need to install the appropriate
       package for your operating system before this module can be used.
 options:
   backend:
@@ -32,7 +33,7 @@ options:
     description:
       - Wait until the server has no active connections or until the timeout
         determined by wait_interval and wait_retries is reached.
-      - Continue only after the status changes to 'MAINT'.
+      - Continue only after the status changes to C(MAINT).
       - This overrides the shutdown_sessions option.
     type: bool
     default: false
@@ -48,7 +49,7 @@ options:
       - This can be used to terminate long-running sessions after a server is put
         into maintenance mode. Overridden by the drain option.
     type: bool
-    default: no
+    default: false
   socket:
     description:
       - Path to the HAProxy socket file.
@@ -67,25 +68,25 @@ options:
     description:
       - Disable/enable agent checks (depending on I(state) value).
     type: bool
-    default: no
+    default: false
     version_added: 1.0.0
   health:
     description:
       - Disable/enable health checks (depending on I(state) value).
     type: bool
-    default: no
+    default: false
     version_added: "1.0.0"
   fail_on_not_found:
     description:
-      - Fail whenever trying to enable/disable a backend host that does not exist
+      - Fail whenever trying to enable/disable a backend host that does not exist.
     type: bool
-    default: no
+    default: false
   wait:
     description:
-      - Wait until the server reports a status of 'UP' when C(state=enabled),
-        status of 'MAINT' when C(state=disabled) or status of 'DRAIN' when C(state=drain)
+      - Wait until the server reports a status of C(UP) when I(state=enabled),
+        status of C(MAINT) when I(state=disabled) or status of C(DRAIN) when I(state=drain).
     type: bool
-    default: no
+    default: false
   wait_interval:
     description:
       - Number of seconds to wait between retries.
@@ -99,7 +100,7 @@ options:
   weight:
     description:
       - The value passed in argument.
-      - If the value ends with the `%` sign, then the new weight will be
+      - If the value ends with the C(%) sign, then the new weight will be
         relative to the initially configured weight.
       - Relative weights are only permitted between 0 and 100% and absolute
         weights are permitted between 0 and 256.
@@ -117,8 +118,8 @@ EXAMPLES = r'''
   community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
-    health: yes
-    agent: yes
+    health: true
+    agent: true
 
 - name: Disable server without backend pool name (apply to all available backend pool)
   community.general.haproxy:
@@ -138,7 +139,7 @@ EXAMPLES = r'''
     host: '{{ inventory_hostname }}'
     socket: /var/run/haproxy.sock
     backend: www
-    wait: yes
+    wait: true
 
 # Place server in drain mode, providing a socket file.  Then check the server's
 # status every minute to see if it changes to maintenance mode, continuing if it
@@ -148,8 +149,8 @@ EXAMPLES = r'''
     host: '{{ inventory_hostname }}'
     socket: /var/run/haproxy.sock
     backend: www
-    wait: yes
-    drain: yes
+    wait: true
+    drain: true
     wait_interval: 60
     wait_retries: 60
 
@@ -159,13 +160,13 @@ EXAMPLES = r'''
     host: '{{ inventory_hostname }}'
     backend: www
     socket: /var/run/haproxy.sock
-    shutdown_sessions: yes
+    shutdown_sessions: true
 
 - name: Disable server without backend pool name (apply to all available backend pool) but fail when the backend host is not found
   community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
-    fail_on_not_found: yes
+    fail_on_not_found: true
 
 - name: Enable server in 'www' backend pool
   community.general.haproxy:
@@ -178,14 +179,14 @@ EXAMPLES = r'''
     state: enabled
     host: '{{ inventory_hostname }}'
     backend: www
-    wait: yes
+    wait: true
 
 - name: Enable server in 'www' backend pool wait until healthy. Retry 10 times with intervals of 5 seconds to retrieve the health
   community.general.haproxy:
     state: enabled
     host: '{{ inventory_hostname }}'
     backend: www
-    wait: yes
+    wait: true
     wait_retries: 10
     wait_interval: 5
 

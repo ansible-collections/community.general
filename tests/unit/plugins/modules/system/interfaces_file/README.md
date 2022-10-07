@@ -1,9 +1,15 @@
+<!--
+Copyright (c) Ansible Project
+GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
 # interfaces_file unit tests
 
 ## Tests structure
 
 - `input` directory contains interfaces configuration files
-- `test_interfaces_file.py` runs each hardcoded test agains all configurations in `input` directory and compares results with golden outputs in `golden_output`
+- `test_interfaces_file.py` runs each hardcoded test against all configurations in `input` directory and compares results with golden outputs in `golden_output`
 
 ## Running unit tests with docker
 

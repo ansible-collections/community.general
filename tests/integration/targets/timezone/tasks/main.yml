@@ -1,7 +1,12 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # Because hwclock usually isn't available inside Docker containers in Shippable
 # these tasks will detect if hwclock works and only run hwclock tests if it is
@@ -66,7 +71,7 @@
 
 
 - name: Run tests
-  # Skip tests on Fedora 31 and 32 because dbus fails to start unless the container is run in priveleged mode.
+  # Skip tests on Fedora 31 and 32 because dbus fails to start unless the container is run in privileged mode.
   # Even then, it starts unreliably. This may be due to the move to cgroup v2 in Fedora 31 and 32.
   # https://www.redhat.com/sysadmin/fedora-31-control-group-v2
   when:

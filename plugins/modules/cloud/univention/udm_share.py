@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016, Adfinis SyGroup AG
+# Copyright (c) 2016, Adfinis SyGroup AG
 # Tobias Rueetschi <tobias.ruetschi@adfinis-sygroup.ch>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -37,17 +38,17 @@ options:
         required: false
         description:
             - Host FQDN (server which provides the share), e.g. C({{
-              ansible_fqdn }}). Required if C(state=present).
+              ansible_fqdn }}). Required if I(state=present).
         type: str
     path:
         required: false
         description:
-            - Directory on the providing server, e.g. C(/home). Required if C(state=present).
+            - Directory on the providing server, e.g. C(/home). Required if I(state=present).
         type: path
     sambaName:
         required: false
         description:
-            - Windows name. Required if C(state=present).
+            - Windows name. Required if I(state=present).
         type: str
         aliases: [ samba_name ]
     ou:
@@ -105,7 +106,7 @@ options:
         description:
         - Show in Windows network environment.
         type: bool
-        default: True
+        default: true
         aliases: [ samba_browsable ]
     sambaCreateMode:
         default: '0744'

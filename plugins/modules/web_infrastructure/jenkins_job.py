@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright: (c) Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -22,14 +23,14 @@ options:
     description:
       - config in XML format.
       - Required if job does not yet exist.
-      - Mutually exclusive with C(enabled).
-      - Considered if C(state=present).
+      - Mutually exclusive with I(enabled).
+      - Considered if I(state=present).
     required: false
   enabled:
     description:
       - Whether the job should be enabled or disabled.
-      - Mutually exclusive with C(config).
-      - Considered if C(state=present).
+      - Mutually exclusive with I(config).
+      - Considered if I(state=present).
     type: bool
     required: false
   name:
@@ -67,10 +68,10 @@ options:
     required: false
   validate_certs:
     type: bool
-    default: yes
+    default: true
     description:
-      - If set to C(no), the SSL certificates will not be validated.
-        This should only set to C(no) used on personally controlled sites
+      - If set to C(false), the SSL certificates will not be validated.
+        This should only set to C(false) used on personally controlled sites
         using self-signed certificates as it avoids verifying the source site.
       - The C(python-jenkins) library only handles this by using the environment variable C(PYTHONHTTPSVERIFY).
     version_added: 2.3.0
@@ -113,7 +114,7 @@ EXAMPLES = '''
   community.general.jenkins_job:
     name: test
     password: admin
-    enabled: False
+    enabled: false
     url: http://localhost:8080
     user: admin
 
@@ -121,7 +122,7 @@ EXAMPLES = '''
   community.general.jenkins_job:
     name: test
     token: asdfasfasfasdfasdfadfasfasdfasdfc
-    enabled: False
+    enabled: false
     url: http://localhost:8080
     user: admin
 '''

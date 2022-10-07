@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# (c) 2018, Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2018, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # started out with AWX's scan_packages module
 
@@ -17,9 +18,9 @@ options:
   clients:
     description:
       - A list of the pip executables that will be used to get the packages.
-        They can be supplied with the full path or just the executable name, i.e `pip3.7`.
+        They can be supplied with the full path or just the executable name, for example C(pip3.7).
     default: ['pip']
-    required: False
+    required: false
     type: list
     elements: path
 requirements:
@@ -97,13 +98,13 @@ from ansible.module_utils.facts.packages import CLIMgr
 
 class PIP(CLIMgr):
 
-    def __init__(self, pip):
+    def __init__(self, pip, module):
 
         self.CLI = pip
+        self.module = module
 
     def list_installed(self):
-        global module
-        rc, out, err = module.run_command([self._cli, 'list', '-l', '--format=json'])
+        rc, out, err = self.module.run_command([self._cli, 'list', '-l', '--format=json'])
         if rc != 0:
             raise Exception("Unable to list packages rc=%s : %s" % (rc, err))
         return json.loads(out)
@@ -116,7 +117,6 @@ class PIP(CLIMgr):
 def main():
 
     # start work
-    global module
     module = AnsibleModule(
         argument_spec=dict(
             clients=dict(type='list', elements='path', default=['pip']),
@@ -133,7 +133,7 @@ def main():
             module.warn('Skipping invalid pip client: %s' % (pip))
             continue
         try:
-            pip_mgr = PIP(pip)
+            pip_mgr = PIP(pip, module)
             if pip_mgr.is_available():
                 found += 1
                 packages[pip] = pip_mgr.get_packages()

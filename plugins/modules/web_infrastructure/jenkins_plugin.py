@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2016, Jiri Tyr <jiri.tyr@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Jiri Tyr <jiri.tyr@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -36,7 +37,7 @@ options:
     type: str
     description:
       - Plugin name.
-    required: yes
+    required: true
   owner:
     type: str
     description:
@@ -113,7 +114,7 @@ options:
       - Defines whether to install plugin dependencies.
       - This option takes effect only if the I(version) is not defined.
     type: bool
-    default: yes
+    default: true
 
 notes:
   - Plugin installation should be run under root or the same user which owns
@@ -140,7 +141,7 @@ EXAMPLES = '''
 - name: Install plugin without its dependencies
   community.general.jenkins_plugin:
     name: build-pipeline-plugin
-    with_dependencies: no
+    with_dependencies: false
 
 - name: Make sure the plugin is always up-to-date
   community.general.jenkins_plugin:
@@ -195,11 +196,11 @@ EXAMPLES = '''
   vars:
     my_jenkins_plugins:
       token-macro:
-        enabled: yes
+        enabled: true
       build-pipeline-plugin:
         version: "1.4.9"
-        pinned: no
-        enabled: yes
+        pinned: false
+        enabled: true
   tasks:
     - name: Install plugins without a specific version
       community.general.jenkins_plugin:
@@ -220,17 +221,17 @@ EXAMPLES = '''
 
     - name: Initiate the fact
       ansible.builtin.set_fact:
-        jenkins_restart_required: no
+        jenkins_restart_required: false
 
     - name: Check if restart is required by any of the versioned plugins
       ansible.builtin.set_fact:
-        jenkins_restart_required: yes
+        jenkins_restart_required: true
       when: item.changed
       with_items: "{{ my_jenkins_plugin_versioned.results }}"
 
     - name: Check if restart is required by any of the unversioned plugins
       ansible.builtin.set_fact:
-        jenkins_restart_required: yes
+        jenkins_restart_required: true
       when: item.changed
       with_items: "{{ my_jenkins_plugin_unversioned.results }}"
 
@@ -256,7 +257,7 @@ EXAMPLES = '''
 
     - name: Reset the fact
       ansible.builtin.set_fact:
-        jenkins_restart_required: no
+        jenkins_restart_required: false
       when: jenkins_restart_required
 
     - name: Plugin pinning
@@ -295,7 +296,6 @@ from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url, url_argument_spec
 from ansible.module_utils.six import text_type, binary_type
 from ansible.module_utils.common.text.converters import to_native
-import base64
 import hashlib
 import io
 import json

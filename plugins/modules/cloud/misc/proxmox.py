@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright: Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -85,7 +86,7 @@ options:
   onboot:
     description:
       - specifies whether a VM will be started during system bootup
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(no).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
     type: bool
   storage:
     description:
@@ -117,7 +118,7 @@ options:
       - with C(state=present) force option allow to overwrite existing container
       - with states C(stopped) , C(restarted) allow to force stop instance
     type: bool
-    default: 'no'
+    default: false
   purge:
     description:
       - Remove container from all related configurations.
@@ -139,9 +140,11 @@ options:
     type: str
   unprivileged:
     description:
-      - Indicate if the container should be unprivileged
+      - Indicate if the container should be unprivileged.
+      - >
+        The default value for this parameter is C(false) but that is deprecated
+        and it will be replaced with C(true) in community.general 7.0.0.
     type: bool
-    default: 'no'
   description:
     description:
       - Specify the description for the container. Only used on the configuration web interface.
@@ -238,7 +241,7 @@ EXAMPLES = r'''
     password: 123456
     hostname: example.org
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
-    force: yes
+    force: true
 
 - name: Create new container with minimal options use environment PROXMOX_PASSWORD variable(you should export it before)
   community.general.proxmox:
@@ -368,7 +371,7 @@ EXAMPLES = r'''
     api_user: root@pam
     api_password: 1q2w3e
     api_host: node1
-    force: yes
+    force: true
     state: stopped
 
 - name: Restart container(stopped or mounted container you can't restart)
@@ -389,11 +392,10 @@ EXAMPLES = r'''
 '''
 
 import time
-import traceback
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
-from ansible.module_utils.basic import AnsibleModule, env_fallback
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils.proxmox import (
@@ -480,8 +482,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
             taskid = getattr(proxmox_node, VZ_TYPE).create(vmid=vmid, storage=storage, memory=memory, swap=swap, **kwargs)
 
         while timeout:
-            if (proxmox_node.tasks(taskid).status.get()['status'] == 'stopped' and
-                    proxmox_node.tasks(taskid).status.get()['exitstatus'] == 'OK'):
+            if self.api_task_ok(node, taskid):
                 return True
             timeout -= 1
             if timeout == 0:
@@ -494,8 +495,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
     def start_instance(self, vm, vmid, timeout):
         taskid = getattr(self.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.start.post()
         while timeout:
-            if (self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['status'] == 'stopped' and
-                    self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):
+            if self.api_task_ok(vm['node'], taskid):
                 return True
             timeout -= 1
             if timeout == 0:
@@ -511,8 +511,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
         else:
             taskid = getattr(self.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.shutdown.post()
         while timeout:
-            if (self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['status'] == 'stopped' and
-                    self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):
+            if self.api_task_ok(vm['node'], taskid):
                 return True
             timeout -= 1
             if timeout == 0:
@@ -525,8 +524,7 @@ class ProxmoxLxcAnsible(ProxmoxAnsible):
     def umount_instance(self, vm, vmid, timeout):
         taskid = getattr(self.proxmox_api.nodes(vm['node']), VZ_TYPE)(vmid).status.umount.post()
         while timeout:
-            if (self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['status'] == 'stopped' and
-                    self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):
+            if self.api_task_ok(vm['node'], taskid):
                 return True
             timeout -= 1
             if timeout == 0:
@@ -565,7 +563,7 @@ def main():
         purge=dict(type='bool', default=False),
         state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted']),
         pubkey=dict(type='str'),
-        unprivileged=dict(type='bool', default=False),
+        unprivileged=dict(type='bool'),
         description=dict(type='str'),
         hookscript=dict(type='str'),
         proxmox_default_behavior=dict(type='str', default='no_defaults', choices=['compatibility', 'no_defaults']),
@@ -606,6 +604,14 @@ def main():
         template_store = module.params['ostemplate'].split(":")[0]
     timeout = module.params['timeout']
     clone = module.params['clone']
+
+    if module.params['unprivileged'] is None:
+        module.params['unprivileged'] = False
+        module.deprecate(
+            'The default value `false` for the parameter "unprivileged" is deprecated and it will be replaced with `true`',
+            version='7.0.0',
+            collection_name='community.general'
+        )
 
     if module.params['proxmox_default_behavior'] == 'compatibility':
         old_default_values = dict(
@@ -743,6 +749,8 @@ def main():
             module.fail_json(msg="restarting of VM %s failed with exception: %s" % (vmid, e))
 
     elif state == 'absent':
+        if not vmid:
+            module.exit_json(changed=False, msg='VM with hostname = %s is already absent' % hostname)
         try:
             vm = proxmox.get_vm(vmid, ignore_missing=True)
             if not vm:
@@ -763,8 +771,7 @@ def main():
             taskid = getattr(proxmox.proxmox_api.nodes(vm['node']), VZ_TYPE).delete(vmid, **delete_params)
 
             while timeout:
-                task_status = proxmox.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
-                if (task_status['status'] == 'stopped' and task_status['exitstatus'] == 'OK'):
+                if proxmox.api_task_ok(vm['node'], taskid):
                     module.exit_json(changed=True, msg="VM %s removed" % vmid)
                 timeout -= 1
                 if timeout == 0:

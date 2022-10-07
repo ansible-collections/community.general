@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-# (c) 2017, Edward Nunez <edward.nunez@cyberark.com>
-# (c) 2017 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Edward Nunez <edward.nunez@cyberark.com>
+# Copyright (c) 2017 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -21,10 +22,10 @@ DOCUMENTATION = '''
         default: '/opt/CARKaim/sdk/clipasswordsdk'
       appid:
         description: Defines the unique ID of the application that is issuing the password request.
-        required: True
+        required: true
       query:
         description: Describes the filter criteria for the password retrieval.
-        required: True
+        required: true
       output:
         description:
           - Specifies the desired output fields separated by commas.

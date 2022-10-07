@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2014, Peter Oliver <ansible@mavit.org.uk>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2014, Peter Oliver <ansible@mavit.org.uk>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -35,7 +36,7 @@ options:
     description:
       - Accept any licences.
     type: bool
-    default: no
+    default: false
     aliases: [ accept, accept_licences ]
   be_name:
     description:
@@ -45,7 +46,7 @@ options:
     description:
       - Refresh publishers before execution.
     type: bool
-    default: yes
+    default: true
 '''
 EXAMPLES = '''
 - name: Install Vim
@@ -55,7 +56,7 @@ EXAMPLES = '''
 - name: Install Vim without refreshing publishers
   community.general.pkg5:
     name: editor/vim
-    refresh: no
+    refresh: false
 
 - name: Remove finger daemon
   community.general.pkg5:

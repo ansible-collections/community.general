@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2019, Markus Bergholz (markuman@gmail.com)
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2019, Markus Bergholz (markuman@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
@@ -116,8 +117,8 @@ EXAMPLES = '''
         value: abc123
       - name: SECRET_ACCESS_KEY
         value: dassgrfaeui8989
-        masked: yes
-        protected: yes
+        masked: true
+        protected: true
         environment_scope: production
 
 - name: Set or update some CI/CD variables
@@ -155,27 +156,26 @@ project_variable:
       description: A list of variables which were created.
       returned: always
       type: list
-      sample: "['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']"
+      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
     untouched:
       description: A list of variables which exist.
       returned: always
       type: list
-      sample: "['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']"
+      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
     removed:
       description: A list of variables which were deleted.
       returned: always
       type: list
-      sample: "['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']"
+      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
     updated:
       description: A list of variables whose values were changed.
       returned: always
       type: list
-      sample: "['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']"
+      sample: ['ACCESS_KEY_ID', 'SECRET_ACCESS_KEY']
 '''
 
 import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.six import string_types
 from ansible.module_utils.six import integer_types
@@ -188,7 +188,9 @@ except Exception:
     GITLAB_IMP_ERR = traceback.format_exc()
     HAS_GITLAB_PACKAGE = False
 
-from ansible_collections.community.general.plugins.module_utils.gitlab import auth_argument_spec, gitlab_authentication
+from ansible_collections.community.general.plugins.module_utils.gitlab import (
+    auth_argument_spec, gitlab_authentication, ensure_gitlab_package
+)
 
 
 def vars_to_variables(vars, module):
@@ -430,6 +432,7 @@ def main():
         ],
         supports_check_mode=True
     )
+    ensure_gitlab_package(module)
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)

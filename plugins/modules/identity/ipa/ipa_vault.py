@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2018, Juan Manuel Parrilla <jparrill@redhat.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2018, Juan Manuel Parrilla <jparrill@redhat.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -63,9 +64,9 @@ options:
         type: str
     replace:
         description:
-        - Force replace the existant vault on IPA server.
+        - Force replace the existent vault on IPA server.
         type: bool
-        default: False
+        default: false
         choices: ["True", "False"]
     validate_certs:
         description:
@@ -114,7 +115,7 @@ EXAMPLES = r'''
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
-    replace: True
+    replace: true
 
 - name: Get vault info if already exists
   community.general.ipa_vault:

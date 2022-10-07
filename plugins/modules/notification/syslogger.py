@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2017, Tim Rightnour <thegarbledone@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Tim Rightnour <thegarbledone@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -17,7 +18,7 @@ options:
         type: str
         description:
             - This is the message to place in syslog.
-        required: True
+        required: true
     priority:
         type: str
         description:
@@ -36,7 +37,7 @@ options:
         description:
             - Log the PID in brackets.
         type: bool
-        default: False
+        default: false
     ident:
         description:
             - Specify the name of application name which is sending the log to syslog.
@@ -87,7 +88,7 @@ log_pid:
   description: Log PID status
   returned: always
   type: bool
-  sample: True
+  sample: true
 msg:
   description: Message sent to syslog
   returned: always

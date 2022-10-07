@@ -1,11 +1,17 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 - name: test cmd_echo [{{ item.name }}]
   cmd_echo:
     arg_formats: "{{ item.arg_formats|default(omit) }}"
     arg_order: "{{ item.arg_order }}"
     arg_values: "{{ item.arg_values|default(omit) }}"
+    check_mode_skip: "{{ item.check_mode_skip|default(omit) }}"
     aa: "{{ item.aa|default(omit) }}"
   register: test_result
+  check_mode: "{{ item.check_mode|default(omit) }}"
   ignore_errors: "{{ item.expect_error|default(omit) }}"
 
 - name: check results [{{ item.name }}]

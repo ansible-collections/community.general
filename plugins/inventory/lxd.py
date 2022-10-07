@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2021, Frank Dornheim <dornheim@posteo.de>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2021, Frank Dornheim <dornheim@posteo.de>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -522,7 +523,7 @@ class InventoryModule(BaseInventoryPlugin):
         """Helper to save data
 
         Helper to save the data in self.data
-        Detect if data is allready in branch and use dict_merge() to prevent that branch is overwritten.
+        Detect if data is already in branch and use dict_merge() to prevent that branch is overwritten.
 
         Args:
             str(instance_name): name of instance

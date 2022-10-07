@@ -3,7 +3,8 @@
 
 # Copyright (c) 2017, Eike Frost <ei@kefro.st>
 # Copyright (c) 2021, Christophe Gilles <christophe.gilles54@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -163,7 +164,7 @@ options:
         aliases:
             - defaultGroups
         type: list
-        elements: dict
+        elements: str
     default_locale:
         description:
             - The realm default locale.
@@ -183,7 +184,7 @@ options:
         aliases:
             - defaultRoles
         type: list
-        elements: dict
+        elements: str
     default_signature_algorithm:
         description:
             - The realm default signature algorithm.
@@ -622,10 +623,10 @@ def main():
         client_authentication_flow=dict(type='str', aliases=['clientAuthenticationFlow']),
         client_scope_mappings=dict(type='dict', aliases=['clientScopeMappings']),
         default_default_client_scopes=dict(type='list', elements='str', aliases=['defaultDefaultClientScopes']),
-        default_groups=dict(type='list', elements='dict', aliases=['defaultGroups']),
+        default_groups=dict(type='list', elements='str', aliases=['defaultGroups']),
         default_locale=dict(type='str', aliases=['defaultLocale']),
         default_optional_client_scopes=dict(type='list', elements='str', aliases=['defaultOptionalClientScopes']),
-        default_roles=dict(type='list', elements='dict', aliases=['defaultRoles']),
+        default_roles=dict(type='list', elements='str', aliases=['defaultRoles']),
         default_signature_algorithm=dict(type='str', aliases=['defaultSignatureAlgorithm']),
         direct_grant_flow=dict(type='str', aliases=['directGrantFlow']),
         display_name=dict(type='str', aliases=['displayName']),

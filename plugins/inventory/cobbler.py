@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2020 Orion Poplawski <orion@nwra.com>
 # Copyright (c) 2020 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -18,7 +19,7 @@ DOCUMENTATION = '''
     options:
       plugin:
         description: The name of this plugin, it should always be set to C(community.general.cobbler) for this plugin to recognize it as it's own.
-        required: yes
+        required: true
         choices: [ 'cobbler', 'community.general.cobbler' ]
       url:
         description: URL to cobbler.
@@ -27,18 +28,18 @@ DOCUMENTATION = '''
             - name: COBBLER_SERVER
       user:
         description: Cobbler authentication user.
-        required: no
+        required: false
         env:
             - name: COBBLER_USER
       password:
         description: Cobbler authentication password
-        required: no
+        required: false
         env:
             - name: COBBLER_PASSWORD
       cache_fallback:
         description: Fallback to cached results if connection to cobbler fails
         type: boolean
-        default: no
+        default: false
       exclude_profiles:
         description:
           - Profiles to exclude from inventory.
@@ -69,7 +70,7 @@ DOCUMENTATION = '''
       want_facts:
         description: Toggle, if C(true) the plugin will retrieve host facts from the server
         type: boolean
-        default: yes
+        default: true
 '''
 
 EXAMPLES = '''
@@ -213,7 +214,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                         self.inventory.add_child(parent_group_name, group_name)
             else:
                 self.display.vvvv('Processing profile %s without parent\n' % profile['name'])
-                # Create a heirarchy of profile names
+                # Create a hierarchy of profile names
                 profile_elements = profile['name'].split('-')
                 i = 0
                 while i < len(profile_elements) - 1:

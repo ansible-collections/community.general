@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) Ansible project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -195,15 +197,15 @@ def main():
     name = module.params['name']
     state = module.params['state']
 
-    if not os.path.exists("/etc/locale.gen"):
-        if os.path.exists("/var/lib/locales/supported.d/"):
-            # Ubuntu created its own system to manage locales.
-            ubuntuMode = True
+    if not os.path.exists("/var/lib/locales/supported.d/"):
+        if os.path.exists("/etc/locale.gen"):
+            # We found the common way to manage locales.
+            ubuntuMode = False
         else:
             module.fail_json(msg="/etc/locale.gen and /var/lib/locales/supported.d/local are missing. Is the package \"locales\" installed?")
     else:
-        # We found the common way to manage locales.
-        ubuntuMode = False
+        # Ubuntu created its own system to manage locales.
+        ubuntuMode = True
 
     if not is_available(name, ubuntuMode):
         module.fail_json(msg="The locale you've entered is not available "

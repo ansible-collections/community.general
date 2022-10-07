@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, Matthias Vogelgesang <matthias.vogelgesang@gmail.com>
-# (c) 2014, Justin Lecher <jlec@gentoo.org>
+# Copyright (c) 2013, Matthias Vogelgesang <matthias.vogelgesang@gmail.com>
+# Copyright (c) 2014, Justin Lecher <jlec@gentoo.org>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -43,12 +44,12 @@ options:
               I(present).
             - Needs zypper version >= 1.6.2.
         type: bool
-        default: no
+        default: false
     autorefresh:
         description:
             - Enable autorefresh of the repository.
         type: bool
-        default: yes
+        default: true
         aliases: [ "refresh" ]
     priority:
         description:
@@ -61,7 +62,7 @@ options:
             - Overwrite multiple repository entries, if repositories with both name and
               URL already exist.
         type: bool
-        default: no
+        default: false
     auto_import_keys:
         description:
             - Automatically import the gpg signing key of the new or changed repository.
@@ -69,18 +70,18 @@ options:
             - Implies runrefresh.
             - Only works with C(.repo) files if `name` is given explicitly.
         type: bool
-        default: no
+        default: false
     runrefresh:
         description:
             - Refresh the package list of the given repository.
             - Can be used with repo=* to refresh all repositories.
         type: bool
-        default: no
+        default: false
     enabled:
         description:
             - Set repository to enabled (or disabled).
         type: bool
-        default: yes
+        default: true
 
 
 requirements:
@@ -108,19 +109,19 @@ EXAMPLES = '''
 - name: Refresh all repos
   community.general.zypper_repository:
     repo: '*'
-    runrefresh: yes
+    runrefresh: true
 
 - name: Add a repo and add its gpg key
   community.general.zypper_repository:
     repo: 'http://download.opensuse.org/repositories/systemsmanagement/openSUSE_Leap_42.1/'
-    auto_import_keys: yes
+    auto_import_keys: true
 
 - name: Force refresh of a repository
   community.general.zypper_repository:
     repo: 'http://my_internal_ci_repo/repo'
     name: my_ci_repo
     state: present
-    runrefresh: yes
+    runrefresh: true
 '''
 
 import traceback

@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2014, Jakub Jirutka <jakub@jirutka.cz>
+# Copyright (c) 2014, Jakub Jirutka <jakub@jirutka.cz>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -24,7 +25,7 @@ options:
   name:
     description:
       - The overlay id to install, synchronize, or uninstall.
-        Use 'ALL' to sync all of the installed overlays (can be used only when C(state=updated)).
+        Use 'ALL' to sync all of the installed overlays (can be used only when I(state=updated)).
     required: true
     type: str
   list_url:
@@ -42,11 +43,11 @@ options:
     type: str
   validate_certs:
     description:
-      - If C(no), SSL certificates will not be validated. This should only be
-        set to C(no) when no other option exists.  Prior to 1.9.3 the code
-        defaulted to C(no).
+      - If C(false), SSL certificates will not be validated. This should only be
+        set to C(false) when no other option exists.  Prior to 1.9.3 the code
+        defaulted to C(false).
     type: bool
-    default: yes
+    default: true
 '''
 
 EXAMPLES = '''

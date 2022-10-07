@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2017-2018 Dell EMC Inc.
-# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -21,37 +22,37 @@ options:
   category:
     required: false
     description:
-      - List of categories to execute on OOB controller
+      - List of categories to execute on OOB controller.
     default: ['Systems']
     type: list
     elements: str
   command:
     required: false
     description:
-      - List of commands to execute on OOB controller
+      - List of commands to execute on OOB controller.
     type: list
     elements: str
   baseuri:
     required: true
     description:
-      - Base URI of OOB controller
+      - Base URI of OOB controller.
     type: str
   username:
     description:
-      - User for authentication with OOB controller
+      - Username for authenticating to OOB controller.
     type: str
   password:
     description:
-      - Password for authentication with OOB controller
+      - Password for authenticating to OOB controller.
     type: str
   auth_token:
     description:
-      - Security token for authentication with OOB controller
+      - Security token for authenticating to OOB controller.
     type: str
     version_added: 2.3.0
   timeout:
     description:
-      - Timeout in seconds for URL requests to OOB controller
+      - Timeout in seconds for HTTP requests to OOB controller.
     default: 10
     type: int
 
@@ -107,6 +108,19 @@ EXAMPLES = '''
   - name: Get Virtual Media information
     community.general.redfish_info:
       category: Manager
+      command: GetVirtualMedia
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+    register: result
+
+  - name: Print fetched information
+    ansible.builtin.debug:
+      msg: "{{ result.redfish_facts.virtual_media.entries | to_nice_json }}"
+
+  - name: Get Virtual Media information from Systems
+    community.general.redfish_info:
+      category: Systems
       command: GetVirtualMedia
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
@@ -277,6 +291,14 @@ EXAMPLES = '''
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+
+  - name: Get Manager Inventory
+    community.general.redfish_info:
+      category: Manager
+      command: GetManagerInventory
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
 '''
 
 RETURN = '''
@@ -294,14 +316,14 @@ CATEGORY_COMMANDS_ALL = {
     "Systems": ["GetSystemInventory", "GetPsuInventory", "GetCpuInventory",
                 "GetMemoryInventory", "GetNicInventory", "GetHealthReport",
                 "GetStorageControllerInventory", "GetDiskInventory", "GetVolumeInventory",
-                "GetBiosAttributes", "GetBootOrder", "GetBootOverride"],
+                "GetBiosAttributes", "GetBootOrder", "GetBootOverride", "GetVirtualMedia"],
     "Chassis": ["GetFanInventory", "GetPsuInventory", "GetChassisPower",
                 "GetChassisThermals", "GetChassisInventory", "GetHealthReport"],
     "Accounts": ["ListUsers"],
     "Sessions": ["GetSessions"],
     "Update": ["GetFirmwareInventory", "GetFirmwareUpdateCapabilities", "GetSoftwareInventory"],
     "Manager": ["GetManagerNicInventory", "GetVirtualMedia", "GetLogs", "GetNetworkProtocols",
-                "GetHealthReport", "GetHostInterfaces"],
+                "GetHealthReport", "GetHostInterfaces", "GetManagerInventory"],
 }
 
 CATEGORY_COMMANDS_DEFAULT = {
@@ -411,6 +433,8 @@ def main():
                     result["boot_override"] = rf_utils.get_multi_boot_override()
                 elif command == "GetHealthReport":
                     result["health_report"] = rf_utils.get_multi_system_health_report()
+                elif command == "GetVirtualMedia":
+                    result["virtual_media"] = rf_utils.get_multi_virtualmedia(category)
 
         elif category == "Chassis":
             # execute only if we find Chassis resource
@@ -476,7 +500,7 @@ def main():
                 if command == "GetManagerNicInventory":
                     result["manager_nics"] = rf_utils.get_multi_nic_inventory(category)
                 elif command == "GetVirtualMedia":
-                    result["virtual_media"] = rf_utils.get_multi_virtualmedia()
+                    result["virtual_media"] = rf_utils.get_multi_virtualmedia(category)
                 elif command == "GetLogs":
                     result["log"] = rf_utils.get_logs()
                 elif command == "GetNetworkProtocols":
@@ -485,6 +509,8 @@ def main():
                     result["health_report"] = rf_utils.get_multi_manager_health_report()
                 elif command == "GetHostInterfaces":
                     result["host_interfaces"] = rf_utils.get_hostinterfaces()
+                elif command == "GetManagerInventory":
+                    result["manager"] = rf_utils.get_multi_manager_inventory()
 
     # Return data back
     module.exit_json(redfish_facts=result)

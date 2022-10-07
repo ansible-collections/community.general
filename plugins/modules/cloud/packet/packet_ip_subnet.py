@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2019, Nurfet Becirevic <nurfet.becirevic@gmail.com>
-# Copyright: (c) 2017, Tomas Karasek <tom.to.the.k@gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2019, Nurfet Becirevic <nurfet.becirevic@gmail.com>
+# Copyright (c) 2017, Tomas Karasek <tom.to.the.k@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 
@@ -36,13 +37,13 @@ options:
   hostname:
     description:
       - A hostname of a device to/from which to assign/remove a subnet.
-    required: False
+    required: false
     type: str
 
   device_id:
     description:
       - UUID of a device to/from which to assign/remove a subnet.
-    required: False
+    required: false
     type: str
 
   project_id:
@@ -117,7 +118,7 @@ RETURN = '''
 changed:
   description: True if an IP address assignments were altered in any way (created or removed).
   type: bool
-  sample: True
+  sample: true
   returned: success
 
 device_id:
@@ -134,15 +135,15 @@ subnet:
     assigned_to: { href : /devices/61f9aa5e-0530-47f5-97c2-113828e61ed0 }
     cidr: 31
     created_at: '2017-08-07T15:15:30Z'
-    enabled: True
+    enabled: true
     gateway: 147.75.90.240
     href: /ips/31eda960-0a16-4c0f-b196-f3dc4928529f
     id: 1eda960-0a16-4c0f-b196-f3dc4928529f
-    manageable: True
-    management: True
+    manageable: true
+    management: true
     netmask: 255.255.255.254
     network: 147.75.90.240
-    public: True
+    public: true
   returned: success
 '''
 
@@ -216,7 +217,7 @@ def parse_subnet_cidr(cidr):
     try:
         prefixlen = int(prefixlen)
     except ValueError:
-        raise("Wrong prefix length in CIDR expression {0}".format(cidr))
+        raise Exception("Wrong prefix length in CIDR expression {0}".format(cidr))
     return addr, prefixlen
 
 

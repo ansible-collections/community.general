@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2017-2018 Dell EMC Inc.
-# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -21,35 +22,35 @@ options:
   category:
     required: true
     description:
-      - Category to execute on OOB controller
+      - Category to execute on OOB controller.
     type: str
   command:
     required: true
     description:
-      - List of commands to execute on OOB controller
+      - List of commands to execute on OOB controller.
     type: list
     elements: str
   baseuri:
     required: true
     description:
-      - Base URI of OOB controller
+      - Base URI of OOB controller.
     type: str
   username:
     description:
-      - Username for authentication with OOB controller
+      - Username for authenticating to OOB controller.
     type: str
   password:
     description:
-      - Password for authentication with OOB controller
+      - Password for authenticating to OOB controller.
     type: str
   auth_token:
     description:
-      - Security token for authentication with OOB controller
+      - Security token for authenticating to OOB controller.
     type: str
     version_added: 2.3.0
   session_uri:
     description:
-      - URI of the session resource
+      - URI of the session resource.
     type: str
     version_added: 2.3.0
   id:
@@ -63,28 +64,28 @@ options:
     required: false
     aliases: [ account_username ]
     description:
-      - Username of account to add/delete/modify
+      - Username of account to add/delete/modify.
     type: str
   new_password:
     required: false
     aliases: [ account_password ]
     description:
-      - New password of account to add/modify
+      - New password of account to add/modify.
     type: str
   roleid:
     required: false
     aliases: [ account_roleid ]
     description:
-      - Role of account to add/modify
+      - Role of account to add/modify.
     type: str
   bootdevice:
     required: false
     description:
-      - bootdevice when setting boot configuration
+      - Boot device when setting boot configuration.
     type: str
   timeout:
     description:
-      - Timeout in seconds for URL requests to OOB controller
+      - Timeout in seconds for HTTP requests to OOB controller.
     default: 10
     type: int
   boot_override_mode:
@@ -96,117 +97,117 @@ options:
   uefi_target:
     required: false
     description:
-      - UEFI target when bootdevice is "UefiTarget"
+      - UEFI boot target when bootdevice is "UefiTarget".
     type: str
   boot_next:
     required: false
     description:
-      - BootNext target when bootdevice is "UefiBootNext"
+      - BootNext target when bootdevice is "UefiBootNext".
     type: str
   update_username:
     required: false
     aliases: [ account_updatename ]
     description:
-      - new update user name for account_username
+      - New user name for updating account_username.
     type: str
     version_added: '0.2.0'
   account_properties:
     required: false
     description:
-      - properties of account service to update
+      - Properties of account service to update.
     type: dict
     version_added: '0.2.0'
   resource_id:
     required: false
     description:
-      - The ID of the System, Manager or Chassis to modify
+      - ID of the System, Manager or Chassis to modify.
     type: str
     version_added: '0.2.0'
   update_image_uri:
     required: false
     description:
-      - The URI of the image for the update
+      - URI of the image for the update.
     type: str
     version_added: '0.2.0'
   update_protocol:
     required: false
     description:
-      - The protocol for the update
+      - Protocol for the update.
     type: str
     version_added: '0.2.0'
   update_targets:
     required: false
     description:
-      - The list of target resource URIs to apply the update to
+      - List of target resource URIs to apply the update to.
     type: list
     elements: str
     version_added: '0.2.0'
   update_creds:
     required: false
     description:
-      - The credentials for retrieving the update image
+      - Credentials for retrieving the update image.
     type: dict
     version_added: '0.2.0'
     suboptions:
       username:
         required: false
         description:
-          - The username for retrieving the update image
+          - Username for retrieving the update image.
         type: str
       password:
         required: false
         description:
-          - The password for retrieving the update image
+          - Password for retrieving the update image.
         type: str
   virtual_media:
     required: false
     description:
-      - The options for VirtualMedia commands
+      - Options for VirtualMedia commands.
     type: dict
     version_added: '0.2.0'
     suboptions:
       media_types:
         required: false
         description:
-          - The list of media types appropriate for the image
+          - List of media types appropriate for the image.
         type: list
         elements: str
       image_url:
         required: false
         description:
-          - The URL od the image the insert or eject
+          - URL of the image to insert or eject.
         type: str
       inserted:
         required: false
         description:
-          - Indicates if the image is treated as inserted on command completion
+          - Indicates that the image is treated as inserted on command completion.
         type: bool
-        default: True
+        default: true
       write_protected:
         required: false
         description:
-          - Indicates if the media is treated as write-protected
+          - Indicates that the media is treated as write-protected.
         type: bool
-        default: True
+        default: true
       username:
         required: false
         description:
-          - The username for accessing the image URL
+          - Username for accessing the image URL.
         type: str
       password:
         required: false
         description:
-          - The password for accessing the image URL
+          - Password for accessing the image URL.
         type: str
       transfer_protocol_type:
         required: false
         description:
-          - The network protocol to use with the image
+          - Network protocol to use with the image.
         type: str
       transfer_method:
         required: false
         description:
-          - The transfer method to use with the image
+          - Transfer method to use with the image.
         type: str
   strip_etag_quotes:
     description:
@@ -506,6 +507,20 @@ EXAMPLES = '''
 
   - name: Insert Virtual Media
     community.general.redfish_command:
+      category: Systems
+      command: VirtualMediaInsert
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      virtual_media:
+        image_url: 'http://example.com/images/SomeLinux-current.iso'
+        media_types:
+          - CD
+          - DVD
+      resource_id: 1
+
+  - name: Insert Virtual Media
+    community.general.redfish_command:
       category: Manager
       command: VirtualMediaInsert
       baseuri: "{{ baseuri }}"
@@ -517,6 +532,17 @@ EXAMPLES = '''
           - CD
           - DVD
       resource_id: BMC
+
+  - name: Eject Virtual Media
+    community.general.redfish_command:
+      category: Systems
+      command: VirtualMediaEject
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      virtual_media:
+        image_url: 'http://example.com/images/SomeLinux-current.iso'
+      resource_id: 1
 
   - name: Eject Virtual Media
     community.general.redfish_command:
@@ -592,7 +618,7 @@ from ansible.module_utils.common.text.converters import to_native
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["PowerOn", "PowerForceOff", "PowerForceRestart", "PowerGracefulRestart",
                 "PowerGracefulShutdown", "PowerReboot", "SetOneTimeBoot", "EnableContinuousBootOverride", "DisableBootOverride",
-                "IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink"],
+                "IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink", "VirtualMediaInsert", "VirtualMediaEject"],
     "Chassis": ["IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink"],
     "Accounts": ["AddUser", "EnableUser", "DeleteUser", "DisableUser",
                  "UpdateUserRole", "UpdateUserPassword", "UpdateUserName",
@@ -765,6 +791,10 @@ def main():
                 result = rf_utils.set_boot_override(boot_opts)
             elif command.startswith('IndicatorLed'):
                 result = rf_utils.manage_system_indicator_led(command)
+            elif command == 'VirtualMediaInsert':
+                result = rf_utils.virtual_media_insert(virtual_media, category)
+            elif command == 'VirtualMediaEject':
+                result = rf_utils.virtual_media_eject(virtual_media, category)
 
     elif category == "Chassis":
         result = rf_utils._find_chassis_resource()
@@ -813,9 +843,9 @@ def main():
             elif command == 'ClearLogs':
                 result = rf_utils.clear_logs()
             elif command == 'VirtualMediaInsert':
-                result = rf_utils.virtual_media_insert(virtual_media)
+                result = rf_utils.virtual_media_insert(virtual_media, category)
             elif command == 'VirtualMediaEject':
-                result = rf_utils.virtual_media_eject(virtual_media)
+                result = rf_utils.virtual_media_eject(virtual_media, category)
 
     elif category == "Update":
         # execute only if we find UpdateService resources

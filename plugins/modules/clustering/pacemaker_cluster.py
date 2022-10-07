@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2016, Mathieu Bultel <mbultel@redhat.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Mathieu Bultel <mbultel@redhat.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -36,13 +37,13 @@ options:
       description:
         - Force the change of the cluster state
       type: bool
-      default: 'yes'
+      default: true
 '''
 EXAMPLES = '''
 ---
 - name: Set cluster Online
   hosts: localhost
-  gather_facts: no
+  gather_facts: false
   tasks:
   - name: Get cluster state
     community.general.pacemaker_cluster:
@@ -51,7 +52,7 @@ EXAMPLES = '''
 
 RETURN = '''
 changed:
-    description: True if the cluster state has changed
+    description: true if the cluster state has changed
     type: bool
     returned: always
 out:

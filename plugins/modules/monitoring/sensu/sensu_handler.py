@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2017, Red Hat Inc.
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2017, Red Hat Inc.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -26,7 +27,7 @@ options:
     type: str
     description:
       - A unique name for the handler. The name cannot contain special characters or spaces.
-    required: True
+    required: true
   type:
     type: str
     description:
@@ -63,12 +64,12 @@ options:
     description:
       - If events matching one or more silence entries should be handled.
     type: bool
-    default: 'no'
+    default: false
   handle_flapping:
     description:
       - If events in the flapping state should be handled.
     type: bool
-    default: 'no'
+    default: false
   command:
     type: str
     description:

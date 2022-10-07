@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2018 Nicolai Buchwitz <nb@tipi-net.de>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2018 Nicolai Buchwitz <nb@tipi-net.de>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 
@@ -14,63 +15,69 @@ module: netcup_dns
 notes: []
 short_description: manage Netcup DNS records
 description:
-  - "Manages DNS records via the Netcup API, see the docs U(https://ccp.netcup.net/run/webservice/servers/endpoint.php)"
+  - "Manages DNS records via the Netcup API, see the docs U(https://ccp.netcup.net/run/webservice/servers/endpoint.php)."
 options:
   api_key:
     description:
-      - API key for authentication, must be obtained via the netcup CCP (U(https://ccp.netcup.net))
-    required: True
+      - "API key for authentication, must be obtained via the netcup CCP (U(https://ccp.netcup.net))."
+    required: true
     type: str
   api_password:
     description:
-      - API password for authentication, must be obtained via the netcup CCP (https://ccp.netcup.net)
-    required: True
+      - "API password for authentication, must be obtained via the netcup CCP (U(https://ccp.netcup.net))."
+    required: true
     type: str
   customer_id:
     description:
-      - Netcup customer id
-    required: True
+      - Netcup customer id.
+    required: true
     type: int
   domain:
     description:
-      - Domainname the records should be added / removed
-    required: True
+      - Domainname the records should be added / removed.
+    required: true
     type: str
   record:
     description:
-      - Record to add or delete, supports wildcard (*). Default is C(@) (e.g. the zone name)
+      - Record to add or delete, supports wildcard (*). Default is C(@) (e.g. the zone name).
     default: "@"
     aliases: [ name ]
     type: str
   type:
     description:
-      - Record type
+      - Record type.
     choices: ['A', 'AAAA', 'MX', 'CNAME', 'CAA', 'SRV', 'TXT', 'TLSA', 'NS', 'DS']
-    required: True
+    required: true
     type: str
   value:
     description:
-      - Record value
+      - Record value.
     required: true
     type: str
   solo:
     type: bool
-    default: False
+    default: false
     description:
-      - Whether the record should be the only one for that record type and record name. Only use with C(state=present)
+      - Whether the record should be the only one for that record type and record name. Only use with I(state=present).
       - This will delete all other records with the same record name and type.
   priority:
     description:
-      - Record priority. Required for C(type=MX)
-    required: False
+      - Record priority. Required for I(type=MX).
+    required: false
     type: int
   state:
     description:
-      - Whether the record should exist or not
-    required: False
+      - Whether the record should exist or not.
+    required: false
     default: present
     choices: [ 'present', 'absent' ]
     type: str
+  timeout:
+    description:
+      - HTTP(S) connection timeout in seconds.
+    default: 5
+    type: int
+    version_added: 5.7.0
 requirements:
   - "nc-dnsapi >= 0.1.3"
 author: "Nicolai Buchwitz (@nbuchwitz)"
@@ -128,6 +135,18 @@ EXAMPLES = '''
     type: "AAAA"
     value: "::1"
     solo: true
+
+- name: Increase the connection timeout to avoid problems with an unstable connection
+  community.general.netcup_dns:
+    api_key: "..."
+    api_password: "..."
+    customer_id: "..."
+    domain: "example.com"
+    name: "mail"
+    type: "A"
+    value: "127.0.0.1"
+    timeout: 30
+
 '''
 
 RETURN = '''
@@ -192,6 +211,7 @@ def main():
             priority=dict(required=False, type='int'),
             solo=dict(required=False, type='bool', default=False),
             state=dict(required=False, choices=['present', 'absent'], default='present'),
+            timeout=dict(required=False, type='int', default=5),
 
         ),
         supports_check_mode=True
@@ -210,6 +230,7 @@ def main():
     priority = module.params.get('priority')
     solo = module.params.get('solo')
     state = module.params.get('state')
+    timeout = module.params.get('timeout')
 
     if record_type == 'MX' and not priority:
         module.fail_json(msg="record type MX required the 'priority' argument")
@@ -217,7 +238,7 @@ def main():
     has_changed = False
     all_records = []
     try:
-        with nc_dnsapi.Client(customer_id, api_key, api_password) as api:
+        with nc_dnsapi.Client(customer_id, api_key, api_password, timeout) as api:
             all_records = api.dns_records(domain)
             record = DNSRecord(record, record_type, value, priority=priority)
 

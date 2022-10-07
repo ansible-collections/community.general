@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright: (c) 2016, Abdoul Bah (@helldorado) <bahabdoul at gmail.com>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Copyright (c) 2016, Abdoul Bah (@helldorado) <bahabdoul at gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -19,12 +20,14 @@ options:
   acpi:
     description:
       - Specify if ACPI should be enabled/disabled.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(yes).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(true).
     type: bool
   agent:
     description:
       - Specify if the QEMU Guest Agent should be enabled/disabled.
-    type: bool
+      - Since community.general 5.5.0, this can also be a string instead of a boolean.
+        This allows to specify values such as C(enabled=1,fstrim_cloned_disks=1).
+    type: str
   args:
     description:
       - Pass arbitrary arguments to kvm.
@@ -35,7 +38,7 @@ options:
   autostart:
     description:
       - Specify if the VM should be automatically restarted after crash (currently ignored in PVE API).
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(no).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
     type: bool
   balloon:
     description:
@@ -83,7 +86,7 @@ options:
     version_added: 1.3.0
   clone:
     description:
-      - Name of VM to be cloned. If C(vmid) is setted, C(clone) can take arbitrary value but required for initiating the clone.
+      - Name of VM to be cloned. If I(vmid) is set, I(clone) can take an arbitrary value but is required for initiating the clone.
     type: str
   cores:
     description:
@@ -157,7 +160,7 @@ options:
     description:
       - Allow to force stop VM.
       - Can be used with states C(stopped), C(restarted) and C(absent).
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(no).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
     type: bool
   format:
     description:
@@ -181,7 +184,7 @@ options:
       - For VM templates, we try to create a linked clone by default.
       - Used only with clone
     type: bool
-    default: 'yes'
+    default: true
   hostpci:
     description:
       - Specify a hash/dictionary of map host pci devices into guest. C(hostpci='{"key":"value", "key":"value"}').
@@ -235,7 +238,7 @@ options:
   kvm:
     description:
       - Enable/disable KVM hardware virtualization.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(yes).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(true).
     type: bool
   localtime:
     description:
@@ -311,7 +314,7 @@ options:
   onboot:
     description:
       - Specifies whether a VM will be started during system bootup.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(yes).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(true).
     type: bool
   ostype:
     description:
@@ -332,7 +335,7 @@ options:
     type: bool
   reboot:
     description:
-      - Allow reboot. If set to C(yes), the VM exit on reboot.
+      - Allow reboot. If set to C(true), the VM exit on reboot.
     type: bool
   revert:
     description:
@@ -434,7 +437,7 @@ options:
   tablet:
     description:
       - Enables/disables the USB tablet device.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(no).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
     type: bool
   tags:
     description:
@@ -456,7 +459,7 @@ options:
   template:
     description:
       - Enables/disables the template.
-      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(no).
+      - This option has no default unless I(proxmox_default_behavior) is set to C(compatiblity); then the default is C(false).
     type: bool
   timeout:
     description:
@@ -465,12 +468,12 @@ options:
     default: 30
   update:
     description:
-      - If C(yes), the VM will be updated with new value.
+      - If C(true), the VM will be updated with new value.
       - Cause of the operations of the API and security reasons, I have disabled the update of the following parameters
       - C(net, virtio, ide, sata, scsi). Per example updating C(net) update the MAC address and C(virtio) create always new disk...
       - Update of C(pool) is disabled. It needs an additional API endpoint not covered by this module.
     type: bool
-    default: 'no'
+    default: false
   vcpus:
     description:
       - Sets number of hotplugged vcpus.
@@ -577,7 +580,7 @@ EXAMPLES = '''
       storage: VMs_LVM_thin
       format: raw
       efitype: 4m
-      pre_enrolled_keys: False
+      pre_enrolled_keys: false
 
 - name: Create VM with 1 10GB SATA disk and an EFI disk, with Secure Boot enabled by default
   community.general.proxmox_kvm:
@@ -622,7 +625,7 @@ EXAMPLES = '''
     name: zavala
     node: sabrewulf
     storage: VMs
-    full: no
+    full: false
     format: unspecified
     timeout: 500
 
@@ -656,7 +659,7 @@ EXAMPLES = '''
     api_host: helldorado
     name: spynal
     node: sabrewulf
-    protection: yes
+    protection: true
 
 - name: Create new VM using cloud-init with a username and password
   community.general.proxmox_kvm:
@@ -721,7 +724,7 @@ EXAMPLES = '''
     name: spynal
     node: sabrewulf
     state: stopped
-    force: yes
+    force: true
 
 - name: Restart VM
   community.general.proxmox_kvm:
@@ -759,7 +762,7 @@ EXAMPLES = '''
     node: sabrewulf
     cores: 8
     memory: 16384
-    update: yes
+    update: true
 
 - name: Delete QEMU parameters
   community.general.proxmox_kvm:
@@ -800,14 +803,13 @@ msg:
 
 import re
 import time
-import traceback
 from ansible.module_utils.six.moves.urllib.parse import quote
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 from ansible_collections.community.general.plugins.module_utils.proxmox import (proxmox_auth_argument_spec, ProxmoxAnsible)
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.parsing.convert_bool import boolean
 
 
 def parse_mac(netstr):
@@ -864,8 +866,7 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
         timeout = self.module.params['timeout']
 
         while timeout:
-            task = self.proxmox_api.nodes(node).tasks(taskid).status.get()
-            if task['status'] == 'stopped' and task['exitstatus'] == 'OK':
+            if self.api_task_ok(node, taskid):
                 # Wait an extra second as the API can be a ahead of the hypervisor
                 time.sleep(1)
                 return True
@@ -959,7 +960,15 @@ class ProxmoxKvmAnsible(ProxmoxAnsible):
                 kwargs.update(kwargs[k])
                 del kwargs[k]
 
-        # Rename numa_enabled to numa. According the API documentation
+        if 'agent' in kwargs:
+            try:
+                # The API also allows booleans instead of e.g. `enabled=1` for backward-compatibility.
+                kwargs['agent'] = boolean(kwargs['agent'], strict=True)
+            except TypeError:
+                # Not something that Ansible would parse as a boolean.
+                pass
+
+        # Rename numa_enabled to numa, according the API documentation
         if 'numa_enabled' in kwargs:
             kwargs['numa'] = kwargs['numa_enabled']
             del kwargs['numa_enabled']
@@ -1039,7 +1048,7 @@ def main():
     module_args = proxmox_auth_argument_spec()
     kvm_args = dict(
         acpi=dict(type='bool'),
-        agent=dict(type='bool'),
+        agent=dict(type='str'),
         args=dict(type='str'),
         autostart=dict(type='bool'),
         balloon=dict(type='int'),
@@ -1204,12 +1213,12 @@ def main():
         # Ensure source VM id exists when cloning
         proxmox.get_vm(vmid)
 
-        # Ensure the choosen VM name doesn't already exist when cloning
+        # Ensure the chosen VM name doesn't already exist when cloning
         existing_vmid = proxmox.get_vmid(name, ignore_missing=True)
         if existing_vmid:
             module.exit_json(changed=False, vmid=existing_vmid, msg="VM with name <%s> already exists" % name)
 
-        # Ensure the choosen VM id doesn't already exist when cloning
+        # Ensure the chosen VM id doesn't already exist when cloning
         if proxmox.get_vm(newid, ignore_missing=True):
             module.exit_json(changed=False, vmid=vmid, msg="vmid %s with VM name %s already exists" % (newid, name))
 
@@ -1233,8 +1242,10 @@ def main():
                 module.exit_json(changed=False, vmid=vmid, msg="VM with vmid <%s> already exists" % vmid)
             elif proxmox.get_vmid(name, ignore_missing=True) and not (update or clone):
                 module.exit_json(changed=False, vmid=proxmox.get_vmid(name), msg="VM with name <%s> already exists" % name)
-            elif not (node, name):
-                module.fail_json(msg='node, name is mandatory for creating/updating vm')
+            elif not node:
+                module.fail.json(msg='node is mandatory for creating/updating VM')
+            elif update and not any([vmid, name]):
+                module.fail_json(msg='vmid or name is mandatory for updating VM')
             elif not proxmox.get_node(node):
                 module.fail_json(msg="node '%s' does not exist in cluster" % node)
 
@@ -1370,6 +1381,8 @@ def main():
 
     elif state == 'absent':
         status = {}
+        if not vmid:
+            module.exit_json(changed=False, msg='VM with name = %s is already absent' % name)
         try:
             vm = proxmox.get_vm(vmid, ignore_missing=True)
             if not vm:
@@ -1381,7 +1394,7 @@ def main():
                 if module.params['force']:
                     proxmox.stop_vm(vm, True)
                 else:
-                    module.exit_json(changed=False, vmid=vmid, msg="VM %s is running. Stop it before deletion or use force=yes." % vmid)
+                    module.exit_json(changed=False, vmid=vmid, msg="VM %s is running. Stop it before deletion or use force=true." % vmid)
             taskid = proxmox_node.qemu.delete(vmid)
             if not proxmox.wait_for_task(vm['node'], taskid):
                 module.fail_json(msg='Reached timeout while waiting for removing VM. Last line in task before timeout: %s' %

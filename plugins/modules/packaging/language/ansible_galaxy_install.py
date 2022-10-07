@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# (c) 2021, Alexei Znamensky <russoz@gmail.com>
+# Copyright (c) 2021, Alexei Znamensky <russoz@gmail.com>
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
@@ -226,7 +227,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
     check_rc = True
 
     def _get_ansible_galaxy_version(self):
-        ansible_galaxy = self.module.get_bin_path("ansible-galaxy", required=True)
+        ansible_galaxy = self.get_bin_path("ansible-galaxy", required=True)
         dummy, out, dummy = self.module.run_command([ansible_galaxy, "--version"], check_rc=True)
         line = out.splitlines()[0]
         match = self._RE_GALAXY_VERSION.match(line)
@@ -242,7 +243,7 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
             self.module.deprecate(
                 "Support for Ansible 2.9 and ansible-base 2.10 is being deprecated. "
                 "At the same time support for them is ended, also the ack_ansible29 option will be removed. "
-                "Upgrading is strongly recommended, or set 'ack_min_ansiblecore211' to supress this message.",
+                "Upgrading is strongly recommended, or set 'ack_min_ansiblecore211' to suppress this message.",
                 version="8.0.0",
                 collection_name="community.general",
             )
@@ -302,9 +303,9 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
         self.vars.set("new_roles", {})
         self.vars.set("ansible29_change", False, change=True, output=False)
         if not (self.vars.ack_ansible29 or self.vars.ack_min_ansiblecore211):
-            self.module.warn("Ansible 2.9 or older: unable to retrieve lists of roles and collections already installed")
+            self.warn("Ansible 2.9 or older: unable to retrieve lists of roles and collections already installed")
             if self.vars.requirements_file is not None and self.vars.type == 'both':
-                self.module.warn("Ansible 2.9 or older: will install only roles from requirement files")
+                self.warn("Ansible 2.9 or older: will install only roles from requirement files")
 
     def _setup210plus(self):
         self.vars.set("new_collections", {}, change=True)

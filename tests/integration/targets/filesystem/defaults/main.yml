@@ -1,4 +1,8 @@
 ---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 tested_filesystems:
   # key: fstype
   #   fssize: size (Mo)
@@ -15,7 +19,7 @@ tested_filesystems:
   ext4dev: {fssize: 10, grow: True}
   ext3: {fssize: 10, grow: True}
   ext2: {fssize: 10, grow: True}
-  xfs: {fssize: 20, grow: False}  # grow requires a mounted filesystem
+  xfs: {fssize: 300, grow: False}  # grow requires a mounted filesystem
   btrfs: {fssize: 150, grow: False}  # grow requires a mounted filesystem
   reiserfs: {fssize: 33, grow: False}  # grow not implemented
   vfat: {fssize: 20, grow: True}
