@@ -187,10 +187,7 @@ def iso_check_file_exists(opened_iso, dest_file):
         if dirname != parent_dir.upper():
             return False
 
-        if file_name.upper() in filelist or file_in_iso_path in filelist:
-            return True
-        else:
-            return False
+        return file_name.upper() in filelist or file_in_iso_path in filelist
 
 
 def iso_add_file(module, opened_iso, iso_type, src_file, dest_file):
