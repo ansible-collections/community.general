@@ -1,0 +1,81 @@
+# Copyright (c) 2022, Ansible Project
+# Copyright (c) 2022, VMware, Inc. All Rights Reserved.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "Testcase: local resource ISO does not exists"
+  community.general.iso_customize:
+    src_iso: "{{ test_dir }}/test11.iso"
+    dest_iso: "{{ test_dir }}/{{ dest_iso_name }}"
+  register: customized_result
+  failed_when: customized_result.msg.find('does not exist') == -1
+
+- name: "Testcase:: dest dir does not exists"
+  community.general.iso_customize:
+    src_iso: "{{ test_dir }}/test1.iso"
+    dest_iso: "/aaa/{{ dest_iso_name }}"
+  register: customized_result
+  failed_when: customized_result.msg.find('does not exist') == -1
+
+# Test: Get MODULE FAILURE when no add files data and no delete files data
+- name: "Testcase:: no add files data and no delete files data"
+  community.general.iso_customize:
+    src_iso: "{{ test_dir }}/test1.iso"
+    dest_iso: "{{ test_dir }}/iso_customize_nodata.iso"
+    delete_files:
+    add_files:
+  register: customized_result
+  failed_when: customized_result.msg.find("MODULE FAILURE") == -1
+
+# Test: nothing is changed when no options "add files" and "delete files"
+- block:
+    - name: "Testcase: no options 'add files' and 'delete files'"
+      community.general.iso_customize:
+        src_iso: "{{ test_dir }}/test1.iso"
+        dest_iso: "{{ test_dir }}/iso_customize_nochanged.iso"
+
+    - name: Get stats of a file test1.iso
+      ansible.builtin.stat:
+        path: "{{ test_dir }}/test1.iso"
+      register: iso_orginal
+
+    - name: Get stats of a file iso_customize_nochanged.iso
+      ansible.builtin.stat:
+        path: "{{ test_dir }}/iso_customize_nochanged.iso"
+      register: iso_customized
+
+    - name: compare size
+      fail: msg="Check we have nothing changed for customized ISO"
+      when: iso_orginal.stat.size != iso_customized.stat.size
+
+- name: "Testcase: delete the non-existing file in ISO"
+  community.general.iso_customize:
+    src_iso: "{{ test_dir }}/test1.iso"
+    dest_iso: "{{ test_dir }}/{{ dest_iso_name }}"
+    delete_files:
+      - "/test03.cfg"
+  register: customized_result
+  failed_when: customized_result.msg.find("does not exist") == -1
+
+# Test: failed when local src file does not exists
+- name: "Testcase: local src file does not exists"
+  community.general.iso_customize:
+    src_iso: "{{ test_dir }}/test.iso"
+    dest_iso: "{{ test_dir }}/{{ dest_iso_name }}"
+    add_files:
+      - src_file: "{{ test_dir }}/test03.cfg"
+        dest_file: "/preseed/ubuntu.seed"
+  register: customized_result
+  failed_when: customized_result.msg.find("does not exist") == -1
+
+# Test: filenames with whitespaces
+# We report error: the user should be reponsible for the it
+- name: "Testcase: filenames with whitespaces"
+  community.general.iso_customize:
+    src_iso: "{{ test_dir }}/test.iso"
+    dest_iso: "{{ test_dir }}/{{ dest_iso_name }}"
+    add_files:
+      - src_file: " {{ test_dir }}/test01.cfg "
+        dest_file: "/preseed/ubuntu.seed"
+  register: customized_result
+  failed_when: customized_result.msg.find("does not exist") == -1
