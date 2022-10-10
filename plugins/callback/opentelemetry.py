@@ -62,6 +62,17 @@ DOCUMENTATION = '''
           - The L(W3C Trace Context header traceparent,https://www.w3.org/TR/trace-context-1/#traceparent-header).
         env:
           - name: TRACEPARENT
+      disable_logs:
+        default: false
+        type: bool
+        description:
+          - Disable sending logs.
+        env:
+          - name: ANSIBLE_OPENTELEMETRY_DISABLE_LOGS
+        ini:
+          - section: callback_opentelemetry
+            key: disable_logs
+        version_added: 5.8.0
     requirements:
       - opentelemetry-api (Python library)
       - opentelemetry-exporter-otlp (Python library)
@@ -134,6 +145,7 @@ class TaskData:
             self.start = _time_ns()
         self.action = action
         self.args = args
+        self.dump = None
 
     def add_host(self, host):
         if host.uuid in self.host_data:
@@ -199,7 +211,7 @@ class OpenTelemetrySource(object):
 
         tasks_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
 
-    def finish_task(self, tasks_data, status, result):
+    def finish_task(self, tasks_data, status, result, dump):
         """ record the results of a task for a single host """
 
         task_uuid = result._task._uuid
@@ -216,9 +228,10 @@ class OpenTelemetrySource(object):
         if self.ansible_version is None and hasattr(result, '_task_fields') and result._task_fields['args'].get('_ansible_version'):
             self.ansible_version = result._task_fields['args'].get('_ansible_version')
 
+        task.dump = dump
         task.add_host(HostData(host_uuid, host_name, status, result))
 
-    def generate_distributed_traces(self, otel_service_name, ansible_playbook, tasks_data, status, traceparent):
+    def generate_distributed_traces(self, otel_service_name, ansible_playbook, tasks_data, status, traceparent, disable_logs):
         """ generate distributed traces from the collected TaskData and HostData """
 
         tasks = []
@@ -254,9 +267,9 @@ class OpenTelemetrySource(object):
             for task in tasks:
                 for host_uuid, host_data in task.host_data.items():
                     with tracer.start_as_current_span(task.name, start_time=task.start, end_on_exit=False) as span:
-                        self.update_span_data(task, host_data, span)
+                        self.update_span_data(task, host_data, span, disable_logs)
 
-    def update_span_data(self, task_data, host_data, span):
+    def update_span_data(self, task_data, host_data, span, disable_logs):
         """ update the span with the given TaskData and HostData """
 
         name = '[%s] %s: %s' % (host_data.name, task_data.play, task_data.name)
@@ -302,6 +315,9 @@ class OpenTelemetrySource(object):
         self.set_span_attribute(span, "ansible.task.host.status", host_data.status)
         # This will allow to enrich the service map
         self.add_attributes_for_service_map_if_possible(span, task_data)
+        # Send logs
+        if not disable_logs:
+            span.add_event(task_data.dump)
         span.end(end_time=host_data.finish)
 
     def set_span_attribute(self, span, attributeName, attributeValue):
@@ -405,6 +421,7 @@ class CallbackModule(CallbackBase):
     def __init__(self, display=None):
         super(CallbackModule, self).__init__(display=display)
         self.hide_task_arguments = None
+        self.disable_logs = None
         self.otel_service_name = None
         self.ansible_playbook = None
         self.play_name = None
@@ -434,6 +451,8 @@ class CallbackModule(CallbackBase):
                                   "Disabling the `opentelemetry` callback plugin.".format(environment_variable))
 
         self.hide_task_arguments = self.get_option('hide_task_arguments')
+
+        self.disable_logs = self.get_option('disable_logs')
 
         self.otel_service_name = self.get_option('otel_service_name')
 
@@ -491,28 +510,32 @@ class CallbackModule(CallbackBase):
         self.opentelemetry.finish_task(
             self.tasks_data,
             status,
-            result
+            result,
+            self._dump_results(result._result)
         )
 
     def v2_runner_on_ok(self, result):
         self.opentelemetry.finish_task(
             self.tasks_data,
             'ok',
-            result
+            result,
+            self._dump_results(result._result)
         )
 
     def v2_runner_on_skipped(self, result):
         self.opentelemetry.finish_task(
             self.tasks_data,
             'skipped',
-            result
+            result,
+            self._dump_results(result._result)
         )
 
     def v2_playbook_on_include(self, included_file):
         self.opentelemetry.finish_task(
             self.tasks_data,
             'included',
-            included_file
+            included_file,
+            ""
         )
 
     def v2_playbook_on_stats(self, stats):
@@ -525,7 +548,8 @@ class CallbackModule(CallbackBase):
             self.ansible_playbook,
             self.tasks_data,
             status,
-            self.traceparent
+            self.traceparent,
+            self.disable_logs
         )
 
     def v2_runner_on_async_failed(self, result, **kwargs):
