@@ -132,7 +132,7 @@ def time_ns():
         # Support versions older than 3.7 with opentelemetry-api > 1.12
         if OTEL_LIBRARY_TIME_NS_ERROR:
             return int(time.time() * 1e9)
-        return  _time_ns()
+        return _time_ns()
 
 
 class TaskData:
