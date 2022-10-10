@@ -13,7 +13,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 
 module: manageiq_policies_info
-version_added: 5.7.0
+version_added: 5.8.0
 
 short_description: Listing of resource policy_profiles in ManageIQ
 extends_documentation_fragment:
