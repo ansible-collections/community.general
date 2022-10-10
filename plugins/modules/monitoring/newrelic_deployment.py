@@ -13,9 +13,9 @@ DOCUMENTATION = '''
 ---
 module: newrelic_deployment
 author: "Matt Coddington (@mcodd)"
-short_description: Notify newrelic about app deployments
+short_description: Notify New Relic about app deployments
 description:
-  - Notify newrelic about app deployments (see https://docs.newrelic.com/docs/apm/new-relic-apm/maintenance/record-monitor-deployments/)
+  - Notify New Relic about app deployments (see https://docs.newrelic.com/docs/apm/new-relic-apm/maintenance/record-monitor-deployments/)
 options:
   token:
     type: str
@@ -25,12 +25,14 @@ options:
   app_name:
     type: str
     description:
-      - (one of app_name or application_id are required) The value of app_name in the newrelic.yml file used by the application
+      - The value of app_name in the newrelic.yml file used by the application.
+      - One of I(app_name) or I(application_id) is required.
     required: false
   application_id:
     type: str
     description:
-      - (one of app_name or application_id are required) The application ID, found in the metadata of the application in APM
+      - The application ID, found in the metadata of the application in APM.
+      - One of I(app_name) or I(application_id) is required.
     required: false
   changelog:
     type: str
@@ -46,7 +48,7 @@ options:
     type: str
     description:
       - A revision number (e.g., git commit SHA)
-    required: True
+    required: true
   user:
     type: str
     description:
@@ -56,19 +58,19 @@ options:
     type: str
     description:
       - Name of the application.
-      - This option has been deprecated and will be removed. Please do not use.
+      - This option has been deprecated and will be removed in community.general 7.0.0. Please do not use.
     required: false
   environment:
     type: str
     description:
       - The environment for this deployment.
-      - This option has been deprecated and will be removed. Please do not use.
+      - This option has been deprecated and will be removed community.general 7.0.0. Please do not use.
     required: false
   validate_certs:
     description:
       - If C(false), SSL certificates will not be validated. This should only be used
         on personally controlled sites using self-signed certificates.
-      - This option has been deprecated and will be removed. Please do not use.
+      - This option has been deprecated and will be removed community.general 7.0.0. Please do not use.
     required: false
     default: true
     type: bool
@@ -76,10 +78,10 @@ requirements: []
 '''
 
 EXAMPLES = '''
-- name:  Notify newrelic about an app deployment
+- name:  Notify New Relic about an app deployment
   community.general.newrelic_deployment:
     token: AAAAAA
-    application_id: 12345678
+    app_name: myapp
     user: ansible deployment
     revision: '1.0'
 '''
@@ -137,7 +139,7 @@ def main():
     if module.check_mode:
         module.exit_json(changed=True)
 
-    # Send the data to NewRelic
+    # Send the data to New Relic
     url = "https://api.newrelic.com/v2/applications/%s/deployments.json" % quote(str(app_id), safe='')
     data = {
         'deployment': params
@@ -150,23 +152,23 @@ def main():
     if info['status'] in (200, 201):
         module.exit_json(changed=True)
     else:
-        module.fail_json(msg="Unable to update newrelic: %s" % info['msg'])
+        module.fail_json(msg="Unable to update New Relic: %s" % info['msg'])
 
 
 def get_application_id(module):
     url = "https://api.newrelic.com/v2/applications.json"
     data = "filter[name]=%s" % quote(module.params["app_name"], safe='')
     headers = {
-        'Api-Key': quote(module.params["token"], safe=''),
+        'Api-Key': module.params["token"],
     }
     response, info = fetch_url(module, url, data=data, headers=headers)
     if info['status'] not in (200, 201):
-        module.fail_json(msg="unable to get application from newrelic: %s" % info['msg'])
+        module.fail_json(msg="Unable to get application from New Relic: %s" % info['msg'])
         return None
 
     result = json.loads(response.read())
     if result is None or len(result["applications"]) == 0:
-        module.fail_json(msg='No application found')
+        module.fail_json(msg='No application found with name "%s"' % module.params["app_name"])
         return None
     return result["applications"][0]["id"]
 
