@@ -560,6 +560,8 @@ files:
     maintainers: jpmens noseka1
   $modules/files/iso_create.py:
     maintainers: Tomorrow9
+  $modules/files/iso_customize.py:
+    maintainers: ZouYuhua
   $modules/files/iso_extract.py:
     maintainers: dagwieers jhoekx ribbons
   $modules/files/read_csv.py:
