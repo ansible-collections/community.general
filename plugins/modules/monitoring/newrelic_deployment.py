@@ -6,17 +6,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import absolute_import, division, print_function
-from ansible.module_utils.six.moves.urllib.parse import quote
-import json
 __metaclass__ = type
 
 
 DOCUMENTATION = '''
 ---
 module: newrelic_deployment
-author:
-  - "Matt Coddington (@mcodd)"
-  - "Wei Liao (@wliao008)"
+author: "Matt Coddington (@mcodd)"
 short_description: Notify newrelic about app deployments
 description:
   - Notify newrelic about app deployments (see https://docs.newrelic.com/docs/apm/new-relic-apm/maintenance/record-monitor-deployments/)
@@ -90,6 +86,8 @@ EXAMPLES = '''
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
+from ansible.module_utils.six.moves.urllib.parse import quote
+import json
 
 # ===========================================
 # Module execution.
