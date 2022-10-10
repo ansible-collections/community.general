@@ -20,7 +20,7 @@ options:
   token:
     type: str
     description:
-      - API token, to place in the Api-Key header.
+      - API token to place in the Api-Key header.
     required: true
   app_name:
     type: str
@@ -31,7 +31,7 @@ options:
   application_id:
     type: str
     description:
-      - The application ID, found in the metadata of the application in APM.
+      - The application ID found in the metadata of the application in APM.
       - One of I(app_name) or I(application_id) is required.
     required: false
   changelog:
@@ -129,7 +129,7 @@ def main():
         module.fail_json(msg="you must set one of 'app_name' or 'application_id'")
 
     if app_id is None:
-        module.fail_json(msg="No application with name %s is found in NewRelic" % quote(module.params["app_name"], safe=''))
+        module.fail_json(msg="No application with name %s is found in NewRelic" % module.params["app_name"])
 
     for item in ["changelog", "description", "revision", "user"]:
         if module.params[item]:
@@ -152,22 +152,22 @@ def main():
     if info['status'] in (200, 201):
         module.exit_json(changed=True)
     else:
-        module.fail_json(msg="Unable to update New Relic: %s" % info['msg'])
+        module.fail_json(msg="Unable to insert deployment marker: %s" % info['msg'])
 
 
 def get_application_id(module):
     url = "https://api.newrelic.com/v2/applications.json"
-    data = "filter[name]=%s" % quote(module.params["app_name"], safe='')
+    data = "filter[name]=%s" % module.params["app_name"]
     headers = {
         'Api-Key': module.params["token"],
     }
     response, info = fetch_url(module, url, data=data, headers=headers)
     if info['status'] not in (200, 201):
-        module.fail_json(msg="Unable to get application from New Relic: %s" % info['msg'])
+        module.fail_json(msg="Unable to get application: %s" % info['msg'])
         return None
 
     result = json.loads(response.read())
-    if result is None or len(result["applications"]) == 0:
+    if result is None or len(result.get("applications", "")) == 0:
         module.fail_json(msg='No application found with name "%s"' % module.params["app_name"])
         return None
     return result["applications"][0]["id"]
