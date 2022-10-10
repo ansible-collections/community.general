@@ -125,6 +125,16 @@ else:
     OTEL_LIBRARY_IMPORT_ERROR = None
 
 
+def time_ns():
+    if sys.version_info >= (3, 7):
+        return time.time_ns()
+    else:
+        # Support versions older than 3.7 with opentelemetry-api > 1.12
+        if OTEL_LIBRARY_TIME_NS_ERROR:
+            return int(time.time() * 1e9)
+        return  _time_ns()
+
+
 class TaskData:
     """
     Data about an individual task.
@@ -136,14 +146,7 @@ class TaskData:
         self.path = path
         self.play = play
         self.host_data = OrderedDict()
-        if sys.version_info >= (3, 7):
-            self.start = time.time_ns()
-        else:
-            # Support versions older than 3.7 with opentelemetry-api > 1.12
-            if OTEL_LIBRARY_TIME_NS_ERROR:
-                self.start = int(time.time() * 1e9)
-            else:
-                self.start = _time_ns()
+        self.start = time_ns()
         self.action = action
         self.args = args
 
@@ -168,14 +171,7 @@ class HostData:
         self.name = name
         self.status = status
         self.result = result
-        if sys.version_info >= (3, 7):
-            self.finish = time.time_ns()
-        else:
-            # Support versions older than 3.7 with opentelemetry-api > 1.12
-            if OTEL_LIBRARY_TIME_NS_ERROR:
-                self.finish = int(time.time() * 1e9)
-            else:
-                self.finish = _time_ns()
+        self.finish = time_ns()
 
 
 class OpenTelemetrySource(object):
