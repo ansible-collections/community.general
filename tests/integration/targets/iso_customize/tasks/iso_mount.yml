@@ -1,0 +1,39 @@
+# Copyright (c) 2022, Ansible Project
+# Copyright (c) 2022, VMware, Inc. All Rights Reserved.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- debug: var=ansible_distribution
+
+- block:
+    - name: "Mount customized ISO on MAC"
+      command: "hdiutil attach {{ test_dir }}/{{ iso_name }} -mountroot {{ test_dir }}/iso_mount"
+
+    # For MAC, we have different root directory for different type of ISO
+    - set_fact:
+        mount_root_dir: "{{ test_dir }}/iso_mount/disk_image"
+
+    - set_fact:
+        mount_root_dir: "{{ test_dir }}/iso_mount/AUTOINSTALL"
+      when: iso_name.find('joliet') != -1
+
+    - set_fact:
+        mount_root_dir: "{{ test_dir }}/iso_mount/CDROM"
+      when: iso_name.find('udf') != -1
+  when: ansible_distribution == "MacOSX"
+
+- block:
+    - name: "Mount {{ iso_name }} to {{ test_dir }}/iso_mount on localhost"
+      become: true
+      ansible.posix.mount:
+        path: "{{ test_dir }}/iso_mount"
+        src: "{{ test_dir }}/{{ iso_name }}"
+        opts: "ro,noauto"
+        fstab: "{{ test_dir }}/temp.fstab"
+        fstype: "iso9660"
+        state: mounted
+
+    - set_fact:
+        mount_root_dir: "{{ test_dir }}/iso_mount"
+  when: 
+    - ansible_distribution != "MacOSX"

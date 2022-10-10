@@ -1,0 +1,75 @@
+# Copyright (c) 2022, Ansible Project
+# Copyright (c) 2022, VMware, Inc. All Rights Reserved.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Add a line to the file test02.cfg and make sure it succeed
+  ansible.builtin.lineinfile:
+    path: "{{ test_dir }}/test02.cfg"
+    regexp: "^test"
+    line: "test"
+
+- name: "Customize ISO file: add file, delete file and change file"
+  community.general.iso_customize:
+    src_iso: "{{ test_dir }}/test.iso"
+    dest_iso: "{{ test_dir }}/{{ dest_iso_name }}"
+    delete_files:
+      - "/test01.cfg"
+    add_files:
+      - src_file: "{{ test_dir }}/test01.cfg"
+        dest_file: "/preseed/ubuntu.seed"
+      - src_file: "{{ test_dir }}/test02.cfg"
+        dest_file: "/test02.cfg"
+
+- include_tasks: iso_mount.yml
+  vars:
+    iso_name: "{{ dest_iso_name }}"
+
+- debug: var=mount_root_dir
+
+- name: Check the file test01.cfg is deleted
+  stat:
+    path: "{{ mount_root_dir }}/test01.cfg"
+  register: check_file
+
+- assert:
+    that:
+    - check_file.stat.exists == False
+
+- name: Check the file /preseed/ubuntu.seed is added
+  stat:
+    path: "{{ mount_root_dir }}/preseed/ubuntu.seed"
+  register: check_file
+
+- assert:
+    that:
+    - check_file.stat.exists == True
+
+- block:
+    - name: Get the content of file test02.cfg
+      command: "cat {{ mount_root_dir }}/test02.cfg"
+      register: get_file_content
+
+    - set_fact:
+        file_contents: "{{ get_file_content.stdout }}"
+  when: ansible_distribution == 'RedHat' and ansible_distribution_version is version('7.9', '==')
+
+- name: Get the content of file test02.cfg
+  set_fact:
+    file_contents: "{{ lookup('file', mount_root_dir + '/test02.cfg') }}"
+  when: not (ansible_distribution == 'RedHat' and ansible_distribution_version is version('7.9', '=='))
+
+- fail: msg="Failed to replace the file test02.cfg"
+  when: file_contents != "test"
+
+- name: Umount ISO
+  mount:
+    path: "{{ mount_root_dir }}"
+    fstab: "{{ test_dir }}/temp.fstab"
+    state: unmounted
+
+- name: Delete line of file test02.cfg
+  ansible.builtin.lineinfile:
+    path: "{{ test_dir }}/test02.cfg"
+    regexp: "test" 
+    state: absent
