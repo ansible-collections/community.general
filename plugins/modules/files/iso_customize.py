@@ -21,7 +21,7 @@ author:
 requirements:
   - "pycdlib"
   - "python >= 2.7"
-version_added: '5.7.0'
+version_added: '5.8.0'
 
 options:
   src_iso:
@@ -88,7 +88,7 @@ src_iso:
   type: str
   sample: "/path/to/file.iso"
 dest_iso:
-  description: path of the customized iso file.
+  description: Path of the customized ISO file.
   returned: on success
   type: str
   sample: "/path/to/customized.iso"
