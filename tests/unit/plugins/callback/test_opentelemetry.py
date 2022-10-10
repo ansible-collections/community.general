@@ -68,7 +68,8 @@ class TestOpentelemetry(unittest.TestCase):
         self.opentelemetry.finish_task(
             tasks_data,
             'ok',
-            self.my_task_result
+            self.my_task_result,
+            ""
         )
 
         task_data = tasks_data['myuuid']
@@ -85,7 +86,8 @@ class TestOpentelemetry(unittest.TestCase):
         self.opentelemetry.finish_task(
             tasks_data,
             'ok',
-            result
+            result,
+            ""
         )
 
         task_data = tasks_data['myuuid']
@@ -104,7 +106,8 @@ class TestOpentelemetry(unittest.TestCase):
         self.opentelemetry.finish_task(
             tasks_data,
             'ok',
-            result
+            result,
+            ""
         )
 
         self.assertEqual(self.opentelemetry.ansible_version, '1.2.3')
