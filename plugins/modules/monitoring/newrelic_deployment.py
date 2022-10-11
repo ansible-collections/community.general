@@ -106,8 +106,8 @@ def main():
             description=dict(required=False),
             revision=dict(required=True),
             user=dict(required=False),
-            appname=dict(required=False),
-            environment=dict(required=False),
+            appname=dict(required=False, removed_in_version='7.0.0', removed_from_collection='community.general'),
+            environment=dict(required=False, removed_in_version='7.0.0', removed_from_collection='community.general'),
             validate_certs=dict(default=True, type='bool'),
         ),
         required_one_of=[['app_name', 'application_id']],
@@ -163,12 +163,11 @@ def get_application_id(module):
     response, info = fetch_url(module, url, data=data, headers=headers)
     if info['status'] not in (200, 201):
         module.fail_json(msg="Unable to get application: %s" % info['msg'])
-        return None
 
     result = json.loads(response.read())
     if result is None or len(result.get("applications", "")) == 0:
         module.fail_json(msg='No application found with name "%s"' % module.params["app_name"])
-        return None
+
     return result["applications"][0]["id"]
 
 
