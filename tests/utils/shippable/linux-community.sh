@@ -12,9 +12,9 @@ image="${args[1]}"
 python="${args[2]}"
 
 if [ "${#args[@]}" -gt 3 ]; then
-    target="shippable/posix/group${args[3]}/"
+    target="azp/posix/${args[3]}/"
 else
-    target="shippable/posix/"
+    target="azp/posix/"
 fi
 
 # shellcheck disable=SC2086

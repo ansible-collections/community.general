@@ -20,13 +20,13 @@ def main():
     with open('.azure-pipelines/azure-pipelines.yml', 'rb') as f:
         azp = yaml.safe_load(f)
 
-    allowed_targets = set(['shippable/cloud/group1'])
+    allowed_targets = set(['azp/generic/1'])
     for stage in azp['stages']:
-        if stage['stage'].startswith(('Sanity', 'Unit', 'Cloud', 'Summary')):
+        if stage['stage'].startswith(('Sanity', 'Unit', 'Generic', 'Summary')):
             continue
         for job in stage['jobs']:
             for group in job['parameters']['groups']:
-                allowed_targets.add('shippable/posix/group{0}'.format(group))
+                allowed_targets.add('azp/posix/{0}'.format(group))
 
     for path in paths:
         targets = []
