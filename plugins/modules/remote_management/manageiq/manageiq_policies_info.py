@@ -60,7 +60,7 @@ EXAMPLES = '''
 RETURN = '''
 profiles:
   description:
-    - List current policy_profile and policies for a provider in ManageIQ
+    - List current policy_profile and policies for a provider in ManageIQ.
   returned: always
   type: list
   sample:
