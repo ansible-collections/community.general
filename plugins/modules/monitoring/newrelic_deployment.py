@@ -70,7 +70,6 @@ options:
     description:
       - If C(false), SSL certificates will not be validated. This should only be used
         on personally controlled sites using self-signed certificates.
-      - This option has been deprecated and will be removed community.general 7.0.0. Please do not use.
     required: false
     default: true
     type: bool
@@ -109,7 +108,7 @@ def main():
             user=dict(required=False),
             appname=dict(required=False),
             environment=dict(required=False),
-            validate_certs=dict(required=False, default=True, type='bool'),
+            validate_certs=dict(default=True, type='bool'),
         ),
         required_one_of=[['app_name', 'application_id']],
         supports_check_mode=True
