@@ -12,9 +12,9 @@ platform="${args[0]}"
 version="${args[1]}"
 
 if [ "${#args[@]}" -gt 2 ]; then
-    target="shippable/posix/group${args[2]}/"
+    target="azp/posix/${args[2]}/"
 else
-    target="shippable/posix/"
+    target="azp/posix/"
 fi
 
 stage="${S:-prod}"
