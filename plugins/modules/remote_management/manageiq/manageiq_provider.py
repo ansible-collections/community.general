@@ -89,6 +89,7 @@ options:
         description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
         type: bool
         default: true
+        aliases: [ verify_ssl ]
       security_protocol:
         type: str
         description: How SSL certificates should be used for HTTPS requests. defaults to None.
@@ -120,6 +121,7 @@ options:
         description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
         type: bool
         default: true
+        aliases: [ verify_ssl ]
       security_protocol:
         type: str
         choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation','non-ssl']
@@ -154,6 +156,7 @@ options:
         type: bool
         description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
         default: true
+        aliases: [ verify_ssl ]
       security_protocol:
         type: str
         choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation', 'non-ssl']
