@@ -25,6 +25,8 @@ from ansible_collections.community.general.plugins.module_utils.linode import ge
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from ansible_collections.community.general.tests.unit.compat import mock
 
+from .linode_conftest import access_token, no_access_token_in_env, default_args, mock_linode
+
 
 def test_mandatory_state_is_validated(capfd):
     with pytest.raises(SystemExit):
