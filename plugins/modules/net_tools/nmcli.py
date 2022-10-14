@@ -74,6 +74,7 @@ options:
         choices: [ datagram, connected ]
         default: datagram
         version_added: 5.8.0
+        version_added: 5.8.0
     master:
         description:
             - Master <master (ifname, or connection UUID or conn_name) of bridge, team, bond master connection profile.
