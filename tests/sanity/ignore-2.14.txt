@@ -1,6 +1,4 @@
 .azure-pipelines/scripts/publish-codecov.py replace-urlopen
-plugins/modules/cloud/univention/udm_user.py import-3.11  # Uses deprecated stdlib library 'crypt'
-plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
 plugins/modules/cloud/lxc/lxc_container.py validate-modules:use-run-command-not-popen
 plugins/modules/cloud/lxd/lxd_project.py use-argspec-type-path # expanduser() applied to constants
 plugins/modules/cloud/misc/rhevm.py validate-modules:parameter-state-invalid-choice
@@ -15,6 +13,7 @@ plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:para
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:undocumented-parameter
 plugins/modules/cloud/univention/udm_share.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/univention/udm_user.py validate-modules:parameter-list-no-elements
+plugins/modules/cloud/univention/udm_user.py import-3.11  # Uses deprecated stdlib library 'crypt'
 plugins/modules/clustering/consul/consul.py validate-modules:doc-missing-type
 plugins/modules/clustering/consul/consul.py validate-modules:undocumented-parameter
 plugins/modules/clustering/consul/consul_session.py validate-modules:parameter-state-invalid-choice
