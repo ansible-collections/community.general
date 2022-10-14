@@ -72,8 +72,6 @@ options:
             - This option sets the connection type of Infiniband IPoIB devices.
         type: str
         choices: [ datagram, connected ]
-        default: datagram
-        version_added: 5.8.0
         version_added: 5.8.0
     master:
         description:
@@ -2299,7 +2297,7 @@ def main():
             gsm=dict(type='dict'),
             wireguard=dict(type='dict'),
             vpn=dict(type='dict'),
-            transport_mode=dict(type='str', default='datagram', choices=['datagram', 'connected']),
+            transport_mode=dict(type='str', choices=['datagram', 'connected']),
         ),
         mutually_exclusive=[['never_default4', 'gw4'],
                             ['routes4_extended', 'routes4'],
