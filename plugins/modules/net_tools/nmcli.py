@@ -67,9 +67,9 @@ options:
         type: str
         choices: [ 802.3ad, active-backup, balance-alb, balance-rr, balance-tlb, balance-xor, broadcast ]
         default: balance-rr
-    transport_mode: 
+    transport_mode:
         description:
-            - This option sets the connection type of Infiniband IPoIB devices. 
+            - This option sets the connection type of Infiniband IPoIB devices.
         type: str
         choices: [ datagram, connected ]
         default: datagram
