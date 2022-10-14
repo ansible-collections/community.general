@@ -1,2 +1,2 @@
 minor_changes:
-  - "nmcli - Add transport_mode configuration for Infiniband devices (https://github.com/ansible-collections/community.general/pull/5361)."
+  - "nmcli - add ``transport_mode`` configuration for Infiniband devices (https://github.com/ansible-collections/community.general/pull/5361)."
