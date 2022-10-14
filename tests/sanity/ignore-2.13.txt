@@ -1,5 +1,4 @@
 .azure-pipelines/scripts/publish-codecov.py replace-urlopen
-plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
 plugins/modules/cloud/lxc/lxc_container.py validate-modules:use-run-command-not-popen
 plugins/modules/cloud/lxd/lxd_project.py use-argspec-type-path # expanduser() applied to constants
 plugins/modules/cloud/misc/rhevm.py validate-modules:parameter-state-invalid-choice
