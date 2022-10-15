@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 
 module: manageiq_tags_info
 version_added: 5.8.0
-short_description: retrieve resource tags in ManageIQ.
+short_description: Retrieve resource tags in ManageIQ.
 extends_documentation_fragment:
 - community.general.manageiq
 
@@ -65,8 +65,8 @@ from ansible_collections.community.general.plugins.module_utils.manageiq import 
 
 def main():
     argument_spec = dict(
-        resource_id=dict(required=False, type='int'),
-        resource_name=dict(required=False, type='str'),
+        resource_id=dict(type='int'),
+        resource_name=dict(type='str'),
         resource_type=dict(required=True, type='str',
                            choices=list(manageiq_entities().keys())),
     )

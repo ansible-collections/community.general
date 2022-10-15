@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 
 module: manageiq_tags
 
-short_description: management of resource tags in ManageIQ.
+short_description: Management of resource tags in ManageIQ.
 extends_documentation_fragment:
 - community.general.manageiq
 
@@ -129,8 +129,8 @@ def main():
     actions = {'present': 'assign', 'absent': 'unassign', 'list': 'list'}
     argument_spec = dict(
         tags=dict(type='list', elements='dict'),
-        resource_id=dict(required=False, type='int'),
-        resource_name=dict(required=False, type='str'),
+        resource_id=dict(type='int'),
+        resource_name=dict(type='str'),
         resource_type=dict(required=True, type='str',
                            choices=list(manageiq_entities().keys())),
         state=dict(required=False, type='str',
