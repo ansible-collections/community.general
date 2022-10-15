@@ -373,7 +373,7 @@ def parse_check(module):
         module.fail_json(
             msg='checks are either script, tcp, http or ttl driven, supplying more than one does not make sense')
 
-    if _checks:
+    if module.params['check_id'] or _checks:
         return ConsulCheck(
             module.params['check_id'],
             module.params['check_name'],
