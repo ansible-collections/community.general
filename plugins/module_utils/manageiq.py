@@ -76,21 +76,6 @@ def manageiq_entities():
     }
 
 
-def query_resource_id(manageiq, resource_type, resource_name):
-    """ Query the resource name in ManageIQ.
-
-    Returns:
-        the resource id if it exists in manageiq, Fail otherwise.
-    """
-    resource = manageiq.find_collection_resource_by(resource_type, name=resource_name)
-    if resource:
-        return resource["id"]
-    else:
-        msg = "{resource_name} {resource_type} does not exist in manageiq".format(
-            resource_name=resource_name, resource_type=resource_type)
-        manageiq.module.fail_json(msg=msg)
-
-
 class ManageIQ(object):
     """
         class encapsulating ManageIQ API client.
@@ -180,6 +165,20 @@ class ManageIQ(object):
             resource_id = manageiq.find_collection_resource_or_fail(resource_type, name=resource_name)['id']
 
         return ManageIQPolicies(manageiq, resource_type, resource_id)
+
+    def query_resource_id(self, resource_type, resource_name):
+        """ Query the resource name in ManageIQ.
+
+        Returns:
+            the resource id if it exists in manageiq, Fail otherwise.
+        """
+        resource = self.find_collection_resource_by(resource_type, name=resource_name)
+        if resource:
+            return resource["id"]
+        else:
+            msg = "{resource_name} {resource_type} does not exist in manageiq".format(
+                resource_name=resource_name, resource_type=resource_type)
+            self.module.fail_json(msg=msg)
 
 
 class ManageIQPolicies(object):

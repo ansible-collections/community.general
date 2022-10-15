@@ -59,7 +59,7 @@ RETURN = '''
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.manageiq import (
-    ManageIQ, ManageIQTags, manageiq_argument_spec, manageiq_entities, query_resource_id
+    ManageIQ, ManageIQTags, manageiq_argument_spec, manageiq_entities
 )
 
 
@@ -91,7 +91,7 @@ def main():
 
     # query resource id, fail if resource does not exist
     if resource_id is None:
-        resource_id = query_resource_id(manageiq, resource_type, resource_name)
+        resource_id = manageiq.query_resource_id(resource_type, resource_name)
 
     manageiq_tags = ManageIQTags(manageiq, resource_type, resource_id)
 
