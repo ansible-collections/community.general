@@ -156,7 +156,7 @@
       command: 'pkg add {{ pkgng_test_outofdate_pkg_path }}'
       register: pkgng_example4_nopower_prepare
 
-    - name: Check for any available package upgrades (checkmode)
+    - name: Check for any available package upgrades with unprivileged user
       become: true
       become_user: powerless
       pkgng:
