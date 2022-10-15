@@ -269,8 +269,6 @@ def remove(module):
     ''' removes a service or a check '''
     service_id = module.params['service_id'] or module.params['service_name']
     check_id = module.params['check_id'] or module.params['check_name']
-    if not (service_id or check_id):
-        module.fail_json(msg='services and checks are removed by id or name. please supply a service id/name or a check id/name')
     if service_id:
         remove_service(module, service_id)
     else:
