@@ -369,7 +369,7 @@ def get_service_by_id_or_name(consul_api, service_id_or_name):
 def parse_check(module):
     _checks = [module.params[p] for p in ('script', 'ttl', 'tcp', 'http')]
 
-    if filter(lambda x: x, _checks):
+    if filter(lambda x: x, _checks) > 1:
         module.fail_json(
             msg='checks are either script, tcp, http or ttl driven, supplying more than one does not make sense')
 
