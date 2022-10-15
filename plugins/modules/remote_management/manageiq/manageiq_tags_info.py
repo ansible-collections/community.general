@@ -11,31 +11,17 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 
-module: manageiq_tags
-
-short_description: management of resource tags in ManageIQ.
+module: manageiq_tags_info
+version_added: 5.8.0
+short_description: retrieve resource tags in ManageIQ.
 extends_documentation_fragment:
 - community.general.manageiq
 
-author: Daniel Korn (@dkorn)
+author: Alexei Znamensky (@russoz)
 description:
-  - The manageiq_tags module supports adding, updating and deleting tags in ManageIQ.
+  - The manageiq_tags_info module supports retrieving resource tags from ManageIQ.
 
 options:
-  state:
-    type: str
-    description:
-      - C(absent) - tags should not exist,
-      - C(present) - tags should exist,
-      - C(list) - list current tags.
-    choices: ['absent', 'present', 'list']
-    default: 'present'
-  tags:
-    type: list
-    elements: dict
-    description:
-      - C(tags) - list of dictionaries, each includes C(name) and c(category) keys.
-      - required if I(state) is C(present) or C(absent).
   resource_type:
     type: str
     description:
@@ -54,59 +40,11 @@ options:
       - The ID of the resource at which tags will be controlled.
       - Must be specified if I(resource_name) is not set. Both options are mutually exclusive.
     type: int
-    version_added: 2.2.0
 '''
 
 EXAMPLES = '''
-- name: Create new tags for a provider in ManageIQ
-  community.general.manageiq_tags:
-    resource_name: 'EngLab'
-    resource_type: 'provider'
-    tags:
-    - category: environment
-      name: prod
-    - category: owner
-      name: prod_ops
-    manageiq_connection:
-      url: 'http://127.0.0.1:3000'
-      username: 'admin'
-      password: 'smartvm'
-      validate_certs: false
-
-- name: Create new tags for a provider in ManageIQ
-  community.general.manageiq_tags:
-    resource_id: 23000000790497
-    resource_type: 'provider'
-    tags:
-    - category: environment
-      name: prod
-    - category: owner
-      name: prod_ops
-    manageiq_connection:
-      url: 'http://127.0.0.1:3000'
-      username: 'admin'
-      password: 'smartvm'
-      validate_certs: false
-
-- name: Remove tags for a provider in ManageIQ
-  community.general.manageiq_tags:
-    state: absent
-    resource_name: 'EngLab'
-    resource_type: 'provider'
-    tags:
-    - category: environment
-      name: prod
-    - category: owner
-      name: prod_ops
-    manageiq_connection:
-      url: 'http://127.0.0.1:3000'
-      username: 'admin'
-      password: 'smartvm'
-      validate_certs: false
-
 - name: List current tags for a provider in ManageIQ
-  community.general.manageiq_tags:
-    state: list
+  community.general.manageiq_tags_info:
     resource_name: 'EngLab'
     resource_type: 'provider'
     manageiq_connection:
@@ -126,15 +64,11 @@ from ansible_collections.community.general.plugins.module_utils.manageiq import 
 
 
 def main():
-    actions = {'present': 'assign', 'absent': 'unassign', 'list': 'list'}
     argument_spec = dict(
-        tags=dict(type='list', elements='dict'),
         resource_id=dict(required=False, type='int'),
         resource_name=dict(required=False, type='str'),
         resource_type=dict(required=True, type='str',
                            choices=list(manageiq_entities().keys())),
-        state=dict(required=False, type='str',
-                   choices=['present', 'absent', 'list'], default='present'),
     )
     # add the manageiq connection arguments to the arguments
     argument_spec.update(manageiq_argument_spec())
@@ -143,20 +77,14 @@ def main():
         argument_spec=argument_spec,
         mutually_exclusive=[["resource_id", "resource_name"]],
         required_one_of=[["resource_id", "resource_name"]],
-        required_if=[
-            ('state', 'present', ['tags']),
-            ('state', 'absent', ['tags'])
-        ],
+        supports_check_mode=True,
     )
 
-    tags = module.params['tags']
     resource_id = module.params['resource_id']
     resource_type_key = module.params['resource_type']
     resource_name = module.params['resource_name']
-    state = module.params['state']
 
     # get the action and resource type
-    action = actions[state]
     resource_type = manageiq_entities()[resource_type_key]
 
     manageiq = ManageIQ(module)
@@ -167,13 +95,9 @@ def main():
 
     manageiq_tags = ManageIQTags(manageiq, resource_type, resource_id)
 
-    if action == 'list':
-        # return a list of current tags for this object
-        current_tags = manageiq_tags.query_resource_tags()
-        res_args = dict(changed=False, tags=current_tags)
-    else:
-        # assign or unassign the tags
-        res_args = manageiq_tags.assign_or_unassign_tags(tags, action)
+    # return a list of current tags for this object
+    current_tags = manageiq_tags.query_resource_tags()
+    res_args = dict(changed=False, tags=current_tags)
 
     module.exit_json(**res_args)
 
