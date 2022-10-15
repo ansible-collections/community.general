@@ -185,7 +185,7 @@ def upgrade_packages(module, run_pkgng):
 
     pkgng_args = ['upgrade']
     pkgng_args.append('-n' if module.check_mode else '-y')
-    rc, out, err = run_pkgng(*pkgng_args, check_rc=True)
+    rc, out, err = run_pkgng(*pkgng_args, check_rc=(not module.check_mode))
 
     matches = re.findall('^Number of packages to be (?:upgraded|reinstalled): ([0-9]+)', out, re.MULTILINE)
     for match in matches:
