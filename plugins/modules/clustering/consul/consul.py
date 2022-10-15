@@ -367,13 +367,13 @@ def get_service_by_id_or_name(consul_api, service_id_or_name):
 
 
 def parse_check(module):
-    _checks = [module.params[p] for p in ('script', 'ttl', 'tcp', 'http')]
+    _checks = [module.params[p] for p in ('script', 'ttl', 'tcp', 'http') if module.params[p]]
 
-    if len(c for c in _checks if c) > 1:
+    if len(_checks) > 1:
         module.fail_json(
             msg='checks are either script, tcp, http or ttl driven, supplying more than one does not make sense')
 
-    if any(_checks):
+    if _checks:
         return ConsulCheck(
             module.params['check_id'],
             module.params['check_name'],
