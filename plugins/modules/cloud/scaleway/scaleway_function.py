@@ -15,10 +15,10 @@ DOCUMENTATION = '''
 ---
 module: scaleway_function
 short_description: Scaleway Function management module
+version_added: 5.8.0
 author: Guillaume MARTINEZ (@Lunik)
 description:
-  - This module manages function on Scaleway account
-    U(https://developer.scaleway.com)
+  - This module manages function on Scaleway account.
 extends_documentation_fragment:
   - community.general.scaleway
   - community.general.scaleway_waitable_resource
@@ -43,7 +43,7 @@ options:
   region:
     type: str
     description:
-      - Scaleway region to use (for example fr-par).
+      - Scaleway region to use (for example C(fr-par)).
     required: true
     choices:
       - fr-par
@@ -147,35 +147,33 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-data:
-    description: This is only present when C(state=present)
-    returned: when C(state=present)
+function:
+    description: The function informations.
+    returned: when I(state=present)
     type: dict
     sample: {
-      "function": {
-        "cpu_limit": 140,
-        "description": "Function used for testing scaleway_function ansible module",
-        "domain_name": "fnansibletestfxamabuc-fn-ansible-test.functions.fnc.fr-par.scw.cloud",
-        "environment_variables": {
-            "MY_VAR": "my_value"
-        },
-        "error_message": null,
-        "handler": "handler.handle",
-        "http_option": "",
-        "id": "ceb64dc4-4464-4196-8e20-ecef705475d3",
-        "max_scale": 5,
-        "memory_limit": 256,
-        "min_scale": 0,
-        "name": "fn-ansible-test",
-        "namespace_id": "82737d8d-0ebb-4d89-b0ad-625876eca50d",
-        "privacy": "public",
-        "region": "fr-par",
-        "runtime": "python310",
-        "runtime_message": "",
-        "secret_environment_variables": "SENSITIVE_VALUE",
-        "status": "created",
-        "timeout": "300s"
-      }
+      "cpu_limit": 140,
+      "description": "Function used for testing scaleway_function ansible module",
+      "domain_name": "fnansibletestfxamabuc-fn-ansible-test.functions.fnc.fr-par.scw.cloud",
+      "environment_variables": {
+          "MY_VAR": "my_value"
+      },
+      "error_message": null,
+      "handler": "handler.handle",
+      "http_option": "",
+      "id": "ceb64dc4-4464-4196-8e20-ecef705475d3",
+      "max_scale": 5,
+      "memory_limit": 256,
+      "min_scale": 0,
+      "name": "fn-ansible-test",
+      "namespace_id": "82737d8d-0ebb-4d89-b0ad-625876eca50d",
+      "privacy": "public",
+      "region": "fr-par",
+      "runtime": "python310",
+      "runtime_message": "",
+      "secret_environment_variables": "SENSITIVE_VALUE",
+      "status": "created",
+      "timeout": "300s"
     }
 '''
 

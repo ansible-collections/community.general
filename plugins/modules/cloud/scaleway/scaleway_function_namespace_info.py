@@ -15,10 +15,10 @@ DOCUMENTATION = '''
 ---
 module: scaleway_function_namespace_info
 short_description: Scaleway Container namespace info module
+version_added: 5.8.0
 author: Guillaume MARTINEZ (@Lunik)
 description:
-  - This module return info on function namespace on Scaleway account
-    U(https://developer.scaleway.com)
+  - This module return info on function namespace on Scaleway account.
 extends_documentation_fragment:
   - community.general.scaleway
 
@@ -33,7 +33,7 @@ options:
   region:
     type: str
     description:
-      - Scaleway region to use (for example fr-par).
+      - Scaleway region to use (for example C(fr-par)).
     required: true
     choices:
       - fr-par
@@ -57,27 +57,25 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-data:
-    description: This is always present
+function_namespace:
+    description: The function namespace informations.
     returned: always
     type: dict
     sample: {
-      "function_namespace": {
-         "description": "",
-         "environment_variables": {
-             "MY_VAR": "my_value"
-         },
-         "error_message": null,
-         "id": "531a1fd7-98d2-4a74-ad77-d398324304b8",
-         "name": "my-awesome-function-namespace",
-         "organization_id": "e04e3bdc-015c-4514-afde-9389e9be24b0",
-         "project_id": "d44cea58-dcb7-4c95-bff1-1105acb60a98",
-         "region": "fr-par",
-         "registry_endpoint": "",
-         "registry_namespace_id": "",
-         "secret_environment_variables": "SENSITIVE_VALUE",
-         "status": "pending"
-      }
+      "description": "",
+      "environment_variables": {
+          "MY_VAR": "my_value"
+      },
+      "error_message": null,
+      "id": "531a1fd7-98d2-4a74-ad77-d398324304b8",
+      "name": "my-awesome-function-namespace",
+      "organization_id": "e04e3bdc-015c-4514-afde-9389e9be24b0",
+      "project_id": "d44cea58-dcb7-4c95-bff1-1105acb60a98",
+      "region": "fr-par",
+      "registry_endpoint": "",
+      "registry_namespace_id": "",
+      "secret_environment_variables": "SENSITIVE_VALUE",
+      "status": "pending"
     }
 '''
 

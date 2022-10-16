@@ -15,10 +15,10 @@ DOCUMENTATION = '''
 ---
 module: scaleway_container_info
 short_description: Scaleway Container info module
+version_added: 5.8.0
 author: Guillaume MARTINEZ (@Lunik)
 description:
-  - This module return info on container on Scaleway account
-    U(https://developer.scaleway.com)
+  - This module return info on container on Scaleway account.
 extends_documentation_fragment:
   - community.general.scaleway
 
@@ -33,7 +33,7 @@ options:
   region:
     type: str
     description:
-      - Scaleway region to use (for example fr-par).
+      - Scaleway region to use (for example C(fr-par)).
     required: true
     choices:
       - fr-par
@@ -57,36 +57,34 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-data:
-    description: This is always present
+container:
+    description: The container informations.
     returned: always
     type: dict
     sample: {
-      "container": {
-        "cpu_limit": 140,
-        "description": "Container used for testing scaleway_container ansible module",
-        "domain_name": "cnansibletestgfogtjod-cn-ansible-test.functions.fnc.fr-par.scw.cloud",
-        "environment_variables": {
-            "MY_VAR": "my_value"
-        },
-        "error_message": null,
-        "http_option": "",
-        "id": "c9070eb0-d7a4-48dd-9af3-4fb139890721",
-        "max_concurrency": 50,
-        "max_scale": 5,
-        "memory_limit": 256,
-        "min_scale": 0,
-        "name": "cn-ansible-test",
-        "namespace_id": "75e299f1-d1e5-4e6b-bc6e-4fb51cfe1e69",
-        "port": 80,
-        "privacy": "public",
-        "protocol": "http1",
-        "region": "fr-par",
-        "registry_image": "rg.fr-par.scw.cloud/namespace-ansible-ci/nginx:latest",
-        "secret_environment_variables": "SENSITIVE_VALUE",
-        "status": "created",
-        "timeout": "300s"
-      }
+      "cpu_limit": 140,
+      "description": "Container used for testing scaleway_container ansible module",
+      "domain_name": "cnansibletestgfogtjod-cn-ansible-test.functions.fnc.fr-par.scw.cloud",
+      "environment_variables": {
+          "MY_VAR": "my_value"
+      },
+      "error_message": null,
+      "http_option": "",
+      "id": "c9070eb0-d7a4-48dd-9af3-4fb139890721",
+      "max_concurrency": 50,
+      "max_scale": 5,
+      "memory_limit": 256,
+      "min_scale": 0,
+      "name": "cn-ansible-test",
+      "namespace_id": "75e299f1-d1e5-4e6b-bc6e-4fb51cfe1e69",
+      "port": 80,
+      "privacy": "public",
+      "protocol": "http1",
+      "region": "fr-par",
+      "registry_image": "rg.fr-par.scw.cloud/namespace-ansible-ci/nginx:latest",
+      "secret_environment_variables": "SENSITIVE_VALUE",
+      "status": "created",
+      "timeout": "300s"
     }
 '''
 

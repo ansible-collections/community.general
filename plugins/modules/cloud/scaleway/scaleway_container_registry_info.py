@@ -15,10 +15,10 @@ DOCUMENTATION = '''
 ---
 module: scaleway_container_registry_info
 short_description: Scaleway Container registry info module
+version_added: 5.8.0
 author: Guillaume MARTINEZ (@Lunik)
 description:
-  - This module return info on container registry on Scaleway account
-    U(https://developer.scaleway.com)
+  - This module return info on container registry on Scaleway account.
 extends_documentation_fragment:
   - community.general.scaleway
 
@@ -33,7 +33,7 @@ options:
   region:
     type: str
     description:
-      - Scaleway region to use (for example fr-par).
+      - Scaleway region to use (for example C(fr-par)).
     required: true
     choices:
       - fr-par
@@ -57,27 +57,25 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-data:
-    description: This is always present
+container_registry:
+    description: The container registry informations.
     returned: always
     type: dict
     sample: {
-      "container_registry": {
-        "created_at": "2022-10-14T09:51:07.949716Z",
-        "description": "Managed by Ansible",
-        "endpoint": "rg.fr-par.scw.cloud/my-awesome-registry",
-        "id": "0d7d5270-7864-49c2-920b-9fd6731f3589",
-        "image_count": 0,
-        "is_public": false,
-        "name": "my-awesome-registry",
-        "organization_id": "10697b59-5c34-4d24-8d15-9ff2d3b89f58",
-        "project_id": "3da4f0b2-06be-4773-8ec4-5dfa435381be",
-        "region": "fr-par",
-        "size": 0,
-        "status": "ready",
-        "status_message": "",
-        "updated_at": "2022-10-14T09:51:07.949716Z"
-      }
+      "created_at": "2022-10-14T09:51:07.949716Z",
+      "description": "Managed by Ansible",
+      "endpoint": "rg.fr-par.scw.cloud/my-awesome-registry",
+      "id": "0d7d5270-7864-49c2-920b-9fd6731f3589",
+      "image_count": 0,
+      "is_public": false,
+      "name": "my-awesome-registry",
+      "organization_id": "10697b59-5c34-4d24-8d15-9ff2d3b89f58",
+      "project_id": "3da4f0b2-06be-4773-8ec4-5dfa435381be",
+      "region": "fr-par",
+      "size": 0,
+      "status": "ready",
+      "status_message": "",
+      "updated_at": "2022-10-14T09:51:07.949716Z"
     }
 '''
 
