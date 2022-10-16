@@ -130,12 +130,9 @@ if sys.version_info >= (3, 7):
 elif not OTEL_LIBRARY_TIME_NS_ERROR:
     time_ns = _time_ns
 else:
-    # option 1
     def time_ns():
         # Support versions older than 3.7 with opentelemetry-api > 1.12
         return int(time.time() * 1e9)
-    # option 2 - not the recommended way to create a function, but it "reads" more similar to the previous cases
-    time_ns = lambda: int(time.time() * 1e9)
 
 
 class TaskData:
