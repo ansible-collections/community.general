@@ -9,6 +9,8 @@ __metaclass__ = type
 import json
 import re
 import sys
+import datetime
+import time
 
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.urls import fetch_url
@@ -23,6 +25,14 @@ def scaleway_argument_spec():
         api_timeout=dict(type='int', default=30, aliases=['timeout']),
         query_parameters=dict(type='dict', default={}),
         validate_certs=dict(default=True, type='bool'),
+    )
+
+
+def scaleway_waitable_resource_argument_spec():
+    return dict(
+        wait=dict(type="bool", default=True),
+        wait_timeout=dict(type="int", default=300),
+        wait_sleep_time=dict(type="int", default=3),
     )
 
 
@@ -61,6 +71,72 @@ def parse_pagination_link(header):
             data = match.groupdict()
             parsed_relations[data['relation']] = data['target_IRI']
         return parsed_relations
+
+
+def fetch_state(api, resource):
+    api.module.debug("fetch_state of resource: %s" % resource["id"])
+    response = api.get(path=api.api_path + "/%s" % resource["id"])
+
+    if response.status_code == 404:
+        return "absent"
+
+    if not response.ok:
+        msg = 'Error during state fetching: (%s) %s' % (response.status_code, response.json)
+        api.module.fail_json(msg=msg)
+
+    try:
+        api.module.debug("Resource %s in state: %s" % (resource["id"], response.json["status"]))
+        return response.json["status"]
+    except KeyError:
+        api.module.fail_json(msg="Could not fetch state in %s" % response.json)
+
+
+def wait_to_complete_state_transition(api, resource, stable_states, force_wait=False):
+    wait = api.module.params["wait"]
+
+    if not (wait or force_wait):
+        return
+
+    wait_timeout = api.module.params["wait_timeout"]
+    wait_sleep_time = api.module.params["wait_sleep_time"]
+
+    # Prevent requesting the ressource status too soon
+    time.sleep(wait_sleep_time)
+
+    start = datetime.datetime.utcnow()
+    end = start + datetime.timedelta(seconds=wait_timeout)
+
+    while datetime.datetime.utcnow() < end:
+        api.module.debug("We are going to wait for the resource to finish its transition")
+
+        state = fetch_state(api, resource)
+        if state in stable_states:
+            api.module.debug("It seems that the resource is not in transition anymore.")
+            api.module.debug("load-balancer in state: %s" % fetch_state(api, resource))
+            break
+
+        time.sleep(wait_sleep_time)
+    else:
+        api.module.fail_json(msg="Server takes too long to finish its transition")
+
+
+def filter_sensitive_attributes(container, attributes):
+    for attr in attributes:
+        container[attr] = "SENSITIVE_VALUE"
+
+    return container
+
+
+def resource_attributes_should_be_changed(target, wished, verifiable_mutable_attributes, mutable_attributes):
+    diff = dict()
+    for attr in verifiable_mutable_attributes:
+        if wished[attr] is not None and target[attr] != wished[attr]:
+            diff[attr] = wished[attr]
+
+    if diff:
+        return dict((attr, wished[attr]) for attr in mutable_attributes)
+    else:
+        return diff
 
 
 class Response(object):
