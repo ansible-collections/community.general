@@ -1,0 +1,8 @@
+deprecated_features:
+  - "Please note that some tools, like the VScode plugin (https://github.com/ansible/vscode-ansible/issues/573), or ``ansible-doc --list --type module``,
+     suggest to replace the correct FQCNs for modules and actions in community.general with internal names that have more than three components.
+     For example, ``community.general.ufw`` is suggested to be replaced by ``community.general.system.ufw``. While these longer names do work, they
+     are considered **internal names** by the collection and are subject to change and be removed at all time. They **will** be removed in
+     community.general 6.0.0 and result in deprecation messages. Avoid using these internal names, and use general three-component FQCNs
+     (``community.general.<name_of_module>``) instead
+     (https://github.com/ansible-collections/community.general/pull/5373)."
