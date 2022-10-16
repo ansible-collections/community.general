@@ -1,0 +1,11 @@
+minor_changes:
+  - scaleway_container_registry - Add new module to manage Scaleway serverless container registries
+  - scaleway_container_registry_info - Add new module to get info about Scaleway serverless container registries
+  - scaleway_container_namespace - Add new module to manage Scaleway serverless container namespaces
+  - scaleway_container_namespace_info - Add new module to get info about Scaleway serverless container namespaces
+  - scaleway_container - Add new module to manage Scaleway serverless containers
+  - scaleway_container_info - Add new module to get info about Scaleway serverless containers
+  - scaleway_function_namespace - Add new module to manage Scaleway serverless function namespaces
+  - scaleway_function_namespace_info - Add new module to get info about Scaleway serverless function namespaces
+  - scaleway_function - Add new module to manage Scaleway serverless functions
+  - scaleway_function_info - Add new module to get info about Scaleway serverless functions
