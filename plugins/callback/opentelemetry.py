@@ -121,6 +121,7 @@ try:
 
 except ImportError as imp_exc:
     OTEL_LIBRARY_IMPORT_ERROR = imp_exc
+    OTEL_LIBRARY_TIME_NS_ERROR = imp_exc
 else:
     OTEL_LIBRARY_IMPORT_ERROR = None
 
