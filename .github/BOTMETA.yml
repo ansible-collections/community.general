@@ -461,8 +461,28 @@ files:
     maintainers: $team_scaleway
   $modules/cloud/scaleway/scaleway_compute_private_network.py:
     maintainers: pastral
+  $modules/cloud/scaleway/scaleway_container.py:
+    maintainers: Lunik
+  $modules/cloud/scaleway/scaleway_container_info.py:
+    maintainers: Lunik
+  $modules/cloud/scaleway/scaleway_container_namespace.py:
+    maintainers: Lunik
+  $modules/cloud/scaleway/scaleway_container_namespace_info.py:
+    maintainers: Lunik
+  $modules/cloud/scaleway/scaleway_container_registry.py:
+    maintainers: Lunik
+  $modules/cloud/scaleway/scaleway_container_registry_info.py:
+    maintainers: Lunik
   $modules/cloud/scaleway/scaleway_database_backup.py:
     maintainers: guillaume_ro_fr
+  $modules/cloud/scaleway/scaleway_function.py:
+    maintainers: Lunik
+  $modules/cloud/scaleway/scaleway_function_info.py:
+    maintainers: Lunik
+  $modules/cloud/scaleway/scaleway_function_namespace.py:
+    maintainers: Lunik
+  $modules/cloud/scaleway/scaleway_function_namespace_info.py:
+    maintainers: Lunik
   $modules/cloud/scaleway/scaleway_image_info.py:
     maintainers: Spredzy
   $modules/cloud/scaleway/scaleway_ip_info.py:

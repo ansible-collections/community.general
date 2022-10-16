@@ -1377,8 +1377,28 @@ plugin_routing:
       redirect: community.general.cloud.scaleway.scaleway_compute
     scaleway_compute_private_network:
       redirect: community.general.cloud.scaleway.scaleway_compute_private_network
+    scaleway_container:
+      redirect: community.general.cloud.scaleway.scaleway_container
+    scaleway_container_info:
+      redirect: community.general.cloud.scaleway.scaleway_container_info
+    scaleway_container_namespace:
+      redirect: community.general.cloud.scaleway.scaleway_container_namespace
+    scaleway_container_namespace_info:
+      redirect: community.general.cloud.scaleway.scaleway_container_namespace_info
+    scaleway_container_registry:
+      redirect: community.general.cloud.scaleway.scaleway_container_registry
+    scaleway_container_registry_info:
+      redirect: community.general.cloud.scaleway.scaleway_container_registry_info
     scaleway_database_backup:
       redirect: community.general.cloud.scaleway.scaleway_database_backup
+    scaleway_function:
+      redirect: community.general.cloud.scaleway.scaleway_function
+    scaleway_function_info:
+      redirect: community.general.cloud.scaleway.scaleway_function_info
+    scaleway_function_namespace:
+      redirect: community.general.cloud.scaleway.scaleway_function_namespace
+    scaleway_function_namespace_info:
+      redirect: community.general.cloud.scaleway.scaleway_function_namespace_info
     scaleway_image_facts:
       tombstone:
         removal_version: 3.0.0
