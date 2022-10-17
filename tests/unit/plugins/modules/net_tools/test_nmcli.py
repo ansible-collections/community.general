@@ -3810,4 +3810,3 @@ def test_infiniband_connection_static_transport_mode_connected(
 
     assert results.get('changed') is True
     assert not results.get('failed')
-
