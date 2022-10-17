@@ -115,7 +115,7 @@ container_registry:
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_ENDPOINT, SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
     wait_to_complete_state_transition, scaleway_waitable_resource_argument_spec,
-    resource_attributes_should_be_changed
+    resource_attributes_should_be_changed, fetch_all_resources
 )
 from ansible.module_utils.basic import AnsibleModule
 
@@ -142,15 +142,9 @@ def payload_from_wished_cr(wished_cr):
 
 
 def absent_strategy(api, wished_cr):
-    response = api.get(path=api.api_path)
     changed = False
 
-    status_code = response.status_code
-    if not response.ok:
-        api.module.fail_json(msg='Error getting container registries [{0}: {1}]'.format(
-            response.status_code, response.json['message']))
-
-    cr_list = response.json["namespaces"]
+    cr_list = fetch_all_resources(api, "namespaces")
     cr_lookup = dict((cr["name"], cr)
                      for cr in cr_list)
 
@@ -175,12 +169,7 @@ def absent_strategy(api, wished_cr):
 def present_strategy(api, wished_cr):
     changed = False
 
-    response = api.get(path=api.api_path)
-    if not response.ok:
-        api.module.fail_json(msg='Error getting container registries [{0}: {1}]'.format(
-            response.status_code, response.json['message']))
-
-    cr_list = response.json["namespaces"]
+    cr_list = fetch_all_resources(api, "namespaces")
     cr_lookup = dict((cr["name"], cr)
                      for cr in cr_list)
 
@@ -207,8 +196,8 @@ def present_strategy(api, wished_cr):
         return changed, response.json
 
     target_cr = cr_lookup[wished_cr["name"]]
-    patch_payload = resource_attributes_should_be_changed(target_cr=target_cr,
-                                                          wished_cr=playload_cr,
+    patch_payload = resource_attributes_should_be_changed(target=target_cr,
+                                                          wished=playload_cr,
                                                           verifiable_mutable_attributes=MUTABLE_ATTRIBUTES,
                                                           mutable_attributes=MUTABLE_ATTRIBUTES)
 

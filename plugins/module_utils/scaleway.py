@@ -91,6 +91,35 @@ def fetch_state(api, resource):
         api.module.fail_json(msg="Could not fetch state in %s" % response.json)
 
 
+def fetch_paginated_resources(api, resource_key, **pagination_kwargs):
+    response = api.get(
+        path=api.api_path,
+        params=pagination_kwargs)
+
+    status_code = response.status_code
+    if not response.ok:
+        api.module.fail_json(msg='Error getting {0} [{1}: {2}]'.format(
+            resource_key,
+            response.status_code, response.json['message']))
+
+    return response.json[resource_key]
+
+
+def fetch_all_resources(api, resource_key, **pagination_kwargs):
+    resources = []
+
+    result = [None]
+    while len(result) != 0:
+        result = fetch_paginated_resources(api, resource_key, **pagination_kwargs)
+        resources += result
+        if 'page' in pagination_kwargs:
+            pagination_kwargs['page'] += 1
+        else:
+            pagination_kwargs['page'] = 2
+
+    return resources
+
+
 def wait_to_complete_state_transition(api, resource, stable_states, force_wait=False):
     wait = api.module.params["wait"]
 

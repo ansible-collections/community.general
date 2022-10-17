@@ -81,22 +81,17 @@ function_namespace:
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_ENDPOINT, SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
-    filter_sensitive_attributes
+    filter_sensitive_attributes, fetch_all_resources
 )
 from ansible.module_utils.basic import AnsibleModule
 
 SENSITIVE_ATTRIBUTES = (
-    "secret_environment_variables"
+    "secret_environment_variables",
 )
 
 
 def info_strategy(api, wished_fn):
-    response = api.get(path=api.api_path)
-    if not response.ok:
-        api.module.fail_json(msg='Error getting function namespaces [{0}: {1}]'.format(
-            response.status_code, response.json['message']))
-
-    fn_list = response.json["namespaces"]
+    fn_list = fetch_all_resources(api, "namespaces")
     fn_lookup = dict((fn["name"], fn)
                      for fn in fn_list)
 

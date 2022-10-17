@@ -122,7 +122,8 @@ function_namespace:
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_ENDPOINT, SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
     wait_to_complete_state_transition, scaleway_waitable_resource_argument_spec,
-    filter_sensitive_attributes, resource_attributes_should_be_changed
+    filter_sensitive_attributes, resource_attributes_should_be_changed,
+    fetch_all_resources
 )
 from ansible.module_utils.basic import AnsibleModule
 
@@ -141,7 +142,7 @@ MUTABLE_ATTRIBUTES = VERIFIABLE_MUTABLE_ATTRIBUTES + (
 )
 
 SENSITIVE_ATTRIBUTES = (
-    "secret_environment_variables"
+    "secret_environment_variables",
 )
 
 
@@ -161,15 +162,9 @@ def payload_from_wished_fn(wished_fn):
 
 
 def absent_strategy(api, wished_fn):
-    response = api.get(path=api.api_path)
     changed = False
 
-    status_code = response.status_code
-    if not response.ok:
-        api.module.fail_json(msg='Error getting function namespaces [{0}: {1}]'.format(
-            response.status_code, response.json['message']))
-
-    fn_list = response.json["namespaces"]
+    fn_list = fetch_all_resources(api, "namespaces")
     fn_lookup = dict((fn["name"], fn)
                      for fn in fn_list)
 
@@ -194,12 +189,7 @@ def absent_strategy(api, wished_fn):
 def present_strategy(api, wished_fn):
     changed = False
 
-    response = api.get(path=api.api_path)
-    if not response.ok:
-        api.module.fail_json(msg='Error getting function namespaces [{0}: {1}]'.format(
-            response.status_code, response.json['message']))
-
-    fn_list = response.json["namespaces"]
+    fn_list = fetch_all_resources(api, "namespaces")
     fn_lookup = dict((fn["name"], fn)
                      for fn in fn_list)
 
@@ -226,8 +216,8 @@ def present_strategy(api, wished_fn):
         return changed, response.json
 
     target_fn = fn_lookup[wished_fn["name"]]
-    patch_payload = resource_attributes_should_be_changed(target_fn=target_fn,
-                                                          wished_fn=playload_fn,
+    patch_payload = resource_attributes_should_be_changed(target=target_fn,
+                                                          wished=playload_fn,
                                                           verifiable_mutable_attributes=VERIFIABLE_MUTABLE_ATTRIBUTES,
                                                           mutable_attributes=MUTABLE_ATTRIBUTES)
 
