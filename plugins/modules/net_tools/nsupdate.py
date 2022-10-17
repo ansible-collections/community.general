@@ -341,11 +341,10 @@ class RecordManager(object):
         update = dns.update.Update(self.zone, keyring=self.keyring, keyalgorithm=self.algorithm)
 
         if self.module.params['type'].upper() == 'NS':
-            # When modifying a NS record, track records that are no longer required and only remove them
-            # after adding the new entries.
-            # Bind9 silently refuses to delete all the NS entries for a zone:
+            # When modifying a NS record, Bind9 silently refuses to delete all the NS entries for a zone:
             # 09-May-2022 18:00:50.352 client @0x7fe7dd1f9568 192.168.1.3#45458/key rndc_ddns_ansible: updating zone 'lab/IN': attempt to delete all SOA or NS records ignored
             # https://gitlab.isc.org/isc-projects/bind9/-/blob/v9_18/lib/ns/update.c#L3304
+            # Let's perform dns inserts and updates first, deletes after.  
             query = dns.message.make_query(self.module.params['record'], self.module.params['type'])
             if self.keyring:
                 query.use_tsig(keyring=self.keyring, algorithm=self.algorithm)
