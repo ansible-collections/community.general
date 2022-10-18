@@ -55,6 +55,11 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
+tags:
+  description: List of tags associated with the resource.
+  returned: on success
+  type: list
+  elements: dict
 '''
 
 from ansible.module_utils.basic import AnsibleModule
