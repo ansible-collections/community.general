@@ -170,7 +170,7 @@ class ManageIQ(object):
         """ Query the resource name in ManageIQ.
 
         Returns:
-            the resource id if it exists in manageiq, Fail otherwise.
+            the resource ID if it exists in ManageIQ, Fail otherwise.
         """
         resource = self.find_collection_resource_by(resource_type, name=resource_name)
         if resource:

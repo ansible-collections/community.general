@@ -25,8 +25,8 @@ options:
   state:
     type: str
     description:
-      - C(absent) - tags should not exist,
-      - C(present) - tags should exist,
+      - C(absent) - tags should not exist.
+      - C(present) - tags should exist.
       - C(list) - list current tags.
     choices: ['absent', 'present', 'list']
     default: 'present'
@@ -35,7 +35,7 @@ options:
     elements: dict
     description:
       - C(tags) - list of dictionaries, each includes C(name) and c(category) keys.
-      - required if I(state) is C(present) or C(absent).
+      - Required if I(state) is C(present) or C(absent).
   resource_type:
     type: str
     description:
@@ -71,7 +71,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+  register: result
 
 - name: Create new tags for a provider in ManageIQ
   community.general.manageiq_tags:
@@ -86,7 +86,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+  register: result
 
 - name: Remove tags for a provider in ManageIQ
   community.general.manageiq_tags:
@@ -102,7 +102,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+  register: result
 
 - name: List current tags for a provider in ManageIQ
   community.general.manageiq_tags:
@@ -113,7 +113,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+  register: result
 '''
 
 RETURN = '''

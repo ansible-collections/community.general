@@ -13,19 +13,19 @@ DOCUMENTATION = '''
 
 module: manageiq_tags_info
 version_added: 5.8.0
-short_description: Retrieve resource tags in ManageIQ.
+short_description: Retrieve resource tags in ManageIQ
 extends_documentation_fragment:
 - community.general.manageiq
 
 author: Alexei Znamensky (@russoz)
 description:
-  - The manageiq_tags_info module supports retrieving resource tags from ManageIQ.
+  - This module supports retrieving resource tags from ManageIQ.
 
 options:
   resource_type:
     type: str
     description:
-      - The relevant resource type in manageiq.
+      - The relevant resource type in ManageIQ.
     required: true
     choices: ['provider', 'host', 'vm', 'blueprint', 'category', 'cluster',
         'data store', 'group', 'resource pool', 'service', 'service template',
@@ -43,7 +43,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: List current tags for a provider in ManageIQ
+- name: List current tags for a provider in ManageIQ.
   community.general.manageiq_tags_info:
     resource_name: 'EngLab'
     resource_type: 'provider'
@@ -51,7 +51,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-      validate_certs: false
+  register: result
 '''
 
 RETURN = '''
