@@ -36,7 +36,7 @@ class ArgFormat(object):
         """
         THIS CLASS IS BEING DEPRECATED.
         It was never meant to be used outside the scope of CmdMixin, and CmdMixin is being deprecated.
-        See the deprecation notice in CmdMixin.__init__() below.
+        See the deprecation notice in ``CmdMixin.__init__()`` below.
 
         Creates a CLI-formatter for one specific argument. The argument may be a module parameter or just a named parameter for
         the CLI command execution.
@@ -92,6 +92,9 @@ class ArgFormat(object):
 
 class CmdMixin(object):
     """
+    THIS CLASS IS BEING DEPRECATED.
+    See the deprecation notice in ``CmdMixin.__init__()`` below.
+
     Mixin for mapping module options to running a CLI command with its arguments.
     """
     command = None
