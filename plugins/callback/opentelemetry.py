@@ -94,11 +94,30 @@ try:
     from opentelemetry.sdk.trace.export import (
         BatchSpanProcessor
     )
-    from opentelemetry.util._time import _time_ns
+
+    # Support for opentelemetry-api <= 1.12
+    try:
+        from opentelemetry.util._time import _time_ns
+    except ImportError as imp_exc:
+        OTEL_LIBRARY_TIME_NS_ERROR = imp_exc
+    else:
+        OTEL_LIBRARY_TIME_NS_ERROR = None
+
 except ImportError as imp_exc:
     OTEL_LIBRARY_IMPORT_ERROR = imp_exc
+    OTEL_LIBRARY_TIME_NS_ERROR = imp_exc
 else:
     OTEL_LIBRARY_IMPORT_ERROR = None
+
+
+if sys.version_info >= (3, 7):
+    time_ns = time.time_ns
+elif not OTEL_LIBRARY_TIME_NS_ERROR:
+    time_ns = _time_ns
+else:
+    def time_ns():
+        # Support versions older than 3.7 with opentelemetry-api > 1.12
+        return int(time.time() * 1e9)
 
 
 class TaskData:
@@ -112,10 +131,7 @@ class TaskData:
         self.path = path
         self.play = play
         self.host_data = OrderedDict()
-        if sys.version_info >= (3, 7):
-            self.start = time.time_ns()
-        else:
-            self.start = _time_ns()
+        self.start = time_ns()
         self.action = action
         self.args = args
 
@@ -140,10 +156,7 @@ class HostData:
         self.name = name
         self.status = status
         self.result = result
-        if sys.version_info >= (3, 7):
-            self.finish = time.time_ns()
-        else:
-            self.finish = _time_ns()
+        self.finish = time_ns()
 
 
 class OpenTelemetrySource(object):
