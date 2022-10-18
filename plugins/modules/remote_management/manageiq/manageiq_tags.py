@@ -58,7 +58,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: Create new tags for a provider in ManageIQ
+- name: Create new tags for a provider in ManageIQ.
   community.general.manageiq_tags:
     resource_name: 'EngLab'
     resource_type: 'provider'
@@ -71,9 +71,9 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-  register: result
+      validate_certs: false
 
-- name: Create new tags for a provider in ManageIQ
+- name: Create new tags for a provider in ManageIQ.
   community.general.manageiq_tags:
     resource_id: 23000000790497
     resource_type: 'provider'
@@ -86,9 +86,9 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-  register: result
+      validate_certs: false
 
-- name: Remove tags for a provider in ManageIQ
+- name: Remove tags for a provider in ManageIQ.
   community.general.manageiq_tags:
     state: absent
     resource_name: 'EngLab'
@@ -102,9 +102,9 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-  register: result
+      validate_certs: false
 
-- name: List current tags for a provider in ManageIQ
+- name: List current tags for a provider in ManageIQ.
   community.general.manageiq_tags:
     state: list
     resource_name: 'EngLab'
@@ -113,7 +113,7 @@ EXAMPLES = '''
       url: 'http://127.0.0.1:3000'
       username: 'admin'
       password: 'smartvm'
-  register: result
+      validate_certs: false
 '''
 
 RETURN = '''
