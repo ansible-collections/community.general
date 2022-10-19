@@ -1,0 +1,2 @@
+bugfixes:
+  - Replacing compare_s with search_s fixes 977 because search is X-ORDERED agnostic
