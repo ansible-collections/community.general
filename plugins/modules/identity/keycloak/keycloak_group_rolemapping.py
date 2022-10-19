@@ -101,7 +101,7 @@ extends_documentation_fragment:
 
 
 author:
-    - Dušan Marković (@bratwurzt)
+    - Marius Huysamen (mhuysamen)
 '''
 
 EXAMPLES = '''
