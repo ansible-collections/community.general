@@ -101,7 +101,7 @@ extends_documentation_fragment:
 
 
 author:
-    - Marius Huysamen (mhuysamen)
+    - Marius Huysamen (@mhuysamen)
 '''
 
 EXAMPLES = '''
