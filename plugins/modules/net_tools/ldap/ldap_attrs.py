@@ -166,6 +166,7 @@ modlist:
 '''
 
 import traceback
+import ldap
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.converters import to_native, to_bytes
@@ -263,9 +264,10 @@ class LdapAttrs(LdapGeneric):
     def _is_value_present(self, name, value):
         """ True if the target attribute has the given value. """
         try:
-            is_present = bool(
-                self.connection.compare_s(self.dn, name, value))
-        except ldap.NO_SUCH_ATTRIBUTE:
+            filterstr = f"({name}={value.decode()})"
+            dns = self.connection.search_s(self.dn, ldap.SCOPE_BASE, filterstr)
+            is_present = bool(len(dns) == 1)
+        except (ldap.INVALID_DN_SYNTAX, ldap.NO_SUCH_OBJECT):
             is_present = False
 
         return is_present
