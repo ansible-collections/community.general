@@ -67,9 +67,9 @@ options:
     default: false
 notes:
     - Can produce I(gzip), I(bzip2), I(lzma), and I(zip) compressed files or archives.
+    - Requires C(tarfile), C(zipfile), C(gzip), and C(bz2) packages on target host. These are all part of the Python standard library for Python 2 and 3.
 requirements:
     - Requires C(lzma) (standard library of Python 3) or L(backports.lzma, https://pypi.org/project/backports.lzma/) (Python 2) if using C(xz) format.
-    - Requires C(tarfile), C(zipfile), C(gzip), and C(bz2) packages on target host. These are all part of the Python standard library for Python 2 and 3.
 seealso:
     - module: ansible.builtin.unarchive
 author:
