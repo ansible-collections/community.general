@@ -96,7 +96,7 @@ def jc(data, parser, quiet=True, raw=False):
     Example:
         # This step is optional in case you have the package already installed on your machine
         - name: add the jc prereqs to the running machine
-          delegate_to: 127.0.0.1
+          delegate_to: localhost
           pip:
             name: jc
             state: present
