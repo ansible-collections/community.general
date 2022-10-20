@@ -12,6 +12,37 @@
 # Make sure we start fresh
 
 # Test setup
+- name: prep our files
+  copy: src={{ item }} dest={{remote_tmp_dir}}/{{ item }}
+  with_items:
+    - foo.txt
+    - bar.txt
+    - empty.txt
+    - sub
+    - sub/subfile.txt
+
+# Run twice without lzma backport installed, to make sure it does not crash
+- name: Archive - pre-test - first run
+  archive:
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_pretest_1.tar"
+    format: "tar"
+  register: pretest_1
+
+- name: Archive - pre-test - second run
+  archive:
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_pretest_1.tar"
+    format: "tar"
+  register: pretest_2
+
+- name: Archive - validate pre-test
+  assert:
+    that:
+      - pretest_1 is changed
+      - pretest_2 is not changed
+
+# Install dependencies
 - name: Ensure zip is present to create test archive (yum)
   yum: name=zip state=latest
   when: ansible_facts.pkg_mgr == 'yum'
@@ -62,15 +93,6 @@
   pip: name=backports.lzma state=latest
   when: ansible_python_version.split('.')[0] == '2'
   register: backports_lzma_pip
-
-- name: prep our files
-  copy: src={{ item }} dest={{remote_tmp_dir}}/{{ item }}
-  with_items:
-    - foo.txt
-    - bar.txt
-    - empty.txt
-    - sub
-    - sub/subfile.txt
 
 - name: Define formats to test
   set_fact:
