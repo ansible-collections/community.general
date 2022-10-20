@@ -42,6 +42,13 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
+# This step is optional in case you have the package already installed on your machine
+- name: add the jc prereqs to the running machine
+  delegate_to: localhost
+  pip:
+    name: jc
+    state: present
+
 - name: Run command
   ansible.builtin.command: uname -a
   register: result
