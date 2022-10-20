@@ -94,6 +94,7 @@ def jc(data, parser, quiet=True, raw=False):
         dictionary or list of dictionaries
 
     Example:
+        # This step is optional in case you have the package already installed on your machine
         - name: add the jc prereqs to the running machine
           delegate_to: 127.0.0.1
           pip:
