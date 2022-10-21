@@ -23,7 +23,7 @@ options:
       - The name of the Django management command to run. The commands listed below are built in this module and have some basic parameter validation.
       - >
         C(cleanup) - clean up old data from the database (deprecated in Django 1.5). This parameter will be
-        deprecated in community.general 9.0.0. Use C(clearsessions) instead.
+        removed in community.general 9.0.0. Use C(clearsessions) instead.
       - C(collectstatic) - Collects the static files into C(STATIC_ROOT).
       - C(createcachetable) - Creates the cache tables for use with the database cache backend.
       - C(flush) - Removes all data from the database.
@@ -31,11 +31,11 @@ options:
       - C(migrate) - Synchronizes the database state with models and migrations.
       - >
         C(syncdb) - Synchronizes the database state with models and migrations (deprecated in Django 1.7).
-        This parameter will be deprecated in community.general 9.0.0. Use C(migrate) instead.
+        This parameter will be removed in community.general 9.0.0. Use C(migrate) instead.
       - C(test) - Runs tests for all installed apps.
       - >
         C(validate) - Validates all installed models (deprecated in Django 1.7). This parameter will be
-        deprecated in community.general 9.0.0. Use C(check) instead.
+        removed in community.general 9.0.0. Use C(check) instead.
       - Other commands can be entered, but will fail if they are unknown to Django.  Other commands that may
         prompt for user input should be run with the C(--noinput) flag.
     type: str
@@ -125,7 +125,7 @@ options:
     aliases: [test_runner]
 notes:
   - >
-    B(ATTENTION - DEPRECATION): Django releases older than 4.1 will be deprecated in
+    B(ATTENTION - DEPRECATION): Support for Django releases older than 4.1 will be removed in
     community.general version 9.0.0 (estimated to be released in May 2024).
     Please notice that Django 4.1 requires Python 3.8 or greater.
   - C(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the I(virtualenv) parameter
