@@ -22,7 +22,7 @@ options:
     description:
       - The name of the Django management command to run. The commands listed below are built in this module and have some basic parameter validation.
       - >
-        C(cleanup) - clean up old data from the database (deprecated in Django 1.7). This parameter will be
+        C(cleanup) - clean up old data from the database (deprecated in Django 1.5). This parameter will be
         deprecated in community.general 9.0.0. Use C(clearsessions) instead.
       - C(collectstatic) - Collects the static files into C(STATIC_ROOT).
       - C(createcachetable) - Creates the cache tables for use with the database cache backend.
