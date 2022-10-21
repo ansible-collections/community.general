@@ -1,2 +1,2 @@
 bugfixes:
-  - ldap_attrs - Fixes issue 977 by ignoring the ``{x}`` prefix on attribute values (https://github.com/ansible-collections/community.general/pull/5385).
+  - ldap_attrs - fixes issue 977 by ignoring the ``{x}`` prefix on attribute values (https://github.com/ansible-collections/community.general/pull/5385).
