@@ -43,7 +43,7 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 # This step is optional in case you have the package already installed on your machine
-- name: add the jc prereqs to the running machine
+- name: Make sure the jc Python library is installed on the Ansible controller
   delegate_to: localhost
   pip:
     name: jc
