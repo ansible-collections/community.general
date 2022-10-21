@@ -1,0 +1,2 @@
+deprecated_features:
+  - django_manage - dropping commands ``cleanup``, ``syncdb`` and ``validate`` that have been deprecated in Django long time ago (https://github.com/ansible-collections/community.general/pull/5400).
