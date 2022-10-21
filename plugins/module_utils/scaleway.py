@@ -73,82 +73,6 @@ def parse_pagination_link(header):
         return parsed_relations
 
 
-def fetch_state(api, resource):
-    api.module.debug("fetch_state of resource: %s" % resource["id"])
-    response = api.get(path=api.api_path + "/%s" % resource["id"])
-
-    if response.status_code == 404:
-        return "absent"
-
-    if not response.ok:
-        msg = 'Error during state fetching: (%s) %s' % (response.status_code, response.json)
-        api.module.fail_json(msg=msg)
-
-    try:
-        api.module.debug("Resource %s in state: %s" % (resource["id"], response.json["status"]))
-        return response.json["status"]
-    except KeyError:
-        api.module.fail_json(msg="Could not fetch state in %s" % response.json)
-
-
-def fetch_paginated_resources(api, resource_key, **pagination_kwargs):
-    response = api.get(
-        path=api.api_path,
-        params=pagination_kwargs)
-
-    status_code = response.status_code
-    if not response.ok:
-        api.module.fail_json(msg='Error getting {0} [{1}: {2}]'.format(
-            resource_key,
-            response.status_code, response.json['message']))
-
-    return response.json[resource_key]
-
-
-def fetch_all_resources(api, resource_key, **pagination_kwargs):
-    resources = []
-
-    result = [None]
-    while len(result) != 0:
-        result = fetch_paginated_resources(api, resource_key, **pagination_kwargs)
-        resources += result
-        if 'page' in pagination_kwargs:
-            pagination_kwargs['page'] += 1
-        else:
-            pagination_kwargs['page'] = 2
-
-    return resources
-
-
-def wait_to_complete_state_transition(api, resource, stable_states, force_wait=False):
-    wait = api.module.params["wait"]
-
-    if not (wait or force_wait):
-        return
-
-    wait_timeout = api.module.params["wait_timeout"]
-    wait_sleep_time = api.module.params["wait_sleep_time"]
-
-    # Prevent requesting the ressource status too soon
-    time.sleep(wait_sleep_time)
-
-    start = datetime.datetime.utcnow()
-    end = start + datetime.timedelta(seconds=wait_timeout)
-
-    while datetime.datetime.utcnow() < end:
-        api.module.debug("We are going to wait for the resource to finish its transition")
-
-        state = fetch_state(api, resource)
-        if state in stable_states:
-            api.module.debug("It seems that the resource is not in transition anymore.")
-            api.module.debug("load-balancer in state: %s" % fetch_state(api, resource))
-            break
-
-        time.sleep(wait_sleep_time)
-    else:
-        api.module.fail_json(msg="Server takes too long to finish its transition")
-
-
 def filter_sensitive_attributes(container, attributes):
     for attr in attributes:
         container[attr] = "SENSITIVE_VALUE"
@@ -273,6 +197,78 @@ class Scaleway(object):
 
     def warn(self, x):
         self.module.warn(str(x))
+
+    def fetch_state(self, resource):
+        self.module.debug("fetch_state of resource: %s" % resource["id"])
+        response = self.get(path=self.api_path + "/%s" % resource["id"])
+
+        if response.status_code == 404:
+            return "absent"
+
+        if not response.ok:
+            msg = 'Error during state fetching: (%s) %s' % (response.status_code, response.json)
+            self.module.fail_json(msg=msg)
+
+        try:
+            self.module.debug("Resource %s in state: %s" % (resource["id"], response.json["status"]))
+            return response.json["status"]
+        except KeyError:
+            self.module.fail_json(msg="Could not fetch state in %s" % response.json)
+
+    def fetch_paginated_resources(self, resource_key, **pagination_kwargs):
+        response = self.get(
+            path=self.api_path,
+            params=pagination_kwargs)
+
+        status_code = response.status_code
+        if not response.ok:
+            self.module.fail_json(msg='Error getting {0} [{1}: {2}]'.format(
+                resource_key,
+                response.status_code, response.json['message']))
+
+        return response.json[resource_key]
+
+    def fetch_all_resources(self, resource_key, **pagination_kwargs):
+        resources = []
+
+        result = [None]
+        while len(result) != 0:
+            result = self.fetch_paginated_resources(resource_key, **pagination_kwargs)
+            resources += result
+            if 'page' in pagination_kwargs:
+                pagination_kwargs['page'] += 1
+            else:
+                pagination_kwargs['page'] = 2
+
+        return resources
+
+    def wait_to_complete_state_transition(self, resource, stable_states, force_wait=False):
+        wait = self.module.params["wait"]
+
+        if not (wait or force_wait):
+            return
+
+        wait_timeout = self.module.params["wait_timeout"]
+        wait_sleep_time = self.module.params["wait_sleep_time"]
+
+        # Prevent requesting the ressource status too soon
+        time.sleep(wait_sleep_time)
+
+        start = datetime.datetime.utcnow()
+        end = start + datetime.timedelta(seconds=wait_timeout)
+
+        while datetime.datetime.utcnow() < end:
+            self.module.debug("We are going to wait for the resource to finish its transition")
+
+            state = self.fetch_state(resource)
+            if state in stable_states:
+                self.module.debug("It seems that the resource is not in transition anymore.")
+                self.module.debug("load-balancer in state: %s" % self.fetch_state(resource))
+                break
+
+            time.sleep(wait_sleep_time)
+        else:
+            self.module.fail_json(msg="Server takes too long to finish its transition")
 
 
 SCALEWAY_LOCATION = {

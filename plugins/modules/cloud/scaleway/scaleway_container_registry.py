@@ -91,31 +91,29 @@ EXAMPLES = '''
 
 RETURN = '''
 container_registry:
-    description: The container registry informations.
+    description: The container registry information.
     returned: when I(state=present)
     type: dict
-    sample: {
-      "created_at": "2022-10-14T09:51:07.949716Z",
-      "description": "Managed by Ansible",
-      "endpoint": "rg.fr-par.scw.cloud/my-awesome-registry",
-      "id": "0d7d5270-7864-49c2-920b-9fd6731f3589",
-      "image_count": 0,
-      "is_public": false,
-      "name": "my-awesome-registry",
-      "organization_id": "10697b59-5c34-4d24-8d15-9ff2d3b89f58",
-      "project_id": "3da4f0b2-06be-4773-8ec4-5dfa435381be",
-      "region": "fr-par",
-      "size": 0,
-      "status": "ready",
-      "status_message": "",
-      "updated_at": "2022-10-14T09:51:07.949716Z"
-    }
+    sample:
+      created_at: "2022-10-14T09:51:07.949716Z"
+      description: Managed by Ansible
+      endpoint: rg.fr-par.scw.cloud/my-awesome-registry
+      id: 0d7d5270-7864-49c2-920b-9fd6731f3589
+      image_count: 0
+      is_public: false
+      name: my-awesome-registry
+      organization_id: 10697b59-5c34-4d24-8d15-9ff2d3b89f58
+      project_id: 3da4f0b2-06be-4773-8ec4-5dfa435381be
+      region: fr-par
+      size: 0
+      status: ready
+      status_message: ""
+      updated_at: "2022-10-14T09:51:07.949716Z"
 '''
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_ENDPOINT, SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
-    wait_to_complete_state_transition, scaleway_waitable_resource_argument_spec,
-    resource_attributes_should_be_changed, fetch_all_resources
+    scaleway_waitable_resource_argument_spec, resource_attributes_should_be_changed
 )
 from ansible.module_utils.basic import AnsibleModule
 
@@ -144,7 +142,7 @@ def payload_from_wished_cr(wished_cr):
 def absent_strategy(api, wished_cr):
     changed = False
 
-    cr_list = fetch_all_resources(api, "namespaces")
+    cr_list = api.fetch_all_resources("namespaces")
     cr_lookup = dict((cr["name"], cr)
                      for cr in cr_list)
 
@@ -156,20 +154,20 @@ def absent_strategy(api, wished_cr):
     if api.module.check_mode:
         return changed, {"status": "Container registry would be destroyed"}
 
-    wait_to_complete_state_transition(api=api, resource=target_cr, stable_states=STABLE_STATES, force_wait=True)
+    api.wait_to_complete_state_transition(resource=target_cr, stable_states=STABLE_STATES, force_wait=True)
     response = api.delete(path=api.api_path + "/%s" % target_cr["id"])
     if not response.ok:
         api.module.fail_json(msg='Error deleting container registry [{0}: {1}]'.format(
             response.status_code, response.json))
 
-    wait_to_complete_state_transition(api=api, resource=target_cr, stable_states=STABLE_STATES)
+    api.wait_to_complete_state_transition(resource=target_cr, stable_states=STABLE_STATES)
     return changed, response.json
 
 
 def present_strategy(api, wished_cr):
     changed = False
 
-    cr_list = fetch_all_resources(api, "namespaces")
+    cr_list = api.fetch_all_resources("namespaces")
     cr_lookup = dict((cr["name"], cr)
                      for cr in cr_list)
 
@@ -191,7 +189,7 @@ def present_strategy(api, wished_cr):
                                                                                creation_response.json)
             api.module.fail_json(msg=msg)
 
-        wait_to_complete_state_transition(api=api, resource=creation_response.json, stable_states=STABLE_STATES)
+        api.wait_to_complete_state_transition(resource=creation_response.json, stable_states=STABLE_STATES)
         response = api.get(path=api.api_path + "/%s" % creation_response.json["id"])
         return changed, response.json
 
@@ -215,7 +213,7 @@ def present_strategy(api, wished_cr):
         api.module.fail_json(msg='Error during container registry attributes update: [{0}: {1}]'.format(
             cr_patch_response.status_code, cr_patch_response.json['message']))
 
-    wait_to_complete_state_transition(api=api, resource=target_cr, stable_states=STABLE_STATES)
+    api.wait_to_complete_state_transition(resource=target_cr, stable_states=STABLE_STATES)
     response = api.get(path=api.api_path + "/%s" % target_cr["id"])
     return changed, response.json
 

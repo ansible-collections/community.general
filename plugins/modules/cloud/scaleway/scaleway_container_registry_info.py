@@ -18,7 +18,7 @@ short_description: Scaleway Container registry info module
 version_added: 5.8.0
 author: Guillaume MARTINEZ (@Lunik)
 description:
-  - This module return info on container registry on Scaleway account.
+  - This module return information about a container registry on Scaleway account.
 extends_documentation_fragment:
   - community.general.scaleway
 
@@ -58,30 +58,29 @@ EXAMPLES = '''
 
 RETURN = '''
 container_registry:
-    description: The container registry informations.
+    description: The container registry information.
     returned: always
     type: dict
-    sample: {
-      "created_at": "2022-10-14T09:51:07.949716Z",
-      "description": "Managed by Ansible",
-      "endpoint": "rg.fr-par.scw.cloud/my-awesome-registry",
-      "id": "0d7d5270-7864-49c2-920b-9fd6731f3589",
-      "image_count": 0,
-      "is_public": false,
-      "name": "my-awesome-registry",
-      "organization_id": "10697b59-5c34-4d24-8d15-9ff2d3b89f58",
-      "project_id": "3da4f0b2-06be-4773-8ec4-5dfa435381be",
-      "region": "fr-par",
-      "size": 0,
-      "status": "ready",
-      "status_message": "",
-      "updated_at": "2022-10-14T09:51:07.949716Z"
-    }
+    sample:
+      created_at: "2022-10-14T09:51:07.949716Z"
+      description: Managed by Ansible
+      endpoint: rg.fr-par.scw.cloud/my-awesome-registry
+      id: 0d7d5270-7864-49c2-920b-9fd6731f3589
+      image_count: 0
+      is_public: false
+      name: my-awesome-registry
+      organization_id: 10697b59-5c34-4d24-8d15-9ff2d3b89f58
+      project_id: 3da4f0b2-06be-4773-8ec4-5dfa435381be
+      region: fr-par
+      size: 0
+      status: ready
+      status_message: ""
+      updated_at: "2022-10-14T09:51:07.949716Z"
 '''
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_ENDPOINT, SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
-    filter_sensitive_attributes, fetch_all_resources
+    filter_sensitive_attributes
 )
 from ansible.module_utils.basic import AnsibleModule
 
@@ -91,7 +90,7 @@ SENSITIVE_ATTRIBUTES = (
 
 
 def info_strategy(api, wished_cn):
-    cn_list = fetch_all_resources(api, "namespaces")
+    cn_list = api.fetch_all_resources("namespaces")
     cn_lookup = dict((fn["name"], fn)
                      for fn in cn_list)
 

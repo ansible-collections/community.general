@@ -18,16 +18,13 @@
     description: '{{ description }}'
   register: cr_creation_check_task
 
-- ansible.builtin.debug: var=cr_creation_check_task
+- ansible.builtin.debug:
+    var: cr_creation_check_task
 
-- name: cr_creation_check_task is success
+- name: Check module call result
   ansible.builtin.assert:
     that:
       - cr_creation_check_task is success
-
-- name: cr_creation_check_task is changed
-  ansible.builtin.assert:
-    that:
       - cr_creation_check_task is changed
 
 - name: Create container_registry
@@ -37,24 +34,17 @@
     region: '{{ scaleway_region }}'
     project_id: '{{ scw_project }}'
     description: '{{ description }}'
-  register: cr_creation_check_task
+  register: cr_creation_task
 
-- ansible.builtin.debug: var=cr_creation_check_task
+- ansible.builtin.debug:
+    var: cr_creation_task
 
-- name: cr_creation_check_task is success
+- name: Check module call result
   ansible.builtin.assert:
     that:
-      - cr_creation_check_task is success
-
-- name: cr_creation_check_task is changed
-  ansible.builtin.assert:
-    that:
-      - cr_creation_check_task is changed
-
-- name: Assert that the container registry is in a valid state
-  ansible.builtin.assert:
-    that:
-      - cr_creation_check_task.container_registry.status == "ready"
+      - cr_creation_task is success
+      - cr_creation_task is changed
+      - cr_creation_task.container_registry.status == "ready"
 
 - name: Create container registry (Confirmation)
   community.general.scaleway_container_registry:
@@ -65,21 +55,14 @@
     description: '{{ description }}'
   register: cr_creation_confirmation_task
 
-- ansible.builtin.debug: var=cr_creation_confirmation_task
+- ansible.builtin.debug:
+    var: cr_creation_confirmation_task
 
-- name: cr_creation_confirmation_task is success
+- name: Check module call result
   ansible.builtin.assert:
     that:
       - cr_creation_confirmation_task is success
-
-- name: cr_creation_confirmation_task is not changed
-  ansible.builtin.assert:
-    that:
       - cr_creation_confirmation_task is not changed
-
-- name: Assert that the container registry is in a valid state
-  ansible.builtin.assert:
-    that:
       - cr_creation_confirmation_task.container_registry.status == "ready"
 
 - name: Update container registry (Check)
@@ -92,16 +75,13 @@
     description: '{{ updated_description }}'
   register: cr_update_check_task
 
-- ansible.builtin.debug: var=cr_update_check_task
+- ansible.builtin.debug:
+    var: cr_update_check_task
 
-- name: cr_update_check_task is success
+- name: Check module call result
   ansible.builtin.assert:
     that:
       - cr_update_check_task is success
-
-- name: cr_update_check_task is changed
-  ansible.builtin.assert:
-    that:
       - cr_update_check_task is changed
 
 - name: Update container registry
@@ -113,21 +93,14 @@
     description: '{{ updated_description }}'
   register: cr_update_task
 
-- ansible.builtin.debug: var=cr_update_task
+- ansible.builtin.debug:
+    var: cr_update_task
 
-- name: cr_update_task is success
+- name: Check module call result
   ansible.builtin.assert:
     that:
       - cr_update_task is success
-
-- name: cr_update_task is changed
-  ansible.builtin.assert:
-    that:
       - cr_update_task is changed
-
-- name: Assert that the container registry is in a valid state
-  ansible.builtin.assert:
-    that:
       - cr_update_task.container_registry.status == "ready"
 
 - name: Update container registry (Confirmation)
@@ -139,21 +112,14 @@
     description: '{{ updated_description }}'
   register: cr_update_confirmation_task
 
-- ansible.builtin.debug: var=cr_update_confirmation_task
+- ansible.builtin.debug:
+    var: cr_update_confirmation_task
 
-- name: cr_update_confirmation_task is success
+- name: Check module call result
   ansible.builtin.assert:
     that:
       - cr_update_confirmation_task is success
-
-- name: cr_update_confirmation_task is not changed
-  ansible.builtin.assert:
-    that:
       - cr_update_confirmation_task is not changed
-
-- name: Assert that the container registry is in a valid state
-  ansible.builtin.assert:
-    that:
       - cr_update_confirmation_task.container_registry.status == "ready"
 
 - name: Delete container registry (Check)
@@ -166,14 +132,13 @@
     project_id: '{{ scw_project }}'
   register: cr_deletion_check_task
 
-- name: cr_deletion_check_task is success
+- ansible.builtin.debug:
+    var: cr_deletion_check_task
+
+- name: Check module call result
   ansible.builtin.assert:
     that:
       - cr_deletion_check_task is success
-
-- name: cr_deletion_check_task is changed
-  ansible.builtin.assert:
-    that:
       - cr_deletion_check_task is changed
 
 - name: Delete container registry
@@ -185,14 +150,13 @@
     project_id: '{{ scw_project }}'
   register: cr_deletion_task
 
-- name: cr_deletion_task is success
+- ansible.builtin.debug:
+    var: cr_deletion_task
+
+- name: Check module call result
   ansible.builtin.assert:
     that:
       - cr_deletion_task is success
-
-- name: cr_deletion_task is changed
-  ansible.builtin.assert:
-    that:
       - cr_deletion_task is changed
 
 - name: Delete container regitry (Confirmation)
@@ -204,12 +168,11 @@
     project_id: '{{ scw_project }}'
   register: cr_deletion_confirmation_task
 
-- name: cr_deletion_confirmation_task is success
+- ansible.builtin.debug:
+    var: cr_deletion_confirmation_task
+
+- name: Check module call result
   ansible.builtin.assert:
     that:
       - cr_deletion_confirmation_task is success
-
-- name: cr_deletion_confirmation_task is not changed
-  ansible.builtin.assert:
-    that:
       - cr_deletion_confirmation_task is not changed
