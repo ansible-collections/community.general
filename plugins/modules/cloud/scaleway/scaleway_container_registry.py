@@ -129,14 +129,14 @@ MUTABLE_ATTRIBUTES = (
 
 
 def payload_from_wished_cr(wished_cr):
-    playload = {
+    payload = {
         "project_id": wished_cr["project_id"],
         "name": wished_cr["name"],
         "description": wished_cr["description"],
         "is_public": wished_cr["privacy_policy"] == "public"
     }
 
-    return playload
+    return payload
 
 
 def absent_strategy(api, wished_cr):
