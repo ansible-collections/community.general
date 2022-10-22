@@ -38,7 +38,7 @@ DOCUMENTATION = '''
       type: boolean
       default: false
   requirements:
-    - jc (https://github.com/kellyjonbrazil/jc)
+    - jc (https://github.com/kellyjonbrazil/jc) installed on the local Ansible controller
 '''
 
 EXAMPLES = '''
@@ -134,7 +134,7 @@ def jc(data, parser, quiet=True, raw=False):
     """
 
     if not HAS_LIB:
-        raise AnsibleError('You need to install "jc" prior to running jc filter')
+        raise AnsibleError('You need to install "jc" on the local Ansible controller prior to running jc filter')
 
     try:
         jc_parser = importlib.import_module('jc.parsers.' + parser)
