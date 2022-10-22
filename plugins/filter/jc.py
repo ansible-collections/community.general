@@ -42,8 +42,7 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
-# This step is optional in case you have the package already installed on your machine
-- name: Make sure the jc Python library is installed on the Ansible controller
+- name: Install the prereqs of the jc filter (jc python package) so the local Ansible controller
   delegate_to: localhost
   pip:
     name: jc
@@ -101,8 +100,7 @@ def jc(data, parser, quiet=True, raw=False):
         dictionary or list of dictionaries
 
     Example:
-        # This step is optional in case you have the package already installed on your machine
-        - name: add the jc prereqs to the running machine
+        - name: install the prereqs of the jc filter (jc python package) so the local Ansible controller
           delegate_to: localhost
           pip:
             name: jc
