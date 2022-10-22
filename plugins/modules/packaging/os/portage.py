@@ -187,7 +187,6 @@ options:
     type: bool
     default: false
 
-requirements: [ gentoolkit ]
 author:
     - "William L Thomson Jr (@wltjr)"
     - "Yap Sok Ann (@sayap)"
@@ -315,9 +314,10 @@ def sync_repositories(module, webrsync=False):
         module.fail_json(msg='could not sync package repositories')
 
 
-# Note: In the 3 functions below, equery is done one-by-one, but emerge is done
-# in one go. If that is not desirable, split the packages into multiple tasks
-# instead of joining them together with comma.
+# Note: In the 3 functions below, package querying is done one-by-one,
+# but emerge is done in one go. If that is not desirable, split the
+# packages into multiple tasks instead of joining them together with
+# comma.
 
 
 def emerge_packages(module, packages):
