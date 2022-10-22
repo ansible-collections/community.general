@@ -111,9 +111,11 @@ options:
     aliases: [test_runner]
 notes:
   - C(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the I(virtualenv) parameter
-    is specified.
+    is specified. This requirement is deprecated and will be removed in community.general version 9.0.0.
   - This module will create a virtualenv if the I(virtualenv) parameter is specified and a virtual environment does not already
-    exist at the given location.
+    exist at the given location. This behavior is deprecated and will be removed in community.general version 9.0.0.
+  - The parameter I(virtualenv) will remain in use, but it will require the specified virtualenv to exist.
+    The recommended way to create one in Ansible is by using M(ansible.builtin.pip).
   - This module assumes English error messages for the C(createcachetable) command to detect table existence,
     unfortunately.
   - To be able to use the C(migrate) command with django versions < 1.7, you must have C(south) installed and added
@@ -179,10 +181,21 @@ def _ensure_virtualenv(module):
     if venv_param is None:
         return
 
+    ack_venv_deprecation = module.params['ack_venv_creation_deprecation']
+
     vbin = os.path.join(venv_param, 'bin')
     activate = os.path.join(vbin, 'activate')
 
     if not os.path.exists(activate):
+        # In version 9.0.0, if the venv is not found, it should fail_json() here.
+        if not ack_venv_deprecation:
+            module.deprecate(
+                'The behavior of "creating the virtual environment when missing" is being '
+                'deprecated and will be removed in community.general version 9.0.0. '
+                'Set the module parameter `ack_venv_creation_deprecation: true` to '
+                'prevent this message from showing up in every run.'
+            )
+
         virtualenv = module.get_bin_path('virtualenv', True)
         vcmd = [virtualenv, venv_param]
         rc, out_venv, err_venv = module.run_command(vcmd)
@@ -272,6 +285,7 @@ def main():
             skip=dict(type='bool'),
             merge=dict(type='bool'),
             link=dict(type='bool'),
+            ack_venv_creation_deprecation=dict(type='bool'),
         ),
     )
 
