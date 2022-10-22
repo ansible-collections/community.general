@@ -109,6 +109,14 @@ options:
     type: str
     required: false
     aliases: [test_runner]
+  ack_venv_creation_deprecation:
+    description:
+      - >-
+        When a I(virtualenv) is set but the virtual environment does not exist, the current behavior is
+        to create a new virtual environment. That behavior is deprecated and if that case happens it will
+        generate a deprecation warning. Set this flag to C(true) to suppress the deprecation warning.
+    type: bool
+
 notes:
   - C(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the I(virtualenv) parameter
     is specified. This requirement is deprecated and will be removed in community.general version 9.0.0.
@@ -193,7 +201,9 @@ def _ensure_virtualenv(module):
                 'The behavior of "creating the virtual environment when missing" is being '
                 'deprecated and will be removed in community.general version 9.0.0. '
                 'Set the module parameter `ack_venv_creation_deprecation: true` to '
-                'prevent this message from showing up in every run.'
+                'prevent this message from showing up when creating a virtualenv.',
+                version='9.0.0',
+                collection_name='community.general',
             )
 
         virtualenv = module.get_bin_path('virtualenv', True)
