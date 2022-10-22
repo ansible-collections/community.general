@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Copyright (c) 2022, Alexei Znamensky <russoz@gmail.com>
 # Copyright (c) 2013, Scott Anderson <scottanderson42@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -12,24 +13,36 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: django_manage
-short_description: Manages a Django application.
+short_description: Manages a Django application
 description:
-    - Manages a Django application using the C(manage.py) application frontend to C(django-admin). With the
-      C(virtualenv) parameter, all management commands will be executed by the given C(virtualenv) installation.
+  - Manages a Django application using the C(manage.py) application frontend to C(django-admin). With the
+    I(virtualenv) parameter, all management commands will be executed by the given C(virtualenv) installation.
 options:
   command:
     description:
-      - The name of the Django management command to run. Built in commands are C(cleanup), C(collectstatic),
-        C(flush), C(loaddata), C(migrate), C(syncdb), C(test), and C(validate).
-      - Other commands can be entered, but will fail if they're unknown to Django.  Other commands that may
+      - The name of the Django management command to run. The commands listed below are built in this module and have some basic parameter validation.
+      - >
+        C(cleanup) - clean up old data from the database (deprecated in Django 1.5). This parameter will be
+        removed in community.general 9.0.0. Use C(clearsessions) instead.
+      - C(collectstatic) - Collects the static files into C(STATIC_ROOT).
+      - C(createcachetable) - Creates the cache tables for use with the database cache backend.
+      - C(flush) - Removes all data from the database.
+      - C(loaddata) - Searches for and loads the contents of the named I(fixtures) into the database.
+      - C(migrate) - Synchronizes the database state with models and migrations.
+      - >
+        C(syncdb) - Synchronizes the database state with models and migrations (deprecated in Django 1.7).
+        This parameter will be removed in community.general 9.0.0. Use C(migrate) instead.
+      - C(test) - Runs tests for all installed apps.
+      - >
+        C(validate) - Validates all installed models (deprecated in Django 1.7). This parameter will be
+        removed in community.general 9.0.0. Use C(check) instead.
+      - Other commands can be entered, but will fail if they are unknown to Django.  Other commands that may
         prompt for user input should be run with the C(--noinput) flag.
-      - The module will perform some basic parameter validation (when applicable) to the commands C(cleanup),
-        C(collectstatic), C(createcachetable), C(flush), C(loaddata), C(migrate), C(syncdb), C(test), and C(validate).
     type: str
     required: true
   project_path:
     description:
-      - The path to the root of the Django application where B(manage.py) lives.
+      - The path to the root of the Django application where C(manage.py) lives.
     type: path
     required: true
     aliases: [app_path, chdir]
@@ -42,12 +55,13 @@ options:
     description:
       - A directory to add to the Python path. Typically used to include the settings module if it is located
         external to the application directory.
+      - This would be equivalent to adding I(pythonpath)'s value to the C(PYTHONPATH) environment variable.
     type: path
     required: false
     aliases: [python_path]
   virtualenv:
     description:
-      - An optional path to a I(virtualenv) installation to use while running the manage application.
+      - An optional path to a C(virtualenv) installation to use while running the manage application.
     type: path
     aliases: [virtual_env]
   apps:
@@ -87,29 +101,33 @@ options:
     required: false
   skip:
     description:
-     - Will skip over out-of-order missing migrations, you can only use this parameter with C(migrate) command.
+      - Will skip over out-of-order missing migrations, you can only use this parameter with C(migrate) command.
     required: false
     type: bool
   merge:
     description:
-     - Will run out-of-order or missing migrations as they are not rollback migrations, you can only use this
-       parameter with C(migrate) command.
+      - Will run out-of-order or missing migrations as they are not rollback migrations, you can only use this
+        parameter with C(migrate) command.
     required: false
     type: bool
   link:
     description:
-     - Will create links to the files instead of copying them, you can only use this parameter with
-       C(collectstatic) command.
+      - Will create links to the files instead of copying them, you can only use this parameter with
+        C(collectstatic) command.
     required: false
     type: bool
   testrunner:
     description:
-      - "From the Django docs: Controls the test runner class that is used to execute tests."
+      - Controls the test runner class that is used to execute tests.
       - This parameter is passed as-is to C(manage.py).
     type: str
     required: false
     aliases: [test_runner]
 notes:
+  - >
+    B(ATTENTION - DEPRECATION): Support for Django releases older than 4.1 will be removed in
+    community.general version 9.0.0 (estimated to be released in May 2024).
+    Please notice that Django 4.1 requires Python 3.8 or greater.
   - C(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the I(virtualenv) parameter
     is specified.
   - This module will create a virtualenv if the I(virtualenv) parameter is specified and a virtual environment does not already
@@ -121,8 +139,20 @@ notes:
   - To be able to use the C(collectstatic) command, you must have enabled staticfiles in your settings.
   - Your C(manage.py) application must be executable (rwxr-xr-x), and must have a valid shebang,
     i.e. C(#!/usr/bin/env python), for invoking the appropriate Python interpreter.
+seealso:
+  - name: django-admin and manage.py Reference
+    description: Reference for C(django-admin) or C(manage.py) commands.
+    link: https://docs.djangoproject.com/en/4.1/ref/django-admin/
+  - name: Django Download page
+    description: The page showing how to get Django and the timeline of supported releases.
+    link: https://www.djangoproject.com/download/
+  - name: What Python version can I use with Django?
+    description: From the Django FAQ, the response to Python requirements for the framework.
+    link: https://docs.djangoproject.com/en/dev/faq/install/#what-python-version-can-i-use-with-django
 requirements: [ "virtualenv", "django" ]
-author: "Scott Anderson (@tastychutney)"
+author:
+  - Alexei Znamensky (@russoz)
+  - Scott Anderson (@tastychutney)
 '''
 
 EXAMPLES = """
@@ -279,6 +309,21 @@ def main():
     command_bin = command_split[0]
     project_path = module.params['project_path']
     virtualenv = module.params['virtualenv']
+
+    try:
+        _deprecation = dict(
+            cleanup="clearsessions",
+            syncdb="migrate",
+            validate="check",
+        )
+        module.deprecate(
+            'The command {0} has been deprecated as it is no longer supported in recent Django versions.'
+            'Please use the command {1} instead that provide similar capability.'.format(command_bin, _deprecation[command_bin]),
+            version='9.0.0',
+            collection_name='community.general'
+        )
+    except KeyError:
+        pass
 
     for param in specific_params:
         value = module.params[param]
