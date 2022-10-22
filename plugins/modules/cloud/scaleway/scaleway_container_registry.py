@@ -146,7 +146,7 @@ def absent_strategy(api, wished_cr):
     cr_lookup = dict((cr["name"], cr)
                      for cr in cr_list)
 
-    if wished_cr["name"] not in cr_lookup.keys():
+    if wished_cr["name"] not in cr_lookup:
         return changed, {}
 
     target_cr = cr_lookup[wished_cr["name"]]
@@ -171,17 +171,17 @@ def present_strategy(api, wished_cr):
     cr_lookup = dict((cr["name"], cr)
                      for cr in cr_list)
 
-    playload_cr = payload_from_wished_cr(wished_cr)
+    payload_cr = payload_from_wished_cr(wished_cr)
 
-    if wished_cr["name"] not in cr_lookup.keys():
+    if wished_cr["name"] not in cr_lookup:
         changed = True
         if api.module.check_mode:
             return changed, {"status": "A container registry would be created."}
 
         # Create container registry
-        api.warn(playload_cr)
+        api.warn(payload_cr)
         creation_response = api.post(path=api.api_path,
-                                     data=playload_cr)
+                                     data=payload_cr)
 
         if not creation_response.ok:
             msg = "Error during container registry creation: %s: '%s' (%s)" % (creation_response.info['msg'],
@@ -195,7 +195,7 @@ def present_strategy(api, wished_cr):
 
     target_cr = cr_lookup[wished_cr["name"]]
     patch_payload = resource_attributes_should_be_changed(target=target_cr,
-                                                          wished=playload_cr,
+                                                          wished=payload_cr,
                                                           verifiable_mutable_attributes=MUTABLE_ATTRIBUTES,
                                                           mutable_attributes=MUTABLE_ATTRIBUTES)
 
