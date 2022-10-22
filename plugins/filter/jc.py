@@ -42,7 +42,7 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
-- name: Install the prereqs of the jc filter (jc python package) so the local Ansible controller
+- name: Install the prereqs of the jc filter (jc python package) on the local Ansible controller
   delegate_to: localhost
   pip:
     name: jc
@@ -100,7 +100,7 @@ def jc(data, parser, quiet=True, raw=False):
         dictionary or list of dictionaries
 
     Example:
-        - name: install the prereqs of the jc filter (jc python package) so the local Ansible controller
+        - name: install the prereqs of the jc filter (jc python package) on the local Ansible controller
           delegate_to: localhost
           pip:
             name: jc
