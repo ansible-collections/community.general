@@ -141,6 +141,42 @@
           - not pkgng_example4_idempotent.changed
 
 ##
+## pkgng - example - state=latest for out-of-date package without privileges
+##
+- name: Install intentionally out-of-date package and try to upgrade it with unprivileged user
+  block:
+    - ansible.builtin.user:
+        name: powerless
+        shell: /bin/bash
+
+    - name: Create out-of-date test package
+      import_tasks: create-outofdate-pkg.yml
+
+    - name: Install out-of-date test package
+      command: 'pkg add {{ pkgng_test_outofdate_pkg_path }}'
+      register: pkgng_example4_nopower_prepare
+
+    - name: Check for any available package upgrades with unprivileged user
+      become: true
+      become_user: powerless
+      pkgng:
+        name: '*'
+        state: latest
+      register: pkgng_example4_nopower_wildcard
+      ignore_errors: true
+
+    - name: Remove test out-of-date package
+      pkgng:
+        name: '{{ pkgng_test_pkg_name }}'
+        state: absent
+
+    - name: Ensure pkgng upgrades package correctly
+      assert:
+        that:
+          - not pkgng_example4_nopower_prepare.failed
+          - pkgng_example4_nopower_wildcard.failed
+
+##
 ## pkgng - example - Install multiple packages in one command
 ##
 - name: Remove test package (checkmode)

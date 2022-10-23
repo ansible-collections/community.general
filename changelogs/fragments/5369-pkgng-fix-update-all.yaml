@@ -1,0 +1,2 @@
+bugfixes:
+  - pkgng - fix case when ``pkg`` fails when trying to upgrade all packages (https://github.com/ansible-collections/community.general/issues/5363).
