@@ -982,6 +982,8 @@ files:
     maintainers: evertmulder
   $modules/remote_management/manageiq/manageiq_policies_info.py:
     maintainers: russoz $team_manageiq
+  $modules/remote_management/manageiq/manageiq_tags_info.py:
+    maintainers: russoz $team_manageiq
   $modules/remote_management/manageiq/manageiq_tenant.py:
     maintainers: evertmulder
   $modules/remote_management/oneview/:
