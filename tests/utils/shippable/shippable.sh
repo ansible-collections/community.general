@@ -24,7 +24,10 @@ test="$(join / "${args[@]:1}")"
 
 docker images ansible/ansible
 docker images quay.io/ansible/*
+docker image prune -a -y
+docker images
 docker ps
+exit
 
 for container in $(docker ps --format '{{.Image}} {{.ID}}' | grep -v -e '^drydock/' -e '^quay.io/ansible/azure-pipelines-test-container:' | sed 's/^.* //'); do
     docker rm -f "${container}" || true  # ignore errors
