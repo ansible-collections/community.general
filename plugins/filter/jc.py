@@ -38,7 +38,7 @@ DOCUMENTATION = '''
       type: boolean
       default: false
   requirements:
-    - jc (https://github.com/kellyjonbrazil/jc) installed on the local Ansible controller
+    - jc installed as a Python library (U(https://pypi.org/project/jc/))
 '''
 
 EXAMPLES = '''
