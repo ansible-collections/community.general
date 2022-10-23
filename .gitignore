@@ -509,3 +509,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/vim,git,macos,linux,pydev,emacs,dotenv,python,windows,webstorm,pycharm+all,jupyternotebooks
+
+# Integration tests cloud configs
+tests/integration/cloud-config-*.ini
