@@ -44,7 +44,7 @@ DOCUMENTATION = '''
 EXAMPLES = '''
 - name: Install the prereqs of the jc filter (jc python package) on the local Ansible controller
   delegate_to: localhost
-  pip:
+  ansible.builtin.pip:
     name: jc
     state: present
 
