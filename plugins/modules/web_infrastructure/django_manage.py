@@ -115,6 +115,8 @@ options:
         When a I(virtualenv) is set but the virtual environment does not exist, the current behavior is
         to create a new virtual environment. That behavior is deprecated and if that case happens it will
         generate a deprecation warning. Set this flag to C(true) to suppress the deprecation warning.
+      - Please note that you will receive no further warning about this being removed until the module
+        will start failing in such cases from community.general 9.0.0 on.
     type: bool
 
 notes:
