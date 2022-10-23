@@ -192,14 +192,12 @@ def _ensure_virtualenv(module):
     if venv_param is None:
         return
 
-    ack_venv_deprecation = module.params['ack_venv_creation_deprecation']
-
     vbin = os.path.join(venv_param, 'bin')
     activate = os.path.join(vbin, 'activate')
 
     if not os.path.exists(activate):
         # In version 9.0.0, if the venv is not found, it should fail_json() here.
-        if not ack_venv_deprecation:
+        if not module.params['ack_venv_creation_deprecation']:
             module.deprecate(
                 'The behavior of "creating the virtual environment when missing" is being '
                 'deprecated and will be removed in community.general version 9.0.0. '
