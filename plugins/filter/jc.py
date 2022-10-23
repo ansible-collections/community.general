@@ -102,7 +102,7 @@ def jc(data, parser, quiet=True, raw=False):
     Example:
         - name: install the prereqs of the jc filter (jc python package) on the local Ansible controller
           delegate_to: localhost
-          pip:
+          ansible.builtin.pip:
             name: jc
             state: present
         - name: run date command
