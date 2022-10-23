@@ -266,7 +266,7 @@ class LdapAttrs(LdapGeneric):
         try:
             filterstr = "(%s=%s)" % (name, value.decode())
             dns = self.connection.search_s(self.dn, ldap.SCOPE_BASE, filterstr)
-            is_present = bool(len(dns) == 1)
+            is_present = len(dns) == 1
         except (ldap.INVALID_DN_SYNTAX, ldap.NO_SUCH_OBJECT):
             is_present = False
 
