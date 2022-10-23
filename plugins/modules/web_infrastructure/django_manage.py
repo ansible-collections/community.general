@@ -118,6 +118,7 @@ options:
       - Please note that you will receive no further warning about this being removed until the module
         will start failing in such cases from community.general 9.0.0 on.
     type: bool
+    version_added: 5.8.0
 
 notes:
   - C(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the I(virtualenv) parameter
