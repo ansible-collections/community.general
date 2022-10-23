@@ -1,0 +1,178 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2022, Guillaume MARTINEZ <lunik@tiwabbit.fr>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create a container registry (Check)
+  check_mode: yes
+  community.general.scaleway_container_registry:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    project_id: '{{ scw_project }}'
+    description: '{{ description }}'
+  register: cr_creation_check_task
+
+- ansible.builtin.debug:
+    var: cr_creation_check_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cr_creation_check_task is success
+      - cr_creation_check_task is changed
+
+- name: Create container_registry
+  community.general.scaleway_container_registry:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    project_id: '{{ scw_project }}'
+    description: '{{ description }}'
+  register: cr_creation_task
+
+- ansible.builtin.debug:
+    var: cr_creation_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cr_creation_task is success
+      - cr_creation_task is changed
+      - cr_creation_task.container_registry.status == "ready"
+
+- name: Create container registry (Confirmation)
+  community.general.scaleway_container_registry:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    project_id: '{{ scw_project }}'
+    description: '{{ description }}'
+  register: cr_creation_confirmation_task
+
+- ansible.builtin.debug:
+    var: cr_creation_confirmation_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cr_creation_confirmation_task is success
+      - cr_creation_confirmation_task is not changed
+      - cr_creation_confirmation_task.container_registry.status == "ready"
+
+- name: Update container registry (Check)
+  check_mode: yes
+  community.general.scaleway_container_registry:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    project_id: '{{ scw_project }}'
+    description: '{{ updated_description }}'
+  register: cr_update_check_task
+
+- ansible.builtin.debug:
+    var: cr_update_check_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cr_update_check_task is success
+      - cr_update_check_task is changed
+
+- name: Update container registry
+  community.general.scaleway_container_registry:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    project_id: '{{ scw_project }}'
+    description: '{{ updated_description }}'
+  register: cr_update_task
+
+- ansible.builtin.debug:
+    var: cr_update_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cr_update_task is success
+      - cr_update_task is changed
+      - cr_update_task.container_registry.status == "ready"
+
+- name: Update container registry (Confirmation)
+  community.general.scaleway_container_registry:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    project_id: '{{ scw_project }}'
+    description: '{{ updated_description }}'
+  register: cr_update_confirmation_task
+
+- ansible.builtin.debug:
+    var: cr_update_confirmation_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cr_update_confirmation_task is success
+      - cr_update_confirmation_task is not changed
+      - cr_update_confirmation_task.container_registry.status == "ready"
+
+- name: Delete container registry (Check)
+  check_mode: yes
+  community.general.scaleway_container_registry:
+    state: absent
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    description: '{{ description }}'
+    project_id: '{{ scw_project }}'
+  register: cr_deletion_check_task
+
+- ansible.builtin.debug:
+    var: cr_deletion_check_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cr_deletion_check_task is success
+      - cr_deletion_check_task is changed
+
+- name: Delete container registry
+  community.general.scaleway_container_registry:
+    state: absent
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    description: '{{ description }}'
+    project_id: '{{ scw_project }}'
+  register: cr_deletion_task
+
+- ansible.builtin.debug:
+    var: cr_deletion_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cr_deletion_task is success
+      - cr_deletion_task is changed
+
+- name: Delete container regitry (Confirmation)
+  community.general.scaleway_container_registry:
+    state: absent
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    description: '{{ description }}'
+    project_id: '{{ scw_project }}'
+  register: cr_deletion_confirmation_task
+
+- ansible.builtin.debug:
+    var: cr_deletion_confirmation_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cr_deletion_confirmation_task is success
+      - cr_deletion_confirmation_task is not changed
