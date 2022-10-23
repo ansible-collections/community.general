@@ -38,7 +38,7 @@ options:
     state:
         description:
             - State of the package.
-            - 'Note: "latest" added in 2.7'
+            - 'Note: C(latest) added in 2.7.'
         choices: [ 'present', 'latest', 'absent' ]
         required: false
         default: present
@@ -149,10 +149,7 @@ def query_package(module, run_pkgng, name):
 
     rc, out, err = run_pkgng('info', '-g', '-e', name)
 
-    if rc == 0:
-        return True
-
-    return False
+    return rc == 0
 
 
 def query_update(module, run_pkgng, name):
@@ -162,10 +159,7 @@ def query_update(module, run_pkgng, name):
     # rc = 1, updates available
     rc, out, err = run_pkgng('upgrade', '-g', '-n', name)
 
-    if rc == 1:
-        return True
-
-    return False
+    return rc == 1
 
 
 def pkgng_older_than(module, pkgng_path, compare_version):
@@ -191,7 +185,7 @@ def upgrade_packages(module, run_pkgng):
 
     pkgng_args = ['upgrade']
     pkgng_args.append('-n' if module.check_mode else '-y')
-    rc, out, err = run_pkgng(*pkgng_args)
+    rc, out, err = run_pkgng(*pkgng_args, check_rc=(not module.check_mode))
 
     matches = re.findall('^Number of packages to be (?:upgraded|reinstalled): ([0-9]+)', out, re.MULTILINE)
     for match in matches:
