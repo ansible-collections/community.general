@@ -134,7 +134,7 @@ def jc(data, parser, quiet=True, raw=False):
     """
 
     if not HAS_LIB:
-        raise AnsibleError('You need to install "jc" on the Ansible controller prior to running jc filter')
+        raise AnsibleError('You need to install "jc" as a Python library on the Ansible controller prior to running jc filter')
 
     try:
         jc_parser = importlib.import_module('jc.parsers.' + parser)
