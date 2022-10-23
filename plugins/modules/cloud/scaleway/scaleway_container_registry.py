@@ -81,7 +81,7 @@ EXAMPLES = '''
     name: my-awesome-container-registry
   register: container_registry_creation_task
 
-- name: Make sure container regitry is deleted
+- name: Make sure container registry is deleted
   community.general.scaleway_container_registry:
     project_id: '{{ scw_project }}'
     state: absent
