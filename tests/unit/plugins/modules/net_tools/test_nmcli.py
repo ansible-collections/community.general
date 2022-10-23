@@ -105,6 +105,12 @@ TESTCASE_CONNECTION = [
         'state': 'absent',
         '_ansible_check_mode': True,
     },
+    {
+        'type': 'infiniband',
+        'conn_name': 'non_existent_nw_device',
+        'state': 'absent',
+        '_ansible_check_mode': True,
+    },
 ]
 
 TESTCASE_GENERIC = [
@@ -1271,6 +1277,53 @@ vpn.service-type:                       org.freedesktop.NetworkManager.pptp
 vpn.data:                               gateway=vpn.example.com, password-flags=2, user=brittany
 """
 
+TESTCASE_INFINIBAND_STATIC = [
+    {
+        'type': 'infiniband',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'infiniband_non_existant',
+        'ip4': '10.10.10.10/24',
+        'gw4': '10.10.10.1',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    }
+]
+
+TESTCASE_INFINIBAND_STATIC_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.type:                        infiniband
+connection.interface-name:              infiniband_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            manual
+ipv4.addresses:                         10.10.10.10/24
+ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+infiniband.transport-mode               datagram
+"""
+
+TESTCASE_INFINIBAND_STATIC_MODIFY_TRANSPORT_MODE = [
+    {
+
+        'type': 'infiniband',
+        'conn_name': 'non_existent_nw_device',
+        'transport_mode': 'connected',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+]
+
+TESTCASE_INFINIBAND_STATIC_MODIFY_TRANSPORT_MODE_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              infiniband_non_existant
+infiniband.transport_mode:              connected
+"""
+
 
 def mocker_set(mocker,
                connection_exists=False,
@@ -1653,6 +1706,24 @@ def mocked_vpn_pptp_connection_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
                execute_return=(0, TESTCASE_VPN_PPTP_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_infiniband_connection_static_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_INFINIBAND_STATIC_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_infiniband_connection_static_transport_mode_connected_modify(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_INFINIBAND_STATIC_MODIFY_TRANSPORT_MODE_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_BOND, indirect=['patch_ansible_module'])
@@ -3696,3 +3767,46 @@ def test_create_vpn_pptp(mocked_generic_connection_create, capfd):
     results = json.loads(out)
     assert not results.get('failed')
     assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_INFINIBAND_STATIC, indirect=['patch_ansible_module'])
+def test_infiniband_connection_static_unchanged(mocked_infiniband_connection_static_unchanged, capfd):
+    """
+    Test : Infiniband connection unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_INFINIBAND_STATIC_MODIFY_TRANSPORT_MODE, indirect=['patch_ansible_module'])
+def test_infiniband_connection_static_transport_mode_connected(
+        mocked_infiniband_connection_static_transport_mode_connected_modify, capfd):
+    """
+    Test : Modify Infiniband connection to use connected as transport_mode
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[1]
+
+    assert add_args[0][0] == '/usr/bin/nmcli'
+    assert add_args[0][1] == 'con'
+    assert add_args[0][2] == 'modify'
+    assert add_args[0][3] == 'non_existent_nw_device'
+
+    add_args_text = list(map(to_text, add_args[0]))
+
+    for param in ['infiniband.transport-mode', 'connected']:
+        assert param in add_args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+
+    assert results.get('changed') is True
+    assert not results.get('failed')

@@ -67,6 +67,12 @@ options:
         type: str
         choices: [ 802.3ad, active-backup, balance-alb, balance-rr, balance-tlb, balance-xor, broadcast ]
         default: balance-rr
+    transport_mode:
+        description:
+            - This option sets the connection type of Infiniband IPoIB devices.
+        type: str
+        choices: [ datagram, connected ]
+        version_added: 5.8.0
     master:
         description:
             - Master <master (ifname, or connection UUID or conn_name) of bridge, team, bond master connection profile.
@@ -1481,6 +1487,7 @@ class Nmcli(object):
         self.gsm = module.params['gsm']
         self.wireguard = module.params['wireguard']
         self.vpn = module.params['vpn']
+        self.transport_mode = module.params['transport_mode']
 
         if self.method4:
             self.ipv4_method = self.method4
@@ -1693,6 +1700,11 @@ class Nmcli(object):
                     options.update({
                         'vpn.data': vpn_data_values,
                     })
+        elif self.type == 'infiniband':
+            options.update({
+                'infiniband.transport-mode': self.transport_mode,
+            })
+
         # Convert settings values based on the situation.
         for setting, value in options.items():
             setting_type = self.settings_type(setting)
@@ -2285,6 +2297,7 @@ def main():
             gsm=dict(type='dict'),
             wireguard=dict(type='dict'),
             vpn=dict(type='dict'),
+            transport_mode=dict(type='str', choices=['datagram', 'connected']),
         ),
         mutually_exclusive=[['never_default4', 'gw4'],
                             ['routes4_extended', 'routes4'],
