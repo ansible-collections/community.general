@@ -38,7 +38,7 @@ DOCUMENTATION = '''
       type: boolean
       default: false
   requirements:
-    - jc installed as a Python library (https://pypi.org/project/jc/)
+    - jc installed as a Python library (U(https://pypi.org/project/jc/))
 '''
 
 EXAMPLES = '''
