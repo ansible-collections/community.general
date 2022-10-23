@@ -84,8 +84,16 @@ class StateModuleHelper(StateMixin, ModuleHelper):
 
 
 class CmdModuleHelper(CmdMixin, ModuleHelper):
+    """
+    THIS CLASS IS BEING DEPRECATED.
+    See the deprecation notice in ``CmdMixin.__init__()``.
+    """
     pass
 
 
 class CmdStateModuleHelper(CmdMixin, StateMixin, ModuleHelper):
+    """
+    THIS CLASS IS BEING DEPRECATED.
+    See the deprecation notice in ``CmdMixin.__init__()``.
+    """
     pass
