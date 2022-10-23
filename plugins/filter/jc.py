@@ -100,19 +100,20 @@ def jc(data, parser, quiet=True, raw=False):
         dictionary or list of dictionaries
 
     Example:
-        - name: install the prereqs of the jc filter (jc python package) on the local Ansible controller
-          delegate_to: localhost
-          ansible.builtin.pip:
-            name: jc
-            state: present
+       
         - name: run date command
           hosts: ubuntu
           tasks:
-          - shell: date
+          - name: install the prereqs of the jc filter (jc python package) on the local Ansible controller
+            delegate_to: localhost
+            ansible.builtin.pip:
+              name: jc
+              state: present
+          - ansible.builtin.shell: date
             register: result
-          - set_fact:
+          - ansible.builtin.set_fact:
               myvar: "{{ result.stdout | community.general.jc('date') }}"
-          - debug:
+          - ansible.builtin.debug:
               msg: "{{ myvar }}"
 
         produces:
