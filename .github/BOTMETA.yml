@@ -461,6 +461,10 @@ files:
     maintainers: $team_scaleway
   $modules/cloud/scaleway/scaleway_compute_private_network.py:
     maintainers: pastral
+  $modules/cloud/scaleway/scaleway_container_registry.py:
+     maintainers: Lunik
+  $modules/cloud/scaleway/scaleway_container_registry_info.py:
+     maintainers: Lunik
   $modules/cloud/scaleway/scaleway_database_backup.py:
     maintainers: guillaume_ro_fr
   $modules/cloud/scaleway/scaleway_image_info.py:
