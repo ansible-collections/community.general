@@ -24,7 +24,7 @@ test="$(join / "${args[@]:1}")"
 
 docker images ansible/ansible
 docker images quay.io/ansible/*
-docker image prune -a -y
+docker image prune -a -f
 docker images
 docker ps
 exit
