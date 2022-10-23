@@ -100,7 +100,6 @@ def jc(data, parser, quiet=True, raw=False):
         dictionary or list of dictionaries
 
     Example:
-       
         - name: run date command
           hosts: ubuntu
           tasks:
