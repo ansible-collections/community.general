@@ -42,7 +42,7 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
-- name: Install the prereqs of the jc filter (jc python package) on the local Ansible controller
+- name: Install the prereqs of the jc filter (jc python package) on the Ansible controller
   delegate_to: localhost
   ansible.builtin.pip:
     name: jc
@@ -103,7 +103,7 @@ def jc(data, parser, quiet=True, raw=False):
         - name: run date command
           hosts: ubuntu
           tasks:
-          - name: install the prereqs of the jc filter (jc python package) on the local Ansible controller
+          - name: install the prereqs of the jc filter (jc python package) on the Ansible controller
             delegate_to: localhost
             ansible.builtin.pip:
               name: jc
@@ -134,7 +134,7 @@ def jc(data, parser, quiet=True, raw=False):
     """
 
     if not HAS_LIB:
-        raise AnsibleError('You need to install "jc" on the local Ansible controller prior to running jc filter')
+        raise AnsibleError('You need to install "jc" on the Ansible controller prior to running jc filter')
 
     try:
         jc_parser = importlib.import_module('jc.parsers.' + parser)
