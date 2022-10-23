@@ -1,0 +1,2 @@
+bugfixes:
+  - "proxmox_kvm - fix ``agent`` parameter when boolean value is specified (https://github.com/ansible-collections/community.general/pull/5198)."
