@@ -34,6 +34,10 @@ class ArgFormat(object):
 
     def __init__(self, name, fmt=None, style=FORMAT, stars=0):
         """
+        THIS CLASS IS BEING DEPRECATED.
+        It was never meant to be used outside the scope of CmdMixin, and CmdMixin is being deprecated.
+        See the deprecation notice in ``CmdMixin.__init__()`` below.
+
         Creates a CLI-formatter for one specific argument. The argument may be a module parameter or just a named parameter for
         the CLI command execution.
         :param name: Name of the argument to be formatted
@@ -88,6 +92,9 @@ class ArgFormat(object):
 
 class CmdMixin(object):
     """
+    THIS CLASS IS BEING DEPRECATED.
+    See the deprecation notice in ``CmdMixin.__init__()`` below.
+
     Mixin for mapping module options to running a CLI command with its arguments.
     """
     command = None
@@ -109,6 +116,15 @@ class CmdMixin(object):
         for param, fmt_spec in self.command_args_formats.items():
             result[param] = ArgFormat(param, **fmt_spec)
         return result
+
+    def __init__(self, *args, **kwargs):
+        super(CmdMixin, self).__init__(*args, **kwargs)
+        self.module.deprecate(
+            'The CmdMixin used in classes CmdModuleHelper and CmdStateModuleHelper is being deprecated. '
+            'Modules should use community.general.plugins.module_utils.cmd_runner.CmdRunner instead.',
+            version='8.0.0',
+            collection_name='community.general',
+        )
 
     def _calculate_args(self, extra_params=None, params=None):
         def add_arg_formatted_param(_cmd_args, arg_format, _value):
