@@ -1,2 +1,0 @@
-bugfixes:
-  - redhat_subscription - make module idempotent when ``pool_ids`` are used (https://github.com/ansible-collections/community.general/issues/5313).

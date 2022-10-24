@@ -1955,3 +1955,27 @@ releases:
     - 5259-gitlab-imports.yaml
     - 5282-locale_gen.yaml
     release_date: '2022-10-03'
+  4.8.8:
+    changes:
+      bugfixes:
+      - archive - avoid crash when ``lzma`` is not present and ``format`` is not ``xz``
+        (https://github.com/ansible-collections/community.general/pull/5393).
+      - opentelemetry callback plugin - support opentelemetry-api 1.13.0 that removed
+        support for ``_time_ns`` (https://github.com/ansible-collections/community.general/pull/5342).
+      - pfexec become plugin - remove superflous quotes preventing exe wrap from working
+        as expected (https://github.com/ansible-collections/community.general/issues/3671,
+        https://github.com/ansible-collections/community.general/pull/3889).
+      - pkgng - fix case when ``pkg`` fails when trying to upgrade all packages (https://github.com/ansible-collections/community.general/issues/5363).
+      - redhat_subscription - make module idempotent when ``pool_ids`` are used (https://github.com/ansible-collections/community.general/issues/5313).
+      - xenserver_facts - fix broken ``AnsibleModule`` call that prevented the module
+        from working at all (https://github.com/ansible-collections/community.general/pull/5383).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 3671-illumos-pfexec.yml
+    - 4.8.8.yml
+    - 5313-fix-redhat_subscription-idempotency-pool_ids.yml
+    - 5342-opentelemetry_bug_fix_opentelemetry-api-1.13.yml
+    - 5369-pkgng-fix-update-all.yaml
+    - 5383-xenserver_facts.yml
+    - 5393-archive.yml
+    release_date: '2022-10-24'
