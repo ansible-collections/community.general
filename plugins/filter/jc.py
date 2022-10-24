@@ -103,7 +103,7 @@ def jc(data, parser, quiet=True, raw=False):
         - name: run date command
           hosts: ubuntu
           tasks:
-          - name: install the prereqs of the jc filter (jc python package) on the Ansible controller
+          - name: install the prereqs of the jc filter (jc Python package) on the Ansible controller
             delegate_to: localhost
             ansible.builtin.pip:
               name: jc
