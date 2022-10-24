@@ -14,7 +14,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: scaleway_function_namespace
-short_description: Scaleway Function namespace management module
+short_description: Scaleway Function namespace management
 version_added: 5.8.0
 author: Guillaume MARTINEZ (@Lunik)
 description:

@@ -14,7 +14,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: scaleway_function_namespace_info
-short_description: Scaleway Container namespace info module
+short_description: Retrieve information on Scaleway Function namespace
 version_added: 5.8.0
 author: Guillaume MARTINEZ (@Lunik)
 description:
