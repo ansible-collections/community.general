@@ -38,10 +38,16 @@ DOCUMENTATION = '''
       type: boolean
       default: false
   requirements:
-    - jc (https://github.com/kellyjonbrazil/jc)
+    - jc installed as a Python library (U(https://pypi.org/project/jc/))
 '''
 
 EXAMPLES = '''
+- name: Install the prereqs of the jc filter (jc Python package) on the Ansible controller
+  delegate_to: localhost
+  ansible.builtin.pip:
+    name: jc
+    state: present
+
 - name: Run command
   ansible.builtin.command: uname -a
   register: result
@@ -94,15 +100,19 @@ def jc(data, parser, quiet=True, raw=False):
         dictionary or list of dictionaries
 
     Example:
-
         - name: run date command
           hosts: ubuntu
           tasks:
-          - shell: date
+          - name: install the prereqs of the jc filter (jc Python package) on the Ansible controller
+            delegate_to: localhost
+            ansible.builtin.pip:
+              name: jc
+              state: present
+          - ansible.builtin.shell: date
             register: result
-          - set_fact:
+          - ansible.builtin.set_fact:
               myvar: "{{ result.stdout | community.general.jc('date') }}"
-          - debug:
+          - ansible.builtin.debug:
               msg: "{{ myvar }}"
 
         produces:
@@ -124,7 +134,7 @@ def jc(data, parser, quiet=True, raw=False):
     """
 
     if not HAS_LIB:
-        raise AnsibleError('You need to install "jc" prior to running jc filter')
+        raise AnsibleError('You need to install "jc" as a Python library on the Ansible controller prior to running jc filter')
 
     try:
         jc_parser = importlib.import_module('jc.parsers.' + parser)
