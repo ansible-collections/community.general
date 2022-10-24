@@ -591,17 +591,17 @@ class KeycloakAPI(object):
         :return: None.
         """
         if cid is None:
-            rolemappings_url = URL_REALM_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid)
+            group_realm_rolemappings_url = URL_REALM_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid)
             try:
-                open_url(rolemappings_url, method="POST", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(role_rep),
+                open_url(group_realm_rolemappings_url, method="POST", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(role_rep),
                         validate_certs=self.validate_certs, timeout=self.connection_timeout)
             except Exception as e:
                 self.module.fail_json(msg="Could not add rolemappings to group %s, realm %s: %s"
                                         % (gid, realm, str(e)))
         else:
-            rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
+            group_client_rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
             try:
-                open_url(rolemappings_url, method="POST", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(role_rep),
+                open_url(group_client_rolemappings_url, method="POST", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(role_rep),
                         validate_certs=self.validate_certs, timeout=self.connection_timeout)
             except Exception as e:
                 self.module.fail_json(msg="Could not add rolemappings for client %s to group %s, realm %s: %s"
@@ -617,17 +617,17 @@ class KeycloakAPI(object):
         :return: None.
         """
         if cid is None:
-            rolemappings_url = URL_REALM_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid)
+            group_realm_rolemappings_url = URL_REALM_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid)
             try:
-                open_url(rolemappings_url, method="DELETE", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(role_rep),
+                open_url(group_realm_rolemappings_url, method="DELETE", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(role_rep),
                         validate_certs=self.validate_certs, timeout=self.connection_timeout)
             except Exception as e:
                 self.module.fail_json(msg="Could not delete rolemappings from group %s, realm %s: %s"
                                         % (gid, realm, str(e)))
         else:
-            rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
+            group_client_rolemappings_url = URL_CLIENT_GROUP_ROLEMAPPINGS.format(url=self.baseurl, realm=realm, id=gid, client=cid)
             try:
-                open_url(rolemappings_url, method="DELETE", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(role_rep),
+                open_url(group_client_rolemappings_url, method="DELETE", http_agent=self.http_agent, headers=self.restheaders, data=json.dumps(role_rep),
                         validate_certs=self.validate_certs, timeout=self.connection_timeout)
             except Exception as e:
                 self.module.fail_json(msg="Could not delete available rolemappings for client %s to group %s, realm %s: %s"

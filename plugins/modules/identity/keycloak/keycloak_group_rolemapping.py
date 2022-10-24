@@ -13,7 +13,7 @@ module: keycloak_group_rolemapping
 
 short_description: Allows administration of Keycloak group_rolemapping with the Keycloak API
 
-version_added: 5.7.0
+version_added: 5.8.0
 
 description:
     - This module allows you to add, remove or modify Keycloak group_rolemapping with the Keycloak REST API.
@@ -101,6 +101,7 @@ extends_documentation_fragment:
 
 
 author:
+    - Dušan Marković (@bratwurzt)
     - Marius Huysamen (@mhuysamen)
 '''
 

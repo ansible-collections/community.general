@@ -1,0 +1,155 @@
+# Copyright (c) 2022, Marius Huysamen (@mhuysamen)
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+
+- name: Create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+
+- name: Create client
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    service_accounts_enabled: true
+    state: present
+  register: client
+
+- name: Create group
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ group_name }}"
+    state: present
+  register: group
+
+- name: Create new realm role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    description: "{{ description_1 }}"
+    state: present
+
+- name: Map a realm role to a group
+  vars:
+    - roles: [{'name': '{{ role }}'}]
+  community.general.keycloak_group_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    gid: "{{ group.end_state.id }}"
+    roles: "{{ roles }}"
+    state: present
+  register: result
+
+- name: Assert realm role is assigned
+  ansible.builtin.assert:
+    that:
+      - result is changed
+      - result.end_state | selectattr("clientRole", "eq", false) | selectattr("name", "eq", "{{ role }}") | list | count > 0
+
+- name: Unmap a realm role from a group
+  vars:
+    - roles: [{'name': '{{ role }}'}]
+  community.general.keycloak_group_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    gid: "{{ group.end_state.id }}"
+    roles: "{{ roles }}"
+    state: absent
+  register: result
+
+- name: Assert realm role is unassigned
+  ansible.builtin.assert:
+    that:
+      - result is changed
+      - (result.end_state | length) == (result.existing | length) - 1
+      - result.existing | selectattr("clientRole", "eq", false) | selectattr("name", "eq", "{{ role }}") | list | count > 0
+      - result.end_state | selectattr("clientRole", "eq", false) | selectattr("name", "eq", "{{ role }}") | list | count == 0
+
+- name: Delete existing realm role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    state: absent
+
+- name: Create new client role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ role }}"
+    description: "{{ description_1 }}"
+    state: present
+
+- name: Map a client role to a group
+  vars:
+    - roles: [{'name': '{{ role }}'}]
+  community.general.keycloak_group_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    gid: "{{ group.end_state.id }}"
+    roles: "{{ roles }}"
+    state: present
+  register: result
+
+- name: Assert client role is assigned
+  ansible.builtin.assert:
+    that:
+      - result is changed
+      - result.end_state | selectattr("clientRole", "eq", true) | selectattr("name", "eq", "{{ role }}") | list | count > 0
+
+- name: Unmap a client role from a group
+  vars:
+    - roles: [{'name': '{{ role }}'}]
+  community.general.keycloak_group_rolemapping:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    gid: "{{ group.end_state.id }}"
+    roles: "{{ roles }}"
+    state: absent
+  register: result
+
+- name: Assert client role is unassigned
+  ansible.builtin.assert:
+    that:
+      - result is changed
+      - result.end_state == []
+      - result.existing | selectattr("clientRole", "eq", true) | selectattr("name", "eq", "{{ role }}") | list | count > 0
