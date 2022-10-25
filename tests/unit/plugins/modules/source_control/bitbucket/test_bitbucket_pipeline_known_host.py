@@ -29,7 +29,7 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'bitbucket.org',
                     'state': 'present',
@@ -78,7 +78,7 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'bitbucket.org',
                     'state': 'present',
@@ -97,7 +97,7 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'bitbucket.org',
                     'state': 'present',
@@ -128,7 +128,7 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'bitbucket.org',
                     'state': 'absent',
@@ -147,7 +147,7 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'bitbucket.org',
                     'state': 'absent',
@@ -177,7 +177,7 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'bitbucket.org',
                     'state': 'absent',

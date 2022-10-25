@@ -50,10 +50,10 @@ options:
           - If set to C(true), options starting with C(volatile.) are ignored. As a result,
             they are reapplied for each execution.
           - This default behavior can be changed by setting this option to C(false).
-          - The current default value C(true) is deprecated since community.general 4.0.0,
-            and will change to C(false) in community.general 6.0.0.
+          - The default value changed from C(true) to C(false) in community.general 6.0.0.
         type: bool
         required: false
+        default: false
         version_added: 3.7.0
     profiles:
         description:
@@ -769,6 +769,7 @@ def main():
             ),
             ignore_volatile_options=dict(
                 type='bool',
+                default=False,
             ),
             devices=dict(
                 type='dict',
@@ -831,16 +832,6 @@ def main():
         ),
         supports_check_mode=False,
     )
-
-    if module.params['ignore_volatile_options'] is None:
-        module.params['ignore_volatile_options'] = True
-        module.deprecate(
-            'If the keyword "volatile" is used in a playbook in the config'
-            'section, a "changed" message will appear with every run, even without a change'
-            'to the playbook.'
-            'This will change in the future. Please test your scripts'
-            'by "ignore_volatile_options: false". To keep the old behavior, set that option explicitly to "true"',
-            version='6.0.0', collection_name='community.general')
 
     lxd_manage = LXDContainerManagement(module=module)
     lxd_manage.run()

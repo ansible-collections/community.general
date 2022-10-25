@@ -27,8 +27,10 @@ options:
     description:
       - The username.
       - If not set the environment variable C(BITBUCKET_USERNAME) will be used.
+      - I(username) is an alias of I(user) since community.genreal 6.0.0. It was an alias of I(workspace) before.
     type: str
     version_added: 4.0.0
+    aliases: [ username ]
   password:
     description:
       - The App password.

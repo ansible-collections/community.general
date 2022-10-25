@@ -22,7 +22,7 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
             set_module_args({
                 'client_id': 'ABC',
                 'client_secret': 'XXX',
-                'username': 'name',
+                'workspace': 'name',
                 'repository': 'repo',
                 'state': 'present',
             })
@@ -56,7 +56,7 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'public_key': 'public',
                     'private_key': 'PRIVATE',
@@ -79,7 +79,7 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'public_key': 'public',
                     'private_key': 'PRIVATE',
@@ -101,7 +101,7 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'public_key': 'public',
                     'private_key': 'PRIVATE',
@@ -123,7 +123,7 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'public_key': 'public',
                     'private_key': 'PRIVATE',
@@ -146,7 +146,7 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'state': 'absent',
                 })
@@ -163,7 +163,7 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'state': 'absent',
                 })
@@ -183,7 +183,7 @@ class TestBucketPipelineKeyPairModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'state': 'absent',
                     '_ansible_check_mode': True,

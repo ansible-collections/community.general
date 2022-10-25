@@ -113,10 +113,9 @@ DOCUMENTATION = '''
         description:
           - Whether to set C(ansbile_host) for proxmox nodes.
           - When set to C(true) (default), will use the first available interface. This can be different from what you expect.
-          - This currently defaults to C(true), but the default is deprecated since community.general 4.8.0.
-            The default will change to C(false) in community.general 6.0.0. To avoid a deprecation warning, please
-            set this parameter explicitly.
+          - The default of this option changed from C(true) to C(false) in community.general 6.0.0.
         type: bool
+        default: false
       filters:
         version_added: 4.6.0
         description: A list of Jinja templates that allow filtering hosts.
@@ -567,14 +566,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.inventory.add_group(nodes_group)
 
         want_proxmox_nodes_ansible_host = self.get_option("want_proxmox_nodes_ansible_host")
-        if want_proxmox_nodes_ansible_host is None:
-            display.deprecated(
-                'The want_proxmox_nodes_ansible_host option of the community.general.proxmox inventory plugin'
-                ' currently defaults to `true`, but this default has been deprecated and will change to `false`'
-                ' in community.general 6.0.0. To keep the current behavior and remove this deprecation warning,'
-                ' explicitly set `want_proxmox_nodes_ansible_host` to `true` in your inventory configuration',
-                version='6.0.0', collection_name='community.general')
-            want_proxmox_nodes_ansible_host = True
 
         # gather vm's on nodes
         self._get_auth()

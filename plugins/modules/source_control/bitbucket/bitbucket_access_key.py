@@ -27,10 +27,9 @@ options:
   workspace:
     description:
       - The repository owner.
-      - Alias I(username) has been deprecated and will become an alias of I(user) in community.general 6.0.0.
+      - I(username) used to be an alias of this option. Since community.general 6.0.0 it is an alias of I(user).
     type: str
     required: true
-    aliases: [ username ]
   key:
     description:
       - The SSH public key.
@@ -218,8 +217,7 @@ def main():
     argument_spec.update(
         repository=dict(type='str', required=True),
         workspace=dict(
-            type='str', aliases=['username'], required=True,
-            deprecated_aliases=[dict(name='username', version='6.0.0', collection_name='community.general')],
+            type='str', required=True,
         ),
         key=dict(type='str', no_log=False),
         label=dict(type='str', required=True),
