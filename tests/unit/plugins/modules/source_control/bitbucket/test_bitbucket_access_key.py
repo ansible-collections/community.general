@@ -22,7 +22,7 @@ class TestBucketAccessKeyModule(ModuleTestCase):
             set_module_args({
                 'client_id': 'ABC',
                 'client_secret': 'XXX',
-                'username': 'name',
+                'workspace': 'name',
                 'repository': 'repo',
                 'label': 'key name',
                 'state': 'present',
@@ -57,7 +57,7 @@ class TestBucketAccessKeyModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'key': 'public_key',
                     'label': 'key name',
@@ -108,7 +108,7 @@ class TestBucketAccessKeyModule(ModuleTestCase):
                     set_module_args({
                         'client_id': 'ABC',
                         'client_secret': 'XXX',
-                        'username': 'name',
+                        'workspace': 'name',
                         'repository': 'repo',
                         'key': 'new public key',
                         'label': 'mykey',
@@ -159,7 +159,7 @@ class TestBucketAccessKeyModule(ModuleTestCase):
                     set_module_args({
                         'client_id': 'ABC',
                         'client_secret': 'XXX',
-                        'username': 'name',
+                        'workspace': 'name',
                         'repository': 'repo',
                         'key': 'new public key',
                         'label': 'mykey',
@@ -210,7 +210,7 @@ class TestBucketAccessKeyModule(ModuleTestCase):
                     set_module_args({
                         'client_id': 'ABC',
                         'client_secret': 'XXX',
-                        'username': 'name',
+                        'workspace': 'name',
                         'repository': 'repo',
                         'key': 'new public key',
                         'label': 'mykey',
@@ -261,7 +261,7 @@ class TestBucketAccessKeyModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'label': 'mykey',
                     'state': 'absent',
@@ -279,7 +279,7 @@ class TestBucketAccessKeyModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'label': 'mykey',
                     'state': 'absent',
@@ -327,7 +327,7 @@ class TestBucketAccessKeyModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'label': 'mykey',
                     'state': 'absent',

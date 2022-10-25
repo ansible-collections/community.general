@@ -27,7 +27,7 @@ options:
   gitlab_group:
     description:
       - The C(full_path) of the GitLab group the member is added to/removed from.
-      - Setting this to C(name) or C(path) is deprecated and will be removed in community.general 6.0.0. Use C(full_path) instead.
+      - Setting this to C(name) or C(path) has been disallowed since community.general 6.0.0. Use C(full_path) instead.
     required: true
     type: str
   gitlab_user:
@@ -175,12 +175,6 @@ class GitLabGroup(object):
         groups = self._gitlab.groups.list(search=gitlab_group, all=True)
         for group in groups:
             if group.full_path == gitlab_group:
-                return group.id
-        for group in groups:
-            if group.path == gitlab_group or group.name == gitlab_group:
-                self._module.deprecate(
-                    msg="Setting 'gitlab_group' to 'name' or 'path' is deprecated. Use 'full_path' instead",
-                    version="6.0.0", collection_name="community.general")
                 return group.id
 
     # get all members in a group

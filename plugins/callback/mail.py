@@ -49,8 +49,9 @@ options:
   sender:
     description:
         - Mail sender.
-        - Note that this will be required from community.general 6.0.0 on.
+        - This is required since community.general 6.0.0.
     type: str
+    required: true
     ini:
         - section: callback_mail
           key: sender
@@ -105,10 +106,6 @@ class CallbackModule(CallbackBase):
         super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         self.sender = self.get_option('sender')
-        if self.sender is None:
-            self._display.deprecated(
-                'The sender for the mail callback has not been specified. This will be an error in the future',
-                version='6.0.0', collection_name='community.general')
         self.to = self.get_option('to')
         self.smtphost = self.get_option('mta')
         self.smtpport = self.get_option('mtaport')
