@@ -35,6 +35,16 @@ options:
         description:
             - Modules parameters.
         default: ''
+    persistent:
+        type: bool
+        default: False
+        description:
+            - Persistency between reboots for configured module.
+            - This option creates files in /etc/modules-load.d/ and /etc/modprobe.d/ that make your module configuration persistent during reboots.
+            - Note that it is usually a better idea to rely on the automatic module loading by PCI IDs, USB IDs, DMI IDs or similar triggers encoded in the
+              kernel modules themselves instead of configuration like this.
+            - In fact, most modern kernel modules are prepared for automatic loading already.
+            - Also this options work only with distributives that uses systemd.
 '''
 
 EXAMPLES = '''
@@ -54,11 +64,14 @@ import os.path
 import platform
 import shlex
 import traceback
+import re
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
 RELEASE_VER = platform.release()
+MODULES_LOAD_LOCATION = '/etc/modules-load.d'
+PARAMETERS_FILES_LOCATION = '/etc/modprobe.d'
 
 
 class Modprobe(object):
@@ -70,6 +83,7 @@ class Modprobe(object):
         self.desired_state = module.params['state']
         self.name = module.params['name']
         self.params = module.params['params']
+        self.persistent = module.params['persistent']
 
         self.changed = False
 
@@ -92,6 +106,124 @@ class Modprobe(object):
             )
             if rc != 0:
                 self.module.warn(stderr)
+
+    @property
+    def module_is_loaded_persistently(self):
+        pattern = re.compile(r'^ *{0} *(?:[#;].*)?\n?'.format(self.name))
+        for module_file in self.modules_files:
+            with open(module_file) as file:
+                for line in file:
+                    if pattern.fullmatch(line):
+                        return True
+
+        return False
+
+    @property
+    def params_is_set(self):
+        desired_params = set(self.params.split())
+
+        return desired_params == self.permanent_params
+
+    @property
+    def permanent_params(self):
+        params = set()
+
+        pattern = re.compile(r'^options {0} (\w+=\S+) *(?:[#;].*)?\n?'.format(self.name))
+
+        for modprobe_file in self.modprobe_files:
+            with open(modprobe_file) as file:
+                for line in file:
+                    match = pattern.fullmatch(line)
+                    if match:
+                        params.add(match[1])
+
+        return params
+
+    def create_module_file(self):
+        file_path = os.path.join(MODULES_LOAD_LOCATION,
+                                 self.name + '.conf')
+        with open(file_path, 'w') as file:
+            file.write(self.name + '\n')
+
+    @property
+    def module_options_file_content(self):
+        file_content = ['options {0} {1}'.format(self.name, param)
+                        for param in self.params.split()]
+        return '\n'.join(file_content) + '\n'
+
+    def create_module_options_file(self):
+        new_file_path = os.path.join(PARAMETERS_FILES_LOCATION,
+                                     self.name + '.conf')
+        with open(new_file_path, 'w') as file:
+            file.write(self.module_options_file_content)
+
+    def disable_old_params(self):
+
+        pattern = re.compile(r'^options {0} \w+=\S+ *(?:[#;].*)?\n?'.format(self.name))
+
+        for modprobe_file in self.modprobe_files:
+            with open(modprobe_file) as file:
+                file_content = file.readlines()
+
+            content_changed = False
+            for index, line in enumerate(file_content):
+                if pattern.fullmatch(line):
+                    file_content[index] = '#' + line
+                    content_changed = True
+
+            if content_changed:
+                with open(modprobe_file, 'w') as file:
+                    file.write('\n'.join(file_content))
+
+    def disable_module_permanent(self):
+
+        pattern = re.compile(r'^ *{0} *(?:[#;].*)?\n?'.format(self.name))
+
+        for module_file in self.modules_files:
+            with open(module_file) as file:
+                file_content = file.readlines()
+
+            content_changed = False
+            for index, line in enumerate(file_content):
+                if pattern.fullmatch(line):
+                    file_content[index] = '#' + line
+                    content_changed = True
+
+            if content_changed:
+                with open(module_file, 'w') as file:
+                    file.write('\n'.join(file_content))
+
+    def load_module_permanent(self):
+
+        if not self.module_is_loaded_persistently:
+            self.create_module_file()
+            self.changed = True
+
+        if not self.params_is_set:
+            self.disable_old_params()
+            self.create_module_options_file()
+            self.changed = True
+
+    def unload_module_permanent(self):
+        if self.module_is_loaded_persistently:
+            self.disable_module_permanent()
+            self.changed = True
+
+        if self.permanent_params:
+            self.disable_old_params()
+            self.changed = True
+
+    @property
+    def modules_files(self):
+        modules_paths = [os.path.join(MODULES_LOAD_LOCATION, path)
+                         for path in os.listdir(MODULES_LOAD_LOCATION)]
+        return list(filter(os.path.isfile, modules_paths))
+
+    @property
+    def modprobe_files(self):
+        modules_paths = [os.path.join(PARAMETERS_FILES_LOCATION, path)
+                         for path in os.listdir(PARAMETERS_FILES_LOCATION)]
+        return list(filter(os.path.isfile, modules_paths))
 
     def module_loaded(self):
         is_loaded = False
@@ -143,6 +275,7 @@ def main():
             name=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
             params=dict(type='str', default=''),
+            persistent=dict(type='bool', default=False)
         ),
         supports_check_mode=True,
     )
@@ -153,6 +286,12 @@ def main():
         modprobe.load_module()
     elif modprobe.desired_state == 'absent' and modprobe.module_loaded():
         modprobe.unload_module()
+
+    if modprobe.persistent:
+        if modprobe.desired_state == 'present' and not (modprobe.module_is_loaded_persistently and modprobe.params_is_set):
+            modprobe.load_module_permanent()
+        elif modprobe.desired_state == 'absent' and (modprobe.module_is_loaded_persistently or modprobe.permanent_params):
+            modprobe.unload_module_permanent()
 
     module.exit_json(**modprobe.result)
 
