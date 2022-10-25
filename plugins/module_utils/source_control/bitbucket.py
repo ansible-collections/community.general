@@ -28,7 +28,7 @@ class BitbucketHelper:
             # TODO:
             # - Rename user to username once current usage of username is removed
             # - Alias user to username and deprecate it
-            user=dict(type='str', fallback=(env_fallback, ['BITBUCKET_USERNAME'])),
+            user=dict(type='str', aliases=['username'], fallback=(env_fallback, ['BITBUCKET_USERNAME'])),
             password=dict(type='str', no_log=True, fallback=(env_fallback, ['BITBUCKET_PASSWORD'])),
         )
 

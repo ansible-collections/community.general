@@ -27,10 +27,9 @@ options:
   workspace:
     description:
       - The repository owner.
-      - Alias I(username) has been deprecated and will become an alias of I(user) in community.general 6.0.0.
+      - I(username) used to be an alias of this option. Since community.general 6.0.0 it is an alias of I(user).
     type: str
     required: true
-    aliases: [ username ]
   public_key:
     description:
       - The public key.
@@ -154,10 +153,7 @@ def main():
     argument_spec = BitbucketHelper.bitbucket_argument_spec()
     argument_spec.update(
         repository=dict(type='str', required=True),
-        workspace=dict(
-            type='str', aliases=['username'], required=True,
-            deprecated_aliases=[dict(name='username', version='6.0.0', collection_name='community.general')],
-        ),
+        workspace=dict(type='str', required=True),
         public_key=dict(type='str'),
         private_key=dict(type='str', no_log=True),
         state=dict(type='str', choices=['present', 'absent'], required=True),

@@ -20,7 +20,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     def test_without_required_parameters(self):
         with self.assertRaises(AnsibleFailJson) as exec_info:
             set_module_args({
-                'username': 'name',
+                'workspace': 'name',
                 'repository': 'repo',
                 'name': 'PIPELINE_VAR_NAME',
                 'state': 'absent',
@@ -34,7 +34,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
             set_module_args({
                 'client_id': 'ABC',
                 'client_secret': 'XXX',
-                'username': 'name',
+                'workspace': 'name',
                 'repository': 'repo',
                 'name': 'PIPELINE_VAR_NAME',
                 'state': 'present',
@@ -52,7 +52,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
     def test_oauth_env_vars_params(self, *args):
         with self.assertRaises(AnsibleExitJson):
             set_module_args({
-                'username': 'name',
+                'workspace': 'name',
                 'repository': 'repo',
                 'name': 'PIPELINE_VAR_NAME',
                 'state': 'absent',
@@ -100,7 +100,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'PIPELINE_VAR_NAME',
                     'value': '42',
@@ -126,7 +126,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'PIPELINE_VAR_NAME',
                     'value': '42',
@@ -150,7 +150,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'PIPELINE_VAR_NAME',
                     'value': '42',
@@ -176,7 +176,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'PIPELINE_VAR_NAME',
                     'value': '42',
@@ -202,7 +202,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'PIPELINE_VAR_NAME',
                     'value': '42',
@@ -227,7 +227,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'PIPELINE_VAR_NAME',
                     'value': '42',
@@ -253,7 +253,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'PIPELINE_VAR_NAME',
                     'state': 'absent',
@@ -271,7 +271,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'PIPELINE_VAR_NAME',
                     'state': 'absent',
@@ -295,7 +295,7 @@ class TestBucketPipelineVariableModule(ModuleTestCase):
                 set_module_args({
                     'client_id': 'ABC',
                     'client_secret': 'XXX',
-                    'username': 'name',
+                    'workspace': 'name',
                     'repository': 'repo',
                     'name': 'PIPELINE_VAR_NAME',
                     'state': 'absent',

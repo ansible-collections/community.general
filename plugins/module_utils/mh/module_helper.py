@@ -13,7 +13,7 @@ from ansible_collections.community.general.plugins.module_utils.mh.base import M
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.cmd import CmdMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.deps import DependencyMixin
-from ansible_collections.community.general.plugins.module_utils.mh.mixins.vars import VarsMixin, VarDict as _VD
+from ansible_collections.community.general.plugins.module_utils.mh.mixins.vars import VarsMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.deprecate_attrs import DeprecateAttrsMixin
 
 
@@ -25,8 +25,6 @@ class ModuleHelper(DeprecateAttrsMixin, VarsMixin, DependencyMixin, ModuleHelper
     change_params = ()
     facts_params = ()
 
-    VarDict = _VD  # for backward compatibility, will be deprecated at some point
-
     def __init__(self, module=None):
         super(ModuleHelper, self).__init__(module)
         for name, value in self.module.params.items():
@@ -37,16 +35,6 @@ class ModuleHelper(DeprecateAttrsMixin, VarsMixin, DependencyMixin, ModuleHelper
                 change=None if not self.change_params else name in self.change_params,
                 fact=name in self.facts_params,
             )
-
-        self._deprecate_attr(
-            attr="VarDict",
-            msg="ModuleHelper.VarDict attribute is deprecated, use VarDict from "
-                "the ansible_collections.community.general.plugins.module_utils.mh.mixins.vars module instead",
-            version="6.0.0",
-            collection_name="community.general",
-            target=ModuleHelper,
-            module=self.module,
-        )
 
     def update_output(self, **kwargs):
         self.update_vars(meta={"output": True}, **kwargs)

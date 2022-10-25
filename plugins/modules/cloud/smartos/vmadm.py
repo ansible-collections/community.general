@@ -552,7 +552,7 @@ def create_payload(module, uuid):
     # Create the JSON payload (vmdef) and return the filename.
 
     # Filter out the few options that are not valid VM properties.
-    module_options = ['debug', 'force', 'state']
+    module_options = ['force', 'state']
     # @TODO make this a simple {} comprehension as soon as py2 is ditched
     # @TODO {k: v for k, v in p.items() if k not in module_options}
     vmdef = dict([(k, v) for k, v in module.params.items() if k not in module_options and v])
@@ -689,7 +689,6 @@ def main():
         nics=dict(type='list', elements='dict'),
         resolvers=dict(type='list', elements='str'),
         filesystems=dict(type='list', elements='dict'),
-        debug=dict(type='bool', removed_in_version='6.0.0', removed_from_collection='community.general'),
     )
 
     # Add our 'simple' options to options dict.
