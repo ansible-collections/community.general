@@ -1214,3 +1214,96 @@ releases:
       name: proxmox_disk
       namespace: cloud.misc
     release_date: '2022-10-04'
+  5.8.0:
+    changes:
+      breaking_changes:
+      - newrelic_deployment - ``revision`` is required for v2 API (https://github.com/ansible-collections/community.general/pull/5341).
+      bugfixes:
+      - archive - avoid crash when ``lzma`` is not present and ``format`` is not ``xz``
+        (https://github.com/ansible-collections/community.general/pull/5393).
+      - ldap_attrs - fix ordering issue by ignoring the ``{x}`` prefix on attribute
+        values (https://github.com/ansible-collections/community.general/issues/977,
+        https://github.com/ansible-collections/community.general/pull/5385).
+      - opentelemetry callback plugin - support opentelemetry-api 1.13.0 that removed
+        support for ``_time_ns`` (https://github.com/ansible-collections/community.general/pull/5342).
+      - pfexec become plugin - remove superflous quotes preventing exe wrap from working
+        as expected (https://github.com/ansible-collections/community.general/issues/3671,
+        https://github.com/ansible-collections/community.general/pull/3889).
+      - pkgng - fix case when ``pkg`` fails when trying to upgrade all packages (https://github.com/ansible-collections/community.general/issues/5363).
+      - proxmox_kvm - fix ``agent`` parameter when boolean value is specified (https://github.com/ansible-collections/community.general/pull/5198).
+      - virtualbox inventory plugin - skip parsing values with keys that have both
+        a value and nested data. Skip parsing values that are nested more than two
+        keys deep (https://github.com/ansible-collections/community.general/issues/5332,
+        https://github.com/ansible-collections/community.general/pull/5348).
+      - xenserver_facts - fix broken ``AnsibleModule`` call that prevented the module
+        from working at all (https://github.com/ansible-collections/community.general/pull/5383).
+      deprecated_features:
+      - ArgFormat module utils - deprecated along ``CmdMixin``, in favor of the ``cmd_runner_fmt``
+        module util (https://github.com/ansible-collections/community.general/pull/5370).
+      - CmdMixin module utils - deprecated in favor of the ``CmdRunner`` module util
+        (https://github.com/ansible-collections/community.general/pull/5370).
+      - CmdModuleHelper module utils - deprecated in favor of the ``CmdRunner`` module
+        util (https://github.com/ansible-collections/community.general/pull/5370).
+      - CmdStateModuleHelper module utils - deprecated in favor of the ``CmdRunner``
+        module util (https://github.com/ansible-collections/community.general/pull/5370).
+      - django_manage - support for Django releases older than 4.1 has been deprecated
+        and will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5400).
+      - django_manage - support for the commands ``cleanup``, ``syncdb`` and ``validate``
+        that have been deprecated in Django long time ago will be removed in community.general
+        9.0.0 (https://github.com/ansible-collections/community.general/pull/5400).
+      - django_manage - the behavior of "creating the virtual environment when missing"
+        is being deprecated and will be removed in community.general version 9.0.0
+        (https://github.com/ansible-collections/community.general/pull/5405).
+      - newrelic_deployment - ``appname`` and ``environment`` are no longer valid
+        options in the v2 API. They will be removed in community.general 7.0.0 (https://github.com/ansible-collections/community.general/pull/5341).
+      major_changes:
+      - newrelic_deployment - removed New Relic v1 API, added support for v2 API (https://github.com/ansible-collections/community.general/pull/5341).
+      minor_changes:
+      - consul - minor refactoring (https://github.com/ansible-collections/community.general/pull/5367).
+      - lxc_container - minor refactoring (https://github.com/ansible-collections/community.general/pull/5358).
+      - nmcli - add ``transport_mode`` configuration for Infiniband devices (https://github.com/ansible-collections/community.general/pull/5361).
+      - opentelemetry callback plugin - send logs. This can be disabled by setting
+        ``disable_logs=false`` (https://github.com/ansible-collections/community.general/pull/4175).
+      - portage - add knobs for Portage's ``--backtrack`` and ``--with-bdeps`` options
+        (https://github.com/ansible-collections/community.general/pull/5349).
+      - portage - use Portage's python module instead of calling gentoolkit-provided
+        program in shell (https://github.com/ansible-collections/community.general/pull/5349).
+      - znode - possibility to use ZooKeeper ACL authentication (https://github.com/ansible-collections/community.general/pull/5306).
+      release_summary: Regular feature and bugfix release.
+    fragments:
+    - 3671-illumos-pfexec.yml
+    - 4175-opentelemetry_logs.yml
+    - 5.8.0.yml
+    - 5198-proxmox.yml
+    - 5306-add-options-for-authentication.yml
+    - 5341-newrelic-v2-api-changes.yml
+    - 5342-opentelemetry_bug_fix_opentelemetry-api-1.13.yml
+    - 5348-fix-vbox-deeply-nested-hostvars.yml
+    - 5349-drop-gentoolkit-more-knobs.yml
+    - 5358-lxc-container-refactor.yml
+    - 5361-nmcli-add-infiniband-transport-mode.yaml
+    - 5367-consul-refactor.yaml
+    - 5369-pkgng-fix-update-all.yaml
+    - 5370-mh-cmdmixin-deprecation.yaml
+    - 5383-xenserver_facts.yml
+    - 5385-search_s-based-_is_value_present.yaml
+    - 5393-archive.yml
+    - 5400-django-manage-deprecations.yml
+    - 5404-django-manage-venv-deprecation.yml
+    modules:
+    - description: Add/remove/change files in ISO file
+      name: iso_customize
+      namespace: files
+    - description: Listing of resource policy_profiles in ManageIQ
+      name: manageiq_policies_info
+      namespace: remote_management.manageiq
+    - description: Retrieve resource tags in ManageIQ
+      name: manageiq_tags_info
+      namespace: remote_management.manageiq
+    - description: Scaleway Container registry management module
+      name: scaleway_container_registry
+      namespace: cloud.scaleway
+    - description: Scaleway Container registry info module
+      name: scaleway_container_registry_info
+      namespace: cloud.scaleway
+    release_date: '2022-10-25'

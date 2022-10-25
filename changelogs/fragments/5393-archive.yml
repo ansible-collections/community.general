@@ -1,2 +1,0 @@
-bugfixes:
-  - "archive - avoid crash when ``lzma`` is not present and ``format`` is not ``xz`` (https://github.com/ansible-collections/community.general/pull/5393)."

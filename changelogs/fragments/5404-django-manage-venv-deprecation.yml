@@ -1,5 +1,0 @@
-deprecated_features:
-  - >-
-    django_manage - the behavior of "creating the virtual environment when missing"
-    is being deprecated and will be removed in community.general version 9.0.0
-    (https://github.com/ansible-collections/community.general/pull/5405).
