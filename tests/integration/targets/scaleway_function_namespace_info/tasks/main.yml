@@ -15,6 +15,7 @@
     region: '{{ scaleway_region }}'
     project_id: '{{ scw_project }}'
     description: '{{ description }}'
+    secret_environment_variables: '{{ secret_environment_variables }}'
 
 - name: Get function namespace info
   community.general.scaleway_function_namespace_info:
@@ -31,6 +32,7 @@
     that:
       - fn_info_task is success
       - fn_info_task is not changed
+      - "'hashed_value' in fn_info_task.function_namespace.secret_environment_variables[0]"
 
 - name: Delete function namespace
   community.general.scaleway_function_namespace:

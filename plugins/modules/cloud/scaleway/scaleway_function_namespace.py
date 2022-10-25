@@ -15,14 +15,15 @@ DOCUMENTATION = '''
 ---
 module: scaleway_function_namespace
 short_description: Scaleway Function namespace management
-version_added: 5.8.0
+version_added: 6.0.0
 author: Guillaume MARTINEZ (@Lunik)
 description:
   - This module manages function namespaces on Scaleway account.
 extends_documentation_fragment:
   - community.general.scaleway
   - community.general.scaleway_waitable_resource
-
+requirements:
+  - passlib[argon2] >= 1.7.4
 
 options:
   state:
@@ -113,32 +114,30 @@ function_namespace:
     region: fr-par
     registry_endpoint: ""
     registry_namespace_id: ""
-    secret_environment_variables: SENSITIVE_VALUE
+    secret_environment_variables:
+      - key: MY_SECRET_VAR
+        value: $argon2id$v=19$m=65536,t=1,p=2$tb6UwSPWx/rH5Vyxt9Ujfw$5ZlvaIjWwNDPxD9Rdght3NarJz4IETKjpvAU3mMSmFg
     status: pending
 '''
 
+from copy import deepcopy
+
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_ENDPOINT, SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
-    scaleway_waitable_resource_argument_spec, filter_sensitive_attributes,
-    resource_attributes_should_be_changed
+    scaleway_waitable_resource_argument_spec, resource_attributes_should_be_changed,
+    SecretVariables
 )
 from ansible.module_utils.basic import AnsibleModule
+
 
 STABLE_STATES = (
     "ready",
     "absent"
 )
 
-VERIFIABLE_MUTABLE_ATTRIBUTES = (
+MUTABLE_ATTRIBUTES = (
     "description",
-    "environment_variables"
-)
-
-MUTABLE_ATTRIBUTES = VERIFIABLE_MUTABLE_ATTRIBUTES + (
-    "secret_environment_variables",
-)
-
-SENSITIVE_ATTRIBUTES = (
+    "environment_variables",
     "secret_environment_variables",
 )
 
@@ -149,10 +148,7 @@ def payload_from_wished_fn(wished_fn):
         "name": wished_fn["name"],
         "description": wished_fn["description"],
         "environment_variables": wished_fn["environment_variables"],
-        "secret_environment_variables": [
-            dict(key=var[0], value=var[1])
-            for var in wished_fn["secret_environment_variables"].items()
-        ]
+        "secret_environment_variables": SecretVariables.dict_to_list(wished_fn["secret_environment_variables"])
     }
 
     return payload
@@ -213,9 +209,13 @@ def present_strategy(api, wished_fn):
         return changed, response.json
 
     target_fn = fn_lookup[wished_fn["name"]]
-    patch_payload = resource_attributes_should_be_changed(target=target_fn,
+    decoded_target_fn = deepcopy(target_fn)
+    decoded_target_fn["secret_environment_variables"] = SecretVariables.decode(decoded_target_fn["secret_environment_variables"],
+                                                                               payload_fn["secret_environment_variables"])
+
+    patch_payload = resource_attributes_should_be_changed(target=decoded_target_fn,
                                                           wished=payload_fn,
-                                                          verifiable_mutable_attributes=VERIFIABLE_MUTABLE_ATTRIBUTES,
+                                                          verifiable_mutable_attributes=MUTABLE_ATTRIBUTES,
                                                           mutable_attributes=MUTABLE_ATTRIBUTES)
 
     if not patch_payload:
@@ -244,6 +244,8 @@ state_strategy = {
 
 
 def core(module):
+    SecretVariables.ensure_scaleway_secret_package(module)
+
     region = module.params["region"]
     wished_function_namespace = {
         "state": module.params["state"],
@@ -259,7 +261,7 @@ def core(module):
 
     changed, summary = state_strategy[wished_function_namespace["state"]](api=api, wished_fn=wished_function_namespace)
 
-    module.exit_json(changed=changed, function_namespace=filter_sensitive_attributes(summary, SENSITIVE_ATTRIBUTES))
+    module.exit_json(changed=changed, function_namespace=summary)
 
 
 def main():

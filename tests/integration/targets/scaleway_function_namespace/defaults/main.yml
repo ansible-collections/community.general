@@ -11,3 +11,5 @@ environment_variables:
   MY_VAR: my_value
 secret_environment_variables:
   MY_SECRET_VAR: my_secret_value
+updated_secret_environment_variables:
+  MY_SECRET_VAR: my_other_secret_value
