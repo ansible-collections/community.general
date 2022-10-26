@@ -6,6 +6,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+import sys
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args
 from ansible_collections.community.general.tests.unit.compat.mock import call, patch
 from ansible_collections.community.general.tests.unit.compat.mock import Mock
@@ -46,7 +47,7 @@ class TestLoadModule(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False)
+                persistent=dict(type='bool', default=False),
             ),
             supports_check_mode=True,
         )
@@ -76,7 +77,7 @@ class TestLoadModule(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False)
+                persistent=dict(type='bool', default=False),
             ),
             supports_check_mode=True,
         )
@@ -125,7 +126,7 @@ class TestUnloadModule(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False)
+                persistent=dict(type='bool', default=False),
             ),
             supports_check_mode=True,
         )
@@ -155,7 +156,7 @@ class TestUnloadModule(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False)
+                persistent=dict(type='bool', default=False),
             ),
             supports_check_mode=True,
         )
@@ -183,6 +184,9 @@ class TestUnloadModule(ModuleTestCase):
 
 class TestModuleIsLoadedPersistently(ModuleTestCase):
     def setUp(self):
+        if (sys.version_info[0] == 3 and sys.version_info[1] < 7) or (sys.version_info[0] == 2 and sys.version_info[1] < 7):
+            self.skipTest('open_mock doesnt support readline in earlier python versions')
+
         super(TestModuleIsLoadedPersistently, self).setUp()
 
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
@@ -208,7 +212,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False)
+                persistent=dict(type='bool', default=False),
             ),
             supports_check_mode=True,
         )
@@ -237,7 +241,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False)
+                persistent=dict(type='bool', default=False),
             ),
             supports_check_mode=True,
         )
@@ -266,7 +270,7 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False)
+                persistent=dict(type='bool', default=False),
             ),
             supports_check_mode=True,
         )
@@ -282,6 +286,8 @@ class TestModuleIsLoadedPersistently(ModuleTestCase):
 
 class TestPermanentParams(ModuleTestCase):
     def setUp(self):
+        if (sys.version_info[0] == 3 and sys.version_info[1] < 7) or (sys.version_info[0] == 2 and sys.version_info[1] < 7):
+            self.skipTest('open_mock doesnt support readline in earlier python versions')
         super(TestPermanentParams, self).setUp()
 
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
@@ -313,7 +319,7 @@ class TestPermanentParams(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False)
+                persistent=dict(type='bool', default=False),
             ),
             supports_check_mode=True,
         )
@@ -327,7 +333,7 @@ class TestPermanentParams(ModuleTestCase):
             with patch('ansible_collections.community.general.plugins.modules.system.modprobe.Modprobe.modprobe_files'):
                 modprobe.modprobe_files = ['/etc/modprobe.d/dummy1.conf', '/etc/modprobe.d/dummy2.conf']
 
-                assert modprobe.permanent_params == set(['dummy_parameter1=6', 'numdummies=4', 'dummy_parameter2=5'])
+                assert modprobe.permanent_params == set(['numdummies=4', 'dummy_parameter1=6', 'dummy_parameter2=5'])
 
     def test_module_permanent_params_empty(self):
 
@@ -348,7 +354,7 @@ class TestPermanentParams(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False)
+                persistent=dict(type='bool', default=False),
             ),
             supports_check_mode=True,
         )
@@ -392,7 +398,7 @@ class TestCreateModuleFIle(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False)
+                persistent=dict(type='bool', default=False),
             ),
             supports_check_mode=True,
         )
@@ -435,7 +441,7 @@ class TestCreateModuleOptionsFIle(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False)
+                persistent=dict(type='bool', default=False),
             ),
             supports_check_mode=True,
         )
@@ -479,7 +485,7 @@ class TestDisableOldParams(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False)
+                persistent=dict(type='bool', default=False),
             ),
             supports_check_mode=True,
         )
@@ -510,7 +516,7 @@ class TestDisableOldParams(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False)
+                persistent=dict(type='bool', default=False),
             ),
             supports_check_mode=True,
         )
@@ -554,7 +560,7 @@ class TestDisableModulePermanent(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False)
+                persistent=dict(type='bool', default=False),
             ),
             supports_check_mode=True,
         )
@@ -584,7 +590,7 @@ class TestDisableModulePermanent(ModuleTestCase):
                 name=dict(type='str', required=True),
                 state=dict(type='str', default='present', choices=['absent', 'present']),
                 params=dict(type='str', default=''),
-                persistent=dict(type='bool', default=False)
+                persistent=dict(type='bool', default=False),
             ),
             supports_check_mode=True,
         )

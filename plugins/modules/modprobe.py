@@ -37,10 +37,10 @@ options:
         default: ''
     persistent:
         type: bool
-        default: False
+        default: false
         description:
             - Persistency between reboots for configured module.
-            - This option creates files in /etc/modules-load.d/ and /etc/modprobe.d/ that make your module configuration persistent during reboots.
+            - This option creates files in C(/etc/modules-load.d/) and C(/etc/modprobe.d/) that make your module configuration persistent during reboots.
             - Note that it is usually a better idea to rely on the automatic module loading by PCI IDs, USB IDs, DMI IDs or similar triggers encoded in the
               kernel modules themselves instead of configuration like this.
             - In fact, most modern kernel modules are prepared for automatic loading already.
@@ -109,11 +109,11 @@ class Modprobe(object):
 
     @property
     def module_is_loaded_persistently(self):
-        pattern = re.compile(r'^ *{0} *(?:[#;].*)?\n?'.format(self.name))
+        pattern = re.compile(r'^ *{0} *(?:[#;].*)?\n?\Z'.format(self.name))
         for module_file in self.modules_files:
             with open(module_file) as file:
                 for line in file:
-                    if pattern.fullmatch(line):
+                    if pattern.match(line):
                         return True
 
         return False
@@ -128,14 +128,14 @@ class Modprobe(object):
     def permanent_params(self):
         params = set()
 
-        pattern = re.compile(r'^options {0} (\w+=\S+) *(?:[#;].*)?\n?'.format(self.name))
+        pattern = re.compile(r'^options {0} (\w+=\S+) *(?:[#;].*)?\n?\Z'.format(self.name))
 
         for modprobe_file in self.modprobe_files:
             with open(modprobe_file) as file:
                 for line in file:
-                    match = pattern.fullmatch(line)
+                    match = pattern.match(line)
                     if match:
-                        params.add(match[1])
+                        params.add(match.group(1))
 
         return params
 
@@ -159,7 +159,7 @@ class Modprobe(object):
 
     def disable_old_params(self):
 
-        pattern = re.compile(r'^options {0} \w+=\S+ *(?:[#;].*)?\n?'.format(self.name))
+        pattern = re.compile(r'^options {0} \w+=\S+ *(?:[#;].*)?\n?\Z'.format(self.name))
 
         for modprobe_file in self.modprobe_files:
             with open(modprobe_file) as file:
@@ -167,7 +167,7 @@ class Modprobe(object):
 
             content_changed = False
             for index, line in enumerate(file_content):
-                if pattern.fullmatch(line):
+                if pattern.match(line):
                     file_content[index] = '#' + line
                     content_changed = True
 
@@ -177,7 +177,7 @@ class Modprobe(object):
 
     def disable_module_permanent(self):
 
-        pattern = re.compile(r'^ *{0} *(?:[#;].*)?\n?'.format(self.name))
+        pattern = re.compile(r'^ *{0} *(?:[#;].*)?\n?\Z'.format(self.name))
 
         for module_file in self.modules_files:
             with open(module_file) as file:
@@ -185,7 +185,7 @@ class Modprobe(object):
 
             content_changed = False
             for index, line in enumerate(file_content):
-                if pattern.fullmatch(line):
+                if pattern.match(line):
                     file_content[index] = '#' + line
                     content_changed = True
 
@@ -217,13 +217,13 @@ class Modprobe(object):
     def modules_files(self):
         modules_paths = [os.path.join(MODULES_LOAD_LOCATION, path)
                          for path in os.listdir(MODULES_LOAD_LOCATION)]
-        return list(filter(os.path.isfile, modules_paths))
+        return [path for path in modules_paths if os.path.isfile(path)]
 
     @property
     def modprobe_files(self):
         modules_paths = [os.path.join(PARAMETERS_FILES_LOCATION, path)
                          for path in os.listdir(PARAMETERS_FILES_LOCATION)]
-        return list(filter(os.path.isfile, modules_paths))
+        return [path for path in modules_paths if os.path.isfile(path)]
 
     def module_loaded(self):
         is_loaded = False
@@ -275,7 +275,7 @@ def main():
             name=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
             params=dict(type='str', default=''),
-            persistent=dict(type='bool', default=False)
+            persistent=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
     )
