@@ -192,7 +192,7 @@ class RedfishUtils(object):
                     return check_resp
             else:
                 return r
-            
+
         username, password, basic_auth = self._auth_params(req_headers)
         try:
             resp = open_url(uri, data=json.dumps(pyld),
