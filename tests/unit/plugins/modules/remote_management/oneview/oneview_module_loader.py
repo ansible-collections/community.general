@@ -10,8 +10,9 @@ from ansible_collections.community.general.tests.unit.compat.mock import Mock
 
 # FIXME: These should be done inside of a fixture so that they're only mocked during
 # these unittests
-sys.modules['hpOneView'] = Mock()
-sys.modules['hpOneView.oneview_client'] = Mock()
+if 'hpOneView' not in sys.modules:
+    sys.modules['hpOneView'] = Mock()
+    sys.modules['hpOneView.oneview_client'] = Mock()
 
 ONEVIEW_MODULE_UTILS_PATH = 'ansible_collections.community.general.plugins.module_utils.oneview'
 from ansible_collections.community.general.plugins.module_utils.oneview import (OneViewModuleException,
