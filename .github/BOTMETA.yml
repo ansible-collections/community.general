@@ -327,13 +327,13 @@ files:
   $module_utils/xfconf.py:
     maintainers: russoz
     labels: xfconf
-  $modules/cloud/alicloud/:
+  $modules/cloud/alicloud/ali_:
     maintainers: xiaozhu36
   $modules/cloud/atomic/atomic_container.py:
     maintainers: giuseppe krsacme
-  $modules/cloud/atomic/:
+  $modules/cloud/atomic/atomic_:
     maintainers: krsacme
-  $modules/cloud/centurylink/:
+  $modules/cloud/centurylink/clc_:
     maintainers: clc-runner
   $modules/cloud/dimensiondata/dimensiondata_network.py:
     maintainers: aimonb tintoy
@@ -342,22 +342,22 @@ files:
     maintainers: tintoy
   $modules/cloud/heroku/heroku_collaborator.py:
     maintainers: marns93
-  $modules/cloud/huawei/:
+  $modules/cloud/huawei/hwc_:
     maintainers: $team_huawei huaweicloud
     keywords: cloud huawei hwc
-  $modules/cloud/linode/:
+  $modules/cloud/linode/linode:
     maintainers: $team_linode
   $modules/cloud/linode/linode.py:
     maintainers: zbal
   $modules/cloud/lxc/lxc_container.py:
     maintainers: cloudnull
-  $modules/cloud/lxd/:
+  $modules/cloud/lxd/lxd_:
     ignore: hnakamur
   $modules/cloud/lxd/lxd_profile.py:
     maintainers: conloos
   $modules/cloud/lxd/lxd_project.py:
     maintainers: we10710aa
-  $modules/cloud/memset/:
+  $modules/cloud/memset/memset_:
     maintainers: glitchcrab
   $modules/cloud/misc/cloud_init_data_facts.py:
     maintainers: resmo
@@ -385,41 +385,42 @@ files:
     labels: rhevm virt
     ignore: skvidal
     keywords: kvm libvirt proxmox qemu
-  $modules/cloud/misc/:
+  $modules/cloud/misc/serverless.py:
     ignore: ryansb
   $modules/cloud/misc/terraform.py:
     maintainers: m-yosefpor rainerleber
+    ignore: ryansb
   $modules/cloud/misc/xenserver_facts.py:
     maintainers: caphrim007 cheese
     labels: xenserver_facts
-    ignore: andyhky
-  $modules/cloud/oneandone/:
+    ignore: andyhky ryansb
+  $modules/cloud/oneandone/oneandone_:
     maintainers: aajdinov edevenport
-  $modules/cloud/online/:
+  $modules/cloud/online/online_:
     maintainers: remyleone
-  $modules/cloud/opennebula/:
+  $modules/cloud/opennebula/one_:
     maintainers: $team_opennebula
   $modules/cloud/opennebula/one_host.py:
     maintainers: rvalle
   $modules/cloud/oracle/oci_vcn.py:
     maintainers: $team_oracle rohitChaware
-  $modules/cloud/ovh/:
+  $modules/cloud/ovh/ovh_:
     maintainers: pascalheraud
   $modules/cloud/ovh/ovh_monthly_billing.py:
     maintainers: fraff
   $modules/cloud/packet/packet_device.py:
     maintainers: baldwinSPC t0mk teebes
-  $modules/cloud/packet/:
+  $modules/cloud/packet/packet_:
     maintainers: nurfet-becirevic t0mk
   $modules/cloud/packet/packet_sshkey.py:
     maintainers: t0mk
-  $modules/cloud/profitbricks/:
+  $modules/cloud/profitbricks/profitbricks:
     maintainers: baldwinSPC
   $modules/cloud/pubnub/pubnub_blocks.py:
     maintainers: parfeon pubnub
   $modules/cloud/rackspace/rax.py:
     maintainers: omgjlk sivel
-  $modules/cloud/rackspace/:
+  $modules/cloud/rackspace/rax:
     ignore: ryansb sivel
   $modules/cloud/rackspace/rax_cbs.py:
     maintainers: claco
@@ -457,7 +458,7 @@ files:
     maintainers: smashwilson
   $modules/cloud/rackspace/rax_queue.py:
     maintainers: claco
-  $modules/cloud/scaleway/:
+  $modules/cloud/scaleway/scaleway_:
     maintainers: $team_scaleway
   $modules/cloud/scaleway/scaleway_compute_private_network.py:
     maintainers: pastral
@@ -490,29 +491,39 @@ files:
     ignore: hekonsek
   $modules/cloud/scaleway/scaleway_volume_info.py:
     maintainers: Spredzy
-  $modules/cloud/smartos/:
+  $modules/cloud/smartos/imgadm.py:
     maintainers: $team_solaris
     labels: solaris
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/cloud/smartos/nictagadm.py:
-    maintainers: SmithX10
+    maintainers: $team_solaris SmithX10
+    labels: solaris
+    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
+  $modules/cloud/smartos/smartos_image_info.py:
+    maintainers: $team_solaris
+    labels: solaris
+    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
+  $modules/cloud/smartos/vmadm.py:
+    maintainers: $team_solaris
+    labels: solaris
+    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/cloud/softlayer/sl_vm.py:
     maintainers: mcltn
   $modules/cloud/spotinst/spotinst_aws_elastigroup.py:
     maintainers: talzur
-  $modules/cloud/univention/:
+  $modules/cloud/univention/udm_:
     maintainers: keachi
-  $modules/cloud/webfaction/:
+  $modules/cloud/webfaction/webfaction_:
     maintainers: quentinsf
-  $modules/cloud/xenserver/:
+  $modules/cloud/xenserver/xenserver_:
     maintainers: bvitnik
-  $modules/clustering/consul/:
+  $modules/clustering/consul/consul:
     maintainers: $team_consul
     ignore: colin-nolan
   $modules/clustering/etcd3.py:
     maintainers: evrardjp
     ignore: vfauth
-  $modules/clustering/nomad/:
+  $modules/clustering/nomad/nomad_:
     maintainers: chris93111
   $modules/clustering/pacemaker_cluster.py:
     maintainers: matbu
@@ -520,7 +531,7 @@ files:
     maintainers: treyperry
   $modules/database/aerospike/aerospike_migrations.py:
     maintainers: Alb0t
-  $modules/database/influxdb/:
+  $modules/database/influxdb/influxdb_:
     maintainers: kamsz
   $modules/database/influxdb/influxdb_query.py:
     maintainers: resmo
@@ -554,7 +565,7 @@ files:
     labels: mssql_script
   $modules/database/saphana/hana_query.py:
     maintainers: rainerleber
-  $modules/database/vertica/:
+  $modules/database/vertica/vertica_:
     maintainers: dareko
   $modules/files/archive.py:
     maintainers: bendoh
@@ -579,7 +590,7 @@ files:
     maintainers: dagwieers magnus919 tbielawa cmprescott sm4rk0
     labels: m:xml xml
     ignore: magnus919
-  $modules/identity/ipa/:
+  $modules/identity/ipa/ipa_:
     maintainers: $team_ipa
   $modules/identity/ipa/ipa_pwpolicy.py:
     maintainers: adralioh
@@ -587,7 +598,7 @@ files:
     maintainers: cprh
   $modules/identity/ipa/ipa_vault.py:
     maintainers: jparrill
-  $modules/identity/keycloak/:
+  $modules/identity/keycloak/keycloak_:
     maintainers: $team_keycloak
   $modules/identity/keycloak/keycloak_authentication.py:
     maintainers: elfelip Gaetan2907
@@ -665,10 +676,10 @@ files:
     maintainers: thaumos
   $modules/monitoring/rollbar_deployment.py:
     maintainers: kavu
+  $modules/monitoring/sensu/sensu_:
+    maintainers: dmsimard
   $modules/monitoring/sensu/sensu_check.py:
     maintainers: andsens
-  $modules/monitoring/sensu/:
-    maintainers: dmsimard
   $modules/monitoring/sensu/sensu_silence.py:
     maintainers: smbambling
   $modules/monitoring/sensu/sensu_subscription.py:
@@ -725,7 +736,7 @@ files:
     maintainers: nerzhul
   $modules/net_tools/omapi_host.py:
     maintainers: amasolov nerzhul
-  $modules/net_tools/pritunl/:
+  $modules/net_tools/pritunl/pritunl_:
     maintainers: Lowess
   $modules/net_tools/nmcli.py:
     maintainers: alcamie101
@@ -961,21 +972,24 @@ files:
     maintainers: $team_suse
     labels: zypper
     ignore: matze
-  $modules/remote_management/cobbler/:
+  $modules/remote_management/cobbler/cobbler_:
     maintainers: dagwieers
-  $modules/remote_management/hpilo/:
+  $modules/remote_management/hpilo/hpilo_:
+    maintainers: haad
+    ignore: dagwieers
+  $modules/remote_management/hpilo/hponcfg.py:
     maintainers: haad
     ignore: dagwieers
   $modules/remote_management/imc/imc_rest.py:
     maintainers: dagwieers
     labels: cisco
-  $modules/remote_management/ipmi/:
+  $modules/remote_management/ipmi/ipmi_:
     maintainers: bgaifullin cloudnull
-  $modules/remote_management/lenovoxcc/:
+  $modules/remote_management/lenovoxcc/xcc_:
     maintainers: panyy3 renxulei
-  $modules/remote_management/lxca/:
+  $modules/remote_management/lxca/lxca_:
     maintainers: navalkp prabhosa
-  $modules/remote_management/manageiq/:
+  $modules/remote_management/manageiq/manageiq_:
     labels: manageiq
     maintainers: $team_manageiq
   $modules/remote_management/manageiq/manageiq_alert_profiles.py:
@@ -990,7 +1004,7 @@ files:
     maintainers: russoz $team_manageiq
   $modules/remote_management/manageiq/manageiq_tenant.py:
     maintainers: evertmulder
-  $modules/remote_management/oneview/:
+  $modules/remote_management/oneview/oneview_:
     maintainers: adriane-cardozo fgbulsoni tmiotto
   $modules/remote_management/oneview/oneview_datacenter_info.py:
     maintainers: aalexmonteiro madhav-bharadwaj ricardogpsf soodpr
@@ -998,7 +1012,16 @@ files:
     maintainers: fgbulsoni
   $modules/remote_management/oneview/oneview_fcoe_network.py:
     maintainers: fgbulsoni
-  $modules/remote_management/redfish/:
+  $modules/remote_management/redfish/idrac_:
+    maintainers: $team_redfish
+    ignore: jose-delarosa
+  $modules/remote_management/redfish/ilo_:
+    maintainers: $team_redfish
+    ignore: jose-delarosa
+  $modules/remote_management/redfish/redfish_:
+    maintainers: $team_redfish
+    ignore: jose-delarosa
+  $modules/remote_management/redfish/wdc_:
     maintainers: $team_redfish
     ignore: jose-delarosa
   $modules/remote_management/redfish/wdc_redfish_command.py:
@@ -1010,7 +1033,7 @@ files:
     labels: stacki_host
   $modules/remote_management/wakeonlan.py:
     maintainers: dagwieers
-  $modules/source_control/bitbucket/:
+  $modules/source_control/bitbucket/bitbucket_:
     maintainers: catcombo
   $modules/source_control/bzr.py:
     maintainers: andreparames
@@ -1028,9 +1051,9 @@ files:
     maintainers: adrianmoisey
   $modules/source_control/github/github_repo.py:
     maintainers: atorrescogollo
-  $modules/source_control/github/:
+  $modules/source_control/github/github_:
     maintainers: stpierre
-  $modules/source_control/gitlab/:
+  $modules/source_control/gitlab/gitlab_:
     notify: jlozadad
     maintainers: $team_gitlab
     keywords: gitlab source_control
@@ -1048,13 +1071,13 @@ files:
     maintainers: remixtj
   $modules/storage/hpe3par/ss_3par_cpg.py:
     maintainers: farhan7500 gautamphegde
-  $modules/storage/ibm/:
+  $modules/storage/ibm/ibm_sa_:
     maintainers: tzure
   $modules/storage/pmem/pmem.py:
     maintainers: mizumm
-  $modules/storage/vexata/:
+  $modules/storage/vexata/vexata_:
     maintainers: vexata
-  $modules/storage/zfs/:
+  $modules/storage/zfs/zfs:
     maintainers: $team_solaris
     labels: solaris
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
@@ -1062,6 +1085,10 @@ files:
     maintainers: johanwiren
   $modules/storage/zfs/zfs_delegate_admin.py:
     maintainers: natefoo
+  $modules/storage/zfs/zpool_facts:
+    maintainers: $team_solaris
+    labels: solaris
+    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/system/aix:
     maintainers: $team_aix
     labels: aix
@@ -1259,7 +1286,7 @@ files:
     maintainers: phsmith
   $modules/web_infrastructure/rundeck_job_executions_info.py:
     maintainers: phsmith
-  $modules/web_infrastructure/sophos_utm/:
+  $modules/web_infrastructure/sophos_utm/utm_:
     maintainers: $team_e_spirit
     keywords: sophos utm
   $modules/web_infrastructure/sophos_utm/utm_proxy_auth_profile.py:

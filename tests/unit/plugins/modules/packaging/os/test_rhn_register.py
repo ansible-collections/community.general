@@ -15,6 +15,8 @@ import ansible.module_utils.six
 from ansible.module_utils.six.moves import xmlrpc_client
 from ansible_collections.community.general.plugins.modules.packaging.os import rhn_register
 
+from .rhn_conftest import mock_request
+
 import pytest
 
 
