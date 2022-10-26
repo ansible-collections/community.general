@@ -22,7 +22,9 @@ class SecretVariablesTestCase(unittest.TestCase):
             dict(key="attribute2", value="value2")
         ]
 
-        self.assertEqual(SecretVariables.dict_to_list(source), expect)
+        result = SecretVariables.dict_to_list(source)
+        result = sorted(result, key=lambda el: el['key'])
+        self.assertEqual(result, expect)
 
     def test_list_to_dict(self):
         source = [
@@ -64,6 +66,7 @@ class SecretVariablesTestCase(unittest.TestCase):
         ]
 
         result = SecretVariables.decode(source_secret, source_value)
+        result = sorted(result, key=lambda el: el['key'])
         self.assertEqual(result, expect)
 
     def test_decode_dict_divergent_values(self):
@@ -82,6 +85,7 @@ class SecretVariablesTestCase(unittest.TestCase):
         ]
 
         result = SecretVariables.decode(source_secret, source_value)
+        result = sorted(result, key=lambda el: el['key'])
         self.assertEqual(result, expect)
 
     def test_decode_dict_missing_values_left(self):
@@ -98,6 +102,7 @@ class SecretVariablesTestCase(unittest.TestCase):
         ]
 
         result = SecretVariables.decode(source_secret, source_value)
+        result = sorted(result, key=lambda el: el['key'])
         self.assertEqual(result, expect)
 
     def test_decode_dict_missing_values_right(self):
@@ -115,4 +120,5 @@ class SecretVariablesTestCase(unittest.TestCase):
         ]
 
         result = SecretVariables.decode(source_secret, source_value)
+        result = sorted(result, key=lambda el: el['key'])
         self.assertEqual(result, expect)

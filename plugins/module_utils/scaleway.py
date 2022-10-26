@@ -109,10 +109,10 @@ class SecretVariables(object):
     @staticmethod
     def list_to_dict(source_list, hashed=False):
         key_value = 'hashed_value' if hashed else 'value'
-        return {
-            var['key']: var[key_value]
+        return dict(
+            (var['key'], var[key_value])
             for var in source_list
-        }
+        )
 
     @classmethod
     def decode(cls, secrets_list, values_list):
