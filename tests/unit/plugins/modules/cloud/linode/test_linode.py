@@ -10,6 +10,8 @@ import pytest
 from ansible_collections.community.general.plugins.modules.cloud.linode import linode
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 
+from .linode_conftest import api_key, auth
+
 if not linode.HAS_LINODE:
     pytestmark = pytest.mark.skip('test_linode.py requires the `linode-python` module')
 

@@ -39,8 +39,8 @@ class ModuleMocked:
 
 
 module = ModuleMocked()
-fixture_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'input')
-golden_output_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'golden_output')
+fixture_path = os.path.join(os.path.dirname(__file__), 'interfaces_file_fixtures', 'input')
+golden_output_path = os.path.join(os.path.dirname(__file__), 'interfaces_file_fixtures', 'golden_output')
 
 
 class TestInterfacesFileModule(unittest.TestCase):

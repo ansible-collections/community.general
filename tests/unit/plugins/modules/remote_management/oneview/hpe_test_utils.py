@@ -13,6 +13,7 @@ import yaml
 
 from mock import Mock, patch
 from .oneview_module_loader import ONEVIEW_MODULE_UTILS_PATH
+from .oneview_conftest import mock_ov_client, mock_ansible_module
 from hpOneView.oneview_client import OneViewClient
 
 

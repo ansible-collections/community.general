@@ -10,7 +10,8 @@ __metaclass__ = type
 import json
 import pytest
 
-from .common import fake_xenapi_ref
+from .xenserver_common import fake_xenapi_ref
+from .xenserver_conftest import fake_ansible_module, XenAPI, xenserver_guest_powerstate
 
 
 testcase_set_powerstate = {

@@ -8,8 +8,9 @@ __metaclass__ = type
 from copy import deepcopy
 
 from ansible_collections.community.general.tests.unit.compat import unittest, mock
-from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_logical_interconnect_group import LogicalInterconnectGroupModule
 from .hpe_test_utils import OneViewBaseTestCase
+from .oneview_conftest import mock_ov_client, mock_ansible_module
+from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_logical_interconnect_group import LogicalInterconnectGroupModule
 
 
 FAKE_MSG_ERROR = 'Fake message error'

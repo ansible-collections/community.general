@@ -11,7 +11,8 @@ __metaclass__ = type
 import json
 import pytest
 
-from .common import fake_xenapi_ref
+from .xenserver_common import fake_xenapi_ref
+from .xenserver_conftest import XenAPI, xenserver_guest_info
 
 pytestmark = pytest.mark.usefixtures('patch_ansible_module')
 
