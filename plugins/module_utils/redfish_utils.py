@@ -188,9 +188,11 @@ class RedfishUtils(object):
             # are needed or if there are unsupported properties
             if r['ret']:
                 check_resp = self._check_request_payload(pyld, r['data'], uri)
-                if not check_resp['changes_required']:
+                if not check_resp.pop('changes_required'):
+                    check_resp['changed'] = False
                     return check_resp
             else:
+                r['changed'] = False
                 return r
 
         username, password, basic_auth = self._auth_params(req_headers)
@@ -203,18 +205,18 @@ class RedfishUtils(object):
                             use_proxy=True, timeout=self.timeout)
         except HTTPError as e:
             msg = self._get_extended_message(e)
-            return {'ret': False,
+            return {'ret': False, 'changed': False,
                     'msg': "HTTP Error %s on PATCH request to '%s', extended message: '%s'"
                            % (e.code, uri, msg),
                     'status': e.code}
         except URLError as e:
-            return {'ret': False, 'msg': "URL Error on PATCH request to '%s': '%s'"
-                                         % (uri, e.reason)}
+            return {'ret': False, 'changed': False,
+                    'msg': "URL Error on PATCH request to '%s': '%s'" % (uri, e.reason)}
         # Almost all errors should be caught above, but just in case
         except Exception as e:
-            return {'ret': False,
+            return {'ret': False, 'changed': False,
                     'msg': "Failed PATCH request to '%s': '%s'" % (uri, to_text(e))}
-        return {'ret': True, 'resp': resp}
+        return {'ret': True, 'changed': True, 'resp': resp, 'msg': 'Modified %s' % uri}
 
     def delete_request(self, uri, pyld=None):
         req_headers = dict(DELETE_HEADERS)
@@ -832,7 +834,10 @@ class RedfishUtils(object):
         if command not in payloads.keys():
             return {'ret': False, 'msg': 'Invalid command (%s)' % command}
         payload = {'IndicatorLED': payloads[command]}
-        return self.patch_request(self.root_uri + resource_uri, payload, check_pyld=True)
+        resp = self.patch_request(self.root_uri + resource_uri, payload, check_pyld=True)
+        if resp['ret'] and resp['changed']:
+            resp['msg'] = 'Set IndicatorLED to %s' % payloads[command]
+        return resp
 
     def _map_reset_type(self, reset_type, allowable_values):
         equiv_types = {
@@ -1187,7 +1192,10 @@ class RedfishUtils(object):
             return {'ret': False, 'msg': "AccountService resource not found"}
 
         # Perform a PATCH on the AccountService resource with the requested properties
-        return self.patch_request(self.root_uri + accountservice_uri, account_properties, check_pyld=True)
+        resp = self.patch_request(self.root_uri + accountservice_uri, account_properties, check_pyld=True)
+        if resp['ret'] and resp['changed']:
+            resp['msg'] = 'Modified account service'
+        return resp
 
     def get_sessions(self):
         result = {}
@@ -1658,6 +1666,9 @@ class RedfishUtils(object):
 
         # Apply the requested boot override request
         return self.patch_request(self.root_uri + self.systems_uri, payload, check_pyld=True)
+        if resp['ret'] and resp['changed']:
+            resp['msg'] = 'Updated the boot override settings'
+        return resp
 
     def set_bios_attributes(self, attributes):
         # Find the Bios resource from the requested ComputerSystem resource
@@ -1750,7 +1761,10 @@ class RedfishUtils(object):
                 'BootOrder': boot_list
             }
         }
-        return self.patch_request(self.root_uri + systems_uri, payload, check_pyld=True)
+        resp = self.patch_request(self.root_uri + systems_uri, payload, check_pyld=True)
+        if resp['ret'] and resp['changed']:
+            resp['msg'] = 'Modified the boot order'
+        return resp
 
     def set_default_boot_order(self):
         systems_uri = self.systems_uri
@@ -2240,7 +2254,10 @@ class RedfishUtils(object):
             payload['Inserted'] = True
 
         # PATCH the resource
-        return self.patch_request(self.root_uri + uri, payload, check_pyld=True)
+        resp = self.patch_request(self.root_uri + uri, payload, check_pyld=True)
+        if resp['ret'] and resp['changed']:
+            resp['msg'] = 'VirtualMedia inserted'
+        return resp
 
     def virtual_media_insert(self, options, resource_type='Manager'):
         param_map = {
@@ -2358,7 +2375,10 @@ class RedfishUtils(object):
             del payload['Inserted']
 
         # PATCH resource
-        return self.patch_request(self.root_uri + uri, payload, check_pyld=True)
+        resp = self.patch_request(self.root_uri + uri, payload, check_pyld=True)
+        if resp['ret'] and resp['changed']:
+            resp['msg'] = 'VirtualMedia ejected'
+        return resp
 
     def virtual_media_eject(self, options, resource_type='Manager'):
         image_url = options.get('image_url')
@@ -2590,7 +2610,10 @@ class RedfishUtils(object):
             return {'ret': False, 'msg': "NetworkProtocol resource not found"}
 
         # Modify the ManagerNetworkProtocol resource
-        return self.patch_request(self.root_uri + networkprotocol_uri, payload, check_pyld=True)
+        resp = self.patch_request(self.root_uri + networkprotocol_uri, payload, check_pyld=True)
+        if resp['ret'] and resp['changed']:
+            resp['msg'] = 'Modified manager network protocol settings'
+        return resp
 
     @staticmethod
     def to_singular(resource_name):
@@ -2742,7 +2765,10 @@ class RedfishUtils(object):
                 payload[property] = value
 
         # Modify the EthernetInterface resource
-        return self.patch_request(self.root_uri + target_ethernet_uri, payload, check_pyld=True)
+        resp = self.patch_request(self.root_uri + target_ethernet_uri, payload, check_pyld=True)
+        if resp['ret'] and resp['changed']:
+            resp['msg'] = 'Modified manager NIC'
+        return resp
 
     # A helper function to get the EthernetInterface URI
     def get_manager_ethernet_uri(self, nic_addr='null'):
@@ -2820,7 +2846,10 @@ class RedfishUtils(object):
             return {'ret': False, 'msg': "HostInterface ID not defined and multiple interfaces detected."}
 
         # Modify the HostInterface resource
-        return self.patch_request(self.root_uri + hostinterface_uri, hostinterface_config, check_pyld=True)
+        resp = self.patch_request(self.root_uri + hostinterface_uri, hostinterface_config, check_pyld=True)
+        if resp['ret'] and resp['changed']:
+            resp['msg'] = 'Modified host interface'
+        return resp
 
     def get_hostinterfaces(self):
         result = {}
@@ -2925,4 +2954,7 @@ class RedfishUtils(object):
             return {'ret': False, 'msg':
                     'Must provide sessions_config for SetSessionService command'}
 
-        return self.patch_request(self.root_uri + self.session_service_uri, sessions_config, check_pyld=True)
+        resp = self.patch_request(self.root_uri + self.session_service_uri, sessions_config, check_pyld=True)
+        if resp['ret'] and resp['changed']:
+            resp['msg'] = 'Modified session service'
+        return resp
