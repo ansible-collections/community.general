@@ -1665,7 +1665,7 @@ class RedfishUtils(object):
                 payload['Boot']['BootSourceOverrideMode'] = boot_override_mode
 
         # Apply the requested boot override request
-        return self.patch_request(self.root_uri + self.systems_uri, payload, check_pyld=True)
+        resp = self.patch_request(self.root_uri + self.systems_uri, payload, check_pyld=True)
         if resp['ret'] and resp['changed']:
             resp['msg'] = 'Updated the boot override settings'
         return resp
