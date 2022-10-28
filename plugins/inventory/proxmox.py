@@ -222,7 +222,6 @@ from ansible.module_utils.common.text.converters import to_native
 from ansible.module_utils.six import string_types
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.utils.display import Display
-from ansible.template import Templar
 
 from ansible_collections.community.general.plugins.module_utils.version import LooseVersion
 
