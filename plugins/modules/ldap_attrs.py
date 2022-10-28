@@ -176,6 +176,7 @@ import re
 LDAP_IMP_ERR = None
 try:
     import ldap
+    import ldap.filter
 
     HAS_LDAP = True
 except ImportError:
@@ -264,7 +265,7 @@ class LdapAttrs(LdapGeneric):
     def _is_value_present(self, name, value):
         """ True if the target attribute has the given value. """
         try:
-            filterstr = "(%s=%s)" % (name, value.decode())
+            filterstr = "(%s=%s)" % (name, ldap.filter.escape_filter_chars(value.decode()))
             dns = self.connection.search_s(self.dn, ldap.SCOPE_BASE, filterstr)
             is_present = len(dns) == 1
         except ldap.NO_SUCH_OBJECT:
