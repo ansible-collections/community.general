@@ -147,7 +147,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         access_token = self.get_option('access_token')
         if self.templar.is_template(access_token):
-            access_token = self.templar.template(variable=access_token, disable_lookups=False)        
+            access_token = self.templar.template(variable=access_token, disable_lookups=False)
 
         if access_token is None:
             raise AnsibleError((
