@@ -618,10 +618,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if self.templar.is_template(v):
                 v = self.templar.template(v, disable_looups=False)
             setattr(self, 'proxmox_%s' % o, v)
-        
+
         # some more cleanup and validation
         self.proxmox_url = self.proxmox_url.rstrip('/')
-        
+
         if self.proxmox_password is None and (self.proxmox_token_id is None or self.proxmox_token_secret is None):
             raise AnsibleError('You must specify either a password or both token_id and token_secret.')
 
