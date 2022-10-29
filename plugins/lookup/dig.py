@@ -52,6 +52,13 @@ DOCUMENTATION = '''
         default: false
         type: bool
         version_added: 5.4.0
+      real_empty:
+        description:
+          - Return empty result without empty strings, and return empty list instead of C(NXDOMAIN).
+          - The default for this option will likely change to C(true) in the future.
+        default: false
+        type: bool
+        version_added: 6.0.0
     notes:
       - ALL is not a record per-se, merely the listed fields are available for any record results you retrieve in the form of a dictionary.
       - While the 'dig' lookup plugin supports anything which dnspython supports out of the box, only a subset can be converted into a dictionary.
@@ -285,6 +292,7 @@ class LookupModule(LookupBase):
         qtype = 'A'
         flat = True
         fail_on_error = False
+        real_empty = False
         rdclass = dns.rdataclass.from_text('IN')
 
         for t in terms:
@@ -325,6 +333,8 @@ class LookupModule(LookupBase):
                     myres.retry_servfail = boolean(arg)
                 elif opt == 'fail_on_error':
                     fail_on_error = boolean(arg)
+                elif opt == 'real_empty':
+                    real_empty = boolean(arg)
 
                 continue
 
@@ -375,15 +385,18 @@ class LookupModule(LookupBase):
         except dns.resolver.NXDOMAIN as err:
             if fail_on_error:
                 raise AnsibleError("Lookup failed: %s" % str(err))
-            ret.append('NXDOMAIN')
+            if not real_empty:
+                ret.append('NXDOMAIN')
         except dns.resolver.NoAnswer as err:
             if fail_on_error:
                 raise AnsibleError("Lookup failed: %s" % str(err))
-            ret.append("")
+            if not real_empty:
+                ret.append("")
         except dns.resolver.Timeout as err:
             if fail_on_error:
                 raise AnsibleError("Lookup failed: %s" % str(err))
-            ret.append('')
+            if not real_empty:
+                ret.append("")
         except dns.exception.DNSException as err:
             raise AnsibleError("dns.resolver unhandled exception %s" % to_native(err))
 
