@@ -14,23 +14,23 @@ DOCUMENTATION = '''
     requirements:
       - hiera (command line utility)
     description:
-        - Retrieves data from an Puppetmaster node using Hiera as ENC
+        - Retrieves data from an Puppetmaster node using Hiera as ENC.
     options:
-      _hiera_key:
+      _terms:
             description:
-                - The list of keys to lookup on the Puppetmaster
+                - The list of keys to lookup on the Puppetmaster.
             type: list
             elements: string
             required: true
-      _bin_file:
+      executable:
             description:
-                - Binary file to execute Hiera
+                - Binary file to execute Hiera.
             default: '/usr/bin/hiera'
             env:
                 - name: ANSIBLE_HIERA_BIN
-      _hierarchy_file:
+      config_file:
             description:
-                - File that describes the hierarchy of Hiera
+                - File that describes the hierarchy of Hiera.
             default: '/etc/hiera.yaml'
             env:
                 - name: ANSIBLE_HIERA_CFG
@@ -67,11 +67,12 @@ from ansible.plugins.lookup import LookupBase
 from ansible.utils.cmd_functions import run_cmd
 from ansible.module_utils.common.text.converters import to_text
 
-ANSIBLE_HIERA_CFG = os.getenv('ANSIBLE_HIERA_CFG', '/etc/hiera.yaml')
-ANSIBLE_HIERA_BIN = os.getenv('ANSIBLE_HIERA_BIN', '/usr/bin/hiera')
-
 
 class Hiera(object):
+    def __init__(self, hiera_cfg, hiera_bin):
+        self.hiera_cfg = hiera_cfg
+        self.hiera_bin = hiera_bin
+
     def get(self, hiera_key):
         pargs = [ANSIBLE_HIERA_BIN]
         pargs.extend(['-c', ANSIBLE_HIERA_CFG])
@@ -88,6 +89,6 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
 
-        hiera = Hiera()
+        hiera = Hiera(self.get_option('config_file'), self.get_option('executable'))
         ret = [hiera.get(terms)]
         return ret
