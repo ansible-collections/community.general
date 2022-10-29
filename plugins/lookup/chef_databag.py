@@ -91,8 +91,6 @@ class LookupModule(LookupBase):
         if not HAS_CHEF:
             raise AnsibleError('PyChef needed for lookup plugin, try `pip install pychef`')
 
-        self.set_options(var_options=variables, direct=kwargs)
-
         for term in terms:
             self.parse_kv_args(parse_kv(term))
 
