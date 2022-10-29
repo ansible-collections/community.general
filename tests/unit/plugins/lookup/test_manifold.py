@@ -11,6 +11,7 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.urls import ConnectionError, SSLValidationError
 from ansible.module_utils.six.moves.urllib.error import HTTPError, URLError
 from ansible.module_utils import six
+from ansible.plugins.loader import lookup_loader
 from ansible_collections.community.general.plugins.lookup.manifold import ManifoldApiClient, LookupModule, ApiError
 import json
 
@@ -375,8 +376,7 @@ class TestManifoldApiClient(unittest.TestCase):
 
 class TestLookupModule(unittest.TestCase):
     def setUp(self):
-        self.lookup = LookupModule()
-        self.lookup._load_name = "manifold"
+        self.lookup = lookup_loader.get('community.general.manifold')
 
     @patch('ansible_collections.community.general.plugins.lookup.manifold.ManifoldApiClient')
     def test_get_all(self, client_mock):
