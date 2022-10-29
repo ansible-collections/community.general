@@ -18,12 +18,15 @@ mandatory_py_version = pytest.mark.skipif(
 
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.parsing.dataloader import DataLoader
+from ansible.template import Templar
 from ansible_collections.community.general.plugins.inventory.linode import InventoryModule
 
 
 @pytest.fixture(scope="module")
 def inventory():
-    return InventoryModule()
+    plugin = InventoryModule()
+    plugin.templar = Templar(loader=DataLoader())
+    return plugin
 
 
 def test_missing_access_token_lookup(inventory):
