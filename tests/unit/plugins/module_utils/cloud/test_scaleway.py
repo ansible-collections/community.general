@@ -8,7 +8,7 @@ __metaclass__ = type
 import random
 
 from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.plugins.module_utils.scaleway import SecretVariables
+from ansible_collections.community.general.plugins.module_utils.scaleway import SecretVariables, argon2
 
 
 class SecretVariablesTestCase(unittest.TestCase):
@@ -50,6 +50,7 @@ class SecretVariablesTestCase(unittest.TestCase):
 
         self.assertEqual(SecretVariables.list_to_dict(source, hashed=False), expect)
 
+    @unittest.skipIf(argon2 is None, "Missing required 'argon2' library")
     def test_decode_full(self):
         source_secret = [
             dict(key="secret1", hashed_value="$argon2id$v=19$m=65536,t=1,p=2$NuZk+6UATHNFV78nFRXFvA$3kivcXfzNHI1c/4ZBpP8BeBSGhhI82NfOh4Dd48JJgc"),
@@ -69,6 +70,7 @@ class SecretVariablesTestCase(unittest.TestCase):
         result = sorted(result, key=lambda el: el['key'])
         self.assertEqual(result, expect)
 
+    @unittest.skipIf(argon2 is None, "Missing required 'argon2' library")
     def test_decode_dict_divergent_values(self):
         source_secret = [
             dict(key="secret1", hashed_value="$argon2id$v=19$m=65536,t=1,p=2$NuZk+6UATHNFV78nFRXFvA$3kivcXfzNHI1c/4ZBpP8BeBSGhhI82NfOh4Dd48JJgc"),
@@ -88,6 +90,7 @@ class SecretVariablesTestCase(unittest.TestCase):
         result = sorted(result, key=lambda el: el['key'])
         self.assertEqual(result, expect)
 
+    @unittest.skipIf(argon2 is None, "Missing required 'argon2' library")
     def test_decode_dict_missing_values_left(self):
         source_secret = [
             dict(key="secret1", hashed_value="$argon2id$v=19$m=65536,t=1,p=2$NuZk+6UATHNFV78nFRXFvA$3kivcXfzNHI1c/4ZBpP8BeBSGhhI82NfOh4Dd48JJgc"),
@@ -105,6 +108,7 @@ class SecretVariablesTestCase(unittest.TestCase):
         result = sorted(result, key=lambda el: el['key'])
         self.assertEqual(result, expect)
 
+    @unittest.skipIf(argon2 is None, "Missing required 'argon2' library")
     def test_decode_dict_missing_values_right(self):
         source_secret = [
             dict(key="secret1", hashed_value="$argon2id$v=19$m=65536,t=1,p=2$NuZk+6UATHNFV78nFRXFvA$3kivcXfzNHI1c/4ZBpP8BeBSGhhI82NfOh4Dd48JJgc"),
