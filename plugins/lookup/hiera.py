@@ -74,13 +74,13 @@ class Hiera(object):
         self.hiera_bin = hiera_bin
 
     def get(self, hiera_key):
-        pargs = [ANSIBLE_HIERA_BIN]
-        pargs.extend(['-c', ANSIBLE_HIERA_CFG])
+        pargs = [self.hiera_bin]
+        pargs.extend(['-c', self.hiera_cfg])
 
         pargs.extend(hiera_key)
 
         rc, output, err = run_cmd("{0} -c {1} {2}".format(
-            ANSIBLE_HIERA_BIN, ANSIBLE_HIERA_CFG, hiera_key[0]))
+            self.hiera_bin, self.hiera_cfg, hiera_key[0]))
 
         return to_text(output.strip())
 
