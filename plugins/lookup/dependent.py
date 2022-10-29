@@ -16,7 +16,7 @@ description:
      or template expressions which evaluate to lists or dicts, composed of the elements of
      the input evaluated lists and dictionaries."
 options:
-  _raw:
+  _terms:
     description:
       - A list where the elements are one-element dictionaries, mapping a name to a string, list, or dictionary.
         The name is the index that is used in the result object. The value is iterated over as described below.

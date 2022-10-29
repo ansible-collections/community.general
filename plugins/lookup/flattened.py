@@ -11,14 +11,16 @@ DOCUMENTATION = '''
     author: Serge van Ginderachter (!UNKNOWN) <serge@vanginderachter.be>
     short_description: return single list completely flattened
     description:
-      - given one or more lists, this lookup will flatten any list elements found recursively until only 1 list is left.
+      - Given one or more lists, this lookup will flatten any list elements found recursively until only 1 list is left.
     options:
       _terms:
         description: lists to flatten
+        type: list
+        elements: raw
         required: true
     notes:
-      - unlike 'items' which only flattens 1 level, this plugin will continue to flatten until it cannot find lists anymore.
-      - aka highlander plugin, there can only be one (list).
+      - Unlike 'items' which only flattens 1 level, this plugin will continue to flatten until it cannot find lists anymore.
+      - Aka highlander plugin, there can only be one (list).
 '''
 
 EXAMPLES = """

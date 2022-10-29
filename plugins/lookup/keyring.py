@@ -26,7 +26,9 @@ EXAMPLES = """
     - 'servicename username'
 
 - name: access mysql with password from keyring
-  mysql_db: login_password={{lookup('community.general.keyring','mysql joe')}} login_user=joe
+  community.mysql.mysql_db:
+    login_password: "{{ lookup('community.general.keyring', 'mysql joe') }}"
+    login_user: joe
 """
 
 RETURN = """
