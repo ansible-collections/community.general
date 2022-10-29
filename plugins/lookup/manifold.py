@@ -219,14 +219,9 @@ class LookupModule(LookupBase):
 
         self.set_options(var_options=variables, direct=kwargs)
 
-        api_token = kwargs.get('api_token')
-        project = kwargs.get('project')
-        team = kwargs.get('team')
-
-        if not api_token:
-            api_token = os.getenv('MANIFOLD_API_TOKEN')
-        if not api_token:
-            raise AnsibleError('API token is required. Please set api_token parameter or MANIFOLD_API_TOKEN env var')
+        api_token = self.get_option('api_token')
+        project = self.get_option('project')
+        team = self.get_option('team')
 
         try:
             labels = terms
