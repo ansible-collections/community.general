@@ -22,11 +22,11 @@ DOCUMENTATION = '''
         type: list
         elements: str
       db:
-        description: path to LMDB database
+        description: Path to LMDB database.
         type: str
         default: 'ansible.mdb'
         vars:
-          - lmdb_kv_db
+          - name: lmdb_kv_db
 '''
 
 EXAMPLES = """
