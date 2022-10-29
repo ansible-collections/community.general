@@ -21,8 +21,8 @@ DOCUMENTATION = '''
       - In addition to (default) A record, it is also possible to specify a different record type that should be queried.
         This can be done by either passing-in additional parameter of format qtype=TYPE to the dig lookup, or by appending /TYPE to the FQDN being queried.
       - If multiple values are associated with the requested record, the results will be returned as a comma-separated list.
-        In such cases you may want to pass option wantlist=True to the plugin, which will result in the record values being returned as a list
-        over which you can iterate later on.
+        In such cases you may want to pass option I(wantlist=true) to the lookup call, or alternatively use C(query) instead of C(lookup),
+        which will result in the record values being returned as a list over which you can iterate later on.
       - By default, the lookup will rely on system-wide configured DNS servers for performing the query.
         It is also possible to explicitly specify DNS servers to query using the @DNS_SERVER_1,DNS_SERVER_2,...,DNS_SERVER_N notation.
         This needs to be passed-in as an additional parameter to the lookup
@@ -83,7 +83,7 @@ EXAMPLES = """
 
 - name: "The TXT record for example.org."
   ansible.builtin.debug:
-    msg: "{{ lookup('community.general.dig', 'example.org.', 'qtype=TXT') }}"
+    msg: "{{ lookup('community.general.dig', 'example.org.', qtype='TXT') }}"
 
 - name: "The TXT record for example.org, alternative syntax."
   ansible.builtin.debug:
@@ -92,24 +92,24 @@ EXAMPLES = """
 - name: use in a loop
   ansible.builtin.debug:
     msg: "MX record for gmail.com {{ item }}"
-  with_items: "{{ lookup('community.general.dig', 'gmail.com./MX', wantlist=True) }}"
+  with_items: "{{ lookup('community.general.dig', 'gmail.com./MX', wantlist=true) }}"
 
 - ansible.builtin.debug:
     msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '192.0.2.5/PTR') }}"
 - ansible.builtin.debug:
     msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '5.2.0.192.in-addr.arpa./PTR') }}"
 - ansible.builtin.debug:
-    msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '5.2.0.192.in-addr.arpa.', 'qtype=PTR') }}"
+    msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '5.2.0.192.in-addr.arpa.', qtype='PTR') }}"
 - ansible.builtin.debug:
     msg: "Querying 198.51.100.23 for IPv4 address for example.com. produces {{ lookup('dig', 'example.com', '@198.51.100.23') }}"
 
 - ansible.builtin.debug:
     msg: "XMPP service for gmail.com. is available at {{ item.target }} on port {{ item.port }}"
-  with_items: "{{ lookup('community.general.dig', '_xmpp-server._tcp.gmail.com./SRV', 'flat=0', wantlist=True) }}"
+  with_items: "{{ lookup('community.general.dig', '_xmpp-server._tcp.gmail.com./SRV', flat=0, wantlist=true) }}"
 
 - name: Retry nameservers that return SERVFAIL
   ansible.builtin.debug:
-    msg: "{{ lookup('community.general.dig', 'example.org./A', 'retry_servfail=True') }}"
+    msg: "{{ lookup('community.general.dig', 'example.org./A', retry_servfail=true) }}"
 """
 
 RETURN = """
