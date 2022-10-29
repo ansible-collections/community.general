@@ -13,15 +13,20 @@ DOCUMENTATION = '''
     version_added: '0.2.0'
     short_description: fetch data from LMDB
     description:
-      - This lookup returns a list of results from an LMDB DB corresponding to a list of items given to it
+      - This lookup returns a list of results from an LMDB DB corresponding to a list of items given to it.
     requirements:
       - lmdb (python library https://lmdb.readthedocs.io/en/release/)
     options:
       _terms:
-        description: list of keys to query
+        description: List of keys to query.
+        type: list
+        elements: str
       db:
         description: path to LMDB database
+        type: str
         default: 'ansible.mdb'
+        vars:
+          - lmdb_kv_db
 '''
 
 EXAMPLES = """
@@ -43,8 +48,8 @@ EXAMPLES = """
       - item == 'Belgium'
     vars:
       - lmdb_kv_db: jp.mdb
-    with_community.general.lmdb_kv:
-      - be
+  with_community.general.lmdb_kv:
+    - be
 """
 
 RETURN = """
@@ -58,6 +63,7 @@ _raw:
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.module_utils.common.text.converters import to_native, to_text
+
 HAVE_LMDB = True
 try:
     import lmdb
@@ -85,10 +91,7 @@ class LookupModule(LookupBase):
 
         self.set_options(var_options=variables, direct=kwargs)
 
-        db = variables.get('lmdb_kv_db', None)
-        if db is None:
-            db = kwargs.get('db', 'ansible.mdb')
-        db = str(db)
+        db = self.get_option('db')
 
         try:
             env = lmdb.open(db, readonly=True)
