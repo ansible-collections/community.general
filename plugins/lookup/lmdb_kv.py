@@ -67,8 +67,7 @@ except ImportError:
 
 class LookupModule(LookupBase):
 
-    def run(self, terms, variables, **kwargs):
-
+    def run(self, terms, variables=None, **kwargs):
         '''
         terms contain any number of keys to be retrieved.
         If terms is None, all keys from the database are returned
@@ -81,9 +80,10 @@ class LookupModule(LookupBase):
               vars:
                 - lmdb_kv_db: "jp.mdb"
         '''
-
         if HAVE_LMDB is False:
             raise AnsibleError("Can't LOOKUP(lmdb_kv): this module requires lmdb to be installed")
+
+        self.set_options(var_options=variables, direct=kwargs)
 
         db = variables.get('lmdb_kv_db', None)
         if db is None:

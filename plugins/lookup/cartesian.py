@@ -69,6 +69,7 @@ class LookupModule(LookupBase):
         return results
 
     def run(self, terms, variables=None, **kwargs):
+        self.set_options(var_options=variables, direct=kwargs)
 
         terms = self._lookup_variables(terms)
 

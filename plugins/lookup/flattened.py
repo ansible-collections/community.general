@@ -78,9 +78,10 @@ class LookupModule(LookupBase):
 
         return ret
 
-    def run(self, terms, variables, **kwargs):
-
+    def run(self, terms, variables=None, **kwargs):
         if not isinstance(terms, list):
             raise AnsibleError("with_flattened expects a list")
+
+        self.set_options(var_options=variables, direct=kwargs)
 
         return self._do_flatten(terms, variables)

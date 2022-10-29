@@ -268,6 +268,8 @@ class OnePass(object):
 class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
+        self.set_options(var_options=variables, direct=kwargs)
+
         op = OnePass()
 
         field = kwargs.get('field', 'password')

@@ -100,10 +100,11 @@ except ImportError:
 
 
 class LookupModule(LookupBase):
-    def run(self, terms, variables, **kwargs):
-
+    def run(self, terms, variables=None, **kwargs):
         if not CREDSTASH_INSTALLED:
             raise AnsibleError('The credstash lookup plugin requires credstash to be installed.')
+
+        self.set_options(var_options=variables, direct=kwargs)
 
         ret = []
         for term in terms:

@@ -207,7 +207,7 @@ class ManifoldApiClient(object):
 
 class LookupModule(LookupBase):
 
-    def run(self, terms, variables=None, api_token=None, project=None, team=None):
+    def run(self, terms, variables=None, **kwargs):
         """
         :param terms: a list of resources lookups to run.
         :param variables: ansible variables active at the time of the lookup
@@ -216,6 +216,12 @@ class LookupModule(LookupBase):
         :param team: optional team label
         :return: a dictionary of resources credentials
         """
+
+        self.set_options(var_options=variables, direct=kwargs)
+
+        api_token = kwargs.get('api_token')
+        project = kwargs.get('project')
+        team = kwargs.get('team')
 
         if not api_token:
             api_token = os.getenv('MANIFOLD_API_TOKEN')

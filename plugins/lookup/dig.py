@@ -279,9 +279,10 @@ class LookupModule(LookupBase):
 
             ... flat=0                                      # returns a dict; default is 1 == string
         '''
-
         if HAVE_DNS is False:
             raise AnsibleError("The dig lookup requires the python 'dnspython' library and it is not installed")
+
+        self.set_options(var_options=variables, direct=kwargs)
 
         # Create Resolver object so that we can set NS if necessary
         myres = dns.resolver.Resolver(configure=True)

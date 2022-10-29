@@ -53,6 +53,7 @@ class LookupModule(LookupBase):
         return res
 
     def run(self, terms, variables=None, **kwargs):
+        self.set_options(var_options=variables, direct=kwargs)
 
         if not isinstance(terms, list):
             terms = [terms]

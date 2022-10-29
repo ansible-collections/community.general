@@ -180,6 +180,8 @@ class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
         """Generate list."""
+        self.set_options(var_options=variables, direct=kwargs)
+
         result = []
         if len(terms) > 0:
             templar = Templar(loader=self._templar._loader)

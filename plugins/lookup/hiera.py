@@ -85,7 +85,9 @@ class Hiera(object):
 
 
 class LookupModule(LookupBase):
-    def run(self, terms, variables=''):
+    def run(self, terms, variables=None, **kwargs):
+        self.set_options(var_options=variables, direct=kwargs)
+
         hiera = Hiera()
         ret = [hiera.get(terms)]
         return ret
