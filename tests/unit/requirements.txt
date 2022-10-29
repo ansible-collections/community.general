@@ -36,4 +36,5 @@ dataclasses ; python_version == '3.6'
 # opentelemetry-sdk ; python_version >= '3.6' and python_version < '3.10'
 
 # requirement for the elastic callback plugin
-elastic-apm ; python_version >= '3.6'
+elastic-apm < 6.13.0 ; python_version == '3.6'
+elastic-apm ; python_version >= '3.7'
