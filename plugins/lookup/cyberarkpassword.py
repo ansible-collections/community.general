@@ -174,8 +174,6 @@ class LookupModule(LookupBase):
     """
 
     def run(self, terms, variables=None, **kwargs):
-        self.set_options(var_options=variables, direct=kwargs)
-
         display.vvvv("%s" % terms)
         if isinstance(terms, list):
             return_values = []
