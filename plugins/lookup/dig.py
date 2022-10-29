@@ -29,14 +29,18 @@ DOCUMENTATION = '''
     options:
       _terms:
         description: Domain(s) to query.
+        type: list
+        elements: str
       qtype:
         description:
             - Record type to query.
             - C(DLV) has been removed in community.general 6.0.0.
+        type: str
         default: 'A'
         choices: [A, ALL, AAAA, CNAME, DNAME, DNSKEY, DS, HINFO, LOC, MX, NAPTR, NS, NSEC3PARAM, PTR, RP, RRSIG, SOA, SPF, SRV, SSHFP, TLSA, TXT]
       flat:
         description: If 0 each record is returned as a dictionary, otherwise a string.
+        type: int
         default: 1
       retry_servfail:
         description: Retry a nameserver if it returns SERVFAIL.
@@ -59,6 +63,11 @@ DOCUMENTATION = '''
         default: false
         type: bool
         version_added: 6.0.0
+      class:
+        description:
+          - "Class."
+        type: str
+        default: 'IN'
     notes:
       - ALL is not a record per-se, merely the listed fields are available for any record results you retrieve in the form of a dictionary.
       - While the 'dig' lookup plugin supports anything which dnspython supports out of the box, only a subset can be converted into a dictionary.
@@ -290,11 +299,15 @@ class LookupModule(LookupBase):
         myres.use_edns(0, ednsflags=dns.flags.DO, payload=edns_size)
 
         domain = None
-        qtype = 'A'
-        flat = True
-        fail_on_error = False
-        real_empty = False
-        rdclass = dns.rdataclass.from_text('IN')
+        qtype = self.get_option('qtype')
+        flat = self.get_option('flat')
+        fail_on_error = self.get_option('fail_on_error')
+        real_empty = self.get_option('real_empty')
+        try:
+            rdclass = dns.rdataclass.from_text(self.get_option('class'))
+        except Exception as e:
+            raise AnsibleError("dns lookup illegal CLASS: %s" % to_native(e))
+        myres.retry_servfail = self.get_option('retry_servfail')
 
         for t in terms:
             if t.startswith('@'):       # e.g. "@10.0.1.2,192.0.2.1" is ok.
@@ -317,7 +330,7 @@ class LookupModule(LookupBase):
                 continue
             if '=' in t:
                 try:
-                    opt, arg = t.split('=')
+                    opt, arg = t.split('=', 1)
                 except Exception:
                     pass
 
