@@ -94,7 +94,7 @@ class LookupModule(LookupBase):
         db = self.get_option('db')
 
         try:
-            env = lmdb.open(db, readonly=True)
+            env = lmdb.open(str(db), readonly=True)
         except Exception as e:
             raise AnsibleError("LMDB can't open database %s: %s" % (db, to_native(e)))
 
