@@ -21,17 +21,15 @@ DOCUMENTATION = '''
       _terms:
         description: query key.
         required: true
-      passwordstore:
-        description:
-          - Location of the password store.
-          - 'The value is decided by checking the following in order:'
-          - If set, this value is used.
-          - If C(directory) is set, that value will be used.
-          - If I(backend=pass), then C(~/.password-store) is used.
-          - If I(backend=gopass), then the C(path) field in C(~/.config/gopass/config.yml) is used,
-            falling back to C(~/.local/share/gopass/stores/root) if not defined.
       directory:
-        description: The directory of the password store.
+        description:
+          - The directory of the password store.
+          - If I(backend=pass), the default is C(~/.password-store) is used.
+          - If I(backend=gopass), then the default is the C(path) field in C(~/.config/gopass/config.yml),
+            falling back to C(~/.local/share/gopass/stores/root) if C(path) is not defined in the gopass config.
+        type: path
+        vars:
+          - name: passwordstore
         env:
           - name: PASSWORD_STORE_DIR
       create:
@@ -55,9 +53,11 @@ DOCUMENTATION = '''
         default: false
       subkey:
         description: Return a specific subkey of the password. When set to C(password), always returns the first line.
+        type: str
         default: password
       userpass:
         description: Specify a password to save, instead of a generated one.
+        type: str
       length:
         description: The length of the generated password.
         type: integer
@@ -67,7 +67,7 @@ DOCUMENTATION = '''
         type: bool
         default: false
       nosymbols:
-        description: use alphanumeric characters.
+        description: Use alphanumeric characters.
         type: bool
         default: false
       missing:
@@ -129,6 +129,8 @@ DOCUMENTATION = '''
           - pass
           - gopass
         version_added: 5.2.0
+    notes:
+      - The lookup supports passing all options as lookup parameters since community.general 6.0.0.
 '''
 EXAMPLES = """
 ansible.cfg: |
@@ -136,7 +138,7 @@ ansible.cfg: |
   lock=readwrite
   locktimeout=45s
 
-playbook.yml: |
+tasks.yml: |
   ---
 
   # Debug is used for examples, BAD IDEA to show passwords on screen
@@ -146,45 +148,49 @@ playbook.yml: |
 
   - name: Basic lookup. Warns if example/test does not exist and returns empty string
     ansible.builtin.debug:
-      msg: "{{ lookup('community.general.passwordstore', 'example/test missing=warn')}}"
+      msg: "{{ lookup('community.general.passwordstore', 'example/test', missing='warn')}}"
 
   - name: Create pass with random 16 character password. If password exists just give the password
     ansible.builtin.debug:
       var: mypassword
     vars:
-      mypassword: "{{ lookup('community.general.passwordstore', 'example/test create=true')}}"
+      mypassword: "{{ lookup('community.general.passwordstore', 'example/test', create=true)}}"
 
   - name: Create pass with random 16 character password. If password exists just give the password
     ansible.builtin.debug:
       var: mypassword
     vars:
-      mypassword: "{{ lookup('community.general.passwordstore', 'example/test missing=create')}}"
+      mypassword: "{{ lookup('community.general.passwordstore', 'example/test', missing='create')}}"
 
   - name: Prints 'abc' if example/test does not exist, just give the password otherwise
     ansible.builtin.debug:
       var: mypassword
     vars:
-      mypassword: "{{ lookup('community.general.passwordstore', 'example/test missing=empty') | default('abc', true) }}"
+      mypassword: >-
+        {{ lookup('community.general.passwordstore', 'example/test', missing='empty')
+           | default('abc', true) }}
 
   - name: Different size password
     ansible.builtin.debug:
-      msg: "{{ lookup('community.general.passwordstore', 'example/test create=true length=42')}}"
+      msg: "{{ lookup('community.general.passwordstore', 'example/test', create=true, length=42)}}"
 
-  - name: Create password and overwrite the password if it exists. As a bonus, this module includes the old password inside the pass file
+  - name: >-
+      Create password and overwrite the password if it exists.
+      As a bonus, this module includes the old password inside the pass file
     ansible.builtin.debug:
-      msg: "{{ lookup('community.general.passwordstore', 'example/test create=true overwrite=true')}}"
+      msg: "{{ lookup('community.general.passwordstore', 'example/test', create=true, overwrite=true)}}"
 
   - name: Create an alphanumeric password
     ansible.builtin.debug:
-      msg: "{{ lookup('community.general.passwordstore', 'example/test create=true nosymbols=true') }}"
+      msg: "{{ lookup('community.general.passwordstore', 'example/test', create=true, nosymbols=true) }}"
 
   - name: Return the value for user in the KV pair user, username
     ansible.builtin.debug:
-      msg: "{{ lookup('community.general.passwordstore', 'example/test subkey=user')}}"
+      msg: "{{ lookup('community.general.passwordstore', 'example/test', subkey='user')}}"
 
   - name: Return the entire password file content
     ansible.builtin.set_fact:
-      passfilecontent: "{{ lookup('community.general.passwordstore', 'example/test returnall=true')}}"
+      passfilecontent: "{{ lookup('community.general.passwordstore', 'example/test', returnall=true)}}"
 """
 
 RETURN = """
@@ -320,7 +326,7 @@ class LookupModule(LookupBase):
                 raise AnsibleError('Passwordstore directory \'{0}\' does not exist'.format(self.paramvals['directory']))
 
             # Set PASSWORD_STORE_UMASK if umask is set
-            if 'umask' in self.paramvals:
+            if self.paramvals.get('umask') is not None:
                 if len(self.paramvals['umask']) != 3:
                     raise AnsibleError('Passwordstore umask must have a length of 3.')
                 elif int(self.paramvals['umask'][0]) > 3:
@@ -435,8 +441,7 @@ class LookupModule(LookupBase):
         unit_to_seconds = {"s": 1, "m": 60, "h": 3600}
         self.lock_timeout = int(timeout[:-1]) * unit_to_seconds[timeout[-1]]
 
-        directory = variables.get('passwordstore', os.environ.get('PASSWORD_STORE_DIR', None))
-
+        directory = self.get_option('directory')
         if directory is None:
             if self.backend == 'gopass':
                 try:
@@ -448,16 +453,17 @@ class LookupModule(LookupBase):
                 directory = os.path.expanduser('~/.password-store')
 
         self.paramvals = {
-            'subkey': 'password',
+            'subkey': self.get_option('subkey'),
             'directory': directory,
-            'create': False,
-            'returnall': False,
-            'overwrite': False,
-            'nosymbols': False,
-            'userpass': '',
-            'length': 16,
-            'backup': False,
-            'missing': 'error',
+            'create': self.get_option('create'),
+            'returnall': self.get_option('returnall'),
+            'overwrite': self.get_option('overwrite'),
+            'nosymbols': self.get_option('nosymbols'),
+            'userpass': self.get_option('userpass') or '',
+            'length': self.get_option('length'),
+            'backup': self.get_option('backup'),
+            'missing': self.get_option('missing'),
+            'umask': self.get_option('umask'),
         }
 
     def run(self, terms, variables, **kwargs):
