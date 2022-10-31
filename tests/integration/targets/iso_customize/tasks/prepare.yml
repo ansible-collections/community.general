@@ -6,6 +6,7 @@
 - name: install pycdlib
   ansible.builtin.pip:
     name: pycdlib
+    extra_args: "-c {{ remote_constraints }}"
 
 - name: Make sure the previous testing sub-directory is deleted
   ansible.builtin.file:
