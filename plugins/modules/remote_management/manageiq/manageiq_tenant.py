@@ -65,7 +65,7 @@ options:
     - ' - C(vms_allocated) (int): use null to remove the quota.'
     - ' - C(templates_allocated) (int): use null to remove the quota.'
     required: false
-    default: null
+    default: {}
 '''
 
 EXAMPLES = '''

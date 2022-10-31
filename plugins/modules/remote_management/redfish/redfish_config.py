@@ -72,6 +72,7 @@ options:
     description:
       - Setting dict of manager services to update.
     type: dict
+    default: {}
     version_added: '0.2.0'
   resource_id:
     required: false
@@ -91,6 +92,7 @@ options:
     description:
       - Setting dict of EthernetInterface on OOB controller.
     type: dict
+    default: {}
     version_added: '0.2.0'
   strip_etag_quotes:
     description:
@@ -106,6 +108,7 @@ options:
     description:
       - Setting dict of HostInterface on OOB controller.
     type: dict
+    default: {}
     version_added: '4.1.0'
   hostinterface_id:
     required: false
@@ -118,6 +121,7 @@ options:
     description:
       - Setting dict of Sessions.
     type: dict
+    default: {}
     version_added: '5.7.0'
 
 author: "Jose Delarosa (@jose-delarosa)"

@@ -37,6 +37,7 @@ options:
         entries are never modified. To assert specific attribute values on an
         existing entry, use M(community.general.ldap_attrs) module instead.
     type: dict
+    default: {}
   objectClass:
     description:
       - If I(state=present), value or list of values to use when creating

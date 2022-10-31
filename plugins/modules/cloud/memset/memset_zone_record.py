@@ -44,11 +44,13 @@ options:
         description:
             - C(SRV) and C(TXT) record priority, in the range 0 > 999 (inclusive).
         type: int
+        default: 0
     record:
         required: false
         description:
             - The subdomain to create.
         type: str
+        default: ''
     type:
         required: true
         description:
@@ -65,6 +67,7 @@ options:
         description:
             - The record's TTL in seconds (will inherit zone's TTL if not explicitly set). This must be a
               valid int from U(https://www.memset.com/apidocs/methods_dns.html#dns.zone_record_create).
+        default: 0
         choices: [ 0, 300, 600, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400 ]
         type: int
     zone:

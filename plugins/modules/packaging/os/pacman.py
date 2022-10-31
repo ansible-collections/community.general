@@ -73,7 +73,7 @@ options:
     extra_args:
         description:
             - Additional option to pass to pacman when enforcing C(state).
-        default:
+        default: ''
         type: str
 
     update_cache:
@@ -89,7 +89,7 @@ options:
     update_cache_extra_args:
         description:
             - Additional option to pass to pacman when enforcing C(update_cache).
-        default:
+        default: ''
         type: str
 
     upgrade:
@@ -102,7 +102,7 @@ options:
     upgrade_extra_args:
         description:
             - Additional option to pass to pacman when enforcing C(upgrade).
-        default:
+        default: ''
         type: str
 
     reason:

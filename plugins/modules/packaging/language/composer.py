@@ -31,6 +31,7 @@ options:
         type: str
         description:
             - Composer arguments like required package, version and so on.
+        default: ''
     executable:
         type: path
         description:
