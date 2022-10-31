@@ -76,6 +76,7 @@ options:
             - especially useful for SCM and rsync grimoires
             - makes sense only in pair with C(update_cache)
         type: int
+        default: 0
 '''
 
 
