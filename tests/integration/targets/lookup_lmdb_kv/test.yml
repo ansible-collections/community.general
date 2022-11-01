@@ -6,10 +6,10 @@
 - hosts: localhost
   tasks:
   - debug:
-      msg: '{{ query(''community.general.lmdb_kv'', ''nl'', ''be'', ''lu'', db=''jp.mdb'') }}'
+      msg: '{{ query("community.general.lmdb_kv", "nl", "be", "lu", db="jp.mdb") }}'
   - debug:
       var: item.1
-    loop: '{{ query(''community.general.lmdb_kv'', db=''jp.mdb'') }}'
+    loop: '{{ query("community.general.lmdb_kv", db="jp.mdb") }}'
   - assert:
       that:
       - query('community.general.lmdb_kv', 'nl', 'be', 'lu', db='jp.mdb') == ['Netherlands', 'Belgium', 'Luxembourg']

@@ -201,6 +201,8 @@ def file_props(root, path):
 class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
+        self.set_options(var_options=variables, direct=kwargs)
+
         basedir = self.get_basedir(variables)
 
         ret = []

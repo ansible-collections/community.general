@@ -11,8 +11,10 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.urls import ConnectionError, SSLValidationError
 from ansible.module_utils.six.moves.urllib.error import HTTPError, URLError
 from ansible.module_utils import six
+from ansible.plugins.loader import lookup_loader
 from ansible_collections.community.general.plugins.lookup.manifold import ManifoldApiClient, LookupModule, ApiError
 import json
+import os
 
 
 API_FIXTURES = {
@@ -375,8 +377,7 @@ class TestManifoldApiClient(unittest.TestCase):
 
 class TestLookupModule(unittest.TestCase):
     def setUp(self):
-        self.lookup = LookupModule()
-        self.lookup._load_name = "manifold"
+        self.lookup = lookup_loader.get('community.general.manifold')
 
     @patch('ansible_collections.community.general.plugins.lookup.manifold.ManifoldApiClient')
     def test_get_all(self, client_mock):
@@ -515,23 +516,22 @@ class TestLookupModule(unittest.TestCase):
             self.lookup.run([], api_token='token-123')
         self.assertTrue('Exception: Unknown error' in str(context.exception))
 
-    @patch('ansible_collections.community.general.plugins.lookup.manifold.os.getenv')
     @patch('ansible_collections.community.general.plugins.lookup.manifold.ManifoldApiClient')
-    def test_falls_back_to_env_var(self, client_mock, getenv_mock):
-        getenv_mock.return_value = 'token-321'
+    def test_falls_back_to_env_var(self, client_mock):
         client_mock.return_value.get_resources.return_value = []
         client_mock.return_value.get_credentials.return_value = []
-        self.lookup.run([])
-        getenv_mock.assert_called_with('MANIFOLD_API_TOKEN')
+        try:
+            os.environ['MANIFOLD_API_TOKEN'] = 'token-321'
+            self.lookup.run([])
+        finally:
+            os.environ.pop('MANIFOLD_API_TOKEN', None)
         client_mock.assert_called_with('token-321')
 
-    @patch('ansible_collections.community.general.plugins.lookup.manifold.os.getenv')
     @patch('ansible_collections.community.general.plugins.lookup.manifold.ManifoldApiClient')
-    def test_falls_raises_on_no_token(self, client_mock, getenv_mock):
-        getenv_mock.return_value = None
+    def test_falls_raises_on_no_token(self, client_mock):
         client_mock.return_value.get_resources.return_value = []
         client_mock.return_value.get_credentials.return_value = []
+        os.environ.pop('MANIFOLD_API_TOKEN', None)
         with self.assertRaises(AnsibleError) as context:
             self.lookup.run([])
-        self.assertEqual('API token is required. Please set api_token parameter or MANIFOLD_API_TOKEN env var',
-                         str(context.exception))
+        assert 'api_token' in str(context.exception)

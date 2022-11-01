@@ -26,7 +26,9 @@ EXAMPLES = """
     - 'servicename username'
 
 - name: access mysql with password from keyring
-  mysql_db: login_password={{lookup('community.general.keyring','mysql joe')}} login_user=joe
+  community.mysql.mysql_db:
+    login_password: "{{ lookup('community.general.keyring', 'mysql joe') }}"
+    login_user: joe
 """
 
 RETURN = """
@@ -53,9 +55,11 @@ display = Display()
 
 class LookupModule(LookupBase):
 
-    def run(self, terms, **kwargs):
+    def run(self, terms, variables=None, **kwargs):
         if not HAS_KEYRING:
             raise AnsibleError(u"Can't LOOKUP(keyring): missing required python library 'keyring'")
+
+        self.set_options(var_options=variables, direct=kwargs)
 
         display.vvvv(u"keyring: %s" % keyring.get_keyring())
         ret = []

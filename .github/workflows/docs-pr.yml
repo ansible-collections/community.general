@@ -26,6 +26,7 @@ jobs:
       init-fail-on-error: true
       provide-link-targets: |
         ansible_collections.ansible.builtin.dict2items_filter
+        ansible_collections.ansible.builtin.items_lookup
         ansible_collections.ansible.builtin.path_join_filter
         ansible_collections.community.kubevirt.kubevirt_cdi_upload_module
         ansible_collections.community.kubevirt.kubevirt_inventory
