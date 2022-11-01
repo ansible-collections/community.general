@@ -125,9 +125,7 @@
     that:
       - eval_error is failed
       - >-
-        "Passwordstore directory '" in eval_error.msg
-      - >-
-        "/somenonexistentplace' does not exist" in eval_error.msg
+        "Passwordstore directory 'somenonexistentplace' does not exist" in eval_error.msg
 
 - name: Test pass compatibility shim detection
   block:

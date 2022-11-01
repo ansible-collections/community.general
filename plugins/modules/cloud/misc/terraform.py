@@ -105,7 +105,6 @@ options:
         resources selected here will also auto-include any dependencies.
     type: list
     elements: str
-    default: []
   lock:
     description:
       - Enable statefile locking, if you use a service that accepts locks (such

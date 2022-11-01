@@ -503,12 +503,6 @@ options:
         Only works if wait_for_instances is True.
     type: int
 
-  do_not_update:
-    description:
-      - TODO document.
-    type: list
-    default: []
-
 '''
 EXAMPLES = '''
 # Basic configuration YAML example

@@ -152,6 +152,7 @@ options:
               When some attribute is not listed in the new list of attributes, the existing
               attribute will be removed from C(syspurpose.json) file. Unknown attributes are ignored.
         type: dict
+        default: {}
         suboptions:
             usage:
                 description: Syspurpose attribute usage
