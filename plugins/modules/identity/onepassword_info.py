@@ -86,6 +86,7 @@ options:
                 description:
                     - The secret key for your subdomain.
                     - Only required for initial sign in.
+        default: {}
         required: false
     cli_path:
         type: path

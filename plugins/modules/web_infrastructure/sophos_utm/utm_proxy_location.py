@@ -48,7 +48,6 @@ options:
         type: str
         description:
           - The reference name of the auth profile
-        default: ''
     backend:
         type: list
         elements: str
@@ -59,12 +58,10 @@ options:
         type: str
         description:
           - The path of the backend
-        default: ''
     comment:
         type: str
         description:
           - The optional comment string
-        default: ''
     denied_networks:
         type: list
         elements: str

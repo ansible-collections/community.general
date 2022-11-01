@@ -28,7 +28,6 @@ options:
     default: LEAST_CONNECTIONS
   meta:
     type: dict
-    default: {}
     description:
       - A hash of metadata to associate with the instance
   name:

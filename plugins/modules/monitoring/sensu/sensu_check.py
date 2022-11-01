@@ -53,12 +53,14 @@ options:
     elements: str
     description:
       - List of handlers to notify when the check fails
+    default: []
   subscribers:
     type: list
     elements: str
     description:
       - List of subscribers/channels this check should run for
       - See sensu_subscribers to subscribe a machine to a channel
+    default: []
   interval:
     type: int
     description:
@@ -90,6 +92,7 @@ options:
     elements: str
     description:
       - Other checks this check depends on, if dependencies fail handling of this check will be disabled
+    default: []
   metric:
     description:
       - Whether the check is a metric
@@ -135,6 +138,7 @@ options:
     description:
       - A hash/dictionary of custom parameters for mixing to the configuration.
       - You can't rewrite others module parameters using this
+    default: {}
   source:
     type: str
     description:

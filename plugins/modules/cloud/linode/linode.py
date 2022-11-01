@@ -37,7 +37,6 @@ options:
     description:
      - Add the instance to a Display Group in Linode Manager.
     type: str
-    default: ''
   linode_id:
     description:
      - Unique ID of a linode server. This value is read-only in the sense that
