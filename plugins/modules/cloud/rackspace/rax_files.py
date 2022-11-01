@@ -27,6 +27,7 @@ options:
       - The container to use for container or metadata operations.
   meta:
     type: dict
+    default: {}
     description:
       - A hash of items to set as metadata values on a container
   private:

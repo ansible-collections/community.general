@@ -62,6 +62,7 @@ options:
     type: str
     description:
       - The prefix to add to the metric.
+    default: ''
   value:
     type: int
     required: true

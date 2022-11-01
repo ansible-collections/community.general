@@ -143,6 +143,7 @@ options:
       - List of ssh keys by their Id to be assigned to a virtual instance.
     type: list
     elements: str
+    default: []
   post_uri:
     description:
       - URL of a post provisioning script to be loaded and executed on virtual instance.
