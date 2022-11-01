@@ -14,23 +14,24 @@ DOCUMENTATION = '''
       - Read keys from Python shelve file.
     options:
       _terms:
-        description: sets of key value pairs of parameters
+        description: Sets of key value pairs of parameters.
       key:
-        description: key to query
+        description: Key to query.
         required: true
       file:
-        description: path to shelve file
+        description: Path to shelve file.
         required: true
 '''
 
 EXAMPLES = """
-- name: retrieve a string value corresponding to a key inside a Python shelve file
-  ansible.builtin.debug: msg="{{ lookup('community.general.shelvefile', 'file=path_to_some_shelve_file.db key=key_to_retrieve') }}
+- name: Retrieve a string value corresponding to a key inside a Python shelve file
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.shelvefile', 'file=path_to_some_shelve_file.db key=key_to_retrieve') }}"
 """
 
 RETURN = """
 _list:
-  description: value(s) of key(s) in shelve file(s)
+  description: Value(s) of key(s) in shelve file(s).
   type: list
   elements: str
 """
@@ -53,7 +54,6 @@ class LookupModule(LookupBase):
         return res
 
     def run(self, terms, variables=None, **kwargs):
-
         if not isinstance(terms, list):
             terms = [terms]
 

@@ -71,6 +71,7 @@ from ansible.plugins.lookup import LookupBase
 class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
+        self.set_options(var_options=variables, direct=kwargs)
 
         if HAVE_DNS is False:
             raise AnsibleError("Can't LOOKUP(dnstxt): module dns.resolver is not installed")
