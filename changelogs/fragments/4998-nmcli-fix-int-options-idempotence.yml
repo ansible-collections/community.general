@@ -1,0 +1,2 @@
+bugfixes:
+  - nmcli - fix int options idempotence (https://github.com/ansible-collections/community.general/issues/4998).
