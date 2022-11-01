@@ -37,6 +37,7 @@ options:
       same play)."
     required: false
     type: str
+    default: ''
   password:
     description:
       - Password which match to account to which specified C(email) belong.
@@ -44,6 +45,7 @@ options:
       same play)."
     required: false
     type: str
+    default: ''
   cache:
     description: >
        In case if single play use blocks management module few times it is
@@ -58,7 +60,7 @@ options:
       manage blocks."
       - "User's account will be used if value not set or empty."
     type: str
-    required: false
+    default: ''
   application:
     description:
       - "Name of target PubNub application for which blocks configuration on

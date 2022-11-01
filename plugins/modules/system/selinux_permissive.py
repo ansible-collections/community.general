@@ -38,6 +38,7 @@ options:
     description:
       - Name of the SELinux policy store to use.
     type: str
+    default: ''
 notes:
     - Requires a recent version of SELinux and C(policycoreutils-python) (EL 6 or newer).
 requirements: [ policycoreutils-python ]
