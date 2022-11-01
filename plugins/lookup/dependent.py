@@ -16,7 +16,7 @@ description:
      or template expressions which evaluate to lists or dicts, composed of the elements of
      the input evaluated lists and dictionaries."
 options:
-  _raw:
+  _terms:
     description:
       - A list where the elements are one-element dictionaries, mapping a name to a string, list, or dictionary.
         The name is the index that is used in the result object. The value is iterated over as described below.
@@ -180,6 +180,8 @@ class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
         """Generate list."""
+        self.set_options(var_options=variables, direct=kwargs)
+
         result = []
         if len(terms) > 0:
             templar = Templar(loader=self._templar._loader)

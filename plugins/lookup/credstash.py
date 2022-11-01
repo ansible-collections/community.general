@@ -22,25 +22,33 @@ DOCUMENTATION = '''
         required: true
       table:
         description: name of the credstash table to query
+        type: str
         default: 'credential-store'
       version:
         description: Credstash version
+        type: str
+        default: ''
       region:
         description: AWS region
+        type: str
       profile_name:
         description: AWS profile to use for authentication
+        type: str
         env:
           - name: AWS_PROFILE
       aws_access_key_id:
         description: AWS access key ID
+        type: str
         env:
           - name: AWS_ACCESS_KEY_ID
       aws_secret_access_key:
         description: AWS access key
+        type: str
         env:
           - name: AWS_SECRET_ACCESS_KEY
       aws_session_token:
         description: AWS session token
+        type: str
         env:
           - name: AWS_SESSION_TOKEN
 '''
@@ -100,28 +108,39 @@ except ImportError:
 
 
 class LookupModule(LookupBase):
-    def run(self, terms, variables, **kwargs):
-
+    def run(self, terms, variables=None, **kwargs):
         if not CREDSTASH_INSTALLED:
             raise AnsibleError('The credstash lookup plugin requires credstash to be installed.')
+
+        self.set_options(var_options=variables, direct=kwargs)
+
+        version = self.get_option('version')
+        region = self.get_option('region')
+        table = self.get_option('table')
+        profile_name = self.get_option('profile_name')
+        aws_access_key_id = self.get_option('aws_access_key_id')
+        aws_secret_access_key = self.get_option('aws_secret_access_key')
+        aws_session_token = self.get_option('aws_session_token')
+
+        context = dict(
+            (k, v) for k, v in kwargs.items()
+            if k not in ('version', 'region', 'table', 'profile_name', 'aws_access_key_id', 'aws_secret_access_key', 'aws_session_token')
+        )
+
+        kwargs_pass = {
+            'profile_name': profile_name,
+            'aws_access_key_id': aws_access_key_id,
+            'aws_secret_access_key': aws_secret_access_key,
+            'aws_session_token': aws_session_token,
+        }
 
         ret = []
         for term in terms:
             try:
-                version = kwargs.pop('version', '')
-                region = kwargs.pop('region', None)
-                table = kwargs.pop('table', 'credential-store')
-                profile_name = kwargs.pop('profile_name', os.getenv('AWS_PROFILE', None))
-                aws_access_key_id = kwargs.pop('aws_access_key_id', os.getenv('AWS_ACCESS_KEY_ID', None))
-                aws_secret_access_key = kwargs.pop('aws_secret_access_key', os.getenv('AWS_SECRET_ACCESS_KEY', None))
-                aws_session_token = kwargs.pop('aws_session_token', os.getenv('AWS_SESSION_TOKEN', None))
-                kwargs_pass = {'profile_name': profile_name, 'aws_access_key_id': aws_access_key_id,
-                               'aws_secret_access_key': aws_secret_access_key, 'aws_session_token': aws_session_token}
-                val = credstash.getSecret(term, version, region, table, context=kwargs, **kwargs_pass)
+                ret.append(credstash.getSecret(term, version, region, table, context=context, **kwargs_pass))
             except credstash.ItemNotFound:
                 raise AnsibleError('Key {0} not found'.format(term))
             except Exception as e:
                 raise AnsibleError('Encountered exception while fetching {0}: {1}'.format(term, e))
-            ret.append(val)
 
         return ret

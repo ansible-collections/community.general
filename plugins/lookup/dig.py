@@ -21,22 +21,26 @@ DOCUMENTATION = '''
       - In addition to (default) A record, it is also possible to specify a different record type that should be queried.
         This can be done by either passing-in additional parameter of format qtype=TYPE to the dig lookup, or by appending /TYPE to the FQDN being queried.
       - If multiple values are associated with the requested record, the results will be returned as a comma-separated list.
-        In such cases you may want to pass option wantlist=True to the plugin, which will result in the record values being returned as a list
-        over which you can iterate later on.
+        In such cases you may want to pass option I(wantlist=true) to the lookup call, or alternatively use C(query) instead of C(lookup),
+        which will result in the record values being returned as a list over which you can iterate later on.
       - By default, the lookup will rely on system-wide configured DNS servers for performing the query.
         It is also possible to explicitly specify DNS servers to query using the @DNS_SERVER_1,DNS_SERVER_2,...,DNS_SERVER_N notation.
         This needs to be passed-in as an additional parameter to the lookup
     options:
       _terms:
         description: Domain(s) to query.
+        type: list
+        elements: str
       qtype:
         description:
             - Record type to query.
             - C(DLV) has been removed in community.general 6.0.0.
+        type: str
         default: 'A'
         choices: [A, ALL, AAAA, CNAME, DNAME, DNSKEY, DS, HINFO, LOC, MX, NAPTR, NS, NSEC3PARAM, PTR, RP, RRSIG, SOA, SPF, SRV, SSHFP, TLSA, TXT]
       flat:
         description: If 0 each record is returned as a dictionary, otherwise a string.
+        type: int
         default: 1
       retry_servfail:
         description: Retry a nameserver if it returns SERVFAIL.
@@ -59,6 +63,11 @@ DOCUMENTATION = '''
         default: false
         type: bool
         version_added: 6.0.0
+      class:
+        description:
+          - "Class."
+        type: str
+        default: 'IN'
     notes:
       - ALL is not a record per-se, merely the listed fields are available for any record results you retrieve in the form of a dictionary.
       - While the 'dig' lookup plugin supports anything which dnspython supports out of the box, only a subset can be converted into a dictionary.
@@ -74,7 +83,7 @@ EXAMPLES = """
 
 - name: "The TXT record for example.org."
   ansible.builtin.debug:
-    msg: "{{ lookup('community.general.dig', 'example.org.', 'qtype=TXT') }}"
+    msg: "{{ lookup('community.general.dig', 'example.org.', qtype='TXT') }}"
 
 - name: "The TXT record for example.org, alternative syntax."
   ansible.builtin.debug:
@@ -83,24 +92,24 @@ EXAMPLES = """
 - name: use in a loop
   ansible.builtin.debug:
     msg: "MX record for gmail.com {{ item }}"
-  with_items: "{{ lookup('community.general.dig', 'gmail.com./MX', wantlist=True) }}"
+  with_items: "{{ lookup('community.general.dig', 'gmail.com./MX', wantlist=true) }}"
 
 - ansible.builtin.debug:
     msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '192.0.2.5/PTR') }}"
 - ansible.builtin.debug:
     msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '5.2.0.192.in-addr.arpa./PTR') }}"
 - ansible.builtin.debug:
-    msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '5.2.0.192.in-addr.arpa.', 'qtype=PTR') }}"
+    msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '5.2.0.192.in-addr.arpa.', qtype='PTR') }}"
 - ansible.builtin.debug:
     msg: "Querying 198.51.100.23 for IPv4 address for example.com. produces {{ lookup('dig', 'example.com', '@198.51.100.23') }}"
 
 - ansible.builtin.debug:
     msg: "XMPP service for gmail.com. is available at {{ item.target }} on port {{ item.port }}"
-  with_items: "{{ lookup('community.general.dig', '_xmpp-server._tcp.gmail.com./SRV', 'flat=0', wantlist=True) }}"
+  with_items: "{{ lookup('community.general.dig', '_xmpp-server._tcp.gmail.com./SRV', flat=0, wantlist=true) }}"
 
 - name: Retry nameservers that return SERVFAIL
   ansible.builtin.debug:
-    msg: "{{ lookup('community.general.dig', 'example.org./A', 'retry_servfail=True') }}"
+    msg: "{{ lookup('community.general.dig', 'example.org./A', retry_servfail=true) }}"
 """
 
 RETURN = """
@@ -279,9 +288,10 @@ class LookupModule(LookupBase):
 
             ... flat=0                                      # returns a dict; default is 1 == string
         '''
-
         if HAVE_DNS is False:
             raise AnsibleError("The dig lookup requires the python 'dnspython' library and it is not installed")
+
+        self.set_options(var_options=variables, direct=kwargs)
 
         # Create Resolver object so that we can set NS if necessary
         myres = dns.resolver.Resolver(configure=True)
@@ -289,11 +299,15 @@ class LookupModule(LookupBase):
         myres.use_edns(0, ednsflags=dns.flags.DO, payload=edns_size)
 
         domain = None
-        qtype = 'A'
-        flat = True
-        fail_on_error = False
-        real_empty = False
-        rdclass = dns.rdataclass.from_text('IN')
+        qtype = self.get_option('qtype')
+        flat = self.get_option('flat')
+        fail_on_error = self.get_option('fail_on_error')
+        real_empty = self.get_option('real_empty')
+        try:
+            rdclass = dns.rdataclass.from_text(self.get_option('class'))
+        except Exception as e:
+            raise AnsibleError("dns lookup illegal CLASS: %s" % to_native(e))
+        myres.retry_servfail = self.get_option('retry_servfail')
 
         for t in terms:
             if t.startswith('@'):       # e.g. "@10.0.1.2,192.0.2.1" is ok.
@@ -316,7 +330,7 @@ class LookupModule(LookupBase):
                 continue
             if '=' in t:
                 try:
-                    opt, arg = t.split('=')
+                    opt, arg = t.split('=', 1)
                 except Exception:
                     pass
 
