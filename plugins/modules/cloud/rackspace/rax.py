@@ -82,20 +82,17 @@ options:
     default: false
   extra_client_args:
     type: dict
-    default: {}
     description:
       - A hash of key/value pairs to be used when creating the cloudservers
         client. This is considered an advanced option, use it wisely and
         with caution.
   extra_create_args:
     type: dict
-    default: {}
     description:
       - A hash of key/value pairs to be used when creating a new server.
         This is considered an advanced option, use it wisely and with caution.
   files:
     type: dict
-    default: {}
     description:
       - Files to insert into the instance. remotefilename:localcontent
   flavor:
@@ -127,7 +124,6 @@ options:
       - keypair
   meta:
     type: dict
-    default: {}
     description:
       - A hash of metadata to associate with the instance
   name:

@@ -56,6 +56,7 @@ options:
     description:
       - Password for importing from PKCS12 keystore.
     type: str
+    default: ''
   pkcs12_alias:
     description:
       - Alias in the PKCS12 keystore.

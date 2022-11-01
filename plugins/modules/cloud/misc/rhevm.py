@@ -54,7 +54,6 @@ options:
         description:
             - The RHEV/oVirt cluster in which you want you VM to start.
         type: str
-        default: ''
     datacenter:
         description:
             - The RHEV/oVirt datacenter in which you want you VM to start.

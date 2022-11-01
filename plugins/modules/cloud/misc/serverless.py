@@ -35,13 +35,11 @@ options:
       - The name of the serverless framework project stage to deploy to.
       - This uses the serverless framework default "dev".
     type: str
-    default: ''
   region:
     description:
       - AWS region to deploy the service to.
       - This parameter defaults to C(us-east-1).
     type: str
-    default: ''
   deploy:
     description:
       - Whether or not to deploy artifacts after building them.
