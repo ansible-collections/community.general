@@ -62,7 +62,6 @@ options:
         and value is used to advise when the value is exceeded.
     type: list
     elements: dict
-    default: []
     suboptions:
       cpu:
         description:
@@ -89,7 +88,6 @@ options:
       - Array of ports that will be monitoring.
     type: list
     elements: dict
-    default: []
     suboptions:
       protocol:
         description:
@@ -114,7 +112,6 @@ options:
       - Array of processes that will be monitoring.
     type: list
     elements: dict
-    default: []
     suboptions:
       process:
         description:
@@ -131,56 +128,48 @@ options:
     type: list
     elements: dict
     required: false
-    default: []
   add_processes:
     description:
       - Processes to add to the monitoring policy.
     type: list
     elements: dict
     required: false
-    default: []
   add_servers:
     description:
       - Servers to add to the monitoring policy.
     type: list
     elements: str
     required: false
-    default: []
   remove_ports:
     description:
       - Ports to remove from the monitoring policy.
     type: list
     elements: str
     required: false
-    default: []
   remove_processes:
     description:
       - Processes to remove from the monitoring policy.
     type: list
     elements: str
     required: false
-    default: []
   remove_servers:
     description:
       - Servers to remove from the monitoring policy.
     type: list
     elements: str
     required: false
-    default: []
   update_ports:
     description:
       - Ports to be updated on the monitoring policy.
     type: list
     elements: dict
     required: false
-    default: []
   update_processes:
     description:
       - Processes to be updated on the monitoring policy.
     type: list
     elements: dict
     required: false
-    default: []
   wait:
     description:
       - wait for the instance to be in state 'running' before returning

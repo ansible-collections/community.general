@@ -17,7 +17,6 @@ options:
           - Is needed for some modules
         type: dict
         required: false
-        default: {}
     utm_host:
         description:
           - The REST Endpoint of the Sophos UTM.
