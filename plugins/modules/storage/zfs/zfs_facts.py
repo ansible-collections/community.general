@@ -51,6 +51,7 @@ options:
         description:
             - Specifies recursion depth.
         type: int
+        default: 0
 '''
 
 EXAMPLES = '''

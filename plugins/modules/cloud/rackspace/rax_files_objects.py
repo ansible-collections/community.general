@@ -39,6 +39,7 @@ options:
         Requires an integer, specifying expiration in seconds
   meta:
     type: dict
+    default: {}
     description:
       - A hash of items to set as metadata values on an uploaded file or folder
   method:

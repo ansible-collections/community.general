@@ -41,6 +41,7 @@ options:
         type: str
         description:
           - An optional comment to add to the dns host object
+        default: ''
     hostname:
         type: str
         description:
@@ -49,6 +50,7 @@ options:
         type: str
         description:
           - The reference name of the interface to use. If not provided the default interface will be used
+        default: ''
     resolved:
         description:
           - whether the hostname's ipv4 address is already resolved or not

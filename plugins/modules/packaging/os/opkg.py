@@ -46,6 +46,7 @@ options:
             - "remove"
             - "checksum"
             - "removal-of-dependent-packages"
+        default: ""
         type: str
     update_cache:
         description:

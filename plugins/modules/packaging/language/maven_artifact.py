@@ -50,6 +50,7 @@ options:
         type: str
         description:
             - The maven classifier coordinate
+        default: ''
     extension:
         type: str
         description:

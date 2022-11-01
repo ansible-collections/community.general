@@ -22,6 +22,7 @@ options:
     description:
       - The password to use with I(bind_dn).
     type: str
+    default: ''
   dn:
     required: true
     description:

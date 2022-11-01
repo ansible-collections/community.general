@@ -97,6 +97,7 @@ options:
         port_balancer, and port_server parameters, in addition to source parameter, which is optional.
     type: list
     elements: dict
+    default: []
   description:
     description:
       - Description of the load balancer. maxLength=256
@@ -109,12 +110,14 @@ options:
     type: list
     elements: str
     required: false
+    default: []
   remove_server_ips:
     description:
       - A list of server IP ids to be unassigned from a load balancer. Used in combination with update state.
     type: list
     elements: str
     required: false
+    default: []
   add_rules:
     description:
       - A list of rules that will be added to an existing load balancer.
@@ -122,12 +125,14 @@ options:
     type: list
     elements: dict
     required: false
+    default: []
   remove_rules:
     description:
       - A list of rule ids that will be removed from an existing load balancer. Used in combination with update state.
     type: list
     elements: str
     required: false
+    default: []
   wait:
     description:
       - wait for the instance to be in state 'running' before returning
