@@ -19,7 +19,8 @@ DOCUMENTATION = '''
         elements: raw
         required: true
     notes:
-      - Unlike 'items' which only flattens 1 level, this plugin will continue to flatten until it cannot find lists anymore.
+      - Unlike the R(items lookup,ansible_collections.ansible.builtin.items_lookup) which only flattens 1 level,
+        this plugin will continue to flatten until it cannot find lists anymore.
       - Aka highlander plugin, there can only be one (list).
 '''
 
