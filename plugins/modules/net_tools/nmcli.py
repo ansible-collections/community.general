@@ -2135,7 +2135,8 @@ class Nmcli(object):
             elif all([key == self.mtu_setting, self.type == 'dummy', current_value is None, value == 'auto', self.mtu is None]):
                 value = None
             else:
-                if current_value != to_text(value):
+                value = to_text(value)
+                if current_value != value:
                     changed = True
 
             diff_before[key] = current_value
