@@ -61,6 +61,7 @@ options:
     description:
       - Description of the function namespace.
     type: str
+    default: ''
 
   environment_variables:
     description:
