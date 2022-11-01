@@ -15,9 +15,11 @@ DOCUMENTATION = '''
         - It is clearer with an example, it turns [1, 2, 3], [a, b] into [1, a], [1, b], [2, a], [2, b], [3, a], [3, b].
          You can see the exact syntax in the examples section.
     options:
-      _raw:
+      _terms:
         description:
           - a set of lists
+        type: list
+        elements: list
         required: true
 '''
 
@@ -69,6 +71,7 @@ class LookupModule(LookupBase):
         return results
 
     def run(self, terms, variables=None, **kwargs):
+        self.set_options(var_options=variables, direct=kwargs)
 
         terms = self._lookup_variables(terms)
 
