@@ -87,6 +87,7 @@ options:
       I(ip_addresses) hash to resolve an IP address to target.
   details:
     type: dict
+    default: {}
     description:
     - Additional details specific to the check type. Must be a hash of strings
       between 1 and 255 characters long, or an array or object containing 0 to
@@ -98,6 +99,7 @@ options:
     default: false
   metadata:
     type: dict
+    default: {}
     description:
     - Hash of arbitrary key-value pairs to accompany this check if it fires.
       Keys and values must be strings between 1 and 255 characters long.
