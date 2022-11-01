@@ -49,12 +49,14 @@ options:
     - This is a list, which may contain address and phrase portions.
     type: list
     elements: str
+    default: []
   bcc:
     description:
     - The email-address(es) the mail is being 'blind' copied to.
     - This is a list, which may contain address and phrase portions.
     type: list
     elements: str
+    default: []
   subject:
     description:
     - The subject of the email being sent.

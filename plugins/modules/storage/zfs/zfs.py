@@ -38,6 +38,7 @@ options:
       - A dictionary of zfs properties to be set.
       - See the zfs(8) man page for more information.
     type: dict
+    default: {}
 notes:
   - C(check_mode) is supported, but in certain situations it may report a task
     as changed that will not be reported as changed when C(check_mode) is disabled.
