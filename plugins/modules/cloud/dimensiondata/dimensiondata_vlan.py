@@ -31,6 +31,7 @@ options:
     description:
       - A description of the VLAN.
     type: str
+    default: ''
   network_domain:
     description:
       - The Id or name of the target network domain.
@@ -40,11 +41,13 @@ options:
     description:
         - The base address for the VLAN's IPv4 network (e.g. 192.168.1.0).
     type: str
+    default: ''
   private_ipv4_prefix_size:
     description:
         - The size of the IPv4 address space, e.g 24.
         - Required, if C(private_ipv4_base_address) is specified.
     type: int
+    default: 0
   state:
     description:
       - The desired state for the target VLAN.

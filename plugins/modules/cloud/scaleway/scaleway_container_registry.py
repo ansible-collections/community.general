@@ -60,6 +60,7 @@ options:
     description:
       - Description of the container registry.
     type: str
+    default: ''
 
   privacy_policy:
     type: str

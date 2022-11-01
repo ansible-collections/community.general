@@ -42,27 +42,22 @@ options:
     description:
       - Network ID.
     type: str
-    default: ''
   ip_address:
     description:
       - IP Address for a reservation or a release.
     type: str
-    default: ''
   network_address:
     description:
       - Network address with CIDR format (e.g., 192.168.310.0).
     type: str
-    default: ''
   network_size:
     description:
       - Network bitmask (e.g. 255.255.255.220) or CIDR format (e.g., /26).
     type: str
-    default: ''
   network_name:
     description:
       - The name of a network.
     type: str
-    default: ''
   network_location:
     description:
       - The parent network id for a given network.

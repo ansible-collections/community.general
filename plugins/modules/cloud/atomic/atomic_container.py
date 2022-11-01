@@ -61,6 +61,7 @@ options:
             - The values specified here will be used at installation time as --set arguments for atomic install.
         type: list
         elements: str
+        default: []
 '''
 
 EXAMPLES = r'''
