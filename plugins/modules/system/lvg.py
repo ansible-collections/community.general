@@ -42,6 +42,7 @@ options:
     description:
     - Additional options to pass to C(pvcreate) when creating the volume group.
     type: str
+    default: ''
   pvresize:
     description:
     - If C(true), resize the physical volume to the maximum available size.
@@ -52,6 +53,7 @@ options:
     description:
     - Additional options to pass to C(vgcreate) when creating the volume group.
     type: str
+    default: ''
   state:
     description:
     - Control if the volume group exists.
