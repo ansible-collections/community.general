@@ -44,7 +44,6 @@ options:
             - The default TTL for all records created in the zone. This must be a
               valid int from U(https://www.memset.com/apidocs/methods_dns.html#dns.zone_create).
         type: int
-        default: 0
         choices: [ 0, 300, 600, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400 ]
     force:
         required: false

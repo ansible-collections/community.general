@@ -66,7 +66,6 @@ options:
   tags:
     type: list
     elements: str
-    default: []
     description:
     - List of tags to apply to the load-balancer
 

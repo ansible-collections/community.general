@@ -136,7 +136,6 @@ options:
       - URL of custom iPXE script for provisioning.
       - More about custom iPXE for Packet devices at U(https://help.packet.net/technical/infrastructure/custom-ipxe).
     type: str
-    default: ''
 
   always_pxe:
     description:

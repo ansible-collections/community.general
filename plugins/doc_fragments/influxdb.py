@@ -43,7 +43,6 @@ options:
     - The path on which InfluxDB server is accessible
     - Only available when using python-influxdb >= 5.1.0
     type: str
-    default: ''
     version_added: '0.2.0'
   validate_certs:
     description:
@@ -81,5 +80,4 @@ options:
     description:
     - HTTP(S) proxy to use for Requests to connect to InfluxDB server.
     type: dict
-    default: {}
 '''

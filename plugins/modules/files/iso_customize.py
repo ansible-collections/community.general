@@ -40,7 +40,6 @@ options:
     type: list
     required: false
     elements: str
-    default: []
   add_files:
     description:
     - Allows to add and replace files in the ISO file.
@@ -48,7 +47,6 @@ options:
     type: list
     required: false
     elements: dict
-    default: []
     suboptions:
       src_file:
         description:

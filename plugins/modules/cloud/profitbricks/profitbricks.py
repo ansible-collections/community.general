@@ -38,7 +38,6 @@ options:
       - Public SSH keys allowing access to the virtual machine.
     type: list
     elements: str
-    default: []
   datacenter:
     description:
       - The datacenter to provision this virtual machine.
@@ -75,7 +74,6 @@ options:
       - list of instance ids, currently only used when state='absent' to remove instances.
     type: list
     elements: str
-    default: []
   count:
     description:
       - The number of virtual machines to create.

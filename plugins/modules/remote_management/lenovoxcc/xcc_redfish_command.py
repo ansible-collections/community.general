@@ -70,7 +70,6 @@ options:
           - The list of media types appropriate for the image.
         type: list
         elements: str
-        default: []
       image_url:
         description:
           - The URL of the image to insert or eject.

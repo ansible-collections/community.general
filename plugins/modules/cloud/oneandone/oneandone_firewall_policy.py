@@ -48,7 +48,6 @@ options:
         (port_from, port_to, and source)
     type: list
     elements: dict
-    default: []
   add_server_ips:
     description:
       - A list of server identifiers (id or name) to be assigned to a firewall policy.
@@ -56,14 +55,12 @@ options:
     type: list
     elements: str
     required: false
-    default: []
   remove_server_ips:
     description:
       - A list of server IP ids to be unassigned from a firewall policy. Used in combination with update state.
     type: list
     elements: str
     required: false
-    default: []
   add_rules:
     description:
       - A list of rules that will be added to an existing firewall policy.
@@ -71,14 +68,12 @@ options:
     type: list
     elements: dict
     required: false
-    default: []
   remove_rules:
     description:
       - A list of rule ids that will be removed from an existing firewall policy. Used in combination with update state.
     type: list
     elements: str
     required: false
-    default: []
   description:
     description:
       - Firewall policy description. maxLength=256

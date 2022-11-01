@@ -62,13 +62,11 @@ options:
       - List of server identifiers (name or id) to be added to the private network.
     type: list
     elements: str
-    default: []
   remove_members:
     description:
       - List of server identifiers (name or id) to be removed from the private network.
     type: list
     elements: str
-    default: []
   wait:
     description:
       - wait for the instance to be in state 'running' before returning
