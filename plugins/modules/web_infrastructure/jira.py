@@ -161,6 +161,7 @@ options:
        and the JIRA REST API for the structure required for various fields.
      - When passed to comment, the data structure is merged at the first level since community.general 4.6.0. Useful to add JIRA properties for example.
      - Note that JIRA may not allow changing field values on specific transitions or states.
+    default: {}
 
   jql:
     required: false

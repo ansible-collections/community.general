@@ -127,7 +127,6 @@ options:
     description:
       - Name or id of the contact list that the monitor will notify.
       - The default C('') means the Account Owner.
-    default: ''
     type: str
 
   httpFqdn:

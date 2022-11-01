@@ -38,6 +38,7 @@ options:
       bound. Necessary to collect C(agent.) rax_mon_checks against this entity.
   named_ip_addresses:
     type: dict
+    default: {}
     description:
     - Hash of IP addresses that may be referenced by name by rax_mon_checks
       added to this entity. Must be a dictionary of with keys that are names
@@ -45,6 +46,7 @@ options:
       addresses.
   metadata:
     type: dict
+    default: {}
     description:
     - Hash of arbitrary C(name), C(value) pairs that are passed to associated
       rax_mon_alarms. Names and values must all be between 1 and 255 characters

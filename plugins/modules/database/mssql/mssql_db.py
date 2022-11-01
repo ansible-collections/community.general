@@ -27,10 +27,12 @@ options:
     description:
       - The username used to authenticate with
     type: str
+    default: ''
   login_password:
     description:
       - The password used to authenticate with
     type: str
+    default: ''
   login_host:
     description:
       - Host running the database
