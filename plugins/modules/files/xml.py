@@ -40,6 +40,7 @@ options:
     - The namespace C(prefix:uri) mapping for the XPath expression.
     - Needs to be a C(dict), not a C(list) of items.
     type: dict
+    default: {}
   state:
     description:
     - Set or remove an xpath selection (node(s), attribute(s)).

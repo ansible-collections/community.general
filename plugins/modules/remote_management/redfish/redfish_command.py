@@ -116,6 +116,7 @@ options:
     description:
       - Properties of account service to update.
     type: dict
+    default: {}
     version_added: '0.2.0'
   resource_id:
     required: false
@@ -141,6 +142,7 @@ options:
       - List of target resource URIs to apply the update to.
     type: list
     elements: str
+    default: []
     version_added: '0.2.0'
   update_creds:
     required: false
@@ -172,6 +174,7 @@ options:
           - List of media types appropriate for the image.
         type: list
         elements: str
+        default: []
       image_url:
         required: false
         description:

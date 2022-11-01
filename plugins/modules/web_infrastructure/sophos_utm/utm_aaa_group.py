@@ -33,10 +33,12 @@ options:
           - List of adirectory group strings.
         type: list
         elements: str
+        default: []
     adirectory_groups_sids:
         description:
           - Dictionary of group sids.
         type: dict
+        default: {}
     backend_match:
         description:
           - The backend for the group.
@@ -68,18 +70,22 @@ options:
           - List of edirectory group strings.
         type: list
         elements: str
+        default: []
     ipsec_dn:
         description:
           - The ipsec dn string.
         type: str
+        default: ''
     ldap_attribute:
         description:
           - The ldap attribute to check against.
         type: str
+        default: ''
     ldap_attribute_value:
         description:
           - The ldap attribute value to check against.
         type: str
+        default: ''
     members:
         description:
           - A list of user ref names (aaa/user).

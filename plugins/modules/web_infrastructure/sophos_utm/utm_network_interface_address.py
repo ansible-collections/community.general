@@ -42,6 +42,7 @@ options:
         type: str
         description:
           - An optional comment to add to the object
+        default: ''
     resolved:
         type: bool
         description:

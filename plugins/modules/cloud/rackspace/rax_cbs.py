@@ -26,6 +26,7 @@ options:
         C(name). This option requires C(pyrax>=1.9.3).
   meta:
     type: dict
+    default: {}
     description:
       - A hash of metadata to associate with the volume.
   name:
