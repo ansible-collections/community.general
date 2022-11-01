@@ -38,6 +38,7 @@ options:
       - Used to set an expiration in seconds on an uploaded file or folder.
   meta:
     type: dict
+    default: {}
     description:
       - Items to set as metadata values on an uploaded file or folder.
   method:

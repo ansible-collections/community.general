@@ -62,11 +62,13 @@ options:
     description:
     - Free-form options to be passed to the mklv command.
     type: str
+    default: ''
   pvs:
     description:
     - A list of physical volumes e.g. C(hdisk1,hdisk2).
     type: list
     elements: str
+    default: []
 '''
 
 EXAMPLES = r'''
