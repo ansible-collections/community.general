@@ -29,6 +29,7 @@ options:
       - Server name to modify metadata for
   meta:
     type: dict
+    default: {}
     description:
       - A hash of metadata to associate with the instance
 author: "Matt Martz (@sivel)"

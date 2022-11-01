@@ -49,7 +49,7 @@ options:
       - Public SSH keys allowing access to the virtual machine.
     type: list
     elements: str
-    required: false
+    default: []
   disk_type:
     description:
       - The disk type of the volume.
@@ -80,7 +80,7 @@ options:
       - list of instance ids, currently only used when state='absent' to remove instances.
     type: list
     elements: str
-    required: false
+    default: []
   subscription_user:
     description:
       - The ProfitBricks username. Overrides the PB_SUBSCRIPTION_ID environment variable.

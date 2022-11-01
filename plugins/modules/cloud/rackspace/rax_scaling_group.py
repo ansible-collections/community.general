@@ -36,6 +36,7 @@ options:
       - manual
   files:
     type: dict
+    default: {}
     description:
       - 'Files to insert into the instance. Hash of C(remotepath: localpath)'
   flavor:
@@ -65,6 +66,7 @@ options:
     required: true
   meta:
     type: dict
+    default: {}
     description:
       - A hash of metadata to associate with the instance
   min_entities:

@@ -168,6 +168,7 @@ options:
         description:
             - List of telephone numbers.
         type: list
+        default: []
     postcode:
         description:
             - Postal code of users business address.
@@ -199,11 +200,13 @@ options:
                join."
         aliases: [ sambaPrivileges ]
         type: list
+        default: []
     samba_user_workstations:
         description:
             - Allow the authentication only on this Microsoft Windows host.
         aliases: [ sambaUserWorkstations ]
         type: list
+        default: []
     sambahome:
         description:
             - Windows home path, e.g. C('\\$FQDN\$USERNAME').

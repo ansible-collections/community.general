@@ -42,11 +42,13 @@ options:
     nameserver:
         type: list
         elements: str
+        default: []
         description:
             - List of appropriate name servers. Required if C(state=present).
     interfaces:
         type: list
         elements: str
+        default: []
         description:
             - List of interface IP addresses, on which the server should
               response this zone. Required if C(state=present).
