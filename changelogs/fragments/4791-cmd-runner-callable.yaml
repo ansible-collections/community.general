@@ -1,2 +1,0 @@
-minor_changes:
-  - cmd_runner module utils - add ``__call__`` method to invoke context (https://github.com/ansible-collections/community.general/pull/4791).

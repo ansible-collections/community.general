@@ -1,2 +1,0 @@
-minor_changes:
-  - seport - added new argument ``local`` (https://github.com/ansible-collections/community.general/pull/5203)

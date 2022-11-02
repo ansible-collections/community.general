@@ -1,2 +1,0 @@
-minor_changes:
-  - nagios - minor refactoring on parameter validation for different actions (https://github.com/ansible-collections/community.general/pull/5239).

@@ -1,2 +1,0 @@
-minor_changes:
-  - keycloak_* modules - add ``http_agent`` parameter with default value ``Ansible`` (https://github.com/ansible-collections/community.general/issues/5023).

@@ -1,2 +1,0 @@
-minor_changes:
-  - "proxmox inventory plugin - simplify option handling code (https://github.com/ansible-collections/community.general/pull/5437)."

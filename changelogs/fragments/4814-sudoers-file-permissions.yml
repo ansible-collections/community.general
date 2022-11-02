@@ -1,2 +1,0 @@
-bugfixes:
-  - sudoers - ensure sudoers config files are created with the permissions requested by sudoers (0440) (https://github.com/ansible-collections/community.general/pull/4814).

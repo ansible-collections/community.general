@@ -1,2 +1,0 @@
-bugfixes:
-  - passwordstore lookup plugin - fix ``returnall`` for gopass (https://github.com/ansible-collections/community.general/pull/5027).

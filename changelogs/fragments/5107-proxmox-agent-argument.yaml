@@ -1,2 +1,0 @@
-minor_changes:
-  - proxmox_kvm - allow ``agent`` argument to be a string (https://github.com/ansible-collections/community.general/pull/5107).

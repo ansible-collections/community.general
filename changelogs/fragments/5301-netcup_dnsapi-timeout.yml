@@ -1,2 +1,0 @@
-minor_changes:
-  - netcup_dnsapi - add ``timeout`` parameter (https://github.com/ansible-collections/community.general/pull/5301).

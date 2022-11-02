@@ -1,2 +1,0 @@
-deprecated_features:
-  - proxmox - deprecated the current ``unprivileged`` default value, will be changed to ``true`` in community.general 7.0.0 (https://github.com/pull/5224).

@@ -1,2 +1,0 @@
-minor_changes:
-  - consul_session - adds ``token`` parameter for session (https://github.com/ansible-collections/community.general/pull/5193).

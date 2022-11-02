@@ -1,2 +1,0 @@
-deprecated_features:
-  - xfconf - deprecated parameter ``disable_facts``, as since version 4.0.0 it only allows value ``true`` (https://github.com/ansible-collections/community.general/pull/4520).
