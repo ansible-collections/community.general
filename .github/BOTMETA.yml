@@ -462,9 +462,9 @@ files:
     maintainers: $team_scaleway
   $modules/scaleway_compute_private_network.py:
     maintainers: pastral
-  $modules/cloud/scaleway/scaleway_container_namespace.py:
+  $modules/scaleway_container_namespace.py:
      maintainers: Lunik
-  $modules/cloud/scaleway/scaleway_container_namespace_info.py:
+  $modules/scaleway_container_namespace_info.py:
      maintainers: Lunik
   $modules/scaleway_container_registry.py:
      maintainers: Lunik
