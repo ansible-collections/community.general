@@ -1,3 +1,0 @@
-minor_changes:
-  - proxmox inventory plugin - added new flag ``qemu_extended_statuses`` and new groups ``<group_prefix>prelaunch``, ``<group_prefix>paused``. They will be populated only when ``want_facts=true``, ``qemu_extended_statuses=true`` and only for ``QEMU`` machines
-    (https://github.com/ansible-collections/community.general/pull/4723).

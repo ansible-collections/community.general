@@ -1,2 +1,0 @@
-bugfixes:
-  - redhat_subscription - fix unsubscribing on RHEL 9 (https://github.com/ansible-collections/community.general/issues/4741).

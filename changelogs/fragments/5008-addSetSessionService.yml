@@ -1,2 +1,0 @@
-minor_changes:
-  - redfish_config - add ``SetSessionService`` to set default session timeout policy (https://github.com/ansible-collections/community.general/issues/5008).

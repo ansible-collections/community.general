@@ -1,2 +1,0 @@
-minor_changes:
-  - znode - possibility to use ZooKeeper ACL authentication (https://github.com/ansible-collections/community.general/pull/5306).

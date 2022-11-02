@@ -1,5 +1,0 @@
-bugfixes:
-  - lxc_container - the module has been updated to support Python 3 (https://github.com/ansible-collections/community.general/pull/5304).
-
-deprecated_features:
-  - lxc_container - the module will no longer make any effort to support Python 2 (https://github.com/ansible-collections/community.general/pull/5304). 

@@ -1,2 +1,0 @@
-bugfixes:
-  - "alternatives - do not set the priority if the priority was not set by the user (https://github.com/ansible-collections/community.general/pull/4810)."

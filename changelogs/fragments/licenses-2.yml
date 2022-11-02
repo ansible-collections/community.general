@@ -1,2 +1,0 @@
-minor_changes:
-  - "The collection repository conforms to the `REUSE specification <https://reuse.software/spec/>`__ except for the changelog fragments (https://github.com/ansible-collections/community.general/pull/5138)."

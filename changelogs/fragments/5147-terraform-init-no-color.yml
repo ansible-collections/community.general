@@ -1,2 +1,0 @@
-minor_changes:
-  - terraform - run ``terraform init`` with ``-no-color`` not to mess up the stdout of the task (https://github.com/ansible-collections/community.general/pull/5147).

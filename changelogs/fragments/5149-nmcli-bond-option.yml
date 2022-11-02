@@ -1,2 +1,0 @@
-minor_changes:
-  - nmcli - add bond option ``xmit_hash_policy`` to bond options (https://github.com/ansible-collections/community.general/issues/5148).
