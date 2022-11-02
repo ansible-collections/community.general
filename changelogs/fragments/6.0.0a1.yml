@@ -1,0 +1,4 @@
+release_summary: >-
+  This is a pre-release for the upcoming 6.0.0 major release. The main objective of this
+  pre-release is to make it possible to test the large stuctural changes by flattening
+  the directory structure. See the corresponding entry in the changelog for details.
