@@ -1,0 +1,8 @@
+major_changes:
+  - "The internal structure of the collection was changed for modules and action plugins.
+     These no longer live in a directory hierarchy ordered by topic, but instead are now all in a single (flat) directory.
+     This has no impact on users *assuming they did not use internal FQCNs*. These will still work, but result in deprecation warnings.
+     They were never officially supported and thus the redirects are kept as a courtsey, and this is not labelled as a breaking change.
+     Note that for example the Ansible VScode plugin started recommending these internal names. If you followed its recommendation,
+     you will now have to change back to the short names to avoid deprecation warnings, and potential errors in the future as
+     these redirects will be removed in community.general 9.0.0 (https://github.com/ansible-collections/community.general/pull/5461)."

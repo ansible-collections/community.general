@@ -112,19 +112,9 @@ Creating new modules and plugins requires a bit more work than other Pull Reques
    - Make sure that new plugins and modules have tests (unit tests, integration tests, or both); it is preferable to have some tests
      which run in CI.
 
-4. For modules and action plugins, make sure to create your module/plugin in the correct subdirectory, and add a redirect entry
-   in `meta/runtime.yml`. For example, for the `aerospike_migrations` module located in
-   `plugins/modules/database/aerospike/aerospike_migrations.py`, you need to create the following entry:
-   ```.yaml
-       aerospike_migrations:
-         redirect: community.general.database.aerospike.aerospike_migrations
-   ```
-   Here, the relative path `database/aerospike/` is inserted into the module's FQCN (Fully Qualified Collection Name) after the
-   collection's name and before the module's name. This must not be done for other plugin types but modules and action plugins!
-
-   - Action plugins need to be accompanied by a module, even if the module file only contains documentation
-     (`DOCUMENTATION`, `EXAMPLES` and `RETURN`). The module must have the same name and directory path in `plugins/modules/`
-     than the action plugin has in `plugins/action/`.
+4. Action plugins need to be accompanied by a module, even if the module file only contains documentation
+   (`DOCUMENTATION`, `EXAMPLES` and `RETURN`). The module must have the same name and directory path in `plugins/modules/`
+   than the action plugin has in `plugins/action/`.
 
 5. Make sure to add a BOTMETA entry for your new module/plugin in `.github/BOTMETA.yml`. Search for other plugins/modules in the
    same directory to see how entries could look. You should list all authors either as `maintainers` or under `ignore`. People
