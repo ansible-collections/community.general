@@ -160,8 +160,8 @@ def absent_strategy(api, wished_cn):
     changed = False
 
     cn_list = api.fetch_all_resources("namespaces")
-    cn_lookup = dict((fn["name"], fn)
-                     for fn in cn_list)
+    cn_lookup = dict((cn["name"], cn)
+                     for cn in cn_list)
 
     if wished_cn["name"] not in cn_lookup:
         return changed, {}
@@ -185,8 +185,8 @@ def present_strategy(api, wished_cn):
     changed = False
 
     cn_list = api.fetch_all_resources("namespaces")
-    cn_lookup = dict((fn["name"], fn)
-                     for fn in cn_list)
+    cn_lookup = dict((cn["name"], cn)
+                     for cn in cn_list)
 
     payload_cn = payload_from_wished_cn(wished_cn)
 
