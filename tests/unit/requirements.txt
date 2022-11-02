@@ -41,3 +41,6 @@ dataclasses ; python_version == '3.6'
 
 # requirement for the elastic callback plugin
 elastic-apm ; python_version >= '3.6'
+
+# requirements for scaleway modules
+passlib[argon2]
