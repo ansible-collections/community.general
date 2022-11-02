@@ -468,6 +468,10 @@ files:
      maintainers: Lunik
   $modules/cloud/scaleway/scaleway_database_backup.py:
     maintainers: guillaume_ro_fr
+  $modules/cloud/scaleway/scaleway_function_namespace.py:
+     maintainers: Lunik
+  $modules/cloud/scaleway/scaleway_function_namespace_info.py:
+     maintainers: Lunik
   $modules/cloud/scaleway/scaleway_image_info.py:
     maintainers: Spredzy
   $modules/cloud/scaleway/scaleway_ip_info.py:
