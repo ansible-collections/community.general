@@ -9,7 +9,7 @@ import json
 import pytest
 
 
-from ansible_collections.community.general.plugins.modules.cloud.scaleway import scaleway_compute_private_network
+from ansible_collections.community.general.plugins.modules import scaleway_compute_private_network
 from ansible_collections.community.general.plugins.module_utils.scaleway import Scaleway, Response
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from ansible_collections.community.general.tests.unit.compat.mock import patch

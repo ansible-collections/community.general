@@ -9,7 +9,7 @@ from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
-from ansible_collections.community.general.plugins.modules.web_infrastructure import jenkins_build
+from ansible_collections.community.general.plugins.modules import jenkins_build
 
 import json
 
@@ -98,14 +98,14 @@ class TestJenkinsBuild(unittest.TestCase):
         self.mock_module_helper.start()
         self.addCleanup(self.mock_module_helper.stop)
 
-    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies')
     def test_module_fail_when_required_args_missing(self, test_deps):
         test_deps.return_value = None
         with self.assertRaises(AnsibleFailJson):
             set_module_args({})
             jenkins_build.main()
 
-    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies')
     def test_module_fail_when_missing_build_number(self, test_deps):
         test_deps.return_value = None
         with self.assertRaises(AnsibleFailJson):
@@ -115,8 +115,8 @@ class TestJenkinsBuild(unittest.TestCase):
             })
             jenkins_build.main()
 
-    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
-    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.JenkinsBuild.get_jenkins_connection')
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies')
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.JenkinsBuild.get_jenkins_connection')
     def test_module_create_build(self, jenkins_connection, test_deps):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()
@@ -129,8 +129,8 @@ class TestJenkinsBuild(unittest.TestCase):
             })
             jenkins_build.main()
 
-    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
-    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.JenkinsBuild.get_jenkins_connection')
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies')
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.JenkinsBuild.get_jenkins_connection')
     def test_module_stop_build(self, jenkins_connection, test_deps):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()
@@ -147,8 +147,8 @@ class TestJenkinsBuild(unittest.TestCase):
 
         self.assertTrue(return_json.exception.args[0]['changed'])
 
-    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
-    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.JenkinsBuild.get_jenkins_connection')
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies')
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.JenkinsBuild.get_jenkins_connection')
     def test_module_stop_build_again(self, jenkins_connection, test_deps):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMockIdempotent()
@@ -165,8 +165,8 @@ class TestJenkinsBuild(unittest.TestCase):
 
         self.assertFalse(return_json.exception.args[0]['changed'])
 
-    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
-    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.JenkinsBuild.get_jenkins_connection')
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.test_dependencies')
+    @patch('ansible_collections.community.general.plugins.modules.jenkins_build.JenkinsBuild.get_jenkins_connection')
     def test_module_delete_build(self, jenkins_connection, test_deps):
         test_deps.return_value = None
         jenkins_connection.return_value = JenkinsMock()

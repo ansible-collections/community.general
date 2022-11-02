@@ -6,9 +6,9 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch, call
-from ansible_collections.community.general.plugins.modules.system import parted as parted_module
-from ansible_collections.community.general.plugins.modules.system.parted import parse_parted_version
-from ansible_collections.community.general.plugins.modules.system.parted import parse_partition_info
+from ansible_collections.community.general.plugins.modules import parted as parted_module
+from ansible_collections.community.general.plugins.modules.parted import parse_parted_version
+from ansible_collections.community.general.plugins.modules.parted import parse_partition_info
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 # Example of output : parted -s -m /dev/sdb -- unit 'MB' print
@@ -133,10 +133,10 @@ class TestParted(ModuleTestCase):
         super(TestParted, self).setUp()
 
         self.module = parted_module
-        self.mock_check_parted_label = (patch('ansible_collections.community.general.plugins.modules.system.parted.check_parted_label', return_value=False))
+        self.mock_check_parted_label = (patch('ansible_collections.community.general.plugins.modules.parted.check_parted_label', return_value=False))
         self.check_parted_label = self.mock_check_parted_label.start()
 
-        self.mock_parted = (patch('ansible_collections.community.general.plugins.modules.system.parted.parted'))
+        self.mock_parted = (patch('ansible_collections.community.general.plugins.modules.parted.parted'))
         self.parted = self.mock_parted.start()
 
         self.mock_run_command = (patch('ansible.module_utils.basic.AnsibleModule.run_command'))
@@ -192,7 +192,7 @@ class TestParted(ModuleTestCase):
             'number': 1,
             'state': 'present',
         })
-        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
+        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
             self.execute_module(changed=False)
 
     def test_create_new_partition(self):
@@ -201,7 +201,7 @@ class TestParted(ModuleTestCase):
             'number': 4,
             'state': 'present',
         })
-        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
+        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
             self.execute_module(changed=True, script='unit KiB mkpart primary 0% 100%')
 
     def test_create_new_partition_1G(self):
@@ -211,7 +211,7 @@ class TestParted(ModuleTestCase):
             'state': 'present',
             'part_end': '1GiB',
         })
-        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
+        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
             self.execute_module(changed=True, script='unit KiB mkpart primary 0% 1GiB')
 
     def test_create_new_partition_minus_1G(self):
@@ -222,7 +222,7 @@ class TestParted(ModuleTestCase):
             'fs_type': 'ext2',
             'part_start': '-1GiB',
         })
-        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
+        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
             self.execute_module(changed=True, script='unit KiB mkpart primary ext2 -1GiB 100%')
 
     def test_remove_partition_number_1(self):
@@ -231,7 +231,7 @@ class TestParted(ModuleTestCase):
             'number': 1,
             'state': 'absent',
         })
-        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
+        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
             self.execute_module(changed=True, script='rm 1')
 
     def test_resize_partition(self):
@@ -242,7 +242,7 @@ class TestParted(ModuleTestCase):
             'part_end': '100%',
             'resize': True
         })
-        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
+        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
             self.execute_module(changed=True, script='resizepart 3 100%')
 
     def test_change_flag(self):
@@ -258,7 +258,7 @@ class TestParted(ModuleTestCase):
             '_ansible_check_mode': True,
         })
 
-        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
+        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
             self.parted.reset_mock()
             self.execute_module(changed=True)
             # When using multiple flags:
@@ -282,7 +282,7 @@ class TestParted(ModuleTestCase):
             'fs_type': 'ext3',
             '_ansible_check_mode': True,
         })
-        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
+        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
             self.execute_module(changed=True, script='unit KiB mkpart primary ext3 257GiB 100% unit KiB set 4 boot on')
 
     def test_create_label_gpt(self):
@@ -298,7 +298,7 @@ class TestParted(ModuleTestCase):
             'state': 'present',
             '_ansible_check_mode': True,
         })
-        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict2):
+        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict2):
             self.execute_module(changed=True, script='unit KiB mklabel gpt mkpart primary 0% 100% unit KiB name 1 \'"lvmpartition"\' set 1 lvm on')
 
     def test_change_label_gpt(self):
@@ -311,7 +311,7 @@ class TestParted(ModuleTestCase):
             'label': 'gpt',
             '_ansible_check_mode': True,
         })
-        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
+        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict1):
             self.execute_module(changed=True, script='unit KiB mklabel gpt mkpart primary 0% 100%')
 
     def test_check_mode_unchanged(self):
@@ -324,7 +324,7 @@ class TestParted(ModuleTestCase):
             'flags': ['some_flag'],
             '_ansible_check_mode': True,
         })
-        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict3):
+        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict3):
             self.execute_module(changed=False)
 
     def test_check_mode_changed(self):
@@ -337,7 +337,7 @@ class TestParted(ModuleTestCase):
             'flags': ['other_flag'],
             '_ansible_check_mode': True,
         })
-        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict3):
+        with patch('ansible_collections.community.general.plugins.modules.parted.get_device_info', return_value=parted_dict3):
             self.execute_module(changed=True)
 
     def test_version_info(self):

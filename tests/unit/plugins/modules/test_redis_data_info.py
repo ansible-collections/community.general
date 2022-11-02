@@ -12,7 +12,7 @@ import pytest
 import json
 from redis import __version__
 
-from ansible_collections.community.general.plugins.modules.database.misc import (
+from ansible_collections.community.general.plugins.modules import (
     redis_data_info)
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 

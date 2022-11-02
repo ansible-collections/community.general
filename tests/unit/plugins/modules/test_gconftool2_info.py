@@ -8,7 +8,7 @@ __metaclass__ = type
 
 import json
 
-from ansible_collections.community.general.plugins.modules.system import gconftool2_info
+from ansible_collections.community.general.plugins.modules import gconftool2_info
 
 import pytest
 

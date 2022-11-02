@@ -14,7 +14,7 @@ pytest.importorskip('xmltodict')
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args, AnsibleFailJson, AnsibleExitJson
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 
-from ansible_collections.community.general.plugins.modules.storage.pmem import pmem as pmem_module
+from ansible_collections.community.general.plugins.modules import pmem as pmem_module
 
 # goal_plain: the mock return value of pmem_run_command with:
 # impctl create -goal MemoryMode=70 Reserved=20 PersistentMemoryType=AppDirect
@@ -276,9 +276,9 @@ class TestPmem(ModuleTestCase):
         self.get_bin_path = self.mock_get_bin_path.start()
 
         self.mock_pmem_is_dcpmm_installed = (patch(
-            'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_is_dcpmm_installed', return_value=""))
+            'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_is_dcpmm_installed', return_value=""))
         self.mock_pmem_init_env = (patch(
-            'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_init_env', return_value=""))
+            'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_init_env', return_value=""))
 
         self.pmem_is_dcpmm_installed = self.mock_pmem_is_dcpmm_installed.start()
         self.pmem_init_env = self.mock_pmem_init_env.start()
@@ -360,7 +360,7 @@ class TestPmem(ModuleTestCase):
             'memorymode': 70,
         })
         with patch(
-                'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command',
                 side_effect=[goal_plain, goal, dimmlist]):
             with self.assertRaises(AnsibleExitJson) as result:
                 pmem_module.main()
@@ -373,7 +373,7 @@ class TestPmem(ModuleTestCase):
             'reserved': 20,
         })
         with patch(
-                'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command',
                 side_effect=[goal_plain, goal, dimmlist]):
             with self.assertRaises(AnsibleExitJson) as result:
                 pmem_module.main()
@@ -387,7 +387,7 @@ class TestPmem(ModuleTestCase):
             'reserved': 20,
         })
         with patch(
-                'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command',
                 side_effect=[goal_plain, goal, dimmlist]):
             with self.assertRaises(AnsibleExitJson) as result:
                 pmem_module.main()
@@ -458,7 +458,7 @@ class TestPmem(ModuleTestCase):
             ],
         })
         with patch(
-                'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command',
                 side_effect=[
                     show_skt, goal_plain_sk0, goal_sk0, dimmlist_sk0, goal_plain_sk1, goal_sk1, dimmlist_sk1]):
             with self.assertRaises(AnsibleExitJson) as result:
@@ -484,7 +484,7 @@ class TestPmem(ModuleTestCase):
             ],
         })
         with patch(
-                'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command',
                 side_effect=[
                     show_skt, goal_plain_sk0, goal_sk0, dimmlist_sk0, goal_plain_sk1, goal_sk1, dimmlist_sk1]):
             with self.assertRaises(AnsibleExitJson) as result:
@@ -511,7 +511,7 @@ class TestPmem(ModuleTestCase):
             ],
         })
         with patch(
-                'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command',
                 side_effect=[
                     show_skt, goal_plain_sk0, goal_sk0, dimmlist_sk0, goal_plain_sk1, goal_sk1, dimmlist_sk1]):
             with self.assertRaises(AnsibleExitJson) as result:
@@ -547,7 +547,7 @@ class TestPmem(ModuleTestCase):
                 ],
             })
             with patch(
-                    'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                    'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command',
                     side_effect=[ndctl_region_empty]):
                 pmem_module.main()
 
@@ -563,7 +563,7 @@ class TestPmem(ModuleTestCase):
                 ],
             })
             with patch(
-                    'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                    'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command',
                     side_effect=[ndctl_region]):
                 pmem_module.main()
 
@@ -584,7 +584,7 @@ class TestPmem(ModuleTestCase):
                 ],
             })
             with patch(
-                    'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                    'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command',
                     side_effect=[ndctl_region]):
                 pmem_module.main()
 
@@ -605,7 +605,7 @@ class TestPmem(ModuleTestCase):
                 ],
             })
             with patch(
-                    'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                    'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command',
                     side_effect=[ndctl_region]):
                 pmem_module.main()
 
@@ -625,7 +625,7 @@ class TestPmem(ModuleTestCase):
                 ],
             })
             with patch(
-                    'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                    'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command',
                     side_effect=[ndctl_region]):
                 pmem_module.main()
 
@@ -646,7 +646,7 @@ class TestPmem(ModuleTestCase):
                 ],
             })
             with patch(
-                    'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                    'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command',
                     side_effect=[ndctl_region]):
                 pmem_module.main()
 
@@ -660,7 +660,7 @@ class TestPmem(ModuleTestCase):
             ],
         })
         with patch(
-                'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command',
                 side_effect=[ndctl_region, ndctl_create_without_size, ndctl_list_N]):
             with self.assertRaises(AnsibleExitJson) as result:
                 pmem_module.main()
@@ -678,7 +678,7 @@ class TestPmem(ModuleTestCase):
             'namespace_append': True,
         })
         with patch(
-                'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command',
                 side_effect=[ndctl_region, ndctl_create_640M, ndctl_list_N_two_namespaces]):
             with self.assertRaises(AnsibleExitJson) as result:
                 pmem_module.main()
@@ -700,7 +700,7 @@ class TestPmem(ModuleTestCase):
             ],
         })
         with patch(
-                'ansible_collections.community.general.plugins.modules.storage.pmem.pmem.PersistentMemory.pmem_run_command',
+                'ansible_collections.community.general.plugins.modules.pmem.PersistentMemory.pmem_run_command',
                 side_effect=[ndctl_region, ndctl_create_1G, ndctl_create_640M, ndctl_list_N_two_namespaces]):
             with self.assertRaises(AnsibleExitJson) as result:
                 pmem_module.main()

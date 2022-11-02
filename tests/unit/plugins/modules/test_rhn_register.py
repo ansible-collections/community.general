@@ -13,7 +13,7 @@ from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_native
 import ansible.module_utils.six
 from ansible.module_utils.six.moves import xmlrpc_client
-from ansible_collections.community.general.plugins.modules.packaging.os import rhn_register
+from ansible_collections.community.general.plugins.modules import rhn_register
 
 from .rhn_conftest import mock_request
 
@@ -80,7 +80,7 @@ def test_systemid_with_requirements(capfd, mocker, patch_rhn):
 
     mocker.patch.object(rhn_register.Rhn, 'enable')
     mock_isfile = mocker.patch('os.path.isfile', return_value=True)
-    mocker.patch('ansible_collections.community.general.plugins.modules.packaging.os.rhn_register.open', mock_open(read_data=SYSTEMID), create=True)
+    mocker.patch('ansible_collections.community.general.plugins.modules.rhn_register.open', mock_open(read_data=SYSTEMID), create=True)
     rhn = rhn_register.Rhn()
     assert '123456789' == to_native(rhn.systemid)
 
@@ -91,7 +91,7 @@ def test_systemid_requirements_missing(capfd, mocker, patch_rhn, import_libxml):
     """Check that missing dependencies are detected"""
 
     mocker.patch('os.path.isfile', return_value=True)
-    mocker.patch('ansible_collections.community.general.plugins.modules.packaging.os.rhn_register.open', mock_open(read_data=SYSTEMID), create=True)
+    mocker.patch('ansible_collections.community.general.plugins.modules.rhn_register.open', mock_open(read_data=SYSTEMID), create=True)
 
     with pytest.raises(SystemExit):
         rhn_register.main()

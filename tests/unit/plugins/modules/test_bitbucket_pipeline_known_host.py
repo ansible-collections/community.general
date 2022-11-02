@@ -8,8 +8,8 @@ __metaclass__ = type
 import pytest
 
 from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper
-from ansible_collections.community.general.plugins.modules.source_control.bitbucket import bitbucket_pipeline_known_host
-from ansible_collections.community.general.plugins.modules.source_control.bitbucket.bitbucket_pipeline_known_host import HAS_PARAMIKO
+from ansible_collections.community.general.plugins.modules import bitbucket_pipeline_known_host
+from ansible_collections.community.general.plugins.modules.bitbucket_pipeline_known_host import HAS_PARAMIKO
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args

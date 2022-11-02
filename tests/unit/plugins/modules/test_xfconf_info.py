@@ -7,7 +7,7 @@ __metaclass__ = type
 
 import json
 
-from ansible_collections.community.general.plugins.modules.system import xfconf_info
+from ansible_collections.community.general.plugins.modules import xfconf_info
 
 import pytest
 

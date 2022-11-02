@@ -8,7 +8,7 @@ __metaclass__ = type
 from ansible.module_utils import basic
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase
-from ansible_collections.community.general.plugins.modules.system import sysupgrade
+from ansible_collections.community.general.plugins.modules import sysupgrade
 
 
 class TestSysupgradeModule(ModuleTestCase):

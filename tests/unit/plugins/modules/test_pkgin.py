@@ -8,7 +8,7 @@ __metaclass__ = type
 from ansible_collections.community.general.tests.unit.compat import mock
 from ansible_collections.community.general.tests.unit.compat import unittest
 
-from ansible_collections.community.general.plugins.modules.packaging.os import pkgin
+from ansible_collections.community.general.plugins.modules import pkgin
 
 
 class TestPkginQueryPackage(unittest.TestCase):
@@ -16,7 +16,7 @@ class TestPkginQueryPackage(unittest.TestCase):
     def setUp(self):
         pkgin.PKGIN_PATH = ""
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.packaging.os.pkgin.AnsibleModule')
+    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
     def test_package_without_version_is_present(self, mock_module):
         # given
         package = 'py37-conan'
@@ -32,7 +32,7 @@ class TestPkginQueryPackage(unittest.TestCase):
         # then
         self.assertEquals(command_result, pkgin.PackageState.PRESENT)
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.packaging.os.pkgin.AnsibleModule')
+    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
     def test_package_with_version_is_present(self, mock_module):
         # given
         package = 'py37-conan-1.21.0'
@@ -48,7 +48,7 @@ class TestPkginQueryPackage(unittest.TestCase):
         # then
         self.assertEquals(command_result, pkgin.PackageState.PRESENT)
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.packaging.os.pkgin.AnsibleModule')
+    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
     def test_package_found_but_not_installed(self, mock_module):
         # given
         package = 'cmake'
@@ -64,7 +64,7 @@ class TestPkginQueryPackage(unittest.TestCase):
         # then
         self.assertEquals(command_result, pkgin.PackageState.NOT_INSTALLED)
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.packaging.os.pkgin.AnsibleModule')
+    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
     def test_package_found_outdated(self, mock_module):
         # given
         package = 'cmake316'
@@ -80,7 +80,7 @@ class TestPkginQueryPackage(unittest.TestCase):
         # then
         self.assertEquals(command_result, pkgin.PackageState.OUTDATED)
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.packaging.os.pkgin.AnsibleModule')
+    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
     def test_package_with_version_found_outdated(self, mock_module):
         # given
         package = 'cmake316-3.16.0nb1'
@@ -96,7 +96,7 @@ class TestPkginQueryPackage(unittest.TestCase):
         # then
         self.assertEquals(command_result, pkgin.PackageState.OUTDATED)
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.packaging.os.pkgin.AnsibleModule')
+    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
     def test_package_not_found(self, mock_module):
         # given
         package = 'cmake320-3.20.0nb1'
@@ -112,7 +112,7 @@ class TestPkginQueryPackage(unittest.TestCase):
         # then
         self.assertEquals(command_result, pkgin.PackageState.NOT_FOUND)
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.packaging.os.pkgin.AnsibleModule')
+    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
     def test_with_parseable_flag_supported_package_is_present(self, mock_module):
         # given
         package = 'py37-conan'
@@ -128,7 +128,7 @@ class TestPkginQueryPackage(unittest.TestCase):
         # then
         self.assertEquals(command_result, pkgin.PackageState.PRESENT)
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.packaging.os.pkgin.AnsibleModule')
+    @mock.patch('ansible_collections.community.general.plugins.modules.pkgin.AnsibleModule')
     def test_with_parseable_flag_not_supported_package_is_present(self, mock_module):
         # given
         package = 'py37-conan'

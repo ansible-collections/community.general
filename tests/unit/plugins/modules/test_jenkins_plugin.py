@@ -7,7 +7,7 @@ __metaclass__ = type
 
 from io import BytesIO
 
-from ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_plugin import JenkinsPlugin
+from ansible_collections.community.general.plugins.modules.jenkins_plugin import JenkinsPlugin
 from ansible.module_utils.common._collections_compat import Mapping
 
 

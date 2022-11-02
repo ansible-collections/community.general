@@ -11,7 +11,7 @@ from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
-import ansible_collections.community.general.plugins.modules.remote_management.lenovoxcc.xcc_redfish_command as module
+import ansible_collections.community.general.plugins.modules.xcc_redfish_command as module
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args, exit_json, fail_json
 

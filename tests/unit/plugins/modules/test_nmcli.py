@@ -10,7 +10,7 @@ import json
 import pytest
 
 from ansible.module_utils.common.text.converters import to_text
-from ansible_collections.community.general.plugins.modules.net_tools import nmcli
+from ansible_collections.community.general.plugins.modules import nmcli
 from ansible.module_utils.basic import AnsibleModule
 
 pytestmark = pytest.mark.usefixtures('patch_ansible_module')

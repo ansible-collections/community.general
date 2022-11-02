@@ -15,7 +15,7 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.compat.mock import Mock
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.modules.system.java_keystore import JavaKeystore
+from ansible_collections.community.general.plugins.modules.java_keystore import JavaKeystore
 
 
 module_argument_spec = dict(
@@ -44,9 +44,9 @@ class TestCreateJavaKeystore(ModuleTestCase):
         super(TestCreateJavaKeystore, self).setUp()
 
         orig_exists = os.path.exists
-        self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file')
-        self.mock_create_path = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_path')
-        self.mock_current_type = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.JavaKeystore.current_type')
+        self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.java_keystore.create_file')
+        self.mock_create_path = patch('ansible_collections.community.general.plugins.modules.java_keystore.create_path')
+        self.mock_current_type = patch('ansible_collections.community.general.plugins.modules.java_keystore.JavaKeystore.current_type')
         self.mock_run_command = patch('ansible.module_utils.basic.AnsibleModule.run_command')
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
         self.mock_preserved_copy = patch('ansible.module_utils.basic.AnsibleModule.preserved_copy')
@@ -233,8 +233,8 @@ class TestCertChanged(ModuleTestCase):
     def setUp(self):
         """Setup."""
         super(TestCertChanged, self).setUp()
-        self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file')
-        self.mock_current_type = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.JavaKeystore.current_type')
+        self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.java_keystore.create_file')
+        self.mock_current_type = patch('ansible_collections.community.general.plugins.modules.java_keystore.JavaKeystore.current_type')
         self.mock_run_command = patch('ansible.module_utils.basic.AnsibleModule.run_command')
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
         self.mock_preserved_copy = patch('ansible.module_utils.basic.AnsibleModule.preserved_copy')

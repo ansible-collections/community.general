@@ -12,7 +12,7 @@ import pytest
 import json
 from redis import __version__
 
-from ansible_collections.community.general.plugins.modules.database.misc import redis_data
+from ansible_collections.community.general.plugins.modules import redis_data
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 
 HAS_REDIS_USERNAME_OPTION = True

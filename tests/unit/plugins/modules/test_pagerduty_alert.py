@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.plugins.modules.monitoring import pagerduty_alert
+from ansible_collections.community.general.plugins.modules import pagerduty_alert
 
 
 class PagerDutyAlertsTest(unittest.TestCase):

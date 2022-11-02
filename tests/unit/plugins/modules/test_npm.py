@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat.mock import call, patch
-from ansible_collections.community.general.plugins.modules.packaging.language import npm
+from ansible_collections.community.general.plugins.modules import npm
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
     AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args)
 
@@ -17,7 +17,7 @@ class NPMModuleTestCase(ModuleTestCase):
 
     def setUp(self):
         super(NPMModuleTestCase, self).setUp()
-        ansible_module_path = "ansible_collections.community.general.plugins.modules.packaging.language.npm.AnsibleModule"
+        ansible_module_path = "ansible_collections.community.general.plugins.modules.npm.AnsibleModule"
         self.mock_run_command = patch('%s.run_command' % ansible_module_path)
         self.module_main_command = self.mock_run_command.start()
         self.mock_get_bin_path = patch('%s.get_bin_path' % ansible_module_path)

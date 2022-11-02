@@ -10,7 +10,7 @@ import platform
 
 import pytest
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.modules.system import (
+from ansible_collections.community.general.plugins.modules import (
     solaris_zone
 )
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import (

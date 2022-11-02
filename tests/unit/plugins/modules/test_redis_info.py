@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock
-from ansible_collections.community.general.plugins.modules.database.misc import redis_info
+from ansible_collections.community.general.plugins.modules import redis_info
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 
@@ -41,7 +41,7 @@ class TestRedisInfoModule(ModuleTestCase):
         super(TestRedisInfoModule, self).tearDown()
 
     def patch_redis_client(self, **kwds):
-        return patch('ansible_collections.community.general.plugins.modules.database.misc.redis_info.redis_client', autospec=True, **kwds)
+        return patch('ansible_collections.community.general.plugins.modules.redis_info.redis_client', autospec=True, **kwds)
 
     def test_without_parameters(self):
         """Test without parameters"""

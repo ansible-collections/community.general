@@ -13,7 +13,7 @@ __metaclass__ = type
 import pytest
 import json
 
-from ansible_collections.community.general.plugins.modules.cloud.misc import proxmox_tasks_info
+from ansible_collections.community.general.plugins.modules import proxmox_tasks_info
 import ansible_collections.community.general.plugins.module_utils.proxmox as proxmox_utils
 from ansible_collections.community.general.plugins.module_utils.proxmox import ProxmoxAnsible
 from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, patch

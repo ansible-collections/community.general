@@ -7,7 +7,7 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.community.general.plugins.modules.web_infrastructure.apache2_module import create_apache_identifier
+from ansible_collections.community.general.plugins.modules.apache2_module import create_apache_identifier
 
 REPLACEMENTS = [
     ('php7.1', 'php7_module'),

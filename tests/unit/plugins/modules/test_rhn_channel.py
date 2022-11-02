@@ -8,7 +8,7 @@ __metaclass__ = type
 
 import json
 
-from ansible_collections.community.general.plugins.modules.packaging.os import rhn_channel
+from ansible_collections.community.general.plugins.modules import rhn_channel
 
 from .rhn_conftest import mock_request
 

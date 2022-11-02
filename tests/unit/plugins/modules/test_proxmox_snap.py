@@ -10,7 +10,7 @@ import json
 import pytest
 
 from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, patch
-from ansible_collections.community.general.plugins.modules.cloud.misc import proxmox_snap
+from ansible_collections.community.general.plugins.modules import proxmox_snap
 import ansible_collections.community.general.plugins.module_utils.proxmox as proxmox_utils
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 

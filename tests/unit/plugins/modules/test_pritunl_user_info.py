@@ -7,7 +7,7 @@ from __future__ import absolute_import, division, print_function
 
 import sys
 
-from ansible_collections.community.general.plugins.modules.net_tools.pritunl import (
+from ansible_collections.community.general.plugins.modules import (
     pritunl_user_info,
 )
 from ansible_collections.community.general.tests.unit.compat.mock import patch

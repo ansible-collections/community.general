@@ -9,7 +9,7 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.community.general.plugins.modules.source_control.gitlab.gitlab_project import GitLabProject
+from ansible_collections.community.general.plugins.modules.gitlab_project import GitLabProject
 
 
 def _dummy(x):

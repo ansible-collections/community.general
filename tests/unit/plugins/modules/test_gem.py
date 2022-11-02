@@ -8,7 +8,7 @@ import copy
 
 import pytest
 
-from ansible_collections.community.general.plugins.modules.packaging.language import gem
+from ansible_collections.community.general.plugins.modules import gem
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 
@@ -24,7 +24,7 @@ class TestGem(ModuleTestCase):
         super(TestGem, self).setUp()
         self.rubygems_path = ['/usr/bin/gem']
         self.mocker.patch(
-            'ansible_collections.community.general.plugins.modules.packaging.language.gem.get_rubygems_path',
+            'ansible_collections.community.general.plugins.modules.gem.get_rubygems_path',
             lambda module: copy.deepcopy(self.rubygems_path),
         )
 
@@ -35,7 +35,7 @@ class TestGem(ModuleTestCase):
     def patch_installed_versions(self, versions):
         """Mocks the versions of the installed package"""
 
-        target = 'ansible_collections.community.general.plugins.modules.packaging.language.gem.get_installed_versions'
+        target = 'ansible_collections.community.general.plugins.modules.gem.get_installed_versions'
 
         def new(module, remote=False):
             return versions
@@ -43,7 +43,7 @@ class TestGem(ModuleTestCase):
         return self.mocker.patch(target, new)
 
     def patch_rubygems_version(self, version=None):
-        target = 'ansible_collections.community.general.plugins.modules.packaging.language.gem.get_rubygems_version'
+        target = 'ansible_collections.community.general.plugins.modules.gem.get_rubygems_version'
 
         def new(module):
             return version

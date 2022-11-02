@@ -7,7 +7,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible_collections.community.general.plugins.modules.cloud.misc.proxmox_kvm import parse_dev, parse_mac
+from ansible_collections.community.general.plugins.modules.proxmox_kvm import parse_dev, parse_mac
 
 
 def test_parse_mac():

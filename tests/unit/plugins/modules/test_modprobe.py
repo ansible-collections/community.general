@@ -10,7 +10,7 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.compat.mock import Mock
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.modules.system.modprobe import Modprobe
+from ansible_collections.community.general.plugins.modules.modprobe import Modprobe
 
 
 class TestLoadModule(ModuleTestCase):
@@ -18,7 +18,7 @@ class TestLoadModule(ModuleTestCase):
         super(TestLoadModule, self).setUp()
 
         self.mock_module_loaded = patch(
-            'ansible_collections.community.general.plugins.modules.system.modprobe.Modprobe.module_loaded'
+            'ansible_collections.community.general.plugins.modules.modprobe.Modprobe.module_loaded'
         )
         self.mock_run_command = patch('ansible.module_utils.basic.AnsibleModule.run_command')
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
@@ -95,7 +95,7 @@ class TestUnloadModule(ModuleTestCase):
         super(TestUnloadModule, self).setUp()
 
         self.mock_module_loaded = patch(
-            'ansible_collections.community.general.plugins.modules.system.modprobe.Modprobe.module_loaded'
+            'ansible_collections.community.general.plugins.modules.modprobe.Modprobe.module_loaded'
         )
         self.mock_run_command = patch('ansible.module_utils.basic.AnsibleModule.run_command')
         self.mock_get_bin_path = patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')

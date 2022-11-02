@@ -15,7 +15,7 @@ from ansible_collections.community.general.tests.unit.compat.mock import call, p
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, \
     ModuleTestCase, set_module_args
 
-from ansible_collections.community.general.plugins.modules.identity.keycloak import keycloak_clientscope
+from ansible_collections.community.general.plugins.modules import keycloak_clientscope
 
 from itertools import count
 

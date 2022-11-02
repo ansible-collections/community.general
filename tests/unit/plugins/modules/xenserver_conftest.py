@@ -40,7 +40,7 @@ def XenAPI():
 
     # First we use importlib.import_module() to import the module and assign
     # it to a local symbol.
-    fake_xenapi = importlib.import_module('ansible_collections.community.general.tests.unit.plugins.modules.cloud.xenserver.FakeXenAPI')
+    fake_xenapi = importlib.import_module('ansible_collections.community.general.tests.unit.plugins.modules.FakeXenAPI')
 
     # Now we populate Python module cache with imported fake module using the
     # original module name (XenAPI). That way, any 'import XenAPI' statement
@@ -58,7 +58,7 @@ def xenserver_guest_info(XenAPI):
     # that depend on it have to be imported inside a test function. To make
     # this easier to handle and remove some code repetition, we wrap the import
     # of xenserver_guest_info module with a fixture.
-    from ansible_collections.community.general.plugins.modules.cloud.xenserver import xenserver_guest_info
+    from ansible_collections.community.general.plugins.modules import xenserver_guest_info
 
     return xenserver_guest_info
 
@@ -71,6 +71,6 @@ def xenserver_guest_powerstate(XenAPI):
     # that depend on it have to be imported inside a test function. To make
     # this easier to handle and remove some code repetition, we wrap the import
     # of xenserver_guest_powerstate module with a fixture.
-    from ansible_collections.community.general.plugins.modules.cloud.xenserver import xenserver_guest_powerstate
+    from ansible_collections.community.general.plugins.modules import xenserver_guest_powerstate
 
     return xenserver_guest_powerstate

@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.modules.packaging.os import pacman_key
+from ansible_collections.community.general.plugins.modules import pacman_key
 import pytest
 import json
 

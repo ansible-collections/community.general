@@ -13,7 +13,7 @@ from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import call, patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, ModuleTestCase, set_module_args
 
-from ansible_collections.community.general.plugins.modules.identity.keycloak import keycloak_realm_info
+from ansible_collections.community.general.plugins.modules import keycloak_realm_info
 
 from itertools import count
 

@@ -11,7 +11,7 @@ import pytest
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.tests.unit.compat.mock import Mock, patch
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args
-from ansible_collections.community.general.plugins.modules.files.archive import get_archive, common_path
+from ansible_collections.community.general.plugins.modules.archive import get_archive, common_path
 
 
 class TestArchive(ModuleTestCase):

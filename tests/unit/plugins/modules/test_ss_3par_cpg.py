@@ -11,13 +11,13 @@ sys.modules['hpe3par_sdk'] = mock.Mock()
 sys.modules['hpe3par_sdk.client'] = mock.Mock()
 sys.modules['hpe3parclient'] = mock.Mock()
 sys.modules['hpe3parclient.exceptions'] = mock.Mock()
-from ansible_collections.community.general.plugins.modules.storage.hpe3par import ss_3par_cpg
+from ansible_collections.community.general.plugins.modules import ss_3par_cpg
 from ansible_collections.community.general.plugins.module_utils.storage.hpe3par import hpe3par
 
 
-@mock.patch('ansible_collections.community.general.plugins.modules.storage.hpe3par.ss_3par_cpg.client')
-@mock.patch('ansible_collections.community.general.plugins.modules.storage.hpe3par.ss_3par_cpg.AnsibleModule')
-@mock.patch('ansible_collections.community.general.plugins.modules.storage.hpe3par.ss_3par_cpg.create_cpg')
+@mock.patch('ansible_collections.community.general.plugins.modules.ss_3par_cpg.client')
+@mock.patch('ansible_collections.community.general.plugins.modules.ss_3par_cpg.AnsibleModule')
+@mock.patch('ansible_collections.community.general.plugins.modules.ss_3par_cpg.create_cpg')
 def test_module_args(mock_create_cpg, mock_module, mock_client):
     """
     hpe3par CPG - test module arguments
@@ -52,9 +52,9 @@ def test_module_args(mock_create_cpg, mock_module, mock_client):
         required_together=[['raid_type', 'set_size']])
 
 
-@mock.patch('ansible_collections.community.general.plugins.modules.storage.hpe3par.ss_3par_cpg.client')
-@mock.patch('ansible_collections.community.general.plugins.modules.storage.hpe3par.ss_3par_cpg.AnsibleModule')
-@mock.patch('ansible_collections.community.general.plugins.modules.storage.hpe3par.ss_3par_cpg.create_cpg')
+@mock.patch('ansible_collections.community.general.plugins.modules.ss_3par_cpg.client')
+@mock.patch('ansible_collections.community.general.plugins.modules.ss_3par_cpg.AnsibleModule')
+@mock.patch('ansible_collections.community.general.plugins.modules.ss_3par_cpg.create_cpg')
 def test_main_exit_functionality_present_success_without_issue_attr_dict(mock_create_cpg, mock_module, mock_client):
     """
     hpe3par flash cache - success check
@@ -94,9 +94,9 @@ def test_main_exit_functionality_present_success_without_issue_attr_dict(mock_cr
     assert instance.fail_json.call_count == 0
 
 
-@mock.patch('ansible_collections.community.general.plugins.modules.storage.hpe3par.ss_3par_cpg.client')
-@mock.patch('ansible_collections.community.general.plugins.modules.storage.hpe3par.ss_3par_cpg.AnsibleModule')
-@mock.patch('ansible_collections.community.general.plugins.modules.storage.hpe3par.ss_3par_cpg.delete_cpg')
+@mock.patch('ansible_collections.community.general.plugins.modules.ss_3par_cpg.client')
+@mock.patch('ansible_collections.community.general.plugins.modules.ss_3par_cpg.AnsibleModule')
+@mock.patch('ansible_collections.community.general.plugins.modules.ss_3par_cpg.delete_cpg')
 def test_main_exit_functionality_absent_success_without_issue_attr_dict(mock_delete_cpg, mock_module, mock_client):
     """
     hpe3par flash cache - success check
@@ -146,7 +146,7 @@ def test_convert_to_binary_multiple():
     assert hpe3par.convert_to_binary_multiple(' 1.5 TiB ') == 1.5 * 1024 * 1024
 
 
-@mock.patch('ansible_collections.community.general.plugins.modules.storage.hpe3par.ss_3par_cpg.client')
+@mock.patch('ansible_collections.community.general.plugins.modules.ss_3par_cpg.client')
 def test_validate_set_size(mock_client):
     mock_client.HPE3ParClient.RAID_MAP = {'R0': {'raid_value': 1, 'set_sizes': [1]},
                                           'R1': {'raid_value': 2, 'set_sizes': [2, 3, 4]},
@@ -164,7 +164,7 @@ def test_validate_set_size(mock_client):
     assert not ss_3par_cpg.validate_set_size(raid_type, set_size)
 
 
-@mock.patch('ansible_collections.community.general.plugins.modules.storage.hpe3par.ss_3par_cpg.client')
+@mock.patch('ansible_collections.community.general.plugins.modules.ss_3par_cpg.client')
 def test_cpg_ldlayout_map(mock_client):
     mock_client.HPE3ParClient.PORT = 1
     mock_client.HPE3ParClient.RAID_MAP = {'R0': {'raid_value': 1, 'set_sizes': [1]},
@@ -177,7 +177,7 @@ def test_cpg_ldlayout_map(mock_client):
         'RAIDType': 4, 'HA': 1}
 
 
-@mock.patch('ansible_collections.community.general.plugins.modules.storage.hpe3par.ss_3par_cpg.client')
+@mock.patch('ansible_collections.community.general.plugins.modules.ss_3par_cpg.client')
 def test_create_cpg(mock_client):
     ss_3par_cpg.validate_set_size = mock.Mock(return_value=True)
     ss_3par_cpg.cpg_ldlayout_map = mock.Mock(
@@ -227,7 +227,7 @@ def test_create_cpg(mock_client):
                                   ) == (False, False, 'Set size 3 not part of RAID set R6')
 
 
-@mock.patch('ansible_collections.community.general.plugins.modules.storage.hpe3par.ss_3par_cpg.client')
+@mock.patch('ansible_collections.community.general.plugins.modules.ss_3par_cpg.client')
 def test_delete_cpg(mock_client):
     mock_client.HPE3ParClient.login.return_value = True
     mock_client.HPE3ParClient.cpgExists.return_value = True

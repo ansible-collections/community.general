@@ -9,7 +9,7 @@ import sys
 
 from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible.module_utils.six import iteritems
-from ansible_collections.community.general.plugins.modules.net_tools.pritunl import (
+from ansible_collections.community.general.plugins.modules import (
     pritunl_org,
 )
 from ansible_collections.community.general.tests.unit.compat.mock import patch

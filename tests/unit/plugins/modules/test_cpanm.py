@@ -13,7 +13,7 @@ __metaclass__ = type
 
 import json
 
-from ansible_collections.community.general.plugins.modules.packaging.language import cpanm
+from ansible_collections.community.general.plugins.modules import cpanm
 
 import pytest
 

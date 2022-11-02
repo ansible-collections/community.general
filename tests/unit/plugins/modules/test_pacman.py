@@ -20,8 +20,8 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
     fail_json,
 )
 
-from ansible_collections.community.general.plugins.modules.packaging.os import pacman
-from ansible_collections.community.general.plugins.modules.packaging.os.pacman import (
+from ansible_collections.community.general.plugins.modules import pacman
+from ansible_collections.community.general.plugins.modules.pacman import (
     Package,
     VersionTuple,
 )

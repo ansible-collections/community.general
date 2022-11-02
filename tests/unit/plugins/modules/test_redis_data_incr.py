@@ -13,7 +13,7 @@ import json
 import redis
 from redis import __version__
 
-from ansible_collections.community.general.plugins.modules.database.misc import redis_data_incr
+from ansible_collections.community.general.plugins.modules import redis_data_incr
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 
 

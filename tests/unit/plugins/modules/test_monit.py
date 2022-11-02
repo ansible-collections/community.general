@@ -9,7 +9,7 @@ import mock
 import pytest
 
 from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.plugins.modules.monitoring import monit
+from ansible_collections.community.general.plugins.modules import monit
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson
 
 

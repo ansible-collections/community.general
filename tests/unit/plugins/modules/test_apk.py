@@ -8,7 +8,7 @@ __metaclass__ = type
 from ansible_collections.community.general.tests.unit.compat import mock
 from ansible_collections.community.general.tests.unit.compat import unittest
 
-from ansible_collections.community.general.plugins.modules.packaging.os import apk
+from ansible_collections.community.general.plugins.modules import apk
 
 
 class TestApkQueryLatest(unittest.TestCase):
@@ -19,7 +19,7 @@ class TestApkQueryLatest(unittest.TestCase):
             'g++',
         ]
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.packaging.os.apk.AnsibleModule')
+    @mock.patch('ansible_collections.community.general.plugins.modules.apk.AnsibleModule')
     def test_not_latest(self, mock_module):
         apk.APK_PATH = ""
         for module_name in self.module_names:
@@ -28,7 +28,7 @@ class TestApkQueryLatest(unittest.TestCase):
             command_result = apk.query_latest(mock_module, module_name)
             self.assertFalse(command_result)
 
-    @mock.patch('ansible_collections.community.general.plugins.modules.packaging.os.apk.AnsibleModule')
+    @mock.patch('ansible_collections.community.general.plugins.modules.apk.AnsibleModule')
     def test_latest(self, mock_module):
         apk.APK_PATH = ""
         for module_name in self.module_names:

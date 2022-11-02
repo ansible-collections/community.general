@@ -20,13 +20,13 @@ from ansible_collections.community.general.plugins.module_utils.oneview import (
                                                                                 OneViewModuleResourceNotFound,
                                                                                 OneViewModuleBase)
 
-from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_ethernet_network import EthernetNetworkModule
-from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_ethernet_network_info import EthernetNetworkInfoModule
-from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_fc_network import FcNetworkModule
-from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_fc_network_info import FcNetworkInfoModule
-from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_fcoe_network import FcoeNetworkModule
-from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_fcoe_network_info import FcoeNetworkInfoModule
-from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_network_set import NetworkSetModule
-from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_network_set_info import NetworkSetInfoModule
-from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_san_manager import SanManagerModule
-from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_san_manager_info import SanManagerInfoModule
+from ansible_collections.community.general.plugins.modules.oneview_ethernet_network import EthernetNetworkModule
+from ansible_collections.community.general.plugins.modules.oneview_ethernet_network_info import EthernetNetworkInfoModule
+from ansible_collections.community.general.plugins.modules.oneview_fc_network import FcNetworkModule
+from ansible_collections.community.general.plugins.modules.oneview_fc_network_info import FcNetworkInfoModule
+from ansible_collections.community.general.plugins.modules.oneview_fcoe_network import FcoeNetworkModule
+from ansible_collections.community.general.plugins.modules.oneview_fcoe_network_info import FcoeNetworkInfoModule
+from ansible_collections.community.general.plugins.modules.oneview_network_set import NetworkSetModule
+from ansible_collections.community.general.plugins.modules.oneview_network_set_info import NetworkSetInfoModule
+from ansible_collections.community.general.plugins.modules.oneview_san_manager import SanManagerModule
+from ansible_collections.community.general.plugins.modules.oneview_san_manager_info import SanManagerInfoModule

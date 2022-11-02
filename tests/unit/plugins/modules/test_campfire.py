@@ -7,7 +7,7 @@ __metaclass__ = type
 
 import pytest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.plugins.modules.notification import campfire
+from ansible_collections.community.general.plugins.modules import campfire
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 

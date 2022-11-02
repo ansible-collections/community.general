@@ -7,7 +7,7 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.community.general.plugins.modules.monitoring import statsd
+from ansible_collections.community.general.plugins.modules import statsd
 from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
@@ -35,10 +35,10 @@ class TestStatsDModule(ModuleTestCase):
         super(TestStatsDModule, self).tearDown()
 
     def patch_udp_statsd_client(self, **kwargs):
-        return patch('ansible_collections.community.general.plugins.modules.monitoring.statsd.udp_statsd_client', autospec=True, **kwargs)
+        return patch('ansible_collections.community.general.plugins.modules.statsd.udp_statsd_client', autospec=True, **kwargs)
 
     def patch_tcp_statsd_client(self, **kwargs):
-        return patch('ansible_collections.community.general.plugins.modules.monitoring.statsd.tcp_statsd_client', autospec=True, **kwargs)
+        return patch('ansible_collections.community.general.plugins.modules.statsd.tcp_statsd_client', autospec=True, **kwargs)
 
     def test_udp_without_parameters(self):
         """Test udp without parameters"""

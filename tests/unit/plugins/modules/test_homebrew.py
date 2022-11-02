@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.plugins.modules.packaging.os.homebrew import Homebrew
+from ansible_collections.community.general.plugins.modules.homebrew import Homebrew
 
 
 class TestHomebrewModule(unittest.TestCase):

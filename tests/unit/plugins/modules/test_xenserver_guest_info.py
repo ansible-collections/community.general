@@ -55,9 +55,9 @@ def test_xenserver_guest_info(mocker, capfd, XenAPI, xenserver_guest_info):
     """
     fake_vm_facts = {"fake-vm-fact": True}
 
-    mocker.patch('ansible_collections.community.general.plugins.modules.cloud.xenserver.xenserver_guest_info.get_object_ref', return_value=None)
-    mocker.patch('ansible_collections.community.general.plugins.modules.cloud.xenserver.xenserver_guest_info.gather_vm_params', return_value=None)
-    mocker.patch('ansible_collections.community.general.plugins.modules.cloud.xenserver.xenserver_guest_info.gather_vm_facts', return_value=fake_vm_facts)
+    mocker.patch('ansible_collections.community.general.plugins.modules.xenserver_guest_info.get_object_ref', return_value=None)
+    mocker.patch('ansible_collections.community.general.plugins.modules.xenserver_guest_info.gather_vm_params', return_value=None)
+    mocker.patch('ansible_collections.community.general.plugins.modules.xenserver_guest_info.gather_vm_facts', return_value=fake_vm_facts)
 
     mocked_xenapi = mocker.patch.object(XenAPI.Session, 'xenapi', create=True)
 

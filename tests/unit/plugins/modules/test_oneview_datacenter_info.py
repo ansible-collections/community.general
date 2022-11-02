@@ -10,7 +10,7 @@ import pytest
 from .hpe_test_utils import FactsParamsTest
 from .oneview_conftest import mock_ov_client, mock_ansible_module
 
-from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_datacenter_info import DatacenterInfoModule
+from ansible_collections.community.general.plugins.modules.oneview_datacenter_info import DatacenterInfoModule
 
 PARAMS_GET_CONNECTED = dict(
     config='config.json',

@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat.mock import call, patch
-from ansible_collections.community.general.plugins.modules.packaging.os import rhsm_release
+from ansible_collections.community.general.plugins.modules import rhsm_release
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
     AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args)
 
@@ -20,12 +20,12 @@ class RhsmRepositoryReleaseModuleTestCase(ModuleTestCase):
         # Mainly interested that the subscription-manager calls are right
         # based on the module args, so patch out run_command in the module.
         # returns (rc, out, err) structure
-        self.mock_run_command = patch('ansible_collections.community.general.plugins.modules.packaging.os.rhsm_release.'
+        self.mock_run_command = patch('ansible_collections.community.general.plugins.modules.rhsm_release.'
                                       'AnsibleModule.run_command')
         self.module_main_command = self.mock_run_command.start()
 
         # Module does a get_bin_path check before every run_command call
-        self.mock_get_bin_path = patch('ansible_collections.community.general.plugins.modules.packaging.os.rhsm_release.'
+        self.mock_get_bin_path = patch('ansible_collections.community.general.plugins.modules.rhsm_release.'
                                        'AnsibleModule.get_bin_path')
         self.get_bin_path = self.mock_get_bin_path.start()
         self.get_bin_path.return_value = '/testbin/subscription-manager'

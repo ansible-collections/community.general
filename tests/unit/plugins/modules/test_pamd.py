@@ -7,11 +7,11 @@ __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat import unittest
 
-from ansible_collections.community.general.plugins.modules.system.pamd import PamdRule
-from ansible_collections.community.general.plugins.modules.system.pamd import PamdLine
-from ansible_collections.community.general.plugins.modules.system.pamd import PamdComment
-from ansible_collections.community.general.plugins.modules.system.pamd import PamdInclude
-from ansible_collections.community.general.plugins.modules.system.pamd import PamdService
+from ansible_collections.community.general.plugins.modules.pamd import PamdRule
+from ansible_collections.community.general.plugins.modules.pamd import PamdLine
+from ansible_collections.community.general.plugins.modules.pamd import PamdComment
+from ansible_collections.community.general.plugins.modules.pamd import PamdInclude
+from ansible_collections.community.general.plugins.modules.pamd import PamdService
 
 
 class PamdLineTestCase(unittest.TestCase):

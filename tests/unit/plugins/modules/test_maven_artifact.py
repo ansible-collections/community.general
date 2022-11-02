@@ -6,7 +6,7 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.community.general.plugins.modules.packaging.language import maven_artifact
+from ansible_collections.community.general.plugins.modules import maven_artifact
 from ansible.module_utils import basic
 
 
@@ -62,7 +62,7 @@ maven_metadata_example = b"""<?xml version="1.0" encoding="UTF-8"?>
     (None, "[2.0,)", "4.13-beta-2"),
 ])
 def test_find_version_by_spec(mocker, version_by_spec, version_choosed):
-    _getContent = mocker.patch('ansible_collections.community.general.plugins.modules.packaging.language.maven_artifact.MavenDownloader._getContent')
+    _getContent = mocker.patch('ansible_collections.community.general.plugins.modules.maven_artifact.MavenDownloader._getContent')
     _getContent.return_value = maven_metadata_example
 
     artifact = maven_artifact.Artifact("junit", "junit", None, version_by_spec, "jar")

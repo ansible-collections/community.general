@@ -8,7 +8,7 @@ __metaclass__ = type
 import json
 import pytest
 from ansible_collections.community.general.tests.unit.compat.mock import Mock, patch
-from ansible_collections.community.general.plugins.modules.notification import slack
+from ansible_collections.community.general.plugins.modules import slack
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 

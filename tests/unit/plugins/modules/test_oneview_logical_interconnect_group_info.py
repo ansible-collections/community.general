@@ -8,7 +8,7 @@ __metaclass__ = type
 from ansible_collections.community.general.tests.unit.compat import unittest
 from .hpe_test_utils import FactsParamsTestCase
 from .oneview_conftest import mock_ov_client, mock_ansible_module
-from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_logical_interconnect_group_info import (
+from ansible_collections.community.general.plugins.modules.oneview_logical_interconnect_group_info import (
     LogicalInterconnectGroupInfoModule
 )
 
