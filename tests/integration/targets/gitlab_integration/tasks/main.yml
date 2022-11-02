@@ -1,0 +1,27 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Install required libs
+  pip:
+    name: python-gitlab
+    state: present
+
+- name: Create a new integration
+  gitlab_integration:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    project: test/project
+    integration: emails-on-push
+    events:
+      - push
+    params:
+      recipients: test@example.com
+    state: present
+  register: gitlab_integration_state
+
+- name: Check integration has been created correctly
+  assert:
+    that:
+      - gitlab_integration_state is changed
