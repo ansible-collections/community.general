@@ -68,6 +68,7 @@ options:
       - Environment variables of the container namespace.
       - Injected in containers at runtime.
     type: dict
+    default: {}
 
   secret_environment_variables:
     description:
@@ -75,6 +76,7 @@ options:
       - Updating thoses values will not output a C(changed) state in Ansible.
       - Injected in containers at runtime.
     type: dict
+    default: {}
 '''
 
 EXAMPLES = '''
@@ -121,9 +123,11 @@ container_namespace:
     status: pending
 '''
 
+from copy import deepcopy
+
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
     SCALEWAY_ENDPOINT, SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
-    scaleway_waitable_resource_argument_spec, filter_sensitive_attributes,
+    scaleway_waitable_resource_argument_spec,
     resource_attributes_should_be_changed, SecretVariables
 )
 from ansible.module_utils.basic import AnsibleModule
@@ -256,7 +260,7 @@ def core(module):
 
     changed, summary = state_strategy[wished_container_namespace["state"]](api=api, wished_cn=wished_container_namespace)
 
-    module.exit_json(changed=changed, container_namespace=filter_sensitive_attributes(summary, SENSITIVE_ATTRIBUTES))
+    module.exit_json(changed=changed, container_namespace=summary)
 
 
 def main():
