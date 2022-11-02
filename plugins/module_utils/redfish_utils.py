@@ -39,6 +39,7 @@ class RedfishUtils(object):
         self.resource_id = resource_id
         self.data_modification = data_modification
         self.strip_etag_quotes = strip_etag_quotes
+        self._vendor = None
         self._init_session()
 
     def _auth_params(self, headers):
@@ -272,13 +273,32 @@ class RedfishUtils(object):
         pass
 
     def _get_vendor(self):
+        # If we got the vendor info once, don't get it again
+        if self._vendor is not None:
+            return {'ret': 'True', 'Vendor': self._vendor}
+
+        # Find the vendor info from the service root
         response = self.get_request(self.root_uri + self.service_root)
         if response['ret'] is False:
             return {'ret': False, 'Vendor': ''}
         data = response['data']
+
         if 'Vendor' in data:
+            # Extract the vendor string from the Vendor property
+            self._vendor = data["Vendor"]
             return {'ret': True, 'Vendor': data["Vendor"]}
+        elif 'Oem' in data and len(data['Oem']) > 0:
+            # Determine the vendor from the OEM object if needed
+            vendor = list(data['Oem'].keys())[0]
+            if vendor == 'Hpe' or vendor == 'Hp':
+                # HPE uses Pascal-casing for their OEM object
+                # Older systems reported 'Hp' (pre-split)
+                vendor = 'HPE'
+            self._vendor = vendor
+            return {'ret': True, 'Vendor': vendor}
         else:
+            # Could not determine; use an empty string
+            self._vendor = ''
             return {'ret': True, 'Vendor': ''}
 
     def _find_accountservice_resource(self):
@@ -1666,6 +1686,15 @@ class RedfishUtils(object):
 
         # Apply the requested boot override request
         resp = self.patch_request(self.root_uri + self.systems_uri, payload, check_pyld=True)
+        if resp['ret'] is False:
+            # WORKAROUND
+            # Older Dell systems do not allow BootSourceOverrideEnabled to be
+            # specified with UefiTarget as the target device
+            vendor = self._get_vendor()['Vendor']
+            if vendor == 'Dell':
+                if bootdevice == 'UefiTarget' and override_enabled != 'Disabled':
+                    payload['Boot'].pop('BootSourceOverrideEnabled', None)
+                    resp = self.patch_request(self.root_uri + self.systems_uri, payload, check_pyld=True)
         if resp['ret'] and resp['changed']:
             resp['msg'] = 'Updated the boot override settings'
         return resp
@@ -2221,7 +2250,7 @@ class RedfishUtils(object):
         return resources, headers
 
     @staticmethod
-    def _insert_virt_media_payload(options, param_map, data, ai, image_only=False):
+    def _insert_virt_media_payload(options, param_map, data, ai):
         payload = {
             'Image': options.get('image_url')
         }
@@ -2235,12 +2264,6 @@ class RedfishUtils(object):
                                        options.get(option), option,
                                        allowable)}
                 payload[param] = options.get(option)
-
-        # Some hardware (such as iLO 4 or Supermicro) only supports the Image property
-        # Inserted and WriteProtected are not writable
-        if image_only:
-            del payload['Inserted']
-            del payload['WriteProtected']
         return payload
 
     def virtual_media_insert_via_patch(self, options, param_map, uri, data, image_only=False):
@@ -2249,12 +2272,22 @@ class RedfishUtils(object):
                    {'AllowableValues': v}) for k, v in data.items()
                   if k.endswith('@Redfish.AllowableValues'))
         # construct payload
-        payload = self._insert_virt_media_payload(options, param_map, data, ai, image_only)
+        payload = self._insert_virt_media_payload(options, param_map, data, ai)
         if 'Inserted' not in payload and not image_only:
+            # Add Inserted to the payload if needed
             payload['Inserted'] = True
 
         # PATCH the resource
         resp = self.patch_request(self.root_uri + uri, payload, check_pyld=True)
+        if resp['ret'] is False:
+            # WORKAROUND
+            # Older HPE systems with iLO 4 and Supermicro do not support
+            # specifying Inserted or WriteProtected
+            vendor = self._get_vendor()['Vendor']
+            if vendor == 'HPE' or vendor == 'Supermicro':
+                payload.pop('Inserted', None)
+                payload.pop('WriteProtected', None)
+                resp = self.patch_request(self.root_uri + uri, payload, check_pyld=True)
         if resp['ret'] and resp['changed']:
             resp['msg'] = 'VirtualMedia inserted'
         return resp
@@ -2268,7 +2301,6 @@ class RedfishUtils(object):
             'TransferProtocolType': 'transfer_protocol_type',
             'TransferMethod': 'transfer_method'
         }
-        image_only = False
         image_url = options.get('image_url')
         if not image_url:
             return {'ret': False,
@@ -2287,18 +2319,6 @@ class RedfishUtils(object):
         data = response['data']
         if 'VirtualMedia' not in data:
             return {'ret': False, 'msg': "VirtualMedia resource not found"}
-
-        # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
-        # Inserted and WriteProtected are not writable
-        if "FirmwareVersion" in data and data["FirmwareVersion"].startswith("iLO 4"):
-            image_only = True
-
-        # Supermicro does also not support Inserted and WriteProtected
-        # Supermicro uses as firmware version only a number so we can't check for it because we
-        # can't be sure that this firmware version is nut used by another vendor
-        # Tested with Supermicro Firmware 01.74.02
-        if 'Supermicro' in data['Oem']:
-            image_only = True
 
         virt_media_uri = data["VirtualMedia"]["@odata.id"]
         response = self.get_request(self.root_uri + virt_media_uri)
@@ -2343,7 +2363,7 @@ class RedfishUtils(object):
                             'msg': "%s action not found and PATCH not allowed"
                             % '#VirtualMedia.InsertMedia'}
             return self.virtual_media_insert_via_patch(options, param_map,
-                                                       uri, data, image_only)
+                                                       uri, data)
 
         # get the action property
         action = data['Actions']['#VirtualMedia.InsertMedia']
@@ -2355,9 +2375,18 @@ class RedfishUtils(object):
         # get ActionInfo or AllowableValues
         ai = self._get_all_action_info_values(action)
         # construct payload
-        payload = self._insert_virt_media_payload(options, param_map, data, ai, image_only)
+        payload = self._insert_virt_media_payload(options, param_map, data, ai)
         # POST to action
         response = self.post_request(self.root_uri + action_uri, payload)
+        if response['ret'] is False and ('Inserted' in payload or 'WriteProtected' in payload):
+            # WORKAROUND
+            # Older HPE systems with iLO 4 and Supermicro do not support
+            # specifying Inserted or WriteProtected
+            vendor = self._get_vendor()['Vendor']
+            if vendor == 'HPE' or vendor == 'Supermicro':
+                payload.pop('Inserted', None)
+                payload.pop('WriteProtected', None)
+                response = self.post_request(self.root_uri + action_uri, payload)
         if response['ret'] is False:
             return response
         return {'ret': True, 'changed': True, 'msg': "VirtualMedia inserted"}
@@ -2369,13 +2398,20 @@ class RedfishUtils(object):
             'Image': None
         }
 
-        # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
         # Inserted is not writable
         if image_only:
             del payload['Inserted']
 
         # PATCH resource
         resp = self.patch_request(self.root_uri + uri, payload, check_pyld=True)
+        if resp['ret'] is False and 'Inserted' in payload:
+            # WORKAROUND
+            # Older HPE systems with iLO 4 and Supermicro do not support
+            # specifying Inserted
+            vendor = self._get_vendor()['Vendor']
+            if vendor == 'HPE' or vendor == 'Supermicro':
+                payload.pop('Inserted', None)
+                resp = self.patch_request(self.root_uri + uri, payload, check_pyld=True)
         if resp['ret'] and resp['changed']:
             resp['msg'] = 'VirtualMedia ejected'
         return resp
@@ -2398,15 +2434,6 @@ class RedfishUtils(object):
         data = response['data']
         if 'VirtualMedia' not in data:
             return {'ret': False, 'msg': "VirtualMedia resource not found"}
-
-        # Some hardware (such as iLO 4) only supports the Image property on the PATCH operation
-        # Inserted is not writable
-        image_only = False
-        if "FirmwareVersion" in data and data["FirmwareVersion"].startswith("iLO 4"):
-            image_only = True
-
-        if 'Supermicro' in data['Oem']:
-            image_only = True
 
         virt_media_uri = data["VirtualMedia"]["@odata.id"]
         response = self.get_request(self.root_uri + virt_media_uri)
@@ -2432,7 +2459,7 @@ class RedfishUtils(object):
                         return {'ret': False,
                                 'msg': "%s action not found and PATCH not allowed"
                                        % '#VirtualMedia.EjectMedia'}
-                return self.virtual_media_eject_via_patch(uri, image_only)
+                return self.virtual_media_eject_via_patch(uri)
             else:
                 # POST to the EjectMedia Action
                 action = data['Actions']['#VirtualMedia.EjectMedia']
