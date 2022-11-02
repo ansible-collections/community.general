@@ -1,2 +1,0 @@
-bugfixes:
-  - "proxmox_kvm - fix exception when no ``agent`` argument is specified (https://github.com/ansible-collections/community.general/pull/5194)."

@@ -1,2 +1,0 @@
-minor_changes:
-  - pacman - added parameters ``reason`` and ``reason_for`` to set/change the install reason of packages (https://github.com/ansible-collections/community.general/pull/4956).

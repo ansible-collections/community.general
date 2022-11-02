@@ -1,2 +1,0 @@
-minor_changes:
-  - opentelemetry callback plugin - send logs. This can be disabled by setting ``disable_logs=false`` (https://github.com/ansible-collections/community.general/pull/4175).

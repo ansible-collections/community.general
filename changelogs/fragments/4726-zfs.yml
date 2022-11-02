@@ -1,2 +1,0 @@
-bugfixes:
-  - "zfs - fix wrong quoting of properties (https://github.com/ansible-collections/community.general/issues/4707, https://github.com/ansible-collections/community.general/pull/4726)."

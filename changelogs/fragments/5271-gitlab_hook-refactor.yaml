@@ -1,2 +1,0 @@
-minor_changes:
-  - gitlab_hook - minor refactoring (https://github.com/ansible-collections/community.general/pull/5271).
