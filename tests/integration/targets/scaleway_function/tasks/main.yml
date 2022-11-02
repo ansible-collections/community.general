@@ -157,7 +157,7 @@
     region: '{{ scaleway_region }}'
     namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
     runtime: '{{ runtime }}'
-    description: '{{ description }}'
+    description: '{{ updated_description }}'
     environment_variables: '{{ environment_variables }}'
     secret_environment_variables: '{{ updated_secret_environment_variables }}'
   register: fn_update_secret_check_task
@@ -178,7 +178,7 @@
     region: '{{ scaleway_region }}'
     namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
     runtime: '{{ runtime }}'
-    description: '{{ description }}'
+    description: '{{ updated_description }}'
     environment_variables: '{{ environment_variables }}'
     secret_environment_variables: '{{ updated_secret_environment_variables }}'
   register: fn_update_secret_task
@@ -192,7 +192,7 @@
       - fn_update_secret_task is success
       - fn_update_secret_task is changed
       - fn_update_secret_task.function.status in ["created", "ready"]
-      - "'hashed_value' in fn_creation_task.function.secret_environment_variables[0]"
+      - "'hashed_value' in fn_update_secret_task.function.secret_environment_variables[0]"
 
 - name: Update function secret variables (Confirmation)
   community.general.scaleway_function:
@@ -201,7 +201,7 @@
     region: '{{ scaleway_region }}'
     namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
     runtime: '{{ runtime }}'
-    description: '{{ description }}'
+    description: '{{ updated_description }}'
     environment_variables: '{{ environment_variables }}'
     secret_environment_variables: '{{ updated_secret_environment_variables }}'
   register: fn_update_secret_confirmation_task
@@ -215,7 +215,7 @@
       - fn_update_secret_confirmation_task is success
       - fn_update_secret_confirmation_task is not changed
       - fn_update_secret_confirmation_task.function.status in ["created", "ready"]
-      - "'hashed_value' in fn_creation_task.function.secret_environment_variables[0]"
+      - "'hashed_value' in fn_update_secret_confirmation_task.function.secret_environment_variables[0]"
 
 - name: Delete function (Check)
   check_mode: yes
