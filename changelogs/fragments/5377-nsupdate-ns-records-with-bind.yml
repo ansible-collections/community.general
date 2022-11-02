@@ -1,0 +1,2 @@
+bugfixes:
+  - nsupdate - fix silent failures when updating ``NS`` entries from Bind9 managed DNS zones (https://github.com/ansible-collections/community.general/issues/4657).
