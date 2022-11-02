@@ -1,0 +1,2 @@
+bugfixes:
+  - redfish_utils module utils - centralize payload checking when performing modification requests to a Redfish service (https://github.com/ansible-collections/community.general/issues/5210/).
