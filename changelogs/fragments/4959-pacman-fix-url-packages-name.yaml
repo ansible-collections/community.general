@@ -1,2 +1,0 @@
-bugfixes:
-  - pacman - fixed name resolution of URL packages (https://github.com/ansible-collections/community.general/pull/4959).

@@ -1,2 +1,0 @@
-minor_changes:
-  - bitwarden lookup plugin - add option ``search`` to search for other attributes than name (https://github.com/ansible-collections/community.general/pull/5297).
