@@ -68,6 +68,7 @@ options:
       - Environment variables of the function namespace.
       - Injected in functions at runtime.
     type: dict
+    default: {}
 
   secret_environment_variables:
     description:
@@ -75,6 +76,7 @@ options:
       - Updating thoses values will not output a C(changed) state in Ansible.
       - Injected in functions at runtime.
     type: dict
+    default: {}
 '''
 
 EXAMPLES = '''
