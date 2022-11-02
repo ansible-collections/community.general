@@ -78,7 +78,7 @@ class LdapGeneric(object):
                 dns = self.connection.search_s(','.join(explode_dn[1:]),
                                                ldap.SCOPE_ONELEVEL, "(%s)" % explode_dn[0])
                 if len(dns) == 1:
-                    dn, _ = dns[0]
+                    dn, dummy = dns[0]
             except Exception:
                 pass
 
