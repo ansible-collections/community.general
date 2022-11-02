@@ -245,6 +245,8 @@ state_strategy = {
 
 
 def core(module):
+    SecretVariables.ensure_scaleway_secret_package(module)
+
     region = module.params["region"]
     wished_container_namespace = {
         "state": module.params["state"],
