@@ -64,6 +64,10 @@ ansible-galaxy collection install community.general:==X.Y.Z
 
 See [Ansible Using collections](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html) for more details.
 
+### FQCNs for modules and actions
+
+⚠️ The collection uses a similar directory structure for modules as the Ansible repository used for Ansible 2.9 and before. This directory structure was never exposed to the user. Due to changes in community.general 5.0.0 (using `meta/runtime.yml` redirects instead of symbolic links) some tooling started exposing the internal module names to end-users. These **internal names**, like `community.general.system.ufw` for the UFW firewall managing module, do work, but should be avoided since they are treated as an implementation detail that can change at any time, even in bugfix releases. Always use the three-component FQCN form, for example `community.general.ufw` for the UFW module. ⚠️
+
 ## Contributing to this collection
 
 The content of this collection is made by good people just like you, a community of individuals collaborating on making the world better through developing automation software.
