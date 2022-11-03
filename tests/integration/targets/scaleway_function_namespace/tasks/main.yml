@@ -145,7 +145,7 @@
     name: '{{ name }}'
     region: '{{ scaleway_region }}'
     project_id: '{{ scw_project }}'
-    description: '{{ description }}'
+    description: '{{ updated_description }}'
     environment_variables: '{{ environment_variables }}'
     secret_environment_variables: '{{ updated_secret_environment_variables }}'
   register: fn_update_secret_check_task
@@ -165,7 +165,7 @@
     name: '{{ name }}'
     region: '{{ scaleway_region }}'
     project_id: '{{ scw_project }}'
-    description: '{{ description }}'
+    description: '{{ updated_description }}'
     environment_variables: '{{ environment_variables }}'
     secret_environment_variables: '{{ updated_secret_environment_variables }}'
   register: fn_update_secret_task
@@ -179,7 +179,7 @@
       - fn_update_secret_task is success
       - fn_update_secret_task is changed
       - fn_update_secret_task.function_namespace.status == "ready"
-      - "'hashed_value' in fn_creation_task.function_namespace.secret_environment_variables[0]"
+      - "'hashed_value' in fn_update_secret_task.function_namespace.secret_environment_variables[0]"
 
 - name: Update function namespace secret variables (Confirmation)
   community.general.scaleway_function_namespace:
@@ -187,7 +187,7 @@
     name: '{{ name }}'
     region: '{{ scaleway_region }}'
     project_id: '{{ scw_project }}'
-    description: '{{ description }}'
+    description: '{{ updated_description }}'
     environment_variables: '{{ environment_variables }}'
     secret_environment_variables: '{{ updated_secret_environment_variables }}'
   register: fn_update_secret_confirmation_task
@@ -201,7 +201,7 @@
       - fn_update_secret_confirmation_task is success
       - fn_update_secret_confirmation_task is not changed
       - fn_update_secret_confirmation_task.function_namespace.status == "ready"
-      - "'hashed_value' in fn_creation_task.function_namespace.secret_environment_variables[0]"
+      - "'hashed_value' in fn_update_secret_confirmation_task.function_namespace.secret_environment_variables[0]"
 
 - name: Delete function namespace (Check)
   check_mode: yes
