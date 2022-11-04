@@ -8,7 +8,7 @@ __metaclass__ = type
 import os
 import json
 
-from ansible_collections.community.general.plugins.lookup.onepassword import (
+from ansible_collections.community.general.plugins.module_utils.onepassword import (
     OnePassCLIv1,
     OnePassCLIv2,
 )
