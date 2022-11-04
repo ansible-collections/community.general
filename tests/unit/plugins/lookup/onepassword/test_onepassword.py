@@ -152,7 +152,7 @@ def test_op_get_field(mocker, op_fixture, output, expected, request):
 
 
 # This test sometimes fails on older Python versions because the gathered tests mismatch.
-# Attempt to make this more reliable by creating deterministic IDs
+# Sort the fixture data to make this reliable
 # https://github.com/pytest-dev/pytest-xdist/issues/432
 @pytest.mark.parametrize(
     ("cli_class", "vault", "queries", "kwargs", "output", "expected"),
@@ -160,11 +160,7 @@ def test_op_get_field(mocker, op_fixture, output, expected, request):
         (_cli_class, item["vault_name"], item["queries"], item.get("kwargs", {}), item["output"], item["expected"])
         for _cli_class in MOCK_ENTRIES
         for item in MOCK_ENTRIES[_cli_class]
-    ),
-    ids=[
-        "v%s_%s" % (cls.supports_version, idx + 1) for cls in MOCK_ENTRIES
-        for idx, value in enumerate(MOCK_ENTRIES[cls])
-    ],
+    )
 )
 def test_op_lookup(mocker, cli_class, vault, queries, kwargs, output, expected):
     mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePass._get_cli_class", cli_class)
