@@ -1,0 +1,2 @@
+minor_changes:
+   - onepassword_info - support version 2 of the OnePassword CLI (https://github.com/ansible-collections/community.general/pull/5472)
