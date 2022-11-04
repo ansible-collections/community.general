@@ -108,7 +108,7 @@ options:
 
   handler:
     description:
-      - The module-name.export value in your function.
+      - The C(module-name.export) value in your function.
     type: str
 
   privacy:
