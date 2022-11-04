@@ -190,13 +190,19 @@ class OnePasswordInfo(object):
 
         self._config = OnePasswordConfig()
 
-    def _run(self, args, expected_rc=0, command_input=None, ignore_errors=False):
+    def _run(self, args, expected_rc=0, command_input=None, ignore_errors=False, environment_update=None):
         if self.token:
             # Adds the session token to all commands if we're logged in.
-            args += [to_bytes('--session=') + self.token]
+            args.extend([to_bytes("--session"), self.token])
+
+        extra_kwargs = {}
+        if environment_update:
+            env = os.environ.copy()
+            env.update(environment_update)
+            extra_kwargs = {"env": env}
 
         command = [self.cli_path] + args
-        p = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE)
+        p = Popen(command, stdout=PIPE, stderr=PIPE, stdin=PIPE, **extra_kwargs)
         out, err = p.communicate(input=command_input)
         rc = p.wait()
         if not ignore_errors and rc != expected_rc:
