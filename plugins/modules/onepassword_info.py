@@ -214,7 +214,7 @@ class OnePasswordInfo(object):
 
         if ('documentAttributes' in data['details']):
             # This is actually a document, let's fetch the document data instead!
-            document = self._run(["get", "document", data['overview']['title']])
+            document = self._run(["document", "get", data["overview"]["title"]])
             return {'document': document[1].strip()}
 
         else:
@@ -264,11 +264,15 @@ class OnePasswordInfo(object):
 
         return processed_terms
 
-    def get_raw(self, item_id, vault=None):
+    def get_raw(self, item_id, vault=None, token=None):
         try:
-            args = ["get", "item", item_id]
+            args = ["item", "get", item_id, "--format", "json"]
             if vault is not None:
-                args += ['--vault={0}'.format(vault)]
+                args.extend(["--vault", vault])
+
+            if token is not None:
+                args.extend(["--session", token])
+
             rc, output, dummy = self._run(args)
             return output
 
@@ -290,15 +294,15 @@ class OnePasswordInfo(object):
                                      'subdomain, username, secret_key, and master_password are required to perform initial sign in.')
 
             args = [
-                'signin',
-                '{0}.1password.com'.format(self.auto_login['subdomain']),
-                to_bytes(self.auto_login['username']),
-                to_bytes(self.auto_login['secret_key']),
-                '--output=raw',
+                "account", "add", "--raw",
+                "--address", "{0}.1password.com".format(self.auto_login["subdomain"]),
+                "--email", to_bytes(self.auto_login["username"]),
+                "--signin",
             ]
 
+            environment_update = {"OP_SECRET_KEY": self.auto_login["secret_key"]}
             try:
-                rc, out, err = self._run(args, command_input=to_bytes(self.auto_login['master_password']))
+                rc, out, err = self._run(args, command_input=to_bytes(self.auto_login['master_password']), environment_update=environment_update)
                 self.token = out.strip()
             except AnsibleModuleError as e:
                 module.fail_json(msg="Failed to perform initial sign in to 1Password: %s" % to_native(e))
@@ -318,10 +322,10 @@ class OnePasswordInfo(object):
 
                 # Try signing in using the master_password and a subdomain if one is provided
                 try:
-                    args = ['signin', '--output=raw']
+                    args = ["signin", "--raw"]
 
-                    if self.auto_login.get('subdomain'):
-                        args = ['signin', self.auto_login['subdomain'], '--output=raw']
+                    if self.auto_login.get("subdomain"):
+                        args.extend(["--account", self.auto_login["subdomain"]])
 
                     rc, out, err = self._run(args, command_input=to_bytes(self.auto_login['master_password']))
                     self.token = out.strip()
@@ -338,7 +342,7 @@ class OnePasswordInfo(object):
 
     def assert_logged_in(self):
         try:
-            rc, out, err = self._run(['get', 'account'], ignore_errors=True)
+            rc, out, err = self._run(["account", "list"], ignore_errors=True)
             if rc == 0:
                 self.logged_in = True
             if not self.logged_in:
