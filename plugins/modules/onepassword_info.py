@@ -19,7 +19,8 @@ author:
 requirements:
     - C(op) 1Password command line utility. See U(https://support.1password.com/command-line/)
 notes:
-    - Tested with C(op) version 0.5.5
+    - Only supports C(op) version 2 and later
+    - Tested with C(op) version 2.7.1
     - "Based on the C(onepassword) lookup plugin by Scott Buchanan <sbuchanan@ri.pn>."
 short_description: Gather items from 1Password
 description:
