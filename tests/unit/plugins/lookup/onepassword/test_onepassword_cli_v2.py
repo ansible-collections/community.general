@@ -8,7 +8,7 @@ __metaclass__ = type
 import pytest
 
 
-from ansible_collections.community.general.plugins.module_utils.onepassword import OnePassCLIv2
+from ansible_collections.community.general.plugins.lookup.onepassword import OnePassCLIv2
 
 
 @pytest.mark.parametrize(

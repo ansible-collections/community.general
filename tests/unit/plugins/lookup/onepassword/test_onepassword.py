@@ -14,7 +14,7 @@ from .common import MOCK_ENTRIES
 
 from ansible.errors import AnsibleLookupError
 from ansible.plugins.loader import lookup_loader
-from ansible_collections.community.general.plugins.module_utils.onepassword import (
+from ansible_collections.community.general.plugins.lookup.onepassword import (
     OnePassCLIv1,
     OnePassCLIv2,
 )
