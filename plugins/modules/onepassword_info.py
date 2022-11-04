@@ -212,35 +212,40 @@ class OnePasswordInfo(object):
     def _parse_field(self, data_json, item_id, field_name, section_title=None):
         data = json.loads(data_json)
 
-        if ('documentAttributes' in data['details']):
+        if data.get("category").lower() == "document":
             # This is actually a document, let's fetch the document data instead!
-            document = self._run(["document", "get", data["overview"]["title"]])
+            # Use 'id' since items can have duplicate names
+            document = self._run(["document", "get", data["id"]])
             return {'document': document[1].strip()}
 
         else:
-            # This is not a document, let's try to find the requested field
-
-            # Some types of 1Password items have a 'password' field directly alongside the 'fields' attribute,
-            # not inside it, so we need to check there first.
-            if (field_name in data['details']):
-                return {field_name: data['details'][field_name]}
-
-            # Otherwise we continue looking inside the 'fields' attribute for the specified field.
-            else:
+            for field in data.get("fields", []):
+                # This is not a document, let's try to find the requested field
                 if section_title is None:
-                    for field_data in data['details'].get('fields', []):
-                        if field_data.get('name', '').lower() == field_name.lower():
-                            return {field_name: field_data.get('value', '')}
+                    # If the field name exists in the section, return that value
+                    if field.get(field_name):
+                        return field.get(field_name)
 
-                # Not found it yet, so now lets see if there are any sections defined
-                # and search through those for the field. If a section was given, we skip
-                # any non-matching sections, otherwise we search them all until we find the field.
-                for section_data in data['details'].get('sections', []):
-                    if section_title is not None and section_title.lower() != section_data['title'].lower():
-                        continue
-                    for field_data in section_data.get('fields', []):
-                        if field_data.get('t', '').lower() == field_name.lower():
-                            return {field_name: field_data.get('v', '')}
+                    # If the field name doesn't exist in the section, match on the value of "label"
+                    # then "id" and return "value"
+                    if field.get("label") == field_name:
+                        return field["value"]
+
+                    if field.get("id") == field_name:
+                        return field["value"]
+
+                # Look at the section data and get an indentifier. The value of 'id' is either a unique ID
+                # or a human-readable string. If a 'label' field exists, prefer that since
+                # it is the value visible in the 1Password UI when both 'id' and 'label' exist.
+                section = field.get("section", {})
+                current_section_title = section.get("label", section.get("id"))
+                if section_title == current_section_title:
+                    # In the correct section. Check "label" then "id" for the desired field_name
+                    if field.get("label") == field_name:
+                        return field["value"]
+
+                    if field.get("id") == field_name:
+                        return field["value"]
 
         # We will get here if the field could not be found in any section and the item wasn't a document to be downloaded.
         optional_section_title = '' if section_title is None else " in the section '%s'" % section_title
