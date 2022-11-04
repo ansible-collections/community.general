@@ -1,0 +1,3 @@
+major_changes:
+  - The community.general 3.x.y release stream is now effectively **End of Life**.
+    No more releases will be made, and regular CI runs will stop.
