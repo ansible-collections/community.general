@@ -55,7 +55,7 @@ DOCUMENTATION = '''
       - This lookup stores potentially sensitive data from 1Password as Ansible facts.
         Facts are subject to caching if enabled, which means this data could be stored in clear text
         on disk or in a database.
-      - Tested with C(op) version 2.7.0
+      - Tested with C(op) version 2.7.2
 '''
 
 EXAMPLES = """
@@ -457,13 +457,18 @@ class OnePassCLIv2(OnePassCLIBase):
                 if field.get("id") == field_name:
                     return field["value"]
 
-            # Match on the section name.
-            # TODO: This returns t
-            if field.get("section", {}).get("label") == field_name:
-                return field["value"]
+            # Look at the section data and get an indentifier. The value of 'id' is either a unique ID
+            # or a human-readable string. If a 'label' field exists, prefer that since
+            # it is the value visible in the 1Password UI when both 'id' and 'label' exist.
+            section = field.get("section", {})
+            current_section_title = section.get("label", section.get("id"))
+            if section_title == current_section_title:
+                # In the correct section. Check "label" then "id" for the desired field_name
+                if field.get("label") == field_name:
+                    return field["value"]
 
-            if field.get("section", {}).get("id") == field_name:
-                return field["value"]
+                if field.get("id") == field_name:
+                    return field["value"]
 
         return ""
 

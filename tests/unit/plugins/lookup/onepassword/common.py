@@ -70,5 +70,16 @@ MOCK_ENTRIES = {
             "expected": ["data in custom field"],
             "output": load_file("v2_out_02.json")
         },
+        {
+            # Request data from a custom section
+            "vault_name": "Test Vault",
+            "queries": ["Duplicate Sections"],
+            "kwargs": {
+                "field": "s2 text",
+                "section": "Section 2",
+            },
+            "expected": ["first value"],
+            "output": load_file("v2_out_03.json")
+        },
     ],
 }
