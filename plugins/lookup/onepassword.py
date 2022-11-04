@@ -210,7 +210,6 @@ class OnePassCLIBase(with_metaclass(abc.ABCMeta, object)):
 
 
 class OnePassCLIv1(OnePassCLIBase):
-    # TODO: Should supports_version be a tuple?
     supports_version = "1"
 
     def _parse_field(self, data_json, field_name, section_title):
@@ -320,7 +319,7 @@ class OnePassCLIv1(OnePassCLIBase):
             args += ["--vault={0}".format(vault)]
 
         if token is not None:
-            args += [to_bytes("--session=") + token]  # FIXME: Why is only this bytes?
+            args += [to_bytes("--session=") + token]
 
         return self._run(args)
 
@@ -519,7 +518,7 @@ class OnePassCLIv2(OnePassCLIBase):
         if vault is not None:
             args += ["--vault={0}".format(vault)]
         if token is not None:
-            args += [to_bytes("--session=") + token]  # FIXME: Why is only this bytes?
+            args += [to_bytes("--session=") + token]
 
         return self._run(args)
 
@@ -548,7 +547,6 @@ class OnePass(object):
         self._cli = self._get_cli_class()
 
     def _get_cli_class(self):
-        # TODO: When we get a new op version, warn but use the latest class
         version = OnePassCLIBase.get_current_version()
         for cls in OnePassCLIBase.__subclasses__():
             if cls.supports_version == version.split(".")[0]:
