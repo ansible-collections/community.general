@@ -179,6 +179,7 @@ Bugfixes
 - filesystem - improve error messages when output cannot be parsed by including newlines in escaped form (https://github.com/ansible-collections/community.general/pull/4700).
 - funcd connection plugin - fix signature of ``exec_command`` (https://github.com/ansible-collections/community.general/pull/5111).
 - ini_file - minor refactor fixing a python lint error (https://github.com/ansible-collections/community.general/pull/5307).
+- iso_create plugin - iso_create doesn't add folers (https://github.com/ansible-collections/community.general/pull/5468).
 - keycloak_realm - fix default groups and roles (https://github.com/ansible-collections/community.general/issues/4241).
 - keyring_info - fix the result from the keyring library never getting returned (https://github.com/ansible-collections/community.general/pull/4964).
 - ldap_attrs - fix ordering issue by ignoring the ``{x}`` prefix on attribute values (https://github.com/ansible-collections/community.general/issues/977, https://github.com/ansible-collections/community.general/pull/5385).
