@@ -1,34 +1,34 @@
 .azure-pipelines/scripts/publish-codecov.py replace-urlopen
-plugins/modules/lxc_container.py validate-modules:use-run-command-not-popen
-plugins/modules/lxd_project.py use-argspec-type-path # expanduser() applied to constants
-plugins/modules/rhevm.py validate-modules:parameter-state-invalid-choice
-plugins/modules/rax.py use-argspec-type-path # fix needed
-plugins/modules/rax_files.py validate-modules:parameter-state-invalid-choice
-plugins/modules/rax_files_objects.py use-argspec-type-path
-plugins/modules/rax_scaling_group.py use-argspec-type-path  # fix needed, expanduser() applied to dict values
-plugins/modules/scaleway_organization_info.py validate-modules:return-syntax-error
-plugins/modules/spotinst_aws_elastigroup.py validate-modules:parameter-list-no-elements
-plugins/modules/spotinst_aws_elastigroup.py validate-modules:parameter-type-not-in-doc
-plugins/modules/spotinst_aws_elastigroup.py validate-modules:undocumented-parameter
-plugins/modules/udm_share.py validate-modules:parameter-list-no-elements
-plugins/modules/udm_user.py validate-modules:parameter-list-no-elements
 plugins/modules/consul.py validate-modules:doc-missing-type
 plugins/modules/consul.py validate-modules:undocumented-parameter
 plugins/modules/consul_session.py validate-modules:parameter-state-invalid-choice
-plugins/modules/yarn.py use-argspec-type-path
-plugins/modules/redhat_subscription.py validate-modules:return-syntax-error
+plugins/modules/gconftool2.py validate-modules:parameter-state-invalid-choice
+plugins/modules/iptables_state.py validate-modules:undocumented-parameter
+plugins/modules/jenkins_plugin.py use-argspec-type-path
+plugins/modules/lxc_container.py validate-modules:use-run-command-not-popen
+plugins/modules/lxd_project.py use-argspec-type-path # expanduser() applied to constants
 plugins/modules/manageiq_policies.py validate-modules:parameter-state-invalid-choice
 plugins/modules/manageiq_provider.py validate-modules:doc-choices-do-not-match-spec   # missing docs on suboptions
 plugins/modules/manageiq_provider.py validate-modules:doc-missing-type                # missing docs on suboptions
 plugins/modules/manageiq_provider.py validate-modules:parameter-type-not-in-doc       # missing docs on suboptions
 plugins/modules/manageiq_provider.py validate-modules:undocumented-parameter          # missing docs on suboptions
 plugins/modules/manageiq_tags.py validate-modules:parameter-state-invalid-choice
-plugins/modules/gconftool2.py validate-modules:parameter-state-invalid-choice
-plugins/modules/iptables_state.py validate-modules:undocumented-parameter
 plugins/modules/osx_defaults.py validate-modules:parameter-state-invalid-choice
 plugins/modules/parted.py validate-modules:parameter-state-invalid-choice
 plugins/modules/puppet.py use-argspec-type-path
 plugins/modules/puppet.py validate-modules:parameter-invalid  # invalid alias - removed in 7.0.0
+plugins/modules/rax_files_objects.py use-argspec-type-path
+plugins/modules/rax_files.py validate-modules:parameter-state-invalid-choice
+plugins/modules/rax.py use-argspec-type-path # fix needed
+plugins/modules/rax_scaling_group.py use-argspec-type-path  # fix needed, expanduser() applied to dict values
+plugins/modules/redhat_subscription.py validate-modules:return-syntax-error
+plugins/modules/rhevm.py validate-modules:parameter-state-invalid-choice
+plugins/modules/scaleway_organization_info.py validate-modules:return-syntax-error
+plugins/modules/spotinst_aws_elastigroup.py validate-modules:parameter-list-no-elements
+plugins/modules/spotinst_aws_elastigroup.py validate-modules:parameter-type-not-in-doc
+plugins/modules/spotinst_aws_elastigroup.py validate-modules:undocumented-parameter
 plugins/modules/ssh_config.py use-argspec-type-path # Required since module uses other methods to specify path
+plugins/modules/udm_share.py validate-modules:parameter-list-no-elements
+plugins/modules/udm_user.py validate-modules:parameter-list-no-elements
 plugins/modules/xfconf.py validate-modules:return-syntax-error
-plugins/modules/jenkins_plugin.py use-argspec-type-path
+plugins/modules/yarn.py use-argspec-type-path
