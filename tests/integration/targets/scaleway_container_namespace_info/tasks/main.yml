@@ -1,0 +1,41 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2022, Guillaume MARTINEZ <lunik@tiwabbit.fr>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create container_namespace
+  community.general.scaleway_container_namespace:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    project_id: '{{ scw_project }}'
+    description: '{{ description }}'
+
+- name: Get container namespace info
+  community.general.scaleway_container_namespace_info:
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    project_id: '{{ scw_project }}'
+  register: cn_info_task
+
+- ansible.builtin.debug:
+    var: cn_info_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cn_info_task is success
+      - cn_info_task is not changed
+
+- name: Delete container namespace
+  community.general.scaleway_container_namespace:
+    state: absent
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    description: '{{ description }}'
+    project_id: '{{ scw_project }}'
