@@ -16,6 +16,10 @@ short_description: Gather facts about ZFS datasets.
 description:
   - Gather facts from ZFS dataset properties.
 author: Adam Števko (@xen0l)
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.facts
+  - community.general.attributes.facts_module
 options:
     name:
         description:

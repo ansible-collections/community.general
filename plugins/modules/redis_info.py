@@ -16,6 +16,9 @@ short_description: Gather information about Redis servers
 version_added: '0.2.0'
 description:
 - Gathers information and statistics about Redis servers.
+extends_documentation_fragment:
+- community.general.attributes
+- community.general.attributes.info_module
 options:
   login_host:
     description:

@@ -18,6 +18,9 @@ description:
     - This module was called C(smartos_image_facts) before Ansible 2.9, returning C(ansible_facts).
       Note that the M(community.general.smartos_image_info) module no longer returns C(ansible_facts)!
 author: Adam Števko (@xen0l)
+extends_documentation_fragment:
+    - community.general.attributes
+    - community.general.attributes.info_module
 options:
     filters:
         description:

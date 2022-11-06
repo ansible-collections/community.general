@@ -18,7 +18,9 @@ description:
 author:
   - "Remy Leone (@remyleone)"
 extends_documentation_fragment:
-- community.general.online
+  - community.general.online
+  - community.general.attributes
+  - community.general.attributes.info_module
 
 '''
 

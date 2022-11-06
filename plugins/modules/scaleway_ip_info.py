@@ -18,7 +18,9 @@ author:
   - "Yanis Guenane (@Spredzy)"
   - "Remy Leone (@remyleone)"
 extends_documentation_fragment:
-- community.general.scaleway
+  - community.general.scaleway
+  - community.general.attributes
+  - community.general.attributes.info_module
 
 options:
   region:

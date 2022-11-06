@@ -16,6 +16,9 @@ short_description: Rretrieves information about applications installed with pipx
 version_added: 5.6.0
 description:
     - Retrieve details about Python applications installed in isolated virtualenvs using pipx.
+extends_documentation_fragment:
+    - community.general.attributes
+    - community.general.attributes.info_module
 options:
     name:
         description:

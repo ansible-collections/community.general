@@ -41,6 +41,8 @@ options:
 extends_documentation_fragment:
   - community.general.rundeck
   - url
+  - community.general.attributes
+  - community.general.attributes.info_module
 '''
 
 EXAMPLES = '''

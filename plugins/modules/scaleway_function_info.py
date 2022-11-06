@@ -21,7 +21,8 @@ description:
   - This module return information about a function on Scaleway account.
 extends_documentation_fragment:
   - community.general.scaleway
-
+  - community.general.attributes
+  - community.general.attributes.info_module
 
 options:
   namespace_id:
