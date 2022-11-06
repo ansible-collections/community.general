@@ -20,6 +20,10 @@ description:
       inserted to the ansible_facts key.
 requirements:
     - pysnmp
+extends_documentation_fragment:
+    - community.general.attributes
+    - community.general.attributes.facts
+    - community.general.attributes.facts_module
 options:
     host:
         description:

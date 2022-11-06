@@ -60,6 +60,8 @@ requirements:
     - "footmark >= 1.13.0"
 extends_documentation_fragment:
     - community.general.alicloud
+    - community.general.attributes
+    - community.general.attributes.info_module
 '''
 
 EXAMPLES = '''

@@ -15,6 +15,10 @@ short_description: Retrieve facts of cloud-init.
 description:
   - Gathers facts by reading the status.json and result.json of cloud-init.
 author: René Moser (@resmo)
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.facts
+  - community.general.attributes.facts_module
 options:
   filter:
     description:
