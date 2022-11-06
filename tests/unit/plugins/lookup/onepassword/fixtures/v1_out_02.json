@@ -1,0 +1,18 @@
+{
+    "uuid": "9876543210",
+    "vaultUuid": "1357",
+    "overview": {
+        "title": "Mock Website",
+        "URLs": [
+            {"l": "website", "u": "https://acme.com/login"}
+        ]
+    },
+    "details": {
+        "sections": [{
+            "title": "",
+            "fields": [
+                {"t": "password", "v": "t0pS3cret"}
+            ]
+        }]
+    }
+}
