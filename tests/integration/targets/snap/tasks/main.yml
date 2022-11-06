@@ -8,7 +8,9 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- block:
+- name: Has-snap block
+  when: has_snap
+  block:
     - name: Make sure package is not installed (hello-world)
       community.general.snap:
         name: hello-world
@@ -189,5 +191,3 @@
           - "'uhttpd:document-root-dir=/tmp' in install_with_option_changed.options_changed"
           - "'uhttpd:listening-port=8080' not in install_with_option_changed.options_changed"
           - remove is changed
-
-  when: has_snap
