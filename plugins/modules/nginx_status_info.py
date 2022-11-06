@@ -16,6 +16,9 @@ short_description: Retrieve information on nginx status.
 description:
   - Gathers information from nginx from an URL having C(stub_status) enabled.
 author: "René Moser (@resmo)"
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.info_module
 options:
   url:
     type: str

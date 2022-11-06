@@ -16,9 +16,13 @@ short_description: get facts reported on xenserver
 description:
   - Reads data out of XenAPI, can be used instead of multiple xe commands.
 author:
-    - Andy Hill (@andyhky)
-    - Tim Rupp (@caphrim007)
-    - Robin Lee (@cheese)
+  - Andy Hill (@andyhky)
+  - Tim Rupp (@caphrim007)
+  - Robin Lee (@cheese)
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.facts
+  - community.general.attributes.facts_module
 options: {}
 '''
 

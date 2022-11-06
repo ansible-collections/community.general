@@ -17,6 +17,9 @@ description:
   - This module was called C(github_webhook_facts) before Ansible 2.9. The usage did not change.
 requirements:
   - "PyGithub >= 1.3.5"
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.info_module
 options:
   repository:
     description:

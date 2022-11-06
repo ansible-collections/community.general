@@ -17,6 +17,9 @@ description:
   - This module was called C(one_image_facts) before Ansible 2.9. The usage did not change.
 requirements:
   - pyone
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.info_module
 options:
   api_url:
     description:

@@ -21,7 +21,8 @@ description:
   - This module return information about a container registry on Scaleway account.
 extends_documentation_fragment:
   - community.general.scaleway
-
+  - community.general.attributes
+  - community.general.attributes.info_module
 
 options:
   project_id:

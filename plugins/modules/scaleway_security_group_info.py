@@ -33,7 +33,9 @@ options:
       - waw1
       - EMEA-PL-WAW1
 extends_documentation_fragment:
-- community.general.scaleway
+  - community.general.scaleway
+  - community.general.attributes
+  - community.general.attributes.info_module
 
 '''
 
