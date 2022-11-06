@@ -83,13 +83,6 @@ def parse_pagination_link(header):
         return parsed_relations
 
 
-def filter_sensitive_attributes(container, attributes):
-    for attr in attributes:
-        container[attr] = "SENSITIVE_VALUE"
-
-    return container
-
-
 class SecretVariables(object):
     @staticmethod
     def ensure_scaleway_secret_package(module):

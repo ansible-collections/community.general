@@ -80,20 +80,17 @@ function:
     region: fr-par
     runtime: python310
     runtime_message: ""
-    secret_environment_variables: SENSITIVE_VALUE
+    secret_environment_variables:
+      - key: MY_SECRET_VAR
+        value: $argon2id$v=19$m=65536,t=1,p=2$tb6UwSPWx/rH5Vyxt9Ujfw$5ZlvaIjWwNDPxD9Rdght3NarJz4IETKjpvAU3mMSmFg
     status: created
     timeout: 300s
 '''
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
-    SCALEWAY_ENDPOINT, SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
-    filter_sensitive_attributes
+    SCALEWAY_ENDPOINT, SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway
 )
 from ansible.module_utils.basic import AnsibleModule
-
-SENSITIVE_ATTRIBUTES = (
-    "secret_environment_variables",
-)
 
 
 def info_strategy(api, wished_fn):
@@ -131,7 +128,7 @@ def core(module):
 
     summary = info_strategy(api=api, wished_fn=wished_function)
 
-    module.exit_json(changed=False, function=filter_sensitive_attributes(summary, SENSITIVE_ATTRIBUTES))
+    module.exit_json(changed=False, function=summary)
 
 
 def main():

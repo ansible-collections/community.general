@@ -79,14 +79,9 @@ container_registry:
 '''
 
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
-    SCALEWAY_ENDPOINT, SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway,
-    filter_sensitive_attributes
+    SCALEWAY_ENDPOINT, SCALEWAY_REGIONS, scaleway_argument_spec, Scaleway
 )
 from ansible.module_utils.basic import AnsibleModule
-
-SENSITIVE_ATTRIBUTES = (
-    "secret_environment_variables",
-)
 
 
 def info_strategy(api, wished_cn):
@@ -124,7 +119,7 @@ def core(module):
 
     summary = info_strategy(api=api, wished_cn=wished_container_namespace)
 
-    module.exit_json(changed=False, container_registry=filter_sensitive_attributes(summary, SENSITIVE_ATTRIBUTES))
+    module.exit_json(changed=False, container_registry=summary)
 
 
 def main():
