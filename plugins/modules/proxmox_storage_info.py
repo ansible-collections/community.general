@@ -27,7 +27,10 @@ options:
       - Filter on a specifc storage type.
     type: str
 author: Tristan Le Guern (@tleguern)
-extends_documentation_fragment: community.general.proxmox.documentation
+extends_documentation_fragment:
+  - community.general.proxmox.documentation
+  - community.general.attributes
+  - community.general.attributes.info_module
 notes:
   - Storage specific options can be returned by this module, please look at the documentation at U(https://pve.proxmox.com/wiki/Storage).
 '''

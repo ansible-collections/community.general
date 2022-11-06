@@ -14,6 +14,9 @@ module: pip_package_info
 short_description: pip package information
 description:
   - Return information about installed pip packages
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.info_module
 options:
   clients:
     description:
@@ -24,7 +27,7 @@ options:
     type: list
     elements: path
 requirements:
-    - The requested pip executables must be installed on the target.
+  - The requested pip executables must be installed on the target.
 author:
   - Matthew Jones (@matburt)
   - Brian Coca (@bcoca)

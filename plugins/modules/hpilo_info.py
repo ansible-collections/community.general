@@ -21,6 +21,9 @@ description:
 - This module requires the C(hpilo) python module.
 - This module was called C(hpilo_facts) before Ansible 2.9, returning C(ansible_facts).
   Note that the M(community.general.hpilo_info) module no longer returns C(ansible_facts)!
+extends_documentation_fragment:
+- community.general.attributes
+- community.general.attributes.info_module
 options:
   host:
     description:

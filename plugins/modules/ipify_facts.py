@@ -17,6 +17,10 @@ description:
   - If behind NAT and need to know the public IP of your internet gateway.
 author:
 - René Moser (@resmo)
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.facts
+  - community.general.attributes.facts_module
 options:
   api_url:
     description:

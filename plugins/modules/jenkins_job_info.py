@@ -18,6 +18,9 @@ description:
   - This module was called C(jenkins_job_info) before Ansible 2.9. The usage did not change.
 requirements:
   - "python-jenkins >= 0.4.12"
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.info_module
 options:
   name:
     type: str

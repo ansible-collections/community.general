@@ -23,7 +23,10 @@ options:
     aliases: ['realm', 'name']
     type: str
 author: Tristan Le Guern (@tleguern)
-extends_documentation_fragment: community.general.proxmox.documentation
+extends_documentation_fragment:
+  - community.general.proxmox.documentation
+  - community.general.attributes
+  - community.general.attributes.info_module
 '''
 
 

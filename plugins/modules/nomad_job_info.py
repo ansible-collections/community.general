@@ -21,6 +21,8 @@ requirements:
   - python-nomad
 extends_documentation_fragment:
   - community.general.nomad
+  - community.general.attributes
+  - community.general.attributes.info_module
 options:
     name:
       description:

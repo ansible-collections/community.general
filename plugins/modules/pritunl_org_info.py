@@ -18,6 +18,8 @@ description:
     - A module to list Pritunl organizations using the Pritunl API.
 extends_documentation_fragment:
     - community.general.pritunl
+    - community.general.attributes
+    - community.general.attributes.info_module
 options:
     organization:
         type: str

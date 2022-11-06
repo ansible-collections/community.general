@@ -19,6 +19,9 @@ notes:
 description:
     - Retrieve server information.
     - This module was called C(memset_server_facts) before Ansible 2.9. The usage did not change.
+extends_documentation_fragment:
+    - community.general.attributes
+    - community.general.attributes.info_module
 options:
     api_key:
         required: true

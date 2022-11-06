@@ -47,7 +47,8 @@ options:
     type: str
 extends_documentation_fragment:
 - community.general.xenserver.documentation
-
+- community.general.attributes
+- community.general.attributes.info_module
 '''
 
 EXAMPLES = r'''

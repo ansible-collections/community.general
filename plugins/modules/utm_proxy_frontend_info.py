@@ -31,8 +31,9 @@ options:
         required: true
 
 extends_documentation_fragment:
-- community.general.utm
-
+    - community.general.utm
+    - community.general.attributes
+    - community.general.attributes.info_module
 '''
 
 EXAMPLES = """
