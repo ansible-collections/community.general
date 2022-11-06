@@ -1,0 +1,4 @@
+release_summary: |-
+  Bugfix release.
+
+  Note that from now on, community.general 4.x.y only receives security fixes and major bugfixes, but no longer regular bugfixes.
