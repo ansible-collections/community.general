@@ -1978,6 +1978,21 @@ releases:
     - 3626-fix-one_image-error.yml
     - 3649-proxmox_group_info_TypeError.yml
     release_date: '2021-11-02'
+  3.8.10:
+    changes:
+      bugfixes:
+      - xenserver_facts - fix broken ``AnsibleModule`` call that prevented the module
+        from working at all (https://github.com/ansible-collections/community.general/pull/5383).
+      major_changes:
+      - The community.general 3.x.y release stream is now effectively **End of Life**.
+        No more releases will be made, and regular CI runs will stop.
+      release_summary: Final maintenance release of community.general major version
+        3.
+    fragments:
+    - 3.8.10.yml
+    - 5383-xenserver_facts.yml
+    - eol.yml
+    release_date: '2022-11-06'
   3.8.2:
     changes:
       bugfixes:

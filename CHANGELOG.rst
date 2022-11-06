@@ -6,6 +6,24 @@ Community General Release Notes
 
 This changelog describes changes after version 2.0.0.
 
+v3.8.10
+=======
+
+Release Summary
+---------------
+
+Final maintenance release of community.general major version 3.
+
+Major Changes
+-------------
+
+- The community.general 3.x.y release stream is now effectively **End of Life**. No more releases will be made, and regular CI runs will stop.
+
+Bugfixes
+--------
+
+- xenserver_facts - fix broken ``AnsibleModule`` call that prevented the module from working at all (https://github.com/ansible-collections/community.general/pull/5383).
+
 v3.8.9
 ======
 
