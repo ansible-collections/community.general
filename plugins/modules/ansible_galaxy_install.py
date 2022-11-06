@@ -184,10 +184,11 @@ RETURN = """
 
 import re
 
-from ansible_collections.community.general.plugins.module_utils.module_helper import CmdModuleHelper, ArgFormat
+from ansible_collections.community.general.plugins.module_utils.cmd_runner import CmdRunner, cmd_runner_fmt as fmt
+from ansible_collections.community.general.plugins.module_utils.module_helper import ModuleHelper
 
 
-class AnsibleGalaxyInstall(CmdModuleHelper):
+class AnsibleGalaxyInstall(ModuleHelper):
     _RE_GALAXY_VERSION = re.compile(r'^ansible-galaxy(?: \[core)? (?P<version>\d+\.\d+\.\d+)(?:\.\w+)?(?:\])?')
     _RE_LIST_PATH = re.compile(r'^# (?P<path>.*)$')
     _RE_LIST_COLL = re.compile(r'^(?P<elem>\w+\.\w+)\s+(?P<version>[\d\.]+)\s*$')
@@ -216,28 +217,33 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
 
     command = 'ansible-galaxy'
     command_args_formats = dict(
-        type=dict(fmt=lambda v: [] if v == 'both' else [v]),
-        galaxy_cmd=dict(),
-        requirements_file=dict(fmt=('-r', '{0}'),),
-        dest=dict(fmt=('-p', '{0}'),),
-        force=dict(fmt="--force", style=ArgFormat.BOOLEAN),
-        no_deps=dict(fmt="--no-deps", style=ArgFormat.BOOLEAN),
+        type=fmt.as_func(lambda v: [] if v == 'both' else [v]),
+        galaxy_cmd=fmt.as_list(),
+        requirements_file=fmt.as_opt_val('-r'),
+        dest=fmt.as_opt_val('-p'),
+        force=fmt.as_bool("--force"),
+        no_deps=fmt.as_bool("--no-deps"),
+        version=fmt.as_bool("--version"),
+        name=fmt.as_list(),
     )
     force_lang = "en_US.UTF-8"
     check_rc = True
 
     def _get_ansible_galaxy_version(self):
-        ansible_galaxy = self.get_bin_path("ansible-galaxy", required=True)
-        dummy, out, dummy = self.module.run_command([ansible_galaxy, "--version"], check_rc=True)
-        line = out.splitlines()[0]
-        match = self._RE_GALAXY_VERSION.match(line)
-        if not match:
-            raise RuntimeError("Unable to determine ansible-galaxy version from: {0}".format(line))
-        version = match.group("version")
-        version = tuple(int(x) for x in version.split('.')[:3])
-        return version
+        def process(rc, out, err):
+            line = out.splitlines()[0]
+            match = self._RE_GALAXY_VERSION.match(line)
+            if not match:
+                self.do_raise("Unable to determine ansible-galaxy version from: {0}".format(line))
+            version = match.group("version")
+            version = tuple(int(x) for x in version.split('.')[:3])
+            return version
+
+        with self.runner("version", check_rc=True, output_process=process) as ctx:
+            return ctx.run(version=True)
 
     def __init_module__(self):
+        self.runner = CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=self.force_lang)
         self.ansible_version = self._get_ansible_galaxy_version()
         if self.ansible_version < (2, 11) and not self.vars.ack_min_ansiblecore211:
             self.module.deprecate(
@@ -260,18 +266,13 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
                                                  r'|- (?P<role>\w+\.\w+) \((?P<rversion>[\d\.]+)\))'
                                                  r' was installed successfully$')
 
-    @staticmethod
-    def _process_output_list(*args):
-        if "None of the provided paths were usable" in args[1]:
-            return []
-        return args[1].splitlines()
-
     def _list_element(self, _type, path_re, elem_re):
-        params = ({'type': _type}, {'galaxy_cmd': 'list'}, 'dest')
-        elems = self.run_command(params=params,
-                                 publish_rc=False, publish_out=False, publish_err=False, publish_cmd=False,
-                                 process_output=self._process_output_list,
-                                 check_rc=False)
+        def process(rc, out, err):
+            return [] if "None of the provided paths were usable" in out else out.splitlines()
+
+        with self.runner('type galaxy_cmd dest', output_process=process, check_rc=False) as ctx:
+            elems = ctx.run(type=_type, galaxy_cmd='list')
+
         elems_dict = {}
         current_path = None
         for line in elems:
@@ -316,28 +317,28 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
             self.vars.installed_collections = self._list_collections()
 
     def __run__(self):
+        def process(rc, out, err):
+            for line in out.splitlines():
+                match = self._RE_INSTALL_OUTPUT.match(line)
+                if not match:
+                    continue
+                if match.group("collection"):
+                    self.vars.new_collections[match.group("collection")] = match.group("cversion")
+                    if self.is_ansible29:
+                        self.vars.ansible29_change = True
+                elif match.group("role"):
+                    self.vars.new_roles[match.group("role")] = match.group("rversion")
+                    if self.is_ansible29:
+                        self.vars.ansible29_change = True
+
         if self.is_ansible29:
             if self.vars.type == 'both':
                 raise ValueError("Type 'both' not supported in Ansible 2.9")
             self._setup29()
         else:
             self._setup210plus()
-        params = ('type', {'galaxy_cmd': 'install'}, 'force', 'no_deps', 'dest', 'requirements_file', 'name')
-        self.run_command(params=params)
-
-    def process_command_output(self, rc, out, err):
-        for line in out.splitlines():
-            match = self._RE_INSTALL_OUTPUT.match(line)
-            if not match:
-                continue
-            if match.group("collection"):
-                self.vars.new_collections[match.group("collection")] = match.group("cversion")
-                if self.is_ansible29:
-                    self.vars.ansible29_change = True
-            elif match.group("role"):
-                self.vars.new_roles[match.group("role")] = match.group("rversion")
-                if self.is_ansible29:
-                    self.vars.ansible29_change = True
+        with self.runner("type galaxy_cmd force no_deps dest requirements_file name", output_process=process) as ctx:
+            ctx.run(galaxy_cmd="install")
 
 
 def main():
