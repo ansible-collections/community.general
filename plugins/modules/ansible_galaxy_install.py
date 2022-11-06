@@ -242,7 +242,6 @@ class AnsibleGalaxyInstall(ModuleHelper):
         with self.runner("version", check_rc=True, output_process=process) as ctx:
             return ctx.run(version=True)
 
-
     def __init_module__(self):
         self.runner = CmdRunner(self.module, command=self.command, arg_formats=self.command_args_formats, force_lang=self.force_lang)
         self.ansible_version = self._get_ansible_galaxy_version()
@@ -340,6 +339,7 @@ class AnsibleGalaxyInstall(ModuleHelper):
             self._setup210plus()
         with self.runner("type galaxy_cmd force no_deps dest requirements_file name", output_process=process) as ctx:
             ctx.run(galaxy_cmd="install")
+
 
 def main():
     galaxy = AnsibleGalaxyInstall()
