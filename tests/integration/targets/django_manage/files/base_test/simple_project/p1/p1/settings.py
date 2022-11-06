@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -17,6 +18,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -126,3 +128,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = '/tmp/django-static'
+
+if "DJANGO_ANSIBLE_RAISE" in os.environ:
+    raise ValueError("DJANGO_ANSIBLE_RAISE={0}".format(os.environ["DJANGO_ANSIBLE_RAISE"]))
