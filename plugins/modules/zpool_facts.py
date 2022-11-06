@@ -16,6 +16,10 @@ short_description: Gather facts about ZFS pools.
 description:
   - Gather facts from ZFS pool properties.
 author: Adam Števko (@xen0l)
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.facts
+  - community.general.attributes.facts_module
 options:
     name:
         description:

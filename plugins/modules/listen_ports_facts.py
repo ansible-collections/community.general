@@ -23,6 +23,10 @@ notes:
   - |
     C(ss) returns all processes for each listen address and port.
     This plugin will return each of them, so multiple entries for the same listen address and port are likely in results.
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.facts
+  - community.general.attributes.facts_module
 options:
   command:
     description:

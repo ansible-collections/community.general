@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 module: rax_facts
 short_description: Gather facts for Rackspace Cloud Servers
 description:
-     - Gather facts for Rackspace Cloud Servers.
+  - Gather facts for Rackspace Cloud Servers.
 options:
   address:
     type: str
@@ -30,7 +30,10 @@ options:
       - Server name to retrieve facts for
 author: "Matt Martz (@sivel)"
 extends_documentation_fragment:
-- community.general.rackspace.openstack
+  - community.general.rackspace.openstack
+  - community.general.attributes
+  - community.general.attributes.facts
+  - community.general.attributes.facts_module
 
 '''
 

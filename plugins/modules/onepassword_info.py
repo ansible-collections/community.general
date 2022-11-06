@@ -29,6 +29,9 @@ description:
     - This module was called C(onepassword_facts) before Ansible 2.9, returning C(ansible_facts).
       Note that the M(community.general.onepassword_info) module no longer returns C(ansible_facts)!
       You must now use the C(register) option to use the facts in other tasks.
+extends_documentation_fragment:
+    - community.general.attributes
+    - community.general.attributes.info_module
 options:
     search_terms:
         type: list

@@ -36,7 +36,9 @@ options:
            - C(sort): The sort order of the returned data set."
       type: dict
 extends_documentation_fragment:
-- community.general.oneview
+  - community.general.oneview
+  - community.general.attributes
+  - community.general.attributes.info_module
 
 '''
 

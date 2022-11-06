@@ -16,6 +16,10 @@ short_description: "Retrieve IP geolocation facts of a host's IP address"
 description:
   - "Gather IP geolocation facts of a host's IP address using ipinfo.io API"
 author: "Aleksei Kostiuk (@akostyuk)"
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.facts
+  - community.general.attributes.facts_module
 options:
   timeout:
     description:
