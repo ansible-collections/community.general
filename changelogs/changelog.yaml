@@ -1979,3 +1979,23 @@ releases:
     - 5383-xenserver_facts.yml
     - 5393-archive.yml
     release_date: '2022-10-24'
+  4.8.9:
+    changes:
+      bugfixes:
+      - ldap_attrs - fix bug which caused a ``Bad search filter`` error. The error
+        was occuring when the ldap attribute value contained special characters such
+        as ``(`` or ``*`` (https://github.com/ansible-collections/community.general/issues/5434,
+        https://github.com/ansible-collections/community.general/pull/5435).
+      - ldap_attrs - fix ordering issue by ignoring the ``{x}`` prefix on attribute
+        values (https://github.com/ansible-collections/community.general/issues/977,
+        https://github.com/ansible-collections/community.general/pull/5385).
+      release_summary: 'Bugfix release.
+
+
+        Note that from now on, community.general 4.x.y only receives security fixes
+        and major bugfixes, but no longer regular bugfixes.'
+    fragments:
+    - 4.8.9.yml
+    - 5385-search_s-based-_is_value_present.yaml
+    - 5435-escape-ldap-param.yml
+    release_date: '2022-11-06'

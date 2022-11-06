@@ -6,6 +6,22 @@ Community General Release Notes
 
 This changelog describes changes after version 3.0.0.
 
+v4.8.9
+======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Note that from now on, community.general 4.x.y only receives security fixes and major bugfixes, but no longer regular bugfixes.
+
+Bugfixes
+--------
+
+- ldap_attrs - fix bug which caused a ``Bad search filter`` error. The error was occuring when the ldap attribute value contained special characters such as ``(`` or ``*`` (https://github.com/ansible-collections/community.general/issues/5434, https://github.com/ansible-collections/community.general/pull/5435).
+- ldap_attrs - fix ordering issue by ignoring the ``{x}`` prefix on attribute values (https://github.com/ansible-collections/community.general/issues/977, https://github.com/ansible-collections/community.general/pull/5385).
+
 v4.8.8
 ======
 
