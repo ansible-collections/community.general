@@ -1,0 +1,20 @@
+{
+    "uuid": "864201357",
+    "vaultUuid": "1357",
+    "overview": {
+        "title": "Mock Something"
+    },
+    "details": {
+        "fields": [
+            {
+                "value": "jbond@mi6.gov.uk",
+                "name": "emailAddress"
+            },
+            {
+                "name": "password",
+                "value": "vauxhall"
+            },
+            {}
+        ]
+    }
+}
