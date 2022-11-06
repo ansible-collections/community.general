@@ -170,7 +170,7 @@ def _state_map(value):
 
 class Snap(CmdStateModuleHelper):
     __disable_re = re.compile(r'(?:\S+\s+){5}(?P<notes>\S+)')
-    __set_param_re = re.compile(r'(?P<snap_prefix>\S+:)?(?P<key>\S+)=(?P<value>\S+)')
+    __set_param_re = re.compile(r'(?P<snap_prefix>\S+:)?(?P<key>\S+)\s*=\s*(?P<value>.+)')
     module = dict(
         argument_spec={
             'name': dict(type='list', elements='str', required=True),
@@ -342,7 +342,7 @@ class Snap(CmdStateModuleHelper):
 
                 if selected_snap_name is None or (snap_name is not None and snap_name == selected_snap_name):
                     key = match.group("key")
-                    value = match.group("value")
+                    value = match.group("value").strip()
 
                     if key not in option_map or key in option_map and option_map[key] != value:
                         option_without_prefix = key + "=" + value
