@@ -117,8 +117,8 @@ class SnapAlias(StateModuleHelper):
         return {n: self._get_aliases_for(n)} if n else self._get_aliases()
 
     def __init_module__(self):
-        self.vars.set("snap_aliases", self._aliases(), change=True, diff=True)
         self.runner = CmdRunner(self.module, "snap", self.command_args_formats, check_rc=False)
+        self.vars.set("snap_aliases", self._aliases(), change=True, diff=True)
 
     def __quit_module__(self):
         self.vars.snap_aliases = self._aliases()
