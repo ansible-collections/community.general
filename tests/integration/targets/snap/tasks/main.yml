@@ -191,3 +191,10 @@
           - "'uhttpd:document-root-dir=/tmp' in install_with_option_changed.options_changed"
           - "'uhttpd:listening-port=8080' not in install_with_option_changed.options_changed"
           - remove is changed
+
+    - name: Install two packages at the same time
+      community.general.snap:
+        name:
+          - hello-world
+          - uhttpd
+        state: present
