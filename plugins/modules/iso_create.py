@@ -188,9 +188,9 @@ def add_directory(module, iso_file=None, dir_path=None, rock_ridge=None, use_jol
     if rock_ridge:
         rr_name = os.path.basename(dir_path)
     if use_joliet:
-        joliet_path = iso_dir_path
+        joliet_path = dir_path
     if use_udf:
-        udf_path = iso_dir_path
+        udf_path = dir_path
     try:
         iso_file.add_directory(iso_path=iso_dir_path, rr_name=rr_name, joliet_path=joliet_path, udf_path=udf_path)
     except Exception as err:
@@ -254,7 +254,7 @@ def main():
         udf=use_udf
     )
     if not module.check_mode:
-        iso_file = pycdlib.PyCdlib()
+        iso_file = pycdlib.PyCdlib(always_consistent=True)
         iso_file.new(interchange_level=inter_level, vol_ident=volume_id, rock_ridge=rock_ridge, joliet=use_joliet, udf=use_udf)
 
         for src_file in src_file_list:
